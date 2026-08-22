@@ -176,7 +176,7 @@ class _ScreenNavigator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
+    return Material(
       color: AppColors.paper,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,12 +201,16 @@ class _ScreenNavigator extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 11),
-                    const Text(
-                      'BreatheFree',
-                      style: TextStyle(
-                        color: AppColors.deepTeal,
-                        fontSize: 23,
-                        fontWeight: FontWeight.w800,
+                    const Expanded(
+                      child: Text(
+                        'BreatheFree',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: AppColors.deepTeal,
+                          fontSize: 23,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ],
