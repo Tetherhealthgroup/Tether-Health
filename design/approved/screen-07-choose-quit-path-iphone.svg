@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="2796" viewBox="0 0 1290 2796">
+  <defs>
+    <linearGradient id="s7bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF8F0"/>
+      <stop offset="1" stop-color="#F5F2E8"/>
+    </linearGradient>
+    <linearGradient id="s7mint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E3F3EA"/>
+      <stop offset="1" stop-color="#BFE1D2"/>
+    </linearGradient>
+    <filter id="s7shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="16" stdDeviation="26" flood-color="#123C37" flood-opacity="0.11"/>
+    </filter>
+    <filter id="s7soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="11" stdDeviation="18" flood-color="#123C37" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="1290" height="2796" fill="url(#s7bg)"/>
+
+  <!-- iOS status bar -->
+  <g fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700">
+    <text x="74" y="76" font-size="36">9:41</text>
+    <g transform="translate(1056 43)">
+      <rect x="0" y="22" width="10" height="15" rx="3"/>
+      <rect x="16" y="17" width="10" height="20" rx="3"/>
+      <rect x="32" y="11" width="10" height="26" rx="3"/>
+      <rect x="48" y="5" width="10" height="32" rx="3"/>
+      <path d="M82 28c12-15 31-15 43 0l-7 7c-8-9-21-9-29 0zm10 10c6-7 16-7 22 0l-11 11z"/>
+      <rect x="143" y="9" width="61" height="32" rx="9" fill="none" stroke="#123C37" stroke-width="4"/>
+      <rect x="207" y="18" width="5" height="14" rx="2"/>
+      <rect x="149" y="15" width="45" height="20" rx="5"/>
+    </g>
+  </g>
+
+  <!-- Header -->
+  <g transform="translate(72 139)">
+    <circle cx="38" cy="38" r="36" fill="#FFFDF7" stroke="#C9D7D2" stroke-width="2"/>
+    <path d="M45 23L30 38l15 15" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="645" y="190" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="38">Build your plan</text>
+  <g transform="translate(1033 149)">
+    <rect width="185" height="64" rx="32" fill="#E6F1EA"/>
+    <text x="93" y="42" text-anchor="middle" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="1.5">1 OF 5</text>
+  </g>
+
+  <!-- Plan progress -->
+  <g transform="translate(72 278)">
+    <text x="0" y="0" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="3">QUIT PLAN</text>
+    <text x="1146" y="0" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25">20%</text>
+    <rect y="32" width="1146" height="16" rx="8" fill="#DCE6E0"/>
+    <rect y="32" width="229" height="16" rx="8" fill="#FF7D61"/>
+  </g>
+
+  <!-- Branching path illustration -->
+  <g transform="translate(645 548)">
+    <circle r="208" fill="none" stroke="#C5DED4" stroke-width="2"/>
+    <circle r="158" fill="url(#s7mint)"/>
+    <path d="M0 116V21C0-25-48-31-85-60M0 21C0-25 49-31 87-60M0-19V-105" fill="none" stroke="#123C37" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="0" cy="116" r="14" fill="#FF7D61"/>
+    <circle cx="-87" cy="-62" r="26" fill="#FFFDF7" stroke="#123C37" stroke-width="6"/>
+    <circle cx="0" cy="-108" r="26" fill="#FF7D61"/>
+    <circle cx="88" cy="-62" r="26" fill="#FFFDF7" stroke="#123C37" stroke-width="6"/>
+    <path d="M-10-108l8 8 15-20" fill="none" stroke="#FFFDF7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Main copy -->
+  <text x="72" y="815" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="28" letter-spacing="5">CHOOSE YOUR PATH</text>
+  <text x="72" y="929" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="79" letter-spacing="-3">
+    <tspan x="72" dy="0">What feels possible</tspan>
+    <tspan x="72" dy="91">right now?</tspan>
+  </text>
+  <text x="72" y="1138" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="38">There is no wrong place to start. Choose what fits you.</text>
+
+  <!-- Selected path -->
+  <g transform="translate(72 1230)" filter="url(#s7shadow)">
+    <rect width="1146" height="334" rx="36" fill="#DFF0E7" stroke="#FF7D61" stroke-width="4"/>
+    <circle cx="77" cy="77" r="36" fill="#FF7D61"/>
+    <circle cx="77" cy="77" r="13" fill="#FFFDF7"/>
+    <rect x="863" y="30" width="247" height="58" rx="29" fill="#123C37"/>
+    <text x="987" y="68" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24" letter-spacing="1.5">RECOMMENDED</text>
+    <text x="139" y="89" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="44">Set a quit date</text>
+    <text x="36" y="174" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="31">Prepare for 7–14 days, then stop completely on the</text>
+    <text x="36" y="219" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="31">date you choose. We’ll guide one small step each day.</text>
+    <g transform="translate(36 256)">
+      <circle cx="18" cy="18" r="18" fill="#FFFDF7"/>
+      <path d="M10 18l6 6 11-14" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="52" y="27" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="26">Matches your preparation preference</text>
+    </g>
+  </g>
+
+  <!-- Quit today path -->
+  <g transform="translate(72 1598)">
+    <rect width="1146" height="255" rx="34" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="77" cy="77" r="36" fill="#FFFDF7" stroke="#9EB1AB" stroke-width="4"/>
+    <circle cx="1005" cy="73" r="42" fill="#FFF0EB"/>
+    <path d="M1005 50v29l19 12" fill="none" stroke="#FF7D61" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="139" y="89" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="44">Quit today</text>
+    <text x="36" y="169" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="31">Begin your smoke-free time now and get extra support</text>
+    <text x="36" y="214" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="31">through the first day.</text>
+  </g>
+
+  <!-- Reduce path -->
+  <g transform="translate(72 1887)">
+    <rect width="1146" height="255" rx="34" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="77" cy="77" r="36" fill="#FFFDF7" stroke="#9EB1AB" stroke-width="4"/>
+    <circle cx="1005" cy="73" r="42" fill="#E4F2EA"/>
+    <path d="M978 51h54M986 68h38M994 85h22" fill="none" stroke="#123C37" stroke-width="6" stroke-linecap="round"/>
+    <text x="139" y="89" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="44">Reduce gradually</text>
+    <text x="36" y="169" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="31">Follow a step-down schedule and work toward stopping</text>
+    <text x="36" y="214" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="31">completely on a future date.</text>
+  </g>
+
+  <!-- Reassurance -->
+  <g transform="translate(72 2184)">
+    <circle cx="30" cy="30" r="30" fill="#E4F2EA"/>
+    <path d="M20 30l7 7 15-19" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="78" y="39" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="29">Your path is flexible. You can adjust it at any time.</text>
+  </g>
+
+  <!-- Action -->
+  <g transform="translate(72 2312)">
+    <rect width="1146" height="146" rx="30" fill="#123C37"/>
+    <text x="573" y="91" fill="#FFFFFF" text-anchor="middle" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="39">Continue with this path</text>
+    <path d="M1054 73h28m-11-11 11 11-11 11" fill="none" stroke="#D5EF75" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="645" y="2602" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">Set a quit date selected · Saved automatically</text>
+
+  <!-- iOS home indicator -->
+  <rect x="468" y="2738" width="354" height="16" rx="8" fill="#123C37"/>
+</svg>

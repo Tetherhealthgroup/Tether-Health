@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="2796" viewBox="0 0 1290 2796">
+  <defs>
+    <linearGradient id="s8bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF8F0"/>
+      <stop offset="1" stop-color="#F5F2E8"/>
+    </linearGradient>
+    <linearGradient id="s8mint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E7F5ED"/>
+      <stop offset="1" stop-color="#C5E5D7"/>
+    </linearGradient>
+    <filter id="s8shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="16" stdDeviation="26" flood-color="#123C37" flood-opacity="0.11"/>
+    </filter>
+  </defs>
+
+  <rect width="1290" height="2796" fill="url(#s8bg)"/>
+
+  <!-- iOS status bar -->
+  <g fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700">
+    <text x="74" y="76" font-size="36">9:41</text>
+    <g transform="translate(1056 43)">
+      <rect x="0" y="22" width="10" height="15" rx="3"/>
+      <rect x="16" y="17" width="10" height="20" rx="3"/>
+      <rect x="32" y="11" width="10" height="26" rx="3"/>
+      <rect x="48" y="5" width="10" height="32" rx="3"/>
+      <path d="M82 28c12-15 31-15 43 0l-7 7c-8-9-21-9-29 0zm10 10c6-7 16-7 22 0l-11 11z"/>
+      <rect x="143" y="9" width="61" height="32" rx="9" fill="none" stroke="#123C37" stroke-width="4"/>
+      <rect x="207" y="18" width="5" height="14" rx="2"/>
+      <rect x="149" y="15" width="45" height="20" rx="5"/>
+    </g>
+  </g>
+
+  <!-- Header -->
+  <g transform="translate(72 139)">
+    <circle cx="38" cy="38" r="36" fill="#FFFDF7" stroke="#C9D7D2" stroke-width="2"/>
+    <path d="M45 23L30 38l15 15" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="645" y="190" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="38">Choose your quit date</text>
+  <g transform="translate(1033 149)">
+    <rect width="185" height="64" rx="32" fill="#E6F1EA"/>
+    <text x="93" y="42" text-anchor="middle" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="1.5">2 OF 5</text>
+  </g>
+
+  <!-- Plan progress -->
+  <g transform="translate(72 278)">
+    <text x="0" y="0" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="3">QUIT PLAN</text>
+    <text x="1146" y="0" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25">40%</text>
+    <rect y="32" width="1146" height="16" rx="8" fill="#DCE6E0"/>
+    <rect y="32" width="458" height="16" rx="8" fill="#FF7D61"/>
+  </g>
+
+  <!-- Main copy -->
+  <text x="72" y="421" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="28" letter-spacing="5">YOUR DATE</text>
+  <text x="72" y="520" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="72" letter-spacing="-3">Choose a day to begin.</text>
+  <text x="72" y="596" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="34">A date 7–14 days away gives you time to prepare</text>
+  <text x="72" y="641" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="34">without losing momentum.</text>
+
+  <!-- Calendar -->
+  <g transform="translate(72 704)" filter="url(#s8shadow)">
+    <rect width="1146" height="884" rx="42" fill="#FFFDF7"/>
+
+    <g transform="translate(42 37)">
+      <circle cx="46" cy="46" r="43" fill="#F0F5F1"/>
+      <path d="M53 30L37 46l16 16" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="1018" cy="46" r="43" fill="#F0F5F1"/>
+      <path d="M1011 30l16 16-16 16" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="532" y="58" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="43">August 2026</text>
+    </g>
+
+    <g fill="#7A918B" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24" text-anchor="middle" letter-spacing="2">
+      <text x="80" y="174">S</text><text x="244" y="174">M</text><text x="408" y="174">T</text>
+      <text x="572" y="174">W</text><text x="736" y="174">T</text><text x="900" y="174">F</text><text x="1064" y="174">S</text>
+    </g>
+    <line x1="42" y1="207" x2="1104" y2="207" stroke="#E1E9E4" stroke-width="2"/>
+
+    <!-- Week one -->
+    <g fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-size="31" text-anchor="middle">
+      <text x="1064" y="269">1</text>
+      <text x="80" y="360">2</text><text x="244" y="360">3</text><text x="408" y="360">4</text><text x="572" y="360">5</text><text x="736" y="360">6</text><text x="900" y="360">7</text><text x="1064" y="360">8</text>
+      <text x="80" y="451">9</text><text x="244" y="451">10</text><text x="408" y="451">11</text><text x="572" y="451">12</text><text x="736" y="451">13</text><text x="900" y="451">14</text><text x="1064" y="451">15</text>
+      <text x="80" y="542">16</text><text x="244" y="542">17</text><text x="408" y="542">18</text><text x="572" y="542">19</text><text x="736" y="542">20</text>
+      <text x="1064" y="542">22</text>
+      <text x="80" y="633">23</text><text x="244" y="633">24</text><text x="408" y="633">25</text><text x="572" y="633">26</text><text x="736" y="633">27</text><text x="1064" y="633">29</text>
+      <text x="80" y="724">30</text><text x="244" y="724">31</text>
+    </g>
+
+    <!-- Today -->
+    <circle cx="900" cy="532" r="42" fill="#E4F2EA" stroke="#7FAF9C" stroke-width="3"/>
+    <text x="900" y="542" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="31">21</text>
+    <circle cx="900" cy="579" r="5" fill="#7FAF9C"/>
+
+    <!-- Selected quit date -->
+    <circle cx="900" cy="623" r="50" fill="#FF7D61"/>
+    <text x="900" y="634" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="34">28</text>
+
+    <line x1="42" y1="772" x2="1104" y2="772" stroke="#E1E9E4" stroke-width="2"/>
+    <g transform="translate(42 800)">
+      <rect width="1062" height="58" rx="29" fill="url(#s8mint)"/>
+      <circle cx="35" cy="29" r="16" fill="#123C37"/>
+      <path d="M27 29l6 6 11-14" fill="none" stroke="#D5EF75" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="66" y="39" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25">Recommended preparation window: Aug 28 – Sep 4</text>
+    </g>
+  </g>
+
+  <!-- Selected date summary -->
+  <g transform="translate(72 1622)">
+    <rect width="1146" height="246" rx="34" fill="#DFF0E7" stroke="#B9DCCB" stroke-width="3"/>
+    <g transform="translate(36 36)">
+      <rect width="132" height="142" rx="25" fill="#FFFDF7"/>
+      <rect width="132" height="40" rx="20" fill="#FF7D61"/>
+      <rect y="20" width="132" height="22" fill="#FF7D61"/>
+      <text x="66" y="29" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19" letter-spacing="2">AUG</text>
+      <text x="66" y="101" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="54">28</text>
+      <text x="66" y="129" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="18">FRIDAY</text>
+    </g>
+    <text x="205" y="65" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="23" letter-spacing="3">YOUR QUIT DATE</text>
+    <text x="205" y="117" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="38">Friday, August 28, 2026</text>
+    <text x="205" y="162" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="29">7 days to prepare</text>
+    <g transform="translate(886 172)">
+      <rect width="224" height="50" rx="25" fill="#123C37"/>
+      <text x="112" y="34" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="20" letter-spacing="1">RECOMMENDED</text>
+    </g>
+  </g>
+
+  <!-- Reminder -->
+  <g transform="translate(72 1902)">
+    <rect width="1146" height="264" rx="34" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="79" cy="76" r="40" fill="#FFF0EB"/>
+    <path d="M79 50v29l19 12" fill="none" stroke="#FF7D61" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="139" y="65" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="37">Quit-day check-in</text>
+    <text x="139" y="109" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="28">7:00 AM · Private notification</text>
+    <g transform="translate(951 52)">
+      <rect width="137" height="74" rx="37" fill="#123C37"/>
+      <circle cx="100" cy="37" r="29" fill="#FFFFFF"/>
+    </g>
+    <line x1="36" y1="151" x2="1110" y2="151" stroke="#E1E9E4" stroke-width="2"/>
+    <path d="M49 193h28v25H49zM55 193v-8c0-11 16-11 16 0v8" fill="none" stroke="#718A84" stroke-width="4" stroke-linecap="round"/>
+    <text x="98" y="207" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="24">Lock screen shows: “You have a check-in.”</text>
+  </g>
+
+  <!-- Reassurance -->
+  <g transform="translate(72 2209)">
+    <circle cx="30" cy="30" r="30" fill="#E4F2EA"/>
+    <path d="M20 30l7 7 15-19" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="78" y="39" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="29">You can change this date later without losing progress.</text>
+  </g>
+
+  <!-- Action -->
+  <g transform="translate(72 2320)">
+    <rect width="1146" height="146" rx="30" fill="#123C37"/>
+    <text x="573" y="91" fill="#FFFFFF" text-anchor="middle" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="39">Confirm this date</text>
+    <path d="M1054 73h28m-11-11 11 11-11 11" fill="none" stroke="#D5EF75" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="645" y="2587" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">Date and time use your current time zone · Pacific Time</text>
+  <text x="645" y="2632" text-anchor="middle" fill="#8BA09A" font-family="Nimbus Sans, Arial, sans-serif" font-size="23">Saved automatically</text>
+
+  <!-- iOS home indicator -->
+  <rect x="468" y="2738" width="354" height="16" rx="8" fill="#123C37"/>
+</svg>

@@ -1,0 +1,23 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Create generated platform runners
+        run: flutter create . --project-name breathefree_patient --org com.breathefree --platforms=android,web
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - run: flutter build web --release
+      - run: flutter build appbundle --debug

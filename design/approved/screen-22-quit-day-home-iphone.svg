@@ -1,0 +1,220 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="2796" viewBox="0 0 1290 2796">
+  <defs>
+    <linearGradient id="s22bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF8F0"/>
+      <stop offset="1" stop-color="#F5F2E8"/>
+    </linearGradient>
+    <linearGradient id="s22hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#123C37"/>
+      <stop offset="1" stop-color="#1D514A"/>
+    </linearGradient>
+    <linearGradient id="s22mint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E8F5ED"/>
+      <stop offset="1" stop-color="#C7E6D8"/>
+    </linearGradient>
+    <linearGradient id="s22coral" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF0EB"/>
+      <stop offset="1" stop-color="#FFE0D7"/>
+    </linearGradient>
+    <filter id="s22shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#123C37" flood-opacity="0.10"/>
+    </filter>
+    <filter id="s22navshadow" x="-20%" y="-60%" width="140%" height="200%">
+      <feDropShadow dx="0" dy="-10" stdDeviation="22" flood-color="#123C37" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="1290" height="2796" fill="url(#s22bg)"/>
+
+  <!-- iOS status bar -->
+  <g fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700">
+    <text x="74" y="76" font-size="36">9:41</text>
+    <g transform="translate(1056 43)">
+      <rect x="0" y="22" width="10" height="15" rx="3"/>
+      <rect x="16" y="17" width="10" height="20" rx="3"/>
+      <rect x="32" y="11" width="10" height="26" rx="3"/>
+      <rect x="48" y="5" width="10" height="32" rx="3"/>
+      <path d="M82 28c12-15 31-15 43 0l-7 7c-8-9-21-9-29 0zm10 10c6-7 16-7 22 0l-11 11z"/>
+      <rect x="143" y="9" width="61" height="32" rx="9" fill="none" stroke="#123C37" stroke-width="4"/>
+      <rect x="207" y="18" width="5" height="14" rx="2"/>
+      <rect x="149" y="15" width="45" height="20" rx="5"/>
+    </g>
+  </g>
+
+  <!-- Brand header -->
+  <g transform="translate(72 130)">
+    <circle cx="45" cy="45" r="45" fill="#123C37"/>
+    <path d="M28 50c2-26 28-34 48-31-2 22-15 40-38 38M35 60c12-18 24-25 40-34" fill="none" stroke="#D5EF75" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="111" y="57" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="43">BreatheFree</text>
+    <g transform="translate(843 7)">
+      <circle cx="38" cy="38" r="38" fill="#FFFDF7" stroke="#C9D7D2" stroke-width="2"/>
+      <path d="M26 47h24l-4-7V31c0-13-16-13-16 0v9zM34 53c2 6 8 6 10 0" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="58" cy="16" r="8" fill="#FF7D61"/>
+    </g>
+    <g transform="translate(955 0)">
+      <circle cx="45" cy="45" r="45" fill="url(#s22mint)" stroke="#B9DCCB" stroke-width="2"/>
+      <text x="45" y="58" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="39">A</text>
+    </g>
+  </g>
+
+  <!-- Quit-day greeting -->
+  <g transform="translate(72 288)">
+    <rect width="300" height="50" rx="25" fill="#FFF0EB" stroke="#FFC6B7" stroke-width="2"/>
+    <circle cx="27" cy="25" r="12" fill="#FF7D61"/>
+    <text x="169" y="34" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="20" letter-spacing="1.8">QUIT DAY · AUG 28</text>
+  </g>
+  <text x="72" y="410" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="62" letter-spacing="-2">Good morning, Alex.</text>
+  <text x="72" y="465" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="29">Keep today simple. One choice at a time.</text>
+
+  <!-- Quit-day focus hero -->
+  <g transform="translate(72 516)" filter="url(#s22shadow)">
+    <rect width="1146" height="650" rx="46" fill="url(#s22hero)"/>
+    <circle cx="954" cy="158" r="217" fill="#285850" opacity="0.73"/>
+    <circle cx="954" cy="158" r="158" fill="none" stroke="#6C9088" stroke-width="3"/>
+    <circle cx="954" cy="158" r="104" fill="#D5EF75"/>
+    <path d="M909 164c18-18 35-18 53 0s35 18 53 0" fill="none" stroke="#123C37" stroke-width="8" stroke-linecap="round"/>
+
+    <text x="42" y="62" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="22" letter-spacing="3">SINCE YOUR PLANNED QUIT TIME</text>
+    <text x="42" y="176" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="94" letter-spacing="-3">2h 41m</text>
+    <text x="42" y="226" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="27">Started at 7:00 AM · Pacific Time</text>
+
+    <!-- Primary craving action -->
+    <g transform="translate(24 294)">
+      <rect width="1098" height="190" rx="35" fill="url(#s22coral)" stroke="#FFC6B7" stroke-width="3"/>
+      <circle cx="87" cy="82" r="51" fill="#FF7D61"/>
+      <path d="M61 86c10-22 20-22 30 0s20 22 30 0" fill="none" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round"/>
+      <text x="160" y="75" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="42">I have a craving</text>
+      <text x="160" y="120" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="26">Open fast support for the next few minutes.</text>
+      <g transform="translate(829 56)">
+        <rect width="230" height="79" rx="40" fill="#FF7D61"/>
+        <text x="115" y="51" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="27">Open Rescue</text>
+      </g>
+      <text x="42" y="166" fill="#8B7770" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">One tap · No typing · Works offline</text>
+    </g>
+
+    <!-- Slip route -->
+    <g transform="translate(24 520)">
+      <rect width="1098" height="91" rx="28" fill="#234E48" stroke="#557D75" stroke-width="2"/>
+      <circle cx="47" cy="46" r="24" fill="#D5EF75"/>
+      <path d="M36 46h22" stroke="#123C37" stroke-width="4" stroke-linecap="round"/>
+      <text x="91" y="56" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25">I smoked or had a slip</text>
+      <text x="1041" y="56" text-anchor="end" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Your progress will not be erased</text>
+      <path d="M1057 37l11 11-11 11" fill="none" stroke="#D5EF75" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- One next-best action -->
+  <g transform="translate(72 1210)" filter="url(#s22shadow)">
+    <rect width="1146" height="264" rx="39" fill="url(#s22mint)" stroke="#B9DCCB" stroke-width="3"/>
+    <g transform="translate(35 30)">
+      <rect width="237" height="52" rx="26" fill="#123C37"/>
+      <circle cx="27" cy="26" r="13" fill="#D5EF75"/>
+      <path d="M22 26h10M27 21v10" stroke="#123C37" stroke-width="2" stroke-linecap="round"/>
+      <text x="140" y="35" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="18" letter-spacing="1">NEXT BEST STEP</text>
+    </g>
+    <text x="35" y="132" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="36">Take your planned morning action</text>
+    <text x="35" y="176" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">Drink water, then walk for five minutes in a smoke-free place.</text>
+    <g transform="translate(861 153)">
+      <rect width="250" height="75" rx="37" fill="#123C37"/>
+      <text x="125" y="49" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25">Mark complete</text>
+    </g>
+    <text x="35" y="226" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">From your trigger plan · About 5 minutes</text>
+  </g>
+
+  <!-- Today essentials -->
+  <text x="72" y="1547" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="37">Today’s essentials</text>
+  <text x="1218" y="1547" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="22">2 items</text>
+
+  <g transform="translate(72 1581)" filter="url(#s22shadow)">
+    <rect width="1146" height="333" rx="39" fill="#FFFDF7"/>
+    <!-- Check-in -->
+    <g transform="translate(35 28)">
+      <circle cx="52" cy="52" r="43" fill="#E6F1EA"/>
+      <path d="M35 58c7-16 16-16 23 0s16 16 23 0" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round"/>
+      <text x="119" y="39" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19" letter-spacing="1.7">MORNING CHECK-IN</text>
+      <text x="119" y="78" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="28">How is your first morning going?</text>
+      <g transform="translate(880 18)">
+        <rect width="195" height="68" rx="34" fill="#E6F1EA"/>
+        <text x="98" y="44" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="23">Check in</text>
+      </g>
+    </g>
+    <line x1="35" y1="145" x2="1111" y2="145" stroke="#E1E9E4" stroke-width="2"/>
+    <!-- Medication plan -->
+    <g transform="translate(35 177)">
+      <circle cx="52" cy="52" r="43" fill="#FFF0EB"/>
+      <rect x="36" y="43" width="32" height="18" rx="9" fill="none" stroke="#FF7D61" stroke-width="4"/>
+      <path d="M52 43v18" stroke="#FF7D61" stroke-width="4"/>
+      <text x="119" y="39" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19" letter-spacing="1.7">RECORDED TREATMENT PLAN</text>
+      <text x="119" y="78" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="28">Confirm your morning plan status</text>
+      <g transform="translate(835 18)">
+        <rect width="240" height="68" rx="34" fill="#FFF0EB" stroke="#FFC6B7" stroke-width="2"/>
+        <text x="120" y="44" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="23">Review status</text>
+      </g>
+      <text x="119" y="111" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="19">Follow only the plan recorded with you or your care team.</text>
+    </g>
+  </g>
+
+  <!-- Personal reason and support -->
+  <g transform="translate(72 1957)" filter="url(#s22shadow)">
+    <rect width="1146" height="152" rx="35" fill="#FFFDF7"/>
+    <circle cx="70" cy="76" r="40" fill="#FFF0EB"/>
+    <path d="M70 97c-22-15-35-27-35-43 0-20 26-27 35-8 9-19 35-12 35 8 0 16-13 28-35 43z" fill="#FF7D61"/>
+    <text x="132" y="59" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19" letter-spacing="2">YOUR REASON TODAY</text>
+    <text x="132" y="105" fill="#123C37" font-family="Georgia, serif" font-style="italic" font-size="36">“Protect my family.”</text>
+    <text x="1098" y="86" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">From My Plan</text>
+  </g>
+
+  <g transform="translate(72 2151)" filter="url(#s22shadow)">
+    <rect width="1146" height="176" rx="35" fill="url(#s22coral)" stroke="#FFC6B7" stroke-width="2"/>
+    <circle cx="73" cy="74" r="42" fill="#FF7D61"/>
+    <circle cx="73" cy="63" r="10" fill="none" stroke="#FFFFFF" stroke-width="4"/>
+    <path d="M54 91c3-15 35-15 38 0" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+    <text x="137" y="63" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="30">Jordan is part of your support plan</text>
+    <text x="137" y="103" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="23">Send your saved help phrase or contact a quitline counselor.</text>
+    <g transform="translate(870 52)">
+      <rect width="240" height="72" rx="36" fill="#FF7D61"/>
+      <text x="120" y="47" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24">View support</text>
+    </g>
+    <text x="35" y="151" fill="#8B7770" font-family="Nimbus Sans, Arial, sans-serif" font-size="19">Nothing is sent unless you choose it.</text>
+  </g>
+
+  <!-- Calm reassurance -->
+  <g transform="translate(72 2360)">
+    <circle cx="24" cy="24" r="24" fill="#E6F1EA"/>
+    <path d="M13 25c7-9 16-9 23 0M19 31c4-4 8-4 12 0" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round"/>
+    <text x="64" y="33" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="22">Today adapts to your answers. There is no perfect way to do this.</text>
+  </g>
+
+  <!-- Bottom navigation -->
+  <g transform="translate(0 2453)" filter="url(#s22navshadow)">
+    <path d="M0 32Q0 0 32 0h1226q32 0 32 32v311H0z" fill="#FFFDF7"/>
+    <line x1="0" y1="0" x2="1290" y2="0" stroke="#E2E9E5" stroke-width="2"/>
+
+    <g transform="translate(80 35)">
+      <rect width="154" height="102" rx="38" fill="#E6F1EA"/>
+      <path d="M49 54l28-25 28 25v31H85V65H69v20H49z" fill="none" stroke="#123C37" stroke-width="5" stroke-linejoin="round"/>
+      <text x="77" y="133" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="21">Home</text>
+    </g>
+    <g transform="translate(308 44)">
+      <rect x="36" y="4" width="54" height="69" rx="8" fill="none" stroke="#718A84" stroke-width="5"/>
+      <path d="M49 25h28M49 41h28M49 57h20" fill="none" stroke="#718A84" stroke-width="4" stroke-linecap="round"/>
+      <text x="63" y="124" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Plan</text>
+    </g>
+    <g transform="translate(542 44)">
+      <path d="M31 70V48M56 70V31M81 70V14" fill="none" stroke="#718A84" stroke-width="8" stroke-linecap="round"/>
+      <text x="56" y="124" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Progress</text>
+    </g>
+    <g transform="translate(780 44)">
+      <path d="M20 20c19-7 36-4 49 7v52c-13-11-30-14-49-7zM118 20c-19-7-36-4-49 7v52c13-11 30-14 49-7z" fill="none" stroke="#718A84" stroke-width="5" stroke-linejoin="round"/>
+      <text x="69" y="124" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Learn</text>
+    </g>
+    <g transform="translate(1030 44)">
+      <circle cx="54" cy="29" r="17" fill="none" stroke="#718A84" stroke-width="5"/>
+      <path d="M23 78c5-28 57-28 62 0M89 28h25v20H101l-9 9v-9h-3z" fill="none" stroke="#718A84" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="69" y="124" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Support</text>
+    </g>
+  </g>
+
+  <!-- iOS home indicator -->
+  <rect x="468" y="2738" width="354" height="16" rx="8" fill="#123C37"/>
+</svg>

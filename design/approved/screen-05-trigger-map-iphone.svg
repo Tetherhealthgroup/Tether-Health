@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="2796" viewBox="0 0 1290 2796">
+  <defs>
+    <linearGradient id="s5bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF8F0"/>
+      <stop offset="1" stop-color="#F5F2E8"/>
+    </linearGradient>
+    <filter id="s5shadow" x="-25%" y="-30%" width="150%" height="180%">
+      <feDropShadow dx="0" dy="13" stdDeviation="21" flood-color="#123C37" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1290" height="2796" fill="url(#s5bg)"/>
+
+  <!-- iOS status bar -->
+  <g fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700">
+    <text x="74" y="76" font-size="36">9:41</text>
+    <g transform="translate(1056 43)">
+      <rect x="0" y="22" width="10" height="15" rx="3"/>
+      <rect x="16" y="17" width="10" height="20" rx="3"/>
+      <rect x="32" y="11" width="10" height="26" rx="3"/>
+      <rect x="48" y="5" width="10" height="32" rx="3"/>
+      <path d="M82 28c12-15 31-15 43 0l-7 7c-8-9-21-9-29 0zm10 10c6-7 16-7 22 0l-11 11z"/>
+      <rect x="143" y="9" width="61" height="32" rx="9" fill="none" stroke="#123C37" stroke-width="4"/>
+      <rect x="207" y="18" width="5" height="14" rx="2"/>
+      <rect x="149" y="15" width="45" height="20" rx="5"/>
+    </g>
+  </g>
+
+  <!-- Header -->
+  <g transform="translate(72 139)">
+    <circle cx="38" cy="38" r="36" fill="#FFFDF7" stroke="#C9D7D2" stroke-width="2"/>
+    <path d="M45 23L30 38l15 15" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="645" y="190" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="38">Your triggers</text>
+  <g transform="translate(1033 149)">
+    <rect width="185" height="64" rx="32" fill="#E6F1EA"/>
+    <text x="93" y="42" text-anchor="middle" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="1.5">6 OF 8</text>
+  </g>
+
+  <!-- Progress -->
+  <g transform="translate(72 278)">
+    <text x="0" y="0" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="3">ASSESSMENT</text>
+    <text x="1146" y="0" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25">75%</text>
+    <rect y="32" width="1146" height="16" rx="8" fill="#DCE6E0"/>
+    <rect y="32" width="860" height="16" rx="8" fill="#FF7D61"/>
+  </g>
+
+  <text x="72" y="443" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="28" letter-spacing="5">QUESTION 6 · CHOOSE ALL THAT APPLY</text>
+  <text x="72" y="558" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="71" letter-spacing="-2.7">
+    <tspan x="72" dy="0">When are you most likely</tspan>
+    <tspan x="72" dy="84">to want a cigarette?</tspan>
+  </text>
+  <text x="72" y="760" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="37">Choose every situation that feels true for you.</text>
+
+  <!-- Trigger grid: row 1 -->
+  <g transform="translate(72 851)" filter="url(#s5shadow)">
+    <rect width="553" height="144" rx="30" fill="#FFF0EB" stroke="#FF7D61" stroke-width="4"/>
+    <circle cx="66" cy="72" r="37" fill="#FF7D61"/>
+    <path d="M72 35L48 73h22L59 109l35-47H72z" fill="#FFFDF7"/>
+    <text x="126" y="84" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="34">Stress</text>
+    <circle cx="500" cy="36" r="19" fill="#FF7D61"/>
+    <path d="M491 36l7 7 12-15" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(665 851)">
+    <rect width="553" height="144" rx="30" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="66" cy="72" r="37" fill="#E4F2EA"/>
+    <path d="M51 44v56M45 44v20c0 10 12 10 12 0V44M81 44v56M81 44c16 3 18 29 0 35" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round"/>
+    <text x="126" y="84" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="34">After meals</text>
+  </g>
+
+  <!-- row 2 -->
+  <g transform="translate(72 1021)" filter="url(#s5shadow)">
+    <rect width="553" height="144" rx="30" fill="#FFF0EB" stroke="#FF7D61" stroke-width="4"/>
+    <circle cx="66" cy="72" r="37" fill="#FF7D61"/>
+    <path d="M39 78l8-20h39l9 20M34 78h67v19H34zM48 97v8M88 97v8" fill="none" stroke="#FFFDF7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="49" cy="82" r="5" fill="#FFFDF7"/><circle cx="86" cy="82" r="5" fill="#FFFDF7"/>
+    <text x="126" y="84" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="34">Driving</text>
+    <circle cx="500" cy="36" r="19" fill="#FF7D61"/>
+    <path d="M491 36l7 7 12-15" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(665 1021)">
+    <rect width="553" height="144" rx="30" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="66" cy="72" r="37" fill="#E4F2EA"/>
+    <path d="M42 58h42v38H42zM84 65h11c13 0 13 22 0 22H84M49 45c0-8 8-8 8-16M68 45c0-8 8-8 8-16" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="126" y="84" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="34">With coffee</text>
+  </g>
+
+  <!-- row 3 -->
+  <g transform="translate(72 1191)" filter="url(#s5shadow)">
+    <rect width="553" height="144" rx="30" fill="#FFF0EB" stroke="#FF7D61" stroke-width="4"/>
+    <circle cx="66" cy="72" r="37" fill="#FF7D61"/>
+    <circle cx="54" cy="57" r="12" fill="none" stroke="#FFFDF7" stroke-width="5"/>
+    <circle cx="82" cy="57" r="12" fill="none" stroke="#FFFDF7" stroke-width="5"/>
+    <path d="M35 98c1-18 11-28 25-28M72 70c15 0 25 10 26 28" fill="none" stroke="#FFFDF7" stroke-width="5" stroke-linecap="round"/>
+    <text x="126" y="84" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="34">Social settings</text>
+    <circle cx="500" cy="36" r="19" fill="#FF7D61"/>
+    <path d="M491 36l7 7 12-15" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(665 1191)" filter="url(#s5shadow)">
+    <rect width="553" height="144" rx="30" fill="#FFF0EB" stroke="#FF7D61" stroke-width="4"/>
+    <circle cx="66" cy="72" r="37" fill="#FF7D61"/>
+    <rect x="38" y="51" width="57" height="44" rx="4" fill="none" stroke="#FFFDF7" stroke-width="5"/>
+    <path d="M53 51V41h27v10M38 70h57" fill="none" stroke="#FFFDF7" stroke-width="5"/>
+    <text x="126" y="84" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="34">Work breaks</text>
+    <circle cx="500" cy="36" r="19" fill="#FF7D61"/>
+    <path d="M491 36l7 7 12-15" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- row 4 -->
+  <g transform="translate(72 1361)">
+    <rect width="553" height="144" rx="30" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="66" cy="72" r="37" fill="#E4F2EA"/>
+    <path d="M49 43h34l-5 34c-1 10-21 10-23 0zM66 85v15M51 101h30" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="126" y="84" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="34">Alcohol</text>
+  </g>
+  <g transform="translate(665 1361)">
+    <rect width="553" height="144" rx="30" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="66" cy="72" r="37" fill="#E4F2EA"/>
+    <circle cx="47" cy="72" r="6" fill="#123C37"/><circle cx="66" cy="72" r="6" fill="#123C37"/><circle cx="85" cy="72" r="6" fill="#123C37"/>
+    <text x="126" y="84" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="34">Boredom</text>
+  </g>
+
+  <!-- row 5 -->
+  <g transform="translate(72 1531)">
+    <rect width="553" height="144" rx="30" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="66" cy="72" r="37" fill="#E4F2EA"/>
+    <path d="M39 83h54M46 83a22 22 0 0 1 40 0M66 41v12M39 52l9 9M93 52l-9 9" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round"/>
+    <text x="126" y="84" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="34">Morning</text>
+  </g>
+  <g transform="translate(665 1531)">
+    <rect width="553" height="144" rx="30" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="66" cy="72" r="37" fill="#E4F2EA"/>
+    <path d="M77 40c-22 7-29 38-7 52 13 8 29 3 36-9-23 4-37-18-29-43z" fill="#123C37"/>
+    <text x="126" y="84" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="34">Before bed</text>
+  </g>
+
+  <!-- Custom trigger -->
+  <g transform="translate(72 1726)">
+    <rect width="1146" height="156" rx="30" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="70" cy="78" r="37" fill="#E4F2EA"/>
+    <path d="M70 57v42M49 78h42" fill="none" stroke="#123C37" stroke-width="6" stroke-linecap="round"/>
+    <text x="128" y="68" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24" letter-spacing="2">ADD YOUR OWN TRIGGER</text>
+    <text x="128" y="111" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-size="31">Type another situation...</text>
+  </g>
+
+  <!-- Privacy note -->
+  <g transform="translate(72 1924)">
+    <rect width="1146" height="208" rx="30" fill="#E4F1E9" stroke="#BDD8CC" stroke-width="2"/>
+    <circle cx="77" cy="104" r="40" fill="#FFFDF7"/>
+    <path d="M62 102V91c0-20 30-20 30 0v11M58 102h38v34H58z" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="145" y="82" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="32">Used to prepare, not to monitor</text>
+    <text x="145" y="128" fill="#5D7772" font-family="Nimbus Sans, Arial, sans-serif" font-size="28">Your choices shape coping tools and reminder timing.</text>
+    <text x="145" y="169" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">BreatheFree does not track your location in the background.</text>
+  </g>
+
+  <!-- Action -->
+  <g transform="translate(72 2266)">
+    <rect width="1146" height="146" rx="30" fill="#123C37"/>
+    <text x="573" y="91" fill="#FFFFFF" text-anchor="middle" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="39">Continue</text>
+    <path d="M1054 73h28m-11-11 11 11-11 11" fill="none" stroke="#D5EF75" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="645" y="2532" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">4 triggers selected · Saved automatically</text>
+
+  <!-- iOS home indicator -->
+  <rect x="468" y="2738" width="354" height="16" rx="8" fill="#123C37"/>
+</svg>
