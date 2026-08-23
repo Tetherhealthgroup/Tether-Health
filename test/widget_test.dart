@@ -66,6 +66,59 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Screen 1 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+
+      await tester.pumpWidget(
+        BreatheFreeApp(key: ValueKey(device.name)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-welcome-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display the functional welcome screen.',
+      );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      final accountAction = find.byKey(const ValueKey('welcome-sign-in'));
+      await tester.ensureVisible(accountAction);
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.getRect(accountAction).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep the account action reachable.',
+      );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should scroll without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
+  });
+
   testWidgets('laptop view exposes all screens and developer navigation',
       (tester) async {
     tester.view.physicalSize = const Size(1440, 1000);
