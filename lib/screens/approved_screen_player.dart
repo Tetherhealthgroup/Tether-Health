@@ -1,10 +1,15 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/screen_spec.dart';
 import '../models/tap_target.dart';
 import '../theme/app_colors.dart';
 import '../widgets/approved_screen_viewport.dart';
 import 'welcome_screen.dart';
+import 'why_breathefree_screen.dart';
 
 class ApprovedScreenPlayer extends StatefulWidget {
   const ApprovedScreenPlayer({
@@ -28,6 +33,47 @@ class ApprovedScreenPlayer extends StatefulWidget {
 
 class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _showHotspots = false;
+  WelcomeLanguage _language = WelcomeLanguage.english;
+
+  @override
+  void initState() {
+    super.initState();
+    _configureSystemUi();
+  }
+
+  @override
+  void didUpdateWidget(covariant ApprovedScreenPlayer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentIndex != widget.currentIndex) {
+      _configureSystemUi();
+    }
+  }
+
+  void _configureSystemUi() {
+    if (kIsWeb ||
+        (defaultTargetPlatform != TargetPlatform.iOS &&
+            defaultTargetPlatform != TargetPlatform.android)) {
+      return;
+    }
+
+    if (widget.currentIndex <= 1) {
+      unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
+      SystemChrome.setSystemUIOverlayStyle(
+        const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarBrightness: Brightness.light,
+          statusBarIconBrightness: Brightness.dark,
+          systemNavigationBarColor: AppColors.cream,
+          systemNavigationBarIconBrightness: Brightness.dark,
+        ),
+      );
+      return;
+    }
+
+    unawaited(
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +97,21 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
         }
 
         if (widget.currentIndex == 0) {
-          return WelcomeScreen(onGetStarted: widget.onNext);
+          return WelcomeScreen(
+            language: _language,
+            onLanguageSelected: (language) {
+              setState(() => _language = language);
+            },
+            onGetStarted: widget.onNext,
+          );
+        }
+
+        if (widget.currentIndex == 1) {
+          return WhyBreatheFreeScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            onBack: widget.onPrevious,
+            onContinue: widget.onNext,
+          );
         }
 
         return Scaffold(

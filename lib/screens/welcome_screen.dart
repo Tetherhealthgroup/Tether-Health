@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../theme/app_colors.dart';
 
@@ -9,10 +6,14 @@ enum WelcomeLanguage { english, spanish }
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({
+    required this.language,
+    required this.onLanguageSelected,
     required this.onGetStarted,
     super.key,
   });
 
+  final WelcomeLanguage language;
+  final ValueChanged<WelcomeLanguage> onLanguageSelected;
   final VoidCallback onGetStarted;
 
   @override
@@ -20,39 +21,10 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  WelcomeLanguage _language = WelcomeLanguage.english;
-
-  @override
-  void initState() {
-    super.initState();
-    unawaited(_showNativeSystemBars());
-  }
-
-  Future<void> _showNativeSystemBars() async {
-    await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarBrightness: Brightness.light,
-        statusBarIconBrightness: Brightness.dark,
-        systemNavigationBarColor: AppColors.cream,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    unawaited(
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky),
-    );
-    super.dispose();
-  }
-
-  bool get _isSpanish => _language == WelcomeLanguage.spanish;
+  bool get _isSpanish => widget.language == WelcomeLanguage.spanish;
 
   void _selectLanguage(WelcomeLanguage language) {
-    setState(() => _language = language);
+    widget.onLanguageSelected(language);
   }
 
   void _showInformationSheet({
@@ -129,7 +101,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _WelcomeHeader(
-                          language: _language,
+                          language: widget.language,
                           onLanguageSelected: _selectLanguage,
                         ),
                         SizedBox(height: compactHeight ? 12 : 26),
