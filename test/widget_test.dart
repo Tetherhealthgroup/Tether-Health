@@ -1,6 +1,5 @@
 import 'package:breathefree_patient/main.dart';
 import 'package:breathefree_patient/models/screen_spec.dart';
-import 'package:breathefree_patient/widgets/approved_screen_viewport.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -19,9 +18,9 @@ void main() {
     );
   });
 
-  testWidgets('mobile view opens Screen 1 and swipes to Screen 2',
+  testWidgets('mobile view opens functional Screen 1 and continues to Screen 2',
       (tester) async {
-    tester.view.physicalSize = const Size(1290, 2796);
+    tester.view.physicalSize = const Size(1179, 2556);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -29,17 +28,95 @@ void main() {
     await tester.pumpWidget(const BreatheFreeApp());
     await tester.pump();
 
-    expect(find.byKey(const ValueKey('screen-image-1')), findsOneWidget);
-
-    await tester.fling(
-      find.byType(ApprovedScreenViewport),
-      const Offset(-600, 0),
-      1200,
+    expect(
+      find.byKey(const ValueKey('functional-welcome-screen')),
+      findsOneWidget,
     );
+    expect(find.text('Your next breath can be different.'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('welcome-sign-in')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('welcome-get-started')));
     await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('screen-image-2')), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 1 language control switches to Spanish', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp());
+    await tester.pump();
+
+    await tester.ensureVisible(find.byKey(const ValueKey('welcome-spanish')));
+    await tester.tap(find.byKey(const ValueKey('welcome-spanish')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Tu próxima respiración puede ser diferente.'),
+      findsOneWidget,
+    );
+    expect(find.text('Comenzar'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 1 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+
+      await tester.pumpWidget(
+        BreatheFreeApp(key: ValueKey(device.name)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-welcome-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display the functional welcome screen.',
+      );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      final accountAction = find.byKey(const ValueKey('welcome-sign-in'));
+      await tester.ensureVisible(accountAction);
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.getRect(accountAction).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep the account action reachable.',
+      );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should scroll without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
   });
 
   testWidgets('laptop view exposes all screens and developer navigation',

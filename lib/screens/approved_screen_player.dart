@@ -4,6 +4,7 @@ import '../models/screen_spec.dart';
 import '../models/tap_target.dart';
 import '../theme/app_colors.dart';
 import '../widgets/approved_screen_viewport.dart';
+import 'welcome_screen.dart';
 
 class ApprovedScreenPlayer extends StatefulWidget {
   const ApprovedScreenPlayer({
@@ -47,6 +48,10 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onNext: widget.onNext,
             onTarget: widget.onTarget,
           );
+        }
+
+        if (widget.currentIndex == 0) {
+          return WelcomeScreen(onGetStarted: widget.onNext);
         }
 
         return Scaffold(
@@ -327,9 +332,8 @@ class _DesktopToolbar extends StatelessWidget {
           const SizedBox(width: 10),
           IconButton.filledTonal(
             tooltip: 'Next screen',
-            onPressed: currentIndex == approvedScreens.length - 1
-                ? null
-                : onNext,
+            onPressed:
+                currentIndex == approvedScreens.length - 1 ? null : onNext,
             icon: const Icon(Icons.arrow_forward_rounded),
           ),
           const SizedBox(width: 18),
