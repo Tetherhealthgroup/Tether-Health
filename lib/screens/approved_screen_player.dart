@@ -8,6 +8,7 @@ import '../models/screen_spec.dart';
 import '../models/tap_target.dart';
 import '../theme/app_colors.dart';
 import '../widgets/approved_screen_viewport.dart';
+import 'consent_privacy_screen.dart';
 import 'welcome_screen.dart';
 import 'why_breathefree_screen.dart';
 
@@ -34,6 +35,9 @@ class ApprovedScreenPlayer extends StatefulWidget {
 class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _showHotspots = false;
   WelcomeLanguage _language = WelcomeLanguage.english;
+  bool _helpfulReminders = true;
+  bool _shareWithCareTeam = false;
+  bool _helpImproveBreatheFree = false;
 
   @override
   void initState() {
@@ -56,7 +60,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 1) {
+    if (widget.currentIndex <= 2) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -109,6 +113,26 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
         if (widget.currentIndex == 1) {
           return WhyBreatheFreeScreen(
             isSpanish: _language == WelcomeLanguage.spanish,
+            onBack: widget.onPrevious,
+            onContinue: widget.onNext,
+          );
+        }
+
+        if (widget.currentIndex == 2) {
+          return ConsentPrivacyScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            helpfulReminders: _helpfulReminders,
+            shareWithCareTeam: _shareWithCareTeam,
+            helpImproveBreatheFree: _helpImproveBreatheFree,
+            onHelpfulRemindersChanged: (value) {
+              setState(() => _helpfulReminders = value);
+            },
+            onShareWithCareTeamChanged: (value) {
+              setState(() => _shareWithCareTeam = value);
+            },
+            onHelpImproveBreatheFreeChanged: (value) {
+              setState(() => _helpImproveBreatheFree = value);
+            },
             onBack: widget.onPrevious,
             onContinue: widget.onNext,
           );

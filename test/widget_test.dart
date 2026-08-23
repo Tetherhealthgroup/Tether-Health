@@ -83,6 +83,16 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Continuar'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('why-continue')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-consent-privacy-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Tu historia sigue siendo tuya.'), findsOneWidget);
+    expect(find.text('Aceptar y continuar'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -120,7 +130,10 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('why-continue')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('screen-image-3')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-consent-privacy-screen')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -261,6 +274,152 @@ void main() {
         tester.takeException(),
         isNull,
         reason: '${device.name} should scroll through all support cards.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets('Screen 3 privacy choices change and persist across navigation',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 2));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-consent-privacy-screen')),
+      findsOneWidget,
+    );
+
+    final reminders = find.byKey(const ValueKey('consent-helpful-reminders'));
+    final careTeam = find.byKey(const ValueKey('consent-share-care-team'));
+    final improve = find.byKey(const ValueKey('consent-help-improve'));
+
+    await tester.ensureVisible(reminders);
+    expect(tester.widget<Switch>(reminders).value, isTrue);
+    await tester.tap(reminders);
+    await tester.pumpAndSettle();
+    expect(tester.widget<Switch>(reminders).value, isFalse);
+
+    await tester.ensureVisible(careTeam);
+    await tester.tap(careTeam);
+    await tester.pumpAndSettle();
+    expect(tester.widget<Switch>(careTeam).value, isTrue);
+
+    await tester.ensureVisible(improve);
+    await tester.tap(improve);
+    await tester.pumpAndSettle();
+    expect(tester.widget<Switch>(improve).value, isTrue);
+
+    await tester.tap(find.byKey(const ValueKey('consent-back')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-why-breathefree-screen')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('why-continue')));
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<Switch>(reminders).value, isFalse);
+    await tester.ensureVisible(careTeam);
+    expect(tester.widget<Switch>(careTeam).value, isTrue);
+    await tester.ensureVisible(improve);
+    expect(tester.widget<Switch>(improve).value, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 3 opens the privacy review and continues to Screen 4',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 2));
+    await tester.pumpAndSettle();
+
+    final review = find.byKey(const ValueKey('consent-review-privacy'));
+    await tester.ensureVisible(review);
+    await tester.tap(review);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('consent-sheet-done')), findsOneWidget);
+    expect(
+      find.textContaining('complete Terms of Use and Privacy Notice'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('consent-sheet-done')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.byKey(const ValueKey('consent-agree-continue')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('screen-image-4')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 3 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-3-${device.name}'),
+          initialScreen: 2,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-consent-privacy-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 3.',
+      );
+
+      final continueButton =
+          find.byKey(const ValueKey('consent-agree-continue'));
+      expect(continueButton, findsOneWidget);
+      expect(
+        tester.getRect(continueButton).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep Agree and continue visible.',
+      );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      final finalChoice = find.byKey(const ValueKey('consent-help-improve'));
+      await tester.ensureVisible(finalChoice);
+      await tester.pumpAndSettle();
+
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should reach every optional choice.',
       );
 
       await tester.pumpWidget(const SizedBox.shrink());
