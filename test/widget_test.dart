@@ -539,8 +539,196 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('trigger-continue')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('screen-image-6')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-readiness-result-screen')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 6 reflects assessment answers and continues to Screen 7',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 3));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.byKey(const ValueKey('baseline-choice-elevenToTwenty')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('baseline-next')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('trigger-choice-stress')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('trigger-choice-driving')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('trigger-continue')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-readiness-result-screen')),
+      findsOneWidget,
+    );
+    expect(
+      find.text('11–20 cigarettes on a typical day'),
+      findsOneWidget,
+    );
+    expect(
+      find.text('You want support for stress and driving'),
+      findsOneWidget,
+    );
+    expect(find.text('You identified 2 situations to prepare for'),
+        findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('readiness-continue')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('screen-image-7')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 6 path choice and explanation work and persist',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 5));
+    await tester.pumpAndSettle();
+
+    final why = find.byKey(const ValueKey('readiness-why-fit'));
+    await tester.ensureVisible(why);
+    await tester.tap(why);
+    await tester.pumpAndSettle();
+    expect(find.text('Why preparation may fit'), findsOneWidget);
+    expect(
+      find.textContaining('not a medical assessment'),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('readiness-why-done')));
+    await tester.pumpAndSettle();
+
+    final explore = find.byKey(const ValueKey('readiness-path-explore'));
+    await tester.ensureVisible(explore);
+    await tester.tap(explore);
+    await tester.pumpAndSettle();
+    expect(find.text('Explore without setting a date'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('readiness-back')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-trigger-map-screen')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('trigger-choice-stress')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('trigger-continue')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Explore without setting a date'), findsOneWidget);
+
+    final connect = find.byKey(const ValueKey('readiness-path-connect'));
+    await tester.ensureVisible(connect);
+    await tester.tap(connect);
+    await tester.pumpAndSettle();
+    expect(find.text('Find support options'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 6 inherits Spanish from onboarding', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp());
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('welcome-spanish')));
+    await tester.tap(find.byKey(const ValueKey('welcome-spanish')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('welcome-get-started')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('why-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('consent-agree-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('baseline-choice-tenOrFewer')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('baseline-next')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('trigger-choice-stress')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('trigger-continue')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Tu punto de partida'), findsOneWidget);
+    expect(
+      find.text('10 cigarrillos o menos en un día habitual'),
+      findsOneWidget,
+    );
+    expect(find.text('Quieres prepararte para estrés'), findsOneWidget);
+    expect(find.text('Crear mi plan de preparación'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 6 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-6-${device.name}'),
+          initialScreen: 5,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-readiness-result-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 6.',
+      );
+      final continueButton = find.byKey(const ValueKey('readiness-continue'));
+      expect(
+        tester.getRect(continueButton).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep the main action visible.',
+      );
+
+      final connect = find.byKey(const ValueKey('readiness-path-connect'));
+      await tester.ensureVisible(connect);
+      await tester.tap(connect);
+      await tester.pumpAndSettle();
+      expect(find.text('Find support options'), findsOneWidget);
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
   });
 
   testWidgets('Screen 5 inherits Spanish from onboarding', (tester) async {
@@ -828,6 +1016,22 @@ void main() {
           )
           .onPressed,
       isNull,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('trigger-choice-stress')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('trigger-continue')));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-readiness-result-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-readiness-result-screen')),
+      findsOneWidget,
+      reason: 'Screen 6 should require its explicit main action.',
     );
     expect(tester.takeException(), isNull);
   });

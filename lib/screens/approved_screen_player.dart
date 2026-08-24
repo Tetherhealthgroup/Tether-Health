@@ -10,6 +10,7 @@ import '../theme/app_colors.dart';
 import '../widgets/approved_screen_viewport.dart';
 import 'baseline_assessment_screen.dart';
 import 'consent_privacy_screen.dart';
+import 'readiness_result_screen.dart';
 import 'trigger_map_screen.dart';
 import 'welcome_screen.dart';
 import 'why_breathefree_screen.dart';
@@ -43,6 +44,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   DailyCigaretteUse? _dailyCigaretteUse;
   Set<SmokingTrigger> _smokingTriggers = <SmokingTrigger>{};
   String? _customSmokingTrigger;
+  ReadinessPath _readinessPath = ReadinessPath.prepare;
 
   @override
   void initState() {
@@ -65,7 +67,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 4) {
+    if (widget.currentIndex <= 5) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -165,6 +167,21 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             },
             onCustomTriggerChanged: (value) {
               setState(() => _customSmokingTrigger = value);
+            },
+            onBack: widget.onPrevious,
+            onContinue: widget.onNext,
+          );
+        }
+
+        if (widget.currentIndex == 5) {
+          return ReadinessResultScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            dailyCigaretteUse: _dailyCigaretteUse,
+            selectedTriggers: _smokingTriggers,
+            customTrigger: _customSmokingTrigger,
+            selectedPath: _readinessPath,
+            onPathChanged: (value) {
+              setState(() => _readinessPath = value);
             },
             onBack: widget.onPrevious,
             onContinue: widget.onNext,
