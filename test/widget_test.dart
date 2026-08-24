@@ -588,8 +588,182 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('readiness-continue')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('screen-image-7')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-choose-quit-path-screen')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 7 quit path changes and persists across navigation',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 6));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-choose-quit-path-screen')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('quit-path-selected-setQuitDate')),
+      findsOneWidget,
+      reason: 'Set a quit date should be the recommended default.',
+    );
+
+    final quitToday = find.byKey(const ValueKey('quit-path-choice-quitToday'));
+    await tester.ensureVisible(quitToday);
+    await tester.tap(quitToday);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('quit-path-selected-quitToday')),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Quit today selected · Saved automatically'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('quit-path-back')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-readiness-result-screen')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('readiness-continue')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('quit-path-selected-quitToday')),
+      findsOneWidget,
+      reason: 'The chosen quit path should remain saved after going back.',
+    );
+
+    final gradual =
+        find.byKey(const ValueKey('quit-path-choice-reduceGradually'));
+    await tester.ensureVisible(gradual);
+    await tester.tap(gradual);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('quit-path-selected-reduceGradually')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 7 Continue advances to Screen 8', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 6));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('quit-path-continue')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('screen-image-8')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 7 inherits Spanish from onboarding', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp());
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('welcome-spanish')));
+    await tester.tap(find.byKey(const ValueKey('welcome-spanish')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('welcome-get-started')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('why-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('consent-agree-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('baseline-choice-tenOrFewer')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('baseline-next')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('trigger-choice-stress')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('trigger-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('readiness-continue')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Crea tu plan'), findsOneWidget);
+    expect(find.text('¿Qué te parece posible ahora mismo?'), findsOneWidget);
+    expect(find.text('Elegir una fecha'), findsOneWidget);
+    expect(find.text('Dejar de fumar hoy'), findsOneWidget);
+    expect(find.text('Reducir gradualmente'), findsOneWidget);
+    expect(find.text('RECOMENDADO'), findsOneWidget);
+    expect(find.text('Continuar con este camino'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 7 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-7-${device.name}'),
+          initialScreen: 6,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-choose-quit-path-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 7.',
+      );
+      final continueButton = find.byKey(const ValueKey('quit-path-continue'));
+      expect(
+        tester.getRect(continueButton).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep Continue visible.',
+      );
+
+      final gradual =
+          find.byKey(const ValueKey('quit-path-choice-reduceGradually'));
+      await tester.ensureVisible(gradual);
+      await tester.tap(gradual);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('quit-path-selected-reduceGradually')),
+        findsOneWidget,
+      );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
   });
 
   testWidgets('Screen 6 path choice and explanation work and persist',
@@ -1032,6 +1206,19 @@ void main() {
       find.byKey(const ValueKey('functional-readiness-result-screen')),
       findsOneWidget,
       reason: 'Screen 6 should require its explicit main action.',
+    );
+    await tester.tap(find.byKey(const ValueKey('readiness-continue')));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-choose-quit-path-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-choose-quit-path-screen')),
+      findsOneWidget,
+      reason: 'Screen 7 should require its explicit Continue button.',
     );
     expect(tester.takeException(), isNull);
   });

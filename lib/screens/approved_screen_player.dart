@@ -9,6 +9,7 @@ import '../models/tap_target.dart';
 import '../theme/app_colors.dart';
 import '../widgets/approved_screen_viewport.dart';
 import 'baseline_assessment_screen.dart';
+import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
 import 'readiness_result_screen.dart';
 import 'trigger_map_screen.dart';
@@ -45,6 +46,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   Set<SmokingTrigger> _smokingTriggers = <SmokingTrigger>{};
   String? _customSmokingTrigger;
   ReadinessPath _readinessPath = ReadinessPath.prepare;
+  QuitPlanPath _quitPlanPath = QuitPlanPath.setQuitDate;
 
   @override
   void initState() {
@@ -67,7 +69,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 5) {
+    if (widget.currentIndex <= 6) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -182,6 +184,18 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             selectedPath: _readinessPath,
             onPathChanged: (value) {
               setState(() => _readinessPath = value);
+            },
+            onBack: widget.onPrevious,
+            onContinue: widget.onNext,
+          );
+        }
+
+        if (widget.currentIndex == 6) {
+          return ChooseQuitPathScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            selectedPath: _quitPlanPath,
+            onPathChanged: (value) {
+              setState(() => _quitPlanPath = value);
             },
             onBack: widget.onPrevious,
             onContinue: widget.onNext,
