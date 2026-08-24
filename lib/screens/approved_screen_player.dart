@@ -8,6 +8,7 @@ import '../models/screen_spec.dart';
 import '../models/tap_target.dart';
 import '../theme/app_colors.dart';
 import '../widgets/approved_screen_viewport.dart';
+import 'baseline_assessment_screen.dart';
 import 'consent_privacy_screen.dart';
 import 'welcome_screen.dart';
 import 'why_breathefree_screen.dart';
@@ -38,6 +39,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _helpfulReminders = true;
   bool _shareWithCareTeam = false;
   bool _helpImproveBreatheFree = false;
+  DailyCigaretteUse? _dailyCigaretteUse;
 
   @override
   void initState() {
@@ -60,7 +62,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 2) {
+    if (widget.currentIndex <= 3) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -132,6 +134,18 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             },
             onHelpImproveBreatheFreeChanged: (value) {
               setState(() => _helpImproveBreatheFree = value);
+            },
+            onBack: widget.onPrevious,
+            onContinue: widget.onNext,
+          );
+        }
+
+        if (widget.currentIndex == 3) {
+          return BaselineAssessmentScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            dailyCigaretteUse: _dailyCigaretteUse,
+            onDailyCigaretteUseChanged: (value) {
+              setState(() => _dailyCigaretteUse = value);
             },
             onBack: widget.onPrevious,
             onContinue: widget.onNext,

@@ -116,8 +116,6 @@ class ConsentPrivacyScreen extends StatelessWidget {
             final velocity = details.primaryVelocity ?? 0;
             if (velocity > 250) {
               onBack();
-            } else if (velocity < -250) {
-              onContinue();
             }
           },
           child: LayoutBuilder(

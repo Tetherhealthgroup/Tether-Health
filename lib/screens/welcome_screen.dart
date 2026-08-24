@@ -76,11 +76,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       body: SafeArea(
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onHorizontalDragEnd: (details) {
-            if ((details.primaryVelocity ?? 0) < -250) {
-              widget.onGetStarted();
-            }
-          },
           child: LayoutBuilder(
             builder: (context, constraints) {
               final horizontalPadding =

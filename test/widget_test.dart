@@ -363,7 +363,265 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('screen-image-4')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-baseline-assessment-screen')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 4 answer changes and persists across navigation',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 3));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-baseline-assessment-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Selected'), findsNothing);
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.byKey(const ValueKey('baseline-next')),
+          )
+          .onPressed,
+      isNull,
+      reason: 'Next must remain disabled until the patient answers.',
+    );
+
+    final tenOrFewer = find.byKey(const ValueKey('baseline-choice-tenOrFewer'));
+    await tester.ensureVisible(tenOrFewer);
+    await tester.tap(tenOrFewer);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('baseline-selected-tenOrFewer')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('baseline-selected-elevenToTwenty')),
+      findsNothing,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('baseline-back')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-consent-privacy-screen')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('consent-agree-continue')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('baseline-selected-tenOrFewer')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 4 Next continues to Screen 5', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 3));
+    await tester.pumpAndSettle();
+
+    final selectedChoice =
+        find.byKey(const ValueKey('baseline-choice-elevenToTwenty'));
+    await tester.ensureVisible(selectedChoice);
+    await tester.tap(selectedChoice);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('baseline-next')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('screen-image-5')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 4 inherits Spanish from onboarding', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp());
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.byKey(const ValueKey('welcome-spanish')));
+    await tester.tap(find.byKey(const ValueKey('welcome-spanish')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('welcome-get-started')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('why-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('consent-agree-continue')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('En un día habitual, ¿cuántos cigarrillos fumas?'),
+      findsOneWidget,
+    );
+    expect(find.text('11–20 cigarrillos'), findsOneWidget);
+    expect(find.text('Siguiente'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 4 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-4-${device.name}'),
+          initialScreen: 3,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-baseline-assessment-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 4.',
+      );
+
+      final nextButton = find.byKey(const ValueKey('baseline-next'));
+      expect(nextButton, findsOneWidget);
+      expect(
+        tester.getRect(nextButton).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep Next visible.',
+      );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      final lastChoice =
+          find.byKey(const ValueKey('baseline-choice-thirtyOneOrMore'));
+      await tester.ensureVisible(lastChoice);
+      await tester.pumpAndSettle();
+      await tester.tap(lastChoice);
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('baseline-selected-thirtyOneOrMore')),
+        findsOneWidget,
+        reason: '${device.name} should allow the final answer.',
+      );
+      expect(
+        tester.widget<FilledButton>(nextButton).onPressed,
+        isNotNull,
+        reason: '${device.name} should enable Next after an answer.',
+      );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should scroll without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets('forward swipes cannot bypass explicit onboarding actions',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp());
+    await tester.pumpAndSettle();
+
+    await tester.fling(
+      find.byKey(const ValueKey('functional-welcome-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-welcome-screen')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('welcome-get-started')));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-why-breathefree-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-why-breathefree-screen')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('why-continue')));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-consent-privacy-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-consent-privacy-screen')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('consent-agree-continue')),
+    );
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-baseline-assessment-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-baseline-assessment-screen')),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.byKey(const ValueKey('baseline-next')),
+          )
+          .onPressed,
+      isNull,
+    );
     expect(tester.takeException(), isNull);
   });
 
