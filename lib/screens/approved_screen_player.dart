@@ -10,6 +10,7 @@ import '../theme/app_colors.dart';
 import '../widgets/approved_screen_viewport.dart';
 import 'baseline_assessment_screen.dart';
 import 'consent_privacy_screen.dart';
+import 'trigger_map_screen.dart';
 import 'welcome_screen.dart';
 import 'why_breathefree_screen.dart';
 
@@ -40,6 +41,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _shareWithCareTeam = false;
   bool _helpImproveBreatheFree = false;
   DailyCigaretteUse? _dailyCigaretteUse;
+  Set<SmokingTrigger> _smokingTriggers = <SmokingTrigger>{};
+  String? _customSmokingTrigger;
 
   @override
   void initState() {
@@ -62,7 +65,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 3) {
+    if (widget.currentIndex <= 4) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -146,6 +149,22 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             dailyCigaretteUse: _dailyCigaretteUse,
             onDailyCigaretteUseChanged: (value) {
               setState(() => _dailyCigaretteUse = value);
+            },
+            onBack: widget.onPrevious,
+            onContinue: widget.onNext,
+          );
+        }
+
+        if (widget.currentIndex == 4) {
+          return TriggerMapScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            selectedTriggers: _smokingTriggers,
+            customTrigger: _customSmokingTrigger,
+            onSelectedTriggersChanged: (value) {
+              setState(() => _smokingTriggers = value);
+            },
+            onCustomTriggerChanged: (value) {
+              setState(() => _customSmokingTrigger = value);
             },
             onBack: widget.onPrevious,
             onContinue: widget.onNext,

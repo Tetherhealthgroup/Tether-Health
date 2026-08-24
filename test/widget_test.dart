@@ -446,8 +446,189 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('baseline-next')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('screen-image-5')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-trigger-map-screen')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 5 trigger choices change and persist across navigation',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 4));
+    await tester.pumpAndSettle();
+
+    final continueButton = find.byKey(const ValueKey('trigger-continue'));
+    expect(
+      tester.widget<FilledButton>(continueButton).onPressed,
+      isNull,
+      reason: 'Continue must remain disabled until a trigger is selected.',
+    );
+
+    final stress = find.byKey(const ValueKey('trigger-choice-stress'));
+    final driving = find.byKey(const ValueKey('trigger-choice-driving'));
+    await tester.tap(stress);
+    await tester.pumpAndSettle();
+    await tester.tap(driving);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('trigger-selected-stress')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('trigger-selected-driving')),
+      findsOneWidget,
+    );
+    expect(tester.widget<FilledButton>(continueButton).onPressed, isNotNull);
+
+    await tester.tap(find.byKey(const ValueKey('trigger-back')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-baseline-assessment-screen')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('baseline-choice-tenOrFewer')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('baseline-next')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('trigger-selected-stress')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('trigger-selected-driving')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 5 saves a custom trigger and continues to Screen 6',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 4));
+    await tester.pumpAndSettle();
+
+    final addOwn = find.byKey(const ValueKey('trigger-add-own'));
+    await tester.ensureVisible(addOwn);
+    await tester.tap(addOwn);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('trigger-custom-input')),
+      'Phone calls',
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('trigger-custom-save')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Phone calls'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('trigger-continue')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('screen-image-6')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 5 inherits Spanish from onboarding', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp());
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('welcome-spanish')));
+    await tester.tap(find.byKey(const ValueKey('welcome-spanish')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('welcome-get-started')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('why-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('consent-agree-continue')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('baseline-choice-tenOrFewer')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('baseline-next')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('¿Cuándo es más probable que quieras fumar?'),
+      findsOneWidget,
+    );
+    expect(find.text('Entornos sociales'), findsOneWidget);
+    expect(find.text('Continuar'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 5 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-5-${device.name}'),
+          initialScreen: 4,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-trigger-map-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 5.',
+      );
+      final continueButton = find.byKey(const ValueKey('trigger-continue'));
+      expect(
+        tester.getRect(continueButton).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep Continue visible.',
+      );
+      expect(tester.takeException(), isNull);
+
+      final lastChoice = find.byKey(const ValueKey('trigger-choice-beforeBed'));
+      await tester.ensureVisible(lastChoice);
+      await tester.tap(lastChoice);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const ValueKey('trigger-selected-beforeBed')),
+        findsOneWidget,
+      );
+      expect(tester.widget<FilledButton>(continueButton).onPressed, isNotNull);
+      expect(tester.takeException(), isNull);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
   });
 
   testWidgets('Screen 4 inherits Spanish from onboarding', (tester) async {
@@ -618,6 +799,32 @@ void main() {
       tester
           .widget<FilledButton>(
             find.byKey(const ValueKey('baseline-next')),
+          )
+          .onPressed,
+      isNull,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('baseline-choice-tenOrFewer')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('baseline-next')));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-trigger-map-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-trigger-map-screen')),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.byKey(const ValueKey('trigger-continue')),
           )
           .onPressed,
       isNull,
