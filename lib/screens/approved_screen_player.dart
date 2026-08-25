@@ -12,6 +12,7 @@ import 'baseline_assessment_screen.dart';
 import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
 import 'readiness_result_screen.dart';
+import 'select_quit_date_screen.dart';
 import 'trigger_map_screen.dart';
 import 'welcome_screen.dart';
 import 'why_breathefree_screen.dart';
@@ -47,6 +48,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   String? _customSmokingTrigger;
   ReadinessPath _readinessPath = ReadinessPath.prepare;
   QuitPlanPath _quitPlanPath = QuitPlanPath.setQuitDate;
+  DateTime? _quitDate;
+  bool _quitDayCheckIn = true;
 
   @override
   void initState() {
@@ -69,7 +72,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 6) {
+    if (widget.currentIndex <= 7) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -195,10 +198,33 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             isSpanish: _language == WelcomeLanguage.spanish,
             selectedPath: _quitPlanPath,
             onPathChanged: (value) {
-              setState(() => _quitPlanPath = value);
+              setState(() {
+                _quitPlanPath = value;
+                _quitDate = null;
+              });
             },
             onBack: widget.onPrevious,
             onContinue: widget.onNext,
+          );
+        }
+
+        if (widget.currentIndex == 7) {
+          return SelectQuitDateScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            quitPath: _quitPlanPath,
+            selectedDate: _quitDate,
+            quitDayCheckIn: _quitDayCheckIn,
+            onDateChanged: (value) {
+              setState(() => _quitDate = value);
+            },
+            onQuitDayCheckInChanged: (value) {
+              setState(() => _quitDayCheckIn = value);
+            },
+            onBack: widget.onPrevious,
+            onContinue: (value) {
+              setState(() => _quitDate = value);
+              widget.onNext();
+            },
           );
         }
 

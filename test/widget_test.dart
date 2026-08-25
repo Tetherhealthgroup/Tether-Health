@@ -666,7 +666,10 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('quit-path-continue')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('screen-image-8')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-select-quit-date-screen')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -707,6 +710,13 @@ void main() {
     expect(find.text('Reducir gradualmente'), findsOneWidget);
     expect(find.text('RECOMENDADO'), findsOneWidget);
     expect(find.text('Continuar con este camino'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('quit-path-continue')));
+    await tester.pumpAndSettle();
+    expect(find.text('Elige tu fecha para dejarlo'), findsOneWidget);
+    expect(find.text('Elige un día para comenzar.'), findsOneWidget);
+    expect(find.text('Confirmar esta fecha'), findsOneWidget);
+    expect(find.text('2 DE 5'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -755,6 +765,200 @@ void main() {
         find.byKey(const ValueKey('quit-path-selected-reduceGradually')),
         findsOneWidget,
       );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets('Screen 8 date and check-in choices persist across navigation',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 7));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-select-quit-date-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Choose a day to begin.'), findsOneWidget);
+    expect(find.byKey(const ValueKey('quit-date-selected')), findsOneWidget);
+
+    final defaultDate = DateUtils.dateOnly(
+      DateTime.now().add(const Duration(days: 7)),
+    );
+    final daysInMonth = DateUtils.getDaysInMonth(
+      defaultDate.year,
+      defaultDate.month,
+    );
+    final alternateDate = defaultDate.day < daysInMonth
+        ? defaultDate.add(const Duration(days: 1))
+        : defaultDate.subtract(const Duration(days: 1));
+    final month = alternateDate.month.toString().padLeft(2, '0');
+    final day = alternateDate.day.toString().padLeft(2, '0');
+    final alternateKey = ValueKey(
+      'quit-date-day-${alternateDate.year}-$month-$day',
+    );
+
+    await tester.tap(find.byKey(alternateKey));
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: find.byKey(alternateKey),
+        matching: find.byKey(const ValueKey('quit-date-selected')),
+      ),
+      findsOneWidget,
+    );
+
+    final checkIn = find.byKey(const ValueKey('quit-date-check-in'));
+    await tester.ensureVisible(checkIn);
+    await tester.tap(checkIn);
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<Switch>(find.byKey(const ValueKey('quit-date-check-in')))
+          .value,
+      isFalse,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('quit-date-back')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-choose-quit-path-screen')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('quit-path-continue')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(
+        of: find.byKey(alternateKey),
+        matching: find.byKey(const ValueKey('quit-date-selected')),
+      ),
+      findsOneWidget,
+      reason: 'The selected date should remain saved after going back.',
+    );
+    expect(
+      tester
+          .widget<Switch>(find.byKey(const ValueKey('quit-date-check-in')))
+          .value,
+      isFalse,
+      reason: 'The private check-in choice should remain saved.',
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 8 adapts to Quit today and Reduce gradually paths',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 6));
+    await tester.pumpAndSettle();
+
+    final quitToday = find.byKey(const ValueKey('quit-path-choice-quitToday'));
+    await tester.ensureVisible(quitToday);
+    await tester.tap(quitToday);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('quit-path-continue')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Today is your starting point.'), findsOneWidget);
+    expect(find.text('Start my quit today'), findsOneWidget);
+    expect(find.text('Starting today'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('quit-date-back')));
+    await tester.pumpAndSettle();
+    final gradual =
+        find.byKey(const ValueKey('quit-path-choice-reduceGradually'));
+    await tester.ensureVisible(gradual);
+    await tester.tap(gradual);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('quit-path-continue')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Choose the day to become smoke-free.'),
+      findsOneWidget,
+    );
+    expect(find.text('Confirm target date'), findsOneWidget);
+    expect(find.textContaining('days to reduce gradually'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 8 calendar navigation and Confirm advance to Screen 9',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 7));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('quit-date-next-month')));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await tester.tap(find.byKey(const ValueKey('quit-date-previous-month')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('quit-date-confirm')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-9')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 8 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-8-${device.name}'),
+          initialScreen: 7,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-select-quit-date-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 8.',
+      );
+      final confirm = find.byKey(const ValueKey('quit-date-confirm'));
+      expect(
+        tester.getRect(confirm).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep Confirm visible.',
+      );
+      expect(find.byKey(const ValueKey('quit-date-calendar')), findsOneWidget);
+
+      final checkIn = find.byKey(const ValueKey('quit-date-check-in'));
+      await tester.ensureVisible(checkIn);
+      await tester.pumpAndSettle();
       expect(
         tester.takeException(),
         isNull,
@@ -1219,6 +1423,19 @@ void main() {
       find.byKey(const ValueKey('functional-choose-quit-path-screen')),
       findsOneWidget,
       reason: 'Screen 7 should require its explicit Continue button.',
+    );
+    await tester.tap(find.byKey(const ValueKey('quit-path-continue')));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-select-quit-date-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-select-quit-date-screen')),
+      findsOneWidget,
+      reason: 'Screen 8 should require its explicit Confirm button.',
     );
     expect(tester.takeException(), isNull);
   });
