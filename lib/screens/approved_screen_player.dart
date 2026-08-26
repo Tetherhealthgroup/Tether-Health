@@ -11,6 +11,7 @@ import '../widgets/approved_screen_viewport.dart';
 import 'baseline_assessment_screen.dart';
 import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
+import 'my_reasons_screen.dart';
 import 'readiness_result_screen.dart';
 import 'select_quit_date_screen.dart';
 import 'trigger_map_screen.dart';
@@ -50,6 +51,13 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   QuitPlanPath _quitPlanPath = QuitPlanPath.setQuitDate;
   DateTime? _quitDate;
   bool _quitDayCheckIn = true;
+  Set<QuitReason> _quitReasons = <QuitReason>{
+    QuitReason.family,
+    QuitReason.breatheEasier,
+    QuitReason.improveHealth,
+  };
+  String? _customQuitReason;
+  QuitReason? _topQuitReason = QuitReason.family;
 
   @override
   void initState() {
@@ -72,7 +80,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 7) {
+    if (widget.currentIndex <= 8) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -225,6 +233,26 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               setState(() => _quitDate = value);
               widget.onNext();
             },
+          );
+        }
+
+        if (widget.currentIndex == 8) {
+          return MyReasonsScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            selectedReasons: _quitReasons,
+            customReason: _customQuitReason,
+            topReason: _topQuitReason,
+            onSelectionChanged: (reasons, topReason) {
+              setState(() {
+                _quitReasons = reasons;
+                _topQuitReason = topReason;
+              });
+            },
+            onCustomReasonChanged: (value) {
+              setState(() => _customQuitReason = value);
+            },
+            onBack: widget.onPrevious,
+            onContinue: widget.onNext,
           );
         }
 

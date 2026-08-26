@@ -915,7 +915,10 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('quit-date-confirm')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-9')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-my-reasons-screen')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -958,6 +961,213 @@ void main() {
 
       final checkIn = find.byKey(const ValueKey('quit-date-check-in'));
       await tester.ensureVisible(checkIn);
+      await tester.pumpAndSettle();
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets('Screen 9 reasons and top reason change and persist',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 8));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-my-reasons-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('3 SELECTED'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('reason-selected-family')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('reason-choice-saveMoney')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('reason-top-saveMoney')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('reason-selected-saveMoney')),
+      findsOneWidget,
+    );
+    expect(
+      find.textContaining('You chose this to save money.'),
+      findsOneWidget,
+    );
+    expect(find.text('4 SELECTED'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('reasons-back')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-select-quit-date-screen')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('quit-date-confirm')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('reason-selected-saveMoney')),
+      findsOneWidget,
+      reason: 'Selected reasons should remain saved after going back.',
+    );
+    expect(
+      find.textContaining('You chose this to save money.'),
+      findsOneWidget,
+      reason: 'The top reason should remain saved after going back.',
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 9 custom reason can become the top motivation',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 8));
+    await tester.pumpAndSettle();
+
+    final customEditor = find.byKey(const ValueKey('reason-custom-editor'));
+    await tester.ensureVisible(customEditor);
+    await tester.tap(customEditor);
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const ValueKey('reason-custom-text-field')),
+      'I want more energy for hiking',
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('reason-custom-make-top')),
+    );
+    await tester.pumpAndSettle();
+    final save = find.byKey(const ValueKey('reason-custom-save'));
+    await tester.ensureVisible(save);
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('reason-custom-card')),
+      findsOneWidget,
+    );
+    expect(find.text('I want more energy for hiking'), findsWidgets);
+    expect(
+      find.textContaining('You chose this because'),
+      findsOneWidget,
+    );
+    expect(find.text('4 SELECTED'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(const ValueKey('reason-custom-remove')),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('reason-custom-editor')),
+      findsOneWidget,
+    );
+    expect(find.text('I want more energy for hiking'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 9 inherits Spanish and Save advances to Screen 10',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp());
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('welcome-spanish')));
+    await tester.tap(find.byKey(const ValueKey('welcome-spanish')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('welcome-get-started')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('why-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('consent-agree-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('baseline-choice-tenOrFewer')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('baseline-next')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('trigger-choice-stress')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('trigger-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('readiness-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('quit-path-continue')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('quit-date-confirm')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Mis razones'), findsOneWidget);
+    expect(find.text('¿Por qué quieres dejar de fumar?'), findsOneWidget);
+    expect(find.text('Proteger a mi familia'), findsOneWidget);
+    expect(find.text('Guardar mis razones'), findsOneWidget);
+    expect(find.text('3 DE 5'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('reasons-save')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-10')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 9 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-9-${device.name}'),
+          initialScreen: 8,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-my-reasons-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 9.',
+      );
+      final save = find.byKey(const ValueKey('reasons-save'));
+      expect(
+        tester.getRect(save).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep Save my reasons visible.',
+      );
+
+      final customEditor = find.byKey(const ValueKey('reason-custom-editor'));
+      await tester.ensureVisible(customEditor);
       await tester.pumpAndSettle();
       expect(
         tester.takeException(),
@@ -1436,6 +1646,19 @@ void main() {
       find.byKey(const ValueKey('functional-select-quit-date-screen')),
       findsOneWidget,
       reason: 'Screen 8 should require its explicit Confirm button.',
+    );
+    await tester.tap(find.byKey(const ValueKey('quit-date-confirm')));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-my-reasons-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-my-reasons-screen')),
+      findsOneWidget,
+      reason: 'Screen 9 should require its explicit Save button.',
     );
     expect(tester.takeException(), isNull);
   });
