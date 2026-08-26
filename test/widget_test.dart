@@ -1126,7 +1126,13 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('reasons-save')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-10')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-support-preparation-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Apoyo y preparación'), findsOneWidget);
+    expect(find.text('No tienes que hacer esto a solas.'), findsOneWidget);
+    expect(find.text('Guardar mi plan de apoyo'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -1168,6 +1174,182 @@ void main() {
 
       final customEditor = find.byKey(const ValueKey('reason-custom-editor'));
       await tester.ensureVisible(customEditor);
+      await tester.pumpAndSettle();
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets('Screen 10 support and preparation choices persist',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 9));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-support-preparation-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Jordan'), findsOneWidget);
+    expect(find.text('1 PERSON ADDED'), findsOneWidget);
+    expect(find.text('2 OF 3'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(const ValueKey('support-person-toggle-jordan')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('0 PEOPLE ADDED'), findsOneWidget);
+
+    final finalTask =
+        find.byKey(const ValueKey('preparation-task-stockAlternatives'));
+    await tester.ensureVisible(finalTask);
+    await tester.tap(finalTask);
+    await tester.pumpAndSettle();
+    expect(find.text('3 OF 3'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('support-back')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-my-reasons-screen')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('reasons-save')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('0 PEOPLE ADDED'), findsOneWidget);
+    expect(find.text('3 OF 3'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 10 can add and edit support people', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 9));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.byKey(const ValueKey('support-person-edit-jordan')),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('support-person-name-field')),
+      'Jordan Lee',
+    );
+    await tester.tap(find.byKey(const ValueKey('support-person-save')));
+    await tester.pumpAndSettle();
+    expect(find.text('Jordan Lee'), findsOneWidget);
+
+    final addPerson = find.byKey(const ValueKey('support-add-person'));
+    await tester.ensureVisible(addPerson);
+    await tester.tap(addPerson);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('support-person-name-field')),
+      'Alex',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('support-person-relationship-field')),
+      'Sibling',
+    );
+    await tester.tap(find.byKey(const ValueKey('support-person-save')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Alex'), findsOneWidget);
+    expect(find.text('Sibling · Text message'), findsOneWidget);
+    expect(find.text('2 PEOPLE ADDED'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 10 treatment education and Save work', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 9));
+    await tester.pumpAndSettle();
+
+    final learn = find.byKey(const ValueKey('support-treatment-learn'));
+    await tester.ensureVisible(learn);
+    await tester.tap(learn);
+    await tester.pumpAndSettle();
+    expect(find.text('Quit-smoking treatment options'), findsOneWidget);
+    expect(
+      find.textContaining('does not prescribe'),
+      findsWidgets,
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('support-treatment-done')),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.byKey(const ValueKey('support-treatment-toggle')),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('support-care-team-reminder')),
+      findsNothing,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('support-save')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-11')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 10 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-10-${device.name}'),
+          initialScreen: 9,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-support-preparation-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 10.',
+      );
+      final save = find.byKey(const ValueKey('support-save'));
+      expect(
+        tester.getRect(save).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep Save visible.',
+      );
+
+      final finalTask =
+          find.byKey(const ValueKey('preparation-task-stockAlternatives'));
+      await tester.ensureVisible(finalTask);
       await tester.pumpAndSettle();
       expect(
         tester.takeException(),
@@ -1659,6 +1841,19 @@ void main() {
       find.byKey(const ValueKey('functional-my-reasons-screen')),
       findsOneWidget,
       reason: 'Screen 9 should require its explicit Save button.',
+    );
+    await tester.tap(find.byKey(const ValueKey('reasons-save')));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-support-preparation-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-support-preparation-screen')),
+      findsOneWidget,
+      reason: 'Screen 10 should require its explicit Save button.',
     );
     expect(tester.takeException(), isNull);
   });

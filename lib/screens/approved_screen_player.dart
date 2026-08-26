@@ -14,6 +14,7 @@ import 'consent_privacy_screen.dart';
 import 'my_reasons_screen.dart';
 import 'readiness_result_screen.dart';
 import 'select_quit_date_screen.dart';
+import 'support_preparation_screen.dart';
 import 'trigger_map_screen.dart';
 import 'welcome_screen.dart';
 import 'why_breathefree_screen.dart';
@@ -58,6 +59,21 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   };
   String? _customQuitReason;
   QuitReason? _topQuitReason = QuitReason.family;
+  List<SupportPersonPlan> _supportPeople = const [
+    SupportPersonPlan(
+      id: 'jordan',
+      name: 'Jordan',
+      relationship: 'Friend',
+      channel: SupportChannel.text,
+      checkIn: 'Check in the evening before my quit date',
+    ),
+  ];
+  Set<PreparationTask> _completedPreparationTasks = {
+    PreparationTask.removeSupplies,
+    PreparationTask.smokeFreeSpaces,
+  };
+  bool _treatmentSupport = true;
+  bool _careTeamReminder = true;
 
   @override
   void initState() {
@@ -80,7 +96,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 8) {
+    if (widget.currentIndex <= 9) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -250,6 +266,30 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             },
             onCustomReasonChanged: (value) {
               setState(() => _customQuitReason = value);
+            },
+            onBack: widget.onPrevious,
+            onContinue: widget.onNext,
+          );
+        }
+
+        if (widget.currentIndex == 9) {
+          return SupportPreparationScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            supportPeople: _supportPeople,
+            completedTasks: _completedPreparationTasks,
+            treatmentSupport: _treatmentSupport,
+            careTeamReminder: _careTeamReminder,
+            onSupportPeopleChanged: (value) {
+              setState(() => _supportPeople = value);
+            },
+            onCompletedTasksChanged: (value) {
+              setState(() => _completedPreparationTasks = value);
+            },
+            onTreatmentSupportChanged: (value) {
+              setState(() => _treatmentSupport = value);
+            },
+            onCareTeamReminderChanged: (value) {
+              setState(() => _careTeamReminder = value);
             },
             onBack: widget.onPrevious,
             onContinue: widget.onNext,
