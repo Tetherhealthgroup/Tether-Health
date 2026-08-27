@@ -30,6 +30,7 @@ class HomePreparationScreen extends StatelessWidget {
     required this.onOpenProfile,
     required this.onOpenReasons,
     required this.onOpenPreparation,
+    required this.onOpenDailyCheckIn,
     super.key,
   });
 
@@ -54,6 +55,7 @@ class HomePreparationScreen extends StatelessWidget {
   final VoidCallback onOpenProfile;
   final VoidCallback onOpenReasons;
   final VoidCallback onOpenPreparation;
+  final VoidCallback onOpenDailyCheckIn;
 
   DateTime get _today => DateUtils.dateOnly(DateTime.now());
 
@@ -267,6 +269,12 @@ class HomePreparationScreen extends StatelessWidget {
       builder: (sheetContext) => _PreparationNotificationsSheet(
         isSpanish: isSpanish,
         upcomingItems: _upcomingItems,
+        onStartCheckIn: () {
+          Navigator.of(sheetContext).pop();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            onOpenDailyCheckIn();
+          });
+        },
         onDone: () => Navigator.of(sheetContext).pop(),
       ),
     );
@@ -1499,11 +1507,13 @@ class _PreparationNotificationsSheet extends StatelessWidget {
   const _PreparationNotificationsSheet({
     required this.isSpanish,
     required this.upcomingItems,
+    required this.onStartCheckIn,
     required this.onDone,
   });
 
   final bool isSpanish;
   final List<_UpcomingPlanItem> upcomingItems;
+  final VoidCallback onStartCheckIn;
   final VoidCallback onDone;
 
   @override
@@ -1534,6 +1544,59 @@ class _PreparationNotificationsSheet extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
+            Material(
+              color: AppColors.mint,
+              borderRadius: BorderRadius.circular(17),
+              clipBehavior: Clip.antiAlias,
+              child: InkWell(
+                key: const ValueKey('preparation-start-check-in'),
+                onTap: onStartCheckIn,
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Row(
+                    children: [
+                      const CircleAvatar(
+                        backgroundColor: AppColors.deepTeal,
+                        foregroundColor: AppColors.lime,
+                        child: Icon(Icons.checklist_rounded),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isSpanish
+                                  ? 'Tu registro diario está listo'
+                                  : 'Your daily check-in is ready',
+                              style: const TextStyle(
+                                color: AppColors.deepTeal,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              isSpanish
+                                  ? 'Aproximadamente 60 segundos'
+                                  : 'About 60 seconds',
+                              style: const TextStyle(
+                                color: AppColors.tealSecondary,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(
+                        Icons.chevron_right_rounded,
+                        color: AppColors.deepTeal,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
             if (upcomingItems.isEmpty)
               Text(
                 isSpanish

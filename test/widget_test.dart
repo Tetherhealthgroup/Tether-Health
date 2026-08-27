@@ -1157,6 +1157,23 @@ void main() {
     expect(find.text('Tu preparación'), findsOneWidget);
     expect(find.text('Abrir Rescate'), findsOneWidget);
     expect(find.textContaining('Proteger a mi familia'), findsOneWidget);
+    await tester.tap(
+      find.byKey(const ValueKey('preparation-notifications')),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Tu registro diario está listo'), findsOneWidget);
+    await tester.tap(
+      find.byKey(const ValueKey('preparation-start-check-in')),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-daily-check-in-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Registro diario'), findsOneWidget);
+    expect(find.text('¿Cómo estás hoy?'), findsOneWidget);
+    expect(find.text('Guardar registro'), findsOneWidget);
+    expect(find.text('Abrir Rescate'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -1644,9 +1661,10 @@ void main() {
       find.textContaining('Review Jordan’s message'),
       findsWidgets,
     );
-    await tester.tap(
-      find.byKey(const ValueKey('preparation-notifications-done')),
-    );
+    final notificationsDone =
+        find.byKey(const ValueKey('preparation-notifications-done'));
+    await tester.ensureVisible(notificationsDone);
+    await tester.tap(notificationsDone);
     await tester.pumpAndSettle();
 
     expect(
@@ -1748,6 +1766,201 @@ void main() {
 
       final upcoming = find.byKey(const ValueKey('preparation-upcoming-card'));
       await tester.ensureVisible(upcoming);
+      await tester.pumpAndSettle();
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets('Screen 12 notification opens Screen 13 and close returns home',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 11));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('preparation-notifications')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Your daily check-in is ready'), findsOneWidget);
+    await tester.tap(
+      find.byKey(const ValueKey('preparation-start-check-in')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-daily-check-in-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Daily check-in'), findsOneWidget);
+    expect(find.text('How are you doing today?'), findsOneWidget);
+    expect(find.text('Save check-in'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('checkin-close')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-home-preparation-screen')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 13 edits save and persist after returning from Screen 14',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 12));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-daily-check-in-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('6'), findsOneWidget);
+    expect(find.text('6 · Moderate'), findsOneWidget);
+    expect(find.text('7 / 10'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('checkin-mood-good')));
+    await tester.pumpAndSettle();
+    final cigarettePlus = find.byKey(const ValueKey('checkin-cigarette-plus'));
+    await tester.ensureVisible(cigarettePlus);
+    await tester.pumpAndSettle();
+    await tester.tap(cigarettePlus);
+    await tester.pumpAndSettle();
+    expect(find.text('7'), findsWidgets);
+
+    final symptoms =
+        find.byKey(const ValueKey('checkin-symptom-troubleSleeping'));
+    await tester.ensureVisible(symptoms);
+    await tester.tap(symptoms);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('checkin-symptom-other')));
+    await tester.pumpAndSettle();
+    final otherField =
+        find.byKey(const ValueKey('checkin-other-symptom-field'));
+    await tester.ensureVisible(otherField);
+    await tester.enterText(
+      otherField,
+      'Headache',
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('checkin-save')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-14')), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('Go back'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-daily-check-in-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('7'), findsWidgets);
+    expect(find.text('Headache'), findsOneWidget);
+    expect(
+      tester.widget<FilterChip>(symptoms).selected,
+      isTrue,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 13 smoking choices and Rescue navigation work',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 12));
+    await tester.pumpAndSettle();
+
+    final smokingNone = find.byKey(const ValueKey('checkin-smoking-none'));
+    await tester.ensureVisible(smokingNone);
+    await tester.pumpAndSettle();
+    await tester.tap(smokingNone);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('checkin-cigarette-count')),
+      findsNothing,
+    );
+    final smokingOneOrMore =
+        find.byKey(const ValueKey('checkin-smoking-oneOrMore'));
+    await tester.ensureVisible(smokingOneOrMore);
+    await tester.pumpAndSettle();
+    await tester.tap(smokingOneOrMore);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('checkin-cigarette-count')),
+      findsOneWidget,
+    );
+
+    final rescue = find.byKey(const ValueKey('checkin-open-rescue'));
+    await tester.ensureVisible(rescue);
+    await tester.tap(rescue);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-17')), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('Go back'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-daily-check-in-screen')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 13 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-13-${device.name}'),
+          initialScreen: 12,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-daily-check-in-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 13.',
+      );
+      expect(
+        tester
+            .getRect(find.byKey(const ValueKey('checkin-save')))
+            .overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep Save check-in visible.',
+      );
+
+      final support = find.byKey(const ValueKey('checkin-open-rescue'));
+      await tester.ensureVisible(support);
       await tester.pumpAndSettle();
       expect(
         tester.takeException(),
@@ -2278,6 +2491,25 @@ void main() {
       find.byKey(const ValueKey('functional-home-preparation-screen')),
       findsOneWidget,
       reason: 'Screen 12 should not advance through a forward swipe.',
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('preparation-notifications')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('preparation-start-check-in')),
+    );
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-daily-check-in-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-daily-check-in-screen')),
+      findsOneWidget,
+      reason: 'Screen 13 should require its explicit Save button.',
     );
     expect(tester.takeException(), isNull);
   });
