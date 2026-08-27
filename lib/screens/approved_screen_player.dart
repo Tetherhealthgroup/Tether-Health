@@ -13,6 +13,7 @@ import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
 import 'my_reasons_screen.dart';
 import 'readiness_result_screen.dart';
+import 'review_quit_plan_screen.dart';
 import 'select_quit_date_screen.dart';
 import 'support_preparation_screen.dart';
 import 'trigger_map_screen.dart';
@@ -74,6 +75,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   };
   bool _treatmentSupport = true;
   bool _careTeamReminder = true;
+  bool _editingPlanFromReview = false;
 
   @override
   void initState() {
@@ -96,7 +98,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 9) {
+    if (widget.currentIndex <= 10) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -113,6 +115,34 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     unawaited(
       SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky),
     );
+  }
+
+  void _openPlanEditor(int index) {
+    setState(() => _editingPlanFromReview = true);
+    widget.onSelectScreen(index);
+  }
+
+  void _finishPlanEdit() {
+    setState(() => _editingPlanFromReview = false);
+    widget.onPrevious();
+  }
+
+  void _cancelPlanEdit() {
+    setState(() => _editingPlanFromReview = false);
+    widget.onPrevious();
+  }
+
+  DateTime _defaultQuitDate() {
+    final today = DateUtils.dateOnly(DateTime.now());
+    return switch (_quitPlanPath) {
+      QuitPlanPath.setQuitDate => today.add(const Duration(days: 7)),
+      QuitPlanPath.quitToday => today,
+      QuitPlanPath.reduceGradually => today.add(const Duration(days: 14)),
+    };
+  }
+
+  void _saveEffectiveQuitDate() {
+    setState(() => _quitDate ??= _defaultQuitDate());
   }
 
   @override
@@ -227,8 +257,10 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
                 _quitDate = null;
               });
             },
-            onBack: widget.onPrevious,
-            onContinue: widget.onNext,
+            onBack:
+                _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
+            onContinue:
+                _editingPlanFromReview ? _finishPlanEdit : widget.onNext,
           );
         }
 
@@ -244,10 +276,15 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onQuitDayCheckInChanged: (value) {
               setState(() => _quitDayCheckIn = value);
             },
-            onBack: widget.onPrevious,
+            onBack:
+                _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
             onContinue: (value) {
               setState(() => _quitDate = value);
-              widget.onNext();
+              if (_editingPlanFromReview) {
+                _finishPlanEdit();
+              } else {
+                widget.onNext();
+              }
             },
           );
         }
@@ -267,8 +304,10 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onCustomReasonChanged: (value) {
               setState(() => _customQuitReason = value);
             },
-            onBack: widget.onPrevious,
-            onContinue: widget.onNext,
+            onBack:
+                _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
+            onContinue:
+                _editingPlanFromReview ? _finishPlanEdit : widget.onNext,
           );
         }
 
@@ -291,8 +330,37 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onCareTeamReminderChanged: (value) {
               setState(() => _careTeamReminder = value);
             },
+            onBack:
+                _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
+            onContinue:
+                _editingPlanFromReview ? _finishPlanEdit : widget.onNext,
+          );
+        }
+
+        if (widget.currentIndex == 10) {
+          return ReviewQuitPlanScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            quitPath: _quitPlanPath,
+            quitDate: _quitDate,
+            selectedReasons: _quitReasons,
+            customReason: _customQuitReason,
+            topReason: _topQuitReason,
+            supportPeople: _supportPeople,
+            completedTasks: _completedPreparationTasks,
+            treatmentSupport: _treatmentSupport,
+            careTeamReminder: _careTeamReminder,
             onBack: widget.onPrevious,
-            onContinue: widget.onNext,
+            onEditQuitDate: () => _openPlanEditor(7),
+            onEditApproach: () => _openPlanEditor(6),
+            onEditReasons: () => _openPlanEditor(8),
+            onEditSupport: () => _openPlanEditor(9),
+            onEditPreparation: () => _openPlanEditor(9),
+            onEditTreatment: () => _openPlanEditor(9),
+            onStartPlan: () {
+              _saveEffectiveQuitDate();
+              widget.onNext();
+            },
+            onSaveForLater: _saveEffectiveQuitDate,
           );
         }
 

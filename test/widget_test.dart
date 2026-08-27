@@ -876,7 +876,7 @@ void main() {
 
     expect(find.text('Today is your starting point.'), findsOneWidget);
     expect(find.text('Start my quit today'), findsOneWidget);
-    expect(find.text('Starting today'), findsOneWidget);
+    expect(find.textContaining('Starting today'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('quit-date-back')));
     await tester.pumpAndSettle();
@@ -1133,6 +1133,19 @@ void main() {
     expect(find.text('Apoyo y preparación'), findsOneWidget);
     expect(find.text('No tienes que hacer esto a solas.'), findsOneWidget);
     expect(find.text('Guardar mi plan de apoyo'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('support-save')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Revisa tu plan'), findsOneWidget);
+    expect(find.text('5 DE 5'), findsOneWidget);
+    expect(find.text('Tu plan está listo.'), findsOneWidget);
+    expect(find.text('Proteger a mi familia'), findsOneWidget);
+    expect(find.text('Comenzar mi plan para dejarlo'), findsOneWidget);
+    expect(find.text('Guardar y terminar después'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -1307,7 +1320,10 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('support-save')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-11')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -1350,6 +1366,188 @@ void main() {
       final finalTask =
           find.byKey(const ValueKey('preparation-task-stockAlternatives'));
       await tester.ensureVisible(finalTask);
+      await tester.pumpAndSettle();
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets('Screen 11 reviews the saved plan and starts Screen 12',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 10));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Review your plan'), findsOneWidget);
+    expect(find.text('5 OF 5'), findsOneWidget);
+    expect(find.text('100%'), findsOneWidget);
+    expect(find.text('Your plan is ready.'), findsOneWidget);
+    expect(find.text('Set a quit date'), findsOneWidget);
+    expect(find.text('Protect my family'), findsOneWidget);
+    expect(find.text('Jordan · Evening before'), findsOneWidget);
+    expect(find.text('2 of 3 tasks complete'), findsOneWidget);
+    expect(
+      find.text('Care-team discussion reminder on'),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('review-save-later')));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Your plan is saved. Come back whenever you are ready.'),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('review-start-plan')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-12')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 11 edits return to the review and keep new choices',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 10));
+    await tester.pumpAndSettle();
+
+    final reasons = find.byKey(const ValueKey('review-edit-reasons'));
+    await tester.ensureVisible(reasons);
+    await tester.tap(reasons);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-my-reasons-screen')),
+      findsOneWidget,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('reason-choice-saveMoney')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('reason-top-saveMoney')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('reasons-save')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Save money'), findsOneWidget);
+
+    final approach = find.byKey(const ValueKey('review-edit-approach'));
+    await tester.ensureVisible(approach);
+    await tester.tap(approach);
+    await tester.pumpAndSettle();
+    final quitToday = find.byKey(const ValueKey('quit-path-choice-quitToday'));
+    await tester.ensureVisible(quitToday);
+    await tester.pumpAndSettle();
+    await tester.tap(quitToday);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('quit-path-continue')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Quit today'), findsOneWidget);
+    expect(find.textContaining('Starting today'), findsOneWidget);
+
+    final support = find.byKey(const ValueKey('review-edit-support'));
+    await tester.ensureVisible(support);
+    await tester.tap(support);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-support-preparation-screen')),
+      findsOneWidget,
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('support-person-edit-jordan')),
+    );
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('support-person-name-field')),
+      'Jordan Lee',
+    );
+    await tester.tap(find.byKey(const ValueKey('support-person-save')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('support-save')));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Jordan Lee · Evening before'), findsOneWidget);
+    expect(find.text('Save money'), findsOneWidget);
+    expect(find.text('Quit today'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 11 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-11-${device.name}'),
+          initialScreen: 10,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 11.',
+      );
+      for (final key in const [
+        ValueKey('review-start-plan'),
+        ValueKey('review-save-later'),
+      ]) {
+        expect(
+          tester.getRect(find.byKey(key)).overlaps(Offset.zero & device.size),
+          isTrue,
+          reason: '${device.name} should keep both actions visible.',
+        );
+      }
+
+      final treatment = find.byKey(const ValueKey('review-edit-treatment'));
+      await tester.ensureVisible(treatment);
       await tester.pumpAndSettle();
       expect(
         tester.takeException(),
@@ -1854,6 +2052,19 @@ void main() {
       find.byKey(const ValueKey('functional-support-preparation-screen')),
       findsOneWidget,
       reason: 'Screen 10 should require its explicit Save button.',
+    );
+    await tester.tap(find.byKey(const ValueKey('support-save')));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+      findsOneWidget,
+      reason: 'Screen 11 should require its explicit Start button.',
     );
     expect(tester.takeException(), isNull);
   });
