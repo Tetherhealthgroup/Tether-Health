@@ -11,6 +11,7 @@ import '../widgets/approved_screen_viewport.dart';
 import 'baseline_assessment_screen.dart';
 import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
+import 'daily_check_in_screen.dart';
 import 'home_preparation_screen.dart';
 import 'my_reasons_screen.dart';
 import 'readiness_result_screen.dart';
@@ -78,6 +79,17 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _careTeamReminder = true;
   bool _editingPlanFromReview = false;
   bool _hasUnreadPreparationNotifications = true;
+  DailyMood _dailyMood = DailyMood.okay;
+  int _dailyStressLevel = 4;
+  DailySmokingStatus _dailySmokingStatus = DailySmokingStatus.oneOrMore;
+  int _dailyCigaretteCount = 6;
+  int _dailyStrongestCraving = 6;
+  int _dailyConfidence = 7;
+  Set<DailySymptom> _dailySymptoms = {
+    DailySymptom.restless,
+    DailySymptom.irritable,
+  };
+  String? _dailyOtherSymptom;
 
   @override
   void initState() {
@@ -100,7 +112,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 11) {
+    if (widget.currentIndex <= 12) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -393,6 +405,48 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onOpenProfile: () => widget.onSelectScreen(27),
             onOpenReasons: () => widget.onSelectScreen(8),
             onOpenPreparation: () => widget.onSelectScreen(9),
+            onOpenDailyCheckIn: () => widget.onSelectScreen(12),
+          );
+        }
+
+        if (widget.currentIndex == 12) {
+          return DailyCheckInScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            mood: _dailyMood,
+            stressLevel: _dailyStressLevel,
+            smokingStatus: _dailySmokingStatus,
+            cigaretteCount: _dailyCigaretteCount,
+            strongestCraving: _dailyStrongestCraving,
+            confidence: _dailyConfidence,
+            symptoms: _dailySymptoms,
+            otherSymptom: _dailyOtherSymptom,
+            onMoodChanged: (value) {
+              setState(() => _dailyMood = value);
+            },
+            onStressChanged: (value) {
+              setState(() => _dailyStressLevel = value);
+            },
+            onSmokingStatusChanged: (value) {
+              setState(() => _dailySmokingStatus = value);
+            },
+            onCigaretteCountChanged: (value) {
+              setState(() => _dailyCigaretteCount = value);
+            },
+            onStrongestCravingChanged: (value) {
+              setState(() => _dailyStrongestCraving = value);
+            },
+            onConfidenceChanged: (value) {
+              setState(() => _dailyConfidence = value);
+            },
+            onSymptomsChanged: (value) {
+              setState(() => _dailySymptoms = value);
+            },
+            onOtherSymptomChanged: (value) {
+              setState(() => _dailyOtherSymptom = value);
+            },
+            onClose: widget.onPrevious,
+            onOpenRescue: () => widget.onSelectScreen(16),
+            onSave: widget.onNext,
           );
         }
 
