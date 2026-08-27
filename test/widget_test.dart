@@ -1146,6 +1146,17 @@ void main() {
     expect(find.text('Proteger a mi familia'), findsOneWidget);
     expect(find.text('Comenzar mi plan para dejarlo'), findsOneWidget);
     expect(find.text('Guardar y terminar después'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('review-start-plan')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-home-preparation-screen')),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Alex.'), findsOneWidget);
+    expect(find.text('Tu preparación'), findsOneWidget);
+    expect(find.text('Abrir Rescate'), findsOneWidget);
+    expect(find.textContaining('Proteger a mi familia'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -1418,7 +1429,10 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('review-start-plan')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-12')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-home-preparation-screen')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -1548,6 +1562,192 @@ void main() {
 
       final treatment = find.byKey(const ValueKey('review-edit-treatment'));
       await tester.ensureVisible(treatment);
+      await tester.pumpAndSettle();
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets('Screen 12 shows the activated plan and completes its next task',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 11));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-home-preparation-screen')),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Alex.'), findsOneWidget);
+    expect(find.text('7 days'), findsOneWidget);
+    expect(find.text('Stock gum, water or healthy snacks'), findsOneWidget);
+    expect(find.text('2/3'), findsOneWidget);
+    expect(find.textContaining('Protect my family'), findsOneWidget);
+    expect(find.text('1 supporter'), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(const ValueKey('preparation-primary-action')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('3/3'), findsOneWidget);
+    expect(find.text('Your preparation is complete'), findsOneWidget);
+    expect(find.text('View plan'), findsOneWidget);
+
+    final planCard = find.byKey(const ValueKey('preparation-plan-card'));
+    await tester.ensureVisible(planCard);
+    await tester.pumpAndSettle();
+    await tester.tap(planCard);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('review-back')));
+    await tester.pumpAndSettle();
+    expect(find.text('3/3'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 12 notifications open and clear the unread indicator',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 11));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('preparation-notification-dot')),
+      findsOneWidget,
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('preparation-notifications')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Upcoming reminders'), findsOneWidget);
+    expect(find.text('Discuss treatment options'), findsWidgets);
+    expect(
+      find.textContaining('Review Jordan’s message'),
+      findsWidgets,
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('preparation-notifications-done')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('preparation-notification-dot')),
+      findsNothing,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 12 rescue and bottom navigation open their destinations',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    const destinations = <({String key, String imageKey})>[
+      (key: 'preparation-open-rescue', imageKey: 'screen-image-17'),
+      (key: 'preparation-nav-progress', imageKey: 'screen-image-26'),
+      (key: 'preparation-nav-learn', imageKey: 'screen-image-25'),
+      (key: 'preparation-nav-support', imageKey: 'screen-image-27'),
+      (key: 'preparation-profile', imageKey: 'screen-image-28'),
+    ];
+
+    for (final destination in destinations) {
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-12-${destination.key}'),
+          initialScreen: 11,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final action = find.byKey(ValueKey(destination.key));
+      await tester.ensureVisible(action);
+      await tester.tap(action);
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(ValueKey(destination.imageKey)),
+        findsOneWidget,
+        reason: '${destination.key} should open its approved destination.',
+      );
+    }
+
+    await tester.pumpWidget(
+      const BreatheFreeApp(
+        key: ValueKey('screen-12-plan-navigation'),
+        initialScreen: 11,
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('preparation-nav-plan')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 12 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-12-${device.name}'),
+          initialScreen: 11,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-home-preparation-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 12.',
+      );
+      expect(
+        tester
+            .getRect(
+              find.byKey(const ValueKey('preparation-bottom-navigation')),
+            )
+            .overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep bottom navigation visible.',
+      );
+
+      final upcoming = find.byKey(const ValueKey('preparation-upcoming-card'));
+      await tester.ensureVisible(upcoming);
       await tester.pumpAndSettle();
       expect(
         tester.takeException(),
@@ -2065,6 +2265,19 @@ void main() {
       find.byKey(const ValueKey('functional-review-quit-plan-screen')),
       findsOneWidget,
       reason: 'Screen 11 should require its explicit Start button.',
+    );
+    await tester.tap(find.byKey(const ValueKey('review-start-plan')));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-home-preparation-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-home-preparation-screen')),
+      findsOneWidget,
+      reason: 'Screen 12 should not advance through a forward swipe.',
     );
     expect(tester.takeException(), isNull);
   });

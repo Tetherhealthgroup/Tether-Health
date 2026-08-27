@@ -11,6 +11,7 @@ import '../widgets/approved_screen_viewport.dart';
 import 'baseline_assessment_screen.dart';
 import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
+import 'home_preparation_screen.dart';
 import 'my_reasons_screen.dart';
 import 'readiness_result_screen.dart';
 import 'review_quit_plan_screen.dart';
@@ -76,6 +77,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _treatmentSupport = true;
   bool _careTeamReminder = true;
   bool _editingPlanFromReview = false;
+  bool _hasUnreadPreparationNotifications = true;
 
   @override
   void initState() {
@@ -98,7 +100,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 10) {
+    if (widget.currentIndex <= 11) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -361,6 +363,36 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               widget.onNext();
             },
             onSaveForLater: _saveEffectiveQuitDate,
+          );
+        }
+
+        if (widget.currentIndex == 11) {
+          return HomePreparationScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            quitPath: _quitPlanPath,
+            quitDate: _quitDate,
+            selectedReasons: _quitReasons,
+            customReason: _customQuitReason,
+            topReason: _topQuitReason,
+            supportPeople: _supportPeople,
+            completedTasks: _completedPreparationTasks,
+            treatmentSupport: _treatmentSupport,
+            careTeamReminder: _careTeamReminder,
+            hasUnreadNotifications: _hasUnreadPreparationNotifications,
+            onNotificationsViewed: () {
+              setState(() => _hasUnreadPreparationNotifications = false);
+            },
+            onTaskCompleted: (task) {
+              setState(() => _completedPreparationTasks.add(task));
+            },
+            onOpenRescue: () => widget.onSelectScreen(16),
+            onOpenPlan: () => widget.onSelectScreen(10),
+            onOpenProgress: () => widget.onSelectScreen(25),
+            onOpenLearn: () => widget.onSelectScreen(24),
+            onOpenSupport: () => widget.onSelectScreen(26),
+            onOpenProfile: () => widget.onSelectScreen(27),
+            onOpenReasons: () => widget.onSelectScreen(8),
+            onOpenPreparation: () => widget.onSelectScreen(9),
           );
         }
 
