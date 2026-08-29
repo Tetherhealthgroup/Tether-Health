@@ -1198,6 +1198,25 @@ void main() {
     expect(find.text('PASO 1 DE 3 · RESPIRA'), findsOneWidget);
     expect(find.text('Pausar'), findsOneWidget);
     expect(find.text('Abrir Rescate'), findsOneWidget);
+
+    final stressResetSkip = find.byKey(const ValueKey('stress-reset-skip'));
+    await tester.ensureVisible(stressResetSkip);
+    await tester.tap(stressResetSkip);
+    await tester.pump();
+    await tester.tap(stressResetSkip);
+    await tester.pump();
+    await tester.tap(stressResetSkip);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(
+        const ValueKey('functional-exercise-complete-recheck-screen'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Le diste tiempo a la sensación para cambiar.'),
+        findsOneWidget);
+    expect(find.text('¿Qué tan fuerte es el antojo ahora?'), findsOneWidget);
+    expect(find.text('Guardar resultado'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -2926,7 +2945,10 @@ void main() {
 
     await tester.tap(skip);
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-16')), findsOneWidget);
+    expect(
+        find.byKey(
+            const ValueKey('functional-exercise-complete-recheck-screen')),
+        findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -3038,6 +3060,230 @@ void main() {
         tester.getRect(end).overlaps(Offset.zero & device.size),
         isTrue,
         reason: '${device.name} should reach End exercise.',
+      );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    }
+  });
+
+  testWidgets('Screen 16 shows an honest completion recheck', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const BreatheFreeApp(
+        key: ValueKey('screen-16-save-flow'),
+        initialScreen: 15,
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      find.byKey(
+        const ValueKey('functional-exercise-complete-recheck-screen'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('COMPLETE'), findsOneWidget);
+    expect(find.text('You gave the feeling time to change.'), findsOneWidget);
+    expect(find.text('0:00'), findsOneWidget);
+    expect(find.text('3 of 3'), findsOneWidget);
+    expect(find.text('Saved'), findsOneWidget);
+    expect(find.text('How strong is the craving now?'), findsOneWidget);
+    expect(find.text('6 · Moderate'), findsOneWidget);
+    expect(find.text('6 / 10'), findsNWidgets(2));
+    expect(find.text('— 0'), findsOneWidget);
+    expect(find.text('Save result'), findsOneWidget);
+
+    await tester.fling(
+      find.byKey(
+        const ValueKey('functional-exercise-complete-recheck-screen'),
+      ),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(
+        const ValueKey('functional-exercise-complete-recheck-screen'),
+      ),
+      findsOneWidget,
+      reason: 'Screen 16 should require an explicit action.',
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 16 rating and helpful choice update its result',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 15));
+    await tester.pump();
+
+    final slider =
+        find.byKey(const ValueKey('exercise-recheck-craving-slider'));
+    await tester.ensureVisible(slider);
+    await tester.pump();
+    tester.widget<Slider>(slider).onChanged!(3);
+    await tester.pump();
+
+    expect(find.text('3 · Mild'), findsOneWidget);
+    expect(find.text('↓ 3'), findsOneWidget);
+
+    final water = find.byKey(const ValueKey('exercise-recheck-helpful-water'));
+    await tester.ensureVisible(water);
+    await tester.tap(water);
+    await tester.pump();
+    expect(
+      find.text('We’ll prioritize a water break when stress is high.'),
+      findsOneWidget,
+    );
+    expect(tester.widget<ChoiceChip>(water).selected, isTrue);
+
+    final switching = find.byKey(
+      const ValueKey('exercise-recheck-helpful-switchingActivities'),
+    );
+    await tester.tap(switching);
+    await tester.pump();
+    expect(tester.widget<ChoiceChip>(water).selected, isFalse);
+    expect(tester.widget<ChoiceChip>(switching).selected, isTrue);
+    expect(
+      find.text(
+        'We’ll prioritize switching activities when stress is high.',
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 16 Save returns home and Repeat restarts the exercise',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 15));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('exercise-recheck-repeat')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-guided-stress-reset-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('STEP 1 OF 3 · BREATHE'), findsOneWidget);
+    expect(find.text('3:00 LEFT'), findsOneWidget);
+
+    await tester.pumpWidget(
+      const BreatheFreeApp(
+        key: ValueKey('screen-16-save-after-repeat'),
+        initialScreen: 15,
+      ),
+    );
+    await tester.pump();
+    final slider =
+        find.byKey(const ValueKey('exercise-recheck-craving-slider'));
+    tester.widget<Slider>(slider).onChanged!(4);
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('exercise-recheck-save')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-home-preparation-screen')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 16 protects unsaved exit and opens Rescue explicitly',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 15));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('exercise-recheck-close')));
+    await tester.pumpAndSettle();
+    expect(find.text('Leave without saving?'), findsOneWidget);
+    await tester.tap(
+      find.byKey(const ValueKey('exercise-recheck-exit-stay')),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(
+        const ValueKey('functional-exercise-complete-recheck-screen'),
+      ),
+      findsOneWidget,
+    );
+
+    final rescue = find.byKey(const ValueKey('exercise-recheck-rescue'));
+    await tester.ensureVisible(rescue);
+    await tester.pump();
+    await tester.tap(rescue);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-17')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 16 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-16-${device.name}'),
+          initialScreen: 15,
+        ),
+      );
+      await tester.pump();
+
+      expect(
+        find.byKey(
+          const ValueKey('functional-exercise-complete-recheck-screen'),
+        ),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 16.',
+      );
+      final save = find.byKey(const ValueKey('exercise-recheck-save'));
+      expect(
+        tester.getRect(save).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep Save result visible.',
+      );
+
+      final rescue = find.byKey(const ValueKey('exercise-recheck-rescue'));
+      await tester.ensureVisible(rescue);
+      await tester.pump();
+      expect(
+        tester.getRect(rescue).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should reach Rescue.',
       );
       expect(
         tester.takeException(),
