@@ -11,6 +11,7 @@ import '../widgets/approved_screen_viewport.dart';
 import 'baseline_assessment_screen.dart';
 import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
+import 'craving_rescue_start_screen.dart';
 import 'daily_check_in_screen.dart';
 import 'exercise_complete_recheck_screen.dart';
 import 'guided_stress_reset_screen.dart';
@@ -105,6 +106,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   int _stressResetRecheckCraving = 6;
   StressResetHelpfulChoice? _stressResetHelpfulChoice;
   bool _stressResetResultSaved = false;
+  int _rescueIntensity = 6;
+  Set<RescueContext> _rescueContexts = <RescueContext>{};
 
   @override
   void initState() {
@@ -127,7 +130,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 15) {
+    if (widget.currentIndex <= 16) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -172,6 +175,44 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
 
   void _saveEffectiveQuitDate() {
     setState(() => _quitDate ??= _defaultQuitDate());
+  }
+
+  void _openRescue([int? intensity]) {
+    setState(() {
+      _rescueIntensity =
+          (intensity ?? _dailyStrongestCraving).clamp(1, 10).toInt();
+    });
+    widget.onSelectScreen(16);
+  }
+
+  String _rescueTopReasonLabel(bool isSpanish) {
+    final reason = _topQuitReason ??
+        (_quitReasons.isNotEmpty ? _quitReasons.first : QuitReason.family);
+    return switch (reason) {
+      QuitReason.family =>
+        isSpanish ? 'Proteger a mi familia' : 'Protect my family',
+      QuitReason.breatheEasier =>
+        isSpanish ? 'Respirar mejor' : 'Breathe easier',
+      QuitReason.improveHealth =>
+        isSpanish ? 'Mejorar mi salud' : 'Improve my health',
+      QuitReason.saveMoney => isSpanish ? 'Ahorrar dinero' : 'Save money',
+      QuitReason.control =>
+        isSpanish ? 'Sentirme en control' : 'Feel more in control',
+      QuitReason.future =>
+        isSpanish ? 'Estar presente para mi futuro' : 'Be there for my future',
+      QuitReason.custom => _customQuitReason?.trim().isNotEmpty == true
+          ? _customQuitReason!.trim()
+          : (isSpanish ? 'Mi propia razón' : 'My own reason'),
+    };
+  }
+
+  String _rescueSupportName(bool isSpanish) {
+    for (final person in _supportPeople) {
+      if (person.enabled && person.name.trim().isNotEmpty) {
+        return person.name.trim();
+      }
+    }
+    return isSpanish ? 'tu persona de apoyo' : 'your support person';
   }
 
   @override
@@ -412,7 +453,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onTaskCompleted: (task) {
               setState(() => _completedPreparationTasks.add(task));
             },
-            onOpenRescue: () => widget.onSelectScreen(16),
+            onOpenRescue: _openRescue,
             onOpenPlan: () => widget.onSelectScreen(10),
             onOpenProgress: () => widget.onSelectScreen(25),
             onOpenLearn: () => widget.onSelectScreen(24),
@@ -478,7 +519,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               setState(() => _dailyOtherSymptom = value);
             },
             onClose: widget.onPrevious,
-            onOpenRescue: () => widget.onSelectScreen(16),
+            onOpenRescue: _openRescue,
             onSave: widget.onNext,
           );
         }
@@ -516,14 +557,14 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
                   widget.onSelectScreen(14);
                   return;
                 case NextStepStrategy.cravingRescue:
-                  widget.onSelectScreen(16);
+                  _openRescue();
                   return;
                 case NextStepStrategy.supportCheckIn:
                   widget.onSelectScreen(26);
                   return;
               }
             },
-            onOpenRescue: () => widget.onSelectScreen(16),
+            onOpenRescue: _openRescue,
             onOpenSupport: () => widget.onSelectScreen(26),
           );
         }
@@ -566,7 +607,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             },
             onOpenRescue: () {
               setState(() => _stressResetPaused = true);
-              widget.onSelectScreen(16);
+              _openRescue();
             },
           );
         }
@@ -608,8 +649,28 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               });
               widget.onSelectScreen(14);
             },
-            onOpenRescue: () => widget.onSelectScreen(16),
+            onOpenRescue: () => _openRescue(_stressResetRecheckCraving),
             onClose: () => widget.onSelectScreen(13),
+          );
+        }
+
+        if (widget.currentIndex == 16) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+          return CravingRescueStartScreen(
+            isSpanish: isSpanish,
+            intensity: _rescueIntensity,
+            selectedContexts: _rescueContexts,
+            topReason: _rescueTopReasonLabel(isSpanish),
+            supportName: _rescueSupportName(isSpanish),
+            onIntensityChanged: (value) {
+              setState(() => _rescueIntensity = value);
+            },
+            onContextsChanged: (value) {
+              setState(() => _rescueContexts = value);
+            },
+            onClose: widget.onPrevious,
+            onContinue: () => widget.onSelectScreen(17),
+            onViewSupport: () => widget.onSelectScreen(26),
           );
         }
 
