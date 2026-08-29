@@ -17,6 +17,45 @@ Reference viewport: 430 × 932 logical points at a 3× device pixel ratio.
 - Quitline, callback request, data export and deletion demonstrate consent or safety confirmation without performing an external side effect.
 - Desktop mode can display normalized tap targets for developer inspection.
 
+## Contact and safety routing
+
+`lib/config/contact_info.dart` is the single source of truth for every way the
+app puts a person in touch with help: both approved quitlines, the emergency
+number, and the product-support address `support@tetherhealthgroup.com`.
+
+Previously the English quitline's name lived in `tap_target.dart` and its
+number in `main.dart`, with nothing connecting them — a correctness risk for a
+safety route, because one could be corrected and the other left stale. Nothing
+should hard-code a number or address again; read it from `ContactInfo`.
+
+The support address is deliberately kept distinct from the clinical routes. It
+reaches the people who build the app, and its dialog says so and points urgent
+symptoms at the emergency number and the quitline instead.
+
+### Fixed: dialogs could never open
+
+`_BreatheFreeAppState` builds the `MaterialApp`, so its own `context` sits
+*above* it and has neither a `Navigator` nor `MaterialLocalizations`. Every
+dialog was shown with that context and therefore threw "No MaterialLocalizations
+found" instead of opening — the quitline, call-back consent, data-export and
+account-deletion dialogs included. The app now holds a `navigatorKey` and shows
+dialogs from `_navigatorKey.currentContext`. Covered by
+`test/contact_info_test.dart`.
+
+### Fixed: the primary action ran underneath the tab bar
+
+On screens 13-21 the "Continue" target ran from 0.72 to 0.89 while the tab bar
+starts at 0.875. The tab bar is added to the `Stack` later and so won the hit
+test, silently taking the lowest strip of the primary action. Targets above the
+tab bar now stop at `_tabBarTop`, and a test asserts that no two targets on any
+screen overlap.
+
+### Reachable now
+
+The approved artwork drew these controls, but no tap target covered them:
+the Spanish quitline on the Support hub, the supporter and quit-coach rows, and
+the accessibility card in Settings & privacy.
+
 ## Accessibility
 
 - Every image has a screen-level semantic label.
