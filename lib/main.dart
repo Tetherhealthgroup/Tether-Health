@@ -35,6 +35,17 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   late int _currentIndex;
   final List<int> _history = <int>[];
 
+  /// Gives dialogs a context that sits below [MaterialApp].
+  ///
+  /// This State builds the MaterialApp, so its own `context` is *above* it and
+  /// has neither a Navigator nor MaterialLocalizations. Calling showDialog
+  /// with it threw "No MaterialLocalizations found" and every dialog in the
+  /// app — quitline, call-back consent, export and deletion — failed to open.
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
+  /// Context for showing dialogs, or null before the first frame.
+  BuildContext? get _dialogContext => _navigatorKey.currentContext;
+
   @override
   void initState() {
     super.initState();
@@ -105,8 +116,10 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   }
 
   Future<void> _showQuitlineDialog() async {
+    final host = _dialogContext;
+    if (host == null) return;
     await showDialog<void>(
-      context: context,
+      context: host,
       builder: (context) => AlertDialog(
         title: const Text('Call 1-800-QUIT-NOW?'),
         content: const Text(
@@ -148,8 +161,10 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     required String confirmLabel,
     bool destructive = false,
   }) async {
+    final host = _dialogContext;
+    if (host == null) return;
     await showDialog<void>(
-      context: context,
+      context: host,
       builder: (context) => AlertDialog(
         title: Text(title),
         content: Text(message),
@@ -175,6 +190,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       title: 'BreatheFree',
       debugShowCheckedModeBanner: false,
       restorationScopeId: 'breathefree',
