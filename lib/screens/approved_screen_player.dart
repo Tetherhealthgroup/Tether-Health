@@ -12,6 +12,7 @@ import 'baseline_assessment_screen.dart';
 import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
 import 'daily_check_in_screen.dart';
+import 'exercise_complete_recheck_screen.dart';
 import 'guided_stress_reset_screen.dart';
 import 'home_preparation_screen.dart';
 import 'my_reasons_screen.dart';
@@ -100,6 +101,10 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _stressResetPaused = false;
   bool _stressResetVoiceGuidance = true;
   bool _stressResetReducedMotion = true;
+  int _stressResetBeforeCraving = 6;
+  int _stressResetRecheckCraving = 6;
+  StressResetHelpfulChoice? _stressResetHelpfulChoice;
+  bool _stressResetResultSaved = false;
 
   @override
   void initState() {
@@ -122,7 +127,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 14) {
+    if (widget.currentIndex <= 15) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -550,13 +555,61 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             },
             onClose: widget.onPrevious,
             onComplete: () {
-              setState(() => _stressResetPaused = true);
+              setState(() {
+                _stressResetPaused = true;
+                _stressResetBeforeCraving = _dailyStrongestCraving;
+                _stressResetRecheckCraving = _dailyStrongestCraving;
+                _stressResetHelpfulChoice = null;
+                _stressResetResultSaved = false;
+              });
               widget.onSelectScreen(15);
             },
             onOpenRescue: () {
               setState(() => _stressResetPaused = true);
               widget.onSelectScreen(16);
             },
+          );
+        }
+
+        if (widget.currentIndex == 15) {
+          return ExerciseCompleteRecheckScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            elapsedSeconds: _stressResetTotalElapsedSeconds,
+            beforeCraving: _stressResetBeforeCraving,
+            currentCraving: _stressResetRecheckCraving,
+            helpfulChoice: _stressResetHelpfulChoice,
+            resultSaved: _stressResetResultSaved,
+            onCravingChanged: (value) {
+              setState(() {
+                _stressResetRecheckCraving = value;
+                _stressResetResultSaved = false;
+              });
+            },
+            onHelpfulChoiceChanged: (value) {
+              setState(() {
+                _stressResetHelpfulChoice = value;
+                _stressResetResultSaved = false;
+              });
+            },
+            onSave: () {
+              setState(() {
+                _stressResetResultSaved = true;
+                _dailyStrongestCraving = _stressResetRecheckCraving;
+              });
+              widget.onSelectScreen(11);
+            },
+            onRepeat: () {
+              setState(() {
+                _stressResetStep = StressResetStep.breathe;
+                _stressResetStepElapsedSeconds = 0;
+                _stressResetTotalElapsedSeconds = 0;
+                _stressResetPaused = false;
+                _stressResetResultSaved = false;
+              });
+              widget.onSelectScreen(14);
+            },
+            onOpenRescue: () => widget.onSelectScreen(16),
+            onClose: () => widget.onSelectScreen(13),
           );
         }
 
