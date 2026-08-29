@@ -19,6 +19,7 @@ import 'home_preparation_screen.dart';
 import 'my_reasons_screen.dart';
 import 'personalized_next_step_screen.dart';
 import 'readiness_result_screen.dart';
+import 'recommended_rescue_tool_screen.dart';
 import 'review_quit_plan_screen.dart';
 import 'select_quit_date_screen.dart';
 import 'support_preparation_screen.dart';
@@ -108,6 +109,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _stressResetResultSaved = false;
   int _rescueIntensity = 6;
   Set<RescueContext> _rescueContexts = <RescueContext>{};
+  RescueTool _rescueTool = RescueTool.slowBreathing;
 
   @override
   void initState() {
@@ -130,7 +132,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 16) {
+    if (widget.currentIndex <= 17) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -670,6 +672,23 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             },
             onClose: widget.onPrevious,
             onContinue: () => widget.onSelectScreen(17),
+            onViewSupport: () => widget.onSelectScreen(26),
+          );
+        }
+
+        if (widget.currentIndex == 17) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+          return RecommendedRescueToolScreen(
+            isSpanish: isSpanish,
+            intensity: _rescueIntensity,
+            stressSelected: _rescueContexts.contains(RescueContext.stress),
+            supportName: _rescueSupportName(isSpanish),
+            selectedTool: _rescueTool,
+            onToolChanged: (value) {
+              setState(() => _rescueTool = value);
+            },
+            onBack: widget.onPrevious,
+            onStart: () => widget.onSelectScreen(18),
             onViewSupport: () => widget.onSelectScreen(26),
           );
         }
