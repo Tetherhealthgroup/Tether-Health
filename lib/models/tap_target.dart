@@ -24,9 +24,15 @@ class AppTapTarget {
   final int? destination;
 }
 
+/// Top edge of the five-tab bar, as a fraction of screen height.
+const double _tabBarTop = 0.875;
+
 List<AppTapTarget> tapTargetsFor(int index) {
   final number = index + 1;
   final targets = <AppTapTarget>[];
+
+  // Screens 12-27 carry the tab bar; anything above it must stop short of it.
+  final hasTabBar = number >= 12 && number <= 27;
 
   if (number > 1) {
     targets.add(
@@ -39,9 +45,18 @@ List<AppTapTarget> tapTargetsFor(int index) {
   }
 
   if (number <= 11 || (number >= 13 && number <= 21)) {
+    // On tab-bar screens this stopped at 0.89 and so ran 0.015 underneath the
+    // tab bar, which is added later and therefore won the hit test. The
+    // primary action silently lost its lowest strip of touch area.
+    const double top = 0.72;
     targets.add(
       AppTapTarget(
-        normalizedRect: const Rect.fromLTWH(0.05, 0.72, 0.90, 0.17),
+        normalizedRect: Rect.fromLTWH(
+          0.05,
+          top,
+          0.90,
+          hasTabBar ? _tabBarTop - top : 0.17,
+        ),
         label: number == 1 ? 'Get started' : 'Continue to the next step',
         action: TapAction.navigate,
         destination: (index + 1).clamp(0, 27).toInt(),
@@ -133,31 +148,31 @@ List<AppTapTarget> tapTargetsFor(int index) {
     final homeDestination = number >= 22 ? 21 : 11;
     targets.addAll([
       AppTapTarget(
-        normalizedRect: const Rect.fromLTWH(0.00, 0.875, 0.20, 0.11),
+        normalizedRect: const Rect.fromLTWH(0.00, _tabBarTop, 0.20, 0.11),
         label: 'Home tab',
         action: TapAction.navigate,
         destination: homeDestination,
       ),
       const AppTapTarget(
-        normalizedRect: Rect.fromLTWH(0.20, 0.875, 0.20, 0.11),
+        normalizedRect: Rect.fromLTWH(0.20, _tabBarTop, 0.20, 0.11),
         label: 'Plan tab',
         action: TapAction.navigate,
         destination: 10,
       ),
       const AppTapTarget(
-        normalizedRect: Rect.fromLTWH(0.40, 0.875, 0.20, 0.11),
+        normalizedRect: Rect.fromLTWH(0.40, _tabBarTop, 0.20, 0.11),
         label: 'Progress tab',
         action: TapAction.navigate,
         destination: 25,
       ),
       const AppTapTarget(
-        normalizedRect: Rect.fromLTWH(0.60, 0.875, 0.20, 0.11),
+        normalizedRect: Rect.fromLTWH(0.60, _tabBarTop, 0.20, 0.11),
         label: 'Learn tab',
         action: TapAction.navigate,
         destination: 24,
       ),
       const AppTapTarget(
-        normalizedRect: Rect.fromLTWH(0.80, 0.875, 0.20, 0.11),
+        normalizedRect: Rect.fromLTWH(0.80, _tabBarTop, 0.20, 0.11),
         label: 'Support tab',
         action: TapAction.navigate,
         destination: 26,
