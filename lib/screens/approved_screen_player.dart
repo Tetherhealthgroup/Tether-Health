@@ -12,6 +12,7 @@ import 'baseline_assessment_screen.dart';
 import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
 import 'daily_check_in_screen.dart';
+import 'guided_stress_reset_screen.dart';
 import 'home_preparation_screen.dart';
 import 'my_reasons_screen.dart';
 import 'personalized_next_step_screen.dart';
@@ -93,6 +94,12 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   String? _dailyOtherSymptom;
   NextStepStrategy? _nextStepStrategyOverride;
   final Set<NextStepStrategy> _copingPlanStrategies = <NextStepStrategy>{};
+  StressResetStep _stressResetStep = StressResetStep.breathe;
+  int _stressResetStepElapsedSeconds = 0;
+  int _stressResetTotalElapsedSeconds = 0;
+  bool _stressResetPaused = false;
+  bool _stressResetVoiceGuidance = true;
+  bool _stressResetReducedMotion = true;
 
   @override
   void initState() {
@@ -115,7 +122,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 13) {
+    if (widget.currentIndex <= 14) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -513,6 +520,43 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             },
             onOpenRescue: () => widget.onSelectScreen(16),
             onOpenSupport: () => widget.onSelectScreen(26),
+          );
+        }
+
+        if (widget.currentIndex == 14) {
+          return GuidedStressResetScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            step: _stressResetStep,
+            stepElapsedSeconds: _stressResetStepElapsedSeconds,
+            totalElapsedSeconds: _stressResetTotalElapsedSeconds,
+            isPaused: _stressResetPaused,
+            voiceGuidanceEnabled: _stressResetVoiceGuidance,
+            reducedMotionEnabled: _stressResetReducedMotion,
+            onProgressChanged: (step, stepElapsed, totalElapsed) {
+              setState(() {
+                _stressResetStep = step;
+                _stressResetStepElapsedSeconds = stepElapsed;
+                _stressResetTotalElapsedSeconds = totalElapsed;
+              });
+            },
+            onPausedChanged: (value) {
+              setState(() => _stressResetPaused = value);
+            },
+            onVoiceGuidanceChanged: (value) {
+              setState(() => _stressResetVoiceGuidance = value);
+            },
+            onReducedMotionChanged: (value) {
+              setState(() => _stressResetReducedMotion = value);
+            },
+            onClose: widget.onPrevious,
+            onComplete: () {
+              setState(() => _stressResetPaused = true);
+              widget.onSelectScreen(15);
+            },
+            onOpenRescue: () {
+              setState(() => _stressResetPaused = true);
+              widget.onSelectScreen(16);
+            },
           );
         }
 

@@ -1,6 +1,7 @@
 import 'package:breathefree_patient/main.dart';
 import 'package:breathefree_patient/models/screen_spec.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -1187,6 +1188,16 @@ void main() {
     );
     expect(find.text('Practicar ahora'), findsOneWidget);
     expect(find.text('Agregar a mi plan de afrontamiento'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('next-step-practice')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-guided-stress-reset-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Reinicio del estrés'), findsOneWidget);
+    expect(find.text('PASO 1 DE 3 · RESPIRA'), findsOneWidget);
+    expect(find.text('Pausar'), findsOneWidget);
+    expect(find.text('Abrir Rescate'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -2737,6 +2748,19 @@ void main() {
       findsOneWidget,
       reason: 'Screen 14 should require its explicit Practice action.',
     );
+    await tester.tap(find.byKey(const ValueKey('next-step-practice')));
+    await tester.pumpAndSettle();
+    await tester.fling(
+      find.byKey(const ValueKey('functional-guided-stress-reset-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-guided-stress-reset-screen')),
+      findsOneWidget,
+      reason: 'Screen 15 should require an explicit exercise action.',
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -2797,6 +2821,232 @@ void main() {
 
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets('Screen 15 timer pauses and resumes without losing progress',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    const speechChannel = MethodChannel('flutter_tts');
+    final speechCalls = <MethodCall>[];
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    messenger.setMockMethodCallHandler(speechChannel, (call) async {
+      speechCalls.add(call);
+      return 1;
+    });
+    addTearDown(
+      () => messenger.setMockMethodCallHandler(speechChannel, null),
+    );
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 14));
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('functional-guided-stress-reset-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('STEP 1 OF 3 · BREATHE'), findsOneWidget);
+    expect(find.text('Breath 1 of 10'), findsOneWidget);
+    expect(find.text('3:00 LEFT'), findsOneWidget);
+    expect(
+      speechCalls.any((call) => call.method == 'speak'),
+      isTrue,
+      reason: 'Voice guidance should speak the current breathing cue.',
+    );
+
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
+    expect(find.text('2:59 LEFT'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('stress-reset-pause')));
+    await tester.pump();
+    expect(find.text('Resume exercise'), findsOneWidget);
+    final pausedTime = (tester.widget<Text>(
+      find.byKey(const ValueKey('stress-reset-time-left')),
+    )).data;
+    await tester.pump(const Duration(seconds: 2));
+    expect(
+      (tester.widget<Text>(
+        find.byKey(const ValueKey('stress-reset-time-left')),
+      )).data,
+      pausedTime,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('stress-reset-pause')));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
+    expect(
+      (tester.widget<Text>(
+        find.byKey(const ValueKey('stress-reset-time-left')),
+      )).data,
+      isNot(pausedTime),
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 15 preferences and three-step sequence work',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 14));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('stress-reset-voice')));
+    await tester.pump();
+    expect(find.text('VOICE OFF'), findsOneWidget);
+    expect(find.text('Voice guidance off'), findsOneWidget);
+
+    final motion = find.byKey(const ValueKey('stress-reset-motion'));
+    await tester.ensureVisible(motion);
+    await tester.pump();
+    await tester.tap(motion);
+    await tester.pump();
+    expect(find.text('Full motion on'), findsOneWidget);
+
+    final skip = find.byKey(const ValueKey('stress-reset-skip'));
+    await tester.ensureVisible(skip);
+    await tester.tap(skip);
+    await tester.pump();
+    expect(find.text('STEP 2 OF 3 · WATER'), findsOneWidget);
+    expect(find.text('Drink a glass of water'), findsOneWidget);
+
+    await tester.tap(skip);
+    await tester.pump();
+    expect(find.text('STEP 3 OF 3 · SWITCH'), findsOneWidget);
+    expect(find.text('Switch what you are doing'), findsOneWidget);
+
+    await tester.tap(skip);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-16')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 15 saves partial progress when leaving', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 14));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('stress-reset-close')));
+    await tester.pumpAndSettle();
+    expect(find.text('Leave the exercise?'), findsOneWidget);
+    expect(
+        find.textContaining('partial progress will be saved'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('stress-reset-exit-save')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-personalized-next-step-screen')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('next-step-practice')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-guided-stress-reset-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Resume exercise'), findsOneWidget);
+    expect(find.text('2:59 LEFT'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 15 end and Rescue actions require explicit choices',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 14));
+    await tester.pump();
+
+    final end = find.byKey(const ValueKey('stress-reset-end'));
+    await tester.ensureVisible(end);
+    await tester.pump();
+    await tester.tap(end);
+    await tester.pumpAndSettle();
+    expect(find.text('End the exercise now?'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('stress-reset-end-cancel')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-guided-stress-reset-screen')),
+      findsOneWidget,
+    );
+
+    final rescue = find.byKey(const ValueKey('stress-reset-rescue'));
+    await tester.ensureVisible(rescue);
+    await tester.pump();
+    await tester.tap(rescue);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-17')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 15 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-15-${device.name}'),
+          initialScreen: 14,
+        ),
+      );
+      await tester.pump();
+
+      expect(
+        find.byKey(const ValueKey('functional-guided-stress-reset-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 15.',
+      );
+      expect(
+        tester
+            .getRect(find.byKey(const ValueKey('stress-reset-close')))
+            .overlaps(Offset.zero & device.size),
+        isTrue,
+      );
+      final end = find.byKey(const ValueKey('stress-reset-end'));
+      await tester.ensureVisible(end);
+      await tester.pump();
+      expect(
+        tester.getRect(end).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should reach End exercise.',
+      );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
     }
   });
 
