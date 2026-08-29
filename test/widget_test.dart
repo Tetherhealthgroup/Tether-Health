@@ -1217,6 +1217,19 @@ void main() {
         findsOneWidget);
     expect(find.text('¿Qué tan fuerte es el antojo ahora?'), findsOneWidget);
     expect(find.text('Guardar resultado'), findsOneWidget);
+
+    final openRescue = find.byKey(const ValueKey('exercise-recheck-rescue'));
+    await tester.ensureVisible(openRescue);
+    await tester.tap(openRescue);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Rescate del antojo'), findsOneWidget);
+    expect(find.text('Superemos este momento.'), findsOneWidget);
+    expect(find.text('Muéstrame qué hacer'), findsOneWidget);
+    expect(find.text('“Proteger a mi familia.”'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -1725,7 +1738,10 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     const destinations = <({String key, String imageKey})>[
-      (key: 'preparation-open-rescue', imageKey: 'screen-image-17'),
+      (
+        key: 'preparation-open-rescue',
+        imageKey: 'functional-craving-rescue-start-screen',
+      ),
       (key: 'preparation-nav-progress', imageKey: 'screen-image-26'),
       (key: 'preparation-nav-learn', imageKey: 'screen-image-25'),
       (key: 'preparation-nav-support', imageKey: 'screen-image-27'),
@@ -1958,9 +1974,12 @@ void main() {
     await tester.ensureVisible(rescue);
     await tester.tap(rescue);
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-17')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+      findsOneWidget,
+    );
 
-    await tester.tap(find.bySemanticsLabel('Go back'));
+    await tester.tap(find.byKey(const ValueKey('rescue-start-close')));
     await tester.pumpAndSettle();
     expect(
       find.byKey(const ValueKey('functional-daily-check-in-screen')),
@@ -2089,8 +2108,11 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('next-step-practice')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-17')), findsOneWidget);
-    await tester.tap(find.bySemanticsLabel('Go back'));
+    expect(
+      find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('rescue-start-close')));
     await tester.pumpAndSettle();
     expect(
       find.byKey(const ValueKey('functional-personalized-next-step-screen')),
@@ -2130,7 +2152,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('next-step-open-rescue')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-17')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -2946,9 +2971,11 @@ void main() {
     await tester.tap(skip);
     await tester.pumpAndSettle();
     expect(
-        find.byKey(
-            const ValueKey('functional-exercise-complete-recheck-screen')),
-        findsOneWidget);
+      find.byKey(
+        const ValueKey('functional-exercise-complete-recheck-screen'),
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -3014,7 +3041,10 @@ void main() {
     await tester.pump();
     await tester.tap(rescue);
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-17')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -3235,7 +3265,10 @@ void main() {
     await tester.pump();
     await tester.tap(rescue);
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-17')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -3285,6 +3318,202 @@ void main() {
         isTrue,
         reason: '${device.name} should reach Rescue.',
       );
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    }
+  });
+
+  testWidgets('Screen 17 starts with an honest personalized Rescue state',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 16));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Craving Rescue'), findsOneWidget);
+    expect(find.text('OFFLINE READY'), findsOneWidget);
+    expect(find.text('Let’s get through this moment.'), findsOneWidget);
+    expect(find.text('How strong is it right now?'), findsOneWidget);
+    expect(find.text('6'), findsOneWidget);
+    expect(find.text('MODERATE'), findsOneWidget);
+    expect(find.text('“Protect my family.”'), findsOneWidget);
+    expect(find.text('Contact Jordan or a trained quitline counselor.'),
+        findsOneWidget);
+
+    await tester.fling(
+      find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+      const Offset(-600, 0),
+      1200,
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+      findsOneWidget,
+      reason: 'Screen 17 should require an explicit action.',
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 17 rating and optional contexts update safely',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 16));
+    await tester.pumpAndSettle();
+
+    final slider = find.byKey(const ValueKey('rescue-start-intensity-slider'));
+    tester.widget<Slider>(slider).onChanged!(8);
+    await tester.pump();
+    expect(find.text('8'), findsOneWidget);
+    expect(find.text('STRONG'), findsOneWidget);
+
+    final stress = find.byKey(const ValueKey('rescue-start-context-stress'));
+    final afterMeal =
+        find.byKey(const ValueKey('rescue-start-context-afterMeal'));
+    await tester.ensureVisible(stress);
+    await tester.pump();
+    await tester.tap(stress);
+    await tester.pump();
+    await tester.tap(afterMeal);
+    await tester.pump();
+    expect(tester.widget<FilterChip>(stress).selected, isTrue);
+    expect(tester.widget<FilterChip>(afterMeal).selected, isTrue);
+
+    final notSure = find.byKey(const ValueKey('rescue-start-context-notSure'));
+    await tester.tap(notSure);
+    await tester.pump();
+    expect(tester.widget<FilterChip>(notSure).selected, isTrue);
+    expect(tester.widget<FilterChip>(stress).selected, isFalse);
+    expect(tester.widget<FilterChip>(afterMeal).selected, isFalse);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 17 continues explicitly and keeps choices on return',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 16));
+    await tester.pumpAndSettle();
+
+    final slider = find.byKey(const ValueKey('rescue-start-intensity-slider'));
+    tester.widget<Slider>(slider).onChanged!(9);
+    await tester.pump();
+    final driving = find.byKey(const ValueKey('rescue-start-context-driving'));
+    await tester.ensureVisible(driving);
+    await tester.tap(driving);
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('rescue-start-continue')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-18')), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('Go back'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('9'), findsOneWidget);
+    expect(tester.widget<FilterChip>(driving).selected, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 17 support and emergency guidance are explicit',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 16));
+    await tester.pumpAndSettle();
+
+    final support = find.byKey(const ValueKey('rescue-start-support'));
+    await tester.ensureVisible(support);
+    await tester.tap(support);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-27')), findsOneWidget);
+    await tester.tap(find.bySemanticsLabel('Go back'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('rescue-start-emergency')));
+    await tester.pumpAndSettle();
+    expect(find.text('Medical emergency'), findsOneWidget);
+    expect(find.textContaining('call 911 now'), findsOneWidget);
+    expect(
+      find.text('BreatheFree will only start a call when you tap “Call 911.”'),
+      findsOneWidget,
+    );
+    await tester.tap(
+      find.byKey(const ValueKey('rescue-start-emergency-done')),
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 17 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-17-${device.name}'),
+          initialScreen: 16,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 17.',
+      );
+      final continueButton =
+          find.byKey(const ValueKey('rescue-start-continue'));
+      expect(
+        tester.getRect(continueButton).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep the Rescue action visible.',
+      );
+      final context =
+          find.byKey(const ValueKey('rescue-start-context-notSure'));
+      await tester.ensureVisible(context);
+      await tester.pump();
       expect(
         tester.takeException(),
         isNull,
