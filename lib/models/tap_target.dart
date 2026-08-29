@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import '../config/contact_info.dart';
+
 enum TapAction {
   navigate,
   back,
@@ -7,6 +9,7 @@ enum TapAction {
   callbackConsent,
   exportData,
   deleteAccount,
+  contactSupport,
   information,
 }
 
@@ -16,12 +19,19 @@ class AppTapTarget {
     required this.label,
     required this.action,
     this.destination,
+    this.quitline,
   });
 
   final Rect normalizedRect;
   final String label;
   final TapAction action;
   final int? destination;
+
+  /// Which quitline a [TapAction.quitline] target dials.
+  ///
+  /// The Support hub offers an English and a Spanish line, so the action alone
+  /// does not say which one was tapped.
+  final QuitlineContact? quitline;
 }
 
 /// Top edge of the five-tab bar, as a fraction of screen height.
@@ -104,16 +114,40 @@ List<AppTapTarget> tapTargetsFor(int index) {
   }
 
   if (number == 27) {
+    // Rectangles below are derived from the group transforms in
+    // design/approved/screen-27-support-hub-iphone.svg, divided by the
+    // 1290 x 2796 artboard.
     targets.addAll([
-      const AppTapTarget(
-        normalizedRect: Rect.fromLTWH(0.05, 0.14, 0.61, 0.17),
-        label: 'Call 1-800-QUIT-NOW',
+      AppTapTarget(
+        normalizedRect: const Rect.fromLTWH(0.05, 0.14, 0.61, 0.17),
+        label: 'Call ${ContactInfo.english.vanityNumber}',
         action: TapAction.quitline,
+        quitline: ContactInfo.english,
       ),
       const AppTapTarget(
         normalizedRect: Rect.fromLTWH(0.66, 0.18, 0.29, 0.08),
         label: 'Request a counselor call-back',
         action: TapAction.callbackConsent,
+      ),
+      // "Ayuda en español" card, translate(72 962), height 111. The artwork
+      // has always drawn this line; nothing reached it before.
+      AppTapTarget(
+        normalizedRect: const Rect.fromLTWH(0.05, 0.34, 0.89, 0.04),
+        label: 'Call ${ContactInfo.spanish.vanityNumber}',
+        action: TapAction.quitline,
+        quitline: ContactInfo.spanish,
+      ),
+      // Supporter row, translate(72 1179) + translate(35 30).
+      const AppTapTarget(
+        normalizedRect: Rect.fromLTWH(0.05, 0.432, 0.89, 0.055),
+        label: 'Message or call your supporter',
+        action: TapAction.information,
+      ),
+      // Quit-coach row, translate(72 1179) + translate(35 247).
+      const AppTapTarget(
+        normalizedRect: Rect.fromLTWH(0.05, 0.508, 0.89, 0.05),
+        label: 'Send a secure message to your quit coach',
+        action: TapAction.information,
       ),
       const AppTapTarget(
         normalizedRect: Rect.fromLTWH(0.05, 0.75, 0.90, 0.10),
@@ -135,6 +169,14 @@ List<AppTapTarget> tapTargetsFor(int index) {
         normalizedRect: Rect.fromLTWH(0.05, 0.70, 0.90, 0.06),
         label: 'Delete account and data',
         action: TapAction.deleteAccount,
+      ),
+      // Accessibility card, translate(72 2221), height 321. Reachable now:
+      // settings that exist to help disabled users must not themselves be
+      // unreachable.
+      const AppTapTarget(
+        normalizedRect: Rect.fromLTWH(0.05, 0.79, 0.89, 0.115),
+        label: 'Open accessibility settings',
+        action: TapAction.information,
       ),
       const AppTapTarget(
         normalizedRect: Rect.fromLTWH(0.05, 0.92, 0.90, 0.05),
