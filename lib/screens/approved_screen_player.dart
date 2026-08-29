@@ -14,6 +14,7 @@ import 'consent_privacy_screen.dart';
 import 'daily_check_in_screen.dart';
 import 'home_preparation_screen.dart';
 import 'my_reasons_screen.dart';
+import 'personalized_next_step_screen.dart';
 import 'readiness_result_screen.dart';
 import 'review_quit_plan_screen.dart';
 import 'select_quit_date_screen.dart';
@@ -90,6 +91,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     DailySymptom.irritable,
   };
   String? _dailyOtherSymptom;
+  NextStepStrategy? _nextStepStrategyOverride;
+  final Set<NextStepStrategy> _copingPlanStrategies = <NextStepStrategy>{};
 
   @override
   void initState() {
@@ -112,7 +115,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 12) {
+    if (widget.currentIndex <= 13) {
       unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
       SystemChrome.setSystemUIOverlayStyle(
         const SystemUiOverlayStyle(
@@ -421,25 +424,43 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             symptoms: _dailySymptoms,
             otherSymptom: _dailyOtherSymptom,
             onMoodChanged: (value) {
-              setState(() => _dailyMood = value);
+              setState(() {
+                _dailyMood = value;
+                _nextStepStrategyOverride = null;
+              });
             },
             onStressChanged: (value) {
-              setState(() => _dailyStressLevel = value);
+              setState(() {
+                _dailyStressLevel = value;
+                _nextStepStrategyOverride = null;
+              });
             },
             onSmokingStatusChanged: (value) {
-              setState(() => _dailySmokingStatus = value);
+              setState(() {
+                _dailySmokingStatus = value;
+                _nextStepStrategyOverride = null;
+              });
             },
             onCigaretteCountChanged: (value) {
               setState(() => _dailyCigaretteCount = value);
             },
             onStrongestCravingChanged: (value) {
-              setState(() => _dailyStrongestCraving = value);
+              setState(() {
+                _dailyStrongestCraving = value;
+                _nextStepStrategyOverride = null;
+              });
             },
             onConfidenceChanged: (value) {
-              setState(() => _dailyConfidence = value);
+              setState(() {
+                _dailyConfidence = value;
+                _nextStepStrategyOverride = null;
+              });
             },
             onSymptomsChanged: (value) {
-              setState(() => _dailySymptoms = value);
+              setState(() {
+                _dailySymptoms = value;
+                _nextStepStrategyOverride = null;
+              });
             },
             onOtherSymptomChanged: (value) {
               setState(() => _dailyOtherSymptom = value);
@@ -447,6 +468,51 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onClose: widget.onPrevious,
             onOpenRescue: () => widget.onSelectScreen(16),
             onSave: widget.onNext,
+          );
+        }
+
+        if (widget.currentIndex == 13) {
+          return PersonalizedNextStepScreen(
+            isSpanish: _language == WelcomeLanguage.spanish,
+            mood: _dailyMood,
+            stressLevel: _dailyStressLevel,
+            smokingStatus: _dailySmokingStatus,
+            cigaretteCount: _dailyCigaretteCount,
+            strongestCraving: _dailyStrongestCraving,
+            confidence: _dailyConfidence,
+            symptoms: _dailySymptoms,
+            otherSymptom: _dailyOtherSymptom,
+            supportPeople: _supportPeople,
+            strategyOverride: _nextStepStrategyOverride,
+            copingPlanStrategies: _copingPlanStrategies,
+            onBack: widget.onPrevious,
+            onStrategyChanged: (value) {
+              setState(() => _nextStepStrategyOverride = value);
+            },
+            onCopingPlanChanged: (strategy, added) {
+              setState(() {
+                if (added) {
+                  _copingPlanStrategies.add(strategy);
+                } else {
+                  _copingPlanStrategies.remove(strategy);
+                }
+              });
+            },
+            onPractice: (strategy) {
+              switch (strategy) {
+                case NextStepStrategy.stressReset:
+                  widget.onSelectScreen(14);
+                  return;
+                case NextStepStrategy.cravingRescue:
+                  widget.onSelectScreen(16);
+                  return;
+                case NextStepStrategy.supportCheckIn:
+                  widget.onSelectScreen(26);
+                  return;
+              }
+            },
+            onOpenRescue: () => widget.onSelectScreen(16),
+            onOpenSupport: () => widget.onSelectScreen(26),
           );
         }
 
