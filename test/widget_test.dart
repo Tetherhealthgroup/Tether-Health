@@ -3424,9 +3424,13 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('rescue-start-continue')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-18')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-recommended-rescue-tool-screen')),
+      findsOneWidget,
+    );
 
-    await tester.tap(find.bySemanticsLabel('Go back'));
+    final rescueToolBack = find.byKey(const ValueKey('rescue-tool-back'));
+    tester.widget<IconButton>(rescueToolBack).onPressed!();
     await tester.pumpAndSettle();
     expect(
       find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
@@ -3513,6 +3517,163 @@ void main() {
       final context =
           find.byKey(const ValueKey('rescue-start-context-notSure'));
       await tester.ensureVisible(context);
+      await tester.pump();
+      expect(
+        tester.takeException(),
+        isNull,
+        reason: '${device.name} should render without Flutter exceptions.',
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    }
+  });
+
+  testWidgets('Screen 18 shows the personalized recommended rescue tool',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 17));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-recommended-rescue-tool-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Craving Rescue'), findsOneWidget);
+    expect(find.text('2 OF 5'), findsOneWidget);
+    expect(find.text('40%'), findsOneWidget);
+    expect(find.text('Start with what helped before.'), findsOneWidget);
+    expect(find.text('Slow breathing'), findsOneWidget);
+    expect(find.text('2:00'), findsOneWidget);
+    expect(
+      find.text('Slow breathing was selected as most helpful.'),
+      findsOneWidget,
+    );
+    expect(find.text('Start 2-minute breathing'), findsOneWidget);
+    expect(find.text('Move for 3 minutes'), findsOneWidget);
+    expect(find.text('Change the scene'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 18 lets the patient choose another action and keeps it',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 17));
+    await tester.pumpAndSettle();
+
+    final move = find.byKey(const ValueKey('rescue-tool-move'));
+    final moveInkWell = find.descendant(
+      of: move,
+      matching: find.byType(InkWell),
+    );
+    tester.widget<InkWell>(moveInkWell).onTap!();
+    await tester.pumpAndSettle();
+    expect(find.text('Start 3-minute movement'), findsOneWidget);
+
+    final rescueToolBack = find.byKey(const ValueKey('rescue-tool-back'));
+    tester.widget<IconButton>(rescueToolBack).onPressed!();
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-craving-rescue-start-screen')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('rescue-start-continue')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-recommended-rescue-tool-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Start 3-minute movement'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 18 explains the match and opens support', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 17));
+    await tester.pumpAndSettle();
+
+    final why = find.byKey(const ValueKey('rescue-tool-why-match'));
+    tester.widget<InkWell>(why).onTap!();
+    await tester.pumpAndSettle();
+    expect(find.text('Why this match?'), findsWidgets);
+    expect(find.byKey(const ValueKey('rescue-tool-why-done')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('rescue-tool-why-done')));
+    await tester.pumpAndSettle();
+
+    final support = find.byKey(const ValueKey('rescue-tool-support'));
+    tester.widget<FilledButton>(support).onPressed!();
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-27')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 18 start action continues to active Rescue Screen 19',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 17));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('rescue-tool-start')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('screen-image-19')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 18 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-18-${device.name}'),
+          initialScreen: 17,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-recommended-rescue-tool-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 18.',
+      );
+      final start = find.byKey(const ValueKey('rescue-tool-start'));
+      expect(
+        tester.getRect(start).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep the primary Rescue action visible.',
+      );
+
+      final support = find.byKey(const ValueKey('rescue-tool-support'));
+      await tester.ensureVisible(support);
       await tester.pump();
       expect(
         tester.takeException(),
