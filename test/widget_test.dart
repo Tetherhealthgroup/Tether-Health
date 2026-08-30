@@ -3632,7 +3632,12 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('rescue-tool-start')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-19')), findsOneWidget);
+    expect(
+      find.byKey(
+        const ValueKey('functional-active-craving-rescue-screen'),
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -3684,6 +3689,118 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump();
     }
+  });
+
+  testWidgets('Screen 19 renders the active craving rescue exercise',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 18));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(
+        const ValueKey('functional-active-craving-rescue-screen'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('active-rescue-time-left')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('active-rescue-breath-circle')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('active-rescue-phase')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('active-rescue-countdown')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('active-rescue-progress')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 19 pause and resume controls work', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 18));
+    await tester.pumpAndSettle();
+
+    final pause = find.byKey(const ValueKey('active-rescue-pause'));
+    expect(pause, findsOneWidget);
+
+    await tester.tap(pause);
+    await tester.pump();
+
+    expect(find.text('Resume'), findsOneWidget);
+
+    await tester.tap(pause);
+    await tester.pump();
+
+    expect(find.text('Pause'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 19 voice and haptics controls toggle', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 18));
+    await tester.pumpAndSettle();
+
+    final voice = find.byKey(const ValueKey('active-rescue-voice'));
+    final haptics = find.byKey(const ValueKey('active-rescue-haptics'));
+
+    expect(voice, findsOneWidget);
+    expect(haptics, findsOneWidget);
+
+    await tester.tap(voice);
+    await tester.pump();
+
+    await tester.tap(haptics);
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 19 switch tool returns to Recommended Rescue Tool',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 18));
+    await tester.pumpAndSettle();
+
+    final switchTool = find.byKey(const ValueKey('active-rescue-switch-tool'));
+
+    await tester.ensureVisible(switchTool);
+    await tester.tap(switchTool);
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(
+        const ValueKey('functional-recommended-rescue-tool-screen'),
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('laptop view exposes all screens and developer navigation',

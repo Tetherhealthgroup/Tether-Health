@@ -8,6 +8,7 @@ import '../models/screen_spec.dart';
 import '../models/tap_target.dart';
 import '../theme/app_colors.dart';
 import '../widgets/approved_screen_viewport.dart';
+import 'active_craving_rescue_screen.dart';
 import 'baseline_assessment_screen.dart';
 import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
@@ -110,6 +111,11 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   int _rescueIntensity = 6;
   Set<RescueContext> _rescueContexts = <RescueContext>{};
   RescueTool _rescueTool = RescueTool.slowBreathing;
+  int? _rescueReturnScreen;
+  int _activeRescueElapsedSeconds = 0;
+  bool _activeRescuePaused = false;
+  bool _activeRescueVoiceEnabled = true;
+  bool _activeRescueHapticsEnabled = true;
 
   @override
   void initState() {
@@ -181,6 +187,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
 
   void _openRescue([int? intensity]) {
     setState(() {
+      _rescueReturnScreen = widget.currentIndex;
       _rescueIntensity =
           (intensity ?? _dailyStrongestCraving).clamp(1, 10).toInt();
     });
@@ -687,9 +694,50 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onToolChanged: (value) {
               setState(() => _rescueTool = value);
             },
-            onBack: widget.onPrevious,
+            onBack: () {
+              final returnScreen = _rescueReturnScreen;
+              if (returnScreen != null) {
+                setState(() => _rescueReturnScreen = null);
+                widget.onSelectScreen(returnScreen);
+              } else {
+                widget.onPrevious();
+              }
+            },
             onStart: () => widget.onSelectScreen(18),
             onViewSupport: () => widget.onSelectScreen(26),
+          );
+        }
+
+        if (widget.currentIndex == 18) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+          return ActiveCravingRescueScreen(
+            isSpanish: isSpanish,
+            tool: _rescueTool,
+            elapsedSeconds: _activeRescueElapsedSeconds,
+            isPaused: _activeRescuePaused,
+            voiceEnabled: _activeRescueVoiceEnabled,
+            hapticsEnabled: _activeRescueHapticsEnabled,
+            onElapsedChanged: (value) {
+              setState(() => _activeRescueElapsedSeconds = value);
+            },
+            onPausedChanged: (value) {
+              setState(() => _activeRescuePaused = value);
+            },
+            onVoiceChanged: (value) {
+              setState(() => _activeRescueVoiceEnabled = value);
+            },
+            onHapticsChanged: (value) {
+              setState(() => _activeRescueHapticsEnabled = value);
+            },
+            onClose: () => widget.onSelectScreen(17),
+            onComplete: () {
+              setState(() {
+                _activeRescuePaused = true;
+              });
+              widget.onSelectScreen(19);
+            },
+            onSwitchTool: () => widget.onSelectScreen(17),
+            onOpenSupport: () => widget.onSelectScreen(26),
           );
         }
 
