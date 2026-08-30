@@ -111,6 +111,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   int _rescueIntensity = 6;
   Set<RescueContext> _rescueContexts = <RescueContext>{};
   RescueTool _rescueTool = RescueTool.slowBreathing;
+  int? _rescueReturnScreen;
   int _activeRescueElapsedSeconds = 0;
   bool _activeRescuePaused = false;
   bool _activeRescueVoiceEnabled = true;
@@ -186,6 +187,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
 
   void _openRescue([int? intensity]) {
     setState(() {
+      _rescueReturnScreen = widget.currentIndex;
       _rescueIntensity =
           (intensity ?? _dailyStrongestCraving).clamp(1, 10).toInt();
     });
@@ -692,7 +694,15 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onToolChanged: (value) {
               setState(() => _rescueTool = value);
             },
-            onBack: widget.onPrevious,
+            onBack: () {
+              final returnScreen = _rescueReturnScreen;
+              if (returnScreen != null) {
+                setState(() => _rescueReturnScreen = null);
+                widget.onSelectScreen(returnScreen);
+              } else {
+                widget.onPrevious();
+              }
+            },
             onStart: () => widget.onSelectScreen(18),
             onViewSupport: () => widget.onSelectScreen(26),
           );
