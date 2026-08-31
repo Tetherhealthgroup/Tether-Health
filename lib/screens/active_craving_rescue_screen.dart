@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -50,7 +51,8 @@ class ActiveCravingRescueScreen extends StatefulWidget {
 }
 
 class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
-  static const int _durationSeconds = 120;
+  int get _durationSeconds =>
+    widget.tool == RescueTool.move ? 180 : 120;
 
   Timer? _timer;
   late final FlutterTts _tts;
@@ -149,34 +151,78 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
     super.dispose();
   }
 
-  Future<void> _configureTts() async {
-    try {
-      await _tts.setLanguage(_isSpanish ? 'es-US' : 'en-US');
-      await _tts.setSpeechRate(0.42);
-      await _tts.setPitch(1.0);
-      await _tts.setVolume(1.0);
-    } catch (_) {
-      // Voice guidance is optional. Visual guidance remains available.
+Future<void> _configureTts() async {
+  try {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      await _tts.setSharedInstance(true);
+      await _tts.setIosAudioCategory(
+        IosTextToSpeechAudioCategory.playback,
+        <IosTextToSpeechAudioCategoryOptions>[
+          IosTextToSpeechAudioCategoryOptions.duckOthers,
+          IosTextToSpeechAudioCategoryOptions
+              .interruptSpokenAudioAndMixWithOthers,
+          IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+          IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+        ],
+        IosTextToSpeechAudioMode.voicePrompt,
+      );
     }
+
+    await _tts.setLanguage(_isSpanish ? 'es-US' : 'en-US');
+    await _tts.setSpeechRate(0.42);
+    await _tts.setPitch(1.0);
+    await _tts.setVolume(1.0);
+
+    print('TTS CONFIG: completed');
+  } catch (e) {
+    print('TTS CONFIG ERROR: $e');
+  }
+}
+
+ Future<void> _speakCurrentCue() async {
+  if (!widget.voiceEnabled || widget.isPaused) {
+    return;
   }
 
-  Future<void> _speakCurrentCue() async {
-    if (!widget.voiceEnabled ||
-        widget.isPaused ||
-        widget.tool != RescueTool.slowBreathing) {
+  String message;
+
+  if (widget.tool == RescueTool.slowBreathing) {
+    message = _isInhale
+        ? (_isSpanish ? 'Inhala lentamente' : 'Breathe in slowly')
+        : (_isSpanish ? 'Exhala lentamente' : 'Breathe out slowly');
+  } else if (widget.tool == RescueTool.move) {
+    final elapsed = widget.elapsedSeconds;
+
+    if (elapsed == 0) {
+      message = _isSpanish ? 'Empieza a moverte' : 'Start moving';
+    } else if (elapsed == 120) {
+      message = _isSpanish ? 'Te queda un minuto' : 'One minute left';
+    } else if (elapsed == 150) {
+      message =
+          _isSpanish ? 'Te quedan treinta segundos' : 'Thirty seconds left';
+    } else if (elapsed == 170) {
+      message = _isSpanish ? 'Diez segundos más' : 'Ten seconds left';
+    } else if (elapsed >= 180) {
+      message = _isSpanish
+          ? 'Muy bien. Completaste tres minutos.'
+          : 'Great job. You completed three minutes.';
+    } else if (elapsed % 30 == 0) {
+      message = _isSpanish ? 'Sigue moviéndote' : 'Keep moving';
+    } else {
       return;
     }
+  } else {
+    return;
+  }
 
-    try {
-      await _tts.stop();
-      await _tts.speak(
-        _isInhale
-            ? (_isSpanish ? 'Inhala lentamente' : 'Breathe in slowly')
-            : (_isSpanish ? 'Exhala lentamente' : 'Breathe out slowly'),
-      );
-    } catch (_) {
-      // Keep the exercise usable if speech is unavailable.
-    }
+  try {
+    
+    await _tts.speak(message);
+  } catch (_) {
+    // Keep the exercise usable if speech is unavailable.
+  }
+
+  
   }
 
   Future<void> _stopSpeech() async {
@@ -187,31 +233,143 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
     }
   }
 
-  void _syncTimer() {
-    _timer?.cancel();
+ void _syncTimer() {
+  _timer?.cancel();
 
-    if (widget.isPaused || widget.elapsedSeconds >= _durationSeconds) {
+  if (widget.isPaused || widget.elapsedSeconds >= _durationSeconds) {
+    return;
+  }
+
+  _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    if (!mounted || widget.isPaused) {
       return;
     }
 
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted || widget.isPaused) {
-        return;
+    final next = math.min(
+      _durationSeconds,
+      widget.elapsedSeconds + 1,
+    );
+
+ 
+
+    if (widget.tool == RescueTool.move &&
+        widget.voiceEnabled &&
+        (next == 30 ||
+            next == 60 ||
+            next == 90 ||
+            next == 120 ||
+            next == 150 ||
+            next == 170)) {
+      unawaited(_speakMovementCue(next));
+    }
+    widget.onElapsedChanged(next);
+    if (widget.tool == RescueTool.changeScene &&
+    widget.voiceEnabled &&
+    (next == 30 || next == 60 || next == 90)) {
+  unawaited(_speakChangeSceneCue(next));
+}
+    if (next >= _durationSeconds) {
+      _timer?.cancel();
+
+      if (widget.tool == RescueTool.move && widget.voiceEnabled) {
+        unawaited(_speakMovementCue(next));
       }
 
-      final next = math.min(
-        _durationSeconds,
-        widget.elapsedSeconds + 1,
-      );
+      widget.onComplete();
+    }
+  });
+}
 
-      widget.onElapsedChanged(next);
+Future<void> _speakMovementCue(int elapsed) async {
+  print('MOVEMENT VOICE CUE: $elapsed');
 
-      if (next >= _durationSeconds) {
-        _timer?.cancel();
-        widget.onComplete();
-      }
-    });
+  if (!widget.voiceEnabled || widget.isPaused) {
+    return;
   }
+
+  String message;
+
+  switch (elapsed) {
+    case 30:
+    case 60:
+    case 90:
+      message = _isSpanish ? 'Sigue moviéndote' : 'Keep moving';
+      break;
+
+    case 120:
+      message = _isSpanish ? 'Te queda un minuto' : 'One minute left';
+      break;
+
+    case 150:
+      message = _isSpanish
+          ? 'Te quedan treinta segundos'
+          : 'Thirty seconds left';
+      break;
+
+    case 170:
+      message = _isSpanish ? 'Diez segundos más' : 'Ten seconds left';
+      break;
+
+    case 180:
+      message = _isSpanish
+          ? 'Muy bien. Completaste tres minutos.'
+          : 'Great job. You completed three minutes.';
+      break;
+
+    default:
+      return;
+  }
+
+  try {
+    print('TTS START: $message');
+
+    await _tts.awaitSpeakCompletion(true);
+    await _tts.speak(message);
+
+    print('TTS FINISHED: $message');
+  } catch (e) {
+    print('TTS ERROR: $e');
+  }
+}
+Future<void> _speakChangeSceneCue(int elapsed) async {
+  if (!widget.voiceEnabled || widget.isPaused) {
+    return;
+  }
+
+  String message;
+
+  switch (elapsed) {
+    case 30:
+      message = _isSpanish
+          ? 'Sigue moviéndote a un lugar sin humo.'
+          : 'Keep moving to a smoke-free place.';
+      break;
+    case 60:
+      message = _isSpanish
+          ? 'Ya estás a la mitad. Sigue adelante.'
+          : 'You are halfway there. Keep going.';
+      break;
+    case 90:
+      message = _isSpanish
+          ? 'Sigue adelante. Estás haciendo un cambio positivo.'
+          : 'Keep going. You are making a positive change.';
+      break;
+    case 120:
+      message = _isSpanish
+          ? 'Muy bien. Has cambiado de entorno.'
+          : 'Great job. You changed your surroundings.';
+      break;
+    default:
+      return;
+  }
+
+  try {
+    await _tts.stop();
+    await _tts.speak(message);
+  } catch (_) {
+    // Keep the exercise usable if speech is unavailable.
+  }
+}
 
   Future<void> _showCloseConfirmation() async {
     widget.onPausedChanged(true);
@@ -425,20 +583,45 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                           ),
                         ),
                         const SizedBox(height: 16),
-                        _BreathingCard(
-                          isSpanish: _isSpanish,
-                          remainingLabel: _remainingLabel,
-                          isInhale: _isInhale,
-                          phaseCountdown: _phaseCountdown,
-                          breathProgress: _breathProgress,
-                          overallProgress: _overallProgress,
-                          paused: widget.isPaused,
-                          voiceEnabled: widget.voiceEnabled,
-                          hapticsEnabled: widget.hapticsEnabled,
-                          onPausedChanged: widget.onPausedChanged,
-                          onVoiceChanged: widget.onVoiceChanged,
-                          onHapticsChanged: widget.onHapticsChanged,
-                        ),
+                        if (widget.tool == RescueTool.slowBreathing)
+  _BreathingCard(
+    isSpanish: _isSpanish,
+    remainingLabel: _remainingLabel,
+    isInhale: _isInhale,
+    phaseCountdown: _phaseCountdown,
+    breathProgress: _breathProgress,
+    overallProgress: _overallProgress,
+    paused: widget.isPaused,
+    voiceEnabled: widget.voiceEnabled,
+    hapticsEnabled: widget.hapticsEnabled,
+    onPausedChanged: widget.onPausedChanged,
+    onVoiceChanged: widget.onVoiceChanged,
+    onHapticsChanged: widget.onHapticsChanged,
+  )
+else if (widget.tool == RescueTool.move)
+  _MovementCard(
+    isSpanish: _isSpanish,
+    remainingLabel: _remainingLabel,
+    overallProgress: _overallProgress,
+    paused: widget.isPaused,
+    voiceEnabled: widget.voiceEnabled,
+    hapticsEnabled: widget.hapticsEnabled,
+    onPausedChanged: widget.onPausedChanged,
+    onVoiceChanged: widget.onVoiceChanged,
+    onHapticsChanged: widget.onHapticsChanged,
+  )
+else
+  _ChangeSceneCard(
+    isSpanish: _isSpanish,
+    remainingLabel: _remainingLabel,
+    overallProgress: _overallProgress,
+    paused: widget.isPaused,
+    voiceEnabled: widget.voiceEnabled,
+    hapticsEnabled: widget.hapticsEnabled,
+    onPausedChanged: widget.onPausedChanged,
+    onVoiceChanged: widget.onVoiceChanged,
+    onHapticsChanged: widget.onHapticsChanged,
+  ),
                         const SizedBox(height: 16),
                         _EncouragementCard(isSpanish: _isSpanish),
                         const SizedBox(height: 16),
@@ -963,6 +1146,358 @@ class _BreathingCard extends StatelessWidget {
             value: overallProgress,
             backgroundColor: const Color(0xFF315C55),
             valueColor: const AlwaysStoppedAnimation(AppColors.coral),
+          ),
+        ],
+      ),
+    );
+  }
+}
+class _MovementCard extends StatelessWidget {
+  const _MovementCard({
+    required this.isSpanish,
+    required this.remainingLabel,
+    required this.overallProgress,
+    required this.paused,
+    required this.voiceEnabled,
+    required this.hapticsEnabled,
+    required this.onPausedChanged,
+    required this.onVoiceChanged,
+    required this.onHapticsChanged,
+  });
+
+  final bool isSpanish;
+  final String remainingLabel;
+  final double overallProgress;
+  final bool paused;
+  final bool voiceEnabled;
+  final bool hapticsEnabled;
+  final ValueChanged<bool> onPausedChanged;
+  final ValueChanged<bool> onVoiceChanged;
+  final ValueChanged<bool> onHapticsChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const ValueKey('active-rescue-movement-card'),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF234F49),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x26123C37),
+            blurRadius: 24,
+            offset: Offset(0, 11),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF315C55),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+                child: Text(
+                  isSpanish ? 'MOVIMIENTO' : 'MOVEMENT',
+                  style: const TextStyle(
+                    color: AppColors.mintStrong,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '$remainingLabel ${isSpanish ? 'RESTANTE' : 'LEFT'}',
+                key: const ValueKey('active-rescue-time-left'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Container(
+            width: 178,
+            height: 178,
+            decoration: BoxDecoration(
+              color: AppColors.lime,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: const Color(0x55718A84),
+                width: 10,
+              ),
+            ),
+            child: Center(
+              child: Icon(
+                Icons.directions_walk_rounded,
+                size: 72,
+                color: AppColors.deepTeal,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            isSpanish ? 'MUÉVETE' : 'KEEP MOVING',
+            key: const ValueKey('active-rescue-phase'),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.4,
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            isSpanish
+                ? 'Camina, estírate o muévete suavemente.'
+                : 'Walk, stretch, or move gently.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.mintStrong,
+              fontSize: 13,
+              height: 1.4,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 20),
+          LinearProgressIndicator(
+            key: const ValueKey('active-rescue-progress'),
+            minHeight: 5,
+            value: overallProgress,
+            backgroundColor: const Color(0xFF315C55),
+            valueColor: const AlwaysStoppedAnimation(AppColors.lime),
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(
+                child: _ControlButton(
+                  key: const ValueKey('active-rescue-pause'),
+                  icon: paused
+                      ? Icons.play_arrow_rounded
+                      : Icons.pause_rounded,
+                  label: paused
+                      ? (isSpanish ? 'Reanudar' : 'Resume')
+                      : (isSpanish ? 'Pausar' : 'Pause'),
+                  active: paused,
+                  onTap: () => onPausedChanged(!paused),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _ControlButton(
+                  key: const ValueKey('active-rescue-voice'),
+                  icon: voiceEnabled
+                      ? Icons.volume_up_rounded
+                      : Icons.volume_off_rounded,
+                  label: voiceEnabled
+                      ? (isSpanish ? 'Voz ON' : 'Voice ON')
+                      : (isSpanish ? 'Voz OFF' : 'Voice OFF'),
+                  active: voiceEnabled,
+                  onTap: () => onVoiceChanged(!voiceEnabled),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _ControlButton(
+                  key: const ValueKey('active-rescue-haptics'),
+                  icon: hapticsEnabled
+                      ? Icons.vibration_rounded
+                      : Icons.smartphone_rounded,
+                  label: hapticsEnabled
+                      ? (isSpanish ? 'Hápticos ON' : 'Haptics ON')
+                      : (isSpanish ? 'Hápticos OFF' : 'Haptics OFF'),
+                  active: hapticsEnabled,
+                  onTap: () => onHapticsChanged(!hapticsEnabled),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ChangeSceneCard extends StatelessWidget {
+  const _ChangeSceneCard({
+    required this.isSpanish,
+    required this.remainingLabel,
+    required this.overallProgress,
+    required this.paused,
+    required this.voiceEnabled,
+    required this.hapticsEnabled,
+    required this.onPausedChanged,
+    required this.onVoiceChanged,
+    required this.onHapticsChanged,
+  });
+
+  final bool isSpanish;
+  final String remainingLabel;
+  final double overallProgress;
+  final bool paused;
+  final bool voiceEnabled;
+  final bool hapticsEnabled;
+  final ValueChanged<bool> onPausedChanged;
+  final ValueChanged<bool> onVoiceChanged;
+  final ValueChanged<bool> onHapticsChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const ValueKey('active-rescue-change-scene-card'),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF234F49),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x26123C37),
+            blurRadius: 24,
+            offset: Offset(0, 11),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF315C55),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+                child: Text(
+                  isSpanish ? 'CAMBIA DE ENTORNO' : 'CHANGE THE SCENE',
+                  style: const TextStyle(
+                    color: AppColors.mintStrong,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.1,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '$remainingLabel ${isSpanish ? 'RESTANTE' : 'LEFT'}',
+                key: const ValueKey('active-rescue-time-left'),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 28),
+          Container(
+            width: 178,
+            height: 178,
+            decoration: BoxDecoration(
+              color: AppColors.lime,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: const Color(0x55718A84),
+                width: 10,
+              ),
+            ),
+            child: Center(
+              child: Icon(
+                Icons.swap_horiz_rounded,
+                size: 72,
+                color: AppColors.deepTeal,
+              ),
+            ),
+          ),
+          const SizedBox(height: 22),
+          Text(
+            isSpanish ? 'CAMBIA EL ENTORNO' : 'CHANGE YOUR SURROUNDINGS',
+            key: const ValueKey('active-rescue-phase'),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.1,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isSpanish
+                ? 'Ve a otro lugar sin humo y cambia lo que estás haciendo.'
+                : 'Go somewhere smoke-free and change what you are doing.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: AppColors.mintStrong,
+              fontSize: 13,
+              height: 1.45,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 20),
+          LinearProgressIndicator(
+            key: const ValueKey('active-rescue-progress'),
+            minHeight: 5,
+            value: overallProgress,
+            backgroundColor: const Color(0xFF315C55),
+            valueColor: const AlwaysStoppedAnimation(AppColors.lime),
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(
+                child: _ControlButton(
+                  key: const ValueKey('active-rescue-pause'),
+                  icon: paused
+                      ? Icons.play_arrow_rounded
+                      : Icons.pause_rounded,
+                  label: paused
+                      ? (isSpanish ? 'Reanudar' : 'Resume')
+                      : (isSpanish ? 'Pausar' : 'Pause'),
+                  active: paused,
+                  onTap: () => onPausedChanged(!paused),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _ControlButton(
+                  key: const ValueKey('active-rescue-voice'),
+                  icon: voiceEnabled
+                      ? Icons.volume_up_rounded
+                      : Icons.volume_off_rounded,
+                  label: voiceEnabled
+                      ? (isSpanish ? 'Voz ON' : 'Voice ON')
+                      : (isSpanish ? 'Voz OFF' : 'Voice OFF'),
+                  active: voiceEnabled,
+                  onTap: () => onVoiceChanged(!voiceEnabled),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _ControlButton(
+                  key: const ValueKey('active-rescue-haptics'),
+                  icon: hapticsEnabled
+                      ? Icons.vibration_rounded
+                      : Icons.smartphone_rounded,
+                  label: hapticsEnabled
+                      ? (isSpanish ? 'Hápticos ON' : 'Haptics ON')
+                      : (isSpanish ? 'Hápticos OFF' : 'Haptics OFF'),
+                  active: hapticsEnabled,
+                  onTap: () => onHapticsChanged(!hapticsEnabled),
+                ),
+              ),
+            ],
           ),
         ],
       ),
