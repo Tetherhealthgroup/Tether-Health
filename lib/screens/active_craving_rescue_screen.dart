@@ -173,9 +173,9 @@ Future<void> _configureTts() async {
     await _tts.setPitch(1.0);
     await _tts.setVolume(1.0);
 
-    print('TTS CONFIG: completed');
+    
   } catch (e) {
-    print('TTS CONFIG ERROR: $e');
+    debugPrint('TTS configuration unavailable: $e');
   }
 }
 
@@ -281,7 +281,7 @@ Future<void> _configureTts() async {
 }
 
 Future<void> _speakMovementCue(int elapsed) async {
-  print('MOVEMENT VOICE CUE: $elapsed');
+  
 
   if (!widget.voiceEnabled || widget.isPaused) {
     return;
@@ -321,14 +321,14 @@ Future<void> _speakMovementCue(int elapsed) async {
   }
 
   try {
-    print('TTS START: $message');
+    
 
     await _tts.awaitSpeakCompletion(true);
     await _tts.speak(message);
 
-    print('TTS FINISHED: $message');
+    
   } catch (e) {
-    print('TTS ERROR: $e');
+    debugPrint('Movement voice unavailable: $e');
   }
 }
 Future<void> _speakChangeSceneCue(int elapsed) async {
@@ -1236,8 +1236,8 @@ class _MovementCard extends StatelessWidget {
                 width: 10,
               ),
             ),
-            child: Center(
-              child: Icon(
+            child: const Center(
+               child: Icon(
                 Icons.directions_walk_rounded,
                 size: 72,
                 color: AppColors.deepTeal,
@@ -1412,7 +1412,7 @@ class _ChangeSceneCard extends StatelessWidget {
                 width: 10,
               ),
             ),
-            child: Center(
+            child: const Center(
               child: Icon(
                 Icons.swap_horiz_rounded,
                 size: 72,
