@@ -13,6 +13,7 @@ import 'baseline_assessment_screen.dart';
 import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
 import 'craving_rescue_start_screen.dart';
+import 'craving_recheck_screen.dart';
 import 'daily_check_in_screen.dart';
 import 'exercise_complete_recheck_screen.dart';
 import 'guided_stress_reset_screen.dart';
@@ -109,6 +110,9 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   StressResetHelpfulChoice? _stressResetHelpfulChoice;
   bool _stressResetResultSaved = false;
   int _rescueIntensity = 6;
+  int _rescueBeforeIntensity = 6;
+  int? _rescueRecheckIntensity;
+  RescueHelpfulChoice? _rescueHelpfulChoice;
   Set<RescueContext> _rescueContexts = <RescueContext>{};
   RescueTool _rescueTool = RescueTool.slowBreathing;
   int? _rescueReturnScreen;
@@ -703,7 +707,16 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
                 widget.onPrevious();
               }
             },
-            onStart: () => widget.onSelectScreen(18),
+            onStart: () {
+              setState(() {
+                _rescueBeforeIntensity = _rescueIntensity;
+                _rescueRecheckIntensity = null;
+                _rescueHelpfulChoice = null;
+                _activeRescueElapsedSeconds = 0;
+                _activeRescuePaused = false;
+              });
+              widget.onSelectScreen(18);
+            },
             onViewSupport: () => widget.onSelectScreen(26),
           );
         }
@@ -738,6 +751,34 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             },
             onSwitchTool: () => widget.onSelectScreen(17),
             onOpenSupport: () => widget.onSelectScreen(26),
+          );
+        }
+
+        if (widget.currentIndex == 19) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+          return CravingRecheckScreen(
+            isSpanish: isSpanish,
+            beforeIntensity: _rescueBeforeIntensity,
+            tool: _rescueTool,
+            selectedIntensity: _rescueRecheckIntensity,
+            helpfulChoice: _rescueHelpfulChoice,
+            onIntensityChanged: (value) {
+              setState(() => _rescueRecheckIntensity = value);
+            },
+            onHelpfulChoiceChanged: (value) {
+              setState(() => _rescueHelpfulChoice = value);
+            },
+            onBack: () => widget.onSelectScreen(18),
+            onSaveAndSeeResult: () => widget.onSelectScreen(20),
+            onRepeatRescue: () {
+              setState(() {
+                _activeRescueElapsedSeconds = 0;
+                _activeRescuePaused = false;
+                _rescueRecheckIntensity = null;
+                _rescueHelpfulChoice = null;
+              });
+              widget.onSelectScreen(18);
+            },
           );
         }
 
