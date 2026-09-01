@@ -3803,6 +3803,190 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+
+  testWidgets('Screen 20 renders the functional craving recheck',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 19));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-craving-recheck-screen')),
+      findsOneWidget,
+    );
+    expect(find.text('Craving Rescue'), findsOneWidget);
+    expect(find.text('4 OF 5'), findsOneWidget);
+    expect(find.text('How strong is the craving now?'), findsOneWidget);
+    expect(find.text('THIS RESCUE'), findsOneWidget);
+    expect(find.text('Not a medical measurement'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('craving-recheck-save')),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 20 requires a craving rating and updates before/after',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 19));
+    await tester.pumpAndSettle();
+
+    final save = find.byKey(const ValueKey('craving-recheck-save'));
+    expect(tester.widget<FilledButton>(save).onPressed, isNull);
+
+    await tester.tap(
+      find.byKey(const ValueKey('craving-recheck-number-3')),
+    );
+    await tester.pump();
+
+    expect(find.text('3 · Mild'), findsOneWidget);
+    expect(find.text('3 / 10'), findsOneWidget);
+    expect(tester.widget<FilledButton>(save).onPressed, isNotNull);
+    expect(find.text('↓ 3'), findsOneWidget);
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('craving-recheck-helpful-yes')),
+    );
+    await tester.pump();
+    await tester.tap(
+      find.byKey(
+        const ValueKey('craving-recheck-helpful-yes'),
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      find.textContaining("We'll remember that slow breathing helped."),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 20 saves and advances to Screen 21',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 19));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.byKey(const ValueKey('craving-recheck-number-3')),
+    );
+    await tester.pump();
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('craving-recheck-save')),
+    );
+    await tester.pump();
+    await tester.tap(
+      find.byKey(const ValueKey('craving-recheck-save')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('screen-image-21')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 20 repeat rescue returns to the active rescue screen',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 19));
+    await tester.pumpAndSettle();
+
+    await tester.tap(
+      find.byKey(const ValueKey('craving-recheck-number-4')),
+    );
+    await tester.pump();
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('craving-recheck-repeat')),
+    );
+    await tester.pump();
+    await tester.tap(
+      find.byKey(const ValueKey('craving-recheck-repeat')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(
+        const ValueKey('functional-active-craving-rescue-screen'),
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 20 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        BreatheFreeApp(
+          key: ValueKey('screen-20-${device.name}'),
+          initialScreen: 19,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-craving-recheck-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 20.',
+      );
+
+      final save = find.byKey(const ValueKey('craving-recheck-save'));
+       await tester.ensureVisible(save);
+       await tester.pump();
+      expect(
+        tester.getRect(save).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep the primary action accessible.',
+      );
+
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('craving-recheck-number-5')),
+      );
+      await tester.pump();
+      await tester.tap(
+        find.byKey(const ValueKey('craving-recheck-number-5')),
+      );
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    }
+  });
+
   testWidgets('laptop view exposes all screens and developer navigation',
       (tester) async {
     tester.view.physicalSize = const Size(1440, 1000);
