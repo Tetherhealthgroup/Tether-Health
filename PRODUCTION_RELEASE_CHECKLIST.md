@@ -36,7 +36,19 @@
 
 ## Android
 
-- Choose the final application ID and create a protected upload keystore.
+- Choose the final application ID. It is permanent once published — Play matches
+  updates on it — and the current value (`com.breathefree.breathefree_patient`)
+  does not follow the `com.tetherhealthgroup.*` namespace the sibling Chronic
+  Care app uses. Settle this before the first upload.
+- Create a protected upload keystore. **The Gradle wiring is in place**:
+  `android/app/build.gradle.kts` reads `android/key.properties` (gitignored) and
+  signs the release build with it. Copy `android/key.properties.example`, run the
+  `keytool` command in it, and keep the keystore somewhere durable — losing it
+  means the Play listing can never be updated again. Until that file exists the
+  release build prints a warning and falls back to the debug keystore, which the
+  Play Store rejects; verify any candidate artifact with
+  `apksigner verify --print-certs build/app/outputs/flutter-apk/app-release.apk`
+  and confirm the signer is *not* `CN=Android Debug`.
 - Complete the Google Play Data safety form and content rating.
 - Review Android permissions and notification channels.
 - Build an App Bundle with `flutter build appbundle --release` and test through internal sharing.
