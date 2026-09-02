@@ -16,6 +16,12 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  # Drives the e2e tier in integration_test/ on a real device or emulator.
+  # The widget tiers stub every platform channel; this one does not, which is
+  # why it is the only tier that can catch a plugin or localizations failure
+  # that appears solely under the real engine.
+  integration_test:
+    sdk: flutter
 
 flutter:
   uses-material-design: true
