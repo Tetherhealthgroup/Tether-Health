@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'config/contact_info.dart';
 import 'models/screen_spec.dart';
 import 'models/tap_target.dart';
 import 'screens/approved_screen_player.dart';
@@ -34,6 +35,17 @@ class BreatheFreeApp extends StatefulWidget {
 class _BreatheFreeAppState extends State<BreatheFreeApp> {
   late int _currentIndex;
   final List<int> _history = <int>[];
+
+  /// Gives dialogs a context that sits below [MaterialApp].
+  ///
+  /// This State builds the MaterialApp, so its own `context` is *above* it and
+  /// has neither a Navigator nor MaterialLocalizations. Calling showDialog
+  /// with it threw "No MaterialLocalizations found" and every dialog in the
+  /// app — quitline, call-back consent, export and deletion — failed to open.
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
+  /// Context for showing dialogs, or null before the first frame.
+  BuildContext? get _dialogContext => _navigatorKey.currentContext;
 
   @override
   void initState() {
@@ -71,7 +83,10 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         _goBack();
         break;
       case TapAction.quitline:
-        await _showQuitlineDialog();
+        await _showQuitlineDialog(target.quitline ?? ContactInfo.english);
+        break;
+      case TapAction.contactSupport:
+        await _showSupportDialog();
         break;
       case TapAction.callbackConsent:
         await _showCallbackConsent();
@@ -104,33 +119,93 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     }
   }
 
-  Future<void> _showQuitlineDialog() async {
+  Future<void> _showQuitlineDialog(QuitlineContact quitline) async {
+    final host = _dialogContext;
+    if (host == null) return;
     await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Call 1-800-QUIT-NOW?'),
-        content: const Text(
-          'This free, confidential service routes the caller to their state quitline. Phone launching is intentionally disabled in this source-only preview.',
+      context: host,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Call ${quitline.vanityNumber}?'),
+        content: Text(
+          'This free, confidential ${quitline.language} service routes the '
+          'caller to their state quitline. Services and hours may vary. Phone '
+          'launching is intentionally disabled in this source-only preview.',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () {
-              Clipboard.setData(const ClipboardData(text: '1-800-784-8669'));
-              final messenger = ScaffoldMessenger.of(context);
-              Navigator.pop(context);
-              messenger.showSnackBar(
-                const SnackBar(content: Text('Quitline number copied')),
-              );
-            },
+            key: const ValueKey('quitline-copy'),
+            onPressed: () => _copyAndConfirm(
+              dialogContext,
+              value: quitline.dialledNumber,
+              confirmation: '${quitline.language} quitline number copied',
+            ),
             child: const Text('Copy number'),
           ),
         ],
       ),
     );
+  }
+
+  /// Shows the product-support address and offers to copy it.
+  ///
+  /// This is deliberately separate from the quitline and emergency routes. It
+  /// reaches the people who build BreatheFree, not a clinician, and the copy
+  /// says so — a patient with urgent symptoms must not be sent to an inbox.
+  Future<void> _showSupportDialog() async {
+    if (!mounted) return;
+    final host = _dialogContext;
+    if (host == null) return;
+    await showDialog<void>(
+      context: host,
+      builder: (dialogContext) => AlertDialog(
+        key: const ValueKey('support-dialog'),
+        title: const Text('Contact BreatheFree support'),
+        // Not const: ContactInfo.english.vanityNumber is a property read on a
+        // const object, which Dart cannot evaluate at compile time.
+        content: Text(
+          'For questions about the app, your account or your data, email '
+          '${ContactInfo.supportEmail}.\n\n'
+          'This inbox is not monitored for medical emergencies and cannot give '
+          'medical advice. In an emergency call ${ContactInfo.emergencyNumber}, '
+          'or call ${ContactInfo.english.vanityNumber} for free, confidential '
+          'quit support.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Close'),
+          ),
+          FilledButton(
+            key: const ValueKey('support-copy'),
+            onPressed: () => _copyAndConfirm(
+              dialogContext,
+              value: ContactInfo.supportEmail,
+              confirmation: 'Support address copied',
+            ),
+            child: const Text('Copy address'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Copies [value], closes the dialog, then confirms in a snack bar.
+  ///
+  /// The messenger is looked up before the pop, because afterwards
+  /// [dialogContext] is defunct and looking it up then throws.
+  void _copyAndConfirm(
+    BuildContext dialogContext, {
+    required String value,
+    required String confirmation,
+  }) {
+    final messenger = ScaffoldMessenger.of(dialogContext);
+    Clipboard.setData(ClipboardData(text: value));
+    Navigator.pop(dialogContext);
+    messenger.showSnackBar(SnackBar(content: Text(confirmation)));
   }
 
   Future<void> _showCallbackConsent() {
@@ -148,23 +223,35 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     required String confirmLabel,
     bool destructive = false,
   }) async {
+    final host = _dialogContext;
+    if (host == null) return;
     await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
+      context: host,
+      builder: (dialogContext) => AlertDialog(
         title: Text(title),
         content: Text(message),
         actions: [
+          // A protected action that a patient cannot complete is exactly when
+          // they need a way to ask a person, so every one of these offers it.
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            key: const ValueKey('information-contact-support'),
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              await _showSupportDialog();
+            },
+            child: const Text('Contact support'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           FilledButton(
             style: destructive
                 ? FilledButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.error,
+                    backgroundColor: Theme.of(dialogContext).colorScheme.error,
                   )
                 : null,
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text(confirmLabel),
           ),
         ],
@@ -175,6 +262,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       title: 'BreatheFree',
       debugShowCheckedModeBanner: false,
       restorationScopeId: 'breathefree',
