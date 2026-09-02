@@ -14,6 +14,7 @@ import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
 import 'craving_rescue_start_screen.dart';
 import 'craving_recheck_screen.dart';
+import 'rescue_result_next_step_screen.dart';
 import 'daily_check_in_screen.dart';
 import 'exercise_complete_recheck_screen.dart';
 import 'guided_stress_reset_screen.dart';
@@ -216,6 +217,28 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       QuitReason.custom => _customQuitReason?.trim().isNotEmpty == true
           ? _customQuitReason!.trim()
           : (isSpanish ? 'Mi propia razón' : 'My own reason'),
+    };
+  }
+
+  String _reasonLabel(bool isSpanish) {
+    final reason = _topQuitReason ??
+        QuitReason.family;
+    return switch (reason) {
+      QuitReason.family =>
+        isSpanish ? '“Quiero estar presente para mi familia.”' : '“I’m choosing this for my family.”',
+      QuitReason.breatheEasier =>
+        isSpanish ? '“Quiero respirar más fácilmente.”' : '“I want to breathe easier.”',
+      QuitReason.improveHealth =>
+        isSpanish ? '“Quiero mejorar mi salud.”' : '“I want to improve my health.”',
+      QuitReason.saveMoney =>
+        isSpanish ? '“Quiero ahorrar dinero.”' : '“I’m choosing this to save money.”',
+      QuitReason.control =>
+        isSpanish ? '“Quiero sentirme en control.”' : '“I want to feel more in control.”',
+      QuitReason.future =>
+        isSpanish ? '“Quiero estar presente para mi futuro.”' : '“I’m choosing this for my future.”',
+      QuitReason.custom => _customQuitReason?.trim().isNotEmpty == true
+          ? '“${_customQuitReason!.trim()}”'
+          : (isSpanish ? '“Mi propia razón.”' : '“My own reason.”'),
     };
   }
 
@@ -779,6 +802,50 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               });
               widget.onSelectScreen(18);
             },
+          );
+        }
+
+        if (widget.currentIndex == 20) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+          final afterCraving = _rescueRecheckIntensity ?? _rescueBeforeIntensity;
+          final toolName = switch (_rescueTool) {
+            RescueTool.slowBreathing =>
+              isSpanish ? 'Respiración lenta' : 'slow breathing',
+            RescueTool.move => isSpanish ? 'Movimiento' : 'movement',
+            RescueTool.changeScene =>
+              isSpanish ? 'Cambiar de entorno' : 'changing your surroundings',
+          };
+          final helpfulness = switch (_rescueHelpfulChoice) {
+            RescueHelpfulChoice.yes => isSpanish ? 'Sí' : 'Yes',
+            RescueHelpfulChoice.aLittle => isSpanish ? 'Un poco' : 'A little',
+            RescueHelpfulChoice.notThisTime =>
+              isSpanish ? 'Esta vez no' : 'Not this time',
+            null => isSpanish ? 'No seleccionado' : 'Not selected',
+          };
+
+          return RescueResultNextStepScreen(
+            beforeCraving: _rescueBeforeIntensity,
+            afterCraving: afterCraving,
+            toolName: toolName,
+            helpfulness: helpfulness,
+            isSpanish: isSpanish,
+            triggerLabel: _rescueContexts.contains(RescueContext.stress)
+                ? 'Stress'
+                : (isSpanish ? 'Craving' : 'Craving'),
+            reasonText: _reasonLabel(isSpanish),
+            practiceLabel: _rescueTool == RescueTool.move ? '3 minutes' : '2 minutes',
+            onContinue: () => widget.onSelectScreen(21),
+            onRepeatRescue: () {
+              setState(() {
+                _activeRescueElapsedSeconds = 0;
+                _activeRescuePaused = false;
+                _rescueRecheckIntensity = null;
+                _rescueHelpfulChoice = null;
+              });
+              widget.onSelectScreen(18);
+            },
+            onHumanSupport: () => widget.onSelectScreen(26),
+            onBackToToday: () => widget.onSelectScreen(21),
           );
         }
 
