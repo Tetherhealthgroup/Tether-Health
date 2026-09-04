@@ -315,7 +315,9 @@ return _QuitDayNotificationsSheet(
                       onTap: widget.onOpenSupport,
                     ),
                     const SizedBox(height: 8),
-                    const _AdaptiveMessage(),
+                    _AdaptiveMessage(
+    isSpanish: widget.isSpanish,
+),
                   ],
                 ),
               ),
@@ -501,9 +503,11 @@ class _QuitDayHero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'SINCE YOUR PLANNED QUIT TIME',
-            style: TextStyle(
+          Text(
+  isSpanish
+      ? 'DESDE TU HORA PLANIFICADA PARA DEJARLO'
+      : 'SINCE YOUR PLANNED QUIT TIME',
+            style: const TextStyle(
               color: AppColors.mint,
               fontSize: 10,
               fontWeight: FontWeight.w800,
@@ -515,6 +519,7 @@ class _QuitDayHero extends StatelessWidget {
           // Compact text area. The orb is intentionally allowed
           // to extend outside this Stack without increasing its height.
           SizedBox(
+              width: double.infinity,
             height: 69,
             child: Stack(
               clipBehavior: Clip.none,
@@ -551,7 +556,7 @@ class _QuitDayHero extends StatelessWidget {
                 // The orb is 112x112 but floats independently
                 // so it does not create a large gap before the craving card.
                 const Positioned(
-                  right: -75,
+                  right: 0,
                   top: -53,
                   child: _BreathingOrb(),
                 ),
@@ -1265,7 +1270,9 @@ class _SupportCard extends StatelessWidget {
                           ? (isSpanish
                               ? 'Tu equipo de apoyo'
                               : 'Your support team')
-                          : '${person.name} is part of your support plan',
+                          : isSpanish
+    ? '${person.name} es parte de tu plan de apoyo'
+    : '${person.name} is part of your support plan',
                       style: const TextStyle(
                         color: AppColors.deepTeal,
                         fontSize: 12.5,
@@ -1324,7 +1331,10 @@ class _SupportCard extends StatelessWidget {
 }
 
 class _AdaptiveMessage extends StatelessWidget {
-  const _AdaptiveMessage();
+  const _AdaptiveMessage({
+    required this.isSpanish,
+  });
+ final bool isSpanish;
 
   @override
   Widget build(BuildContext context) {
@@ -1344,11 +1354,13 @@ class _AdaptiveMessage extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-        const Expanded(
-          child: Text(
-            'Today adapts to your answers. There is no perfect way to do this.',
-            style: TextStyle(
-              color: AppColors.mutedTeal,
+        Expanded(
+  child: Text(
+    isSpanish
+        ? 'Hoy se adapta a tus respuestas. No hay una forma perfecta de hacerlo.'
+        : 'Today adapts to your answers. There is no perfect way to do this.',
+    style: const TextStyle(
+      color: AppColors.mutedTeal,
               fontSize: 8.5,
               height: 1.2,
             ),
