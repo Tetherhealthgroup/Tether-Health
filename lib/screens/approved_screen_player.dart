@@ -15,6 +15,7 @@ import 'consent_privacy_screen.dart';
 import 'craving_rescue_start_screen.dart';
 import 'craving_recheck_screen.dart';
 import 'rescue_result_next_step_screen.dart';
+import 'quit_day_home_screen.dart';
 import 'daily_check_in_screen.dart';
 import 'exercise_complete_recheck_screen.dart';
 import 'guided_stress_reset_screen.dart';
@@ -143,22 +144,15 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 17) {
-      unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
-      SystemChrome.setSystemUIOverlayStyle(
-        const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarBrightness: Brightness.light,
-          statusBarIconBrightness: Brightness.dark,
-          systemNavigationBarColor: AppColors.cream,
-          systemNavigationBarIconBrightness: Brightness.dark,
-        ),
-      );
-      return;
-    }
-
-    unawaited(
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky),
+    unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: AppColors.cream,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
     );
   }
 
@@ -846,6 +840,28 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             },
             onHumanSupport: () => widget.onSelectScreen(26),
             onBackToToday: () => widget.onSelectScreen(21),
+          );
+        }
+
+        if (widget.currentIndex == 21) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return QuitDayHomeScreen(
+            isSpanish: isSpanish,
+            quitDate: _quitDate,
+            topReason: _topQuitReason,
+            customReason: _customQuitReason,
+            supportPeople: _supportPeople,
+            treatmentSupport: _treatmentSupport,
+            onOpenRescue: _openRescue,
+            onOpenSlipRecovery: () => widget.onSelectScreen(22),
+            onOpenDailyCheckIn: () => widget.onSelectScreen(12),
+            onOpenPlan: () => widget.onSelectScreen(10),
+            onOpenProgress: () => widget.onSelectScreen(25),
+            onOpenLearn: () => widget.onSelectScreen(24),
+            onOpenSupport: () => widget.onSelectScreen(26),
+            onNotifications: () {},
+            onOpenProfile: () => widget.onSelectScreen(27),
           );
         }
 
