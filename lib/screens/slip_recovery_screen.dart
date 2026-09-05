@@ -355,16 +355,25 @@ class _TopBar extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            const Center(
-              child: Text(
-                'Slip recovery',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: 'Arial',
-                  color: AppColors.deepTeal,
-                  fontSize: 21,
-                  fontWeight: FontWeight.w700,
-                  height: 1,
+            Center(
+              child: SizedBox(
+                width: 180 * sx,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    isSpanish
+                        ? 'Recuperación tras un desliz'
+                        : 'Slip recovery',
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontFamily: 'Arial',
+                      color: AppColors.deepTeal,
+                      fontSize: 21,
+                      fontWeight: FontWeight.w700,
+                      height: 1,
+                    ),
+                  ),
                 ),
               ),
             ),
