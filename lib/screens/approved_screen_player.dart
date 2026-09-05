@@ -16,6 +16,8 @@ import 'craving_rescue_start_screen.dart';
 import 'craving_recheck_screen.dart';
 import 'rescue_result_next_step_screen.dart';
 import 'quit_day_home_screen.dart';
+import 'slip_recovery_screen.dart';
+
 import 'daily_check_in_screen.dart';
 import 'exercise_complete_recheck_screen.dart';
 import 'guided_stress_reset_screen.dart';
@@ -122,6 +124,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _activeRescuePaused = false;
   bool _activeRescueVoiceEnabled = true;
   bool _activeRescueHapticsEnabled = true;
+  bool _slipRecoverySaved = false;
 
   @override
   void initState() {
@@ -854,7 +857,10 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             supportPeople: _supportPeople,
             treatmentSupport: _treatmentSupport,
             onOpenRescue: _openRescue,
-            onOpenSlipRecovery: () => widget.onSelectScreen(22),
+            onOpenSlipRecovery: () {
+              setState(() => _slipRecoverySaved = false);
+              widget.onSelectScreen(22);
+            },
             onOpenDailyCheckIn: () => widget.onSelectScreen(12),
             onOpenPlan: () => widget.onSelectScreen(10),
             onOpenProgress: () => widget.onSelectScreen(25),
@@ -862,6 +868,25 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onOpenSupport: () => widget.onSelectScreen(26),
             onNotifications: () {},
             onOpenProfile: () => widget.onSelectScreen(27),
+          );
+        }
+        if (widget.currentIndex == 22) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return SlipRecoveryScreen(
+            isSpanish: isSpanish,
+            initiallySaved: _slipRecoverySaved,
+            onClose: () => widget.onSelectScreen(21),
+            onSave: () {
+              setState(() => _slipRecoverySaved = true);
+              _openRescue();
+            },
+            onOpenNextStep: () {
+              if (_slipRecoverySaved) {
+                _openRescue();
+              }
+            },
+            onOpenSupport: () => widget.onSelectScreen(26),
           );
         }
 
