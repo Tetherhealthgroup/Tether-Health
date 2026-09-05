@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../lib/screens/approved_screen_player.dart';
-import '../lib/screens/craving_rescue_start_screen.dart';
+import 'package:breathefree_patient/screens/approved_screen_player.dart';
+import 'package:breathefree_patient/screens/craving_rescue_start_screen.dart';
 
 void main() {
   testWidgets(
