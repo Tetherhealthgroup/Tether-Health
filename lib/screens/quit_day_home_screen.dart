@@ -22,6 +22,7 @@ class QuitDayHomeScreen extends StatefulWidget {
     required this.onOpenSlipRecovery,
     required this.onOpenDailyCheckIn,
     required this.onOpenPlan,
+    required this.onOpenTreatmentPlan,
     required this.onOpenProgress,
     required this.onOpenLearn,
     required this.onOpenSupport,
@@ -41,6 +42,7 @@ class QuitDayHomeScreen extends StatefulWidget {
   final VoidCallback onOpenSlipRecovery;
   final VoidCallback onOpenDailyCheckIn;
   final VoidCallback onOpenPlan;
+  final VoidCallback onOpenTreatmentPlan;
   final VoidCallback onOpenProgress;
   final VoidCallback onOpenLearn;
   final VoidCallback onOpenSupport;
@@ -88,43 +90,41 @@ class _QuitDayHomeScreenState extends State<QuitDayHomeScreen> {
     _timer?.cancel();
     super.dispose();
   }
-   Future<void> _openNotifications() async {
-  await showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    showDragHandle: true,
-    backgroundColor: AppColors.paper,
-    builder: (sheetContext) {
-return _QuitDayNotificationsSheet(
-  isSpanish: widget.isSpanish,
-  onStartCheckIn: widget.onOpenDailyCheckIn,
-  onCravingSupport: widget.onOpenRescue,
-  onProgress: widget.onOpenProgress,
-  onDone: () => Navigator.of(sheetContext).pop(),
-);
-    },
-  );
-}
 
- String _greeting() {
-  final hour = DateTime.now().hour;
-
-  if (hour < 12) {
-    return widget.isSpanish
-        ? 'Buenos días, Alex.'
-        : 'Good morning, Alex.';
+  Future<void> _openNotifications() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      backgroundColor: AppColors.paper,
+      builder: (sheetContext) {
+        return _QuitDayNotificationsSheet(
+          isSpanish: widget.isSpanish,
+          onStartCheckIn: widget.onOpenDailyCheckIn,
+          onCravingSupport: widget.onOpenRescue,
+          onProgress: widget.onOpenProgress,
+          onDone: () => Navigator.of(sheetContext).pop(),
+        );
+      },
+    );
   }
 
-  if (hour < 17) {
-    return widget.isSpanish
-        ? 'Buenas tardes, Alex.'
-        : 'Good afternoon, Alex.';
+  String _greeting() {
+    final hour = DateTime.now().hour;
+
+    if (hour < 12) {
+      return widget.isSpanish ? 'Buenos días, Alex.' : 'Good morning, Alex.';
+    }
+
+    if (hour < 17) {
+      return widget.isSpanish
+          ? 'Buenas tardes, Alex.'
+          : 'Good afternoon, Alex.';
+    }
+
+    return widget.isSpanish ? 'Buenas noches, Alex.' : 'Good evening, Alex.';
   }
 
-  return widget.isSpanish
-      ? 'Buenas noches, Alex.'
-      : 'Good evening, Alex.';
-}
   String _month(int month) {
     const names = <String>[
       'Jan',
@@ -184,27 +184,20 @@ return _QuitDayNotificationsSheet(
     final reason = widget.topReason;
 
     if (reason == null) {
-      return widget.isSpanish
-          ? 'Mi razón para dejarlo.'
-          : 'My reason to quit.';
+      return widget.isSpanish ? 'Mi razón para dejarlo.' : 'My reason to quit.';
     }
 
     return switch (reason) {
-      QuitReason.family => widget.isSpanish
-          ? 'Proteger a mi familia.'
-          : 'Protect my family.',
-      QuitReason.breatheEasier => widget.isSpanish
-          ? 'Respirar mejor.'
-          : 'Breathe easier.',
-      QuitReason.improveHealth => widget.isSpanish
-          ? 'Mejorar mi salud.'
-          : 'Improve my health.',
-      QuitReason.saveMoney => widget.isSpanish
-          ? 'Ahorrar dinero.'
-          : 'Save money.',
-      QuitReason.control => widget.isSpanish
-          ? 'Sentirme en control.'
-          : 'Feel more in control.',
+      QuitReason.family =>
+        widget.isSpanish ? 'Proteger a mi familia.' : 'Protect my family.',
+      QuitReason.breatheEasier =>
+        widget.isSpanish ? 'Respirar mejor.' : 'Breathe easier.',
+      QuitReason.improveHealth =>
+        widget.isSpanish ? 'Mejorar mi salud.' : 'Improve my health.',
+      QuitReason.saveMoney =>
+        widget.isSpanish ? 'Ahorrar dinero.' : 'Save money.',
+      QuitReason.control =>
+        widget.isSpanish ? 'Sentirme en control.' : 'Feel more in control.',
       QuitReason.future => widget.isSpanish
           ? 'Estar presente para mi futuro.'
           : 'Be there for my future.',
@@ -235,11 +228,11 @@ return _QuitDayNotificationsSheet(
         child: Column(
           children: [
             _Header(
-               isSpanish: widget.isSpanish,
-               hasUnreadNotifications: true,
-               onNotifications: _openNotifications,
-               onProfile: widget.onOpenProfile,
-                 ),
+              isSpanish: widget.isSpanish,
+              hasUnreadNotifications: true,
+              onNotifications: _openNotifications,
+              onProfile: widget.onOpenProfile,
+            ),
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -254,12 +247,12 @@ return _QuitDayNotificationsSheet(
                     Text(
                       _greeting(),
                       style: const TextStyle(
-                      color: AppColors.deepTeal,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                      height: 1.05,
-                        ),
-                       ),
+                        color: AppColors.deepTeal,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                        height: 1.05,
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     Text(
                       widget.isSpanish
@@ -301,7 +294,7 @@ return _QuitDayNotificationsSheet(
                       isSpanish: widget.isSpanish,
                       treatmentSupport: widget.treatmentSupport,
                       onCheckIn: widget.onOpenDailyCheckIn,
-                      onTreatmentPlan: widget.onOpenPlan,
+                      onTreatmentPlan: widget.onOpenTreatmentPlan,
                     ),
                     const SizedBox(height: 10),
                     _ReasonCard(
@@ -316,8 +309,8 @@ return _QuitDayNotificationsSheet(
                     ),
                     const SizedBox(height: 8),
                     _AdaptiveMessage(
-    isSpanish: widget.isSpanish,
-),
+                      isSpanish: widget.isSpanish,
+                    ),
                   ],
                 ),
               ),
@@ -353,80 +346,80 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 18),
-  child: SizedBox(
-    height: 54,
-    child: Row(
-        children: [
-          const CircleAvatar(
-            radius: 23,
-            backgroundColor: AppColors.deepTeal,
-            child: Icon(
-              Icons.eco_rounded,
-              color: AppColors.lime,
-              size: 29,
-            ),
-          ),
-          const SizedBox(width: 10),
-          const Expanded(
-            child: Text(
-              'BreatheFree',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: AppColors.deepTeal,
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              IconButton.outlined(
-                tooltip: 'Notifications',
-                onPressed: onNotifications,
-                style: IconButton.styleFrom(
-                  foregroundColor: AppColors.deepTeal,
-                  side: const BorderSide(
-                    color: AppColors.border,
-                  ),
-                ),
-                icon: const Icon(
-                  Icons.notifications_none_rounded,
-                ),
-              ),
-              if (hasUnreadNotifications)
-                const Positioned(
-                  right: 3,
-                  top: 2,
-                  child: CircleAvatar(
-                    radius: 5,
-                    backgroundColor: AppColors.coral,
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(width: 8),
-          InkWell(
-            onTap: onProfile,
-            borderRadius: BorderRadius.circular(24),
-            child: const CircleAvatar(
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      child: SizedBox(
+        height: 54,
+        child: Row(
+          children: [
+            const CircleAvatar(
               radius: 23,
-              backgroundColor: AppColors.mint,
-              foregroundColor: AppColors.deepTeal,
+              backgroundColor: AppColors.deepTeal,
+              child: Icon(
+                Icons.eco_rounded,
+                color: AppColors.lime,
+                size: 29,
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Expanded(
               child: Text(
-                'A',
+                'BreatheFree',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 20,
+                  color: AppColors.deepTeal,
+                  fontSize: 22,
                   fontWeight: FontWeight.w800,
                 ),
               ),
             ),
-          ),
-        ],
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                IconButton.outlined(
+                  tooltip: 'Notifications',
+                  onPressed: onNotifications,
+                  style: IconButton.styleFrom(
+                    foregroundColor: AppColors.deepTeal,
+                    side: const BorderSide(
+                      color: AppColors.border,
+                    ),
+                  ),
+                  icon: const Icon(
+                    Icons.notifications_none_rounded,
+                  ),
+                ),
+                if (hasUnreadNotifications)
+                  const Positioned(
+                    right: 3,
+                    top: 2,
+                    child: CircleAvatar(
+                      radius: 5,
+                      backgroundColor: AppColors.coral,
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(width: 8),
+            InkWell(
+              onTap: onProfile,
+              borderRadius: BorderRadius.circular(24),
+              child: const CircleAvatar(
+                radius: 23,
+                backgroundColor: AppColors.mint,
+                foregroundColor: AppColors.deepTeal,
+                child: Text(
+                  'A',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-     ),
     );
   }
 }
@@ -504,9 +497,9 @@ class _QuitDayHero extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-  isSpanish
-      ? 'DESDE TU HORA PLANIFICADA PARA DEJARLO'
-      : 'SINCE YOUR PLANNED QUIT TIME',
+            isSpanish
+                ? 'DESDE TU HORA PLANIFICADA PARA DEJARLO'
+                : 'SINCE YOUR PLANNED QUIT TIME',
             style: const TextStyle(
               color: AppColors.mint,
               fontSize: 10,
@@ -519,7 +512,7 @@ class _QuitDayHero extends StatelessWidget {
           // Compact text area. The orb is intentionally allowed
           // to extend outside this Stack without increasing its height.
           SizedBox(
-              width: double.infinity,
+            width: double.infinity,
             height: 69,
             child: Stack(
               clipBehavior: Clip.none,
@@ -1271,8 +1264,8 @@ class _SupportCard extends StatelessWidget {
                               ? 'Tu equipo de apoyo'
                               : 'Your support team')
                           : isSpanish
-    ? '${person.name} es parte de tu plan de apoyo'
-    : '${person.name} is part of your support plan',
+                              ? '${person.name} es parte de tu plan de apoyo'
+                              : '${person.name} is part of your support plan',
                       style: const TextStyle(
                         color: AppColors.deepTeal,
                         fontSize: 12.5,
@@ -1334,7 +1327,7 @@ class _AdaptiveMessage extends StatelessWidget {
   const _AdaptiveMessage({
     required this.isSpanish,
   });
- final bool isSpanish;
+  final bool isSpanish;
 
   @override
   Widget build(BuildContext context) {
@@ -1355,12 +1348,12 @@ class _AdaptiveMessage extends StatelessWidget {
         ),
         const SizedBox(width: 8),
         Expanded(
-  child: Text(
-    isSpanish
-        ? 'Hoy se adapta a tus respuestas. No hay una forma perfecta de hacerlo.'
-        : 'Today adapts to your answers. There is no perfect way to do this.',
-    style: const TextStyle(
-      color: AppColors.mutedTeal,
+          child: Text(
+            isSpanish
+                ? 'Hoy se adapta a tus respuestas. No hay una forma perfecta de hacerlo.'
+                : 'Today adapts to your answers. There is no perfect way to do this.',
+            style: const TextStyle(
+              color: AppColors.mutedTeal,
               fontSize: 8.5,
               height: 1.2,
             ),
@@ -1472,21 +1465,16 @@ class _NavItem extends StatelessWidget {
               child: Icon(
                 icon,
                 size: 24,
-                color: selected
-                    ? AppColors.deepTeal
-                    : AppColors.mutedTeal,
+                color: selected ? AppColors.deepTeal : AppColors.mutedTeal,
               ),
             ),
             const SizedBox(height: 2),
             Text(
               label,
               style: TextStyle(
-                color: selected
-                    ? AppColors.deepTeal
-                    : AppColors.mutedTeal,
+                color: selected ? AppColors.deepTeal : AppColors.mutedTeal,
                 fontSize: 9,
-                fontWeight:
-                    selected ? FontWeight.w800 : FontWeight.w500,
+                fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
               ),
             ),
           ],

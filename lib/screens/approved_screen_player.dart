@@ -17,6 +17,7 @@ import 'craving_recheck_screen.dart';
 import 'rescue_result_next_step_screen.dart';
 import 'quit_day_home_screen.dart';
 import 'slip_recovery_screen.dart';
+import 'medication_center_screen.dart';
 
 import 'daily_check_in_screen.dart';
 import 'exercise_complete_recheck_screen.dart';
@@ -125,6 +126,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _activeRescueVoiceEnabled = true;
   bool _activeRescueHapticsEnabled = true;
   bool _slipRecoverySaved = false;
+  bool _medicationReminderPreviews = true;
+  MedicationTodayStatus _medicationTodayStatus = MedicationTodayStatus.taken;
 
   @override
   void initState() {
@@ -218,21 +221,26 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   }
 
   String _reasonLabel(bool isSpanish) {
-    final reason = _topQuitReason ??
-        QuitReason.family;
+    final reason = _topQuitReason ?? QuitReason.family;
     return switch (reason) {
-      QuitReason.family =>
-        isSpanish ? '“Quiero estar presente para mi familia.”' : '“I’m choosing this for my family.”',
-      QuitReason.breatheEasier =>
-        isSpanish ? '“Quiero respirar más fácilmente.”' : '“I want to breathe easier.”',
-      QuitReason.improveHealth =>
-        isSpanish ? '“Quiero mejorar mi salud.”' : '“I want to improve my health.”',
-      QuitReason.saveMoney =>
-        isSpanish ? '“Quiero ahorrar dinero.”' : '“I’m choosing this to save money.”',
-      QuitReason.control =>
-        isSpanish ? '“Quiero sentirme en control.”' : '“I want to feel more in control.”',
-      QuitReason.future =>
-        isSpanish ? '“Quiero estar presente para mi futuro.”' : '“I’m choosing this for my future.”',
+      QuitReason.family => isSpanish
+          ? '“Quiero estar presente para mi familia.”'
+          : '“I’m choosing this for my family.”',
+      QuitReason.breatheEasier => isSpanish
+          ? '“Quiero respirar más fácilmente.”'
+          : '“I want to breathe easier.”',
+      QuitReason.improveHealth => isSpanish
+          ? '“Quiero mejorar mi salud.”'
+          : '“I want to improve my health.”',
+      QuitReason.saveMoney => isSpanish
+          ? '“Quiero ahorrar dinero.”'
+          : '“I’m choosing this to save money.”',
+      QuitReason.control => isSpanish
+          ? '“Quiero sentirme en control.”'
+          : '“I want to feel more in control.”',
+      QuitReason.future => isSpanish
+          ? '“Quiero estar presente para mi futuro.”'
+          : '“I’m choosing this for my future.”',
       QuitReason.custom => _customQuitReason?.trim().isNotEmpty == true
           ? '“${_customQuitReason!.trim()}”'
           : (isSpanish ? '“Mi propia razón.”' : '“My own reason.”'),
@@ -804,7 +812,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
 
         if (widget.currentIndex == 20) {
           final isSpanish = _language == WelcomeLanguage.spanish;
-          final afterCraving = _rescueRecheckIntensity ?? _rescueBeforeIntensity;
+          final afterCraving =
+              _rescueRecheckIntensity ?? _rescueBeforeIntensity;
           final toolName = switch (_rescueTool) {
             RescueTool.slowBreathing =>
               isSpanish ? 'Respiración lenta' : 'slow breathing',
@@ -830,7 +839,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
                 ? 'Stress'
                 : (isSpanish ? 'Craving' : 'Craving'),
             reasonText: _reasonLabel(isSpanish),
-            practiceLabel: _rescueTool == RescueTool.move ? '3 minutes' : '2 minutes',
+            practiceLabel:
+                _rescueTool == RescueTool.move ? '3 minutes' : '2 minutes',
             onContinue: () => widget.onSelectScreen(21),
             onRepeatRescue: () {
               setState(() {
@@ -863,6 +873,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             },
             onOpenDailyCheckIn: () => widget.onSelectScreen(12),
             onOpenPlan: () => widget.onSelectScreen(10),
+            onOpenTreatmentPlan: () => widget.onSelectScreen(23),
             onOpenProgress: () => widget.onSelectScreen(25),
             onOpenLearn: () => widget.onSelectScreen(24),
             onOpenSupport: () => widget.onSelectScreen(26),
@@ -887,6 +898,27 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               }
             },
             onOpenSupport: () => widget.onSelectScreen(26),
+          );
+        }
+
+        if (widget.currentIndex == 23) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return MedicationCenterScreen(
+            isSpanish: isSpanish,
+            reminderPreviews: _medicationReminderPreviews,
+            todayStatus: _medicationTodayStatus,
+            onReminderPreviewsChanged: (value) {
+              setState(() => _medicationReminderPreviews = value);
+            },
+            onTodayStatusChanged: (value) {
+              setState(() => _medicationTodayStatus = value);
+            },
+            onBack: widget.onPrevious,
+            onOpenLearn: () => widget.onSelectScreen(24),
+            onOpenSupport: () => widget.onSelectScreen(26),
+            onOpenHome: () => widget.onSelectScreen(21),
+            onOpenProgress: () => widget.onSelectScreen(25),
           );
         }
 
