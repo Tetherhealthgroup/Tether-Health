@@ -1743,7 +1743,7 @@ void main() {
         imageKey: 'functional-craving-rescue-start-screen',
       ),
       (key: 'preparation-nav-progress', imageKey: 'screen-image-26'),
-      (key: 'preparation-nav-learn', imageKey: 'screen-image-25'),
+      (key: 'preparation-nav-learn', imageKey: 'learn-library-screen'),
       (key: 'preparation-nav-support', imageKey: 'screen-image-27'),
       (key: 'preparation-profile', imageKey: 'screen-image-28'),
     ];
