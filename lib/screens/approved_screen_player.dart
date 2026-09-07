@@ -18,6 +18,7 @@ import 'rescue_result_next_step_screen.dart';
 import 'quit_day_home_screen.dart';
 import 'slip_recovery_screen.dart';
 import 'medication_center_screen.dart';
+import 'learn_library_screen.dart';
 
 import 'daily_check_in_screen.dart';
 import 'exercise_complete_recheck_screen.dart';
@@ -919,6 +920,19 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onOpenSupport: () => widget.onSelectScreen(26),
             onOpenHome: () => widget.onSelectScreen(21),
             onOpenProgress: () => widget.onSelectScreen(25),
+          );
+        }
+
+        if (widget.currentIndex == 24) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return LearnLibraryScreen(
+            isSpanish: isSpanish,
+            onOpenHome: () => widget.onSelectScreen(21),
+            onOpenPlan: () => widget.onSelectScreen(23),
+            onOpenProgress: () => widget.onSelectScreen(25),
+            onOpenSettings: () => widget.onSelectScreen(27),
+            onOpenSupport: () => widget.onSelectScreen(26),
           );
         }
 
