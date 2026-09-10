@@ -19,6 +19,7 @@ import 'quit_day_home_screen.dart';
 import 'slip_recovery_screen.dart';
 import 'medication_center_screen.dart';
 import 'learn_library_screen.dart';
+import 'progress_dashboard_screen.dart';
 
 import 'daily_check_in_screen.dart';
 import 'exercise_complete_recheck_screen.dart';
@@ -932,6 +933,20 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onOpenPlan: () => widget.onSelectScreen(23),
             onOpenProgress: () => widget.onSelectScreen(25),
             onOpenSettings: () => widget.onSelectScreen(27),
+            onOpenSupport: () => widget.onSelectScreen(26),
+          );
+        }
+
+        if (widget.currentIndex == 25) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return ProgressDashboardScreen(
+            isSpanish: isSpanish,
+            onBack: widget.onPrevious,
+            onOpenSettings: () => widget.onSelectScreen(27),
+            onOpenHome: () => widget.onSelectScreen(21),
+            onOpenPlan: () => widget.onSelectScreen(23),
+            onOpenLearn: () => widget.onSelectScreen(24),
             onOpenSupport: () => widget.onSelectScreen(26),
           );
         }

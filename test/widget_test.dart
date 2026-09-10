@@ -1742,7 +1742,7 @@ void main() {
         key: 'preparation-open-rescue',
         imageKey: 'functional-craving-rescue-start-screen',
       ),
-      (key: 'preparation-nav-progress', imageKey: 'screen-image-26'),
+      (key: 'preparation-nav-progress', imageKey: 'functional-progress-dashboard-screen'),
       (key: 'preparation-nav-learn', imageKey: 'learn-library-screen'),
       (key: 'preparation-nav-support', imageKey: 'screen-image-27'),
       (key: 'preparation-profile', imageKey: 'screen-image-28'),
