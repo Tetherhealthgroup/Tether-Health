@@ -100,12 +100,18 @@ class ResourcePageHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (onBack != null) ...[
-            IconButton(
-              tooltip: backSemanticLabel,
-              onPressed: onBack,
-              icon: const Icon(
-                Icons.arrow_back_ios_new_rounded,
-                color: AppColors.deepTeal,
+            Semantics(
+              label: backSemanticLabel,
+              button: true,
+              onTap: onBack,
+              excludeSemantics: true,
+              child: IconButton(
+                tooltip: backSemanticLabel,
+                onPressed: onBack,
+                icon: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: AppColors.deepTeal,
+                ),
               ),
             ),
             const SizedBox(width: 2),
