@@ -1744,7 +1744,7 @@ void main() {
       ),
       (key: 'preparation-nav-progress', imageKey: 'functional-progress-dashboard-screen'),
       (key: 'preparation-nav-learn', imageKey: 'learn-library-screen'),
-      (key: 'preparation-nav-support', imageKey: 'screen-image-27'),
+      (key: 'preparation-nav-support', imageKey: 'functional-support-hub-screen'),
       (key: 'preparation-profile', imageKey: 'screen-image-28'),
     ];
 
@@ -2142,7 +2142,7 @@ void main() {
         findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('next-step-open-support')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-27')), findsOneWidget);
+    expect(find.byKey(const ValueKey('functional-support-hub-screen')), findsOneWidget);
 
     await tester.tap(find.bySemanticsLabel('Go back'));
     await tester.pumpAndSettle();
@@ -3455,7 +3455,7 @@ void main() {
     await tester.ensureVisible(support);
     await tester.tap(support);
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-27')), findsOneWidget);
+    expect(find.byKey(const ValueKey('functional-support-hub-screen')), findsOneWidget);
     await tester.tap(find.bySemanticsLabel('Go back'));
     await tester.pumpAndSettle();
 
@@ -3616,7 +3616,7 @@ void main() {
     final support = find.byKey(const ValueKey('rescue-tool-support'));
     tester.widget<FilledButton>(support).onPressed!();
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-27')), findsOneWidget);
+    expect(find.byKey(const ValueKey('functional-support-hub-screen')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
