@@ -204,20 +204,33 @@ class ResourceCard extends StatelessWidget {
 }
 
 class SectionTitle extends StatelessWidget {
-  const SectionTitle(this.title, {super.key});
+  const SectionTitle(this.title, {this.trailing, super.key});
 
   final String title;
+  final Widget? trailing;
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: AppColors.deepTeal,
-        fontSize: 19,
-        height: 1.15,
-        fontWeight: FontWeight.w800,
-      ),
+    const titleStyle = TextStyle(
+      color: AppColors.deepTeal,
+      fontSize: 19,
+      height: 1.15,
+      fontWeight: FontWeight.w800,
+    );
+
+    if (trailing == null) {
+      return Text(title, style: titleStyle);
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          child: Text(title, style: titleStyle),
+        ),
+        const SizedBox(width: 8),
+        trailing!,
+      ],
     );
   }
 }
