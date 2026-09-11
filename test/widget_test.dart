@@ -1745,7 +1745,7 @@ void main() {
       (key: 'preparation-nav-progress', imageKey: 'functional-progress-dashboard-screen'),
       (key: 'preparation-nav-learn', imageKey: 'learn-library-screen'),
       (key: 'preparation-nav-support', imageKey: 'functional-support-hub-screen'),
-      (key: 'preparation-profile', imageKey: 'screen-image-28'),
+      (key: 'preparation-profile', imageKey: 'functional-settings-privacy-screen'),
     ];
 
     for (final destination in destinations) {

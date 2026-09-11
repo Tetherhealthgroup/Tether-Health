@@ -21,6 +21,7 @@ import 'medication_center_screen.dart';
 import 'learn_library_screen.dart';
 import 'progress_dashboard_screen.dart';
 import 'support_hub_screen.dart';
+import 'settings_privacy_screen.dart';
 
 import 'daily_check_in_screen.dart';
 import 'exercise_complete_recheck_screen.dart';
@@ -63,6 +64,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _helpfulReminders = true;
   bool _shareWithCareTeam = false;
   bool _helpImproveBreatheFree = false;
+  bool _sensitiveDetailsEnabled = false;
+  bool _reduceMotionEnabled = false;
   DailyCigaretteUse? _dailyCigaretteUse;
   Set<SmokingTrigger> _smokingTriggers = <SmokingTrigger>{};
   String? _customSmokingTrigger;
@@ -963,6 +966,27 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onOpenPlan: () => widget.onSelectScreen(10),
             onOpenProgress: () => widget.onSelectScreen(25),
             onOpenLearn: () => widget.onSelectScreen(24),
+          );
+        }
+
+        if (widget.currentIndex == 27) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return SettingsPrivacyScreen(
+            isSpanish: isSpanish,
+            remindersEnabled: _helpfulReminders,
+            sensitiveDetailsEnabled: _sensitiveDetailsEnabled,
+            diagnosticsEnabled: _helpImproveBreatheFree,
+            reduceMotionEnabled: _reduceMotionEnabled,
+            onRemindersChanged: (value) =>
+                setState(() => _helpfulReminders = value),
+            onSensitiveDetailsChanged: (value) =>
+                setState(() => _sensitiveDetailsEnabled = value),
+            onDiagnosticsChanged: (value) =>
+                setState(() => _helpImproveBreatheFree = value),
+            onReduceMotionChanged: (value) =>
+                setState(() => _reduceMotionEnabled = value),
+            onBack: widget.onPrevious,
           );
         }
 
