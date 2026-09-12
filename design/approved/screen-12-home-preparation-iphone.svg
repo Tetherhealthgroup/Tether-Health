@@ -41,7 +41,7 @@
   <g transform="translate(72 130)">
     <circle cx="45" cy="45" r="45" fill="#123C37"/>
     <path d="M28 50c2-26 28-34 48-31-2 22-15 40-38 38M35 60c12-18 24-25 40-34" fill="none" stroke="#D5EF75" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-    <text x="111" y="57" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="43">BreatheFree</text>
+    <text x="111" y="57" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="43">Tether Health</text>
     <g transform="translate(843 7)">
       <circle cx="38" cy="38" r="38" fill="#FFFDF7" stroke="#C9D7D2" stroke-width="2"/>
       <path d="M26 47h24l-4-7V31c0-13-16-13-16 0v9zM34 53c2 6 8 6 10 0" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>

@@ -1,4 +1,4 @@
-package com.tetherhealthgroup.tetherhealth.unplug
+package com.TetherHealthLLC.tetherhealth.unplug
 
 import android.app.AppOpsManager
 import android.app.usage.UsageEvents

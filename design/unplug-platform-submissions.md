@@ -22,7 +22,7 @@ Submit at <https://developer.apple.com/contact/request/family-controls-distribut
 with the Tether Apple Developer account.
 
 **App name:** Tether Health
-**Bundle identifier:** `com.tetherhealthgroup.tetherhealth`. The three extensions
+**Bundle identifier:** `com.TetherHealthLLC.tetherhealth`. The three extensions
 are suffixed `.unplugmonitor`, `.unplugshield` and `.unplugshieldaction`.
 
 **What the app does**

@@ -18,9 +18,9 @@ import 'package:pigeon/pigeon.dart';
     swiftOut: 'ios/Runner/Unplug/UnplugApi.g.swift',
     swiftOptions: SwiftOptions(),
     kotlinOut:
-        'android/app/src/main/kotlin/com/tetherhealthgroup/tetherhealth/unplug/UnplugApi.g.kt',
+        'android/app/src/main/kotlin/com/TetherHealthLLC/tetherhealth/unplug/UnplugApi.g.kt',
     kotlinOptions: KotlinOptions(
-      package: 'com.tetherhealthgroup.tetherhealth.unplug',
+      package: 'com.TetherHealthLLC.tetherhealth.unplug',
     ),
     dartPackageName: 'tether_health',
   ),

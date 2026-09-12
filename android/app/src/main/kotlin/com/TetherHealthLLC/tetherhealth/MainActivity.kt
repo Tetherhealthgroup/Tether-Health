@@ -1,10 +1,10 @@
-package com.tetherhealthgroup.tetherhealth
+package com.TetherHealthLLC.tetherhealth
 
 import android.content.Intent
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
-import com.tetherhealthgroup.tetherhealth.unplug.AppPickerActivity
-import com.tetherhealthgroup.tetherhealth.unplug.UnplugHost
+import com.TetherHealthLLC.tetherhealth.unplug.AppPickerActivity
+import com.TetherHealthLLC.tetherhealth.unplug.UnplugHost
 
 /**
  * Hosts the Flutter engine and the Unplug channel (addendum §2.3).

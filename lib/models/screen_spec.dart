@@ -33,7 +33,7 @@ class ScreenSpec {
 
 String _slugFor(int number) => switch (number) {
       1 => 'welcome',
-      2 => 'why-breathefree',
+      2 => 'why-tether-health',
       3 => 'consent-privacy',
       4 => 'baseline-assessment',
       5 => 'trigger-map',
@@ -67,12 +67,12 @@ const approvedScreens = <ScreenSpec>[
   ScreenSpec(
     number: 1,
     title: 'Welcome',
-    description: 'Introduces BreatheFree, language choice and the private, judgment-free promise.',
+    description: 'Introduces Tether Health, language choice and the private, judgment-free promise.',
     phase: JourneyPhase.welcome,
   ),
   ScreenSpec(
     number: 2,
-    title: 'Why BreatheFree',
+    title: 'Why Tether Health',
     description: 'Explains how the app supports cravings, planning and progress.',
     phase: JourneyPhase.onboarding,
   ),

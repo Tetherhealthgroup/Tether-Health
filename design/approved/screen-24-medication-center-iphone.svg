@@ -53,7 +53,7 @@
     <rect width="1146" height="132" rx="34" fill="#FFFDF7"/>
     <circle cx="65" cy="66" r="34" fill="#E6F1EA"/><path d="M52 75h26l-4-8V56c0-14-18-14-18 0v11zM59 81c2 6 8 6 10 0" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
     <text x="119" y="55" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="28">Private reminder previews</text>
-    <text x="119" y="91" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Lock screen shows “You have a BreatheFree reminder.”</text>
+    <text x="119" y="91" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Lock screen shows “You have a Tether Health reminder.”</text>
     <g transform="translate(974 41)"><rect width="123" height="53" rx="27" fill="#123C37"/><circle cx="96" cy="27" r="21" fill="#D5EF75"/><text x="43" y="35" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="18">ON</text></g>
   </g>
 

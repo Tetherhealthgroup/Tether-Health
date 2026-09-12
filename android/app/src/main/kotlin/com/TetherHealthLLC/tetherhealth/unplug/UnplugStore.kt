@@ -1,4 +1,4 @@
-package com.tetherhealthgroup.tetherhealth.unplug
+package com.TetherHealthLLC.tetherhealth.unplug
 
 import android.content.Context
 

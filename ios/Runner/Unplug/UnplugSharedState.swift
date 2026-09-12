@@ -16,7 +16,7 @@ import Foundation
 public enum UnplugSharedState {
 
     /// Must match the App Group on the Runner and all three extension targets.
-    public static let appGroup = "group.com.tetherhealthgroup.tetherhealth.unplug"
+    public static let appGroup = "group.com.TetherHealthLLC.tetherhealth.unplug"
 
     private static let defaults = UserDefaults(suiteName: appGroup)
 
