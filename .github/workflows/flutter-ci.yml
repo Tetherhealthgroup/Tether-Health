@@ -32,3 +32,12 @@ jobs:
             android/app/src/main/kotlin/com/breathefree/breathefree_patient/unplug/UnplugApi.g.kt
       - run: flutter build web --release
       - run: flutter build appbundle --debug
+      # A debug APK a reviewer can sideload. The Unplug intercept is a
+      # foreground service and an overlay, and neither can be judged from a
+      # screenshot — they have to be installed and watched.
+      - run: flutter build apk --debug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: breathefree-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14

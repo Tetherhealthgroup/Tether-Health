@@ -23,7 +23,7 @@ Future<void> main() async {
     );
   }
 
-  runApp(const BreatheFreeApp());
+  runApp(const BreatheFreeApp(initialScreen: 28));
 }
 
 class BreatheFreeApp extends StatefulWidget {
