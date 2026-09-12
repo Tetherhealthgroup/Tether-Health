@@ -1,10 +1,10 @@
-package com.breathefree.breathefree_patient
+package com.tetherhealthgroup.tetherhealth
 
 import android.content.Intent
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
-import com.breathefree.breathefree_patient.unplug.AppPickerActivity
-import com.breathefree.breathefree_patient.unplug.UnplugHost
+import com.tetherhealthgroup.tetherhealth.unplug.AppPickerActivity
+import com.tetherhealthgroup.tetherhealth.unplug.UnplugHost
 
 /**
  * Hosts the Flutter engine and the Unplug channel (addendum §2.3).

@@ -665,7 +665,7 @@ class UnplugHostApiSetup {
     let channelSuffix = messageChannelSuffix.count > 0 ? ".\(messageChannelSuffix)" : ""
     /// False on web, desktop, and any build without the screen-time layer. Dart
     /// falls back to its own simulation when this is false.
-    let isSupportedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.isSupported\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let isSupportedChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.tether_health.UnplugHostApi.isSupported\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       isSupportedChannel.setMessageHandler { _, reply in
         do {
@@ -678,7 +678,7 @@ class UnplugHostApiSetup {
     } else {
       isSupportedChannel.setMessageHandler(nil)
     }
-    let requestAuthorizationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.requestAuthorization\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let requestAuthorizationChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.tether_health.UnplugHostApi.requestAuthorization\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       requestAuthorizationChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -695,7 +695,7 @@ class UnplugHostApiSetup {
     } else {
       requestAuthorizationChannel.setMessageHandler(nil)
     }
-    let authorizationStatusChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.authorizationStatus\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let authorizationStatusChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.tether_health.UnplugHostApi.authorizationStatus\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       authorizationStatusChannel.setMessageHandler { _, reply in
         do {
@@ -712,7 +712,7 @@ class UnplugHostApiSetup {
     ///
     /// The picker is a system component on both platforms and cannot be drawn by
     /// Flutter, which is why this returns a count and not a list.
-    let presentAppPickerChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.presentAppPicker\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let presentAppPickerChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.tether_health.UnplugHostApi.presentAppPicker\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       presentAppPickerChannel.setMessageHandler { _, reply in
         Task { @MainActor in
@@ -727,7 +727,7 @@ class UnplugHostApiSetup {
     } else {
       presentAppPickerChannel.setMessageHandler(nil)
     }
-    let applyShieldChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.applyShield\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let applyShieldChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.tether_health.UnplugHostApi.applyShield\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       applyShieldChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -743,7 +743,7 @@ class UnplugHostApiSetup {
     } else {
       applyShieldChannel.setMessageHandler(nil)
     }
-    let liftShieldChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.liftShield\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let liftShieldChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.tether_health.UnplugHostApi.liftShield\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       liftShieldChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -758,7 +758,7 @@ class UnplugHostApiSetup {
     } else {
       liftShieldChannel.setMessageHandler(nil)
     }
-    let startSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.startSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let startSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.tether_health.UnplugHostApi.startSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       startSessionChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -775,7 +775,7 @@ class UnplugHostApiSetup {
     } else {
       startSessionChannel.setMessageHandler(nil)
     }
-    let endSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.endSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let endSessionChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.tether_health.UnplugHostApi.endSession\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       endSessionChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -790,7 +790,7 @@ class UnplugHostApiSetup {
     } else {
       endSessionChannel.setMessageHandler(nil)
     }
-    let setThresholdsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.setThresholds\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let setThresholdsChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.tether_health.UnplugHostApi.setThresholds\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       setThresholdsChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -806,7 +806,7 @@ class UnplugHostApiSetup {
       setThresholdsChannel.setMessageHandler(nil)
     }
     /// Reads the last [days] days. Shaped to the iOS floor on both platforms.
-    let readUsageChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.readUsage\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let readUsageChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.tether_health.UnplugHostApi.readUsage\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       readUsageChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -823,7 +823,7 @@ class UnplugHostApiSetup {
     } else {
       readUsageChannel.setMessageHandler(nil)
     }
-    let trackingHealthChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.trackingHealth\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let trackingHealthChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.tether_health.UnplugHostApi.trackingHealth\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       trackingHealthChannel.setMessageHandler { _, reply in
         do {
@@ -839,7 +839,7 @@ class UnplugHostApiSetup {
     /// Deletes everything the module holds on this device.
     ///
     /// Called by the retention sweep (§3.2) and by account deletion.
-    let purgeLocalDataChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.purgeLocalData\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    let purgeLocalDataChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.tether_health.UnplugHostApi.purgeLocalData\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
       purgeLocalDataChannel.setMessageHandler { message, reply in
         let args = message as! [Any?]
@@ -881,7 +881,7 @@ class UnplugFlutterApi: UnplugFlutterApiProtocol {
   }
   func onThresholdCrossed(minutesUsed minutesUsedArg: Int64, opens opensArg: Int64) async throws {
     return try await withCheckedThrowingContinuation { continuation in
-      let channelName: String = "dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onThresholdCrossed\(messageChannelSuffix)"
+      let channelName: String = "dev.flutter.pigeon.tether_health.UnplugFlutterApi.onThresholdCrossed\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([minutesUsedArg, opensArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
@@ -901,7 +901,7 @@ class UnplugFlutterApi: UnplugFlutterApiProtocol {
   }
   func onShieldShown(groupLabel groupLabelArg: String) async throws {
     return try await withCheckedThrowingContinuation { continuation in
-      let channelName: String = "dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onShieldShown\(messageChannelSuffix)"
+      let channelName: String = "dev.flutter.pigeon.tether_health.UnplugFlutterApi.onShieldShown\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([groupLabelArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
@@ -921,7 +921,7 @@ class UnplugFlutterApi: UnplugFlutterApiProtocol {
   }
   func onShieldDismissed(groupLabel groupLabelArg: String) async throws {
     return try await withCheckedThrowingContinuation { continuation in
-      let channelName: String = "dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onShieldDismissed\(messageChannelSuffix)"
+      let channelName: String = "dev.flutter.pigeon.tether_health.UnplugFlutterApi.onShieldDismissed\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([groupLabelArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
@@ -941,7 +941,7 @@ class UnplugFlutterApi: UnplugFlutterApiProtocol {
   }
   func onOverrideUsed(groupLabel groupLabelArg: String, overridesRemaining overridesRemainingArg: Int64) async throws {
     return try await withCheckedThrowingContinuation { continuation in
-      let channelName: String = "dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onOverrideUsed\(messageChannelSuffix)"
+      let channelName: String = "dev.flutter.pigeon.tether_health.UnplugFlutterApi.onOverrideUsed\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([groupLabelArg, overridesRemainingArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {
@@ -963,7 +963,7 @@ class UnplugFlutterApi: UnplugFlutterApiProtocol {
   /// than left believing the module is still running (§2.2).
   func onTrackingStopped(checkName checkNameArg: String, detail detailArg: String) async throws {
     return try await withCheckedThrowingContinuation { continuation in
-      let channelName: String = "dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onTrackingStopped\(messageChannelSuffix)"
+      let channelName: String = "dev.flutter.pigeon.tether_health.UnplugFlutterApi.onTrackingStopped\(messageChannelSuffix)"
       let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
       channel.sendMessage([checkNameArg, detailArg] as [Any?]) { response in
         guard let listResponse = response as? [Any?] else {

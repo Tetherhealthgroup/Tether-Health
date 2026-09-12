@@ -1,15 +1,15 @@
 import 'dart:io';
 
-import 'package:breathefree_patient/main.dart';
-import 'package:breathefree_patient/models/prototype_catalog.dart';
-import 'package:breathefree_patient/models/screen_spec.dart';
-import 'package:breathefree_patient/unplug/models/delivery_track.dart';
-import 'package:breathefree_patient/unplug/models/intercept_tokens.dart';
-import 'package:breathefree_patient/unplug/models/platform_ceiling.dart';
-import 'package:breathefree_patient/unplug/models/program_template.dart';
-import 'package:breathefree_patient/unplug/models/unplug_module_state.dart';
-import 'package:breathefree_patient/unplug/models/unplug_screen_spec.dart';
-import 'package:breathefree_patient/unplug/platform/unplug_api.g.dart';
+import 'package:tether_health/main.dart';
+import 'package:tether_health/models/prototype_catalog.dart';
+import 'package:tether_health/models/screen_spec.dart';
+import 'package:tether_health/unplug/models/delivery_track.dart';
+import 'package:tether_health/unplug/models/intercept_tokens.dart';
+import 'package:tether_health/unplug/models/platform_ceiling.dart';
+import 'package:tether_health/unplug/models/program_template.dart';
+import 'package:tether_health/unplug/models/unplug_module_state.dart';
+import 'package:tether_health/unplug/models/unplug_screen_spec.dart';
+import 'package:tether_health/unplug/platform/unplug_api.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -295,7 +295,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        BreatheFreeApp(initialScreen: unplugCatalogOffset),
+        TetherHealthApp(initialScreen: unplugCatalogOffset),
       );
       await tester.pump();
 
@@ -312,7 +312,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        BreatheFreeApp(initialScreen: unplugCatalogOffset),
+        TetherHealthApp(initialScreen: unplugCatalogOffset),
       );
       await tester.pump();
 
@@ -341,7 +341,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        BreatheFreeApp(initialScreen: unplugCatalogOffset),
+        TetherHealthApp(initialScreen: unplugCatalogOffset),
       );
       await tester.pump();
 

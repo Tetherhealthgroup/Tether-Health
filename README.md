@@ -1,6 +1,6 @@
-# BreatheFree Flutter
+# Tether Health — Flutter patient app
 
-BreatheFree is a cross-platform smoking-cessation patient app prototype containing all 28 approved screens. The mobile view uses the exact approved 1290 × 2796 App Store artwork. The desktop view places the same experience inside an iPhone-sized preview with screen navigation and developer interaction overlays.
+Tether Health is the cross-platform patient app. It carries two modules: the BreatheFree smoking-cessation programme, whose 28 screens are approved artwork, and Unplug v2.1, a digital-wellbeing module built as native responsive views. The mobile view uses the exact approved 1290 × 2796 App Store artwork. The desktop view places the same experience inside an iPhone-sized preview with screen navigation and developer interaction overlays.
 
 ## What is included
 
@@ -69,8 +69,8 @@ Flutter creates machine-specific runner folders without changing the approved ap
 
 ```bash
 flutter create . \
-  --project-name breathefree_patient \
-  --org com.breathefree \
+  --project-name tether_health \
+  --org com.tetherhealthgroup \
   --platforms android,ios,web,windows,macos,linux
 flutter pub get
 flutter analyze
@@ -95,7 +95,7 @@ An iPhone build must be created on a Mac because Apple requires Xcode:
 3. Connect the unlocked iPhone and tap **Trust This Computer**.
 4. Open `ios/Runner.xcworkspace` in Xcode.
 5. Select **Runner → Signing & Capabilities** and choose your Apple Development Team.
-6. Change the bundle identifier from `com.breathefree.breathefreePatient` if needed.
+6. Change the bundle identifier from `com.tetherhealthgroup.tetherhealth` if needed.
 7. Select the iPhone and press Run, or use `flutter run -d <device-id>`.
 
 A free Apple ID can install a development build on a personal device. Publishing through TestFlight or the App Store requires the Apple Developer Program and App Store Connect.
@@ -192,7 +192,7 @@ in `design/unplug-platform-submissions.md`.
 - `lib/unplug/widgets/` — the module's shared page chrome and scope
 - `pigeons/unplug_api.dart` — the §2.3 channel contract, the source of the generated code
 - `ios/Runner/Unplug/`, `ios/UnplugMonitor/`, `ios/UnplugShield/`, `ios/UnplugShieldAction/` — the iOS layer and its three extensions
-- `android/app/src/main/kotlin/com/breathefree/breathefree_patient/unplug/` — the Android layer
+- `android/app/src/main/kotlin/com/tetherhealthgroup/tetherhealth/unplug/` — the Android layer
 - `assets/screens/` — runtime 1290 × 2796 approved PNGs
 - `assets/unplug/intercept_tokens.json` — colours and copy shared by all three intercepts
 - `design/approved/` — editable approved SVG sources

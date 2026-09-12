@@ -6,7 +6,7 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.breathefree.breathefreePatient.unplug</string>
+		<string>group.com.tetherhealthgroup.tetherhealth.unplug</string>
 	</array>
 </dict>
 </plist>

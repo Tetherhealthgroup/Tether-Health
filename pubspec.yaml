@@ -1,5 +1,5 @@
-name: breathefree_patient
-description: BreatheFree smoking-cessation patient application — the approved 28-screen experience plus the Unplug v2.1 digital-wellbeing module (screens A–L).
+name: tether_health
+description: Tether Health patient application — the approved 28-screen BreatheFree cessation programme plus the Unplug v2.1 digital-wellbeing module (screens A–L).
 publish_to: none
 version: 1.0.0+1
 

@@ -1,4 +1,4 @@
-package com.breathefree.breathefree_patient.unplug
+package com.tetherhealthgroup.tetherhealth.unplug
 
 import android.app.Activity
 import android.content.Intent

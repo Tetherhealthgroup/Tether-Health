@@ -18,11 +18,11 @@ import 'package:pigeon/pigeon.dart';
     swiftOut: 'ios/Runner/Unplug/UnplugApi.g.swift',
     swiftOptions: SwiftOptions(),
     kotlinOut:
-        'android/app/src/main/kotlin/com/breathefree/breathefree_patient/unplug/UnplugApi.g.kt',
+        'android/app/src/main/kotlin/com/tetherhealthgroup/tetherhealth/unplug/UnplugApi.g.kt',
     kotlinOptions: KotlinOptions(
-      package: 'com.breathefree.breathefree_patient.unplug',
+      package: 'com.tetherhealthgroup.tetherhealth.unplug',
     ),
-    dartPackageName: 'breathefree_patient',
+    dartPackageName: 'tether_health',
   ),
 )
 /// Which authorization iOS is being asked for.

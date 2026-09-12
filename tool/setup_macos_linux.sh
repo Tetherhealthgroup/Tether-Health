@@ -23,8 +23,8 @@ case "$(uname -s)" in
 esac
 
 flutter create . \
-  --project-name breathefree_patient \
-  --org com.breathefree \
+  --project-name tether_health \
+  --org com.tetherhealthgroup \
   --platforms="$breathefree_platforms"
 flutter pub get
 flutter analyze

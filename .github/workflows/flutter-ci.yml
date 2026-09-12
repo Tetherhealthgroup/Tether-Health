@@ -15,7 +15,7 @@ jobs:
           channel: stable
           cache: true
       - name: Create generated platform runners
-        run: flutter create . --project-name breathefree_patient --org com.breathefree --platforms=android,web
+        run: flutter create . --project-name tether_health --org com.tetherhealthgroup --platforms=android,web
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
@@ -29,7 +29,7 @@ jobs:
           git diff --exit-code -- \
             lib/unplug/platform/unplug_api.g.dart \
             ios/Runner/Unplug/UnplugApi.g.swift \
-            android/app/src/main/kotlin/com/breathefree/breathefree_patient/unplug/UnplugApi.g.kt
+            android/app/src/main/kotlin/com/tetherhealthgroup/tetherhealth/unplug/UnplugApi.g.kt
       - run: flutter build web --release
       - run: flutter build appbundle --debug
       # A debug APK a reviewer can sideload. The Unplug intercept is a

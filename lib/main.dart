@@ -23,19 +23,19 @@ Future<void> main() async {
     );
   }
 
-  runApp(const BreatheFreeApp());
+  runApp(const TetherHealthApp());
 }
 
-class BreatheFreeApp extends StatefulWidget {
-  const BreatheFreeApp({this.initialScreen = 0, super.key});
+class TetherHealthApp extends StatefulWidget {
+  const TetherHealthApp({this.initialScreen = 0, super.key});
 
   final int initialScreen;
 
   @override
-  State<BreatheFreeApp> createState() => _BreatheFreeAppState();
+  State<TetherHealthApp> createState() => _TetherHealthAppState();
 }
 
-class _BreatheFreeAppState extends State<BreatheFreeApp> {
+class _TetherHealthAppState extends State<TetherHealthApp> {
   late int _currentIndex;
   final List<int> _history = <int>[];
   final UnplugModuleState _unplug = UnplugModuleState();
@@ -212,9 +212,9 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'BreatheFree',
+      title: 'Tether Health',
       debugShowCheckedModeBanner: false,
-      restorationScopeId: 'breathefree',
+      restorationScopeId: 'tetherhealth',
       theme: AppTheme.light(),
       home: UnplugScope(
         state: _unplug,

@@ -1,6 +1,6 @@
-import 'package:breathefree_patient/main.dart';
-import 'package:breathefree_patient/models/screen_spec.dart';
-import 'package:breathefree_patient/widgets/approved_screen_viewport.dart';
+import 'package:tether_health/main.dart';
+import 'package:tether_health/models/screen_spec.dart';
+import 'package:tether_health/widgets/approved_screen_viewport.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -26,7 +26,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const BreatheFreeApp());
+    await tester.pumpWidget(const TetherHealthApp());
     await tester.pump();
 
     expect(find.byKey(const ValueKey('screen-image-1')), findsOneWidget);
@@ -49,7 +49,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 27));
+    await tester.pumpWidget(const TetherHealthApp(initialScreen: 27));
     await tester.pump();
 
     expect(find.text('28 approved screens'), findsOneWidget);

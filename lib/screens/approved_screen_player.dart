@@ -222,7 +222,7 @@ class _ScreenNavigator extends StatelessWidget {
                     const SizedBox(width: 11),
                     const Expanded(
                       child: Text(
-                        'BreatheFree',
+                        'Tether Health',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(

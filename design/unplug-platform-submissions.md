@@ -21,14 +21,14 @@ reports, and the §5 risk register's only **Critical** row.
 Submit at <https://developer.apple.com/contact/request/family-controls-distribution>
 with the Tether Apple Developer account.
 
-**App name:** BreatheFree
-**Bundle identifier:** the shipping identifier, which is *not* the
-`com.hshanmug12.breathefreePatient` placeholder currently in the project — see
-`PRODUCTION_RELEASE_CHECKLIST.md`.
+**App name:** Tether Health
+**Bundle identifier:** `com.tetherhealthgroup.tetherhealth`. The three extensions
+are suffixed `.unplugmonitor`, `.unplugshield` and `.unplugshieldaction`.
 
 **What the app does**
 
-> BreatheFree is a digital health application for people trying to stop smoking,
+> Tether Health is a digital health application whose BreatheFree programme supports
+> people trying to stop smoking,
 > delivered through healthcare providers and through self-guided programmes. Its
 > Unplug module supports the screen habits that sit alongside a quit attempt: the
 > person chooses which apps to slow down, and the app interrupts those apps with

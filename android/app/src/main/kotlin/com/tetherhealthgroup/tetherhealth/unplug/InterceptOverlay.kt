@@ -1,4 +1,4 @@
-package com.breathefree.breathefree_patient.unplug
+package com.tetherhealthgroup.tetherhealth.unplug
 
 import android.annotation.SuppressLint
 import android.content.Context

@@ -597,7 +597,7 @@ class UnplugHostApi {
   /// False on web, desktop, and any build without the screen-time layer. Dart
   /// falls back to its own simulation when this is false.
   Future<bool> isSupported() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.isSupported$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.tether_health.UnplugHostApi.isSupported$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -616,7 +616,7 @@ class UnplugHostApi {
   }
 
   Future<PlatformAuthorizationStatus> requestAuthorization(PlatformAuthorizationMode mode) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.requestAuthorization$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.tether_health.UnplugHostApi.requestAuthorization$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -635,7 +635,7 @@ class UnplugHostApi {
   }
 
   Future<PlatformAuthorizationStatus> authorizationStatus() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.authorizationStatus$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.tether_health.UnplugHostApi.authorizationStatus$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -658,7 +658,7 @@ class UnplugHostApi {
   /// The picker is a system component on both platforms and cannot be drawn by
   /// Flutter, which is why this returns a count and not a list.
   Future<int> presentAppPicker() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.presentAppPicker$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.tether_health.UnplugHostApi.presentAppPicker$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -677,7 +677,7 @@ class UnplugHostApi {
   }
 
   Future<void> applyShield(PlatformModuleConfig config, PlatformAppSelection selection) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.applyShield$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.tether_health.UnplugHostApi.applyShield$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -695,7 +695,7 @@ class UnplugHostApi {
   }
 
   Future<void> liftShield(String reason) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.liftShield$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.tether_health.UnplugHostApi.liftShield$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -713,7 +713,7 @@ class UnplugHostApi {
   }
 
   Future<void> startSession(int durationSeconds, PlatformShieldScope scope, bool strict) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.startSession$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.tether_health.UnplugHostApi.startSession$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -731,7 +731,7 @@ class UnplugHostApi {
   }
 
   Future<void> endSession(String? overrideReason) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.endSession$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.tether_health.UnplugHostApi.endSession$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -749,7 +749,7 @@ class UnplugHostApi {
   }
 
   Future<void> setThresholds(PlatformThresholds thresholds) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.setThresholds$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.tether_health.UnplugHostApi.setThresholds$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -768,7 +768,7 @@ class UnplugHostApi {
 
   /// Reads the last [days] days. Shaped to the iOS floor on both platforms.
   Future<PlatformUsage> readUsage(int days) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.readUsage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.tether_health.UnplugHostApi.readUsage$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -787,7 +787,7 @@ class UnplugHostApi {
   }
 
   Future<List<PlatformTrackingCheck>> trackingHealth() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.trackingHealth$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.tether_health.UnplugHostApi.trackingHealth$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -809,7 +809,7 @@ class UnplugHostApi {
   ///
   /// Called by the retention sweep (§3.2) and by account deletion.
   Future<void> purgeLocalData(int olderThanDays) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.purgeLocalData$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName = 'dev.flutter.pigeon.tether_health.UnplugHostApi.purgeLocalData$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -847,7 +847,7 @@ abstract class UnplugFlutterApi {
     messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onThresholdCrossed$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.tether_health.UnplugFlutterApi.onThresholdCrossed$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -869,7 +869,7 @@ abstract class UnplugFlutterApi {
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onShieldShown$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.tether_health.UnplugFlutterApi.onShieldShown$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -890,7 +890,7 @@ abstract class UnplugFlutterApi {
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onShieldDismissed$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.tether_health.UnplugFlutterApi.onShieldDismissed$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -911,7 +911,7 @@ abstract class UnplugFlutterApi {
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onOverrideUsed$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.tether_health.UnplugFlutterApi.onOverrideUsed$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -933,7 +933,7 @@ abstract class UnplugFlutterApi {
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onTrackingStopped$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.tether_health.UnplugFlutterApi.onTrackingStopped$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);

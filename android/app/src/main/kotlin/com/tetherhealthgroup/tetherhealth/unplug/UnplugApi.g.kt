@@ -2,7 +2,7 @@
 // See also: https://pub.dev/packages/pigeon
 @file:Suppress("UNCHECKED_CAST", "ArrayInDataClass")
 
-package com.breathefree.breathefree_patient.unplug
+package com.tetherhealthgroup.tetherhealth.unplug
 
 import android.util.Log
 import io.flutter.plugin.common.BasicMessageChannel
@@ -729,7 +729,7 @@ interface UnplugHostApi {
     fun setUp(binaryMessenger: BinaryMessenger, api: UnplugHostApi?, messageChannelSuffix: String = "") {
       val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.isSupported$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.tether_health.UnplugHostApi.isSupported$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
@@ -744,7 +744,7 @@ interface UnplugHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.requestAuthorization$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.tether_health.UnplugHostApi.requestAuthorization$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -763,7 +763,7 @@ interface UnplugHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.authorizationStatus$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.tether_health.UnplugHostApi.authorizationStatus$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
@@ -778,7 +778,7 @@ interface UnplugHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.presentAppPicker$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.tether_health.UnplugHostApi.presentAppPicker$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             CoroutineScope(Dispatchers.Main).launch {
@@ -795,7 +795,7 @@ interface UnplugHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.applyShield$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.tether_health.UnplugHostApi.applyShield$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -814,7 +814,7 @@ interface UnplugHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.liftShield$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.tether_health.UnplugHostApi.liftShield$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -832,7 +832,7 @@ interface UnplugHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.startSession$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.tether_health.UnplugHostApi.startSession$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -852,7 +852,7 @@ interface UnplugHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.endSession$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.tether_health.UnplugHostApi.endSession$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -870,7 +870,7 @@ interface UnplugHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.setThresholds$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.tether_health.UnplugHostApi.setThresholds$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -888,7 +888,7 @@ interface UnplugHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.readUsage$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.tether_health.UnplugHostApi.readUsage$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -907,7 +907,7 @@ interface UnplugHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.trackingHealth$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.tether_health.UnplugHostApi.trackingHealth$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
@@ -922,7 +922,7 @@ interface UnplugHostApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.breathefree_patient.UnplugHostApi.purgeLocalData$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.tether_health.UnplugHostApi.purgeLocalData$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
@@ -958,7 +958,7 @@ class UnplugFlutterApi(private val binaryMessenger: BinaryMessenger, private val
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
-      val channelName = "dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onThresholdCrossed$separatedMessageChannelSuffix"
+      val channelName = "dev.flutter.pigeon.tether_health.UnplugFlutterApi.onThresholdCrossed$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(minutesUsedArg, opensArg)) {
         if (it is List<*>) {
@@ -977,7 +977,7 @@ class UnplugFlutterApi(private val binaryMessenger: BinaryMessenger, private val
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
-      val channelName = "dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onShieldShown$separatedMessageChannelSuffix"
+      val channelName = "dev.flutter.pigeon.tether_health.UnplugFlutterApi.onShieldShown$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(groupLabelArg)) {
         if (it is List<*>) {
@@ -996,7 +996,7 @@ class UnplugFlutterApi(private val binaryMessenger: BinaryMessenger, private val
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
-      val channelName = "dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onShieldDismissed$separatedMessageChannelSuffix"
+      val channelName = "dev.flutter.pigeon.tether_health.UnplugFlutterApi.onShieldDismissed$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(groupLabelArg)) {
         if (it is List<*>) {
@@ -1015,7 +1015,7 @@ class UnplugFlutterApi(private val binaryMessenger: BinaryMessenger, private val
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
-      val channelName = "dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onOverrideUsed$separatedMessageChannelSuffix"
+      val channelName = "dev.flutter.pigeon.tether_health.UnplugFlutterApi.onOverrideUsed$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(groupLabelArg, overridesRemainingArg)) {
         if (it is List<*>) {
@@ -1038,7 +1038,7 @@ class UnplugFlutterApi(private val binaryMessenger: BinaryMessenger, private val
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     return suspendCancellableCoroutine { continuation ->
-      val channelName = "dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onTrackingStopped$separatedMessageChannelSuffix"
+      val channelName = "dev.flutter.pigeon.tether_health.UnplugFlutterApi.onTrackingStopped$separatedMessageChannelSuffix"
       val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
       channel.send(listOf(checkNameArg, detailArg)) {
         if (it is List<*>) {
