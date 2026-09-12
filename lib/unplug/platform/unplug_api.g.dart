@@ -10,9 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart' show immutable, protected, visibleForTesting;
 
 Object? _extractReplyValueOrThrow(
-    List<Object?>? replyList,
-    String channelName, {
-    required bool isNullValid,
+  List<Object?>? replyList,
+  String channelName, {
+  required bool isNullValid,
 }) {
   if (replyList == null) {
     throw PlatformException(
@@ -34,8 +34,8 @@ Object? _extractReplyValueOrThrow(
   return replyList.firstOrNull;
 }
 
-
-List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty = false}) {
+List<Object?> wrapResponse(
+    {Object? result, PlatformException? error, bool empty = false}) {
   if (empty) {
     return <Object?>[];
   }
@@ -44,6 +44,7 @@ List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty
   }
   return <Object?>[error.code, error.message, error.details];
 }
+
 bool _deepEquals(Object? a, Object? b) {
   if (identical(a, b)) {
     return true;
@@ -106,7 +107,6 @@ int _deepHash(Object? value) {
   return value.hashCode;
 }
 
-
 /// Which authorization iOS is being asked for.
 ///
 /// `child` is the one that needs an iCloud Family and the guardian's Screen
@@ -121,9 +121,11 @@ enum PlatformAuthorizationStatus {
   notRequested,
   approved,
   denied,
+
   /// iOS only: the device is not in an iCloud Family, so a child device cannot
   /// be shielded at all. No amount of retrying changes this.
   blockedNoFamilySharing,
+
   /// The platform has no screen-time API this build can use.
   unavailable,
 }
@@ -176,7 +178,8 @@ class PlatformModuleConfig {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformModuleConfig decode(Object result) {
     result as List<Object?>;
@@ -198,7 +201,11 @@ class PlatformModuleConfig {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(tier, other.tier) && _deepEquals(overrideAllowance, other.overrideAllowance) && _deepEquals(overridesUsed, other.overridesUsed) && _deepEquals(gate, other.gate) && _deepEquals(strict, other.strict);
+    return _deepEquals(tier, other.tier) &&
+        _deepEquals(overrideAllowance, other.overrideAllowance) &&
+        _deepEquals(overridesUsed, other.overridesUsed) &&
+        _deepEquals(gate, other.gate) &&
+        _deepEquals(strict, other.strict);
   }
 
   @override
@@ -238,7 +245,8 @@ class PlatformAppSelection {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformAppSelection decode(Object result) {
     result as List<Object?>;
@@ -258,7 +266,9 @@ class PlatformAppSelection {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(groupLabels, other.groupLabels) && _deepEquals(groupAppCounts, other.groupAppCounts) && _deepEquals(totalApps, other.totalApps);
+    return _deepEquals(groupLabels, other.groupLabels) &&
+        _deepEquals(groupAppCounts, other.groupAppCounts) &&
+        _deepEquals(totalApps, other.totalApps);
   }
 
   @override
@@ -290,7 +300,8 @@ class PlatformThresholds {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformThresholds decode(Object result) {
     result as List<Object?>;
@@ -309,7 +320,8 @@ class PlatformThresholds {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(minutes, other.minutes) && _deepEquals(opens, other.opens);
+    return _deepEquals(minutes, other.minutes) &&
+        _deepEquals(opens, other.opens);
   }
 
   @override
@@ -345,7 +357,8 @@ class PlatformAppUsage {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformAppUsage decode(Object result) {
     result as List<Object?>;
@@ -365,7 +378,9 @@ class PlatformAppUsage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(label, other.label) && _deepEquals(minutes, other.minutes) && _deepEquals(opens, other.opens);
+    return _deepEquals(label, other.label) &&
+        _deepEquals(minutes, other.minutes) &&
+        _deepEquals(opens, other.opens);
   }
 
   @override
@@ -413,7 +428,8 @@ class PlatformUsage {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformUsage decode(Object result) {
     result as List<Object?>;
@@ -435,7 +451,11 @@ class PlatformUsage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(dailyMinutes, other.dailyMinutes) && _deepEquals(daypartMinutes, other.daypartMinutes) && _deepEquals(opens, other.opens) && _deepEquals(opensAreApproximate, other.opensAreApproximate) && _deepEquals(perApp, other.perApp);
+    return _deepEquals(dailyMinutes, other.dailyMinutes) &&
+        _deepEquals(daypartMinutes, other.daypartMinutes) &&
+        _deepEquals(opens, other.opens) &&
+        _deepEquals(opensAreApproximate, other.opensAreApproximate) &&
+        _deepEquals(perApp, other.perApp);
   }
 
   @override
@@ -471,7 +491,8 @@ class PlatformTrackingCheck {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PlatformTrackingCheck decode(Object result) {
     result as List<Object?>;
@@ -491,7 +512,9 @@ class PlatformTrackingCheck {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(name, other.name) && _deepEquals(healthy, other.healthy) && _deepEquals(detail, other.detail);
+    return _deepEquals(name, other.name) &&
+        _deepEquals(healthy, other.healthy) &&
+        _deepEquals(detail, other.detail);
   }
 
   @override
@@ -504,7 +527,6 @@ class PlatformTrackingCheck {
   }
 }
 
-
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -512,34 +534,34 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is PlatformAuthorizationMode) {
+    } else if (value is PlatformAuthorizationMode) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    }    else if (value is PlatformAuthorizationStatus) {
+    } else if (value is PlatformAuthorizationStatus) {
       buffer.putUint8(130);
       writeValue(buffer, value.index);
-    }    else if (value is PlatformShieldScope) {
+    } else if (value is PlatformShieldScope) {
       buffer.putUint8(131);
       writeValue(buffer, value.index);
-    }    else if (value is PlatformEffortGate) {
+    } else if (value is PlatformEffortGate) {
       buffer.putUint8(132);
       writeValue(buffer, value.index);
-    }    else if (value is PlatformModuleConfig) {
+    } else if (value is PlatformModuleConfig) {
       buffer.putUint8(133);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformAppSelection) {
+    } else if (value is PlatformAppSelection) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformThresholds) {
+    } else if (value is PlatformThresholds) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformAppUsage) {
+    } else if (value is PlatformAppUsage) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformUsage) {
+    } else if (value is PlatformUsage) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    }    else if (value is PlatformTrackingCheck) {
+    } else if (value is PlatformTrackingCheck) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
     } else {
@@ -585,9 +607,11 @@ class UnplugHostApi {
   /// Constructor for [UnplugHostApi]. The [binaryMessenger] named argument is
   /// available for dependency injection. If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  UnplugHostApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+  UnplugHostApi(
+      {BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
       : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+        pigeonVar_messageChannelSuffix =
+            messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
   final BinaryMessenger? pigeonVar_binaryMessenger;
 
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
@@ -597,7 +621,8 @@ class UnplugHostApi {
   /// False on web, desktop, and any build without the screen-time layer. Dart
   /// falls back to its own simulation when this is false.
   Future<bool> isSupported() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.isSupported$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.isSupported$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -607,35 +632,37 @@ class UnplugHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 
-  Future<PlatformAuthorizationStatus> requestAuthorization(PlatformAuthorizationMode mode) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.requestAuthorization$pigeonVar_messageChannelSuffix';
+  Future<PlatformAuthorizationStatus> requestAuthorization(
+      PlatformAuthorizationMode mode) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.requestAuthorization$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mode]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[mode]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as PlatformAuthorizationStatus;
   }
 
   Future<PlatformAuthorizationStatus> authorizationStatus() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.authorizationStatus$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.authorizationStatus$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -645,11 +672,10 @@ class UnplugHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as PlatformAuthorizationStatus;
   }
 
@@ -658,7 +684,8 @@ class UnplugHostApi {
   /// The picker is a system component on both platforms and cannot be drawn by
   /// Flutter, which is why this returns a count and not a list.
   Future<int> presentAppPicker() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.presentAppPicker$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.presentAppPicker$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -668,126 +695,134 @@ class UnplugHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as int;
   }
 
-  Future<void> applyShield(PlatformModuleConfig config, PlatformAppSelection selection) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.applyShield$pigeonVar_messageChannelSuffix';
+  Future<void> applyShield(
+      PlatformModuleConfig config, PlatformAppSelection selection) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.applyShield$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[config, selection]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[config, selection]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   Future<void> liftShield(String reason) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.liftShield$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.liftShield$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[reason]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[reason]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
-  Future<void> startSession(int durationSeconds, PlatformShieldScope scope, bool strict) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.startSession$pigeonVar_messageChannelSuffix';
+  Future<void> startSession(
+      int durationSeconds, PlatformShieldScope scope, bool strict) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.startSession$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[durationSeconds, scope, strict]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[durationSeconds, scope, strict]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   Future<void> endSession(String? overrideReason) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.endSession$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.endSession$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[overrideReason]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[overrideReason]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   Future<void> setThresholds(PlatformThresholds thresholds) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.setThresholds$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.setThresholds$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[thresholds]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[thresholds]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   /// Reads the last [days] days. Shaped to the iOS floor on both platforms.
   Future<PlatformUsage> readUsage(int days) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.readUsage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.readUsage$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[days]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[days]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as PlatformUsage;
   }
 
   Future<List<PlatformTrackingCheck>> trackingHealth() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.trackingHealth$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.trackingHealth$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -797,33 +832,34 @@ class UnplugHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
-    return (pigeonVar_replyValue! as List<Object?>).cast<PlatformTrackingCheck>();
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return (pigeonVar_replyValue! as List<Object?>)
+        .cast<PlatformTrackingCheck>();
   }
 
   /// Deletes everything the module holds on this device.
   ///
   /// Called by the retention sweep (§3.2) and by account deletion.
   Future<void> purgeLocalData(int olderThanDays) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.purgeLocalData$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.breathefree_patient.UnplugHostApi.purgeLocalData$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[olderThanDays]);
+    final Future<Object?> pigeonVar_sendFuture =
+        pigeonVar_channel.send(<Object?>[olderThanDays]);
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 }
 
@@ -843,11 +879,17 @@ abstract class UnplugFlutterApi {
   /// than left believing the module is still running (§2.2).
   void onTrackingStopped(String checkName, String detail);
 
-  static void setUp(UnplugFlutterApi? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
-    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  static void setUp(
+    UnplugFlutterApi? api, {
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) {
+    messageChannelSuffix =
+        messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onThresholdCrossed$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onThresholdCrossed$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -861,15 +903,17 @@ abstract class UnplugFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onShieldShown$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onShieldShown$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -882,15 +926,17 @@ abstract class UnplugFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onShieldDismissed$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onShieldDismissed$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -903,15 +949,17 @@ abstract class UnplugFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onOverrideUsed$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onOverrideUsed$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -925,15 +973,17 @@ abstract class UnplugFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
     }
     {
       final pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onTrackingStopped$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.breathefree_patient.UnplugFlutterApi.onTrackingStopped$messageChannelSuffix',
+          pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
@@ -947,8 +997,9 @@ abstract class UnplugFlutterApi {
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
-          }          catch (e) {
-            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
