@@ -5,6 +5,7 @@ BreatheFree is a cross-platform smoking-cessation patient app prototype containi
 ## What is included
 
 - All 28 approved iPhone screens and editable SVG design sources
+- The Unplug v2.1 digital-wellbeing module, screens A–L, built as native responsive Flutter views
 - Flutter/Dart application source
 - Mobile swipe navigation and accessible invisible tap targets
 - Home, Plan, Progress, Learn, Support and Settings routing
@@ -105,15 +106,59 @@ A free Apple ID can install a development build on a personal device. Publishing
 - Desktop: use the screen list, Previous/Next buttons, arrow keys or swipe the preview.
 - Enable **Show tap areas** in desktop mode to inspect the interaction map.
 
+The prototype walks one list: approved screens 1–28, then Unplug screens A–L. On a
+phone, swiping right from screen 28 continues into the Unplug module, and each Unplug
+screen carries its own Previous/Next footer. On desktop, the sidebar lists both
+sections. Tap-area overlays apply to the approved screens only — the Unplug screens are
+real widgets, so their controls are the interaction map.
+
+## The Unplug v2.1 module
+
+`design/unplug-v2.1-integration-addendum.md` specifies a digital-wellbeing module that
+sits alongside cessation. Screens A–L implement it as native responsive Flutter views:
+
+| | Screen | Addendum |
+|---|---|---|
+| A | What this can see — the platform data ceiling | §1 |
+| B | Apps and authorization | §1, §2.3, §3.1 |
+| C | Intercept preview | §2.1 |
+| D | Effort gate | §2.1 |
+| E | Observe Week report | §1, §5 |
+| F | Tier and limits | §4 |
+| G | Focus session | §2.3 |
+| H | Urge SOS and distress routing | §4.1, §5 |
+| I | Tracking health | §2.2, §5 |
+| J | Guardian zone and Family Sharing | §3 |
+| K | Care team and the role matrix | §4, §4.1 |
+| L | Program templates | §4.2 |
+
+There is no approved 1290 × 2796 artwork for these screens, so they are widgets rather
+than bitmaps and each states the addendum section it implements. What runs here is the
+Dart layer only. The iOS `DeviceActivityMonitor`, `ShieldConfiguration` and
+`ShieldAction` extensions, the Android foreground service and overlay, and the Pigeon
+channel between them are **not implemented** — screen C says so on its face, and the
+in-app state is a local simulation of what those calls would return.
+
+`assets/unplug/intercept_tokens.json` holds the intercept colours and copy. Addendum
+§2.1 requires the intercept to exist three times — Dart, SwiftUI and an Android overlay
+— and all three read that one file so they cannot drift apart. Change a colour or a
+string there and nowhere else.
+
 ## Project structure
 
 - `lib/main.dart` — app bootstrap, navigation history and protected demo actions
 - `lib/models/screen_spec.dart` — the canonical 28-screen catalog
+- `lib/models/prototype_catalog.dart` — the approved screens and the Unplug screens as one list
 - `lib/models/tap_target.dart` — accessible interaction map and routing
 - `lib/screens/approved_screen_player.dart` — mobile/desktop responsive shell
 - `lib/widgets/approved_screen_viewport.dart` — pixel-accurate artwork renderer
+- `lib/unplug/models/` — the module's state, role matrix, templates and platform ceiling
+- `lib/unplug/screens/` — Unplug screens A–L and their host
+- `lib/unplug/widgets/` — the module's shared page chrome and scope
 - `assets/screens/` — runtime 1290 × 2796 approved PNGs
+- `assets/unplug/intercept_tokens.json` — colours and copy shared by all three intercepts
 - `design/approved/` — editable approved SVG sources
+- `design/unplug-v2.1-integration-addendum.md` — the specification screens A–L implement
 - `test/` — catalog and navigation tests
 - `tool/` — platform setup and run scripts
 

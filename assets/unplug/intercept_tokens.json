@@ -1,0 +1,34 @@
+{
+  "version": "2.1.0",
+  "purpose": "Addendum §2.1: the intercept is built three times — once in Dart for the in-app preview and settings, once in SwiftUI for ShieldConfiguration, once as an Android overlay. All three read this file so they cannot drift apart. Change a colour or a string here and nowhere else.",
+  "consumers": [
+    "lib/unplug/screens/unplug_screen_c.dart",
+    "ios/ShieldConfiguration (not yet implemented)",
+    "android overlay service (not yet implemented)"
+  ],
+  "colors": {
+    "background": "#0F2E2A",
+    "surface": "#123C37",
+    "onBackground": "#FFFDF7",
+    "onSurfaceMuted": "#BFD5CD",
+    "accent": "#D5EF75",
+    "onAccent": "#123C37",
+    "danger": "#FF7D61"
+  },
+  "copy": {
+    "title": "Paused for a moment",
+    "body": "You asked us to slow this one down. Nothing here is a judgment — the pause is the whole point.",
+    "reasonLabel": "Your reason",
+    "breatheAction": "Take a breath",
+    "closeAction": "Close the app",
+    "overrideAction": "Open anyway",
+    "overrideRemaining": "{remaining} of {total} overrides left in this window",
+    "overrideExhausted": "No overrides left in this window",
+    "strictNotice": "This is a strict session. Ending it early is recorded with the reason you give."
+  },
+  "timing": {
+    "breathSeconds": 30,
+    "androidOverlayLatencyMsMin": 500,
+    "androidOverlayLatencyMsMax": 1500
+  }
+}

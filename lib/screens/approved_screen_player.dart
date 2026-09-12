@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../models/prototype_catalog.dart';
 import '../models/screen_spec.dart';
 import '../models/tap_target.dart';
 import '../theme/app_colors.dart';
+import '../unplug/models/unplug_screen_spec.dart';
+import '../unplug/screens/unplug_screen_host.dart';
 import '../widgets/approved_screen_viewport.dart';
 
 class ApprovedScreenPlayer extends StatefulWidget {
@@ -28,15 +31,41 @@ class ApprovedScreenPlayer extends StatefulWidget {
 class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _showHotspots = false;
 
+  /// The screen body, whichever module the current entry belongs to.
+  Widget _buildScreen(CatalogEntry entry, {required bool showHotspots}) {
+    switch (entry) {
+      case ApprovedCatalogEntry(:final spec):
+        return ApprovedScreenViewport(
+          spec: spec,
+          showHotspots: showHotspots,
+          onPrevious: widget.onPrevious,
+          onNext: widget.onNext,
+          onTarget: widget.onTarget,
+        );
+      case UnplugCatalogEntry(:final spec):
+        return UnplugScreenHost(
+          spec: spec,
+          position: widget.currentIndex - unplugCatalogOffset + 1,
+          total: unplugScreens.length,
+          onPrevious: widget.onPrevious,
+          onNext: widget.onNext,
+          onSelectLetter: (letter) {
+            final index = prototypeIndexOfLetter(letter);
+            if (index >= 0) widget.onSelectScreen(index);
+          },
+        );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final spec = approvedScreens[widget.currentIndex];
+    final entry = prototypeCatalog[widget.currentIndex];
 
     return LayoutBuilder(
       builder: (context, constraints) {
         if (constraints.maxWidth >= 900) {
           return _DesktopPlayer(
-            spec: spec,
+            entry: entry,
             currentIndex: widget.currentIndex,
             showHotspots: _showHotspots,
             onShowHotspotsChanged: (value) {
@@ -45,18 +74,14 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onSelectScreen: widget.onSelectScreen,
             onPrevious: widget.onPrevious,
             onNext: widget.onNext,
-            onTarget: widget.onTarget,
+            screenBuilder: (showHotspots) =>
+                _buildScreen(entry, showHotspots: showHotspots),
           );
         }
 
         return Scaffold(
           backgroundColor: AppColors.cream,
-          body: ApprovedScreenViewport(
-            spec: spec,
-            onPrevious: widget.onPrevious,
-            onNext: widget.onNext,
-            onTarget: widget.onTarget,
-          ),
+          body: _buildScreen(entry, showHotspots: false),
         );
       },
     );
@@ -65,24 +90,24 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
 
 class _DesktopPlayer extends StatelessWidget {
   const _DesktopPlayer({
-    required this.spec,
+    required this.entry,
     required this.currentIndex,
     required this.showHotspots,
     required this.onShowHotspotsChanged,
     required this.onSelectScreen,
     required this.onPrevious,
     required this.onNext,
-    required this.onTarget,
+    required this.screenBuilder,
   });
 
-  final ScreenSpec spec;
+  final CatalogEntry entry;
   final int currentIndex;
   final bool showHotspots;
   final ValueChanged<bool> onShowHotspotsChanged;
   final ValueChanged<int> onSelectScreen;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
-  final ValueChanged<AppTapTarget> onTarget;
+  final Widget Function(bool showHotspots) screenBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +127,7 @@ class _DesktopPlayer extends StatelessWidget {
               child: Column(
                 children: [
                   _DesktopToolbar(
-                    spec: spec,
+                    entry: entry,
                     currentIndex: currentIndex,
                     showHotspots: showHotspots,
                     onShowHotspotsChanged: onShowHotspotsChanged,
@@ -133,13 +158,7 @@ class _DesktopPlayer extends StatelessWidget {
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(32),
-                              child: ApprovedScreenViewport(
-                                spec: spec,
-                                showHotspots: showHotspots,
-                                onPrevious: onPrevious,
-                                onNext: onNext,
-                                onTarget: onTarget,
-                              ),
+                              child: screenBuilder(showHotspots),
                             ),
                           ),
                         ),
@@ -152,7 +171,7 @@ class _DesktopPlayer extends StatelessWidget {
             SizedBox(
               width: 300,
               child: _DetailsPanel(
-                spec: spec,
+                entry: entry,
                 currentIndex: currentIndex,
                 onPrevious: onPrevious,
                 onNext: onNext,
@@ -231,11 +250,15 @@ class _ScreenNavigator extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 10),
-              itemCount: approvedScreens.length,
+              itemCount: prototypeCatalog.length,
               itemBuilder: (context, index) {
-                final item = approvedScreens[index];
+                final item = prototypeCatalog[index];
                 final selected = currentIndex == index;
-                return Padding(
+                final header = index == unplugCatalogOffset
+                    ? const _NavigatorHeading('Unplug v2.1 · screens A–L')
+                    : null;
+
+                final tile = Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
                     vertical: 2,
@@ -254,7 +277,7 @@ class _ScreenNavigator extends StatelessWidget {
                       foregroundColor:
                           selected ? Colors.white : AppColors.deepTeal,
                       child: Text(
-                        item.number.toString(),
+                        item.badge,
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w800,
@@ -273,7 +296,7 @@ class _ScreenNavigator extends StatelessWidget {
                       ),
                     ),
                     subtitle: Text(
-                      item.phase.label,
+                      item.sectionLabel,
                       style: const TextStyle(
                         color: AppColors.mutedTeal,
                         fontSize: 11,
@@ -281,6 +304,12 @@ class _ScreenNavigator extends StatelessWidget {
                     ),
                     onTap: () => onSelectScreen(index),
                   ),
+                );
+
+                if (header == null) return tile;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [header, tile],
                 );
               },
             ),
@@ -291,9 +320,31 @@ class _ScreenNavigator extends StatelessWidget {
   }
 }
 
+class _NavigatorHeading extends StatelessWidget {
+  const _NavigatorHeading(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 18, 20, 8),
+      child: Text(
+        label.toUpperCase(),
+        style: const TextStyle(
+          color: AppColors.mutedTeal,
+          fontSize: 10.5,
+          letterSpacing: 1,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
 class _DesktopToolbar extends StatelessWidget {
   const _DesktopToolbar({
-    required this.spec,
+    required this.entry,
     required this.currentIndex,
     required this.showHotspots,
     required this.onShowHotspotsChanged,
@@ -301,7 +352,7 @@ class _DesktopToolbar extends StatelessWidget {
     required this.onNext,
   });
 
-  final ScreenSpec spec;
+  final CatalogEntry entry;
   final int currentIndex;
   final bool showHotspots;
   final ValueChanged<bool> onShowHotspotsChanged;
@@ -310,6 +361,8 @@ class _DesktopToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final approved = entry is ApprovedCatalogEntry;
+
     return Container(
       height: 76,
       padding: const EdgeInsets.symmetric(horizontal: 22),
@@ -327,7 +380,7 @@ class _DesktopToolbar extends StatelessWidget {
           const SizedBox(width: 10),
           IconButton.filledTonal(
             tooltip: 'Next screen',
-            onPressed: currentIndex == approvedScreens.length - 1
+            onPressed: currentIndex == prototypeCatalog.length - 1
                 ? null
                 : onNext,
             icon: const Icon(Icons.arrow_forward_rounded),
@@ -335,7 +388,7 @@ class _DesktopToolbar extends StatelessWidget {
           const SizedBox(width: 18),
           Expanded(
             child: Text(
-              'Screen ${spec.number} · ${spec.title}',
+              'Screen ${entry.badge} · ${entry.title}',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -343,13 +396,13 @@ class _DesktopToolbar extends StatelessWidget {
               ),
             ),
           ),
-          const Text(
-            'Show tap areas',
-            style: TextStyle(color: Color(0xFFBFD5CD), fontSize: 13),
+          Text(
+            approved ? 'Show tap areas' : 'Tap areas are approved-screen only',
+            style: const TextStyle(color: Color(0xFFBFD5CD), fontSize: 13),
           ),
           Switch(
-            value: showHotspots,
-            onChanged: onShowHotspotsChanged,
+            value: showHotspots && approved,
+            onChanged: approved ? onShowHotspotsChanged : null,
           ),
         ],
       ),
@@ -359,16 +412,58 @@ class _DesktopToolbar extends StatelessWidget {
 
 class _DetailsPanel extends StatelessWidget {
   const _DetailsPanel({
-    required this.spec,
+    required this.entry,
     required this.currentIndex,
     required this.onPrevious,
     required this.onNext,
   });
 
-  final ScreenSpec spec;
+  final CatalogEntry entry;
   final int currentIndex;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
+
+  String get _description => switch (entry) {
+        ApprovedCatalogEntry(:final spec) => spec.description,
+        UnplugCatalogEntry(:final spec) => spec.description,
+      };
+
+  List<Widget> get _facts => switch (entry) {
+        ApprovedCatalogEntry() => const [
+            _InfoRow(
+              icon: Icons.phone_iphone_rounded,
+              title: 'Reference',
+              value: '430 × 932 pt',
+            ),
+            _InfoRow(
+              icon: Icons.image_outlined,
+              title: 'App Store asset',
+              value: '1290 × 2796 px',
+            ),
+            _InfoRow(
+              icon: Icons.devices_rounded,
+              title: 'Targets',
+              value: 'iOS · Android · Desktop · Web',
+            ),
+          ],
+        UnplugCatalogEntry(:final spec) => [
+            _InfoRow(
+              icon: Icons.description_outlined,
+              title: 'Specified by',
+              value: 'Addendum ${spec.addendumRef}',
+            ),
+            const _InfoRow(
+              icon: Icons.widgets_outlined,
+              title: 'Rendering',
+              value: 'Native widgets · no bitmap',
+            ),
+            const _InfoRow(
+              icon: Icons.devices_rounded,
+              title: 'Targets',
+              value: 'iOS · Android · Desktop · Web',
+            ),
+          ],
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -386,7 +481,7 @@ class _DetailsPanel extends StatelessWidget {
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Text(
-                spec.phase.label.toUpperCase(),
+                entry.sectionLabel.toUpperCase(),
                 style: const TextStyle(
                   color: AppColors.deepTeal,
                   fontSize: 11,
@@ -397,7 +492,7 @@ class _DetailsPanel extends StatelessWidget {
             ),
             const SizedBox(height: 18),
             Text(
-              spec.title,
+              entry.title,
               style: const TextStyle(
                 color: AppColors.deepTeal,
                 fontSize: 28,
@@ -407,7 +502,7 @@ class _DetailsPanel extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             Text(
-              spec.description,
+              _description,
               style: const TextStyle(
                 color: AppColors.tealSecondary,
                 fontSize: 15,
@@ -417,21 +512,7 @@ class _DetailsPanel extends StatelessWidget {
             const SizedBox(height: 24),
             const Divider(),
             const SizedBox(height: 18),
-            const _InfoRow(
-              icon: Icons.phone_iphone_rounded,
-              title: 'Reference',
-              value: '430 × 932 pt',
-            ),
-            const _InfoRow(
-              icon: Icons.image_outlined,
-              title: 'App Store asset',
-              value: '1290 × 2796 px',
-            ),
-            const _InfoRow(
-              icon: Icons.devices_rounded,
-              title: 'Targets',
-              value: 'iOS · Android · Desktop · Web',
-            ),
+            ..._facts,
             const Spacer(),
             const Text(
               'Use ← and →, swipe the phone preview, select a screen, or enable tap areas.',
@@ -453,7 +534,7 @@ class _DetailsPanel extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: FilledButton(
-                    onPressed: currentIndex == approvedScreens.length - 1
+                    onPressed: currentIndex == prototypeCatalog.length - 1
                         ? null
                         : onNext,
                     child: const Text('Next'),

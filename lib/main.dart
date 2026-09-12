@@ -2,10 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'models/screen_spec.dart';
+import 'models/prototype_catalog.dart';
 import 'models/tap_target.dart';
 import 'screens/approved_screen_player.dart';
 import 'theme/app_theme.dart';
+import 'unplug/models/intercept_tokens.dart';
+import 'unplug/models/unplug_module_state.dart';
+import 'unplug/widgets/unplug_scope.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,16 +37,38 @@ class BreatheFreeApp extends StatefulWidget {
 class _BreatheFreeAppState extends State<BreatheFreeApp> {
   late int _currentIndex;
   final List<int> _history = <int>[];
+  final UnplugModuleState _unplug = UnplugModuleState();
 
   @override
   void initState() {
     super.initState();
     _currentIndex =
-        widget.initialScreen.clamp(0, approvedScreens.length - 1).toInt();
+        widget.initialScreen.clamp(0, prototypeCatalog.length - 1).toInt();
+    _loadInterceptTokens();
+  }
+
+  /// Reads the intercept design tokens the Unplug module shares with the
+  /// SwiftUI and Android intercepts. A failure is surfaced on screen C rather
+  /// than swallowed, because the native implementations read the same file.
+  Future<void> _loadInterceptTokens() async {
+    try {
+      final tokens = await InterceptTokens.load();
+      if (!mounted) return;
+      _unplug.setTokens(tokens);
+    } catch (error) {
+      if (!mounted) return;
+      _unplug.setTokenError(error);
+    }
+  }
+
+  @override
+  void dispose() {
+    _unplug.dispose();
+    super.dispose();
   }
 
   void _goTo(int index, {bool remember = true}) {
-    final safeIndex = index.clamp(0, approvedScreens.length - 1).toInt();
+    final safeIndex = index.clamp(0, prototypeCatalog.length - 1).toInt();
     if (safeIndex == _currentIndex) return;
 
     setState(() {
@@ -179,12 +204,15 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
       debugShowCheckedModeBanner: false,
       restorationScopeId: 'breathefree',
       theme: AppTheme.light(),
-      home: ApprovedScreenPlayer(
-        currentIndex: _currentIndex,
-        onSelectScreen: _goTo,
-        onPrevious: _goBack,
-        onNext: _goNext,
-        onTarget: _handleTarget,
+      home: UnplugScope(
+        state: _unplug,
+        child: ApprovedScreenPlayer(
+          currentIndex: _currentIndex,
+          onSelectScreen: _goTo,
+          onPrevious: _goBack,
+          onNext: _goNext,
+          onTarget: _handleTarget,
+        ),
       ),
     );
   }
