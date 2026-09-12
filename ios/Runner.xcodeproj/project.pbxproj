@@ -7,24 +7,64 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00898ABB9F267CA38718E31A /* InterceptTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A380103E2DC6FB2E52E3EC2C /* InterceptTokens.swift */; };
+		053E567BB5807E4BFCFD36BE /* InterceptTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A380103E2DC6FB2E52E3EC2C /* InterceptTokens.swift */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		1563AEABFA547FD99105EA3E /* UnplugSharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 828F3CF9BDEC064537323E74 /* UnplugSharedState.swift */; };
+		2B0E5169DE3C1466D1262399 /* UnplugShield.appex in Embed Unplug Extensions */ = {isa = PBXBuildFile; fileRef = 9C4DF93082A9084908D2DF0F /* UnplugShield.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
+		39A2D9CF4193F59FB58AB008 /* UnplugShieldConfigurationExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0A25A7899553FD5B47859F /* UnplugShieldConfigurationExtension.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		3BA05945ADAD9FA073C5DF4F /* UnplugSharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 828F3CF9BDEC064537323E74 /* UnplugSharedState.swift */; };
+		476B098BEFA7128BE515BD13 /* UnplugMonitor.appex in Embed Unplug Extensions */ = {isa = PBXBuildFile; fileRef = FDCE45438DC8D892D530B54E /* UnplugMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4AB0E053E5D91D9480250ADC /* UnplugSharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 828F3CF9BDEC064537323E74 /* UnplugSharedState.swift */; };
+		60E15710F8900BBD72926A50 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE7F7954C2B0B3068C7A4207 /* Foundation.framework */; };
+		72741CA057526229913A1133 /* UnplugMonitorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1E7E330A15DA21E9B506B67 /* UnplugMonitorExtension.swift */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
+		88A81588A625DCDB53CBB454 /* InterceptTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A380103E2DC6FB2E52E3EC2C /* InterceptTokens.swift */; };
+		975FC5128676E81A3B3EE5AB /* UnplugShieldAction.appex in Embed Unplug Extensions */ = {isa = PBXBuildFile; fileRef = 10961877E357064C31D12F34 /* UnplugShieldAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		C1CA97FFE241FD82BE13778D /* InterceptTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A380103E2DC6FB2E52E3EC2C /* InterceptTokens.swift */; };
+		D439126BA399AB8D8307F9EA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE7F7954C2B0B3068C7A4207 /* Foundation.framework */; };
+		D9CF8E6B10B26A8D30C173DB /* UnplugShieldActionExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F093186B40B63A96572742B3 /* UnplugShieldActionExtension.swift */; };
+		DA5A61157D3529FFA24462B8 /* UnplugHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E79276979429A19434DAB37 /* UnplugHost.swift */; };
+		DC7E21D5DDB401663013D86F /* UnplugApi.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0D46BC2B2B01F273B47FE0F /* UnplugApi.g.swift */; };
+		E0B7525F93C8DE6AB0391EBD /* UnplugSharedState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 828F3CF9BDEC064537323E74 /* UnplugSharedState.swift */; };
+		F4C7A9249D506E11EE362D65 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE7F7954C2B0B3068C7A4207 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		22C4303DF003FDA1A6CB4839 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 47D1F7E008B7D6A3BD78F6BF;
+			remoteInfo = UnplugShieldAction;
+		};
+		22E803602F123212E08DD1DF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6E99124C7F9BEA8DA24E19EB;
+			remoteInfo = UnplugShield;
+		};
 		331C8085294A63A400263BE5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 97C146ED1CF9000F007C117D;
 			remoteInfo = Runner;
+		};
+		88281571B9DE21F296BB2C61 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7B8A9C44D3079A52BEDCCB80;
+			remoteInfo = UnplugMonitor;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -39,19 +79,35 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AB754D1A359AB98A533F5182 /* Embed Unplug Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				476B098BEFA7128BE515BD13 /* UnplugMonitor.appex in Embed Unplug Extensions */,
+				2B0E5169DE3C1466D1262399 /* UnplugShield.appex in Embed Unplug Extensions */,
+				975FC5128676E81A3B3EE5AB /* UnplugShieldAction.appex in Embed Unplug Extensions */,
+			);
+			name = "Embed Unplug Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		10961877E357064C31D12F34 /* UnplugShieldAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = UnplugShieldAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		5E79276979429A19434DAB37 /* UnplugHost.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Runner/Unplug/UnplugHost.swift; sourceTree = SOURCE_ROOT; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		78E0A7A72DC9AD7400C4905E /* FlutterGeneratedPluginSwiftPackage */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FlutterGeneratedPluginSwiftPackage; path = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		828F3CF9BDEC064537323E74 /* UnplugSharedState.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Runner/Unplug/UnplugSharedState.swift; sourceTree = SOURCE_ROOT; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -59,6 +115,14 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9C4DF93082A9084908D2DF0F /* UnplugShield.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = UnplugShield.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A380103E2DC6FB2E52E3EC2C /* InterceptTokens.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Runner/Unplug/InterceptTokens.swift; sourceTree = SOURCE_ROOT; };
+		B1E7E330A15DA21E9B506B67 /* UnplugMonitorExtension.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UnplugMonitor/UnplugMonitorExtension.swift; sourceTree = SOURCE_ROOT; };
+		BE7F7954C2B0B3068C7A4207 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		BF0A25A7899553FD5B47859F /* UnplugShieldConfigurationExtension.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UnplugShield/UnplugShieldConfigurationExtension.swift; sourceTree = SOURCE_ROOT; };
+		E0D46BC2B2B01F273B47FE0F /* UnplugApi.g.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Runner/Unplug/UnplugApi.g.swift; sourceTree = SOURCE_ROOT; };
+		F093186B40B63A96572742B3 /* UnplugShieldActionExtension.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = UnplugShieldAction/UnplugShieldActionExtension.swift; sourceTree = SOURCE_ROOT; };
+		FDCE45438DC8D892D530B54E /* UnplugMonitor.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = UnplugMonitor.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,9 +134,49 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C92F62B650D32941E7683544 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D439126BA399AB8D8307F9EA /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E43A0B486B4B26276FF7A851 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60E15710F8900BBD72926A50 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F4577756E78859AA04B85A33 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4C7A9249D506E11EE362D65 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0CFB6FF281CF26655427C06F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B330ED9339FD482E77A8B6B5 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		274714D34E6980193961EC1B /* UnplugShieldAction */ = {
+			isa = PBXGroup;
+			children = (
+				F093186B40B63A96572742B3 /* UnplugShieldActionExtension.swift */,
+			);
+			name = UnplugShieldAction;
+			sourceTree = SOURCE_ROOT;
+		};
 		331C8082294A63A400263BE5 /* RunnerTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -80,6 +184,14 @@
 			);
 			path = RunnerTests;
 			sourceTree = "<group>";
+		};
+		5964FE146B21F87AA2CA63E2 /* UnplugShield */ = {
+			isa = PBXGroup;
+			children = (
+				BF0A25A7899553FD5B47859F /* UnplugShieldConfigurationExtension.swift */,
+			);
+			name = UnplugShield;
+			sourceTree = SOURCE_ROOT;
 		};
 		9740EEB11CF90186004384FC /* Flutter */ = {
 			isa = PBXGroup;
@@ -100,6 +212,10 @@
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
 				331C8082294A63A400263BE5 /* RunnerTests */,
+				0CFB6FF281CF26655427C06F /* Frameworks */,
+				B222CEFBFEA103B2EF8A5374 /* UnplugMonitor */,
+				5964FE146B21F87AA2CA63E2 /* UnplugShield */,
+				274714D34E6980193961EC1B /* UnplugShieldAction */,
 			);
 			sourceTree = "<group>";
 		};
@@ -108,6 +224,9 @@
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				331C8081294A63A400263BE5 /* RunnerTests.xctest */,
+				FDCE45438DC8D892D530B54E /* UnplugMonitor.appex */,
+				9C4DF93082A9084908D2DF0F /* UnplugShield.appex */,
+				10961877E357064C31D12F34 /* UnplugShieldAction.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -124,9 +243,37 @@
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+				EE88372A4CFD2679C1E28C6A /* Unplug */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
+		};
+		B222CEFBFEA103B2EF8A5374 /* UnplugMonitor */ = {
+			isa = PBXGroup;
+			children = (
+				B1E7E330A15DA21E9B506B67 /* UnplugMonitorExtension.swift */,
+			);
+			name = UnplugMonitor;
+			sourceTree = SOURCE_ROOT;
+		};
+		B330ED9339FD482E77A8B6B5 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				BE7F7954C2B0B3068C7A4207 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		EE88372A4CFD2679C1E28C6A /* Unplug */ = {
+			isa = PBXGroup;
+			children = (
+				E0D46BC2B2B01F273B47FE0F /* UnplugApi.g.swift */,
+				5E79276979429A19434DAB37 /* UnplugHost.swift */,
+				828F3CF9BDEC064537323E74 /* UnplugSharedState.swift */,
+				A380103E2DC6FB2E52E3EC2C /* InterceptTokens.swift */,
+			);
+			name = Unplug;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -148,6 +295,57 @@
 			productReference = 331C8081294A63A400263BE5 /* RunnerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		47D1F7E008B7D6A3BD78F6BF /* UnplugShieldAction */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0AA4CDE15ADFE6D5FC23A87E /* Build configuration list for PBXNativeTarget "UnplugShieldAction" */;
+			buildPhases = (
+				585D3988D44B55C143A0BD29 /* Sources */,
+				F4577756E78859AA04B85A33 /* Frameworks */,
+				94B56BACFB56C90A3945D380 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UnplugShieldAction;
+			productName = UnplugShieldAction;
+			productReference = 10961877E357064C31D12F34 /* UnplugShieldAction.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		6E99124C7F9BEA8DA24E19EB /* UnplugShield */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D3EF4951DDE4B3BD51ED42C8 /* Build configuration list for PBXNativeTarget "UnplugShield" */;
+			buildPhases = (
+				A0B55897C09AA60F35AAB5DD /* Sources */,
+				C92F62B650D32941E7683544 /* Frameworks */,
+				96ABF0A52AEFAE778950E000 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UnplugShield;
+			productName = UnplugShield;
+			productReference = 9C4DF93082A9084908D2DF0F /* UnplugShield.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		7B8A9C44D3079A52BEDCCB80 /* UnplugMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4F187CBCE9A292E31690F12F /* Build configuration list for PBXNativeTarget "UnplugMonitor" */;
+			buildPhases = (
+				F8BA9D583FA5FD46BCFEA189 /* Sources */,
+				E43A0B486B4B26276FF7A851 /* Frameworks */,
+				18363198FCAB77D107877298 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UnplugMonitor;
+			productName = UnplugMonitor;
+			productReference = FDCE45438DC8D892D530B54E /* UnplugMonitor.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		97C146ED1CF9000F007C117D /* Runner */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 97C147051CF9000F007C117D /* Build configuration list for PBXNativeTarget "Runner" */;
@@ -157,11 +355,15 @@
 				97C146EB1CF9000F007C117D /* Frameworks */,
 				97C146EC1CF9000F007C117D /* Resources */,
 				9705A1C41CF9048500538489 /* Embed Frameworks */,
+				AB754D1A359AB98A533F5182 /* Embed Unplug Extensions */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A96396C1194D89870A374EB7 /* PBXTargetDependency */,
+				DE5995B0E5460BFB5BE996C8 /* PBXTargetDependency */,
+				179B5A639CDFBEC7CDF89F3A /* PBXTargetDependency */,
 			);
 			name = Runner;
 			packageProductDependencies = (
@@ -201,7 +403,7 @@
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
-				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */,
+				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */,
 			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
@@ -209,12 +411,36 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				331C8080294A63A400263BE5 /* RunnerTests */,
+				7B8A9C44D3079A52BEDCCB80 /* UnplugMonitor */,
+				6E99124C7F9BEA8DA24E19EB /* UnplugShield */,
+				47D1F7E008B7D6A3BD78F6BF /* UnplugShieldAction */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		18363198FCAB77D107877298 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		331C807F294A63A400263BE5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		94B56BACFB56C90A3945D380 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		96ABF0A52AEFAE778950E000 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -277,6 +503,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		585D3988D44B55C143A0BD29 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D9CF8E6B10B26A8D30C173DB /* UnplugShieldActionExtension.swift in Sources */,
+				E0B7525F93C8DE6AB0391EBD /* UnplugSharedState.swift in Sources */,
+				053E567BB5807E4BFCFD36BE /* InterceptTokens.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		97C146EA1CF9000F007C117D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -284,16 +520,58 @@
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
+				DC7E21D5DDB401663013D86F /* UnplugApi.g.swift in Sources */,
+				DA5A61157D3529FFA24462B8 /* UnplugHost.swift in Sources */,
+				4AB0E053E5D91D9480250ADC /* UnplugSharedState.swift in Sources */,
+				88A81588A625DCDB53CBB454 /* InterceptTokens.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A0B55897C09AA60F35AAB5DD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				39A2D9CF4193F59FB58AB008 /* UnplugShieldConfigurationExtension.swift in Sources */,
+				1563AEABFA547FD99105EA3E /* UnplugSharedState.swift in Sources */,
+				C1CA97FFE241FD82BE13778D /* InterceptTokens.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F8BA9D583FA5FD46BCFEA189 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72741CA057526229913A1133 /* UnplugMonitorExtension.swift in Sources */,
+				3BA05945ADAD9FA073C5DF4F /* UnplugSharedState.swift in Sources */,
+				00898ABB9F267CA38718E31A /* InterceptTokens.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		179B5A639CDFBEC7CDF89F3A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = UnplugShieldAction;
+			target = 47D1F7E008B7D6A3BD78F6BF /* UnplugShieldAction */;
+			targetProxy = 22C4303DF003FDA1A6CB4839 /* PBXContainerItemProxy */;
+		};
 		331C8086294A63A400263BE5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 97C146ED1CF9000F007C117D /* Runner */;
 			targetProxy = 331C8085294A63A400263BE5 /* PBXContainerItemProxy */;
+		};
+		A96396C1194D89870A374EB7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = UnplugMonitor;
+			target = 7B8A9C44D3079A52BEDCCB80 /* UnplugMonitor */;
+			targetProxy = 88281571B9DE21F296BB2C61 /* PBXContainerItemProxy */;
+		};
+		DE5995B0E5460BFB5BE996C8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = UnplugShield;
+			target = 6E99124C7F9BEA8DA24E19EB /* UnplugShield */;
+			targetProxy = 22E803602F123212E08DD1DF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -317,6 +595,51 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		155F09310537102159B56B7A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_ENTITLEMENTS = UnplugShieldAction/UnplugShieldAction.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = UnplugShieldAction/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hshanmug12.breathefreePatient.unplugshieldaction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		247636E60148795F5DAF65D2 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_ENTITLEMENTS = UnplugShield/UnplugShield.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = UnplugShield/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hshanmug12.breathefreePatient.unplugshield;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
 		249021D3217E4FDB00AE95B9 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -376,6 +699,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -435,6 +759,74 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Runner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Runner";
+			};
+			name = Profile;
+		};
+		5B2D6BCCF0B9992972F0E836 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_ENTITLEMENTS = UnplugShield/UnplugShield.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = UnplugShield/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hshanmug12.breathefreePatient.unplugshield;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		818856E7A2EF3CA8C61075A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_ENTITLEMENTS = UnplugShield/UnplugShield.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = UnplugShield/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hshanmug12.breathefreePatient.unplugshield;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		91DFC4F74101D0A81C0B0366 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_ENTITLEMENTS = UnplugShieldAction/UnplugShieldAction.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = UnplugShieldAction/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hshanmug12.breathefreePatient.unplugshieldaction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Profile;
 		};
@@ -557,6 +949,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -579,6 +972,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -594,15 +988,126 @@
 			};
 			name = Release;
 		};
+		ADA97E4F34B67CA32DB62C94 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_ENTITLEMENTS = UnplugMonitor/UnplugMonitor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = UnplugMonitor/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hshanmug12.breathefreePatient.unplugmonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B62AEC4893A97F4EB3CCF3AF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_ENTITLEMENTS = UnplugShieldAction/UnplugShieldAction.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = UnplugShieldAction/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hshanmug12.breathefreePatient.unplugshieldaction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E24B8F27B0B15C1CFD907F85 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_ENTITLEMENTS = UnplugMonitor/UnplugMonitor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = UnplugMonitor/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hshanmug12.breathefreePatient.unplugmonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F3B1292187BF3BE6FFF8052E /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_ENTITLEMENTS = UnplugMonitor/UnplugMonitor.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = UnplugMonitor/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.hshanmug12.breathefreePatient.unplugmonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Profile;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0AA4CDE15ADFE6D5FC23A87E /* Build configuration list for PBXNativeTarget "UnplugShieldAction" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B62AEC4893A97F4EB3CCF3AF /* Release */,
+				155F09310537102159B56B7A /* Debug */,
+				91DFC4F74101D0A81C0B0366 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		331C8087294A63A400263BE5 /* Build configuration list for PBXNativeTarget "RunnerTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				331C8088294A63A400263BE5 /* Debug */,
 				331C8089294A63A400263BE5 /* Release */,
 				331C808A294A63A400263BE5 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4F187CBCE9A292E31690F12F /* Build configuration list for PBXNativeTarget "UnplugMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E24B8F27B0B15C1CFD907F85 /* Release */,
+				ADA97E4F34B67CA32DB62C94 /* Debug */,
+				F3B1292187BF3BE6FFF8052E /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -627,10 +1132,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		D3EF4951DDE4B3BD51ED42C8 /* Build configuration list for PBXNativeTarget "UnplugShield" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5B2D6BCCF0B9992972F0E836 /* Release */,
+				818856E7A2EF3CA8C61075A2 /* Debug */,
+				247636E60148795F5DAF65D2 /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */ = {
+		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage;
 		};

@@ -19,5 +19,16 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+      # The Unplug channel contract is generated for three languages and the
+      # output is checked in. If someone edits pigeons/unplug_api.dart without
+      # regenerating, Dart and the native sides drift apart silently — so the
+      # build regenerates and fails on any difference.
+      - name: Channel contract is up to date
+        run: |
+          ./tool/generate_pigeon.sh
+          git diff --exit-code -- \
+            lib/unplug/platform/unplug_api.g.dart \
+            ios/Runner/Unplug/UnplugApi.g.swift \
+            android/app/src/main/kotlin/com/breathefree/breathefree_patient/unplug/UnplugApi.g.kt
       - run: flutter build web --release
       - run: flutter build appbundle --debug

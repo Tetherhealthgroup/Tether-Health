@@ -43,7 +43,11 @@ class _UnplugScreenGState extends State<UnplugScreenG> {
 
     final reason = await showDialog<String>(
       context: context,
-      builder: (context) => const _StrictEndDialog(),
+      // Addendum §3.2: a child profile types nothing, so the reason becomes a
+      // choice from a fixed list rather than a text field.
+      builder: (context) => _StrictEndDialog(
+        childSafe: state.childLockdownActive,
+      ),
     );
     if (reason == null) return;
     state.endSession(reason: reason);
@@ -256,7 +260,10 @@ class _RunningSession extends StatelessWidget {
 }
 
 class _StrictEndDialog extends StatefulWidget {
-  const _StrictEndDialog();
+  const _StrictEndDialog({required this.childSafe});
+
+  /// True on a child profile, where no field may accept free text.
+  final bool childSafe;
 
   @override
   State<_StrictEndDialog> createState() => _StrictEndDialogState();
@@ -264,11 +271,18 @@ class _StrictEndDialog extends StatefulWidget {
 
 class _StrictEndDialogState extends State<_StrictEndDialog> {
   final _controller = TextEditingController();
+  String? _picked;
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  String? get _reason {
+    if (widget.childSafe) return _picked;
+    final typed = _controller.text.trim();
+    return typed.isEmpty ? null : typed;
   }
 
   @override
@@ -284,17 +298,32 @@ class _StrictEndDialogState extends State<_StrictEndDialog> {
             'only thing that makes the log worth reading later.',
           ),
           const SizedBox(height: 14),
-          TextField(
-            controller: _controller,
-            autofocus: true,
-            minLines: 1,
-            maxLines: 3,
-            decoration: const InputDecoration(
-              labelText: 'Reason',
-              border: OutlineInputBorder(),
+          if (widget.childSafe)
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final reason in childSafeSessionReasons)
+                  ChoiceChip(
+                    label: Text(reason),
+                    selected: _picked == reason,
+                    showCheckmark: false,
+                    onSelected: (_) => setState(() => _picked = reason),
+                  ),
+              ],
+            )
+          else
+            TextField(
+              controller: _controller,
+              autofocus: true,
+              minLines: 1,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Reason',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (_) => setState(() {}),
             ),
-            onChanged: (_) => setState(() {}),
-          ),
         ],
       ),
       actions: [
@@ -303,9 +332,8 @@ class _StrictEndDialogState extends State<_StrictEndDialog> {
           child: const Text('Keep going'),
         ),
         FilledButton(
-          onPressed: _controller.text.trim().isEmpty
-              ? null
-              : () => Navigator.pop(context, _controller.text.trim()),
+          onPressed:
+              _reason == null ? null : () => Navigator.pop(context, _reason),
           child: const Text('End session'),
         ),
       ],

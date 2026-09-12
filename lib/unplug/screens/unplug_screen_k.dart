@@ -4,6 +4,7 @@ import '../../theme/app_colors.dart';
 import '../models/delivery_track.dart';
 import '../widgets/unplug_kit.dart';
 import '../widgets/unplug_scope.dart';
+import 'care_team_view.dart';
 
 /// Screen K — who holds which capability, per addendum §4.
 ///
@@ -56,6 +57,18 @@ class UnplugScreenK extends StatelessWidget {
               for (final capability in trackCapabilities)
                 _CapabilityRow(capability: capability, selected: track),
             ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 18),
+          child: SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: () =>
+                  Navigator.of(context).push(CareTeamView.route(state)),
+              icon: const Icon(Icons.monitor_heart_outlined),
+              label: const Text('Open the care-team view'),
+            ),
           ),
         ),
         UnplugSection(

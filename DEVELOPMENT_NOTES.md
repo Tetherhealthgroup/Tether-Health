@@ -27,18 +27,50 @@ intercepts all read (addendum §2.1). `InterceptTokens` parses it strictly and
 substitutes nothing on failure — a default here would hide the same broken file from the
 two native implementations, which is the drift the shared file exists to prevent.
 
-### What is simulated
+### Live and simulated, and why both exist
 
-`UnplugModuleState` is an in-memory simulation of what the native layer would report.
-Nothing is persisted, nothing is synced, and no platform API is called. Specifically not
-implemented: the iOS `DeviceActivityMonitor`, `ShieldConfiguration` and `ShieldAction`
-extensions, the App Group container, the Android foreground service and overlay, and the
-Pigeon channel listed on screen G. The Observe Week figures on screen E are sample data,
-labelled as such on the screen and in `lib/unplug/models/observe_week.dart`.
+`UnplugPlatform.attach` probes the channel at startup. When a platform layer answers, the
+module forwards every state change that the intercept must respect and folds the
+platform's callbacks back into `UnplugModuleState`. When nothing answers — web, desktop,
+a widget test, an iOS build whose entitlement has not been granted — the same methods run
+against the state object alone.
+
+Both modes exist because the module must be reviewable on a machine that cannot run it.
+What makes that safe rather than misleading is `UnplugModuleState.isLive`, rendered as a
+banner on every screen in the module. Do not remove it, and do not let a screen imply a
+number is a measurement when it is not.
+
+Every mutation applies locally first and reconciles afterwards, so the UI behaves
+identically in both modes and no screen has to branch on which it is in.
+
+### What is still not real
+
+- The Observe Week figures on screen E are sample data when `liveUsage` is null, and the
+  screen says so. On iOS they will stay sample-shaped: `DeviceActivityReport` computes
+  usage inside an extension with no network access that cannot return values to its host,
+  so there is no API that hands the app a number of minutes. `opensAreApproximate` is
+  true there for the same reason.
+- The Apple `FamilyControls` distribution entitlement has not been applied for, so
+  `requestAuthorization` fails on a real iPhone.
+- Nothing syncs. There is no server.
 
 Two rules in the state are policy rather than UI, and should move to the server when one
 exists: a loosening of a limit always costs a reviewer or a 24-hour cool-off (§4), and a
 run of distress tags opens an escalation route that never terminates at a coach (§4.1).
+
+### The child-profile lockdown
+
+Pairing a child profile (§3.2) removes every free-text field in the module: group names
+become a pick-from-list, the strict-session reason becomes a pick-from-list, and the
+typed-commitment gate is withdrawn — a sentence someone types is a free-text field
+whatever it is called. The gate change is written to the shared container rather than
+applied at render time, because the intercept is a different process and would otherwise
+keep offering it.
+
+`test/no_third_party_sdks_test.dart` enforces the other half of §3.2: no analytics, no
+crash reporter that collects identifiers, no session replay, including transitively. The
+runtime dependency tree is Flutter SDK packages only; the single native dependency is
+kotlinx-coroutines, which Pigeon's generated Kotlin requires.
 
 ## Interaction behavior
 

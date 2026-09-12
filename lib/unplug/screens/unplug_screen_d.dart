@@ -4,23 +4,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../theme/app_colors.dart';
+import '../models/unplug_module_state.dart';
 import '../widgets/unplug_kit.dart';
 import '../widgets/unplug_scope.dart';
-
-/// The gates that fit inside a `ShieldAction` execution window.
-enum EffortGate {
-  breath('Breath', 'A timed breath, with nothing to do but wait it out.'),
-  commitment(
-    'Typed commitment',
-    'Type the sentence. Typing is slow enough to interrupt a reflex.',
-  ),
-  puzzle('Short puzzle', 'One small sum. Enough thought to break autopilot.');
-
-  const EffortGate(this.label, this.description);
-
-  final String label;
-  final String description;
-}
 
 /// Screen D — the effort gate, module M5.
 ///
@@ -40,7 +26,6 @@ class UnplugScreenD extends StatefulWidget {
 class _UnplugScreenDState extends State<UnplugScreenD> {
   static const _commitmentPhrase = 'I can come back to this later';
 
-  EffortGate _gate = EffortGate.breath;
   bool _passed = false;
 
   Timer? _breathTimer;
@@ -73,20 +58,18 @@ class _UnplugScreenDState extends State<UnplugScreenD> {
     super.dispose();
   }
 
+  /// Only meaningful while the commitment gate is showing; selecting another
+  /// gate clears the field, so a stale match cannot carry over.
   void _onCommitmentChanged() {
-    final matches =
-        _commitmentController.text.trim().toLowerCase() ==
-            _commitmentPhrase.toLowerCase();
-    if (matches && !_passed) setState(() => _passed = true);
-    if (!matches && _passed && _gate == EffortGate.commitment) {
-      setState(() => _passed = false);
-    }
+    final matches = _commitmentController.text.trim().toLowerCase() ==
+        _commitmentPhrase.toLowerCase();
+    if (matches != _passed) setState(() => _passed = matches);
   }
 
-  void _selectGate(EffortGate gate) {
+  void _selectGate(UnplugModuleState state, EffortGateChoice gate) {
     _breathTimer?.cancel();
+    state.selectGate(gate);
     setState(() {
-      _gate = gate;
       _passed = false;
       _breathRemaining = 0;
       _answerWrong = false;
@@ -137,17 +120,17 @@ class _UnplugScreenDState extends State<UnplugScreenD> {
       children: [
         UnplugSection(
           title: 'Gate',
-          child: UnplugChoices<EffortGate>(
-            values: EffortGate.values,
-            selected: _gate,
+          child: UnplugChoices<EffortGateChoice>(
+            values: state.availableGates,
+            selected: state.gate,
             labelOf: (value) => value.label,
-            onSelected: _selectGate,
+            onSelected: (value) => _selectGate(state, value),
           ),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 10),
           child: Text(
-            _gate.description,
+            state.gate.description,
             style: const TextStyle(
               color: AppColors.tealSecondary,
               fontSize: 13.5,
@@ -157,8 +140,8 @@ class _UnplugScreenDState extends State<UnplugScreenD> {
         ),
         UnplugSection(
           title: 'Try it',
-          child: switch (_gate) {
-            EffortGate.breath => _BreathGate(
+          child: switch (state.gate) {
+            EffortGateChoice.breath => _BreathGate(
                 seconds: breathSeconds,
                 remaining: _breathRemaining,
                 running: _breathTimer?.isActive ?? false,
@@ -167,12 +150,12 @@ class _UnplugScreenDState extends State<UnplugScreenD> {
                     ? null
                     : () => _startBreath(breathSeconds),
               ),
-            EffortGate.commitment => _CommitmentGate(
+            EffortGateChoice.commitment => _CommitmentGate(
                 phrase: _commitmentPhrase,
                 controller: _commitmentController,
                 passed: _passed,
               ),
-            EffortGate.puzzle => _PuzzleGate(
+            EffortGateChoice.puzzle => _PuzzleGate(
                 sum: _sum,
                 controller: _answerController,
                 wrong: _answerWrong,
@@ -193,6 +176,12 @@ class _UnplugScreenDState extends State<UnplugScreenD> {
               'or long-running — a camera-based pushup counter, for instance — '
               'is not realistic on iOS.',
         ),
+        if (state.childLockdownActive)
+          const UnplugNote(
+            text: 'The typed commitment is not offered on a child profile: a '
+                'sentence someone types is a free-text field, whatever it is '
+                'called (§3.2).',
+          ),
         if (breathSeconds == null)
           const UnplugNote(
             tone: NoteTone.warning,

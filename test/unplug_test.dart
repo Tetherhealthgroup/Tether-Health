@@ -9,6 +9,7 @@ import 'package:breathefree_patient/unplug/models/platform_ceiling.dart';
 import 'package:breathefree_patient/unplug/models/program_template.dart';
 import 'package:breathefree_patient/unplug/models/unplug_module_state.dart';
 import 'package:breathefree_patient/unplug/models/unplug_screen_spec.dart';
+import 'package:breathefree_patient/unplug/platform/unplug_api.g.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -352,6 +353,124 @@ void main() {
         reason: 'the details panel sources an Unplug screen to the addendum',
       );
       expect(tester.takeException(), isNull);
+    });
+  });
+
+  group('child profile lockdown (§3.2)', () {
+    UnplugModuleState childProfile() {
+      final state = UnplugModuleState(platform: TrackedPlatform.ios)
+        ..setFamilySharing(FamilySharingState.configured)
+        ..pairChildProfile();
+      return state;
+    }
+
+    test('pairing a child profile turns the lockdown on', () {
+      final state = childProfile();
+      addTearDown(state.dispose);
+      expect(state.childLockdownActive, isTrue);
+    });
+
+    test('the typed commitment is withdrawn, because typing is free text', () {
+      final state = UnplugModuleState(platform: TrackedPlatform.ios)
+        ..selectGate(EffortGateChoice.commitment);
+      addTearDown(state.dispose);
+
+      expect(state.availableGates, EffortGateChoice.values);
+      expect(state.gate, EffortGateChoice.commitment);
+
+      state
+        ..setFamilySharing(FamilySharingState.configured)
+        ..pairChildProfile();
+
+      expect(state.availableGates, isNot(contains(EffortGateChoice.commitment)));
+      expect(
+        state.gate,
+        EffortGateChoice.breath,
+        reason: 'the selected gate must fall back, not stay on a gate the '
+            'intercept will no longer offer',
+      );
+    });
+
+    test('every child-safe list is non-empty and free of blanks', () {
+      for (final list in [childSafeGroupLabels, childSafeSessionReasons]) {
+        expect(list, isNotEmpty);
+        expect(list.every((entry) => entry.trim().isNotEmpty), isTrue);
+      }
+    });
+
+    test('retention on a child profile is the 30 days the addendum sets', () {
+      expect(childRetentionDays, 30);
+    });
+  });
+
+  group('platform binding', () {
+    test('an unbound module is not live and says so', () {
+      final state = UnplugModuleState(platform: TrackedPlatform.ios);
+      addTearDown(state.dispose);
+      expect(state.isLive, isFalse);
+      expect(state.liveUsage, isNull);
+      expect(state.channelFailure, isNull);
+    });
+
+    test('platform callbacks fold into the state', () {
+      final state = UnplugModuleState(platform: TrackedPlatform.android)
+        ..setOverrideAllowance(3);
+      addTearDown(state.dispose);
+
+      state
+        ..applyInterceptShown('Video apps')
+        ..applyInterceptShown('Video apps')
+        ..applyInterceptDismissed('Video apps')
+        ..applyOverrideUsed(1)
+        ..applyThresholdCrossed(95, 40);
+
+      expect(state.interceptsShown, 2);
+      expect(state.interceptsDismissed, 1);
+      expect(state.overridesUsed, 2, reason: '3 allowed, 1 remaining');
+      expect(state.lastThreshold?.minutes, 95);
+      expect(state.lastThreshold?.opens, 40);
+    });
+
+    test('a platform authorization result overrides the optimistic guess', () {
+      final state = UnplugModuleState(platform: TrackedPlatform.ios);
+      addTearDown(state.dispose);
+
+      state.applyPlatformAuthorization(
+        PlatformAuthorizationStatus.blockedNoFamilySharing,
+      );
+      expect(state.authorization, AuthorizationState.blockedNoFamilySharing);
+
+      state.applyPlatformAuthorization(PlatformAuthorizationStatus.approved);
+      expect(state.authorization, AuthorizationState.approved);
+    });
+
+    test('platform-reported checks replace the built-in ones', () {
+      final state = UnplugModuleState(platform: TrackedPlatform.ios);
+      addTearDown(state.dispose);
+
+      state.applyPlatformChecks([
+        PlatformTrackingCheck(
+          name: 'Screen-time authorization',
+          healthy: false,
+          detail: 'Screen Time access is not granted.',
+        ),
+      ]);
+
+      expect(state.trackingHealthy, isFalse);
+      expect(state.applicableChecks, hasLength(1));
+      expect(
+        state.applicableChecks.single.remedy,
+        isNotEmpty,
+        reason: 'a failing check must still tell the person what to do',
+      );
+    });
+
+    test('a channel failure is surfaced, not swallowed', () {
+      final state = UnplugModuleState(platform: TrackedPlatform.ios);
+      addTearDown(state.dispose);
+      expect(state.channelFailure, isNull);
+      state.applyChannelFailure('applyShield', 'MissingPluginException');
+      expect(state.channelFailure, contains('applyShield'));
     });
   });
 }

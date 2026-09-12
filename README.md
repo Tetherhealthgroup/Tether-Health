@@ -133,16 +133,50 @@ sits alongside cessation. Screens A–L implement it as native responsive Flutte
 | L | Program templates | §4.2 |
 
 There is no approved 1290 × 2796 artwork for these screens, so they are widgets rather
-than bitmaps and each states the addendum section it implements. What runs here is the
-Dart layer only. The iOS `DeviceActivityMonitor`, `ShieldConfiguration` and
-`ShieldAction` extensions, the Android foreground service and overlay, and the Pigeon
-channel between them are **not implemented** — screen C says so on its face, and the
-in-app state is a local simulation of what those calls would return.
+than bitmaps and each states the addendum section it implements. Screen K also opens a
+read-only **care-team view**, the Phase 1 deliverable in §5.
 
-`assets/unplug/intercept_tokens.json` holds the intercept colours and copy. Addendum
-§2.1 requires the intercept to exist three times — Dart, SwiftUI and an Android overlay
-— and all three read that one file so they cannot drift apart. Change a colour or a
-string there and nowhere else.
+### The native layer
+
+The module is not Dart-only. `pigeons/unplug_api.dart` defines the channel contract from
+§2.3, and `tool/generate_pigeon.sh` generates the Dart, Swift and Kotlin sides of it.
+Never edit a generated `.g.dart`, `.g.swift` or `.g.kt`.
+
+**iOS** (`ios/Runner/Unplug/`, plus three extension targets):
+
+| Piece | Where |
+|---|---|
+| `FamilyControls` authorization and picker | `Runner/Unplug/UnplugHost.swift` |
+| `ManagedSettings` shielding, `DeviceActivity` schedule | same |
+| App Group shared container | `Runner/Unplug/UnplugSharedState.swift` |
+| `DeviceActivityMonitor` extension | `ios/UnplugMonitor/` |
+| `ShieldConfiguration` extension | `ios/UnplugShield/` |
+| `ShieldAction` extension | `ios/UnplugShieldAction/` |
+
+**Android** (`android/app/src/main/kotlin/.../unplug/`): `UnplugHost` implements the
+contract, `UsageReader` reads `UsageStatsManager`, `UnplugWatchService` is the polling
+foreground service, `InterceptOverlay` draws the intercept, `AppPickerActivity` is the
+picker Android has no system equivalent for, and `UnplugStore` is the shared state the
+three of them agree through.
+
+`assets/unplug/intercept_tokens.json` holds the intercept colours and copy. §2.1
+requires the intercept to exist three times — Dart, SwiftUI and an Android overlay — and
+all three read that one file so they cannot drift apart. Change a colour or a string
+there and nowhere else.
+
+### Live or simulated
+
+Every Unplug screen carries a banner saying which it is. When the platform layer answers
+`isSupported()`, the module is **live** and the numbers come from the device; otherwise
+it runs its own simulation and says so. A prototype that looks identical either way is a
+prototype that eventually gets demonstrated as though it were connected.
+
+### What still blocks a real device
+
+The Apple `FamilyControls` distribution entitlement has **not been granted** — it has
+not yet been applied for. Until it is, `requestAuthorization` fails on a real iPhone and
+screen I reports exactly that. The drafted submissions for Apple and for Google Play are
+in `design/unplug-platform-submissions.md`.
 
 ## Project structure
 
@@ -153,12 +187,17 @@ string there and nowhere else.
 - `lib/screens/approved_screen_player.dart` — mobile/desktop responsive shell
 - `lib/widgets/approved_screen_viewport.dart` — pixel-accurate artwork renderer
 - `lib/unplug/models/` — the module's state, role matrix, templates and platform ceiling
-- `lib/unplug/screens/` — Unplug screens A–L and their host
+- `lib/unplug/platform/` — the generated channel and the binding that makes it live
+- `lib/unplug/screens/` — Unplug screens A–L, their host, and the care-team view
 - `lib/unplug/widgets/` — the module's shared page chrome and scope
+- `pigeons/unplug_api.dart` — the §2.3 channel contract, the source of the generated code
+- `ios/Runner/Unplug/`, `ios/UnplugMonitor/`, `ios/UnplugShield/`, `ios/UnplugShieldAction/` — the iOS layer and its three extensions
+- `android/app/src/main/kotlin/com/breathefree/breathefree_patient/unplug/` — the Android layer
 - `assets/screens/` — runtime 1290 × 2796 approved PNGs
 - `assets/unplug/intercept_tokens.json` — colours and copy shared by all three intercepts
 - `design/approved/` — editable approved SVG sources
 - `design/unplug-v2.1-integration-addendum.md` — the specification screens A–L implement
+- `design/unplug-platform-submissions.md` — the drafted Apple entitlement and Play declarations
 - `test/` — catalog and navigation tests
 - `tool/` — platform setup and run scripts
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_colors.dart';
 import '../models/unplug_screen_spec.dart';
+import 'unplug_scope.dart';
 
 /// Where a screen sits in the module, and how to leave it.
 ///
@@ -49,6 +50,7 @@ class UnplugPage extends StatelessWidget {
         child: Column(
           children: [
             _UnplugHeader(spec: nav.spec),
+            const _ModeBanner(),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
@@ -63,6 +65,60 @@ class UnplugPage extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// States, on every screen, whether the numbers below mean anything.
+///
+/// A prototype that looks identical whether or not it is connected to a real
+/// screen-time layer is a prototype that will eventually be demonstrated as if
+/// it were connected. This strip is the cheapest defence against that.
+class _ModeBanner extends StatelessWidget {
+  const _ModeBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final state = UnplugScope.of(context);
+    final live = state.isLive;
+    final failure = state.channelFailure;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
+      color: live && failure == null ? AppColors.mint : AppColors.coralLight,
+      child: Row(
+        children: [
+          Icon(
+            live && failure == null
+                ? Icons.sensors_rounded
+                : Icons.science_outlined,
+            size: 15,
+            color: live && failure == null
+                ? AppColors.deepTeal
+                : const Color(0xFF8C3A26),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              failure != null
+                  ? 'Channel error — $failure'
+                  : live
+                      ? 'Live — reading this device'
+                      : 'Simulated — no screen-time layer on this build',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: live && failure == null
+                    ? AppColors.deepTeal
+                    : const Color(0xFF8C3A26),
+                fontSize: 11.5,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

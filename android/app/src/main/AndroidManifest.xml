@@ -1,4 +1,25 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+        Unplug (addendum §2.2). The intercept is a foreground service polling
+        UsageStatsManager plus a SYSTEM_ALERT_WINDOW overlay, not an
+        AccessibilityService: a one-second delay before the shield appears is a
+        minor cost, and an app removed from the Play Store is a dead programme.
+
+        PACKAGE_USAGE_STATS and SYSTEM_ALERT_WINDOW are special-access
+        permissions. Neither can be granted by a runtime dialog; both are granted
+        in Settings and can be revoked later without telling the app, which is
+        what the health check on screen I exists to notice.
+    -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:label="breathefree_patient"
         android:name="${applicationName}"
@@ -25,6 +46,34 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!--
+            The app picker. Android has no system equivalent of Apple's
+            FamilyActivityPicker, so the module supplies one — and then holds the
+            result exactly as iOS does: on this device, never sent to Dart, never
+            uploaded (§1).
+        -->
+        <activity
+            android:name=".unplug.AppPickerActivity"
+            android:exported="false"
+            android:label="Choose apps"
+            android:theme="@style/NormalTheme" />
+
+        <!--
+            specialUse is the correct type: this is neither dataSync nor
+            mediaPlayback, and mislabelling a foreground service is a Play policy
+            problem in its own right.
+        -->
+        <service
+            android:name=".unplug.UnplugWatchService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Watches for the apps the person asked this app to
+                    shield, so the intercept can be drawn over them. Runs only
+                    while screen-time support is switched on." />
+        </service>
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
@@ -40,6 +89,16 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!--
+            Launchable apps only, so the picker can list them and the usage
+            report can name them. QUERY_ALL_PACKAGES would be simpler and is
+            deliberately not used: it is a Play policy problem, and it would
+            reveal apps a person can never actually be looking at.
+        -->
+        <intent>
+            <action android:name="android.intent.action.MAIN"/>
+            <category android:name="android.intent.category.LAUNCHER"/>
         </intent>
     </queries>
 </manifest>

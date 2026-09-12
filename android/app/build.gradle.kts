@@ -44,6 +44,12 @@ kotlin {
     }
 }
 
+dependencies {
+    // Pigeon 28 generates suspend functions for the @async methods on the
+    // Unplug channel, so the generated Kotlin needs coroutines on the classpath.
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+}
+
 flutter {
     source = "../.."
 }

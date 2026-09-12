@@ -8,6 +8,7 @@ import 'screens/approved_screen_player.dart';
 import 'theme/app_theme.dart';
 import 'unplug/models/intercept_tokens.dart';
 import 'unplug/models/unplug_module_state.dart';
+import 'unplug/platform/unplug_platform.dart';
 import 'unplug/widgets/unplug_scope.dart';
 
 Future<void> main() async {
@@ -45,6 +46,17 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     _currentIndex =
         widget.initialScreen.clamp(0, prototypeCatalog.length - 1).toInt();
     _loadInterceptTokens();
+    _attachUnplugPlatform();
+  }
+
+  /// Connects the Unplug module to the platform screen-time layer, when this
+  /// build has one. When it does not, the module runs on its own simulation and
+  /// says so in the banner on every one of its screens.
+  Future<void> _attachUnplugPlatform() async {
+    final platform = await UnplugPlatform.attach(_unplug);
+    if (platform == null || !mounted) return;
+    await _unplug.refreshUsage();
+    await _unplug.purgeExpiredData();
   }
 
   /// Reads the intercept design tokens the Unplug module shares with the

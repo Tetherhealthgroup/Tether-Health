@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../platform/unplug_api.g.dart';
+import '../platform/unplug_platform.dart';
 import 'delivery_track.dart';
 import 'intercept_tokens.dart';
 import 'platform_ceiling.dart';
@@ -154,6 +156,59 @@ class TrackingCheck {
       );
 }
 
+/// The gates that fit inside a `ShieldAction` execution window (§2.1).
+///
+/// The choice lives here rather than on screen D because the intercept reads it
+/// from the shared container, and the intercept is a different process.
+enum EffortGateChoice {
+  breath('Breath', 'A timed breath, with nothing to do but wait it out.'),
+  commitment(
+    'Typed commitment',
+    'Type the sentence. Typing is slow enough to interrupt a reflex.',
+  ),
+  puzzle('Short puzzle', 'One small sum. Enough thought to break autopilot.');
+
+  const EffortGateChoice(this.label, this.description);
+
+  final String label;
+  final String description;
+
+  PlatformEffortGate get platformValue => switch (this) {
+        EffortGateChoice.breath => PlatformEffortGate.breath,
+        EffortGateChoice.commitment => PlatformEffortGate.commitment,
+        EffortGateChoice.puzzle => PlatformEffortGate.puzzle,
+      };
+}
+
+/// The tier at which the intercept starts offering an effort gate.
+const int effortGateTier = 3;
+
+/// The group names a child profile may choose from.
+///
+/// Addendum §3.2: no free-text fields anywhere on a child-facing profile — no
+/// journal, no custom intentions, no names — pick-from-list only. A text field
+/// that a child can type into is a text field that can contain anything, and
+/// every downstream system then has to be built as though it does.
+const childSafeGroupLabels = <String>[
+  'Video apps',
+  'Games',
+  'Messaging',
+  'Social',
+  'Music',
+  'Browsing',
+];
+
+/// The reasons a child profile may give for ending a strict session.
+const childSafeSessionReasons = <String>[
+  'I need it for school',
+  'A grown-up asked me to',
+  'I pressed it by mistake',
+  'Something else',
+];
+
+/// How long the module keeps anything on a child profile (§3.2).
+const int childRetentionDays = 30;
+
 /// A tag the person applied to an urge.
 class UrgeTag {
   const UrgeTag(this.label, {this.distress = false});
@@ -183,19 +238,29 @@ const Duration selfGuidedCoolOff = Duration(hours: 24);
 /// The live configuration of one Unplug program instance.
 ///
 /// Screens A–L read and write this one object, so a change made on any screen
-/// is visible on every other. Nothing here is persisted or synced: this is the
-/// in-app simulation of the module, and the Pigeon contract in §2.3 is where
-/// the real implementation would take over.
+/// is visible on every other.
+///
+/// When [UnplugPlatform.attach] finds a screen-time layer, every change that
+/// the intercept must respect is forwarded across the §2.3 channel and the
+/// platform's callbacks are folded back in here. When it does not — on web, on
+/// desktop, in a widget test, or on an iOS build whose entitlement has not been
+/// granted — the same methods run against this object alone and [isLive] is
+/// false. The UI is identical either way; what differs is whether the numbers
+/// mean anything, which is why [isLive] is shown in the page header rather than
+/// hidden.
+///
+/// Nothing here is persisted or synced by Dart in either mode. Retention of
+/// what the platform holds is [purgeExpiredData]'s job.
 class UnplugModuleState extends ChangeNotifier {
   UnplugModuleState({TrackedPlatform? platform})
-      : _platform = platform ?? _defaultPlatform();
+      : _trackedPlatform = platform ?? _defaultPlatform();
 
   static TrackedPlatform _defaultPlatform() =>
       defaultTargetPlatform == TargetPlatform.android
           ? TrackedPlatform.android
           : TrackedPlatform.ios;
 
-  TrackedPlatform _platform;
+  TrackedPlatform _trackedPlatform;
   DeliveryTrack _track = DeliveryTrack.clinician;
   ProgramTemplate? _template;
   int _tier = 2;
@@ -217,8 +282,14 @@ class UnplugModuleState extends ChangeNotifier {
   List<TrackingCheck> _checks = _initialChecks;
   InterceptTokens? _tokens;
   Object? _tokenError;
+  UnplugPlatform? _platform;
+  EffortGateChoice _gate = EffortGateChoice.breath;
+  PlatformUsage? _liveUsage;
+  String? _channelFailure;
+  int _interceptsShown = 0;
+  int _interceptsDismissed = 0;
 
-  TrackedPlatform get platform => _platform;
+  TrackedPlatform get platform => _trackedPlatform;
   DeliveryTrack get track => _track;
   ProgramTemplate? get template => _template;
   int get tier => _tier;
@@ -235,6 +306,43 @@ class UnplugModuleState extends ChangeNotifier {
   List<UrgeTag> get recentTags => List.unmodifiable(_recentTags);
   bool get escalationOpened => _escalationOpened;
   List<TrackingCheck> get checks => List.unmodifiable(_checks);
+
+  /// True when a real screen-time layer is attached.
+  ///
+  /// False means every number and every switch on these screens is this
+  /// object's own simulation. No screen may imply otherwise.
+  bool get isLive => _platform != null;
+
+  /// The gate the intercept offers at [effortGateTier] and above.
+  EffortGateChoice get gate => _gate;
+
+  /// True when this device is running as a child profile (§3.2).
+  ///
+  /// Under lockdown there are no free-text fields anywhere, no journal, no
+  /// streaks and nothing shareable, and retention drops to
+  /// [childRetentionDays] on-device with only aggregate adherence syncing.
+  bool get childLockdownActive => _childProfilePaired;
+
+  /// The gates a child profile may be offered.
+  ///
+  /// The typed commitment is excluded because typing a sentence is a free-text
+  /// field wearing a different hat.
+  List<EffortGateChoice> get availableGates => childLockdownActive
+      ? const [EffortGateChoice.breath, EffortGateChoice.puzzle]
+      : EffortGateChoice.values;
+
+  /// Real usage, when the platform supplied it. Null means screen E is showing
+  /// clearly-labelled sample data.
+  PlatformUsage? get liveUsage => _liveUsage;
+
+  /// The last channel call that failed, if one has.
+  String? get channelFailure => _channelFailure;
+
+  /// Intercepts the platform has reported firing in this window.
+  int get interceptsShown => _interceptsShown;
+
+  /// How many of those the person closed rather than pushed through.
+  int get interceptsDismissed => _interceptsDismissed;
 
   /// The shared intercept tokens, once loaded. Null until then.
   InterceptTokens? get tokens => _tokens;
@@ -254,9 +362,148 @@ class UnplugModuleState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // --- Platform binding -----------------------------------------------------
+
+  /// Attaches a live screen-time layer. Called once, by [UnplugPlatform.attach].
+  void bindPlatform(UnplugPlatform platform) {
+    _platform = platform;
+    notifyListeners();
+  }
+
+  void selectGate(EffortGateChoice value) {
+    if (_gate == value) return;
+    _gate = value;
+    _pushShield();
+    notifyListeners();
+  }
+
+  /// Sends the current tier, allowance, gate and selection to the platform.
+  ///
+  /// Every change that the intercept must respect goes through here, so there
+  /// is one place where Dart state becomes shared-container state rather than
+  /// a dozen scattered calls.
+  void _pushShield() {
+    final platform = _platform;
+    if (platform == null) return;
+    unawaited(
+      platform.applyShield(
+        tier: _tier,
+        overrideAllowance: _overrideAllowance,
+        overridesUsed: _overridesUsed,
+        gate: _tier >= effortGateTier
+            ? _gate.platformValue
+            : PlatformEffortGate.none,
+        strict: _session?.strict ?? false,
+        groups: _groups,
+      ),
+    );
+  }
+
+  /// Pulls a fresh usage window from the platform.
+  Future<void> refreshUsage({int days = 7}) async {
+    final platform = _platform;
+    if (platform == null) return;
+    final usage = await platform.readUsage(days);
+    if (usage == null) return;
+    _liveUsage = usage;
+    notifyListeners();
+  }
+
+  /// Runs the retention sweep. On a child profile this is [childRetentionDays].
+  Future<void> purgeExpiredData() async {
+    final days = _childProfilePaired ? childRetentionDays : 365;
+    await _platform?.purgeLocalData(days);
+  }
+
+  void applyPlatformAuthorization(PlatformAuthorizationStatus status) {
+    final mapped = switch (status) {
+      PlatformAuthorizationStatus.notRequested =>
+        AuthorizationState.notRequested,
+      PlatformAuthorizationStatus.approved => AuthorizationState.approved,
+      PlatformAuthorizationStatus.denied => AuthorizationState.denied,
+      PlatformAuthorizationStatus.blockedNoFamilySharing =>
+        AuthorizationState.blockedNoFamilySharing,
+      PlatformAuthorizationStatus.unavailable => AuthorizationState.denied,
+    };
+    if (_authorization == mapped) return;
+    _authorization = mapped;
+    notifyListeners();
+  }
+
+  /// Replaces the health checks with what the platform actually reports.
+  void applyPlatformChecks(List<PlatformTrackingCheck> reported) {
+    if (reported.isEmpty) return;
+    _checks = [
+      for (final check in reported)
+        TrackingCheck(
+          name: check.name,
+          healthy: check.healthy,
+          detail: check.detail,
+          remedy: _remedyFor(check.name),
+          platforms: {_platformOf(check.name)},
+        ),
+    ];
+    notifyListeners();
+  }
+
+  void applyThresholdCrossed(int minutesUsed, int opens) {
+    _lastThreshold = (minutes: minutesUsed, opens: opens);
+    notifyListeners();
+  }
+
+  void applyInterceptShown(String groupLabel) {
+    _interceptsShown++;
+    notifyListeners();
+  }
+
+  void applyInterceptDismissed(String groupLabel) {
+    _interceptsDismissed++;
+    notifyListeners();
+  }
+
+  void applyOverrideUsed(int overridesRemaining) {
+    _overridesUsed =
+        (_overrideAllowance - overridesRemaining).clamp(0, _overrideAllowance);
+    notifyListeners();
+  }
+
+  void applyTrackingStopped(String checkName) {
+    _checks = [
+      for (final check in _checks)
+        if (check.name == checkName) check.copyWith(healthy: false) else check,
+    ];
+    notifyListeners();
+  }
+
+  void applyChannelFailure(String call, Object error) {
+    _channelFailure = '$call: $error';
+    notifyListeners();
+  }
+
+  ({int minutes, int opens})? _lastThreshold;
+
+  /// The last threshold the platform reported crossing.
+  ({int minutes, int opens})? get lastThreshold => _lastThreshold;
+
+  static TrackedPlatform _platformOf(String checkName) =>
+      _initialChecks
+          .firstWhere(
+            (check) => check.name == checkName,
+            orElse: () => _initialChecks.first,
+          )
+          .platforms
+          .first;
+
+  static String _remedyFor(String checkName) => _initialChecks
+      .firstWhere(
+        (check) => check.name == checkName,
+        orElse: () => _initialChecks.first,
+      )
+      .remedy;
+
   /// The checks that apply to the platform currently selected.
   List<TrackingCheck> get applicableChecks => _checks
-      .where((check) => check.platforms.contains(_platform))
+      .where((check) => check.platforms.contains(_trackedPlatform))
       .toList(growable: false);
 
   /// True when every applicable check passes.
@@ -281,8 +528,8 @@ class UnplugModuleState extends ChangeNotifier {
   bool wouldLoosen(int candidate) => candidate < _tier;
 
   void selectPlatform(TrackedPlatform value) {
-    if (_platform == value) return;
-    _platform = value;
+    if (_trackedPlatform == value) return;
+    _trackedPlatform = value;
     notifyListeners();
   }
 
@@ -322,6 +569,7 @@ class UnplugModuleState extends ChangeNotifier {
     if (!wouldLoosen(target)) {
       _tier = target;
       _limitRequest = null;
+      _pushShield();
       notifyListeners();
       return;
     }
@@ -360,6 +608,7 @@ class UnplugModuleState extends ChangeNotifier {
     }
     _tier = request.requestedTier.clamp(tierFloor, tierCeiling);
     _limitRequest = null;
+    _pushShield();
     notifyListeners();
   }
 
@@ -371,7 +620,19 @@ class UnplugModuleState extends ChangeNotifier {
 
   void requestAuthorization() {
     if (_authorization == AuthorizationState.approved) return;
-    _authorization = _platform == TrackedPlatform.ios &&
+
+    final platform = _platform;
+    if (platform != null) {
+      // The system prompt decides. Nothing is assumed until it answers.
+      _authorization = AuthorizationState.pending;
+      notifyListeners();
+      unawaited(
+        platform.requestAuthorization(forChild: _childProfilePaired),
+      );
+      return;
+    }
+
+    _authorization = _trackedPlatform == TrackedPlatform.ios &&
             _familySharing == FamilySharingState.missing
         ? AuthorizationState.blockedNoFamilySharing
         : AuthorizationState.approved;
@@ -389,7 +650,7 @@ class UnplugModuleState extends ChangeNotifier {
     _familySharing = value;
     if (value == FamilySharingState.missing) {
       _childProfilePaired = false;
-      if (_platform == TrackedPlatform.ios &&
+      if (_trackedPlatform == TrackedPlatform.ios &&
           _authorization == AuthorizationState.approved) {
         _authorization = AuthorizationState.blockedNoFamilySharing;
       }
@@ -400,6 +661,18 @@ class UnplugModuleState extends ChangeNotifier {
   void pairChildProfile() {
     if (_familySharing != FamilySharingState.configured) return;
     _childProfilePaired = true;
+    // The typed commitment is a free-text field, so it cannot be the gate on a
+    // child profile. Switching here rather than at render time means the
+    // intercept — a different process reading the shared container — also stops
+    // offering it.
+    if (!availableGates.contains(_gate)) _gate = EffortGateChoice.breath;
+    _pushShield();
+    notifyListeners();
+  }
+
+  void unpairChildProfile() {
+    if (!_childProfilePaired) return;
+    _childProfilePaired = false;
     notifyListeners();
   }
 
@@ -407,12 +680,14 @@ class UnplugModuleState extends ChangeNotifier {
     final trimmed = label.trim();
     if (trimmed.isEmpty || appCount <= 0) return;
     _groups = [..._groups, AppGroup(label: trimmed, appCount: appCount)];
+    _pushShield();
     notifyListeners();
   }
 
   void removeGroup(int index) {
     if (index < 0 || index >= _groups.length) return;
     _groups = [..._groups]..removeAt(index);
+    _pushShield();
     notifyListeners();
   }
 
@@ -421,6 +696,7 @@ class UnplugModuleState extends ChangeNotifier {
     final next = [..._groups];
     next[index] = next[index].copyWith(shielded: !next[index].shielded);
     _groups = next;
+    _pushShield();
     notifyListeners();
   }
 
@@ -428,6 +704,8 @@ class UnplugModuleState extends ChangeNotifier {
   bool useOverride() {
     if (overridesLeft == 0) return false;
     _overridesUsed++;
+    _platform?.liftShield('override');
+    _pushShield();
     notifyListeners();
     return true;
   }
@@ -435,6 +713,7 @@ class UnplugModuleState extends ChangeNotifier {
   void resetOverrides() {
     if (_overridesUsed == 0) return;
     _overridesUsed = 0;
+    _pushShield();
     notifyListeners();
   }
 
@@ -443,6 +722,7 @@ class UnplugModuleState extends ChangeNotifier {
     if (clamped == _overrideAllowance) return;
     _overrideAllowance = clamped;
     if (_overridesUsed > clamped) _overridesUsed = clamped;
+    _pushShield();
     notifyListeners();
   }
 
@@ -459,6 +739,14 @@ class UnplugModuleState extends ChangeNotifier {
       strict: strict,
     );
     _startTicker();
+    unawaited(
+      _platform?.startSession(
+            duration: duration,
+            scope: scope,
+            strict: strict,
+          ) ??
+          Future<void>.value(),
+    );
     notifyListeners();
   }
 
@@ -473,6 +761,7 @@ class UnplugModuleState extends ChangeNotifier {
     }
     _session = null;
     _stopTicker();
+    unawaited(_platform?.endSession(reason) ?? Future<void>.value());
     notifyListeners();
     return true;
   }

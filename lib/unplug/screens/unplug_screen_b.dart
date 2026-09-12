@@ -188,17 +188,45 @@ class _UnplugScreenBState extends State<UnplugScreenB> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextField(
-                      controller: _labelController,
-                      textInputAction: TextInputAction.done,
-                      decoration: const InputDecoration(
-                        labelText: 'Group name',
-                        hintText: 'Video apps',
-                        border: OutlineInputBorder(),
-                        isDense: true,
+                    // Addendum §3.2: a child profile gets no free-text field
+                    // anywhere, so the name becomes a choice from a fixed list.
+                    if (state.childLockdownActive)
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          for (final preset in childSafeGroupLabels)
+                            ChoiceChip(
+                              label: Text(preset),
+                              selected: _labelController.text == preset,
+                              showCheckmark: false,
+                              backgroundColor: AppColors.paper,
+                              selectedColor: AppColors.deepTeal,
+                              side: const BorderSide(color: AppColors.border),
+                              labelStyle: TextStyle(
+                                color: _labelController.text == preset
+                                    ? Colors.white
+                                    : AppColors.deepTeal,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              onSelected: (_) =>
+                                  setState(() => _labelController.text = preset),
+                            ),
+                        ],
+                      )
+                    else
+                      TextField(
+                        controller: _labelController,
+                        textInputAction: TextInputAction.done,
+                        decoration: const InputDecoration(
+                          labelText: 'Group name',
+                          hintText: 'Video apps',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                        onSubmitted: (_) => _addGroup(state),
                       ),
-                      onSubmitted: (_) => _addGroup(state),
-                    ),
                     const SizedBox(height: 12),
                     Row(
                       children: [
@@ -249,6 +277,12 @@ class _UnplugScreenBState extends State<UnplugScreenB> {
             ],
           ),
         ),
+        if (state.childLockdownActive)
+          const UnplugNote(
+            text: 'This is a child profile, so group names are chosen from a '
+                'list rather than typed. No screen in the module accepts free '
+                'text while it is active.',
+          ),
         UnplugNote(
           text: state.platform == TrackedPlatform.ios
               ? 'These labels are the only names the module has for these apps. '
