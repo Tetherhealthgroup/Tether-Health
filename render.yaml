@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: breathefree-api-dev
+    runtime: node
+    plan: free
+    region: oregon
+    branch: develop
+    rootDir: api
+    buildCommand: npm ci && npm run build
+    startCommand: node dist/main.js
+    healthCheckPath: /health
+    autoDeployTrigger: off
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SUPABASE_URL
+        value: https://gcsazvotzqvjayqnqyra.supabase.co
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_JWT_AUDIENCE
+        value: authenticated

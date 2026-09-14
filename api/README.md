@@ -6,3 +6,14 @@ service-role key here; the API forwards each caller's token so RLS applies.
 
 Commands: `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:e2e`,
 and `npm run build`.
+
+## Development deployment
+
+The repository-root `render.yaml` defines a free Render web service for the
+`develop` branch. During Blueprint creation, enter only the cloud Supabase
+publishable key for `SUPABASE_ANON_KEY`; never enter a service-role or secret
+key. Automatic deployments are disabled, so later releases remain deliberate.
+
+This free development service is not approved for real patient or clinical
+data. Production hosting requires a separate security/compliance review and
+appropriate contractual safeguards.
