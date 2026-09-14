@@ -121,4 +121,15 @@ A free Apple ID can install a development build on a personal device. Publishing
 
 This archive is a complete, compilable Flutter implementation of the approved 28-screen user experience. It is intentionally safe as a source prototype: phone dialing, authentication, protected health-data storage, clinician/EHR connections, secure messaging, remote notifications, analytics, exports and server-side deletion are represented by consent-aware demo actions and interfaces.
 
-Before an App Store clinical production release, connect those interfaces to a reviewed ASP.NET Core API and compliant data services, complete security/privacy testing, obtain clinical/legal review, finish professional Spanish localization and replace the prototype application identifier/signing configuration. See `PRODUCTION_RELEASE_CHECKLIST.md`.
+The production foundation uses Flutter on iPhone/Android, a NestJS API
+(TypeScript/Node.js), and Supabase (PostgreSQL, Auth and Storage). Before an App
+Store clinical production release, complete security/privacy testing, obtain
+clinical/legal review, finish professional Spanish localization and replace the
+prototype application identifier/signing configuration. See
+`docs/ARCHITECTURE.md`, `docs/contracts/` and `PRODUCTION_RELEASE_CHECKLIST.md`.
+
+For a configured development build, copy `config/dart_defines.example.json` to
+an ignored local file, replace placeholders through an approved secret/config
+channel, and run Flutter with `--dart-define-from-file=<local-file>`. Only the
+Supabase publishable/anonymous key belongs in a client build; never use a
+service-role key in Flutter.

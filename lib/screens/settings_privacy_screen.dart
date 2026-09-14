@@ -15,6 +15,9 @@ class SettingsPrivacyScreen extends StatelessWidget {
     this.onDiagnosticsChanged,
     this.onReduceMotionChanged,
     required this.onBack,
+    this.signedIn = false,
+    this.accountEmail,
+    this.displayName,
     this.onReviewConsent,
     this.onInformation,
     this.onDownloadData,
@@ -33,6 +36,9 @@ class SettingsPrivacyScreen extends StatelessWidget {
   final ValueChanged<bool>? onDiagnosticsChanged;
   final ValueChanged<bool>? onReduceMotionChanged;
   final VoidCallback onBack;
+  final bool signedIn;
+  final String? accountEmail;
+  final String? displayName;
   final VoidCallback? onReviewConsent;
   final ValueChanged<String>? onInformation;
   final VoidCallback? onDownloadData;
@@ -228,6 +234,30 @@ class SettingsPrivacyScreen extends StatelessWidget {
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    SectionTitle(t('Account', 'Cuenta')),
+                    const SizedBox(height: 8),
+                    ResourceCard(
+                      key: const ValueKey('settings-account-summary'),
+                      child: ListTile(
+                        leading: const Icon(Icons.person_outline_rounded),
+                        title: Text(
+                          displayName?.trim().isNotEmpty == true
+                              ? displayName!.trim()
+                              : t(
+                                  signedIn ? 'Your profile' : 'Not signed in',
+                                  signedIn ? 'Tu perfil' : 'Sesión no iniciada',
+                                ),
+                        ),
+                        subtitle: Text(
+                          accountEmail ??
+                              t(
+                                'Sign in to sync your profile.',
+                                'Inicia sesión para sincronizar tu perfil.',
+                              ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 18),
@@ -544,7 +574,11 @@ class SettingsPrivacyScreen extends StatelessWidget {
                       child: OutlinedButton(
                         key: const ValueKey('settings-sign-out'),
                         onPressed: () => _handleSignOut(context),
-                        child: Text(t('Sign out', 'Cerrar sesión')),
+                        child: Text(
+                          signedIn
+                              ? t('Sign out', 'Cerrar sesión')
+                              : t('Sign in', 'Iniciar sesión'),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),

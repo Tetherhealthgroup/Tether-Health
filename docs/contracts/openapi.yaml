@@ -1,0 +1,82 @@
+openapi: 3.1.0
+info:
+  title: BreatheFree API
+  version: 1.0.0
+  description: Identity/profile-only contract; health and clinical data are out of scope.
+servers:
+  - url: https://api.example.invalid
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Service readiness
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Health'}
+  /v1/profile:
+    get:
+      operationId: getMyProfile
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: Authenticated user's profile
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Profile'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+    patch:
+      operationId: updateMyProfile
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UpdateProfile'}
+      responses:
+        '200':
+          description: Updated profile
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Profile'}
+        '400': {description: Invalid request body}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+components:
+  securitySchemes:
+    supabaseJwt: {type: http, scheme: bearer, bearerFormat: JWT}
+  responses:
+    Unauthorized: {description: Missing or invalid Supabase access token}
+  schemas:
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status, service, version]
+      properties:
+        status: {const: ok}
+        service: {const: breathefree-api}
+        version: {type: string}
+    Profile:
+      type: object
+      additionalProperties: false
+      required: [id, displayName, locale, timeZone, onboardingCompleted, createdAt, updatedAt]
+      properties:
+        id: {type: string, format: uuid}
+        displayName: {type: [string, 'null'], maxLength: 80}
+        locale: {type: string, enum: [en, es]}
+        timeZone: {type: string, minLength: 1, maxLength: 64}
+        onboardingCompleted: {type: boolean}
+        avatarPath: {type: [string, 'null'], maxLength: 512}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+    UpdateProfile:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        displayName: {type: [string, 'null'], maxLength: 80}
+        locale: {type: string, enum: [en, es]}
+        timeZone: {type: string, minLength: 1, maxLength: 64}
+        onboardingCompleted: {type: boolean}
+        avatarPath: {type: [string, 'null'], maxLength: 512}

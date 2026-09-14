@@ -1,9 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'auth/account_controller.dart';
+import 'auth/auth_gateway.dart';
+import 'auth/secure_session_storage.dart';
+import 'config/app_config.dart';
 import 'models/screen_spec.dart';
 import 'models/tap_target.dart';
+import 'profile/profile_api_client.dart';
+import 'profile/profile_repository.dart';
 import 'screens/approved_screen_player.dart';
 import 'theme/app_theme.dart';
 
@@ -19,13 +28,39 @@ Future<void> main() async {
     );
   }
 
-  runApp(const BreatheFreeApp());
+  final config = AppConfig.fromEnvironment();
+  AccountController? account;
+  if (config.hasAnyConfiguration) config.validate();
+  if (config.isConfigured) {
+    await Supabase.initialize(
+      url: config.supabaseUrl,
+      publishableKey: config.supabaseAnonKey,
+      authOptions: FlutterAuthClientOptions(
+        localStorage: SecureSessionStorage(),
+      ),
+    );
+    final auth = SupabaseAuthGateway(Supabase.instance.client);
+    account = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(
+        auth: auth,
+        api: HttpProfileApiClient(baseUrl: config.apiBaseUrl),
+      ),
+    );
+  }
+
+  runApp(BreatheFreeApp(accountController: account));
 }
 
 class BreatheFreeApp extends StatefulWidget {
-  const BreatheFreeApp({this.initialScreen = 0, super.key});
+  const BreatheFreeApp({
+    this.initialScreen = 0,
+    this.accountController,
+    super.key,
+  });
 
   final int initialScreen;
+  final AccountController? accountController;
 
   @override
   State<BreatheFreeApp> createState() => _BreatheFreeAppState();
@@ -33,13 +68,36 @@ class BreatheFreeApp extends StatefulWidget {
 
 class _BreatheFreeAppState extends State<BreatheFreeApp> {
   late int _currentIndex;
+  late final AccountController _accountController;
+  late final bool _ownsAccountController;
   final List<int> _history = <int>[];
 
   @override
   void initState() {
     super.initState();
+    _ownsAccountController = widget.accountController == null;
+    _accountController =
+        widget.accountController ?? AccountController.disabled();
     _currentIndex =
         widget.initialScreen.clamp(0, approvedScreens.length - 1).toInt();
+    unawaited(_initializeAccount());
+  }
+
+  @override
+  void dispose() {
+    if (_ownsAccountController) _accountController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _initializeAccount() async {
+    await _accountController.initialize();
+    if (!mounted || !_accountController.isSignedIn || _currentIndex != 0) {
+      return;
+    }
+    _goTo(
+      _accountController.profile?.onboardingCompleted == true ? 11 : 1,
+      remember: false,
+    );
   }
 
   void _goTo(int index, {bool remember = true}) {
@@ -174,17 +232,21 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BreatheFree',
-      debugShowCheckedModeBanner: false,
-      restorationScopeId: 'breathefree',
-      theme: AppTheme.light(),
-      home: ApprovedScreenPlayer(
-        currentIndex: _currentIndex,
-        onSelectScreen: _goTo,
-        onPrevious: _goBack,
-        onNext: _goNext,
-        onTarget: _handleTarget,
+    return AnimatedBuilder(
+      animation: _accountController,
+      builder: (context, _) => MaterialApp(
+        title: 'BreatheFree',
+        debugShowCheckedModeBanner: false,
+        restorationScopeId: 'breathefree',
+        theme: AppTheme.light(),
+        home: ApprovedScreenPlayer(
+          accountController: _accountController,
+          currentIndex: _currentIndex,
+          onSelectScreen: _goTo,
+          onPrevious: _goBack,
+          onNext: _goNext,
+          onTarget: _handleTarget,
+        ),
       ),
     );
   }

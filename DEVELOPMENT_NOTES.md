@@ -31,13 +31,14 @@ The approved bitmap renderer is ideal for design acceptance and regression compa
 
 ## Server integration boundary
 
-Recommended production architecture:
+Confirmed production architecture:
 
-- Flutter client: UI, offline queue, encrypted local cache and platform notifications
-- ASP.NET Core API: authentication, consent enforcement, business rules and audit trails
-- PostgreSQL or SQL Server: encrypted clinical and application data
-- Object storage: reviewed educational media and export packages
+- iPhone/Android Flutter client: UI, offline queue, encrypted local cache and platform notifications
+- NestJS API (TypeScript/Node.js): Supabase JWT validation, consent enforcement, business rules and audit boundaries
+- Supabase PostgreSQL: authentication-linked data, constraints and row-level security
+- Supabase Storage: private user objects and reviewed educational media
 - FHIR adapter: optional clinician/EHR interoperability
 - APNs/FCM: generic private notification copy by default
 
 Do not place API secrets, service credentials or production signing certificates in this repository.
+See `docs/ARCHITECTURE.md` and `docs/contracts/` for versioned boundaries.

@@ -4,10 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../auth/account_controller.dart';
 import '../models/screen_spec.dart';
 import '../models/tap_target.dart';
 import '../theme/app_colors.dart';
 import '../widgets/approved_screen_viewport.dart';
+import '../widgets/sign_in_dialog.dart';
 import 'active_craving_rescue_screen.dart';
 import 'baseline_assessment_screen.dart';
 import 'choose_quit_path_screen.dart';
@@ -45,6 +47,7 @@ class ApprovedScreenPlayer extends StatefulWidget {
     required this.onPrevious,
     required this.onNext,
     required this.onTarget,
+    this.accountController,
     super.key,
   });
 
@@ -53,12 +56,15 @@ class ApprovedScreenPlayer extends StatefulWidget {
   final VoidCallback onPrevious;
   final VoidCallback onNext;
   final ValueChanged<AppTapTarget> onTarget;
+  final AccountController? accountController;
 
   @override
   State<ApprovedScreenPlayer> createState() => _ApprovedScreenPlayerState();
 }
 
 class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
+  late final AccountController _accountController;
+  late final bool _ownsAccountController;
   bool _showHotspots = false;
   WelcomeLanguage _language = WelcomeLanguage.english;
   bool _helpfulReminders = true;
@@ -138,7 +144,16 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   @override
   void initState() {
     super.initState();
+    _ownsAccountController = widget.accountController == null;
+    _accountController =
+        widget.accountController ?? AccountController.disabled();
     _configureSystemUi();
+  }
+
+  @override
+  void dispose() {
+    if (_ownsAccountController) _accountController.dispose();
+    super.dispose();
   }
 
   @override
@@ -196,6 +211,21 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     setState(() => _quitDate ??= _defaultQuitDate());
   }
 
+  Future<void> _startPlan() async {
+    _saveEffectiveQuitDate();
+    final saved = await _accountController.completeOnboarding();
+    if (!mounted) return;
+    if (saved) {
+      widget.onNext();
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Could not save your progress. Please try again.'),
+      ),
+    );
+  }
+
   void _openRescue([int? intensity]) {
     setState(() {
       _rescueReturnScreen = widget.currentIndex;
@@ -203,6 +233,21 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
           (intensity ?? _dailyStrongestCraving).clamp(1, 10).toInt();
     });
     widget.onSelectScreen(16);
+  }
+
+  Future<void> _showSignIn() async {
+    final signedIn = await showDialog<bool>(
+      context: context,
+      builder: (context) => SignInDialog(account: _accountController),
+    );
+    if (!mounted || signedIn != true) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Signed in successfully.')),
+    );
+    widget.onSelectScreen(
+      _accountController.profile?.onboardingCompleted == true ? 11 : 1,
+    );
   }
 
   String _rescueTopReasonLabel(bool isSpanish) {
@@ -290,6 +335,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               setState(() => _language = language);
             },
             onGetStarted: widget.onNext,
+            onSignIn: _showSignIn,
           );
         }
 
@@ -473,10 +519,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onEditSupport: () => _openPlanEditor(9),
             onEditPreparation: () => _openPlanEditor(9),
             onEditTreatment: () => _openPlanEditor(9),
-            onStartPlan: () {
-              _saveEffectiveQuitDate();
-              widget.onNext();
-            },
+            onStartPlan: () => unawaited(_startPlan()),
             onSaveForLater: _saveEffectiveQuitDate,
           );
         }
@@ -987,6 +1030,12 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onReduceMotionChanged: (value) =>
                 setState(() => _reduceMotionEnabled = value),
             onBack: widget.onPrevious,
+            signedIn: _accountController.isSignedIn,
+            accountEmail: _accountController.email,
+            displayName: _accountController.profile?.displayName,
+            onSignOut: _accountController.isSignedIn
+                ? () => unawaited(_accountController.signOut())
+                : _showSignIn,
           );
         }
 
