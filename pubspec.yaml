@@ -14,9 +14,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  # Generates the Unplug channel contract (addendum §2.3) for Dart, Swift and
-  # Kotlin from pigeons/unplug_api.dart. Regenerate with tool/generate_pigeon.sh
-  # after any change to that file; never edit the generated sources by hand.
+  # Generates two channel contracts for Dart, Swift and Kotlin: the Unplug
+  # screen-time contract (addendum §2.3) from pigeons/unplug_api.dart, and the
+  # shell's key/value store from pigeons/tether_store_api.dart. Regenerate with
+  # tool/generate_pigeon.sh after changing either; never edit a generated
+  # source by hand. CI regenerates and fails on any difference.
   pigeon: ^28.1.0
 
 flutter:
@@ -24,3 +26,6 @@ flutter:
   assets:
     - assets/screens/
     - assets/unplug/
+    # The design bundle, rendered at runtime rather than transcribed into
+    # Dart. See lib/tether/data/design_bundle.dart for why.
+    - assets/design/

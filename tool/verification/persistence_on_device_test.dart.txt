@@ -1,0 +1,133 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test/integration_test.dart';
+import 'package:tether_health/tether/data/bundle_loader.dart';
+import 'package:tether_health/tether/data/design_bundle.dart';
+import 'package:tether_health/tether/state/session_store.dart';
+import 'package:tether_health/tether/state/tether_session.dart';
+
+/// Persistence, proved against the real platform store.
+///
+/// Run it on a booted simulator or device:
+///
+///     flutter test integration_test/persistence_on_device_test.dart -d <id>
+///
+/// This is the one part of the shell a widget test cannot reach. Under
+/// `flutter test` there is no platform side at all: [SessionStore.open] finds
+/// no host, falls back to memory, and every assertion passes without a single
+/// byte crossing the channel. The 14 unit tests in
+/// `test/tether_persistence_test.dart` prove the Dart is right. Only this one
+/// proves that `TetherStore.swift` is registered, that the Pigeon channel
+/// names line up on both sides, and that what was written is still there after
+/// the store is thrown away and reopened.
+void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  /// A key of its own, so a test run cannot overwrite whatever the app has
+  /// saved on the device it is running on.
+  const testKey = 'tether.session.integration_test';
+
+  late DesignBundle bundle;
+
+  setUpAll(() async => bundle = await BundleLoader.load());
+
+  tearDown(() async {
+    // `sessionErased` is the only public way to clear the store, which is
+    // deliberate — see its doc comment. Nothing is left behind on the device
+    // after a run.
+    final store = await SessionStore.open(key: testKey);
+    store.sessionErased(TetherSession(bundle: bundle));
+    await store.flush();
+    store.dispose();
+  });
+
+  testWidgets('the platform store is actually there', (tester) async {
+    final store = await SessionStore.open(key: testKey);
+    addTearDown(store.dispose);
+
+    // If this is false the test is running against the in-memory fallback and
+    // everything below would pass while proving nothing. Fail loudly instead.
+    expect(
+      store.isDurable,
+      isTrue,
+      reason: 'No platform store answered. On iOS that means TetherStore was '
+          'not registered in AppDelegate; on Android, not registered in '
+          'MainActivity.',
+    );
+  });
+
+  testWidgets('a session survives being closed and reopened', (tester) async {
+    final before = TetherSession(bundle: bundle);
+    final store = await SessionStore.open(key: testKey);
+    before.bindPersistence(store);
+
+    before.join('digital');
+    before.setHidden('digital', hidden: true);
+    before.setSharing(
+      'digital',
+      const SharingSetting(totalsAndAdherence: true, recipient: 'Maya'),
+    );
+    before.setSlider('digital', 'S17', 0, 70);
+    before.toggleChip('digital', 'S13', 0, 3);
+    before.setText('digital', 'S09', 0, 'I want my evenings back.');
+    before.recordLapse(
+      LapseEvent(
+        areaId: 'digital',
+        at: DateTime(2026, 8, 19),
+        severity: 'A long evening on it',
+        context: const ['In bed'],
+      ),
+    );
+
+    // The autosave is debounced, so a relaunch inside the window would lose
+    // the lot. This is the same flush the app performs when it is backgrounded.
+    await store.flush();
+    store.dispose();
+
+    // A second store, opened from scratch, standing in for a relaunch.
+    final reopened = await SessionStore.open(key: testKey);
+    addTearDown(reopened.dispose);
+    final after = TetherSession(bundle: bundle);
+    await reopened.restore(after);
+
+    expect(after.enrolment('digital').isActive, isTrue);
+    expect(after.enrolment('digital').hidden, isTrue);
+    expect(after.enrolment('digital').sharing.totalsAndAdherence, isTrue);
+    expect(after.enrolment('digital').sharing.recipient, 'Maya');
+    expect(after.answersFor('digital', 'S17').slider[0], 70);
+    expect(after.answersFor('digital', 'S13').chips[0], contains(3));
+    expect(
+      after.answersFor('digital', 'S09').text[0],
+      'I want my evenings back.',
+    );
+    expect(after.lapsesFor('digital'), hasLength(1));
+    expect(after.lapsesFor('digital').single.severity, 'A long evening on it');
+  });
+
+  testWidgets('deleting everything clears the device too', (tester) async {
+    // The `export_and_delete` safeguard asks that deletion be "completed
+    // rather than hidden". A delete that empties the object in memory and
+    // leaves the document on disk would be exactly the hidden kind, and it
+    // would come back on the next launch.
+    final session = TetherSession(bundle: bundle);
+    final store = await SessionStore.open(key: testKey);
+    session.bindPersistence(store);
+
+    session.join('tobacco');
+    session.setSlider('tobacco', 'S13', 2, 60);
+    await store.flush();
+
+    session.deleteEverything();
+    await store.flush();
+    store.dispose();
+
+    final reopened = await SessionStore.open(key: testKey);
+    addTearDown(reopened.dispose);
+    final restored = TetherSession(bundle: bundle);
+    await reopened.restore(restored);
+
+    expect(restored.activePrograms, isEmpty);
+    expect(restored.enrolment('tobacco').isJoined, isFalse);
+    expect(restored.lapses, isEmpty);
+    expect(restored.answersFor('tobacco', 'S13').isEmpty, isTrue);
+  });
+}

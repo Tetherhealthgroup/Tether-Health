@@ -12,6 +12,15 @@ import UIKit
   /// show made-up numbers as though they were measurements.
   private var unplug: AnyObject?
 
+  /// The iOS half of the shell's key/value store.
+  ///
+  /// Unconditional, unlike `unplug`: there is no OS version below which
+  /// `UserDefaults` is unavailable, and the shell restores the saved session
+  /// before its first frame. A store registered any later than this reads, from
+  /// Dart, as a store that is not there — and the shell would take that as an
+  /// instruction to start the person off with an empty record.
+  private var store: TetherStore?
+
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -21,6 +30,10 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+
+    store = TetherStore(
+      binaryMessenger: engineBridge.applicationRegistrar.messenger()
+    )
 
     // FamilyControls, ManagedSettings and DeviceActivity are all iOS 16+. On
     // anything older the host is simply not installed, `isSupported()` never

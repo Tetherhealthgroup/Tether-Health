@@ -1,0 +1,668 @@
+{
+  "version": "1.1.0",
+  "$comment": "The shared behaviour-change machinery. Improve an archetype once and every area inherits it. A product screen must reference an archetype id and fill its slots.",
+  "archetypes": [
+    {
+      "id": "welcome",
+      "name": "Welcome",
+      "purpose": "A private, judgment-free opening that asks for nothing before it gives something.",
+      "chrome": {
+        "leading": "none",
+        "badge": false
+      },
+      "slots": {
+        "headline": "required",
+        "sub": "required",
+        "promiseCards": "required:3",
+        "localePicker": "optional"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "why"
+        },
+        {
+          "kind": "ghost",
+          "to": "sso"
+        }
+      ],
+      "requires": [
+        "product_disclaimer"
+      ]
+    },
+    {
+      "id": "why",
+      "name": "What it does",
+      "purpose": "Four capabilities, each named for the moment it is needed.",
+      "chrome": {
+        "leading": "close",
+        "badge": true
+      },
+      "slots": {
+        "headline": "required",
+        "sub": "optional",
+        "capabilityCards": "required:4"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "consent"
+        }
+      ]
+    },
+    {
+      "id": "consent",
+      "name": "Consent & privacy",
+      "purpose": "Informed consent in plain language, with optional sharing kept separate from required consent.",
+      "chrome": {
+        "leading": "close",
+        "badge": true,
+        "progress": true
+      },
+      "slots": {
+        "headline": "required",
+        "heldLocally": "required",
+        "sharedWithTeam": "required",
+        "exitPromise": "required",
+        "requiredConsent": "required",
+        "optionalShare": "optional"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "baseline"
+        },
+        {
+          "kind": "ghost",
+          "to": "privacy_notice"
+        }
+      ],
+      "requires": [
+        "export_and_delete"
+      ]
+    },
+    {
+      "id": "baseline",
+      "name": "Baseline",
+      "purpose": "Records the starting picture without judgment. No intervention runs during it.",
+      "chrome": {
+        "leading": "close",
+        "badge": true
+      },
+      "slots": {
+        "headline": "required",
+        "sub": "required",
+        "chart": "required",
+        "stats": "required:2",
+        "insight": "optional",
+        "skipCard": "required"
+      },
+      "actions": [
+        {
+          "kind": "ghost",
+          "to": "plan_path"
+        }
+      ],
+      "requires": [
+        "self_report_disclaimer"
+      ],
+      "notes": "The skip must exist. A person who feels trapped in a tracking-only period uninstalls instead of waiting."
+    },
+    {
+      "id": "trigger_map",
+      "name": "Trigger map",
+      "purpose": "Situations and feelings linked to the behaviour, cross-checked against baseline data.",
+      "chrome": {
+        "leading": "close",
+        "badge": true,
+        "progress": true
+      },
+      "slots": {
+        "headline": "required",
+        "situationChips": "required",
+        "feelingChips": "required",
+        "crossCheck": "optional"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "plan_path"
+        }
+      ]
+    },
+    {
+      "id": "plan_path",
+      "name": "Choose a path",
+      "purpose": "Stop outright or reduce, presented as equals.",
+      "chrome": {
+        "leading": "back",
+        "badge": true,
+        "progress": true
+      },
+      "slots": {
+        "headline": "required",
+        "sub": "required",
+        "options": "required:2-3",
+        "floorNote": "optional"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "plan_targets"
+        }
+      ],
+      "notes": "Reduction is never presented as a safe endpoint. Copy must not imply it is."
+    },
+    {
+      "id": "plan_targets",
+      "name": "Set targets",
+      "purpose": "The person sets what they will actually attempt, anchored to their own baseline.",
+      "chrome": {
+        "leading": "back",
+        "badge": true,
+        "progress": true
+      },
+      "slots": {
+        "headline": "required",
+        "sub": "required",
+        "targetControls": "required:1-3",
+        "scheduleControl": "optional"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "plan_reasons"
+        }
+      ]
+    },
+    {
+      "id": "plan_reasons",
+      "name": "My reasons",
+      "purpose": "Self-authored reasons, later surfaced at the hardest moments.",
+      "chrome": {
+        "leading": "back",
+        "badge": true,
+        "progress": true
+      },
+      "slots": {
+        "headline": "required",
+        "sub": "required",
+        "reasonInput": "required",
+        "suggestionChips": "optional"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "plan_support"
+        }
+      ],
+      "notes": "Under-13 profiles have no free text. Render chips only."
+    },
+    {
+      "id": "plan_support",
+      "name": "Support preparation",
+      "purpose": "One named supporter and a phrase they will understand.",
+      "chrome": {
+        "leading": "back",
+        "badge": true,
+        "progress": true
+      },
+      "slots": {
+        "headline": "required",
+        "contactPicker": "required",
+        "phraseInput": "required",
+        "momentChips": "optional"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "plan_review"
+        }
+      ],
+      "requires": [
+        "share_preview"
+      ]
+    },
+    {
+      "id": "plan_review",
+      "name": "Review plan",
+      "purpose": "Every choice in one place before activation.",
+      "chrome": {
+        "leading": "back",
+        "badge": true,
+        "progress": true
+      },
+      "slots": {
+        "headline": "required",
+        "levelCard": "required",
+        "planRows": "required:3-6",
+        "activationNote": "required"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "home"
+        },
+        {
+          "kind": "ghost",
+          "to": "home"
+        }
+      ]
+    },
+    {
+      "id": "home",
+      "name": "Daily home",
+      "purpose": "Today's state, one primary action, and the next human touchpoint.",
+      "chrome": {
+        "leading": "none",
+        "badge": true
+      },
+      "slots": {
+        "greeting": "required",
+        "primaryMetricCard": "required",
+        "stats": "optional:2",
+        "rescueCard": "required",
+        "checkinCard": "required",
+        "coachCard": "optional"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "checkin"
+        }
+      ],
+      "notes": "The rescue entry must be reachable in one tap from here. It is the moment the product earns its keep."
+    },
+    {
+      "id": "checkin",
+      "name": "Daily check-in",
+      "purpose": "A nonpunitive status in under ninety seconds.",
+      "chrome": {
+        "leading": "close",
+        "badge": true,
+        "progress": true
+      },
+      "slots": {
+        "headline": "required",
+        "sub": "required",
+        "moodControl": "required",
+        "behaviourControl": "required",
+        "intensityControl": "required",
+        "symptomChips": "optional"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "next_step"
+        }
+      ],
+      "requires": [
+        "self_report_disclaimer",
+        "distress_escalation"
+      ]
+    },
+    {
+      "id": "next_step",
+      "name": "Personalized next step",
+      "purpose": "One manageable action chosen from the check-in.",
+      "chrome": {
+        "leading": "close",
+        "badge": true
+      },
+      "slots": {
+        "headline": "required",
+        "recommendedCard": "required",
+        "alternativeChips": "optional",
+        "skipNote": "required"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "action"
+        },
+        {
+          "kind": "ghost",
+          "to": "home"
+        }
+      ],
+      "notes": "One action, never a list of five. The skip never asks why."
+    },
+    {
+      "id": "rescue_start",
+      "name": "Rescue start",
+      "purpose": "Immediate one-handed help. Works offline, no typing required.",
+      "chrome": {
+        "leading": "close",
+        "badge": true
+      },
+      "slots": {
+        "headline": "required",
+        "intensityControl": "required",
+        "tagChips": "optional"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "rescue_tool"
+        },
+        {
+          "kind": "ghost",
+          "to": "rescue_active"
+        }
+      ],
+      "requires": [
+        "offline_capable"
+      ],
+      "notes": "Nothing may block the person from reaching a tool. Every input here is optional except intensity."
+    },
+    {
+      "id": "rescue_tool",
+      "name": "Recommended tool",
+      "purpose": "One suggested coping tool, ranked by what has worked for this person.",
+      "chrome": {
+        "leading": "close",
+        "badge": true
+      },
+      "slots": {
+        "headline": "required",
+        "sub": "required",
+        "recommendedCard": "required",
+        "otherTools": "required"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "rescue_active"
+        }
+      ]
+    },
+    {
+      "id": "rescue_active",
+      "name": "Active rescue",
+      "purpose": "Runs the tool in real time, offline, with an anchor to the person's own words.",
+      "chrome": {
+        "leading": "close",
+        "badge": true,
+        "progress": true
+      },
+      "slots": {
+        "headline": "required",
+        "toolRunner": "required",
+        "anchorQuote": "optional",
+        "switchCard": "optional"
+      },
+      "actions": [
+        {
+          "kind": "ghost",
+          "to": "rescue_recheck"
+        }
+      ],
+      "requires": [
+        "offline_capable",
+        "reduced_motion_fallback",
+        "no_data_sent"
+      ]
+    },
+    {
+      "id": "rescue_recheck",
+      "name": "Recheck",
+      "purpose": "An honest recheck that does not claim to be a measurement.",
+      "chrome": {
+        "leading": "close",
+        "badge": true
+      },
+      "slots": {
+        "headline": "required",
+        "sub": "required",
+        "intensityControl": "required",
+        "beforeValue": "required"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "rescue_result"
+        },
+        {
+          "kind": "ghost",
+          "to": "rescue_tool"
+        }
+      ],
+      "requires": [
+        "self_report_disclaimer"
+      ]
+    },
+    {
+      "id": "rescue_result",
+      "name": "Rescue result",
+      "purpose": "The patient-reported change, then one safe next option.",
+      "chrome": {
+        "leading": "close",
+        "badge": true
+      },
+      "slots": {
+        "changeCard": "required",
+        "whatHelped": "required",
+        "nextStepCard": "optional",
+        "supportCard": "required"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "home"
+        }
+      ],
+      "notes": "Unchanged or worse intensity needs its own copy. Never imply the person did it wrong."
+    },
+    {
+      "id": "lapse",
+      "name": "Lapse recovery",
+      "purpose": "Responds to a slip while preserving all prior progress.",
+      "chrome": {
+        "leading": "close",
+        "badge": true
+      },
+      "slots": {
+        "reassuranceCard": "required",
+        "whatHappened": "required",
+        "context": "optional",
+        "whatNow": "required",
+        "nextStepCard": "optional"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "home"
+        }
+      ],
+      "requires": [
+        "slip_never_resets"
+      ]
+    },
+    {
+      "id": "education",
+      "name": "Learn library",
+      "purpose": "Clinically reviewed, plain-language lessons with a visible review date.",
+      "chrome": {
+        "leading": "back",
+        "badge": true
+      },
+      "slots": {
+        "headline": "required",
+        "filterChips": "optional",
+        "articleRows": "required",
+        "scopeNote": "required"
+      },
+      "requires": [
+        "never_prescribe",
+        "review_date"
+      ]
+    },
+    {
+      "id": "progress",
+      "name": "Progress",
+      "purpose": "Patterns and estimates without punishment after a lapse.",
+      "chrome": {
+        "leading": "back",
+        "badge": true
+      },
+      "slots": {
+        "rangeChips": "required",
+        "primaryChart": "required",
+        "stats": "optional:2",
+        "insightCard": "optional",
+        "lapseNote": "required"
+      },
+      "actions": [
+        {
+          "kind": "ghost",
+          "to": "share_preview"
+        }
+      ],
+      "requires": [
+        "slip_never_resets",
+        "share_on_request_only"
+      ]
+    },
+    {
+      "id": "support_hub",
+      "name": "Support hub",
+      "purpose": "Routes to a real person. Nothing is sent without preview and confirmation.",
+      "chrome": {
+        "leading": "back",
+        "badge": true
+      },
+      "slots": {
+        "crisisCard": "required:first",
+        "supporterRow": "optional",
+        "coachRow": "optional",
+        "careTeamRow": "optional",
+        "helplineCard": "required"
+      },
+      "actions": [
+        {
+          "kind": "ghost",
+          "to": "share_preview"
+        }
+      ],
+      "requires": [
+        "crisis_card_pinned_first",
+        "share_preview"
+      ]
+    },
+    {
+      "id": "settings",
+      "name": "Settings & privacy",
+      "purpose": "Notification privacy, consent, export, accessibility and deletion in one place.",
+      "chrome": {
+        "leading": "back",
+        "badge": true
+      },
+      "slots": {
+        "notificationCard": "required",
+        "controlRows": "required",
+        "dataCard": "required",
+        "disclaimerCard": "required"
+      },
+      "requires": [
+        "sensitive_notifications_off",
+        "export_and_delete"
+      ]
+    },
+    {
+      "id": "programs_home",
+      "name": "Your programs",
+      "purpose": "What you are in, what is paused, and one way to add another.",
+      "chrome": {
+        "leading": "back",
+        "badge": true
+      },
+      "slots": {
+        "activeCards": "required:0-2",
+        "pausedRows": "optional",
+        "addAction": "required"
+      },
+      "notes": "Shell archetype — identical in every program."
+    },
+    {
+      "id": "area_directory",
+      "name": "Health areas",
+      "purpose": "The eleven areas, honest about status. Reached on request, never on the home screen.",
+      "chrome": {
+        "leading": "back",
+        "badge": true
+      },
+      "slots": {
+        "headline": "required",
+        "statusNote": "required",
+        "areaRows": "required:11"
+      },
+      "notes": "Shell archetype — identical in every program."
+    },
+    {
+      "id": "program_join",
+      "name": "Join a program",
+      "purpose": "What changes if you join, what is shared, and what it is not.",
+      "chrome": {
+        "leading": "back",
+        "badge": true
+      },
+      "slots": {
+        "headline": "required",
+        "whatChanges": "required",
+        "whatIsShared": "required",
+        "limitNote": "optional",
+        "scopeDisclaimer": "required"
+      },
+      "notes": "Shell archetype — identical in every program."
+    },
+    {
+      "id": "record",
+      "name": "Your record",
+      "purpose": "One place across every program. Exportable and deletable by the person it describes.",
+      "chrome": {
+        "leading": "back",
+        "badge": true
+      },
+      "slots": {
+        "headline": "required",
+        "programSections": "required",
+        "exportAction": "required",
+        "deleteAction": "required"
+      },
+      "notes": "Shell archetype — identical in every program."
+    },
+    {
+      "id": "sharing_matrix",
+      "name": "Who sees what",
+      "purpose": "Per-program sharing, shown side by side so the differences are visible.",
+      "chrome": {
+        "leading": "back",
+        "badge": true
+      },
+      "slots": {
+        "headline": "required",
+        "programRows": "required",
+        "segregationNote": "optional"
+      },
+      "notes": "Shell archetype — identical in every program."
+    },
+    {
+      "id": "crisis_route",
+      "name": "Get help now",
+      "purpose": "The global crisis route. Identical everywhere, never reordered or filtered.",
+      "chrome": {
+        "leading": "back",
+        "badge": true
+      },
+      "slots": {
+        "emergencyCard": "required:first",
+        "helplineCards": "required",
+        "supporterRow": "optional"
+      },
+      "requires": [
+        "crisis_card_pinned_first"
+      ],
+      "notes": "Shell archetype — identical in every program."
+    }
+  ]
+}

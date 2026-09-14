@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		14E9A1C0B5D3477F91AC0011 /* TetherStoreApi.g.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E9A1C0B5D3477F91AC0001 /* TetherStoreApi.g.swift */; };
+		14E9A1C0B5D3477F91AC0012 /* TetherStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E9A1C0B5D3477F91AC0002 /* TetherStore.swift */; };
 		00898ABB9F267CA38718E31A /* InterceptTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A380103E2DC6FB2E52E3EC2C /* InterceptTokens.swift */; };
 		053E567BB5807E4BFCFD36BE /* InterceptTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = A380103E2DC6FB2E52E3EC2C /* InterceptTokens.swift */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
@@ -95,6 +97,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		14E9A1C0B5D3477F91AC0001 /* TetherStoreApi.g.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Runner/Store/TetherStoreApi.g.swift; sourceTree = SOURCE_ROOT; };
+		14E9A1C0B5D3477F91AC0002 /* TetherStore.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Runner/Store/TetherStore.swift; sourceTree = SOURCE_ROOT; };
 		10961877E357064C31D12F34 /* UnplugShieldAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = UnplugShieldAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
@@ -168,6 +172,15 @@
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
+		};
+		14E9A1C0B5D3477F91AC0003 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				14E9A1C0B5D3477F91AC0001 /* TetherStoreApi.g.swift */,
+				14E9A1C0B5D3477F91AC0002 /* TetherStore.swift */,
+			);
+			name = Store;
+			sourceTree = SOURCE_ROOT;
 		};
 		274714D34E6980193961EC1B /* UnplugShieldAction */ = {
 			isa = PBXGroup;
@@ -244,6 +257,7 @@
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				EE88372A4CFD2679C1E28C6A /* Unplug */,
+				14E9A1C0B5D3477F91AC0003 /* Store */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -524,6 +538,8 @@
 				DA5A61157D3529FFA24462B8 /* UnplugHost.swift in Sources */,
 				4AB0E053E5D91D9480250ADC /* UnplugSharedState.swift in Sources */,
 				88A81588A625DCDB53CBB454 /* InterceptTokens.swift in Sources */,
+				14E9A1C0B5D3477F91AC0011 /* TetherStoreApi.g.swift in Sources */,
+				14E9A1C0B5D3477F91AC0012 /* TetherStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

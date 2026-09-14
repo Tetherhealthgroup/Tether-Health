@@ -19,17 +19,21 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
-      # The Unplug channel contract is generated for three languages and the
-      # output is checked in. If someone edits pigeons/unplug_api.dart without
-      # regenerating, Dart and the native sides drift apart silently — so the
-      # build regenerates and fails on any difference.
+      # Both channel contracts — the Unplug screen-time boundary and the shell's
+      # key/value store — are generated for three languages and the output is
+      # checked in. If someone edits a pigeons/*.dart without regenerating, Dart
+      # and the native sides drift apart silently, so the build regenerates and
+      # fails on any difference.
       - name: Channel contract is up to date
         run: |
           ./tool/generate_pigeon.sh
           git diff --exit-code -- \
             lib/unplug/platform/unplug_api.g.dart \
             ios/Runner/Unplug/UnplugApi.g.swift \
-            android/app/src/main/kotlin/com/TetherHealthLLC/tetherhealth/unplug/UnplugApi.g.kt
+            android/app/src/main/kotlin/com/TetherHealthLLC/tetherhealth/unplug/UnplugApi.g.kt \
+            lib/tether/platform/tether_store_api.g.dart \
+            ios/Runner/Store/TetherStoreApi.g.swift \
+            android/app/src/main/kotlin/com/TetherHealthLLC/tetherhealth/store/TetherStoreApi.g.kt
       - run: flutter build web --release
       - run: flutter build appbundle --debug
       # A debug APK a reviewer can sideload. The Unplug intercept is a

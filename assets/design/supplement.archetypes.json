@@ -1,0 +1,72 @@
+{
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Proposed archetypes, not promoted into the shared library.",
+  "$comment": "Two archetypes named in product.lookup.json proposedArchetypes but absent from archetypes.json. Shape matches an entry in the shared library so a later promotion is a copy, not a rewrite. Every string here is unreviewed.",
+  "archetypes": [
+    {
+      "id": "age_gate",
+      "name": "Age & floor",
+      "purpose": "Establishes an age band before any target is set, applies a floor the person's own limits cannot go below, and offers a guardian link without ever requiring one.",
+      "chrome": {
+        "leading": "back",
+        "badge": true,
+        "progress": true
+      },
+      "slots": {
+        "headline": "required",
+        "sub": "optional",
+        "ageBandControl": "required",
+        "floorNote": "required",
+        "guardianCard": "required",
+        "restrictedInputNote": "optional"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "baseline"
+        },
+        {
+          "kind": "ghost",
+          "to": "baseline"
+        }
+      ],
+      "requires": [
+        "person_retains_decisions",
+        "supporter_not_surveillance"
+      ],
+      "notes": "Reusable by healthy aging (supporter involvement) and preventive health (age-appropriate screening). The floor is a ceiling on how restrictive a plan may become, not a feature ceiling — an under-18 plan must keep a usable amount of the behaviour available. Under-13 profiles carry no free text anywhere downstream: plan_reasons and every note field render chips only. The band is self-declared and must never be presented as verified; declaring an older band may only remove a protection, never unlock a capability."
+    },
+    {
+      "id": "environment",
+      "name": "Quiet environment",
+      "purpose": "Reduces cue exposure rather than resisting it. Changes the surroundings so fewer urges start, instead of asking for more willpower once one has.",
+      "chrome": {
+        "leading": "back",
+        "badge": true,
+        "progress": false
+      },
+      "slots": {
+        "headline": "required",
+        "sub": "optional",
+        "cueNote": "required",
+        "changeCards": "required:2-5",
+        "scopeRows": "optional",
+        "revertNote": "required"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "home"
+        },
+        {
+          "kind": "ghost",
+          "to": "education"
+        }
+      ],
+      "requires": [
+        "person_retains_decisions"
+      ],
+      "notes": "Generalises to nutrition (kitchen setup) and tobacco (removing smoking cues). Each change card is one change with an honest cost stated next to it. Every change must be reversible by the person from their own device settings without opening the product — a change the product can impose but the person cannot undo is surveillance, not environment design. Where the platform will not let the product make the change, the copy must say the person makes it."
+    }
+  ]
+}
