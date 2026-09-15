@@ -173,6 +173,20 @@ class ProgramsHomeScreen extends StatelessWidget {
               body: _shellPurpose(bundle, entry.$1),
               onTap: () => Navigator.of(context).pushNamed(entry.$2),
             ),
+
+        // The remedy library, listed with the shell screens because it behaves
+        // like one. Titled here rather than read from `shell.json`, which does
+        // not know about it — see [ShellRoutes.remedies]. Hidden entirely when
+        // the supplement file is absent, so the row can never lead to an empty
+        // list.
+        if (bundle.remedies.isNotEmpty)
+          _ShellCard(
+            title: 'Things that help',
+            body: 'Short practices for a hard moment or a bad night. The same '
+                'ones in every program, because they are safe for anybody.',
+            onTap: () =>
+                Navigator.of(context).pushNamed(ShellRoutes.remedies),
+          ),
       ],
       actions: [
         // addAction — "required". One way to add another, never a list of

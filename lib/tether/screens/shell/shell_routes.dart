@@ -1,4 +1,4 @@
-/// The six routes the host shell owns.
+/// The routes the host shell owns: the bundle's six, plus one the app adds.
 ///
 /// They live in one place because `shell.json` says the shell is "built once
 /// and is identical in every area". A program that could supply its own crisis
@@ -29,7 +29,29 @@ abstract final class ShellRoutes {
   /// SH6 · Get help now.
   static const crisis = '/help-now';
 
-  static const all = <String>[programs, areas, join, record, sharing, crisis];
+  /// Things that help right now. App-owned, with no SH number.
+  ///
+  /// The bundle's shell is SH1..SH6 and `shell.json` is held byte-identical to
+  /// the shipped design by `test/tether_bundle_test.dart`, so a seventh screen
+  /// cannot be added there without breaking that guarantee. It behaves like a
+  /// shell screen in every other respect — one copy, same in all eleven areas —
+  /// which is why it lives here rather than in a program.
+  static const remedies = '/remedies';
+
+  /// One remedy. Not routed by name: [remedy] builds the path for
+  /// `RouteSettings` so the screen is identifiable in navigator observers and
+  /// logs, while the route itself is pushed with the [Remedy] as an argument.
+  static String remedy(String id) => '$remedies/$id';
+
+  static const all = <String>[
+    programs,
+    areas,
+    join,
+    record,
+    sharing,
+    crisis,
+    remedies,
+  ];
 
   /// Shell screen id to route, exactly as `shell.json` numbers them.
   static const _byScreenId = <String, String>{

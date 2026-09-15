@@ -1,0 +1,103 @@
+{
+  "version": "1.0.0",
+  "locale": "en",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "$scope": "Every remedy here is safe to do regardless of which program somebody is in, and regardless of what else is wrong with them. That constraint is the whole design. Condition-specific self-care — how much to drink, what to eat, how hard to exercise, when to check a reading — is deliberately absent: fluid advice harms somebody in heart failure or on dialysis, activity targets harm somebody with unstable angina, and this file cannot know who is reading it. See design/remedies-clinical-review.md for what was left out and what it would take to add it.",
+  "$boundary": "Nothing here treats a disease. Each remedy says so in its own words rather than relying on one disclaimer at the top, because a person in a hard moment reads one card, not a page.",
+  "remedies": [
+    {
+      "id": "paced_breathing",
+      "title": "Slow your breathing",
+      "helpsWith": ["a hard moment", "a craving", "feeling wound up"],
+      "seconds": 300,
+      "summary": "Breathing out for longer than you breathe in settles the body's alarm. You can do it anywhere, with nothing, and nobody around you can tell.",
+      "steps": [
+        "Sit down if you can. Let your shoulders drop.",
+        "Breathe in through your nose while you count to four.",
+        "Breathe out through your mouth while you count to six.",
+        "Keep going. The count matters less than the out-breath being the longer one.",
+        "Five minutes is plenty. Two minutes is better than none."
+      ],
+      "boundary": "This changes how the moment feels. It does not treat what is underneath it, and it is not a substitute for anything you have been prescribed.",
+      "stopIf": "Stop if you feel dizzy or light-headed — breathe normally and let it pass. If you are short of breath while sitting still, that is not a moment for a breathing exercise."
+    },
+    {
+      "id": "grounding",
+      "title": "Get back in the room",
+      "helpsWith": ["panic", "feeling far away", "being overwhelmed"],
+      "seconds": 180,
+      "summary": "When the feeling is too big to think through, naming what is actually around you gives your attention somewhere else to be. It is not a distraction technique; it is a way back.",
+      "steps": [
+        "Name five things you can see. Say them out loud if you are alone.",
+        "Name four things you can hear.",
+        "Name three things you can feel touching you — the chair, the floor, your sleeve.",
+        "Name two things you can smell.",
+        "Name one thing you can taste.",
+        "If you are still not back, start again at five. It is not a test."
+      ],
+      "boundary": "This helps you ride out a wave. It does not stop the waves coming, and if they are coming often, that is worth telling somebody about.",
+      "stopIf": "If you are thinking about harming yourself, stop and talk to a person now — call or text 988."
+    },
+    {
+      "id": "urge_delay",
+      "title": "Wait it out",
+      "helpsWith": ["an urge", "a craving", "about to break a streak"],
+      "seconds": 900,
+      "summary": "An urge feels like it will keep climbing until you give in. It does not. It peaks and it drops, usually inside twenty minutes, whether or not you do anything about it.",
+      "steps": [
+        "Decide you are not saying no forever. You are saying not in the next fifteen minutes.",
+        "Change where you are. Another room, outside, anywhere with different walls.",
+        "Do something with your hands.",
+        "Let the urge be there. You are not trying to make it go away — you are outlasting it.",
+        "When the time is up, check: is it smaller than it was?"
+      ],
+      "boundary": "Waiting works on the urge in front of you. It is not a plan, and if every day is made of these, the plan is the thing to talk to somebody about.",
+      "stopIf": "If stopping suddenly makes you physically unwell — shaking, sweating, confusion, a racing heart — that is withdrawal, not willpower. Stop and get medical help."
+    },
+    {
+      "id": "wind_down",
+      "title": "Wind down for sleep",
+      "helpsWith": ["not sleeping", "lying awake", "waking exhausted"],
+      "summary": "Most sleep advice is about the hour before bed. The part that actually moves is the time you get up, which anchors everything else.",
+      "steps": [
+        "Get up at the same time every day, including the bad nights and the weekend.",
+        "Dim the lights an hour before bed. Bright light tells your body it is still daytime.",
+        "Keep the bed for sleeping. Working and scrolling in it teaches your body that bed is where you are awake.",
+        "If you are still awake after about twenty minutes, get up and do something quiet in low light until you are sleepy. Lying there trying harder does not work.",
+        "Give it two weeks before you judge whether it is helping."
+      ],
+      "boundary": "This is a routine, not a treatment. It does nothing for a sleep disorder.",
+      "stopIf": "If you snore heavily and wake unrefreshed, stop breathing in your sleep, or fall asleep in the day without meaning to, tell a clinician. Those are not fixed by a routine."
+    },
+    {
+      "id": "appointment_prep",
+      "title": "Write it down before you go",
+      "helpsWith": ["an appointment coming up", "never remembering to ask"],
+      "summary": "Fifteen minutes goes fast, and the question you meant to ask usually arrives in the car park. Writing three of them down beforehand is the cheapest thing in this list and probably the most useful.",
+      "steps": [
+        "Write your three most important questions. Three, not ten — you will get through three.",
+        "Write down what has changed since last time, including things you are not sure matter.",
+        "Write down what you actually take, including the days you skip. Nobody is marking you.",
+        "Ask them to write the answer down, or write it down yourself while they say it.",
+        "Ask what should make you call before the next appointment."
+      ],
+      "boundary": "This makes an appointment go better. It does not replace one.",
+      "stopIf": ""
+    },
+    {
+      "id": "move_break",
+      "title": "Move for two minutes",
+      "helpsWith": ["sitting too long", "stiffness", "a flat afternoon"],
+      "seconds": 120,
+      "summary": "Two minutes of standing and walking breaks up a long sit. This is about interrupting the sitting, not about exercise, and there is no target to hit.",
+      "steps": [
+        "Stand up.",
+        "Walk at a pace where you could still hold a conversation.",
+        "Roll your shoulders back a few times.",
+        "Sit back down when the time is up, or keep going if you want to."
+      ],
+      "boundary": "This is a movement break. It is not an exercise program, and if you have been given activity limits by a clinician, theirs are the ones that count.",
+      "stopIf": "Stop at once for chest pain or pressure, pain spreading to your arm, jaw or back, sudden breathlessness, or feeling faint. Those are reasons to call 911, not to push through."
+    }
+  ]
+}

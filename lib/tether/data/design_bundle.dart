@@ -451,6 +451,79 @@ class Safeguard {
 }
 
 // ---------------------------------------------------------------------------
+// Remedies — data/supplement.remedies.json
+// ---------------------------------------------------------------------------
+
+/// One practice somebody can do right now.
+///
+/// Remedies are not attached to a program, and that is a clinical decision
+/// rather than a modelling convenience. A remedy filed under "kidney & liver"
+/// would sooner or later say something about how much to drink, and this app
+/// cannot know whether the person reading it is on dialysis. So the library is
+/// the same in all eleven areas and holds only what is safe for anybody —
+/// which is why there is no `areaId` here to bind one to a program with.
+///
+/// See `design/remedies-clinical-review.md` for what that rule excludes.
+@immutable
+class Remedy {
+  const Remedy({
+    required this.id,
+    required this.title,
+    required this.helpsWith,
+    required this.summary,
+    required this.steps,
+    required this.boundary,
+    required this.stopIf,
+    this.duration,
+  });
+
+  final String id;
+  final String title;
+
+  /// Plain-language situations, in the person's words rather than a clinical
+  /// index. Somebody looking for help does not search for "anxiolysis".
+  final List<String> helpsWith;
+
+  final String summary;
+  final List<String> steps;
+
+  /// What this does not do. Carried per remedy rather than as one banner,
+  /// because in a hard moment a person reads one card and leaves.
+  final String boundary;
+
+  /// When to stop and involve a person instead. Empty when a remedy has no
+  /// failure mode worth naming — `appointment_prep` cannot hurt anybody, and
+  /// inventing a warning for it would dilute the ones that matter.
+  final String stopIf;
+
+  /// How long the practice runs, when it is the kind with a length.
+  ///
+  /// Null for the untimed ones. A sleep routine measured in a countdown would
+  /// be absurd, and a timer on screen implies the thing ends when it stops.
+  final Duration? duration;
+
+  bool get isTimed => duration != null;
+
+  bool get hasStopRule => stopIf.isNotEmpty;
+
+  factory Remedy.fromJson(Map<String, Object?> json) {
+    final seconds = json['seconds'];
+    return Remedy(
+      id: json['id']! as String,
+      title: (json['title'] as String?) ?? (json['id']! as String),
+      helpsWith: _strings(json['helpsWith']),
+      summary: (json['summary'] as String?) ?? '',
+      steps: _strings(json['steps']),
+      boundary: (json['boundary'] as String?) ?? '',
+      stopIf: (json['stopIf'] as String?) ?? '',
+      duration: seconds is num && seconds > 0
+          ? Duration(seconds: seconds.toInt())
+          : null,
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Shell — data/shell.json
 // ---------------------------------------------------------------------------
 
@@ -1301,6 +1374,7 @@ class DesignBundle {
     required this.shell,
     required this.products,
     required this.content,
+    this.remedies = const <Remedy>[],
   });
 
   /// The eleven areas, in catalogue order.
@@ -1319,6 +1393,17 @@ class DesignBundle {
 
   /// `<productId>.<locale>` to its content pack.
   final Map<String, ContentPack> content;
+
+  /// The remedy library, shared by every area. Empty when the supplement file
+  /// is absent, which hides the entry point rather than showing a bare list.
+  final List<Remedy> remedies;
+
+  Remedy? remedy(String id) {
+    for (final remedy in remedies) {
+      if (remedy.id == id) return remedy;
+    }
+    return null;
+  }
 
   Area? area(String id) {
     for (final area in areas) {

@@ -42,6 +42,10 @@ abstract final class BundleLoader {
   static const _supplementNavigation =
       '$assetDirectory/supplement.navigation.json';
 
+  /// The shared remedy library. One file for all eleven areas — see [Remedy]
+  /// for why it is not per-program.
+  static const _supplementRemedies = '$assetDirectory/supplement.remedies.json';
+
   /// Products written in this repository for areas the bundle left unbuilt.
   ///
   /// Nine of the eleven areas ship with `productId: null`, which is the
@@ -235,6 +239,16 @@ abstract final class BundleLoader {
         json['id'] as String: Safeguard.fromJson(json),
     };
 
+    // Optional like the rest of the supplement. A build without the file has
+    // no remedies entry point at all, which is better than an entry point
+    // leading to an empty library — see [DesignBundle.remedies].
+    final remediesJson = await _readOptional(assets, _supplementRemedies);
+    final remedies = [
+      for (final json in (remediesJson?['remedies'] as List<Object?>? ?? const [])
+          .whereType<Map<String, Object?>>())
+        Remedy.fromJson(json),
+    ];
+
     return DesignBundle(
       areas: areas,
       archetypes: archetypes,
@@ -242,6 +256,7 @@ abstract final class BundleLoader {
       shell: ShellSpec.fromJson(shellJson),
       products: products,
       content: content,
+      remedies: remedies,
     );
   }
 

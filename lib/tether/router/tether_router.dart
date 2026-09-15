@@ -10,6 +10,7 @@ import '../screens/shell/crisis_route_screen.dart';
 import '../screens/shell/program_join_screen.dart';
 import '../screens/shell/programs_home_screen.dart';
 import '../screens/shell/record_screen.dart';
+import '../screens/shell/remedies_screen.dart';
 import '../screens/shell/shell_routes.dart';
 import '../screens/shell/sharing_matrix_screen.dart';
 import '../state/tether_session.dart';
@@ -102,6 +103,9 @@ abstract final class TetherRouter {
 
       case ShellRoutes.crisis:
         return page(const CrisisRouteScreen());
+
+      case ShellRoutes.remedies:
+        return page(const RemediesScreen());
 
       case programRoute:
         final areaId = settings.arguments;
