@@ -14,7 +14,8 @@ import 'package:tether_health/tether/state/tether_scope.dart';
 import 'package:tether_health/tether/state/tether_session.dart';
 import 'package:tether_health/tether/tether_app.dart';
 
-import 'tether_bundle_test.dart' show DiskAssetBundle;
+import 'tether_bundle_test.dart'
+    show CatalogueOnlyAssetBundle, DiskAssetBundle;
 
 /// The six shell screens, driven rather than rendered.
 ///
@@ -26,8 +27,18 @@ import 'tether_bundle_test.dart' show DiskAssetBundle;
 void main() {
   late DesignBundle bundle;
 
+  /// The bundle without this repository's eight product files, so that the
+  /// eight areas the catalogue still leaves unbuilt are available to test SH3's
+  /// not-implemented branch against. See [CatalogueOnlyAssetBundle].
+  ///
+  /// Loaded here rather than inside the test that needs it: `BundleLoader`
+  /// reads real files, and a real I/O future never completes inside
+  /// `testWidgets`' fake-async zone.
+  late DesignBundle catalogue;
+
   setUpAll(() async {
     bundle = await BundleLoader.load(bundle: DiskAssetBundle());
+    catalogue = await BundleLoader.load(bundle: CatalogueOnlyAssetBundle());
   });
 
   Future<TetherSession> pump(
@@ -87,22 +98,73 @@ void main() {
       );
     });
 
-    testWidgets('a planned area offers no join at all', (tester) async {
-      // Nine areas have no implementation. Offering a control that cannot work
-      // is the failure `not_every_area_ships` exists to prevent.
-      final area = bundle.area('cancer')!;
-      final state = await pump(tester, ProgramJoinScreen(area: area));
+    /// A live Join button: the control the not-implemented branch must not draw.
+    final liveJoin = find.byWidgetPredicate(
+      (widget) =>
+          widget is FilledButton &&
+          widget.child is Text &&
+          (widget.child! as Text).data?.toLowerCase().contains('join') == true &&
+          widget.onPressed != null,
+    );
 
-      final live = find.byWidgetPredicate(
-        (widget) =>
-            widget is FilledButton &&
-            widget.child is Text &&
-            (widget.child! as Text).data?.toLowerCase().contains('join') ==
-                true &&
-            widget.onPressed != null,
+    testWidgets('a planned area offers no join at all', (tester) async {
+      // `cancer` used to be the example here: nine areas had no implementation,
+      // and offering a control that cannot work is the failure
+      // `not_every_area_ships` exists to prevent.
+      //
+      // Every area now has a product, so no area in the shipped data reaches
+      // this branch of SH3. The branch is still drawn — the "There is nothing
+      // to join yet" card and the suppressed button — and it is still the
+      // screen an area gets the next time one is added ahead of its product.
+      // It is exercised against the catalogue as the bundle ships it, where
+      // `cancer` really does carry `productId: null`. See
+      // [CatalogueOnlyAssetBundle].
+      final area = catalogue.area('cancer')!;
+      expect(area.productId, isNull);
+
+      // Tall enough that the whole page is built. `TetherPage` draws its body
+      // into a `ListView`, which builds only what is on screen, and the notice
+      // below is far enough down that a phone-sized surface would report it
+      // missing when it is merely not yet built.
+      tester.view.physicalSize = const Size(1200, 4000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+
+      final state = await pump(
+        tester,
+        ProgramJoinScreen(area: area),
+        state: TetherSession(bundle: catalogue),
       );
-      expect(live, findsNothing);
+
+      expect(liveJoin, findsNothing);
       expect(state.enrolment('cancer').isJoined, isFalse);
+      // The refusal is stated, not merely enacted. A screen that dropped the
+      // button and said nothing would look like a screen that had failed to
+      // load.
+      expect(find.text('There is nothing to join yet'), findsOneWidget);
+      // And the scope disclaimer survives the variant. `shell.json` marks it
+      // required with no exception for the screens that have nothing to offer.
+      expect(
+        find.textContaining('It does not diagnose, treat or prescribe'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('every implemented area offers a live join', (tester) async {
+      // The other half of `not_every_area_ships`, and the half that has a
+      // subject now: an area with a programme behind it has to offer to start
+      // it. All eleven do.
+      for (final area in bundle.areas) {
+        await pump(tester, ProgramJoinScreen(area: area));
+        expect(
+          liveJoin,
+          findsOneWidget,
+          reason: '${area.id} is built as ${area.productId} and SH3 offered '
+              'no way to join it',
+        );
+        expect(find.text('There is nothing to join yet'), findsNothing,
+            reason: area.id);
+      }
     });
 
     testWidgets('a third program is refused, not silently swapped',
@@ -283,12 +345,15 @@ void main() {
   });
 
   group('SH2 · health areas', () {
-    testWidgets('an implemented area is reachable, a planned one is not',
+    testWidgets('an implemented area row opens its join screen',
         (tester) async {
       await pump(tester, const AreaDirectoryScreen());
 
-      // Tobacco has a product; cancer does not. The directory has to make that
-      // difference operable, not merely visible.
+      // `_AreaRow` is tappable only when the area has a product behind it, and
+      // the directory has to make that difference operable rather than merely
+      // visible. All eleven rows are tappable now — the not-joinable row is
+      // covered by the SH3 group above, against the catalogue that still has
+      // one.
       await reveal(tester, find.text('Tobacco & nicotine'));
       await tester.tap(find.text('Tobacco & nicotine'), warnIfMissed: false);
       await tester.pump();

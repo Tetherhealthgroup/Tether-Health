@@ -34,7 +34,7 @@
         "person_retains_decisions",
         "supporter_not_surveillance"
       ],
-      "notes": "Reusable by healthy aging (supporter involvement) and preventive health (age-appropriate screening). The floor is a ceiling on how restrictive a plan may become, not a feature ceiling — an under-18 plan must keep a usable amount of the behaviour available. Under-13 profiles carry no free text anywhere downstream: plan_reasons and every note field render chips only. The band is self-declared and must never be presented as verified; declaring an older band may only remove a protection, never unlock a capability."
+      "notes": "Reusable by healthy aging (supporter involvement) and preventive health (age-appropriate screening). The floor is a ceiling on how restrictive a plan may become, not a feature ceiling \u2014 an under-18 plan must keep a usable amount of the behaviour available. Under-13 profiles carry no free text anywhere downstream: plan_reasons and every note field render chips only. The band is self-declared and must never be presented as verified; declaring an older band may only remove a protection, never unlock a capability."
     },
     {
       "id": "environment",
@@ -66,7 +66,122 @@
       "requires": [
         "person_retains_decisions"
       ],
-      "notes": "Generalises to nutrition (kitchen setup) and tobacco (removing smoking cues). Each change card is one change with an honest cost stated next to it. Every change must be reversible by the person from their own device settings without opening the product — a change the product can impose but the person cannot undo is surveillance, not environment design. Where the platform will not let the product make the change, the copy must say the person makes it."
+      "notes": "Generalises to nutrition (kitchen setup) and tobacco (removing smoking cues). Each change card is one change with an honest cost stated next to it. Every change must be reversible by the person from their own device settings without opening the product \u2014 a change the product can impose but the person cannot undo is surveillance, not environment design. Where the platform will not let the product make the change, the copy must say the person makes it."
+    },
+    {
+      "id": "reading_log",
+      "name": "Readings",
+      "purpose": "Records a number the person measured, and routes rather than interprets it.",
+      "chrome": {
+        "leading": "back",
+        "badge": true,
+        "progress": false
+      },
+      "slots": {
+        "headline": "required",
+        "readingControl": "required",
+        "recentRows": "required",
+        "rangeNote": "required",
+        "routingCard": "required"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "home"
+        }
+      ],
+      "requires": [
+        "self_report_disclaimer",
+        "threshold_routing"
+      ],
+      "notes": "Shared by metabolic (glucose), cardiovascular (blood pressure), respiratory (reliever use) and kidney_liver (lab results) \u2014 four areas, which is why it belongs in the library rather than in one product. The routingCard is not optional: out_of_range_routing says that where a reading may be dangerous the product says to contact a clinician rather than log and continue. It shows a value and a trend and never a verdict."
+    },
+    {
+      "id": "due_record",
+      "name": "What is due",
+      "purpose": "What has been done and what is coming, owned by the person it describes.",
+      "chrome": {
+        "leading": "back",
+        "badge": true,
+        "progress": false
+      },
+      "slots": {
+        "headline": "required",
+        "dueRows": "required",
+        "doneRows": "optional",
+        "scopeNote": "required",
+        "exportAction": "required"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "home"
+        }
+      ],
+      "requires": [
+        "export_and_delete",
+        "never_prescribe"
+      ],
+      "notes": "Shared by cancer and preventive. no_screening_claim governs the copy: it describes what screening exists and how to raise it, and the product does not screen. A date is not an eligibility verdict, and scopeNote is where that is said out loud."
+    },
+    {
+      "id": "supporter_view",
+      "name": "Someone helping",
+      "purpose": "A family member helps without taking the person's decisions away.",
+      "chrome": {
+        "leading": "back",
+        "badge": true,
+        "progress": false
+      },
+      "slots": {
+        "headline": "required",
+        "supporterRow": "required",
+        "sharedList": "required",
+        "notSharedList": "required",
+        "revokeAction": "required"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "home"
+        }
+      ],
+      "requires": [
+        "share_preview",
+        "person_owns_record"
+      ],
+      "notes": "Proposed by aging; reusable by digital, where a guardian is linked to a child profile. notSharedList is required rather than optional and carries the weight: supporter_not_surveillance forbids location_tracking, message_visibility and continuous_monitoring, and the only way a person can trust that is to see the list of what a supporter cannot see."
+    },
+    {
+      "id": "share_preview",
+      "name": "Before you send",
+      "purpose": "The exact contents of a share, shown before anything leaves the device.",
+      "chrome": {
+        "leading": "close",
+        "badge": true,
+        "progress": false
+      },
+      "slots": {
+        "headline": "required",
+        "recipientRow": "required",
+        "contentRows": "required",
+        "omittedNote": "required"
+      },
+      "actions": [
+        {
+          "kind": "primary",
+          "to": "home"
+        },
+        {
+          "kind": "ghost",
+          "to": "home"
+        }
+      ],
+      "requires": [
+        "share_preview",
+        "share_on_request_only"
+      ],
+      "notes": "Named by cardiovascular and required by plan_support and support_hub, so it was already a dependency of three archetypes before it was one itself. omittedNote states what is NOT being sent, because a preview that lists only the included is a preview a person cannot check."
     }
   ]
 }

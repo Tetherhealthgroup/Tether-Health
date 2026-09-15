@@ -1,0 +1,86 @@
+{
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "id": "steady",
+  "name": "Steady",
+  "$nameNote": "Placeholder. Not trademark-cleared.",
+  "areaId": "aging",
+  "$areaStatus": "design",
+  "serviceLines": [
+    "aging.prevention",
+    "aging.monitoring",
+    "aging.exercise",
+    "aging.supporter"
+  ],
+  "status": "design",
+  "locales": ["en"],
+  "vocabulary": {
+    "behaviour": "getting out and staying steady",
+    "urge": "a wobble",
+    "lapse": "an off week",
+    "target": "what you're working towards",
+    "primaryMetric": "how steady you felt"
+  },
+  "$vocabularyNote": "`urge` is the closest word this area has to a moment that needs recording in one tap, and it is a wobble rather than a craving — the thing you want written down before you forget it. `lapse` is 'an off week' and never a fall: a fall is an event that belongs in the record and in a conversation with a clinician, not a failure of adherence, and the copy never conflates the two.",
+  "helplines": [
+    {
+      "locale": "en",
+      "name": "988 Suicide & Crisis Lifeline",
+      "number": "988"
+    },
+    {
+      "locale": "es",
+      "name": "988 Línea de Prevención del Suicidio y Crisis",
+      "number": "988"
+    }
+  ],
+  "$helplineNote": "988 only. An older-adults services line (the kind that connects a person to local aging services) would belong here and is deliberately absent: no number could be checked as currently correct at the time of writing — this machine has no network access. S13 says a national line exists, says why no digits are printed, and routes to the care team instead. 911 appears in S13's emergency card as the US emergency number, which is copy rather than a helpline entry.",
+  "screens": [
+    { "id": "S01", "archetype": "welcome", "route": "/welcome", "phase": 1 },
+    { "id": "S02", "archetype": "why", "route": "/onboarding/why", "phase": 2 },
+    { "id": "S03", "archetype": "consent", "route": "/onboarding/consent", "phase": 2 },
+    { "id": "S04", "archetype": "baseline", "route": "/onboarding/first-week", "phase": 2 },
+    { "id": "S05", "archetype": "plan_targets", "route": "/plan/working-towards", "phase": 3 },
+    { "id": "S06", "archetype": "plan_review", "route": "/plan/review", "phase": 3 },
+    { "id": "S07", "archetype": "home", "route": "/today", "phase": 4 },
+    { "id": "S08", "archetype": "checkin", "route": "/checkin", "phase": 4 },
+    { "id": "S09", "archetype": "next_step", "route": "/checkin/next", "phase": 4 },
+    {
+      "id": "S10",
+      "archetype": "supporter_view",
+      "route": "/supporter",
+      "phase": 5,
+      "$note": "Where supporter_not_surveillance and person_retains_decisions are made visible. notSharedList is the longer of the two lists on purpose, and it names location, messages and anything live — the three things the safeguard forbids."
+    },
+    { "id": "S11", "archetype": "education", "route": "/learn", "phase": 6 },
+    { "id": "S12", "archetype": "progress", "route": "/progress", "phase": 6 },
+    { "id": "S13", "archetype": "support_hub", "route": "/support", "phase": 6 },
+    { "id": "S14", "archetype": "settings", "route": "/settings", "phase": 7 },
+    { "id": "SH1", "archetype": "programs_home", "route": "/programs", "phase": 8, "$shell": true },
+    { "id": "SH2", "archetype": "area_directory", "route": "/areas", "phase": 8, "$shell": true },
+    { "id": "SH3", "archetype": "program_join", "route": "/areas/join", "phase": 8, "$shell": true },
+    { "id": "SH4", "archetype": "record", "route": "/record", "phase": 8, "$shell": true },
+    { "id": "SH5", "archetype": "sharing_matrix", "route": "/privacy/sharing", "phase": 8, "$shell": true },
+    { "id": "SH6", "archetype": "crisis_route", "route": "/help-now", "phase": 8, "$shell": true }
+  ],
+  "platformCapabilities": {
+    "blocking": false,
+    "passiveTracking": false,
+    "offlineRescue": false,
+    "$note": "No sensors, no wearable, no accelerometer, no location, no microphone, no always-on anything. Nothing in this programme detects a fall, and nothing in it predicts one — both are outside what a phone in a pocket can honestly claim, and a product that implied otherwise would be sold on a promise it could not keep. Every figure on every screen is one the person typed in."
+  },
+  "$accessibilityFloor": {
+    "minTextScale": 2.0,
+    "minTapTarget": 56,
+    "minContrast": 7.0,
+    "$note": "Copied from areas.json so the product file states its own floor. S14 exposes it as settings that can be raised and cannot be lowered past it."
+  },
+  "$safeguardNotes": {
+    "never_prescribe": "S09 declines to hand out an exercise and says so in as many words: the coach and the person's clinician set those. S11 scopeNote and S14 disclaimer repeat it. No medicine, dose or treatment is named anywhere.",
+    "self_report_only": "self_report_disclaimer appears on S04 and S08, the two screens that collect a steadiness rating.",
+    "supporter_not_surveillance": "S10 is the whole answer: a sharedList of four lines and a notSharedList of six, naming location, messages and anything live. S14 shows LOCATION as off with no switch to turn it on. Carol receives one note a week, after Ruth has read it and pressed send.",
+    "person_retains_decisions": "S10's notSharedList ends with what Carol cannot do — change the plan, answer a check-in, switch anything on — and states there is no button for it on her side. S05 says no one else sets or raises the target. S06 carries a plan row reading 'WHAT CAROL CAN CHANGE — Nothing'.",
+    "export_and_delete": "S03 exit promise, S14 export and hard-delete cards, with deletion explicitly removing Carol's view too.",
+    "falls": "Falls are in scope and are written about plainly — the back step, getting up again, who to call. S12 carries a card saying the programme does not predict a fall and why a number that pretended to would be worse than none."
+  }
+}

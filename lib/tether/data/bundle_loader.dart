@@ -42,6 +42,32 @@ abstract final class BundleLoader {
   static const _supplementNavigation =
       '$assetDirectory/supplement.navigation.json';
 
+  /// Products written in this repository for areas the bundle left unbuilt.
+  ///
+  /// Nine of the eleven areas ship with `productId: null`, which is the
+  /// catalogue saying "this is a plan". This file is how a plan becomes a
+  /// programme without editing `areas.json`, which is a verbatim copy of the
+  /// shipped bundle and is drift-tested against it.
+  /// The areas this repository supplies a product for, one file each:
+  /// `supplement.product.<areaId>.json`.
+  ///
+  /// A list rather than a directory scan, because an asset bundle has no
+  /// readdir — and because a programme appearing in the app should be a line
+  /// somebody added on purpose, not a file that happened to be copied in.
+  static const supplementProductAreas = <String>[
+    'metabolic',
+    'cancer',
+    'cardiovascular',
+    'nutrition',
+    'respiratory',
+    'kidney_liver',
+    'preventive',
+    'aging',
+  ];
+
+  static String _supplementProductPath(String areaId) =>
+      '$assetDirectory/supplement.product.$areaId.json';
+
   /// Parses the whole bundle. Called once at startup.
   ///
   /// Anything missing throws rather than yielding a half-built app: a screen
@@ -72,6 +98,50 @@ abstract final class BundleLoader {
       content[key] = ContentPack.fromJson(json);
     }
 
+    var areas = (areasJson['areas'] as List<Object?>? ?? const [])
+        .whereType<Map<String, Object?>>()
+        .map(Area.fromJson)
+        .toList(growable: false);
+
+    // Products written here, for areas the catalogue left as a plan.
+    //
+    // Loaded before content so that a supplement content pack has a product to
+    // attach to. Only an area with no `productId` of its own can be claimed:
+    // the bundle's two products win, and a supplement that tried to rebind
+    // `tobacco` away from BreatheFree is ignored rather than honoured.
+    final supplementProductJson = <Map<String, Object?>>[];
+    for (final areaId in supplementProductAreas) {
+      final json = await _readOptional(assets, _supplementProductPath(areaId));
+      if (json != null) supplementProductJson.add(json);
+    }
+
+    for (final json in supplementProductJson) {
+      final product = Product.fromJson(json);
+      if (products.containsKey(product.id)) continue;
+
+      final index = areas.indexWhere((area) => area.id == product.areaId);
+      if (index == -1) continue;
+      if (areas[index].productId != null) continue;
+
+      products[product.id] = product;
+      areas = [
+        for (var i = 0; i < areas.length; i++)
+          if (i == index)
+            areas[i].withImplementation(
+              productId: product.id,
+              // An area with a programme somebody can join is not `planned`,
+              // whatever the catalogue still says. The directory's whole
+              // contract is being truthful about what exists, so the label has
+              // to move with the implementation or the screen starts lying.
+              status: json.containsKey(r'$areaStatus')
+                  ? AreaStatus.parse(json[r'$areaStatus'])
+                  : AreaStatus.inDevelopment,
+            )
+          else
+            areas[i],
+      ];
+    }
+
     // The supplement is optional and loaded second, and a missing file is not
     // an error: the bundle alone is a valid, if incomplete, product. Only the
     // supplement tolerates being absent — see [_readOptional].
@@ -84,6 +154,28 @@ abstract final class BundleLoader {
         provenance: ContentProvenance.supplement,
       );
       content[key] = content[key]?.fillGapsFrom(pack) ?? pack;
+    }
+
+    // Content for a product this repository added, discovered from the product
+    // rather than from a list somebody has to remember to extend. A programme
+    // with no content pack renders as its archetypes' slot lists, which is the
+    // honest failure and not a crash.
+    for (final json in supplementProductJson) {
+      final productId = json['id'] as String?;
+      if (productId == null) continue;
+      for (final locale in _locales(json['locales'])) {
+        final key = '$productId.$locale';
+        if (content.containsKey(key)) continue;
+        final packJson = await _readOptional(
+          assets,
+          '$assetDirectory/supplement.content.$key.json',
+        );
+        if (packJson == null) continue;
+        content[key] = ContentPack.fromJson(
+          packJson,
+          provenance: ContentProvenance.supplement,
+        );
+      }
     }
 
     // Applied last, so a fix can point at a screen the supplement supplied.
@@ -113,11 +205,6 @@ abstract final class BundleLoader {
         );
       }
     }
-
-    final areas = (areasJson['areas'] as List<Object?>? ?? const [])
-        .whereType<Map<String, Object?>>()
-        .map(Area.fromJson)
-        .toList(growable: false);
 
     final archetypes = {
       for (final json
@@ -157,6 +244,17 @@ abstract final class BundleLoader {
       content: content,
     );
   }
+
+  /// The locales a product declares, defaulting to English.
+  ///
+  /// Values are stringified rather than cast, because a locale arriving as
+  /// anything but a string is a malformed product file and an empty list of
+  /// locales would silently cost that programme its entire content pack — the
+  /// failure would look like "the screens are unwritten" rather than "the file
+  /// is wrong", which is a much longer afternoon.
+  static List<String> _locales(Object? raw) => raw is List && raw.isNotEmpty
+      ? raw.map((value) => value.toString()).toList(growable: false)
+      : const <String>['en'];
 
   /// Reads an asset that is allowed not to exist.
   ///

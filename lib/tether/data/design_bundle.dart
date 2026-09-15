@@ -223,6 +223,33 @@ class Area {
   bool get hasClinicalThresholds =>
       measures.any((measure) => measure.clinicalThresholds);
 
+  /// The same area with a product bound to it, and its status corrected.
+  ///
+  /// The only override the supplement may make to the catalogue, and it is
+  /// narrow on purpose: `productId` and `status` and nothing else. A name, a
+  /// scope or a service line is a statement about what the organisation does
+  /// and belongs to whoever maintains `areas.json`.
+  ///
+  /// `status` has to move with `productId` or the app contradicts itself. An
+  /// area labelled `planned` while offering a programme somebody can join is
+  /// the exact dishonesty the area directory exists to prevent — it is the
+  /// screen whose whole contract is being truthful about what exists.
+  Area withImplementation({required String productId, AreaStatus? status}) {
+    return Area(
+      id: id,
+      name: name,
+      scope: scope,
+      status: status ?? this.status,
+      url: url,
+      productId: productId,
+      serviceLines: serviceLines,
+      measures: measures,
+      safeguardIds: safeguardIds,
+      sharedArchetypeIds: sharedArchetypeIds,
+      specificArchetypes: specificArchetypes,
+    );
+  }
+
   factory Area.fromJson(Map<String, Object?> json) {
     final screens = (json['screens'] as Map<String, Object?>?) ?? const {};
     return Area(

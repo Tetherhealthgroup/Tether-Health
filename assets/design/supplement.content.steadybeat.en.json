@@ -1,0 +1,735 @@
+{
+  "product": "steadybeat",
+  "locale": "en",
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "$comment": "Every non-shell screen in supplement.product.cardiovascular.json. Shell screens SH1–SH6 are drawn by the app and are not authored here. One person throughout: Dev, day 45, baseline week 146 / 91 across seven mornings, now 136 / 85, the home number 135 over 85 typed in from his own clinician on 12 February, appointment 24 September. Blood pressure is one reading with two numbers everywhere it appears. Every string is unreviewed.",
+  "start": "S01",
+  "screens": {
+    "S01": {
+      "title": "",
+      "lead": "none",
+      "headline": "High blood pressure doesn't feel like anything.",
+      "sub": "That's the whole problem with it. SteadyBeat helps you see your own numbers and your own habits, and hand them to someone who can actually read them.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "Your readings stay yours",
+          "body": "Nothing goes to your practice unless you send it, and you see the exact file before it leaves."
+        },
+        {
+          "t": "card",
+          "title": "A number can mean call someone",
+          "body": "Some readings, and some feelings, are a phone call rather than a log entry. We say which, and we say it before you tap save."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "You will never get a score out of this",
+          "body": "No ten-year figure, no letter, no green tick or red light on your reading. Working out what your numbers mean together is a consultation, and we are not one."
+        },
+        {
+          "t": "chips",
+          "items": ["English", "Español"],
+          "selected": [0]
+        }
+      ],
+      "actions": [
+        { "label": "Get started", "to": "S02" },
+        { "label": "I already have an account", "kind": "ghost", "to": "S07" }
+      ],
+      "footer": "Education and self-management support. Not a diagnosis or treatment."
+    },
+
+    "S02": {
+      "title": "What it does",
+      "badge": "1 of 3",
+      "headline": "Four moments this is built for.",
+      "sub": "Not four features. Four points where a heart condition you can't feel becomes something you have to act on.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Moment one",
+          "title": "When the cuff has been in the drawer since March",
+          "body": "A week of just taking readings, nothing asked of you. Seven mornings is a picture. One morning is a mood."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment two",
+          "title": "When the habit is the hard part, not the knowledge",
+          "body": "You already know about walking and salt. One aim, set by you, small enough to survive a bad week."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Moment three",
+          "title": "When a reading comes back higher than usual",
+          "body": "The screen tells you what would make it urgent and who to ring. It does not tell you what the number means."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment four",
+          "title": "When you're sitting in the waiting room with nothing to show",
+          "body": "A month of readings, in one file, that you choose to send. Your practice sees what you sent and nothing else."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What it isn't",
+          "body": "It doesn't read your cuff, name a medicine, change one, calculate an assessment of you, or grade a reading. If a screen ever looks like it's doing one of those, it's a bug worth reporting."
+        }
+      ],
+      "actions": [{ "label": "Continue", "to": "S03" }],
+      "footer": "Education and self-management support. Not a diagnosis or treatment."
+    },
+
+    "S03": {
+      "title": "Consent & privacy",
+      "badge": "2 of 3",
+      "progress": 66,
+      "headline": "What we hold, and what we don't.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Held on your phone",
+          "body": "Your readings, the home number you typed in, your check-ins, your notes, your walking aim. These stay local."
+        },
+        {
+          "t": "card",
+          "title": "Shared with your practice",
+          "body": "Nothing, until you choose. When you do, you read the whole file first — and the file has no mood ratings and no notes in it.",
+          "to": "S13",
+          "pill": "See a preview"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "You can leave",
+          "body": "Export or delete everything at any point. Deletion is completed, not hidden — your phone, our servers, and anything waiting to sync."
+        },
+        {
+          "t": "options",
+          "items": [
+            { "title": "I understand and agree", "sel": true },
+            { "title": "Let June see that I'm using this", "body": "Off by default. She'd see that you're here, and nothing you logged." }
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "One thing you are not consenting to",
+          "body": "This is not monitoring. Nobody is watching your readings, including us, and nothing here can call an ambulance for you. If something is wrong now, use the phone."
+        }
+      ],
+      "actions": [
+        { "label": "Agree and continue", "to": "S04" },
+        { "label": "Read the full privacy notice", "kind": "ghost", "to": "S03" }
+      ],
+      "footer": "You can change either choice later in Settings."
+    },
+
+    "S04": {
+      "title": "Baseline week",
+      "badge": "Day 4 of 7",
+      "headline": "Just take the readings.",
+      "sub": "Nothing changes this week. No aim, no nudge. One reading each morning, the same way each time, so the week means something.",
+      "blocks": [
+        { "t": "bars", "values": [64, 70, 58, 54, 0, 0, 0] },
+        {
+          "t": "stats",
+          "items": [
+            ["146 / 91", "Morning average so far"],
+            ["4 of 7", "Mornings logged"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Same chair, same arm, before coffee",
+          "body": "Sitting, feet on the floor, arm resting at about the height of your heart, five quiet minutes first. This isn't fussiness — it's the difference between a week you can compare and a week you can't."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "These are numbers you typed in",
+          "body": "SteadyBeat doesn't read your cuff and doesn't check what you enter. Home readings also aren't clinic readings, and we never mix the two into one line."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "You don't have to wait out the week",
+          "body": "Set your aim now if you'd rather. We'll mark the baseline as partial and say so on every chart that uses it.",
+          "to": "S05",
+          "pill": "Skip ahead"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If a reading worries you this week",
+          "body": "Don't wait for the baseline to finish. There's a list of what makes a reading urgent, and a number to ring.",
+          "to": "S12",
+          "pill": "Support"
+        }
+      ],
+      "actions": [
+        { "label": "Log this morning's reading", "to": "S09" },
+        { "label": "Set my aim now", "kind": "ghost", "to": "S05" }
+      ],
+      "footer": "Saves offline · Syncs when connected"
+    },
+
+    "S05": {
+      "title": "Your weekly aim",
+      "badge": "1 of 2",
+      "progress": 50,
+      "lead": "back",
+      "headline": "What could you actually do next week?",
+      "sub": "Pick something that survives a bad Tuesday. You can move it later, in either direction, with no penalty.",
+      "blocks": [
+        {
+          "t": "slider",
+          "title": "Minutes of walking, on the mornings you walk",
+          "value": 50,
+          "left": "0",
+          "mid": "25 minutes",
+          "right": "50",
+          "foot": "Short and repeatable beats long and occasional, for most people, most of the time."
+        },
+        {
+          "t": "slider",
+          "title": "Mornings a week",
+          "value": 57,
+          "left": "0",
+          "mid": "4 mornings",
+          "right": "7",
+          "foot": "Four leaves you three days of slack before the week is spoiled."
+        },
+        {
+          "t": "card",
+          "title": "One change to the evenings",
+          "body": "Optional, and one is plenty. Most of the salt in a week arrives in food somebody else cooked.",
+          "chips": ["Cook two more nights", "Takeaway once instead of three times", "Read one label a week", "Nothing for now"],
+          "selected": [1]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "We are not setting a blood pressure target",
+          "body": "There's no slider here for your numbers, and there never will be. The home number on your reading screen is the one your clinician gave you and you typed in. Only you can change it, and changing it here changes nothing about your care."
+        }
+      ],
+      "actions": [{ "label": "Continue", "to": "S06" }],
+      "footer": "Loosening an aim takes effect straight away. Nothing here waits or argues with you."
+    },
+
+    "S06": {
+      "title": "Review your plan",
+      "badge": "2 of 2",
+      "progress": 100,
+      "lead": "back",
+      "headline": "Your plan is ready.",
+      "sub": "Have a last look. Any line here can be edited now or later.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Starting level",
+          "title": "Light — one reading, four walks",
+          "body": "We'll suggest more only if your own numbers say it would help, and you can say no."
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WALKING", "25 minutes · 4 mornings a week"],
+            ["READING", "One each morning, before coffee"],
+            ["EVENINGS", "Takeaway once instead of three times"],
+            ["HOME NUMBER FROM YOUR CLINICIAN", "Under 135 over 85 · you entered this 12 February"],
+            ["IF A READING WORRIES YOU", "Ring the practice. Signs on the list mean 911."],
+            ["SHARING", "Nothing shared · you preview every send"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What starting actually turns on",
+          "body": "A reminder, a check-in, and a place to put readings. It does not turn on monitoring, and it does not tell your practice you've joined."
+        }
+      ],
+      "actions": [
+        { "label": "Start my plan", "to": "S07" },
+        { "label": "Save and finish later", "kind": "ghost", "to": "S07" }
+      ]
+    },
+
+    "S07": {
+      "title": "Today",
+      "badge": "Private",
+      "lead": "none",
+      "headline": "Morning, Dev.",
+      "sub": "Day 45. Three walks so far this week, and twelve days without missing a reading.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Get help now",
+          "body": "Reachable from every screen, in every program.",
+          "to": "SH6",
+          "pill": "Open"
+        },
+        {
+          "t": "metric",
+          "eyebrow": "This morning · 6:50 am",
+          "value": "138 / 86",
+          "unit": "sitting, before coffee",
+          "foot": "Your fortnight average is 136 / 85. One reading on its own is weather, not climate."
+        },
+        {
+          "t": "stats",
+          "items": [
+            ["52", "Readings logged"],
+            ["3 of 4", "Walks this week"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Log a reading",
+          "body": "Takes about fifteen seconds. Works with no signal.",
+          "to": "S09",
+          "pill": "Open"
+        },
+        {
+          "t": "card",
+          "title": "Today's check-in",
+          "body": "Not done yet · about 60 seconds"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Ahn Family Practice · 24 September",
+          "body": "Twelve days away. Thirty mornings of readings are ready to send whenever you want to send them.",
+          "to": "S13",
+          "pill": "See what would go"
+        }
+      ],
+      "actions": [
+        { "label": "Start today's check-in", "to": "S08" },
+        { "label": "Your progress", "kind": "ghost", "to": "S11" },
+        { "label": "Settings & privacy", "kind": "ghost", "to": "S14" },
+        { "label": "Your programs", "kind": "ghost", "to": "SH1" }
+      ],
+      "footer": "Works offline · Syncs securely when connected"
+    },
+
+    "S08": {
+      "title": "Daily check-in",
+      "badge": "About 60 sec",
+      "progress": 72,
+      "headline": "How did today go?",
+      "sub": "No right answers, and nothing here is a test. It only shapes what we offer you next.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "How do you feel?",
+          "chips": ["Low", "Not great", "Okay", "Good", "Great"],
+          "selected": [3]
+        },
+        {
+          "t": "card",
+          "title": "How did the habits go?",
+          "body": "A week where you manage some of it is a normal week, not a bad one.",
+          "chips": ["Hardly any of it", "Some of it", "Most of it", "All of it", "Skip"],
+          "selected": [2]
+        },
+        {
+          "t": "card",
+          "title": "Medicines as usual today?",
+          "body": "Yes or no is all we record. We never ask which ones or how much, and we never tell you what to take or when to change anything.",
+          "chips": ["Yes", "No", "Skip"],
+          "selected": [0]
+        },
+        {
+          "t": "slider",
+          "title": "How heavy did today feel?",
+          "value": 30,
+          "left": "0 · Light",
+          "mid": "3 · Fine",
+          "right": "10",
+          "foot": "This is how the day felt to you. It is not a measurement of anything."
+        },
+        {
+          "t": "card",
+          "title": "Anything going on today?",
+          "chips": ["Ankles puffy", "Out of breath on the stairs", "Headache", "Slept badly", "Stressed", "Nothing unusual"],
+          "selected": [3, 4]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Some things don't belong in a check-in",
+          "body": "Chest pain or pressure. Trouble speaking or understanding. Weakness or numbness down one side. A drooping face. Sudden trouble seeing, or a sudden severe headache unlike your usual. Breathlessness at rest. Any of those, right now, is 911 — not a chip, and not something to finish this screen first.",
+          "to": "SH6",
+          "pill": "Get help now"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Everything on this screen is you describing your own day. SteadyBeat records it as a self-report, never as a clinical finding, and never adds it up into an assessment of you."
+        }
+      ],
+      "actions": [
+        { "label": "Save check-in", "to": "S07" },
+        { "label": "Log a reading too", "kind": "ghost", "to": "S09" }
+      ],
+      "footer": "Private · Works offline · You can edit today's answers later"
+    },
+
+    "S09": {
+      "title": "Readings",
+      "badge": "52 logged",
+      "lead": "back",
+      "headline": "What did the cuff say?",
+      "sub": "One reading, both numbers, and the time. That's all that goes in.",
+      "blocks": [
+        { "t": "input", "title": "Reading · systolic over diastolic", "value": "138 / 86" },
+        {
+          "t": "card",
+          "title": "How did you take it?",
+          "chips": ["Sitting, arm supported", "Before coffee", "After five quiet minutes", "Standing", "Straight after walking"],
+          "selected": [0, 1, 2]
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["12 SEPTEMBER · 6:50 AM", "138 / 86 · sitting, before coffee"],
+            ["11 SEPTEMBER · 6:45 AM", "134 / 84"],
+            ["10 SEPTEMBER · 7:05 AM", "141 / 88"],
+            ["9 SEPTEMBER · 6:40 AM", "133 / 82"],
+            ["8 SEPTEMBER · 6:55 AM", "136 / 85"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "The number is yours, not ours",
+          "title": "Under 135 over 85, at home",
+          "body": "You typed this in on 12 February from your appointment. SteadyBeat didn't choose it, can't change it, and has no view about whether it's right for you. Home numbers usually sit lower than clinic ones, which is why this is a separate line from anything measured at the practice."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "When a reading is a phone call",
+          "body": "If a reading is well above what you normally get, sit quietly for five minutes and take it again — a single high number is often a single high number. If the second one is still well above your usual, ring the practice today and read them both out. We will not tell you what either one means.",
+          "to": "S12",
+          "pill": "Who to call"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Don't wait, and don't take it again",
+          "body": "Chest pain or pressure. Trouble speaking. Weakness or numbness down one side, or a drooping face. Sudden trouble seeing, or a sudden severe headache unlike your usual. Breathlessness at rest. With any of those, the reading stops mattering — call 911.",
+          "to": "SH6",
+          "pill": "Get help now"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "This screen shows your reading and how it's been moving. It does not grade it, colour it, or work out what it means. Typed in by you, unchecked by us."
+        }
+      ],
+      "actions": [
+        { "label": "Save reading", "to": "S07" },
+        { "label": "Get help now", "kind": "ghost", "to": "SH6" }
+      ],
+      "footer": "Saves offline · You can edit or delete any reading here"
+    },
+
+    "S10": {
+      "title": "Learn",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "Short, plain, and dated.",
+      "sub": "Seven pieces, none longer than a bus ride. Each one shows when it was last checked.",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": ["All", "Readings", "Salt", "Moving", "Your factors", "Appointments"],
+          "selected": [0]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "The one people ask for and we don't have",
+          "title": "Why SteadyBeat gives you no number for your risk",
+          "body": "6 min · reviewed August 2026"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["THE FACTORS THAT MOVE, AND THE ONES THAT DON'T", "5 min · reviewed August 2026"],
+            ["WHY ONE HIGH READING USUALLY ISN'T NEWS", "4 min · reviewed July 2026"],
+            ["GETTING A USABLE READING AT HOME", "3 min · reviewed July 2026"],
+            ["SALT LIVES IN BREAD, NOT THE SALT CELLAR", "5 min · reviewed June 2026"],
+            ["THE SIGNS THAT MEAN 911, LEARNED BEFORE YOU NEED THEM", "3 min · reviewed August 2026"],
+            ["WHAT ISN'T SETTLED YET", "2 min · reviewed August 2026"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Your own factors",
+          "title": "Named, not added up.",
+          "body": "Your readings. How much you move. What the evenings are made of. Whether you smoke. What runs in your family. Your age. Some of those move and some don't, and knowing which is which is worth more than a figure. Putting them together into an assessment needs a clinician with your notes in front of them — that's a consultation, and this isn't one."
+        },
+        {
+          "t": "card",
+          "title": "Why the dates are on the front",
+          "body": "Anything not checked in eighteen months comes down rather than sitting here looking current."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "What this library will never contain",
+          "body": "No medicine named for you, no change to one you already take, no score, no grade, no percentage, no traffic light on a reading. These pieces explain, and they haven't seen your notes.",
+          "to": "S12",
+          "pill": "View support"
+        }
+      ],
+      "actions": [{ "label": "Back to today", "kind": "ghost", "to": "S07" }],
+      "footer": "Reviewed before it goes up, and dated so you can see how old it is."
+    },
+
+    "S11": {
+      "title": "Progress",
+      "badge": "Day 45",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": ["7 days", "30 days", "All 45 days"],
+          "selected": [0]
+        },
+        { "t": "bars", "values": [58, 54, 62, 50, 56, 52, 57] },
+        {
+          "t": "metric",
+          "eyebrow": "Last fortnight",
+          "value": "136 / 85",
+          "unit": "morning average",
+          "foot": "Your baseline week was 146 / 91 across seven mornings"
+        },
+        {
+          "t": "metric",
+          "eyebrow": "Walking this week",
+          "value": "3",
+          "unit": "of 4 mornings · 78 minutes",
+          "pct": 75,
+          "foot": "One morning left in the week"
+        },
+        {
+          "t": "stats",
+          "items": [
+            ["52", "Readings logged"],
+            ["41 of 45", "Days medicines as usual"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Two mornings missed, and they're still here",
+          "title": "23 August and 2 September.",
+          "body": "Nothing was reset. You're still on day 45, both gaps are visible in the chart rather than smoothed over, and the averages are worked out from the mornings you actually logged."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "Pattern in your own numbers",
+          "title": "Your highest mornings follow the nights you marked as slept badly.",
+          "body": "That's a description of what you logged, not a cause and not a finding. It's a good thing to mention on the 24th; it isn't something this screen can work out for you."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "There is no score at the bottom of this page",
+          "body": "We could add up your readings, your walks and your age and print something. It would look authoritative and it would be a guess made by an app that has never seen your notes. Dr. Ahn can do the real version in ten minutes on the 24th."
+        },
+        {
+          "t": "card",
+          "title": "Send this to the practice?",
+          "body": "Nothing has left your phone. You'd read the exact file first, including the list of what isn't in it.",
+          "to": "S13",
+          "pill": "Preview the file"
+        }
+      ],
+      "actions": [
+        { "label": "Back to today", "to": "S07" },
+        { "label": "Read about your factors", "kind": "ghost", "to": "S10" },
+        { "label": "Preview what would be sent", "kind": "ghost", "to": "S13" }
+      ],
+      "footer": "Nothing on this screen has been shared. It only leaves your phone if you ask it to."
+    },
+
+    "S12": {
+      "title": "Support",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "A route to a person.",
+      "sub": "Nothing is sent until you preview it and confirm.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Call 911 now if any of these",
+          "body": "Chest pain or pressure. Trouble speaking or understanding. Weakness or numbness down one side, or a drooping face. Sudden trouble seeing, or a sudden severe headache unlike your usual. Breathlessness at rest. Don't drive yourself, and don't take another reading first.",
+          "pill": "Call 911"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "A reading well above your usual, and you feel fine",
+          "body": "Sit five minutes, take it again, and ring Ahn Family Practice today with both numbers. SteadyBeat has no opinion about what they mean and will not offer one.",
+          "pill": "Call the practice"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["AHN FAMILY PRACTICE", "Weekdays · same-day line for readings"],
+            ["LENA · PRACTICE NURSE", "Replies within two working days · she has seen nothing from here"],
+            ["JUNE", "“Can you sit with me a minute?”"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "988 Suicide & Crisis Lifeline",
+          "body": "Call or text 988 · English and Spanish · 24 hours. A heart diagnosis is frightening, and that line is for that too."
+        },
+        {
+          "t": "card",
+          "title": "American Heart Association",
+          "body": "1-800-AHA-USA-1 · information and local programs, not urgent care."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Before anything is sent",
+          "body": "Every share shows you the exact contents first, and the list of what's being left out. You can stop at that point, and nothing goes on its own.",
+          "to": "S13",
+          "pill": "Preview a share"
+        }
+      ],
+      "actions": [
+        { "label": "Back to today", "to": "S07" },
+        { "label": "Preview what would be sent", "kind": "ghost", "to": "S13" }
+      ],
+      "footer": "Crisis numbers route to United States services."
+    },
+
+    "S13": {
+      "title": "Before you send",
+      "badge": "Nothing sent yet",
+      "headline": "This is the whole file.",
+      "sub": "Read it, then decide. Closing this screen sends nothing.",
+      "blocks": [
+        {
+          "t": "rows",
+          "items": [
+            ["TO", "Ahn Family Practice · secure message through the patient portal"],
+            ["FOR", "Your appointment on 24 September"],
+            ["SENT BY", "You, once, now — not on a schedule"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "What's in it",
+          "title": "Thirty mornings of readings",
+          "body": "8 August to 12 September. Each line is one reading: date, time, both numbers, and how you took it. Two mornings are marked as missed rather than filled in."
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["READINGS", "30 mornings · both numbers, unrounded"],
+            ["FORTNIGHT AVERAGE", "136 / 85 · and the baseline week, 146 / 91"],
+            ["HOW THEY WERE TAKEN", "Sitting, arm supported, before coffee"],
+            ["MEDICINES AS USUAL", "41 of 45 days · yes or no only, never which"],
+            ["WALKING", "Minutes and mornings, by week"],
+            ["THE HOME NUMBER YOU RECORDED", "Under 135 over 85 · entered 12 February"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "What is not in it",
+          "title": "Six things stay on your phone.",
+          "body": "Your mood ratings. How heavy the days felt. The symptom chips you ticked. Anything you typed in a note. Your reasons. Anything from any other program you're in — those are separate files and they are never pooled."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "And nothing is interpreted",
+          "body": "There's no summary line, no score, no flag on a reading, and no letter from us at the top. The practice gets your numbers and reads them itself."
+        }
+      ],
+      "actions": [
+        { "label": "Send to Ahn Family Practice", "to": "S07" },
+        { "label": "Don't send", "kind": "ghost", "to": "S11" }
+      ],
+      "footer": "One send, not a connection. Nothing goes again unless you come back here."
+    },
+
+    "S14": {
+      "title": "Settings & privacy",
+      "badge": "Private",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Notifications",
+          "body": "Detail is off. A reminder on your lock screen says SteadyBeat and nothing else — not which program, not a reading, not why. Anyone who picks up your phone learns that an app reminded you. That's all, and that's the default.",
+          "chips": ["Generic — “SteadyBeat”", "Show detail", "None at all"],
+          "selected": [0]
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WALKING AIM", "25 minutes · 4 mornings a week"],
+            ["READING REMINDER", "06:45 · before coffee"],
+            ["HOME NUMBER FROM YOUR CLINICIAN", "Under 135 over 85 · entered 12 February"],
+            ["EVENINGS", "Takeaway once instead of three times"],
+            ["MOTION", "Follows your phone"],
+            ["TEXT SIZE", "Follows your phone"],
+            ["LANGUAGE", "English · Español available"],
+            ["SHARING WITH THE PRACTICE", "Nothing shared · every send previewed"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Export everything",
+          "body": "A readable file and a structured one: every reading, every check-in, every note, including the ones you've hidden from view. It stays on your phone unless you send it.",
+          "to": "SH4",
+          "pill": "Export"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Delete everything",
+          "body": "Completed, not hidden — your phone, our servers, and anything queued to sync. It can't be undone, and it ends your active programs.",
+          "to": "SH4",
+          "pill": "Delete"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Education and self-management support. It does not diagnose, treat or prescribe, does not calculate a clinical assessment of you, and is not a substitute for advice from a qualified health professional."
+        }
+      ],
+      "actions": [
+        { "label": "Done", "to": "S07" },
+        { "label": "Preview what would be sent", "kind": "ghost", "to": "S13" },
+        { "label": "Your record across programs", "kind": "ghost", "to": "SH4" }
+      ],
+      "footer": "Changing your home number here changes nothing about your care. Tell your practice, not us."
+    }
+  }
+}

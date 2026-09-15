@@ -21,7 +21,7 @@ import 'tether_bundle_test.dart' show DiskAssetBundle;
 
 /// Does every screen in every program actually build?
 ///
-/// There are 236 of them across the eleven areas and almost none are reachable
+/// There are 237 of them across the eleven areas and almost none are reachable
 /// by hand in a review session. A renderer that throws on one archetype's slot
 /// combination would be found by a patient rather than by anybody here, so the
 /// last test in this file pumps all of them.
@@ -68,11 +68,24 @@ void main() {
 
       // Every area must be named. Scrolling is allowed; omission is not — the
       // directory's whole contract is being honest about all eleven.
+      //
+      // The search restarts from the top for each area. SH2 groups its rows by
+      // status and the groups run most-advanced first, so catalogue order is
+      // no longer display order: `nutrition` is fifth in the catalogue and
+      // eighth on the screen, and `respiratory` is sixth in the catalogue and
+      // fifth on the screen. `scrollUntilVisible` only ever scrolls one way, so
+      // without the reset it would scroll past `respiratory` looking for
+      // `nutrition` and then report the area it had already gone by as
+      // missing — a false failure that says "omitted" about a row that is
+      // drawn.
+      final scrollable = find.byType(Scrollable).first;
       for (final area in bundle.areas) {
+        tester.state<ScrollableState>(scrollable).position.jumpTo(0);
+        await tester.pump();
         await tester.scrollUntilVisible(
           find.text(area.name),
           200,
-          scrollable: find.byType(Scrollable).first,
+          scrollable: scrollable,
         );
         expect(find.text(area.name), findsWidgets, reason: area.id);
       }
@@ -131,10 +144,14 @@ void main() {
     });
 
     testWidgets('an unwritten screen says so', (tester) async {
-      // Neither authored product has an unwritten screen left: LookUp's copy
-      // is complete and BreatheFree's screens are approved artwork. This uses
-      // a generated journey, which is where nearly all the unwritten screens
-      // in the app now live.
+      // Neither product the bundle ships has an unwritten screen left: LookUp's
+      // copy is complete and BreatheFree's screens are approved artwork. Every
+      // unwritten screen in the app is now a shell screen, SH1..SH6, in one of
+      // the eight programmes written here — six each, and deliberately so.
+      // Those six are drawn by the host shell's own screens rather than from a
+      // content pack, so their authors correctly wrote no copy for them, and
+      // reached through `JourneyScreenHost` they are exactly what an unwritten
+      // screen looks like.
       final cancer = JourneyBuilder.forArea(bundle, bundle.area('cancer')!);
       final screen = cancer.awaitingCopy.first;
       await pump(
@@ -197,11 +214,44 @@ void main() {
     });
 
     testWidgets('an unbuilt archetype is not faked', (tester) async {
-      // Cancer's `due_record` is one of the seven archetypes nobody has built.
-      // Its area has no product and no copy, so there is nothing to draw and
-      // the screen must say that rather than invent a UI for it.
+      // This used to be Cancer's `due_record`: an area with no product, no
+      // copy and an archetype nobody had built, so there was nothing to draw
+      // and the screen had to say so rather than invent a UI for it.
+      //
+      // No screen in the app is in that state any longer. All eleven areas
+      // have a product, and every archetype those products name now exists —
+      // `due_record` among them. `JourneyReadiness.awaitingArchetype` is
+      // unreachable from the shipped data, which is asserted directly in
+      // `test/tether_bundle_test.dart`.
+      //
+      // The arm is still live code in `JourneyScreenHost`, and it is the arm
+      // that runs the first time somebody pins an archetype before building
+      // it. Losing its only test at the moment the data stopped producing it
+      // would mean it is never run again until a real screen depends on it. So
+      // the screen is constructed here instead: a journey screen with no
+      // content, no artwork and an archetype id the library does not define,
+      // which is precisely the state the renderer exists for.
       final cancer = JourneyBuilder.forArea(bundle, bundle.area('cancer')!);
-      final screen = cancer.awaitingArchetype.first;
+      expect(
+        bundle.archetypes.containsKey('not_an_archetype'),
+        isFalse,
+        reason: 'this test needs an id the library genuinely does not define',
+      );
+
+      const screen = JourneyScreen(
+        id: 'cancer.not_an_archetype',
+        archetypeId: 'not_an_archetype',
+        route: '/cancer/not_an_archetype',
+        phase: 0,
+        origin: JourneyOrigin.areaSpecific,
+        archetype: null,
+        content: null,
+        rationale: 'Pinned by a product before anybody drew it.',
+        isShell: false,
+        isProposed: true,
+      );
+      expect(screen.readiness, JourneyReadiness.awaitingArchetype);
+
       await pump(
         tester,
         JourneyScreenHost(
@@ -214,6 +264,7 @@ void main() {
 
       expect(find.byType(UnbuiltScreen), findsOneWidget);
       expect(find.byType(ContentScreen), findsNothing);
+      expect(find.byType(UnwrittenScreen), findsNothing);
       expect(tester.takeException(), isNull);
     });
 
@@ -339,7 +390,7 @@ void main() {
     }
   });
 
-  testWidgets('all 236 screens across all eleven programs build', (tester) async {
+  testWidgets('all 237 screens across all eleven programs build', (tester) async {
     // The one test that would have caught a slot combination nobody drew by
     // hand. It asserts nothing about how a screen looks — only that asking for
     // it does not throw.
@@ -371,6 +422,6 @@ void main() {
     }
 
     expect(failures, isEmpty, reason: failures.join('\n'));
-    expect(built, 236);
+    expect(built, 237);
   });
 }

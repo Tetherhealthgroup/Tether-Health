@@ -201,9 +201,14 @@ void main() {
     expect(currentScreen(tester), 'S05');
   });
 
-  testWidgets('a generated program opens without a dead screen',
+  testWidgets('a partly written program opens without a dead screen',
       (tester) async {
-    // Cancer has no product and no copy. Every screen still has to open.
+    // Cancer used to have no product and no copy at all, and every screen
+    // still had to open. WorthAsking now supplies its fourteen, eight of them
+    // with copy and six of them the shell's — so the mix this walks is
+    // authored screens and unwritten ones in one journey, which is the state
+    // every programme except LookUp and BreatheFree is in. Opening a screen
+    // must not depend on somebody having written it.
     final cancer = JourneyBuilder.forArea(bundle, bundle.area('cancer')!);
     for (final screen in cancer.screens.take(6)) {
       await boot(tester, '/program/cancer/${screen.id}');

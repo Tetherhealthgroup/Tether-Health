@@ -3,7 +3,8 @@ import 'package:tether_health/tether/data/bundle_loader.dart';
 import 'package:tether_health/tether/data/design_bundle.dart';
 import 'package:tether_health/tether/state/tether_session.dart';
 
-import 'tether_bundle_test.dart' show DiskAssetBundle;
+import 'tether_bundle_test.dart'
+    show CatalogueOnlyAssetBundle, DiskAssetBundle;
 
 /// The safeguards, turned into something that fails the build.
 ///
@@ -131,14 +132,66 @@ void main() {
       expect(state.activePrograms, hasLength(2));
     });
 
-    test('an area with no implementation cannot be joined at all', () {
-      // Nine of the eleven are a plan. Offering a join would be the app
-      // claiming something that does not exist.
-      final state = session();
-      final outcome = state.join('cancer');
-      expect(outcome.joined, isFalse);
-      expect(outcome.refusal, JoinRefusal.areaNotImplemented);
-      expect(state.activePrograms, isEmpty);
+    test('every one of the eleven can now be joined', () {
+      // This test used to read "an area with no implementation cannot be
+      // joined at all", and `cancer` was the example: nine of the eleven were
+      // a plan, and offering a join would have been the app claiming something
+      // that does not exist.
+      //
+      // Eight products were written and every area now has one, so the rule
+      // has no subject left in the shipped data. The change is recorded here
+      // as the new fact rather than the old test being quietly deleted — and
+      // it is a fact worth pinning, because `not_every_area_ships` cuts both
+      // ways: an area that has a programme and refuses to start it is the same
+      // kind of lie as one that has none and offers to.
+      for (final area in bundle.areas) {
+        final state = session();
+        final outcome = state.join(area.id);
+        expect(
+          outcome.joined,
+          isTrue,
+          reason: '${area.id} has ${area.productId} behind it and still '
+              'refused the join: ${outcome.refusal}',
+        );
+        expect(state.activePrograms, hasLength(1), reason: area.id);
+      }
+    });
+
+    test('an area with no implementation still cannot be joined', () async {
+      // The refusal itself is live code — `JoinRefusal.areaNotImplemented` is
+      // the first thing `canJoin` tests and the thing SH3 reads to decide
+      // whether to draw a Join button at all. It is the rule that runs the next
+      // time an area is added to the catalogue ahead of its product.
+      //
+      // So it is tested against the catalogue as the bundle actually ships it,
+      // where eight areas still carry `productId: null`. See
+      // [CatalogueOnlyAssetBundle]: this is the shipped `areas.json`, not a
+      // mock of one.
+      final catalogue = await BundleLoader.load(
+        bundle: CatalogueOnlyAssetBundle(),
+      );
+      final planned =
+          catalogue.areas.where((area) => area.productId == null).toList();
+      expect(planned, hasLength(8));
+
+      for (final area in planned) {
+        final state = TetherSession(bundle: catalogue);
+        final outcome = state.join(area.id);
+        expect(outcome.joined, isFalse, reason: area.id);
+        expect(outcome.refusal, JoinRefusal.areaNotImplemented,
+            reason: area.id);
+        expect(state.activePrograms, isEmpty, reason: area.id);
+      }
+
+      // And naming a program to pause does not get round it. The ceiling is a
+      // trade a person can make; a missing implementation is not.
+      final state = TetherSession(bundle: catalogue);
+      state.join('tobacco');
+      expect(
+        state.join('cancer', pausing: 'tobacco').refusal,
+        JoinRefusal.areaNotImplemented,
+      );
+      expect(state.enrolment('tobacco').status, EnrolmentStatus.active);
     });
   });
 
