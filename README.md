@@ -194,6 +194,22 @@ xcrun simctl launch  booted com.TetherHealthLLC.tetherhealth
 xcrun simctl launch  booted com.TetherHealthLLC.tetherhealth --route=/support
 ```
 
+Simulator builds are pinned to `arm64` in `ios/Flutter/Debug.xcconfig` and
+`ios/Flutter/Release.xcconfig`. Without that pin, current Xcode fails the build
+before it compiles anything, with an error that contradicts itself:
+
+```
+Target debug_unpack_ios failed: Exception: Binary .../Flutter.framework/Flutter
+does not contain architectures "arm64 x86_64".
+lipo -info: ... are: x86_64 arm64
+```
+
+Flutter verifies the engine with `lipo <binary> -verify_arch arm64 x86_64`, and
+the `lipo` in current Xcode reads the second architecture as a second input
+file (`-verify_arch requires exactly one input file`). One architecture keeps
+that call valid. On an Intel Mac, swap the pin to `x86_64`. Device, `ipa` and
+`apk` builds were never affected — they are arm64-only already.
+
 **Android emulator.** A debug APK is ~155 MB and a streamed `adb install` can
 time out on it; push then install instead.
 
