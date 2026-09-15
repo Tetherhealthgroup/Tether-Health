@@ -1,0 +1,7 @@
+-r requirements.txt
+
+# Test and type-check tooling. httpx is what starlette's TestClient drives the
+# app through in-process, so no port is ever bound during a test run.
+httpx==0.28.1
+pytest==9.1.1
+mypy==2.3.1
