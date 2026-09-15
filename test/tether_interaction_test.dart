@@ -45,10 +45,25 @@ void main() {
         session: active,
         child: MaterialApp(
           theme: TetherTheme.light(),
-          home: JourneyScreenHost(
-            screen: screen,
-            journey: lookup,
-            onNavigate: visited.add,
+          // Keyed by screen, so each pump builds a new element tree.
+          //
+          // Without this, consecutive `pumpWidget` calls reuse the elements —
+          // same widget types in the same places — and the body `ListView`
+          // keeps the scroll offset the previous screen left behind. The next
+          // screen then opens part-scrolled, its first blocks are never built
+          // because the list is lazy, and `scrollUntilVisible` cannot recover:
+          // it only scrolls one way. The symptom is a card at the top of a
+          // screen reported as missing, and how far the previous screen
+          // scrolled depends on the body's height, so a change to the page
+          // chrome could make it appear or disappear. The app itself never
+          // does this — each screen is its own route with its own list.
+          home: KeyedSubtree(
+            key: ValueKey(screen.id),
+            child: JourneyScreenHost(
+              screen: screen,
+              journey: lookup,
+              onNavigate: visited.add,
+            ),
           ),
           onGenerateRoute: (settings) =>
               TetherRouter.onGenerateRoute(settings, active),

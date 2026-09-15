@@ -59,6 +59,11 @@ class TetherPage extends StatelessWidget {
   /// What the leading control does. Defaults to popping the route.
   final VoidCallback? onLeading;
 
+  /// The most of the screen the pinned buttons and footer may occupy before
+  /// they start scrolling among themselves. Never reached at ordinary text
+  /// sizes; see where it is used.
+  static const _chromeMaxFraction = 0.55;
+
   @override
   Widget build(BuildContext context) {
     final background = dark ? TetherColors.ink : TetherColors.cream;
@@ -71,58 +76,92 @@ class TetherPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(
             horizontal: TetherSpace.screenGutter,
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 6),
-              _TopBar(
-                title: title,
-                badge: badge,
-                leading: leading,
-                dark: dark,
-                onLeading: onLeading ?? () => Navigator.of(context).maybePop(),
-              ),
-              if (progress != null) ...[
-                const SizedBox(height: 10),
-                _ProgressHairline(percent: progress!),
-              ],
-              const SizedBox(height: 12),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  children: [
-                    if (headline case final String text) ...[
-                      Text(
-                        text,
-                        style: TetherText.headline.copyWith(color: onBackground),
-                      ),
-                      const SizedBox(height: 5),
-                    ],
-                    if (sub case final String text) ...[
-                      Text(
-                        text,
-                        style: TetherText.sub.copyWith(
-                          color: dark ? Colors.white : TetherColors.muted,
+          child: LayoutBuilder(
+            builder: (context, constraints) => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 6),
+                _TopBar(
+                  title: title,
+                  badge: badge,
+                  leading: leading,
+                  dark: dark,
+                  onLeading:
+                      onLeading ?? () => Navigator.of(context).maybePop(),
+                ),
+                if (progress != null) ...[
+                  const SizedBox(height: 10),
+                  _ProgressHairline(percent: progress!),
+                ],
+                const SizedBox(height: 12),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    children: [
+                      if (headline case final String text) ...[
+                        Text(
+                          text,
+                          style:
+                              TetherText.headline.copyWith(color: onBackground),
                         ),
-                      ),
-                      const SizedBox(height: 14),
+                        const SizedBox(height: 5),
+                      ],
+                      if (sub case final String text) ...[
+                        Text(
+                          text,
+                          style: TetherText.sub.copyWith(
+                            color: dark ? Colors.white : TetherColors.muted,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                      ],
+                      ...body,
                     ],
-                    ...body,
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              ...actions,
-              if (footer case final String text) ...[
                 const SizedBox(height: 8),
-                Text(
-                  text,
-                  textAlign: TextAlign.center,
-                  style: TetherText.footnote,
+
+                // The buttons and the disclosure line, bounded and scrollable.
+                //
+                // They are pinned below the body rather than scrolling with
+                // it, which is the design — but pinned children of a Column
+                // cannot shrink, and at large system text sizes the buttons
+                // and a wrapped footer grew past the screen on their own. The
+                // body's Expanded dutifully collapsed to nothing and the page
+                // still overflowed, striping the bottom of a screen that in
+                // some programs carries the stop rule.
+                //
+                // A cap plus an inner scroll view fixes it without touching
+                // ordinary text sizes: at 100% the natural height is far below
+                // the cap, so the constraint never binds and the layout is
+                // byte-for-byte what it was. Making this a second flex child
+                // would not have been equivalent — two flex children split the
+                // free space, which would have shrunk the body on every screen
+                // at every size.
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: constraints.maxHeight * _chromeMaxFraction,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ...actions,
+                        if (footer case final String text) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            text,
+                            textAlign: TextAlign.center,
+                            style: TetherText.footnote,
+                          ),
+                        ],
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                  ),
                 ),
               ],
-              const SizedBox(height: 10),
-            ],
+            ),
           ),
         ),
       ),
@@ -151,39 +190,57 @@ class _TopBar extends StatelessWidget {
   static const _controlSize = 34.0;
   static const _badgeMinWidth = 58.0;
 
+  /// The most of the bar the status pill may take.
+  ///
+  /// The pill is not a flex child — it sizes to its text — so at large system
+  /// text sizes it grew until the whole row ran off the screen edge. Capping
+  /// it is the fix that leaves ordinary sizes untouched: at 100% every badge
+  /// in the app is well under this, so the constraint never binds. Making the
+  /// badge `Flexible` instead would have been simpler and wrong — it would
+  /// take a share of the free space on every screen, shrinking the title's box
+  /// and shifting the centred title left even at 100%.
+  static const _badgeMaxFraction = 0.45;
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        if (leading == LeadingControl.none)
-          const SizedBox(width: _controlSize, height: _controlSize)
-        else
-          _RoundControl(
-            icon: leading == LeadingControl.back
-                ? Icons.arrow_back
-                : Icons.close,
-            semanticLabel: leading == LeadingControl.back ? 'Back' : 'Close',
-            dark: dark,
-            onPressed: onLeading,
-          ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TetherText.barTitle.copyWith(
-              color: dark ? Colors.white : TetherColors.ink,
+    return LayoutBuilder(
+      builder: (context, constraints) => Row(
+        children: [
+          if (leading == LeadingControl.none)
+            const SizedBox(width: _controlSize, height: _controlSize)
+          else
+            _RoundControl(
+              icon: leading == LeadingControl.back
+                  ? Icons.arrow_back
+                  : Icons.close,
+              semanticLabel: leading == LeadingControl.back ? 'Back' : 'Close',
+              dark: dark,
+              onPressed: onLeading,
+            ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TetherText.barTitle.copyWith(
+                color: dark ? Colors.white : TetherColors.ink,
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        if (badge case final String text)
-          _Badge(text: text)
-        else
-          const SizedBox(width: _badgeMinWidth),
-      ],
+          const SizedBox(width: 8),
+          if (badge case final String text)
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: constraints.maxWidth * _badgeMaxFraction,
+              ),
+              child: _Badge(text: text),
+            )
+          else
+            const SizedBox(width: _badgeMinWidth),
+        ],
+      ),
     );
   }
 }
@@ -246,6 +303,11 @@ class _Badge extends StatelessWidget {
       child: Text(
         text.toUpperCase(),
         textAlign: TextAlign.center,
+        // Wraps before it truncates. A badge is a status word — "PAUSED",
+        // "ALWAYS HERE" — and half of one tells somebody less than a second
+        // line costs them.
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
         style: TetherText.badge,
       ),
     );
