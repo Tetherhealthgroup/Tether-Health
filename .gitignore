@@ -23,3 +23,26 @@ ios/Flutter/ephemeral/
 macos/Flutter/ephemeral/
 
 # Generated local runner files can be recreated with tool/setup_*.
+
+# Fastlane store credentials. Every one of these is a key that can publish as
+# us, so none of them belongs in the repository. See docs/releasing.md.
+AuthKey_*.p8
+*.p8
+play-service-account*.json
+*.mobileprovision
+*.cer
+*.certSigningRequest
+fastlane/.env*
+ios/fastlane/.env*
+android/fastlane/.env*
+
+# Fastlane run artefacts
+fastlane/report.xml
+ios/fastlane/report.xml
+android/fastlane/report.xml
+fastlane/Preview.html
+ios/fastlane/Preview.html
+android/fastlane/Preview.html
+fastlane/test_output/
+ios/fastlane/test_output/
+android/fastlane/test_output/
