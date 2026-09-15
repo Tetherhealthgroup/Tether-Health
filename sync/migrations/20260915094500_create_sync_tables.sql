@@ -8,19 +8,19 @@
 -- document, is what this service stores.
 
 CREATE TABLE IF NOT EXISTS sync_account (
-    account_id  text        PRIMARY KEY,
+    account_id  varchar(128) PRIMARY KEY,
     -- Per-account change counter. Every write to any of this account's areas
     -- claims the next value, which is what lets one integer cursor describe
     -- "everything I have seen" across independently versioned programmes.
-    change_seq  bigint      NOT NULL DEFAULT 0,
-    created_at  timestamptz NOT NULL,
-    updated_at  timestamptz NOT NULL
+    change_seq  bigint       NOT NULL DEFAULT 0,
+    created_at  timestamptz  NOT NULL,
+    updated_at  timestamptz  NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS sync_area (
-    account_id                 text        NOT NULL
+    account_id                 varchar(128) NOT NULL
         REFERENCES sync_account (account_id) ON DELETE CASCADE,
-    area_id                    text        NOT NULL,
+    area_id                    varchar(64)  NOT NULL,
     -- Monotonic per area. A push carrying a different value for this area is
     -- a conflict and is returned to the client, never merged here.
     revision                   bigint      NOT NULL,
@@ -29,12 +29,12 @@ CREATE TABLE IF NOT EXISTS sync_area (
     -- the flag, so the person's other device learns to delete its copy. Every
     -- enrolment column below is NULL once this is true.
     revoked                    boolean     NOT NULL DEFAULT false,
-    enrolment_status           text,
+    enrolment_status           varchar(16),
     enrolment_hidden           boolean,
     joined_on                  timestamptz,
     share_totals_and_adherence boolean,
     share_notes                boolean,
-    share_recipient            text,
+    share_recipient            varchar(256),
     updated_at                 timestamptz NOT NULL,
     PRIMARY KEY (account_id, area_id)
 );
@@ -46,13 +46,13 @@ CREATE INDEX IF NOT EXISTS sync_area_change_seq_idx
     ON sync_area (account_id, change_seq);
 
 CREATE TABLE IF NOT EXISTS sync_answer (
-    account_id text        NOT NULL,
-    area_id    text        NOT NULL,
+    account_id varchar(128) NOT NULL,
+    area_id    varchar(64)  NOT NULL,
     -- Bare screen id. The client sends `areaId/screenId`; the prefix is checked
     -- against area_id and then dropped, so a stored answer cannot name one
     -- programme in its key and sit in another's row.
-    screen_id  text        NOT NULL,
-    payload    jsonb       NOT NULL,
+    screen_id  varchar(64)  NOT NULL,
+    payload    jsonb        NOT NULL,
     updated_at timestamptz NOT NULL,
     PRIMARY KEY (account_id, area_id, screen_id),
     FOREIGN KEY (account_id, area_id)
@@ -60,14 +60,14 @@ CREATE TABLE IF NOT EXISTS sync_answer (
 );
 
 CREATE TABLE IF NOT EXISTS sync_lapse (
-    account_id text        NOT NULL,
-    area_id    text        NOT NULL,
+    account_id varchar(128) NOT NULL,
+    area_id    varchar(64)  NOT NULL,
     -- Position in the client's list rather than a surrogate key: the client
     -- replaces the whole list on every push, so the index is the identity and
     -- the order survives without a separate sort column.
     ordinal    integer     NOT NULL,
     at         timestamptz NOT NULL,
-    severity   text        NOT NULL,
+    severity   varchar(64)  NOT NULL,
     context    jsonb       NOT NULL,
     PRIMARY KEY (account_id, area_id, ordinal),
     FOREIGN KEY (account_id, area_id)

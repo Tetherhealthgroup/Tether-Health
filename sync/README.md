@@ -252,13 +252,28 @@ naming eleven programmes.
 
 Stated plainly, because the tests cannot cover it here:
 
-* **Nothing has been run against PostgreSQL.** There is no Postgres server and
-  no Docker in the environment this was built in. The whole suite runs on
-  SQLite. Specifically unverified: that `migrations/*.sql` applies cleanly,
-  that `timestamptz` round-trips as the code assumes, that `jsonb` accepts what
-  the JSON variant sends, and that the composite foreign keys behave as
-  written. Apply the migration to a scratch database and re-run a manual round
-  trip before the first deploy.
+* **No PostgreSQL *server* has run.** There is none in the environment this was
+  built in, and none can be: the sandbox denies `shmget`, so `initdb` cannot
+  even bootstrap a cluster — PostgreSQL always creates a small System V segment
+  as the postmaster interlock, whatever `shared_memory_type` says. Homebrew
+  needs `sudo` here and Docker is absent. This was attempted, not assumed.
+
+  What that leaves, and what has been done about it: the suite executes on
+  SQLite, which is lenient, so a statement it accepts might still be rejected
+  by the server. Every statement the suite runs — 1501 of them — is therefore
+  compiled a second time for the PostgreSQL dialect and parsed by
+  `libpg_query`, the server's own grammar built as a library (see the listener
+  in `tests/conftest.py`). The migration DDL and the `MetaData` are both put
+  through the same parser and compared on column types, lengths, primary keys
+  and defaults, which is how the `text` versus `varchar(128)` drift and a
+  `BOOLEAN DEFAULT 0` that PostgreSQL rejects outright were both found and
+  fixed.
+
+  Still genuinely unverified, because syntax is not behaviour: that
+  `timestamptz` round-trips the offset the client sent, that `jsonb` accepts
+  every document the app builds, and that the composite foreign keys cascade as
+  written. Apply the migration to a scratch database and run one round trip
+  before the first deploy.
 * `psycopg` (in `requirements-postgres.txt`) has never been installed here and
   is range-pinned rather than exact for that reason.
 * Concurrency is reasoned about, not load-tested. `_next_seq` relies on the

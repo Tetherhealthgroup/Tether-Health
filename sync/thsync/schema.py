@@ -83,7 +83,13 @@ sync_area = Table(
     # checked against — see `thsync.repository.push_bundles`.
     Column("revision", BigInteger, nullable=False),
     Column("change_seq", BigInteger, nullable=False),
-    Column("revoked", Boolean, nullable=False, server_default=text("0")),
+    # `false`, not `0`. PostgreSQL will not take an integer default on a
+    # boolean column — `DEFAULT 0` fails with "column is of type boolean but
+    # default expression is of type integer" — and SQLite, which the tests run
+    # on, accepts either. So the wrong spelling here is invisible until the
+    # first Postgres deploy. SQLite has understood the `false` keyword since
+    # 3.23, so this one works on both.
+    Column("revoked", Boolean, nullable=False, server_default=text("false")),
     # Null on a revoked area. Nullable rather than a separate table because the
     # enrolment is one-to-one with the area and splitting it would mean a
     # revocation had two rows to clear instead of one.

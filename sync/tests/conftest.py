@@ -12,9 +12,11 @@ from collections.abc import Iterator
 from typing import Any
 
 import jwt
+import pglast
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import Engine
+from sqlalchemy import Engine, event
+from sqlalchemy.dialects import postgresql
 
 from thsync.config import Settings
 from thsync.db import create_engine_from_settings, create_schema
@@ -42,9 +44,54 @@ def settings() -> Settings:
     )
 
 
+#: PostgreSQL, in the paramstyle whose placeholders are themselves valid SQL.
+#:
+#: SQLAlchemy's default `pyformat` renders `%(id)s`, which is psycopg's
+#: client-side interpolation and not something PostgreSQL's grammar accepts;
+#: `numeric` renders `:1`, which it also does not. `numeric_dollar` renders
+#: `$1`, a real PostgreSQL parameter, so the compiled statement can be handed
+#: to the server's own parser unchanged.
+_POSTGRES = postgresql.dialect(paramstyle="numeric_dollar")  # type: ignore[no-untyped-call]
+
+
 @pytest.fixture
 def engine(settings: Settings) -> Iterator[Engine]:
     built = create_engine_from_settings(settings)
+
+    # Every statement this suite runs, checked against PostgreSQL's grammar.
+    #
+    # The tests execute on SQLite because no PostgreSQL can run in the
+    # environment this was written in — the sandbox denies `shmget`, so even
+    # `initdb` cannot bootstrap a cluster. That leaves a specific hole: SQLite
+    # is famously lenient, so a query it accepts may still be rejected by the
+    # server in production, and the suite would be green either way.
+    #
+    # This closes most of that hole without a server. Each statement is
+    # compiled a second time for the PostgreSQL dialect and parsed by
+    # `libpg_query`, which is the server's own `gram.y` built as a library. A
+    # construct Postgres cannot parse now fails here, in the test that used it,
+    # rather than on the first deploy.
+    #
+    # It proves syntax and dialect support, not behaviour: a statement can
+    # parse and still return different results, and the two places that is most
+    # likely — `timestamptz` offsets and `jsonb` — are called out in the README
+    # as needing a live server.
+    @event.listens_for(built, "before_execute")
+    def _must_be_valid_postgresql(
+        conn: Any,
+        clauseelement: Any,
+        multiparams: Any,
+        params: Any,
+        execution_options: Any,
+    ) -> None:
+        compiled = clauseelement.compile(dialect=_POSTGRES)
+        try:
+            pglast.parse_sql(str(compiled))
+        except pglast.parser.ParseError as error:  # pragma: no cover - a failure
+            raise AssertionError(
+                f"statement is not valid PostgreSQL: {error}\n\n{compiled}"
+            ) from error
+
     create_schema(built)
     yield built
     built.dispose()
