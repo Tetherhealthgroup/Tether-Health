@@ -7,6 +7,7 @@ import '../../widgets/approved_screen_viewport.dart';
 import '../journey/journey.dart';
 import '../theme/tether_tokens.dart';
 import '../widgets/call_affordance.dart';
+import '../../config/contact_info.dart';
 import 'shell/shell_routes.dart';
 
 /// A screen that was signed off as a picture.
@@ -175,11 +176,28 @@ class _ArtworkScreenState extends State<ArtworkScreen> {
         Navigator.of(context).maybePop();
 
       case TapAction.quitline:
-        // The same route every other number in the app takes.
+        // The same route every other number in the app takes. The line comes
+        // from the target rather than being hardcoded here, so a Spanish
+        // target reaches the Spanish quitline instead of the English one.
+        final line = target.quitline ?? ContactInfo.english;
         CallAffordance.offer(
           context,
-          name: '1-800-QUIT-NOW',
-          number: '1-800-784-8669',
+          name: line.vanityNumber,
+          number: line.dialledNumber,
+        );
+
+      case TapAction.contactSupport:
+        // Product support, not a clinician, and the copy has to say so:
+        // somebody with urgent symptoms must not be left waiting on an inbox.
+        _explain(
+          context,
+          title: 'Contact support',
+          body: 'For questions about the app, your account or your data, '
+              'email ${ContactInfo.supportEmail}. That inbox is not monitored '
+              'for medical emergencies and cannot give medical advice. In an '
+              'emergency call ${ContactInfo.emergencyNumber}.',
+          confirmLabel: 'Get help now',
+          onConfirm: () => Navigator.of(context).pushNamed(ShellRoutes.crisis),
         );
 
       case TapAction.callbackConsent:

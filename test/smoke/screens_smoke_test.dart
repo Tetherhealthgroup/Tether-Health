@@ -1,27 +1,16 @@
+// Smoke — does the app boot and reach its first and last surfaces.
+//
+// Extracted from the original flat test/widget_test.dart; each test was
+// already self-contained, so behaviour is unchanged.
+
 import 'package:tether_health/main.dart';
-import 'package:tether_health/models/screen_spec.dart';
-import 'package:tether_health/widgets/approved_screen_viewport.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('catalog contains the complete ordered 28-screen experience', () {
-    expect(approvedScreens, hasLength(28));
-    expect(
-      approvedScreens.map((screen) => screen.number),
-      orderedEquals(List<int>.generate(28, (index) => index + 1)),
-    );
-    expect(approvedScreens.first.title, 'Welcome');
-    expect(approvedScreens.last.title, 'Settings & privacy');
-    expect(
-      approvedScreens.map((screen) => screen.assetPath).toSet(),
-      hasLength(28),
-    );
-  });
-
-  testWidgets('mobile view opens Screen 1 and swipes to Screen 2',
+  testWidgets('mobile view opens functional Screen 1 and continues to Screen 2',
       (tester) async {
-    tester.view.physicalSize = const Size(1290, 2796);
+    tester.view.physicalSize = const Size(1179, 2556);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -29,16 +18,29 @@ void main() {
     await tester.pumpWidget(const TetherHealthApp());
     await tester.pump();
 
-    expect(find.byKey(const ValueKey('screen-image-1')), findsOneWidget);
-
-    await tester.fling(
-      find.byType(ApprovedScreenViewport),
-      const Offset(-600, 0),
-      1200,
+    expect(
+      find.byKey(const ValueKey('functional-welcome-screen')),
+      findsOneWidget,
     );
+    expect(find.text('Your next breath can be different.'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('welcome-sign-in')),
+      findsOneWidget,
+    );
+
+    final getStarted = find.byKey(const ValueKey('welcome-get-started'));
+    await tester.ensureVisible(getStarted);
+    await tester.tap(getStarted);
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const ValueKey('screen-image-2')), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('functional-why-breathefree-screen')),
+      findsOneWidget,
+    );
+    expect(
+      find.text('Support for the moments that matter most.'),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 

@@ -70,10 +70,10 @@ android {
                 signingConfigs.getByName("debug")
             }
 
-            // Left off on purpose. The app has one runtime dependency and no
-            // reflection-based serialisation, so shrinking buys little; what it
-            // costs is a stack trace from a patient device that nobody can read
-            // without a mapping file this project does not yet upload anywhere.
+            // Left off on purpose. The app has three runtime dependencies and
+            // no reflection-based serialisation, so shrinking buys little; what
+            // it costs is a stack trace from a patient device that nobody can
+            // read without a mapping file this project does not upload anywhere.
             isMinifyEnabled = false
             isShrinkResources = false
         }

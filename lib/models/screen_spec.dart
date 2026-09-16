@@ -79,7 +79,8 @@ const approvedScreens = <ScreenSpec>[
   ScreenSpec(
     number: 3,
     title: 'Consent & privacy',
-    description: 'Collects informed consent and explains data choices in plain language.',
+    description:
+        'Collects informed consent and explains data choices in plain language.',
     phase: JourneyPhase.onboarding,
   ),
   ScreenSpec(
@@ -103,7 +104,8 @@ const approvedScreens = <ScreenSpec>[
   ScreenSpec(
     number: 7,
     title: 'Choose quit path',
-    description: 'Lets the patient choose a quit-date or gradual-reduction path.',
+    description:
+        'Lets the patient choose a quit-date or gradual-reduction path.',
     phase: JourneyPhase.quitPlan,
   ),
   ScreenSpec(
@@ -133,13 +135,15 @@ const approvedScreens = <ScreenSpec>[
   ScreenSpec(
     number: 12,
     title: 'Preparation home',
-    description: 'Daily home before quit day with tasks, check-in and craving support.',
+    description:
+        'Daily home before quit day with tasks, check-in and craving support.',
     phase: JourneyPhase.dailySupport,
   ),
   ScreenSpec(
     number: 13,
     title: 'Daily check-in',
-    description: 'Records a quick, nonpunitive daily status in under 90 seconds.',
+    description:
+        'Records a quick, nonpunitive daily status in under 90 seconds.',
     phase: JourneyPhase.dailySupport,
   ),
   ScreenSpec(
@@ -157,7 +161,8 @@ const approvedScreens = <ScreenSpec>[
   ScreenSpec(
     number: 16,
     title: 'Exercise complete & recheck',
-    description: 'Measures how the exercise felt and recommends what to do next.',
+    description:
+        'Measures how the exercise felt and recommends what to do next.',
     phase: JourneyPhase.dailySupport,
   ),
   ScreenSpec(
@@ -181,25 +186,29 @@ const approvedScreens = <ScreenSpec>[
   ScreenSpec(
     number: 20,
     title: 'Craving recheck',
-    description: 'Rechecks craving intensity without claiming a clinical measurement.',
+    description:
+        'Rechecks craving intensity without claiming a clinical measurement.',
     phase: JourneyPhase.cravingRescue,
   ),
   ScreenSpec(
     number: 21,
     title: 'Rescue result & next step',
-    description: 'Shows the patient-reported change and offers another safe option.',
+    description:
+        'Shows the patient-reported change and offers another safe option.',
     phase: JourneyPhase.cravingRescue,
   ),
   ScreenSpec(
     number: 22,
     title: 'Quit-day home',
-    description: 'Supports the patient through quit day with immediate help and check-ins.',
+    description:
+        'Supports the patient through quit day with immediate help and check-ins.',
     phase: JourneyPhase.quitDay,
   ),
   ScreenSpec(
     number: 23,
     title: 'Slip recovery',
-    description: 'Responds to a slip with support while preserving all prior progress.',
+    description:
+        'Responds to a slip with support while preserving all prior progress.',
     phase: JourneyPhase.quitDay,
   ),
   ScreenSpec(
@@ -211,7 +220,8 @@ const approvedScreens = <ScreenSpec>[
   ScreenSpec(
     number: 25,
     title: 'Learn library',
-    description: 'Offers clinically reviewed, plain-language learning resources.',
+    description:
+        'Offers clinically reviewed, plain-language learning resources.',
     phase: JourneyPhase.resources,
   ),
   ScreenSpec(
@@ -223,13 +233,15 @@ const approvedScreens = <ScreenSpec>[
   ScreenSpec(
     number: 27,
     title: 'Support hub',
-    description: 'Connects the patient to quitlines, supporters, coaches and care teams.',
+    description:
+        'Connects the patient to quitlines, supporters, coaches and care teams.',
     phase: JourneyPhase.resources,
   ),
   ScreenSpec(
     number: 28,
     title: 'Settings & privacy',
-    description: 'Centralizes notification privacy, consent, exports, accessibility and deletion.',
+    description:
+        'Centralizes notification privacy, consent, exports, accessibility and deletion.',
     phase: JourneyPhase.account,
   ),
 ];

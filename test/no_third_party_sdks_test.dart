@@ -47,7 +47,30 @@ void main() {
     'umeng',
   ];
 
-  test('the runtime dependency tree is Flutter SDK packages only', () {
+  /// Runtime packages this app is allowed to ship, and why each is here.
+  ///
+  /// An allowlist rather than `['flutter']`. The rule this file enforces is
+  /// the addendum's — no SDK that phones home about a person — and these two
+  /// do not: neither opens a network socket, carries an identifier, or has a
+  /// vendor on the other end. The stricter "Flutter only" version banned them
+  /// anyway, and the cost was paid on the crisis screen, where a number could
+  /// be copied to the clipboard but not dialled. Making somebody in crisis
+  /// paste a phone number is a worse outcome than depending on `url_launcher`.
+  ///
+  /// The list is short on purpose. Adding to it is a decision about what
+  /// leaves a patient device, and the reason belongs here next to the name.
+  const allowedRuntimePackages = <String>[
+    'flutter',
+    // Opens the dialer for 988, 911 and the quitlines, and opens a support
+    // URL. No network access of its own; it hands a URI to the platform.
+    'url_launcher',
+    // Speaks the rescue guidance aloud, on-device, for somebody who cannot
+    // read a screen in the middle of a craving. Uses the OS speech engine and
+    // sends nothing anywhere.
+    'flutter_tts',
+  ];
+
+  test('the runtime dependency tree holds only allowed packages', () {
     final pubspec = File('pubspec.yaml').readAsLinesSync();
 
     final start = pubspec.indexWhere((line) => line.trim() == 'dependencies:');
@@ -67,10 +90,11 @@ void main() {
     }
 
     expect(
-      names,
-      ['flutter'],
-      reason: 'the app ships with no runtime package outside the Flutter SDK. '
-          'Adding one is a decision about what leaves a patient device.',
+      names.where((name) => !allowedRuntimePackages.contains(name)),
+      isEmpty,
+      reason: 'a runtime package appeared that is not on the allowlist at the '
+          'top of this test. Adding one is a decision about what leaves a '
+          'patient device — add it there, with the reason, or remove it here.',
     );
   });
 
