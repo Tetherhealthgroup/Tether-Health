@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:breathefree_patient/profile/profile_api_client.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
@@ -29,5 +31,19 @@ void main() {
     );
     await expectLater(
         client.getProfile('token'), throwsA(isA<ProfileApiException>()));
+  });
+
+  test('times out a profile request so startup can retry', () async {
+    final client = HttpProfileApiClient(
+      baseUrl: 'https://api.example.test',
+      requestTimeout: const Duration(milliseconds: 1),
+      client: MockClient((_) async {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+        return http.Response('{}', 200);
+      }),
+    );
+
+    await expectLater(
+        client.getProfile('token'), throwsA(isA<TimeoutException>()));
   });
 }

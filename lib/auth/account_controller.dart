@@ -34,14 +34,16 @@ class AccountController extends ChangeNotifier {
   bool get isSignedIn => _auth.currentIdentity != null;
   String? get email => _auth.currentIdentity?.email;
 
-  Future<void> initialize() async {
-    if (isSignedIn) {
-      try {
-        await _loadProfile();
-      } catch (_) {
-        errorMessage = 'Your profile is temporarily unavailable.';
-        notifyListeners();
-      }
+  Future<bool> initialize() async {
+    if (!isSignedIn) return false;
+    try {
+      await _loadProfile();
+      errorMessage = null;
+      return true;
+    } catch (_) {
+      errorMessage = 'Your profile is temporarily unavailable.';
+      notifyListeners();
+      return false;
     }
   }
 

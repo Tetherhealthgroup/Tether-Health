@@ -67,9 +67,17 @@ class BreatheFreeApp extends StatefulWidget {
 }
 
 class _BreatheFreeAppState extends State<BreatheFreeApp> {
+  static const _profileRetryDelays = <Duration>[
+    Duration.zero,
+    Duration(seconds: 2),
+    Duration(seconds: 5),
+  ];
+
   late int _currentIndex;
   late final AccountController _accountController;
   late final bool _ownsAccountController;
+  late bool _restoringAccount;
+  bool _restoreFailed = false;
   final List<int> _history = <int>[];
 
   @override
@@ -80,6 +88,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         widget.accountController ?? AccountController.disabled();
     _currentIndex =
         widget.initialScreen.clamp(0, approvedScreens.length - 1).toInt();
+    _restoringAccount = _accountController.isSignedIn && _currentIndex == 0;
     unawaited(_initializeAccount());
   }
 
@@ -90,14 +99,58 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   }
 
   Future<void> _initializeAccount() async {
-    await _accountController.initialize();
-    if (!mounted || !_accountController.isSignedIn || _currentIndex != 0) {
-      return;
+    if (!_accountController.isSignedIn || _currentIndex != 0) return;
+
+    for (final delay in _profileRetryDelays) {
+      if (delay > Duration.zero) await Future<void>.delayed(delay);
+      if (!mounted) return;
+
+      final loaded = await _accountController.initialize();
+      if (!mounted) return;
+      if (!_accountController.isSignedIn) {
+        setState(() {
+          _restoringAccount = false;
+          _restoreFailed = false;
+        });
+        return;
+      }
+      if (loaded && _accountController.profile != null) {
+        setState(() {
+          _restoringAccount = false;
+          _restoreFailed = false;
+          _history.clear();
+          _currentIndex =
+              _accountController.profile!.onboardingCompleted ? 11 : 1;
+        });
+        return;
+      }
     }
-    _goTo(
-      _accountController.profile?.onboardingCompleted == true ? 11 : 1,
-      remember: false,
-    );
+
+    if (mounted) {
+      setState(() {
+        _restoringAccount = false;
+        _restoreFailed = true;
+      });
+    }
+  }
+
+  void _retryAccountRestore() {
+    setState(() {
+      _restoringAccount = true;
+      _restoreFailed = false;
+    });
+    unawaited(_initializeAccount());
+  }
+
+  Future<void> _signOutAfterRestoreFailure() async {
+    await _accountController.signOut();
+    if (!mounted) return;
+    setState(() {
+      _restoringAccount = false;
+      _restoreFailed = false;
+      _history.clear();
+      _currentIndex = 0;
+    });
   }
 
   void _goTo(int index, {bool remember = true}) {
@@ -239,13 +292,97 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         debugShowCheckedModeBanner: false,
         restorationScopeId: 'breathefree',
         theme: AppTheme.light(),
-        home: ApprovedScreenPlayer(
-          accountController: _accountController,
-          currentIndex: _currentIndex,
-          onSelectScreen: _goTo,
-          onPrevious: _goBack,
-          onNext: _goNext,
-          onTarget: _handleTarget,
+        home: _restoringAccount || _restoreFailed
+            ? _AccountConnectionScreen(
+                failed: _restoreFailed,
+                onRetry: _retryAccountRestore,
+                onSignOut: _signOutAfterRestoreFailure,
+              )
+            : ApprovedScreenPlayer(
+                accountController: _accountController,
+                currentIndex: _currentIndex,
+                onSelectScreen: _goTo,
+                onPrevious: _goBack,
+                onNext: _goNext,
+                onTarget: _handleTarget,
+              ),
+      ),
+    );
+  }
+}
+
+class _AccountConnectionScreen extends StatelessWidget {
+  const _AccountConnectionScreen({
+    required this.failed,
+    required this.onRetry,
+    required this.onSignOut,
+  });
+
+  final bool failed;
+  final VoidCallback onRetry;
+  final Future<void> Function() onSignOut;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: const ValueKey('account-connection-screen'),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(32),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (failed)
+                    Icon(
+                      Icons.cloud_off_rounded,
+                      size: 52,
+                      color: Theme.of(context).colorScheme.primary,
+                    )
+                  else
+                    const SizedBox.square(
+                      dimension: 44,
+                      child: CircularProgressIndicator(),
+                    ),
+                  const SizedBox(height: 24),
+                  Text(
+                    failed
+                        ? 'We could not reach your profile'
+                        : 'Connecting to BreatheFree',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    failed
+                        ? 'Your account is still signed in. Check your connection and try again.'
+                        : 'Your secure session is restored. This can take a moment while the development service wakes up.',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  if (failed) ...[
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        key: const ValueKey('account-connection-retry'),
+                        onPressed: onRetry,
+                        child: const Text('Try again'),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton(
+                      key: const ValueKey('account-connection-sign-out'),
+                      onPressed: () => unawaited(onSignOut()),
+                      child: const Text('Sign out'),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

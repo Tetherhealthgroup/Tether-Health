@@ -16,11 +16,16 @@ abstract interface class ProfileApiClient {
 }
 
 class HttpProfileApiClient implements ProfileApiClient {
-  HttpProfileApiClient({required String baseUrl, http.Client? client})
-      : _baseUri = Uri.parse(baseUrl),
+  HttpProfileApiClient({
+    required String baseUrl,
+    http.Client? client,
+    this.requestTimeout = const Duration(seconds: 20),
+  })  : _baseUri = Uri.parse(baseUrl),
         _client = client ?? http.Client();
+
   final Uri _baseUri;
   final http.Client _client;
+  final Duration requestTimeout;
 
   @override
   Future<UserProfile> getProfile(String accessToken) =>
@@ -40,8 +45,10 @@ class HttpProfileApiClient implements ProfileApiClient {
       request.headers['content-type'] = 'application/json';
       request.body = jsonEncode(body);
     }
-    final response =
-        await http.Response.fromStream(await _client.send(request));
+    final streamedResponse =
+        await _client.send(request).timeout(requestTimeout);
+    final response = await http.Response.fromStream(streamedResponse)
+        .timeout(requestTimeout);
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw ProfileApiException(response.statusCode);
     }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:breathefree_patient/auth/account_controller.dart';
 import 'package:breathefree_patient/auth/auth_gateway.dart';
 import 'package:breathefree_patient/main.dart';
@@ -50,6 +52,39 @@ void main() {
 
     expect(
         find.byKey(const ValueKey('functional-welcome-screen')), findsNothing);
+    expect(find.byKey(const ValueKey('functional-why-breathefree-screen')),
+        findsOneWidget);
+  });
+
+  testWidgets('restored account shows connection state while profile loads',
+      (tester) async {
+    tester.view.physicalSize = const Size(430, 932);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final auth = _SuccessfulAuth(signedIn: true);
+    final api = _DeferredProfileApi();
+    final account = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: api),
+    );
+    addTearDown(account.dispose);
+
+    await tester.pumpWidget(BreatheFreeApp(accountController: account));
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('account-connection-screen')),
+        findsOneWidget);
+    expect(find.text('Connecting to BreatheFree'), findsOneWidget);
+    expect(
+        find.byKey(const ValueKey('functional-welcome-screen')), findsNothing);
+
+    api.complete();
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byKey(const ValueKey('account-connection-screen')), findsNothing);
     expect(find.byKey(const ValueKey('functional-why-breathefree-screen')),
         findsOneWidget);
   });
@@ -119,19 +154,35 @@ class _SuccessfulAuth implements AuthGateway {
 
 class _ProfileApi implements ProfileApiClient {
   @override
-  Future<UserProfile> getProfile(String accessToken) async => UserProfile(
-        id: 'user-id',
-        displayName: null,
-        locale: 'en',
-        timeZone: 'UTC',
-        onboardingCompleted: false,
-        avatarPath: null,
-        createdAt: DateTime.utc(2026),
-        updatedAt: DateTime.utc(2026),
-      );
+  Future<UserProfile> getProfile(String accessToken) async => _profile();
 
   @override
   Future<UserProfile> updateProfile(
           String accessToken, Map<String, Object?> update) =>
       getProfile(accessToken);
 }
+
+class _DeferredProfileApi implements ProfileApiClient {
+  final _completer = Completer<UserProfile>();
+
+  void complete() => _completer.complete(_profile());
+
+  @override
+  Future<UserProfile> getProfile(String accessToken) => _completer.future;
+
+  @override
+  Future<UserProfile> updateProfile(
+          String accessToken, Map<String, Object?> update) =>
+      getProfile(accessToken);
+}
+
+UserProfile _profile() => UserProfile(
+      id: 'user-id',
+      displayName: null,
+      locale: 'en',
+      timeZone: 'UTC',
+      onboardingCompleted: false,
+      avatarPath: null,
+      createdAt: DateTime.utc(2026),
+      updatedAt: DateTime.utc(2026),
+    );
