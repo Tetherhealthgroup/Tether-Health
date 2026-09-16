@@ -45,13 +45,34 @@ from thsync.schema import metadata
 #: database while the tests stayed green.
 MIGRATIONS = Path(__file__).resolve().parents[2] / "supabase" / "migrations"
 
+
+def _own_migrations() -> list[Path]:
+    """The migration files belonging to *this* service.
+
+    `supabase/migrations/` is shared: Supabase Branching applies the whole
+    directory, so the profile service's DDL sits alongside the sync service's.
+    Every check here is about whether this service's schema and its migrations
+    agree, and a file that creates somebody else's table is not evidence either
+    way — comparing against it reported the profile tables as columns this
+    service had lost.
+
+    Ownership is decided by what a file creates, not by its name, because a
+    name is a convention and `CREATE TABLE` is a fact.
+    """
+    owned = []
+    for path in sorted(MIGRATIONS.glob("*.sql")):
+        created = set(_tables(path.read_text()))
+        if created & set(metadata.tables):
+            owned.append(path)
+    return owned
+
 #: `YYYYMMDDHHmmss_name.sql`. The runner applies files in filename order, so a
 #: file that does not sort by timestamp would be applied at the wrong moment.
 _FILENAME = re.compile(r"^\d{14}_[a-z0-9_]+\.sql$")
 
 
 def _sql() -> str:
-    return "\n".join(path.read_text() for path in sorted(MIGRATIONS.glob("*.sql")))
+    return "\n".join(path.read_text() for path in _own_migrations())
 
 
 def _type_of(column: ast.ColumnDef) -> str:
@@ -135,7 +156,7 @@ def _schema_ddl() -> str:
 
 
 def test_migration_filenames_follow_the_convention() -> None:
-    files = sorted(MIGRATIONS.glob("*.sql"))
+    files = _own_migrations()
     assert files, "no migrations found"
     for path in files:
         assert _FILENAME.match(path.name), path.name
@@ -143,7 +164,7 @@ def test_migration_filenames_follow_the_convention() -> None:
 
 def test_migrations_do_not_open_their_own_transaction() -> None:
     """The runner wraps each file; a BEGIN here would commit half of it early."""
-    for path in sorted(MIGRATIONS.glob("*.sql")):
+    for path in _own_migrations():
         body = path.read_text().upper()
         assert not re.search(r"^\s*BEGIN\b", body, re.MULTILINE), path.name
         assert not re.search(r"^\s*COMMIT\b", body, re.MULTILINE), path.name
@@ -151,6 +172,8 @@ def test_migrations_do_not_open_their_own_transaction() -> None:
 
 def test_every_migration_is_valid_postgresql() -> None:
     """Parsed by libpg_query — PostgreSQL's own grammar, not an approximation."""
+    # Every file in the shared directory, not just this service's: a syntax
+    # error in any of them fails the same deploy.
     for path in sorted(MIGRATIONS.glob("*.sql")):
         # Raises ParseError, which carries the same message the server would
         # give, including the character offset.
