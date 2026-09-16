@@ -124,7 +124,8 @@ void main() {
   group('journey screens render in all three states', () {
     late Journey lookup;
 
-    setUp(() => lookup = JourneyBuilder.forArea(bundle, bundle.area('digital')!));
+    setUp(
+        () => lookup = JourneyBuilder.forArea(bundle, bundle.area('digital')!));
 
     testWidgets('an authored screen renders its own copy', (tester) async {
       final today = lookup.screen('S12')!;
@@ -274,8 +275,7 @@ void main() {
       // of them could render without saying so, a reader would have no way to
       // tell signed-off wording from wording invented to fill a gap.
       final unreviewed = lookup.screens.where(
-        (screen) =>
-            screen.content?.provenance == ContentProvenance.supplement,
+        (screen) => screen.content?.provenance == ContentProvenance.supplement,
       );
       expect(unreviewed, hasLength(10));
 
@@ -390,7 +390,8 @@ void main() {
     }
   });
 
-  testWidgets('all 237 screens across all eleven programs build', (tester) async {
+  testWidgets('all 237 screens across all eleven programs build',
+      (tester) async {
     // The one test that would have caught a slot combination nobody drew by
     // hand. It asserts nothing about how a screen looks — only that asking for
     // it does not throw.

@@ -46,7 +46,8 @@ class InterceptTokens {
   String text(String name, [Map<String, String> values = const {}]) {
     final template = copy[name];
     if (template == null) {
-      throw StateError('Intercept token file has no copy string named "$name".');
+      throw StateError(
+          'Intercept token file has no copy string named "$name".');
     }
     return values.entries.fold(
       template,
@@ -117,9 +118,7 @@ class InterceptTokens {
 
   /// Parses `#RRGGBB`, the form the native implementations also read.
   static Color _color(String name, Object? value) {
-    if (value is! String ||
-        value.length != 7 ||
-        !value.startsWith('#')) {
+    if (value is! String || value.length != 7 || !value.startsWith('#')) {
       throw FormatException('Intercept colour "$name" is not #RRGGBB.');
     }
     final channels = int.tryParse(value.substring(1), radix: 16);

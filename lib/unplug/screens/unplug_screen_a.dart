@@ -74,7 +74,10 @@ class _SignalRow extends StatelessWidget {
     final availability = signal.availabilityOn(platform);
     final (background, foreground) = switch (availability) {
       SignalAvailability.full => (AppColors.mint, AppColors.deepTeal),
-      SignalAvailability.aggregate => (AppColors.mintStrong, AppColors.deepTeal),
+      SignalAvailability.aggregate => (
+          AppColors.mintStrong,
+          AppColors.deepTeal
+        ),
       SignalAvailability.approximate => (
           const Color(0xFFFFF3D6),
           const Color(0xFF7A5A15),

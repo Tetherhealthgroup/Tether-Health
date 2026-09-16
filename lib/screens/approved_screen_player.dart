@@ -1114,9 +1114,8 @@ class _DesktopToolbar extends StatelessWidget {
           const SizedBox(width: 10),
           IconButton.filledTonal(
             tooltip: 'Next screen',
-            onPressed: currentIndex == prototypeCatalog.length - 1
-                ? null
-                : onNext,
+            onPressed:
+                currentIndex == prototypeCatalog.length - 1 ? null : onNext,
             icon: const Icon(Icons.arrow_forward_rounded),
           ),
           const SizedBox(width: 18),

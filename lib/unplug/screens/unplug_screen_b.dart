@@ -113,8 +113,7 @@ class _UnplugScreenBState extends State<UnplugScreenB> {
             ),
           ),
         ),
-        if (state.authorization ==
-            AuthorizationState.blockedNoFamilySharing)
+        if (state.authorization == AuthorizationState.blockedNoFamilySharing)
           const UnplugNote(
             tone: NoteTone.warning,
             text: 'This device is not in an iCloud Family, so a child profile '
@@ -210,8 +209,8 @@ class _UnplugScreenBState extends State<UnplugScreenB> {
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
                               ),
-                              onSelected: (_) =>
-                                  setState(() => _labelController.text = preset),
+                              onSelected: (_) => setState(
+                                  () => _labelController.text = preset),
                             ),
                         ],
                       )

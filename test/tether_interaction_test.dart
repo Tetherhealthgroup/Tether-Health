@@ -221,8 +221,8 @@ void main() {
       final state = TetherSession(bundle: bundle);
       await pumpScreen(tester, screen, state: state);
 
-      final index = screen.content!.blocks
-          .indexWhere((block) => block is OptionsBlock);
+      final index =
+          screen.content!.blocks.indexWhere((block) => block is OptionsBlock);
       final block = screen.content!.blocks[index] as OptionsBlock;
       expect(block.items.length, greaterThan(1));
 

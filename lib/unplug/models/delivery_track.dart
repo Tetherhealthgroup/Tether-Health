@@ -50,17 +50,14 @@ enum GrantKind {
 class CapabilityGrant {
   const CapabilityGrant(this.label, this.kind);
 
-  const CapabilityGrant.allowed(String label)
-      : this(label, GrantKind.allowed);
+  const CapabilityGrant.allowed(String label) : this(label, GrantKind.allowed);
 
   const CapabilityGrant.conditional(String label)
       : this(label, GrantKind.conditional);
 
-  const CapabilityGrant.blocked(String label)
-      : this(label, GrantKind.blocked);
+  const CapabilityGrant.blocked(String label) : this(label, GrantKind.blocked);
 
-  const CapabilityGrant.notApplicable()
-      : this('n/a', GrantKind.notApplicable);
+  const CapabilityGrant.notApplicable() : this('n/a', GrantKind.notApplicable);
 
   final String label;
   final GrantKind kind;
@@ -104,8 +101,7 @@ const trackCapabilities = <TrackCapability>[
     clinician: CapabilityGrant.conditional('With consent'),
     coach: CapabilityGrant.blocked('No'),
     selfGuided: CapabilityGrant.conditional('Self only'),
-    note:
-        'A coach never reads free text. The tags that drive escalation are '
+    note: 'A coach never reads free text. The tags that drive escalation are '
         'evaluated by policy, not read by the coach.',
   ),
   TrackCapability(
@@ -125,8 +121,7 @@ const trackCapabilities = <TrackCapability>[
     clinician: CapabilityGrant.allowed('Yes'),
     coach: CapabilityGrant.allowed('Yes'),
     selfGuided: CapabilityGrant.conditional('24h cool-off'),
-    note:
-        'Loosening a limit is the one direction that always costs something: '
+    note: 'Loosening a limit is the one direction that always costs something: '
         'a reviewer, or a wait.',
   ),
   TrackCapability(

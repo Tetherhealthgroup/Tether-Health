@@ -97,9 +97,8 @@ class UnplugScreenH extends StatelessWidget {
                   for (final tag in state.recentTags)
                     UnplugPill(
                       label: tag.label,
-                      background: tag.distress
-                          ? AppColors.coralLight
-                          : AppColors.mint,
+                      background:
+                          tag.distress ? AppColors.coralLight : AppColors.mint,
                       foreground: tag.distress
                           ? const Color(0xFF8C3A26)
                           : AppColors.deepTeal,

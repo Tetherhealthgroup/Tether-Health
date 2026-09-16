@@ -79,7 +79,9 @@ Map<String, Object?> _document() => {
       ],
       'answers': {
         'tobacco/S05': {
-          'chips': {'0': [1, 2]},
+          'chips': {
+            '0': [1, 2]
+          },
         },
         'tobacco/S13': {
           'slider': {'2': 90.0},
@@ -205,7 +207,8 @@ void main() {
       final answers = merged['answers']! as Map<String, Object?>;
       // The server's copy of the area replaces the local one wholesale, so the
       // old tobacco answers are gone rather than merged field by field.
-      expect(answers.keys, containsAll(<String>['tobacco/S01', 'metabolic/S05']));
+      expect(
+          answers.keys, containsAll(<String>['tobacco/S01', 'metabolic/S05']));
       expect(answers.containsKey('tobacco/S05'), isFalse);
     });
 

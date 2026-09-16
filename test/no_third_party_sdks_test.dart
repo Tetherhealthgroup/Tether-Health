@@ -117,7 +117,8 @@ void main() {
         expect(
           RegExp('\\b$fragment\\b').hasMatch(contents),
           isFalse,
-          reason: '$path mentions "$fragment". Addendum §3.2 forbids analytics, '
+          reason:
+              '$path mentions "$fragment". Addendum §3.2 forbids analytics, '
               'crash reporters that collect identifiers and session replay on '
               'child profiles, including through a transitive dependency.',
         );

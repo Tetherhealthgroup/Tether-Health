@@ -195,8 +195,7 @@ class _GrantLine extends StatelessWidget {
             child: Text(
               track.label,
               style: TextStyle(
-                color:
-                    highlighted ? AppColors.deepTeal : AppColors.mutedTeal,
+                color: highlighted ? AppColors.deepTeal : AppColors.mutedTeal,
                 fontSize: 12.5,
                 fontWeight: highlighted ? FontWeight.w800 : FontWeight.w600,
               ),

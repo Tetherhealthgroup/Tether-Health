@@ -82,8 +82,7 @@ const platformSignals = <PlatformSignal>[
     name: 'Per-app named minutes',
     wanted: 'Named apps with per-app durations in the care-team dashboard.',
     ios: SignalAvailability.unavailable,
-    iosNote:
-        'Tokens are opaque and device-local. Show the selected set as an '
+    iosNote: 'Tokens are opaque and device-local. Show the selected set as an '
         'aggregate, plus the groups the person labelled themselves.',
     android: SignalAvailability.full,
     androidNote:

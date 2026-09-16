@@ -44,15 +44,15 @@ class AreaDirectoryScreen extends StatelessWidget {
       for (final status in AreaStatus.values)
         status: areas.where((area) => area.status == status).length,
     };
-    final implemented =
-        areas.where((area) => area.productId != null).length;
+    final implemented = areas.where((area) => area.productId != null).length;
 
     return TetherPage(
       title: _shellName(bundle, 'SH2') ?? 'Health areas',
       badge: '${areas.length} areas',
       leading: LeadingControl.back,
       headline: 'What Tether covers, and what exists yet.',
-      sub: 'One area has code being written. The rest are a plan. Where a line sounds like something you could use now, it is not.',
+      sub:
+          'One area has code being written. The rest are a plan. Where a line sounds like something you could use now, it is not.',
       body: [
         // statusNote — "required". The authored sentence is kept exactly; the
         // arithmetic in front of it is generated so the two cannot disagree.
@@ -125,8 +125,8 @@ class _AreaRow extends StatelessWidget {
           ? null
           : '${area.scope} · $lines service ${lines == 1 ? 'line' : 'lines'}',
       onTap: joinable
-          ? () => Navigator.of(context)
-              .pushNamed(ShellRoutes.join, arguments: area)
+          ? () =>
+              Navigator.of(context).pushNamed(ShellRoutes.join, arguments: area)
           : null,
       children: [
         const SizedBox(height: 8),
@@ -154,8 +154,8 @@ class _AreaRow extends StatelessWidget {
               // buried in SH3 because it is the reason this area may be
               // removed from a build entirely.
               // TODO(copy): threshold flag label.
-              const _Tag(label: 'Carries clinical thresholds',
-                  tone: CardTone.coral),
+              const _Tag(
+                  label: 'Carries clinical thresholds', tone: CardTone.coral),
           ],
         ),
         if (area.url.isNotEmpty) ...[
@@ -321,9 +321,8 @@ class _ShellCard extends StatelessWidget {
                   Text(
                     text.toUpperCase(),
                     style: TetherText.eyebrow.copyWith(
-                      color: dark
-                          ? TetherColors.mutedOnDark
-                          : TetherColors.muted,
+                      color:
+                          dark ? TetherColors.mutedOnDark : TetherColors.muted,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -340,9 +339,8 @@ class _ShellCard extends StatelessWidget {
                   Text(
                     bodyText,
                     style: TetherText.cardBody.copyWith(
-                      color: dark
-                          ? TetherColors.mutedOnDark
-                          : TetherColors.muted,
+                      color:
+                          dark ? TetherColors.mutedOnDark : TetherColors.muted,
                     ),
                   ),
                 ],

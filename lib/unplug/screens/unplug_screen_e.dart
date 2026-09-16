@@ -182,9 +182,7 @@ class _AndroidSplit extends StatelessWidget {
   Widget build(BuildContext context) {
     final peak = week.perApp.isEmpty
         ? 0
-        : week.perApp
-            .map((app) => app.minutes)
-            .reduce((a, b) => a > b ? a : b);
+        : week.perApp.map((app) => app.minutes).reduce((a, b) => a > b ? a : b);
 
     return UnplugCard(
       child: Column(

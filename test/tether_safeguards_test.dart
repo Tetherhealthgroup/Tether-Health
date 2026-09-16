@@ -3,8 +3,7 @@ import 'package:tether_health/tether/data/bundle_loader.dart';
 import 'package:tether_health/tether/data/design_bundle.dart';
 import 'package:tether_health/tether/state/tether_session.dart';
 
-import 'tether_bundle_test.dart'
-    show CatalogueOnlyAssetBundle, DiskAssetBundle;
+import 'tether_bundle_test.dart' show CatalogueOnlyAssetBundle, DiskAssetBundle;
 
 /// The safeguards, turned into something that fails the build.
 ///
@@ -62,8 +61,8 @@ void main() {
 
   group('a slip is an event, not a reset', () {
     test('the archetypes that can see a lapse declare the safeguard', () {
-      expect(bundle.archetypes['lapse']!.requires,
-          contains('slip_never_resets'));
+      expect(
+          bundle.archetypes['lapse']!.requires, contains('slip_never_resets'));
       expect(bundle.archetypes['progress']!.requires,
           contains('slip_never_resets'));
     });
@@ -272,8 +271,8 @@ void main() {
 
       // The export agrees: one program holds it, the other holds nothing, and
       // there is no third place holding it for both.
-      final programs =
-          (state.exportRecord()['programs']! as List).cast<Map<String, Object?>>();
+      final programs = (state.exportRecord()['programs']! as List)
+          .cast<Map<String, Object?>>();
       final answersByArea = {
         for (final program in programs)
           program['area']! as String: program['answers']! as Map,
@@ -404,8 +403,8 @@ void main() {
       final rescue = bundle.archetypes['rescue_active']!;
       expect(
         rescue.requires,
-        containsAll(['offline_capable', 'reduced_motion_fallback',
-            'no_data_sent']),
+        containsAll(
+            ['offline_capable', 'reduced_motion_fallback', 'no_data_sent']),
       );
       expect(
         bundle.archetypes['rescue_start']!.requires,

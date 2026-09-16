@@ -58,7 +58,8 @@ class SharingMatrixScreen extends StatelessWidget {
             title: 'Nothing to share yet',
             // TODO(copy): empty-state body. Restates the default so that the
             // screen is still informative when it is empty.
-            body: 'When you join a program, its own sharing settings appear here — switched off, and separate from every other program.',
+            body:
+                'When you join a program, its own sharing settings appear here — switched off, and separate from every other program.',
           )
         else
           for (final enrolment in joined)
@@ -69,9 +70,11 @@ class SharingMatrixScreen extends StatelessWidget {
         _ShellCard(
           tone: CardTone.mintPale,
           title: 'Why they are separate',
-          body: 'A cessation coach has no reason to see behavioural health data. Some categories are legally required to stay segregated.',
+          body:
+              'A cessation coach has no reason to see behavioural health data. Some categories are legally required to stay segregated.',
           children: [
-            if (bundle.shell.rule('per_program_sharing') case final ShellRule rule) ...[
+            if (bundle.shell.rule('per_program_sharing')
+                case final ShellRule rule) ...[
               const SizedBox(height: 10),
               Text(rule.why, style: TetherText.cardBody),
             ],
@@ -80,7 +83,8 @@ class SharingMatrixScreen extends StatelessWidget {
 
         const _ShellCard(
           title: 'Preview before sending',
-          body: 'Every share shows you the exact contents first. You can cancel at that point.',
+          body:
+              'Every share shows you the exact contents first. You can cancel at that point.',
           children: [
             SizedBox(height: 8),
             Text(
@@ -156,7 +160,8 @@ class _ProgramSharingRow extends StatelessWidget {
           // The authored wording for this disclosure, kept exactly.
           label: 'Totals and adherence',
           // TODO(copy): the explanatory line under the switch.
-          description: 'Aggregate progress for this program. Nothing from any other program.',
+          description:
+              'Aggregate progress for this program. Nothing from any other program.',
           value: sharing.totalsAndAdherence,
           programName: name,
           onChanged: (value) => session.setSharing(
@@ -338,43 +343,39 @@ class _ShellCard extends StatelessWidget {
         // the switches, and a tappable card around them would be a second,
         // ambiguous way to change a consent setting.
         child: Padding(
-            padding: TetherSpace.cardPadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (eyebrow case final String text) ...[
-                  Text(
-                    text.toUpperCase(),
-                    style: TetherText.eyebrow.copyWith(
-                      color: dark
-                          ? TetherColors.mutedOnDark
-                          : TetherColors.muted,
-                    ),
+          padding: TetherSpace.cardPadding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (eyebrow case final String text) ...[
+                Text(
+                  text.toUpperCase(),
+                  style: TetherText.eyebrow.copyWith(
+                    color: dark ? TetherColors.mutedOnDark : TetherColors.muted,
                   ),
-                  const SizedBox(height: 4),
-                ],
-                if (titleText != null)
-                  Text(
-                    titleText,
-                    style: TetherText.cardTitle.copyWith(
-                      color: dark ? Colors.white : TetherColors.ink,
-                    ),
-                  ),
-                if (bodyText != null) ...[
-                  if (titleText != null) const SizedBox(height: 4),
-                  Text(
-                    bodyText,
-                    style: TetherText.cardBody.copyWith(
-                      color: dark
-                          ? TetherColors.mutedOnDark
-                          : TetherColors.muted,
-                    ),
-                  ),
-                ],
-                ...children,
+                ),
+                const SizedBox(height: 4),
               ],
-            ),
+              if (titleText != null)
+                Text(
+                  titleText,
+                  style: TetherText.cardTitle.copyWith(
+                    color: dark ? Colors.white : TetherColors.ink,
+                  ),
+                ),
+              if (bodyText != null) ...[
+                if (titleText != null) const SizedBox(height: 4),
+                Text(
+                  bodyText,
+                  style: TetherText.cardBody.copyWith(
+                    color: dark ? TetherColors.mutedOnDark : TetherColors.muted,
+                  ),
+                ),
+              ],
+              ...children,
+            ],
+          ),
         ),
       ),
     );

@@ -24,7 +24,8 @@ import '../unplug/widgets/unplug_scope.dart';
 /// Reached at [TetherRouter.prototypeRoute], or by launching with
 /// `--dart-define=TETHER_ENTRY=prototype`.
 class TetherHealthApp extends StatefulWidget {
-  const TetherHealthApp({this.initialScreen = 0, this.standalone = true, super.key});
+  const TetherHealthApp(
+      {this.initialScreen = 0, this.standalone = true, super.key});
 
   final int initialScreen;
 

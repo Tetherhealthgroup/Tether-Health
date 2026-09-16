@@ -44,8 +44,7 @@ class ProgramsHomeScreen extends StatelessWidget {
         .toList(growable: false);
     final paused = session.pausedPrograms;
     final activeCount = session.activePrograms.length;
-    final nothingJoined =
-        activeCount == 0 && paused.isEmpty && hidden.isEmpty;
+    final nothingJoined = activeCount == 0 && paused.isEmpty && hidden.isEmpty;
 
     // The ceiling is read from the bundle rather than written here, so that
     // editing `shell.json` edits the app. See [ShellSpec.maxActivePrograms].
@@ -78,7 +77,8 @@ class ProgramsHomeScreen extends StatelessWidget {
             // TODO(copy): empty-state card body. Deliberately does not name an
             // area, because naming one here would be the directory this screen
             // is forbidden from showing.
-            body: 'Look at an area when you are ready, read what joining changes, and decide then. Nothing starts on its own.',
+            body:
+                'Look at an area when you are ready, read what joining changes, and decide then. Nothing starts on its own.',
           ),
 
         // activeCards — "required:0-2". Zero is a legitimate state and is why
@@ -99,7 +99,8 @@ class ProgramsHomeScreen extends StatelessWidget {
             title: 'Room for one more',
             // TODO(copy): one-program card body. Second sentence echoes the
             // authored sub so the ceiling is stated the same way twice.
-            body: 'You can add a second program whenever you want. A third needs a conversation, not a tap.',
+            body:
+                'You can add a second program whenever you want. A third needs a conversation, not a tap.',
           ),
 
         // pausedRows — "optional". A paused program is still joined: it does
@@ -128,7 +129,8 @@ class ProgramsHomeScreen extends StatelessWidget {
             title: 'Hidden from your home screen',
             // TODO(copy): the sentence structure is authored; the names and
             // the plural are generated.
-            body: '${_nameList(session, hidden)} ${hidden.length == 1 ? 'is' : 'are'} reachable only from here. Nothing shows on your lock screen.',
+            body:
+                '${_nameList(session, hidden)} ${hidden.length == 1 ? 'is' : 'are'} reachable only from here. Nothing shows on your lock screen.',
             children: [
               const SizedBox(height: 10),
               Wrap(
@@ -184,8 +186,7 @@ class ProgramsHomeScreen extends StatelessWidget {
             title: 'Things that help',
             body: 'Short practices for a hard moment or a bad night. The same '
                 'ones in every program, because they are safe for anybody.',
-            onTap: () =>
-                Navigator.of(context).pushNamed(ShellRoutes.remedies),
+            onTap: () => Navigator.of(context).pushNamed(ShellRoutes.remedies),
           ),
       ],
       actions: [
@@ -193,14 +194,12 @@ class ProgramsHomeScreen extends StatelessWidget {
         // eleven.
         TetherActionButton(
           label: 'Look at another area',
-          onPressed: () =>
-              Navigator.of(context).pushNamed(ShellRoutes.areas),
+          onPressed: () => Navigator.of(context).pushNamed(ShellRoutes.areas),
         ),
         TetherActionButton(
           label: _shellName(session.bundle, 'SH6') ?? 'Get help now',
           kind: 'ghost',
-          onPressed: () =>
-              Navigator.of(context).pushNamed(ShellRoutes.crisis),
+          onPressed: () => Navigator.of(context).pushNamed(ShellRoutes.crisis),
         ),
       ],
       footer: 'Each program shares separately. Nothing is pooled.',
@@ -396,9 +395,8 @@ class _ShellCard extends StatelessWidget {
                   Text(
                     text.toUpperCase(),
                     style: TetherText.eyebrow.copyWith(
-                      color: dark
-                          ? TetherColors.mutedOnDark
-                          : TetherColors.muted,
+                      color:
+                          dark ? TetherColors.mutedOnDark : TetherColors.muted,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -415,9 +413,8 @@ class _ShellCard extends StatelessWidget {
                   Text(
                     bodyText,
                     style: TetherText.cardBody.copyWith(
-                      color: dark
-                          ? TetherColors.mutedOnDark
-                          : TetherColors.muted,
+                      color:
+                          dark ? TetherColors.mutedOnDark : TetherColors.muted,
                     ),
                   ),
                 ],

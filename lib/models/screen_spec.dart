@@ -67,13 +67,15 @@ const approvedScreens = <ScreenSpec>[
   ScreenSpec(
     number: 1,
     title: 'Welcome',
-    description: 'Introduces Tether Health, language choice and the private, judgment-free promise.',
+    description:
+        'Introduces Tether Health, language choice and the private, judgment-free promise.',
     phase: JourneyPhase.welcome,
   ),
   ScreenSpec(
     number: 2,
     title: 'Why Tether Health',
-    description: 'Explains how the app supports cravings, planning and progress.',
+    description:
+        'Explains how the app supports cravings, planning and progress.',
     phase: JourneyPhase.onboarding,
   ),
   ScreenSpec(

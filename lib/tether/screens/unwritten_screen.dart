@@ -97,8 +97,7 @@ class UnwrittenScreen extends StatelessWidget {
         _Safeguards(ids: archetype.requires, bundle: bundle),
       ],
       actions: [
-        for (final action in archetype.actions)
-          _archetypeActionButton(action),
+        for (final action in archetype.actions) _archetypeActionButton(action),
       ],
       footer: 'Archetype ${archetype.id} · '
           '${archetype.slots.length} slots · '
@@ -118,8 +117,10 @@ class UnwrittenScreen extends StatelessWidget {
   /// that pumps this screen on its own should get a page with raw safeguard ids
   /// on it, not a failed assertion: the ids alone are still true, and the
   /// screen's job is to degrade rather than disappear.
-  DesignBundle? _bundleOrNull(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<TetherScope>()?.notifier?.bundle;
+  DesignBundle? _bundleOrNull(BuildContext context) => context
+      .dependOnInheritedWidgetOfExactType<TetherScope>()
+      ?.notifier
+      ?.bundle;
 
   /// One of the archetype's declared actions, as a real button.
   ///
@@ -248,7 +249,8 @@ class _Facts extends StatelessWidget {
   static String _originLabel(JourneyOrigin origin) => switch (origin) {
         JourneyOrigin.product => 'Pinned by the product file',
         JourneyOrigin.areaShared => 'Derived from the area’s shared screens',
-        JourneyOrigin.areaSpecific => 'Derived from the area’s specific screens',
+        JourneyOrigin.areaSpecific =>
+          'Derived from the area’s specific screens',
       };
 }
 

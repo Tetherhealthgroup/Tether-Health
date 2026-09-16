@@ -69,7 +69,9 @@ void main() {
         ],
         'answers': {
           '$area/S05': {
-            'chips': {'0': [1, 2]},
+            'chips': {
+              '0': [1, 2]
+            },
             'option': {'1': 3},
             'slider': {'2': 90.0},
             'text': {'3': note},

@@ -369,8 +369,7 @@ class _BuildRow extends StatelessWidget {
                 ),
                 UnplugPill(
                   label: status,
-                  background:
-                      built ? AppColors.mint : AppColors.coralLight,
+                  background: built ? AppColors.mint : AppColors.coralLight,
                   foreground:
                       built ? AppColors.deepTeal : const Color(0xFF8C3A26),
                 ),

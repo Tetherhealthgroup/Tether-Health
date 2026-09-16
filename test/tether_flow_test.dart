@@ -249,14 +249,19 @@ void main() {
     await boot(tester, '/program/digital/S19');
     await tester.pump(const Duration(seconds: 2));
 
-    final before = tester.widget<Text>(
-      find.descendant(
-        of: find.byType(Semantics),
-        matching: find.byWidgetPredicate(
-          (widget) => widget is Text && int.tryParse(widget.data ?? '') != null,
-        ),
-      ).first,
-    ).data;
+    final before = tester
+        .widget<Text>(
+          find
+              .descendant(
+                of: find.byType(Semantics),
+                matching: find.byWidgetPredicate(
+                  (widget) =>
+                      widget is Text && int.tryParse(widget.data ?? '') != null,
+                ),
+              )
+              .first,
+        )
+        .data;
 
     await press(tester, 'End early');
     expect(currentScreen(tester), 'S20');
@@ -270,14 +275,19 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     expect(currentScreen(tester), 'S19');
 
-    final after = tester.widget<Text>(
-      find.descendant(
-        of: find.byType(Semantics),
-        matching: find.byWidgetPredicate(
-          (widget) => widget is Text && int.tryParse(widget.data ?? '') != null,
-        ),
-      ).first,
-    ).data;
+    final after = tester
+        .widget<Text>(
+          find
+              .descendant(
+                of: find.byType(Semantics),
+                matching: find.byWidgetPredicate(
+                  (widget) =>
+                      widget is Text && int.tryParse(widget.data ?? '') != null,
+                ),
+              )
+              .first,
+        )
+        .data;
 
     expect(
       int.parse(after!),

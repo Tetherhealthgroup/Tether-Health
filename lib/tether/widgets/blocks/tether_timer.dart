@@ -101,9 +101,8 @@ class _TetherTimerState extends State<TetherTimer> {
             ),
           const SizedBox(height: 12),
           Semantics(
-            label: _remaining > 0
-                ? '$_remaining seconds remaining'
-                : 'Finished',
+            label:
+                _remaining > 0 ? '$_remaining seconds remaining' : 'Finished',
             child: ExcludeSemantics(
               child: Container(
                 width: 118,

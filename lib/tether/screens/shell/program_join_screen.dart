@@ -102,7 +102,8 @@ class _ProgramJoinScreenState extends State<ProgramJoinScreen> {
       badge: area.status.label,
       leading: LeadingControl.back,
       headline: 'What joining changes.',
-      sub: 'Read this before you decide. You can leave at any point and take your data with you.',
+      sub:
+          'Read this before you decide. You can leave at any point and take your data with you.',
       body: [
         if (enrolment.isJoined)
           const _ShellCard(
@@ -111,7 +112,8 @@ class _ProgramJoinScreenState extends State<ProgramJoinScreen> {
             // variant for somebody who is already in the program.
             title: 'You are already in this program',
             // TODO(copy): as above.
-            body: 'Nothing on this screen will start it again. Your programs is where you pause, hide or leave it.',
+            body:
+                'Nothing on this screen will start it again. Your programs is where you pause, hide or leave it.',
           ),
 
         // whatChanges — "required". Built from the service lines, because the
@@ -137,7 +139,8 @@ class _ProgramJoinScreenState extends State<ProgramJoinScreen> {
             // TODO(copy): generated from the platform-dependent measures. The
             // second sentence is the point: the honest failure mode is a gap,
             // not a zero.
-            body: 'Permission for the things your phone has to measure: ${platformDependent.join(', ').toLowerCase()}. '
+            body:
+                'Permission for the things your phone has to measure: ${platformDependent.join(', ').toLowerCase()}. '
                 'Your phone can refuse, and where it does the number is missing rather than guessed.',
           ),
 
@@ -148,7 +151,8 @@ class _ProgramJoinScreenState extends State<ProgramJoinScreen> {
           // TODO(copy): the authored version names BreatheFree. This is the
           // same promise without the other program's name in it, because the
           // other program is different for everybody.
-          body: 'Totals and adherence for this program only, and only once you switch it on. Nothing from any other program, and not your notes.',
+          body:
+              'Totals and adherence for this program only, and only once you switch it on. Nothing from any other program, and not your notes.',
           children: [
             const SizedBox(height: 10),
             if (area.measures.isEmpty)
@@ -157,8 +161,7 @@ class _ProgramJoinScreenState extends State<ProgramJoinScreen> {
                 'This area does not record a measure yet.',
                 style: TetherText.cardBody,
               ),
-            for (final measure in area.measures)
-              _MeasureLine(measure: measure),
+            for (final measure in area.measures) _MeasureLine(measure: measure),
           ],
         ),
 
@@ -183,7 +186,8 @@ class _ProgramJoinScreenState extends State<ProgramJoinScreen> {
             // build-level rule, and this is the person-facing half of it.
             title: 'This area can tell you to call someone',
             // TODO(copy): as above.
-            body: 'Some of what it records has a range where the right answer is to contact a clinician rather than log it and carry on. That also means this area may not be in every build of the app.',
+            body:
+                'Some of what it records has a range where the right answer is to contact a clinician rather than log it and carry on. That also means this area may not be in every build of the app.',
           ),
 
         // limitNote — "optional", and present exactly when the ceiling is in
@@ -194,14 +198,16 @@ class _ProgramJoinScreenState extends State<ProgramJoinScreen> {
             // TODO(copy): title for an area with no implementation.
             title: 'There is nothing to join yet',
             // Body is the authored SH2 sentence, reused rather than rewritten.
-            body: 'Planned areas have no implementation. We will tell you when that changes, and not before.',
+            body:
+                'Planned areas have no implementation. We will tell you when that changes, and not before.',
           )
         else if (atCeiling && pauseName != null)
           _ShellCard(
             tone: CardTone.coral,
             title: 'You already have two active',
             // The authored sentence, with the program name substituted.
-            body: 'Joining this would pause $pauseName. You can switch back whenever you want.',
+            body:
+                'Joining this would pause $pauseName. You can switch back whenever you want.',
             children: [
               const SizedBox(height: 6),
               // The explicit trade. `two_active_max` exists so that the third
@@ -231,7 +237,8 @@ class _ProgramJoinScreenState extends State<ProgramJoinScreen> {
             title: 'You already have two active',
             // TODO(copy): the case where the session cannot work out which
             // program to offer up. Rare, and it still may not guess.
-            body: 'Two programs are running and we cannot tell which one you would want paused. Pause one from Your programs first.',
+            body:
+                'Two programs are running and we cannot tell which one you would want paused. Pause one from Your programs first.',
           ),
 
         // The two-at-a-time rule in the shell's own words, so that a refusal
@@ -250,7 +257,8 @@ class _ProgramJoinScreenState extends State<ProgramJoinScreen> {
             // TODO(copy): names the product behind the area, and its status.
             title: 'Built as ${product.name}',
             // TODO(copy): as above.
-            body: 'Status: ${product.status}. Program words: ${_vocabulary(product)}.',
+            body:
+                'Status: ${product.status}. Program words: ${_vocabulary(product)}.',
           ),
 
         // scopeDisclaimer — "required", on every variant of this screen
@@ -326,7 +334,8 @@ class _MissingAreaScreen extends StatelessWidget {
       // TODO(copy): the wrong-argument error state. Written for a person, not
       // for a log file, because this is a screen they can actually reach.
       headline: 'We lost track of which area you were reading about.',
-      sub: 'Nothing has changed and nothing has been joined. Go back to the list and pick it again.',
+      sub:
+          'Nothing has changed and nothing has been joined. Go back to the list and pick it again.',
       body: const [
         _ShellCard(tone: CardTone.mintPale, body: _scopeDisclaimer),
       ],
@@ -480,43 +489,39 @@ class _ShellCard extends StatelessWidget {
         // Nothing on the join screen is tappable except its buttons. Reading
         // is the task; a card that navigated would interrupt it.
         child: Padding(
-            padding: TetherSpace.cardPadding,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (eyebrow case final String text) ...[
-                  Text(
-                    text.toUpperCase(),
-                    style: TetherText.eyebrow.copyWith(
-                      color: dark
-                          ? TetherColors.mutedOnDark
-                          : TetherColors.muted,
-                    ),
+          padding: TetherSpace.cardPadding,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (eyebrow case final String text) ...[
+                Text(
+                  text.toUpperCase(),
+                  style: TetherText.eyebrow.copyWith(
+                    color: dark ? TetherColors.mutedOnDark : TetherColors.muted,
                   ),
-                  const SizedBox(height: 4),
-                ],
-                if (titleText != null)
-                  Text(
-                    titleText,
-                    style: TetherText.cardTitle.copyWith(
-                      color: dark ? Colors.white : TetherColors.ink,
-                    ),
-                  ),
-                if (bodyText != null) ...[
-                  if (titleText != null) const SizedBox(height: 4),
-                  Text(
-                    bodyText,
-                    style: TetherText.cardBody.copyWith(
-                      color: dark
-                          ? TetherColors.mutedOnDark
-                          : TetherColors.muted,
-                    ),
-                  ),
-                ],
-                ...children,
+                ),
+                const SizedBox(height: 4),
               ],
-            ),
+              if (titleText != null)
+                Text(
+                  titleText,
+                  style: TetherText.cardTitle.copyWith(
+                    color: dark ? Colors.white : TetherColors.ink,
+                  ),
+                ),
+              if (bodyText != null) ...[
+                if (titleText != null) const SizedBox(height: 4),
+                Text(
+                  bodyText,
+                  style: TetherText.cardBody.copyWith(
+                    color: dark ? TetherColors.mutedOnDark : TetherColors.muted,
+                  ),
+                ),
+              ],
+              ...children,
+            ],
+          ),
         ),
       ),
     );

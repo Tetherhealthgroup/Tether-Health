@@ -106,7 +106,8 @@ class CrisisRouteScreen extends StatelessWidget {
         // rule without reading any Dart.
         const _ShellCard(
           tone: CardTone.mintPale,
-          body: 'This screen is the same from anywhere in the app, in every program. It is never reordered or personalised.',
+          body:
+              'This screen is the same from anywhere in the app, in every program. It is never reordered or personalised.',
         ),
       ],
       actions: [
@@ -146,8 +147,7 @@ class _EmergencyCard extends StatelessWidget {
       tone: CardTone.coral,
       title: _title,
       body: _body,
-      onTap: () =>
-          _offerNumber(context, name: _dialogName, number: _number),
+      onTap: () => _offerNumber(context, name: _dialogName, number: _number),
       children: [
         const SizedBox(height: 10),
         Align(
@@ -357,9 +357,8 @@ class _ShellCard extends StatelessWidget {
                   Text(
                     bodyText,
                     style: TetherText.cardBody.copyWith(
-                      color: dark
-                          ? TetherColors.mutedOnDark
-                          : TetherColors.muted,
+                      color:
+                          dark ? TetherColors.mutedOnDark : TetherColors.muted,
                     ),
                   ),
                 ],

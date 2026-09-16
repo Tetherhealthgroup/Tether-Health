@@ -229,11 +229,12 @@ void main() {
       await store.flush();
 
       expect(host.writes, 1);
-      final document =
-          jsonDecode(host.values[SessionStore.defaultKey]!) as Map<String, Object?>;
+      final document = jsonDecode(host.values[SessionStore.defaultKey]!)
+          as Map<String, Object?>;
       final answers = document['answers']! as Map<String, Object?>;
       final screen = answers['digital/S12']! as Map<String, Object?>;
-      expect((screen['text']! as Map<String, Object?>)['3'], 'worse after lunch');
+      expect(
+          (screen['text']! as Map<String, Object?>)['3'], 'worse after lunch');
     });
   });
 

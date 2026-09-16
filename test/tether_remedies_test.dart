@@ -238,7 +238,8 @@ void main() {
       expect(find.text(remedy.steps.first), findsOneWidget);
     });
 
-    testWidgets('an unknown id says so rather than going quiet', (tester) async {
+    testWidgets('an unknown id says so rather than going quiet',
+        (tester) async {
       await pump(tester, const RemediesScreen());
 
       final navigator = tester.state<NavigatorState>(find.byType(Navigator));

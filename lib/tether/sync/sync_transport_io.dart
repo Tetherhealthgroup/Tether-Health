@@ -40,7 +40,8 @@ class IoSyncTransport implements SyncTransport {
         request.add(bytes);
       }
       final response = await request.close().timeout(_timeout);
-      final text = await response.transform(utf8.decoder).join().timeout(_timeout);
+      final text =
+          await response.transform(utf8.decoder).join().timeout(_timeout);
       return SyncResponse(status: response.statusCode, body: text);
     } on Object catch (error) {
       // Every failure to reach a server — DNS, refused, TLS, timeout — is the

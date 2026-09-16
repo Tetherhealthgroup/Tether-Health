@@ -12,8 +12,7 @@
 /// compiler reads.
 library;
 
-export 'sync_transport_stub.dart'
-    if (dart.library.io) 'sync_transport_io.dart';
+export 'sync_transport_stub.dart' if (dart.library.io) 'sync_transport_io.dart';
 
 /// One HTTP response, reduced to what the client needs.
 class SyncResponse {

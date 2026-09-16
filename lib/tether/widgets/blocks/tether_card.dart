@@ -173,9 +173,8 @@ class _Chip extends StatelessWidget {
                 child: Text(
                   label,
                   style: TetherText.chip.copyWith(
-                    color: selected || !onDark
-                        ? TetherColors.ink
-                        : Colors.white,
+                    color:
+                        selected || !onDark ? TetherColors.ink : Colors.white,
                   ),
                 ),
               ),
@@ -325,7 +324,6 @@ class _Pill extends StatelessWidget {
       // it, so a screen reader reading this too would offer the same action
       // twice.
       _PillKind.destination => ExcludeSemantics(child: chip),
-
       _PillKind.call => Semantics(
           button: true,
           label: label,

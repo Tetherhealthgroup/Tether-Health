@@ -147,9 +147,8 @@ class _TemplateCard extends StatelessWidget {
                     label: module.isUnnamed
                         ? module.id
                         : '${module.id} · ${module.name}',
-                    background: module.isUnnamed
-                        ? AppColors.cream
-                        : AppColors.mint,
+                    background:
+                        module.isUnnamed ? AppColors.cream : AppColors.mint,
                     foreground: module.isUnnamed
                         ? AppColors.mutedTeal
                         : AppColors.deepTeal,

@@ -26,7 +26,8 @@ class CareTeamView extends StatelessWidget {
   const CareTeamView({super.key});
 
   static Route<void> route(UnplugModuleState state) => MaterialPageRoute<void>(
-        builder: (context) => UnplugScope(state: state, child: const CareTeamView()),
+        builder: (context) =>
+            UnplugScope(state: state, child: const CareTeamView()),
       );
 
   @override
@@ -98,7 +99,8 @@ class CareTeamView extends StatelessWidget {
           if (!state.isLive)
             const UnplugNote(
               tone: NoteTone.warning,
-              text: 'Simulated. This build has no screen-time layer attached, so '
+              text:
+                  'Simulated. This build has no screen-time layer attached, so '
                   'every figure below is illustrative. A real record would carry '
                   'the same warning rather than look identical.',
             ),
@@ -137,14 +139,17 @@ class CareTeamView extends StatelessWidget {
                     value: '${state.overridesUsed} of '
                         '${state.overrideAllowance}',
                   ),
-                  UnplugFact(label: 'Current tier', value: 'Tier ${state.tier}'),
+                  UnplugFact(
+                      label: 'Current tier', value: 'Tier ${state.tier}'),
                 ],
               ),
             ),
           ),
-          if (state.platform == TrackedPlatform.ios || live?.perApp.isEmpty == true)
+          if (state.platform == TrackedPlatform.ios ||
+              live?.perApp.isEmpty == true)
             const UnplugNote(
-              text: 'No per-app breakdown appears here, for either platform. On '
+              text:
+                  'No per-app breakdown appears here, for either platform. On '
                   'iOS one cannot exist; showing one for Android patients only '
                   'would train a clinician to look for a number that is absent '
                   'from half their caseload.',
@@ -159,8 +164,7 @@ class CareTeamView extends StatelessWidget {
               color: state.escalationOpened
                   ? AppColors.coralLight
                   : AppColors.paper,
-              borderColor:
-                  state.escalationOpened ? AppColors.coral : null,
+              borderColor: state.escalationOpened ? AppColors.coral : null,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -249,7 +253,8 @@ class _ConsentGated extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final grant = trackCapabilities
-        .firstWhere((capability) => capability.name == 'View journal and mood tags')
+        .firstWhere(
+            (capability) => capability.name == 'View journal and mood tags')
         .grantFor(track);
 
     if (grant.kind == GrantKind.blocked) {

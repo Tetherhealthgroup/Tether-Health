@@ -150,8 +150,8 @@ abstract final class BundleLoader {
     // an error: the bundle alone is a valid, if incomplete, product. Only the
     // supplement tolerates being absent — see [_readOptional].
     for (final key in supplementContentKeys) {
-      final json =
-          await _readOptional(assets, '$assetDirectory/supplement.content.$key.json');
+      final json = await _readOptional(
+          assets, '$assetDirectory/supplement.content.$key.json');
       if (json == null) continue;
       final pack = ContentPack.fromJson(
         json,
@@ -220,7 +220,8 @@ abstract final class BundleLoader {
     // Proposed archetypes fill gaps and never shadow the shared library, for
     // the same reason the content supplement does not: the library is the
     // thing eleven areas share, and a local override would quietly fork it.
-    final supplementArchetypes = await _readOptional(assets, _supplementArchetypes);
+    final supplementArchetypes =
+        await _readOptional(assets, _supplementArchetypes);
     for (final json
         in (supplementArchetypes?['archetypes'] as List<Object?>? ?? const [])
             .whereType<Map<String, Object?>>()) {
@@ -244,8 +245,9 @@ abstract final class BundleLoader {
     // leading to an empty library — see [DesignBundle.remedies].
     final remediesJson = await _readOptional(assets, _supplementRemedies);
     final remedies = [
-      for (final json in (remediesJson?['remedies'] as List<Object?>? ?? const [])
-          .whereType<Map<String, Object?>>())
+      for (final json
+          in (remediesJson?['remedies'] as List<Object?>? ?? const [])
+              .whereType<Map<String, Object?>>())
         Remedy.fromJson(json),
     ];
 

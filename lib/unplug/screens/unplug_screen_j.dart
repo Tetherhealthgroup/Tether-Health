@@ -82,12 +82,11 @@ class _UnplugScreenJState extends State<UnplugScreenJ> {
             title: 'Family Sharing',
             trailing: UnplugPill(
               label: state.familySharing.label,
-              background:
-                  state.familySharing == FamilySharingState.configured
-                      ? AppColors.mint
-                      : state.familySharing == FamilySharingState.missing
-                          ? AppColors.coralLight
-                          : AppColors.mintStrong,
+              background: state.familySharing == FamilySharingState.configured
+                  ? AppColors.mint
+                  : state.familySharing == FamilySharingState.missing
+                      ? AppColors.coralLight
+                      : AppColors.mintStrong,
               foreground: state.familySharing == FamilySharingState.missing
                   ? const Color(0xFF8C3A26)
                   : AppColors.deepTeal,
@@ -208,7 +207,8 @@ class _UnplugScreenJState extends State<UnplugScreenJ> {
                   text: 'No free-text fields anywhere. No journal, no custom '
                       'intentions, no names — pick-from-list only.',
                 ),
-                _Lockdown(text: 'No streaks, no comparisons, nothing sharable.'),
+                _Lockdown(
+                    text: 'No streaks, no comparisons, nothing sharable.'),
                 _Lockdown(
                   text: 'Thirty days of on-device retention. Only aggregate '
                       'adherence syncs.',

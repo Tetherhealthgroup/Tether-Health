@@ -16,7 +16,8 @@ class DiskAssetBundle extends CachingAssetBundle {
   @override
   Future<ByteData> load(String key) async {
     final bytes = await File(key).readAsBytes();
-    return ByteData.view(bytes.buffer, bytes.offsetInBytes, bytes.lengthInBytes);
+    return ByteData.view(
+        bytes.buffer, bytes.offsetInBytes, bytes.lengthInBytes);
   }
 }
 
@@ -239,9 +240,8 @@ void main() {
         {'crisis_card_pinned_first', 'self_report_disclaimer', 'share_preview'},
       );
 
-      final standalone = requirements
-          .difference(asSafeguards)
-          .difference(bundle.capabilities);
+      final standalone =
+          requirements.difference(asSafeguards).difference(bundle.capabilities);
       expect(
         standalone,
         {
@@ -380,9 +380,30 @@ void main() {
       // local one — and this is the assertion that proves the precedence runs
       // in that direction rather than the other.
       const shipped = <String>{
-        'S01', 'S03', 'S05', 'S07', 'S08', 'S09', 'S11', 'S12', 'S13', 'S14',
-        'S17', 'S18', 'S19', 'S20', 'S21', 'S22', 'S23', 'S27',
-        'SH1', 'SH2', 'SH3', 'SH4', 'SH5', 'SH6',
+        'S01',
+        'S03',
+        'S05',
+        'S07',
+        'S08',
+        'S09',
+        'S11',
+        'S12',
+        'S13',
+        'S14',
+        'S17',
+        'S18',
+        'S19',
+        'S20',
+        'S21',
+        'S22',
+        'S23',
+        'S27',
+        'SH1',
+        'SH2',
+        'SH3',
+        'SH4',
+        'SH5',
+        'SH6',
       };
 
       final content = bundle.contentFor('lookup', 'en')!;
@@ -445,8 +466,8 @@ void main() {
       };
       final onDisk = {
         for (final json in (jsonDecode(
-                    File('assets/design/archetypes.json').readAsStringSync())
-                as Map<String, Object?>)['archetypes']! as List<Object?>)
+                File('assets/design/archetypes.json').readAsStringSync())
+            as Map<String, Object?>)['archetypes']! as List<Object?>)
           (json! as Map<String, Object?>)['id']! as String,
       };
       expect(onDisk, hasLength(29));

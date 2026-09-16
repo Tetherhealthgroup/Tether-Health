@@ -219,8 +219,7 @@ class _ArtworkScreenState extends State<ArtworkScreen> {
           body: 'Your record is the one place this app exports from, and it '
               'covers every program rather than this one.',
           confirmLabel: 'Open your record',
-          onConfirm: () =>
-              Navigator.of(context).pushNamed(ShellRoutes.record),
+          onConfirm: () => Navigator.of(context).pushNamed(ShellRoutes.record),
         );
 
       case TapAction.deleteAccount:
@@ -231,8 +230,7 @@ class _ArtworkScreenState extends State<ArtworkScreen> {
               'what goes. A production build must also require recent '
               'authentication before it runs.',
           confirmLabel: 'Open your record',
-          onConfirm: () =>
-              Navigator.of(context).pushNamed(ShellRoutes.record),
+          onConfirm: () => Navigator.of(context).pushNamed(ShellRoutes.record),
         );
 
       case TapAction.information:

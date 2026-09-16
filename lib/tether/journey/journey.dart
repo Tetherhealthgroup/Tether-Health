@@ -131,8 +131,9 @@ class JourneyScreen {
       readiness == JourneyReadiness.artwork;
 
   /// The title to show in chrome, whether or not copy exists.
-  String get title =>
-      content?.title.isNotEmpty == true ? content!.title : archetype?.name ?? archetypeId;
+  String get title => content?.title.isNotEmpty == true
+      ? content!.title
+      : archetype?.name ?? archetypeId;
 }
 
 /// One area's program: its screens, and what is missing from them.

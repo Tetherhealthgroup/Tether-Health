@@ -690,7 +690,9 @@ class TetherSession extends ChangeNotifier {
         if (screen is! Map<String, Object?>) continue;
         final restored = ScreenAnswers();
         _readBlocks(screen['chips'], (block, value) {
-          if (value is List) restored.chips[block] = value.whereType<int>().toSet();
+          if (value is List) {
+            restored.chips[block] = value.whereType<int>().toSet();
+          }
         });
         _readBlocks(screen['option'], (block, value) {
           if (value is int) restored.option[block] = value;
@@ -714,9 +716,8 @@ class TetherSession extends ChangeNotifier {
         LapseEvent(
           areaId: areaId,
           at: at,
-          severity: entry['severity'] is String
-              ? entry['severity']! as String
-              : '',
+          severity:
+              entry['severity'] is String ? entry['severity']! as String : '',
           context: (entry['context'] as List<Object?>? ?? const [])
               .whereType<String>()
               .toList(),

@@ -77,8 +77,10 @@ class ProgramOverviewScreen extends StatelessWidget {
   /// through [TetherScope.of] so that a widget test pumping this screen on its
   /// own gets the ids instead of a failed assertion — the ids are the part the
   /// journey actually asserts, and the names are a courtesy.
-  DesignBundle? _bundleOrNull(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<TetherScope>()?.notifier?.bundle;
+  DesignBundle? _bundleOrNull(BuildContext context) => context
+      .dependOnInheritedWidgetOfExactType<TetherScope>()
+      ?.notifier
+      ?.bundle;
 
   /// Pushes one screen, and keeps pushing as it is navigated.
   ///
@@ -129,11 +131,11 @@ class _Provenance extends StatelessWidget {
         Text(
           journey.isGenerated
               ? 'No product file exists for this area, so the screen list was '
-                'derived from the area catalogue and ordered by the shared '
-                'library. Treat it as a proposal: nobody has chosen these '
-                'routes or this delivery order.'
+                  'derived from the area catalogue and ordered by the shared '
+                  'library. Treat it as a proposal: nobody has chosen these '
+                  'routes or this delivery order.'
               : 'The screen list, routes and delivery phases come from a '
-                'product file. Somebody chose them.',
+                  'product file. Somebody chose them.',
           style: TetherText.cardBody,
         ),
         const SizedBox(height: 6),

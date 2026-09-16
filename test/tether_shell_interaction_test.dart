@@ -14,8 +14,7 @@ import 'package:tether_health/tether/state/tether_scope.dart';
 import 'package:tether_health/tether/state/tether_session.dart';
 import 'package:tether_health/tether/tether_app.dart';
 
-import 'tether_bundle_test.dart'
-    show CatalogueOnlyAssetBundle, DiskAssetBundle;
+import 'tether_bundle_test.dart' show CatalogueOnlyAssetBundle, DiskAssetBundle;
 
 /// The six shell screens, driven rather than rendered.
 ///
@@ -103,7 +102,8 @@ void main() {
       (widget) =>
           widget is FilledButton &&
           widget.child is Text &&
-          (widget.child! as Text).data?.toLowerCase().contains('join') == true &&
+          (widget.child! as Text).data?.toLowerCase().contains('join') ==
+              true &&
           widget.onPressed != null,
     );
 

@@ -49,8 +49,8 @@ class RemediesScreen extends StatelessWidget {
             // the same code. Pushing the object directly was how the two came
             // apart: the route carried a correct `Remedy` and a path nobody
             // had registered, so only the tap worked.
-            onTap: () => Navigator.of(context)
-                .pushNamed(ShellRoutes.remedy(remedy.id)),
+            onTap: () =>
+                Navigator.of(context).pushNamed(ShellRoutes.remedy(remedy.id)),
           ),
 
         // Said once, at the bottom, and again on every remedy. The repetition
@@ -62,8 +62,7 @@ class RemediesScreen extends StatelessWidget {
         TetherActionButton(
           label: 'Get help now',
           kind: 'ghost',
-          onPressed: () =>
-              Navigator.of(context).pushNamed(ShellRoutes.crisis),
+          onPressed: () => Navigator.of(context).pushNamed(ShellRoutes.crisis),
         ),
       ],
       footer: 'Nothing here is recorded, and nothing here is shared.',

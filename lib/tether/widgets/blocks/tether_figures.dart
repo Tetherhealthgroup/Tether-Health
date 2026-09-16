@@ -233,8 +233,7 @@ class TetherRows extends StatelessWidget {
                     border: i == block.items.length - 1
                         ? null
                         : const Border(
-                            bottom:
-                                BorderSide(color: TetherColors.rowDivider),
+                            bottom: BorderSide(color: TetherColors.rowDivider),
                           ),
                   ),
                   child: Column(

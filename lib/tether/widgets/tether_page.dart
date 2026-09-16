@@ -398,8 +398,7 @@ class TetherActionButton extends StatelessWidget {
               borderRadius: TetherRadius.buttonAll,
               side: isGhost
                   ? BorderSide(
-                      color:
-                          dark ? TetherColors.lineOnDark : TetherColors.line,
+                      color: dark ? TetherColors.lineOnDark : TetherColors.line,
                     )
                   : BorderSide.none,
             ),

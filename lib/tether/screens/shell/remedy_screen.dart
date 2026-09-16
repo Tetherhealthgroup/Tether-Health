@@ -59,8 +59,7 @@ class RemedyScreen extends StatelessWidget {
         TetherActionButton(
           label: 'Get help now',
           kind: 'ghost',
-          onPressed: () =>
-              Navigator.of(context).pushNamed(ShellRoutes.crisis),
+          onPressed: () => Navigator.of(context).pushNamed(ShellRoutes.crisis),
         ),
       ],
       footer: 'Not recorded. Not shared. Not a treatment.',

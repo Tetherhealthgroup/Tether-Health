@@ -41,9 +41,7 @@ class UnplugScreenI extends StatelessWidget {
                       ? Icons.verified_rounded
                       : Icons.warning_amber_rounded,
                   size: 30,
-                  color: healthy
-                      ? AppColors.deepTeal
-                      : const Color(0xFF8C3A26),
+                  color: healthy ? AppColors.deepTeal : const Color(0xFF8C3A26),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -139,9 +137,7 @@ class _CheckRow extends StatelessWidget {
                       ? Icons.check_circle_rounded
                       : Icons.cancel_rounded,
                   size: 20,
-                  color: check.healthy
-                      ? AppColors.deepTeal
-                      : AppColors.coral,
+                  color: check.healthy ? AppColors.deepTeal : AppColors.coral,
                 ),
                 const SizedBox(width: 10),
                 Expanded(

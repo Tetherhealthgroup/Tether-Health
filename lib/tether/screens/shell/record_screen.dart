@@ -73,7 +73,8 @@ class RecordScreen extends StatelessWidget {
             // TODO(copy): empty-record title.
             title: 'There is nothing here yet',
             // TODO(copy): empty-record body.
-            body: 'Once you join a program, what it records shows up here — and can be exported or deleted from here.',
+            body:
+                'Once you join a program, what it records shows up here — and can be exported or deleted from here.',
           )
         else
           _RowsCard(
@@ -118,7 +119,8 @@ class RecordScreen extends StatelessWidget {
           // TODO(copy): replaces the authored "A readable file plus a
           // structured one", which this build cannot do without a file-system
           // dependency the app is not allowed to add.
-          body: 'Shown as readable text you can copy out. Includes paused and ended programs. This build writes no file.',
+          body:
+              'Shown as readable text you can copy out. Includes paused and ended programs. This build writes no file.',
           onTap: () => _showExport(context, export),
         ),
 
@@ -126,11 +128,13 @@ class RecordScreen extends StatelessWidget {
         _ShellCard(
           tone: CardTone.coral,
           title: 'Delete everything',
-          body: 'Completed, not hidden. This cannot be undone, and it ends every active program.',
+          body:
+              'Completed, not hidden. This cannot be undone, and it ends every active program.',
           onTap: () => _confirmDelete(context),
         ),
 
-        if (bundle.safeguards['export_and_delete'] case final Safeguard safeguard)
+        if (bundle.safeguards['export_and_delete']
+            case final Safeguard safeguard)
           _ShellCard(
             tone: CardTone.mintPale,
             // TODO(copy): eyebrow over a quoted safeguard.
@@ -153,7 +157,8 @@ class RecordScreen extends StatelessWidget {
       // TODO(copy): replaces the authored footer, which commits to clearing
       // servers and a sync queue. Neither exists in this build, and claiming
       // to have cleared one would be the exact failure this screen is for.
-      footer: 'There is no server in this build and nothing queued to sync. Deleting clears what this phone is holding.',
+      footer:
+          'There is no server in this build and nothing queued to sync. Deleting clears what this phone is holding.',
     );
   }
 
@@ -449,9 +454,8 @@ class _ShellCard extends StatelessWidget {
                   Text(
                     text.toUpperCase(),
                     style: TetherText.eyebrow.copyWith(
-                      color: dark
-                          ? TetherColors.mutedOnDark
-                          : TetherColors.muted,
+                      color:
+                          dark ? TetherColors.mutedOnDark : TetherColors.muted,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -468,9 +472,8 @@ class _ShellCard extends StatelessWidget {
                   Text(
                     bodyText,
                     style: TetherText.cardBody.copyWith(
-                      color: dark
-                          ? TetherColors.mutedOnDark
-                          : TetherColors.muted,
+                      color:
+                          dark ? TetherColors.mutedOnDark : TetherColors.muted,
                     ),
                   ),
                 ],

@@ -485,14 +485,13 @@ class UnplugModuleState extends ChangeNotifier {
   /// The last threshold the platform reported crossing.
   ({int minutes, int opens})? get lastThreshold => _lastThreshold;
 
-  static TrackedPlatform _platformOf(String checkName) =>
-      _initialChecks
-          .firstWhere(
-            (check) => check.name == checkName,
-            orElse: () => _initialChecks.first,
-          )
-          .platforms
-          .first;
+  static TrackedPlatform _platformOf(String checkName) => _initialChecks
+      .firstWhere(
+        (check) => check.name == checkName,
+        orElse: () => _initialChecks.first,
+      )
+      .platforms
+      .first;
 
   static String _remedyFor(String checkName) => _initialChecks
       .firstWhere(
@@ -603,7 +602,8 @@ class UnplugModuleState extends ChangeNotifier {
   void settleLimitRequest({DateTime? now}) {
     final request = _limitRequest;
     if (request == null) return;
-    if (request.clearsAt != null && !request.isClearedAt(now ?? DateTime.now())) {
+    if (request.clearsAt != null &&
+        !request.isClearedAt(now ?? DateTime.now())) {
       return;
     }
     _tier = request.requestedTier.clamp(tierFloor, tierCeiling);
@@ -804,7 +804,10 @@ class UnplugModuleState extends ChangeNotifier {
   void toggleCheck(String name) {
     _checks = [
       for (final check in _checks)
-        if (check.name == name) check.copyWith(healthy: !check.healthy) else check,
+        if (check.name == name)
+          check.copyWith(healthy: !check.healthy)
+        else
+          check,
     ];
     notifyListeners();
   }

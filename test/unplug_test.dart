@@ -213,8 +213,7 @@ void main() {
         ..requestAuthorization();
       addTearDown(state.dispose);
 
-      expect(state.authorization,
-          AuthorizationState.blockedNoFamilySharing);
+      expect(state.authorization, AuthorizationState.blockedNoFamilySharing);
       expect(state.authorization.isUsable, isFalse);
     });
 
@@ -382,7 +381,8 @@ void main() {
         ..setFamilySharing(FamilySharingState.configured)
         ..pairChildProfile();
 
-      expect(state.availableGates, isNot(contains(EffortGateChoice.commitment)));
+      expect(
+          state.availableGates, isNot(contains(EffortGateChoice.commitment)));
       expect(
         state.gate,
         EffortGateChoice.breath,
