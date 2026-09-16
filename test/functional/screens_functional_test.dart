@@ -1999,4 +1999,270 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('Screen 20 renders the craving recheck', (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const TetherHealthApp(initialScreen: 19));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const ValueKey('functional-craving-recheck-screen')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('craving-recheck-progress')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('craving-recheck-result-card')),
+      findsOneWidget,
+    );
+    // The recheck must never read as a measurement.
+    expect(find.text('Not a medical measurement'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 20 rating is reachable by number and by slider',
+      (tester) async {
+    /* The artwork promises "Tap a number or drag the slider". Both routes are
+       asserted because the number row is the accessible path: someone who
+       cannot land a slider thumb precisely has no other way to answer a
+       question the screen marks Required. */
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const TetherHealthApp(initialScreen: 19));
+    await tester.pumpAndSettle();
+
+    // Every number 0-10 is present, not just a representative few.
+    for (var number = 0; number <= 10; number++) {
+      expect(
+        find.byKey(ValueKey('craving-recheck-number-$number')),
+        findsOneWidget,
+        reason: 'rating $number should be tappable',
+      );
+    }
+
+    await tester.tap(find.byKey(const ValueKey('craving-recheck-number-8')));
+    await tester.pumpAndSettle();
+    expect(find.text('8 · Strong'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('craving-recheck-number-0')));
+    await tester.pumpAndSettle();
+    expect(find.text('0 · None'), findsOneWidget);
+
+    // The slider drives the same value. It sits below the fold, and drag()
+    // silently misses an off-screen target, so scroll to it first.
+    final slider = find.byKey(const ValueKey('craving-recheck-slider'));
+    await tester.ensureVisible(slider);
+    await tester.pumpAndSettle();
+    await tester.drag(slider, const Offset(600, 0));
+    await tester.pumpAndSettle();
+    expect(find.text('0 · None'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 20 offers stronger support only at 7-10', (tester) async {
+    /* The artwork reserves this space with "If you select 7-10, stronger
+       support appears here". A high rating has to surface a route to a person,
+       not merely be recorded and carried forward. */
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const TetherHealthApp(initialScreen: 19));
+    await tester.pumpAndSettle();
+
+    final support = find.byKey(
+      const ValueKey('craving-recheck-stronger-support'),
+    );
+
+    // Each rating is scrolled into view before it is tapped: the card
+    // appearing and ensureVisible() below both move the number row, and tap()
+    // silently misses a target that has left the viewport.
+    Future<void> rate(int number) async {
+      final target = find.byKey(ValueKey('craving-recheck-number-$number'));
+      await tester.ensureVisible(target);
+      await tester.pumpAndSettle();
+      await tester.tap(target);
+      await tester.pumpAndSettle();
+    }
+
+    await rate(6);
+    expect(support, findsNothing, reason: '6 is below the threshold');
+
+    await rate(7);
+    expect(support, findsOneWidget, reason: '7 is the threshold the art names');
+
+    await tester.ensureVisible(support);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('craving-recheck-open-support')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('craving-recheck-switch-tool')),
+      findsOneWidget,
+    );
+
+    await rate(3);
+    expect(support, findsNothing, reason: 'lowering the rating retires it');
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 20 helpful answer is optional and can be cleared',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const TetherHealthApp(initialScreen: 19));
+    await tester.pumpAndSettle();
+
+    // Untouched, the screen states no consequence it cannot deliver.
+    expect(
+      find.text('You can tell us whether it helped whenever you’re ready.'),
+      findsOneWidget,
+    );
+
+    final yes = find.byKey(const ValueKey('craving-recheck-helpful-yes'));
+    await tester.ensureVisible(yes);
+    await tester.pumpAndSettle();
+    await tester.tap(yes);
+    await tester.pumpAndSettle();
+    expect(
+      find.text('We’ll remember that slow breathing helped with stress.'),
+      findsOneWidget,
+    );
+
+    // Tapping the same answer again clears it — the field is optional.
+    await tester.tap(yes);
+    await tester.pumpAndSettle();
+    expect(
+      find.text('You can tell us whether it helped whenever you’re ready.'),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 20 saves onward to Screen 21 and can repeat Screen 19',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    // Distinct keys force a fresh app state for the second leg. Without them
+    // the second pumpWidget updates the existing element, initialScreen is
+    // never re-read, and the app stays on Screen 19 from the Repeat above.
+    await tester.pumpWidget(
+      const TetherHealthApp(
+          key: ValueKey('screen-20-repeat'), initialScreen: 19),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('craving-recheck-repeat')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-active-craving-rescue-screen')),
+      findsOneWidget,
+      reason: 'Repeat should return to the Screen 19 exercise',
+    );
+
+    await tester.pumpWidget(
+      const TetherHealthApp(key: ValueKey('screen-20-save'), initialScreen: 19),
+    );
+    await tester.pumpAndSettle();
+
+    final save = find.byKey(const ValueKey('craving-recheck-save'));
+    expect(save, findsOneWidget);
+    await tester.tap(save);
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('functional-craving-recheck-screen')),
+      findsNothing,
+      reason: 'Save should advance past the recheck to Screen 21',
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Screen 20 remains usable across supported phone sizes',
+      (tester) async {
+    const devices = <({String name, Size size})>[
+      (name: 'iPhone SE', size: Size(375, 667)),
+      (name: 'iPhone 14 Pro', size: Size(393, 852)),
+      (name: 'iPhone Pro Max', size: Size(430, 932)),
+      (name: 'small Android', size: Size(360, 800)),
+      (name: 'large Android', size: Size(412, 915)),
+    ];
+
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final device in devices) {
+      tester.view.physicalSize = device.size;
+      await tester.pumpWidget(
+        TetherHealthApp(
+          key: ValueKey('screen-20-${device.name}'),
+          initialScreen: 19,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const ValueKey('functional-craving-recheck-screen')),
+        findsOneWidget,
+        reason: '${device.name} should display functional Screen 20.',
+      );
+
+      final save = find.byKey(const ValueKey('craving-recheck-save'));
+      expect(
+        tester.getRect(save).overlaps(Offset.zero & device.size),
+        isTrue,
+        reason: '${device.name} should keep the primary action visible.',
+      );
+
+      // The rating is Required, so the extremes of the scale must be reachable
+      // on the narrowest supported device, not merely present in the tree.
+      for (final number in <int>[0, 10]) {
+        final target = find.byKey(
+          ValueKey('craving-recheck-number-$number'),
+        );
+        await tester.ensureVisible(target);
+        await tester.pumpAndSettle();
+        expect(
+          tester.getRect(target).overlaps(Offset.zero & device.size),
+          isTrue,
+          reason: '${device.name} should be able to reach rating $number.',
+        );
+      }
+
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('laptop view exposes all screens and developer navigation',
+      (tester) async {
+    tester.view.physicalSize = const Size(1440, 1000);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const TetherHealthApp(initialScreen: 27));
+    await tester.pump();
+
+    expect(find.text('28 approved screens'), findsOneWidget);
+    expect(find.text('Screen 28 · Settings & privacy'), findsOneWidget);
+    expect(find.text('Show tap areas'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

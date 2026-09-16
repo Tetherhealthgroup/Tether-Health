@@ -15,6 +15,7 @@ import 'active_craving_rescue_screen.dart';
 import 'baseline_assessment_screen.dart';
 import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
+import 'craving_recheck_screen.dart';
 import 'craving_rescue_start_screen.dart';
 import 'daily_check_in_screen.dart';
 import 'exercise_complete_recheck_screen.dart';
@@ -119,6 +120,9 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _activeRescuePaused = false;
   bool _activeRescueVoiceEnabled = true;
   bool _activeRescueHapticsEnabled = true;
+  int _rescueRecheckCraving = 3;
+  RescueHelpfulChoice? _rescueHelpfulChoice;
+  bool _rescueRecheckSaved = false;
 
   @override
   void initState() {
@@ -768,6 +772,44 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             },
             onSwitchTool: () => widget.onSelectScreen(17),
             onOpenSupport: () => widget.onSelectScreen(26),
+          );
+        }
+
+        if (widget.currentIndex == 19) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+          return CravingRecheckScreen(
+            isSpanish: isSpanish,
+            tool: _rescueTool,
+            elapsedSeconds: _activeRescueElapsedSeconds,
+            beforeCraving: _rescueIntensity,
+            currentCraving: _rescueRecheckCraving,
+            helpfulChoice: _rescueHelpfulChoice,
+            resultSaved: _rescueRecheckSaved,
+            onCravingChanged: (value) {
+              setState(() {
+                _rescueRecheckCraving = value;
+                // A changed rating invalidates a saved result: Screen 21 must
+                // never show a number the patient has since moved.
+                _rescueRecheckSaved = false;
+              });
+            },
+            onHelpfulChoiceChanged: (value) {
+              setState(() => _rescueHelpfulChoice = value);
+            },
+            onSave: () {
+              setState(() => _rescueRecheckSaved = true);
+              widget.onSelectScreen(20);
+            },
+            onRepeat: () {
+              setState(() {
+                _activeRescueElapsedSeconds = 0;
+                _activeRescuePaused = false;
+              });
+              widget.onSelectScreen(18);
+            },
+            onSwitchTool: () => widget.onSelectScreen(17),
+            onOpenSupport: () => widget.onSelectScreen(26),
+            onClose: () => widget.onSelectScreen(11),
           );
         }
 
