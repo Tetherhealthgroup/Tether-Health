@@ -1,5 +1,6 @@
 import 'package:breathefree_patient/main.dart';
 import 'package:breathefree_patient/models/screen_spec.dart';
+import 'package:breathefree_patient/screens/support_preparation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -1370,6 +1371,47 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Screen 10 disables adding an eleventh support person',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final people = List.generate(
+      10,
+      (index) => SupportPersonPlan(
+        id: 'person-$index',
+        name: 'Person $index',
+        relationship: 'Friend',
+        channel: SupportChannel.text,
+        checkIn: 'Tomorrow',
+      ),
+    );
+    await tester.pumpWidget(MaterialApp(
+      home: SupportPreparationScreen(
+        isSpanish: false,
+        supportPeople: people,
+        completedTasks: const {},
+        treatmentSupport: true,
+        careTeamReminder: true,
+        onSupportPeopleChanged: (_) {},
+        onCompletedTasksChanged: (_) {},
+        onTreatmentSupportChanged: (_) {},
+        onCareTeamReminderChanged: (_) {},
+        onBack: () {},
+        onContinue: () {},
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    final addButton = tester.widget<OutlinedButton>(
+      find.byKey(const ValueKey('support-add-person')),
+    );
+    expect(addButton.onPressed, isNull);
+    expect(find.text('10-person limit reached'), findsOneWidget);
+  });
+
   testWidgets('Screen 10 treatment education and Save work', (tester) async {
     tester.view.physicalSize = const Size(1179, 2556);
     tester.view.devicePixelRatio = 3;
@@ -1492,13 +1534,18 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('review-save-later')));
     await tester.pumpAndSettle();
     expect(
-      find.text('Your plan is saved. Come back whenever you are ready.'),
+      find.text(
+        'Your plan is ready for this session. Sign in to save it across devices.',
+      ),
       findsOneWidget,
     );
     expect(
       find.byKey(const ValueKey('functional-review-quit-plan-screen')),
       findsOneWidget,
     );
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('review-start-plan')));
 
     await tester.tap(find.byKey(const ValueKey('review-start-plan')));
     await tester.pumpAndSettle();
@@ -1742,10 +1789,19 @@ void main() {
         key: 'preparation-open-rescue',
         imageKey: 'functional-craving-rescue-start-screen',
       ),
-      (key: 'preparation-nav-progress', imageKey: 'functional-progress-dashboard-screen'),
+      (
+        key: 'preparation-nav-progress',
+        imageKey: 'functional-progress-dashboard-screen'
+      ),
       (key: 'preparation-nav-learn', imageKey: 'learn-library-screen'),
-      (key: 'preparation-nav-support', imageKey: 'functional-support-hub-screen'),
-      (key: 'preparation-profile', imageKey: 'functional-settings-privacy-screen'),
+      (
+        key: 'preparation-nav-support',
+        imageKey: 'functional-support-hub-screen'
+      ),
+      (
+        key: 'preparation-profile',
+        imageKey: 'functional-settings-privacy-screen'
+      ),
     ];
 
     for (final destination in destinations) {
@@ -2142,7 +2198,8 @@ void main() {
         findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('next-step-open-support')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('functional-support-hub-screen')), findsOneWidget);
+    expect(find.byKey(const ValueKey('functional-support-hub-screen')),
+        findsOneWidget);
 
     await tester.tap(find.bySemanticsLabel('Go back'));
     await tester.pumpAndSettle();
@@ -3455,7 +3512,8 @@ void main() {
     await tester.ensureVisible(support);
     await tester.tap(support);
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('functional-support-hub-screen')), findsOneWidget);
+    expect(find.byKey(const ValueKey('functional-support-hub-screen')),
+        findsOneWidget);
     await tester.tap(find.bySemanticsLabel('Go back'));
     await tester.pumpAndSettle();
 
@@ -3616,7 +3674,8 @@ void main() {
     final support = find.byKey(const ValueKey('rescue-tool-support'));
     tester.widget<FilledButton>(support).onPressed!();
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('functional-support-hub-screen')), findsOneWidget);
+    expect(find.byKey(const ValueKey('functional-support-hub-screen')),
+        findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 
@@ -3803,7 +3862,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-
   testWidgets('Screen 20 renders the functional craving recheck',
       (tester) async {
     tester.view.physicalSize = const Size(1179, 2556);
@@ -3871,8 +3929,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Screen 20 saves and advances to Screen 21',
-      (tester) async {
+  testWidgets('Screen 20 saves and advances to Screen 21', (tester) async {
     tester.view.physicalSize = const Size(1179, 2556);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.resetPhysicalSize);
@@ -3963,8 +4020,8 @@ void main() {
       );
 
       final save = find.byKey(const ValueKey('craving-recheck-save'));
-       await tester.ensureVisible(save);
-       await tester.pump();
+      await tester.ensureVisible(save);
+      await tester.pump();
       expect(
         tester.getRect(save).overlaps(Offset.zero & device.size),
         isTrue,

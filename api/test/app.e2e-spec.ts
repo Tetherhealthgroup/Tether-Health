@@ -7,6 +7,7 @@ import { Test } from "@nestjs/testing";
 import { AppModule } from "../src/app.module";
 import { TokenVerifier } from "../src/auth/token-verifier";
 import { ProfileService } from "../src/profile/profile.service";
+import { QuitPlanService } from "../src/quit-plan/quit-plan.service";
 
 describe("API (e2e)", () => {
   let app: NestFastifyApplication;
@@ -30,12 +31,22 @@ describe("API (e2e)", () => {
           });
         },
       })
+      .overrideProvider(QuitPlanService)
+      .useValue({
+        get: () => Promise.resolve(quitPlanFixture()),
+        put: (_user: unknown, plan: Record<string, unknown>) =>
+          Promise.resolve({ ...quitPlanFixture(), ...plan }),
+      })
       .compile();
     app = module.createNestApplication<NestFastifyApplication>(
       new FastifyAdapter(),
     );
     app.useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
     );
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
@@ -56,9 +67,11 @@ describe("API (e2e)", () => {
   it.each([
     ["GET", "/v1/profile", undefined],
     ["PATCH", "/v1/profile", { locale: "en" }],
+    ["GET", "/v1/quit-plan", undefined],
+    ["PUT", "/v1/quit-plan", {}],
   ])("%s %s requires a token", async (method, url, payload) => {
     const response = await app.inject({
-      method: method as "GET" | "PATCH",
+      method: method as "GET" | "PATCH" | "PUT",
       url,
       payload,
     });
@@ -95,6 +108,52 @@ describe("API (e2e)", () => {
     });
     expect(response.statusCode).toBe(400);
   });
+
+  it("GET /v1/quit-plan returns the caller's complete plan", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: "/v1/quit-plan",
+      headers: { authorization: "Bearer test-token" },
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual(quitPlanFixture());
+  });
+
+  it("PUT /v1/quit-plan validates and replaces the caller's plan", async () => {
+    const payload = { ...quitPlanInput(), readinessPath: "explore" };
+    const response = await app.inject({
+      method: "PUT",
+      url: "/v1/quit-plan",
+      headers: { authorization: "Bearer test-token" },
+      payload,
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ ...quitPlanFixture(), ...payload });
+  });
+
+  it("PUT /v1/quit-plan rejects unknown or invalid fields", async () => {
+    const response = await app.inject({
+      method: "PUT",
+      url: "/v1/quit-plan",
+      headers: { authorization: "Bearer test-token" },
+      payload: { ...quitPlanInput(), readinessPath: "invalid", notes: "no" },
+    });
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("PUT /v1/quit-plan rejects duplicate support-person IDs", async () => {
+    const input = quitPlanInput();
+    const response = await app.inject({
+      method: "PUT",
+      url: "/v1/quit-plan",
+      headers: { authorization: "Bearer test-token" },
+      payload: {
+        ...input,
+        supportPeople: [input.supportPeople[0], input.supportPeople[0]],
+      },
+    });
+    expect(response.statusCode).toBe(400);
+  });
 });
 
 const profileFixture = () => ({
@@ -106,4 +165,37 @@ const profileFixture = () => ({
   avatarPath: null,
   createdAt: "2026-09-11T00:00:00.000Z",
   updatedAt: "2026-09-11T00:00:00.000Z",
+});
+
+const quitPlanInput = () => ({
+  dailyCigaretteUse: "tenOrFewer",
+  smokingTriggers: ["stress", "afterMeals"],
+  customSmokingTrigger: null,
+  readinessPath: "prepare",
+  quitPlanPath: "setQuitDate",
+  quitDate: "2026-10-01",
+  quitDayCheckIn: true,
+  quitReasons: ["family", "breatheEasier"],
+  customQuitReason: null,
+  topQuitReason: "family",
+  supportPeople: [
+    {
+      id: "test-friend",
+      name: "Test Friend",
+      relationship: "Friend",
+      channel: "text",
+      checkIn: "Check in the evening before my quit date",
+      enabled: true,
+    },
+  ],
+  preparationTasks: ["removeSupplies"],
+  treatmentSupport: true,
+  careTeamReminder: true,
+});
+
+const quitPlanFixture = () => ({
+  userId: "00000000-0000-0000-0000-000000000001",
+  ...quitPlanInput(),
+  createdAt: "2026-09-15T00:00:00.000Z",
+  updatedAt: "2026-09-15T00:00:00.000Z",
 });

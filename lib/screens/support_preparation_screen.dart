@@ -129,6 +129,7 @@ class SupportPreparationScreen extends StatelessWidget {
     final existingIndex =
         supportPeople.indexWhere((item) => item.id == person.id);
     if (existingIndex < 0) {
+      if (supportPeople.length >= 10) return;
       onSupportPeopleChanged([...supportPeople, person]);
       return;
     }
@@ -313,7 +314,9 @@ class SupportPreparationScreen extends StatelessWidget {
                                 ],
                               _AddSupporterCard(
                                 isSpanish: isSpanish,
-                                onTap: () => _openPersonEditor(context),
+                                onTap: supportPeople.length >= 10
+                                    ? null
+                                    : () => _openPersonEditor(context),
                               ),
                               SizedBox(height: compact ? 18 : 23),
                               _SectionHeading(
@@ -739,7 +742,7 @@ class _AddSupporterCard extends StatelessWidget {
   const _AddSupporterCard({required this.isSpanish, required this.onTap});
 
   final bool isSpanish;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -764,9 +767,13 @@ class _AddSupporterCard extends StatelessWidget {
           const SizedBox(width: 11),
           Expanded(
             child: Text(
-              isSpanish
-                  ? 'Agregar otra persona de apoyo'
-                  : 'Add another support person',
+              onTap == null
+                  ? (isSpanish
+                      ? 'Límite de 10 personas alcanzado'
+                      : '10-person limit reached')
+                  : (isSpanish
+                      ? 'Agregar otra persona de apoyo'
+                      : 'Add another support person'),
               style: const TextStyle(fontWeight: FontWeight.w800),
             ),
           ),

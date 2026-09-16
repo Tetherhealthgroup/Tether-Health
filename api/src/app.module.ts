@@ -7,6 +7,8 @@ import { environmentSchema } from "./config/environment";
 import { HealthController } from "./health/health.controller";
 import { ProfileController } from "./profile/profile.controller";
 import { ProfileService } from "./profile/profile.service";
+import { QuitPlanController } from "./quit-plan/quit-plan.controller";
+import { QuitPlanService } from "./quit-plan/quit-plan.service";
 
 @Module({
   imports: [
@@ -15,10 +17,11 @@ import { ProfileService } from "./profile/profile.service";
       validationSchema: environmentSchema,
     }),
   ],
-  controllers: [HealthController, ProfileController],
+  controllers: [HealthController, ProfileController, QuitPlanController],
   providers: [
     TokenVerifier,
     ProfileService,
+    QuitPlanService,
     { provide: APP_GUARD, useClass: AuthGuard },
   ],
 })

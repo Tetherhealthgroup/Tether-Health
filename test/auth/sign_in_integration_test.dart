@@ -6,6 +6,10 @@ import 'package:breathefree_patient/main.dart';
 import 'package:breathefree_patient/profile/profile_api_client.dart';
 import 'package:breathefree_patient/profile/profile_repository.dart';
 import 'package:breathefree_patient/profile/user_profile.dart';
+import 'package:breathefree_patient/quit_plan/quit_plan.dart';
+import 'package:breathefree_patient/quit_plan/quit_plan_api_client.dart';
+import 'package:breathefree_patient/quit_plan/quit_plan_controller.dart';
+import 'package:breathefree_patient/quit_plan/quit_plan_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -54,6 +58,69 @@ void main() {
         find.byKey(const ValueKey('functional-welcome-screen')), findsNothing);
     expect(find.byKey(const ValueKey('functional-why-breathefree-screen')),
         findsOneWidget);
+  });
+
+  testWidgets('restored draft plan returns to review', (tester) async {
+    tester.view.physicalSize = const Size(430, 932);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final auth = _SuccessfulAuth(signedIn: true);
+    final account = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _ProfileApi()),
+    );
+    final quitPlan = QuitPlanController(
+      auth: auth,
+      repository: QuitPlanRepository(auth: auth, api: _PlanApi()),
+    );
+    addTearDown(account.dispose);
+    addTearDown(quitPlan.dispose);
+
+    await tester.pumpWidget(BreatheFreeApp(
+      accountController: account,
+      quitPlanController: quitPlan,
+    ));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('functional-review-quit-plan-screen')),
+        findsOneWidget);
+  });
+
+  testWidgets('restored completed account loads its plan and opens home',
+      (tester) async {
+    tester.view.physicalSize = const Size(430, 932);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final auth = _SuccessfulAuth(signedIn: true);
+    final account = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(
+        auth: auth,
+        api: _ProfileApi(onboardingCompleted: true),
+      ),
+    );
+    final quitPlan = QuitPlanController(
+      auth: auth,
+      repository: QuitPlanRepository(auth: auth, api: _PlanApi()),
+    );
+    addTearDown(account.dispose);
+    addTearDown(quitPlan.dispose);
+
+    await tester.pumpWidget(BreatheFreeApp(
+      accountController: account,
+      quitPlanController: quitPlan,
+    ));
+    await tester.pumpAndSettle();
+
+    expect(
+        find.byKey(const ValueKey('account-connection-screen')), findsNothing);
+    expect(find.byKey(const ValueKey('functional-home-preparation-screen')),
+        findsOneWidget);
+    expect(quitPlan.plan?.topQuitReason, 'family');
   });
 
   testWidgets('restored account shows connection state while profile loads',
@@ -153,8 +220,13 @@ class _SuccessfulAuth implements AuthGateway {
 }
 
 class _ProfileApi implements ProfileApiClient {
+  _ProfileApi({this.onboardingCompleted = false});
+
+  final bool onboardingCompleted;
+
   @override
-  Future<UserProfile> getProfile(String accessToken) async => _profile();
+  Future<UserProfile> getProfile(String accessToken) async =>
+      _profile(onboardingCompleted: onboardingCompleted);
 
   @override
   Future<UserProfile> updateProfile(
@@ -176,12 +248,36 @@ class _DeferredProfileApi implements ProfileApiClient {
       getProfile(accessToken);
 }
 
-UserProfile _profile() => UserProfile(
+class _PlanApi implements QuitPlanApiClient {
+  @override
+  Future<QuitPlan> getQuitPlan(String accessToken) async => QuitPlan(
+        userId: 'user-id',
+        dailyCigaretteUse: 'tenOrFewer',
+        smokingTriggers: const ['stress'],
+        customSmokingTrigger: null,
+        readinessPath: 'prepare',
+        quitPlanPath: 'setQuitDate',
+        quitDate: DateTime(2026, 10, 1),
+        quitDayCheckIn: true,
+        quitReasons: const ['family'],
+        customQuitReason: null,
+        topQuitReason: 'family',
+        supportPeople: const [],
+        preparationTasks: const ['removeSupplies'],
+        treatmentSupport: true,
+        careTeamReminder: true,
+      );
+
+  @override
+  Future<QuitPlan> putQuitPlan(String accessToken, QuitPlan plan) async => plan;
+}
+
+UserProfile _profile({bool onboardingCompleted = false}) => UserProfile(
       id: 'user-id',
       displayName: null,
       locale: 'en',
       timeZone: 'UTC',
-      onboardingCompleted: false,
+      onboardingCompleted: onboardingCompleted,
       avatarPath: null,
       createdAt: DateTime.utc(2026),
       updatedAt: DateTime.utc(2026),

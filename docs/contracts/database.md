@@ -20,3 +20,30 @@ Authenticated users may select and update only their row. Insert is performed by
 the trusted signup trigger; delete is intentionally not granted because verified
 account deletion needs a separate audited workflow. Avatar objects use a private
 bucket and must live under a folder matching `auth.uid()`.
+
+## Quit-plan snapshot
+
+Migration sources of truth:
+`supabase/migrations/202609150001_quit_plans.sql`,
+`supabase/migrations/202609150002_quit_plan_validator_grant.sql`,
+`supabase/migrations/202609150003_quit_plan_upsert_grant.sql`,
+`supabase/migrations/202609150004_quit_plan_integrity.sql`, and
+`supabase/migrations/202609150005_quit_plan_contract_hardening.sql`.
+
+`public.quit_plans` stores one complete plan snapshot per authenticated user.
+`user_id` is both the primary key and a cascading foreign key to `profiles.id`.
+The API writes the caller identity from the verified JWT; clients cannot select
+another owner. RLS permits authenticated users to select, insert, and update only
+the row where `auth.uid() = user_id`.
+
+The snapshot contains the bounded values represented by onboarding: baseline
+cigarette-use range, trigger identifiers and optional custom trigger, readiness
+and quit paths, quit date/check-in preference, selected and top reasons,
+bounded synthetic support-person objects, preparation tasks, and treatment or
+care-team reminder preferences. PostgreSQL checks constrain every enum, array
+size, custom text length, nested support-person shape, and top-reason membership.
+The database manages creation and update timestamps.
+
+This table is development-only until privacy, clinical, consent, retention,
+deletion, and compliance review is complete. Only synthetic data may be entered
+in `breathefree-dev`; real patient or support-person information is prohibited.

@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import '../auth/account_controller.dart';
 import '../models/screen_spec.dart';
 import '../models/tap_target.dart';
+import '../quit_plan/quit_plan.dart';
+import '../quit_plan/quit_plan_controller.dart';
 import '../theme/app_colors.dart';
 import '../widgets/approved_screen_viewport.dart';
 import '../widgets/sign_in_dialog.dart';
@@ -48,6 +50,7 @@ class ApprovedScreenPlayer extends StatefulWidget {
     required this.onNext,
     required this.onTarget,
     this.accountController,
+    this.quitPlanController,
     super.key,
   });
 
@@ -57,6 +60,7 @@ class ApprovedScreenPlayer extends StatefulWidget {
   final VoidCallback onNext;
   final ValueChanged<AppTapTarget> onTarget;
   final AccountController? accountController;
+  final QuitPlanController? quitPlanController;
 
   @override
   State<ApprovedScreenPlayer> createState() => _ApprovedScreenPlayerState();
@@ -65,6 +69,8 @@ class ApprovedScreenPlayer extends StatefulWidget {
 class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   late final AccountController _accountController;
   late final bool _ownsAccountController;
+  late final QuitPlanController _quitPlanController;
+  late final bool _ownsQuitPlanController;
   bool _showHotspots = false;
   WelcomeLanguage _language = WelcomeLanguage.english;
   bool _helpfulReminders = true;
@@ -147,12 +153,18 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     _ownsAccountController = widget.accountController == null;
     _accountController =
         widget.accountController ?? AccountController.disabled();
+    _ownsQuitPlanController = widget.quitPlanController == null;
+    _quitPlanController =
+        widget.quitPlanController ?? QuitPlanController.disabled();
+    final restoredPlan = _quitPlanController.plan;
+    if (restoredPlan != null) _applyQuitPlan(restoredPlan);
     _configureSystemUi();
   }
 
   @override
   void dispose() {
     if (_ownsAccountController) _accountController.dispose();
+    if (_ownsQuitPlanController) _quitPlanController.dispose();
     super.dispose();
   }
 
@@ -198,6 +210,100 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     widget.onPrevious();
   }
 
+  T? _enumByName<T extends Enum>(Iterable<T> values, String? name) {
+    if (name == null) return null;
+    for (final value in values) {
+      if (value.name == name) return value;
+    }
+    return null;
+  }
+
+  void _applyQuitPlan(QuitPlan plan) {
+    _dailyCigaretteUse =
+        _enumByName(DailyCigaretteUse.values, plan.dailyCigaretteUse);
+    _smokingTriggers = plan.smokingTriggers
+        .map((name) => _enumByName(SmokingTrigger.values, name))
+        .whereType<SmokingTrigger>()
+        .toSet();
+    _customSmokingTrigger = plan.customSmokingTrigger;
+    _readinessPath = _enumByName(ReadinessPath.values, plan.readinessPath) ??
+        ReadinessPath.prepare;
+    _quitPlanPath = _enumByName(QuitPlanPath.values, plan.quitPlanPath) ??
+        QuitPlanPath.setQuitDate;
+    _quitDate = DateUtils.dateOnly(plan.quitDate.toLocal());
+    _quitDayCheckIn = plan.quitDayCheckIn;
+    _quitReasons = plan.quitReasons
+        .map((name) => _enumByName(QuitReason.values, name))
+        .whereType<QuitReason>()
+        .toSet();
+    _customQuitReason = plan.customQuitReason;
+    _topQuitReason = _enumByName(QuitReason.values, plan.topQuitReason);
+    _supportPeople = plan.supportPeople
+        .map(
+          (person) => SupportPersonPlan(
+            id: person.id,
+            name: person.name,
+            relationship: person.relationship,
+            channel: _enumByName(SupportChannel.values, person.channel) ??
+                SupportChannel.text,
+            checkIn: person.checkIn,
+            enabled: person.enabled,
+          ),
+        )
+        .toList(growable: false);
+    _completedPreparationTasks = plan.preparationTasks
+        .map((name) => _enumByName(PreparationTask.values, name))
+        .whereType<PreparationTask>()
+        .toSet();
+    _treatmentSupport = plan.treatmentSupport;
+    _careTeamReminder = plan.careTeamReminder;
+  }
+
+  QuitPlan _currentQuitPlan() {
+    final quitDate = _quitDate ?? _defaultQuitDate();
+    return QuitPlan(
+      userId: _accountController.profile?.id ?? '',
+      dailyCigaretteUse: _dailyCigaretteUse?.name,
+      smokingTriggers: SmokingTrigger.values
+          .where(_smokingTriggers.contains)
+          .map((value) => value.name)
+          .toList(growable: false),
+      customSmokingTrigger: _customSmokingTrigger?.trim().isEmpty == true
+          ? null
+          : _customSmokingTrigger?.trim(),
+      readinessPath: _readinessPath.name,
+      quitPlanPath: _quitPlanPath.name,
+      quitDate: quitDate,
+      quitDayCheckIn: _quitDayCheckIn,
+      quitReasons: QuitReason.values
+          .where(_quitReasons.contains)
+          .map((value) => value.name)
+          .toList(growable: false),
+      customQuitReason: _customQuitReason?.trim().isEmpty == true
+          ? null
+          : _customQuitReason?.trim(),
+      topQuitReason: _topQuitReason?.name,
+      supportPeople: _supportPeople
+          .map(
+            (person) => QuitPlanSupportPerson(
+              id: person.id,
+              name: person.name.trim(),
+              relationship: person.relationship.trim(),
+              channel: person.channel.name,
+              checkIn: person.checkIn.trim(),
+              enabled: person.enabled,
+            ),
+          )
+          .toList(growable: false),
+      preparationTasks: PreparationTask.values
+          .where(_completedPreparationTasks.contains)
+          .map((value) => value.name)
+          .toList(growable: false),
+      treatmentSupport: _treatmentSupport,
+      careTeamReminder: _careTeamReminder,
+    );
+  }
+
   DateTime _defaultQuitDate() {
     final today = DateUtils.dateOnly(DateTime.now());
     return switch (_quitPlanPath) {
@@ -211,11 +317,26 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     setState(() => _quitDate ??= _defaultQuitDate());
   }
 
-  Future<void> _startPlan() async {
+  Future<bool> _saveQuitPlan() async {
     _saveEffectiveQuitDate();
-    final saved = await _accountController.completeOnboarding();
+    return _quitPlanController.save(_currentQuitPlan());
+  }
+
+  Future<void> _startPlan() async {
+    final planSaved = await _saveQuitPlan();
     if (!mounted) return;
-    if (saved) {
+    if (!planSaved) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not save your quit plan. Please try again.'),
+        ),
+      );
+      return;
+    }
+
+    final profileSaved = await _accountController.completeOnboarding();
+    if (!mounted) return;
+    if (profileSaved) {
       widget.onNext();
       return;
     }
@@ -225,6 +346,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       ),
     );
   }
+
+  Future<bool> _savePlanForLater() => _saveQuitPlan();
 
   void _openRescue([int? intensity]) {
     setState(() {
@@ -242,12 +365,36 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     );
     if (!mounted || signedIn != true) return;
 
+    var destination =
+        _accountController.profile?.onboardingCompleted == true ? 11 : 1;
+    if (_quitPlanController.enabled) {
+      final planLoaded = await _quitPlanController.initialize();
+      if (!mounted) return;
+      if (!planLoaded) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Signed in, but your quit plan is unavailable.'),
+          ),
+        );
+        return;
+      }
+      final restoredPlan = _quitPlanController.plan;
+      if (restoredPlan != null) {
+        setState(() => _applyQuitPlan(restoredPlan));
+        destination =
+            _accountController.profile?.onboardingCompleted == true ? 11 : 10;
+      }
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Signed in successfully.')),
     );
-    widget.onSelectScreen(
-      _accountController.profile?.onboardingCompleted == true ? 11 : 1,
-    );
+    widget.onSelectScreen(destination);
+  }
+
+  Future<void> _signOut() async {
+    await _accountController.signOut();
+    _quitPlanController.clear();
   }
 
   String _rescueTopReasonLabel(bool isSpanish) {
@@ -520,7 +667,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onEditPreparation: () => _openPlanEditor(9),
             onEditTreatment: () => _openPlanEditor(9),
             onStartPlan: () => unawaited(_startPlan()),
-            onSaveForLater: _saveEffectiveQuitDate,
+            onSaveForLater: _savePlanForLater,
+            planWillPersist: _quitPlanController.persistenceAvailable,
           );
         }
 
@@ -1034,7 +1182,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             accountEmail: _accountController.email,
             displayName: _accountController.profile?.displayName,
             onSignOut: _accountController.isSignedIn
-                ? () => unawaited(_accountController.signOut())
+                ? () => unawaited(_signOut())
                 : _showSignIn,
           );
         }

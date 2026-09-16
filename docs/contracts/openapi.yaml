@@ -1,8 +1,11 @@
 openapi: 3.1.0
 info:
   title: BreatheFree API
-  version: 1.0.0
-  description: Identity/profile-only contract; health and clinical data are out of scope.
+  version: 1.1.0
+  description: >-
+    Development contract for authenticated profiles and synthetic quit-plan data.
+    Real patient, clinical, and support-person data remain prohibited until
+    privacy, clinical, retention, deletion, and compliance review is complete.
 servers:
   - url: https://api.example.invalid
 paths:
@@ -43,6 +46,36 @@ paths:
               schema: {$ref: '#/components/schemas/Profile'}
         '400': {description: Invalid request body}
         '401': {$ref: '#/components/responses/Unauthorized'}
+  /v1/quit-plan:
+    get:
+      operationId: getMyQuitPlan
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: Authenticated user's complete quit-plan snapshot
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/QuitPlan'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {description: The authenticated user has not saved a quit plan}
+        '502': {description: Quit-plan storage is temporarily unavailable}
+    put:
+      operationId: putMyQuitPlan
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PutQuitPlan'}
+      responses:
+        '200':
+          description: Replaced quit-plan snapshot
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/QuitPlan'}
+        '400': {description: Invalid request body}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '502': {description: Quit-plan storage is temporarily unavailable}
 components:
   securitySchemes:
     supabaseJwt: {type: http, scheme: bearer, bearerFormat: JWT}
@@ -80,3 +113,86 @@ components:
         timeZone: {type: string, minLength: 1, maxLength: 64}
         onboardingCompleted: {type: boolean}
         avatarPath: {type: [string, 'null'], maxLength: 512}
+    SupportPerson:
+      type: object
+      additionalProperties: false
+      required: [id, name, relationship, channel, checkIn, enabled]
+      properties:
+        id: {type: string, pattern: '^[A-Za-z0-9_-]{1,80}$'}
+        name: {type: string, minLength: 1, maxLength: 80}
+        relationship: {type: string, minLength: 1, maxLength: 80}
+        channel: {type: string, enum: [text, call]}
+        checkIn: {type: string, minLength: 1, maxLength: 160}
+        enabled: {type: boolean}
+    QuitPlanFields:
+      type: object
+      required:
+        - dailyCigaretteUse
+        - smokingTriggers
+        - customSmokingTrigger
+        - readinessPath
+        - quitPlanPath
+        - quitDate
+        - quitDayCheckIn
+        - quitReasons
+        - customQuitReason
+        - topQuitReason
+        - supportPeople
+        - preparationTasks
+        - treatmentSupport
+        - careTeamReminder
+      properties:
+        dailyCigaretteUse:
+          type: [string, 'null']
+          enum: [notEveryDay, tenOrFewer, elevenToTwenty, twentyOneToThirty, thirtyOneOrMore, null]
+        smokingTriggers:
+          type: array
+          uniqueItems: true
+          maxItems: 10
+          items:
+            type: string
+            enum: [stress, afterMeals, driving, coffee, socialSettings, workBreaks, alcohol, boredom, morning, beforeBed]
+        customSmokingTrigger: {type: [string, 'null'], minLength: 1, maxLength: 120}
+        readinessPath: {type: string, enum: [prepare, explore, connect]}
+        quitPlanPath: {type: string, enum: [setQuitDate, quitToday, reduceGradually]}
+        quitDate: {type: string, format: date}
+        quitDayCheckIn: {type: boolean}
+        quitReasons:
+          type: array
+          uniqueItems: true
+          maxItems: 7
+          items:
+            type: string
+            enum: [family, breatheEasier, improveHealth, saveMoney, control, future, custom]
+        customQuitReason: {type: [string, 'null'], minLength: 1, maxLength: 160}
+        topQuitReason:
+          type: [string, 'null']
+          enum: [family, breatheEasier, improveHealth, saveMoney, control, future, custom, null]
+        supportPeople:
+          type: array
+          description: Support-person IDs must be unique within the plan.
+          maxItems: 10
+          items: {$ref: '#/components/schemas/SupportPerson'}
+        preparationTasks:
+          type: array
+          uniqueItems: true
+          maxItems: 3
+          items:
+            type: string
+            enum: [removeSupplies, smokeFreeSpaces, stockAlternatives]
+        treatmentSupport: {type: boolean}
+        careTeamReminder: {type: boolean}
+    PutQuitPlan:
+      allOf:
+        - {$ref: '#/components/schemas/QuitPlanFields'}
+      unevaluatedProperties: false
+    QuitPlan:
+      allOf:
+        - {$ref: '#/components/schemas/QuitPlanFields'}
+        - type: object
+          required: [userId, createdAt, updatedAt]
+          properties:
+            userId: {type: string, format: uuid}
+            createdAt: {type: string, format: date-time}
+            updatedAt: {type: string, format: date-time}
+      unevaluatedProperties: false

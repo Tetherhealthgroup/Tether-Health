@@ -13,6 +13,9 @@ import 'models/screen_spec.dart';
 import 'models/tap_target.dart';
 import 'profile/profile_api_client.dart';
 import 'profile/profile_repository.dart';
+import 'quit_plan/quit_plan_api_client.dart';
+import 'quit_plan/quit_plan_controller.dart';
+import 'quit_plan/quit_plan_repository.dart';
 import 'screens/approved_screen_player.dart';
 import 'theme/app_theme.dart';
 
@@ -30,6 +33,7 @@ Future<void> main() async {
 
   final config = AppConfig.fromEnvironment();
   AccountController? account;
+  QuitPlanController? quitPlan;
   if (config.hasAnyConfiguration) config.validate();
   if (config.isConfigured) {
     await Supabase.initialize(
@@ -47,20 +51,32 @@ Future<void> main() async {
         api: HttpProfileApiClient(baseUrl: config.apiBaseUrl),
       ),
     );
+    quitPlan = QuitPlanController(
+      auth: auth,
+      repository: QuitPlanRepository(
+        auth: auth,
+        api: HttpQuitPlanApiClient(baseUrl: config.apiBaseUrl),
+      ),
+    );
   }
 
-  runApp(BreatheFreeApp(accountController: account));
+  runApp(BreatheFreeApp(
+    accountController: account,
+    quitPlanController: quitPlan,
+  ));
 }
 
 class BreatheFreeApp extends StatefulWidget {
   const BreatheFreeApp({
     this.initialScreen = 0,
     this.accountController,
+    this.quitPlanController,
     super.key,
   });
 
   final int initialScreen;
   final AccountController? accountController;
+  final QuitPlanController? quitPlanController;
 
   @override
   State<BreatheFreeApp> createState() => _BreatheFreeAppState();
@@ -76,6 +92,8 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   late int _currentIndex;
   late final AccountController _accountController;
   late final bool _ownsAccountController;
+  late final QuitPlanController _quitPlanController;
+  late final bool _ownsQuitPlanController;
   late bool _restoringAccount;
   bool _restoreFailed = false;
   final List<int> _history = <int>[];
@@ -86,6 +104,9 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     _ownsAccountController = widget.accountController == null;
     _accountController =
         widget.accountController ?? AccountController.disabled();
+    _ownsQuitPlanController = widget.quitPlanController == null;
+    _quitPlanController =
+        widget.quitPlanController ?? QuitPlanController.disabled();
     _currentIndex =
         widget.initialScreen.clamp(0, approvedScreens.length - 1).toInt();
     _restoringAccount = _accountController.isSignedIn && _currentIndex == 0;
@@ -95,6 +116,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   @override
   void dispose() {
     if (_ownsAccountController) _accountController.dispose();
+    if (_ownsQuitPlanController) _quitPlanController.dispose();
     super.dispose();
   }
 
@@ -115,12 +137,22 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         return;
       }
       if (loaded && _accountController.profile != null) {
+        var destination =
+            _accountController.profile!.onboardingCompleted ? 11 : 1;
+        if (_quitPlanController.enabled) {
+          final planLoaded = await _quitPlanController.initialize();
+          if (!mounted) return;
+          if (!planLoaded) continue;
+          final restoredPlan = _quitPlanController.plan;
+          destination = restoredPlan == null
+              ? 1
+              : (_accountController.profile!.onboardingCompleted ? 11 : 10);
+        }
         setState(() {
           _restoringAccount = false;
           _restoreFailed = false;
           _history.clear();
-          _currentIndex =
-              _accountController.profile!.onboardingCompleted ? 11 : 1;
+          _currentIndex = destination;
         });
         return;
       }
@@ -144,6 +176,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
 
   Future<void> _signOutAfterRestoreFailure() async {
     await _accountController.signOut();
+    _quitPlanController.clear();
     if (!mounted) return;
     setState(() {
       _restoringAccount = false;
@@ -300,6 +333,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
               )
             : ApprovedScreenPlayer(
                 accountController: _accountController,
+                quitPlanController: _quitPlanController,
                 currentIndex: _currentIndex,
                 onSelectScreen: _goTo,
                 onPrevious: _goBack,

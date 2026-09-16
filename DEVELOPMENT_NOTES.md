@@ -40,5 +40,10 @@ Confirmed production architecture:
 - FHIR adapter: optional clinician/EHR interoperability
 - APNs/FCM: generic private notification copy by default
 
+The current cloud-development slice implements Supabase Auth, profile
+preferences, and a complete quit-plan snapshot behind NestJS and owner-only RLS.
+Use synthetic values only; this does not authorize real patient or support-person
+data.
+
 Do not place API secrets, service credentials or production signing certificates in this repository.
 See `docs/ARCHITECTURE.md` and `docs/contracts/` for versioned boundaries.

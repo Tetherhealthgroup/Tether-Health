@@ -31,13 +31,17 @@ Flutter and are not required by the profile API.
 
 ## Clinical and privacy boundary
 
-The first increment stores identity-linked profile preferences only: display
-name, locale, time zone, onboarding status, and an optional private avatar path.
-It does not store tobacco use, cravings, symptoms, medications, pregnancy,
-mental-health information, quit plans, contacts, free text, or exports.
+The cloud development environment stores identity-linked profile preferences and
+one bounded quit-plan snapshot so persistence, API contracts, and user-isolation
+controls can be proven end to end. The quit-plan slice includes a baseline range,
+selected triggers/reasons, quit path/date, preparation preferences, and bounded
+support-person placeholders.
 
-Future health domains require separate clinical/privacy review, purpose and
-consent mapping, retention/deletion rules, audit design, minimum-necessary DTOs,
+Only synthetic test data is permitted in `breathefree-dev`. Real tobacco use,
+cravings, symptoms, medications, pregnancy, mental-health information, contacts,
+free text, or other patient information must not be entered. Production use
+requires separate clinical/privacy review, purpose and consent mapping,
+retention/deletion rules, audit design, minimum-necessary DTOs, provider BAAs,
 and tests proving user/clinician separation. Health payloads must not enter logs,
 analytics, crash reports, push notifications, or object names.
 
