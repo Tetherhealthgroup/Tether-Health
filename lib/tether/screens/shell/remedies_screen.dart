@@ -21,7 +21,6 @@ import '../../state/tether_scope.dart';
 import '../../theme/tether_tokens.dart';
 import '../../widgets/blocks/tether_card.dart';
 import '../../widgets/tether_page.dart';
-import 'remedy_screen.dart';
 import 'shell_routes.dart';
 
 /// The remedy library.
@@ -46,15 +45,12 @@ class RemediesScreen extends StatelessWidget {
         for (final remedy in remedies)
           _RemedyCard(
             remedy: remedy,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => RemedyScreen(remedy: remedy),
-                settings: RouteSettings(
-                  name: ShellRoutes.remedy(remedy.id),
-                  arguments: remedy,
-                ),
-              ),
-            ),
+            // By name, so a tap here and a deep link from a notification run
+            // the same code. Pushing the object directly was how the two came
+            // apart: the route carried a correct `Remedy` and a path nobody
+            // had registered, so only the tap worked.
+            onTap: () => Navigator.of(context)
+                .pushNamed(ShellRoutes.remedy(remedy.id)),
           ),
 
         // Said once, at the bottom, and again on every remedy. The repetition

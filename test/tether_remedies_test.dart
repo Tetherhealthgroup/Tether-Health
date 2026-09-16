@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tether_health/tether/data/bundle_loader.dart';
@@ -6,6 +8,7 @@ import 'package:tether_health/tether/router/tether_router.dart';
 import 'package:tether_health/tether/screens/shell/programs_home_screen.dart';
 import 'package:tether_health/tether/screens/shell/remedies_screen.dart';
 import 'package:tether_health/tether/screens/shell/remedy_screen.dart';
+import 'package:tether_health/tether/screens/shell/shell_routes.dart';
 import 'package:tether_health/tether/state/tether_scope.dart';
 import 'package:tether_health/tether/state/tether_session.dart';
 import 'package:tether_health/tether/tether_app.dart';
@@ -212,6 +215,53 @@ void main() {
       for (var i = 0; i < remedy.steps.length; i++) {
         expect(find.text('${i + 1}'), findsOneWidget);
       }
+    });
+  });
+
+  group('addressed by name', () {
+    // `/remedies/<id>` is what a notification would deep-link to at the moment
+    // somebody needs it. It used to resolve to nothing: the library pushed the
+    // screen with the object and only *labelled* the route with this path, so
+    // the label named a route that did not exist. MaterialApp walks a deep
+    // link segment by segment and falls back to `/` when a segment cannot be
+    // built, so the app opened on the home screen — silently, without even
+    // reaching the unknown-route handler.
+    testWidgets('a deep link opens the remedy', (tester) async {
+      final remedy = bundle.remedies.first;
+      await pump(tester, const RemediesScreen());
+
+      final navigator = tester.state<NavigatorState>(find.byType(Navigator));
+      unawaited(navigator.pushNamed(ShellRoutes.remedy(remedy.id)));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(RemedyScreen), findsOneWidget);
+      expect(find.text(remedy.steps.first), findsOneWidget);
+    });
+
+    testWidgets('an unknown id says so rather than going quiet', (tester) async {
+      await pump(tester, const RemediesScreen());
+
+      final navigator = tester.state<NavigatorState>(find.byType(Navigator));
+      unawaited(navigator.pushNamed(ShellRoutes.remedy('no_such_practice')));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(RemedyScreen), findsNothing);
+      expect(find.textContaining('no_such_practice'), findsOneWidget);
+    });
+
+    testWidgets('tapping a card uses that same route', (tester) async {
+      // The two paths are now one. If this ever diverges again, the deep link
+      // is what breaks, and it breaks silently.
+      final remedy = bundle.remedies.first;
+      await pump(tester, const RemediesScreen());
+
+      await tester.tap(find.text(remedy.title));
+      await tester.pumpAndSettle();
+
+      final route = ModalRoute.of(
+        tester.element(find.byType(RemedyScreen)),
+      );
+      expect(route?.settings.name, ShellRoutes.remedy(remedy.id));
     });
   });
 

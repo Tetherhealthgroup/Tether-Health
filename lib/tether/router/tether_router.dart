@@ -11,6 +11,7 @@ import '../screens/shell/program_join_screen.dart';
 import '../screens/shell/programs_home_screen.dart';
 import '../screens/shell/record_screen.dart';
 import '../screens/shell/remedies_screen.dart';
+import '../screens/shell/remedy_screen.dart';
 import '../screens/shell/shell_routes.dart';
 import '../screens/shell/sharing_matrix_screen.dart';
 import '../state/tether_session.dart';
@@ -170,6 +171,34 @@ abstract final class TetherRouter {
     // being artwork rather than authored slots, are unreachable by path alone.
     // This is how a reviewer opens a named screen in a named program.
     final path = settings.name ?? '';
+
+    // `/remedies/<id>` — one practice, addressed by name.
+    //
+    // Registered rather than pushed with an object, so the deep link and the
+    // tap inside the library are the same code path. They were not: the
+    // library pushed a `MaterialPageRoute` carrying the `Remedy` and merely
+    // *labelled* it with this path, which meant the label named a route that
+    // did not exist. `--route=/remedies/paced_breathing` then landed on the
+    // home screen — `MaterialApp` walks a deep link segment by segment and
+    // quietly falls back to `/` when one cannot be built, so it did not even
+    // reach the unknown-route handler. A silent wrong screen is the worst of
+    // the three outcomes, and a remedy is exactly the thing a notification
+    // would deep-link to at the moment somebody needs it.
+    if (path.startsWith('${ShellRoutes.remedies}/')) {
+      final id = path.substring(ShellRoutes.remedies.length + 1);
+      final remedy = session.bundle.remedy(id);
+      if (remedy == null) {
+        return page(
+          _RouteError(
+            title: 'Things that help',
+            detail: 'There is no practice called "$id" any more. Open '
+                'Things that help to see what there is.',
+          ),
+        );
+      }
+      return page(RemedyScreen(remedy: remedy));
+    }
+
     if (path.startsWith('$programRoute/')) {
       final parts = path.substring(programRoute.length + 1).split('/');
       final journey = session.journey(parts.first);
