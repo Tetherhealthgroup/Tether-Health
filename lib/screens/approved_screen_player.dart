@@ -5,18 +5,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../models/prototype_catalog.dart';
+import '../auth/account_controller.dart';
 import '../models/screen_spec.dart';
 import '../models/tap_target.dart';
 import '../theme/app_colors.dart';
 import '../unplug/models/unplug_screen_spec.dart';
 import '../unplug/screens/unplug_screen_host.dart';
 import '../widgets/approved_screen_viewport.dart';
+import '../widgets/sign_in_dialog.dart';
 import 'active_craving_rescue_screen.dart';
 import 'baseline_assessment_screen.dart';
 import 'choose_quit_path_screen.dart';
 import 'consent_privacy_screen.dart';
 import 'craving_recheck_screen.dart';
 import 'craving_rescue_start_screen.dart';
+import 'rescue_result_next_step_screen.dart';
+import 'quit_day_home_screen.dart';
+import 'slip_recovery_screen.dart';
+import 'medication_center_screen.dart';
+import 'learn_library_screen.dart';
+import 'progress_dashboard_screen.dart';
+import 'support_hub_screen.dart';
+import 'settings_privacy_screen.dart';
+
 import 'daily_check_in_screen.dart';
 import 'exercise_complete_recheck_screen.dart';
 import 'guided_stress_reset_screen.dart';
@@ -39,6 +50,7 @@ class ApprovedScreenPlayer extends StatefulWidget {
     required this.onPrevious,
     required this.onNext,
     required this.onTarget,
+    this.accountController,
     super.key,
   });
 
@@ -47,17 +59,22 @@ class ApprovedScreenPlayer extends StatefulWidget {
   final VoidCallback onPrevious;
   final VoidCallback onNext;
   final ValueChanged<AppTapTarget> onTarget;
+  final AccountController? accountController;
 
   @override
   State<ApprovedScreenPlayer> createState() => _ApprovedScreenPlayerState();
 }
 
 class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
+  late final AccountController _accountController;
+  late final bool _ownsAccountController;
   bool _showHotspots = false;
   WelcomeLanguage _language = WelcomeLanguage.english;
   bool _helpfulReminders = true;
   bool _shareWithCareTeam = false;
   bool _helpImproveBreatheFree = false;
+  bool _sensitiveDetailsEnabled = false;
+  bool _reduceMotionEnabled = false;
   DailyCigaretteUse? _dailyCigaretteUse;
   Set<SmokingTrigger> _smokingTriggers = <SmokingTrigger>{};
   String? _customSmokingTrigger;
@@ -113,6 +130,9 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   StressResetHelpfulChoice? _stressResetHelpfulChoice;
   bool _stressResetResultSaved = false;
   int _rescueIntensity = 6;
+  int _rescueBeforeIntensity = 6;
+  int? _rescueRecheckIntensity;
+  RescueHelpfulChoice? _rescueHelpfulChoice;
   Set<RescueContext> _rescueContexts = <RescueContext>{};
   RescueTool _rescueTool = RescueTool.slowBreathing;
   int? _rescueReturnScreen;
@@ -121,13 +141,24 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _activeRescueVoiceEnabled = true;
   bool _activeRescueHapticsEnabled = true;
   int _rescueRecheckCraving = 3;
-  RescueHelpfulChoice? _rescueHelpfulChoice;
   bool _rescueRecheckSaved = false;
+  bool _slipRecoverySaved = false;
+  bool _medicationReminderPreviews = true;
+  MedicationTodayStatus _medicationTodayStatus = MedicationTodayStatus.taken;
 
   @override
   void initState() {
     super.initState();
+    _ownsAccountController = widget.accountController == null;
+    _accountController =
+        widget.accountController ?? AccountController.disabled();
     _configureSystemUi();
+  }
+
+  @override
+  void dispose() {
+    if (_ownsAccountController) _accountController.dispose();
+    super.dispose();
   }
 
   @override
@@ -145,22 +176,15 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       return;
     }
 
-    if (widget.currentIndex <= 17) {
-      unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
-      SystemChrome.setSystemUIOverlayStyle(
-        const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarBrightness: Brightness.light,
-          statusBarIconBrightness: Brightness.dark,
-          systemNavigationBarColor: AppColors.cream,
-          systemNavigationBarIconBrightness: Brightness.dark,
-        ),
-      );
-      return;
-    }
-
-    unawaited(
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky),
+    unawaited(SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarBrightness: Brightness.light,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: AppColors.cream,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
     );
   }
 
@@ -192,6 +216,21 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     setState(() => _quitDate ??= _defaultQuitDate());
   }
 
+  Future<void> _startPlan() async {
+    _saveEffectiveQuitDate();
+    final saved = await _accountController.completeOnboarding();
+    if (!mounted) return;
+    if (saved) {
+      widget.onNext();
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Could not save your progress. Please try again.'),
+      ),
+    );
+  }
+
   void _openRescue([int? intensity]) {
     setState(() {
       _rescueReturnScreen = widget.currentIndex;
@@ -199,6 +238,21 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
           (intensity ?? _dailyStrongestCraving).clamp(1, 10).toInt();
     });
     widget.onSelectScreen(16);
+  }
+
+  Future<void> _showSignIn() async {
+    final signedIn = await showDialog<bool>(
+      context: context,
+      builder: (context) => SignInDialog(account: _accountController),
+    );
+    if (!mounted || signedIn != true) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Signed in successfully.')),
+    );
+    widget.onSelectScreen(
+      _accountController.profile?.onboardingCompleted == true ? 11 : 1,
+    );
   }
 
   String _rescueTopReasonLabel(bool isSpanish) {
@@ -219,6 +273,33 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       QuitReason.custom => _customQuitReason?.trim().isNotEmpty == true
           ? _customQuitReason!.trim()
           : (isSpanish ? 'Mi propia razón' : 'My own reason'),
+    };
+  }
+
+  String _reasonLabel(bool isSpanish) {
+    final reason = _topQuitReason ?? QuitReason.family;
+    return switch (reason) {
+      QuitReason.family => isSpanish
+          ? '“Quiero estar presente para mi familia.”'
+          : '“I’m choosing this for my family.”',
+      QuitReason.breatheEasier => isSpanish
+          ? '“Quiero respirar más fácilmente.”'
+          : '“I want to breathe easier.”',
+      QuitReason.improveHealth => isSpanish
+          ? '“Quiero mejorar mi salud.”'
+          : '“I want to improve my health.”',
+      QuitReason.saveMoney => isSpanish
+          ? '“Quiero ahorrar dinero.”'
+          : '“I’m choosing this to save money.”',
+      QuitReason.control => isSpanish
+          ? '“Quiero sentirme en control.”'
+          : '“I want to feel more in control.”',
+      QuitReason.future => isSpanish
+          ? '“Quiero estar presente para mi futuro.”'
+          : '“I’m choosing this for my future.”',
+      QuitReason.custom => _customQuitReason?.trim().isNotEmpty == true
+          ? '“${_customQuitReason!.trim()}”'
+          : (isSpanish ? '“Mi propia razón.”' : '“My own reason.”'),
     };
   }
 
@@ -286,6 +367,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               setState(() => _language = language);
             },
             onGetStarted: widget.onNext,
+            onSignIn: _showSignIn,
           );
         }
 
@@ -469,10 +551,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onEditSupport: () => _openPlanEditor(9),
             onEditPreparation: () => _openPlanEditor(9),
             onEditTreatment: () => _openPlanEditor(9),
-            onStartPlan: () {
-              _saveEffectiveQuitDate();
-              widget.onNext();
-            },
+            onStartPlan: () => unawaited(_startPlan()),
             onSaveForLater: _saveEffectiveQuitDate,
           );
         }
@@ -737,7 +816,16 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
                 widget.onPrevious();
               }
             },
-            onStart: () => widget.onSelectScreen(18),
+            onStart: () {
+              setState(() {
+                _rescueBeforeIntensity = _rescueIntensity;
+                _rescueRecheckIntensity = null;
+                _rescueHelpfulChoice = null;
+                _activeRescueElapsedSeconds = 0;
+                _activeRescuePaused = false;
+              });
+              widget.onSelectScreen(18);
+            },
             onViewSupport: () => widget.onSelectScreen(26),
           );
         }
@@ -810,6 +898,236 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onSwitchTool: () => widget.onSelectScreen(17),
             onOpenSupport: () => widget.onSelectScreen(26),
             onClose: () => widget.onSelectScreen(11),
+          );
+        }
+
+        if (widget.currentIndex == 20) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+          final afterCraving =
+              _rescueRecheckIntensity ?? _rescueBeforeIntensity;
+          final toolName = switch (_rescueTool) {
+            RescueTool.slowBreathing =>
+              isSpanish ? 'Respiración lenta' : 'slow breathing',
+            RescueTool.move => isSpanish ? 'Movimiento' : 'movement',
+            RescueTool.changeScene =>
+              isSpanish ? 'Cambiar de entorno' : 'changing your surroundings',
+          };
+          final helpfulness = switch (_rescueHelpfulChoice) {
+            RescueHelpfulChoice.yes => isSpanish ? 'Sí' : 'Yes',
+            RescueHelpfulChoice.aLittle => isSpanish ? 'Un poco' : 'A little',
+            RescueHelpfulChoice.notThisTime =>
+              isSpanish ? 'Esta vez no' : 'Not this time',
+            null => isSpanish ? 'No seleccionado' : 'Not selected',
+          };
+
+          return RescueResultNextStepScreen(
+            beforeCraving: _rescueBeforeIntensity,
+            afterCraving: afterCraving,
+            toolName: toolName,
+            helpfulness: helpfulness,
+            isSpanish: isSpanish,
+            triggerLabel: _rescueContexts.contains(RescueContext.stress)
+                ? 'Stress'
+                : (isSpanish ? 'Craving' : 'Craving'),
+            reasonText: _reasonLabel(isSpanish),
+            practiceLabel:
+                _rescueTool == RescueTool.move ? '3 minutes' : '2 minutes',
+            onContinue: () => widget.onSelectScreen(21),
+            onRepeatRescue: () {
+              setState(() {
+                _activeRescueElapsedSeconds = 0;
+                _activeRescuePaused = false;
+                _rescueRecheckIntensity = null;
+                _rescueHelpfulChoice = null;
+              });
+              widget.onSelectScreen(18);
+            },
+            onHumanSupport: () => widget.onSelectScreen(26),
+            onBackToToday: () => widget.onSelectScreen(21),
+          );
+        }
+
+        if (widget.currentIndex == 21) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return QuitDayHomeScreen(
+            isSpanish: isSpanish,
+            quitDate: _quitDate,
+            topReason: _topQuitReason,
+            customReason: _customQuitReason,
+            supportPeople: _supportPeople,
+            treatmentSupport: _treatmentSupport,
+            onOpenRescue: _openRescue,
+            onOpenSlipRecovery: () {
+              setState(() => _slipRecoverySaved = false);
+              widget.onSelectScreen(22);
+            },
+            onOpenDailyCheckIn: () => widget.onSelectScreen(12),
+            onOpenPlan: () => widget.onSelectScreen(10),
+            onOpenTreatmentPlan: () => widget.onSelectScreen(23),
+            onOpenProgress: () => widget.onSelectScreen(25),
+            onOpenLearn: () => widget.onSelectScreen(24),
+            onOpenSupport: () => widget.onSelectScreen(26),
+            onNotifications: () {},
+            onOpenProfile: () => widget.onSelectScreen(27),
+          );
+        }
+        if (widget.currentIndex == 22) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return SlipRecoveryScreen(
+            isSpanish: isSpanish,
+            initiallySaved: _slipRecoverySaved,
+            onClose: () => widget.onSelectScreen(21),
+            onSave: () {
+              setState(() => _slipRecoverySaved = true);
+              _openRescue();
+            },
+            onOpenNextStep: () {
+              if (_slipRecoverySaved) {
+                _openRescue();
+              }
+            },
+            onOpenSupport: () => widget.onSelectScreen(26),
+          );
+        }
+
+        if (widget.currentIndex == 23) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return MedicationCenterScreen(
+            isSpanish: isSpanish,
+            reminderPreviews: _medicationReminderPreviews,
+            todayStatus: _medicationTodayStatus,
+            onReminderPreviewsChanged: (value) {
+              setState(() => _medicationReminderPreviews = value);
+            },
+            onTodayStatusChanged: (value) {
+              setState(() => _medicationTodayStatus = value);
+            },
+            onBack: widget.onPrevious,
+            onOpenLearn: () => widget.onSelectScreen(24),
+            onOpenSupport: () => widget.onSelectScreen(26),
+            onOpenHome: () => widget.onSelectScreen(21),
+            onOpenProgress: () => widget.onSelectScreen(25),
+          );
+        }
+
+        if (widget.currentIndex == 24) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return LearnLibraryScreen(
+            isSpanish: isSpanish,
+            onOpenHome: () => widget.onSelectScreen(21),
+            onOpenPlan: () => widget.onSelectScreen(10),
+            onOpenProgress: () => widget.onSelectScreen(25),
+            onOpenSettings: () => widget.onSelectScreen(27),
+            onOpenSupport: () => widget.onSelectScreen(26),
+          );
+        }
+
+        if (widget.currentIndex == 25) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return ProgressDashboardScreen(
+            isSpanish: isSpanish,
+            onBack: widget.onPrevious,
+            onOpenSettings: () => widget.onSelectScreen(27),
+            onOpenHome: () => widget.onSelectScreen(21),
+            onOpenPlan: () => widget.onSelectScreen(10),
+            onOpenLearn: () => widget.onSelectScreen(24),
+            onOpenSupport: () => widget.onSelectScreen(26),
+          );
+        }
+
+        if (widget.currentIndex == 26) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return SupportHubScreen(
+            isSpanish: isSpanish,
+            onBack: widget.onPrevious,
+            // Both quitlines answer through the host's dialog rather than a
+            // local one, so the number shown is the number copied and the
+            // Spanish line behaves exactly like the English one. This screen
+            // replaced artwork that drew both numbers; routing them here is
+            // what keeps `fix/contact-routing-and-tap-targets` true.
+            onQuitlineSelected: (quitline) => widget.onTarget(
+              AppTapTarget(
+                normalizedRect: Rect.zero,
+                label: 'Call ${quitline.vanityNumber}',
+                action: TapAction.quitline,
+                quitline: quitline,
+              ),
+            ),
+            // Call-back consent is a protected action: the host's dialog is
+            // the one that names the recipient, the purpose and the expiry,
+            // and the one a reviewer has signed off.
+            onRequestCallback: () => widget.onTarget(
+              const AppTapTarget(
+                normalizedRect: Rect.zero,
+                label: 'Request a counselor call-back',
+                action: TapAction.callbackConsent,
+              ),
+            ),
+            onOpenSettings: () => widget.onSelectScreen(27),
+            onOpenHome: () => widget.onSelectScreen(21),
+            onOpenPlan: () => widget.onSelectScreen(10),
+            onOpenProgress: () => widget.onSelectScreen(25),
+            onOpenLearn: () => widget.onSelectScreen(24),
+          );
+        }
+
+        if (widget.currentIndex == 27) {
+          final isSpanish = _language == WelcomeLanguage.spanish;
+
+          return SettingsPrivacyScreen(
+            // Answered by the host, whose information dialog carries the
+            // "Contact support" route. A protected action somebody cannot
+            // complete is exactly when they need a person.
+            onInformation: (title) => widget.onTarget(
+              AppTapTarget(
+                normalizedRect: Rect.zero,
+                label: title,
+                action: TapAction.information,
+              ),
+            ),
+            // Export and deletion answer through the host too. Its dialogs are
+            // the reviewed ones — they say what a production build would
+            // require before acting, and this preview must not imply it acted.
+            onDownloadData: () => widget.onTarget(
+              const AppTapTarget(
+                normalizedRect: Rect.zero,
+                label: 'Download a copy of your data',
+                action: TapAction.exportData,
+              ),
+            ),
+            onDeleteAccount: () => widget.onTarget(
+              const AppTapTarget(
+                normalizedRect: Rect.zero,
+                label: 'Delete account and data',
+                action: TapAction.deleteAccount,
+              ),
+            ),
+            isSpanish: isSpanish,
+            remindersEnabled: _helpfulReminders,
+            sensitiveDetailsEnabled: _sensitiveDetailsEnabled,
+            diagnosticsEnabled: _helpImproveBreatheFree,
+            reduceMotionEnabled: _reduceMotionEnabled,
+            onRemindersChanged: (value) =>
+                setState(() => _helpfulReminders = value),
+            onSensitiveDetailsChanged: (value) =>
+                setState(() => _sensitiveDetailsEnabled = value),
+            onDiagnosticsChanged: (value) =>
+                setState(() => _helpImproveBreatheFree = value),
+            onReduceMotionChanged: (value) =>
+                setState(() => _reduceMotionEnabled = value),
+            onBack: widget.onPrevious,
+            signedIn: _accountController.isSignedIn,
+            accountEmail: _accountController.email,
+            displayName: _accountController.profile?.displayName,
+            onSignOut: _accountController.isSignedIn
+                ? () => unawaited(_accountController.signOut())
+                : _showSignIn,
           );
         }
 

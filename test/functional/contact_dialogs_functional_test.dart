@@ -96,7 +96,14 @@ void main() {
       await tester.pumpAndSettle();
 
       // Any protected/demo action reaches the same information dialog.
-      await tester.tap(find.bySemanticsLabel('Open accessibility settings'));
+      // Settings scrolls now that it is a widget rather than artwork, and the
+      // accessibility row sits below the fold. The artwork drew it at a fixed
+      // point, so the original tap needed no scrolling.
+      final accessibility =
+          find.bySemanticsLabel('Open accessibility settings');
+      await tester.ensureVisible(accessibility);
+      await tester.pumpAndSettle();
+      await tester.tap(accessibility);
       await tester.pumpAndSettle();
 
       final supportButton =
@@ -128,7 +135,14 @@ void main() {
       await tester.pumpWidget(const TetherHealthApp(initialScreen: 27));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.bySemanticsLabel('Open accessibility settings'));
+      // Settings scrolls now that it is a widget rather than artwork, and the
+      // accessibility row sits below the fold. The artwork drew it at a fixed
+      // point, so the original tap needed no scrolling.
+      final accessibility =
+          find.bySemanticsLabel('Open accessibility settings');
+      await tester.ensureVisible(accessibility);
+      await tester.pumpAndSettle();
+      await tester.tap(accessibility);
       await tester.pumpAndSettle();
       await tester
           .tap(find.byKey(const ValueKey('information-contact-support')));

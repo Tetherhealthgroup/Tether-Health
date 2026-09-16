@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import '../auth/account_controller.dart';
 
 import '../config/contact_info.dart';
 import '../models/prototype_catalog.dart';
@@ -24,10 +28,21 @@ import '../unplug/widgets/unplug_scope.dart';
 /// Reached at [TetherRouter.prototypeRoute], or by launching with
 /// `--dart-define=TETHER_ENTRY=prototype`.
 class TetherHealthApp extends StatefulWidget {
-  const TetherHealthApp(
-      {this.initialScreen = 0, this.standalone = true, super.key});
+  const TetherHealthApp({
+    this.initialScreen = 0,
+    this.standalone = true,
+    this.accountController,
+    super.key,
+  });
 
   final int initialScreen;
+
+  /// The signed-in account, when the build is configured for one.
+  ///
+  /// Null on an unconfigured build, which is the ordinary case for a reviewer
+  /// running `flutter run` with no dart-defines. `AccountController.disabled()`
+  /// stands in so the rest of this class never branches on it.
+  final AccountController? accountController;
 
   /// Whether this widget supplies its own [MaterialApp].
   ///
@@ -42,9 +57,25 @@ class TetherHealthApp extends StatefulWidget {
 }
 
 class _TetherHealthAppState extends State<TetherHealthApp> {
+  /// Waits between attempts to restore a profile after sign-in.
+  ///
+  /// Three tries with a widening gap, because the development API sleeps and
+  /// its first request after a cold start can time out. Failing straight to an
+  /// error would tell somebody their account is broken when it is merely
+  /// asleep.
+  static const _profileRetryDelays = <Duration>[
+    Duration.zero,
+    Duration(seconds: 2),
+    Duration(seconds: 5),
+  ];
+
   late int _currentIndex;
   final List<int> _history = <int>[];
   final UnplugModuleState _unplug = UnplugModuleState();
+  late final AccountController _accountController;
+  late final bool _ownsAccountController;
+  late bool _restoringAccount;
+  bool _restoreFailed = false;
 
   /// Gives dialogs a context that sits below [MaterialApp].
   ///
@@ -66,8 +97,13 @@ class _TetherHealthAppState extends State<TetherHealthApp> {
   @override
   void initState() {
     super.initState();
+    _ownsAccountController = widget.accountController == null;
+    _accountController =
+        widget.accountController ?? AccountController.disabled();
     _currentIndex =
         widget.initialScreen.clamp(0, prototypeCatalog.length - 1).toInt();
+    _restoringAccount = _accountController.isSignedIn && _currentIndex == 0;
+    unawaited(_initializeAccount());
     _loadInterceptTokens();
     _attachUnplugPlatform();
   }
@@ -99,7 +135,63 @@ class _TetherHealthAppState extends State<TetherHealthApp> {
   @override
   void dispose() {
     _unplug.dispose();
+    if (_ownsAccountController) _accountController.dispose();
     super.dispose();
+  }
+
+  Future<void> _initializeAccount() async {
+    if (!_accountController.isSignedIn || _currentIndex != 0) return;
+
+    for (final delay in _profileRetryDelays) {
+      if (delay > Duration.zero) await Future<void>.delayed(delay);
+      if (!mounted) return;
+
+      final loaded = await _accountController.initialize();
+      if (!mounted) return;
+      if (!_accountController.isSignedIn) {
+        setState(() {
+          _restoringAccount = false;
+          _restoreFailed = false;
+        });
+        return;
+      }
+      if (loaded && _accountController.profile != null) {
+        setState(() {
+          _restoringAccount = false;
+          _restoreFailed = false;
+          _history.clear();
+          _currentIndex =
+              _accountController.profile!.onboardingCompleted ? 11 : 1;
+        });
+        return;
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _restoringAccount = false;
+        _restoreFailed = true;
+      });
+    }
+  }
+
+  void _retryAccountRestore() {
+    setState(() {
+      _restoringAccount = true;
+      _restoreFailed = false;
+    });
+    unawaited(_initializeAccount());
+  }
+
+  Future<void> _signOutAfterRestoreFailure() async {
+    await _accountController.signOut();
+    if (!mounted) return;
+    setState(() {
+      _restoringAccount = false;
+      _restoreFailed = false;
+      _history.clear();
+      _currentIndex = 0;
+    });
   }
 
   void _goTo(int index, {bool remember = true}) {
@@ -309,26 +401,116 @@ class _TetherHealthAppState extends State<TetherHealthApp> {
 
   @override
   Widget build(BuildContext context) {
-    final player = UnplugScope(
-      state: _unplug,
-      child: ApprovedScreenPlayer(
-        currentIndex: _currentIndex,
-        onSelectScreen: _goTo,
-        onPrevious: _goBack,
-        onNext: _goNext,
-        onTarget: _handleTarget,
-      ),
+    return AnimatedBuilder(
+      animation: _accountController,
+      builder: (context, _) {
+        final home = _restoringAccount || _restoreFailed
+            ? _AccountConnectionScreen(
+                failed: _restoreFailed,
+                onRetry: _retryAccountRestore,
+                onSignOut: _signOutAfterRestoreFailure,
+              )
+            : UnplugScope(
+                state: _unplug,
+                child: ApprovedScreenPlayer(
+                  accountController: _accountController,
+                  currentIndex: _currentIndex,
+                  onSelectScreen: _goTo,
+                  onPrevious: _goBack,
+                  onNext: _goNext,
+                  onTarget: _handleTarget,
+                ),
+              );
+
+        if (!widget.standalone) return home;
+
+        return MaterialApp(
+          navigatorKey: _navigatorKey,
+          title: 'Tether Health',
+          debugShowCheckedModeBanner: false,
+          restorationScopeId: 'tetherhealth',
+          theme: AppTheme.light(),
+          home: home,
+        );
+      },
     );
+  }
+}
 
-    if (!widget.standalone) return player;
+class _AccountConnectionScreen extends StatelessWidget {
+  const _AccountConnectionScreen({
+    required this.failed,
+    required this.onRetry,
+    required this.onSignOut,
+  });
 
-    return MaterialApp(
-      navigatorKey: _navigatorKey,
-      title: 'Tether Health',
-      debugShowCheckedModeBanner: false,
-      restorationScopeId: 'tetherhealth',
-      theme: AppTheme.light(),
-      home: player,
+  final bool failed;
+  final VoidCallback onRetry;
+  final Future<void> Function() onSignOut;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: const ValueKey('account-connection-screen'),
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(32),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (failed)
+                    Icon(
+                      Icons.cloud_off_rounded,
+                      size: 52,
+                      color: Theme.of(context).colorScheme.primary,
+                    )
+                  else
+                    const SizedBox.square(
+                      dimension: 44,
+                      child: CircularProgressIndicator(),
+                    ),
+                  const SizedBox(height: 24),
+                  Text(
+                    failed
+                        ? 'We could not reach your profile'
+                        : 'Connecting to BreatheFree',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    failed
+                        ? 'Your account is still signed in. Check your connection and try again.'
+                        : 'Your secure session is restored. This can take a moment while the development service wakes up.',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  if (failed) ...[
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        key: const ValueKey('account-connection-retry'),
+                        onPressed: onRetry,
+                        child: const Text('Try again'),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton(
+                      key: const ValueKey('account-connection-sign-out'),
+                      onPressed: () => unawaited(onSignOut()),
+                      child: const Text('Sign out'),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

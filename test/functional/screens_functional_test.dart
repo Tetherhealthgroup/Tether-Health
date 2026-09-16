@@ -903,10 +903,19 @@ void main() {
         key: 'preparation-open-rescue',
         imageKey: 'functional-craving-rescue-start-screen',
       ),
-      (key: 'preparation-nav-progress', imageKey: 'screen-image-26'),
-      (key: 'preparation-nav-learn', imageKey: 'screen-image-25'),
-      (key: 'preparation-nav-support', imageKey: 'screen-image-27'),
-      (key: 'preparation-profile', imageKey: 'screen-image-28'),
+      (
+        key: 'preparation-nav-progress',
+        imageKey: 'functional-progress-dashboard-screen'
+      ),
+      (key: 'preparation-nav-learn', imageKey: 'learn-library-screen'),
+      (
+        key: 'preparation-nav-support',
+        imageKey: 'functional-support-hub-screen'
+      ),
+      (
+        key: 'preparation-profile',
+        imageKey: 'functional-settings-privacy-screen'
+      ),
     ];
 
     for (final destination in destinations) {
@@ -1133,7 +1142,8 @@ void main() {
         findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('next-step-open-support')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-27')), findsOneWidget);
+    expect(find.byKey(const ValueKey('functional-support-hub-screen')),
+        findsOneWidget);
 
     await tester.tap(find.bySemanticsLabel('Go back'));
     await tester.pumpAndSettle();
@@ -1753,7 +1763,8 @@ void main() {
     await tester.ensureVisible(support);
     await tester.tap(support);
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-27')), findsOneWidget);
+    expect(find.byKey(const ValueKey('functional-support-hub-screen')),
+        findsOneWidget);
     await tester.tap(find.bySemanticsLabel('Go back'));
     await tester.pumpAndSettle();
 
@@ -1863,7 +1874,8 @@ void main() {
     final support = find.byKey(const ValueKey('rescue-tool-support'));
     tester.widget<FilledButton>(support).onPressed!();
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('screen-image-27')), findsOneWidget);
+    expect(find.byKey(const ValueKey('functional-support-hub-screen')),
+        findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

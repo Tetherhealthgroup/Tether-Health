@@ -9,12 +9,14 @@ class WelcomeScreen extends StatefulWidget {
     required this.language,
     required this.onLanguageSelected,
     required this.onGetStarted,
+    required this.onSignIn,
     super.key,
   });
 
   final WelcomeLanguage language;
   final ValueChanged<WelcomeLanguage> onLanguageSelected;
   final VoidCallback onGetStarted;
+  final VoidCallback onSignIn;
 
   @override
   State<WelcomeScreen> createState() => _WelcomeScreenState();
@@ -207,14 +209,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         Center(
                           child: TextButton(
                             key: const ValueKey('welcome-sign-in'),
-                            onPressed: () => _showInformationSheet(
-                              title: _isSpanish
-                                  ? 'Iniciar sesión'
-                                  : 'Sign in to BreatheFree',
-                              message: _isSpanish
-                                  ? 'El inicio de sesión seguro se conectará cuando agreguemos las cuentas y el servicio de datos.'
-                                  : 'Secure sign-in will be connected when we add accounts and the production data service.',
-                            ),
+                            onPressed: widget.onSignIn,
                             child: Text(
                               _isSpanish
                                   ? 'Ya tengo una cuenta'

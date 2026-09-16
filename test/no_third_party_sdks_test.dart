@@ -68,6 +68,17 @@ void main() {
     // read a screen in the middle of a craving. Uses the OS speech engine and
     // sends nothing anywhere.
     'flutter_tts',
+    // Sign-in, and the session behind it. This one *does* talk to a server —
+    // ours. That is the distinction the addendum draws and this list keeps:
+    // a backend the patient is a customer of is not a third party collecting
+    // them. What would fail this test is an analytics or crash SDK, where the
+    // person on the other end has no relationship with the patient at all.
+    'supabase_flutter',
+    // Keeps the session token in the Keychain and the Android Keystore rather
+    // than in shared preferences, which is where a token must not be.
+    'flutter_secure_storage',
+    // Talks to our own API for the patient profile.
+    'http',
   ];
 
   test('the runtime dependency tree holds only allowed packages', () {

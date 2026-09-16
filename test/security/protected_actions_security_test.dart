@@ -8,7 +8,6 @@
 
 import 'package:tether_health/config/contact_info.dart';
 import 'package:tether_health/main.dart';
-import 'package:tether_health/models/tap_target.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -55,21 +54,21 @@ void _useIphoneViewport(WidgetTester tester) {
   addTearDown(tester.view.resetDevicePixelRatio);
 }
 
-Future<void> _tapTarget(WidgetTester tester, AppTapTarget target) async {
-  final size = tester.view.physicalSize / tester.view.devicePixelRatio;
-  await tester.tapAt(
-    Offset(
-      (target.normalizedRect.left + target.normalizedRect.width / 2) *
-          size.width,
-      (target.normalizedRect.top + target.normalizedRect.height / 2) *
-          size.height,
-    ),
-  );
+/// Taps a control by key, scrolling it into view first.
+///
+/// Screens 27 and 28 were bitmaps with invisible hit boxes when these tests
+/// were written, so they tapped a normalized rect from `tapTargetsFor`. They
+/// are widgets now and they scroll, which makes a fixed coordinate a tap on
+/// whatever happens to be at that point. The security properties asserted
+/// below are unchanged; only the way the control is reached has moved.
+Future<void> _tapControl(WidgetTester tester, String key) async {
+  final control = find.byKey(ValueKey(key));
+  expect(control, findsOneWidget, reason: '$key is not on screen');
+  await tester.ensureVisible(control);
+  await tester.pumpAndSettle();
+  await tester.tap(control);
   await tester.pumpAndSettle();
 }
-
-AppTapTarget _targetWhere(int screenIndex, bool Function(AppTapTarget) test) =>
-    tapTargetsFor(screenIndex).firstWhere(test);
 
 void main() {
   testWidgets('a quitline control never places a call by itself',
@@ -81,10 +80,7 @@ void main() {
     await tester.pumpWidget(const TetherHealthApp(initialScreen: 26));
     await tester.pumpAndSettle();
 
-    await _tapTarget(
-      tester,
-      _targetWhere(26, (t) => t.action == TapAction.quitline),
-    );
+    await _tapControl(tester, 'support-call-quitline');
 
     // The dialog must be the whole effect of the tap. Dialling is an action a
     // person takes deliberately, and the copy says so.
@@ -109,10 +105,7 @@ void main() {
     await tester.pumpWidget(const TetherHealthApp(initialScreen: 26));
     await tester.pumpAndSettle();
 
-    await _tapTarget(
-      tester,
-      _targetWhere(26, (t) => t.action == TapAction.quitline),
-    );
+    await _tapControl(tester, 'support-call-quitline');
     await tester.tap(find.byKey(const ValueKey('quitline-copy')));
     await tester.pumpAndSettle();
 
@@ -143,10 +136,7 @@ void main() {
     await tester.pumpWidget(const TetherHealthApp(initialScreen: 27));
     await tester.pumpAndSettle();
 
-    await _tapTarget(
-      tester,
-      _targetWhere(27, (t) => t.action == TapAction.deleteAccount),
-    );
+    await _tapControl(tester, 'settings-delete-account');
 
     // First tap must describe what a production build would require, not act.
     expect(find.text('Delete account and data?'), findsOneWidget);
