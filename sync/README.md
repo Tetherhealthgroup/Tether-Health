@@ -31,7 +31,7 @@ documentation and this file is the map.
 python -m venv .venv && . .venv/bin/activate
 pip install -r requirements.txt            # add -r requirements-postgres.txt for the PG driver
 
-export THSYNC_JWT_SECRET='<the Supabase JWT secret>'
+export THSYNC_SUPABASE_URL='https://<project-ref>.supabase.co'
 export THSYNC_DATABASE_URL='postgresql+psycopg://user:pass@host/db'
 
 uvicorn --factory thsync.app:create_app --port 8080
@@ -44,7 +44,11 @@ Against SQLite for local work, create the tables first — the `.sql` migrations
 are Postgres DDL and will not run on SQLite:
 
 ```bash
-export THSYNC_JWT_SECRET='local-dev-secret-at-least-32-bytes-long'
+# Asymmetric project (what Supabase issues now) — one variable derives the
+# issuer and the JWKS URL. See ../docs/supabase.md.
+export THSYNC_SUPABASE_URL='https://gcsazvotzqvjayqnqyra.supabase.co'
+# Or, for a legacy symmetric project, THSYNC_JWT_SECRET instead. Setting both
+# is refused at start-up.
 export THSYNC_DATABASE_URL='sqlite+pysqlite:///./thsync.db'
 python -c 'from thsync.config import settings_from_env as s; from thsync.db import *; create_schema(create_engine_from_settings(s()))'
 uvicorn --factory thsync.app:create_app --port 8080
@@ -54,7 +58,7 @@ uvicorn --factory thsync.app:create_app --port 8080
 
 ```bash
 pip install -r requirements-dev.txt
-pytest          # 84 tests, in-process, no network and no server
+pytest          # 97 tests, in-process; only loopback, no external network
 mypy            # strict
 ```
 
@@ -63,13 +67,16 @@ The suite runs against in-memory SQLite. There is no Postgres in it; see
 
 ### Migrations
 
-Plain `.sql` in `migrations/`, named `YYYYMMDDHHmmss_name.sql`, applied by the
+Plain `.sql` in the repo-root `supabase/migrations/`, named
+`YYYYMMDDHHmmss_name.sql`, applied by the
 deployment runner in filename order. No `BEGIN`/`COMMIT` inside — the runner
 wraps each file in its own transaction.
 
 `tests/test_migration_matches_schema.py` compares the DDL against
-`thsync/schema.py` (table names, column names, primary keys) so the two cannot
-drift silently. It cannot compare types.
+`thsync/schema.py` — tables, columns, **types and lengths**, primary keys and
+defaults — so the two cannot drift silently. Both sides are canonicalised by
+PostgreSQL's own parser first, which is how `timestamptz` and `TIMESTAMP WITH
+TIME ZONE` compare equal while `text` and `varchar(128)` do not.
 
 ---
 
@@ -77,7 +84,9 @@ drift silently. It cannot compare types.
 
 | Variable | Required | Default | Meaning |
 | --- | --- | --- | --- |
-| `THSYNC_JWT_SECRET` | **yes** | — | Supabase HS256 JWT secret. Start-up fails without it rather than accepting unverified tokens. |
+| `THSYNC_SUPABASE_URL` | one of these two | — | e.g. `https://<ref>.supabase.co`. Derives the issuer and the JWKS URL. Use this for any project on asymmetric keys, which is what Supabase issues now. |
+| `THSYNC_JWT_SECRET` | one of these two | — | Legacy symmetric HS256 secret. Setting **both** this and `THSYNC_SUPABASE_URL` is refused at start-up — see `thsync/config.py`. |
+| `THSYNC_JWT_JWKS_URL` | no | derived | Overrides the derived key-set URL. |
 | `THSYNC_DATABASE_URL` | no | `sqlite+pysqlite:///./thsync.db` | SQLAlchemy URL. Production: `postgresql+psycopg://…` |
 | `THSYNC_JWT_AUDIENCE` | no | `authenticated` | Required `aud`. Supabase signs `anon` tokens with the same key, so this check is what keeps the public key out. |
 | `THSYNC_JWT_ISSUER` | no | unset (not checked) | Required `iss` when set, e.g. `https://<project>.supabase.co/auth/v1`. |

@@ -10,5 +10,9 @@ starlette==1.6.0
 pydantic==2.13.5
 pydantic_core==2.46.5
 SQLAlchemy==2.0.53
-PyJWT==2.14.0
+# `[crypto]` pulls in `cryptography`, which PyJWT needs for ES256/RS256.
+# Without it, PyJWT imports fine and then refuses every asymmetric token at
+# runtime — and this project's Supabase instance signs with ES256, so the
+# extra is load-bearing rather than optional. See ../docs/supabase.md.
+PyJWT[crypto]==2.14.0
 uvicorn==0.53.0

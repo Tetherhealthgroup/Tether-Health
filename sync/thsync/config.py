@@ -33,12 +33,26 @@ class Settings:
     #: places that have to (see `thsync.db`).
     database_url: str
 
-    #: The HS256 secret Supabase signs access tokens with. There is no
-    #: asymmetric option here on purpose: Supabase's legacy JWT secret is
-    #: symmetric, and accepting *either* family would mean accepting whichever
-    #: one an attacker names in the token header, which is the algorithm
-    #: confusion bug rather than a feature.
+    #: The HS256 secret, for a project still on Supabase's legacy symmetric
+    #: signing key. Empty when [jwt_jwks_url] is set.
+    #:
+    #: Exactly one of the two is configured, and that is enforced in
+    #: [settings_from_env] rather than left to the verifier. Accepting either
+    #: family at verification time — trying the secret, then the JWKS — is the
+    #: algorithm confusion bug: an attacker signs HS256 using the *public* key's
+    #: bytes as the shared secret, and a verifier willing to try both accepts
+    #: it. Choosing the family from configuration, before any token arrives,
+    #: means the token header never gets a vote.
     jwt_secret: str
+
+    #: Where to fetch the signing keys for a project using asymmetric JWTs.
+    #:
+    #: Supabase issues ES256 (P-256) for new projects and publishes the public
+    #: keys at `<project>/auth/v1/.well-known/jwks.json`, which needs no API
+    #: key. Verifying against that is strictly better than a shared secret: the
+    #: service never holds anything that could mint a token, so a compromise of
+    #: this service cannot forge a session for somebody else.
+    jwt_jwks_url: str | None
 
     #: `aud` every token must carry. Supabase issues `authenticated` for a
     #: signed-in user and `anon` for the public key, and those two are the same
@@ -68,20 +82,39 @@ def settings_from_env(env: Mapping[str, str] | None = None) -> Settings:
     """
     source = os.environ if env is None else env
 
-    secret = source.get(f"{_PREFIX}JWT_SECRET", "")
-    if not secret:
-        # Not defaulted, not generated. A generated secret would verify nothing
-        # and still return 200s, which looks exactly like a working deployment.
-        raise ConfigError(
-            f"{_PREFIX}JWT_SECRET is required; it is the Supabase JWT secret "
-            "and there is no safe default for it."
-        )
-
+    secret = source.get(f"{_PREFIX}JWT_SECRET", "").strip()
+    jwks_url = source.get(f"{_PREFIX}JWT_JWKS_URL", "").strip()
     issuer = source.get(f"{_PREFIX}JWT_ISSUER", "").strip()
+
+    # One variable instead of three that have to agree.
+    #
+    # The issuer and the JWKS URL are both fixed functions of the project URL,
+    # and asking for them separately invites a deployment where the issuer
+    # names one project and the keys come from another — which fails closed,
+    # but only after an outage nobody can explain.
+    project = source.get(f"{_PREFIX}SUPABASE_URL", "").strip().rstrip("/")
+    if project:
+        issuer = issuer or f"{project}/auth/v1"
+        jwks_url = jwks_url or f"{project}/auth/v1/.well-known/jwks.json"
+
+    if bool(secret) == bool(jwks_url):
+        # Neither, or both. Both is the dangerous one — see `Settings.jwt_secret`
+        # for why the family must be chosen here and not per token — so it is
+        # refused rather than resolved by precedence, which somebody would
+        # later have to remember.
+        raise ConfigError(
+            f"configure exactly one of {_PREFIX}JWT_SECRET (legacy symmetric "
+            f"projects) or {_PREFIX}SUPABASE_URL / {_PREFIX}JWT_JWKS_URL "
+            "(asymmetric projects, which is what Supabase issues now). "
+            f"{'Both were set.' if secret else 'Neither was set.'} There is no "
+            "safe default: a generated secret would verify nothing and still "
+            "return 200s, which looks exactly like a working deployment."
+        )
 
     return Settings(
         database_url=source.get(f"{_PREFIX}DATABASE_URL", "sqlite+pysqlite:///./thsync.db"),
         jwt_secret=secret,
+        jwt_jwks_url=jwks_url or None,
         jwt_audience=source.get(f"{_PREFIX}JWT_AUDIENCE", "authenticated"),
         jwt_issuer=issuer or None,
         jwt_leeway_seconds=_int(source, f"{_PREFIX}JWT_LEEWAY_SECONDS", 10),

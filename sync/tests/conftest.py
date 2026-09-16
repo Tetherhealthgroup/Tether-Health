@@ -37,6 +37,7 @@ def settings() -> Settings:
     return Settings(
         database_url="sqlite+pysqlite:///:memory:",
         jwt_secret=JWT_SECRET,
+        jwt_jwks_url=None,
         jwt_audience=AUDIENCE,
         jwt_issuer=ISSUER,
         jwt_leeway_seconds=0,

@@ -10,10 +10,12 @@ there is no code path to forget.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any, Final
 
 import jwt
 from fastapi import Request, status
+from jwt import PyJWKClient
 
 from thsync.config import Settings
 from thsync.logs import log
@@ -21,11 +23,19 @@ from thsync.problems import Problem
 
 __all__ = ["Account", "verify_token", "account_from_request"]
 
-#: Pinned, and a list of exactly one. PyJWT will otherwise honour the `alg` in
-#: the token header, which lets a caller present `{"alg":"none"}` or sign an
-#: RS256 token with the HS256 secret's bytes as a public key. Supabase's legacy
-#: signing key is symmetric HS256; nothing else is accepted here.
-_ALGORITHMS: Final = ["HS256"]
+#: Pinned per key family, never taken from the token.
+#:
+#: PyJWT will otherwise honour the `alg` in the token header, which lets a
+#: caller present `{"alg":"none"}`, or sign an HS256 token using the *public*
+#: key's bytes as the shared secret and have it verify. Which list applies is
+#: decided by configuration before any token is seen — see
+#: `Settings.jwt_secret` — so the two never overlap and the header never gets
+#: a vote.
+_SYMMETRIC: Final = ["HS256"]
+
+#: What Supabase issues for projects on asymmetric keys. ES256 is the current
+#: default (P-256); RS256 appears on projects migrated from older setups.
+_ASYMMETRIC: Final = ["ES256", "RS256"]
 
 #: Claims that must be present. `sub` is the account; without `exp` a leaked
 #: token never stops working.
@@ -34,6 +44,11 @@ _REQUIRED_CLAIMS: Final = ["exp", "sub", "aud"]
 _SCHEME: Final = "bearer"
 
 _CHALLENGE: Final = {"WWW-Authenticate": "Bearer"}
+
+#: How long a fetched key set is trusted before it is refetched. Supabase key
+#: rotation is rare and an unknown `kid` forces a refetch anyway, so this only
+#: bounds how long a *revoked* key stays usable.
+_JWKS_LIFESPAN_SECONDS: Final = 600
 
 
 @dataclass(frozen=True, slots=True)
@@ -53,10 +68,25 @@ def verify_token(token: str, settings: Settings) -> Account:
     What it never contains is the token, a claim value, or the account id.
     """
     try:
+        key, algorithms = _key_for(token, settings)
+    except Problem:
+        raise
+    except Exception:
+        # Fetching the JWKS failed: DNS, TLS, a 500 from Supabase. This is the
+        # one authentication failure that is not the caller's fault, and it is
+        # still answered as 401 rather than 503 — telling an unauthenticated
+        # caller about the state of our key infrastructure buys them a probe
+        # and buys us nothing. Logged, so it is visible on our side.
+        log.warning("could not obtain a signing key for token verification")
+        raise _unauthenticated(
+            "invalid-token", "The access token could not be verified."
+        ) from None
+
+    try:
         claims: dict[str, Any] = jwt.decode(
             token,
-            settings.jwt_secret,
-            algorithms=_ALGORITHMS,
+            key,
+            algorithms=algorithms,
             audience=settings.jwt_audience,
             issuer=settings.jwt_issuer,
             leeway=settings.jwt_leeway_seconds,
@@ -90,6 +120,36 @@ def verify_token(token: str, settings: Settings) -> Account:
         raise _unauthenticated("invalid-token", "The access token names no subject.")
 
     return Account(id=subject.strip())
+
+
+@lru_cache(maxsize=8)
+def _jwk_client(url: str) -> PyJWKClient:
+    """One client per JWKS URL, kept for the life of the process.
+
+    `PyJWKClient` caches the key set and only refetches when a token arrives
+    with an unknown `kid`, which is exactly the behaviour a rotation needs: no
+    network call on the hot path, and no stale-key outage when Supabase rolls
+    a key. Building a fresh client per request would fetch the JWKS per
+    request, turning every sync into two round trips and Supabase's auth
+    endpoint into a hard dependency of ours.
+
+    Cached on the URL rather than on `Settings` because `Settings` is not
+    hashable and the URL is the only part that identifies the key set.
+    """
+    return PyJWKClient(url, cache_keys=True, lifespan=_JWKS_LIFESPAN_SECONDS)
+
+
+def _key_for(token: str, settings: Settings) -> tuple[Any, list[str]]:
+    """The verification key and the algorithms allowed with it.
+
+    Returns the pair together so the two can never be mismatched by a caller —
+    handing back a public key and letting somebody else pick the algorithm
+    list is how algorithm confusion gets reintroduced.
+    """
+    if settings.jwt_jwks_url is None:
+        return settings.jwt_secret, list(_SYMMETRIC)
+    signing_key = _jwk_client(settings.jwt_jwks_url).get_signing_key_from_jwt(token)
+    return signing_key.key, list(_ASYMMETRIC)
 
 
 def account_from_request(request: Request, settings: Settings) -> Account:

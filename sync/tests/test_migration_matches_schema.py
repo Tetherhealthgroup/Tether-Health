@@ -37,7 +37,13 @@ from sqlalchemy.schema import CreateTable
 
 from thsync.schema import metadata
 
-MIGRATIONS = Path(__file__).resolve().parent.parent / "migrations"
+#: Repo-root `supabase/migrations`, not `sync/migrations`.
+#:
+#: Supabase branching applies whatever is in that directory when it builds a
+#: preview branch and when it deploys the production branch. Keeping the
+#: service's DDL anywhere else would mean every branch came up with an empty
+#: database while the tests stayed green.
+MIGRATIONS = Path(__file__).resolve().parents[2] / "supabase" / "migrations"
 
 #: `YYYYMMDDHHmmss_name.sql`. The runner applies files in filename order, so a
 #: file that does not sort by timestamp would be applied at the wrong moment.
