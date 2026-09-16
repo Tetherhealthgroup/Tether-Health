@@ -1,5 +1,8 @@
-# Uncomment this line to define a global platform for your project
-# platform :ios, '15.0'
+# Matches Runner's own IPHONEOS_DEPLOYMENT_TARGET. Left commented out, pods
+# default to iOS 13, which current Xcode refuses outright: "the range of
+# supported deployment target versions is 15.0 to 27.0". The Unplug extensions
+# go further and need 16.0 for FamilyControls, but they take no pods.
+platform :ios, '15.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -39,5 +42,12 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+    target.build_configurations.each do |config|
+      # `platform :ios` above sets the floor for pods that declare nothing.
+      # A pod that declares its own lower target keeps it, and one stale
+      # dependency is enough to fail the build, so the floor is applied here
+      # per configuration as well.
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+    end
   end
 end
