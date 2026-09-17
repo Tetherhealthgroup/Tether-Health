@@ -38,6 +38,70 @@ void main() {
         isNull);
   });
 
+  testWidgets('account creation handles email confirmation and resend',
+      (tester) async {
+    tester.view.physicalSize = const Size(430, 932);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final auth = _SuccessfulAuth(requiresConfirmation: true);
+    final account = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _ProfileApi()),
+    );
+    addTearDown(account.dispose);
+
+    await tester.pumpWidget(BreatheFreeApp(accountController: account));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('welcome-sign-in')));
+    await tester.tap(find.byKey(const ValueKey('welcome-sign-in')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('account-toggle-mode')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Create your BreatheFree account'), findsOneWidget);
+    expect(
+        find.byKey(const ValueKey('sign-up-confirm-password')), findsOneWidget);
+    await tester.enterText(
+      find.byKey(const ValueKey('sign-in-email')),
+      'new-person@example.test',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('sign-in-password')),
+      'short',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('sign-up-confirm-password')),
+      'different',
+    );
+    await tester.tap(find.byKey(const ValueKey('sign-up-submit')));
+    await tester.pumpAndSettle();
+    expect(find.text('Use at least 8 characters.'), findsOneWidget);
+    expect(find.text('Passwords do not match.'), findsOneWidget);
+
+    await tester.enterText(
+      find.byKey(const ValueKey('sign-in-password')),
+      'local-password',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('sign-up-confirm-password')),
+      'local-password',
+    );
+    await tester.tap(find.byKey(const ValueKey('sign-up-submit')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Check your email'), findsOneWidget);
+    expect(find.byKey(const ValueKey('sign-up-confirmation-message')),
+        findsOneWidget);
+    expect(account.isSignedIn, isFalse);
+
+    await tester.tap(find.byKey(const ValueKey('sign-up-resend')));
+    await tester.pumpAndSettle();
+    expect(find.text('Confirmation email requested.'), findsOneWidget);
+    expect(auth.resentEmail, 'new-person@example.test');
+  });
+
   testWidgets('restored incomplete account resumes onboarding', (tester) async {
     tester.view.physicalSize = const Size(430, 932);
     tester.view.devicePixelRatio = 1;
@@ -190,7 +254,7 @@ void main() {
 }
 
 class _SuccessfulAuth implements AuthGateway {
-  _SuccessfulAuth({bool signedIn = false}) {
+  _SuccessfulAuth({bool signedIn = false, this.requiresConfirmation = false}) {
     if (signedIn) {
       _identity = const AuthIdentity(
         id: 'user-id',
@@ -200,7 +264,9 @@ class _SuccessfulAuth implements AuthGateway {
     }
   }
 
+  final bool requiresConfirmation;
   AuthIdentity? _identity;
+  String? resentEmail;
 
   @override
   AuthIdentity? get currentIdentity => _identity;
@@ -213,6 +279,27 @@ class _SuccessfulAuth implements AuthGateway {
       email: email,
       accessToken: 'fake-access-token',
     );
+  }
+
+  @override
+  Future<AuthSignUpResult> signUp({
+    required String email,
+    required String password,
+  }) async {
+    if (requiresConfirmation) {
+      return const AuthSignUpResult.emailConfirmationRequired();
+    }
+    final identity = _identity = AuthIdentity(
+      id: 'user-id',
+      email: email,
+      accessToken: 'fake-access-token',
+    );
+    return AuthSignUpResult.authenticated(identity);
+  }
+
+  @override
+  Future<void> resendSignUpConfirmation({required String email}) async {
+    resentEmail = email;
   }
 
   @override

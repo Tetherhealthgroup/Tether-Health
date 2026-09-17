@@ -65,6 +65,15 @@ class _Auth implements AuthGateway {
       throw UnimplementedError();
 
   @override
+  Future<AuthSignUpResult> signUp(
+          {required String email, required String password}) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> resendSignUpConfirmation({required String email}) =>
+      throw UnimplementedError();
+
+  @override
   Future<void> signOut() async {}
 }
 
@@ -77,6 +86,15 @@ class _SignedOutAuth implements AuthGateway {
   @override
   Future<AuthIdentity> signIn(
           {required String email, required String password}) =>
+      throw UnimplementedError();
+
+  @override
+  Future<AuthSignUpResult> signUp(
+          {required String email, required String password}) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> resendSignUpConfirmation({required String email}) =>
       throw UnimplementedError();
 
   @override

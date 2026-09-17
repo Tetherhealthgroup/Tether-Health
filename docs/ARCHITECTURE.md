@@ -12,8 +12,11 @@ NestJS API (TypeScript / Node.js)
 Supabase (PostgreSQL + Auth + Storage)
 ```
 
-Supabase Auth is the identity provider and token issuer. Flutter uses the
-publishable/anonymous key only and sends its short-lived access token to the API.
+Supabase Auth is the identity provider and token issuer. Flutter supports
+email/password registration, email-confirmation-aware onboarding, confirmation
+resend, sign-in, secure session restoration, and sign-out through an auth
+boundary that is replaceable in tests. Flutter uses the publishable/anonymous
+key only and sends its short-lived access token to the API.
 NestJS validates signature, issuer, audience, expiry, and subject against
 Supabase JWKS, then accesses Supabase with that caller token. PostgreSQL RLS is
 the final authorization boundary. Service-role credentials must never ship in
@@ -48,6 +51,8 @@ analytics, crash reports, push notifications, or object names.
 ## Incremental Flutter migration
 
 The approved 28-screen catalog and integer routing contract remain unchanged.
-Authentication and profiles sit behind interfaces with fakes for tests. Screens
-can migrate one bounded domain at a time without coupling widgets to Supabase or
-HTTP.
+Authentication, registration, and profiles sit behind interfaces with fakes for
+tests. Registration does not claim an authenticated session when Supabase
+requires email confirmation; the user confirms externally and then returns to
+sign in. Password recovery remains a later slice. Screens can migrate one
+bounded domain at a time without coupling widgets to Supabase or HTTP.

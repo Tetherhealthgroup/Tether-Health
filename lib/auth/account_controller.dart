@@ -4,6 +4,12 @@ import '../profile/profile_repository.dart';
 import '../profile/user_profile.dart';
 import 'auth_gateway.dart';
 
+enum AccountSignUpOutcome {
+  authenticated,
+  emailConfirmationRequired,
+  accountCreatedSignInRequired,
+}
+
 class AccountController extends ChangeNotifier {
   AccountController(
       {required AuthGateway auth,
@@ -68,6 +74,71 @@ class AccountController extends ChangeNotifier {
       busy = false;
       notifyListeners();
     }
+  }
+
+  Future<AccountSignUpOutcome?> signUp({
+    required String email,
+    required String password,
+  }) async {
+    busy = true;
+    errorMessage = null;
+    notifyListeners();
+    try {
+      final result = await _auth.signUp(
+        email: email.trim(),
+        password: password,
+      );
+      if (result.status == AuthSignUpStatus.emailConfirmationRequired) {
+        profile = null;
+        return AccountSignUpOutcome.emailConfirmationRequired;
+      }
+
+      try {
+        await _loadProfile(notify: false);
+        return AccountSignUpOutcome.authenticated;
+      } catch (_) {
+        try {
+          await _auth.signOut();
+        } catch (_) {
+          // Preserve the profile restoration failure for the user.
+        }
+        profile = null;
+        errorMessage =
+            'Your account was created, but your profile is temporarily '
+            'unavailable. Sign in to continue.';
+        return AccountSignUpOutcome.accountCreatedSignInRequired;
+      }
+    } catch (_) {
+      profile = null;
+      errorMessage =
+          'Account creation failed. Check your details and connection.';
+      return null;
+    } finally {
+      busy = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> resendSignUpConfirmation({required String email}) async {
+    busy = true;
+    errorMessage = null;
+    notifyListeners();
+    try {
+      await _auth.resendSignUpConfirmation(email: email.trim());
+      return true;
+    } catch (_) {
+      errorMessage = 'Confirmation email could not be sent. Please try again.';
+      return false;
+    } finally {
+      busy = false;
+      notifyListeners();
+    }
+  }
+
+  void clearError() {
+    if (errorMessage == null) return;
+    errorMessage = null;
+    notifyListeners();
   }
 
   Future<bool> completeOnboarding() async {
