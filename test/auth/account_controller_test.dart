@@ -56,6 +56,11 @@ class _FakeAuth implements AuthGateway {
 
   @override
   Future<void> signOut() async => _identity = null;
+
+  // The gateway hands out a token that is still valid; these fakes have no
+  // expiry to model, so the current one is always the fresh one.
+  @override
+  Future<String?> freshAccessToken() async => _identity?.accessToken;
 }
 
 class _FakeProfileApi implements ProfileApiClient {

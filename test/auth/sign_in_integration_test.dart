@@ -150,6 +150,9 @@ class _SuccessfulAuth implements AuthGateway {
 
   @override
   Future<void> signOut() async => _identity = null;
+
+  @override
+  Future<String?> freshAccessToken() async => currentIdentity?.accessToken;
 }
 
 class _ProfileApi implements ProfileApiClient {
