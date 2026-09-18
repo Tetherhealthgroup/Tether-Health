@@ -1,0 +1,272 @@
+{
+  "version": "1.1.0",
+  "id": "lookup",
+  "name": "LookUp",
+  "$nameNote": "Placeholder. Not trademark-cleared.",
+  "areaId": "behavioral",
+  "serviceLines": [
+    "behavioral.digital",
+    "behavioral.support",
+    "behavioral.crisis",
+    "behavioral.referral"
+  ],
+  "status": "design",
+  "locales": [
+    "en",
+    "es"
+  ],
+  "vocabulary": {
+    "behaviour": "scrolling",
+    "urge": "pull",
+    "lapse": "going over",
+    "target": "daily limit",
+    "primaryMetric": "minutes on chosen apps"
+  },
+  "helplines": [
+    {
+      "locale": "en",
+      "name": "988 Suicide & Crisis Lifeline",
+      "number": "988"
+    },
+    {
+      "locale": "es",
+      "name": "988 Línea de Prevención del Suicidio",
+      "number": "988"
+    }
+  ],
+  "screens": [
+    {
+      "id": "S01",
+      "archetype": "welcome",
+      "route": "/welcome",
+      "phase": 1
+    },
+    {
+      "id": "S02",
+      "archetype": "why",
+      "route": "/onboarding/why",
+      "phase": 2
+    },
+    {
+      "id": "S03",
+      "archetype": "consent",
+      "route": "/onboarding/consent",
+      "phase": 2
+    },
+    {
+      "id": "S04",
+      "archetype": "age_gate",
+      "route": "/onboarding/age",
+      "phase": 2,
+      "$new": true
+    },
+    {
+      "id": "S05",
+      "archetype": "baseline",
+      "route": "/onboarding/baseline",
+      "phase": 2
+    },
+    {
+      "id": "S06",
+      "archetype": "trigger_map",
+      "route": "/onboarding/triggers",
+      "phase": 2
+    },
+    {
+      "id": "S07",
+      "archetype": "plan_path",
+      "route": "/plan/path",
+      "phase": 3
+    },
+    {
+      "id": "S08",
+      "archetype": "plan_targets",
+      "route": "/plan/limits",
+      "phase": 3
+    },
+    {
+      "id": "S09",
+      "archetype": "plan_reasons",
+      "route": "/plan/reasons",
+      "phase": 3
+    },
+    {
+      "id": "S10",
+      "archetype": "plan_support",
+      "route": "/plan/support",
+      "phase": 3
+    },
+    {
+      "id": "S11",
+      "archetype": "plan_review",
+      "route": "/plan/review",
+      "phase": 3
+    },
+    {
+      "id": "S12",
+      "archetype": "home",
+      "route": "/today",
+      "phase": 4
+    },
+    {
+      "id": "S13",
+      "archetype": "checkin",
+      "route": "/checkin",
+      "phase": 4
+    },
+    {
+      "id": "S14",
+      "archetype": "next_step",
+      "route": "/checkin/next",
+      "phase": 4
+    },
+    {
+      "id": "S15",
+      "archetype": "rescue_active",
+      "route": "/reset/breathing",
+      "phase": 4
+    },
+    {
+      "id": "S16",
+      "archetype": "rescue_recheck",
+      "route": "/reset/complete",
+      "phase": 4
+    },
+    {
+      "id": "S17",
+      "archetype": "rescue_start",
+      "route": "/rescue/start",
+      "phase": 5
+    },
+    {
+      "id": "S18",
+      "archetype": "rescue_tool",
+      "route": "/rescue/tool",
+      "phase": 5
+    },
+    {
+      "id": "S19",
+      "archetype": "rescue_active",
+      "route": "/rescue/active",
+      "phase": 5
+    },
+    {
+      "id": "S20",
+      "archetype": "rescue_recheck",
+      "route": "/rescue/recheck",
+      "phase": 5
+    },
+    {
+      "id": "S21",
+      "archetype": "rescue_result",
+      "route": "/rescue/result",
+      "phase": 5
+    },
+    {
+      "id": "S22",
+      "archetype": "intercept",
+      "route": "/intercept",
+      "phase": 6,
+      "$new": true
+    },
+    {
+      "id": "S23",
+      "archetype": "lapse",
+      "route": "/slip",
+      "phase": 6
+    },
+    {
+      "id": "S24",
+      "archetype": "environment",
+      "route": "/quiet-phone",
+      "phase": 7,
+      "$new": true
+    },
+    {
+      "id": "S25",
+      "archetype": "education",
+      "route": "/learn",
+      "phase": 7
+    },
+    {
+      "id": "S26",
+      "archetype": "progress",
+      "route": "/progress",
+      "phase": 7
+    },
+    {
+      "id": "S27",
+      "archetype": "support_hub",
+      "route": "/support",
+      "phase": 7
+    },
+    {
+      "id": "S28",
+      "archetype": "settings",
+      "route": "/settings",
+      "phase": 8
+    },
+    {
+      "id": "SH1",
+      "archetype": "programs_home",
+      "route": "/programs",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH2",
+      "archetype": "area_directory",
+      "route": "/areas",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH3",
+      "archetype": "program_join",
+      "route": "/areas/join",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH4",
+      "archetype": "record",
+      "route": "/record",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH5",
+      "archetype": "sharing_matrix",
+      "route": "/privacy/sharing",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH6",
+      "archetype": "crisis_route",
+      "route": "/help-now",
+      "phase": 8,
+      "$shell": true
+    }
+  ],
+  "platformCapabilities": {
+    "blocking": true,
+    "passiveTracking": true,
+    "offlineRescue": true,
+    "$note": "iOS returns aggregate usage only. Any screen reading perApp data must degrade."
+  },
+  "proposedArchetypes": [
+    {
+      "id": "age_gate",
+      "reason": "Under-18 populations need a tier ceiling and guardian link. Reusable by aging (supporter involvement) and preventive (age-appropriate screening)."
+    },
+    {
+      "id": "intercept",
+      "reason": "Interrupts the behaviour at the moment it starts. Only possible where the trigger lives inside the device — currently unique to this area."
+    },
+    {
+      "id": "environment",
+      "reason": "Reduces cue exposure rather than resisting it. Generalises to nutrition (kitchen setup) and tobacco (removing smoking cues)."
+    }
+  ]
+}

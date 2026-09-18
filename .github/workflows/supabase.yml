@@ -1,0 +1,99 @@
+# Database migrations for the sync service.
+#
+# Supabase Branching does most of the work once it is switched on in the
+# dashboard: it builds a preview database for every pull request and applies
+# `supabase/migrations` to it, and it applies the same migrations to production
+# when the production branch is updated. That is configuration, not CI, so
+# there is no job here that deploys on merge — a second thing applying the same
+# migrations would race the first.
+#
+# What CI is for is catching a migration that cannot be applied *before* it
+# reaches a branch. A broken migration merged to the production branch is an
+# outage; the same migration caught on the pull request is a rerun.
+name: Supabase
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/**'
+      - 'sync/**'
+      - '.github/workflows/supabase.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/**'
+      - 'sync/**'
+
+concurrency:
+  group: supabase-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  migrations:
+    name: Migrations apply to a real Postgres
+    runs-on: ubuntu-latest
+
+    # The thing the test suite cannot do. `sync/tests` runs on SQLite and
+    # checks the DDL with PostgreSQL's parser, which proves the syntax is valid
+    # and the schema agrees with the code — but not that the migration applies,
+    # that `timestamptz` round-trips, or that `jsonb` takes what the app sends.
+    # This service container is where that gets proven.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: tether_sync
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply every migration, in filename order
+        run: |
+          set -euo pipefail
+          for file in supabase/migrations/*.sql; do
+            echo "── $file"
+            # -v ON_ERROR_STOP=1 so a failure fails the step. Without it psql
+            # reports the error and exits 0, and the job goes green on a
+            # migration that did not apply.
+            # --single-transaction mirrors the runner, which wraps each file —
+            # which is why the migrations must not carry their own BEGIN.
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 --single-transaction -f "$file"
+          done
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tether_sync
+          PGPASSWORD: postgres
+
+      - name: Applying them twice is not an error
+        # Every migration is IF NOT EXISTS. Branching replays the whole
+        # directory onto a fresh preview database, and a rerun on an existing
+        # one must be a no-op rather than a failure.
+        run: |
+          set -euo pipefail
+          for file in supabase/migrations/*.sql; do
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 --single-transaction -f "$file"
+          done
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tether_sync
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: The sync suite, against Postgres rather than SQLite
+        working-directory: sync
+        run: |
+          set -euo pipefail
+          pip install --quiet -r requirements-dev.txt -r requirements-postgres.txt
+          pytest
+          mypy
+        env:
+          THSYNC_DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/tether_sync
+          THSYNC_JWT_SECRET: ci-secret-not-a-real-one-0123456789abcdef

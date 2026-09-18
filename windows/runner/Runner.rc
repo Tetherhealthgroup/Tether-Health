@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.breathefree" "\0"
-            VALUE "FileDescription", "breathefree_patient" "\0"
+            VALUE "CompanyName", "Tether Health Group" "\0"
+            VALUE "FileDescription", "Tether Health" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "breathefree_patient" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.breathefree. All rights reserved." "\0"
-            VALUE "OriginalFilename", "breathefree_patient.exe" "\0"
-            VALUE "ProductName", "breathefree_patient" "\0"
+            VALUE "InternalName", "tether_health" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Tether Health Group. All rights reserved." "\0"
+            VALUE "OriginalFilename", "tether_health.exe" "\0"
+            VALUE "ProductName", "Tether Health" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

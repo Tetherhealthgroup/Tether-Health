@@ -1,0 +1,696 @@
+{
+  "product": "steady",
+  "locale": "en",
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "$comment": "Every non-shell screen in supplement.product.aging.json. Shell screens SH1–SH6 are deliberately absent: they are identical in every programme and are not this file's to write. The person throughout is Ruth, 74, in a bungalow with a back step that has caught her twice; her daughter Carol is twenty minutes away and Dev is her coach. Every string is unreviewed.",
+  "start": "S01",
+  "screens": {
+    "S01": {
+      "title": "",
+      "lead": "none",
+      "headline": "Staying on your own two feet.",
+      "sub": "Steady is a minute a day, in your own words, about the things that keep you doing what you already do. It is not a monitor, and it is not somebody keeping an eye on you.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "Nobody is watching",
+          "body": "No location, no listening, no camera, no alarm that goes off in someone else's kitchen. A family member sees the small thing you agreed to send them, on the day you send it."
+        },
+        {
+          "t": "card",
+          "title": "You decide, every time",
+          "body": "Someone can help you without taking anything over. They can't change your plan, answer for you, or overrule you. That isn't a setting you have to find — there's no button for it on their side at all."
+        },
+        {
+          "t": "card",
+          "title": "Built to be read",
+          "body": "Large text throughout, big buttons, strong contrast. If your phone's text is set large, this follows it, and you can go larger still."
+        }
+      ],
+      "actions": [
+        { "label": "Get started", "to": "S02" },
+        { "label": "I already have an account", "kind": "ghost", "to": "S07" }
+      ],
+      "footer": "Education and self-management support. Not a diagnosis or treatment."
+    },
+
+    "S02": {
+      "title": "What it does",
+      "badge": "1 of 3",
+      "headline": "Four moments this is built for.",
+      "sub": "Not four features. Four things that actually come up.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Moment one",
+          "title": "When you're not sure whether this year is different",
+          "body": "A week of noticing first. How steady you felt, and how long you were on your feet. You say it, we write it down, and nothing is graded."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment two",
+          "title": "When the back step catches you",
+          "body": "A wobble goes in the same day, in one tap. It isn't a failure and it isn't an alarm. It's the thing that tells you which step to sort out."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment three",
+          "title": "When Carol rings to ask how you are",
+          "body": "She's already seen the line you sent on Sunday, so the call can be about something else for once."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Moment four",
+          "title": "When something is actually wrong",
+          "body": "A route to a qualified person, in the same place on every screen, never reordered and never hidden behind anything."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What it isn't",
+          "body": "It does not detect a fall. It does not predict one. It doesn't know where you are, doesn't read your messages, and tells nobody anything you didn't send yourself."
+        }
+      ],
+      "actions": [{ "label": "Continue", "to": "S03" }],
+      "footer": "Education and self-management support. Not a diagnosis or treatment."
+    },
+
+    "S03": {
+      "title": "Consent & privacy",
+      "badge": "2 of 3",
+      "progress": 66,
+      "headline": "What we hold, and what we don't.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Held on your phone",
+          "body": "How steady you felt, your minutes, your notes, the wobbles you wrote down, and who you've picked to help. These stay here."
+        },
+        {
+          "t": "card",
+          "title": "Shared with your care team",
+          "body": "How steady you felt and how much you were on your feet, as a monthly summary, and only once you've read it. Never your notes, and never anything you told Dev."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "You can leave",
+          "body": "Export or delete all of it whenever you like. Deletion is finished rather than hidden, and Carol's view goes with it the same moment."
+        },
+        {
+          "t": "options",
+          "items": [
+            { "title": "I understand and agree", "sel": true },
+            { "title": "Share a monthly summary with my care team" }
+          ]
+        }
+      ],
+      "actions": [
+        { "label": "Agree and continue", "to": "S04" },
+        { "label": "Read the full privacy notice", "kind": "ghost", "to": "S03" }
+      ],
+      "footer": "You can change either choice later in Settings."
+    },
+
+    "S04": {
+      "title": "First week",
+      "badge": "Day 5 of 7",
+      "headline": "Carry on as you normally would.",
+      "sub": "Nothing to change this week. We're writing down what an ordinary week looks like, in your words, so that later on there's something honest to compare against.",
+      "blocks": [
+        { "t": "bars", "values": [55, 40, 70, 35, 60, 0, 0] },
+        {
+          "t": "stats",
+          "items": [
+            ["7 of 10", "How steady you felt"],
+            ["26 min", "On your feet, typical day"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "What you've told us so far",
+          "body": "Steadiest out on the flat. Least steady on the back step, and getting out of the low chair in the front room."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "All of this is what you told us. Steady has no sensors, measures nothing, and does not treat any of it as a clinical reading."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "You don't have to wait the week out",
+          "body": "Five days is plenty to be going on with. Start now and we'll note that the picture is partial.",
+          "to": "S05",
+          "pill": "Skip ahead"
+        }
+      ],
+      "actions": [{ "label": "Start now", "kind": "ghost", "to": "S05" }],
+      "footer": "Saves offline · Syncs when connected"
+    },
+
+    "S05": {
+      "title": "What you're working towards",
+      "badge": "1 of 2",
+      "progress": 50,
+      "lead": "back",
+      "headline": "What would you like to be able to do?",
+      "sub": "Something you'd notice from the inside. Not a score, and not something a chart would tell you.",
+      "blocks": [
+        {
+          "t": "options",
+          "items": [
+            {
+              "title": "The shop and back without stopping",
+              "body": "Wednesday, the long way round the green.",
+              "sel": true
+            },
+            {
+              "title": "Out of the front room chair without using my hands",
+              "body": "People usually give this one a good few weeks, and it comes back in small pieces."
+            },
+            {
+              "title": "Standing at the sink for the whole washing up",
+              "body": "A quiet one. Also a good one."
+            }
+          ]
+        },
+        {
+          "t": "slider",
+          "title": "How many days a week feels right?",
+          "body": "Pick the number you'd manage in a bad week, not a good one.",
+          "value": 50,
+          "left": "Two",
+          "mid": "Four days",
+          "right": "Every day"
+        },
+        {
+          "t": "card",
+          "title": "When suits you?",
+          "body": "Optional. A reminder is a reminder — nothing is recorded if you ignore it.",
+          "chips": ["After breakfast", "Before lunch", "Afternoon", "No set time"],
+          "selected": [0]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Nobody else sets this",
+          "body": "Steady never picks your target, never raises it quietly behind you, and never moves it because a week went badly. Carol cannot change it, and neither can Dev without asking you first."
+        }
+      ],
+      "actions": [{ "label": "Continue", "to": "S06" }]
+    },
+
+    "S06": {
+      "title": "Review your plan",
+      "badge": "2 of 2",
+      "progress": 100,
+      "lead": "back",
+      "headline": "Your plan is ready.",
+      "sub": "One last look. Any part of it can change now or later, and changing it doesn't need anyone's permission.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Starting point",
+          "title": "Four days a week, after breakfast",
+          "body": "We'll only suggest going further when you tell us it's starting to feel easy. Not when a chart says so."
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WORKING TOWARDS", "The shop and back without stopping"],
+            ["HOW OFTEN", "Four days a week, after breakfast"],
+            ["CHECK-IN", "About a minute, whenever suits"],
+            ["SOMEONE HELPING", "Carol · one note a week · nothing live"],
+            ["WHAT CAROL CAN CHANGE", "Nothing"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Starting turns on one reminder after breakfast and nothing else. Carol is sent nothing until you've read it and pressed send, and she is not told that you started today."
+        }
+      ],
+      "actions": [
+        { "label": "Start my plan", "to": "S07" },
+        { "label": "Save and finish later", "kind": "ghost", "to": "S07" }
+      ]
+    },
+
+    "S07": {
+      "title": "Today",
+      "badge": "Private",
+      "lead": "none",
+      "headline": "Good morning, Ruth.",
+      "sub": "Week 3. You've been out three mornings this week.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Get help now",
+          "body": "In the same place on every screen, in every program.",
+          "to": "SH6",
+          "pill": "Open"
+        },
+        {
+          "t": "metric",
+          "eyebrow": "Yesterday",
+          "value": "8",
+          "unit": "out of 10, how steady you felt",
+          "pct": 80,
+          "foot": "Your first week averaged 7"
+        },
+        {
+          "t": "stats",
+          "items": [
+            ["82 min", "On your feet this week"],
+            ["3 of 4", "Mornings out"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Had a wobble just now?",
+          "body": "One tap and it's written down before you forget it. Nobody is told, nothing goes off, and it doesn't count against anything.",
+          "to": "S08",
+          "pill": "Write it down"
+        },
+        {
+          "t": "card",
+          "title": "Today's check-in",
+          "body": "Not done yet · about a minute"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Dev · your coach",
+          "body": "Tuesday, 11:00 am",
+          "to": "S13"
+        }
+      ],
+      "actions": [
+        { "label": "Start today's check-in", "to": "S08" },
+        { "label": "What Carol sees", "kind": "ghost", "to": "S10" },
+        { "label": "Your programs", "kind": "ghost", "to": "SH1" }
+      ],
+      "footer": "Works offline · Syncs securely when connected"
+    },
+
+    "S08": {
+      "title": "Daily check-in",
+      "badge": "About a minute",
+      "progress": 70,
+      "headline": "How's today been?",
+      "sub": "No right answers. A low number is as useful to us as a high one, and more useful to Dev.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "How do you feel in yourself?",
+          "chips": ["Low", "Not great", "Okay", "Good", "Great"],
+          "selected": [3]
+        },
+        {
+          "t": "card",
+          "title": "Did you get out this morning?",
+          "body": "A no isn't a setback. Weather counts as a reason, and so does not fancying it.",
+          "chips": ["Yes", "Part of it", "No", "Skip"],
+          "selected": [0]
+        },
+        {
+          "t": "slider",
+          "title": "How steady did you feel?",
+          "value": 80,
+          "left": "0 · Not at all",
+          "mid": "8 · Steady",
+          "right": "10 · Completely"
+        },
+        {
+          "t": "card",
+          "title": "Anything else today?",
+          "body": "Optional. Tick anything that's true.",
+          "chips": [
+            "A wobble",
+            "Dizzy standing up",
+            "Sore knee",
+            "Slept badly",
+            "New tablets",
+            "Nothing in particular"
+          ],
+          "selected": [0]
+        },
+        {
+          "t": "card",
+          "title": "You ticked a wobble. Where was it?",
+          "body": "Optional. It goes in your record and stays there — nobody is alerted, nothing is sent, and Carol won't see it unless you put it in Sunday's note yourself.",
+          "chips": ["The back step", "Out of the chair", "In the garden", "Somewhere else"],
+          "selected": [0]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Dizzy standing up, more than once?",
+          "body": "That's one to say out loud to a person rather than to an app, and it can have a plain cause worth sorting out. Dev is a coach, not a clinician, so anything like this goes to your care team the same day — and 988 answers at any hour if you're frightened tonight.",
+          "to": "S13",
+          "pill": "See the routes"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "This is how you felt today, in your words. Steady doesn't measure it, can't tell you what it means, and never guesses what might happen next."
+        }
+      ],
+      "actions": [{ "label": "Save check-in", "to": "S09" }],
+      "footer": "Private · Works offline · You can edit today's answers later"
+    },
+
+    "S09": {
+      "title": "Your next step",
+      "badge": "1 step",
+      "headline": "One thing, not five.",
+      "sub": "Based on a wobble on the back step, and a steady 8 everywhere else.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Recommended",
+          "title": "Write one line about what the back step was like.",
+          "body": "Wet, dark, or just the height of it. Three of your wobbles have happened there, and Dev sees you Tuesday — that one sentence is worth more to him than a month of scores.",
+          "pill": "Add a line · 1 min"
+        },
+        {
+          "t": "card",
+          "title": "Or pick another",
+          "chips": [
+            "Ask Carol about a second rail",
+            "Put the outside light on a timer",
+            "Mention it to Dev on Tuesday",
+            "Leave it for now"
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Skipping is fine. We'll offer it again in a few days, and we won't ask why."
+        },
+        {
+          "t": "card",
+          "title": "Why we don't hand you exercises",
+          "body": "Steady doesn't set exercises, and it won't start. Dev works those out with you, and your doctor or a physical therapist is who says whether they're right for you at all. What this app does is remember what happened and put it in front of the two of you."
+        }
+      ],
+      "actions": [
+        { "label": "Do it now", "to": "S07" },
+        { "label": "Not today", "kind": "ghost", "to": "S07" }
+      ]
+    },
+
+    "S10": {
+      "title": "Someone helping",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "This is everything Carol sees.",
+      "sub": "The whole list is on this screen. If something isn't on it, she can't see it — there's no second page and no small print.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Carol",
+          "body": "Your daughter, twenty minutes away. Added on 4 March. She gets one note a week, on Sunday evening, and only after you've read it and pressed send.",
+          "pill": "Sunday · you send it"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["SHE SEES", "How many mornings you got out this week"],
+            ["SHE SEES", "How steady you felt, as one number out of ten"],
+            ["SHE SEES", "That you're still using Steady"],
+            ["SHE SEES", "Anything you type into the note yourself"]
+          ]
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["SHE CANNOT SEE", "Where you are. Steady has no location, on or off."],
+            ["SHE CANNOT SEE", "Your messages, your calls, or your contacts."],
+            ["SHE CANNOT SEE", "Anything live. There is no screen she can watch, and nothing reaches her between Sundays."],
+            ["SHE CANNOT SEE", "Your wobbles, unless you put one into the note yourself."],
+            ["SHE CANNOT SEE", "Your check-in answers, your notes, or anything Dev says to you."],
+            ["SHE CANNOT DO", "Change your plan, answer a check-in, or switch anything on. There is no button for it on her side."]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Sunday's note, as it stands",
+          "body": "“Three mornings out. Felt steady, 8 out of 10. One wobble on the back step.” You'll see this exact wording on Sunday, and you can cut any line of it — or the whole thing — before it goes.",
+          "pill": "Edit or cancel on Sunday"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Stop sharing with Carol",
+          "body": "Takes effect the moment you tap it, and you're not asked for a reason. Carol is told that sharing has stopped. She is not told why, and she cannot turn it back on.",
+          "pill": "Stop sharing"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "The record is yours",
+          "body": "Carol holds a copy of nothing. If you delete a week, it goes from her view in the same moment — she has a window, not a file."
+        }
+      ],
+      "actions": [
+        { "label": "Back to today", "to": "S07" },
+        { "label": "Who sees what across programs", "kind": "ghost", "to": "SH5" }
+      ],
+      "footer": "A supporter helps. They don't decide, and they don't watch."
+    },
+
+    "S11": {
+      "title": "Learn",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "Short, plain, and dated.",
+      "sub": "Seven pieces, none longer than a cup of tea. Each one shows when it was last checked.",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": ["All", "Steadiness", "Getting out", "Your home", "For Carol"],
+          "selected": [0]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "You've mentioned the back step three times",
+          "title": "Steps, thresholds and the dark",
+          "body": "5 min · reviewed July 2026"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WHY STRENGTH GOES, AND WHAT PEOPLE DO ABOUT IT", "6 min · reviewed June 2026"],
+            ["GETTING UP AGAIN, AND WHO TO RING", "4 min · reviewed August 2026"],
+            ["DIZZY WHEN YOU STAND UP", "4 min · reviewed August 2026"],
+            ["WHAT TABLETS HAVE TO DO WITH IT", "5 min · reviewed May 2026"],
+            ["ASKING FOR A RAIL WITHOUT A FUSS", "3 min · reviewed April 2026"],
+            ["FOR THE PERSON HELPING", "5 min · reviewed July 2026"],
+            ["WHAT NOBODY KNOWS YET", "2 min · reviewed August 2026"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Why the dates are on the front",
+          "body": "Anything that hasn't been checked in eighteen months comes down, rather than sitting here looking current."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What this library won't do",
+          "body": "These explain. They don't prescribe. Nothing here sets you an exercise, changes a tablet, or tells you your risk of anything. None of it has seen your record."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If you want that conversation",
+          "body": "It belongs with a qualified person. Dev replies within a day, and your doctor can go a good deal further than he can.",
+          "to": "S13",
+          "pill": "View support"
+        }
+      ],
+      "actions": [{ "label": "Back to today", "kind": "ghost", "to": "S07" }],
+      "footer": "Reviewed before it goes up, and dated so you can see how old it is."
+    },
+
+    "S12": {
+      "title": "Progress",
+      "badge": "Week 3",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": ["7 days", "30 days", "All 3 weeks"],
+          "selected": [0]
+        },
+        { "t": "bars", "values": [70, 80, 0, 60, 80, 75, 0] },
+        {
+          "t": "metric",
+          "eyebrow": "This week",
+          "value": "8",
+          "unit": "out of 10, how steady you felt",
+          "pct": 80,
+          "foot": "Your first week averaged 7"
+        },
+        {
+          "t": "stats",
+          "items": [
+            ["82 min", "On your feet this week"],
+            ["2", "Wobbles written down"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Last week was a quiet one, and it's still here",
+          "title": "Two days out, not four.",
+          "body": "Carol was ill and you stayed in. Nothing was reset, week 3 is still week 3, and those two flat days stay in the chart where they happened. An honest chart is worth more to you than a flattering one."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "Pattern",
+          "title": "It's the back step, not the walk.",
+          "body": "Both wobbles this month happened in the same place, and neither happened on the way to the shop. That's a fact about a step, and a step can be changed."
+        },
+        {
+          "t": "card",
+          "title": "What this screen doesn't say",
+          "body": "Nothing here predicts a fall. Steady can't do that, no phone can, and a number that pretended to would be worse than no number — it would either frighten you for nothing or reassure you wrongly."
+        },
+        {
+          "t": "card",
+          "title": "Send this to your care team?",
+          "body": "You'd read the exact file first: how steady you felt, minutes on your feet, and the wobbles you recorded. No notes. Nothing moves until you press send.",
+          "to": "SH5",
+          "pill": "See what's shared"
+        }
+      ],
+      "actions": [
+        { "label": "Preview what would be sent", "kind": "ghost", "to": "S13" },
+        { "label": "Back to today", "to": "S07" }
+      ],
+      "footer": "Nothing on this screen has been shared. It only leaves your phone if you ask it to."
+    },
+
+    "S13": {
+      "title": "Support",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "A route to a person.",
+      "sub": "Nothing is sent until you've read it and pressed send.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "In an emergency",
+          "body": "If you've had a fall you can't get up from, or you're in danger, call 911 or your local emergency number now. Steady cannot call anyone for you, and it will never do it on its own.",
+          "pill": "Call 911"
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "988 Suicide & Crisis Lifeline",
+          "body": "Call or text 988 · English and Spanish · 24 hours"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["CAROL", "“Can you give me a ring when you get a minute?”"],
+            ["DEV · YOUR COACH", "Replies within a day"],
+            ["YOUR CARE TEAM", "Share this month's summary"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Services for older adults near you",
+          "body": "There is a national line that puts people in touch with help in their own area — rails, transport, meals, someone to talk to. We haven't printed the number here because we couldn't confirm today that it's still the current one, and a wrong number in a bad hour is worse than no number. Your care team has it, and we'll put it on this screen once it's been checked."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Nothing here is automatic",
+          "body": "No one on this screen is told anything unless you send it. This app cannot tell that something has happened to you, and it will never claim to."
+        }
+      ],
+      "actions": [
+        { "label": "Back to today", "to": "S07" },
+        { "label": "Who sees what", "kind": "ghost", "to": "SH5" }
+      ],
+      "footer": "Crisis numbers route to United States services."
+    },
+
+    "S14": {
+      "title": "Settings & privacy",
+      "badge": "Private",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Notifications",
+          "body": "Detail is off. A reminder on your lock screen says “Steady” and nothing else — not your check-in, not your plan, not why. Anyone who picks up your phone learns that an app reminded you. That's all.",
+          "chips": ["Generic — “Steady”", "Show detail", "None at all"],
+          "selected": [0]
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WORKING TOWARDS", "The shop and back without stopping"],
+            ["HOW OFTEN", "Four days a week, after breakfast"],
+            ["SOMEONE HELPING", "Carol · Sunday note · you press send"],
+            ["TEXT SIZE", "Extra large · follows your phone, and can go larger"],
+            ["BUTTONS", "Large targets everywhere · always on"],
+            ["CONTRAST", "High · cannot be turned down"],
+            ["LOCATION", "Off. There is no switch here to turn it on."]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "What Carol sees",
+          "body": "The full list, including the longer list of everything she cannot see and cannot do.",
+          "to": "S10",
+          "pill": "Open the list"
+        },
+        {
+          "t": "card",
+          "title": "Export everything",
+          "body": "A readable file and a structured one, including anything you've deleted from view but not from the record. It stays on your phone unless you send it.",
+          "to": "SH4",
+          "pill": "Export"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Delete everything",
+          "body": "Completed, not hidden — your phone, our servers, anything queued to sync, and Carol's view. It can't be undone, and it ends the programme.",
+          "to": "SH4",
+          "pill": "Delete"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Education and self-management support. It does not diagnose, treat or prescribe, it does not detect or predict falls, and it is not a substitute for advice from a qualified health professional."
+        }
+      ],
+      "actions": [
+        { "label": "Done", "to": "S07" },
+        { "label": "Who sees what", "kind": "ghost", "to": "SH5" },
+        { "label": "Your record across programs", "kind": "ghost", "to": "SH4" }
+      ],
+      "footer": "Text size and contrast can go up from here. They can't come down below what this programme needs to stay readable."
+    }
+  }
+}

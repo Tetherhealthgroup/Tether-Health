@@ -15,9 +15,33 @@ jobs:
           channel: stable
           cache: true
       - name: Create generated platform runners
-        run: flutter create . --project-name breathefree_patient --org com.breathefree --platforms=android,web
+        run: flutter create . --project-name tether_health --org com.TetherHealthLLC --platforms=android,web
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
+      # Both channel contracts — the Unplug screen-time boundary and the shell's
+      # key/value store — are generated for three languages and the output is
+      # checked in. If someone edits a pigeons/*.dart without regenerating, Dart
+      # and the native sides drift apart silently, so the build regenerates and
+      # fails on any difference.
+      - name: Channel contract is up to date
+        run: |
+          ./tool/generate_pigeon.sh
+          git diff --exit-code -- \
+            lib/unplug/platform/unplug_api.g.dart \
+            ios/Runner/Unplug/UnplugApi.g.swift \
+            android/app/src/main/kotlin/com/TetherHealthLLC/tetherhealth/unplug/UnplugApi.g.kt \
+            lib/tether/platform/tether_store_api.g.dart \
+            ios/Runner/Store/TetherStoreApi.g.swift \
+            android/app/src/main/kotlin/com/TetherHealthLLC/tetherhealth/store/TetherStoreApi.g.kt
       - run: flutter build web --release
       - run: flutter build appbundle --debug
+      # A debug APK a reviewer can sideload. The Unplug intercept is a
+      # foreground service and an overlay, and neither can be judged from a
+      # screenshot — they have to be installed and watched.
+      - run: flutter build apk --debug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: breathefree-debug-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 14

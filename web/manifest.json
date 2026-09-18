@@ -1,6 +1,6 @@
 {
-    "name": "breathefree_patient",
-    "short_name": "breathefree_patient",
+    "name": "Tether Health",
+    "short_name": "Tether Health",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

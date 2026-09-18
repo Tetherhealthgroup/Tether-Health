@@ -1,5 +1,5 @@
-name: breathefree_patient
-description: BreatheFree smoking-cessation patient application — complete approved 28-screen experience.
+name: tether_health
+description: Tether Health patient application — the approved 28-screen BreatheFree cessation programme plus the Unplug v2.1 digital-wellbeing module (screens A–L).
 publish_to: none
 version: 1.0.0+1
 
@@ -9,13 +9,40 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_secure_storage: ^11.1.1
+  flutter_tts: ^4.2.5
+  http: ^1.6.0
+  supabase_flutter: ^2.17.2
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  # Generates two channel contracts for Dart, Swift and Kotlin: the Unplug
+  # screen-time contract (addendum §2.3) from pigeons/unplug_api.dart, and the
+  # shell's key/value store from pigeons/tether_store_api.dart. Regenerate with
+  # tool/generate_pigeon.sh after changing either; never edit a generated
+  # source by hand. CI regenerates and fails on any difference.
+  pigeon: ^28.1.0
+
+  # Drives the e2e tier in integration_test/ on a real device or emulator.
+  # The widget tiers stub every platform channel; this one does not, which is
+  # why it is the only tier that can catch a plugin or localizations failure
+  # that appears solely under the real engine.
+  #
+  # It has leaked into a release bundle before — `integration_test.framework`
+  # turned up in Runner.app/Frameworks — so the release check in README's
+  # "Building and releasing" section is not optional after touching iOS build
+  # settings.
+  integration_test:
+    sdk: flutter
 
 flutter:
   uses-material-design: true
   assets:
     - assets/screens/
+    - assets/unplug/
+    # The design bundle, rendered at runtime rather than transcribed into
+    # Dart. See lib/tether/data/design_bundle.dart for why.
+    - assets/design/

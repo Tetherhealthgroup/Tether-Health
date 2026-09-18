@@ -1,1 +1,31 @@
+#include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"
 #include "Generated.xcconfig"
+
+// Simulator builds are arm64-only, deliberately.
+//
+// Flutter's `debug_unpack_ios` step verifies the engine framework with
+// `lipo <binary> -verify_arch arm64 x86_64`. The lipo shipped with current
+// Xcode reads the second architecture as a second input file and fails with
+// "-verify_arch requires exactly one input file", so the build dies before a
+// single file is compiled — and the error it prints claims the framework is
+// missing the very architectures `lipo -info` shows it has.
+//
+// Restricting the simulator slice to one architecture keeps that call
+// single-argument. arm64 is the right one on an Apple Silicon host; on an
+// Intel host, exclude arm64 and keep x86_64 instead.
+//
+// ARCHS is set directly, and EXCLUDED_ARCHS is not enough on its own. The
+// failing step is a *scheme pre-action*, and Xcode exports the raw ARCHS to
+// script actions — the EXCLUDED_ARCHS subtraction is applied by the build
+// system afterwards. So `xcodebuild -showBuildSettings` reports the corrected
+// `ARCHS = arm64` while the pre-action still receives "arm64 x86_64" and
+// fails. Pinning ARCHS is the only lever the pre-action actually sees.
+//
+// Both settings are unconditional rather than `[sdk=iphonesimulator*]`,
+// because a pre-action runs before an SDK is resolved and an sdk-conditional
+// setting is not in scope there. That costs nothing: no iOS device and no
+// Apple Silicon simulator runs x86_64, and device builds were arm64-only
+// already — which is why `flutter build ipa` and `flutter build apk` never
+// hit this.
+ARCHS = arm64
+EXCLUDED_ARCHS = i386 x86_64

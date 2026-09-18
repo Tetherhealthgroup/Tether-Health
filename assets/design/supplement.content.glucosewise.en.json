@@ -1,0 +1,672 @@
+{
+  "product": "glucosewise",
+  "locale": "en",
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "$comment": "Every non-shell screen in supplement.product.metabolic.json. Shell screens SH1–SH6 are drawn by the app and are not authored here. One person throughout: Rosa, day 34, baseline morning average 148 mg/dL, now 132, the range 80–130 before meals typed in from her own clinic on 3 March. Every string is unreviewed.",
+  "start": "S01",
+  "screens": {
+    "S01": {
+      "title": "",
+      "lead": "none",
+      "headline": "Most of diabetes happens between appointments.",
+      "sub": "Fifteen minutes with a clinician, and then six thousand minutes on your own. GlucoseWise is for the six thousand.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "Your numbers stay yours",
+          "body": "Readings, notes and check-ins live on your phone. Nothing reaches your clinic unless you send it."
+        },
+        {
+          "t": "card",
+          "title": "A number can mean call someone",
+          "body": "When a reading sits outside the range your clinician gave you, we say so and point you at a person — not at another screen."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "It will never tell you what to take",
+          "body": "No doses, no amounts, no timing, no calculator. Not once, not as a suggestion. That belongs to you and whoever prescribes for you."
+        },
+        {
+          "t": "chips",
+          "items": ["English", "Español"],
+          "selected": [0]
+        }
+      ],
+      "actions": [
+        { "label": "Get started", "to": "S02" },
+        { "label": "I already have an account", "kind": "ghost", "to": "S07" }
+      ],
+      "footer": "Education and self-management support. Not a diagnosis or treatment."
+    },
+
+    "S02": {
+      "title": "What it does",
+      "badge": "1 of 3",
+      "headline": "Four moments this is built for.",
+      "sub": "Not four features. Four points in an ordinary week where diabetes gets heavy.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Moment one",
+          "title": "When you've stopped looking at the meter",
+          "body": "A week of just logging, nothing asked of you. Without a starting picture, neither of us can tell later whether anything changed."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment two",
+          "title": "When the walk keeps not happening",
+          "body": "One aim, set by you, small enough to survive a bad week. Missing it is data, not a failure."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Moment three",
+          "title": "When the number on the meter scares you",
+          "body": "The screen you land on says who to call. It does not interpret the number, and it does not ask you to log it and carry on."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment four",
+          "title": "When a day just goes badly",
+          "body": "It goes into your history. It never zeroes a count you've built, and nobody is told."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What it isn't",
+          "body": "It doesn't read your meter, name a medicine, work out an amount, adjust anything, or tell you what a reading means. If a screen ever looks like it's doing one of those, it's a bug worth reporting."
+        }
+      ],
+      "actions": [{ "label": "Continue", "to": "S03" }],
+      "footer": "Education and self-management support. Not a diagnosis or treatment."
+    },
+
+    "S03": {
+      "title": "Consent & privacy",
+      "badge": "2 of 3",
+      "progress": 66,
+      "headline": "What we hold, and what we don't.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Held on your phone",
+          "body": "Your readings, the range you typed in, your check-ins, your notes, your walking aim. These stay local."
+        },
+        {
+          "t": "card",
+          "title": "Shared with your clinic",
+          "body": "Nothing, until you choose. When you do, it's the readings and the dates — never your mood ratings, never what you wrote."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "You can leave",
+          "body": "Export or delete everything at any point. Deletion is completed, not hidden — your phone, our servers, and anything waiting to sync."
+        },
+        {
+          "t": "options",
+          "items": [
+            { "title": "I understand and agree", "sel": true },
+            { "title": "Let my clinic's nurse see my readings", "body": "Off by default. You'd still approve each send." }
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "One thing you are not consenting to",
+          "body": "This is not a route to urgent care. It doesn't watch your readings overnight and it can't call anyone for you. If something is wrong now, use the phone."
+        }
+      ],
+      "actions": [
+        { "label": "Agree and continue", "to": "S04" },
+        { "label": "Read the full privacy notice", "kind": "ghost", "to": "S03" }
+      ],
+      "footer": "You can change either choice later in Settings."
+    },
+
+    "S04": {
+      "title": "Baseline week",
+      "badge": "Day 3 of 7",
+      "headline": "Just log, and carry on.",
+      "sub": "Nothing changes this week. No aim, no nudge. We're only trying to find out where you're starting from.",
+      "blocks": [
+        { "t": "bars", "values": [62, 55, 86, 0, 0, 0, 0] },
+        {
+          "t": "stats",
+          "items": [
+            ["155 mg/dL", "Average so far"],
+            ["3 of 7", "Mornings logged"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "All three before breakfast",
+          "body": "That's the one your clinic asked you for, and it's the one that compares cleanly week to week."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "These are numbers you typed in",
+          "body": "GlucoseWise doesn't read your meter and doesn't check what you enter. A typo stays a typo until you fix it."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "You don't have to wait out the week",
+          "body": "Set your aim now if you'd rather. We'll mark the baseline as partial and say so on every chart that uses it.",
+          "to": "S05",
+          "pill": "Skip ahead"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If a reading worries you this week",
+          "body": "Don't wait for the baseline to finish. Call your clinic.",
+          "to": "S12",
+          "pill": "Support"
+        }
+      ],
+      "actions": [
+        { "label": "Log today's reading", "to": "S09" },
+        { "label": "Set my aim now", "kind": "ghost", "to": "S05" }
+      ],
+      "footer": "Saves offline · Syncs when connected"
+    },
+
+    "S05": {
+      "title": "Your weekly aim",
+      "badge": "1 of 2",
+      "progress": 50,
+      "lead": "back",
+      "headline": "What could you actually do next week?",
+      "sub": "Pick something that survives a bad Tuesday. You can move it later, in either direction, with no penalty.",
+      "blocks": [
+        {
+          "t": "slider",
+          "title": "Minutes of walking, on the mornings you walk",
+          "value": 40,
+          "left": "0",
+          "mid": "20 minutes",
+          "right": "50",
+          "foot": "Short and repeatable beats long and occasional, for most people, most of the time."
+        },
+        {
+          "t": "slider",
+          "title": "Mornings a week",
+          "value": 71,
+          "left": "0",
+          "mid": "5 mornings",
+          "right": "7",
+          "foot": "Five leaves you two days of slack before the week is spoiled."
+        },
+        {
+          "t": "card",
+          "title": "When you'll log a reading",
+          "body": "A reminder at the time you pick. On your lock screen it says GlucoseWise and nothing else.",
+          "chips": ["Before breakfast", "Before lunch", "Before dinner", "Bedtime"],
+          "selected": [0]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "We are not setting a glucose target",
+          "body": "There's no slider here for your numbers, and there never will be. The range on your reading screen is the one your clinic gave you and you typed in. Only you can change it, and changing it here changes nothing about your care."
+        }
+      ],
+      "actions": [{ "label": "Continue", "to": "S06" }],
+      "footer": "Loosening an aim takes effect straight away. Nothing here waits or argues with you."
+    },
+
+    "S06": {
+      "title": "Review your plan",
+      "badge": "2 of 2",
+      "progress": 100,
+      "lead": "back",
+      "headline": "Your plan is ready.",
+      "sub": "Have a last look. Any line here can be edited now or later.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Starting level",
+          "title": "Light — one reading, five walks",
+          "body": "We'll suggest more only if your own numbers say it would help, and you can say no."
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WALKING", "20 minutes · 5 mornings a week"],
+            ["READING", "One before breakfast"],
+            ["RANGE FROM YOUR CLINIC", "80 – 130 before meals · you entered this 3 March"],
+            ["REMINDERS", "Generic — the lock screen says GlucoseWise"],
+            ["IF A READING WORRIES YOU", "Call the clinic. Not this app."],
+            ["SHARING", "Nothing shared yet"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What starting actually turns on",
+          "body": "A reminder, a check-in, and a place to put readings. It does not turn on monitoring — nobody is watching this, including us."
+        }
+      ],
+      "actions": [
+        { "label": "Start my plan", "to": "S07" },
+        { "label": "Save and finish later", "kind": "ghost", "to": "S07" }
+      ]
+    },
+
+    "S07": {
+      "title": "Today",
+      "badge": "Private",
+      "lead": "none",
+      "headline": "Good morning, Rosa.",
+      "sub": "Day 34. Three walks so far this week, and you've logged every morning since Sunday.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Get help now",
+          "body": "Reachable from every screen, in every program.",
+          "to": "SH6",
+          "pill": "Open"
+        },
+        {
+          "t": "metric",
+          "eyebrow": "This morning · 7:10 am",
+          "value": "126",
+          "unit": "mg/dL before breakfast",
+          "foot": "Inside the 80 – 130 you entered on 3 March. That comparison is arithmetic, not an opinion about your health."
+        },
+        {
+          "t": "stats",
+          "items": [
+            ["132 mg/dL", "Morning average, 14 days"],
+            ["39", "Readings logged"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Log a reading",
+          "body": "Takes about fifteen seconds. Works with no signal.",
+          "to": "S09",
+          "pill": "Open"
+        },
+        {
+          "t": "card",
+          "title": "Today's check-in",
+          "body": "Not done yet · about 60 seconds"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Priya · diabetes nurse at your clinic",
+          "body": "Thursday, 2:30 pm · she has not seen anything from here",
+          "to": "S12"
+        }
+      ],
+      "actions": [
+        { "label": "Start today's check-in", "to": "S08" },
+        { "label": "Your progress", "kind": "ghost", "to": "S11" },
+        { "label": "Settings & privacy", "kind": "ghost", "to": "S13" },
+        { "label": "Your programs", "kind": "ghost", "to": "SH1" }
+      ],
+      "footer": "Works offline · Syncs securely when connected"
+    },
+
+    "S08": {
+      "title": "Daily check-in",
+      "badge": "About 60 sec",
+      "progress": 72,
+      "headline": "How did today go?",
+      "sub": "No right answers, and nothing here is a test. It only shapes what we offer you next.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "How do you feel?",
+          "chips": ["Low", "Not great", "Okay", "Good", "Great"],
+          "selected": [2]
+        },
+        {
+          "t": "card",
+          "title": "How did your daily care go?",
+          "body": "A week where you manage some of it is a normal week, not a bad one.",
+          "chips": ["Hardly any of it", "Some of it", "Most of it", "All of it", "Skip"],
+          "selected": [2]
+        },
+        {
+          "t": "card",
+          "title": "Medicines as usual today?",
+          "body": "Yes or no is all we record. We never ask which ones or how much, and we never tell you what to take or when to change anything.",
+          "chips": ["Yes", "No", "Skip"],
+          "selected": [0]
+        },
+        {
+          "t": "slider",
+          "title": "How heavy did today feel?",
+          "value": 40,
+          "left": "0 · Light",
+          "mid": "4 · Manageable",
+          "right": "10",
+          "foot": "This is how the day felt to you. It is not a measurement of anything."
+        },
+        {
+          "t": "card",
+          "title": "Anything going on today?",
+          "chips": ["Thirsty", "Tired", "Feet tingling", "Slept badly", "Blurry vision", "Nothing unusual"],
+          "selected": [1, 3]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Some things don't belong in a check-in",
+          "body": "Shaky, sweaty, confused, or a reading that frightened you — that's a phone call, and it's worth making now rather than after you've finished this.",
+          "to": "S12",
+          "pill": "Who to call"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Everything on this screen is you describing your own day. GlucoseWise records it as a self-report and never as a clinical finding."
+        }
+      ],
+      "actions": [
+        { "label": "Save check-in", "to": "S07" },
+        { "label": "Log a reading too", "kind": "ghost", "to": "S09" }
+      ],
+      "footer": "Private · Works offline · You can edit today's answers later"
+    },
+
+    "S09": {
+      "title": "Readings",
+      "badge": "39 logged",
+      "lead": "back",
+      "headline": "What did the meter say?",
+      "sub": "The number and the time. Nothing else is needed, and nothing else is asked.",
+      "blocks": [
+        { "t": "input", "title": "Reading · mg/dL", "value": "126" },
+        {
+          "t": "card",
+          "title": "When was it?",
+          "chips": ["Before breakfast", "Before lunch", "Before dinner", "Bedtime", "Other"],
+          "selected": [0]
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["12 SEPTEMBER · 7:10 AM", "126 · before breakfast"],
+            ["11 SEPTEMBER · 7:20 AM", "134 · before breakfast"],
+            ["10 SEPTEMBER · 6:55 AM", "128 · before breakfast"],
+            ["9 SEPTEMBER · 12:40 PM", "58 · before lunch · you rang the clinic"],
+            ["8 SEPTEMBER · 7:05 AM", "141 · before breakfast"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "The range is yours, not ours",
+          "title": "80 – 130 before meals",
+          "body": "You typed this in on 3 March from your clinic visit. GlucoseWise didn't choose it, can't change it, and has no view about whether it's right for you. If your clinic gives you a different one, edit it here.",
+          "pill": "Edit the range"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "When a number is a phone call",
+          "body": "If a reading falls outside the range you entered, we'll say so and stop there. We will not tell you what it means, and we will not tell you to do anything about it. Ring your clinic the same day — that's the whole instruction.",
+          "to": "S12",
+          "pill": "Who to call"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If you feel shaky, sweaty or confused",
+          "body": "Treat a low the way your clinician or diabetes educator told you to, and tell whoever is with you. If nobody has ever given you a plan for a low, that is worth a call today and not at your next appointment. If you can't keep anything down, can't help yourself, or someone can't wake you — that's 911.",
+          "to": "SH6",
+          "pill": "Get help now"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "This screen shows your number and how it's been moving. It does not interpret it. Typed in by you, unchecked by us."
+        }
+      ],
+      "actions": [
+        { "label": "Save reading", "to": "S07" },
+        { "label": "Get help now", "kind": "ghost", "to": "SH6" }
+      ],
+      "footer": "Saves offline · You can edit or delete any reading here"
+    },
+
+    "S10": {
+      "title": "Learn",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "Short, plain, and dated.",
+      "sub": "Seven pieces, none longer than a bus ride. Each one shows when it was last checked.",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": ["All", "Readings", "Food", "Moving", "Feet and eyes", "Appointments"],
+          "selected": [0]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "You've logged 39 readings and asked about this twice",
+          "title": "Why one morning number tells you less than fourteen of them",
+          "body": "5 min · reviewed August 2026"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WHAT A LOW FEELS LIKE, AND WHO TO TELL", "4 min · reviewed August 2026"],
+            ["GETTING A USABLE READING FROM A FINGERSTICK", "3 min · reviewed July 2026"],
+            ["WALKING AFTER A MEAL, AND WHY PEOPLE BOTHER", "5 min · reviewed June 2026"],
+            ["THE FOOT CHECK NOBODY REMEMBERS TO DO", "4 min · reviewed August 2026"],
+            ["QUESTIONS WORTH TAKING TO AN APPOINTMENT", "6 min · reviewed May 2026"],
+            ["WHAT ISN'T SETTLED YET", "2 min · reviewed August 2026"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Why the dates are on the front",
+          "body": "Anything not checked in eighteen months comes down rather than sitting here looking current."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "What this library will never contain",
+          "body": "No doses. No amounts. No timing. No carbohydrate ratio, no correction factor, no sliding scale, no rule that starts with your reading and ends with your medicine. Not in an article, not in an example, not as a thing other people do. If you want that conversation it has to be with the person who prescribes for you."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "And nothing here knows you",
+          "body": "These pieces explain. They don't prescribe, they haven't seen your history, and they can't tell you whether any of it applies to you.",
+          "to": "S12",
+          "pill": "View support"
+        }
+      ],
+      "actions": [{ "label": "Back to today", "kind": "ghost", "to": "S07" }],
+      "footer": "Reviewed before it goes up, and dated so you can see how old it is."
+    },
+
+    "S11": {
+      "title": "Progress",
+      "badge": "Day 34",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": ["7 days", "30 days", "All 34 days"],
+          "selected": [0]
+        },
+        { "t": "bars", "values": [55, 62, 48, 70, 52, 58, 50] },
+        {
+          "t": "metric",
+          "eyebrow": "Last fortnight",
+          "value": "132",
+          "unit": "mg/dL · morning average",
+          "foot": "Your baseline week was 148 across seven mornings"
+        },
+        {
+          "t": "metric",
+          "eyebrow": "Walking this week",
+          "value": "3",
+          "unit": "of 5 mornings · 64 minutes",
+          "pct": 60,
+          "foot": "Two mornings left in the week"
+        },
+        {
+          "t": "stats",
+          "items": [
+            ["39", "Readings logged"],
+            ["11", "Walks in 14 days"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "One day off, and it's still here",
+          "title": "7 September — no reading, no walk.",
+          "body": "Nothing was reset. You're still on day 34, that day is still in the averages above, and it's the short bar in the middle. An honest chart is more use to you than a flattering one."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "Pattern in your own numbers",
+          "title": "Your three highest mornings all followed a night you marked as slept badly.",
+          "body": "That's a description of what you logged, not a cause and not a finding. Sleep is worth mentioning at your appointment; it isn't something this screen can work out for you."
+        },
+        {
+          "t": "card",
+          "title": "Send this to Priya?",
+          "body": "Nothing has left your phone. If you choose to send, you'd read the exact file first — readings and dates, no mood ratings, no notes.",
+          "to": "SH5",
+          "pill": "See what's shared"
+        }
+      ],
+      "actions": [
+        { "label": "Back to today", "to": "S07" },
+        { "label": "Read about readings", "kind": "ghost", "to": "S10" },
+        { "label": "Who sees what", "kind": "ghost", "to": "SH5" }
+      ],
+      "footer": "Nothing on this screen has been shared. It only leaves your phone if you ask it to."
+    },
+
+    "S12": {
+      "title": "Support",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "A route to a person.",
+      "sub": "Nothing is sent until you preview it and confirm.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If this is an emergency",
+          "body": "Can't keep fluids down, breathing hard, chest pain, too confused to help yourself, or someone can't wake you — call 911 now. Don't finish anything on this screen first.",
+          "pill": "Call 911"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "A reading outside your range",
+          "body": "Ring your clinic the same day and tell them the number and the time. GlucoseWise has no opinion about what it means and will not offer one.",
+          "pill": "Call the clinic"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["PRIYA · DIABETES NURSE", "Your clinic, weekdays · she has seen nothing from here"],
+            ["YOUR CLINIC", "Same-day line for readings and symptoms"],
+            ["MARCO · YOUR SON", "“Can you come round for a bit?”"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "988 Suicide & Crisis Lifeline",
+          "body": "Call or text 988 · English and Spanish · 24 hours. Living with this is heavy, and that line is for that too."
+        },
+        {
+          "t": "card",
+          "title": "American Diabetes Association",
+          "body": "1-800-DIABETES · information and local programs, not urgent care."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Before anything is sent",
+          "body": "Every share shows you the exact contents first — readings and dates, never your check-ins or your notes. You can stop at that point, and nothing goes on its own.",
+          "to": "SH5",
+          "pill": "Who sees what"
+        }
+      ],
+      "actions": [
+        { "label": "Back to today", "to": "S07" },
+        { "label": "Who sees what", "kind": "ghost", "to": "SH5" }
+      ],
+      "footer": "Crisis numbers route to United States services."
+    },
+
+    "S13": {
+      "title": "Settings & privacy",
+      "badge": "Private",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Notifications",
+          "body": "Detail is off. A reminder on your lock screen says GlucoseWise and nothing else — not which program, not a reading, not why. Anyone who picks up your phone learns that an app reminded you. That's all, and that's the default.",
+          "chips": ["Generic — “GlucoseWise”", "Show detail", "None at all"],
+          "selected": [0]
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WALKING AIM", "20 minutes · 5 mornings a week"],
+            ["READING REMINDER", "07:00 · before breakfast"],
+            ["RANGE FROM YOUR CLINIC", "80 – 130 before meals · entered 3 March"],
+            ["MOTION", "Follows your phone"],
+            ["TEXT SIZE", "Follows your phone"],
+            ["LANGUAGE", "English · Español available"],
+            ["SHARING WITH PRIYA", "Nothing shared · you approve each send"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Export everything",
+          "body": "A readable file and a structured one: every reading, every check-in, every note, including the ones you've hidden from view. It stays on your phone unless you send it.",
+          "to": "SH4",
+          "pill": "Export"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Delete everything",
+          "body": "Completed, not hidden — your phone, our servers, and anything queued to sync. It can't be undone, and it ends your active programs.",
+          "to": "SH4",
+          "pill": "Delete"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Education and self-management support. It does not diagnose, treat or prescribe, gives no dosing advice of any kind, and is not a substitute for advice from a qualified health professional."
+        }
+      ],
+      "actions": [
+        { "label": "Done", "to": "S07" },
+        { "label": "Who sees what", "kind": "ghost", "to": "SH5" },
+        { "label": "Your record across programs", "kind": "ghost", "to": "SH4" }
+      ],
+      "footer": "Changing your range here changes nothing about your care. Tell your clinic, not us."
+    }
+  }
+}

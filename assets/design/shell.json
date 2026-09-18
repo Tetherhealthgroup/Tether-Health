@@ -1,0 +1,36 @@
+{
+  "version": "1.0.0",
+  "$comment": "The host shell. Everything here is built once and is identical in every area. The shell is not a menu of areas — see rules below.",
+  "rules": [
+    { "id": "two_active_max", "rule": "At most two programs may be active at once.",
+      "why": "Three concurrent behaviour changes is where adherence collapses. A third requires a conversation with a clinician or coach, not a tap." },
+    { "id": "no_area_directory_on_home", "rule": "The home screen shows active programs only. The eleven areas are never listed there.",
+      "why": "A directory leaks what a person is dealing with to anyone who picks up the phone, and turns a product into a menu." },
+    { "id": "one_crisis_route", "rule": "One global crisis route, identical from every screen in every program.",
+      "why": "Per-program crisis copy will be wrong in at least one program. One route, reviewed once, reachable everywhere." },
+    { "id": "per_program_sharing", "rule": "Sharing consent is granted per program, never globally.",
+      "why": "A cessation coach has no business seeing behavioural health data. Under 42 CFR Part 2, substance-use data must be segregated regardless." },
+    { "id": "discreet_program", "rule": "Any program can be hidden from the home screen and reached only from Your programs.",
+      "why": "Stigma is a real adherence barrier on shared or family devices." },
+    { "id": "threshold_areas_separable", "rule": "Areas whose measures carry clinicalThresholds must be feature-flagged for independent removal.",
+      "why": "Regulatory classification follows the riskiest feature in the binary. Glucose and blood-pressure routing can drag the whole app toward medical-device territory." },
+    { "id": "not_every_area_ships", "rule": "Some service lines never become consumer screens.",
+      "examples": ["kidney.monitoring result interpretation", "cancer.treatment_support clinical material", "behavioral.screening instrument administration"],
+      "why": "These belong on a care-team surface with a clinician in the loop." }
+  ],
+  "screens": [
+    { "id": "SH1", "name": "Your programs", "purpose": "What you are in, what is paused, and one way to add another.",
+      "slots": { "activeCards": "required:0-2", "pausedRows": "optional", "addAction": "required" } },
+    { "id": "SH2", "name": "Health areas", "purpose": "The eleven areas, honest about status. Reached on request, never on the home screen.",
+      "slots": { "headline": "required", "statusNote": "required", "areaRows": "required:11" } },
+    { "id": "SH3", "name": "Join a program", "purpose": "What changes if you join, what is shared, and what it is not.",
+      "slots": { "headline": "required", "whatChanges": "required", "whatIsShared": "required", "limitNote": "optional", "scopeDisclaimer": "required" } },
+    { "id": "SH4", "name": "Your record", "purpose": "One place across every program. Exportable and deletable by the person it describes.",
+      "slots": { "headline": "required", "programSections": "required", "exportAction": "required", "deleteAction": "required" } },
+    { "id": "SH5", "name": "Who sees what", "purpose": "Per-program sharing, shown side by side so the differences are visible.",
+      "slots": { "headline": "required", "programRows": "required", "segregationNote": "optional" } },
+    { "id": "SH6", "name": "Get help now", "purpose": "The global crisis route. Identical everywhere, never reordered or filtered.",
+      "slots": { "emergencyCard": "required:first", "helplineCards": "required", "supporterRow": "optional" },
+      "requires": ["crisis_card_pinned_first"] }
+  ]
+}
