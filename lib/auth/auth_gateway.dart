@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthIdentity {
@@ -46,9 +47,14 @@ abstract interface class AuthGateway {
 }
 
 class SupabaseAuthGateway implements AuthGateway {
-  SupabaseAuthGateway(this._client);
+  SupabaseAuthGateway(
+    this._client, {
+    String? emailRedirectTo,
+  }) : _emailRedirectTo = emailRedirectTo ??
+            (kIsWeb ? null : 'io.breathefree.patient://login-callback');
 
   final SupabaseClient _client;
+  final String? _emailRedirectTo;
 
   @override
   AuthIdentity? get currentIdentity => _identity(_client.auth.currentSession);
@@ -75,6 +81,7 @@ class SupabaseAuthGateway implements AuthGateway {
     required String password,
   }) async {
     final response = await _client.auth.signUp(
+      emailRedirectTo: _emailRedirectTo,
       email: email,
       password: password,
     );
@@ -86,7 +93,11 @@ class SupabaseAuthGateway implements AuthGateway {
 
   @override
   Future<void> resendSignUpConfirmation({required String email}) async {
-    await _client.auth.resend(type: OtpType.signup, email: email);
+    await _client.auth.resend(
+      type: OtpType.signup,
+      email: email,
+      emailRedirectTo: _emailRedirectTo,
+    );
   }
 
   @override

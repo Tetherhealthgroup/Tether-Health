@@ -14,3 +14,10 @@ source. Flutter receives only the publishable key; the profile and quit-plan API
 forward the authenticated caller token so PostgreSQL RLS remains the final
 authorization boundary. Use synthetic quit-plan and support-person data only in
 development environments.
+
+For native email confirmation, add
+`io.breathefree.patient://login-callback` to **Authentication → URL
+Configuration → Redirect URLs** in every Supabase project. Flutter supplies that
+exact callback when creating an account or resending confirmation, and the iOS
+and Android runners register the matching deep link. Do not leave a production
+project relying on the local `http://localhost:3000` Site URL.
