@@ -42,6 +42,12 @@ import 'trigger_map_screen.dart';
 import 'welcome_screen.dart';
 import 'why_breathefree_screen.dart';
 
+enum _GuestPlanConflictChoice { keepBoth, keepCloud, useDevice }
+
+enum _GuestUploadChoice { notNow, upload }
+
+enum _GuestPlanCloudSaveResolution { proceed, alreadySaved, cancelled }
+
 class ApprovedScreenPlayer extends StatefulWidget {
   const ApprovedScreenPlayer({
     required this.currentIndex,
@@ -51,6 +57,7 @@ class ApprovedScreenPlayer extends StatefulWidget {
     required this.onTarget,
     this.accountController,
     this.quitPlanController,
+    this.onSessionReset,
     super.key,
   });
 
@@ -61,6 +68,7 @@ class ApprovedScreenPlayer extends StatefulWidget {
   final ValueChanged<AppTapTarget> onTarget;
   final AccountController? accountController;
   final QuitPlanController? quitPlanController;
+  final ValueChanged<int>? onSessionReset;
 
   @override
   State<ApprovedScreenPlayer> createState() => _ApprovedScreenPlayerState();
@@ -318,8 +326,51 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   }
 
   Future<bool> _saveQuitPlan() async {
+    final resolution = await _resolveGuestPlanBeforeCloudSave();
+    if (resolution == _GuestPlanCloudSaveResolution.cancelled) return false;
+    if (resolution == _GuestPlanCloudSaveResolution.alreadySaved) return true;
     _saveEffectiveQuitDate();
     return _quitPlanController.save(_currentQuitPlan());
+  }
+
+  Future<_GuestPlanCloudSaveResolution>
+      _resolveGuestPlanBeforeCloudSave() async {
+    if (_quitPlanController.guestMergeStatus ==
+        GuestPlanMergeStatus.pendingUpload) {
+      final choice = await _showGuestUploadConsent();
+      if (!mounted || choice != _GuestUploadChoice.upload) {
+        return _GuestPlanCloudSaveResolution.cancelled;
+      }
+      final imported = await _quitPlanController.importGuestPlan();
+      if (!mounted || !imported) {
+        return _GuestPlanCloudSaveResolution.cancelled;
+      }
+    }
+
+    if (_quitPlanController.guestMergeStatus != GuestPlanMergeStatus.conflict) {
+      return _GuestPlanCloudSaveResolution.proceed;
+    }
+
+    final choice = await _showGuestPlanConflict();
+    if (!mounted) return _GuestPlanCloudSaveResolution.cancelled;
+    if (choice == _GuestPlanConflictChoice.useDevice) {
+      final resolved = await _quitPlanController.replaceCloudWithGuestPlan();
+      if (!mounted || !resolved) {
+        return _GuestPlanCloudSaveResolution.cancelled;
+      }
+      final devicePlan = _quitPlanController.plan;
+      if (devicePlan != null) setState(() => _applyQuitPlan(devicePlan));
+      return _GuestPlanCloudSaveResolution.alreadySaved;
+    }
+    if (choice == _GuestPlanConflictChoice.keepCloud) {
+      final resolved = await _quitPlanController.keepCloudPlanAndDiscardGuest();
+      if (!mounted || !resolved) {
+        return _GuestPlanCloudSaveResolution.cancelled;
+      }
+      final cloudPlan = _quitPlanController.plan;
+      if (cloudPlan != null) setState(() => _applyQuitPlan(cloudPlan));
+    }
+    return _GuestPlanCloudSaveResolution.cancelled;
   }
 
   Future<void> _startPlan() async {
@@ -336,7 +387,9 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
 
     final profileSaved = await _accountController.completeOnboarding();
     if (!mounted) return;
-    if (profileSaved) {
+    final stageSaved = profileSaved && await _quitPlanController.markStarted();
+    if (!mounted) return;
+    if (stageSaved) {
       widget.onNext();
       return;
     }
@@ -365,6 +418,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     );
     if (!mounted || signedIn != true) return;
 
+    var message = 'Signed in successfully.';
     var destination =
         _accountController.profile?.onboardingCompleted == true ? 11 : 1;
     if (_quitPlanController.enabled) {
@@ -378,6 +432,52 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
         );
         return;
       }
+
+      if (_quitPlanController.guestMergeStatus ==
+          GuestPlanMergeStatus.pendingUpload) {
+        final choice = await _showGuestUploadConsent();
+        if (!mounted) return;
+        if (choice == _GuestUploadChoice.upload) {
+          final imported = await _quitPlanController.importGuestPlan();
+          if (!mounted || !imported) return;
+          message = 'Your device plan is now backed up to your account.';
+        } else {
+          message =
+              'Signed in. Your guest plan remains encrypted on this device.';
+        }
+      }
+
+      if (_quitPlanController.guestMergeStatus ==
+          GuestPlanMergeStatus.conflict) {
+        final choice = await _showGuestPlanConflict();
+        if (!mounted) return;
+        if (choice == _GuestPlanConflictChoice.keepCloud) {
+          final resolved =
+              await _quitPlanController.keepCloudPlanAndDiscardGuest();
+          if (!mounted || !resolved) return;
+          message = 'Your account plan was kept.';
+        } else if (choice == _GuestPlanConflictChoice.useDevice) {
+          final resolved =
+              await _quitPlanController.replaceCloudWithGuestPlan();
+          if (!mounted || !resolved) return;
+          message = 'Your device plan is now backed up to your account.';
+        } else {
+          message =
+              'Your account plan is open. The device plan remains saved locally.';
+        }
+      } else if (_quitPlanController.guestMergeStatus ==
+          GuestPlanMergeStatus.uploaded) {
+        message = 'Your device plan is now backed up to your account.';
+      }
+
+      if (_quitPlanController.guestMergeStatus ==
+              GuestPlanMergeStatus.uploaded &&
+          _quitPlanController.migratedGuestWasStarted &&
+          _accountController.profile?.onboardingCompleted != true) {
+        final completed = await _accountController.completeOnboarding();
+        if (!mounted || !completed) return;
+      }
+
       final restoredPlan = _quitPlanController.plan;
       if (restoredPlan != null) {
         setState(() => _applyQuitPlan(restoredPlan));
@@ -387,14 +487,179 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Signed in successfully.')),
+      SnackBar(content: Text(message)),
     );
     widget.onSelectScreen(destination);
   }
 
+  Future<_GuestUploadChoice> _showGuestUploadConsent() async {
+    final choice = await showDialog<_GuestUploadChoice>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Back up your device plan?'),
+        content: const Text(
+          'Your guest plan is encrypted on this device. Backing it up will '
+          'upload its quit-plan details to your signed-in account so you can '
+          'restore them on another device.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(
+              context,
+              _GuestUploadChoice.notNow,
+            ),
+            child: const Text('Not now'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(
+              context,
+              _GuestUploadChoice.upload,
+            ),
+            child: const Text('Back up plan'),
+          ),
+        ],
+      ),
+    );
+    return choice ?? _GuestUploadChoice.notNow;
+  }
+
+  Future<_GuestPlanConflictChoice> _showGuestPlanConflict() async {
+    final choice = await showDialog<_GuestPlanConflictChoice>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Two quit plans found'),
+        content: const Text(
+          'This device has a guest plan and your account already has a cloud '
+          'plan. Nothing will be overwritten without your choice.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(
+              context,
+              _GuestPlanConflictChoice.keepBoth,
+            ),
+            child: const Text('Decide later'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(
+              context,
+              _GuestPlanConflictChoice.keepCloud,
+            ),
+            child: const Text('Use account plan'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(
+              context,
+              _GuestPlanConflictChoice.useDevice,
+            ),
+            child: const Text('Use device plan'),
+          ),
+        ],
+      ),
+    );
+    return choice ?? _GuestPlanConflictChoice.keepBoth;
+  }
+
+  Future<void> _backupDevicePlan() async {
+    final choice = await _showGuestUploadConsent();
+    if (!mounted || choice != _GuestUploadChoice.upload) return;
+    final imported = await _quitPlanController.importGuestPlan();
+    if (!mounted || !imported) return;
+
+    var message = 'Your device plan is now backed up to your account.';
+    if (_quitPlanController.guestMergeStatus == GuestPlanMergeStatus.conflict) {
+      final conflictChoice = await _showGuestPlanConflict();
+      if (!mounted) return;
+      if (conflictChoice == _GuestPlanConflictChoice.keepCloud) {
+        final resolved =
+            await _quitPlanController.keepCloudPlanAndDiscardGuest();
+        if (!mounted || !resolved) return;
+        message = 'Your account plan was kept.';
+      } else if (conflictChoice == _GuestPlanConflictChoice.useDevice) {
+        final resolved = await _quitPlanController.replaceCloudWithGuestPlan();
+        if (!mounted || !resolved) return;
+      } else {
+        message =
+            'Your account plan is open. The device plan remains saved locally.';
+      }
+    }
+
+    if (_quitPlanController.guestMergeStatus == GuestPlanMergeStatus.uploaded &&
+        _quitPlanController.migratedGuestWasStarted &&
+        _accountController.profile?.onboardingCompleted != true) {
+      final completed = await _accountController.completeOnboarding();
+      if (!mounted || !completed) return;
+    }
+    final restoredPlan = _quitPlanController.plan;
+    if (restoredPlan != null) setState(() => _applyQuitPlan(restoredPlan));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  Future<void> _deleteDevicePlan() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove plan from this device?'),
+        content: const Text(
+          'This permanently removes the encrypted guest plan stored on this '
+          'device. A plan already backed up to your account is not affected.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Remove device plan'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    await _quitPlanController.clearGuestPlan();
+    if (!mounted) return;
+    if (!_accountController.isSignedIn) {
+      final reset = widget.onSessionReset;
+      if (reset != null) {
+        reset(0);
+      } else {
+        widget.onSelectScreen(0);
+      }
+    } else {
+      setState(() {});
+    }
+  }
+
   Future<void> _signOut() async {
+    if (_quitPlanController.busy) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Wait for the device plan action to finish.'),
+        ),
+      );
+      return;
+    }
     await _accountController.signOut();
     _quitPlanController.clear();
+    await _quitPlanController.initialize();
+    if (!mounted) return;
+    final guestPlan = _quitPlanController.plan;
+    final destination = _quitPlanController.hasGuestPlanRecoveryIssue
+        ? 27
+        : guestPlan == null
+            ? 0
+            : (_quitPlanController.guestPlanStarted ? 11 : 10);
+    final reset = widget.onSessionReset;
+    if (reset != null) {
+      reset(destination);
+    } else {
+      widget.onSelectScreen(destination);
+    }
   }
 
   String _rescueTopReasonLabel(bool isSpanish) {
@@ -668,7 +933,9 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             onEditTreatment: () => _openPlanEditor(9),
             onStartPlan: () => unawaited(_startPlan()),
             onSaveForLater: _savePlanForLater,
+            onCreateAccount: _showSignIn,
             planWillPersist: _quitPlanController.persistenceAvailable,
+            planSavedOnDeviceOnly: _quitPlanController.savedOnDeviceOnly,
           );
         }
 
@@ -1181,6 +1448,12 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             signedIn: _accountController.isSignedIn,
             accountEmail: _accountController.email,
             displayName: _accountController.profile?.displayName,
+            hasDevicePlan: _quitPlanController.hasStoredGuestPlan,
+            devicePlanNeedsRecovery:
+                _quitPlanController.hasGuestPlanRecoveryIssue,
+            canBackupDevicePlan: _quitPlanController.guestPlanNeedsUpload,
+            onBackupDevicePlan: () => unawaited(_backupDevicePlan()),
+            onDeleteDevicePlan: () => unawaited(_deleteDevicePlan()),
             onSignOut: _accountController.isSignedIn
                 ? () => unawaited(_signOut())
                 : _showSignIn,

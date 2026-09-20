@@ -97,6 +97,13 @@ class QuitPlan {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
+  Map<String, Object?> toLocalJson() => {
+        'userId': userId,
+        ...toRequestJson(),
+        'createdAt': createdAt?.toUtc().toIso8601String(),
+        'updatedAt': updatedAt?.toUtc().toIso8601String(),
+      };
+
   Map<String, Object?> toRequestJson() => {
         'dailyCigaretteUse': dailyCigaretteUse,
         'smokingTriggers': smokingTriggers,

@@ -122,7 +122,10 @@ A free Apple ID can install a development build on a personal device. Publishing
 This archive is a complete, compilable Flutter implementation of the approved
 28-screen user experience. Cloud development email/password registration,
 email-confirmation-aware authentication, profile preferences, and a bounded
-quit-plan snapshot are implemented through Flutter, NestJS, and Supabase. Only synthetic quit-plan and support-person data is permitted. Phone
+quit-plan snapshot are implemented through Flutter, NestJS, and Supabase.
+Signed-out users can save an encrypted plan on one device and safely migrate it
+after signing in without silently replacing an existing cloud plan. Only
+synthetic quit-plan and support-person data is permitted. Phone
 dialing, clinician/EHR connections, secure messaging, remote notifications,
 analytics, exports, server-side deletion, and later health domains remain
 consent-aware prototype actions or interfaces.

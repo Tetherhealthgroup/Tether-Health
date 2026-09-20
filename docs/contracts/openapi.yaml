@@ -76,6 +76,26 @@ paths:
         '400': {description: Invalid request body}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '502': {description: Quit-plan storage is temporarily unavailable}
+  /v1/quit-plan/guest-import:
+    post:
+      operationId: createMyQuitPlanFromGuest
+      description: Atomically creates the caller plan only when none exists.
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PutQuitPlan'}
+      responses:
+        '201':
+          description: Created quit-plan snapshot
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/QuitPlan'}
+        '400': {description: Invalid request body}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '409': {description: The authenticated user already has a quit plan}
+        '502': {description: Quit-plan storage is temporarily unavailable}
 components:
   securitySchemes:
     supabaseJwt: {type: http, scheme: bearer, bearerFormat: JWT}

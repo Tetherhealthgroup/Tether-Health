@@ -36,6 +36,8 @@ describe("API (e2e)", () => {
         get: () => Promise.resolve(quitPlanFixture()),
         put: (_user: unknown, plan: Record<string, unknown>) =>
           Promise.resolve({ ...quitPlanFixture(), ...plan }),
+        create: (_user: unknown, plan: Record<string, unknown>) =>
+          Promise.resolve({ ...quitPlanFixture(), ...plan }),
       })
       .compile();
     app = module.createNestApplication<NestFastifyApplication>(
@@ -69,9 +71,10 @@ describe("API (e2e)", () => {
     ["PATCH", "/v1/profile", { locale: "en" }],
     ["GET", "/v1/quit-plan", undefined],
     ["PUT", "/v1/quit-plan", {}],
+    ["POST", "/v1/quit-plan/guest-import", {}],
   ])("%s %s requires a token", async (method, url, payload) => {
     const response = await app.inject({
-      method: method as "GET" | "PATCH" | "PUT",
+      method: method as "GET" | "PATCH" | "POST" | "PUT",
       url,
       payload,
     });
@@ -128,6 +131,18 @@ describe("API (e2e)", () => {
       payload,
     });
     expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ ...quitPlanFixture(), ...payload });
+  });
+
+  it("POST /v1/quit-plan/guest-import creates without replacing", async () => {
+    const payload = { ...quitPlanInput(), readinessPath: "explore" };
+    const response = await app.inject({
+      method: "POST",
+      url: "/v1/quit-plan/guest-import",
+      headers: { authorization: "Bearer test-token" },
+      payload,
+    });
+    expect(response.statusCode).toBe(201);
     expect(response.json()).toEqual({ ...quitPlanFixture(), ...payload });
   });
 

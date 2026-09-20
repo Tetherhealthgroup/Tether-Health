@@ -113,6 +113,39 @@ describe("QuitPlanService", () => {
     );
   });
 
+  it("creates a guest import only when no caller plan exists", async () => {
+    const single = jest.fn().mockResolvedValue({ data: row, error: null });
+    const selectAfterInsert = jest.fn().mockReturnValue({ single });
+    const insert = jest.fn().mockReturnValue({ select: selectAfterInsert });
+    const from = jest.fn().mockReturnValue({ insert });
+    mockedCreateClient.mockReturnValue({ from } as never);
+
+    const service = new QuitPlanService(config);
+    await expect(service.create(user, plan)).resolves.toMatchObject({
+      userId: user.id,
+      topQuitReason: "family",
+    });
+    expect(insert).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: user.id, quit_date: "2026-10-01" }),
+    );
+  });
+
+  it("returns conflict instead of overwriting an existing guest import", async () => {
+    const single = jest.fn().mockResolvedValue({
+      data: null,
+      error: { code: "23505" },
+    });
+    const selectAfterInsert = jest.fn().mockReturnValue({ single });
+    const insert = jest.fn().mockReturnValue({ select: selectAfterInsert });
+    const from = jest.fn().mockReturnValue({ insert });
+    mockedCreateClient.mockReturnValue({ from } as never);
+
+    const service = new QuitPlanService(config);
+    await expect(service.create(user, plan)).rejects.toMatchObject({
+      status: 409,
+    });
+  });
+
   it("rejects a top reason outside the selected reasons", async () => {
     const service = new QuitPlanService(config);
     await expect(

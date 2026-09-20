@@ -13,6 +13,7 @@ import 'models/screen_spec.dart';
 import 'models/tap_target.dart';
 import 'profile/profile_api_client.dart';
 import 'profile/profile_repository.dart';
+import 'quit_plan/guest_quit_plan_store.dart';
 import 'quit_plan/quit_plan_api_client.dart';
 import 'quit_plan/quit_plan_controller.dart';
 import 'quit_plan/quit_plan_repository.dart';
@@ -34,6 +35,7 @@ Future<void> main() async {
   final config = AppConfig.fromEnvironment();
   AccountController? account;
   QuitPlanController? quitPlan;
+  final guestStore = SecureGuestQuitPlanStore();
   if (config.hasAnyConfiguration) config.validate();
   if (config.isConfigured) {
     await Supabase.initialize(
@@ -57,7 +59,10 @@ Future<void> main() async {
         auth: auth,
         api: HttpQuitPlanApiClient(baseUrl: config.apiBaseUrl),
       ),
+      guestStore: guestStore,
     );
+  } else {
+    quitPlan = QuitPlanController.disabled(guestStore: guestStore);
   }
 
   runApp(BreatheFreeApp(
@@ -96,6 +101,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   late final bool _ownsQuitPlanController;
   late bool _restoringAccount;
   bool _restoreFailed = false;
+  int _journeyEpoch = 0;
   final List<int> _history = <int>[];
 
   @override
@@ -109,7 +115,9 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         widget.quitPlanController ?? QuitPlanController.disabled();
     _currentIndex =
         widget.initialScreen.clamp(0, approvedScreens.length - 1).toInt();
-    _restoringAccount = _accountController.isSignedIn && _currentIndex == 0;
+    _restoringAccount = _currentIndex == 0 &&
+        (_accountController.isSignedIn ||
+            _quitPlanController.guestPersistenceAvailable);
     unawaited(_initializeAccount());
   }
 
@@ -121,7 +129,22 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   }
 
   Future<void> _initializeAccount() async {
-    if (!_accountController.isSignedIn || _currentIndex != 0) return;
+    if (_currentIndex != 0) return;
+
+    if (!_accountController.isSignedIn) {
+      final loaded = await _quitPlanController.initialize();
+      if (!mounted) return;
+      setState(() {
+        _restoringAccount = false;
+        _restoreFailed = !loaded;
+        _history.clear();
+        final restoredPlan = _quitPlanController.plan;
+        _currentIndex = restoredPlan == null
+            ? 0
+            : (_quitPlanController.guestPlanStarted ? 11 : 10);
+      });
+      return;
+    }
 
     for (final delay in _profileRetryDelays) {
       if (delay > Duration.zero) await Future<void>.delayed(delay);
@@ -143,6 +166,13 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
           final planLoaded = await _quitPlanController.initialize();
           if (!mounted) return;
           if (!planLoaded) continue;
+          if (_quitPlanController.guestMergeStatus ==
+                  GuestPlanMergeStatus.uploaded &&
+              _quitPlanController.migratedGuestWasStarted &&
+              !_accountController.profile!.onboardingCompleted) {
+            await _accountController.completeOnboarding();
+            if (!mounted) return;
+          }
           final restoredPlan = _quitPlanController.plan;
           destination = restoredPlan == null
               ? 1
@@ -175,14 +205,29 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   }
 
   Future<void> _signOutAfterRestoreFailure() async {
+    final restoringGuest = !_accountController.isSignedIn;
     await _accountController.signOut();
+    if (restoringGuest) await _quitPlanController.clearGuestPlan();
     _quitPlanController.clear();
+    if (!restoringGuest) await _quitPlanController.initialize();
     if (!mounted) return;
+    final guestPlan = _quitPlanController.plan;
     setState(() {
       _restoringAccount = false;
       _restoreFailed = false;
       _history.clear();
-      _currentIndex = 0;
+      _journeyEpoch++;
+      _currentIndex = guestPlan == null
+          ? 0
+          : (_quitPlanController.guestPlanStarted ? 11 : 10);
+    });
+  }
+
+  void _resetJourney(int destination) {
+    setState(() {
+      _history.clear();
+      _journeyEpoch++;
+      _currentIndex = destination;
     });
   }
 
@@ -328,10 +373,12 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         home: _restoringAccount || _restoreFailed
             ? _AccountConnectionScreen(
                 failed: _restoreFailed,
+                restoringGuest: !_accountController.isSignedIn,
                 onRetry: _retryAccountRestore,
                 onSignOut: _signOutAfterRestoreFailure,
               )
             : ApprovedScreenPlayer(
+                key: ValueKey(_journeyEpoch),
                 accountController: _accountController,
                 quitPlanController: _quitPlanController,
                 currentIndex: _currentIndex,
@@ -339,6 +386,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
                 onPrevious: _goBack,
                 onNext: _goNext,
                 onTarget: _handleTarget,
+                onSessionReset: _resetJourney,
               ),
       ),
     );
@@ -348,11 +396,13 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
 class _AccountConnectionScreen extends StatelessWidget {
   const _AccountConnectionScreen({
     required this.failed,
+    required this.restoringGuest,
     required this.onRetry,
     required this.onSignOut,
   });
 
   final bool failed;
+  final bool restoringGuest;
   final VoidCallback onRetry;
   final Future<void> Function() onSignOut;
 
@@ -383,16 +433,24 @@ class _AccountConnectionScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   Text(
                     failed
-                        ? 'We could not reach your profile'
-                        : 'Connecting to BreatheFree',
+                        ? (restoringGuest
+                            ? 'We could not restore your device plan'
+                            : 'We could not reach your profile')
+                        : (restoringGuest
+                            ? 'Restoring your progress'
+                            : 'Connecting to BreatheFree'),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 12),
                   Text(
                     failed
-                        ? 'Your account is still signed in. Check your connection and try again.'
-                        : 'Your secure session is restored. This can take a moment while the development service wakes up.',
+                        ? (restoringGuest
+                            ? 'Your encrypted plan remains on this device. Try again, or start over and remove it.'
+                            : 'Your account is still signed in. Check your connection and try again.')
+                        : (restoringGuest
+                            ? 'Checking this device for saved guest progress.'
+                            : 'Your secure session is restored. This can take a moment while the development service wakes up.'),
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
@@ -410,7 +468,9 @@ class _AccountConnectionScreen extends StatelessWidget {
                     TextButton(
                       key: const ValueKey('account-connection-sign-out'),
                       onPressed: () => unawaited(onSignOut()),
-                      child: const Text('Sign out'),
+                      child: Text(restoringGuest
+                          ? 'Remove device plan and start over'
+                          : 'Sign out'),
                     ),
                   ],
                 ],

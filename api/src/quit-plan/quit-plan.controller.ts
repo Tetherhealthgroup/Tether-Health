@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Put } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Post, Put } from "@nestjs/common";
 import type { AuthUser } from "../auth/auth-user";
 import { RequestUser } from "../auth/request-user.decorator";
 import { PutQuitPlanDto } from "./quit-plan.dto";
@@ -16,5 +16,14 @@ export class QuitPlanController {
   @Put()
   put(@RequestUser() user: AuthUser, @Body() dto: PutQuitPlanDto) {
     return this.quitPlans.put(user, dto);
+  }
+
+  @Post("guest-import")
+  @HttpCode(201)
+  createGuestImport(
+    @RequestUser() user: AuthUser,
+    @Body() dto: PutQuitPlanDto,
+  ) {
+    return this.quitPlans.create(user, dto);
   }
 }

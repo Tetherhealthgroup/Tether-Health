@@ -1535,7 +1535,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       find.text(
-        'Your plan is ready for this session. Sign in to save it across devices.',
+        'Your plan is ready for this session. Sign in to save it.',
       ),
       findsOneWidget,
     );

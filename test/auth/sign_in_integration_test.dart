@@ -220,6 +220,42 @@ void main() {
         findsOneWidget);
   });
 
+  testWidgets('sign-out resets the journey and clears cloud plan memory',
+      (tester) async {
+    tester.view.physicalSize = const Size(430, 932);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final auth = _SuccessfulAuth(signedIn: true);
+    final account = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _ProfileApi()),
+    );
+    final quitPlan = QuitPlanController(
+      auth: auth,
+      repository: QuitPlanRepository(auth: auth, api: _PlanApi()),
+    );
+    await quitPlan.save(await _PlanApi().getQuitPlan('fake-access-token'));
+    addTearDown(account.dispose);
+    addTearDown(quitPlan.dispose);
+
+    await tester.pumpWidget(BreatheFreeApp(
+      initialScreen: 27,
+      accountController: account,
+      quitPlanController: quitPlan,
+    ));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-sign-out')));
+    await tester.tap(find.byKey(const ValueKey('settings-sign-out')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('functional-welcome-screen')),
+        findsOneWidget);
+    expect(account.isSignedIn, isFalse);
+    expect(quitPlan.plan, isNull);
+  });
+
   testWidgets('successful sign-in confirms success and starts onboarding',
       (tester) async {
     tester.view.physicalSize = const Size(430, 932);
@@ -336,6 +372,10 @@ class _DeferredProfileApi implements ProfileApiClient {
 }
 
 class _PlanApi implements QuitPlanApiClient {
+  @override
+  Future<QuitPlan> createQuitPlan(String accessToken, QuitPlan plan) async =>
+      plan;
+
   @override
   Future<QuitPlan> getQuitPlan(String accessToken) async => QuitPlan(
         userId: 'user-id',

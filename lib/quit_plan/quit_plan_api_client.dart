@@ -16,6 +16,7 @@ class QuitPlanApiException implements Exception {
 abstract interface class QuitPlanApiClient {
   Future<QuitPlan> getQuitPlan(String accessToken);
   Future<QuitPlan> putQuitPlan(String accessToken, QuitPlan plan);
+  Future<QuitPlan> createQuitPlan(String accessToken, QuitPlan plan);
 }
 
 class HttpQuitPlanApiClient implements QuitPlanApiClient {
@@ -38,12 +39,21 @@ class HttpQuitPlanApiClient implements QuitPlanApiClient {
   Future<QuitPlan> putQuitPlan(String accessToken, QuitPlan plan) =>
       _send('PUT', accessToken, plan.toRequestJson());
 
+  @override
+  Future<QuitPlan> createQuitPlan(String accessToken, QuitPlan plan) => _send(
+        'POST',
+        accessToken,
+        plan.toRequestJson(),
+        path: '/v1/quit-plan/guest-import',
+      );
+
   Future<QuitPlan> _send(
     String method,
     String accessToken,
-    Map<String, Object?>? body,
-  ) async {
-    final request = http.Request(method, _baseUri.resolve('/v1/quit-plan'))
+    Map<String, Object?>? body, {
+    String path = '/v1/quit-plan',
+  }) async {
+    final request = http.Request(method, _baseUri.resolve(path))
       ..headers['authorization'] = 'Bearer $accessToken'
       ..headers['accept'] = 'application/json';
     if (body != null) {
@@ -65,6 +75,10 @@ class HttpQuitPlanApiClient implements QuitPlanApiClient {
 
 class DisabledQuitPlanApiClient implements QuitPlanApiClient {
   const DisabledQuitPlanApiClient();
+
+  @override
+  Future<QuitPlan> createQuitPlan(String accessToken, QuitPlan plan) =>
+      Future.error(StateError('Quit-plan service is not configured.'));
 
   @override
   Future<QuitPlan> getQuitPlan(String accessToken) =>

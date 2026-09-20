@@ -22,6 +22,11 @@ class SettingsPrivacyScreen extends StatelessWidget {
     this.onInformation,
     this.onDownloadData,
     this.onDeleteAccount,
+    this.hasDevicePlan = false,
+    this.devicePlanNeedsRecovery = false,
+    this.canBackupDevicePlan = false,
+    this.onBackupDevicePlan,
+    this.onDeleteDevicePlan,
     this.onSignOut,
     super.key,
   });
@@ -43,6 +48,11 @@ class SettingsPrivacyScreen extends StatelessWidget {
   final ValueChanged<String>? onInformation;
   final VoidCallback? onDownloadData;
   final VoidCallback? onDeleteAccount;
+  final bool hasDevicePlan;
+  final bool devicePlanNeedsRecovery;
+  final bool canBackupDevicePlan;
+  final VoidCallback? onBackupDevicePlan;
+  final VoidCallback? onDeleteDevicePlan;
   final VoidCallback? onSignOut;
 
   String t(String english, String spanish) =>
@@ -260,6 +270,57 @@ class SettingsPrivacyScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (hasDevicePlan) ...[
+                      const SizedBox(height: 8),
+                      ResourceCard(
+                        child: ListTile(
+                          key: const ValueKey('settings-device-plan'),
+                          leading: const Icon(Icons.phone_iphone_rounded),
+                          title: Text(t(
+                            'Saved on this device',
+                            'Guardado en este dispositivo',
+                          )),
+                          subtitle: Text(devicePlanNeedsRecovery
+                              ? t(
+                                  'This encrypted plan cannot be opened. Remove it to save a new device plan.',
+                                  'Este plan cifrado no se puede abrir. Elimínalo para guardar un plan nuevo en el dispositivo.',
+                                )
+                              : t(
+                                  'Encrypted guest plan; not synced to an account',
+                                  'Plan de invitado cifrado; no sincronizado con una cuenta',
+                                )),
+                          trailing: PopupMenuButton<String>(
+                            key: const ValueKey('settings-device-plan-actions'),
+                            tooltip: t('Device plan actions',
+                                'Acciones del plan del dispositivo'),
+                            onSelected: (value) {
+                              if (value == 'backup') {
+                                onBackupDevicePlan?.call();
+                              } else if (value == 'remove') {
+                                onDeleteDevicePlan?.call();
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              if (canBackupDevicePlan)
+                                PopupMenuItem(
+                                  key: const ValueKey(
+                                    'settings-backup-device-plan',
+                                  ),
+                                  value: 'backup',
+                                  child: Text(t('Back up', 'Respaldar')),
+                                ),
+                              PopupMenuItem(
+                                key: const ValueKey(
+                                  'settings-delete-device-plan',
+                                ),
+                                value: 'remove',
+                                child: Text(t('Remove', 'Eliminar')),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 18),
                     SectionTitle(t('Notifications', 'Notificaciones')),
                     const SizedBox(height: 8),

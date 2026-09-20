@@ -25,8 +25,9 @@ Flutter and are not required by the profile API.
 ## Trust boundaries
 
 - **Flutter:** presentation, Keychain/secure-platform Supabase session persistence,
-  testable data abstractions, and explicit consent. Configuration comes from
-  `--dart-define`.
+  encrypted device-only guest-plan persistence, testable data abstractions, and
+  explicit consent. Guest plans never use the cloud until the user signs in;
+  configuration comes from `--dart-define`.
 - **NestJS:** JWT and DTO validation, business rules, versioned HTTP contracts,
   and future audit/rate-limit integration points.
 - **Supabase:** identity, relational constraints, private storage, grants, RLS,
@@ -54,5 +55,11 @@ The approved 28-screen catalog and integer routing contract remain unchanged.
 Authentication, registration, and profiles sit behind interfaces with fakes for
 tests. Registration does not claim an authenticated session when Supabase
 requires email confirmation; the user confirms externally and then returns to
-sign in. Password recovery remains a later slice. Screens can migrate one
-bounded domain at a time without coupling widgets to Supabase or HTTP.
+sign in. A signed-out user can explicitly save an encrypted plan on one device.
+After sign-in, the app asks for explicit consent before uploading a device plan.
+The API uses an atomic create-only import so a concurrently created cloud plan
+returns a conflict instead of being overwritten; conflicts preserve both plans
+and require an explicit choice before any overwrite. Sign-out recreates the journey widget tree so cloud plan state cannot
+remain visible in a later guest session. Password recovery remains a later
+slice. Screens can migrate one bounded domain at a time without coupling
+widgets to Supabase or HTTP.

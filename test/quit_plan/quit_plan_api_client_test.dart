@@ -44,6 +44,25 @@ void main() {
     expect(saved.userId, '00000000-0000-0000-0000-000000000001');
   });
 
+  test('creates a guest plan through the atomic import endpoint', () async {
+    final plan = QuitPlan.fromJson(_responseJson());
+    final client = HttpQuitPlanApiClient(
+      baseUrl: 'https://api.example.test/base',
+      client: MockClient((request) async {
+        expect(request.method, 'POST');
+        expect(
+          request.url.toString(),
+          'https://api.example.test/v1/quit-plan/guest-import',
+        );
+        expect(request.headers['authorization'], 'Bearer user-token');
+        return http.Response(jsonEncode(_responseJson()), 201);
+      }),
+    );
+
+    final saved = await client.createQuitPlan('user-token', plan);
+    expect(saved.topQuitReason, 'family');
+  });
+
   test('returns a typed not-found response', () async {
     final client = HttpQuitPlanApiClient(
       baseUrl: 'https://api.example.test',

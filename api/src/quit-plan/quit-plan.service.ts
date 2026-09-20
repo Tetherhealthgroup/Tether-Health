@@ -1,6 +1,7 @@
 import {
   BadGatewayException,
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -55,6 +56,35 @@ export class QuitPlanService {
   }
 
   async put(user: AuthUser, plan: PutQuitPlanDto): Promise<QuitPlanResponse> {
+    this.validate(plan);
+    const row = this.toRow(user, plan);
+    const { data, error } = await this.client(user)
+      .from("quit_plans")
+      .upsert(row, { onConflict: "user_id" })
+      .select("*")
+      .single<QuitPlanRow>();
+    if (error) throw new BadGatewayException("Quit plan could not be saved");
+    return this.toResponse(data);
+  }
+
+  async create(
+    user: AuthUser,
+    plan: PutQuitPlanDto,
+  ): Promise<QuitPlanResponse> {
+    this.validate(plan);
+    const { data, error } = await this.client(user)
+      .from("quit_plans")
+      .insert(this.toRow(user, plan))
+      .select("*")
+      .single<QuitPlanRow>();
+    if (error?.code === "23505") {
+      throw new ConflictException("Quit plan already exists");
+    }
+    if (error) throw new BadGatewayException("Quit plan could not be created");
+    return this.toResponse(data);
+  }
+
+  private validate(plan: PutQuitPlanDto) {
     if (
       plan.topQuitReason !== null &&
       !plan.quitReasons.includes(plan.topQuitReason)
@@ -69,8 +99,10 @@ export class QuitPlanService {
         "customQuitReason is required only when custom is selected",
       );
     }
+  }
 
-    const row = {
+  private toRow(user: AuthUser, plan: PutQuitPlanDto) {
+    return {
       user_id: user.id,
       daily_cigarette_use: plan.dailyCigaretteUse,
       smoking_triggers: plan.smokingTriggers,
@@ -87,13 +119,6 @@ export class QuitPlanService {
       treatment_support: plan.treatmentSupport,
       care_team_reminder: plan.careTeamReminder,
     };
-    const { data, error } = await this.client(user)
-      .from("quit_plans")
-      .upsert(row, { onConflict: "user_id" })
-      .select("*")
-      .single<QuitPlanRow>();
-    if (error) throw new BadGatewayException("Quit plan could not be saved");
-    return this.toResponse(data);
   }
 
   private client(user: AuthUser) {
