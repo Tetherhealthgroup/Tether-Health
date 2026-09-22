@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: BreatheFree API
-  version: 1.1.0
+  version: 1.2.0
   description: >-
     Development contract for authenticated profiles and synthetic quit-plan data.
     Real patient, clinical, and support-person data remain prohibited until
@@ -96,6 +96,48 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '409': {description: The authenticated user already has a quit plan}
         '502': {description: Quit-plan storage is temporarily unavailable}
+  /v1/account/export:
+    get:
+      operationId: exportMyAppData
+      description: >-
+        Returns the bounded app-owned profile and optional quit-plan snapshot.
+        Requires a timestamped Supabase JWT authentication method (amr) within the configured recent-auth window.
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: JSON account data export
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AccountDataExport'}
+        '401': {description: Missing, invalid, or insufficiently recent authentication}
+        '502': {description: Account data is temporarily unavailable}
+  /v1/account/data:
+    delete:
+      operationId: deleteMyAppData
+      description: >-
+        Permanently deletes caller-owned profile, quit-plan, and avatar data.
+        Supabase Auth identity deletion is not performed and is reported
+        explicitly in the receipt.
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [confirmation]
+              properties:
+                confirmation: {const: DELETE}
+      responses:
+        '200':
+          description: App-owned data deletion receipt
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AccountDeletionReceipt'}
+        '400': {description: Exact explicit confirmation was not supplied}
+        '401': {description: Missing, invalid, or insufficiently recent authentication}
+        '502': {description: Deletion did not complete}
 components:
   securitySchemes:
     supabaseJwt: {type: http, scheme: bearer, bearerFormat: JWT}
@@ -133,6 +175,35 @@ components:
         timeZone: {type: string, minLength: 1, maxLength: 64}
         onboardingCompleted: {type: boolean}
         avatarPath: {type: [string, 'null'], maxLength: 512}
+    AccountDataExport:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, generatedAt, profile, quitPlan]
+      properties:
+        schemaVersion: {const: '1.0'}
+        generatedAt: {type: string, format: date-time}
+        profile: {$ref: '#/components/schemas/Profile'}
+        quitPlan:
+          oneOf:
+            - {$ref: '#/components/schemas/QuitPlan'}
+            - {type: 'null'}
+    AccountDeletionReceipt:
+      type: object
+      additionalProperties: false
+      required: [requestId, completedAt, deleted, authIdentityDeleted, authIdentityStatus]
+      properties:
+        requestId: {type: string, format: uuid}
+        completedAt: {type: string, format: date-time}
+        deleted:
+          type: object
+          additionalProperties: false
+          required: [profiles, quitPlans, avatarObjects]
+          properties:
+            profiles: {type: integer, minimum: 0, maximum: 1}
+            quitPlans: {type: integer, minimum: 0, maximum: 1}
+            avatarObjects: {type: integer, minimum: 0}
+        authIdentityDeleted: {const: false}
+        authIdentityStatus: {const: external-action-required}
     SupportPerson:
       type: object
       additionalProperties: false

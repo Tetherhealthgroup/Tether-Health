@@ -46,7 +46,20 @@ abstract interface class AuthGateway {
   Future<void> signOut();
 }
 
-class SupabaseAuthGateway implements AuthGateway {
+abstract interface class RecentAuthGateway {
+  Future<AuthIdentity> reauthenticate({required String password});
+}
+
+abstract interface class PasswordRecoveryGateway {
+  Stream<void> get passwordRecoveryEvents;
+
+  Future<void> requestPasswordReset({required String email});
+
+  Future<void> updatePassword({required String newPassword});
+}
+
+class SupabaseAuthGateway
+    implements AuthGateway, RecentAuthGateway, PasswordRecoveryGateway {
   SupabaseAuthGateway(
     this._client, {
     String? emailRedirectTo,
@@ -55,6 +68,11 @@ class SupabaseAuthGateway implements AuthGateway {
 
   final SupabaseClient _client;
   final String? _emailRedirectTo;
+
+  @override
+  Stream<void> get passwordRecoveryEvents => _client.auth.onAuthStateChange
+      .where((event) => event.event == AuthChangeEvent.passwordRecovery)
+      .map((_) {});
 
   @override
   AuthIdentity? get currentIdentity => _identity(_client.auth.currentSession);
@@ -99,6 +117,26 @@ class SupabaseAuthGateway implements AuthGateway {
       emailRedirectTo: _emailRedirectTo,
     );
   }
+
+  @override
+  Future<AuthIdentity> reauthenticate({required String password}) async {
+    final email = _client.auth.currentUser?.email;
+    if (email == null) {
+      throw const AuthException('A signed-in email account is required.');
+    }
+    return signIn(email: email, password: password);
+  }
+
+  @override
+  Future<void> requestPasswordReset({required String email}) =>
+      _client.auth.resetPasswordForEmail(
+        email,
+        redirectTo: _emailRedirectTo,
+      );
+
+  @override
+  Future<void> updatePassword({required String newPassword}) =>
+      _client.auth.updateUser(UserAttributes(password: newPassword));
 
   @override
   Future<void> signOut() => _client.auth.signOut();

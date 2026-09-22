@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../auth/account_controller.dart';
 import '../models/screen_spec.dart';
@@ -10,6 +11,7 @@ import '../models/tap_target.dart';
 import '../quit_plan/quit_plan.dart';
 import '../quit_plan/quit_plan_controller.dart';
 import '../theme/app_colors.dart';
+import '../widgets/account_data_dialogs.dart';
 import '../widgets/approved_screen_viewport.dart';
 import '../widgets/sign_in_dialog.dart';
 import 'active_craving_rescue_screen.dart';
@@ -662,6 +664,73 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     }
   }
 
+  Future<void> _callQuitline() async {
+    var launched = false;
+    try {
+      launched = await launchUrl(
+        Uri(scheme: 'tel', path: '18007848669'),
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (_) {
+      launched = false;
+    }
+    if (!mounted || launched) return;
+    await Clipboard.setData(const ClipboardData(text: '1-800-784-8669'));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('The dialer was unavailable. Quitline number copied.'),
+      ),
+    );
+  }
+
+  Future<void> _exportAccountData() async {
+    if (!_accountController.isSignedIn) {
+      await _showSignIn();
+      return;
+    }
+    if (!mounted) return;
+    await showAccountExportDialog(context, _accountController);
+  }
+
+  Future<void> _deleteAccountData() async {
+    if (!_accountController.isSignedIn) {
+      await _showSignIn();
+      return;
+    }
+    final receipt =
+        await showAccountDeletionDialog(context, _accountController);
+    if (!mounted || receipt == null) return;
+    _quitPlanController.clear();
+    await _quitPlanController.clearGuestPlan();
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('App data deleted'),
+        content: Text(
+          'Deletion receipt ${receipt.requestId}. Your BreatheFree profile and '
+          'plan were deleted. Your sign-in identity still requires a separate '
+          'privileged deletion process.',
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Done'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted) return;
+    final reset = widget.onSessionReset;
+    if (reset != null) {
+      reset(0);
+    } else {
+      widget.onSelectScreen(0);
+    }
+  }
+
   String _rescueTopReasonLabel(bool isSpanish) {
     final reason = _topQuitReason ??
         (_quitReasons.isNotEmpty ? _quitReasons.first : QuitReason.family);
@@ -722,754 +791,764 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   @override
   Widget build(BuildContext context) {
     final spec = approvedScreens[widget.currentIndex];
+    final media = MediaQuery.of(context);
+    final effectiveMedia = media.copyWith(
+      disableAnimations: media.disableAnimations || _reduceMotionEnabled,
+    );
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth >= 900) {
-          return _DesktopPlayer(
-            spec: spec,
-            currentIndex: widget.currentIndex,
-            showHotspots: _showHotspots,
-            onShowHotspotsChanged: (value) {
-              setState(() => _showHotspots = value);
-            },
-            onSelectScreen: widget.onSelectScreen,
-            onPrevious: widget.onPrevious,
-            onNext: widget.onNext,
-            onTarget: widget.onTarget,
-          );
-        }
+    return MediaQuery(
+      data: effectiveMedia,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth >= 900) {
+            return _DesktopPlayer(
+              spec: spec,
+              currentIndex: widget.currentIndex,
+              showHotspots: _showHotspots,
+              onShowHotspotsChanged: (value) {
+                setState(() => _showHotspots = value);
+              },
+              onSelectScreen: widget.onSelectScreen,
+              onPrevious: widget.onPrevious,
+              onNext: widget.onNext,
+              onTarget: widget.onTarget,
+            );
+          }
 
-        if (widget.currentIndex == 0) {
-          return WelcomeScreen(
-            language: _language,
-            onLanguageSelected: (language) {
-              setState(() => _language = language);
-            },
-            onGetStarted: widget.onNext,
-            onSignIn: _showSignIn,
-          );
-        }
+          if (widget.currentIndex == 0) {
+            return WelcomeScreen(
+              language: _language,
+              onLanguageSelected: (language) {
+                setState(() => _language = language);
+              },
+              onGetStarted: widget.onNext,
+              onSignIn: _showSignIn,
+            );
+          }
 
-        if (widget.currentIndex == 1) {
-          return WhyBreatheFreeScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            onBack: widget.onPrevious,
-            onContinue: widget.onNext,
-          );
-        }
+          if (widget.currentIndex == 1) {
+            return WhyBreatheFreeScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              onBack: widget.onPrevious,
+              onContinue: widget.onNext,
+            );
+          }
 
-        if (widget.currentIndex == 2) {
-          return ConsentPrivacyScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            helpfulReminders: _helpfulReminders,
-            shareWithCareTeam: _shareWithCareTeam,
-            helpImproveBreatheFree: _helpImproveBreatheFree,
-            onHelpfulRemindersChanged: (value) {
-              setState(() => _helpfulReminders = value);
-            },
-            onShareWithCareTeamChanged: (value) {
-              setState(() => _shareWithCareTeam = value);
-            },
-            onHelpImproveBreatheFreeChanged: (value) {
-              setState(() => _helpImproveBreatheFree = value);
-            },
-            onBack: widget.onPrevious,
-            onContinue: widget.onNext,
-          );
-        }
+          if (widget.currentIndex == 2) {
+            return ConsentPrivacyScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              helpfulReminders: _helpfulReminders,
+              shareWithCareTeam: _shareWithCareTeam,
+              helpImproveBreatheFree: _helpImproveBreatheFree,
+              onHelpfulRemindersChanged: (value) {
+                setState(() => _helpfulReminders = value);
+              },
+              onShareWithCareTeamChanged: (value) {
+                setState(() => _shareWithCareTeam = value);
+              },
+              onHelpImproveBreatheFreeChanged: (value) {
+                setState(() => _helpImproveBreatheFree = value);
+              },
+              onBack: widget.onPrevious,
+              onContinue: widget.onNext,
+            );
+          }
 
-        if (widget.currentIndex == 3) {
-          return BaselineAssessmentScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            dailyCigaretteUse: _dailyCigaretteUse,
-            onDailyCigaretteUseChanged: (value) {
-              setState(() => _dailyCigaretteUse = value);
-            },
-            onBack: widget.onPrevious,
-            onContinue: widget.onNext,
-          );
-        }
+          if (widget.currentIndex == 3) {
+            return BaselineAssessmentScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              dailyCigaretteUse: _dailyCigaretteUse,
+              onDailyCigaretteUseChanged: (value) {
+                setState(() => _dailyCigaretteUse = value);
+              },
+              onBack: widget.onPrevious,
+              onContinue: widget.onNext,
+            );
+          }
 
-        if (widget.currentIndex == 4) {
-          return TriggerMapScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            selectedTriggers: _smokingTriggers,
-            customTrigger: _customSmokingTrigger,
-            onSelectedTriggersChanged: (value) {
-              setState(() => _smokingTriggers = value);
-            },
-            onCustomTriggerChanged: (value) {
-              setState(() => _customSmokingTrigger = value);
-            },
-            onBack: widget.onPrevious,
-            onContinue: widget.onNext,
-          );
-        }
+          if (widget.currentIndex == 4) {
+            return TriggerMapScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              selectedTriggers: _smokingTriggers,
+              customTrigger: _customSmokingTrigger,
+              onSelectedTriggersChanged: (value) {
+                setState(() => _smokingTriggers = value);
+              },
+              onCustomTriggerChanged: (value) {
+                setState(() => _customSmokingTrigger = value);
+              },
+              onBack: widget.onPrevious,
+              onContinue: widget.onNext,
+            );
+          }
 
-        if (widget.currentIndex == 5) {
-          return ReadinessResultScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            dailyCigaretteUse: _dailyCigaretteUse,
-            selectedTriggers: _smokingTriggers,
-            customTrigger: _customSmokingTrigger,
-            selectedPath: _readinessPath,
-            onPathChanged: (value) {
-              setState(() => _readinessPath = value);
-            },
-            onBack: widget.onPrevious,
-            onContinue: widget.onNext,
-          );
-        }
+          if (widget.currentIndex == 5) {
+            return ReadinessResultScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              dailyCigaretteUse: _dailyCigaretteUse,
+              selectedTriggers: _smokingTriggers,
+              customTrigger: _customSmokingTrigger,
+              selectedPath: _readinessPath,
+              onPathChanged: (value) {
+                setState(() => _readinessPath = value);
+              },
+              onBack: widget.onPrevious,
+              onContinue: widget.onNext,
+            );
+          }
 
-        if (widget.currentIndex == 6) {
-          return ChooseQuitPathScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            selectedPath: _quitPlanPath,
-            onPathChanged: (value) {
-              setState(() {
-                _quitPlanPath = value;
-                _quitDate = null;
-              });
-            },
-            onBack:
-                _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
-            onContinue:
-                _editingPlanFromReview ? _finishPlanEdit : widget.onNext,
-          );
-        }
+          if (widget.currentIndex == 6) {
+            return ChooseQuitPathScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              selectedPath: _quitPlanPath,
+              onPathChanged: (value) {
+                setState(() {
+                  _quitPlanPath = value;
+                  _quitDate = null;
+                });
+              },
+              onBack:
+                  _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
+              onContinue:
+                  _editingPlanFromReview ? _finishPlanEdit : widget.onNext,
+            );
+          }
 
-        if (widget.currentIndex == 7) {
-          return SelectQuitDateScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            quitPath: _quitPlanPath,
-            selectedDate: _quitDate,
-            quitDayCheckIn: _quitDayCheckIn,
-            onDateChanged: (value) {
-              setState(() => _quitDate = value);
-            },
-            onQuitDayCheckInChanged: (value) {
-              setState(() => _quitDayCheckIn = value);
-            },
-            onBack:
-                _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
-            onContinue: (value) {
-              setState(() => _quitDate = value);
-              if (_editingPlanFromReview) {
-                _finishPlanEdit();
-              } else {
-                widget.onNext();
-              }
-            },
-          );
-        }
-
-        if (widget.currentIndex == 8) {
-          return MyReasonsScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            selectedReasons: _quitReasons,
-            customReason: _customQuitReason,
-            topReason: _topQuitReason,
-            onSelectionChanged: (reasons, topReason) {
-              setState(() {
-                _quitReasons = reasons;
-                _topQuitReason = topReason;
-              });
-            },
-            onCustomReasonChanged: (value) {
-              setState(() => _customQuitReason = value);
-            },
-            onBack:
-                _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
-            onContinue:
-                _editingPlanFromReview ? _finishPlanEdit : widget.onNext,
-          );
-        }
-
-        if (widget.currentIndex == 9) {
-          return SupportPreparationScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            supportPeople: _supportPeople,
-            completedTasks: _completedPreparationTasks,
-            treatmentSupport: _treatmentSupport,
-            careTeamReminder: _careTeamReminder,
-            onSupportPeopleChanged: (value) {
-              setState(() => _supportPeople = value);
-            },
-            onCompletedTasksChanged: (value) {
-              setState(() => _completedPreparationTasks = value);
-            },
-            onTreatmentSupportChanged: (value) {
-              setState(() => _treatmentSupport = value);
-            },
-            onCareTeamReminderChanged: (value) {
-              setState(() => _careTeamReminder = value);
-            },
-            onBack:
-                _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
-            onContinue:
-                _editingPlanFromReview ? _finishPlanEdit : widget.onNext,
-          );
-        }
-
-        if (widget.currentIndex == 10) {
-          return ReviewQuitPlanScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            quitPath: _quitPlanPath,
-            quitDate: _quitDate,
-            selectedReasons: _quitReasons,
-            customReason: _customQuitReason,
-            topReason: _topQuitReason,
-            supportPeople: _supportPeople,
-            completedTasks: _completedPreparationTasks,
-            treatmentSupport: _treatmentSupport,
-            careTeamReminder: _careTeamReminder,
-            onBack: widget.onPrevious,
-            onEditQuitDate: () => _openPlanEditor(7),
-            onEditApproach: () => _openPlanEditor(6),
-            onEditReasons: () => _openPlanEditor(8),
-            onEditSupport: () => _openPlanEditor(9),
-            onEditPreparation: () => _openPlanEditor(9),
-            onEditTreatment: () => _openPlanEditor(9),
-            onStartPlan: () => unawaited(_startPlan()),
-            onSaveForLater: _savePlanForLater,
-            onCreateAccount: _showSignIn,
-            planWillPersist: _quitPlanController.persistenceAvailable,
-            planSavedOnDeviceOnly: _quitPlanController.savedOnDeviceOnly,
-          );
-        }
-
-        if (widget.currentIndex == 11) {
-          return HomePreparationScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            quitPath: _quitPlanPath,
-            quitDate: _quitDate,
-            selectedReasons: _quitReasons,
-            customReason: _customQuitReason,
-            topReason: _topQuitReason,
-            supportPeople: _supportPeople,
-            completedTasks: _completedPreparationTasks,
-            treatmentSupport: _treatmentSupport,
-            careTeamReminder: _careTeamReminder,
-            hasUnreadNotifications: _hasUnreadPreparationNotifications,
-            onNotificationsViewed: () {
-              setState(() => _hasUnreadPreparationNotifications = false);
-            },
-            onTaskCompleted: (task) {
-              setState(() => _completedPreparationTasks.add(task));
-            },
-            onOpenRescue: _openRescue,
-            onOpenPlan: () => widget.onSelectScreen(10),
-            onOpenProgress: () => widget.onSelectScreen(25),
-            onOpenLearn: () => widget.onSelectScreen(24),
-            onOpenSupport: () => widget.onSelectScreen(26),
-            onOpenProfile: () => widget.onSelectScreen(27),
-            onOpenReasons: () => widget.onSelectScreen(8),
-            onOpenPreparation: () => widget.onSelectScreen(9),
-            onOpenDailyCheckIn: () => widget.onSelectScreen(12),
-          );
-        }
-
-        if (widget.currentIndex == 12) {
-          return DailyCheckInScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            mood: _dailyMood,
-            stressLevel: _dailyStressLevel,
-            smokingStatus: _dailySmokingStatus,
-            cigaretteCount: _dailyCigaretteCount,
-            strongestCraving: _dailyStrongestCraving,
-            confidence: _dailyConfidence,
-            symptoms: _dailySymptoms,
-            otherSymptom: _dailyOtherSymptom,
-            onMoodChanged: (value) {
-              setState(() {
-                _dailyMood = value;
-                _nextStepStrategyOverride = null;
-              });
-            },
-            onStressChanged: (value) {
-              setState(() {
-                _dailyStressLevel = value;
-                _nextStepStrategyOverride = null;
-              });
-            },
-            onSmokingStatusChanged: (value) {
-              setState(() {
-                _dailySmokingStatus = value;
-                _nextStepStrategyOverride = null;
-              });
-            },
-            onCigaretteCountChanged: (value) {
-              setState(() => _dailyCigaretteCount = value);
-            },
-            onStrongestCravingChanged: (value) {
-              setState(() {
-                _dailyStrongestCraving = value;
-                _nextStepStrategyOverride = null;
-              });
-            },
-            onConfidenceChanged: (value) {
-              setState(() {
-                _dailyConfidence = value;
-                _nextStepStrategyOverride = null;
-              });
-            },
-            onSymptomsChanged: (value) {
-              setState(() {
-                _dailySymptoms = value;
-                _nextStepStrategyOverride = null;
-              });
-            },
-            onOtherSymptomChanged: (value) {
-              setState(() => _dailyOtherSymptom = value);
-            },
-            onClose: widget.onPrevious,
-            onOpenRescue: _openRescue,
-            onSave: widget.onNext,
-          );
-        }
-
-        if (widget.currentIndex == 13) {
-          return PersonalizedNextStepScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            mood: _dailyMood,
-            stressLevel: _dailyStressLevel,
-            smokingStatus: _dailySmokingStatus,
-            cigaretteCount: _dailyCigaretteCount,
-            strongestCraving: _dailyStrongestCraving,
-            confidence: _dailyConfidence,
-            symptoms: _dailySymptoms,
-            otherSymptom: _dailyOtherSymptom,
-            supportPeople: _supportPeople,
-            strategyOverride: _nextStepStrategyOverride,
-            copingPlanStrategies: _copingPlanStrategies,
-            onBack: widget.onPrevious,
-            onStrategyChanged: (value) {
-              setState(() => _nextStepStrategyOverride = value);
-            },
-            onCopingPlanChanged: (strategy, added) {
-              setState(() {
-                if (added) {
-                  _copingPlanStrategies.add(strategy);
+          if (widget.currentIndex == 7) {
+            return SelectQuitDateScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              quitPath: _quitPlanPath,
+              selectedDate: _quitDate,
+              quitDayCheckIn: _quitDayCheckIn,
+              onDateChanged: (value) {
+                setState(() => _quitDate = value);
+              },
+              onQuitDayCheckInChanged: (value) {
+                setState(() => _quitDayCheckIn = value);
+              },
+              onBack:
+                  _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
+              onContinue: (value) {
+                setState(() => _quitDate = value);
+                if (_editingPlanFromReview) {
+                  _finishPlanEdit();
                 } else {
-                  _copingPlanStrategies.remove(strategy);
+                  widget.onNext();
                 }
-              });
-            },
-            onPractice: (strategy) {
-              switch (strategy) {
-                case NextStepStrategy.stressReset:
-                  widget.onSelectScreen(14);
-                  return;
-                case NextStepStrategy.cravingRescue:
-                  _openRescue();
-                  return;
-                case NextStepStrategy.supportCheckIn:
-                  widget.onSelectScreen(26);
-                  return;
-              }
-            },
-            onOpenRescue: _openRescue,
-            onOpenSupport: () => widget.onSelectScreen(26),
-          );
-        }
+              },
+            );
+          }
 
-        if (widget.currentIndex == 14) {
-          return GuidedStressResetScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            step: _stressResetStep,
-            stepElapsedSeconds: _stressResetStepElapsedSeconds,
-            totalElapsedSeconds: _stressResetTotalElapsedSeconds,
-            isPaused: _stressResetPaused,
-            voiceGuidanceEnabled: _stressResetVoiceGuidance,
-            reducedMotionEnabled: _stressResetReducedMotion,
-            onProgressChanged: (step, stepElapsed, totalElapsed) {
-              setState(() {
-                _stressResetStep = step;
-                _stressResetStepElapsedSeconds = stepElapsed;
-                _stressResetTotalElapsedSeconds = totalElapsed;
-              });
-            },
-            onPausedChanged: (value) {
-              setState(() => _stressResetPaused = value);
-            },
-            onVoiceGuidanceChanged: (value) {
-              setState(() => _stressResetVoiceGuidance = value);
-            },
-            onReducedMotionChanged: (value) {
-              setState(() => _stressResetReducedMotion = value);
-            },
-            onClose: widget.onPrevious,
-            onComplete: () {
-              setState(() {
-                _stressResetPaused = true;
-                _stressResetBeforeCraving = _dailyStrongestCraving;
-                _stressResetRecheckCraving = _dailyStrongestCraving;
-                _stressResetHelpfulChoice = null;
-                _stressResetResultSaved = false;
-              });
-              widget.onSelectScreen(15);
-            },
-            onOpenRescue: () {
-              setState(() => _stressResetPaused = true);
-              _openRescue();
-            },
-          );
-        }
+          if (widget.currentIndex == 8) {
+            return MyReasonsScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              selectedReasons: _quitReasons,
+              customReason: _customQuitReason,
+              topReason: _topQuitReason,
+              onSelectionChanged: (reasons, topReason) {
+                setState(() {
+                  _quitReasons = reasons;
+                  _topQuitReason = topReason;
+                });
+              },
+              onCustomReasonChanged: (value) {
+                setState(() => _customQuitReason = value);
+              },
+              onBack:
+                  _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
+              onContinue:
+                  _editingPlanFromReview ? _finishPlanEdit : widget.onNext,
+            );
+          }
 
-        if (widget.currentIndex == 15) {
-          return ExerciseCompleteRecheckScreen(
-            isSpanish: _language == WelcomeLanguage.spanish,
-            elapsedSeconds: _stressResetTotalElapsedSeconds,
-            beforeCraving: _stressResetBeforeCraving,
-            currentCraving: _stressResetRecheckCraving,
-            helpfulChoice: _stressResetHelpfulChoice,
-            resultSaved: _stressResetResultSaved,
-            onCravingChanged: (value) {
-              setState(() {
-                _stressResetRecheckCraving = value;
-                _stressResetResultSaved = false;
-              });
-            },
-            onHelpfulChoiceChanged: (value) {
-              setState(() {
-                _stressResetHelpfulChoice = value;
-                _stressResetResultSaved = false;
-              });
-            },
-            onSave: () {
-              setState(() {
-                _stressResetResultSaved = true;
-                _dailyStrongestCraving = _stressResetRecheckCraving;
-              });
-              widget.onSelectScreen(11);
-            },
-            onRepeat: () {
-              setState(() {
-                _stressResetStep = StressResetStep.breathe;
-                _stressResetStepElapsedSeconds = 0;
-                _stressResetTotalElapsedSeconds = 0;
-                _stressResetPaused = false;
-                _stressResetResultSaved = false;
-              });
-              widget.onSelectScreen(14);
-            },
-            onOpenRescue: () => _openRescue(_stressResetRecheckCraving),
-            onClose: () => widget.onSelectScreen(13),
-          );
-        }
+          if (widget.currentIndex == 9) {
+            return SupportPreparationScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              supportPeople: _supportPeople,
+              completedTasks: _completedPreparationTasks,
+              treatmentSupport: _treatmentSupport,
+              careTeamReminder: _careTeamReminder,
+              onSupportPeopleChanged: (value) {
+                setState(() => _supportPeople = value);
+              },
+              onCompletedTasksChanged: (value) {
+                setState(() => _completedPreparationTasks = value);
+              },
+              onTreatmentSupportChanged: (value) {
+                setState(() => _treatmentSupport = value);
+              },
+              onCareTeamReminderChanged: (value) {
+                setState(() => _careTeamReminder = value);
+              },
+              onBack:
+                  _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
+              onContinue:
+                  _editingPlanFromReview ? _finishPlanEdit : widget.onNext,
+            );
+          }
 
-        if (widget.currentIndex == 16) {
-          final isSpanish = _language == WelcomeLanguage.spanish;
-          return CravingRescueStartScreen(
-            isSpanish: isSpanish,
-            intensity: _rescueIntensity,
-            selectedContexts: _rescueContexts,
-            topReason: _rescueTopReasonLabel(isSpanish),
-            supportName: _rescueSupportName(isSpanish),
-            onIntensityChanged: (value) {
-              setState(() => _rescueIntensity = value);
-            },
-            onContextsChanged: (value) {
-              setState(() => _rescueContexts = value);
-            },
-            onClose: widget.onPrevious,
-            onContinue: () => widget.onSelectScreen(17),
-            onViewSupport: () => widget.onSelectScreen(26),
-          );
-        }
+          if (widget.currentIndex == 10) {
+            return ReviewQuitPlanScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              quitPath: _quitPlanPath,
+              quitDate: _quitDate,
+              selectedReasons: _quitReasons,
+              customReason: _customQuitReason,
+              topReason: _topQuitReason,
+              supportPeople: _supportPeople,
+              completedTasks: _completedPreparationTasks,
+              treatmentSupport: _treatmentSupport,
+              careTeamReminder: _careTeamReminder,
+              onBack: widget.onPrevious,
+              onEditQuitDate: () => _openPlanEditor(7),
+              onEditApproach: () => _openPlanEditor(6),
+              onEditReasons: () => _openPlanEditor(8),
+              onEditSupport: () => _openPlanEditor(9),
+              onEditPreparation: () => _openPlanEditor(9),
+              onEditTreatment: () => _openPlanEditor(9),
+              onStartPlan: () => unawaited(_startPlan()),
+              onSaveForLater: _savePlanForLater,
+              onCreateAccount: _showSignIn,
+              planWillPersist: _quitPlanController.persistenceAvailable,
+              planSavedOnDeviceOnly: _quitPlanController.savedOnDeviceOnly,
+            );
+          }
 
-        if (widget.currentIndex == 17) {
-          final isSpanish = _language == WelcomeLanguage.spanish;
-          return RecommendedRescueToolScreen(
-            isSpanish: isSpanish,
-            intensity: _rescueIntensity,
-            stressSelected: _rescueContexts.contains(RescueContext.stress),
-            supportName: _rescueSupportName(isSpanish),
-            selectedTool: _rescueTool,
-            onToolChanged: (value) {
-              setState(() => _rescueTool = value);
-            },
-            onBack: () {
-              final returnScreen = _rescueReturnScreen;
-              if (returnScreen != null) {
-                setState(() => _rescueReturnScreen = null);
-                widget.onSelectScreen(returnScreen);
-              } else {
-                widget.onPrevious();
-              }
-            },
-            onStart: () {
-              setState(() {
-                _rescueBeforeIntensity = _rescueIntensity;
-                _rescueRecheckIntensity = null;
-                _rescueHelpfulChoice = null;
-                _activeRescueElapsedSeconds = 0;
-                _activeRescuePaused = false;
-              });
-              widget.onSelectScreen(18);
-            },
-            onViewSupport: () => widget.onSelectScreen(26),
-          );
-        }
+          if (widget.currentIndex == 11) {
+            return HomePreparationScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              quitPath: _quitPlanPath,
+              quitDate: _quitDate,
+              selectedReasons: _quitReasons,
+              customReason: _customQuitReason,
+              topReason: _topQuitReason,
+              supportPeople: _supportPeople,
+              completedTasks: _completedPreparationTasks,
+              treatmentSupport: _treatmentSupport,
+              careTeamReminder: _careTeamReminder,
+              hasUnreadNotifications: _hasUnreadPreparationNotifications,
+              onNotificationsViewed: () {
+                setState(() => _hasUnreadPreparationNotifications = false);
+              },
+              onTaskCompleted: (task) {
+                setState(() => _completedPreparationTasks.add(task));
+              },
+              onOpenRescue: _openRescue,
+              onOpenPlan: () => widget.onSelectScreen(10),
+              onOpenProgress: () => widget.onSelectScreen(25),
+              onOpenLearn: () => widget.onSelectScreen(24),
+              onOpenSupport: () => widget.onSelectScreen(26),
+              onOpenProfile: () => widget.onSelectScreen(27),
+              onOpenReasons: () => widget.onSelectScreen(8),
+              onOpenPreparation: () => widget.onSelectScreen(9),
+              onOpenDailyCheckIn: () => widget.onSelectScreen(12),
+            );
+          }
 
-        if (widget.currentIndex == 18) {
-          final isSpanish = _language == WelcomeLanguage.spanish;
-          return ActiveCravingRescueScreen(
-            isSpanish: isSpanish,
-            tool: _rescueTool,
-            elapsedSeconds: _activeRescueElapsedSeconds,
-            isPaused: _activeRescuePaused,
-            voiceEnabled: _activeRescueVoiceEnabled,
-            hapticsEnabled: _activeRescueHapticsEnabled,
-            onElapsedChanged: (value) {
-              setState(() => _activeRescueElapsedSeconds = value);
-            },
-            onPausedChanged: (value) {
-              setState(() => _activeRescuePaused = value);
-            },
-            onVoiceChanged: (value) {
-              setState(() => _activeRescueVoiceEnabled = value);
-            },
-            onHapticsChanged: (value) {
-              setState(() => _activeRescueHapticsEnabled = value);
-            },
-            onClose: () => widget.onSelectScreen(17),
-            onComplete: () {
-              setState(() {
-                _activeRescuePaused = true;
-              });
-              widget.onSelectScreen(19);
-            },
-            onSwitchTool: () => widget.onSelectScreen(17),
-            onOpenSupport: () => widget.onSelectScreen(26),
-          );
-        }
+          if (widget.currentIndex == 12) {
+            return DailyCheckInScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              mood: _dailyMood,
+              stressLevel: _dailyStressLevel,
+              smokingStatus: _dailySmokingStatus,
+              cigaretteCount: _dailyCigaretteCount,
+              strongestCraving: _dailyStrongestCraving,
+              confidence: _dailyConfidence,
+              symptoms: _dailySymptoms,
+              otherSymptom: _dailyOtherSymptom,
+              onMoodChanged: (value) {
+                setState(() {
+                  _dailyMood = value;
+                  _nextStepStrategyOverride = null;
+                });
+              },
+              onStressChanged: (value) {
+                setState(() {
+                  _dailyStressLevel = value;
+                  _nextStepStrategyOverride = null;
+                });
+              },
+              onSmokingStatusChanged: (value) {
+                setState(() {
+                  _dailySmokingStatus = value;
+                  _nextStepStrategyOverride = null;
+                });
+              },
+              onCigaretteCountChanged: (value) {
+                setState(() => _dailyCigaretteCount = value);
+              },
+              onStrongestCravingChanged: (value) {
+                setState(() {
+                  _dailyStrongestCraving = value;
+                  _nextStepStrategyOverride = null;
+                });
+              },
+              onConfidenceChanged: (value) {
+                setState(() {
+                  _dailyConfidence = value;
+                  _nextStepStrategyOverride = null;
+                });
+              },
+              onSymptomsChanged: (value) {
+                setState(() {
+                  _dailySymptoms = value;
+                  _nextStepStrategyOverride = null;
+                });
+              },
+              onOtherSymptomChanged: (value) {
+                setState(() => _dailyOtherSymptom = value);
+              },
+              onClose: widget.onPrevious,
+              onOpenRescue: _openRescue,
+              onSave: widget.onNext,
+            );
+          }
 
-        if (widget.currentIndex == 19) {
-          final isSpanish = _language == WelcomeLanguage.spanish;
-          return CravingRecheckScreen(
-            isSpanish: isSpanish,
-            beforeIntensity: _rescueBeforeIntensity,
-            tool: _rescueTool,
-            selectedIntensity: _rescueRecheckIntensity,
-            helpfulChoice: _rescueHelpfulChoice,
-            onIntensityChanged: (value) {
-              setState(() => _rescueRecheckIntensity = value);
-            },
-            onHelpfulChoiceChanged: (value) {
-              setState(() => _rescueHelpfulChoice = value);
-            },
-            onBack: () => widget.onSelectScreen(18),
-            onSaveAndSeeResult: () => widget.onSelectScreen(20),
-            onRepeatRescue: () {
-              setState(() {
-                _activeRescueElapsedSeconds = 0;
-                _activeRescuePaused = false;
-                _rescueRecheckIntensity = null;
-                _rescueHelpfulChoice = null;
-              });
-              widget.onSelectScreen(18);
-            },
-          );
-        }
+          if (widget.currentIndex == 13) {
+            return PersonalizedNextStepScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              mood: _dailyMood,
+              stressLevel: _dailyStressLevel,
+              smokingStatus: _dailySmokingStatus,
+              cigaretteCount: _dailyCigaretteCount,
+              strongestCraving: _dailyStrongestCraving,
+              confidence: _dailyConfidence,
+              symptoms: _dailySymptoms,
+              otherSymptom: _dailyOtherSymptom,
+              supportPeople: _supportPeople,
+              strategyOverride: _nextStepStrategyOverride,
+              copingPlanStrategies: _copingPlanStrategies,
+              onBack: widget.onPrevious,
+              onStrategyChanged: (value) {
+                setState(() => _nextStepStrategyOverride = value);
+              },
+              onCopingPlanChanged: (strategy, added) {
+                setState(() {
+                  if (added) {
+                    _copingPlanStrategies.add(strategy);
+                  } else {
+                    _copingPlanStrategies.remove(strategy);
+                  }
+                });
+              },
+              onPractice: (strategy) {
+                switch (strategy) {
+                  case NextStepStrategy.stressReset:
+                    widget.onSelectScreen(14);
+                    return;
+                  case NextStepStrategy.cravingRescue:
+                    _openRescue();
+                    return;
+                  case NextStepStrategy.supportCheckIn:
+                    widget.onSelectScreen(26);
+                    return;
+                }
+              },
+              onOpenRescue: _openRescue,
+              onOpenSupport: () => widget.onSelectScreen(26),
+            );
+          }
 
-        if (widget.currentIndex == 20) {
-          final isSpanish = _language == WelcomeLanguage.spanish;
-          final afterCraving =
-              _rescueRecheckIntensity ?? _rescueBeforeIntensity;
-          final toolName = switch (_rescueTool) {
-            RescueTool.slowBreathing =>
-              isSpanish ? 'Respiración lenta' : 'slow breathing',
-            RescueTool.move => isSpanish ? 'Movimiento' : 'movement',
-            RescueTool.changeScene =>
-              isSpanish ? 'Cambiar de entorno' : 'changing your surroundings',
-          };
-          final helpfulness = switch (_rescueHelpfulChoice) {
-            RescueHelpfulChoice.yes => isSpanish ? 'Sí' : 'Yes',
-            RescueHelpfulChoice.aLittle => isSpanish ? 'Un poco' : 'A little',
-            RescueHelpfulChoice.notThisTime =>
-              isSpanish ? 'Esta vez no' : 'Not this time',
-            null => isSpanish ? 'No seleccionado' : 'Not selected',
-          };
-
-          return RescueResultNextStepScreen(
-            beforeCraving: _rescueBeforeIntensity,
-            afterCraving: afterCraving,
-            toolName: toolName,
-            helpfulness: helpfulness,
-            isSpanish: isSpanish,
-            triggerLabel: _rescueContexts.contains(RescueContext.stress)
-                ? 'Stress'
-                : (isSpanish ? 'Craving' : 'Craving'),
-            reasonText: _reasonLabel(isSpanish),
-            practiceLabel:
-                _rescueTool == RescueTool.move ? '3 minutes' : '2 minutes',
-            onContinue: () => widget.onSelectScreen(21),
-            onRepeatRescue: () {
-              setState(() {
-                _activeRescueElapsedSeconds = 0;
-                _activeRescuePaused = false;
-                _rescueRecheckIntensity = null;
-                _rescueHelpfulChoice = null;
-              });
-              widget.onSelectScreen(18);
-            },
-            onHumanSupport: () => widget.onSelectScreen(26),
-            onBackToToday: () => widget.onSelectScreen(21),
-          );
-        }
-
-        if (widget.currentIndex == 21) {
-          final isSpanish = _language == WelcomeLanguage.spanish;
-
-          return QuitDayHomeScreen(
-            isSpanish: isSpanish,
-            quitDate: _quitDate,
-            topReason: _topQuitReason,
-            customReason: _customQuitReason,
-            supportPeople: _supportPeople,
-            treatmentSupport: _treatmentSupport,
-            onOpenRescue: _openRescue,
-            onOpenSlipRecovery: () {
-              setState(() => _slipRecoverySaved = false);
-              widget.onSelectScreen(22);
-            },
-            onOpenDailyCheckIn: () => widget.onSelectScreen(12),
-            onOpenPlan: () => widget.onSelectScreen(10),
-            onOpenTreatmentPlan: () => widget.onSelectScreen(23),
-            onOpenProgress: () => widget.onSelectScreen(25),
-            onOpenLearn: () => widget.onSelectScreen(24),
-            onOpenSupport: () => widget.onSelectScreen(26),
-            onNotifications: () {},
-            onOpenProfile: () => widget.onSelectScreen(27),
-          );
-        }
-        if (widget.currentIndex == 22) {
-          final isSpanish = _language == WelcomeLanguage.spanish;
-
-          return SlipRecoveryScreen(
-            isSpanish: isSpanish,
-            initiallySaved: _slipRecoverySaved,
-            onClose: () => widget.onSelectScreen(21),
-            onSave: () {
-              setState(() => _slipRecoverySaved = true);
-              _openRescue();
-            },
-            onOpenNextStep: () {
-              if (_slipRecoverySaved) {
+          if (widget.currentIndex == 14) {
+            return GuidedStressResetScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              step: _stressResetStep,
+              stepElapsedSeconds: _stressResetStepElapsedSeconds,
+              totalElapsedSeconds: _stressResetTotalElapsedSeconds,
+              isPaused: _stressResetPaused,
+              voiceGuidanceEnabled: _stressResetVoiceGuidance,
+              reducedMotionEnabled: _stressResetReducedMotion,
+              onProgressChanged: (step, stepElapsed, totalElapsed) {
+                setState(() {
+                  _stressResetStep = step;
+                  _stressResetStepElapsedSeconds = stepElapsed;
+                  _stressResetTotalElapsedSeconds = totalElapsed;
+                });
+              },
+              onPausedChanged: (value) {
+                setState(() => _stressResetPaused = value);
+              },
+              onVoiceGuidanceChanged: (value) {
+                setState(() => _stressResetVoiceGuidance = value);
+              },
+              onReducedMotionChanged: (value) {
+                setState(() => _stressResetReducedMotion = value);
+              },
+              onClose: widget.onPrevious,
+              onComplete: () {
+                setState(() {
+                  _stressResetPaused = true;
+                  _stressResetBeforeCraving = _dailyStrongestCraving;
+                  _stressResetRecheckCraving = _dailyStrongestCraving;
+                  _stressResetHelpfulChoice = null;
+                  _stressResetResultSaved = false;
+                });
+                widget.onSelectScreen(15);
+              },
+              onOpenRescue: () {
+                setState(() => _stressResetPaused = true);
                 _openRescue();
-              }
-            },
-            onOpenSupport: () => widget.onSelectScreen(26),
+              },
+            );
+          }
+
+          if (widget.currentIndex == 15) {
+            return ExerciseCompleteRecheckScreen(
+              isSpanish: _language == WelcomeLanguage.spanish,
+              elapsedSeconds: _stressResetTotalElapsedSeconds,
+              beforeCraving: _stressResetBeforeCraving,
+              currentCraving: _stressResetRecheckCraving,
+              helpfulChoice: _stressResetHelpfulChoice,
+              resultSaved: _stressResetResultSaved,
+              onCravingChanged: (value) {
+                setState(() {
+                  _stressResetRecheckCraving = value;
+                  _stressResetResultSaved = false;
+                });
+              },
+              onHelpfulChoiceChanged: (value) {
+                setState(() {
+                  _stressResetHelpfulChoice = value;
+                  _stressResetResultSaved = false;
+                });
+              },
+              onSave: () {
+                setState(() {
+                  _stressResetResultSaved = true;
+                  _dailyStrongestCraving = _stressResetRecheckCraving;
+                });
+                widget.onSelectScreen(11);
+              },
+              onRepeat: () {
+                setState(() {
+                  _stressResetStep = StressResetStep.breathe;
+                  _stressResetStepElapsedSeconds = 0;
+                  _stressResetTotalElapsedSeconds = 0;
+                  _stressResetPaused = false;
+                  _stressResetResultSaved = false;
+                });
+                widget.onSelectScreen(14);
+              },
+              onOpenRescue: () => _openRescue(_stressResetRecheckCraving),
+              onClose: () => widget.onSelectScreen(13),
+            );
+          }
+
+          if (widget.currentIndex == 16) {
+            final isSpanish = _language == WelcomeLanguage.spanish;
+            return CravingRescueStartScreen(
+              isSpanish: isSpanish,
+              intensity: _rescueIntensity,
+              selectedContexts: _rescueContexts,
+              topReason: _rescueTopReasonLabel(isSpanish),
+              supportName: _rescueSupportName(isSpanish),
+              onIntensityChanged: (value) {
+                setState(() => _rescueIntensity = value);
+              },
+              onContextsChanged: (value) {
+                setState(() => _rescueContexts = value);
+              },
+              onClose: widget.onPrevious,
+              onContinue: () => widget.onSelectScreen(17),
+              onViewSupport: () => widget.onSelectScreen(26),
+            );
+          }
+
+          if (widget.currentIndex == 17) {
+            final isSpanish = _language == WelcomeLanguage.spanish;
+            return RecommendedRescueToolScreen(
+              isSpanish: isSpanish,
+              intensity: _rescueIntensity,
+              stressSelected: _rescueContexts.contains(RescueContext.stress),
+              supportName: _rescueSupportName(isSpanish),
+              selectedTool: _rescueTool,
+              onToolChanged: (value) {
+                setState(() => _rescueTool = value);
+              },
+              onBack: () {
+                final returnScreen = _rescueReturnScreen;
+                if (returnScreen != null) {
+                  setState(() => _rescueReturnScreen = null);
+                  widget.onSelectScreen(returnScreen);
+                } else {
+                  widget.onPrevious();
+                }
+              },
+              onStart: () {
+                setState(() {
+                  _rescueBeforeIntensity = _rescueIntensity;
+                  _rescueRecheckIntensity = null;
+                  _rescueHelpfulChoice = null;
+                  _activeRescueElapsedSeconds = 0;
+                  _activeRescuePaused = false;
+                });
+                widget.onSelectScreen(18);
+              },
+              onViewSupport: () => widget.onSelectScreen(26),
+            );
+          }
+
+          if (widget.currentIndex == 18) {
+            final isSpanish = _language == WelcomeLanguage.spanish;
+            return ActiveCravingRescueScreen(
+              isSpanish: isSpanish,
+              tool: _rescueTool,
+              elapsedSeconds: _activeRescueElapsedSeconds,
+              isPaused: _activeRescuePaused,
+              voiceEnabled: _activeRescueVoiceEnabled,
+              hapticsEnabled: _activeRescueHapticsEnabled,
+              onElapsedChanged: (value) {
+                setState(() => _activeRescueElapsedSeconds = value);
+              },
+              onPausedChanged: (value) {
+                setState(() => _activeRescuePaused = value);
+              },
+              onVoiceChanged: (value) {
+                setState(() => _activeRescueVoiceEnabled = value);
+              },
+              onHapticsChanged: (value) {
+                setState(() => _activeRescueHapticsEnabled = value);
+              },
+              onClose: () => widget.onSelectScreen(17),
+              onComplete: () {
+                setState(() {
+                  _activeRescuePaused = true;
+                });
+                widget.onSelectScreen(19);
+              },
+              onSwitchTool: () => widget.onSelectScreen(17),
+              onOpenSupport: () => widget.onSelectScreen(26),
+            );
+          }
+
+          if (widget.currentIndex == 19) {
+            final isSpanish = _language == WelcomeLanguage.spanish;
+            return CravingRecheckScreen(
+              isSpanish: isSpanish,
+              beforeIntensity: _rescueBeforeIntensity,
+              tool: _rescueTool,
+              selectedIntensity: _rescueRecheckIntensity,
+              helpfulChoice: _rescueHelpfulChoice,
+              onIntensityChanged: (value) {
+                setState(() => _rescueRecheckIntensity = value);
+              },
+              onHelpfulChoiceChanged: (value) {
+                setState(() => _rescueHelpfulChoice = value);
+              },
+              onBack: () => widget.onSelectScreen(18),
+              onSaveAndSeeResult: () => widget.onSelectScreen(20),
+              onRepeatRescue: () {
+                setState(() {
+                  _activeRescueElapsedSeconds = 0;
+                  _activeRescuePaused = false;
+                  _rescueRecheckIntensity = null;
+                  _rescueHelpfulChoice = null;
+                });
+                widget.onSelectScreen(18);
+              },
+            );
+          }
+
+          if (widget.currentIndex == 20) {
+            final isSpanish = _language == WelcomeLanguage.spanish;
+            final afterCraving =
+                _rescueRecheckIntensity ?? _rescueBeforeIntensity;
+            final toolName = switch (_rescueTool) {
+              RescueTool.slowBreathing =>
+                isSpanish ? 'Respiración lenta' : 'slow breathing',
+              RescueTool.move => isSpanish ? 'Movimiento' : 'movement',
+              RescueTool.changeScene =>
+                isSpanish ? 'Cambiar de entorno' : 'changing your surroundings',
+            };
+            final helpfulness = switch (_rescueHelpfulChoice) {
+              RescueHelpfulChoice.yes => isSpanish ? 'Sí' : 'Yes',
+              RescueHelpfulChoice.aLittle => isSpanish ? 'Un poco' : 'A little',
+              RescueHelpfulChoice.notThisTime =>
+                isSpanish ? 'Esta vez no' : 'Not this time',
+              null => isSpanish ? 'No seleccionado' : 'Not selected',
+            };
+
+            return RescueResultNextStepScreen(
+              beforeCraving: _rescueBeforeIntensity,
+              afterCraving: afterCraving,
+              toolName: toolName,
+              helpfulness: helpfulness,
+              isSpanish: isSpanish,
+              triggerLabel: _rescueContexts.contains(RescueContext.stress)
+                  ? 'Stress'
+                  : (isSpanish ? 'Craving' : 'Craving'),
+              reasonText: _reasonLabel(isSpanish),
+              practiceLabel:
+                  _rescueTool == RescueTool.move ? '3 minutes' : '2 minutes',
+              onContinue: () => widget.onSelectScreen(21),
+              onRepeatRescue: () {
+                setState(() {
+                  _activeRescueElapsedSeconds = 0;
+                  _activeRescuePaused = false;
+                  _rescueRecheckIntensity = null;
+                  _rescueHelpfulChoice = null;
+                });
+                widget.onSelectScreen(18);
+              },
+              onHumanSupport: () => widget.onSelectScreen(26),
+              onBackToToday: () => widget.onSelectScreen(21),
+            );
+          }
+
+          if (widget.currentIndex == 21) {
+            final isSpanish = _language == WelcomeLanguage.spanish;
+
+            return QuitDayHomeScreen(
+              isSpanish: isSpanish,
+              quitDate: _quitDate,
+              topReason: _topQuitReason,
+              customReason: _customQuitReason,
+              supportPeople: _supportPeople,
+              treatmentSupport: _treatmentSupport,
+              onOpenRescue: _openRescue,
+              onOpenSlipRecovery: () {
+                setState(() => _slipRecoverySaved = false);
+                widget.onSelectScreen(22);
+              },
+              onOpenDailyCheckIn: () => widget.onSelectScreen(12),
+              onOpenPlan: () => widget.onSelectScreen(10),
+              onOpenTreatmentPlan: () => widget.onSelectScreen(23),
+              onOpenProgress: () => widget.onSelectScreen(25),
+              onOpenLearn: () => widget.onSelectScreen(24),
+              onOpenSupport: () => widget.onSelectScreen(26),
+              onNotifications: () {},
+              onOpenProfile: () => widget.onSelectScreen(27),
+            );
+          }
+          if (widget.currentIndex == 22) {
+            final isSpanish = _language == WelcomeLanguage.spanish;
+
+            return SlipRecoveryScreen(
+              isSpanish: isSpanish,
+              initiallySaved: _slipRecoverySaved,
+              onClose: () => widget.onSelectScreen(21),
+              onSave: () {
+                setState(() => _slipRecoverySaved = true);
+                _openRescue();
+              },
+              onOpenNextStep: () {
+                if (_slipRecoverySaved) {
+                  _openRescue();
+                }
+              },
+              onOpenSupport: () => widget.onSelectScreen(26),
+            );
+          }
+
+          if (widget.currentIndex == 23) {
+            final isSpanish = _language == WelcomeLanguage.spanish;
+
+            return MedicationCenterScreen(
+              isSpanish: isSpanish,
+              reminderPreviews: _medicationReminderPreviews,
+              todayStatus: _medicationTodayStatus,
+              onReminderPreviewsChanged: (value) {
+                setState(() => _medicationReminderPreviews = value);
+              },
+              onTodayStatusChanged: (value) {
+                setState(() => _medicationTodayStatus = value);
+              },
+              onBack: widget.onPrevious,
+              onOpenLearn: () => widget.onSelectScreen(24),
+              onOpenSupport: () => widget.onSelectScreen(26),
+              onOpenHome: () => widget.onSelectScreen(21),
+              onOpenProgress: () => widget.onSelectScreen(25),
+            );
+          }
+
+          if (widget.currentIndex == 24) {
+            final isSpanish = _language == WelcomeLanguage.spanish;
+
+            return LearnLibraryScreen(
+              isSpanish: isSpanish,
+              onOpenHome: () => widget.onSelectScreen(21),
+              onOpenPlan: () => widget.onSelectScreen(10),
+              onOpenProgress: () => widget.onSelectScreen(25),
+              onOpenSettings: () => widget.onSelectScreen(27),
+              onOpenSupport: () => widget.onSelectScreen(26),
+            );
+          }
+
+          if (widget.currentIndex == 25) {
+            final isSpanish = _language == WelcomeLanguage.spanish;
+
+            return ProgressDashboardScreen(
+              isSpanish: isSpanish,
+              onBack: widget.onPrevious,
+              onOpenSettings: () => widget.onSelectScreen(27),
+              onOpenHome: () => widget.onSelectScreen(21),
+              onOpenPlan: () => widget.onSelectScreen(10),
+              onOpenLearn: () => widget.onSelectScreen(24),
+              onOpenSupport: () => widget.onSelectScreen(26),
+            );
+          }
+
+          if (widget.currentIndex == 26) {
+            final isSpanish = _language == WelcomeLanguage.spanish;
+
+            return SupportHubScreen(
+              isSpanish: isSpanish,
+              onBack: widget.onPrevious,
+              onOpenSettings: () => widget.onSelectScreen(27),
+              onCallQuitline: () => unawaited(_callQuitline()),
+              onOpenHome: () => widget.onSelectScreen(21),
+              onOpenPlan: () => widget.onSelectScreen(10),
+              onOpenProgress: () => widget.onSelectScreen(25),
+              onOpenLearn: () => widget.onSelectScreen(24),
+            );
+          }
+
+          if (widget.currentIndex == 27) {
+            final isSpanish = _language == WelcomeLanguage.spanish;
+
+            return SettingsPrivacyScreen(
+              isSpanish: isSpanish,
+              remindersEnabled: _helpfulReminders,
+              sensitiveDetailsEnabled: _sensitiveDetailsEnabled,
+              diagnosticsEnabled: _helpImproveBreatheFree,
+              reduceMotionEnabled: _reduceMotionEnabled,
+              onRemindersChanged: (value) =>
+                  setState(() => _helpfulReminders = value),
+              onSensitiveDetailsChanged: (value) =>
+                  setState(() => _sensitiveDetailsEnabled = value),
+              onDiagnosticsChanged: (value) =>
+                  setState(() => _helpImproveBreatheFree = value),
+              onReduceMotionChanged: (value) =>
+                  setState(() => _reduceMotionEnabled = value),
+              onBack: widget.onPrevious,
+              signedIn: _accountController.isSignedIn,
+              accountEmail: _accountController.email,
+              displayName: _accountController.profile?.displayName,
+              hasDevicePlan: _quitPlanController.hasStoredGuestPlan,
+              devicePlanNeedsRecovery:
+                  _quitPlanController.hasGuestPlanRecoveryIssue,
+              canBackupDevicePlan: _quitPlanController.guestPlanNeedsUpload,
+              onBackupDevicePlan: () => unawaited(_backupDevicePlan()),
+              onDeleteDevicePlan: () => unawaited(_deleteDevicePlan()),
+              onDownloadData: () => unawaited(_exportAccountData()),
+              onDeleteAccount: () => unawaited(_deleteAccountData()),
+              onSignOut: _accountController.isSignedIn
+                  ? () => unawaited(_signOut())
+                  : _showSignIn,
+            );
+          }
+
+          return Scaffold(
+            backgroundColor: AppColors.cream,
+            body: ApprovedScreenViewport(
+              spec: spec,
+              onPrevious: widget.onPrevious,
+              onNext: widget.onNext,
+              onTarget: widget.onTarget,
+            ),
           );
-        }
-
-        if (widget.currentIndex == 23) {
-          final isSpanish = _language == WelcomeLanguage.spanish;
-
-          return MedicationCenterScreen(
-            isSpanish: isSpanish,
-            reminderPreviews: _medicationReminderPreviews,
-            todayStatus: _medicationTodayStatus,
-            onReminderPreviewsChanged: (value) {
-              setState(() => _medicationReminderPreviews = value);
-            },
-            onTodayStatusChanged: (value) {
-              setState(() => _medicationTodayStatus = value);
-            },
-            onBack: widget.onPrevious,
-            onOpenLearn: () => widget.onSelectScreen(24),
-            onOpenSupport: () => widget.onSelectScreen(26),
-            onOpenHome: () => widget.onSelectScreen(21),
-            onOpenProgress: () => widget.onSelectScreen(25),
-          );
-        }
-
-        if (widget.currentIndex == 24) {
-          final isSpanish = _language == WelcomeLanguage.spanish;
-
-          return LearnLibraryScreen(
-            isSpanish: isSpanish,
-            onOpenHome: () => widget.onSelectScreen(21),
-            onOpenPlan: () => widget.onSelectScreen(10),
-            onOpenProgress: () => widget.onSelectScreen(25),
-            onOpenSettings: () => widget.onSelectScreen(27),
-            onOpenSupport: () => widget.onSelectScreen(26),
-          );
-        }
-
-        if (widget.currentIndex == 25) {
-          final isSpanish = _language == WelcomeLanguage.spanish;
-
-          return ProgressDashboardScreen(
-            isSpanish: isSpanish,
-            onBack: widget.onPrevious,
-            onOpenSettings: () => widget.onSelectScreen(27),
-            onOpenHome: () => widget.onSelectScreen(21),
-            onOpenPlan: () => widget.onSelectScreen(10),
-            onOpenLearn: () => widget.onSelectScreen(24),
-            onOpenSupport: () => widget.onSelectScreen(26),
-          );
-        }
-
-        if (widget.currentIndex == 26) {
-          final isSpanish = _language == WelcomeLanguage.spanish;
-
-          return SupportHubScreen(
-            isSpanish: isSpanish,
-            onBack: widget.onPrevious,
-            onOpenSettings: () => widget.onSelectScreen(27),
-            onOpenHome: () => widget.onSelectScreen(21),
-            onOpenPlan: () => widget.onSelectScreen(10),
-            onOpenProgress: () => widget.onSelectScreen(25),
-            onOpenLearn: () => widget.onSelectScreen(24),
-          );
-        }
-
-        if (widget.currentIndex == 27) {
-          final isSpanish = _language == WelcomeLanguage.spanish;
-
-          return SettingsPrivacyScreen(
-            isSpanish: isSpanish,
-            remindersEnabled: _helpfulReminders,
-            sensitiveDetailsEnabled: _sensitiveDetailsEnabled,
-            diagnosticsEnabled: _helpImproveBreatheFree,
-            reduceMotionEnabled: _reduceMotionEnabled,
-            onRemindersChanged: (value) =>
-                setState(() => _helpfulReminders = value),
-            onSensitiveDetailsChanged: (value) =>
-                setState(() => _sensitiveDetailsEnabled = value),
-            onDiagnosticsChanged: (value) =>
-                setState(() => _helpImproveBreatheFree = value),
-            onReduceMotionChanged: (value) =>
-                setState(() => _reduceMotionEnabled = value),
-            onBack: widget.onPrevious,
-            signedIn: _accountController.isSignedIn,
-            accountEmail: _accountController.email,
-            displayName: _accountController.profile?.displayName,
-            hasDevicePlan: _quitPlanController.hasStoredGuestPlan,
-            devicePlanNeedsRecovery:
-                _quitPlanController.hasGuestPlanRecoveryIssue,
-            canBackupDevicePlan: _quitPlanController.guestPlanNeedsUpload,
-            onBackupDevicePlan: () => unawaited(_backupDevicePlan()),
-            onDeleteDevicePlan: () => unawaited(_deleteDevicePlan()),
-            onSignOut: _accountController.isSignedIn
-                ? () => unawaited(_signOut())
-                : _showSignIn,
-          );
-        }
-
-        return Scaffold(
-          backgroundColor: AppColors.cream,
-          body: ApprovedScreenViewport(
-            spec: spec,
-            onPrevious: widget.onPrevious,
-            onNext: widget.onNext,
-            onTarget: widget.onTarget,
-          ),
-        );
-      },
+        },
+      ),
     );
   }
 }

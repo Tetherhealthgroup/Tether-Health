@@ -512,6 +512,7 @@ class _MetricCard extends StatelessWidget {
         ),
       );
 }
+
 class _ProgressRangeSelector extends StatefulWidget {
   const _ProgressRangeSelector({
     required this.initialRange,

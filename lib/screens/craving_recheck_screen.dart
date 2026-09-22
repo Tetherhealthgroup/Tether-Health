@@ -132,7 +132,9 @@ class _CravingRecheckScreenState extends State<CravingRecheckScreen> {
                           compact: compact,
                           onChanged: widget.onIntensityChanged,
                           intensityLabel: now == null
-                              ? (_isSpanish ? 'Elige un número' : 'Choose a number')
+                              ? (_isSpanish
+                                  ? 'Elige un número'
+                                  : 'Choose a number')
                               : widget._intensityLabel(now),
                         ),
                         SizedBox(height: compact ? 14 : 18),
@@ -169,9 +171,8 @@ class _CravingRecheckScreenState extends State<CravingRecheckScreen> {
                           height: 58,
                           child: FilledButton(
                             key: const ValueKey('craving-recheck-save'),
-                            onPressed: hasSelection
-                                ? widget.onSaveAndSeeResult
-                                : null,
+                            onPressed:
+                                hasSelection ? widget.onSaveAndSeeResult : null,
                             style: FilledButton.styleFrom(
                               backgroundColor: AppColors.deepTeal,
                               disabledBackgroundColor:
@@ -180,27 +181,27 @@ class _CravingRecheckScreenState extends State<CravingRecheckScreen> {
                               disabledForegroundColor: AppColors.mutedTeal,
                             ),
                             child: Row(
-                               mainAxisAlignment: MainAxisAlignment.center,
-                               mainAxisSize: MainAxisSize.min,
-                               children: [
-                                 Flexible(
-                                   child: Text(
-                                     _isSpanish
-                                         ? 'Guardar y ver resultado'
-                                         : 'Save and see result',
-                                     textAlign: TextAlign.center,
-                                     overflow: TextOverflow.ellipsis,
-                                     maxLines: 1,
-                                     style: const TextStyle(
-                                       fontSize: 17,
-                                       fontWeight: FontWeight.w800,
-                                     ),
-                                   ),
-                                 ),
-                                 const SizedBox(width: 10),
-                                 const Icon(Icons.arrow_forward_rounded),
-                               ],
-                             ),
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    _isSpanish
+                                        ? 'Guardar y ver resultado'
+                                        : 'Save and see result',
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                const Icon(Icons.arrow_forward_rounded),
+                              ],
+                            ),
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -561,7 +562,9 @@ class _RatingCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  isSpanish ? '¿Qué tan fuerte es el antojo ahora?' : 'How strong is the craving now?',
+                  isSpanish
+                      ? '¿Qué tan fuerte es el antojo ahora?'
+                      : 'How strong is the craving now?',
                   style: const TextStyle(
                     color: AppColors.deepTeal,
                     fontSize: 21,
@@ -849,7 +852,9 @@ class _BeforeAfterCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            isSpanish ? 'No es una medición médica' : 'Not a medical measurement',
+            isSpanish
+                ? 'No es una medición médica'
+                : 'Not a medical measurement',
             style: const TextStyle(
               color: Color(0xFFBFD5CD),
               fontSize: 11,
@@ -984,9 +989,8 @@ class _HelpfulCard extends StatelessWidget {
                   width: isSelected ? 2 : 1,
                 ),
                 labelStyle: TextStyle(
-                  color: isSelected
-                      ? AppColors.deepTeal
-                      : AppColors.tealSecondary,
+                  color:
+                      isSelected ? AppColors.deepTeal : AppColors.tealSecondary,
                   fontWeight: FontWeight.w800,
                 ),
               );

@@ -39,7 +39,9 @@ class RescueResultNextStepScreen extends StatelessWidget {
 
   String get _toolLabel {
     if (!isSpanish) {
-      return toolName.toLowerCase() == 'slow breathing' ? 'Breathing' : toolName;
+      return toolName.toLowerCase() == 'slow breathing'
+          ? 'Breathing'
+          : toolName;
     }
     switch (toolName.toLowerCase()) {
       case 'slow breathing':
@@ -127,8 +129,9 @@ class RescueResultNextStepScreen extends StatelessWidget {
     return 'La respiración lenta se ofrecerá primero para antojos de estrés similares.';
   }
 
-  String get _nextStepTitle =>
-      isSpanish ? 'Protege los próximos 10 minutos.' : 'Protect the next 10 minutes.';
+  String get _nextStepTitle => isSpanish
+      ? 'Protege los próximos 10 minutos.'
+      : 'Protect the next 10 minutes.';
 
   String get _nextStepBody => isSpanish
       ? 'Quédate en un lugar sin humo y toma unos sorbos de agua.'
@@ -149,8 +152,7 @@ class RescueResultNextStepScreen extends StatelessWidget {
   String get _supportSubtitle =>
       isSpanish ? 'Persona de apoyo o línea de ayuda' : 'Supporter or quitline';
 
-  String get _reasonLabel =>
-      isSpanish ? 'MI RAZÓN' : 'YOUR REASON';
+  String get _reasonLabel => isSpanish ? 'MI RAZÓN' : 'YOUR REASON';
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +300,9 @@ class RescueResultNextStepScreen extends StatelessWidget {
                         _PrivacyBar(isSpanish: isSpanish),
                         const SizedBox(height: 24),
                         Text(
-                          isSpanish ? 'Ver detalles del progreso' : 'View progress details',
+                          isSpanish
+                              ? 'Ver detalles del progreso'
+                              : 'View progress details',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: AppColors.deepTeal,
@@ -493,7 +497,8 @@ class _ResultHero extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 9, vertical: 6),
                       decoration: BoxDecoration(
                         color: const Color(0xFF234E48),
                         borderRadius: BorderRadius.circular(18),
@@ -615,7 +620,8 @@ class _ResultHero extends StatelessWidget {
                 const SizedBox(width: 8),
                 Container(
                   constraints: const BoxConstraints(minWidth: 112),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   decoration: BoxDecoration(
                     color: AppColors.lime,
                     borderRadius: BorderRadius.circular(18),
@@ -643,7 +649,9 @@ class _ResultHero extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        isSpanish ? 'Tu calificación, no un diagnóstico' : 'Your rating, not a diagnosis',
+                        isSpanish
+                            ? 'Tu calificación, no un diagnóstico'
+                            : 'Your rating, not a diagnosis',
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           color: AppColors.tealSecondary,
@@ -762,7 +770,9 @@ class _PlanCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  isSpanish ? 'Lo que esto agrega a tu plan' : 'What this adds to your plan',
+                  isSpanish
+                      ? 'Lo que esto agrega a tu plan'
+                      : 'What this adds to your plan',
                   style: const TextStyle(
                     color: AppColors.deepTeal,
                     fontSize: 19,
@@ -788,7 +798,9 @@ class _PlanCard extends StatelessWidget {
                   iconColor: AppColors.coral,
                   label: isSpanish ? 'DISPARADOR' : 'TRIGGER',
                   value: trigger,
-                  footer: isSpanish ? 'Seleccionado antes del rescate' : 'Selected before rescue',
+                  footer: isSpanish
+                      ? 'Seleccionado antes del rescate'
+                      : 'Selected before rescue',
                 ),
                 _MiniPlanCard(
                   icon: Icons.check_rounded,
@@ -802,7 +814,9 @@ class _PlanCard extends StatelessWidget {
                   iconColor: AppColors.lime,
                   label: isSpanish ? 'PRÁCTICA' : 'PRACTICE',
                   value: practice,
-                  footer: isSpanish ? 'Completado sin conexión' : 'Completed offline',
+                  footer: isSpanish
+                      ? 'Completado sin conexión'
+                      : 'Completed offline',
                 ),
               ];
 

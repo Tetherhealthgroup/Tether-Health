@@ -1,11 +1,12 @@
-import { ValidationPipe } from "@nestjs/common";
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from "@nestjs/platform-fastify";
 import { Test } from "@nestjs/testing";
 import { AppModule } from "../src/app.module";
+import { AccountService } from "../src/account/account.service";
 import { TokenVerifier } from "../src/auth/token-verifier";
+import { configureApp } from "../src/configure-app";
 import { ProfileService } from "../src/profile/profile.service";
 import { QuitPlanService } from "../src/quit-plan/quit-plan.service";
 
@@ -17,7 +18,10 @@ describe("API (e2e)", () => {
       .overrideProvider(TokenVerifier)
       .useValue({
         verify: () =>
-          Promise.resolve({ sub: "00000000-0000-0000-0000-000000000001" }),
+          Promise.resolve({
+            sub: "00000000-0000-0000-0000-000000000001",
+            authTime: Math.floor(Date.now() / 1000),
+          }),
       })
       .overrideProvider(ProfileService)
       .useValue({
@@ -39,17 +43,29 @@ describe("API (e2e)", () => {
         create: (_user: unknown, plan: Record<string, unknown>) =>
           Promise.resolve({ ...quitPlanFixture(), ...plan }),
       })
+      .overrideProvider(AccountService)
+      .useValue({
+        export: () =>
+          Promise.resolve({
+            schemaVersion: "1.0",
+            generatedAt: "2026-09-20T00:00:00.000Z",
+            profile: profileFixture(),
+            quitPlan: quitPlanFixture(),
+          }),
+        deleteData: () =>
+          Promise.resolve({
+            requestId: "00000000-0000-4000-8000-000000000001",
+            completedAt: "2026-09-20T00:00:00.000Z",
+            deleted: { profiles: 1, quitPlans: 1, avatarObjects: 0 },
+            authIdentityDeleted: false,
+            authIdentityStatus: "external-action-required",
+          }),
+      })
       .compile();
     app = module.createNestApplication<NestFastifyApplication>(
-      new FastifyAdapter(),
+      new FastifyAdapter({ bodyLimit: 65536 }),
     );
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
-    );
+    await configureApp(app);
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
   });
@@ -64,6 +80,9 @@ describe("API (e2e)", () => {
       service: "breathefree-api",
       version: "1.0.0",
     });
+    expect(response.headers["x-content-type-options"]).toBe("nosniff");
+    expect(response.headers["referrer-policy"]).toBe("no-referrer");
+    expect(response.headers["x-ratelimit-limit"]).toBeDefined();
   });
 
   it.each([
@@ -72,9 +91,11 @@ describe("API (e2e)", () => {
     ["GET", "/v1/quit-plan", undefined],
     ["PUT", "/v1/quit-plan", {}],
     ["POST", "/v1/quit-plan/guest-import", {}],
+    ["GET", "/v1/account/export", undefined],
+    ["DELETE", "/v1/account/data", { confirmation: "DELETE" }],
   ])("%s %s requires a token", async (method, url, payload) => {
     const response = await app.inject({
-      method: method as "GET" | "PATCH" | "POST" | "PUT",
+      method: method as "DELETE" | "GET" | "PATCH" | "POST" | "PUT",
       url,
       payload,
     });
@@ -168,6 +189,56 @@ describe("API (e2e)", () => {
       },
     });
     expect(response.statusCode).toBe(400);
+  });
+
+  it("GET /v1/account/export returns only the bounded account export", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: "/v1/account/export",
+      headers: { authorization: "Bearer test-token" },
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      schemaVersion: "1.0",
+      profile: { id: profileFixture().id },
+      quitPlan: { userId: profileFixture().id },
+    });
+  });
+
+  it("DELETE /v1/account/data requires exact explicit confirmation", async () => {
+    const rejected = await app.inject({
+      method: "DELETE",
+      url: "/v1/account/data",
+      headers: { authorization: "Bearer test-token" },
+      payload: { confirmation: "delete" },
+    });
+    expect(rejected.statusCode).toBe(400);
+
+    const accepted = await app.inject({
+      method: "DELETE",
+      url: "/v1/account/data",
+      headers: { authorization: "Bearer test-token" },
+      payload: { confirmation: "DELETE" },
+    });
+    expect(accepted.statusCode).toBe(200);
+    expect(accepted.json()).toMatchObject({
+      deleted: { profiles: 1, quitPlans: 1 },
+      authIdentityDeleted: false,
+      authIdentityStatus: "external-action-required",
+    });
+  });
+
+  it("rejects request bodies larger than the privacy boundary", async () => {
+    const response = await app.inject({
+      method: "PATCH",
+      url: "/v1/profile",
+      headers: { authorization: "Bearer test-token" },
+      payload: { displayName: "x".repeat(70000) },
+    });
+    expect(response.statusCode).toBe(413);
+    expect(response.json()).toEqual(
+      expect.objectContaining({ statusCode: 413, error: "Request rejected" }),
+    );
   });
 });
 

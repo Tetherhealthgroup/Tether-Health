@@ -490,8 +490,8 @@ class SettingsPrivacyScreen extends StatelessWidget {
                             icon: Icons.download_rounded,
                             title: t('Download a copy', 'Descargar una copia'),
                             subtitle: t(
-                              'Your entries, plan and progress · PDF + JSON',
-                              'Tus registros, plan y progreso · PDF + JSON',
+                              'Your profile and saved plan · JSON',
+                              'Tu perfil y plan guardado · JSON',
                             ),
                             action: t('Request', 'Solicitar'),
                             onTap: () => _handleDownloadData(context),
@@ -750,31 +750,36 @@ class _SettingsLink extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => ListTile(
-        contentPadding: EdgeInsets.zero,
-        onTap: onTap,
-        leading: CircleAvatar(
-          backgroundColor: AppColors.mint,
-          child: Icon(icon, color: AppColors.deepTeal, size: 20),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            color: AppColors.deepTeal,
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: '$title. $subtitle. $action',
+        excludeSemantics: true,
+        child: ListTile(
+          contentPadding: EdgeInsets.zero,
+          onTap: onTap,
+          leading: CircleAvatar(
+            backgroundColor: AppColors.mint,
+            child: Icon(icon, color: AppColors.deepTeal, size: 20),
           ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: const TextStyle(color: AppColors.mutedTeal, fontSize: 10),
-        ),
-        trailing: Text(
-          action,
-          style: const TextStyle(
-            color: AppColors.tealSecondary,
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
+          title: Text(
+            title,
+            style: const TextStyle(
+              color: AppColors.deepTeal,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          subtitle: Text(
+            subtitle,
+            style: const TextStyle(color: AppColors.mutedTeal, fontSize: 10),
+          ),
+          trailing: Text(
+            action,
+            style: const TextStyle(
+              color: AppColors.tealSecondary,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       );

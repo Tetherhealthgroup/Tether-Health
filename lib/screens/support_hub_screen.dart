@@ -236,7 +236,8 @@ class SupportHubScreen extends StatelessWidget {
                                   key: const ValueKey(
                                     'support-request-callback',
                                   ),
-                                  onPressed: () => _handleRequestCallback(context),
+                                  onPressed: () =>
+                                      _handleRequestCallback(context),
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: Colors.white,
                                     side: const BorderSide(
