@@ -7,6 +7,7 @@ checks are:
 ```bash
 bash supabase/tests/verify_profiles_migration.sh
 bash supabase/tests/verify_quit_plans_migration.sh
+bash supabase/tests/verify_account_deletion_migration.sh
 ```
 
 Local keys printed by the CLI belong in process/build configuration, never
@@ -19,5 +20,6 @@ For native email confirmation, add
 `io.breathefree.patient://login-callback` to **Authentication → URL
 Configuration → Redirect URLs** in every Supabase project. Flutter supplies that
 exact callback when creating an account or resending confirmation, and the iOS
-and Android runners register the matching deep link. Do not leave a production
+and Android runners register the matching deep link. Password recovery uses the
+same callback and must also be allowlisted. Do not leave a production
 project relying on the local `http://localhost:3000` Site URL.

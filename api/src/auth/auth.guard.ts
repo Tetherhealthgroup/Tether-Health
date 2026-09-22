@@ -35,7 +35,11 @@ export class AuthGuard implements CanActivate {
     const token = header.slice(7);
     try {
       const claims = await this.verifier.verify(token);
-      request.user = { id: claims.sub, accessToken: token };
+      request.user = {
+        id: claims.sub,
+        accessToken: token,
+        authenticatedAt: claims.authTime,
+      };
       return true;
     } catch {
       throw new UnauthorizedException();

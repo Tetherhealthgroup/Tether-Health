@@ -19,6 +19,7 @@ class _SignInDialogState extends State<SignInDialog> {
   bool _creatingAccount = false;
   String? _confirmationEmail;
   bool _confirmationResent = false;
+  bool _recoveryRequested = false;
 
   @override
   void initState() {
@@ -86,6 +87,16 @@ class _SignInDialogState extends State<SignInDialog> {
     final sent = await widget.account.resendSignUpConfirmation(email: email);
     if (!mounted) return;
     setState(() => _confirmationResent = sent);
+  }
+
+  Future<void> _requestPasswordReset() async {
+    final email = _email.text.trim();
+    if (!email.contains('@') || !email.contains('.')) {
+      _formKey.currentState?.validate();
+      return;
+    }
+    final requested = await widget.account.requestPasswordReset(email: email);
+    if (mounted) setState(() => _recoveryRequested = requested);
   }
 
   void _showSignIn() {
@@ -188,6 +199,23 @@ class _SignInDialogState extends State<SignInDialog> {
                 if (!_creatingAccount) _submit();
               },
             ),
+            if (!_creatingAccount)
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  key: const ValueKey('forgot-password'),
+                  onPressed: widget.account.busy ? null : _requestPasswordReset,
+                  child: const Text('Forgot password?'),
+                ),
+              ),
+            if (_recoveryRequested)
+              Semantics(
+                liveRegion: true,
+                child: const Text(
+                  'If an account exists for that address, a recovery link was requested.',
+                  key: ValueKey('password-recovery-requested'),
+                ),
+              ),
             if (_creatingAccount)
               TextFormField(
                 key: const ValueKey('sign-up-confirm-password'),

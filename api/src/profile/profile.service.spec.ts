@@ -40,6 +40,7 @@ describe("ProfileService", () => {
     const user: AuthUser = {
       id: row.id,
       accessToken: "caller-access-token",
+      authenticatedAt: 1700000000,
     };
 
     await expect(service.get(user)).resolves.toMatchObject({

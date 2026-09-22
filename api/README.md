@@ -1,12 +1,24 @@
 # BreatheFree API
 
-NestJS v1 API for Supabase-authenticated profile and synthetic quit-plan access.
+NestJS v1 API for Supabase-authenticated profile, synthetic quit-plan, bounded
+account export, and app-owned data deletion access.
 Copy `.env.example` to an ignored `.env` and provide deployment-managed values.
 Never use the Supabase service-role key here; the API forwards each caller's
 token so RLS applies.
 
 Commands: `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:e2e`,
 and `npm run build`.
+
+Export and deletion require a timestamped Supabase JWT authentication-method
+reference (`amr`) no older than
+`RECENT_AUTH_MAX_AGE_SECONDS` (10 minutes by default). The Flutter client obtains
+a fresh token by re-entering the account password. Deletion returns a request ID
+and counts but never logs profile or quit-plan payloads. Supabase Auth identity
+deletion is intentionally outside this publishable-key service.
+
+Default protections are a 64 KiB body limit, 120 requests/minute/IP, Helmet
+headers, optional explicit CORS allowlisting, DTO whitelisting, and redacted
+error responses. Tune limits with deployment-managed environment values.
 
 ## Development deployment
 

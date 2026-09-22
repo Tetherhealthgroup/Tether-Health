@@ -250,7 +250,8 @@ class _SlipRecoveryScreenState extends State<SlipRecoveryScreen> {
                                   foregroundColor: Colors.white,
                                   disabledBackgroundColor: AppColors.deepTeal,
                                   disabledForegroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 18),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10.3),
                                   ),
@@ -259,24 +260,26 @@ class _SlipRecoveryScreenState extends State<SlipRecoveryScreen> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Flexible(
-  child: FittedBox(
-    fit: BoxFit.scaleDown,
-    child: Text(
-      _saved
-          ? (widget.isSpanish ? 'Guardado' : 'Saved')
-          : (widget.isSpanish
-              ? 'Guardar y comenzar la recuperación'
-              : 'Save and start recovery'),
-      textAlign: TextAlign.center,
-      style: const TextStyle(
-        fontFamily: 'Arial',
-        fontSize: 19,
-        fontWeight: FontWeight.w700,
-        height: 1,
-      ),
-    ),
-  ),
-),
+                                      child: FittedBox(
+                                        fit: BoxFit.scaleDown,
+                                        child: Text(
+                                          _saved
+                                              ? (widget.isSpanish
+                                                  ? 'Guardado'
+                                                  : 'Saved')
+                                              : (widget.isSpanish
+                                                  ? 'Guardar y comenzar la recuperación'
+                                                  : 'Save and start recovery'),
+                                          textAlign: TextAlign.center,
+                                          style: const TextStyle(
+                                            fontFamily: 'Arial',
+                                            fontSize: 19,
+                                            fontWeight: FontWeight.w700,
+                                            height: 1,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                     if (!_saved) ...[
                                       const SizedBox(width: 10),
                                       const Icon(
@@ -304,8 +307,7 @@ class _SlipRecoveryScreenState extends State<SlipRecoveryScreen> {
                                   vertical: 5,
                                 ),
                                 minimumSize: Size.zero,
-                                tapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
                               child: Text(
                                 widget.isSpanish
@@ -361,9 +363,7 @@ class _TopBar extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    isSpanish
-                        ? 'Recuperación tras un desliz'
-                        : 'Slip recovery',
+                    isSpanish ? 'Recuperación tras un desliz' : 'Slip recovery',
                     maxLines: 1,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
@@ -614,8 +614,7 @@ class _WhatHappenedCard extends StatelessWidget {
             builder: (context, constraints) {
               final gap = 14.67 * sx;
               final width = (constraints.maxWidth - gap) / 2;
-              const values =
-                  _SlipRecoveryScreenState._whatHappenedChoices;
+              const values = _SlipRecoveryScreenState._whatHappenedChoices;
 
               return Column(
                 children: [
@@ -775,12 +774,9 @@ class _EventChoice extends StatelessWidget {
                 height: selected ? 11 : 10,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color:
-                      selected ? AppColors.deepTeal : Colors.transparent,
+                  color: selected ? AppColors.deepTeal : Colors.transparent,
                   border: Border.all(
-                    color: selected
-                        ? AppColors.deepTeal
-                        : AppColors.mutedTeal,
+                    color: selected ? AppColors.deepTeal : AppColors.mutedTeal,
                     width: 1,
                   ),
                 ),
@@ -800,9 +796,8 @@ class _EventChoice extends StatelessWidget {
                   overflow: TextOverflow.visible,
                   style: TextStyle(
                     fontFamily: 'Arial',
-                    color: selected
-                        ? AppColors.deepTeal
-                        : AppColors.tealSecondary,
+                    color:
+                        selected ? AppColors.deepTeal : AppColors.tealSecondary,
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                     height: 1,
@@ -892,9 +887,7 @@ class _TriggersCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SectionHeading(
-            title: isSpanish
-                ? '¿Qué estaba pasando?'
-                : 'What was happening?',
+            title: isSpanish ? '¿Qué estaba pasando?' : 'What was happening?',
             trailing: isSpanish ? 'Opcional' : 'Optional',
           ),
           const SizedBox(height: 5),
@@ -1157,12 +1150,9 @@ class _RecoveryChoice extends StatelessWidget {
                 height: recommended ? 15.33 : 14,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color:
-                      selected ? AppColors.deepTeal : Colors.transparent,
+                  color: selected ? AppColors.deepTeal : Colors.transparent,
                   border: Border.all(
-                    color: selected
-                        ? AppColors.deepTeal
-                        : AppColors.mutedTeal,
+                    color: selected ? AppColors.deepTeal : AppColors.mutedTeal,
                     width: 1,
                   ),
                 ),
@@ -1372,12 +1362,13 @@ class _NextStepCard extends StatelessWidget {
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
-                    isSpanish ? 'Abrir después de guardar' : 'Open after saving',
+                    isSpanish
+                        ? 'Abrir después de guardar'
+                        : 'Open after saving',
                     maxLines: 1,
                     style: TextStyle(
                       fontFamily: 'Arial',
-                      color:
-                          enabled ? AppColors.deepTeal : AppColors.mutedTeal,
+                      color: enabled ? AppColors.deepTeal : AppColors.mutedTeal,
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       height: 1,

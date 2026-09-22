@@ -17,8 +17,10 @@ cannot choose another user's identity: RLS predicates use `auth.uid()`.
 | `created_at` / `updated_at` | UTC timestamps; database managed |
 
 Authenticated users may select and update only their row. Insert is performed by
-the trusted signup trigger; delete is intentionally not granted because verified
-account deletion needs a separate audited workflow. Avatar objects use a private
+the trusted signup trigger; direct delete is not granted. The controlled
+`delete_my_app_data('DELETE')` security-definer function derives the caller from
+`auth.uid()`, deletes only that profile and its cascading quit plan, and returns
+row counts. Avatar objects use a private
 bucket and must live under a folder matching `auth.uid()`.
 
 ## Quit-plan snapshot
@@ -47,3 +49,16 @@ The database manages creation and update timestamps.
 This table is development-only until privacy, clinical, consent, retention,
 deletion, and compliance review is complete. Only synthetic data may be entered
 in `breathefree-dev`; real patient or support-person information is prohibited.
+
+## Account-data deletion
+
+Migration source of truth:
+`supabase/migrations/202609200001_account_data_deletion.sql`.
+
+The NestJS API first removes the caller's configured avatar using the caller JWT
+and Storage RLS, then invokes `delete_my_app_data` with exact confirmation. The
+function has a fixed empty search path, rejects unauthenticated calls, and has
+execute permission only for `authenticated`. It does not access or delete
+`auth.users`; Supabase Auth identity deletion remains a separate privileged
+external workflow. API receipts contain only request/completion identifiers and
+deleted counts, never profile or quit-plan payloads.

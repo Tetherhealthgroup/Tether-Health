@@ -14,7 +14,8 @@ Supabase (PostgreSQL + Auth + Storage)
 
 Supabase Auth is the identity provider and token issuer. Flutter supports
 email/password registration, email-confirmation-aware onboarding, confirmation
-resend, sign-in, secure session restoration, and sign-out through an auth
+resend, sign-in, password recovery/deep-link password update, secure session
+restoration, recent-password verification, and sign-out through an auth
 boundary that is replaceable in tests. Flutter uses the publishable/anonymous
 key only and sends its short-lived access token to the API.
 NestJS validates signature, issuer, audience, expiry, and subject against
@@ -29,7 +30,9 @@ Flutter and are not required by the profile API.
   explicit consent. Guest plans never use the cloud until the user signs in;
   configuration comes from `--dart-define`.
 - **NestJS:** JWT and DTO validation, business rules, versioned HTTP contracts,
-  and future audit/rate-limit integration points.
+and privacy-safe deletion receipt boundaries. Requests have a 64 KiB default
+body limit, security headers, configurable per-IP rate limits, allowlisted CORS,
+and payload-free 5xx logging.
 - **Supabase:** identity, relational constraints, private storage, grants, RLS,
   backups, and key rotation.
 
@@ -63,3 +66,23 @@ and require an explicit choice before any overwrite. Sign-out recreates the jour
 remain visible in a later guest session. Password recovery remains a later
 slice. Screens can migrate one bounded domain at a time without coupling
 widgets to Supabase or HTTP.
+
+## Technical MVP boundary
+
+The repository-contained MVP includes profiles, one bounded quit-plan snapshot,
+encrypted device guest-plan storage, authenticated JSON export, app-owned data
+deletion, password recovery, API abuse controls, privacy-safe error boundaries,
+native-screen text scaling/reduced motion, migration policy checks, and
+unsigned/no-codesign release builds.
+
+Deletion is deliberately split at the trust boundary. The caller-scoped
+`delete_my_app_data` function deletes the caller's profile and plan, while the
+API removes the caller's private avatar and returns row/object counts, a request
+ID, completion time, and `authIdentityDeleted: false`. No health payload is
+written to application logs. Deleting `auth.users` requires a privileged
+Supabase Auth administrator and is not implemented with the publishable key.
+
+External release dependencies remain: production infrastructure and redirect
+allowlisting, Auth-admin identity deletion/retention policy, final identifiers
+and signing, clinical/legal/privacy approval, professional localization,
+vendor penetration testing, store review, and physical-device validation.

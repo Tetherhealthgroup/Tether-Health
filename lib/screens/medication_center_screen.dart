@@ -144,8 +144,10 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
       };
 
   String _medicineLabel(_RecordedMedicine medicine) => switch (medicine) {
-        _RecordedMedicine.nicotinePatch => t('Nicotine patch', 'Parche de nicotina'),
-        _RecordedMedicine.nicotineGum => t('Nicotine gum', 'Chicle de nicotina'),
+        _RecordedMedicine.nicotinePatch =>
+          t('Nicotine patch', 'Parche de nicotina'),
+        _RecordedMedicine.nicotineGum =>
+          t('Nicotine gum', 'Chicle de nicotina'),
         _RecordedMedicine.nicotineLozenge =>
           t('Nicotine lozenge', 'Pastilla de nicotina'),
         _RecordedMedicine.other =>
@@ -213,7 +215,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
                 title: t('Taken', 'Tomado'),
                 icon: Icons.check_rounded,
                 selected: widget.todayStatus == MedicationTodayStatus.taken,
-                onTap: () => Navigator.pop(context, MedicationTodayStatus.taken),
+                onTap: () =>
+                    Navigator.pop(context, MedicationTodayStatus.taken),
               ),
               const SizedBox(height: 8),
               _StatusOption(
@@ -221,7 +224,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
                 title: t('Not yet', 'Aún no'),
                 icon: Icons.schedule_rounded,
                 selected: widget.todayStatus == MedicationTodayStatus.notYet,
-                onTap: () => Navigator.pop(context, MedicationTodayStatus.notYet),
+                onTap: () =>
+                    Navigator.pop(context, MedicationTodayStatus.notYet),
               ),
               const SizedBox(height: 8),
               _StatusOption(
@@ -229,7 +233,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
                 title: t('Missed', 'Omitido'),
                 icon: Icons.remove_rounded,
                 selected: widget.todayStatus == MedicationTodayStatus.missed,
-                onTap: () => Navigator.pop(context, MedicationTodayStatus.missed),
+                onTap: () =>
+                    Navigator.pop(context, MedicationTodayStatus.missed),
               ),
             ],
           ),
@@ -280,7 +285,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    t('Recorded medication plan', 'Plan de medicamentos registrado'),
+                    t('Recorded medication plan',
+                        'Plan de medicamentos registrado'),
                     style: const TextStyle(
                       fontFamily: 'Arial',
                       color: AppColors.deepTeal,
@@ -303,7 +309,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    t('Medicine in your recorded plan', 'Medicamento en tu plan registrado'),
+                    t('Medicine in your recorded plan',
+                        'Medicamento en tu plan registrado'),
                     style: const TextStyle(
                       fontFamily: 'Arial',
                       color: AppColors.deepTeal,
@@ -317,7 +324,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
                     runSpacing: 8,
                     children: _RecordedMedicine.values.map((medicine) {
                       return ChoiceChip(
-                        key: ValueKey('medication-plan-medicine-${medicine.name}'),
+                        key: ValueKey(
+                            'medication-plan-medicine-${medicine.name}'),
                         label: Text(_medicineLabel(medicine)),
                         selected: draftMedicine == medicine,
                         onSelected: (_) {
@@ -556,7 +564,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
             ),
             _MedicationEducationPointData(
               icon: Icons.person_outline_rounded,
-              title: t('A prescriber guides treatment', 'Un profesional guía el tratamiento'),
+              title: t('A prescriber guides treatment',
+                  'Un profesional guía el tratamiento'),
               body: t(
                 'A licensed prescriber decides whether a prescription medicine is appropriate and provides the instructions for use.',
                 'Un profesional autorizado decide si un medicamento con receta es apropiado y proporciona las instrucciones de uso.',
@@ -564,7 +573,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
             ),
             _MedicationEducationPointData(
               icon: Icons.health_and_safety_outlined,
-              title: t('Keep changes with your care team', 'Mantén los cambios con tu equipo de atención'),
+              title: t('Keep changes with your care team',
+                  'Mantén los cambios con tu equipo de atención'),
               body: t(
                 'Do not start, stop or change a prescription based on this app. Contact your prescriber for side effects or medication questions.',
                 'No empieces, suspendas ni cambies una receta basándote en esta aplicación. Contacta a quien te recetó por efectos secundarios o preguntas sobre medicamentos.',
@@ -645,7 +655,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
               const SizedBox(height: 14),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF0F5F1),
                   borderRadius: BorderRadius.circular(12),
@@ -705,7 +716,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
                   ),
                   icon: const Icon(Icons.menu_book_outlined, size: 20),
                   label: Text(
-                    t('Open full Learn library', 'Abrir toda la biblioteca Aprende'),
+                    t('Open full Learn library',
+                        'Abrir toda la biblioteca Aprende'),
                     style: const TextStyle(
                       fontFamily: 'Arial',
                       fontSize: 14,
@@ -784,7 +796,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
                         'Learn about quit-smoking medicines',
                         'Aprende sobre medicamentos para dejar de fumar',
                       ),
-                      trailing: t('Clinically reviewed', 'Revisado clínicamente'),
+                      trailing:
+                          t('Clinically reviewed', 'Revisado clínicamente'),
                     ),
                     const SizedBox(height: 6),
                     IntrinsicHeight(
@@ -1238,7 +1251,9 @@ class _RecordedPlanCard extends StatelessWidget {
                           _PlanBadge(
                             icon: Icons.circle,
                             iconColor: AppColors.coral,
-                            text: isSpanish ? 'INGRESADO POR TI' : 'ENTERED BY YOU',
+                            text: isSpanish
+                                ? 'INGRESADO POR TI'
+                                : 'ENTERED BY YOU',
                           ),
                           _PlanBadge(
                             icon: Icons.add_rounded,
@@ -1369,7 +1384,9 @@ class _RecordedPlanCard extends StatelessWidget {
                           shape: const StadiumBorder(),
                         ),
                         child: Text(
-                          isSpanish ? 'Actualizar estado de hoy' : "Update today’s status",
+                          isSpanish
+                              ? 'Actualizar estado de hoy'
+                              : "Update today’s status",
                           maxLines: 2,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
@@ -1528,7 +1545,9 @@ class _ReminderPreviewCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isSpanish ? 'Vistas previas privadas' : 'Private reminder previews',
+                  isSpanish
+                      ? 'Vistas previas privadas'
+                      : 'Private reminder previews',
                   style: const TextStyle(
                     fontFamily: 'Arial',
                     color: AppColors.deepTeal,
@@ -1988,7 +2007,9 @@ class _PlanHelpCard extends StatelessWidget {
             icon: Icons.add_rounded,
             iconColor: AppColors.deepTeal,
             iconBackground: const Color(0xFFE6F1EA),
-            title: isSpanish ? '¿Omitiste o no estás seguro de algo?' : 'Missed or unsure about an item?',
+            title: isSpanish
+                ? '¿Omitiste o no estás seguro de algo?'
+                : 'Missed or unsure about an item?',
             subtitle: isSpanish
                 ? 'Revisa las instrucciones aprobadas o contacta a un profesional clínico o farmacéutico.'
                 : 'Review approved instructions or contact a clinician or pharmacist.',
@@ -2005,7 +2026,9 @@ class _PlanHelpCard extends StatelessWidget {
             icon: Icons.priority_high_rounded,
             iconColor: AppColors.coral,
             iconBackground: const Color(0xFFFFF0EB),
-            title: isSpanish ? 'Efecto secundario o síntoma preocupante' : 'Side effect or concerning symptom',
+            title: isSpanish
+                ? 'Efecto secundario o síntoma preocupante'
+                : 'Side effect or concerning symptom',
             subtitle: isSpanish
                 ? 'Abre la ruta de seguridad aprobada; la app no diagnostica.'
                 : 'Open the approved safety route; the app does not diagnose.',
@@ -2020,14 +2043,17 @@ class _PlanHelpCard extends StatelessWidget {
           InkWell(
             key: const ValueKey('medication-refill-contact'),
             onTap: onContact,
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+            borderRadius:
+                const BorderRadius.vertical(bottom: Radius.circular(16)),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
-                      isSpanish ? '¿Pregunta sobre resurtido?' : 'Refill question?',
+                      isSpanish
+                          ? '¿Pregunta sobre resurtido?'
+                          : 'Refill question?',
                       style: const TextStyle(
                         fontFamily: 'Arial',
                         color: AppColors.mutedTeal,
@@ -2230,44 +2256,44 @@ class _MedicationBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: const BoxDecoration(
-          color: AppColors.paper,
-          border: Border(top: BorderSide(color: Color(0xFFE1E9E4))),
-        ),
-        padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _BottomNavItem(
-              key: const ValueKey('medication-nav-home'),
-              icon: Icons.home_outlined,
-              label: isSpanish ? 'Inicio' : 'Home',
-              onTap: onHome,
-            ),
-            const _BottomNavItem(
-              icon: Icons.description_outlined,
-              label: 'Plan',
-              selected: true,
-              onTap: null,
-            ),
-            _BottomNavItem(
-              key: const ValueKey('medication-nav-progress'),
-              icon: Icons.bar_chart_rounded,
-              label: isSpanish ? 'Progreso' : 'Progress',
-              onTap: onProgress,
-            ),
-            _BottomNavItem(
-              key: const ValueKey('medication-nav-learn'),
-              icon: Icons.menu_book_outlined,
-              label: isSpanish ? 'Aprender' : 'Learn',
-              onTap: onLearn,
-            ),
-            _BottomNavItem(
-              key: const ValueKey('medication-nav-support'),
-              icon: Icons.person_outline_rounded,
-              label: isSpanish ? 'Apoyo' : 'Support',
-              onTap: onSupport,
-            ),
+      decoration: const BoxDecoration(
+        color: AppColors.paper,
+        border: Border(top: BorderSide(color: Color(0xFFE1E9E4))),
+      ),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _BottomNavItem(
+            key: const ValueKey('medication-nav-home'),
+            icon: Icons.home_outlined,
+            label: isSpanish ? 'Inicio' : 'Home',
+            onTap: onHome,
+          ),
+          const _BottomNavItem(
+            icon: Icons.description_outlined,
+            label: 'Plan',
+            selected: true,
+            onTap: null,
+          ),
+          _BottomNavItem(
+            key: const ValueKey('medication-nav-progress'),
+            icon: Icons.bar_chart_rounded,
+            label: isSpanish ? 'Progreso' : 'Progress',
+            onTap: onProgress,
+          ),
+          _BottomNavItem(
+            key: const ValueKey('medication-nav-learn'),
+            icon: Icons.menu_book_outlined,
+            label: isSpanish ? 'Aprender' : 'Learn',
+            onTap: onLearn,
+          ),
+          _BottomNavItem(
+            key: const ValueKey('medication-nav-support'),
+            icon: Icons.person_outline_rounded,
+            label: isSpanish ? 'Apoyo' : 'Support',
+            onTap: onSupport,
+          ),
         ],
       ),
     );

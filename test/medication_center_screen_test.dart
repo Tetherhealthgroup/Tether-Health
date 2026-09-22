@@ -21,8 +21,7 @@ void main() {
         isSpanish: isSpanish,
         reminderPreviews: reminderPreviews,
         todayStatus: todayStatus,
-        onReminderPreviewsChanged:
-            onReminderPreviewsChanged ?? (_) {},
+        onReminderPreviewsChanged: onReminderPreviewsChanged ?? (_) {},
         onTodayStatusChanged: onTodayStatusChanged ?? (_) {},
         onBack: onBack ?? () {},
         onOpenLearn: onOpenLearn ?? () {},
@@ -108,8 +107,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('today status sheet records the selected status',
-      (tester) async {
+  testWidgets('today status sheet records the selected status', (tester) async {
     MedicationTodayStatus? selectedStatus;
 
     await tester.pumpWidget(

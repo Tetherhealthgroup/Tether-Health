@@ -1,14 +1,19 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'account/account_data_api_client.dart';
 import 'auth/account_controller.dart';
 import 'auth/auth_gateway.dart';
+import 'auth/password_recovery_screen.dart';
 import 'auth/secure_session_storage.dart';
 import 'config/app_config.dart';
+import 'error/privacy_safe_error_reporter.dart';
 import 'models/screen_spec.dart';
 import 'models/tap_target.dart';
 import 'profile/profile_api_client.dart';
@@ -19,8 +24,25 @@ import 'quit_plan/quit_plan_controller.dart';
 import 'quit_plan/quit_plan_repository.dart';
 import 'screens/approved_screen_player.dart';
 import 'theme/app_theme.dart';
+import 'widgets/account_data_dialogs.dart';
+import 'widgets/sign_in_dialog.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final errors = PrivacySafeErrorReporter();
+  FlutterError.onError = errors.recordFlutterError;
+  PlatformDispatcher.instance.onError = (error, stack) {
+    errors.record(error, stack, source: 'platform');
+    return true;
+  };
+  ErrorWidget.builder = errors.buildErrorWidget;
+  await runZonedGuarded(
+    () => _bootstrap(),
+    (error, stack) => errors.record(error, stack, source: 'zone'),
+  );
+}
+
+Future<void> _bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (!kIsWeb &&
@@ -36,7 +58,7 @@ Future<void> main() async {
   AccountController? account;
   QuitPlanController? quitPlan;
   final guestStore = SecureGuestQuitPlanStore();
-  if (config.hasAnyConfiguration) config.validate();
+  if (kReleaseMode || config.hasAnyConfiguration) config.validate();
   if (config.isConfigured) {
     await Supabase.initialize(
       url: config.supabaseUrl,
@@ -48,6 +70,7 @@ Future<void> main() async {
     final auth = SupabaseAuthGateway(Supabase.instance.client);
     account = AccountController(
       auth: auth,
+      accountData: HttpAccountDataApiClient(baseUrl: config.apiBaseUrl),
       profiles: ProfileRepository(
         auth: auth,
         api: HttpProfileApiClient(baseUrl: config.apiBaseUrl),
@@ -266,21 +289,10 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         await _showCallbackConsent();
         break;
       case TapAction.exportData:
-        await _showInformationDialog(
-          title: 'Prepare your data copy?',
-          message:
-              'The production service will create a password-protected PDF and JSON export after identity verification.',
-          confirmLabel: 'Continue',
-        );
+        await _exportAccountData();
         break;
       case TapAction.deleteAccount:
-        await _showInformationDialog(
-          title: 'Delete account and data?',
-          message:
-              'This is a protected demo action. A production build must require recent authentication, a final data summary and explicit confirmation before permanent deletion.',
-          confirmLabel: 'Review deletion',
-          destructive: true,
-        );
+        await _deleteAccountData();
         break;
       case TapAction.information:
         await _showInformationDialog(
@@ -291,6 +303,50 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         );
         break;
     }
+  }
+
+  Future<bool> _ensureSignedIn() async {
+    if (_accountController.isSignedIn) return true;
+    final signedIn = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => SignInDialog(account: _accountController),
+    );
+    return signedIn == true && _accountController.isSignedIn;
+  }
+
+  Future<void> _exportAccountData() async {
+    if (!await _ensureSignedIn() || !mounted) return;
+    await showAccountExportDialog(context, _accountController);
+  }
+
+  Future<void> _deleteAccountData() async {
+    if (!await _ensureSignedIn() || !mounted) return;
+    final receipt =
+        await showAccountDeletionDialog(context, _accountController);
+    if (!mounted || receipt == null) return;
+    _quitPlanController.clear();
+    await _quitPlanController.clearGuestPlan();
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('App data deleted'),
+        content: Text(
+          'Deletion receipt ${receipt.requestId}. Your BreatheFree profile and '
+          'quit plan were deleted. Deleting the Supabase sign-in identity '
+          'requires the separately approved privileged account service.',
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Done'),
+          ),
+        ],
+      ),
+    );
+    if (mounted) _resetJourney(0);
   }
 
   Future<void> _showQuitlineDialog() async {
@@ -307,15 +363,31 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () {
-              Clipboard.setData(const ClipboardData(text: '1-800-784-8669'));
-              final messenger = ScaffoldMessenger.of(context);
+            onPressed: () async {
               Navigator.pop(context);
-              messenger.showSnackBar(
-                const SnackBar(content: Text('Quitline number copied')),
+              var launched = false;
+              try {
+                launched = await launchUrl(
+                  Uri(scheme: 'tel', path: '18007848669'),
+                  mode: LaunchMode.externalApplication,
+                );
+              } catch (_) {
+                launched = false;
+              }
+              if (!mounted || launched) return;
+              await Clipboard.setData(
+                const ClipboardData(text: '1-800-784-8669'),
+              );
+              if (!mounted) return;
+              ScaffoldMessenger.of(this.context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'The dialer was unavailable. Quitline number copied.',
+                  ),
+                ),
               );
             },
-            child: const Text('Copy number'),
+            child: const Text('Open dialer'),
           ),
         ],
       ),
@@ -370,24 +442,26 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         debugShowCheckedModeBanner: false,
         restorationScopeId: 'breathefree',
         theme: AppTheme.light(),
-        home: _restoringAccount || _restoreFailed
-            ? _AccountConnectionScreen(
-                failed: _restoreFailed,
-                restoringGuest: !_accountController.isSignedIn,
-                onRetry: _retryAccountRestore,
-                onSignOut: _signOutAfterRestoreFailure,
-              )
-            : ApprovedScreenPlayer(
-                key: ValueKey(_journeyEpoch),
-                accountController: _accountController,
-                quitPlanController: _quitPlanController,
-                currentIndex: _currentIndex,
-                onSelectScreen: _goTo,
-                onPrevious: _goBack,
-                onNext: _goNext,
-                onTarget: _handleTarget,
-                onSessionReset: _resetJourney,
-              ),
+        home: _accountController.passwordRecoveryPending
+            ? PasswordRecoveryScreen(account: _accountController)
+            : _restoringAccount || _restoreFailed
+                ? _AccountConnectionScreen(
+                    failed: _restoreFailed,
+                    restoringGuest: !_accountController.isSignedIn,
+                    onRetry: _retryAccountRestore,
+                    onSignOut: _signOutAfterRestoreFailure,
+                  )
+                : ApprovedScreenPlayer(
+                    key: ValueKey(_journeyEpoch),
+                    accountController: _accountController,
+                    quitPlanController: _quitPlanController,
+                    currentIndex: _currentIndex,
+                    onSelectScreen: _goTo,
+                    onPrevious: _goBack,
+                    onNext: _goNext,
+                    onTarget: _handleTarget,
+                    onSessionReset: _resetJourney,
+                  ),
       ),
     );
   }

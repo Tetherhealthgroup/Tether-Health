@@ -1,23 +1,82 @@
-name: Flutter CI
+name: Production MVP CI
 
 on:
   push:
-    branches: ['main']
+    branches: [main, develop]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  validate:
+  flutter:
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
+          flutter-version: 3.47.1
           channel: stable
           cache: true
-      - name: Create generated platform runners
-        run: flutter create . --project-name breathefree_patient --org com.breathefree --platforms=android,web
       - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze
       - run: flutter test
-      - run: flutter build web --release
-      - run: flutter build appbundle --debug
+      - name: Build unsigned Android release bundle
+        run: flutter build appbundle --release
+
+  ios-no-codesign:
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.1
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build ios --simulator
+      - run: flutter build ios --release --no-codesign
+
+  api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run test:e2e
+      - run: npm run build
+
+  supabase:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: bash supabase/tests/verify_profiles_migration.sh
+      - run: bash supabase/tests/verify_quit_plans_migration.sh
+      - run: bash supabase/tests/verify_account_deletion_migration.sh
+      - name: Apply all migrations to local Supabase
+        run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor
+      - run: supabase db reset --local --no-seed
+      - run: supabase db lint --local --level warning

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:breathefree_patient/account/account_data_api_client.dart';
 import 'package:breathefree_patient/auth/account_controller.dart';
 import 'package:breathefree_patient/auth/auth_gateway.dart';
 import 'package:breathefree_patient/profile/profile_api_client.dart';
@@ -106,14 +109,58 @@ void main() {
     expect(api.receivedUpdate, {'onboardingCompleted': true});
     expect(controller.profile?.onboardingCompleted, isTrue);
   });
+
+  test('password recovery deep link permits a password update', () async {
+    final auth = _FakeAuth();
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+    );
+    addTearDown(controller.dispose);
+
+    expect(
+      await controller.requestPasswordReset(email: ' person@example.test '),
+      isTrue,
+    );
+    expect(auth.recoveryEmail, 'person@example.test');
+    auth.openRecoveryLink();
+    await Future<void>.delayed(Duration.zero);
+    expect(controller.passwordRecoveryPending, isTrue);
+    expect(await controller.updateRecoveredPassword('new-password'), isTrue);
+    expect(auth.updatedPassword, 'new-password');
+  });
+
+  test('export and deletion reauthenticate and use the new token', () async {
+    final auth = _FakeAuth();
+    final accountData = _FakeAccountDataApi();
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      accountData: accountData,
+    );
+    addTearDown(controller.dispose);
+    await controller.signIn(email: 'person@example.test', password: 'password');
+
+    final exported = await controller.exportData(password: 'password');
+    expect(exported?.document['schemaVersion'], '1.0');
+    expect(accountData.receivedToken, 'recent-access-token');
+
+    final receipt = await controller.deleteAppData(password: 'password');
+    expect(receipt?.requestId, 'receipt-id');
+    expect(controller.isSignedIn, isFalse);
+  });
 }
 
-class _FakeAuth implements AuthGateway {
+class _FakeAuth
+    implements AuthGateway, RecentAuthGateway, PasswordRecoveryGateway {
   _FakeAuth({this.requiresConfirmation = false});
 
   final bool requiresConfirmation;
   AuthIdentity? _identity;
   String? resentEmail;
+  String? recoveryEmail;
+  String? updatedPassword;
+  final _recoveryEvents = StreamController<void>.broadcast();
   @override
   AuthIdentity? get currentIdentity => _identity;
   @override
@@ -145,7 +192,54 @@ class _FakeAuth implements AuthGateway {
   }
 
   @override
+  Stream<void> get passwordRecoveryEvents => _recoveryEvents.stream;
+
+  void openRecoveryLink() => _recoveryEvents.add(null);
+
+  @override
+  Future<void> requestPasswordReset({required String email}) async {
+    recoveryEmail = email;
+  }
+
+  @override
+  Future<AuthIdentity> reauthenticate({required String password}) async {
+    return _identity = const AuthIdentity(
+      id: 'user-id',
+      email: 'person@example.test',
+      accessToken: 'recent-access-token',
+    );
+  }
+
+  @override
+  Future<void> updatePassword({required String newPassword}) async {
+    updatedPassword = newPassword;
+  }
+
+  @override
   Future<void> signOut() async => _identity = null;
+}
+
+class _FakeAccountDataApi implements AccountDataApiClient {
+  String? receivedToken;
+
+  @override
+  Future<AccountDataExport> exportData(String accessToken) async {
+    receivedToken = accessToken;
+    return const AccountDataExport(document: {'schemaVersion': '1.0'});
+  }
+
+  @override
+  Future<AccountDeletionReceipt> deleteAppData(String accessToken) async {
+    receivedToken = accessToken;
+    return AccountDeletionReceipt(
+      requestId: 'receipt-id',
+      completedAt: DateTime.utc(2026, 9, 20),
+      profileRowsDeleted: 1,
+      quitPlanRowsDeleted: 1,
+      avatarObjectsDeleted: 0,
+      authIdentityDeleted: false,
+    );
+  }
 }
 
 class _FailingProfileApi implements ProfileApiClient {

@@ -225,14 +225,20 @@ class SectionTitle extends StatelessWidget {
     );
 
     if (trailing == null) {
-      return Text(title, style: titleStyle);
+      return Semantics(
+        header: true,
+        child: Text(title, style: titleStyle),
+      );
     }
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Expanded(
-          child: Text(title, style: titleStyle),
+          child: Semantics(
+            header: true,
+            child: Text(title, style: titleStyle),
+          ),
         ),
         const SizedBox(width: 8),
         trailing!,
@@ -350,40 +356,47 @@ class _ResourceBottomNavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = selected ? AppColors.deepTeal : AppColors.mutedTeal;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 3),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 48,
-              height: 34,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: selected ? const Color(0xFFE6F1EA) : Colors.transparent,
-                borderRadius: BorderRadius.circular(14),
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      excludeSemantics: true,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 3),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 48,
+                height: 34,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color:
+                      selected ? const Color(0xFFE6F1EA) : Colors.transparent,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 24,
+                ),
               ),
-              child: Icon(
-                icon,
-                color: color,
-                size: 24,
+              const SizedBox(height: 2),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 9,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                ),
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: color,
-                fontSize: 9,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

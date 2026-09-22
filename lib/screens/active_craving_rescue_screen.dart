@@ -51,8 +51,7 @@ class ActiveCravingRescueScreen extends StatefulWidget {
 }
 
 class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
-  int get _durationSeconds =>
-    widget.tool == RescueTool.move ? 180 : 120;
+  int get _durationSeconds => widget.tool == RescueTool.move ? 180 : 120;
 
   Timer? _timer;
   late final FlutterTts _tts;
@@ -151,78 +150,73 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
     super.dispose();
   }
 
-Future<void> _configureTts() async {
-  try {
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      await _tts.setSharedInstance(true);
-      await _tts.setIosAudioCategory(
-        IosTextToSpeechAudioCategory.playback,
-        <IosTextToSpeechAudioCategoryOptions>[
-          IosTextToSpeechAudioCategoryOptions.duckOthers,
-          IosTextToSpeechAudioCategoryOptions
-              .interruptSpokenAudioAndMixWithOthers,
-          IosTextToSpeechAudioCategoryOptions.allowBluetooth,
-          IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
-        ],
-        IosTextToSpeechAudioMode.voicePrompt,
-      );
+  Future<void> _configureTts() async {
+    try {
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        await _tts.setSharedInstance(true);
+        await _tts.setIosAudioCategory(
+          IosTextToSpeechAudioCategory.playback,
+          <IosTextToSpeechAudioCategoryOptions>[
+            IosTextToSpeechAudioCategoryOptions.duckOthers,
+            IosTextToSpeechAudioCategoryOptions
+                .interruptSpokenAudioAndMixWithOthers,
+            IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+            IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+          ],
+          IosTextToSpeechAudioMode.voicePrompt,
+        );
+      }
+
+      await _tts.setLanguage(_isSpanish ? 'es-US' : 'en-US');
+      await _tts.setSpeechRate(0.42);
+      await _tts.setPitch(1.0);
+      await _tts.setVolume(1.0);
+    } catch (e) {
+      debugPrint('TTS configuration unavailable: $e');
+    }
+  }
+
+  Future<void> _speakCurrentCue() async {
+    if (!widget.voiceEnabled || widget.isPaused) {
+      return;
     }
 
-    await _tts.setLanguage(_isSpanish ? 'es-US' : 'en-US');
-    await _tts.setSpeechRate(0.42);
-    await _tts.setPitch(1.0);
-    await _tts.setVolume(1.0);
+    String message;
 
-    
-  } catch (e) {
-    debugPrint('TTS configuration unavailable: $e');
-  }
-}
+    if (widget.tool == RescueTool.slowBreathing) {
+      message = _isInhale
+          ? (_isSpanish ? 'Inhala lentamente' : 'Breathe in slowly')
+          : (_isSpanish ? 'Exhala lentamente' : 'Breathe out slowly');
+    } else if (widget.tool == RescueTool.move) {
+      final elapsed = widget.elapsedSeconds;
 
- Future<void> _speakCurrentCue() async {
-  if (!widget.voiceEnabled || widget.isPaused) {
-    return;
-  }
-
-  String message;
-
-  if (widget.tool == RescueTool.slowBreathing) {
-    message = _isInhale
-        ? (_isSpanish ? 'Inhala lentamente' : 'Breathe in slowly')
-        : (_isSpanish ? 'Exhala lentamente' : 'Breathe out slowly');
-  } else if (widget.tool == RescueTool.move) {
-    final elapsed = widget.elapsedSeconds;
-
-    if (elapsed == 0) {
-      message = _isSpanish ? 'Empieza a moverte' : 'Start moving';
-    } else if (elapsed == 120) {
-      message = _isSpanish ? 'Te queda un minuto' : 'One minute left';
-    } else if (elapsed == 150) {
-      message =
-          _isSpanish ? 'Te quedan treinta segundos' : 'Thirty seconds left';
-    } else if (elapsed == 170) {
-      message = _isSpanish ? 'Diez segundos más' : 'Ten seconds left';
-    } else if (elapsed >= 180) {
-      message = _isSpanish
-          ? 'Muy bien. Completaste tres minutos.'
-          : 'Great job. You completed three minutes.';
-    } else if (elapsed % 30 == 0) {
-      message = _isSpanish ? 'Sigue moviéndote' : 'Keep moving';
+      if (elapsed == 0) {
+        message = _isSpanish ? 'Empieza a moverte' : 'Start moving';
+      } else if (elapsed == 120) {
+        message = _isSpanish ? 'Te queda un minuto' : 'One minute left';
+      } else if (elapsed == 150) {
+        message =
+            _isSpanish ? 'Te quedan treinta segundos' : 'Thirty seconds left';
+      } else if (elapsed == 170) {
+        message = _isSpanish ? 'Diez segundos más' : 'Ten seconds left';
+      } else if (elapsed >= 180) {
+        message = _isSpanish
+            ? 'Muy bien. Completaste tres minutos.'
+            : 'Great job. You completed three minutes.';
+      } else if (elapsed % 30 == 0) {
+        message = _isSpanish ? 'Sigue moviéndote' : 'Keep moving';
+      } else {
+        return;
+      }
     } else {
       return;
     }
-  } else {
-    return;
-  }
 
-  try {
-    
-    await _tts.speak(message);
-  } catch (_) {
-    // Keep the exercise usable if speech is unavailable.
-  }
-
-  
+    try {
+      await _tts.speak(message);
+    } catch (_) {
+      // Keep the exercise usable if speech is unavailable.
+    }
   }
 
   Future<void> _stopSpeech() async {
@@ -233,143 +227,135 @@ Future<void> _configureTts() async {
     }
   }
 
- void _syncTimer() {
-  _timer?.cancel();
+  void _syncTimer() {
+    _timer?.cancel();
 
-  if (widget.isPaused || widget.elapsedSeconds >= _durationSeconds) {
-    return;
-  }
-
-  _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-    if (!mounted || widget.isPaused) {
+    if (widget.isPaused || widget.elapsedSeconds >= _durationSeconds) {
       return;
     }
 
-    final next = math.min(
-      _durationSeconds,
-      widget.elapsedSeconds + 1,
-    );
-
- 
-
-    if (widget.tool == RescueTool.move &&
-        widget.voiceEnabled &&
-        (next == 30 ||
-            next == 60 ||
-            next == 90 ||
-            next == 120 ||
-            next == 150 ||
-            next == 170)) {
-      unawaited(_speakMovementCue(next));
-    }
-    widget.onElapsedChanged(next);
-    if (widget.tool == RescueTool.changeScene &&
-    widget.voiceEnabled &&
-    (next == 30 || next == 60 || next == 90)) {
-  unawaited(_speakChangeSceneCue(next));
-}
-    if (next >= _durationSeconds) {
-      _timer?.cancel();
-
-      if (widget.tool == RescueTool.move && widget.voiceEnabled) {
-        unawaited(_speakMovementCue(next));
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted || widget.isPaused) {
+        return;
       }
 
-      widget.onComplete();
+      final next = math.min(
+        _durationSeconds,
+        widget.elapsedSeconds + 1,
+      );
+
+      if (widget.tool == RescueTool.move &&
+          widget.voiceEnabled &&
+          (next == 30 ||
+              next == 60 ||
+              next == 90 ||
+              next == 120 ||
+              next == 150 ||
+              next == 170)) {
+        unawaited(_speakMovementCue(next));
+      }
+      widget.onElapsedChanged(next);
+      if (widget.tool == RescueTool.changeScene &&
+          widget.voiceEnabled &&
+          (next == 30 || next == 60 || next == 90)) {
+        unawaited(_speakChangeSceneCue(next));
+      }
+      if (next >= _durationSeconds) {
+        _timer?.cancel();
+
+        if (widget.tool == RescueTool.move && widget.voiceEnabled) {
+          unawaited(_speakMovementCue(next));
+        }
+
+        widget.onComplete();
+      }
+    });
+  }
+
+  Future<void> _speakMovementCue(int elapsed) async {
+    if (!widget.voiceEnabled || widget.isPaused) {
+      return;
     }
-  });
-}
 
-Future<void> _speakMovementCue(int elapsed) async {
-  
+    String message;
 
-  if (!widget.voiceEnabled || widget.isPaused) {
-    return;
+    switch (elapsed) {
+      case 30:
+      case 60:
+      case 90:
+        message = _isSpanish ? 'Sigue moviéndote' : 'Keep moving';
+        break;
+
+      case 120:
+        message = _isSpanish ? 'Te queda un minuto' : 'One minute left';
+        break;
+
+      case 150:
+        message =
+            _isSpanish ? 'Te quedan treinta segundos' : 'Thirty seconds left';
+        break;
+
+      case 170:
+        message = _isSpanish ? 'Diez segundos más' : 'Ten seconds left';
+        break;
+
+      case 180:
+        message = _isSpanish
+            ? 'Muy bien. Completaste tres minutos.'
+            : 'Great job. You completed three minutes.';
+        break;
+
+      default:
+        return;
+    }
+
+    try {
+      await _tts.awaitSpeakCompletion(true);
+      await _tts.speak(message);
+    } catch (e) {
+      debugPrint('Movement voice unavailable: $e');
+    }
   }
 
-  String message;
-
-  switch (elapsed) {
-    case 30:
-    case 60:
-    case 90:
-      message = _isSpanish ? 'Sigue moviéndote' : 'Keep moving';
-      break;
-
-    case 120:
-      message = _isSpanish ? 'Te queda un minuto' : 'One minute left';
-      break;
-
-    case 150:
-      message = _isSpanish
-          ? 'Te quedan treinta segundos'
-          : 'Thirty seconds left';
-      break;
-
-    case 170:
-      message = _isSpanish ? 'Diez segundos más' : 'Ten seconds left';
-      break;
-
-    case 180:
-      message = _isSpanish
-          ? 'Muy bien. Completaste tres minutos.'
-          : 'Great job. You completed three minutes.';
-      break;
-
-    default:
+  Future<void> _speakChangeSceneCue(int elapsed) async {
+    if (!widget.voiceEnabled || widget.isPaused) {
       return;
+    }
+
+    String message;
+
+    switch (elapsed) {
+      case 30:
+        message = _isSpanish
+            ? 'Sigue moviéndote a un lugar sin humo.'
+            : 'Keep moving to a smoke-free place.';
+        break;
+      case 60:
+        message = _isSpanish
+            ? 'Ya estás a la mitad. Sigue adelante.'
+            : 'You are halfway there. Keep going.';
+        break;
+      case 90:
+        message = _isSpanish
+            ? 'Sigue adelante. Estás haciendo un cambio positivo.'
+            : 'Keep going. You are making a positive change.';
+        break;
+      case 120:
+        message = _isSpanish
+            ? 'Muy bien. Has cambiado de entorno.'
+            : 'Great job. You changed your surroundings.';
+        break;
+      default:
+        return;
+    }
+
+    try {
+      await _tts.stop();
+      await _tts.speak(message);
+    } catch (_) {
+      // Keep the exercise usable if speech is unavailable.
+    }
   }
-
-  try {
-    
-
-    await _tts.awaitSpeakCompletion(true);
-    await _tts.speak(message);
-
-    
-  } catch (e) {
-    debugPrint('Movement voice unavailable: $e');
-  }
-}
-Future<void> _speakChangeSceneCue(int elapsed) async {
-  if (!widget.voiceEnabled || widget.isPaused) {
-    return;
-  }
-
-  String message;
-
-  switch (elapsed) {
-    case 30:
-      message = _isSpanish
-          ? 'Sigue moviéndote a un lugar sin humo.'
-          : 'Keep moving to a smoke-free place.';
-      break;
-    case 60:
-      message = _isSpanish
-          ? 'Ya estás a la mitad. Sigue adelante.'
-          : 'You are halfway there. Keep going.';
-      break;
-    case 90:
-      message = _isSpanish
-          ? 'Sigue adelante. Estás haciendo un cambio positivo.'
-          : 'Keep going. You are making a positive change.';
-      break;
-    case 120:
-      message = _isSpanish
-          ? 'Muy bien. Has cambiado de entorno.'
-          : 'Great job. You changed your surroundings.';
-      break;
-    default:
-      return;
-  }
-
-  try {
-    await _tts.stop();
-    await _tts.speak(message);
-  } catch (_) {
-    // Keep the exercise usable if speech is unavailable.
-  }
-}
 
   Future<void> _showCloseConfirmation() async {
     widget.onPausedChanged(true);
@@ -584,44 +570,44 @@ Future<void> _speakChangeSceneCue(int elapsed) async {
                         ),
                         const SizedBox(height: 16),
                         if (widget.tool == RescueTool.slowBreathing)
-  _BreathingCard(
-    isSpanish: _isSpanish,
-    remainingLabel: _remainingLabel,
-    isInhale: _isInhale,
-    phaseCountdown: _phaseCountdown,
-    breathProgress: _breathProgress,
-    overallProgress: _overallProgress,
-    paused: widget.isPaused,
-    voiceEnabled: widget.voiceEnabled,
-    hapticsEnabled: widget.hapticsEnabled,
-    onPausedChanged: widget.onPausedChanged,
-    onVoiceChanged: widget.onVoiceChanged,
-    onHapticsChanged: widget.onHapticsChanged,
-  )
-else if (widget.tool == RescueTool.move)
-  _MovementCard(
-    isSpanish: _isSpanish,
-    remainingLabel: _remainingLabel,
-    overallProgress: _overallProgress,
-    paused: widget.isPaused,
-    voiceEnabled: widget.voiceEnabled,
-    hapticsEnabled: widget.hapticsEnabled,
-    onPausedChanged: widget.onPausedChanged,
-    onVoiceChanged: widget.onVoiceChanged,
-    onHapticsChanged: widget.onHapticsChanged,
-  )
-else
-  _ChangeSceneCard(
-    isSpanish: _isSpanish,
-    remainingLabel: _remainingLabel,
-    overallProgress: _overallProgress,
-    paused: widget.isPaused,
-    voiceEnabled: widget.voiceEnabled,
-    hapticsEnabled: widget.hapticsEnabled,
-    onPausedChanged: widget.onPausedChanged,
-    onVoiceChanged: widget.onVoiceChanged,
-    onHapticsChanged: widget.onHapticsChanged,
-  ),
+                          _BreathingCard(
+                            isSpanish: _isSpanish,
+                            remainingLabel: _remainingLabel,
+                            isInhale: _isInhale,
+                            phaseCountdown: _phaseCountdown,
+                            breathProgress: _breathProgress,
+                            overallProgress: _overallProgress,
+                            paused: widget.isPaused,
+                            voiceEnabled: widget.voiceEnabled,
+                            hapticsEnabled: widget.hapticsEnabled,
+                            onPausedChanged: widget.onPausedChanged,
+                            onVoiceChanged: widget.onVoiceChanged,
+                            onHapticsChanged: widget.onHapticsChanged,
+                          )
+                        else if (widget.tool == RescueTool.move)
+                          _MovementCard(
+                            isSpanish: _isSpanish,
+                            remainingLabel: _remainingLabel,
+                            overallProgress: _overallProgress,
+                            paused: widget.isPaused,
+                            voiceEnabled: widget.voiceEnabled,
+                            hapticsEnabled: widget.hapticsEnabled,
+                            onPausedChanged: widget.onPausedChanged,
+                            onVoiceChanged: widget.onVoiceChanged,
+                            onHapticsChanged: widget.onHapticsChanged,
+                          )
+                        else
+                          _ChangeSceneCard(
+                            isSpanish: _isSpanish,
+                            remainingLabel: _remainingLabel,
+                            overallProgress: _overallProgress,
+                            paused: widget.isPaused,
+                            voiceEnabled: widget.voiceEnabled,
+                            hapticsEnabled: widget.hapticsEnabled,
+                            onPausedChanged: widget.onPausedChanged,
+                            onVoiceChanged: widget.onVoiceChanged,
+                            onHapticsChanged: widget.onHapticsChanged,
+                          ),
                         const SizedBox(height: 16),
                         _EncouragementCard(isSpanish: _isSpanish),
                         const SizedBox(height: 16),
@@ -1152,6 +1138,7 @@ class _BreathingCard extends StatelessWidget {
     );
   }
 }
+
 class _MovementCard extends StatelessWidget {
   const _MovementCard({
     required this.isSpanish,
@@ -1237,7 +1224,7 @@ class _MovementCard extends StatelessWidget {
               ),
             ),
             child: const Center(
-               child: Icon(
+              child: Icon(
                 Icons.directions_walk_rounded,
                 size: 72,
                 color: AppColors.deepTeal,
@@ -1282,9 +1269,7 @@ class _MovementCard extends StatelessWidget {
               Expanded(
                 child: _ControlButton(
                   key: const ValueKey('active-rescue-pause'),
-                  icon: paused
-                      ? Icons.play_arrow_rounded
-                      : Icons.pause_rounded,
+                  icon: paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
                   label: paused
                       ? (isSpanish ? 'Reanudar' : 'Resume')
                       : (isSpanish ? 'Pausar' : 'Pause'),
@@ -1459,9 +1444,7 @@ class _ChangeSceneCard extends StatelessWidget {
               Expanded(
                 child: _ControlButton(
                   key: const ValueKey('active-rescue-pause'),
-                  icon: paused
-                      ? Icons.play_arrow_rounded
-                      : Icons.pause_rounded,
+                  icon: paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
                   label: paused
                       ? (isSpanish ? 'Reanudar' : 'Resume')
                       : (isSpanish ? 'Pausar' : 'Pause'),

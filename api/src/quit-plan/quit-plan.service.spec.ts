@@ -67,6 +67,7 @@ const config = {
 const user: AuthUser = {
   id: row.user_id,
   accessToken: "caller-access-token",
+  authenticatedAt: 1700000000,
 };
 
 describe("QuitPlanService", () => {
