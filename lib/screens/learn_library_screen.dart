@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/profile_avatar.dart';
 import 'resource_screen_widgets.dart';
 
 enum LearnLibraryFilter { forYou, short, audio, offline, saved }
@@ -14,6 +15,7 @@ class LearnLibraryScreen extends StatefulWidget {
     this.onHeroSavedChanged,
     this.onBack,
     this.onOpenSettings,
+    this.profileIdentity = const ProfileIdentity(),
     required this.onOpenHome,
     required this.onOpenPlan,
     required this.onOpenProgress,
@@ -28,6 +30,7 @@ class LearnLibraryScreen extends StatefulWidget {
   final ValueChanged<bool>? onHeroSavedChanged;
   final VoidCallback? onBack;
   final VoidCallback? onOpenSettings;
+  final ProfileIdentity profileIdentity;
   final VoidCallback onOpenHome;
   final VoidCallback onOpenPlan;
   final VoidCallback onOpenProgress;
@@ -170,18 +173,7 @@ class _LearnLibraryScreenState extends State<LearnLibraryScreen> {
                     'Configuración y privacidad',
                   ),
                   onPressed: widget.onOpenSettings,
-                  icon: const CircleAvatar(
-                    radius: 23,
-                    backgroundColor: AppColors.mint,
-                    foregroundColor: AppColors.deepTeal,
-                    child: Text(
-                      'A',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
+                  icon: ProfileAvatar(identity: widget.profileIdentity),
                 ),
               ],
             ),

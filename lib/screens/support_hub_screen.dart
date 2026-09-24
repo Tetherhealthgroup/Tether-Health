@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/profile_avatar.dart';
 import 'resource_screen_widgets.dart';
 
 class SupportHubScreen extends StatelessWidget {
@@ -8,6 +9,7 @@ class SupportHubScreen extends StatelessWidget {
     required this.isSpanish,
     required this.onBack,
     required this.onOpenSettings,
+    this.profileIdentity = const ProfileIdentity(),
     this.onCallQuitline,
     this.onRequestCallback,
     this.onInformation,
@@ -21,6 +23,7 @@ class SupportHubScreen extends StatelessWidget {
   final bool isSpanish;
   final VoidCallback onBack;
   final VoidCallback onOpenSettings;
+  final ProfileIdentity profileIdentity;
   final VoidCallback? onCallQuitline;
   final VoidCallback? onRequestCallback;
   final ValueChanged<String>? onInformation;
@@ -120,18 +123,7 @@ class SupportHubScreen extends StatelessWidget {
                     'Configuración y privacidad',
                   ),
                   onPressed: onOpenSettings,
-                  icon: const CircleAvatar(
-                    radius: 23,
-                    backgroundColor: AppColors.mint,
-                    foregroundColor: AppColors.deepTeal,
-                    child: Text(
-                      'A',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
+                  icon: ProfileAvatar(identity: profileIdentity),
                 ),
               ],
             ),

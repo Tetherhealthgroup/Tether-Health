@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/profile_avatar.dart';
 import 'choose_quit_path_screen.dart';
 import 'my_reasons_screen.dart';
 import 'support_preparation_screen.dart';
@@ -31,6 +32,7 @@ class HomePreparationScreen extends StatelessWidget {
     required this.onOpenReasons,
     required this.onOpenPreparation,
     required this.onOpenDailyCheckIn,
+    this.profileIdentity = const ProfileIdentity(),
     super.key,
   });
 
@@ -56,18 +58,21 @@ class HomePreparationScreen extends StatelessWidget {
   final VoidCallback onOpenReasons;
   final VoidCallback onOpenPreparation;
   final VoidCallback onOpenDailyCheckIn;
+  final ProfileIdentity profileIdentity;
 
   DateTime get _today => DateUtils.dateOnly(DateTime.now());
 
   String get _greeting {
     final hour = DateTime.now().hour;
+    final name = profileIdentity.firstName;
+    final suffix = name == null ? '' : ', $name';
     if (hour < 12) {
-      return isSpanish ? 'Buenos días, Alex.' : 'Good morning, Alex.';
+      return isSpanish ? 'Buenos días$suffix.' : 'Good morning$suffix.';
     }
     if (hour < 17) {
-      return isSpanish ? 'Buenas tardes, Alex.' : 'Good afternoon, Alex.';
+      return isSpanish ? 'Buenas tardes$suffix.' : 'Good afternoon$suffix.';
     }
-    return isSpanish ? 'Buenas noches, Alex.' : 'Good evening, Alex.';
+    return isSpanish ? 'Buenas noches$suffix.' : 'Good evening$suffix.';
   }
 
   DateTime get _effectiveQuitDate => DateUtils.dateOnly(
@@ -309,6 +314,7 @@ class HomePreparationScreen extends StatelessWidget {
                     hasUnreadNotifications: hasUnreadNotifications,
                     onNotifications: () => _openNotifications(context),
                     onProfile: onOpenProfile,
+                    profileIdentity: profileIdentity,
                   ),
                 ),
                 Expanded(
@@ -473,12 +479,14 @@ class _PreparationHomeHeader extends StatelessWidget {
     required this.hasUnreadNotifications,
     required this.onNotifications,
     required this.onProfile,
+    required this.profileIdentity,
   });
 
   final bool isSpanish;
   final bool hasUnreadNotifications;
   final VoidCallback onNotifications;
   final VoidCallback onProfile;
+  final ProfileIdentity profileIdentity;
 
   @override
   Widget build(BuildContext context) {
@@ -534,15 +542,7 @@ class _PreparationHomeHeader extends StatelessWidget {
             key: const ValueKey('preparation-profile'),
             onTap: onProfile,
             borderRadius: BorderRadius.circular(24),
-            child: const CircleAvatar(
-              radius: 23,
-              backgroundColor: AppColors.mint,
-              foregroundColor: AppColors.deepTeal,
-              child: Text(
-                'A',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
-              ),
-            ),
+            child: ProfileAvatar(identity: profileIdentity),
           ),
         ],
       ),

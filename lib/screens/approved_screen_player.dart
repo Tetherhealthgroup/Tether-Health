@@ -13,6 +13,7 @@ import '../quit_plan/quit_plan_controller.dart';
 import '../theme/app_colors.dart';
 import '../widgets/account_data_dialogs.dart';
 import '../widgets/approved_screen_viewport.dart';
+import '../widgets/profile_avatar.dart';
 import '../widgets/sign_in_dialog.dart';
 import 'active_craving_rescue_screen.dart';
 import 'baseline_assessment_screen.dart';
@@ -156,6 +157,13 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _slipRecoverySaved = false;
   bool _medicationReminderPreviews = true;
   MedicationTodayStatus _medicationTodayStatus = MedicationTodayStatus.taken;
+
+  ProfileIdentity get _profileIdentity => ProfileIdentity(
+        signedIn: _accountController.isSignedIn,
+        displayName: _accountController.profile?.displayName,
+        email: _accountController.email,
+        avatarUrl: _accountController.profile?.avatarPath,
+      );
 
   @override
   void initState() {
@@ -1042,6 +1050,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               onOpenReasons: () => widget.onSelectScreen(8),
               onOpenPreparation: () => widget.onSelectScreen(9),
               onOpenDailyCheckIn: () => widget.onSelectScreen(12),
+              profileIdentity: _profileIdentity,
             );
           }
 
@@ -1418,6 +1427,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               onOpenSupport: () => widget.onSelectScreen(26),
               onNotifications: () {},
               onOpenProfile: () => widget.onSelectScreen(27),
+              profileIdentity: _profileIdentity,
             );
           }
           if (widget.currentIndex == 22) {
@@ -1466,6 +1476,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
 
             return LearnLibraryScreen(
               isSpanish: isSpanish,
+              profileIdentity: _profileIdentity,
               onOpenHome: () => widget.onSelectScreen(21),
               onOpenPlan: () => widget.onSelectScreen(10),
               onOpenProgress: () => widget.onSelectScreen(25),
@@ -1479,6 +1490,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
 
             return ProgressDashboardScreen(
               isSpanish: isSpanish,
+              profileIdentity: _profileIdentity,
               onBack: widget.onPrevious,
               onOpenSettings: () => widget.onSelectScreen(27),
               onOpenHome: () => widget.onSelectScreen(21),
@@ -1493,6 +1505,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
 
             return SupportHubScreen(
               isSpanish: isSpanish,
+              profileIdentity: _profileIdentity,
               onBack: widget.onPrevious,
               onOpenSettings: () => widget.onSelectScreen(27),
               onCallQuitline: () => unawaited(_callQuitline()),
@@ -1524,6 +1537,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               signedIn: _accountController.isSignedIn,
               accountEmail: _accountController.email,
               displayName: _accountController.profile?.displayName,
+              avatarUrl: _accountController.profile?.avatarPath,
               hasDevicePlan: _quitPlanController.hasStoredGuestPlan,
               devicePlanNeedsRecovery:
                   _quitPlanController.hasGuestPlanRecoveryIssue,
