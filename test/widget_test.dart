@@ -1155,7 +1155,10 @@ void main() {
       find.byKey(const ValueKey('functional-home-preparation-screen')),
       findsOneWidget,
     );
-    expect(find.textContaining('Alex.'), findsOneWidget);
+    expect(
+      find.textContaining(RegExp(r'^(Buenos días|Buenas tardes|Buenas noches)\.$')),
+      findsOneWidget,
+    );
     expect(find.text('Tu preparación'), findsOneWidget);
     expect(find.text('Abrir Rescate'), findsOneWidget);
     expect(find.textContaining('Proteger a mi familia'), findsOneWidget);
@@ -1708,7 +1711,10 @@ void main() {
       find.byKey(const ValueKey('functional-home-preparation-screen')),
       findsOneWidget,
     );
-    expect(find.textContaining('Alex.'), findsOneWidget);
+    expect(
+      find.textContaining(RegExp(r'^Good (morning|afternoon|evening)\.$')),
+      findsOneWidget,
+    );
     expect(find.text('7 days'), findsOneWidget);
     expect(find.text('Stock gum, water or healthy snacks'), findsOneWidget);
     expect(find.text('2/3'), findsOneWidget);

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/profile_avatar.dart';
 import 'my_reasons_screen.dart';
 import 'support_preparation_screen.dart';
 
@@ -28,6 +29,7 @@ class QuitDayHomeScreen extends StatefulWidget {
     required this.onOpenSupport,
     required this.onNotifications,
     required this.onOpenProfile,
+    this.profileIdentity = const ProfileIdentity(),
     super.key,
   });
 
@@ -48,6 +50,7 @@ class QuitDayHomeScreen extends StatefulWidget {
   final VoidCallback onOpenSupport;
   final VoidCallback onNotifications;
   final VoidCallback onOpenProfile;
+  final ProfileIdentity profileIdentity;
 
   @override
   State<QuitDayHomeScreen> createState() => _QuitDayHomeScreenState();
@@ -111,18 +114,20 @@ class _QuitDayHomeScreenState extends State<QuitDayHomeScreen> {
 
   String _greeting() {
     final hour = DateTime.now().hour;
+    final name = widget.profileIdentity.firstName;
+    final suffix = name == null ? '' : ', $name';
 
     if (hour < 12) {
-      return widget.isSpanish ? 'Buenos días, Alex.' : 'Good morning, Alex.';
+      return widget.isSpanish ? 'Buenos días$suffix.' : 'Good morning$suffix.';
     }
 
     if (hour < 17) {
       return widget.isSpanish
-          ? 'Buenas tardes, Alex.'
-          : 'Good afternoon, Alex.';
+          ? 'Buenas tardes$suffix.'
+          : 'Good afternoon$suffix.';
     }
 
-    return widget.isSpanish ? 'Buenas noches, Alex.' : 'Good evening, Alex.';
+    return widget.isSpanish ? 'Buenas noches$suffix.' : 'Good evening$suffix.';
   }
 
   String _month(int month) {
@@ -232,6 +237,7 @@ class _QuitDayHomeScreenState extends State<QuitDayHomeScreen> {
               hasUnreadNotifications: true,
               onNotifications: _openNotifications,
               onProfile: widget.onOpenProfile,
+              profileIdentity: widget.profileIdentity,
             ),
             Expanded(
               child: SingleChildScrollView(
@@ -336,12 +342,14 @@ class _Header extends StatelessWidget {
     required this.hasUnreadNotifications,
     required this.onNotifications,
     required this.onProfile,
+    required this.profileIdentity,
   });
 
   final bool isSpanish;
   final bool hasUnreadNotifications;
   final VoidCallback onNotifications;
   final VoidCallback onProfile;
+  final ProfileIdentity profileIdentity;
 
   @override
   Widget build(BuildContext context) {
@@ -404,18 +412,7 @@ class _Header extends StatelessWidget {
             InkWell(
               onTap: onProfile,
               borderRadius: BorderRadius.circular(24),
-              child: const CircleAvatar(
-                radius: 23,
-                backgroundColor: AppColors.mint,
-                foregroundColor: AppColors.deepTeal,
-                child: Text(
-                  'A',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
+              child: ProfileAvatar(identity: profileIdentity),
             ),
           ],
         ),

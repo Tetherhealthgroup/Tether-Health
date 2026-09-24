@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/profile_avatar.dart';
 import 'resource_screen_widgets.dart';
 
 class SettingsPrivacyScreen extends StatelessWidget {
@@ -18,6 +19,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
     this.signedIn = false,
     this.accountEmail,
     this.displayName,
+    this.avatarUrl,
     this.onReviewConsent,
     this.onInformation,
     this.onDownloadData,
@@ -44,6 +46,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
   final bool signedIn;
   final String? accountEmail;
   final String? displayName;
+  final String? avatarUrl;
   final VoidCallback? onReviewConsent;
   final ValueChanged<String>? onInformation;
   final VoidCallback? onDownloadData;
@@ -159,18 +162,14 @@ class SettingsPrivacyScreen extends StatelessWidget {
               ),
               onBack: onBack,
               backSemanticLabel: t('Go back', 'Volver'),
-              actions: const [
-                CircleAvatar(
-                  key: ValueKey('settings-profile-symbol'),
-                  radius: 23,
-                  backgroundColor: AppColors.mint,
-                  foregroundColor: AppColors.deepTeal,
-                  child: Text(
-                    'A',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                    ),
+              actions: [
+                ProfileAvatar(
+                  key: const ValueKey('settings-profile-symbol'),
+                  identity: ProfileIdentity(
+                    signedIn: signedIn,
+                    displayName: displayName,
+                    email: accountEmail,
+                    avatarUrl: avatarUrl,
                   ),
                 ),
               ],
