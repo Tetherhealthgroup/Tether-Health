@@ -1156,7 +1156,8 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.textContaining(RegExp(r'^(Buenos días|Buenas tardes|Buenas noches)\.$')),
+      find.textContaining(
+          RegExp(r'^(Buenos días|Buenas tardes|Buenas noches)\.$')),
       findsOneWidget,
     );
     expect(find.text('Tu preparación'), findsOneWidget);
