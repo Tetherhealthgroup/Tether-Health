@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 import '../program.dart';
 import 'models/bp_reading.dart';
 import 'models/cholesterol_panel.dart';
