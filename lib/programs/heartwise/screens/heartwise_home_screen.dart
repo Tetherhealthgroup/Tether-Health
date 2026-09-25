@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../program.dart';
-import '../../theme/app_colors.dart';
+import '../../../theme/app_colors.dart';
 import '../../widgets/program_home_shell.dart';
 import '../heartwise_controller.dart';
 import '../heartwise_safety.dart';
@@ -177,8 +177,7 @@ class _WhenToCallDoctorCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         item,
-                        style:
-                            const TextStyle(color: AppColors.tealSecondary),
+                        style: const TextStyle(color: AppColors.tealSecondary),
                       ),
                     ),
                   ],

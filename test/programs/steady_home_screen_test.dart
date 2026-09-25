@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Finder byLabel(String label) => find.byWidgetPredicate(
-      (widget) => widget is Semantics && widget.properties?.label == label,
+      (widget) => widget is Semantics && widget.properties.label == label,
     );
 
 void main() {
@@ -27,14 +27,19 @@ void main() {
     );
 
     expect(find.text('Steady'), findsOneWidget);
-    expect(byLabel('Log a glucose reading'), findsOneWidget);
-    expect(byLabel('Open energy reset'), findsOneWidget);
     expect(byLabel('Logging streak, 0 days'), findsOneWidget);
     expect(find.text(SteadySafety.readingsAreDataNote), findsOneWidget);
     expect(
       find.textContaining('No target range recorded yet'),
       findsOneWidget,
     );
+    await tester.scrollUntilVisible(
+      byLabel('Open energy reset'),
+      300,
+    );
+    expect(byLabel('Log a glucose reading'), findsOneWidget);
+    expect(byLabel('Open energy reset'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text(ProgramCopy.disclaimer), 300);
     expect(find.text(ProgramCopy.privacyFooter), findsOneWidget);
     expect(find.text(ProgramCopy.disclaimer), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -54,6 +59,7 @@ void main() {
       ),
     );
 
+    await tester.scrollUntilVisible(find.text('Record target range'), 200);
     await tester.tap(find.text('Record target range'));
     await tester.pumpAndSettle();
 
@@ -73,6 +79,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(controller.targetRange?.setBy, 'Dr. Rao');
+    await tester.scrollUntilVisible(find.text('80–130 mg/dL'), 200);
     expect(find.text('80–130 mg/dL'), findsOneWidget);
     expect(find.text('Set by Dr. Rao'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -102,7 +109,11 @@ void main() {
       findsNothing,
     );
 
-    await tester.tap(byLabel('Save glucose reading'));
+    expect(byLabel('Save glucose reading'), findsWidgets);
+    final saveButton = find.widgetWithText(FilledButton, 'Save reading');
+    await tester.drag(find.byType(ListView), const Offset(0, -500));
+    await tester.pumpAndSettle();
+    await tester.tap(saveButton);
     await tester.pump();
 
     expect(saved, isTrue);

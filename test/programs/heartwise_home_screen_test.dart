@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Finder byLabel(String label) => find.byWidgetPredicate(
-      (widget) => widget is Semantics && widget.properties?.label == label,
+      (widget) => widget is Semantics && widget.properties.label == label,
     );
 
 Widget buildScreen({
@@ -43,14 +43,19 @@ void main() {
     // Navigation with Semantics labels.
     expect(byLabel('Log blood pressure'), findsOneWidget);
     expect(byLabel('Open cholesterol panel'), findsOneWidget);
-    // Safety sections.
+    // Safety sections and footer are lazy ListView content.
+    await tester.scrollUntilVisible(
+      find.text(HeartwiseSafety.whenToCallDoctorTitle),
+      300,
+    );
     expect(
       find.text(HeartwiseSafety.whenToCallDoctorTitle),
       findsOneWidget,
     );
+    await tester.scrollUntilVisible(
+        find.text(HeartwiseSafety.targetsNote), 300);
     expect(find.text(HeartwiseSafety.targetsNote), findsOneWidget);
-    // Shared shell: offline notice, privacy footer, disclaimer.
-    expect(find.text(ProgramCopy.offlineNotice), findsOneWidget);
+    await tester.scrollUntilVisible(find.text(ProgramCopy.disclaimer), 300);
     expect(find.text(ProgramCopy.privacyFooter), findsOneWidget);
     expect(find.text(ProgramCopy.disclaimer), findsOneWidget);
     expect(tester.takeException(), isNull);

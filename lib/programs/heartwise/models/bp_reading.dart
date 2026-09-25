@@ -50,8 +50,7 @@ class BpReading {
       return 'Enter a systolic or diastolic value. Missing values stay blank — they are never treated as zero.';
     }
     final systolic = systolicRaw.isEmpty ? null : int.tryParse(systolicRaw);
-    final diastolic =
-        diastolicRaw.isEmpty ? null : int.tryParse(diastolicRaw);
+    final diastolic = diastolicRaw.isEmpty ? null : int.tryParse(diastolicRaw);
     if ((systolicRaw.isNotEmpty && systolic == null) ||
         (diastolicRaw.isNotEmpty && diastolic == null)) {
       return 'Readings must be whole numbers.';

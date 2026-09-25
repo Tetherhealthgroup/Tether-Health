@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_colors.dart';
+import '../../../theme/app_colors.dart';
 import '../heartwise_controller.dart';
 import '../models/bp_reading.dart';
 
@@ -124,8 +124,7 @@ class _LogBpScreenState extends State<LogBpScreen> {
                 excludeSemantics: true,
                 child: Text(
                   _error!,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.error),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
             ],

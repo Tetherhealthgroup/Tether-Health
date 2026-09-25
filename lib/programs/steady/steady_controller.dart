@@ -90,7 +90,8 @@ class SteadyController extends ProgramController {
   /// Consecutive calendar days with at least one logged reading, ending
   /// today or yesterday. Presented as information only — never as a grade.
   int get loggingStreakDays {
-    final days = _readings.map((reading) => _dateOnly(reading.measuredAt)).toSet();
+    final days =
+        _readings.map((reading) => _dateOnly(reading.measuredAt)).toSet();
     var streak = 0;
     var day = _dateOnly(DateTime.now());
     if (!days.contains(day)) {
@@ -115,6 +116,8 @@ class SteadyController extends ProgramController {
     return counts;
   }
 
-  static DateTime _dateOnly(DateTime value) =>
-      DateTime(value.year, value.month, value.day);
+  static DateTime _dateOnly(DateTime value) {
+    final local = value.toLocal();
+    return DateTime(local.year, local.month, local.day);
+  }
 }

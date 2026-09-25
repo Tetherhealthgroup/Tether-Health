@@ -14,7 +14,6 @@
 // - Copy is plain-language and non-judgmental; the app never diagnoses
 //   or treats. Every program home surface carries the Tether disclaimer.
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';

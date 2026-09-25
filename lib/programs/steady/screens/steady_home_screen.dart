@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../program.dart';
-import '../../theme/app_colors.dart';
+import '../../../theme/app_colors.dart';
 import '../../widgets/program_home_shell.dart';
 import '../models/glucose_reading.dart';
 import '../steady_controller.dart';
@@ -91,100 +91,114 @@ class SteadyHomeScreen extends StatelessWidget {
   static Future<void> _recordTargetRange(
     BuildContext context,
     SteadyController controller,
-  ) async {
-    final minController = TextEditingController();
-    final maxController = TextEditingController();
-    final byController = TextEditingController();
-    String? error;
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('Record target range'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Your clinician sets this range. The app never invents one.',
-                  style: TextStyle(color: AppColors.tealSecondary),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  key: const ValueKey('steady-target-min'),
-                  controller: minController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Lower value (mg/dL)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  key: const ValueKey('steady-target-max'),
-                  controller: maxController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Upper value (mg/dL)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  key: const ValueKey('steady-target-by'),
-                  controller: byController,
-                  decoration: const InputDecoration(
-                    labelText: 'Set by (clinician or care team)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                if (error != null) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    error!,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                ],
-              ],
+  ) =>
+      showDialog<void>(
+        context: context,
+        builder: (_) => _TargetRangeDialog(controller: controller),
+      );
+}
+
+class _TargetRangeDialog extends StatefulWidget {
+  const _TargetRangeDialog({required this.controller});
+
+  final SteadyController controller;
+
+  @override
+  State<_TargetRangeDialog> createState() => _TargetRangeDialogState();
+}
+
+class _TargetRangeDialogState extends State<_TargetRangeDialog> {
+  final _minController = TextEditingController();
+  final _maxController = TextEditingController();
+  final _byController = TextEditingController();
+  String? _error;
+
+  @override
+  void dispose() {
+    _minController.dispose();
+    _maxController.dispose();
+    _byController.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final min = int.tryParse(_minController.text.trim());
+    final max = int.tryParse(_maxController.text.trim());
+    if (min == null || max == null) {
+      setState(() => _error = 'Enter whole numbers for both values.');
+      return;
+    }
+    if (!widget.controller.setTargetRange(
+      minMgDl: min,
+      maxMgDl: max,
+      setBy: _byController.text,
+    )) {
+      setState(() => _error = widget.controller.errorMessage);
+      return;
+    }
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Record target range'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Your clinician sets this range. The app never invents one.',
+              style: TextStyle(color: AppColors.tealSecondary),
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
+            const SizedBox(height: 12),
+            TextField(
+              key: const ValueKey('steady-target-min'),
+              controller: _minController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Lower value (mg/dL)',
+                border: OutlineInputBorder(),
+              ),
             ),
-            FilledButton(
-              onPressed: () {
-                final min = int.tryParse(minController.text.trim());
-                final max = int.tryParse(maxController.text.trim());
-                if (min == null || max == null) {
-                  setState(
-                    () => error = 'Enter whole numbers for both values.',
-                  );
-                  return;
-                }
-                if (!controller.setTargetRange(
-                  minMgDl: min,
-                  maxMgDl: max,
-                  setBy: byController.text,
-                )) {
-                  setState(() => error = controller.errorMessage);
-                  return;
-                }
-                Navigator.of(dialogContext).pop();
-              },
-              child: const Text('Save'),
+            const SizedBox(height: 12),
+            TextField(
+              key: const ValueKey('steady-target-max'),
+              controller: _maxController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Upper value (mg/dL)',
+                border: OutlineInputBorder(),
+              ),
             ),
+            const SizedBox(height: 12),
+            TextField(
+              key: const ValueKey('steady-target-by'),
+              controller: _byController,
+              decoration: const InputDecoration(
+                labelText: 'Set by (clinician or care team)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                _error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ],
           ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(onPressed: _save, child: const Text('Save')),
+      ],
     );
-    minController.dispose();
-    maxController.dispose();
-    byController.dispose();
   }
 }
 

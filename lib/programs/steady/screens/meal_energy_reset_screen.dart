@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_colors.dart';
+import '../../../theme/app_colors.dart';
 import '../steady_safety.dart';
 
 /// The Steady rescue flow: a gentle energy reset after a difficult reading.

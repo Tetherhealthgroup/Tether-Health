@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../theme/app_colors.dart';
+import '../../../theme/app_colors.dart';
 import '../heartwise_safety.dart';
 
 /// Permanent emergency card for the Heartwise program.

@@ -24,8 +24,7 @@ class GlucoseReading {
     this.note,
   });
 
-  factory GlucoseReading.fromJson(Map<String, Object?> json) =>
-      GlucoseReading(
+  factory GlucoseReading.fromJson(Map<String, Object?> json) => GlucoseReading(
         id: json['id']! as String,
         valueMgDl: json['valueMgDl'] as int?,
         context: GlucoseContext.values.byName(json['context']! as String),

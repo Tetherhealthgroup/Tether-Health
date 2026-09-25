@@ -14,13 +14,11 @@ class HeartwiseController extends ProgramController {
   int _idCounter = 0;
 
   List<BpReading> get bpReadings => List.unmodifiable(_bpReadings);
-  List<CholesterolPanel> get cholesterolPanels =>
-      List.unmodifiable(_panels);
+  List<CholesterolPanel> get cholesterolPanels => List.unmodifiable(_panels);
 
   BpReading? get latestBpReading =>
       _bpReadings.isEmpty ? null : _bpReadings.last;
-  CholesterolPanel? get latestPanel =>
-      _panels.isEmpty ? null : _panels.last;
+  CholesterolPanel? get latestPanel => _panels.isEmpty ? null : _panels.last;
 
   String _newId(String prefix) =>
       '$prefix-${DateTime.now().microsecondsSinceEpoch}-${_idCounter++}';

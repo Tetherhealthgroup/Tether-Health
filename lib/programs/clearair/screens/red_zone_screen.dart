@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../theme/app_colors.dart';
+import '../../../theme/app_colors.dart';
 import '../clearair_safety.dart';
 
 /// Red-zone screen. Always reachable from the ClearAir home screen via the
@@ -63,8 +63,7 @@ class RedZoneScreen extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           children: [
             Semantics(
-              label:
-                  'Red zone. ${ClearAirSafety.redZoneBody}',
+              label: 'Red zone. ${ClearAirSafety.redZoneBody}',
               excludeSemantics: true,
               child: Container(
                 width: double.infinity,

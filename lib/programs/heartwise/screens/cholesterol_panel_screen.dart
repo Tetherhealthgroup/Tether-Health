@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_colors.dart';
+import '../../../theme/app_colors.dart';
 import '../heartwise_controller.dart';
 import '../models/cholesterol_panel.dart';
 
@@ -19,8 +19,7 @@ class CholesterolPanelScreen extends StatefulWidget {
   final VoidCallback? onClose;
 
   @override
-  State<CholesterolPanelScreen> createState() =>
-      _CholesterolPanelScreenState();
+  State<CholesterolPanelScreen> createState() => _CholesterolPanelScreenState();
 }
 
 class _CholesterolPanelScreenState extends State<CholesterolPanelScreen> {
