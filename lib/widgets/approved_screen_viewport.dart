@@ -65,6 +65,8 @@ class ApprovedScreenViewport extends StatelessWidget {
                         fit: BoxFit.fill,
                         filterQuality: FilterQuality.high,
                         excludeFromSemantics: true,
+                        errorBuilder: (context, error, stackTrace) =>
+                            _ArtworkFallback(spec: spec),
                       ),
                     ),
                   ),
@@ -163,6 +165,55 @@ class _PositionedTarget extends StatelessWidget {
         child: showHotspot
             ? Tooltip(message: target.label, child: button)
             : button,
+      ),
+    );
+  }
+}
+
+/// Privacy-safe fallback shown when an approved screen artwork asset fails to
+/// load. The tap targets still render on top, so navigation keeps working.
+class _ArtworkFallback extends StatelessWidget {
+  const _ArtworkFallback({required this.spec});
+
+  final ScreenSpec spec;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Semantics(
+      label: 'Screen ${spec.number} artwork unavailable: ${spec.title}',
+      child: ColoredBox(
+        color: theme.colorScheme.surfaceContainerHighest,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.image_not_supported_outlined,
+                  size: 48,
+                  color: theme.colorScheme.onSurfaceVariant,
+                  semanticLabel: 'Artwork missing',
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'This screen preview could not be loaded.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyLarge,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Your progress and navigation still work.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
