@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../program.dart';
-import '../../theme/app_colors.dart';
+import '../../../theme/app_colors.dart';
 import '../../widgets/program_home_shell.dart';
 import '../clearair_controller.dart';
 import '../clearair_safety.dart';
@@ -92,77 +92,99 @@ class ClearAirHomeScreen extends StatelessWidget {
   static Future<void> _recordActionPlan(
     BuildContext context,
     ClearAirController controller,
-  ) async {
-    var zone = ActionPlanZone.green;
-    final byController = TextEditingController();
-    String? error;
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('Record action plan'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Record the zones exactly as your clinician wrote them in your action plan.',
-                  style: TextStyle(color: AppColors.tealSecondary),
-                ),
-                const SizedBox(height: 8),
-                for (final option in ActionPlanZone.values)
-                  RadioListTile<ActionPlanZone>(
-                    title: Text('${option.label} zone'),
-                    value: option,
-                    groupValue: zone,
-                    activeColor: AppColors.deepTeal,
-                    onChanged: (value) {
-                      if (value != null) setState(() => zone = value);
-                    },
-                  ),
-                TextField(
-                  controller: byController,
-                  decoration: const InputDecoration(
-                    labelText: 'Recorded by (clinician or care team)',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                if (error != null) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    error!,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
-                    ),
-                  ),
-                ],
-              ],
+  ) =>
+      showDialog<void>(
+        context: context,
+        builder: (_) => _ActionPlanDialog(controller: controller),
+      );
+}
+
+class _ActionPlanDialog extends StatefulWidget {
+  const _ActionPlanDialog({required this.controller});
+
+  final ClearAirController controller;
+
+  @override
+  State<_ActionPlanDialog> createState() => _ActionPlanDialogState();
+}
+
+class _ActionPlanDialogState extends State<_ActionPlanDialog> {
+  final _byController = TextEditingController();
+  ActionPlanZone _zone = ActionPlanZone.green;
+  String? _error;
+
+  @override
+  void dispose() {
+    _byController.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    if (!widget.controller.recordClinicianPlan(
+      zone: _zone,
+      recordedBy: _byController.text,
+    )) {
+      setState(() => _error = widget.controller.errorMessage);
+      return;
+    }
+    Navigator.of(context).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Record action plan'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Record the zones exactly as your clinician wrote them in your action plan.',
+              style: TextStyle(color: AppColors.tealSecondary),
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () {
-                if (!controller.recordClinicianPlan(
-                  zone: zone,
-                  recordedBy: byController.text,
-                )) {
-                  setState(() => error = controller.errorMessage);
-                  return;
-                }
-                Navigator.of(dialogContext).pop();
+            const SizedBox(height: 8),
+            RadioGroup<ActionPlanZone>(
+              groupValue: _zone,
+              onChanged: (value) {
+                if (value != null) setState(() => _zone = value);
               },
-              child: const Text('Save'),
+              child: Column(
+                children: [
+                  for (final option in ActionPlanZone.values)
+                    RadioListTile<ActionPlanZone>(
+                      title: Text('${option.label} zone'),
+                      value: option,
+                      activeColor: AppColors.deepTeal,
+                    ),
+                ],
+              ),
             ),
+            TextField(
+              controller: _byController,
+              decoration: const InputDecoration(
+                labelText: 'Recorded by (clinician or care team)',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            if (_error != null) ...[
+              const SizedBox(height: 12),
+              Text(
+                _error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            ],
           ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(onPressed: _save, child: const Text('Save')),
+      ],
     );
-    byController.dispose();
   }
 }
 
@@ -287,7 +309,8 @@ class _PlanCard extends StatelessWidget {
                   backgroundColor: AppColors.deepTeal,
                   foregroundColor: Colors.white,
                 ),
-                child: Text(plan == null ? 'Record action plan' : 'Update action plan'),
+                child: Text(
+                    plan == null ? 'Record action plan' : 'Update action plan'),
               ),
             ),
           ],
@@ -327,8 +350,7 @@ class _SymptomHistoryCard extends StatelessWidget {
                 style: TextStyle(color: AppColors.tealSecondary),
               )
             else
-              for (final log in logs.reversed.take(5))
-                _logRow(log),
+              for (final log in logs.reversed.take(5)) _logRow(log),
           ],
         ),
       ),

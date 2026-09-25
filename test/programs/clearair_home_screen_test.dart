@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Finder byLabel(String label) => find.byWidgetPredicate(
-      (widget) => widget is Semantics && widget.properties?.label == label,
+      (widget) => widget is Semantics && widget.properties.label == label,
     );
 
 void main() {

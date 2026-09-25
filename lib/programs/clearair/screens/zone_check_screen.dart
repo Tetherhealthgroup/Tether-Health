@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../program.dart';
-import '../../theme/app_colors.dart';
+import '../../../theme/app_colors.dart';
 import '../clearair_controller.dart';
 import '../clearair_safety.dart';
 import '../models/action_plan.dart';
@@ -137,16 +137,22 @@ class _ZoneCheckScreenState extends State<ZoneCheckScreen> {
               'Follow your plan to decide — the app does not determine this for you.',
               style: TextStyle(color: AppColors.mutedTeal, fontSize: 12),
             ),
-            for (final option in ActionPlanZone.values)
-              RadioListTile<ActionPlanZone>(
-                title: Text('${option.label} zone'),
-                value: option,
-                groupValue: _zone,
-                activeColor: AppColors.deepTeal,
-                onChanged: (value) {
-                  if (value != null) setState(() => _zone = value);
-                },
+            RadioGroup<ActionPlanZone>(
+              groupValue: _zone,
+              onChanged: (value) {
+                if (value != null) setState(() => _zone = value);
+              },
+              child: Column(
+                children: [
+                  for (final option in ActionPlanZone.values)
+                    RadioListTile<ActionPlanZone>(
+                      title: Text('${option.label} zone'),
+                      value: option,
+                      activeColor: AppColors.deepTeal,
+                    ),
+                ],
               ),
+            ),
             const SizedBox(height: 8),
             Card(
               color: AppColors.mint,
@@ -165,8 +171,7 @@ class _ZoneCheckScreenState extends State<ZoneCheckScreen> {
                 excludeSemantics: true,
                 child: Text(
                   _error!,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.error),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
             ],

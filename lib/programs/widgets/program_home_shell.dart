@@ -46,11 +46,11 @@ class ProgramHomeShell extends StatelessWidget {
         child: Builder(
           builder: (context) {
             if (isLoading) {
-              return const Center(
+              return Center(
                 child: Semantics(
                   label: 'Loading',
                   excludeSemantics: true,
-                  child: CircularProgressIndicator(),
+                  child: const CircularProgressIndicator(),
                 ),
               );
             }

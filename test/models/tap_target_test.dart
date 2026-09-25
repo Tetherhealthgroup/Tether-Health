@@ -57,14 +57,12 @@ void main() {
     });
 
     test('support hub exposes the quitline action', () {
-      final actions =
-          tapTargetsFor(26).map((t) => t.action).toSet();
+      final actions = tapTargetsFor(26).map((t) => t.action).toSet();
       expect(actions, contains(TapAction.quitline));
     });
 
     test('settings screen exposes data export and deletion', () {
-      final actions =
-          tapTargetsFor(27).map((t) => t.action).toSet();
+      final actions = tapTargetsFor(27).map((t) => t.action).toSet();
       expect(actions, contains(TapAction.exportData));
       expect(actions, contains(TapAction.deleteAccount));
     });

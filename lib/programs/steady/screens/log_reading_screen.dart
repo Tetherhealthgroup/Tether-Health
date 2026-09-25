@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_colors.dart';
+import '../../../theme/app_colors.dart';
 import '../models/glucose_reading.dart';
 import '../steady_controller.dart';
-import '../steady_safety.dart';
 
 /// Form for logging a glucose reading.
 ///
@@ -86,16 +85,22 @@ class _LogReadingScreenState extends State<LogReadingScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            for (final context in GlucoseContext.values)
-              RadioListTile<GlucoseContext>(
-                title: Text(context.label),
-                value: context,
-                groupValue: _context,
-                activeColor: AppColors.deepTeal,
-                onChanged: (value) {
-                  if (value != null) setState(() => _context = value);
-                },
+            RadioGroup<GlucoseContext>(
+              groupValue: _context,
+              onChanged: (value) {
+                if (value != null) setState(() => _context = value);
+              },
+              child: Column(
+                children: [
+                  for (final context in GlucoseContext.values)
+                    RadioListTile<GlucoseContext>(
+                      title: Text(context.label),
+                      value: context,
+                      activeColor: AppColors.deepTeal,
+                    ),
+                ],
               ),
+            ),
             const SizedBox(height: 12),
             TextField(
               controller: _valueController,
@@ -119,11 +124,6 @@ class _LogReadingScreenState extends State<LogReadingScreen> {
               'A missing reading stays missing — it is never treated as zero.',
               style: TextStyle(color: AppColors.mutedTeal, fontSize: 12),
             ),
-            const SizedBox(height: 4),
-            const Text(
-              SteadySafety.noCaloriesNote,
-              style: TextStyle(color: AppColors.mutedTeal, fontSize: 12),
-            ),
             if (_error != null) ...[
               const SizedBox(height: 12),
               Semantics(
@@ -131,8 +131,7 @@ class _LogReadingScreenState extends State<LogReadingScreen> {
                 excludeSemantics: true,
                 child: Text(
                   _error!,
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.error),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
               ),
             ],
