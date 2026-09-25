@@ -36,7 +36,7 @@ class UnplugScreenC extends StatelessWidget {
               ? null
               : UnplugPill(label: 'Tokens v${tokens.version}'),
           child: tokens == null
-              ? _TokenProblem(error: state.tokenError)
+              ? _TokenProblem(state: state)
               : _InterceptPreview(
                   tokens: tokens,
                   state: state,
@@ -90,12 +90,26 @@ class UnplugScreenC extends StatelessWidget {
 }
 
 class _TokenProblem extends StatelessWidget {
-  const _TokenProblem({required this.error});
+  const _TokenProblem({required this.state});
 
-  final Object? error;
+  final UnplugModuleState state;
+
+  /// Re-reads the shared token file without restarting the app.
+  ///
+  /// A corrupt file usually means a bad asset bundle rather than a transient
+  /// failure, but re-reading is free and the alternative is a dead screen
+  /// until the next launch.
+  Future<void> _retry() async {
+    try {
+      state.setTokens(await InterceptTokens.load());
+    } catch (error) {
+      state.setTokenError(error);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final error = state.tokenError;
     if (error == null) {
       return const UnplugCard(
         child: Row(
@@ -144,6 +158,14 @@ class _TokenProblem extends StatelessWidget {
               color: Color(0xFF8C3A26),
               fontSize: 12.5,
               height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.tonal(
+              onPressed: _retry,
+              child: const Text('Try again'),
             ),
           ),
         ],
