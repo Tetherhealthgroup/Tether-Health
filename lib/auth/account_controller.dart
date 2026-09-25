@@ -273,7 +273,13 @@ class AccountController extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
-    await _auth.signOut();
+    try {
+      await _auth.signOut();
+    } catch (_) {
+      // The local session is cleared regardless so the user is never left
+      // appearing signed in after asking to sign out. A failed remote
+      // sign-out only means the server token may linger until it expires.
+    }
     profile = null;
     errorMessage = null;
     notifyListeners();
