@@ -92,6 +92,7 @@ class _UnplugScreenFState extends State<UnplugScreenF> {
                   max: state.tierCeiling.toDouble(),
                   divisions: divisions == 0 ? null : divisions,
                   label: 'Tier $candidate',
+                  semanticLabel: 'Tier',
                   onChanged: state.selfMayMoveTier
                       ? (value) => setState(() => _candidate = value.round())
                       : null,
@@ -175,6 +176,7 @@ class _UnplugScreenFState extends State<UnplugScreenF> {
                         max: 6,
                         divisions: 6,
                         label: '${state.overrideAllowance}',
+                        semanticLabel: 'Override allowance',
                         onChanged: (value) =>
                             state.setOverrideAllowance(value.round()),
                       ),

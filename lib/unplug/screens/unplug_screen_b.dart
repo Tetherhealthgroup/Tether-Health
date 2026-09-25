@@ -244,6 +244,7 @@ class _UnplugScreenBState extends State<UnplugScreenB> {
                             max: 12,
                             divisions: 11,
                             label: '$_appCount',
+                            semanticLabel: 'Number of apps in the group',
                             onChanged: (value) =>
                                 setState(() => _appCount = value.round()),
                           ),
