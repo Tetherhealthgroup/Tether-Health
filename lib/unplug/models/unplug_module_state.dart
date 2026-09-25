@@ -704,7 +704,9 @@ class UnplugModuleState extends ChangeNotifier {
   bool useOverride() {
     if (overridesLeft == 0) return false;
     _overridesUsed++;
-    _platform?.liftShield('override');
+    // The platform lifts its own shield; its errors are reported through the
+    // channel failure path inside liftShield, not through this return value.
+    unawaited(_platform?.liftShield('override'));
     _pushShield();
     notifyListeners();
     return true;

@@ -104,8 +104,8 @@ class _TetherHealthAppState extends State<TetherHealthApp> {
         widget.initialScreen.clamp(0, prototypeCatalog.length - 1).toInt();
     _restoringAccount = _accountController.isSignedIn && _currentIndex == 0;
     unawaited(_initializeAccount());
-    _loadInterceptTokens();
-    _attachUnplugPlatform();
+    unawaited(_loadInterceptTokens());
+    unawaited(_attachUnplugPlatform());
   }
 
   /// Connects the Unplug module to the platform screen-time layer, when this
