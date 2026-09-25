@@ -473,4 +473,186 @@ void main() {
       expect(state.channelFailure, contains('applyShield'));
     });
   });
+
+  group('group edits', () {
+    test('group edits validate their input and stay in range', () {
+      final state = UnplugModuleState(platform: TrackedPlatform.ios);
+      addTearDown(state.dispose);
+      final before = state.groups.length;
+
+      state.addGroup('   ', 3);
+      state.addGroup('Podcasts', 0);
+      state.addGroup('Podcasts', -2);
+      expect(state.groups, hasLength(before),
+          reason: 'blank labels and non-positive counts are refused');
+
+      state.addGroup('  Podcasts  ', 2);
+      expect(state.groups, hasLength(before + 1));
+      expect(state.groups.last.label, 'Podcasts',
+          reason: 'labels are trimmed before they are stored');
+
+      state.removeGroup(-1);
+      state.removeGroup(state.groups.length);
+      state.toggleGroupShield(-1);
+      state.toggleGroupShield(state.groups.length);
+      expect(state.groups, hasLength(before + 1),
+          reason: 'out-of-range edits are no-ops, not crashes');
+    });
+  });
+
+  group('override allowance', () {
+    test('the allowance is clamped to 0–10 and pulls spent counts down', () {
+      final state = UnplugModuleState(platform: TrackedPlatform.ios)
+        ..setOverrideAllowance(4);
+      addTearDown(state.dispose);
+
+      state.useOverride();
+      state.useOverride();
+      expect(state.overridesUsed, 2);
+
+      state.setOverrideAllowance(1);
+      expect(state.overrideAllowance, 1);
+      expect(state.overridesUsed, 1,
+          reason: 'spent overrides cannot exceed the new allowance');
+
+      state.setOverrideAllowance(99);
+      expect(state.overrideAllowance, 10);
+      state.setOverrideAllowance(-3);
+      expect(state.overrideAllowance, 0);
+    });
+  });
+
+  group('urge tagging', () {
+    test('recent tags keep the last eight and the escalation latches', () {
+      final state = UnplugModuleState(platform: TrackedPlatform.ios);
+      addTearDown(state.dispose);
+
+      final bored = urgeTags.firstWhere((tag) => !tag.distress);
+      for (var i = 0; i < 10; i++) {
+        state.tagUrge(bored);
+      }
+      expect(state.recentTags, hasLength(8));
+      expect(state.escalationOpened, isFalse);
+
+      final anxious = urgeTags.firstWhere((tag) => tag.distress);
+      state.tagUrge(anxious);
+      state.tagUrge(anxious);
+      expect(state.escalationOpened, isTrue);
+
+      state.tagUrge(bored);
+      expect(state.escalationOpened, isTrue,
+          reason: 'an opened escalation stays open once the run breaks');
+    });
+  });
+
+  group('focus sessions', () {
+    test('a session knows when it ends', () {
+      final at = DateTime(2026, 3, 1, 12);
+      final session = FocusSession(
+        startedAt: at,
+        duration: const Duration(minutes: 25),
+        scope: SessionScope.selectedApps,
+        strict: false,
+      );
+
+      expect(session.endsAt, at.add(const Duration(minutes: 25)));
+      expect(session.remainingAt(at), const Duration(minutes: 25));
+      expect(session.remainingAt(at.add(const Duration(minutes: 26))),
+          Duration.zero,
+          reason: 'elapsed sessions report zero, never a negative duration');
+      expect(session.isCompleteAt(at.add(const Duration(minutes: 24))),
+          isFalse);
+      expect(
+          session.isCompleteAt(at.add(const Duration(minutes: 25))), isTrue);
+    });
+  });
+
+  group('limit requests', () {
+    test('a cool-off clears exactly when it expires', () {
+      final at = DateTime(2026, 3, 1, 9);
+      final request = LimitIncreaseRequest(
+        requestedTier: 1,
+        requestedAt: at,
+        clearsAt: at.add(selfGuidedCoolOff),
+        reviewer: null,
+      );
+
+      expect(
+        request.isClearedAt(at.add(const Duration(hours: 23, minutes: 59))),
+        isFalse,
+      );
+      expect(request.isClearedAt(at.add(selfGuidedCoolOff)), isTrue);
+
+      final reviewerHeld = LimitIncreaseRequest(
+        requestedTier: 1,
+        requestedAt: at,
+        clearsAt: null,
+        reviewer: 'the clinician holding this program',
+      );
+      expect(reviewerHeld.isClearedAt(at.add(const Duration(days: 30))),
+          isFalse,
+          reason: 'a reviewer-held request never clears on a clock');
+    });
+  });
+
+  group('effort gates', () {
+    test('each gate maps to its pigeon counterpart', () {
+      expect(EffortGateChoice.breath.platformValue, PlatformEffortGate.breath);
+      expect(EffortGateChoice.commitment.platformValue,
+          PlatformEffortGate.commitment);
+      expect(EffortGateChoice.puzzle.platformValue, PlatformEffortGate.puzzle);
+    });
+  });
+
+  group('program templates', () {
+    test('templates resolve their module references', () {
+      final teen =
+          programTemplates.firstWhere((t) => t.name == 'Teen Digital Health');
+      expect(teen.modules.map((module) => module.id),
+          containsAll(['M3', 'M5']));
+      expect(
+        teen.modules.firstWhere((module) => module.id == 'M3').name,
+        'Open-count budget',
+      );
+      expect(
+        teen.modules.firstWhere((module) => module.id == 'M1').isUnnamed,
+        isTrue,
+      );
+
+      final adult =
+          programTemplates.firstWhere((t) => t.name == 'Adult Self-Guided');
+      expect(adult.modules, hasLength(unplugModules.length));
+
+      const unknown = ProgramTemplate(
+        name: 'test',
+        track: DeliveryTrack.selfGuided,
+        lowestTier: 0,
+        highestTier: 5,
+        moduleIds: ['M1', 'M99'],
+        allModules: false,
+        limitControl: LimitControl.selfSet,
+        journal: JournalPolicy.none,
+        weeks: 1,
+      );
+      expect(
+        unknown.modules.map((module) => module.id),
+        orderedEquals(['M1']),
+        reason: 'unknown module ids are dropped, not named',
+      );
+    });
+  });
+
+  group('observe week', () {
+    test('the sample week has one entry per weekday label', () {
+      expect(sampleObserveWeek.dailyMinutes, hasLength(weekdayLabels.length));
+      expect(sampleObserveWeek.totalMinutes, greaterThan(0));
+    });
+
+    test('formatMinutes renders hours only when there are some', () {
+      expect(formatMinutes(0), '0m');
+      expect(formatMinutes(48), '48m');
+      expect(formatMinutes(60), '1h 0m');
+      expect(formatMinutes(268), '4h 28m');
+    });
+  });
 }
