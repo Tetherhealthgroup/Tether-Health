@@ -30,6 +30,8 @@ class SettingsPrivacyScreen extends StatelessWidget {
     this.onBackupDevicePlan,
     this.onDeleteDevicePlan,
     this.onSignOut,
+    this.onEditProfile,
+    this.onOpenPrograms,
     super.key,
   });
 
@@ -57,6 +59,8 @@ class SettingsPrivacyScreen extends StatelessWidget {
   final VoidCallback? onBackupDevicePlan;
   final VoidCallback? onDeleteDevicePlan;
   final VoidCallback? onSignOut;
+  final VoidCallback? onEditProfile;
+  final VoidCallback? onOpenPrograms;
 
   String t(String english, String spanish) =>
       localized(isSpanish, english, spanish);
@@ -251,6 +255,7 @@ class SettingsPrivacyScreen extends StatelessWidget {
                     ResourceCard(
                       key: const ValueKey('settings-account-summary'),
                       child: ListTile(
+                        onTap: onEditProfile,
                         leading: const Icon(Icons.person_outline_rounded),
                         title: Text(
                           displayName?.trim().isNotEmpty == true
@@ -267,6 +272,23 @@ class SettingsPrivacyScreen extends StatelessWidget {
                                 'Inicia sesión para sincronizar tu perfil.',
                               ),
                         ),
+                        trailing: onEditProfile == null
+                            ? null
+                            : const Icon(Icons.edit_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ResourceCard(
+                      child: ListTile(
+                        key: const ValueKey('settings-programs'),
+                        leading: const Icon(Icons.apps_rounded),
+                        title: Text(t('Health programs', 'Programas de salud')),
+                        subtitle: Text(t(
+                          'Choose BreatheFree, Heartwise, Steady, or ClearAir.',
+                          'Elige BreatheFree, Heartwise, Steady o ClearAir.',
+                        )),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: onOpenPrograms,
                       ),
                     ),
                     if (hasDevicePlan) ...[

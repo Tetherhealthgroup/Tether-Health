@@ -9,6 +9,7 @@ import { TokenVerifier } from "../src/auth/token-verifier";
 import { configureApp } from "../src/configure-app";
 import { ProfileService } from "../src/profile/profile.service";
 import { QuitPlanService } from "../src/quit-plan/quit-plan.service";
+import { ProgramDataService } from "../src/program-data/program-data.service";
 
 describe("API (e2e)", () => {
   let app: NestFastifyApplication;
@@ -51,15 +52,42 @@ describe("API (e2e)", () => {
             generatedAt: "2026-09-20T00:00:00.000Z",
             profile: profileFixture(),
             quitPlan: quitPlanFixture(),
+            programData: [],
           }),
         deleteData: () =>
           Promise.resolve({
             requestId: "00000000-0000-4000-8000-000000000001",
             completedAt: "2026-09-20T00:00:00.000Z",
-            deleted: { profiles: 1, quitPlans: 1, avatarObjects: 0 },
+            deleted: {
+              profiles: 1,
+              quitPlans: 1,
+              avatarObjects: 0,
+              programData: 0,
+            },
             authIdentityDeleted: false,
             authIdentityStatus: "external-action-required",
           }),
+      })
+      .overrideProvider(ProgramDataService)
+      .useValue({
+        get: (_user: unknown, programId: string) =>
+          Promise.resolve({
+            programId,
+            payload: { readings: [] },
+            revision: 1,
+            updatedAt: "2026-09-26T00:00:00.000Z",
+          }),
+        put: (
+          _user: unknown,
+          programId: string,
+          dto: Record<string, unknown>,
+        ) =>
+          Promise.resolve({
+            programId,
+            ...dto,
+            updatedAt: "2026-09-26T00:00:00.000Z",
+          }),
+        delete: () => Promise.resolve(),
       })
       .compile();
     app = module.createNestApplication<NestFastifyApplication>(
@@ -93,6 +121,8 @@ describe("API (e2e)", () => {
     ["POST", "/v1/quit-plan/guest-import", {}],
     ["GET", "/v1/account/export", undefined],
     ["DELETE", "/v1/account/data", { confirmation: "DELETE" }],
+    ["GET", "/v1/program-data/steady", undefined],
+    ["PUT", "/v1/program-data/steady", { payload: {}, revision: 1 }],
   ])("%s %s requires a token", async (method, url, payload) => {
     const response = await app.inject({
       method: method as "DELETE" | "GET" | "PATCH" | "POST" | "PUT",
@@ -129,6 +159,29 @@ describe("API (e2e)", () => {
       url: "/v1/profile",
       headers: { authorization: "Bearer test-token" },
       payload: { healthNotes: "must not enter profile storage" },
+    });
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("GET /v1/program-data/:programId returns only the caller module", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: "/v1/program-data/steady",
+      headers: { authorization: "Bearer test-token" },
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toMatchObject({
+      programId: "steady",
+      payload: { readings: [] },
+      revision: 1,
+    });
+  });
+
+  it("rejects unsupported program identifiers", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: "/v1/program-data/breathefree",
+      headers: { authorization: "Bearer test-token" },
     });
     expect(response.statusCode).toBe(400);
   });
@@ -249,6 +302,8 @@ const profileFixture = () => ({
   timeZone: "UTC",
   onboardingCompleted: false,
   avatarPath: null,
+  avatarUrl: null,
+  avatarUrlExpiresAt: null,
   createdAt: "2026-09-11T00:00:00.000Z",
   updatedAt: "2026-09-11T00:00:00.000Z",
 });

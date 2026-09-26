@@ -17,7 +17,12 @@ import 'error/privacy_safe_error_reporter.dart';
 import 'models/screen_spec.dart';
 import 'models/tap_target.dart';
 import 'profile/profile_api_client.dart';
+import 'profile/avatar_storage.dart';
 import 'profile/profile_repository.dart';
+import 'programs/program.dart';
+import 'programs/program_data_api_client.dart';
+import 'programs/program_navigator.dart';
+import 'programs/secure_program_store.dart';
 import 'quit_plan/guest_quit_plan_store.dart';
 import 'quit_plan/quit_plan_api_client.dart';
 import 'quit_plan/quit_plan_controller.dart';
@@ -57,6 +62,7 @@ Future<void> _bootstrap() async {
   final config = AppConfig.fromEnvironment();
   AccountController? account;
   QuitPlanController? quitPlan;
+  late final SecureProgramStore programStore;
   final guestStore = SecureGuestQuitPlanStore();
   if (kReleaseMode || config.hasAnyConfiguration) config.validate();
   if (config.isConfigured) {
@@ -71,6 +77,7 @@ Future<void> _bootstrap() async {
     account = AccountController(
       auth: auth,
       accountData: HttpAccountDataApiClient(baseUrl: config.apiBaseUrl),
+      avatarStorage: SupabaseAvatarStorage(Supabase.instance.client),
       profiles: ProfileRepository(
         auth: auth,
         api: HttpProfileApiClient(baseUrl: config.apiBaseUrl),
@@ -84,13 +91,18 @@ Future<void> _bootstrap() async {
       ),
       guestStore: guestStore,
     );
+    programStore = SecureProgramStore(
+      api: HttpProgramDataApiClient(baseUrl: config.apiBaseUrl),
+    );
   } else {
     quitPlan = QuitPlanController.disabled(guestStore: guestStore);
+    programStore = SecureProgramStore();
   }
 
   runApp(BreatheFreeApp(
     accountController: account,
     quitPlanController: quitPlan,
+    programStore: programStore,
   ));
 }
 
@@ -99,12 +111,14 @@ class BreatheFreeApp extends StatefulWidget {
     this.initialScreen = 0,
     this.accountController,
     this.quitPlanController,
+    this.programStore,
     super.key,
   });
 
   final int initialScreen;
   final AccountController? accountController;
   final QuitPlanController? quitPlanController;
+  final SecureProgramStore? programStore;
 
   @override
   State<BreatheFreeApp> createState() => _BreatheFreeAppState();
@@ -126,6 +140,9 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   bool _restoreFailed = false;
   int _journeyEpoch = 0;
   final List<int> _history = <int>[];
+  ProgramId? _activeProgram;
+  bool _showProgramPicker = false;
+  late final SecureProgramStore _programStore;
 
   @override
   void initState() {
@@ -136,6 +153,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     _ownsQuitPlanController = widget.quitPlanController == null;
     _quitPlanController =
         widget.quitPlanController ?? QuitPlanController.disabled();
+    _programStore = widget.programStore ?? SecureProgramStore();
     _currentIndex =
         widget.initialScreen.clamp(0, approvedScreens.length - 1).toInt();
     _restoringAccount = _currentIndex == 0 &&
@@ -438,7 +456,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     return AnimatedBuilder(
       animation: _accountController,
       builder: (context, _) => MaterialApp(
-        title: 'BreatheFree',
+        title: 'Tether Health',
         debugShowCheckedModeBanner: false,
         restorationScopeId: 'breathefree',
         theme: AppTheme.light(),
@@ -451,17 +469,40 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
                     onRetry: _retryAccountRestore,
                     onSignOut: _signOutAfterRestoreFailure,
                   )
-                : ApprovedScreenPlayer(
-                    key: ValueKey(_journeyEpoch),
-                    accountController: _accountController,
-                    quitPlanController: _quitPlanController,
-                    currentIndex: _currentIndex,
-                    onSelectScreen: _goTo,
-                    onPrevious: _goBack,
-                    onNext: _goNext,
-                    onTarget: _handleTarget,
-                    onSessionReset: _resetJourney,
-                  ),
+                : _showProgramPicker
+                    ? ProgramSelectionScreen(
+                        account: _accountController,
+                        onSelect: (program) => setState(() {
+                          _activeProgram = program;
+                          _showProgramPicker = false;
+                        }),
+                      )
+                    : _activeProgram != null
+                        ? ProgramNavigator(
+                            key: ValueKey(
+                              '${_accountController.accountId ?? 'guest'}:'
+                              '${_activeProgram!.slug}',
+                            ),
+                            programId: _activeProgram!,
+                            account: _accountController,
+                            store: _programStore,
+                            onChooseProgram: () =>
+                                setState(() => _showProgramPicker = true),
+                          )
+                        : ApprovedScreenPlayer(
+                            key: ValueKey(_journeyEpoch),
+                            accountController: _accountController,
+                            quitPlanController: _quitPlanController,
+                            currentIndex: _currentIndex,
+                            onSelectScreen: _goTo,
+                            onPrevious: _goBack,
+                            onNext: _goNext,
+                            onTarget: _handleTarget,
+                            onSessionReset: _resetJourney,
+                            onOpenPrograms: () =>
+                                setState(() => _showProgramPicker = true),
+                            onAccountDataDeleted: _programStore.deleteAccount,
+                          ),
       ),
     );
   }

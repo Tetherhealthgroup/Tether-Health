@@ -26,6 +26,8 @@ jobs:
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed lib test
       - run: flutter analyze
+      - name: Accessibility, offline, and program integration coverage
+        run: flutter test test/accessibility test/programs test/profile test/auth
       - run: flutter test
       - name: Build unsigned Android release bundle
         run: flutter build appbundle --release
@@ -76,6 +78,7 @@ jobs:
       - run: bash supabase/tests/verify_profiles_migration.sh
       - run: bash supabase/tests/verify_quit_plans_migration.sh
       - run: bash supabase/tests/verify_account_deletion_migration.sh
+      - run: bash supabase/tests/verify_program_data_migration.sh
       - name: Apply all migrations to local Supabase
         run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor
       - run: supabase db reset --local --no-seed

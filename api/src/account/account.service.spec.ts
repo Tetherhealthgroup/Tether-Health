@@ -31,7 +31,7 @@ describe("AccountService", () => {
     expect(mockedCreateClient).not.toHaveBeenCalled();
   });
 
-  it("exports only caller-scoped profile and quit-plan rows", async () => {
+  it("exports only caller-scoped profile, quit-plan, and program rows", async () => {
     const profileSingle = jest.fn().mockResolvedValue({
       data: { id: user(0).id, display_name: "Alex" },
       error: null,
@@ -42,10 +42,16 @@ describe("AccountService", () => {
     });
     const profileEq = jest.fn().mockReturnValue({ single: profileSingle });
     const planEq = jest.fn().mockReturnValue({ maybeSingle: planSingle });
+    const programReturns = jest.fn().mockResolvedValue({
+      data: [{ program_id: "steady", payload: {}, revision: 1 }],
+      error: null,
+    });
+    const programEq = jest.fn().mockReturnValue({ returns: programReturns });
     const from = jest
       .fn()
       .mockReturnValueOnce({ select: () => ({ eq: profileEq }) })
-      .mockReturnValueOnce({ select: () => ({ eq: planEq }) });
+      .mockReturnValueOnce({ select: () => ({ eq: planEq }) })
+      .mockReturnValueOnce({ select: () => ({ eq: programEq }) });
     mockedCreateClient.mockReturnValue({ from } as never);
 
     const service = new AccountService(config);
@@ -54,9 +60,11 @@ describe("AccountService", () => {
       schemaVersion: "1.0",
       profile: { display_name: "Alex" },
       quitPlan: { readiness_path: "prepare" },
+      programData: [{ programId: "steady", revision: 1 }],
     });
     expect(profileEq).toHaveBeenCalledWith("id", user(0).id);
     expect(planEq).toHaveBeenCalledWith("user_id", user(0).id);
+    expect(programEq).toHaveBeenCalledWith("user_id", user(0).id);
   });
 
   it("deletes app rows through the caller-scoped RPC and returns a receipt", async () => {
@@ -67,7 +75,7 @@ describe("AccountService", () => {
     const eq = jest.fn().mockReturnValue({ single });
     const from = jest.fn().mockReturnValue({ select: () => ({ eq }) });
     const rpc = jest.fn().mockResolvedValue({
-      data: { profiles: 1, quit_plans: 1 },
+      data: { profiles: 1, quit_plans: 1, program_data: 2 },
       error: null,
     });
     mockedCreateClient.mockReturnValue({ from, rpc } as never);
@@ -81,7 +89,12 @@ describe("AccountService", () => {
       p_confirmation: "DELETE",
     });
     expect(result).toMatchObject({
-      deleted: { profiles: 1, quitPlans: 1, avatarObjects: 0 },
+      deleted: {
+        profiles: 1,
+        quitPlans: 1,
+        avatarObjects: 0,
+        programData: 2,
+      },
       authIdentityDeleted: false,
       authIdentityStatus: "external-action-required",
     });

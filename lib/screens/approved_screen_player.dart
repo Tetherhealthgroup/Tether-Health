@@ -14,6 +14,7 @@ import '../theme/app_colors.dart';
 import '../widgets/account_data_dialogs.dart';
 import '../widgets/approved_screen_viewport.dart';
 import '../widgets/profile_avatar.dart';
+import '../widgets/profile_editor_dialog.dart';
 import '../widgets/sign_in_dialog.dart';
 import 'active_craving_rescue_screen.dart';
 import 'baseline_assessment_screen.dart';
@@ -61,6 +62,8 @@ class ApprovedScreenPlayer extends StatefulWidget {
     this.accountController,
     this.quitPlanController,
     this.onSessionReset,
+    this.onOpenPrograms,
+    this.onAccountDataDeleted,
     super.key,
   });
 
@@ -72,6 +75,8 @@ class ApprovedScreenPlayer extends StatefulWidget {
   final AccountController? accountController;
   final QuitPlanController? quitPlanController;
   final ValueChanged<int>? onSessionReset;
+  final VoidCallback? onOpenPrograms;
+  final Future<void> Function(String accountId)? onAccountDataDeleted;
 
   @override
   State<ApprovedScreenPlayer> createState() => _ApprovedScreenPlayerState();
@@ -162,7 +167,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
         signedIn: _accountController.isSignedIn,
         displayName: _accountController.profile?.displayName,
         email: _accountController.email,
-        avatarUrl: _accountController.profile?.avatarPath,
+        avatarUrl: _accountController.profile?.avatarUrl,
       );
 
   @override
@@ -706,9 +711,11 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       await _showSignIn();
       return;
     }
+    final accountId = _accountController.accountId;
     final receipt =
         await showAccountDeletionDialog(context, _accountController);
     if (!mounted || receipt == null) return;
+    if (accountId != null) await widget.onAccountDataDeleted?.call(accountId);
     _quitPlanController.clear();
     await _quitPlanController.clearGuestPlan();
     if (!mounted) return;
@@ -1537,7 +1544,14 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               signedIn: _accountController.isSignedIn,
               accountEmail: _accountController.email,
               displayName: _accountController.profile?.displayName,
-              avatarUrl: _accountController.profile?.avatarPath,
+              avatarUrl: _accountController.profile?.avatarUrl,
+              onEditProfile: _accountController.isSignedIn
+                  ? () => showProfileEditorDialog(
+                        context,
+                        _accountController,
+                      )
+                  : null,
+              onOpenPrograms: widget.onOpenPrograms,
               hasDevicePlan: _quitPlanController.hasStoredGuestPlan,
               devicePlanNeedsRecovery:
                   _quitPlanController.hasGuestPlanRecoveryIssue,

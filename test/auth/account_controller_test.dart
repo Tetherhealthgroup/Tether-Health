@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:breathefree_patient/account/account_data_api_client.dart';
 import 'package:breathefree_patient/auth/account_controller.dart';
 import 'package:breathefree_patient/auth/auth_gateway.dart';
 import 'package:breathefree_patient/profile/profile_api_client.dart';
+import 'package:breathefree_patient/profile/avatar_storage.dart';
 import 'package:breathefree_patient/profile/profile_repository.dart';
 import 'package:breathefree_patient/profile/user_profile.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -108,6 +110,55 @@ void main() {
     expect(await controller.completeOnboarding(), isTrue);
     expect(api.receivedUpdate, {'onboardingCompleted': true});
     expect(controller.profile?.onboardingCompleted, isTrue);
+  });
+
+  test('profile edits validate names and safely upload then remove an avatar',
+      () async {
+    final auth = _FakeAuth();
+    final api = _FakeProfileApi();
+    final storage = _FakeAvatarStorage();
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: api),
+      avatarStorage: storage,
+    );
+    await controller.signIn(email: 'person@example.test', password: 'password');
+
+    expect(await controller.updateDisplayName('  Maya Patel  '), isTrue);
+    expect(api.receivedUpdate, {'displayName': 'Maya Patel'});
+    expect(await controller.updateDisplayName('   '), isFalse);
+
+    final jpeg = Uint8List.fromList([0xff, 0xd8, 0xff, 0x00]);
+    expect(
+      await controller.uploadAvatar(bytes: jpeg, contentType: 'image/jpeg'),
+      isTrue,
+    );
+    expect(storage.uploadedPath, 'user-id/avatar.jpg');
+    expect(controller.profile?.avatarPath, 'user-id/avatar.jpg');
+
+    expect(await controller.removeAvatar(), isTrue);
+    expect(storage.removed, contains('user-id/avatar.jpg'));
+    expect(controller.profile?.avatarPath, isNull);
+  });
+
+  test('avatar validation rejects spoofed files before upload', () async {
+    final auth = _FakeAuth();
+    final storage = _FakeAvatarStorage();
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      avatarStorage: storage,
+    );
+    await controller.signIn(email: 'person@example.test', password: 'password');
+
+    expect(
+      await controller.uploadAvatar(
+        bytes: Uint8List.fromList([1, 2, 3, 4]),
+        contentType: 'image/jpeg',
+      ),
+      isFalse,
+    );
+    expect(storage.uploadedPath, isNull);
   });
 
   test('password recovery deep link permits a password update', () async {
@@ -256,6 +307,8 @@ class _FailingProfileApi implements ProfileApiClient {
 class _FakeProfileApi implements ProfileApiClient {
   String? receivedToken;
   Map<String, Object?>? receivedUpdate;
+  String displayName = 'Test Person';
+  String? avatarPath;
 
   @override
   Future<UserProfile> getProfile(String accessToken) async {
@@ -268,6 +321,12 @@ class _FakeProfileApi implements ProfileApiClient {
       String accessToken, Map<String, Object?> update) async {
     receivedToken = accessToken;
     receivedUpdate = update;
+    if (update.containsKey('displayName')) {
+      displayName = update['displayName']! as String;
+    }
+    if (update.containsKey('avatarPath')) {
+      avatarPath = update['avatarPath'] as String?;
+    }
     return _profile(
       onboardingCompleted: update['onboardingCompleted'] == true,
     );
@@ -275,12 +334,31 @@ class _FakeProfileApi implements ProfileApiClient {
 
   UserProfile _profile({required bool onboardingCompleted}) => UserProfile(
         id: 'user-id',
-        displayName: 'Test Person',
+        displayName: displayName,
         locale: 'en',
         timeZone: 'UTC',
         onboardingCompleted: onboardingCompleted,
-        avatarPath: null,
+        avatarPath: avatarPath,
         createdAt: DateTime.utc(2026),
         updatedAt: DateTime.utc(2026),
       );
+}
+
+class _FakeAvatarStorage implements AvatarStorage {
+  String? uploadedPath;
+  final List<String> removed = [];
+
+  @override
+  Future<void> upload({
+    required String path,
+    required Uint8List bytes,
+    required String contentType,
+  }) async {
+    uploadedPath = path;
+  }
+
+  @override
+  Future<void> remove(String path) async {
+    removed.add(path);
+  }
 }

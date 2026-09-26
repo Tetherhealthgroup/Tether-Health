@@ -31,7 +31,7 @@ export class ProfileService {
       .maybeSingle<ProfileRow>();
     if (error) throw new BadGatewayException("Profile data is unavailable");
     if (!data) throw new NotFoundException("Profile not found");
-    return this.toResponse(data);
+    return this.toResponse(user, data);
   }
 
   async update(
@@ -58,7 +58,7 @@ export class ProfileService {
       .select("*")
       .single<ProfileRow>();
     if (error) throw new BadGatewayException("Profile update failed");
-    return this.toResponse(data);
+    return this.toResponse(user, data);
   }
 
   private client(user: AuthUser) {
@@ -72,7 +72,27 @@ export class ProfileService {
     );
   }
 
-  private toResponse(row: ProfileRow): ProfileResponse {
+  private async toResponse(
+    user: AuthUser,
+    row: ProfileRow,
+  ): Promise<ProfileResponse> {
+    const expiresInSeconds = 300;
+    let avatarUrl: string | null = null;
+    let avatarUrlExpiresAt: string | null = null;
+    if (row.avatar_path) {
+      if (!row.avatar_path.startsWith(`${user.id}/`)) {
+        throw new BadGatewayException("Profile avatar is unavailable");
+      }
+      const signed = await this.client(user)
+        .storage.from("avatars")
+        .createSignedUrl(row.avatar_path, expiresInSeconds);
+      if (!signed.error) {
+        avatarUrl = signed.data.signedUrl;
+        avatarUrlExpiresAt = new Date(
+          Date.now() + expiresInSeconds * 1000,
+        ).toISOString();
+      }
+    }
     return {
       id: row.id,
       displayName: row.display_name,
@@ -80,6 +100,8 @@ export class ProfileService {
       timeZone: row.time_zone,
       onboardingCompleted: row.onboarding_completed,
       avatarPath: row.avatar_path,
+      avatarUrl,
+      avatarUrlExpiresAt,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };

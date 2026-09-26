@@ -30,6 +30,7 @@ class AccountDeletionReceipt {
     required this.profileRowsDeleted,
     required this.quitPlanRowsDeleted,
     required this.avatarObjectsDeleted,
+    this.programDataRowsDeleted = 0,
     required this.authIdentityDeleted,
   });
 
@@ -41,6 +42,7 @@ class AccountDeletionReceipt {
       profileRowsDeleted: deleted['profiles'] as int,
       quitPlanRowsDeleted: deleted['quitPlans'] as int,
       avatarObjectsDeleted: deleted['avatarObjects'] as int,
+      programDataRowsDeleted: deleted['programData'] as int? ?? 0,
       authIdentityDeleted: json['authIdentityDeleted'] as bool,
     );
   }
@@ -50,6 +52,7 @@ class AccountDeletionReceipt {
   final int profileRowsDeleted;
   final int quitPlanRowsDeleted;
   final int avatarObjectsDeleted;
+  final int programDataRowsDeleted;
   final bool authIdentityDeleted;
 }
 

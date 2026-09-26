@@ -16,6 +16,14 @@ import type {
 interface DeleteCounts {
   profiles: number;
   quit_plans: number;
+  program_data: number;
+}
+
+interface ProgramExportRow {
+  program_id: "heartwise" | "steady" | "clearair";
+  payload: Record<string, unknown>;
+  revision: number;
+  updated_at: string;
 }
 
 @Injectable()
@@ -27,15 +35,20 @@ export class AccountService {
   async export(user: AuthUser): Promise<AccountDataExportResponse> {
     this.requireRecentAuthentication(user);
     const client = this.client(user);
-    const [profileResult, planResult] = await Promise.all([
+    const [profileResult, planResult, programResult] = await Promise.all([
       client.from("profiles").select("*").eq("id", user.id).single(),
       client
         .from("quit_plans")
         .select("*")
         .eq("user_id", user.id)
         .maybeSingle(),
+      client
+        .from("program_data")
+        .select("program_id,payload,revision,updated_at")
+        .eq("user_id", user.id)
+        .returns<ProgramExportRow[]>(),
     ]);
-    if (profileResult.error || planResult.error) {
+    if (profileResult.error || planResult.error || programResult.error) {
       throw new BadGatewayException("Account data export is unavailable");
     }
     return {
@@ -43,6 +56,12 @@ export class AccountService {
       generatedAt: new Date().toISOString(),
       profile: profileResult.data as Record<string, unknown>,
       quitPlan: planResult.data as Record<string, unknown> | null,
+      programData: programResult.data.map((row) => ({
+        programId: row.program_id,
+        payload: row.payload,
+        revision: row.revision,
+        updatedAt: row.updated_at,
+      })),
     };
   }
 
@@ -86,6 +105,7 @@ export class AccountService {
         profiles: counts.profiles,
         quitPlans: counts.quit_plans,
         avatarObjects,
+        programData: counts.program_data,
       },
       authIdentityDeleted: false,
       authIdentityStatus: "external-action-required",

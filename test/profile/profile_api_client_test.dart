@@ -13,7 +13,7 @@ void main() {
         expect(request.url.toString(), 'https://api.example.test/v1/profile');
         expect(request.headers['authorization'], 'Bearer user-token');
         return http.Response(
-          '{"id":"00000000-0000-0000-0000-000000000001","displayName":"Alex","locale":"en","timeZone":"America/Los_Angeles","onboardingCompleted":false,"avatarPath":null,"createdAt":"2026-09-11T00:00:00Z","updatedAt":"2026-09-11T00:00:00Z"}',
+          '{"id":"00000000-0000-0000-0000-000000000001","displayName":"Alex","locale":"en","timeZone":"America/Los_Angeles","onboardingCompleted":false,"avatarPath":"00000000-0000-0000-0000-000000000001/avatar.jpg","avatarUrl":"https://storage.example.test/signed","avatarUrlExpiresAt":"2026-09-11T00:05:00Z","createdAt":"2026-09-11T00:00:00Z","updatedAt":"2026-09-11T00:00:00Z"}',
           200,
         );
       }),
@@ -22,6 +22,8 @@ void main() {
     final profile = await client.getProfile('user-token');
     expect(profile.displayName, 'Alex');
     expect(profile.locale, 'en');
+    expect(profile.avatarUrl, 'https://storage.example.test/signed');
+    expect(profile.avatarUrlExpiresAt, DateTime.utc(2026, 9, 11, 0, 5));
   });
 
   test('returns a typed error without exposing response data', () async {
