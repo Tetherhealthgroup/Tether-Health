@@ -141,6 +141,23 @@ void main() {
     expect(controller.profile?.avatarPath, isNull);
   });
 
+  test('avatar removal preserves the profile reference when storage fails',
+      () async {
+    final auth = _FakeAuth();
+    final api = _FakeProfileApi()..avatarPath = 'user-id/avatar.jpg';
+    final storage = _FakeAvatarStorage()..failRemoval = true;
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: api),
+      avatarStorage: storage,
+    );
+    await controller.signIn(email: 'person@example.test', password: 'password');
+
+    expect(await controller.removeAvatar(), isFalse);
+    expect(controller.profile?.avatarPath, 'user-id/avatar.jpg');
+    expect(api.avatarPath, 'user-id/avatar.jpg');
+  });
+
   test('avatar validation rejects spoofed files before upload', () async {
     final auth = _FakeAuth();
     final storage = _FakeAvatarStorage();
@@ -346,6 +363,7 @@ class _FakeProfileApi implements ProfileApiClient {
 
 class _FakeAvatarStorage implements AvatarStorage {
   String? uploadedPath;
+  bool failRemoval = false;
   final List<String> removed = [];
 
   @override
@@ -359,6 +377,7 @@ class _FakeAvatarStorage implements AvatarStorage {
 
   @override
   Future<void> remove(String path) async {
+    if (failRemoval) throw StateError('storage unavailable');
     removed.add(path);
   }
 }

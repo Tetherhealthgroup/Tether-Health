@@ -78,7 +78,12 @@ describe("AccountService", () => {
       data: { profiles: 1, quit_plans: 1, program_data: 2 },
       error: null,
     });
-    mockedCreateClient.mockReturnValue({ from, rpc } as never);
+    const list = jest.fn().mockResolvedValue({ data: [], error: null });
+    mockedCreateClient.mockReturnValue({
+      from,
+      rpc,
+      storage: { from: jest.fn().mockReturnValue({ list }) },
+    } as never);
 
     const service = new AccountService(config);
     const result = await service.deleteData(
@@ -98,5 +103,39 @@ describe("AccountService", () => {
       authIdentityDeleted: false,
       authIdentityStatus: "external-action-required",
     });
+  });
+
+  it("deletes every caller-owned avatar object, including unreferenced replacements", async () => {
+    const list = jest
+      .fn()
+      .mockResolvedValueOnce({
+        data: [{ name: "avatar.jpg" }, { name: "avatar.png" }],
+        error: null,
+      })
+      .mockResolvedValueOnce({ data: [], error: null });
+    const remove = jest.fn().mockResolvedValue({
+      data: [{ name: "avatar.jpg" }, { name: "avatar.png" }],
+      error: null,
+    });
+    const rpc = jest.fn().mockResolvedValue({
+      data: { profiles: 1, quit_plans: 0, program_data: 0 },
+      error: null,
+    });
+    mockedCreateClient.mockReturnValue({
+      rpc,
+      storage: { from: jest.fn().mockReturnValue({ list, remove }) },
+    } as never);
+
+    const service = new AccountService(config);
+    const result = await service.deleteData(
+      user(Math.floor(Date.now() / 1000)),
+      "DELETE",
+    );
+
+    expect(remove).toHaveBeenCalledWith([
+      `${user(0).id}/avatar.jpg`,
+      `${user(0).id}/avatar.png`,
+    ]);
+    expect(result.deleted.avatarObjects).toBe(2);
   });
 });

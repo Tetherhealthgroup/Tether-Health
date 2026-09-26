@@ -109,15 +109,11 @@ class AccountController extends ChangeNotifier {
         bytes: bytes,
         contentType: contentType,
       );
+      if (previousPath != null && previousPath != path) {
+        await _avatarStorage.remove(previousPath);
+      }
       profile = await _profiles.update({'avatarPath': path});
       _scheduleAvatarRefresh();
-      if (previousPath != null && previousPath != path) {
-        try {
-          await _avatarStorage.remove(previousPath);
-        } catch (_) {
-          // The current avatar is committed; orphan cleanup can retry later.
-        }
-      }
       return true;
     } catch (_) {
       if (previousPath != path) {
@@ -140,13 +136,9 @@ class AccountController extends ChangeNotifier {
     errorMessage = null;
     notifyListeners();
     try {
+      await _avatarStorage.remove(path);
       profile = await _profiles.update({'avatarPath': null});
       _scheduleAvatarRefresh();
-      try {
-        await _avatarStorage.remove(path);
-      } catch (_) {
-        // The profile no longer references the private object. Cleanup can retry.
-      }
       return true;
     } catch (_) {
       errorMessage = 'Your photo could not be removed. Check your connection.';

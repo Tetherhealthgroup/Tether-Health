@@ -71,24 +71,25 @@ export class AccountService {
   ): Promise<AccountDeletionReceipt> {
     this.requireRecentAuthentication(user);
     const client = this.client(user);
-    const profile = await client
-      .from("profiles")
-      .select("avatar_path")
-      .eq("id", user.id)
-      .single<{ avatar_path: string | null }>();
-    if (profile.error) {
-      throw new BadGatewayException("Account deletion could not start");
-    }
-
+    const avatars = client.storage.from("avatars");
     let avatarObjects = 0;
-    if (profile.data.avatar_path) {
-      const removal = await client.storage
-        .from("avatars")
-        .remove([profile.data.avatar_path]);
-      if (removal.error) {
+    while (true) {
+      const listed = await avatars.list(user.id, {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: "name", order: "asc" },
+      });
+      if (listed.error) {
         throw new BadGatewayException("Account deletion could not start");
       }
-      avatarObjects = removal.data.length;
+      if (listed.data.length === 0) break;
+
+      const paths = listed.data.map((object) => `${user.id}/${object.name}`);
+      const removal = await avatars.remove(paths);
+      if (removal.error || removal.data.length !== paths.length) {
+        throw new BadGatewayException("Account deletion could not start");
+      }
+      avatarObjects += removal.data.length;
     }
 
     const result = await client.rpc("delete_my_app_data", {
