@@ -135,6 +135,9 @@ void main() {
     );
     expect(storage.uploadedPath, 'user-id/avatar');
     expect(controller.profile?.avatarPath, 'user-id/avatar');
+    expect(
+        controller.profile?.avatarUrl, 'https://storage.example.test/avatar');
+    expect(api.getCalls, 2);
 
     final png = Uint8List.fromList([0x89, 0x50, 0x4e, 0x47, 0, 0, 0, 0]);
     expect(
@@ -357,9 +360,11 @@ class _FakeProfileApi implements ProfileApiClient {
   Map<String, Object?>? receivedUpdate;
   String displayName = 'Test Person';
   String? avatarPath;
+  int getCalls = 0;
 
   @override
   Future<UserProfile> getProfile(String accessToken) async {
+    getCalls++;
     receivedToken = accessToken;
     return _profile(onboardingCompleted: false);
   }
@@ -387,6 +392,10 @@ class _FakeProfileApi implements ProfileApiClient {
         timeZone: 'UTC',
         onboardingCompleted: onboardingCompleted,
         avatarPath: avatarPath,
+        avatarUrl:
+            avatarPath == null ? null : 'https://storage.example.test/avatar',
+        avatarUrlExpiresAt:
+            avatarPath == null ? null : DateTime.utc(2030, 1, 1, 0, 10),
         createdAt: DateTime.utc(2026),
         updatedAt: DateTime.utc(2026),
       );
