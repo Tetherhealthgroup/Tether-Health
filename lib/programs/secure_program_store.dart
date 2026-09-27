@@ -36,7 +36,8 @@ class SecureProgramStore {
         await _storage.delete(key: _key(accountScope, programId));
       }
     }
-    if (accessToken == null) return local;
+    final draft = await _readDocument(_draftKey(accountScope, programId));
+    if (accessToken == null) return draft ?? local;
     try {
       final remote = await _api.get(accessToken, programId);
       if (local?.pendingSync == true) {
@@ -44,7 +45,13 @@ class SecureProgramStore {
             remote.revision == local!.revision &&
             jsonEncode(remote.payload) == jsonEncode(local.payload)) {
           await _writeLocal(accountScope, programId, remote);
-          return remote;
+          return await _syncDraft(
+            accountScope,
+            programId,
+            accessToken,
+            remote,
+            draft,
+          );
         }
         try {
           await _api.put(accessToken, programId, local!);
@@ -53,7 +60,13 @@ class SecureProgramStore {
             revision: local.revision,
           );
           await _writeLocal(accountScope, programId, synced);
-          return synced;
+          return await _syncDraft(
+            accountScope,
+            programId,
+            accessToken,
+            synced,
+            draft,
+          );
         } catch (_) {
           throw ProgramDataLoadException(local);
         }
@@ -61,12 +74,27 @@ class SecureProgramStore {
       if (remote != null &&
           (local == null || remote.revision >= local.revision)) {
         await _writeLocal(accountScope, programId, remote);
-        return remote;
+        return await _syncDraft(
+          accountScope,
+          programId,
+          accessToken,
+          remote,
+          draft,
+        );
+      }
+      if (draft != null) {
+        return await _syncDraft(
+          accountScope,
+          programId,
+          accessToken,
+          local,
+          draft,
+        );
       }
       return local;
     } catch (error) {
       if (error is ProgramDataLoadException) rethrow;
-      throw ProgramDataLoadException(local);
+      throw ProgramDataLoadException(draft ?? local);
     }
   }
 
@@ -98,10 +126,22 @@ class SecureProgramStore {
           await _writeLocal(accountScope, programId, remote);
           outgoingRevision = remote.revision + 1;
         } else if (remote != null) {
-          return ProgramSaveResult.conflict(existing.revision);
+          final draft = ProgramDataDocument(
+            payload: payload,
+            revision: remote.revision + 1,
+            pendingSync: true,
+          );
+          await _writeDraft(accountScope, programId, draft);
+          return ProgramSaveResult.conflict(draft.revision);
         }
       } catch (_) {
-        return ProgramSaveResult.pending(existing.revision);
+        final draft = ProgramDataDocument(
+          payload: payload,
+          revision: existing.revision + 1,
+          pendingSync: true,
+        );
+        await _writeDraft(accountScope, programId, draft);
+        return ProgramSaveResult.pending(draft.revision);
       }
     }
 
@@ -121,6 +161,7 @@ class SecureProgramStore {
         programId,
         ProgramDataDocument(payload: payload, revision: outgoingRevision),
       );
+      await _storage.delete(key: _draftKey(accountScope, programId));
       return ProgramSaveResult.synced(outgoingRevision);
     } catch (_) {
       try {
@@ -140,6 +181,64 @@ class SecureProgramStore {
       return ProgramSaveResult.pending(outgoingRevision);
     }
   }
+
+  Future<ProgramDataDocument?> _syncDraft(
+    String accountScope,
+    ProgramId programId,
+    String accessToken,
+    ProgramDataDocument? base,
+    ProgramDataDocument? draft,
+  ) async {
+    if (draft == null) return base;
+    final rebased = ProgramDataDocument(
+      payload: draft.payload,
+      revision: (base?.revision ?? 0) + 1,
+      pendingSync: true,
+    );
+    await _writeDraft(accountScope, programId, rebased);
+    try {
+      await _api.put(accessToken, programId, rebased);
+      final synced = ProgramDataDocument(
+        payload: rebased.payload,
+        revision: rebased.revision,
+      );
+      await _writeLocal(accountScope, programId, synced);
+      await _storage.delete(key: _draftKey(accountScope, programId));
+      return synced;
+    } catch (_) {
+      throw ProgramDataLoadException(rebased);
+    }
+  }
+
+  Future<ProgramDataDocument?> _readDocument(String key) async {
+    final encoded = await _storage.read(key: key);
+    if (encoded == null) return null;
+    try {
+      final value = jsonDecode(encoded) as Map<String, Object?>;
+      return ProgramDataDocument(
+        payload: (value['payload']! as Map).cast<String, Object?>(),
+        revision: value['revision']! as int,
+        pendingSync: value['pendingSync'] == true,
+      );
+    } catch (_) {
+      await _storage.delete(key: key);
+      return null;
+    }
+  }
+
+  Future<void> _writeDraft(
+    String accountScope,
+    ProgramId programId,
+    ProgramDataDocument document,
+  ) =>
+      _storage.write(
+        key: _draftKey(accountScope, programId),
+        value: jsonEncode({
+          'payload': document.payload,
+          'revision': document.revision,
+          'pendingSync': true,
+        }),
+      );
 
   Future<void> deleteAccount(String accountScope) async {
     final values = await _storage.readAll();
@@ -165,6 +264,9 @@ class SecureProgramStore {
 
   String _key(String accountScope, ProgramId programId) =>
       '$_prefix.$accountScope.${programId.slug}';
+
+  String _draftKey(String accountScope, ProgramId programId) =>
+      '${_key(accountScope, programId)}.draft';
 }
 
 class ProgramDataLoadException implements Exception {

@@ -98,6 +98,39 @@ void main() {
     expect(local?.pendingSync, isFalse);
   });
 
+  test('later offline edits survive ambiguous reconciliation and restart',
+      () async {
+    final store = SecureProgramStore(api: _OfflineApi());
+    await store.save(
+      accountScope: 'account-a',
+      programId: ProgramId.heartwise,
+      payload: {'bpReadings': <Object?>[]},
+      revision: 1,
+      accessToken: 'token',
+    );
+    final result = await store.save(
+      accountScope: 'account-a',
+      programId: ProgramId.heartwise,
+      payload: {
+        'bpReadings': <Object?>[
+          {'id': 'bp-1'}
+        ],
+      },
+      revision: 1,
+      accessToken: 'token',
+    );
+
+    expect(result.synced, isFalse);
+    final restored = await store.load(
+      accountScope: 'account-a',
+      programId: ProgramId.heartwise,
+    );
+    expect(restored?.payload['bpReadings'], [
+      {'id': 'bp-1'}
+    ]);
+    expect(restored?.pendingSync, isTrue);
+  });
+
   test('oversized health payload is rejected before local or network write',
       () async {
     final store = SecureProgramStore();

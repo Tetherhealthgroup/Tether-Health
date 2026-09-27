@@ -340,11 +340,16 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
 
   Future<void> _deleteAccountData() async {
     if (!await _ensureSignedIn() || !mounted) return;
-    final receipt =
-        await showAccountDeletionDialog(context, _accountController);
+    final receipt = await showAccountDeletionDialog(
+      context,
+      _accountController,
+      beforeRemoteDelete: (accountId) async {
+        await _programStore.deleteAccount(accountId);
+        _quitPlanController.clear();
+        await _quitPlanController.clearGuestPlan();
+      },
+    );
     if (!mounted || receipt == null) return;
-    _quitPlanController.clear();
-    await _quitPlanController.clearGuestPlan();
     if (!mounted) return;
     await showDialog<void>(
       context: context,
