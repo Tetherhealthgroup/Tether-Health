@@ -114,7 +114,12 @@ class AccountController extends ChangeNotifier {
         bytes: bytes,
         contentType: contentType,
       );
-      _scheduleAvatarRefresh();
+      try {
+        await _loadProfile(notify: false);
+      } catch (_) {
+        errorMessage =
+            'Your photo was uploaded, but its preview is temporarily unavailable.';
+      }
       return true;
     } catch (_) {
       if (previousPath == null && profile?.avatarPath == path) {
