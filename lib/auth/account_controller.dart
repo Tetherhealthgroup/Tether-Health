@@ -345,12 +345,14 @@ class AccountController extends ChangeNotifier {
 
   Future<AccountDeletionReceipt?> deleteAppData({
     required String password,
+    Future<void> Function(String accountId)? beforeRemoteDelete,
   }) async {
     final identity = await _reauthenticate(password);
     if (identity == null) return null;
     busy = true;
     notifyListeners();
     try {
+      await beforeRemoteDelete?.call(identity.id);
       final receipt = await _accountData.deleteAppData(identity.accessToken);
       await _auth.signOut();
       profile = null;

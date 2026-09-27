@@ -70,34 +70,74 @@ class SecureProgramStore {
     }
   }
 
-  Future<bool> save({
+  Future<ProgramSaveResult> save({
     required String accountScope,
     required ProgramId programId,
     required Map<String, Object?> payload,
     required int revision,
     String? accessToken,
   }) async {
-    final document = ProgramDataDocument(
-      payload: payload,
-      revision: revision,
-      pendingSync: accessToken != null,
-    );
+    var outgoingRevision = revision;
     final encoded = jsonEncode({'payload': payload, 'revision': revision});
     if (utf8.encode(encoded).length > 32768) {
       throw StateError('Program data exceeds the storage limit.');
     }
+
+    final existing = await load(
+      accountScope: accountScope,
+      programId: programId,
+    );
+    if (accessToken != null &&
+        existing?.pendingSync == true &&
+        jsonEncode(existing!.payload) != jsonEncode(payload)) {
+      try {
+        final remote = await _api.get(accessToken, programId);
+        if (remote != null &&
+            remote.revision == existing.revision &&
+            jsonEncode(remote.payload) == jsonEncode(existing.payload)) {
+          await _writeLocal(accountScope, programId, remote);
+          outgoingRevision = remote.revision + 1;
+        } else if (remote != null) {
+          return ProgramSaveResult.conflict(existing.revision);
+        }
+      } catch (_) {
+        return ProgramSaveResult.pending(existing.revision);
+      }
+    }
+
+    final document = ProgramDataDocument(
+      payload: payload,
+      revision: outgoingRevision,
+      pendingSync: accessToken != null,
+    );
     await _writeLocal(accountScope, programId, document);
-    if (accessToken == null) return true;
+    if (accessToken == null) {
+      return ProgramSaveResult.synced(outgoingRevision);
+    }
     try {
       await _api.put(accessToken, programId, document);
       await _writeLocal(
         accountScope,
         programId,
-        ProgramDataDocument(payload: payload, revision: revision),
+        ProgramDataDocument(payload: payload, revision: outgoingRevision),
       );
-      return true;
+      return ProgramSaveResult.synced(outgoingRevision);
     } catch (_) {
-      return false;
+      try {
+        final remote = await _api.get(accessToken, programId);
+        if (remote != null &&
+            remote.revision == outgoingRevision &&
+            jsonEncode(remote.payload) == jsonEncode(payload)) {
+          await _writeLocal(accountScope, programId, remote);
+          return ProgramSaveResult.synced(remote.revision);
+        }
+        if (remote != null) {
+          return ProgramSaveResult.conflict(outgoingRevision);
+        }
+      } catch (_) {
+        // The network is still unavailable; keep the encrypted pending copy.
+      }
+      return ProgramSaveResult.pending(outgoingRevision);
     }
   }
 
@@ -131,4 +171,23 @@ class ProgramDataLoadException implements Exception {
   const ProgramDataLoadException(this.local);
 
   final ProgramDataDocument? local;
+}
+
+class ProgramSaveResult {
+  const ProgramSaveResult._({
+    required this.synced,
+    required this.revision,
+    required this.retryable,
+  });
+
+  factory ProgramSaveResult.synced(int revision) =>
+      ProgramSaveResult._(synced: true, revision: revision, retryable: false);
+  factory ProgramSaveResult.pending(int revision) =>
+      ProgramSaveResult._(synced: false, revision: revision, retryable: true);
+  factory ProgramSaveResult.conflict(int revision) =>
+      ProgramSaveResult._(synced: false, revision: revision, retryable: false);
+
+  final bool synced;
+  final int revision;
+  final bool retryable;
 }

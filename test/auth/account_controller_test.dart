@@ -225,6 +225,27 @@ void main() {
     expect(receipt?.requestId, 'receipt-id');
     expect(controller.isSignedIn, isFalse);
   });
+
+  test('local cleanup failure prevents remote deletion and sign-out', () async {
+    final auth = _FakeAuth();
+    final accountData = _FakeAccountDataApi();
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      accountData: accountData,
+    );
+    addTearDown(controller.dispose);
+    await controller.signIn(email: 'person@example.test', password: 'password');
+
+    final receipt = await controller.deleteAppData(
+      password: 'password',
+      beforeRemoteDelete: (_) => Future.error(StateError('storage failure')),
+    );
+
+    expect(receipt, isNull);
+    expect(accountData.deleteCalls, 0);
+    expect(controller.isSignedIn, isTrue);
+  });
 }
 
 class _FakeAuth
@@ -297,6 +318,7 @@ class _FakeAuth
 
 class _FakeAccountDataApi implements AccountDataApiClient {
   String? receivedToken;
+  int deleteCalls = 0;
 
   @override
   Future<AccountDataExport> exportData(String accessToken) async {
@@ -306,6 +328,7 @@ class _FakeAccountDataApi implements AccountDataApiClient {
 
   @override
   Future<AccountDeletionReceipt> deleteAppData(String accessToken) async {
+    deleteCalls++;
     receivedToken = accessToken;
     return AccountDeletionReceipt(
       requestId: 'receipt-id',

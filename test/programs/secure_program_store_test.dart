@@ -46,16 +46,15 @@ void main() {
   test('offline sync keeps the encrypted local copy and reports pending sync',
       () async {
     final store = SecureProgramStore(api: _OfflineApi());
-    expect(
-      await store.save(
-        accountScope: 'account-a',
-        programId: ProgramId.clearAir,
-        payload: {'symptomLogs': <Object?>[]},
-        revision: 2,
-        accessToken: 'token',
-      ),
-      isFalse,
+    final result = await store.save(
+      accountScope: 'account-a',
+      programId: ProgramId.clearAir,
+      payload: {'symptomLogs': <Object?>[]},
+      revision: 2,
+      accessToken: 'token',
     );
+    expect(result.synced, isFalse);
+    expect(result.retryable, isTrue);
     final local = await store.load(
       accountScope: 'account-a',
       programId: ProgramId.clearAir,
@@ -76,6 +75,27 @@ void main() {
         ),
       ),
     );
+  });
+
+  test('a committed PUT with a lost response reconciles as synchronized',
+      () async {
+    final api = _CommittedThenLostApi();
+    final store = SecureProgramStore(api: api);
+    final result = await store.save(
+      accountScope: 'account-a',
+      programId: ProgramId.steady,
+      payload: {'readings': <Object?>[]},
+      revision: 1,
+      accessToken: 'token',
+    );
+
+    expect(result.synced, isTrue);
+    expect(result.revision, 1);
+    final local = await store.load(
+      accountScope: 'account-a',
+      programId: ProgramId.steady,
+    );
+    expect(local?.pendingSync, isFalse);
   });
 
   test('oversized health payload is rejected before local or network write',
@@ -105,4 +125,25 @@ class _OfflineApi implements ProgramDataApiClient {
     ProgramDataDocument document,
   ) =>
       Future.error(StateError('offline'));
+}
+
+class _CommittedThenLostApi implements ProgramDataApiClient {
+  ProgramDataDocument? remote;
+
+  @override
+  Future<ProgramDataDocument?> get(String token, ProgramId programId) async =>
+      remote;
+
+  @override
+  Future<void> put(
+    String token,
+    ProgramId programId,
+    ProgramDataDocument document,
+  ) async {
+    remote = ProgramDataDocument(
+      payload: document.payload,
+      revision: document.revision,
+    );
+    throw StateError('response lost');
+  }
 }

@@ -209,25 +209,25 @@ class _ProgramNavigatorState extends State<ProgramNavigator> {
       do {
         _saveQueued = false;
         final nextRevision = _revision + 1;
-        final synced = await widget.store.save(
+        final result = await widget.store.save(
           accountScope: _scope,
           programId: widget.programId,
           payload: _payload,
           revision: nextRevision,
           accessToken: widget.account.accessToken,
         );
-        if (synced) {
-          _revision = nextRevision;
+        if (result.synced) {
+          _revision = result.revision;
           _retryTimer?.cancel();
           _retryTimer = null;
-        } else {
+        } else if (result.retryable) {
           _retryTimer ??= Timer(const Duration(seconds: 5), () {
             _retryTimer = null;
             unawaited(_save());
           });
         }
-        if (mounted && _offline == synced) {
-          setState(() => _offline = !synced);
+        if (mounted && _offline == result.synced) {
+          setState(() => _offline = !result.synced);
         }
       } while (_saveQueued);
     } finally {

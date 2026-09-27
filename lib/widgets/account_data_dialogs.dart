@@ -16,12 +16,16 @@ Future<void> showAccountExportDialog(
 
 Future<AccountDeletionReceipt?> showAccountDeletionDialog(
   BuildContext context,
-  AccountController account,
-) =>
+  AccountController account, {
+  Future<void> Function(String accountId)? beforeRemoteDelete,
+}) =>
     showDialog<AccountDeletionReceipt>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => _AccountDeletionDialog(account: account),
+      builder: (_) => _AccountDeletionDialog(
+        account: account,
+        beforeRemoteDelete: beforeRemoteDelete,
+      ),
     );
 
 class _AccountExportDialog extends StatefulWidget {
@@ -133,9 +137,13 @@ class _AccountExportDialogState extends State<_AccountExportDialog> {
 }
 
 class _AccountDeletionDialog extends StatefulWidget {
-  const _AccountDeletionDialog({required this.account});
+  const _AccountDeletionDialog({
+    required this.account,
+    this.beforeRemoteDelete,
+  });
 
   final AccountController account;
+  final Future<void> Function(String accountId)? beforeRemoteDelete;
 
   @override
   State<_AccountDeletionDialog> createState() => _AccountDeletionDialogState();
@@ -154,8 +162,10 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
 
   Future<void> _delete() async {
     if (_password.text.isEmpty || _confirmation.text != 'DELETE') return;
-    final receipt =
-        await widget.account.deleteAppData(password: _password.text);
+    final receipt = await widget.account.deleteAppData(
+      password: _password.text,
+      beforeRemoteDelete: widget.beforeRemoteDelete,
+    );
     _password.clear();
     _confirmation.clear();
     if (mounted && receipt != null) Navigator.pop(context, receipt);

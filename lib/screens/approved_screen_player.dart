@@ -711,13 +711,16 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       await _showSignIn();
       return;
     }
-    final accountId = _accountController.accountId;
-    final receipt =
-        await showAccountDeletionDialog(context, _accountController);
+    final receipt = await showAccountDeletionDialog(
+      context,
+      _accountController,
+      beforeRemoteDelete: (accountId) async {
+        await widget.onAccountDataDeleted?.call(accountId);
+        _quitPlanController.clear();
+        await _quitPlanController.clearGuestPlan();
+      },
+    );
     if (!mounted || receipt == null) return;
-    if (accountId != null) await widget.onAccountDataDeleted?.call(accountId);
-    _quitPlanController.clear();
-    await _quitPlanController.clearGuestPlan();
     if (!mounted) return;
     await showDialog<void>(
       context: context,
