@@ -28,21 +28,21 @@ describe("ProgramDataService", () => {
       revision: 3,
       updated_at: "2026-09-26T00:00:00Z",
     };
-    const single = jest.fn().mockResolvedValue({ data: row, error: null });
-    const select = jest.fn().mockReturnValue({ single });
-    const upsert = jest.fn().mockReturnValue({ select });
-    const from = jest.fn().mockReturnValue({ upsert });
-    mockedCreateClient.mockReturnValue({ from } as never);
+    const maybeSingle = jest.fn().mockResolvedValue({ data: row, error: null });
+    const select = jest.fn().mockReturnValue({ maybeSingle });
+    const rpc = jest.fn().mockReturnValue({ select });
+    mockedCreateClient.mockReturnValue({ rpc } as never);
 
     const result = await new ProgramDataService(config).put(user, "steady", {
       payload: { readings: [] },
       revision: 3,
     });
 
-    expect(upsert).toHaveBeenCalledWith(
-      expect.objectContaining({ user_id: user.id, program_id: "steady" }),
-      { onConflict: "user_id,program_id" },
-    );
+    expect(rpc).toHaveBeenCalledWith("save_program_data", {
+      p_program_id: "steady",
+      p_payload: { readings: [] },
+      p_revision: 3,
+    });
     expect(result).toMatchObject({ programId: "steady", revision: 3 });
     expect(mockedCreateClient).toHaveBeenCalledWith(
       expect.any(String),
@@ -62,5 +62,22 @@ describe("ProgramDataService", () => {
       }),
     ).rejects.toMatchObject({ status: 400 });
     expect(mockedCreateClient).not.toHaveBeenCalled();
+  });
+
+  it("rejects stale or out-of-order revisions instead of overwriting", async () => {
+    const maybeSingle = jest
+      .fn()
+      .mockResolvedValue({ data: null, error: null });
+    const rpc = jest.fn().mockReturnValue({
+      select: jest.fn().mockReturnValue({ maybeSingle }),
+    });
+    mockedCreateClient.mockReturnValue({ rpc } as never);
+
+    await expect(
+      new ProgramDataService(config).put(user, "steady", {
+        payload: { readings: [] },
+        revision: 2,
+      }),
+    ).rejects.toMatchObject({ status: 409 });
   });
 });

@@ -133,11 +133,19 @@ void main() {
       await controller.uploadAvatar(bytes: jpeg, contentType: 'image/jpeg'),
       isTrue,
     );
-    expect(storage.uploadedPath, 'user-id/avatar.jpg');
-    expect(controller.profile?.avatarPath, 'user-id/avatar.jpg');
+    expect(storage.uploadedPath, 'user-id/avatar');
+    expect(controller.profile?.avatarPath, 'user-id/avatar');
+
+    final png = Uint8List.fromList([0x89, 0x50, 0x4e, 0x47, 0, 0, 0, 0]);
+    expect(
+      await controller.uploadAvatar(bytes: png, contentType: 'image/png'),
+      isTrue,
+    );
+    expect(storage.uploadedPath, 'user-id/avatar');
+    expect(storage.removed, isEmpty);
 
     expect(await controller.removeAvatar(), isTrue);
-    expect(storage.removed, contains('user-id/avatar.jpg'));
+    expect(storage.removed, contains('user-id/avatar'));
     expect(controller.profile?.avatarPath, isNull);
   });
 

@@ -56,13 +56,25 @@ void main() {
       ),
       isFalse,
     );
-    expect(
-      (await store.load(
+    final local = await store.load(
+      accountScope: 'account-a',
+      programId: ProgramId.clearAir,
+    );
+    expect(local?.revision, 2);
+    expect(local?.pendingSync, isTrue);
+    await expectLater(
+      store.load(
         accountScope: 'account-a',
         programId: ProgramId.clearAir,
-      ))
-          ?.revision,
-      2,
+        accessToken: 'token',
+      ),
+      throwsA(
+        isA<ProgramDataLoadException>().having(
+          (error) => error.local?.revision,
+          'preserved local revision',
+          2,
+        ),
+      ),
     );
   });
 

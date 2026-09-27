@@ -102,24 +102,27 @@ class AccountController extends ChangeNotifier {
     errorMessage = null;
     notifyListeners();
     final previousPath = profile?.avatarPath;
-    final path = '${identity.id}/avatar.$extension';
+    // Keep one stable object per account. Replacements overwrite the same
+    // object, so a failed cleanup can never create an unreferenced image.
+    final path = previousPath ?? '${identity.id}/avatar';
     try {
+      if (previousPath == null) {
+        profile = await _profiles.update({'avatarPath': path});
+      }
       await _avatarStorage.upload(
         path: path,
         bytes: bytes,
         contentType: contentType,
       );
-      if (previousPath != null && previousPath != path) {
-        await _avatarStorage.remove(previousPath);
-      }
-      profile = await _profiles.update({'avatarPath': path});
       _scheduleAvatarRefresh();
       return true;
     } catch (_) {
-      if (previousPath != path) {
+      if (previousPath == null && profile?.avatarPath == path) {
         try {
-          await _avatarStorage.remove(path);
-        } catch (_) {}
+          profile = await _profiles.update({'avatarPath': null});
+        } catch (_) {
+          // A missing object is rendered as initials until the profile retries.
+        }
       }
       errorMessage = 'Your photo could not be uploaded. Check your connection.';
       return false;

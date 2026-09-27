@@ -14,6 +14,7 @@ import 'heartwise/screens/cholesterol_panel_screen.dart';
 import 'heartwise/screens/heartwise_home_screen.dart';
 import 'heartwise/screens/log_bp_screen.dart';
 import 'program.dart';
+import 'program_data_api_client.dart';
 import 'secure_program_store.dart';
 import 'steady/screens/log_reading_screen.dart';
 import 'steady/screens/meal_energy_reset_screen.dart';
@@ -132,6 +133,9 @@ class _ProgramNavigatorState extends State<ProgramNavigator> {
   bool _offline = false;
   int _revision = 0;
   Timer? _saveTimer;
+  Timer? _retryTimer;
+  bool _saving = false;
+  bool _saveQueued = false;
 
   String get _scope => widget.account.accountId ?? 'guest';
 
@@ -164,17 +168,10 @@ class _ProgramNavigatorState extends State<ProgramNavigator> {
         programId: widget.programId,
         accessToken: widget.account.accessToken,
       );
-      if (document != null) {
-        _revision = document.revision;
-        switch (widget.programId) {
-          case ProgramId.heartwise:
-            _heartwise.restore(document.payload);
-          case ProgramId.steady:
-            _steady.restore(document.payload);
-          case ProgramId.clearAir:
-            _clearAir.restore(document.payload);
-        }
-      }
+      if (document != null) _restore(document);
+    } on ProgramDataLoadException catch (error) {
+      if (error.local != null) _restore(error.local!);
+      _offline = true;
     } catch (_) {
       _offline = true;
     } finally {
@@ -188,16 +185,53 @@ class _ProgramNavigatorState extends State<ProgramNavigator> {
     _saveTimer = Timer(const Duration(milliseconds: 350), _save);
   }
 
+  void _restore(ProgramDataDocument document) {
+    _revision = document.pendingSync
+        ? (document.revision - 1).clamp(0, 2147483647)
+        : document.revision;
+    switch (widget.programId) {
+      case ProgramId.heartwise:
+        _heartwise.restore(document.payload);
+      case ProgramId.steady:
+        _steady.restore(document.payload);
+      case ProgramId.clearAir:
+        _clearAir.restore(document.payload);
+    }
+  }
+
   Future<void> _save() async {
-    final synced = await widget.store.save(
-      accountScope: _scope,
-      programId: widget.programId,
-      payload: _payload,
-      revision: ++_revision,
-      accessToken: widget.account.accessToken,
-    );
-    if (mounted && _offline == synced) {
-      setState(() => _offline = !synced);
+    if (_saving) {
+      _saveQueued = true;
+      return;
+    }
+    _saving = true;
+    try {
+      do {
+        _saveQueued = false;
+        final nextRevision = _revision + 1;
+        final synced = await widget.store.save(
+          accountScope: _scope,
+          programId: widget.programId,
+          payload: _payload,
+          revision: nextRevision,
+          accessToken: widget.account.accessToken,
+        );
+        if (synced) {
+          _revision = nextRevision;
+          _retryTimer?.cancel();
+          _retryTimer = null;
+        } else {
+          _retryTimer ??= Timer(const Duration(seconds: 5), () {
+            _retryTimer = null;
+            unawaited(_save());
+          });
+        }
+        if (mounted && _offline == synced) {
+          setState(() => _offline = !synced);
+        }
+      } while (_saveQueued);
+    } finally {
+      _saving = false;
     }
   }
 
@@ -205,6 +239,7 @@ class _ProgramNavigatorState extends State<ProgramNavigator> {
   void dispose() {
     final savePending = _saveTimer?.isActive ?? false;
     _saveTimer?.cancel();
+    _retryTimer?.cancel();
     if (savePending) unawaited(_save());
     _controller.removeListener(_scheduleSave);
     _heartwise.dispose();

@@ -8,9 +8,11 @@ class ProgramDataDocument {
   const ProgramDataDocument({
     required this.payload,
     required this.revision,
+    this.pendingSync = false,
   });
   final Map<String, Object?> payload;
   final int revision;
+  final bool pendingSync;
 }
 
 abstract interface class ProgramDataApiClient {

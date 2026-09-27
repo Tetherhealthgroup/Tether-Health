@@ -1,6 +1,7 @@
 import {
   BadGatewayException,
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -46,19 +47,17 @@ export class ProgramDataService {
       throw new BadRequestException("Program payload is too large");
     }
     const result = await this.client(user)
-      .from("program_data")
-      .upsert(
-        {
-          user_id: user.id,
-          program_id: programId,
-          payload: dto.payload,
-          revision: dto.revision,
-        },
-        { onConflict: "user_id,program_id" },
-      )
+      .rpc("save_program_data", {
+        p_program_id: programId,
+        p_payload: dto.payload,
+        p_revision: dto.revision,
+      })
       .select("program_id,payload,revision,updated_at")
-      .single<ProgramDataRow>();
+      .maybeSingle<ProgramDataRow>();
     if (result.error) throw new BadGatewayException("Program data save failed");
+    if (!result.data) {
+      throw new ConflictException("Program data revision conflict");
+    }
     return this.response(result.data);
   }
 

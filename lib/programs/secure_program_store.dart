@@ -30,6 +30,7 @@ class SecureProgramStore {
         local = ProgramDataDocument(
           payload: (value['payload']! as Map).cast<String, Object?>(),
           revision: value['revision']! as int,
+          pendingSync: value['pendingSync'] == true,
         );
       } catch (_) {
         await _storage.delete(key: _key(accountScope, programId));
@@ -38,15 +39,35 @@ class SecureProgramStore {
     if (accessToken == null) return local;
     try {
       final remote = await _api.get(accessToken, programId);
+      if (local?.pendingSync == true) {
+        if (remote != null &&
+            remote.revision == local!.revision &&
+            jsonEncode(remote.payload) == jsonEncode(local.payload)) {
+          await _writeLocal(accountScope, programId, remote);
+          return remote;
+        }
+        try {
+          await _api.put(accessToken, programId, local!);
+          final synced = ProgramDataDocument(
+            payload: local.payload,
+            revision: local.revision,
+          );
+          await _writeLocal(accountScope, programId, synced);
+          return synced;
+        } catch (_) {
+          throw ProgramDataLoadException(local);
+        }
+      }
       if (remote != null &&
           (local == null || remote.revision >= local.revision)) {
         await _writeLocal(accountScope, programId, remote);
         return remote;
       }
-    } catch (_) {
-      // Offline is expected. The encrypted local copy remains authoritative.
+      return local;
+    } catch (error) {
+      if (error is ProgramDataLoadException) rethrow;
+      throw ProgramDataLoadException(local);
     }
-    return local;
   }
 
   Future<bool> save({
@@ -56,7 +77,11 @@ class SecureProgramStore {
     required int revision,
     String? accessToken,
   }) async {
-    final document = ProgramDataDocument(payload: payload, revision: revision);
+    final document = ProgramDataDocument(
+      payload: payload,
+      revision: revision,
+      pendingSync: accessToken != null,
+    );
     final encoded = jsonEncode({'payload': payload, 'revision': revision});
     if (utf8.encode(encoded).length > 32768) {
       throw StateError('Program data exceeds the storage limit.');
@@ -65,6 +90,11 @@ class SecureProgramStore {
     if (accessToken == null) return true;
     try {
       await _api.put(accessToken, programId, document);
+      await _writeLocal(
+        accountScope,
+        programId,
+        ProgramDataDocument(payload: payload, revision: revision),
+      );
       return true;
     } catch (_) {
       return false;
@@ -89,9 +119,16 @@ class SecureProgramStore {
         value: jsonEncode({
           'payload': document.payload,
           'revision': document.revision,
+          'pendingSync': document.pendingSync,
         }),
       );
 
   String _key(String accountScope, ProgramId programId) =>
       '$_prefix.$accountScope.${programId.slug}';
+}
+
+class ProgramDataLoadException implements Exception {
+  const ProgramDataLoadException(this.local);
+
+  final ProgramDataDocument? local;
 }

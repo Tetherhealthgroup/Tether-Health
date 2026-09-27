@@ -53,6 +53,60 @@ revoke all on table public.program_data from anon, authenticated;
 grant select, insert, update, delete on table public.program_data
 to authenticated;
 
+create function public.save_program_data(
+  p_program_id text,
+  p_payload jsonb,
+  p_revision integer
+)
+returns setof public.program_data
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  caller_id uuid := auth.uid();
+  current_revision integer;
+begin
+  if caller_id is null then
+    raise insufficient_privilege using message = 'Authentication required';
+  end if;
+
+  -- Serialize writes per caller/program so out-of-order requests cannot win.
+  perform pg_advisory_xact_lock(
+    hashtextextended(caller_id::text || ':' || p_program_id, 0)
+  );
+
+  select revision into current_revision
+  from public.program_data
+  where user_id = caller_id and program_id = p_program_id;
+
+  if current_revision is null then
+    if p_revision <> 1 then
+      return;
+    end if;
+    return query
+      insert into public.program_data (user_id, program_id, payload, revision)
+      values (caller_id, p_program_id, p_payload, p_revision)
+      returning *;
+  end if;
+
+  if p_revision <> current_revision + 1 then
+    return;
+  end if;
+
+  return query
+    update public.program_data
+    set payload = p_payload, revision = p_revision
+    where user_id = caller_id and program_id = p_program_id
+    returning *;
+end;
+$$;
+
+revoke all on function public.save_program_data(text, jsonb, integer)
+from public, anon, authenticated;
+grant execute on function public.save_program_data(text, jsonb, integer)
+to authenticated;
+
 create or replace function public.delete_my_app_data(p_confirmation text)
 returns jsonb
 language plpgsql
