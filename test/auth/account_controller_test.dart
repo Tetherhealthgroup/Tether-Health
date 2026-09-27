@@ -152,6 +152,30 @@ void main() {
     expect(controller.profile?.avatarPath, isNull);
   });
 
+  test('successful avatar upload survives a signed-URL refresh failure',
+      () async {
+    final auth = _FakeAuth();
+    final api = _FakeProfileApi();
+    final storage = _FakeAvatarStorage();
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: api),
+      avatarStorage: storage,
+    );
+    await controller.signIn(email: 'person@example.test', password: '***');
+    api.failNextGet = true;
+
+    final jpeg = Uint8List.fromList([0xff, 0xd8, 0xff, 0x00]);
+    expect(
+      await controller.uploadAvatar(bytes: jpeg, contentType: 'image/jpeg'),
+      isTrue,
+    );
+    expect(storage.uploadedPath, 'user-id/avatar');
+    expect(controller.profile?.avatarPath, 'user-id/avatar');
+    expect(controller.errorMessage,
+        contains('preview is temporarily unavailable'));
+  });
+
   test('avatar removal preserves the profile reference when storage fails',
       () async {
     final auth = _FakeAuth();
@@ -361,11 +385,16 @@ class _FakeProfileApi implements ProfileApiClient {
   String displayName = 'Test Person';
   String? avatarPath;
   int getCalls = 0;
+  bool failNextGet = false;
 
   @override
   Future<UserProfile> getProfile(String accessToken) async {
     getCalls++;
     receivedToken = accessToken;
+    if (failNextGet) {
+      failNextGet = false;
+      throw StateError('profile refresh unavailable');
+    }
     return _profile(onboardingCompleted: false);
   }
 
