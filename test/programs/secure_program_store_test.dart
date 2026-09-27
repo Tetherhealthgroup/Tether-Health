@@ -131,6 +131,47 @@ void main() {
     expect(restored?.pendingSync, isTrue);
   });
 
+  test('signed-in restart restores the newest draft when cloud advanced',
+      () async {
+    final offlineStore = SecureProgramStore(api: _OfflineApi());
+    await offlineStore.save(
+      accountScope: 'account-a',
+      programId: ProgramId.heartwise,
+      payload: {'bpReadings': <Object?>[]},
+      revision: 1,
+      accessToken: 'token',
+    );
+    await offlineStore.save(
+      accountScope: 'account-a',
+      programId: ProgramId.heartwise,
+      payload: {
+        'bpReadings': <Object?>[
+          {'id': 'newest-local'}
+        ],
+      },
+      revision: 1,
+      accessToken: 'token',
+    );
+
+    final restarted = SecureProgramStore(api: _AdvancedApi());
+    await expectLater(
+      restarted.load(
+        accountScope: 'account-a',
+        programId: ProgramId.heartwise,
+        accessToken: 'token',
+      ),
+      throwsA(
+        isA<ProgramDataLoadException>().having(
+          (error) => error.local?.payload['bpReadings'],
+          'newest offline draft',
+          [
+            {'id': 'newest-local'}
+          ],
+        ),
+      ),
+    );
+  });
+
   test('oversized health payload is rejected before local or network write',
       () async {
     final store = SecureProgramStore();
@@ -179,4 +220,18 @@ class _CommittedThenLostApi implements ProgramDataApiClient {
     );
     throw StateError('response lost');
   }
+}
+
+class _AdvancedApi implements ProgramDataApiClient {
+  @override
+  Future<ProgramDataDocument?> get(String token, ProgramId programId) async =>
+      const ProgramDataDocument(payload: {'bpReadings': []}, revision: 10);
+
+  @override
+  Future<void> put(
+    String token,
+    ProgramId programId,
+    ProgramDataDocument document,
+  ) =>
+      Future.error(StateError('revision conflict'));
 }

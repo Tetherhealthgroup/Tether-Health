@@ -68,7 +68,7 @@ class SecureProgramStore {
             draft,
           );
         } catch (_) {
-          throw ProgramDataLoadException(local);
+          throw ProgramDataLoadException(draft ?? local);
         }
       }
       if (remote != null &&
