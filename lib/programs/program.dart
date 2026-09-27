@@ -22,7 +22,7 @@ import '../theme/app_colors.dart';
 enum ProgramId {
   heartwise('heartwise'),
   steady('steady'),
-  clearAir('clearAir');
+  clearAir('clearair');
 
   const ProgramId(this.slug);
 

@@ -1,6 +1,7 @@
 # Database contract v1
 
-Migration source of truth: `supabase/migrations/202609110001_profiles.sql`.
+Migration sources of truth include `supabase/migrations/202609110001_profiles.sql`
+and `supabase/migrations/202609260001_program_data.sql`.
 
 `public.profiles` is a one-to-one extension of `auth.users`; `id` is both its
 primary key and cascading foreign key. A signup trigger creates the row. Clients
@@ -22,6 +23,18 @@ the trusted signup trigger; direct delete is not granted. The controlled
 `auth.uid()`, deletes only that profile and its cascading quit plan, and returns
 row counts. Avatar objects use a private
 bucket and must live under a folder matching `auth.uid()`.
+Profile responses provide a caller-authenticated signed URL with a five-minute
+lifetime for private avatar display.
+
+## Program module snapshots
+
+`public.program_data` contains at most one caller-owned snapshot for each of
+`heartwise`, `steady`, and `clearair`. The composite primary key is
+`(user_id, program_id)`; RLS applies `auth.uid() = user_id` to select, insert,
+update, and delete. Payloads must be JSON objects no larger than 32 KiB and use a
+bounded positive revision. Flutter keeps the same snapshot in platform secure
+storage, partitioned by account ID (or an isolated guest scope), and retries
+sync after offline saves. Program payloads are prohibited from logs.
 
 ## Quit-plan snapshot
 
@@ -61,4 +74,4 @@ function has a fixed empty search path, rejects unauthenticated calls, and has
 execute permission only for `authenticated`. It does not access or delete
 `auth.users`; Supabase Auth identity deletion remains a separate privileged
 external workflow. API receipts contain only request/completion identifiers and
-deleted counts, never profile or quit-plan payloads.
+deleted counts, never profile, quit-plan, or program payloads.

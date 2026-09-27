@@ -9,6 +9,10 @@ not be described as production-ready while any release requirement remains open.
 
 - [x] Email/password signup, confirmation resend, sign-in, secure session
   restoration, sign-out, recovery email, and native recovery deep-link handling.
+- [x] Editable profile display name plus private avatar upload/removal with
+  caller-scoped storage and short-lived authenticated image URLs.
+- [x] Heartwise, Steady, and ClearAir program selection, encrypted local
+  persistence, bounded caller-scoped cloud snapshots, and account export/deletion.
 - [x] Recent-password verification before JSON export or app-data deletion.
 - [x] Explicit `DELETE` confirmation, caller-scoped profile/plan/avatar deletion,
   and payload-free deletion receipt logging.

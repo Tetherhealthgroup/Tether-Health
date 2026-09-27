@@ -122,8 +122,11 @@ A free Apple ID can install a development build on a personal device. Publishing
 
 This archive is a complete, compilable Flutter implementation of the approved
 28-screen user experience. Cloud development email/password registration,
-email-confirmation-aware authentication, profile preferences, and a bounded
-quit-plan snapshot are implemented through Flutter, NestJS, and Supabase.
+email-confirmation-aware authentication, editable display names, private avatar
+upload/removal with short-lived authenticated image URLs, and a bounded quit-plan
+snapshot are implemented through Flutter, NestJS, and Supabase. Heartwise,
+Steady, and ClearAir are reachable through a shared program picker and persist
+bounded, encrypted device snapshots with caller-scoped cloud synchronization.
 Signed-out users can save an encrypted plan on one device and safely migrate it
 after signing in without silently replacing an existing cloud plan. Only
 synthetic quit-plan and support-person data is permitted. The US
@@ -133,7 +136,8 @@ messaging, remote notifications, analytics, and later health domains remain
 consent-aware prototype actions or interfaces. Authenticated users can re-enter
 their password to export the
 bounded app-owned dataset as JSON or permanently delete their profile, plan,
-and avatar. The deletion receipt explicitly reports that Supabase Auth identity
+program snapshots, and avatar. The deletion receipt explicitly reports that
+Supabase Auth identity
 deletion remains a privileged external operation.
 
 Password-reset email and native recovery deep links are implemented with the

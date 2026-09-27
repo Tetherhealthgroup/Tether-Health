@@ -19,6 +19,24 @@ class SteadyController extends ProgramController {
       _readings.isEmpty ? null : _readings.last;
   TargetRange? get targetRange => _targetRange;
 
+  Map<String, Object?> toJson() => {
+        'readings': _readings.map((value) => value.toJson()).toList(),
+        'targetRange': _targetRange?.toJson(),
+      };
+
+  void restore(Map<String, Object?> json) {
+    _readings
+      ..clear()
+      ..addAll(((json['readings'] as List<Object?>?) ?? const []).take(200).map(
+          (value) => GlucoseReading.fromJson(
+              (value! as Map).cast<String, Object?>())));
+    final target = json['targetRange'];
+    _targetRange = target == null
+        ? null
+        : TargetRange.fromJson((target as Map).cast<String, Object?>());
+    notifyListeners();
+  }
+
   /// Adds a glucose reading. [valueMgDl] may be null: a missed check-in is
   /// recorded as missing, never as zero. Returns the new reading's id.
   String? addReading({

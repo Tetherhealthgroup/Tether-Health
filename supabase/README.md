@@ -8,10 +8,12 @@ checks are:
 bash supabase/tests/verify_profiles_migration.sh
 bash supabase/tests/verify_quit_plans_migration.sh
 bash supabase/tests/verify_account_deletion_migration.sh
+bash supabase/tests/verify_program_data_migration.sh
 ```
 
 Local keys printed by the CLI belong in process/build configuration, never
-source. Flutter receives only the publishable key; the profile and quit-plan APIs
+source. Flutter receives only the publishable key; the profile, quit-plan, and
+program-data APIs
 forward the authenticated caller token so PostgreSQL RLS remains the final
 authorization boundary. Use synthetic quit-plan and support-person data only in
 development environments.

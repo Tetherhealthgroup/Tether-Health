@@ -19,6 +19,25 @@ class ClearAirController extends ProgramController {
   ActionPlan? get clinicianPlan => _clinicianPlan;
   List<SymptomLog> get symptomLogs => List.unmodifiable(_symptomLogs);
 
+  Map<String, Object?> toJson() => {
+        'clinicianPlan': _clinicianPlan?.toJson(),
+        'symptomLogs': _symptomLogs.map((value) => value.toJson()).toList(),
+      };
+
+  void restore(Map<String, Object?> json) {
+    final plan = json['clinicianPlan'];
+    _clinicianPlan = plan == null
+        ? null
+        : ActionPlan.fromJson((plan as Map).cast<String, Object?>());
+    _symptomLogs
+      ..clear()
+      ..addAll(((json['symptomLogs'] as List<Object?>?) ?? const [])
+          .take(200)
+          .map((value) =>
+              SymptomLog.fromJson((value! as Map).cast<String, Object?>())));
+    notifyListeners();
+  }
+
   /// Records the clinician's action plan. Zones are clinician-recorded:
   /// [recordedBy] is required and the app never decides a zone itself.
   bool recordClinicianPlan({

@@ -48,6 +48,8 @@ export interface ProfileResponse {
   timeZone: string;
   onboardingCompleted: boolean;
   avatarPath: string | null;
+  avatarUrl: string | null;
+  avatarUrlExpiresAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

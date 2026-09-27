@@ -1,4 +1,4 @@
-# BreatheFree production architecture
+# Tether Health application architecture
 
 ## Confirmed stack
 
@@ -26,7 +26,7 @@ Flutter and are not required by the profile API.
 ## Trust boundaries
 
 - **Flutter:** presentation, Keychain/secure-platform Supabase session persistence,
-  encrypted device-only guest-plan persistence, testable data abstractions, and
+  encrypted device-only guest-plan and program persistence, testable data abstractions, and
   explicit consent. Guest plans never use the cloud until the user signs in;
   configuration comes from `--dart-define`.
 - **NestJS:** JWT and DTO validation, business rules, versioned HTTP contracts,
@@ -54,7 +54,11 @@ analytics, crash reports, push notifications, or object names.
 
 ## Incremental Flutter migration
 
-The approved 28-screen catalog and integer routing contract remain unchanged.
+The approved 28-screen BreatheFree catalog and integer routing contract remain
+unchanged and isolated from Heartwise, Steady, and ClearAir content. A shared
+program picker switches modules while preserving the authenticated account
+context. Module snapshots are encrypted locally per account and use
+caller-scoped API/RLS synchronization with offline fallback.
 Authentication, registration, and profiles sit behind interfaces with fakes for
 tests. Registration does not claim an authenticated session when Supabase
 requires email confirmation; the user confirms externally and then returns to

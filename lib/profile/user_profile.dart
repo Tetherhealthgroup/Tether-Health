@@ -6,6 +6,8 @@ class UserProfile {
     required this.timeZone,
     required this.onboardingCompleted,
     required this.avatarPath,
+    this.avatarUrl,
+    this.avatarUrlExpiresAt,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -17,6 +19,10 @@ class UserProfile {
         timeZone: json['timeZone']! as String,
         onboardingCompleted: json['onboardingCompleted']! as bool,
         avatarPath: json['avatarPath'] as String?,
+        avatarUrl: json['avatarUrl'] as String?,
+        avatarUrlExpiresAt: json['avatarUrlExpiresAt'] == null
+            ? null
+            : DateTime.parse(json['avatarUrlExpiresAt']! as String),
         createdAt: DateTime.parse(json['createdAt']! as String),
         updatedAt: DateTime.parse(json['updatedAt']! as String),
       );
@@ -27,6 +33,8 @@ class UserProfile {
   final String timeZone;
   final bool onboardingCompleted;
   final String? avatarPath;
+  final String? avatarUrl;
+  final DateTime? avatarUrlExpiresAt;
   final DateTime createdAt;
   final DateTime updatedAt;
 }

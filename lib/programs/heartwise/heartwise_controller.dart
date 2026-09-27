@@ -16,6 +16,27 @@ class HeartwiseController extends ProgramController {
   List<BpReading> get bpReadings => List.unmodifiable(_bpReadings);
   List<CholesterolPanel> get cholesterolPanels => List.unmodifiable(_panels);
 
+  Map<String, Object?> toJson() => {
+        'bpReadings': _bpReadings.map((value) => value.toJson()).toList(),
+        'cholesterolPanels': _panels.map((value) => value.toJson()).toList(),
+      };
+
+  void restore(Map<String, Object?> json) {
+    _bpReadings
+      ..clear()
+      ..addAll(((json['bpReadings'] as List<Object?>?) ?? const [])
+          .take(200)
+          .map((value) =>
+              BpReading.fromJson((value! as Map).cast<String, Object?>())));
+    _panels
+      ..clear()
+      ..addAll(((json['cholesterolPanels'] as List<Object?>?) ?? const [])
+          .take(100)
+          .map((value) => CholesterolPanel.fromJson(
+              (value! as Map).cast<String, Object?>())));
+    notifyListeners();
+  }
+
   BpReading? get latestBpReading =>
       _bpReadings.isEmpty ? null : _bpReadings.last;
   CholesterolPanel? get latestPanel => _panels.isEmpty ? null : _panels.last;

@@ -11,6 +11,7 @@ export interface AccountDataExportResponse {
   generatedAt: string;
   profile: Record<string, unknown>;
   quitPlan: Record<string, unknown> | null;
+  programData: Record<string, unknown>[];
 }
 
 export interface AccountDeletionReceipt {
@@ -20,6 +21,7 @@ export interface AccountDeletionReceipt {
     profiles: number;
     quitPlans: number;
     avatarObjects: number;
+    programData: number;
   };
   authIdentityDeleted: false;
   authIdentityStatus: "external-action-required";

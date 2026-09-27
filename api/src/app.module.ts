@@ -11,6 +11,8 @@ import { ProfileController } from "./profile/profile.controller";
 import { ProfileService } from "./profile/profile.service";
 import { QuitPlanController } from "./quit-plan/quit-plan.controller";
 import { QuitPlanService } from "./quit-plan/quit-plan.service";
+import { ProgramDataController } from "./program-data/program-data.controller";
+import { ProgramDataService } from "./program-data/program-data.service";
 
 @Module({
   imports: [
@@ -24,12 +26,14 @@ import { QuitPlanService } from "./quit-plan/quit-plan.service";
     ProfileController,
     QuitPlanController,
     AccountController,
+    ProgramDataController,
   ],
   providers: [
     TokenVerifier,
     ProfileService,
     QuitPlanService,
     AccountService,
+    ProgramDataService,
     { provide: APP_GUARD, useClass: AuthGuard },
   ],
 })
