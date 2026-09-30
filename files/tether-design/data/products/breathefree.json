@@ -1,0 +1,46 @@
+{
+  "version": "1.0.0",
+  "id": "breathefree",
+  "name": "BreatheFree",
+  "areaId": "tobacco",
+  "serviceLines": ["tobacco.prevention", "tobacco.cessation", "tobacco.relapse", "tobacco.exposure"],
+  "status": "in_development",
+  "locales": ["en", "es"],
+  "vocabulary": {
+    "behaviour": "smoking",
+    "urge": "craving",
+    "lapse": "slip",
+    "target": "quit date",
+    "primaryMetric": "smoke-free time"
+  },
+  "helplines": [
+    { "locale": "en", "name": "1-800-QUIT-NOW", "number": "1-800-784-8669" },
+    { "locale": "es", "name": "1-855-DÉJELO-YA", "number": "1-855-335-3569" }
+  ],
+  "screens": [
+    { "id": "S01", "archetype": "welcome", "route": "/welcome", "phase": 1 },
+    { "id": "S02", "archetype": "why", "route": "/onboarding/why", "phase": 2 },
+    { "id": "S03", "archetype": "consent", "route": "/onboarding/consent", "phase": 2 },
+    { "id": "S04", "archetype": "baseline", "route": "/onboarding/baseline", "phase": 2 },
+    { "id": "S05", "archetype": "trigger_map", "route": "/onboarding/triggers", "phase": 2 },
+    { "id": "S07", "archetype": "plan_path", "route": "/plan/path", "phase": 3 },
+    { "id": "S08", "archetype": "plan_targets", "route": "/plan/date", "phase": 3 },
+    { "id": "S09", "archetype": "plan_reasons", "route": "/plan/reasons", "phase": 3 },
+    { "id": "S10", "archetype": "plan_support", "route": "/plan/support", "phase": 3 },
+    { "id": "S11", "archetype": "plan_review", "route": "/plan/review", "phase": 3 },
+    { "id": "S12", "archetype": "home", "route": "/today", "phase": 4 },
+    { "id": "S13", "archetype": "checkin", "route": "/checkin", "phase": 4 },
+    { "id": "S14", "archetype": "next_step", "route": "/checkin/next", "phase": 4 },
+    { "id": "S17", "archetype": "rescue_start", "route": "/rescue/start", "phase": 5 },
+    { "id": "S18", "archetype": "rescue_tool", "route": "/rescue/tool", "phase": 5 },
+    { "id": "S19", "archetype": "rescue_active", "route": "/rescue/active", "phase": 5 },
+    { "id": "S20", "archetype": "rescue_recheck", "route": "/rescue/recheck", "phase": 5 },
+    { "id": "S21", "archetype": "rescue_result", "route": "/rescue/result", "phase": 5 },
+    { "id": "S23", "archetype": "lapse", "route": "/slip", "phase": 6 },
+    { "id": "S25", "archetype": "education", "route": "/learn", "phase": 7 },
+    { "id": "S26", "archetype": "progress", "route": "/progress", "phase": 7 },
+    { "id": "S27", "archetype": "support_hub", "route": "/support", "phase": 7 },
+    { "id": "S28", "archetype": "settings", "route": "/settings", "phase": 8 }
+  ],
+  "platformCapabilities": { "blocking": false, "passiveTracking": false, "offlineRescue": true }
+}

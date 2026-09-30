@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+# Local SQLite databases. These hold real session documents when the service is
+# run locally against a phone, so they must never reach a commit.
+*.db
+*.sqlite3

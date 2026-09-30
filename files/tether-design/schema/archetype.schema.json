@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tether/archetype.schema.json",
+  "title": "Shared screen archetype",
+  "description": "The reusable machinery. Improve an archetype once and every product inherits it.",
+  "type": "object",
+  "required": ["version", "archetypes"],
+  "properties": {
+    "version": { "type": "string" },
+    "archetypes": { "type": "array", "items": { "$ref": "#/$defs/archetype" } }
+  },
+  "$defs": {
+    "archetype": {
+      "type": "object",
+      "required": ["id", "name", "purpose", "slots"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z_]+$" },
+        "name": { "type": "string" },
+        "purpose": { "type": "string", "description": "One sentence. What question this screen answers." },
+        "chrome": {
+          "type": "object",
+          "properties": {
+            "leading": { "enum": ["none", "close", "back"] },
+            "badge": { "type": "boolean" },
+            "progress": { "type": "boolean" }
+          }
+        },
+        "slots": {
+          "type": "object",
+          "description": "Slot name to cardinality: required, optional, required:N, optional:N, required:N-M, required:first",
+          "additionalProperties": { "type": "string" }
+        },
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind"],
+            "properties": {
+              "kind": { "enum": ["primary", "ghost", "lime"] },
+              "to": { "type": "string", "description": "Target archetype id, or an external key." }
+            }
+          }
+        },
+        "requires": { "type": "array", "items": { "type": "string" },
+          "description": "Safeguard ids or capability keys this archetype cannot ship without." },
+        "notes": { "type": "string", "description": "Design rationale. The reason a future editor should not simplify this away." }
+      }
+    }
+  }
+}

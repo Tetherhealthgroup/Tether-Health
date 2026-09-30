@@ -1,0 +1,209 @@
+{
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "id": "steadyair",
+  "name": "SteadyAir",
+  "$nameNote": "Placeholder. Not trademark-cleared. Chosen to sit beside BreatheFree without sounding like it — BreatheFree is the tobacco programme and this one must not be mistaken for it.",
+  "areaId": "respiratory",
+  "serviceLines": [
+    "respiratory.triggers",
+    "respiratory.symptoms",
+    "respiratory.coordination",
+    "respiratory.education"
+  ],
+  "status": "design",
+  "locales": [
+    "en"
+  ],
+  "vocabulary": {
+    "behaviour": "exposure",
+    "$behaviourNote": "There is no behaviour to quit here. What a person can change is what they breathe in and how often they meet it, so 'behaviour' is exposure — cold air, dust, smoke, a hill — and never the condition itself.",
+    "reliever": "your reliever",
+    "$relieverNote": "SteadyAir never names a medicine, a brand, a strength or a colour. 'Your reliever' means whatever the person was actually given, by whoever gave it to them. Writing 'the blue one' would be naming a drug class by the back door.",
+    "measurement": "reading",
+    "$measurementNote": "Called a reading because the person read it off themselves. Nothing in SteadyAir is measured by a device.",
+    "flareUp": "a bad stretch",
+    "primaryMetric": "how your breathing has been",
+    "target": "what you're trying this month",
+    "$targetNote": "A target here is a change to an exposure or a habit the person picked. It is never a dose, a distance, a peak-flow number or a count of puffs.",
+    "$omitted": {
+      "urge": "Does not apply, and borrowing it would be a mistake. A breathless spell is not an urge. Nobody chose it, riding it out is not a virtue, and the product routes it to a person rather than coaching someone through it.",
+      "lapse": "Does not apply in the cessation sense. The nearest thing is a bad stretch or a chest infection, which nobody slipped into. SteadyAir records one as an event and never as a failure, and it does not zero anything."
+    }
+  },
+  "helplines": [
+    {
+      "locale": "en",
+      "name": "988 Suicide & Crisis Lifeline",
+      "number": "988"
+    },
+    {
+      "locale": "es",
+      "name": "988 Línea de Prevención del Suicidio y Crisis",
+      "number": "988"
+    },
+    {
+      "locale": "en",
+      "name": "1-800-QUIT-NOW",
+      "number": "1-800-784-8669",
+      "$source": "Carried over verbatim from product.breathefree.json in this repo. NOT independently verified by the author of this file."
+    },
+    {
+      "locale": "es",
+      "name": "1-855-DÉJELO-YA",
+      "number": "1-855-335-3569",
+      "$source": "Carried over verbatim from product.breathefree.json in this repo. NOT independently verified by the author of this file."
+    }
+  ],
+  "$helplinesNote": "The American Lung Association operates a public Lung HelpLine staffed by respiratory clinicians, and it is the obvious entry for this programme. Its number is deliberately absent: the author had no network access at the time of writing and could not confirm the current number, and inventing a helpline number is worse than omitting one. Add it only after checking lung.org directly. 988 is included because it is a fixed three-digit US code serving English and Spanish, and the two quitline numbers are copied from an existing file in this repo rather than looked up.",
+  "screens": [
+    {
+      "id": "S01",
+      "archetype": "welcome",
+      "route": "/welcome",
+      "phase": 1
+    },
+    {
+      "id": "S02",
+      "archetype": "why",
+      "route": "/onboarding/why",
+      "phase": 2
+    },
+    {
+      "id": "S03",
+      "archetype": "consent",
+      "route": "/onboarding/consent",
+      "phase": 2
+    },
+    {
+      "id": "S04",
+      "archetype": "baseline",
+      "route": "/onboarding/baseline",
+      "phase": 2
+    },
+    {
+      "id": "S05",
+      "archetype": "trigger_map",
+      "route": "/onboarding/triggers",
+      "phase": 2
+    },
+    {
+      "id": "S06",
+      "archetype": "plan_targets",
+      "route": "/plan/targets",
+      "phase": 3
+    },
+    {
+      "id": "S07",
+      "archetype": "plan_review",
+      "route": "/plan/review",
+      "phase": 3
+    },
+    {
+      "id": "S08",
+      "archetype": "home",
+      "route": "/today",
+      "phase": 4
+    },
+    {
+      "id": "S09",
+      "archetype": "checkin",
+      "route": "/checkin",
+      "phase": 4
+    },
+    {
+      "id": "S10",
+      "archetype": "reading_log",
+      "route": "/readings",
+      "phase": 4,
+      "$new": true
+    },
+    {
+      "id": "S11",
+      "archetype": "education",
+      "route": "/learn",
+      "phase": 7
+    },
+    {
+      "id": "S12",
+      "archetype": "progress",
+      "route": "/progress",
+      "phase": 7
+    },
+    {
+      "id": "S13",
+      "archetype": "support_hub",
+      "route": "/support",
+      "phase": 7
+    },
+    {
+      "id": "S14",
+      "archetype": "settings",
+      "route": "/settings",
+      "phase": 8
+    },
+    {
+      "id": "SH1",
+      "archetype": "programs_home",
+      "route": "/programs",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH2",
+      "archetype": "area_directory",
+      "route": "/areas",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH3",
+      "archetype": "program_join",
+      "route": "/areas/join",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH4",
+      "archetype": "record",
+      "route": "/record",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH5",
+      "archetype": "sharing_matrix",
+      "route": "/privacy/sharing",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH6",
+      "archetype": "crisis_route",
+      "route": "/help-now",
+      "phase": 8,
+      "$shell": true
+    }
+  ],
+  "$screensNote": "One screen per archetype declared for `respiratory` in areas.json — thirteen shared plus reading_log — and the six shell screens. reading_log is marked $new because it lives in supplement.archetypes.json and has not been promoted into the shared library yet. No next_step, rescue_* or lapse screen exists here, and that is deliberate: this area's declared screen list omits them, and the rescue machinery would be the wrong shape for a symptom that needs a clinician rather than a coping tool.",
+  "$sharePreviewNote": "share_on_request_only requires share_preview. areas.json does not declare a share_preview screen for respiratory, so the preview is rendered inline on S12 (progress) and S13 (support_hub): the exact rows that would be sent, the list of what would not be sent, and a send that only fires after the person has seen both. If share_preview is later added to this area's declared screens, both inline previews should be replaced by a route to it.",
+  "platformCapabilities": {
+    "blocking": false,
+    "passiveTracking": false,
+    "offlineRescue": true,
+    "$note": "No sensor is read and no device is paired. Breathlessness ratings and reliever counts are typed by the person, and SteadyAir has no way to check either one. Any screen that implies a measurement has been taken is wrong and must be rewritten. Spirometry, pulse oximetry and peak flow are explicitly out of scope for this build."
+  },
+  "safeguards": [
+    "never_prescribe",
+    "self_report_only",
+    "out_of_range_routing",
+    "share_on_request_only",
+    "export_and_delete"
+  ],
+  "proposedArchetypes": [
+    {
+      "id": "reading_log",
+      "reason": "Symptom and reliever-use tracking with escalation thresholds. Shared with metabolic, cardiovascular and kidney_liver — four areas record a number the person measured, which is why it belongs in the shared library."
+    }
+  ]
+}

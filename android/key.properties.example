@@ -1,0 +1,20 @@
+# Copy to `android/key.properties` and fill in before cutting a release build.
+# That file and the keystore it points at are gitignored — never commit either.
+#
+# Generate a keystore once, and keep it somewhere durable: losing it means you
+# can never update the Play listing again.
+#
+#   keytool -genkey -v -keystore ~/breathefree-release.jks \
+#     -keyalg RSA -keysize 2048 -validity 10000 -alias breathefree
+#
+# Verify what a built artifact was actually signed with:
+#
+#   jarsigner -verify -verbose -certs build/app/outputs/flutter-apk/app-release.apk
+#
+# Without this file the release build falls back to the DEBUG keystore and the
+# Play Store rejects the upload. That is deliberate — see android/app/build.gradle.kts.
+
+storeFile=/absolute/path/to/breathefree-release.jks
+storePassword=CHANGE_ME
+keyAlias=breathefree
+keyPassword=CHANGE_ME

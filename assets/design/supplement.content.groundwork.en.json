@@ -1,0 +1,637 @@
+{
+  "product": "groundwork",
+  "locale": "en",
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "$comment": "The eight non-shell screens of supplement.product.preventive.json. SH1–SH6 are the host shell and are not authored here. The person throughout is Marisol Reyes, 42, who works three nights a week, has two children, had a flu shot at the Grand Avenue Pharmacy on 14 October 2025 and a cervical screening in March 2023, has a dental cleaning booked for 4 November 2026, and lives with Julián. Every string is unreviewed. The review dates in the learn library are illustrative: nothing in this repository has been through clinical review.",
+  "start": "S01",
+  "screens": {
+    "S01": {
+      "title": "",
+      "lead": "none",
+      "headline": "The checks you keep meaning to book.",
+      "sub": "Groundwork holds the dates — what you have had, when you were told to come back, and a quiet reminder near the time. It does not decide what you need. It remembers what you told it.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "It remembers, it doesn't decide",
+          "body": "Every date here is one you typed, or copied off a letter. Groundwork never works out what you are owed, or when."
+        },
+        {
+          "t": "card",
+          "title": "Nothing on your lock screen",
+          "body": "A reminder says “Groundwork”. Not which check, not which part of you, not why."
+        },
+        {
+          "t": "card",
+          "title": "Yours to take away",
+          "body": "Export the whole record as one page, or delete it outright. Deletion is finished, not hidden."
+        },
+        {
+          "t": "chips",
+          "items": [
+            "English"
+          ],
+          "selected": [
+            0
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "Get started",
+          "to": "S02"
+        },
+        {
+          "label": "I already have an account",
+          "kind": "ghost",
+          "to": "S04"
+        }
+      ],
+      "footer": "Education and reminders. Not a diagnosis, not a screening test, and not a substitute for a clinician. English only so far."
+    },
+    "S02": {
+      "title": "What it does",
+      "badge": "1 of 2",
+      "headline": "Four moments this is built for.",
+      "sub": "Not four features. Four ways a date gets lost.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Moment one",
+          "title": "When the card goes in a drawer",
+          "body": "A clinic says “three years”. Three years is a long time to keep a piece of card. Type it once and it is still here when the three years are up."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment two",
+          "title": "When you are at the pharmacy anyway",
+          "body": "The flu shot in the autumn, and the record of it thirty seconds later, before the receipt goes through the wash."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Moment three",
+          "title": "When the reminder lands while you are at work",
+          "body": "It says “Groundwork” and nothing else. Anybody reading over your shoulder learns the name of an app."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment four",
+          "title": "When a new practice asks what you have had",
+          "body": "One page, in date order, that you can hand over or read off your phone while they type."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What it isn't",
+          "body": "It does not tell you what you need, whether a check is covered, or whether a gap matters. It has no idea what your clinician already knows, and it is not a way of avoiding asking them."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Continue",
+          "to": "S03"
+        }
+      ],
+      "footer": "Education and reminders. Not a diagnosis or a screening test."
+    },
+    "S03": {
+      "title": "Consent & privacy",
+      "badge": "2 of 2",
+      "progress": 100,
+      "headline": "What we hold, and what we don't.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Held on your phone",
+          "body": "The dates you enter, the words you enter them with, and the reminders you set. These stay on this device."
+        },
+        {
+          "t": "card",
+          "title": "Shared with a clinic",
+          "body": "Nothing, ever, on its own. There is no practice, pharmacy or insurer connected to Groundwork. If a clinic wants your record, you export it and hand it over."
+        },
+        {
+          "t": "card",
+          "title": "Never asked for",
+          "body": "No insurance details, no member number, no results, no numbers off a test. Groundwork stores dates and the words you used. A blood pressure reading has a home, and it is not here — it is with whoever can do something about it."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "You can leave with everything",
+          "body": "Export as a readable page plus a structured file, or delete the lot. Deletion is completed on this phone and anywhere it synced — not hidden from the list."
+        },
+        {
+          "t": "options",
+          "items": [
+            {
+              "title": "I understand and agree",
+              "body": "Groundwork records dates I enter. It does not decide which checks apply to me.",
+              "sel": true
+            },
+            {
+              "title": "Remind me near a date I have entered",
+              "body": "Generic wording only. You can change it or switch it off in Settings, and nobody else is told."
+            }
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "Agree and continue",
+          "to": "S04"
+        },
+        {
+          "label": "See what leaving looks like first",
+          "kind": "ghost",
+          "to": "SH4"
+        }
+      ],
+      "footer": "The second choice is optional and reversible. The first is how the app works, and there is no version of it that shares more."
+    },
+    "S04": {
+      "title": "Today",
+      "badge": "Private",
+      "lead": "none",
+      "headline": "Good evening, Marisol.",
+      "sub": "One date coming up, and nothing you have to do about it tonight.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Get help now",
+          "body": "Reachable from every screen, in every programme.",
+          "to": "SH6",
+          "pill": "Open"
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Nearest date you entered",
+          "title": "Flu shot · you wrote “each autumn”",
+          "body": "The last one was 14 October 2025, at the pharmacy on Grand Avenue. You asked for a reminder on 1 October.",
+          "to": "S05",
+          "pill": "Open your record"
+        },
+        {
+          "t": "stats",
+          "items": [
+            [
+              "6",
+              "Dates you have entered"
+            ],
+            [
+              "1 Oct",
+              "Your next reminder"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "Why there is no score up there",
+          "body": "No percentage complete, no gaps found, no green tick. A score would mean Groundwork had decided which checks belong on your list. It has not, and it will not. The list is the one you typed."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Not sure whether something can wait?",
+          "body": "This app cannot tell you. Your practice can, and there is a line that takes general questions in English and Spanish.",
+          "to": "S07",
+          "pill": "Find a person"
+        },
+        {
+          "t": "card",
+          "title": "Add something you have had done",
+          "body": "Thirty seconds. A name, a date, and who told you when to come back.",
+          "to": "S05",
+          "pill": "Add a date"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Grand Avenue Pharmacy",
+          "body": "The number you entered, off the sign you photographed. Walk-in flu shots, it said.",
+          "to": "S07"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Open your record",
+          "to": "S05"
+        },
+        {
+          "label": "Read why a check exists",
+          "kind": "ghost",
+          "to": "S06"
+        },
+        {
+          "label": "Reminders & privacy",
+          "kind": "ghost",
+          "to": "S08"
+        },
+        {
+          "label": "Your programmes",
+          "kind": "ghost",
+          "to": "SH1"
+        }
+      ],
+      "footer": "Works offline · Nothing on this screen has left your phone"
+    },
+    "S05": {
+      "title": "Your record",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "What you have had, and what you wrote down next.",
+      "sub": "Seven rows, all typed by you or copied off a letter. Groundwork worked none of them out.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Coming up",
+          "body": "Dates you entered, in the words you entered them with."
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "FLU SHOT",
+              "“Each autumn” · you set a reminder for 1 October"
+            ],
+            [
+              "CERVICAL SCREENING",
+              "“Come back in three years” · you wrote March 2026"
+            ],
+            [
+              "DENTAL CLEANING",
+              "Booked 4 November, 8:00 am · you entered this on 3 September"
+            ],
+            [
+              "EYE TEST",
+              "No date entered"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "About that March row",
+          "body": "You wrote March 2026, and it is September. Groundwork is not calling that late. We do not know whether you have been since, whether it was moved, or what your clinic has already decided — so the row says what you typed and nothing more. Change it, or ask them. Either beats a guess from us."
+        },
+        {
+          "t": "card",
+          "title": "Already done"
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "CERVICAL SCREENING",
+              "March 2023 · from the clinic letter"
+            ],
+            [
+              "FLU SHOT",
+              "14 October 2025 · Grand Avenue Pharmacy"
+            ],
+            [
+              "TDAP",
+              "2017 · you were not sure of the month, so we left it off"
+            ],
+            [
+              "BLOOD PRESSURE CHECKED",
+              "May 2026 · the date only. The number went to your practice, not here."
+            ]
+          ]
+        },
+        {
+          "t": "input",
+          "title": "Add a check",
+          "value": "Eye test — Julián says every two years"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "A date is not a verdict",
+          "body": "Nothing on this screen means a check applies to you, and nothing on it means you are covered. Groundwork does not know your history, your pregnancies, your family, what you can afford, or what a clinician has already ruled out. A reminder you set for yourself is not an entitlement and not a clinical opinion. It is an alarm clock in your own handwriting."
+        },
+        {
+          "t": "card",
+          "title": "This record belongs to one person",
+          "body": "You. Not the children, not your mother. A second person needs their own record, because two sets of rows in one list makes it unclear whose body a row is about — and that is the kind of mistake that ends up in a consulting room."
+        },
+        {
+          "t": "card",
+          "title": "Take it away",
+          "body": "One readable page in date order, plus a structured file. Hand it to a new practice, or just keep it. It stays on your phone until you send it.",
+          "to": "SH4",
+          "pill": "Export"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Or delete it",
+          "body": "Any single row, or the whole record. Deletion is completed on this phone, on our servers and in anything queued to sync. It is not hidden from the list and kept behind it.",
+          "to": "SH4",
+          "pill": "Delete"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Save",
+          "to": "S04"
+        },
+        {
+          "label": "Everything, across programmes",
+          "kind": "ghost",
+          "to": "SH4"
+        }
+      ],
+      "footer": "Saves offline · Every row is editable and every row is deletable, including the ones we imported from nowhere, which is all of them"
+    },
+    "S06": {
+      "title": "Learn",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "Why a check exists, in plain language.",
+      "sub": "Six pieces and one table. Each shows who published it and when.",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": [
+            "All",
+            "Vaccines",
+            "Checkups",
+            "Screening",
+            "Costs"
+          ],
+          "selected": [
+            0
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Start here",
+          "title": "What a screening programme is actually for",
+          "body": "5 min · reviewed August 2026"
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "WHY THE FLU VACCINE IS A YEARLY ONE",
+              "4 min · reviewed July 2026"
+            ],
+            [
+              "WHAT ACTUALLY HAPPENS AT A ROUTINE CHECKUP",
+              "5 min · reviewed August 2026"
+            ],
+            [
+              "WHY GUIDANCE CHANGES, AND WHY THAT IS NOT A SCANDAL",
+              "6 min · reviewed August 2026"
+            ],
+            [
+              "ASKING WHAT SOMETHING WILL COST BEFORE YOU GO",
+              "5 min · reviewed June 2026"
+            ],
+            [
+              "WHAT TO DO WITH A LETTER YOU DO NOT UNDERSTAND",
+              "3 min · reviewed May 2026"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Published guidance, quoted and not applied",
+          "title": "Who says what, and in which year",
+          "body": "Reproduced with the body that issued it and the year it was issued. Every line describes a population. Whether it describes you is a question for somebody with your history in front of them."
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "INFLUENZA · CDC/ACIP, PUBLISHED EVERY YEAR",
+              "A flu vaccine every season for everyone aged 6 months and over, with few exceptions"
+            ],
+            [
+              "TETANUS · CDC/ACIP",
+              "A Td or Tdap booster every 10 years"
+            ],
+            [
+              "BLOOD PRESSURE · USPSTF, 2021",
+              "Screening for high blood pressure in adults aged 18 and over"
+            ],
+            [
+              "CERVICAL · USPSTF, 2018",
+              "Ages 21 to 65, by one of several methods and intervals"
+            ],
+            [
+              "COLORECTAL · USPSTF, 2021",
+              "Screening for adults aged 45 to 75"
+            ],
+            [
+              "BREAST · USPSTF, 2024",
+              "Mammography every two years, ages 40 to 74"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "We show all of it, not the part that fits you",
+          "body": "Groundwork could filter this table down to an age you typed in. It does not. Deciding which rows apply to a person is a screening judgment, and this app does not make one — it would be wrong often enough to matter, and you would have no way of telling when. Read the lot, and take what looks relevant to somebody who can say."
+        },
+        {
+          "t": "card",
+          "title": "Why the dates are on the front",
+          "body": "The breast row moved in 2024 and the colorectal row moved in 2021. Anything here that has not been rechecked in eighteen months comes down rather than sitting there looking current."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If something needs an answer today",
+          "body": "There is a line that takes general questions about vaccines and preventive care, in English and Spanish. Anything about your own body belongs with your practice.",
+          "to": "S07",
+          "pill": "View support"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Back to today",
+          "kind": "ghost",
+          "to": "S04"
+        }
+      ],
+      "footer": "Nothing here recommends a test, a vaccine or a course of treatment, and nothing here knows your history."
+    },
+    "S07": {
+      "title": "Support",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "A route to a person.",
+      "sub": "Nothing is sent until you have read it and pressed send.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "In an emergency",
+          "body": "If you are in danger, or thinking about harming yourself, call 911 or your local emergency number now.",
+          "pill": "Call 911"
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "988 Suicide & Crisis Lifeline",
+          "body": "Call or text 988 · English and Spanish · 24 hours."
+        },
+        {
+          "t": "card",
+          "title": "CDC-INFO",
+          "body": "English and Spanish. General questions about vaccines and preventive care. They have no access to your record, and neither do we."
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "EASTSIDE FAMILY HEALTH",
+              "The number you entered · they hold your history, we don't"
+            ],
+            [
+              "GRAND AVENUE PHARMACY",
+              "Walk-in flu shots · the number you entered"
+            ],
+            [
+              "JULIÁN",
+              "“Can you take the kids on Thursday morning?”"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "There is no coach in this programme",
+          "body": "Some Tether programmes have one. This one does not. A reminder list with a coach bolted on would be a clinic pretending to be an app, and the thing standing between you and a dental appointment is usually a Thursday morning rather than advice."
+        },
+        {
+          "t": "card",
+          "title": "If you do send something",
+          "body": "You read the exact page first: your dates and the words you used, nothing else, and no interpretation attached, because there is not one to attach.",
+          "to": "SH5",
+          "pill": "Who sees what"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Back to today",
+          "to": "S04"
+        },
+        {
+          "label": "See what a share would contain",
+          "kind": "ghost",
+          "to": "SH5"
+        }
+      ],
+      "footer": "Crisis numbers route to United States services."
+    },
+    "S08": {
+      "title": "Settings & privacy",
+      "badge": "Private",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Notifications",
+          "body": "Detail is off, and this programme ships that way. A reminder says “Groundwork” and nothing else — not which check, not which part of you, not the date. Anyone who sees your lock screen learns the name of an app, which is the most a lock screen should ever give away.",
+          "chips": [
+            "Generic — “Groundwork”",
+            "Show detail",
+            "None at all"
+          ],
+          "selected": [
+            0
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Reminders you have set",
+          "body": "One, for 1 October at 09:00. It says “Groundwork”, it does not repeat, and you set it. We did not work out that you needed it."
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "REMINDERS",
+              "Generic · 1 set, by you"
+            ],
+            [
+              "DATES IN YOUR RECORD",
+              "7 · every one editable, every one deletable"
+            ],
+            [
+              "SHARING",
+              "Nothing shared · no clinic is connected"
+            ],
+            [
+              "HIDDEN FROM YOUR HOME SCREEN",
+              "Off · reachable from Today"
+            ],
+            [
+              "TEXT SIZE",
+              "Follows your phone"
+            ],
+            [
+              "LANGUAGE",
+              "English · Spanish is not written yet"
+            ],
+            [
+              "WHAT LEAVES THIS PHONE",
+              "Nothing, unless you export it and send it"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Export everything",
+          "body": "A readable page and a structured file: your dates, the words you used, and the reminders you set. It stays on your phone unless you send it.",
+          "to": "SH4",
+          "pill": "Export"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Delete everything",
+          "body": "Completed, not hidden — this phone, our servers, and anything queued to sync. It cannot be undone, and it ends this programme.",
+          "to": "SH4",
+          "pill": "Delete"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Education and reminders. Groundwork does not screen, diagnose, treat or prescribe, it does not decide which checks apply to you, and it is not a substitute for advice from a qualified health professional."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Done",
+          "to": "S04"
+        },
+        {
+          "label": "Who sees what",
+          "kind": "ghost",
+          "to": "SH5"
+        },
+        {
+          "label": "Your record across programmes",
+          "kind": "ghost",
+          "to": "SH4"
+        }
+      ],
+      "footer": "Turning detail on takes effect straight away. So does turning it off."
+    }
+  }
+}

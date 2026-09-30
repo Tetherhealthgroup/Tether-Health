@@ -1,0 +1,145 @@
+{
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "id": "worthasking",
+  "name": "Worth Asking",
+  "$nameNote": "Placeholder. Not trademark-cleared, and not searched against any register. It is a description of the product's only claim — that a question is worth putting to a person — and it should be replaced by anyone with a lawyer.",
+  "areaId": "cancer",
+  "serviceLines": [
+    "cancer.risk",
+    "cancer.screening_awareness",
+    "cancer.survivorship"
+  ],
+  "$serviceLinesNote": "cancer.treatment_support is deliberately not claimed. shell.json's not_every_area_ships rule names 'cancer.treatment_support clinical material' as one of the lines that belongs on a care-team surface with a clinician in the loop, and nothing in these eight screens puts one there. cancer.risk is claimed narrowly: the education library explains what is known about modifiable risk for populations, and never estimates anything for the person reading it.",
+  "status": "design",
+  "locales": [
+    "en"
+  ],
+  "$localesNote": "English only. The Spanish helpline rows below are real lines that answer in Spanish; the interface is not translated, and listing 'es' in this array would claim that it is.",
+  "vocabulary": {
+    "behaviour": "asking someone",
+    "urge": "no urge in this programme",
+    "lapse": "no lapse in this programme",
+    "target": "the date you were given",
+    "primaryMetric": "nothing here is scored"
+  },
+  "$vocabularyNote": "Three of the five shared words do not survive contact with this area, and forcing them would be dishonest. There is no urge to ride out and nothing to slip at — the behaviour is raising something with a clinician, which has either happened or has not happened yet, and a person who has not raised it has not lapsed at anything. 'target' is a date somebody else gave the person, never one this product set. There is no primary metric: a number at the top of the home screen would be a score about cancer derived from what a frightened person typed, which no_risk_score forbids and which would be indefensible even if it did not.",
+  "helplines": [
+    {
+      "locale": "en",
+      "name": "988 Suicide & Crisis Lifeline",
+      "number": "988"
+    },
+    {
+      "locale": "es",
+      "name": "988 Línea de Prevención del Suicidio y Crisis",
+      "number": "988"
+    }
+  ],
+  "$helplineNote": "One organisation line was removed before shipping because it could not be verified from this environment: American Cancer Society (1-800-227-2345), Sociedad Americana Contra El Cáncer (1-800-227-2345). See design/helplines-to-verify.md. A wrong number on a health screen is worse than no number, so it is absent rather than unchecked. Only 988 and 911, which are fixed national codes, remain.",
+  "screens": [
+    {
+      "id": "S01",
+      "archetype": "welcome",
+      "route": "/welcome",
+      "phase": 1
+    },
+    {
+      "id": "S02",
+      "archetype": "why",
+      "route": "/onboarding/why",
+      "phase": 2
+    },
+    {
+      "id": "S03",
+      "archetype": "consent",
+      "route": "/onboarding/consent",
+      "phase": 2
+    },
+    {
+      "id": "S04",
+      "archetype": "home",
+      "route": "/today",
+      "phase": 4
+    },
+    {
+      "id": "S05",
+      "archetype": "due_record",
+      "route": "/checks",
+      "phase": 4,
+      "$new": true
+    },
+    {
+      "id": "S06",
+      "archetype": "education",
+      "route": "/learn",
+      "phase": 7
+    },
+    {
+      "id": "S07",
+      "archetype": "support_hub",
+      "route": "/support",
+      "phase": 7
+    },
+    {
+      "id": "S08",
+      "archetype": "settings",
+      "route": "/settings",
+      "phase": 8
+    },
+    {
+      "id": "SH1",
+      "archetype": "programs_home",
+      "route": "/programs",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH2",
+      "archetype": "area_directory",
+      "route": "/areas",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH3",
+      "archetype": "program_join",
+      "route": "/areas/join",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH4",
+      "archetype": "record",
+      "route": "/record",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH5",
+      "archetype": "sharing_matrix",
+      "route": "/privacy/sharing",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH6",
+      "archetype": "crisis_route",
+      "route": "/help-now",
+      "phase": 8,
+      "$shell": true
+    }
+  ],
+  "platformCapabilities": {
+    "blocking": false,
+    "passiveTracking": false,
+    "offlineRescue": false,
+    "$note": "Nothing is measured from the device. Every date and every note on every screen was typed by the person, and nothing is imported from a record, a lab or an insurer — so the list is only ever as complete as the person made it, and the copy says so rather than implying a coverage it does not have. There is no rescue flow to run offline, because the honest response to fear about cancer is a person on a phone line, not a ninety-second timer."
+  },
+  "proposedArchetypes": [
+    {
+      "id": "due_record",
+      "reason": "Dates the person entered and notes the person wrote, held in one place and owned by them. Already proposed in supplement.archetypes.json and shared with preventive, which is why it belongs in a library rather than in this product. Its scopeNote slot is where no_screening_claim is said out loud: a date is not an eligibility verdict."
+    }
+  ]
+}

@@ -1,0 +1,289 @@
+openapi: 3.1.0
+info:
+  title: BreatheFree API
+  version: 1.2.0
+  description: >-
+    Development contract for authenticated profiles and synthetic quit-plan data.
+    Real patient, clinical, and support-person data remain prohibited until
+    privacy, clinical, retention, deletion, and compliance review is complete.
+servers:
+  - url: https://api.example.invalid
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Service readiness
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Health'}
+  /v1/profile:
+    get:
+      operationId: getMyProfile
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: Authenticated user's profile
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Profile'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+    patch:
+      operationId: updateMyProfile
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UpdateProfile'}
+      responses:
+        '200':
+          description: Updated profile
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Profile'}
+        '400': {description: Invalid request body}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+  /v1/quit-plan:
+    get:
+      operationId: getMyQuitPlan
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: Authenticated user's complete quit-plan snapshot
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/QuitPlan'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {description: The authenticated user has not saved a quit plan}
+        '502': {description: Quit-plan storage is temporarily unavailable}
+    put:
+      operationId: putMyQuitPlan
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PutQuitPlan'}
+      responses:
+        '200':
+          description: Replaced quit-plan snapshot
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/QuitPlan'}
+        '400': {description: Invalid request body}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '502': {description: Quit-plan storage is temporarily unavailable}
+  /v1/quit-plan/guest-import:
+    post:
+      operationId: createMyQuitPlanFromGuest
+      description: Atomically creates the caller plan only when none exists.
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PutQuitPlan'}
+      responses:
+        '201':
+          description: Created quit-plan snapshot
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/QuitPlan'}
+        '400': {description: Invalid request body}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '409': {description: The authenticated user already has a quit plan}
+        '502': {description: Quit-plan storage is temporarily unavailable}
+  /v1/account/export:
+    get:
+      operationId: exportMyAppData
+      description: >-
+        Returns the bounded app-owned profile and optional quit-plan snapshot.
+        Requires a timestamped Supabase JWT authentication method (amr) within the configured recent-auth window.
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: JSON account data export
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AccountDataExport'}
+        '401': {description: Missing, invalid, or insufficiently recent authentication}
+        '502': {description: Account data is temporarily unavailable}
+  /v1/account/data:
+    delete:
+      operationId: deleteMyAppData
+      description: >-
+        Permanently deletes caller-owned profile, quit-plan, and avatar data.
+        Supabase Auth identity deletion is not performed and is reported
+        explicitly in the receipt.
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [confirmation]
+              properties:
+                confirmation: {const: DELETE}
+      responses:
+        '200':
+          description: App-owned data deletion receipt
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AccountDeletionReceipt'}
+        '400': {description: Exact explicit confirmation was not supplied}
+        '401': {description: Missing, invalid, or insufficiently recent authentication}
+        '502': {description: Deletion did not complete}
+components:
+  securitySchemes:
+    supabaseJwt: {type: http, scheme: bearer, bearerFormat: JWT}
+  responses:
+    Unauthorized: {description: Missing or invalid Supabase access token}
+  schemas:
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status, service, version]
+      properties:
+        status: {const: ok}
+        service: {const: breathefree-api}
+        version: {type: string}
+    Profile:
+      type: object
+      additionalProperties: false
+      required: [id, displayName, locale, timeZone, onboardingCompleted, createdAt, updatedAt]
+      properties:
+        id: {type: string, format: uuid}
+        displayName: {type: [string, 'null'], maxLength: 80}
+        locale: {type: string, enum: [en, es]}
+        timeZone: {type: string, minLength: 1, maxLength: 64}
+        onboardingCompleted: {type: boolean}
+        avatarPath: {type: [string, 'null'], maxLength: 512}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+    UpdateProfile:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        displayName: {type: [string, 'null'], maxLength: 80}
+        locale: {type: string, enum: [en, es]}
+        timeZone: {type: string, minLength: 1, maxLength: 64}
+        onboardingCompleted: {type: boolean}
+        avatarPath: {type: [string, 'null'], maxLength: 512}
+    AccountDataExport:
+      type: object
+      additionalProperties: false
+      required: [schemaVersion, generatedAt, profile, quitPlan]
+      properties:
+        schemaVersion: {const: '1.0'}
+        generatedAt: {type: string, format: date-time}
+        profile: {$ref: '#/components/schemas/Profile'}
+        quitPlan:
+          oneOf:
+            - {$ref: '#/components/schemas/QuitPlan'}
+            - {type: 'null'}
+    AccountDeletionReceipt:
+      type: object
+      additionalProperties: false
+      required: [requestId, completedAt, deleted, authIdentityDeleted, authIdentityStatus]
+      properties:
+        requestId: {type: string, format: uuid}
+        completedAt: {type: string, format: date-time}
+        deleted:
+          type: object
+          additionalProperties: false
+          required: [profiles, quitPlans, avatarObjects]
+          properties:
+            profiles: {type: integer, minimum: 0, maximum: 1}
+            quitPlans: {type: integer, minimum: 0, maximum: 1}
+            avatarObjects: {type: integer, minimum: 0}
+        authIdentityDeleted: {const: false}
+        authIdentityStatus: {const: external-action-required}
+    SupportPerson:
+      type: object
+      additionalProperties: false
+      required: [id, name, relationship, channel, checkIn, enabled]
+      properties:
+        id: {type: string, pattern: '^[A-Za-z0-9_-]{1,80}$'}
+        name: {type: string, minLength: 1, maxLength: 80}
+        relationship: {type: string, minLength: 1, maxLength: 80}
+        channel: {type: string, enum: [text, call]}
+        checkIn: {type: string, minLength: 1, maxLength: 160}
+        enabled: {type: boolean}
+    QuitPlanFields:
+      type: object
+      required:
+        - dailyCigaretteUse
+        - smokingTriggers
+        - customSmokingTrigger
+        - readinessPath
+        - quitPlanPath
+        - quitDate
+        - quitDayCheckIn
+        - quitReasons
+        - customQuitReason
+        - topQuitReason
+        - supportPeople
+        - preparationTasks
+        - treatmentSupport
+        - careTeamReminder
+      properties:
+        dailyCigaretteUse:
+          type: [string, 'null']
+          enum: [notEveryDay, tenOrFewer, elevenToTwenty, twentyOneToThirty, thirtyOneOrMore, null]
+        smokingTriggers:
+          type: array
+          uniqueItems: true
+          maxItems: 10
+          items:
+            type: string
+            enum: [stress, afterMeals, driving, coffee, socialSettings, workBreaks, alcohol, boredom, morning, beforeBed]
+        customSmokingTrigger: {type: [string, 'null'], minLength: 1, maxLength: 120}
+        readinessPath: {type: string, enum: [prepare, explore, connect]}
+        quitPlanPath: {type: string, enum: [setQuitDate, quitToday, reduceGradually]}
+        quitDate: {type: string, format: date}
+        quitDayCheckIn: {type: boolean}
+        quitReasons:
+          type: array
+          uniqueItems: true
+          maxItems: 7
+          items:
+            type: string
+            enum: [family, breatheEasier, improveHealth, saveMoney, control, future, custom]
+        customQuitReason: {type: [string, 'null'], minLength: 1, maxLength: 160}
+        topQuitReason:
+          type: [string, 'null']
+          enum: [family, breatheEasier, improveHealth, saveMoney, control, future, custom, null]
+        supportPeople:
+          type: array
+          description: Support-person IDs must be unique within the plan.
+          maxItems: 10
+          items: {$ref: '#/components/schemas/SupportPerson'}
+        preparationTasks:
+          type: array
+          uniqueItems: true
+          maxItems: 3
+          items:
+            type: string
+            enum: [removeSupplies, smokeFreeSpaces, stockAlternatives]
+        treatmentSupport: {type: boolean}
+        careTeamReminder: {type: boolean}
+    PutQuitPlan:
+      allOf:
+        - {$ref: '#/components/schemas/QuitPlanFields'}
+      unevaluatedProperties: false
+    QuitPlan:
+      allOf:
+        - {$ref: '#/components/schemas/QuitPlanFields'}
+        - type: object
+          required: [userId, createdAt, updatedAt]
+          properties:
+            userId: {type: string, format: uuid}
+            createdAt: {type: string, format: date-time}
+            updatedAt: {type: string, format: date-time}
+      unevaluatedProperties: false

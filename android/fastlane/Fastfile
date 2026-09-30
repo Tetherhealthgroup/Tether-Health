@@ -1,0 +1,240 @@
+# Tether Health — Android release lanes
+#
+# Run from the `android/` directory:
+#
+#     fastlane beta       # AAB -> Play internal testing track
+#     fastlane release    # AAB -> Play production track
+#     fastlane promote    # move an existing build between tracks, no rebuild
+#
+# Credentials come from the environment only. See docs/releasing.md.
+
+require "shellwords"
+
+default_platform(:android)
+
+PACKAGE_NAME = (ENV["TETHER_ANDROID_PACKAGE_NAME"] || "com.TetherHealthLLC.tetherhealth").freeze
+
+FLUTTER_PROJECT_DIR = File.expand_path("../..", __dir__).freeze
+AAB_PATH = File.join(FLUTTER_PROJECT_DIR, "build", "app", "outputs", "bundle", "release", "app-release.aab").freeze
+KEY_PROPERTIES_PATH = File.join(FLUTTER_PROJECT_DIR, "android", "key.properties").freeze
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def flutter_bin
+  @flutter_bin ||= begin
+    candidate = ENV["FLUTTER_BIN"].to_s.empty? ? "flutter" : ENV["FLUTTER_BIN"]
+    resolved = `command -v #{Shellwords.escape(candidate)} 2>/dev/null`.to_s.strip
+
+    if resolved.empty?
+      UI.user_error!(<<~MSG)
+        flutter was not found on PATH.
+
+        Looked for: #{candidate}
+        PATH:       #{ENV['PATH']}
+
+        These lanes shell out to the Flutter tool rather than driving Gradle
+        directly, so there is nothing to fall back to.
+
+        Fix one of these:
+          * install Flutter and put its bin/ directory on PATH, or
+          * export FLUTTER_BIN=/absolute/path/to/flutter
+      MSG
+    end
+
+    UI.message("Using flutter at #{resolved}")
+    resolved
+  end
+end
+
+def flutter!(args)
+  Dir.chdir(FLUTTER_PROJECT_DIR) do
+    sh(%(#{Shellwords.escape(flutter_bin)} #{args}))
+  end
+end
+
+# Resolve the Play service-account JSON and fail with something readable.
+def play_json_key
+  path = (ENV["PLAY_STORE_JSON_KEY_PATH"] || ENV["SUPPLY_JSON_KEY"]).to_s.strip
+
+  if path.empty?
+    UI.user_error!(<<~MSG)
+      No Google Play service-account key configured.
+
+        export PLAY_STORE_JSON_KEY_PATH=/absolute/path/to/play-service-account.json
+
+      Create it in Google Cloud Console for the project linked to the Play
+      Console, then grant that service account access under
+      Play Console -> Users and permissions. See docs/releasing.md.
+    MSG
+  end
+
+  unless File.exist?(path)
+    UI.user_error!("PLAY_STORE_JSON_KEY_PATH points at #{path}, which does not exist.")
+  end
+
+  path
+end
+
+# android/app/build.gradle.kts falls back to the debug key when key.properties
+# is missing, and registers `verifyReleaseSigning` (a dependency of
+# bundleRelease) to stop a debug-signed bundle reaching Play. That guard is the
+# real one; this check exists only so the failure arrives in two seconds
+# instead of after a full Gradle build.
+def verify_release_signing_configured!
+  return if File.exist?(KEY_PROPERTIES_PATH)
+
+  UI.user_error!(<<~MSG)
+    android/key.properties is missing, so this build would be signed with the
+    debug key. Gradle's own `verifyReleaseSigning` task would fail the bundle
+    anyway — this is the same check, arriving sooner.
+
+    Create android/key.properties (it is gitignored) with:
+
+        storeFile=/absolute/path/to/upload-keystore.jks
+        storePassword=...
+        keyAlias=upload
+        keyPassword=...
+
+    See the "Release signing" section of README.md and
+    PRODUCTION_RELEASE_CHECKLIST.md.
+  MSG
+end
+
+def built_aab
+  unless File.exist?(AAB_PATH)
+    UI.user_error!(<<~MSG)
+      No app bundle at #{AAB_PATH}
+
+      `flutter build appbundle --release` reported success but produced
+      nothing at the expected path. If the Flutter version changed its output
+      layout, update AAB_PATH in android/fastlane/Fastfile.
+    MSG
+  end
+
+  UI.success("Built #{AAB_PATH} (#{(File.size(AAB_PATH) / 1_048_576.0).round(1)} MB)")
+  AAB_PATH
+end
+
+def build_release_bundle
+  flutter_bin
+  verify_release_signing_configured!
+
+  args = ["build", "appbundle", "--release"]
+  args << "--build-name=#{ENV['TETHER_BUILD_NAME']}" unless ENV["TETHER_BUILD_NAME"].to_s.empty?
+  args << "--build-number=#{ENV['TETHER_BUILD_NUMBER']}" unless ENV["TETHER_BUILD_NUMBER"].to_s.empty?
+
+  flutter!(args.join(" "))
+  built_aab
+end
+
+# Shared upload_to_play_store options.
+#
+# Metadata, screenshots, images and the changelog are intentionally skipped:
+# store copy for this app goes through clinical and legal review, and a release
+# lane that can silently overwrite it is a hazard, not a convenience. Manage
+# the listing in the Play Console.
+def play_upload_options(track:, aab:)
+  {
+    package_name: PACKAGE_NAME,
+    json_key: play_json_key,
+    aab: aab,
+    track: track,
+    release_status: ENV["TETHER_PLAY_RELEASE_STATUS"] || "completed",
+    skip_upload_metadata: true,
+    skip_upload_changelogs: true,
+    skip_upload_images: true,
+    skip_upload_screenshots: true,
+    skip_upload_apk: true,
+    validate_only: ENV["TETHER_PLAY_DRY_RUN"] == "true"
+  }
+end
+
+# ---------------------------------------------------------------------------
+# Lanes
+# ---------------------------------------------------------------------------
+
+platform :android do
+  desc "Check flutter, signing and the Play key are all present"
+  lane :preflight do
+    flutter_bin
+    verify_release_signing_configured!
+    play_json_key
+    UI.success("flutter, android/key.properties and the Play service-account key are all present.")
+  end
+
+  desc "Build the release app bundle without uploading"
+  lane :build do
+    build_release_bundle
+  end
+
+  desc "Build an AAB and upload it to the Play internal testing track"
+  lane :beta do
+    aab = build_release_bundle
+
+    upload_to_play_store(**play_upload_options(track: "internal", aab: aab))
+
+    UI.success("Uploaded to the Play internal testing track.")
+  end
+
+  desc "Build an AAB and upload it to the Play production track"
+  lane :release do
+    aab = build_release_bundle
+
+    # A staged rollout is the default for production. TETHER_PLAY_ROLLOUT is a
+    # fraction: "0.1" is 10% of users. Set it to "1" for a full rollout.
+    options = play_upload_options(track: "production", aab: aab)
+    rollout = ENV["TETHER_PLAY_ROLLOUT"].to_s.strip
+    unless rollout.empty?
+      options[:rollout] = rollout
+      # Play rejects a non-final rollout fraction on a "completed" release.
+      options[:release_status] = "inProgress" if rollout.to_f < 1.0
+    end
+
+    upload_to_play_store(**options)
+
+    UI.success("Uploaded to the Play production track#{rollout.empty? ? '' : " at rollout #{rollout}"}.")
+  end
+
+  desc "Promote an already-uploaded build between tracks without rebuilding"
+  lane :promote do |options|
+    from = options[:from] || ENV["TETHER_PLAY_FROM_TRACK"] || "internal"
+    to   = options[:to]   || ENV["TETHER_PLAY_TO_TRACK"]   || "production"
+    version = options[:version_code] || ENV["TETHER_PLAY_VERSION_CODE"]
+
+    if version.to_s.strip.empty?
+      UI.user_error!(<<~MSG)
+        A version code is required to promote a build.
+
+            fastlane promote version_code:42 from:internal to:production
+
+        The version code is the `+N` suffix of `version:` in pubspec.yaml for
+        the build you want to move, and is listed in the Play Console under
+        Release -> App bundle explorer.
+      MSG
+    end
+
+    upload_to_play_store(
+      package_name: PACKAGE_NAME,
+      json_key: play_json_key,
+      track: from,
+      track_promote_to: to,
+      version_code: version.to_i,
+      skip_upload_aab: true,
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      validate_only: ENV["TETHER_PLAY_DRY_RUN"] == "true"
+    )
+
+    UI.success("Promoted version code #{version} from '#{from}' to '#{to}'.")
+  end
+
+  error do |lane, exception|
+    UI.error("Lane '#{lane}' failed: #{exception.message}")
+    UI.error("Troubleshooting: docs/releasing.md")
+  end
+end

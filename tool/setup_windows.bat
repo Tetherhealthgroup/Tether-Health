@@ -11,7 +11,7 @@ if errorlevel 1 (
 cd /d "%~dp0\.."
 
 echo Creating Android, web and Windows runner files...
-flutter create . --project-name breathefree_patient --org com.breathefree --platforms=android,web,windows
+flutter create . --project-name tether_health --org com.TetherHealthLLC --platforms=android,web,windows
 if errorlevel 1 exit /b 1
 
 echo Downloading packages...

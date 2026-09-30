@@ -1,0 +1,163 @@
+{
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "id": "longview",
+  "name": "Longview",
+  "$nameNote": "Placeholder. Not trademark-cleared. Named for the only thing the product actually offers — a run of results in date order instead of one sheet of paper. Flagged for naming review: 'Longview' could be misread as a statement about someone's long-term outlook, which is precisely the claim this programme is forbidden from making.",
+  "areaId": "kidney_liver",
+  "serviceLines": [
+    "kidney.risk",
+    "kidney.monitoring",
+    "kidney.education",
+    "kidney.coordination"
+  ],
+  "status": "design",
+  "locales": [
+    "en"
+  ],
+  "vocabulary": {
+    "result": "result",
+    "$resultNote": "Never 'score', never 'level', never 'reading' — a reading implies the product took it. A result is a thing a laboratory produced and a person copied down.",
+    "resultSet": "a blood draw",
+    "$resultSetNote": "Results arrive in groups on one sheet, months apart. The unit of the product is the sheet, not the number.",
+    "primaryMetric": "results you have saved",
+    "$primaryMetricNote": "Deliberately a count of saved results, not a clinical value. Longview's headline number must never be something a laboratory produced, because a big number on a home screen reads as a score.",
+    "clinician": "your clinic",
+    "record": "your file",
+    "$omitted": {
+      "behaviour": "Does not apply. Longview is not built around changing one behaviour, and it would be dishonest to imply that a daily habit moves these results the way a daily habit moves a cigarette count.",
+      "urge": "Does not apply. There is no moment of temptation in this area and no rescue tool that would answer one.",
+      "lapse": "Does not apply, and the cessation sense would be actively wrong. There is nothing here to slip from. A result that moves is not a lapse, was not caused by weakness, and must never be presented as one.",
+      "target": "Deliberately absent. Longview sets no target of any kind. A target implies a right answer, a right answer implies a wrong one, and the moment a number on this screen is wrong the product has interpreted a lab value."
+    }
+  },
+  "helplines": [
+    {
+      "locale": "en",
+      "name": "988 Suicide & Crisis Lifeline",
+      "number": "988"
+    },
+    {
+      "locale": "es",
+      "name": "988 Línea de Prevención del Suicidio y Crisis",
+      "number": "988"
+    }
+  ],
+  "$helplinesNote": "Two organisations belong on this screen and are missing on purpose. The National Kidney Foundation runs a patient information helpline (NKF Cares), and the American Liver Foundation runs one too. The author had no network access at the time of writing and could not confirm either current number, and a wrong number on a helpline card is worse than an absent one. Both should be added after checking kidney.org and liverfoundation.org directly. 988 is included because it is a fixed three-digit US code serving English and Spanish. No 911 entry appears in this list because 911 is written into the crisis copy itself rather than carried as a helpline record.",
+  "screens": [
+    {
+      "id": "S01",
+      "archetype": "welcome",
+      "route": "/welcome",
+      "phase": 1
+    },
+    {
+      "id": "S02",
+      "archetype": "why",
+      "route": "/onboarding/why",
+      "phase": 2
+    },
+    {
+      "id": "S03",
+      "archetype": "consent",
+      "route": "/onboarding/consent",
+      "phase": 2
+    },
+    {
+      "id": "S04",
+      "archetype": "home",
+      "route": "/today",
+      "phase": 4
+    },
+    {
+      "id": "S05",
+      "archetype": "reading_log",
+      "route": "/results",
+      "phase": 4,
+      "$new": true
+    },
+    {
+      "id": "S06",
+      "archetype": "education",
+      "route": "/learn",
+      "phase": 7
+    },
+    {
+      "id": "S07",
+      "archetype": "support_hub",
+      "route": "/support",
+      "phase": 7
+    },
+    {
+      "id": "S08",
+      "archetype": "settings",
+      "route": "/settings",
+      "phase": 8
+    },
+    {
+      "id": "SH1",
+      "archetype": "programs_home",
+      "route": "/programs",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH2",
+      "archetype": "area_directory",
+      "route": "/areas",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH3",
+      "archetype": "program_join",
+      "route": "/areas/join",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH4",
+      "archetype": "record",
+      "route": "/record",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH5",
+      "archetype": "sharing_matrix",
+      "route": "/privacy/sharing",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH6",
+      "archetype": "crisis_route",
+      "route": "/help-now",
+      "phase": 8,
+      "$shell": true
+    }
+  ],
+  "$screensNote": "Eight screens, exactly the seven shared archetypes declared for kidney_liver in areas.json plus reading_log, and the six shell screens. There is no baseline, no plan, no check-in and no progress screen — a person hears from this area roughly twice a year and inventing a daily loop for them would be manufacturing work to make the product look busy. reading_log is marked $new because it lives in supplement.archetypes.json and has not been promoted into the shared library yet.",
+  "$homeCheckinNote": "The `home` archetype requires a checkinCard slot, and this programme has no check-in screen to point it at. Rather than route the slot nowhere, S04 fills it with an honest statement that there is no daily check-in and why. If a check-in screen is ever added here, that card should be replaced rather than supplemented.",
+  "$sharePreviewNote": "share_on_request_only requires share_preview, and areas.json does not declare a share_preview screen for kidney_liver. The preview is therefore rendered inline on S07 (support_hub): the exact rows that would be sent, the list of what would not be sent, and a send that only fires after the person has seen both. If share_preview is later declared for this area, the inline preview should be replaced by a route to it.",
+  "platformCapabilities": {
+    "blocking": false,
+    "passiveTracking": false,
+    "offlineRescue": false,
+    "labFeed": false,
+    "$note": "There is no laboratory feed, no EHR connection, no portal integration and no photo reading. Every value in Longview was typed in by hand by the person, off a piece of paper, and may contain a typo. No screen may present a saved result as though it arrived from the laboratory, and no screen may compare a value to a reference range — the product does not hold reference ranges and is not going to."
+  },
+  "safeguards": [
+    "never_prescribe",
+    "no_result_interpretation",
+    "self_report_only",
+    "share_on_request_only",
+    "export_and_delete"
+  ],
+  "proposedArchetypes": [
+    {
+      "id": "reading_log",
+      "reason": "Store and trend results. No interpretation — routes to a clinician. Shared with metabolic, cardiovascular and respiratory, which is the reuse test the bundle uses to stop the library fragmenting."
+    }
+  ]
+}

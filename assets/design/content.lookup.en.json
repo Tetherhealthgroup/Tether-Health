@@ -1,0 +1,1153 @@
+{
+  "product": "lookup",
+  "locale": "en",
+  "version": "1.1.0",
+  "$comment": "Slot content per screen. tools/prototype.py renders this into a clickable prototype. Screens absent here are reported as uncovered.",
+  "start": "S01",
+  "screens": {
+    "S01": {
+      "title": "",
+      "lead": "none",
+      "headline": "Your attention is yours to spend.",
+      "sub": "LookUp helps you use social media on your own terms — from the first honest look at a week, to the pull that arrives at 11pm on a Tuesday.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "Private by default",
+          "body": "Nothing leaves your phone unless you choose to send it."
+        },
+        {
+          "t": "card",
+          "title": "Help when the pull hits",
+          "body": "One tap, ninety seconds, works offline."
+        },
+        {
+          "t": "card",
+          "title": "A slip never resets you",
+          "body": "Progress is kept as history, not a streak to lose."
+        },
+        {
+          "t": "chips",
+          "items": [
+            "English",
+            "Español"
+          ],
+          "selected": [
+            0
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "Get started",
+          "to": "S03"
+        },
+        {
+          "label": "I already have an account",
+          "kind": "ghost",
+          "to": "S12"
+        }
+      ],
+      "footer": "Education and self-management support. Not a diagnosis or treatment."
+    },
+    "S03": {
+      "title": "Consent & privacy",
+      "badge": "3 of 5",
+      "progress": 40,
+      "headline": "What we hold, and what we don't.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Held on your phone",
+          "body": "Which apps you picked, your notes, your urge tags. These stay local."
+        },
+        {
+          "t": "card",
+          "title": "Shared with your care team",
+          "body": "Totals and adherence only. Never who you follow, message, or watch."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "You can leave",
+          "body": "Export or delete everything at any point. Deletion is completed, not hidden."
+        },
+        {
+          "t": "options",
+          "items": [
+            {
+              "title": "I understand and agree",
+              "sel": true
+            },
+            {
+              "title": "Share optional notes with my coach"
+            }
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "Agree and continue",
+          "to": "S05"
+        },
+        {
+          "label": "Read the full privacy notice",
+          "kind": "ghost",
+          "to": "S03"
+        }
+      ],
+      "footer": "You can change either choice later in Settings."
+    },
+    "S05": {
+      "title": "Baseline week",
+      "badge": "Day 3 of 7",
+      "headline": "Just live normally.",
+      "sub": "Nothing is blocked this week. Without a starting line, neither of us can tell whether anything worked.",
+      "blocks": [
+        {
+          "t": "bars",
+          "values": [
+            70,
+            88,
+            62,
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        {
+          "t": "stats",
+          "items": [
+            [
+              "4h 12m",
+              "Average day"
+            ],
+            [
+              "78",
+              "Opens a day"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Busiest stretch",
+          "body": "21:30 – 23:00, every night so far."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "You can stop waiting",
+          "body": "Start blocking now if you'd rather. We'll note the baseline is partial."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Start blocking now",
+          "kind": "ghost",
+          "to": "S07"
+        }
+      ],
+      "footer": "Saves offline · Syncs when connected"
+    },
+    "S07": {
+      "title": "Choose your path",
+      "badge": "1 of 5",
+      "progress": 20,
+      "lead": "back",
+      "headline": "Cut back, or step away?",
+      "sub": "Neither is the better answer. You can switch later without losing anything.",
+      "blocks": [
+        {
+          "t": "options",
+          "items": [
+            {
+              "title": "Reduce gradually",
+              "body": "Keep social media, shrink it. Most people start here.",
+              "sel": true
+            },
+            {
+              "title": "Set a step-away date",
+              "body": "A clean break from chosen apps, with a date you pick."
+            },
+            {
+              "title": "Help me decide",
+              "body": "Review both against your baseline, no pressure."
+            }
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Under 18, LookUp keeps at least 30 minutes a day available. Being cut off from friends is its own harm."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Continue",
+          "to": "S08"
+        }
+      ]
+    },
+    "S08": {
+      "title": "Set your limits",
+      "badge": "2 of 5",
+      "progress": 40,
+      "lead": "back",
+      "headline": "What feels doable?",
+      "sub": "Based on your 4h 12m baseline. An estimate is enough.",
+      "blocks": [
+        {
+          "t": "slider",
+          "title": "Daily minutes",
+          "value": 58,
+          "left": "0",
+          "mid": "2h 30m · cuts 40%",
+          "right": "5h"
+        },
+        {
+          "t": "slider",
+          "title": "Times you open them",
+          "body": "Sixty two-minute checks fragments a day more than one long sitting.",
+          "value": 40,
+          "left": "0",
+          "mid": "20 a day",
+          "right": "100"
+        },
+        {
+          "t": "card",
+          "title": "Quiet hours",
+          "body": "22:30 – 06:30, every night"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Continue",
+          "to": "S09"
+        }
+      ],
+      "footer": "You can change these later — increases wait 24 hours."
+    },
+    "S09": {
+      "title": "My reasons",
+      "badge": "3 of 5",
+      "progress": 60,
+      "lead": "back",
+      "headline": "Why does this matter to you?",
+      "sub": "We'll show these back at the moments that are hardest. Your words work better than ours.",
+      "blocks": [
+        {
+          "t": "input",
+          "title": "Your first reason",
+          "value": "I want my evenings back."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Others have written",
+          "chips": [
+            "Sleep",
+            "My kids",
+            "Focus at work",
+            "Comparison"
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "Continue",
+          "to": "S11"
+        }
+      ],
+      "footer": "Kept on your phone. Not shared with anyone."
+    },
+    "S11": {
+      "title": "Review your plan",
+      "badge": "5 of 5",
+      "progress": 100,
+      "lead": "back",
+      "headline": "Your plan is ready.",
+      "sub": "Take one final look. You can edit any part now or later.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Starting level",
+          "title": "Gentle — a pause before you open",
+          "body": "We'll suggest more friction only if the data says you need it."
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "PATH",
+              "Reduce gradually"
+            ],
+            [
+              "DAILY LIMIT",
+              "2h 30m · 20 opens"
+            ],
+            [
+              "QUIET HOURS",
+              "22:30 – 06:30"
+            ],
+            [
+              "TOP REASON",
+              "I want my evenings back"
+            ],
+            [
+              "SUPPORTER",
+              "Jordan · During an urge"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Starting activates your quiet hours and the pause screen. Messages still need your approval before sending."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Start my plan",
+          "to": "S12"
+        },
+        {
+          "label": "Save and finish later",
+          "kind": "ghost",
+          "to": "S12"
+        }
+      ]
+    },
+    "S12": {
+      "title": "Today",
+      "badge": "Private",
+      "lead": "none",
+      "headline": "Good morning, Sam.",
+      "sub": "Day 19. Your evenings have been quieter this week.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Get help now",
+          "body": "Reachable from every screen, in every program.",
+          "to": "SH6",
+          "pill": "Open"
+        },
+        {
+          "t": "metric",
+          "eyebrow": "Today so far",
+          "value": "94",
+          "unit": "of 150 minutes",
+          "pct": 62,
+          "foot": "14 of 20 opens used"
+        },
+        {
+          "t": "stats",
+          "items": [
+            [
+              "6h 40m",
+              "Back this week"
+            ],
+            [
+              "11",
+              "Urges handled"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Feeling the pull?",
+          "body": "One tap, ninety seconds.",
+          "to": "S17",
+          "pill": "Open Rescue"
+        },
+        {
+          "t": "card",
+          "title": "Today's check-in",
+          "body": "Not done yet · about 60 seconds"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Maya · your coach",
+          "body": "Thursday, 6:00 pm",
+          "to": "S27"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Start today's check-in",
+          "to": "S13"
+        },
+        {
+          "label": "Simulate opening Instagram",
+          "kind": "ghost",
+          "to": "S22"
+        },
+        {
+          "label": "Your programs",
+          "kind": "ghost",
+          "to": "SH1"
+        }
+      ],
+      "footer": "Works offline · Syncs securely when connected"
+    },
+    "S13": {
+      "title": "Daily check-in",
+      "badge": "About 60 sec",
+      "progress": 72,
+      "headline": "How are you doing today?",
+      "sub": "No right answers. This shapes what we suggest next.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "How do you feel?",
+          "chips": [
+            "Low",
+            "Not great",
+            "Okay",
+            "Good",
+            "Great"
+          ],
+          "selected": [
+            2
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Did you go over your limit?",
+          "body": "Before your plan settles, this is expected — it isn't a setback.",
+          "chips": [
+            "No",
+            "A little",
+            "Yes, a lot",
+            "Skip"
+          ],
+          "selected": [
+            2
+          ]
+        },
+        {
+          "t": "slider",
+          "title": "Strongest pull today",
+          "value": 60,
+          "left": "0 · None",
+          "mid": "6 · Moderate",
+          "right": "10"
+        },
+        {
+          "t": "card",
+          "title": "Anything affecting you today?",
+          "chips": [
+            "Restless",
+            "Trouble sleeping",
+            "Comparing myself",
+            "Other"
+          ],
+          "selected": [
+            0,
+            1
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "Save check-in",
+          "to": "S14"
+        }
+      ],
+      "footer": "Private · Works offline · You can edit today's answers later"
+    },
+    "S14": {
+      "title": "Your next step",
+      "badge": "1 step",
+      "headline": "One thing, not five.",
+      "sub": "Based on restless, trouble sleeping, and a pull of 6.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Recommended",
+          "title": "Move the apps off your home screen tonight.",
+          "body": "You open them most in bed. Three taps of distance is usually enough.",
+          "pill": "Do it now · 2 min"
+        },
+        {
+          "t": "card",
+          "title": "Or pick another",
+          "chips": [
+            "Guided reset · 3 min",
+            "Quiet hours early",
+            "Message Jordan"
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Skipping is fine. We'll offer it again in a few days, and we won't ask why."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Do it now",
+          "to": "S12"
+        },
+        {
+          "label": "Not today",
+          "kind": "ghost",
+          "to": "S12"
+        }
+      ]
+    },
+    "S17": {
+      "title": "Urge rescue",
+      "badge": "Private",
+      "headline": "How strong is it right now?",
+      "sub": "One question. Nothing to type.",
+      "blocks": [
+        {
+          "t": "slider",
+          "value": 70,
+          "left": "0 · None",
+          "mid": "7 · Strong",
+          "right": "10"
+        },
+        {
+          "t": "card",
+          "title": "What's underneath it?",
+          "body": "Optional — skip and we'll still help.",
+          "chips": [
+            "Bored",
+            "Anxious",
+            "Lonely",
+            "Habit",
+            "Avoiding something"
+          ],
+          "selected": [
+            0
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "Find me a tool",
+          "to": "S18"
+        },
+        {
+          "label": "Skip — just start breathing",
+          "kind": "ghost",
+          "to": "S19"
+        }
+      ],
+      "footer": "Works offline · One-handed · No typing required"
+    },
+    "S18": {
+      "title": "Recommended tool",
+      "badge": "2 of 5",
+      "headline": "Try this one first.",
+      "sub": "Bored, strength 7, 10:40pm — this has worked for you before.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Recommended",
+          "title": "Message a real friend",
+          "body": "The pull is social. This answers it instead of denying it — which is why it beats waiting it out for you.",
+          "pill": "Start · 2 min"
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "SLOW BREATHING",
+              "helped 7 of 9 times"
+            ],
+            [
+              "STEP OUTSIDE",
+              "helped 3 of 4 times"
+            ],
+            [
+              "TIDY ONE SURFACE",
+              "not tried yet"
+            ]
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "Start this tool",
+          "to": "S19"
+        }
+      ],
+      "footer": "Ordered by what has worked for you, not what's popular."
+    },
+    "S19": {
+      "title": "Urge rescue",
+      "badge": "3 of 5",
+      "progress": 60,
+      "headline": "Stay with this moment.",
+      "sub": "Ninety seconds. Most pulls fall away inside that.",
+      "blocks": [
+        {
+          "t": "timer",
+          "seconds": 90,
+          "label": "WAIT IT OUT",
+          "quote": "You said: “I want my evenings back.”"
+        },
+        {
+          "t": "card",
+          "title": "Need something else right now?",
+          "body": "You won't lose this check-in.",
+          "chips": [
+            "Switch tool",
+            "Message Jordan"
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "End early",
+          "kind": "ghost",
+          "to": "S20"
+        }
+      ],
+      "footer": "Nothing is sent or shared during this exercise."
+    },
+    "S20": {
+      "title": "Recheck",
+      "badge": "4 of 5",
+      "headline": "How strong is it now?",
+      "sub": "Move the dot. There's no wrong answer, including “the same”.",
+      "blocks": [
+        {
+          "t": "slider",
+          "value": 30,
+          "left": "0 · None",
+          "mid": "3 · Mild",
+          "right": "10",
+          "foot": "You started at 7 · Strong"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "This is how you felt, in your words. LookUp doesn't treat it as a clinical measurement."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Save and continue",
+          "to": "S21"
+        },
+        {
+          "label": "It's still strong",
+          "kind": "ghost",
+          "to": "S18"
+        }
+      ],
+      "footer": "Saves offline and syncs once · You can delete this event later"
+    },
+    "S21": {
+      "title": "Rescue result",
+      "badge": "5 of 5",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "That one counts",
+          "title": "From 7 to 3 in two minutes.",
+          "body": "Your twelfth urge handled this week."
+        },
+        {
+          "t": "card",
+          "title": "What helped",
+          "body": "Message a real friend — now your top tool for “bored”."
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Your next step",
+          "title": "Put the phone on the shelf until you brush your teeth.",
+          "body": "Late-evening pulls tend to come in pairs for you.",
+          "pill": "Set a 20-minute hold"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Want Jordan or a coach?",
+          "body": "No one is notified unless you choose.",
+          "to": "S27",
+          "pill": "View support"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Back to today",
+          "to": "S12"
+        }
+      ]
+    },
+    "S22": {
+      "title": "Instagram",
+      "badge": "Quiet hours",
+      "dark": true,
+      "blocks": [
+        {
+          "t": "timer",
+          "seconds": 8,
+          "label": "BREATHE",
+          "quote": "Still want to open it?"
+        },
+        {
+          "t": "card",
+          "tone": "inkSoft",
+          "body": "You've used 94 of 150 minutes, and 14 of 20 opens."
+        },
+        {
+          "t": "card",
+          "tone": "inkSoft",
+          "eyebrow": "You wrote this on 2 August",
+          "title": "“I want my evenings back.”"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Do something else instead",
+          "kind": "lime",
+          "to": "S17"
+        },
+        {
+          "label": "Open for 5 minutes · 2 left today",
+          "kind": "ghost",
+          "to": "S23"
+        }
+      ],
+      "footer": "Emergency calls and maps are never blocked."
+    },
+    "S23": {
+      "title": "Over your limit",
+      "badge": "Private",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Your progress is still here",
+          "title": "A slip is information — not the end.",
+          "body": "Share only what feels useful. Nothing below changes or deletes your earlier progress."
+        },
+        {
+          "t": "options",
+          "items": [
+            {
+              "title": "A bit over"
+            },
+            {
+              "title": "A long evening on it",
+              "sel": true
+            },
+            {
+              "title": "Prefer not to answer"
+            }
+          ]
+        },
+        {
+          "t": "card",
+          "title": "What was happening?",
+          "body": "Optional. This updates your trigger map.",
+          "chips": [
+            "In bed",
+            "Bored",
+            "Avoiding something",
+            "Not sure"
+          ],
+          "selected": [
+            0,
+            2
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Your next step",
+          "title": "Block 21:30–23:00 tomorrow, the stretch that keeps catching you.",
+          "pill": "Set it up"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Save and continue",
+          "to": "S12"
+        }
+      ],
+      "footer": "Saves offline and syncs once · You can delete this event later"
+    },
+    "S27": {
+      "title": "Support",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "A route to a person.",
+      "sub": "Nothing is sent until you preview it and confirm.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "In a crisis",
+          "body": "If you're in danger or thinking about harming yourself, call 988 or your local emergency number now.",
+          "pill": "Call 988"
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "JORDAN",
+              "“Can you talk for ten minutes?”"
+            ],
+            [
+              "MAYA · YOUR COACH",
+              "Replies within a day"
+            ],
+            [
+              "YOUR CARE TEAM",
+              "Share this month's summary"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "988 Suicide & Crisis Lifeline",
+          "body": "Call or text 988 · English and Spanish · 24 hours"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Preview what would be sent",
+          "kind": "ghost",
+          "to": "S12"
+        }
+      ],
+      "footer": "Crisis numbers route to United States services."
+    },
+    "SH1": {
+      "title": "Your programs",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "Two at a time, at most.",
+      "sub": "Three concurrent changes is where most people stall. A third needs a conversation, not a tap.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Active · week 4",
+          "title": "LookUp",
+          "body": "Digital wellbeing · 2h 21m average day",
+          "to": "S12",
+          "pill": "Open"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "Active · week 11",
+          "title": "BreatheFree",
+          "body": "Tobacco & nicotine · 19 days smoke-free"
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "PAUSED",
+              "Healthy weight · resumes when you say so"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Hidden from your home screen",
+          "body": "BreatheFree is reachable only from here. Nothing shows on your lock screen."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Look at another area",
+          "to": "SH2"
+        },
+        {
+          "label": "Back to today",
+          "kind": "ghost",
+          "to": "S12"
+        }
+      ],
+      "footer": "Each program shares separately. Nothing is pooled."
+    },
+    "SH2": {
+      "title": "Health areas",
+      "badge": "11 areas",
+      "lead": "back",
+      "headline": "What Tether covers, and what exists yet.",
+      "sub": "One area has code being written. The rest are a plan. Where a line sounds like something you could use now, it is not.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "In development",
+          "title": "Tobacco & nicotine",
+          "body": "Cigarettes, vaping, smokeless tobacco · 4 service lines"
+        },
+        {
+          "t": "card",
+          "eyebrow": "Design",
+          "title": "Digital wellbeing",
+          "body": "Compulsive social media use, screen overuse, sleep disruption",
+          "to": "SH3",
+          "pill": "Read more"
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "PLANNED",
+              "Diabetes & metabolic health"
+            ],
+            [
+              "PLANNED",
+              "Cancer"
+            ],
+            [
+              "PLANNED",
+              "Cardiovascular health"
+            ],
+            [
+              "PLANNED",
+              "Obesity & nutrition"
+            ],
+            [
+              "PLANNED",
+              "Respiratory health"
+            ],
+            [
+              "PLANNED",
+              "Kidney & liver health"
+            ],
+            [
+              "PLANNED",
+              "Mental & behavioral health"
+            ],
+            [
+              "PLANNED",
+              "Preventive health"
+            ],
+            [
+              "PLANNED",
+              "Healthy aging"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Planned areas have no implementation. We will tell you when that changes, and not before."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Back to your programs",
+          "kind": "ghost",
+          "to": "SH1"
+        }
+      ],
+      "footer": "Nothing here is a diagnosis or a recommendation to enrol."
+    },
+    "SH3": {
+      "title": "Digital wellbeing",
+      "badge": "Design",
+      "lead": "back",
+      "headline": "What joining changes.",
+      "sub": "Read this before you decide. You can leave at any point and take your data with you.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "What it does",
+          "body": "Limits you set, a pause before chosen apps open, urge tools that work offline, and check-ins under ninety seconds."
+        },
+        {
+          "t": "card",
+          "title": "What it needs",
+          "body": "Permission to see time on the apps you pick, and to shield them. You choose the apps — we never read who you follow or message."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What your coach would see",
+          "body": "Totals and adherence for this program only. Not your BreatheFree data, not your notes."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "You already have two active",
+          "body": "Joining this would pause Healthy weight. You can switch back whenever you want."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Education and self-management support. It does not diagnose, treat or prescribe, and is not a substitute for advice from a qualified health professional."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Join and pause Healthy weight",
+          "to": "S03"
+        },
+        {
+          "label": "Not now",
+          "kind": "ghost",
+          "to": "SH2"
+        }
+      ],
+      "footer": "Joining asks for consent separately, in plain language."
+    },
+    "SH4": {
+      "title": "Your record",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "Everything, in one place.",
+      "sub": "Across every program you have joined. Yours to export or delete.",
+      "blocks": [
+        {
+          "t": "rows",
+          "items": [
+            [
+              "LOOKUP · 19 DAYS",
+              "Check-ins, urges, limits, two slips"
+            ],
+            [
+              "BREATHEFREE · 11 WEEKS",
+              "Check-ins, cravings, quit plan, one slip"
+            ],
+            [
+              "HEALTHY WEIGHT · PAUSED",
+              "4 weeks of check-ins, kept"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Export everything",
+          "body": "A readable file plus a structured one. Includes paused and ended programs."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Delete everything",
+          "body": "Completed, not hidden. This cannot be undone, and it ends every active program."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Export",
+          "to": "SH4"
+        },
+        {
+          "label": "Back",
+          "kind": "ghost",
+          "to": "SH1"
+        }
+      ],
+      "footer": "Deletion clears your phone, our servers and anything queued to sync."
+    },
+    "SH5": {
+      "title": "Who sees what",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "Sharing is set per program.",
+      "sub": "Nothing is pooled between them, and nothing is shared by default.",
+      "blocks": [
+        {
+          "t": "rows",
+          "items": [
+            [
+              "LOOKUP → MAYA",
+              "Totals and adherence · notes off"
+            ],
+            [
+              "BREATHEFREE → CARE TEAM",
+              "Monthly summary · you approve each send"
+            ],
+            [
+              "HEALTHY WEIGHT",
+              "Nothing shared"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Why they are separate",
+          "body": "A cessation coach has no reason to see behavioural health data. Some categories are legally required to stay segregated."
+        },
+        {
+          "t": "card",
+          "title": "Preview before sending",
+          "body": "Every share shows you the exact contents first. You can cancel at that point."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Back",
+          "kind": "ghost",
+          "to": "SH1"
+        }
+      ],
+      "footer": "Changing a setting here affects one program only."
+    },
+    "SH6": {
+      "title": "Get help now",
+      "badge": "Always here",
+      "lead": "back",
+      "dark": false,
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "In an emergency",
+          "body": "If you are in danger, or thinking about harming yourself, call 911 or your local emergency number now.",
+          "pill": "Call 911"
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "988 Suicide & Crisis Lifeline",
+          "body": "Call or text 988 · English and Spanish · 24 hours"
+        },
+        {
+          "t": "card",
+          "title": "1-800-QUIT-NOW",
+          "body": "1-800-784-8669 · Español 1-855-335-3569"
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "JORDAN",
+              "“Can you talk for ten minutes?”"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "This screen is the same from anywhere in the app, in every program. It is never reordered or personalised."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Back",
+          "kind": "ghost",
+          "to": "S12"
+        }
+      ],
+      "footer": "Crisis numbers route to United States services."
+    }
+  }
+}

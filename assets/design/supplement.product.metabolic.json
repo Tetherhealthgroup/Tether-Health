@@ -1,0 +1,174 @@
+{
+  "version": "1.0.0",
+  "id": "glucosewise",
+  "name": "GlucoseWise",
+  "$nameNote": "Placeholder. Not trademark-cleared. Chosen to describe the area, not to be shipped.",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "areaId": "metabolic",
+  "serviceLines": [
+    "metabolic.screening",
+    "metabolic.lifestyle",
+    "metabolic.glucose",
+    "metabolic.complications"
+  ],
+  "status": "design",
+  "locales": [
+    "en"
+  ],
+  "vocabulary": {
+    "behaviour": "daily care",
+    "urge": "a hard moment",
+    "lapse": "an off day",
+    "target": "your weekly aim",
+    "primaryMetric": "morning glucose readings"
+  },
+  "helplines": [
+    {
+      "locale": "en",
+      "name": "988 Suicide & Crisis Lifeline",
+      "number": "988"
+    },
+    {
+      "locale": "es",
+      "name": "988 Línea de Prevención del Suicidio y Crisis",
+      "number": "988",
+      "$note": "Call or text 988, then press 2 for Spanish."
+    }
+  ],
+  "$helplineNote": "One organisation line was removed before shipping because it could not be verified from this environment: American Diabetes Association (1-800-342-2383). See design/helplines-to-verify.md. A wrong number on a health screen is worse than no number, so it is absent rather than unchecked. Only 988 and 911, which are fixed national codes, remain.",
+  "screens": [
+    {
+      "id": "S01",
+      "archetype": "welcome",
+      "route": "/welcome",
+      "phase": 1
+    },
+    {
+      "id": "S02",
+      "archetype": "why",
+      "route": "/onboarding/why",
+      "phase": 2
+    },
+    {
+      "id": "S03",
+      "archetype": "consent",
+      "route": "/onboarding/consent",
+      "phase": 2
+    },
+    {
+      "id": "S04",
+      "archetype": "baseline",
+      "route": "/onboarding/baseline",
+      "phase": 2
+    },
+    {
+      "id": "S05",
+      "archetype": "plan_targets",
+      "route": "/plan/targets",
+      "phase": 3
+    },
+    {
+      "id": "S06",
+      "archetype": "plan_review",
+      "route": "/plan/review",
+      "phase": 3
+    },
+    {
+      "id": "S07",
+      "archetype": "home",
+      "route": "/today",
+      "phase": 4
+    },
+    {
+      "id": "S08",
+      "archetype": "checkin",
+      "route": "/checkin",
+      "phase": 4
+    },
+    {
+      "id": "S09",
+      "archetype": "reading_log",
+      "route": "/readings",
+      "phase": 5
+    },
+    {
+      "id": "S10",
+      "archetype": "education",
+      "route": "/learn",
+      "phase": 7
+    },
+    {
+      "id": "S11",
+      "archetype": "progress",
+      "route": "/progress",
+      "phase": 7
+    },
+    {
+      "id": "S12",
+      "archetype": "support_hub",
+      "route": "/support",
+      "phase": 7
+    },
+    {
+      "id": "S13",
+      "archetype": "settings",
+      "route": "/settings",
+      "phase": 8
+    },
+    {
+      "id": "SH1",
+      "archetype": "programs_home",
+      "route": "/programs",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH2",
+      "archetype": "area_directory",
+      "route": "/areas",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH3",
+      "archetype": "program_join",
+      "route": "/areas/join",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH4",
+      "archetype": "record",
+      "route": "/record",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH5",
+      "archetype": "sharing_matrix",
+      "route": "/privacy/sharing",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH6",
+      "archetype": "crisis_route",
+      "route": "/help-now",
+      "phase": 8,
+      "$shell": true
+    }
+  ],
+  "platformCapabilities": {
+    "blocking": false,
+    "passiveTracking": false,
+    "offlineRescue": true,
+    "meterIntegration": false,
+    "cgmIntegration": false,
+    "$note": "No meter and no CGM integration. Every reading is typed in by the person, and no screen may imply the product read the device. If a CGM feed is ever added, out_of_range_routing has to be redesigned first: a continuous stream produces out-of-range values while a person sleeps, and a routing card nobody is awake to read is not routing."
+  },
+  "$safeguardNotes": {
+    "no_dosing_advice": "There is no dose_calculator and no titration_guidance anywhere in this product. No screen states a carbohydrate ratio, a correction factor, a sliding scale, or an 'if your reading is X then Y' rule. The reading screen shows the number and the range the person typed in from their own clinic, and routes. It never closes the loop into an action on medicine.",
+    "out_of_range_routing": "S09 carries the routingCard and S12 carries the crisis card. The threshold is the range the person recorded from their own clinician plus the symptoms they can feel — the product publishes no clinical cutoff of its own, because an unreviewed number in this file would be the most dangerous string in the repo.",
+    "self_report_only": "S04, S08, S09 and S11 each carry a visible self-report disclaimer. Ratings are described as how the day felt, never as measurement."
+  }
+}

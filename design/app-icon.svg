@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The Tether Health application icon.
+
+  The mark is the two interlocking rings from the company identity — one person,
+  one source of support, connected — drawn on the same 116 x 76 geometry as the
+  BreatheFree leaf so the parent mark and the product mark sit together without
+  either being rescaled. It is reproduced here from
+  www.tetherhealthgroup.com/project/src/components/TetherLogo.astro, in that
+  component's own on-dark variant: mint ring, coral ring, deep teal ground.
+
+  Colours are the approved palette in lib/theme/app_colors.dart. No transparency
+  and no rounded corners — iOS applies its own mask, and a pre-rounded icon
+  renders with a visible double edge.
+
+  Regenerate the raster sets with tool/generate_app_icons.sh after any change.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024"
+     viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" fill="#123C37"/>
+  <g transform="translate(152 276) scale(6.207)" fill="none" stroke-width="5">
+    <circle cx="38" cy="38" r="30" stroke="#DFF2E7"/>
+    <circle cx="78" cy="38" r="30" stroke="#FF7D61"/>
+    <!--
+      The left ring's overlapping arc is redrawn on top so the two rings read as
+      genuinely interlocked rather than merely crossing.
+    -->
+    <path d="M58 12.8A29.9 29.9 0 0 1 68 38a29.9 29.9 0 0 1-10 25.2"
+          stroke="#DFF2E7" stroke-linecap="round"/>
+  </g>
+</svg>
