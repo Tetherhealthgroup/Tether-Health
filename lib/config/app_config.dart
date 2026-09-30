@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 class AppConfig {
   const AppConfig(
       {required this.apiBaseUrl,
@@ -23,7 +25,7 @@ class AppConfig {
       supabaseUrl.isNotEmpty ||
       supabaseAnonKey.isNotEmpty;
 
-  void validate() {
+  void validate({bool production = kReleaseMode}) {
     if (!isConfigured) {
       throw const FormatException(
           'API_BASE_URL, SUPABASE_URL and SUPABASE_ANON_KEY must be provided together.');
@@ -33,6 +35,21 @@ class AppConfig {
       if (uri == null || !uri.hasScheme || !uri.hasAuthority) {
         throw const FormatException('Service URLs must be absolute.');
       }
+      if (production && uri.scheme != 'https') {
+        throw const FormatException('Production service URLs must use HTTPS.');
+      }
+      if (production && uri.host.endsWith('.invalid')) {
+        throw const FormatException(
+          'Production service URLs must not use placeholder hosts.',
+        );
+      }
+    }
+    final normalizedKey = supabaseAnonKey.toLowerCase();
+    if (normalizedKey.contains('service_role') ||
+        normalizedKey.startsWith('sb_secret_')) {
+      throw const FormatException(
+        'Flutter requires a Supabase publishable or anonymous key.',
+      );
     }
   }
 }

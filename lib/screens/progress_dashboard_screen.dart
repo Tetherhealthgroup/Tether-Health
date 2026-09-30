@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/profile_avatar.dart';
 import 'resource_screen_widgets.dart';
 
 enum ProgressRange { sevenDays, thirtyDays, allTime }
@@ -12,6 +13,7 @@ class ProgressDashboardScreen extends StatelessWidget {
     this.onRangeChanged,
     required this.onBack,
     required this.onOpenSettings,
+    this.profileIdentity = const ProfileIdentity(),
     required this.onOpenHome,
     required this.onOpenPlan,
     required this.onOpenLearn,
@@ -24,6 +26,7 @@ class ProgressDashboardScreen extends StatelessWidget {
   final ValueChanged<ProgressRange>? onRangeChanged;
   final VoidCallback onBack;
   final VoidCallback onOpenSettings;
+  final ProfileIdentity profileIdentity;
   final VoidCallback onOpenHome;
   final VoidCallback onOpenPlan;
   final VoidCallback onOpenLearn;
@@ -67,18 +70,7 @@ class ProgressDashboardScreen extends StatelessWidget {
                     'Configuración y privacidad',
                   ),
                   onPressed: onOpenSettings,
-                  icon: const CircleAvatar(
-                    radius: 23,
-                    backgroundColor: AppColors.mint,
-                    foregroundColor: AppColors.deepTeal,
-                    child: Text(
-                      'A',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
+                  icon: ProfileAvatar(identity: profileIdentity),
                 ),
               ],
             ),

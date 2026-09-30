@@ -8,6 +8,7 @@ import '../auth/account_controller.dart';
 import '../config/contact_info.dart';
 import '../models/prototype_catalog.dart';
 import '../models/tap_target.dart';
+import '../quit_plan/quit_plan_controller.dart';
 import '../screens/approved_screen_player.dart';
 import '../theme/app_theme.dart';
 import '../unplug/models/intercept_tokens.dart';
@@ -32,6 +33,7 @@ class TetherHealthApp extends StatefulWidget {
     this.initialScreen = 0,
     this.standalone = true,
     this.accountController,
+    this.quitPlanController,
     super.key,
   });
 
@@ -43,6 +45,12 @@ class TetherHealthApp extends StatefulWidget {
   /// running `flutter run` with no dart-defines. `AccountController.disabled()`
   /// stands in so the rest of this class never branches on it.
   final AccountController? accountController;
+
+  /// The quit plan, when this build persists one.
+  ///
+  /// Null behaves like [QuitPlanController.disabled], which keeps the plan in
+  /// memory only — the same unconfigured case as [accountController].
+  final QuitPlanController? quitPlanController;
 
   /// Whether this widget supplies its own [MaterialApp].
   ///
@@ -74,8 +82,14 @@ class _TetherHealthAppState extends State<TetherHealthApp> {
   final UnplugModuleState _unplug = UnplugModuleState();
   late final AccountController _accountController;
   late final bool _ownsAccountController;
+  late final QuitPlanController _quitPlanController;
+  late final bool _ownsQuitPlanController;
   late bool _restoringAccount;
   bool _restoreFailed = false;
+
+  /// Bumped to rebuild the player from scratch after sign-out or deletion, so
+  /// no screen state outlives the account it belonged to.
+  int _journeyEpoch = 0;
 
   /// Gives dialogs a context that sits below [MaterialApp].
   ///
@@ -100,9 +114,16 @@ class _TetherHealthAppState extends State<TetherHealthApp> {
     _ownsAccountController = widget.accountController == null;
     _accountController =
         widget.accountController ?? AccountController.disabled();
+    _ownsQuitPlanController = widget.quitPlanController == null;
+    _quitPlanController =
+        widget.quitPlanController ?? QuitPlanController.disabled();
     _currentIndex =
         widget.initialScreen.clamp(0, prototypeCatalog.length - 1).toInt();
-    _restoringAccount = _accountController.isSignedIn && _currentIndex == 0;
+    // A guest with a plan on this device has something to restore too, so the
+    // connecting state is not only for a signed-in account.
+    _restoringAccount = _currentIndex == 0 &&
+        (_accountController.isSignedIn ||
+            _quitPlanController.guestPersistenceAvailable);
     unawaited(_initializeAccount());
     _loadInterceptTokens();
     _attachUnplugPlatform();
@@ -136,11 +157,30 @@ class _TetherHealthAppState extends State<TetherHealthApp> {
   void dispose() {
     _unplug.dispose();
     if (_ownsAccountController) _accountController.dispose();
+    if (_ownsQuitPlanController) _quitPlanController.dispose();
     super.dispose();
   }
 
   Future<void> _initializeAccount() async {
-    if (!_accountController.isSignedIn || _currentIndex != 0) return;
+    if (_currentIndex != 0) return;
+
+    // Signed out, but this device may still hold a guest plan. Restoring it
+    // lands on review or on the preparation home depending on whether the plan
+    // was only drafted or actually started.
+    if (!_accountController.isSignedIn) {
+      final loaded = await _quitPlanController.initialize();
+      if (!mounted) return;
+      setState(() {
+        _restoringAccount = false;
+        _restoreFailed = !loaded;
+        _history.clear();
+        final restoredPlan = _quitPlanController.plan;
+        _currentIndex = restoredPlan == null
+            ? 0
+            : (_quitPlanController.guestPlanStarted ? 11 : 10);
+      });
+      return;
+    }
 
     for (final delay in _profileRetryDelays) {
       if (delay > Duration.zero) await Future<void>.delayed(delay);
@@ -156,12 +196,32 @@ class _TetherHealthAppState extends State<TetherHealthApp> {
         return;
       }
       if (loaded && _accountController.profile != null) {
+        var destination =
+            _accountController.profile!.onboardingCompleted ? 11 : 1;
+        if (_quitPlanController.enabled) {
+          final planLoaded = await _quitPlanController.initialize();
+          if (!mounted) return;
+          // A plan that failed to load is a retryable condition, not an empty
+          // plan — falling through would send someone back to onboarding and
+          // quietly overwrite what is already stored.
+          if (!planLoaded) continue;
+          if (_quitPlanController.guestMergeStatus ==
+                  GuestPlanMergeStatus.uploaded &&
+              _quitPlanController.migratedGuestWasStarted &&
+              !_accountController.profile!.onboardingCompleted) {
+            await _accountController.completeOnboarding();
+            if (!mounted) return;
+          }
+          final restoredPlan = _quitPlanController.plan;
+          destination = restoredPlan == null
+              ? 1
+              : (_accountController.profile!.onboardingCompleted ? 11 : 10);
+        }
         setState(() {
           _restoringAccount = false;
           _restoreFailed = false;
           _history.clear();
-          _currentIndex =
-              _accountController.profile!.onboardingCompleted ? 11 : 1;
+          _currentIndex = destination;
         });
         return;
       }
@@ -175,6 +235,22 @@ class _TetherHealthAppState extends State<TetherHealthApp> {
     }
   }
 
+  /// Starts the journey over at [destination] with nothing carried across.
+  ///
+  /// Bumping the epoch gives the player a new key, so Flutter builds a fresh
+  /// State rather than reusing the one holding the previous session's plan.
+  /// The in-memory plan is dropped for the same reason; anything written to
+  /// the device or the account is left alone, because signing out is not a
+  /// deletion.
+  void _resetSession(int destination) {
+    _quitPlanController.clear();
+    setState(() {
+      _history.clear();
+      _journeyEpoch++;
+      _currentIndex = destination;
+    });
+  }
+
   void _retryAccountRestore() {
     setState(() {
       _restoringAccount = true;
@@ -184,13 +260,24 @@ class _TetherHealthAppState extends State<TetherHealthApp> {
   }
 
   Future<void> _signOutAfterRestoreFailure() async {
+    final restoringGuest = !_accountController.isSignedIn;
     await _accountController.signOut();
+    // "Start over" for a guest means removing the device plan; for an account
+    // it means dropping the in-memory copy and reloading whatever this device
+    // still holds. Clearing both in the wrong order loses the guest plan.
+    if (restoringGuest) await _quitPlanController.clearGuestPlan();
+    _quitPlanController.clear();
+    if (!restoringGuest) await _quitPlanController.initialize();
     if (!mounted) return;
+    final guestPlan = _quitPlanController.plan;
     setState(() {
       _restoringAccount = false;
       _restoreFailed = false;
       _history.clear();
-      _currentIndex = 0;
+      _journeyEpoch++;
+      _currentIndex = guestPlan == null
+          ? 0
+          : (_quitPlanController.guestPlanStarted ? 11 : 10);
     });
   }
 
@@ -413,7 +500,14 @@ class _TetherHealthAppState extends State<TetherHealthApp> {
             : UnplugScope(
                 state: _unplug,
                 child: ApprovedScreenPlayer(
+                  // Changing the key discards the player's state wholesale.
+                  // Sign-out has to do that: the player holds a whole draft
+                  // plan — quit date, reasons, supporters — and reusing the
+                  // element would show the previous account's answers to
+                  // whoever signs in next.
+                  key: ValueKey(_journeyEpoch),
                   accountController: _accountController,
+                  onSessionReset: _resetSession,
                   currentIndex: _currentIndex,
                   onSelectScreen: _goTo,
                   onPrevious: _goBack,

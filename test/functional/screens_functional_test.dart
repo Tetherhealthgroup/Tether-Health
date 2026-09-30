@@ -3,10 +3,11 @@
 // Extracted from the original flat test/widget_test.dart; each test was
 // already self-contained, so behaviour is unchanged.
 
-import 'package:tether_health/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tether_health/main.dart';
+import 'package:tether_health/screens/support_preparation_screen.dart';
 
 void main() {
   testWidgets('Screen 1 language control switches to Spanish', (tester) async {
@@ -515,7 +516,11 @@ void main() {
       find.byKey(const ValueKey('functional-home-preparation-screen')),
       findsOneWidget,
     );
-    expect(find.textContaining('Alex.'), findsOneWidget);
+    expect(
+      find.textContaining(
+          RegExp(r'^(Buenos días|Buenas tardes|Buenas noches)\.$')),
+      findsOneWidget,
+    );
     expect(find.text('Tu preparación'), findsOneWidget);
     expect(find.text('Abrir Rescate'), findsOneWidget);
     expect(find.textContaining('Proteger a mi familia'), findsOneWidget);
@@ -636,6 +641,47 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Screen 10 disables adding an eleventh support person',
+      (tester) async {
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final people = List.generate(
+      10,
+      (index) => SupportPersonPlan(
+        id: 'person-$index',
+        name: 'Person $index',
+        relationship: 'Friend',
+        channel: SupportChannel.text,
+        checkIn: 'Tomorrow',
+      ),
+    );
+    await tester.pumpWidget(MaterialApp(
+      home: SupportPreparationScreen(
+        isSpanish: false,
+        supportPeople: people,
+        completedTasks: const {},
+        treatmentSupport: true,
+        careTeamReminder: true,
+        onSupportPeopleChanged: (_) {},
+        onCompletedTasksChanged: (_) {},
+        onTreatmentSupportChanged: (_) {},
+        onCareTeamReminderChanged: (_) {},
+        onBack: () {},
+        onContinue: () {},
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    final addButton = tester.widget<OutlinedButton>(
+      find.byKey(const ValueKey('support-add-person')),
+    );
+    expect(addButton.onPressed, isNull);
+    expect(find.text('10-person limit reached'), findsOneWidget);
+  });
+
   testWidgets('Screen 10 treatment education and Save work', (tester) async {
     tester.view.physicalSize = const Size(1179, 2556);
     tester.view.devicePixelRatio = 3;
@@ -707,13 +753,18 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('review-save-later')));
     await tester.pumpAndSettle();
     expect(
-      find.text('Your plan is saved. Come back whenever you are ready.'),
+      find.text(
+        'Your plan is ready for this session. Sign in to save it.',
+      ),
       findsOneWidget,
     );
     expect(
       find.byKey(const ValueKey('functional-review-quit-plan-screen')),
       findsOneWidget,
     );
+    await tester.pump(const Duration(seconds: 5));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('review-start-plan')));
 
     await tester.tap(find.byKey(const ValueKey('review-start-plan')));
     await tester.pumpAndSettle();
@@ -822,7 +873,10 @@ void main() {
       find.byKey(const ValueKey('functional-home-preparation-screen')),
       findsOneWidget,
     );
-    expect(find.textContaining('Alex.'), findsOneWidget);
+    expect(
+      find.textContaining(RegExp(r'^Good (morning|afternoon|evening)\.$')),
+      findsOneWidget,
+    );
     expect(find.text('7 days'), findsOneWidget);
     expect(find.text('Stock gum, water or healthy snacks'), findsOneWidget);
     expect(find.text('2/3'), findsOneWidget);

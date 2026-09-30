@@ -1,0 +1,21 @@
+#
+# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
+#
+Pod::Spec.new do |s|
+  s.name             = 'flutter_tts'
+  s.version          = '0.0.1'
+  s.summary          = 'A flutter text to speech plugin.'
+  s.description      = <<-DESC
+A flutter text to speech plugin
+                       DESC
+  s.homepage         = 'https://github.com/dlutton/flutter_tts'
+  s.license          = { :file => '../LICENSE' }
+  s.author           = { 'eyedeadevelopment' => 'eyedea32@gmail.com' }
+  s.source           = { :path => '.' }
+  s.source_files     = 'flutter_tts/Sources/flutter_tts/**/*'
+  s.dependency 'Flutter'
+  s.platform         = :ios, '13.0'
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
+  s.swift_version    = '5.0'
+  s.resource_bundles = {'flutter_tts_privacy' => ['flutter_tts/Sources/flutter_tts/PrivacyInfo.xcprivacy']}
+end

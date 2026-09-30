@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
@@ -26,6 +28,9 @@ class ReviewQuitPlanScreen extends StatelessWidget {
     required this.onEditTreatment,
     required this.onStartPlan,
     required this.onSaveForLater,
+    this.onCreateAccount,
+    this.planWillPersist = true,
+    this.planSavedOnDeviceOnly = false,
     super.key,
   });
 
@@ -47,7 +52,10 @@ class ReviewQuitPlanScreen extends StatelessWidget {
   final VoidCallback onEditPreparation;
   final VoidCallback onEditTreatment;
   final VoidCallback onStartPlan;
-  final VoidCallback onSaveForLater;
+  final Future<bool> Function() onSaveForLater;
+  final Future<void> Function()? onCreateAccount;
+  final bool planWillPersist;
+  final bool planSavedOnDeviceOnly;
 
   DateTime get _today => DateUtils.dateOnly(DateTime.now());
 
@@ -230,8 +238,9 @@ class ReviewQuitPlanScreen extends StatelessWidget {
         : 'Treatment education saved';
   }
 
-  void _saveForLater(BuildContext context) {
-    onSaveForLater();
+  Future<void> _saveForLater(BuildContext context) async {
+    final saved = await onSaveForLater();
+    if (!context.mounted) return;
     final messenger = ScaffoldMessenger.of(context);
     messenger.clearSnackBars();
     messenger.showSnackBar(
@@ -239,10 +248,28 @@ class ReviewQuitPlanScreen extends StatelessWidget {
         key: const ValueKey('review-saved-snackbar'),
         behavior: SnackBarBehavior.floating,
         content: Text(
-          isSpanish
-              ? 'Tu plan está guardado. Puedes volver cuando estés listo.'
-              : 'Your plan is saved. Come back whenever you are ready.',
+          saved
+              ? (planSavedOnDeviceOnly
+                  ? (isSpanish
+                      ? 'Tu plan está cifrado y guardado en este dispositivo.'
+                      : 'Your plan is encrypted and saved on this device.')
+                  : planWillPersist
+                      ? (isSpanish
+                          ? 'Tu plan está guardado. Puedes volver cuando estés listo.'
+                          : 'Your plan is saved. Come back whenever you are ready.')
+                      : (isSpanish
+                          ? 'Tu plan está listo para esta sesión. Inicia sesión para guardarlo.'
+                          : 'Your plan is ready for this session. Sign in to save it.'))
+              : (isSpanish
+                  ? 'No se pudo guardar tu plan. Inténtalo de nuevo.'
+                  : 'Your plan could not be saved. Please try again.'),
         ),
+        action: saved && planSavedOnDeviceOnly && onCreateAccount != null
+            ? SnackBarAction(
+                label: isSpanish ? 'Crear cuenta' : 'Create account',
+                onPressed: () => unawaited(onCreateAccount!()),
+              )
+            : null,
       ),
     );
   }
@@ -418,7 +445,7 @@ class ReviewQuitPlanScreen extends StatelessWidget {
                     compact: compact,
                     horizontalPadding: horizontalPadding,
                     onStartPlan: onStartPlan,
-                    onSaveForLater: () => _saveForLater(context),
+                    onSaveForLater: () => unawaited(_saveForLater(context)),
                   ),
                 ],
               );

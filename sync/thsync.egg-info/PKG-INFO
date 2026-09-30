@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: thsync
+Version: 0.1.0
+Summary: Tether Health session sync service
+Requires-Python: >=3.12
+Requires-Dist: fastapi==0.141.1
+Requires-Dist: starlette==1.6.0
+Requires-Dist: pydantic==2.13.5
+Requires-Dist: pydantic_core==2.46.5
+Requires-Dist: SQLAlchemy==2.0.53
+Requires-Dist: PyJWT[crypto]==2.14.0
+Requires-Dist: uvicorn==0.53.0

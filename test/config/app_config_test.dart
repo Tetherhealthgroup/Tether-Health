@@ -17,6 +17,31 @@ void main() {
       supabaseUrl: 'https://project.supabase.co',
       supabaseAnonKey: 'public-placeholder',
     );
-    expect(config.validate, returnsNormally);
+    expect(() => config.validate(production: true), returnsNormally);
+  });
+
+  test('production rejects insecure or placeholder endpoints', () {
+    const insecure = AppConfig(
+      apiBaseUrl: 'http://api.example.test',
+      supabaseUrl: 'https://project.supabase.co',
+      supabaseAnonKey: 'public-placeholder',
+    );
+    expect(() => insecure.validate(production: true), throwsFormatException);
+
+    const placeholder = AppConfig(
+      apiBaseUrl: 'https://api.example.invalid',
+      supabaseUrl: 'https://project.supabase.co',
+      supabaseAnonKey: 'public-placeholder',
+    );
+    expect(() => placeholder.validate(production: true), throwsFormatException);
+  });
+
+  test('client configuration rejects privileged Supabase keys', () {
+    const config = AppConfig(
+      apiBaseUrl: 'https://api.example.test',
+      supabaseUrl: 'https://project.supabase.co',
+      supabaseAnonKey: 'sb_secret_must-never-ship',
+    );
+    expect(() => config.validate(production: true), throwsFormatException);
   });
 }

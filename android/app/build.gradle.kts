@@ -64,6 +64,9 @@ android {
 
     buildTypes {
         release {
+            // No key configured (CI, and any fresh clone) falls back to the
+            // debug signer, which keeps `assembleRelease` runnable there. A
+            // real upload key is supplied only by the release environment.
             signingConfig = if (hasReleaseKey) {
                 signingConfigs.getByName("release")
             } else {

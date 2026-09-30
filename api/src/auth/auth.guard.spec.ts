@@ -9,7 +9,9 @@ const testHandler = () => undefined;
 describe("AuthGuard", () => {
   it("attaches a verified caller without trusting a client user id", async () => {
     const verifier = {
-      verify: jest.fn().mockResolvedValue({ sub: "user-123" }),
+      verify: jest
+        .fn()
+        .mockResolvedValue({ sub: "user-123", authTime: 1700000000 }),
     } as unknown as TokenVerifier;
     const request = {
       headers: { authorization: "Bearer signed-token" },
@@ -24,6 +26,7 @@ describe("AuthGuard", () => {
     expect(request.user).toEqual({
       id: "user-123",
       accessToken: "signed-token",
+      authenticatedAt: 1700000000,
     });
   });
 

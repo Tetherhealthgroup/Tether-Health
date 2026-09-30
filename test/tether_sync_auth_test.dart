@@ -36,6 +36,20 @@ class _FakeGateway implements AuthGateway {
   }) =>
       throw UnimplementedError();
 
+  // Registration is not part of the token contract these tests cover, so it
+  // throws rather than returning a plausible-looking result a test could
+  // accidentally come to depend on.
+  @override
+  Future<AuthSignUpResult> signUp({
+    required String email,
+    required String password,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> resendSignUpConfirmation({required String email}) =>
+      throw UnimplementedError();
+
   @override
   Future<void> signOut() async {}
 }

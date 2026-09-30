@@ -78,7 +78,9 @@ kotlinx-coroutines, which Pigeon's generated Kotlin requires.
 - Mobile views support horizontal swipe navigation as a nonvisual fallback.
 - Bottom-tab targets connect Home, Plan, Progress, Learn and Support.
 - The profile/avatar target opens Settings & Privacy.
-- Quitline, callback request, data export and deletion demonstrate consent or safety confirmation without performing an external side effect.
+- Quitline and callback request remain consent/safety previews. Authenticated
+  data export and app-owned data deletion are live API flows that require a
+  password re-check and explicit confirmation.
 - Desktop mode can display normalized tap targets for developer inspection.
 
 ## Contact and safety routing
@@ -127,6 +129,9 @@ the accessibility card in Settings & privacy.
 - The desktop shell supports keyboard navigation.
 - The approved visual system was designed for 44 pt iOS / 48 dp Android touch targets.
 - Production native forms must continue to support VoiceOver, TalkBack and 200% dynamic text; bitmap text itself cannot dynamically reflow.
+- Native screens honor system text scaling. The Reduce motion setting propagates
+  through `MediaQuery.disableAnimations`; system reduced-motion remains the
+  default source of truth.
 
 ## Recommended production migration
 
@@ -143,5 +148,16 @@ Confirmed production architecture:
 - FHIR adapter: optional clinician/EHR interoperability
 - APNs/FCM: generic private notification copy by default
 
+The current cloud-development slice implements Supabase Auth, profile
+preferences, and a complete quit-plan snapshot behind NestJS and owner-only RLS.
+Use synthetic values only; this does not authorize real patient or support-person
+data.
+
 Do not place API secrets, service credentials or production signing certificates in this repository.
 See `docs/ARCHITECTURE.md` and `docs/contracts/` for versioned boundaries.
+
+The account-data API exports only those two bounded database records. Deletion
+uses a caller-scoped Supabase RPC, removes a caller avatar through Storage, and
+returns counts plus a request ID without logging payloads. It does not delete
+the Supabase Auth identity; that requires an externally provisioned privileged
+Auth administration path.

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/profile_avatar.dart';
 import 'resource_screen_widgets.dart';
 
 class SettingsPrivacyScreen extends StatelessWidget {
@@ -18,10 +19,16 @@ class SettingsPrivacyScreen extends StatelessWidget {
     this.signedIn = false,
     this.accountEmail,
     this.displayName,
+    this.avatarUrl,
     this.onReviewConsent,
     this.onInformation,
     this.onDownloadData,
     this.onDeleteAccount,
+    this.hasDevicePlan = false,
+    this.devicePlanNeedsRecovery = false,
+    this.canBackupDevicePlan = false,
+    this.onBackupDevicePlan,
+    this.onDeleteDevicePlan,
     this.onSignOut,
     super.key,
   });
@@ -39,10 +46,16 @@ class SettingsPrivacyScreen extends StatelessWidget {
   final bool signedIn;
   final String? accountEmail;
   final String? displayName;
+  final String? avatarUrl;
   final VoidCallback? onReviewConsent;
   final ValueChanged<String>? onInformation;
   final VoidCallback? onDownloadData;
   final VoidCallback? onDeleteAccount;
+  final bool hasDevicePlan;
+  final bool devicePlanNeedsRecovery;
+  final bool canBackupDevicePlan;
+  final VoidCallback? onBackupDevicePlan;
+  final VoidCallback? onDeleteDevicePlan;
   final VoidCallback? onSignOut;
 
   String t(String english, String spanish) =>
@@ -149,18 +162,14 @@ class SettingsPrivacyScreen extends StatelessWidget {
               ),
               onBack: onBack,
               backSemanticLabel: t('Go back', 'Volver'),
-              actions: const [
-                CircleAvatar(
-                  key: ValueKey('settings-profile-symbol'),
-                  radius: 23,
-                  backgroundColor: AppColors.mint,
-                  foregroundColor: AppColors.deepTeal,
-                  child: Text(
-                    'A',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                    ),
+              actions: [
+                ProfileAvatar(
+                  key: const ValueKey('settings-profile-symbol'),
+                  identity: ProfileIdentity(
+                    signedIn: signedIn,
+                    displayName: displayName,
+                    email: accountEmail,
+                    avatarUrl: avatarUrl,
                   ),
                 ),
               ],
@@ -260,6 +269,57 @@ class SettingsPrivacyScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if (hasDevicePlan) ...[
+                      const SizedBox(height: 8),
+                      ResourceCard(
+                        child: ListTile(
+                          key: const ValueKey('settings-device-plan'),
+                          leading: const Icon(Icons.phone_iphone_rounded),
+                          title: Text(t(
+                            'Saved on this device',
+                            'Guardado en este dispositivo',
+                          )),
+                          subtitle: Text(devicePlanNeedsRecovery
+                              ? t(
+                                  'This encrypted plan cannot be opened. Remove it to save a new device plan.',
+                                  'Este plan cifrado no se puede abrir. Elimínalo para guardar un plan nuevo en el dispositivo.',
+                                )
+                              : t(
+                                  'Encrypted guest plan; not synced to an account',
+                                  'Plan de invitado cifrado; no sincronizado con una cuenta',
+                                )),
+                          trailing: PopupMenuButton<String>(
+                            key: const ValueKey('settings-device-plan-actions'),
+                            tooltip: t('Device plan actions',
+                                'Acciones del plan del dispositivo'),
+                            onSelected: (value) {
+                              if (value == 'backup') {
+                                onBackupDevicePlan?.call();
+                              } else if (value == 'remove') {
+                                onDeleteDevicePlan?.call();
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              if (canBackupDevicePlan)
+                                PopupMenuItem(
+                                  key: const ValueKey(
+                                    'settings-backup-device-plan',
+                                  ),
+                                  value: 'backup',
+                                  child: Text(t('Back up', 'Respaldar')),
+                                ),
+                              PopupMenuItem(
+                                key: const ValueKey(
+                                  'settings-delete-device-plan',
+                                ),
+                                value: 'remove',
+                                child: Text(t('Remove', 'Eliminar')),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                     const SizedBox(height: 18),
                     SectionTitle(t('Notifications', 'Notificaciones')),
                     const SizedBox(height: 8),
@@ -429,8 +489,8 @@ class SettingsPrivacyScreen extends StatelessWidget {
                             icon: Icons.download_rounded,
                             title: t('Download a copy', 'Descargar una copia'),
                             subtitle: t(
-                              'Your entries, plan and progress · PDF + JSON',
-                              'Tus registros, plan y progreso · PDF + JSON',
+                              'Your profile and saved plan · JSON',
+                              'Tu perfil y plan guardado · JSON',
                             ),
                             action: t('Request', 'Solicitar'),
                             onTap: () => _handleDownloadData(context),
@@ -699,31 +759,36 @@ class _SettingsLink extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => ListTile(
-        contentPadding: EdgeInsets.zero,
-        onTap: onTap,
-        leading: CircleAvatar(
-          backgroundColor: AppColors.mint,
-          child: Icon(icon, color: AppColors.deepTeal, size: 20),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            color: AppColors.deepTeal,
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: '$title. $subtitle. $action',
+        excludeSemantics: true,
+        child: ListTile(
+          contentPadding: EdgeInsets.zero,
+          onTap: onTap,
+          leading: CircleAvatar(
+            backgroundColor: AppColors.mint,
+            child: Icon(icon, color: AppColors.deepTeal, size: 20),
           ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: const TextStyle(color: AppColors.mutedTeal, fontSize: 10),
-        ),
-        trailing: Text(
-          action,
-          style: const TextStyle(
-            color: AppColors.tealSecondary,
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
+          title: Text(
+            title,
+            style: const TextStyle(
+              color: AppColors.deepTeal,
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          subtitle: Text(
+            subtitle,
+            style: const TextStyle(color: AppColors.mutedTeal, fontSize: 10),
+          ),
+          trailing: Text(
+            action,
+            style: const TextStyle(
+              color: AppColors.tealSecondary,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       );

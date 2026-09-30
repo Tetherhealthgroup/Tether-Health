@@ -112,6 +112,15 @@ port = 54324
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+secure_password_change = false
+max_frequency = "1s"
+otp_length = 6
+otp_expiry = 3600
+
 [storage]
 enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
@@ -160,7 +169,14 @@ site_url = "http://127.0.0.1:3000"
 # The public URL that Auth serves on. Defaults to the API external URL with `/auth/v1` appended.
 # external_url = ""
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+# The custom scheme is what brings an email confirmation back into the app; it
+# must stay identical here, in AndroidManifest.xml and in Info.plist, which
+# test/auth/auth_deep_link_config_test.dart enforces. The same list has to be
+# set on the hosted project — this file only configures a local stack.
+additional_redirect_urls = [
+  "https://127.0.0.1:3000",
+  "io.breathefree.patient://login-callback",
+]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to auth.external_url.

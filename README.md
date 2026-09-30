@@ -424,6 +424,8 @@ in `design/unplug-platform-submissions.md`.
 - `lib/tether/theme/tether_tokens.dart` — colours, type, radii and spacing from the prototype CSS
 - `assets/design/` — the design bundle the app renders
 - `lib/prototype/prototype_app.dart` — the BreatheFree artwork player, kept reachable
+- `lib/account/` — authenticated JSON export and app-data deletion client
+- `lib/quit_plan/` — the quit plan: guest storage on device, and the account-backed copy
 - `lib/models/screen_spec.dart` — the canonical 28-screen catalog
 - `lib/models/prototype_catalog.dart` — the approved screens and the Unplug screens as one list
 - `lib/models/tap_target.dart` — accessible interaction map and routing
@@ -446,7 +448,26 @@ in `design/unplug-platform-submissions.md`.
 
 ## Important production boundary
 
-This archive is a complete, compilable Flutter implementation of the approved 28-screen user experience. It is intentionally safe as a source prototype: phone dialing, authentication, protected health-data storage, clinician/EHR connections, secure messaging, remote notifications, analytics, exports and server-side deletion are represented by consent-aware demo actions and interfaces.
+This archive is a complete, compilable Flutter implementation of the approved
+28-screen user experience. Cloud development email/password registration,
+email-confirmation-aware authentication, profile preferences, and a bounded
+quit-plan snapshot are implemented through Flutter, NestJS, and Supabase.
+Signed-out users can save an encrypted plan on one device and safely migrate it
+after signing in without silently replacing an existing cloud plan. Only
+synthetic quit-plan and support-person data is permitted. The US
+1-800-QUIT-NOW action opens the native dialer with a copy fallback; regional
+quitline routing, callback referrals, clinician/EHR connections, secure
+messaging, remote notifications, analytics, and later health domains remain
+consent-aware prototype actions or interfaces. Authenticated users can re-enter
+their password to export the
+bounded app-owned dataset as JSON or permanently delete their profile, plan,
+and avatar. The deletion receipt explicitly reports that Supabase Auth identity
+deletion remains a privileged external operation.
+
+Password-reset email and native recovery deep links are implemented with the
+same `io.breathefree.patient://login-callback` contract as signup confirmation.
+The API enforces recent authentication, bounded request bodies, rate limits,
+security headers, caller-scoped Supabase access, and privacy-safe errors.
 
 The production foundation uses Flutter on iPhone/Android, a NestJS API
 (TypeScript/Node.js), and Supabase (PostgreSQL, Auth and Storage). Before an App
@@ -460,3 +481,10 @@ an ignored local file, replace placeholders through an approved secret/config
 channel, and run Flutter with `--dart-define-from-file=<local-file>`. Only the
 Supabase publishable/anonymous key belongs in a client build; never use a
 service-role key in Flutter.
+
+This repository is a technically verifiable MVP, not an approved clinical
+production release. Signing identities, final store configuration, production
+Supabase/API provisioning and redirect allowlisting, Auth-admin identity
+deletion, legal/clinical/privacy approval, professional translation,
+third-party penetration testing, and physical-device accessibility/integration
+validation remain external release dependencies.
