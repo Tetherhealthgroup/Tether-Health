@@ -155,6 +155,7 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
   AccountDeletionReceipt? _receipt;
   String? _deletedAccountId;
   bool _finishing = false;
+  String? _finishError;
 
   @override
   void dispose() {
@@ -181,14 +182,21 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
     final receipt = _receipt;
     final accountId = _deletedAccountId;
     if (receipt == null || accountId == null || _finishing) return;
-    setState(() => _finishing = true);
+    setState(() {
+      _finishing = true;
+      _finishError = null;
+    });
     try {
       await widget.afterDeletionAcknowledged?.call(accountId);
-    } catch (_) {
-      // Server deletion already succeeded. Local cleanup is best-effort and
-      // must not leave the user trapped in a session for a deleted profile.
-    } finally {
       await widget.account.signOut();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _finishing = false;
+        _finishError =
+            'Local data cleanup could not finish. Tap Done to try again.';
+      });
+      return;
     }
     if (mounted) Navigator.pop(context, receipt);
   }
@@ -245,11 +253,26 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
                   ],
                 ],
               )
-            : Text(
-                'Deletion receipt ${receipt.requestId}. Your BreatheFree '
-                'profile and quit plan were deleted. Deleting the Supabase '
-                'sign-in identity requires the separately approved '
-                'privileged account service.',
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Deletion receipt ${receipt.requestId}. Your BreatheFree '
+                    'profile and quit plan were deleted. Deleting the Supabase '
+                    'sign-in identity requires the separately approved '
+                    'privileged account service.',
+                  ),
+                  if (_finishError != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      _finishError!,
+                      key: const ValueKey('account-delete-finish-error'),
+                      style:
+                          TextStyle(color: Theme.of(context).colorScheme.error),
+                    ),
+                  ],
+                ],
               ),
         actions: receipt == null
             ? [

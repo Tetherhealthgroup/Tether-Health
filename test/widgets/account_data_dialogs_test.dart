@@ -81,6 +81,81 @@ void main() {
       'welcome',
     ]);
   });
+
+  testWidgets('cleanup failure keeps receipt and session until retry succeeds',
+      (
+    tester,
+  ) async {
+    final events = <String>[];
+    final auth = _TestAuth(events);
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _TestProfileApi()),
+      accountData: _TestAccountDataApi(events),
+    );
+    addTearDown(controller.dispose);
+    await controller.signIn(email: 'person@example.test', password: 'password');
+    var cleanupAttempts = 0;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: _DeletionHarness(
+          account: controller,
+          onCleanup: (accountId) async {
+            cleanupAttempts++;
+            events.add('local-cleanup:$accountId:$cleanupAttempts');
+            if (cleanupAttempts == 1) throw StateError('storage unavailable');
+          },
+          onComplete: () => events.add('welcome'),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Delete account'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('account-delete-password')),
+      'password',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('account-delete-confirmation')),
+      'DELETE',
+    );
+    await tester.pump();
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('account-delete-confirm')),
+    );
+    await tester.tap(find.byKey(const ValueKey('account-delete-confirm')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('account-delete-done')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('App data deleted'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('account-delete-finish-error')),
+      findsOneWidget,
+    );
+    expect(controller.isSignedIn, isTrue);
+    expect(events, [
+      'remote-delete',
+      'local-cleanup:user-id:1',
+    ]);
+
+    await tester.tap(find.byKey(const ValueKey('account-delete-done')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('App data deleted'), findsNothing);
+    expect(find.text('Welcome'), findsOneWidget);
+    expect(controller.isSignedIn, isFalse);
+    expect(events, [
+      'remote-delete',
+      'local-cleanup:user-id:1',
+      'local-cleanup:user-id:2',
+      'sign-out',
+      'welcome',
+    ]);
+  });
 }
 
 class _DeletionHarness extends StatefulWidget {
