@@ -17,14 +17,14 @@ Future<void> showAccountExportDialog(
 Future<AccountDeletionReceipt?> showAccountDeletionDialog(
   BuildContext context,
   AccountController account, {
-  Future<void> Function(String accountId)? beforeRemoteDelete,
+  Future<void> Function(String accountId)? afterDeletionAcknowledged,
 }) =>
     showDialog<AccountDeletionReceipt>(
       context: context,
       barrierDismissible: false,
       builder: (_) => _AccountDeletionDialog(
         account: account,
-        beforeRemoteDelete: beforeRemoteDelete,
+        afterDeletionAcknowledged: afterDeletionAcknowledged,
       ),
     );
 
@@ -139,11 +139,11 @@ class _AccountExportDialogState extends State<_AccountExportDialog> {
 class _AccountDeletionDialog extends StatefulWidget {
   const _AccountDeletionDialog({
     required this.account,
-    this.beforeRemoteDelete,
+    this.afterDeletionAcknowledged,
   });
 
   final AccountController account;
-  final Future<void> Function(String accountId)? beforeRemoteDelete;
+  final Future<void> Function(String accountId)? afterDeletionAcknowledged;
 
   @override
   State<_AccountDeletionDialog> createState() => _AccountDeletionDialogState();
@@ -152,6 +152,11 @@ class _AccountDeletionDialog extends StatefulWidget {
 class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
   final _password = TextEditingController();
   final _confirmation = TextEditingController();
+  AccountDeletionReceipt? _receipt;
+  String? _deletedAccountId;
+  bool _deleting = false;
+  bool _finishing = false;
+  String? _finishError;
 
   @override
   void dispose() {
@@ -161,76 +166,148 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
   }
 
   Future<void> _delete() async {
-    if (_password.text.isEmpty || _confirmation.text != 'DELETE') return;
+    if (_deleting || _password.text.isEmpty || _confirmation.text != 'DELETE') {
+      return;
+    }
+    setState(() => _deleting = true);
     final receipt = await widget.account.deleteAppData(
       password: _password.text,
-      beforeRemoteDelete: widget.beforeRemoteDelete,
     );
     _password.clear();
     _confirmation.clear();
-    if (mounted && receipt != null) Navigator.pop(context, receipt);
-    if (mounted) setState(() {});
+    if (!mounted) return;
+    setState(() {
+      _deleting = false;
+      _receipt = receipt;
+      if (receipt != null) _deletedAccountId = widget.account.accountId;
+    });
+  }
+
+  Future<void> _finish() async {
+    final receipt = _receipt;
+    final accountId = _deletedAccountId;
+    if (receipt == null || accountId == null || _finishing) return;
+    setState(() {
+      _finishing = true;
+      _finishError = null;
+    });
+    try {
+      await widget.afterDeletionAcknowledged?.call(accountId);
+      await widget.account.signOut();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _finishing = false;
+        _finishError =
+            'Local data cleanup could not finish. Tap Done to try again.';
+      });
+      return;
+    }
+    if (mounted) Navigator.pop(context, receipt);
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
+  Widget build(BuildContext context) {
+    final receipt = _receipt;
+    return PopScope(
+      canPop: receipt == null && !_deleting,
+      child: AlertDialog(
         key: const ValueKey('account-delete-dialog'),
         scrollable: true,
-        title: const Text('Delete BreatheFree app data?'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'This permanently deletes your BreatheFree profile, saved quit '
-              'plan, and avatar. Your sign-in identity cannot be deleted by '
-              'this service yet and remains an external account action.',
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              key: const ValueKey('account-delete-password'),
-              controller: _password,
-              obscureText: true,
-              autofillHints: const [AutofillHints.password],
-              decoration: const InputDecoration(labelText: 'Current password'),
-            ),
-            TextField(
-              key: const ValueKey('account-delete-confirmation'),
-              controller: _confirmation,
-              autocorrect: false,
-              enableSuggestions: false,
-              decoration: const InputDecoration(
-                labelText: 'Type DELETE to confirm',
-              ),
-              onChanged: (_) => setState(() {}),
-              onSubmitted: (_) => _delete(),
-            ),
-            if (widget.account.errorMessage != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                widget.account.errorMessage!,
-                key: const ValueKey('account-delete-error'),
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            ],
-          ],
+        title: Text(
+          receipt == null ? 'Delete BreatheFree app data?' : 'App data deleted',
         ),
-        actions: [
-          TextButton(
-            onPressed:
-                widget.account.busy ? null : () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            key: const ValueKey('account-delete-confirm'),
-            style: FilledButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-            onPressed: widget.account.busy || _confirmation.text != 'DELETE'
-                ? null
-                : _delete,
-            child: const Text('Permanently delete app data'),
-          ),
-        ],
-      );
+        content: receipt == null
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'This permanently deletes your BreatheFree profile, saved quit '
+                    'plan, and avatar. Your sign-in identity cannot be deleted by '
+                    'this service yet and remains an external account action.',
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    key: const ValueKey('account-delete-password'),
+                    controller: _password,
+                    obscureText: true,
+                    autofillHints: const [AutofillHints.password],
+                    decoration:
+                        const InputDecoration(labelText: 'Current password'),
+                  ),
+                  TextField(
+                    key: const ValueKey('account-delete-confirmation'),
+                    controller: _confirmation,
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    decoration: const InputDecoration(
+                      labelText: 'Type DELETE to confirm',
+                    ),
+                    onChanged: (_) => setState(() {}),
+                    onSubmitted: (_) => _delete(),
+                  ),
+                  if (widget.account.errorMessage != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      widget.account.errorMessage!,
+                      key: const ValueKey('account-delete-error'),
+                      style:
+                          TextStyle(color: Theme.of(context).colorScheme.error),
+                    ),
+                  ],
+                ],
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Deletion receipt ${receipt.requestId}. Your BreatheFree '
+                    'profile and quit plan were deleted. Deleting the Supabase '
+                    'sign-in identity requires the separately approved '
+                    'privileged account service.',
+                  ),
+                  if (_finishError != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      _finishError!,
+                      key: const ValueKey('account-delete-finish-error'),
+                      style:
+                          TextStyle(color: Theme.of(context).colorScheme.error),
+                    ),
+                  ],
+                ],
+              ),
+        actions: receipt == null
+            ? [
+                TextButton(
+                  onPressed: _deleting ? null : () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                FilledButton(
+                  key: const ValueKey('account-delete-confirm'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                  ),
+                  onPressed: _deleting || _confirmation.text != 'DELETE'
+                      ? null
+                      : _delete,
+                  child: Text(
+                    _deleting
+                        ? 'Deleting app data…'
+                        : 'Permanently delete app data',
+                  ),
+                ),
+              ]
+            : [
+                FilledButton(
+                  key: const ValueKey('account-delete-done'),
+                  onPressed: _finishing ? null : _finish,
+                  child: const Text('Done'),
+                ),
+              ],
+      ),
+    );
+  }
 }

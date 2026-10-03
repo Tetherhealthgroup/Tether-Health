@@ -233,7 +233,7 @@ void main() {
     expect(auth.updatedPassword, 'new-password');
   });
 
-  test('export and deletion reauthenticate and use the new token', () async {
+  test('deletion returns its receipt without signing out', () async {
     final auth = _FakeAuth();
     final accountData = _FakeAccountDataApi();
     final controller = AccountController(
@@ -250,28 +250,12 @@ void main() {
 
     final receipt = await controller.deleteAppData(password: 'password');
     expect(receipt?.requestId, 'receipt-id');
-    expect(controller.isSignedIn, isFalse);
-  });
-
-  test('local cleanup failure prevents remote deletion and sign-out', () async {
-    final auth = _FakeAuth();
-    final accountData = _FakeAccountDataApi();
-    final controller = AccountController(
-      auth: auth,
-      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
-      accountData: accountData,
-    );
-    addTearDown(controller.dispose);
-    await controller.signIn(email: 'person@example.test', password: 'password');
-
-    final receipt = await controller.deleteAppData(
-      password: 'password',
-      beforeRemoteDelete: (_) => Future.error(StateError('storage failure')),
-    );
-
-    expect(receipt, isNull);
-    expect(accountData.deleteCalls, 0);
     expect(controller.isSignedIn, isTrue);
+    expect(controller.profile, isNotNull);
+
+    await controller.signOut();
+    expect(controller.isSignedIn, isFalse);
+    expect(controller.profile, isNull);
   });
 }
 

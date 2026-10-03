@@ -343,32 +343,13 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     final receipt = await showAccountDeletionDialog(
       context,
       _accountController,
-      beforeRemoteDelete: (accountId) async {
+      afterDeletionAcknowledged: (accountId) async {
         await _programStore.deleteAccount(accountId);
         _quitPlanController.clear();
         await _quitPlanController.clearGuestPlan();
       },
     );
     if (!mounted || receipt == null) return;
-    if (!mounted) return;
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('App data deleted'),
-        content: Text(
-          'Deletion receipt ${receipt.requestId}. Your BreatheFree profile and '
-          'quit plan were deleted. Deleting the Supabase sign-in identity '
-          'requires the separately approved privileged account service.',
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Done'),
-          ),
-        ],
-      ),
-    );
     if (mounted) _resetJourney(0);
   }
 

@@ -714,33 +714,13 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     final receipt = await showAccountDeletionDialog(
       context,
       _accountController,
-      beforeRemoteDelete: (accountId) async {
+      afterDeletionAcknowledged: (accountId) async {
         await widget.onAccountDataDeleted?.call(accountId);
         _quitPlanController.clear();
         await _quitPlanController.clearGuestPlan();
       },
     );
     if (!mounted || receipt == null) return;
-    if (!mounted) return;
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('App data deleted'),
-        content: Text(
-          'Deletion receipt ${receipt.requestId}. Your BreatheFree profile and '
-          'plan were deleted. Your sign-in identity still requires a separate '
-          'privileged deletion process.',
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Done'),
-          ),
-        ],
-      ),
-    );
-    if (!mounted) return;
     final reset = widget.onSessionReset;
     if (reset != null) {
       reset(0);
