@@ -154,6 +154,7 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
   final _confirmation = TextEditingController();
   AccountDeletionReceipt? _receipt;
   String? _deletedAccountId;
+  bool _deleting = false;
   bool _finishing = false;
   String? _finishError;
 
@@ -165,7 +166,10 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
   }
 
   Future<void> _delete() async {
-    if (_password.text.isEmpty || _confirmation.text != 'DELETE') return;
+    if (_deleting || _password.text.isEmpty || _confirmation.text != 'DELETE') {
+      return;
+    }
+    setState(() => _deleting = true);
     final receipt = await widget.account.deleteAppData(
       password: _password.text,
     );
@@ -173,6 +177,7 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
     _confirmation.clear();
     if (!mounted) return;
     setState(() {
+      _deleting = false;
       _receipt = receipt;
       if (receipt != null) _deletedAccountId = widget.account.accountId;
     });
@@ -205,7 +210,7 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
   Widget build(BuildContext context) {
     final receipt = _receipt;
     return PopScope(
-      canPop: receipt == null && !widget.account.busy,
+      canPop: receipt == null && !_deleting,
       child: AlertDialog(
         key: const ValueKey('account-delete-dialog'),
         scrollable: true,
@@ -277,8 +282,7 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
         actions: receipt == null
             ? [
                 TextButton(
-                  onPressed:
-                      widget.account.busy ? null : () => Navigator.pop(context),
+                  onPressed: _deleting ? null : () => Navigator.pop(context),
                   child: const Text('Cancel'),
                 ),
                 FilledButton(
@@ -286,11 +290,14 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
                   style: FilledButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.error,
                   ),
-                  onPressed:
-                      widget.account.busy || _confirmation.text != 'DELETE'
-                          ? null
-                          : _delete,
-                  child: const Text('Permanently delete app data'),
+                  onPressed: _deleting || _confirmation.text != 'DELETE'
+                      ? null
+                      : _delete,
+                  child: Text(
+                    _deleting
+                        ? 'Deleting app data…'
+                        : 'Permanently delete app data',
+                  ),
                 ),
               ]
             : [

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:breathefree_patient/account/account_data_api_client.dart';
 import 'package:breathefree_patient/auth/account_controller.dart';
 import 'package:breathefree_patient/auth/auth_gateway.dart';
@@ -80,6 +82,76 @@ void main() {
       'sign-out',
       'welcome',
     ]);
+  });
+
+  testWidgets('remote deletion cannot be dismissed or submitted twice', (
+    tester,
+  ) async {
+    final events = <String>[];
+    final auth = _TestAuth(events);
+    final accountData = _PendingAccountDataApi();
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _TestProfileApi()),
+      accountData: accountData,
+    );
+    addTearDown(controller.dispose);
+    await controller.signIn(email: 'person@example.test', password: 'password');
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: _DeletionHarness(
+          account: controller,
+          onCleanup: (_) async {},
+          onComplete: () {},
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Delete account'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('account-delete-password')),
+      'password',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('account-delete-confirmation')),
+      'DELETE',
+    );
+    await tester.pump();
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('account-delete-confirm')),
+    );
+    await tester.tap(find.byKey(const ValueKey('account-delete-confirm')));
+    await tester.pump();
+
+    expect(accountData.deleteCalls, 1);
+    expect(find.text('Deleting app data…'), findsOneWidget);
+    expect(
+      tester
+          .widget<FilledButton>(
+            find.byKey(const ValueKey('account-delete-confirm')),
+          )
+          .onPressed,
+      isNull,
+    );
+    expect(
+      tester
+          .widget<TextButton>(find.widgetWithText(TextButton, 'Cancel'))
+          .onPressed,
+      isNull,
+    );
+
+    expect(await tester.binding.handlePopRoute(), isTrue);
+    await tester.pump();
+    expect(find.byKey(const ValueKey('account-delete-dialog')), findsOneWidget);
+    expect(accountData.deleteCalls, 1);
+
+    accountData.complete();
+    await tester.pumpAndSettle();
+
+    expect(find.text('App data deleted'), findsOneWidget);
+    expect(find.textContaining('pending-receipt-id'), findsOneWidget);
   });
 
   testWidgets('cleanup failure keeps receipt and session until retry succeeds',
@@ -262,6 +334,32 @@ class _TestAccountDataApi implements AccountDataApiClient {
       avatarObjectsDeleted: 0,
       authIdentityDeleted: false,
     );
+  }
+
+  @override
+  Future<AccountDataExport> exportData(String accessToken) =>
+      throw UnimplementedError();
+}
+
+class _PendingAccountDataApi implements AccountDataApiClient {
+  final _deletion = Completer<AccountDeletionReceipt>();
+  int deleteCalls = 0;
+
+  void complete() => _deletion.complete(
+        AccountDeletionReceipt(
+          requestId: 'pending-receipt-id',
+          completedAt: DateTime.utc(2026, 9, 26),
+          profileRowsDeleted: 1,
+          quitPlanRowsDeleted: 1,
+          avatarObjectsDeleted: 0,
+          authIdentityDeleted: false,
+        ),
+      );
+
+  @override
+  Future<AccountDeletionReceipt> deleteAppData(String accessToken) {
+    deleteCalls++;
+    return _deletion.future;
   }
 
   @override
