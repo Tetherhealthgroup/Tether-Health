@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:breathefree_patient/account/account_data_api_client.dart';
+import 'package:breathefree_patient/account/account_deletion_receipt_store.dart';
 import 'package:breathefree_patient/auth/account_controller.dart';
 import 'package:breathefree_patient/auth/auth_gateway.dart';
 import 'package:breathefree_patient/profile/profile_api_client.dart';
@@ -233,13 +234,16 @@ void main() {
     expect(auth.updatedPassword, 'new-password');
   });
 
-  test('deletion returns its receipt without signing out', () async {
+  test('deletion persists its receipt and invalidates the session immediately',
+      () async {
     final auth = _FakeAuth();
     final accountData = _FakeAccountDataApi();
+    final receiptStore = _FakeDeletionReceiptStore();
     final controller = AccountController(
       auth: auth,
       profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
       accountData: accountData,
+      deletionReceipts: receiptStore,
     );
     addTearDown(controller.dispose);
     await controller.signIn(email: 'person@example.test', password: 'password');
@@ -250,20 +254,94 @@ void main() {
 
     final receipt = await controller.deleteAppData(password: 'password');
     expect(receipt?.requestId, 'receipt-id');
-    expect(controller.isSignedIn, isTrue);
-    expect(controller.profile, isNotNull);
-
-    await controller.signOut();
     expect(controller.isSignedIn, isFalse);
+    expect(controller.profile, isNull);
+    expect(receiptStore.saved?.accountId, 'user-id');
+    expect(receiptStore.saved?.receipt.requestId, 'receipt-id');
+    expect(controller.pendingAccountDeletion?.receipt.requestId, 'receipt-id');
+
+    await controller.acknowledgeAccountDeletion();
+    expect(receiptStore.cleared, isTrue);
+    expect(controller.pendingAccountDeletion, isNull);
+  });
+
+  test('restored receipt invalidates a stale session after app restart',
+      () async {
+    final auth = _FakeAuth();
+    await auth.signIn(email: 'person@example.test', password: 'password');
+    final receiptStore = _FakeDeletionReceiptStore()
+      ..saved = PendingAccountDeletion(
+        accountId: 'user-id',
+        receipt: AccountDeletionReceipt(
+          requestId: 'restored-receipt',
+          completedAt: DateTime.utc(2026, 10, 4),
+          profileRowsDeleted: 1,
+          quitPlanRowsDeleted: 1,
+          avatarObjectsDeleted: 2,
+          authIdentityDeleted: true,
+        ),
+      );
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      deletionReceipts: receiptStore,
+    );
+    addTearDown(controller.dispose);
+
+    final restored = await controller.restorePendingAccountDeletion();
+
+    expect(restored?.receipt.requestId, 'restored-receipt');
+    expect(controller.isSignedIn, isFalse);
+    expect(auth.currentIdentity, isNull);
+  });
+
+  test('confirmed deletion stays locally invalidated when sign-out fails',
+      () async {
+    final auth = _FakeAuth(failSignOut: true);
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      accountData: _FakeAccountDataApi(),
+    );
+    addTearDown(controller.dispose);
+    await controller.signIn(email: 'person@example.test', password: 'password');
+
+    final receipt = await controller.deleteAppData(password: 'password');
+
+    expect(receipt?.requestId, 'receipt-id');
+    expect(auth.currentIdentity, isNotNull);
+    expect(controller.isSignedIn, isFalse);
+    expect(controller.accountId, isNull);
+    expect(controller.accessToken, isNull);
     expect(controller.profile, isNull);
   });
 }
 
+class _FakeDeletionReceiptStore implements AccountDeletionReceiptStore {
+  PendingAccountDeletion? saved;
+  bool cleared = false;
+
+  @override
+  Future<void> clear() async {
+    cleared = true;
+    saved = null;
+  }
+
+  @override
+  Future<PendingAccountDeletion?> load() async => saved;
+
+  @override
+  Future<void> save(PendingAccountDeletion deletion) async {
+    saved = deletion;
+  }
+}
+
 class _FakeAuth
     implements AuthGateway, RecentAuthGateway, PasswordRecoveryGateway {
-  _FakeAuth({this.requiresConfirmation = false});
+  _FakeAuth({this.requiresConfirmation = false, this.failSignOut = false});
 
   final bool requiresConfirmation;
+  final bool failSignOut;
   AuthIdentity? _identity;
   String? resentEmail;
   String? recoveryEmail;
@@ -324,7 +402,10 @@ class _FakeAuth
   }
 
   @override
-  Future<void> signOut() async => _identity = null;
+  Future<void> signOut() async {
+    if (failSignOut) throw StateError('sign-out unavailable');
+    _identity = null;
+  }
 }
 
 class _FakeAccountDataApi implements AccountDataApiClient {

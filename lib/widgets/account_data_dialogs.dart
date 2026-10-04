@@ -17,14 +17,14 @@ Future<void> showAccountExportDialog(
 Future<AccountDeletionReceipt?> showAccountDeletionDialog(
   BuildContext context,
   AccountController account, {
-  Future<void> Function(String accountId)? afterDeletionAcknowledged,
+  Future<void> Function(String accountId)? afterIdentityDeleted,
 }) =>
     showDialog<AccountDeletionReceipt>(
       context: context,
       barrierDismissible: false,
       builder: (_) => _AccountDeletionDialog(
         account: account,
-        afterDeletionAcknowledged: afterDeletionAcknowledged,
+        afterIdentityDeleted: afterIdentityDeleted,
       ),
     );
 
@@ -139,11 +139,11 @@ class _AccountExportDialogState extends State<_AccountExportDialog> {
 class _AccountDeletionDialog extends StatefulWidget {
   const _AccountDeletionDialog({
     required this.account,
-    this.afterDeletionAcknowledged,
+    this.afterIdentityDeleted,
   });
 
   final AccountController account;
-  final Future<void> Function(String accountId)? afterDeletionAcknowledged;
+  final Future<void> Function(String accountId)? afterIdentityDeleted;
 
   @override
   State<_AccountDeletionDialog> createState() => _AccountDeletionDialogState();
@@ -157,6 +157,15 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
   bool _deleting = false;
   bool _finishing = false;
   String? _finishError;
+  bool _localCleanupComplete = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final pending = widget.account.pendingAccountDeletion;
+    _receipt = pending?.receipt;
+    _deletedAccountId = pending?.accountId;
+  }
 
   @override
   void dispose() {
@@ -176,11 +185,32 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
     _password.clear();
     _confirmation.clear();
     if (!mounted) return;
+    final pending = widget.account.pendingAccountDeletion;
     setState(() {
       _deleting = false;
       _receipt = receipt;
-      if (receipt != null) _deletedAccountId = widget.account.accountId;
+      if (receipt != null) _deletedAccountId = pending?.accountId;
     });
+    if (receipt != null) await _wipeLocalData();
+  }
+
+  Future<bool> _wipeLocalData() async {
+    final accountId = _deletedAccountId;
+    if (_localCleanupComplete) return true;
+    if (accountId == null) return false;
+    try {
+      await widget.afterIdentityDeleted?.call(accountId);
+      _localCleanupComplete = true;
+      return true;
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _finishError =
+              'Local data cleanup could not finish. Tap Done to try again.';
+        });
+      }
+      return false;
+    }
   }
 
   Future<void> _finish() async {
@@ -192,8 +222,11 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
       _finishError = null;
     });
     try {
-      await widget.afterDeletionAcknowledged?.call(accountId);
-      await widget.account.signOut();
+      if (!await _wipeLocalData()) {
+        if (mounted) setState(() => _finishing = false);
+        return;
+      }
+      await widget.account.acknowledgeAccountDeletion();
     } catch (_) {
       if (!mounted) return;
       setState(() {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../account/account_data_api_client.dart';
+import '../account/account_deletion_receipt_store.dart';
 import '../profile/profile_api_client.dart';
 import '../profile/avatar_storage.dart';
 import '../profile/profile_repository.dart';
@@ -19,12 +20,15 @@ class AccountController extends ChangeNotifier {
       {required AuthGateway auth,
       required ProfileRepository profiles,
       AccountDataApiClient accountData = const DisabledAccountDataApiClient(),
+      AccountDeletionReceiptStore deletionReceipts =
+          const DisabledAccountDeletionReceiptStore(),
       AvatarStorage avatarStorage = const DisabledAvatarStorage(),
       this.enabled = true})
       : _auth = auth,
         _profiles = profiles,
         _avatarStorage = avatarStorage,
-        _accountData = accountData {
+        _accountData = accountData,
+        _deletionReceipts = deletionReceipts {
     final recovery = auth is PasswordRecoveryGateway
         ? auth as PasswordRecoveryGateway
         : null;
@@ -49,6 +53,7 @@ class AccountController extends ChangeNotifier {
   final AuthGateway _auth;
   final ProfileRepository _profiles;
   final AccountDataApiClient _accountData;
+  final AccountDeletionReceiptStore _deletionReceipts;
   final AvatarStorage _avatarStorage;
   final bool enabled;
   StreamSubscription<void>? _recoverySubscription;
@@ -57,11 +62,14 @@ class AccountController extends ChangeNotifier {
   String? errorMessage;
   bool busy = false;
   bool passwordRecoveryPending = false;
+  bool _sessionInvalidated = false;
+  PendingAccountDeletion? pendingAccountDeletion;
 
-  bool get isSignedIn => _auth.currentIdentity != null;
-  String? get email => _auth.currentIdentity?.email;
-  String? get accountId => _auth.currentIdentity?.id;
-  String? get accessToken => _auth.currentIdentity?.accessToken;
+  bool get isSignedIn => !_sessionInvalidated && _auth.currentIdentity != null;
+  String? get email => isSignedIn ? _auth.currentIdentity?.email : null;
+  String? get accountId => isSignedIn ? _auth.currentIdentity?.id : null;
+  String? get accessToken =>
+      isSignedIn ? _auth.currentIdentity?.accessToken : null;
 
   static const int maxAvatarBytes = 5 * 1024 * 1024;
 
@@ -210,6 +218,7 @@ class AccountController extends ChangeNotifier {
     notifyListeners();
     try {
       await _auth.signIn(email: email.trim(), password: password);
+      _sessionInvalidated = false;
       await _loadProfile(notify: false);
       return true;
     } catch (_) {
@@ -240,6 +249,7 @@ class AccountController extends ChangeNotifier {
         email: email.trim(),
         password: password,
       );
+      _sessionInvalidated = false;
       if (result.status == AuthSignUpStatus.emailConfirmationRequired) {
         profile = null;
         _avatarRefreshTimer?.cancel();
@@ -356,7 +366,23 @@ class AccountController extends ChangeNotifier {
     busy = true;
     notifyListeners();
     try {
-      return await _accountData.deleteAppData(identity.accessToken);
+      final receipt = await _accountData.deleteAppData(identity.accessToken);
+      if (!receipt.authIdentityDeleted) {
+        throw StateError('The remote identity was not deleted.');
+      }
+      final deletion = PendingAccountDeletion(
+        accountId: identity.id,
+        receipt: receipt,
+      );
+      pendingAccountDeletion = deletion;
+      try {
+        await _deletionReceipts.save(deletion);
+      } catch (_) {
+        // Keep the in-memory receipt. Confirmed remote deletion must always
+        // invalidate the local session, even if durable receipt storage fails.
+      }
+      await _invalidateLocalSession();
+      return receipt;
     } catch (_) {
       errorMessage = 'Account deletion could not complete. Please try again.';
       return null;
@@ -364,6 +390,23 @@ class AccountController extends ChangeNotifier {
       busy = false;
       notifyListeners();
     }
+  }
+
+  Future<PendingAccountDeletion?> restorePendingAccountDeletion() async {
+    if (pendingAccountDeletion != null) return pendingAccountDeletion;
+    try {
+      pendingAccountDeletion = await _deletionReceipts.load();
+    } catch (_) {
+      return null;
+    }
+    if (pendingAccountDeletion != null) await _invalidateLocalSession();
+    return pendingAccountDeletion;
+  }
+
+  Future<void> acknowledgeAccountDeletion() async {
+    await _deletionReceipts.clear();
+    pendingAccountDeletion = null;
+    notifyListeners();
   }
 
   Future<AuthIdentity?> _reauthenticate(String password) async {
@@ -414,6 +457,11 @@ class AccountController extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
+    await _invalidateLocalSession();
+  }
+
+  Future<void> _invalidateLocalSession() async {
+    _sessionInvalidated = true;
     try {
       await _auth.signOut();
     } catch (_) {

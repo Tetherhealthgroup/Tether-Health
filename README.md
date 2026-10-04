@@ -136,9 +136,13 @@ messaging, remote notifications, analytics, and later health domains remain
 consent-aware prototype actions or interfaces. Authenticated users can re-enter
 their password to export the
 bounded app-owned dataset as JSON or permanently delete their profile, plan,
-program snapshots, avatar, and Supabase Auth identity. The API performs the Auth
-deletion with a server-only privileged client scoped to the verified caller;
-the privileged credential is never included in Flutter.
+program snapshots, avatar, and Supabase Auth identity. The API sets a durable
+avatar-upload barrier, then performs recursive Storage and Auth cleanup with a
+server-only privileged client scoped to the verified caller; the privileged
+credential is never included in Flutter. Once the API confirms identity
+deletion, Flutter immediately clears account-scoped local data and invalidates
+the session. An encrypted deletion receipt survives app restart and remains
+visible until the user explicitly acknowledges it.
 
 Password-reset email and native recovery deep links are implemented with the
 same `io.breathefree.patient://login-callback` contract as signup confirmation.

@@ -8,7 +8,7 @@ jest.mock("@supabase/supabase-js", () => ({ createClient: jest.fn() }));
 
 const mockedCreateClient = jest.mocked(createClient);
 const user = (authenticatedAt: number): AuthUser => ({
-  id: "00000000-0000-0000-0000-000000000001",
+  id: "00000000-0000-4000-8000-000000000001",
   accessToken: "caller-token",
   authenticatedAt,
 });
@@ -21,12 +21,17 @@ const config = {
   }),
 } as unknown as ConfigService;
 const deleteAuthIdentity = jest.fn();
-const admin = { deleteAuthIdentity } as unknown as SupabaseAdminService;
+const deleteAvatarObjects = jest.fn();
+const admin = {
+  deleteAuthIdentity,
+  deleteAvatarObjects,
+} as unknown as SupabaseAdminService;
 
 describe("AccountService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     deleteAuthIdentity.mockResolvedValue(undefined);
+    deleteAvatarObjects.mockResolvedValue(0);
   });
 
   it("rejects export when authentication is not recent", async () => {
@@ -35,6 +40,18 @@ describe("AccountService", () => {
       status: 401,
     });
     expect(mockedCreateClient).not.toHaveBeenCalled();
+  });
+
+  it("rejects deletion before any barrier or privileged action when authentication is stale", async () => {
+    const service = new AccountService(config, admin);
+
+    await expect(service.deleteData(user(1), "DELETE")).rejects.toMatchObject({
+      status: 401,
+    });
+
+    expect(mockedCreateClient).not.toHaveBeenCalled();
+    expect(deleteAvatarObjects).not.toHaveBeenCalled();
+    expect(deleteAuthIdentity).not.toHaveBeenCalled();
   });
 
   it("exports only caller-scoped profile, quit-plan, and program rows", async () => {
@@ -52,10 +69,11 @@ describe("AccountService", () => {
       data: [{ program_id: "steady", payload: {}, revision: 1 }],
       error: null,
     });
+    const profileSelect = jest.fn().mockReturnValue({ eq: profileEq });
     const programEq = jest.fn().mockReturnValue({ returns: programReturns });
     const from = jest
       .fn()
-      .mockReturnValueOnce({ select: () => ({ eq: profileEq }) })
+      .mockReturnValueOnce({ select: profileSelect })
       .mockReturnValueOnce({ select: () => ({ eq: planEq }) })
       .mockReturnValueOnce({ select: () => ({ eq: programEq }) });
     mockedCreateClient.mockReturnValue({ from } as never);
@@ -71,43 +89,50 @@ describe("AccountService", () => {
     expect(profileEq).toHaveBeenCalledWith("id", user(0).id);
     expect(planEq).toHaveBeenCalledWith("user_id", user(0).id);
     expect(programEq).toHaveBeenCalledWith("user_id", user(0).id);
+    expect(profileSelect).toHaveBeenCalledWith(
+      "id,display_name,locale,time_zone,onboarding_completed,avatar_path,created_at,updated_at",
+    );
   });
 
   it("deletes app rows through the caller-scoped RPC and returns a receipt", async () => {
-    const single = jest.fn().mockResolvedValue({
-      data: { avatar_path: null },
-      error: null,
-    });
-    const eq = jest.fn().mockReturnValue({ single });
-    const from = jest.fn().mockReturnValue({ select: () => ({ eq }) });
-    const rpc = jest.fn().mockResolvedValue({
-      data: { profiles: 1, quit_plans: 1, program_data: 2 },
-      error: null,
-    });
-    const list = jest.fn().mockResolvedValue({ data: [], error: null });
-    mockedCreateClient.mockReturnValue({
-      from,
-      rpc,
-      storage: { from: jest.fn().mockReturnValue({ list }) },
-    } as never);
+    deleteAvatarObjects.mockResolvedValue(3);
+    const rpc = jest.fn((name: string) =>
+      Promise.resolve(
+        name === "begin_account_deletion"
+          ? { data: true, error: null }
+          : {
+              data: { profiles: 1, quit_plans: 1, program_data: 2 },
+              error: null,
+            },
+      ),
+    );
+    mockedCreateClient.mockReturnValue({ rpc } as never);
 
     const service = new AccountService(config, admin);
     const result = await service.deleteData(
       user(Math.floor(Date.now() / 1000)),
       "DELETE",
     );
-    expect(rpc).toHaveBeenCalledWith("delete_my_app_data", {
-      p_confirmation: "DELETE",
-    });
+    expect(rpc.mock.calls).toEqual([
+      ["begin_account_deletion", { p_confirmation: "DELETE" }],
+      ["delete_my_app_data", { p_confirmation: "DELETE" }],
+    ]);
+    expect(deleteAvatarObjects).toHaveBeenCalledWith(user(0).id);
     expect(deleteAuthIdentity).toHaveBeenCalledWith(user(0).id);
     expect(rpc.mock.invocationCallOrder[0]).toBeLessThan(
+      deleteAvatarObjects.mock.invocationCallOrder[0]!,
+    );
+    expect(deleteAvatarObjects.mock.invocationCallOrder[0]).toBeLessThan(
+      rpc.mock.invocationCallOrder[1]!,
+    );
+    expect(rpc.mock.invocationCallOrder[1]).toBeLessThan(
       deleteAuthIdentity.mock.invocationCallOrder[0]!,
     );
     expect(result).toMatchObject({
       deleted: {
         profiles: 1,
         quitPlans: 1,
-        avatarObjects: 0,
+        avatarObjects: 3,
         programData: 2,
       },
       authIdentityDeleted: true,
@@ -116,56 +141,94 @@ describe("AccountService", () => {
   });
 
   it("fails safely after app-data cleanup when Auth deletion is unavailable", async () => {
-    const rpc = jest.fn().mockResolvedValue({
-      data: { profiles: 1, quit_plans: 1, program_data: 0 },
-      error: null,
-    });
-    const list = jest.fn().mockResolvedValue({ data: [], error: null });
-    mockedCreateClient.mockReturnValue({
-      rpc,
-      storage: { from: jest.fn().mockReturnValue({ list }) },
-    } as never);
+    const rpc = jest
+      .fn()
+      .mockResolvedValueOnce({ data: true, error: null })
+      .mockResolvedValueOnce({
+        data: { profiles: 1, quit_plans: 1, program_data: 0 },
+        error: null,
+      });
+    mockedCreateClient.mockReturnValue({ rpc } as never);
     deleteAuthIdentity.mockRejectedValueOnce(new Error("admin unavailable"));
 
     const service = new AccountService(config, admin);
     await expect(
       service.deleteData(user(Math.floor(Date.now() / 1000)), "DELETE"),
     ).rejects.toMatchObject({ status: 502 });
-    expect(rpc).toHaveBeenCalledTimes(1);
+    expect(rpc).toHaveBeenCalledTimes(2);
     expect(deleteAuthIdentity).toHaveBeenCalledWith(user(0).id);
   });
 
-  it("deletes every caller-owned avatar object, including unreferenced replacements", async () => {
-    const list = jest
-      .fn()
-      .mockResolvedValueOnce({
-        data: [{ name: "avatar.jpg" }, { name: "avatar.png" }],
-        error: null,
-      })
-      .mockResolvedValueOnce({ data: [], error: null });
-    const remove = jest.fn().mockResolvedValue({
-      data: [{ name: "avatar.jpg" }, { name: "avatar.png" }],
-      error: null,
+  it("keeps the durable write barrier in place when avatar cleanup fails", async () => {
+    const rpc = jest.fn().mockResolvedValue({ data: true, error: null });
+    mockedCreateClient.mockReturnValue({ rpc } as never);
+    deleteAvatarObjects.mockRejectedValueOnce(new Error("storage unavailable"));
+    const service = new AccountService(config, admin);
+    await expect(
+      service.deleteData(user(Math.floor(Date.now() / 1000)), "DELETE"),
+    ).rejects.toMatchObject({ status: 502 });
+
+    expect(rpc).toHaveBeenCalledTimes(1);
+    expect(rpc).toHaveBeenCalledWith("begin_account_deletion", {
+      p_confirmation: "DELETE",
     });
+    expect(deleteAuthIdentity).not.toHaveBeenCalled();
+  });
+
+  it("does not run privileged cleanup when the write barrier cannot start", async () => {
     const rpc = jest.fn().mockResolvedValue({
-      data: { profiles: 1, quit_plans: 0, program_data: 0 },
-      error: null,
+      data: null,
+      error: { message: "database unavailable" },
     });
-    mockedCreateClient.mockReturnValue({
-      rpc,
-      storage: { from: jest.fn().mockReturnValue({ list, remove }) },
-    } as never);
+    mockedCreateClient.mockReturnValue({ rpc } as never);
 
     const service = new AccountService(config, admin);
-    const result = await service.deleteData(
-      user(Math.floor(Date.now() / 1000)),
-      "DELETE",
-    );
+    await expect(
+      service.deleteData(user(Math.floor(Date.now() / 1000)), "DELETE"),
+    ).rejects.toMatchObject({ status: 502 });
 
-    expect(remove).toHaveBeenCalledWith([
-      `${user(0).id}/avatar.jpg`,
-      `${user(0).id}/avatar.png`,
-    ]);
-    expect(result.deleted.avatarObjects).toBe(2);
+    expect(deleteAvatarObjects).not.toHaveBeenCalled();
+    expect(deleteAuthIdentity).not.toHaveBeenCalled();
+  });
+
+  it("safely retries after Auth deletion succeeds but its response is lost", async () => {
+    const rpc = jest
+      .fn()
+      .mockResolvedValueOnce({ data: true, error: null })
+      .mockResolvedValueOnce({
+        data: { profiles: 1, quit_plans: 1, program_data: 2 },
+        error: null,
+      })
+      .mockResolvedValueOnce({ data: true, error: null })
+      .mockResolvedValueOnce({
+        data: { profiles: 0, quit_plans: 0, program_data: 0 },
+        error: null,
+      });
+    mockedCreateClient.mockReturnValue({ rpc } as never);
+    deleteAvatarObjects.mockResolvedValueOnce(2).mockResolvedValueOnce(0);
+    deleteAuthIdentity
+      .mockRejectedValueOnce(new Error("response lost"))
+      .mockResolvedValueOnce(undefined);
+    const service = new AccountService(config, admin);
+    const recentUser = user(Math.floor(Date.now() / 1000));
+
+    await expect(
+      service.deleteData(recentUser, "DELETE"),
+    ).rejects.toMatchObject({ status: 502 });
+    await expect(
+      service.deleteData(recentUser, "DELETE"),
+    ).resolves.toMatchObject({
+      deleted: {
+        profiles: 0,
+        quitPlans: 0,
+        avatarObjects: 0,
+        programData: 0,
+      },
+      authIdentityDeleted: true,
+    });
+
+    expect(rpc).toHaveBeenCalledTimes(4);
+    expect(deleteAvatarObjects).toHaveBeenCalledTimes(2);
+    expect(deleteAuthIdentity).toHaveBeenCalledTimes(2);
   });
 });

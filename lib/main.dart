@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'account/account_data_api_client.dart';
+import 'account/account_deletion_receipt_store.dart';
 import 'auth/account_controller.dart';
 import 'auth/auth_gateway.dart';
 import 'auth/password_recovery_screen.dart';
@@ -77,6 +78,7 @@ Future<void> _bootstrap() async {
     account = AccountController(
       auth: auth,
       accountData: HttpAccountDataApiClient(baseUrl: config.apiBaseUrl),
+      deletionReceipts: const SecureAccountDeletionReceiptStore(),
       avatarStorage: SupabaseAvatarStorage(Supabase.instance.client),
       profiles: ProfileRepository(
         auth: auth,
@@ -143,6 +145,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   ProgramId? _activeProgram;
   bool _showProgramPicker = false;
   late final SecureProgramStore _programStore;
+  final _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
@@ -171,6 +174,28 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
 
   Future<void> _initializeAccount() async {
     if (_currentIndex != 0) return;
+
+    final pendingDeletion =
+        await _accountController.restorePendingAccountDeletion();
+    if (pendingDeletion != null) {
+      try {
+        await _wipeDeletedAccountData(pendingDeletion.accountId);
+      } catch (_) {
+        // The retained receipt remains available and Done retries cleanup.
+      }
+      if (!mounted) return;
+      setState(() {
+        _restoringAccount = false;
+        _restoreFailed = false;
+        _history.clear();
+        _journeyEpoch++;
+        _currentIndex = 0;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_showPendingDeletionReceipt());
+      });
+      return;
+    }
 
     if (!_accountController.isSignedIn) {
       final loaded = await _quitPlanController.initialize();
@@ -343,14 +368,38 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     final receipt = await showAccountDeletionDialog(
       context,
       _accountController,
-      afterDeletionAcknowledged: (accountId) async {
-        await _programStore.deleteAccount(accountId);
-        _quitPlanController.clear();
-        await _quitPlanController.clearGuestPlan();
-      },
+      afterIdentityDeleted: _wipeDeletedAccountData,
     );
     if (!mounted || receipt == null) return;
     if (mounted) _resetJourney(0);
+  }
+
+  Future<void> _wipeDeletedAccountData(String accountId) async {
+    Object? cleanupError;
+    try {
+      await _programStore.deleteAccount(accountId);
+    } catch (error) {
+      cleanupError = error;
+    }
+    _quitPlanController.clear();
+    try {
+      await _quitPlanController.clearGuestPlan();
+    } catch (error) {
+      cleanupError ??= error;
+    }
+    if (cleanupError != null) throw cleanupError;
+  }
+
+  Future<void> _showPendingDeletionReceipt() async {
+    final navigatorContext = _navigatorKey.currentContext;
+    if (navigatorContext == null) return;
+    final receipt = await showAccountDeletionDialog(
+      navigatorContext,
+      _accountController,
+      afterIdentityDeleted: _wipeDeletedAccountData,
+    );
+    if (!mounted || receipt == null) return;
+    _resetJourney(0);
   }
 
   Future<void> _showQuitlineDialog() async {
@@ -442,6 +491,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     return AnimatedBuilder(
       animation: _accountController,
       builder: (context, _) => MaterialApp(
+        navigatorKey: _navigatorKey,
         title: 'Tether Health',
         debugShowCheckedModeBanner: false,
         restorationScopeId: 'breathefree',

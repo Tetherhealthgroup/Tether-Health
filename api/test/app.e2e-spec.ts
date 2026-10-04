@@ -20,7 +20,7 @@ describe("API (e2e)", () => {
       .useValue({
         verify: () =>
           Promise.resolve({
-            sub: "00000000-0000-0000-0000-000000000001",
+            sub: "00000000-0000-4000-8000-000000000001",
             authTime: Math.floor(Date.now() / 1000),
           }),
       })

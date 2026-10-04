@@ -22,9 +22,9 @@ key only and sends its short-lived access token to the API.
 NestJS validates signature, issuer, audience, expiry, and subject against
 Supabase JWKS, then accesses normal data with that caller token. PostgreSQL RLS
 is the final authorization boundary for app-owned data. Only complete account
-deletion uses a separate server-only service-role client, and it can delete only
-the identity selected from the verified JWT subject. Service-role credentials
-must never ship in Flutter.
+deletion uses a separate server-only service-role client. It recursively cleans
+the exact avatar prefix and deletes only the identity selected from the verified
+JWT subject. Service-role credentials must never ship in Flutter.
 
 ## Trust boundaries
 
@@ -82,14 +82,24 @@ deletion, password recovery, API abuse controls, privacy-safe error boundaries,
 native-screen text scaling/reduced motion, migration policy checks, and
 unsigned/no-codesign release builds.
 
-Deletion crosses the trust boundary only inside the API. The caller-scoped
-`delete_my_app_data` function deletes the caller's profile, plan, and program
-data; the API removes the caller's private avatar, then a server-only Supabase
-administrator deletes exactly the Auth identity from the verified JWT subject.
-The ordered cleanup is idempotent, so a privileged failure returns 502 and a
-retry safely repeats cleanup before retrying Auth deletion. An already-absent
-identity is treated as a successful retry. No health payload or user identifier
-is written to application logs.
+Deletion crosses the trust boundary only inside the API. A caller-scoped RPC
+first sets a durable profile-row barrier. Storage insert/update authorization
+locks that same row, so deletion drains uploads already in flight and blocks new
+ones before cleanup starts. The server-only client then flat-lists every nested
+object under the verified subject's exact prefix with cursor pagination and
+removes bounded batches. Only then does `delete_my_app_data` remove database
+rows and the administrator delete the Auth identity. The ordered cleanup is
+idempotent; failures return 502 and retries repeat cleanup safely. An
+already-absent identity is success. No health payload or user identifier is
+written to application logs.
+
+After a successful response confirms Auth identity deletion, Flutter stores the
+bounded receipt in encrypted platform storage before invalidating its local
+session. It then wipes the deleted account's encrypted program snapshots and
+in-memory/persisted quit-plan state immediately; the receipt UI does not defer
+that cleanup until **Done**. On restart, a pending receipt suppresses any stale
+session, retries idempotent local cleanup, and is shown again. Only explicit
+acknowledgement removes the stored receipt.
 
 External release dependencies remain: production infrastructure and redirect
 allowlisting, service-role provisioning and identity-retention policy, final

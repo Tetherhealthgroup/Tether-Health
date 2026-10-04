@@ -714,10 +714,20 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     final receipt = await showAccountDeletionDialog(
       context,
       _accountController,
-      afterDeletionAcknowledged: (accountId) async {
-        await widget.onAccountDataDeleted?.call(accountId);
+      afterIdentityDeleted: (accountId) async {
+        Object? cleanupError;
+        try {
+          await widget.onAccountDataDeleted?.call(accountId);
+        } catch (error) {
+          cleanupError = error;
+        }
         _quitPlanController.clear();
-        await _quitPlanController.clearGuestPlan();
+        try {
+          await _quitPlanController.clearGuestPlan();
+        } catch (error) {
+          cleanupError ??= error;
+        }
+        if (cleanupError != null) throw cleanupError;
       },
     );
     if (!mounted || receipt == null) return;

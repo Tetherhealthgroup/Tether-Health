@@ -17,9 +17,11 @@ reference (`amr`) no older than
 `RECENT_AUTH_MAX_AGE_SECONDS` (10 minutes by default). The Flutter client obtains
 a fresh token by re-entering the account password. Deletion returns a request ID
 and counts but never logs user identifiers, profile, quit-plan, or program payloads.
-After app-owned cleanup, the API deletes exactly the verified caller's Supabase
-Auth identity with the server-only admin client. Cleanup is idempotent and runs
-before Auth deletion so a 502 can be retried safely.
+Deletion first sets a durable database write barrier that drains in-flight avatar
+uploads and rejects later writes. The server-only client recursively enumerates
+the verified caller's exact Storage prefix with cursor pagination, removes all
+objects in bounded batches, deletes app rows, and finally deletes that caller's
+Supabase Auth identity. Cleanup is idempotent; a 502 can be retried safely.
 
 Default protections are a 64 KiB body limit, 120 requests/minute/IP, Helmet
 headers, optional explicit CORS allowlisting, DTO whitelisting, and redacted

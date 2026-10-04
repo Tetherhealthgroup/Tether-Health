@@ -55,6 +55,18 @@ class AccountDeletionReceipt {
   final int avatarObjectsDeleted;
   final int programDataRowsDeleted;
   final bool authIdentityDeleted;
+
+  Map<String, Object?> toJson() => {
+        'requestId': requestId,
+        'completedAt': completedAt.toUtc().toIso8601String(),
+        'deleted': {
+          'profiles': profileRowsDeleted,
+          'quitPlans': quitPlanRowsDeleted,
+          'avatarObjects': avatarObjectsDeleted,
+          'programData': programDataRowsDeleted,
+        },
+        'authIdentityDeleted': authIdentityDeleted,
+      };
 }
 
 abstract interface class AccountDataApiClient {
