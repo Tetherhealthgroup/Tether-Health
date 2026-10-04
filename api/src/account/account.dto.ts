@@ -23,6 +23,6 @@ export interface AccountDeletionReceipt {
     avatarObjects: number;
     programData: number;
   };
-  authIdentityDeleted: false;
-  authIdentityStatus: "external-action-required";
+  authIdentityDeleted: true;
+  authIdentityStatus: "deleted";
 }

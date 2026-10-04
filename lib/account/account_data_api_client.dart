@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -82,14 +83,26 @@ class HttpAccountDataApiClient implements AccountDataApiClient {
 
   @override
   Future<AccountDeletionReceipt> deleteAppData(String accessToken) async {
-    final json = await _send(
-      'DELETE',
-      accessToken,
-      '/v1/account/data',
-      body: const {'confirmation': 'DELETE'},
-    );
-    return AccountDeletionReceipt.fromJson(json);
+    for (var attempt = 0; attempt < 2; attempt++) {
+      try {
+        final json = await _send(
+          'DELETE',
+          accessToken,
+          '/v1/account/data',
+          body: const {'confirmation': 'DELETE'},
+        );
+        return AccountDeletionReceipt.fromJson(json);
+      } catch (error) {
+        if (attempt == 1 || !_isRetryableDeletionFailure(error)) rethrow;
+      }
+    }
+    throw StateError('Unreachable deletion retry state.');
   }
+
+  bool _isRetryableDeletionFailure(Object error) =>
+      error is TimeoutException ||
+      error is http.ClientException ||
+      (error is AccountDataApiException && error.statusCode >= 500);
 
   Future<Map<String, Object?>> _send(
     String method,

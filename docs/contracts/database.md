@@ -71,7 +71,8 @@ Migration source of truth:
 The NestJS API first removes the caller's configured avatar using the caller JWT
 and Storage RLS, then invokes `delete_my_app_data` with exact confirmation. The
 function has a fixed empty search path, rejects unauthenticated calls, and has
-execute permission only for `authenticated`. It does not access or delete
-`auth.users`; Supabase Auth identity deletion remains a separate privileged
-external workflow. API receipts contain only request/completion identifiers and
-deleted counts, never profile, quit-plan, or program payloads.
+execute permission only for `authenticated`. After app-owned cleanup succeeds,
+the API uses its server-only Supabase service-role client to delete exactly the
+`auth.users` identity named by the verified JWT subject. The request body cannot
+supply or override that user ID. API receipts contain only request/completion
+identifiers and deleted counts, never profile, quit-plan, or program payloads.

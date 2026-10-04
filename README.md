@@ -136,9 +136,9 @@ messaging, remote notifications, analytics, and later health domains remain
 consent-aware prototype actions or interfaces. Authenticated users can re-enter
 their password to export the
 bounded app-owned dataset as JSON or permanently delete their profile, plan,
-program snapshots, and avatar. The deletion receipt explicitly reports that
-Supabase Auth identity
-deletion remains a privileged external operation.
+program snapshots, avatar, and Supabase Auth identity. The API performs the Auth
+deletion with a server-only privileged client scoped to the verified caller;
+the privileged credential is never included in Flutter.
 
 Password-reset email and native recovery deep links are implemented with the
 same `io.breathefree.patient://login-callback` contract as signup confirmation.
@@ -160,7 +160,8 @@ service-role key in Flutter.
 
 This repository is a technically verifiable MVP, not an approved clinical
 production release. Signing identities, final store configuration, production
-Supabase/API provisioning and redirect allowlisting, Auth-admin identity
-deletion, legal/clinical/privacy approval, professional translation,
+Supabase/API provisioning and redirect allowlisting, server-only service-role
+configuration and operational approval, legal/clinical/privacy approval,
+professional translation,
 third-party penetration testing, and physical-device accessibility/integration
 validation remain external release dependencies.

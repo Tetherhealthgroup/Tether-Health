@@ -347,7 +347,7 @@ class _FakeAccountDataApi implements AccountDataApiClient {
       profileRowsDeleted: 1,
       quitPlanRowsDeleted: 1,
       avatarObjectsDeleted: 0,
-      authIdentityDeleted: false,
+      authIdentityDeleted: true,
     );
   }
 }

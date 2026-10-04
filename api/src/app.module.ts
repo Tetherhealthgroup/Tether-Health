@@ -5,6 +5,7 @@ import { AuthGuard } from "./auth/auth.guard";
 import { AccountController } from "./account/account.controller";
 import { AccountService } from "./account/account.service";
 import { TokenVerifier } from "./auth/token-verifier";
+import { SupabaseAdminService } from "./auth/supabase-admin.service";
 import { environmentSchema } from "./config/environment";
 import { HealthController } from "./health/health.controller";
 import { ProfileController } from "./profile/profile.controller";
@@ -30,6 +31,7 @@ import { ProgramDataService } from "./program-data/program-data.service";
   ],
   providers: [
     TokenVerifier,
+    SupabaseAdminService,
     ProfileService,
     QuitPlanService,
     AccountService,

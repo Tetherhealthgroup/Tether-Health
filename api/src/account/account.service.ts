@@ -8,6 +8,7 @@ import { ConfigService } from "@nestjs/config";
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
 import type { AuthUser } from "../auth/auth-user";
+import { SupabaseAdminService } from "../auth/supabase-admin.service";
 import type {
   AccountDataExportResponse,
   AccountDeletionReceipt,
@@ -30,7 +31,10 @@ interface ProgramExportRow {
 export class AccountService {
   private readonly logger = new Logger(AccountService.name);
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(
+    private readonly config: ConfigService,
+    private readonly admin: SupabaseAdminService,
+  ) {}
 
   async export(user: AuthUser): Promise<AccountDataExportResponse> {
     this.requireRecentAuthentication(user);
@@ -70,6 +74,7 @@ export class AccountService {
     confirmation: "DELETE",
   ): Promise<AccountDeletionReceipt> {
     this.requireRecentAuthentication(user);
+    const requestId = randomUUID();
     const client = this.client(user);
     const avatars = client.storage.from("avatars");
     let avatarObjects = 0;
@@ -99,8 +104,16 @@ export class AccountService {
       throw new BadGatewayException("Account data was not deleted");
     }
     const counts = result.data as unknown as DeleteCounts;
+    try {
+      await this.admin.deleteAuthIdentity(user.id);
+    } catch {
+      this.logger.error(
+        `account_deletion_failed requestId=${requestId} status=auth_identity_failed`,
+      );
+      throw new BadGatewayException("Account deletion could not complete");
+    }
     const receipt: AccountDeletionReceipt = {
-      requestId: randomUUID(),
+      requestId,
       completedAt: new Date().toISOString(),
       deleted: {
         profiles: counts.profiles,
@@ -108,11 +121,11 @@ export class AccountService {
         avatarObjects,
         programData: counts.program_data,
       },
-      authIdentityDeleted: false,
-      authIdentityStatus: "external-action-required",
+      authIdentityDeleted: true,
+      authIdentityStatus: "deleted",
     };
     this.logger.log(
-      `account_data_deleted requestId=${receipt.requestId} status=completed`,
+      `account_deleted requestId=${receipt.requestId} status=completed`,
     );
     return receipt;
   }

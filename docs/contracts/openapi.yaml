@@ -158,9 +158,9 @@ paths:
     delete:
       operationId: deleteMyAppData
       description: >-
-        Permanently deletes caller-owned profile, quit-plan, program, and avatar data.
-        Supabase Auth identity deletion is not performed and is reported
-        explicitly in the receipt.
+        Permanently deletes caller-owned profile, quit-plan, program, and avatar data,
+        then deletes the authenticated caller's Supabase Auth identity through a
+        server-only privileged operation.
       security: [{supabaseJwt: []}]
       requestBody:
         required: true
@@ -266,8 +266,8 @@ components:
             quitPlans: {type: integer, minimum: 0, maximum: 1}
             avatarObjects: {type: integer, minimum: 0}
             programData: {type: integer, minimum: 0, maximum: 3}
-        authIdentityDeleted: {const: false}
-        authIdentityStatus: {const: external-action-required}
+        authIdentityDeleted: {const: true}
+        authIdentityStatus: {const: deleted}
     SupportPerson:
       type: object
       additionalProperties: false

@@ -53,7 +53,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('account-delete-confirm')));
     await tester.pumpAndSettle();
 
-    expect(find.text('App data deleted'), findsOneWidget);
+    expect(find.text('Account deleted'), findsOneWidget);
     expect(find.textContaining('receipt-request-id'), findsOneWidget);
     expect(controller.isSignedIn, isTrue);
     expect(controller.profile, isNotNull);
@@ -61,18 +61,18 @@ void main() {
 
     await tester.tapAt(const Offset(4, 4));
     await tester.pumpAndSettle();
-    expect(find.text('App data deleted'), findsOneWidget);
+    expect(find.text('Account deleted'), findsOneWidget);
 
     expect(await tester.binding.handlePopRoute(), isTrue);
     await tester.pumpAndSettle();
-    expect(find.text('App data deleted'), findsOneWidget);
+    expect(find.text('Account deleted'), findsOneWidget);
     expect(controller.isSignedIn, isTrue);
     expect(events, ['remote-delete']);
 
     await tester.tap(find.byKey(const ValueKey('account-delete-done')));
     await tester.pumpAndSettle();
 
-    expect(find.text('App data deleted'), findsNothing);
+    expect(find.text('Account deleted'), findsNothing);
     expect(find.text('Welcome'), findsOneWidget);
     expect(controller.isSignedIn, isFalse);
     expect(controller.profile, isNull);
@@ -126,7 +126,7 @@ void main() {
     await tester.pump();
 
     expect(accountData.deleteCalls, 1);
-    expect(find.text('Deleting app data…'), findsOneWidget);
+    expect(find.text('Deleting account…'), findsOneWidget);
     expect(
       tester
           .widget<FilledButton>(
@@ -150,7 +150,7 @@ void main() {
     accountData.complete();
     await tester.pumpAndSettle();
 
-    expect(find.text('App data deleted'), findsOneWidget);
+    expect(find.text('Account deleted'), findsOneWidget);
     expect(find.textContaining('pending-receipt-id'), findsOneWidget);
   });
 
@@ -203,7 +203,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('account-delete-done')));
     await tester.pumpAndSettle();
 
-    expect(find.text('App data deleted'), findsOneWidget);
+    expect(find.text('Account deleted'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('account-delete-finish-error')),
       findsOneWidget,
@@ -217,7 +217,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('account-delete-done')));
     await tester.pumpAndSettle();
 
-    expect(find.text('App data deleted'), findsNothing);
+    expect(find.text('Account deleted'), findsNothing);
     expect(find.text('Welcome'), findsOneWidget);
     expect(controller.isSignedIn, isFalse);
     expect(events, [
@@ -332,7 +332,7 @@ class _TestAccountDataApi implements AccountDataApiClient {
       profileRowsDeleted: 1,
       quitPlanRowsDeleted: 1,
       avatarObjectsDeleted: 0,
-      authIdentityDeleted: false,
+      authIdentityDeleted: true,
     );
   }
 
@@ -352,7 +352,7 @@ class _PendingAccountDataApi implements AccountDataApiClient {
           profileRowsDeleted: 1,
           quitPlanRowsDeleted: 1,
           avatarObjectsDeleted: 0,
-          authIdentityDeleted: false,
+          authIdentityDeleted: true,
         ),
       );
 

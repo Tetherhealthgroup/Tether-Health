@@ -358,7 +358,7 @@ class AccountController extends ChangeNotifier {
     try {
       return await _accountData.deleteAppData(identity.accessToken);
     } catch (_) {
-      errorMessage = 'Your app data was not deleted. Please try again.';
+      errorMessage = 'Account deletion could not complete. Please try again.';
       return null;
     } finally {
       busy = false;

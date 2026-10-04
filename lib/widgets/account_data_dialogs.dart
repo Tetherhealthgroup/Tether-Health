@@ -215,7 +215,7 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
         key: const ValueKey('account-delete-dialog'),
         scrollable: true,
         title: Text(
-          receipt == null ? 'Delete BreatheFree app data?' : 'App data deleted',
+          receipt == null ? 'Delete BreatheFree account?' : 'Account deleted',
         ),
         content: receipt == null
             ? Column(
@@ -224,8 +224,8 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
                 children: [
                   const Text(
                     'This permanently deletes your BreatheFree profile, saved quit '
-                    'plan, and avatar. Your sign-in identity cannot be deleted by '
-                    'this service yet and remains an external account action.',
+                    'plan, program data, avatar, and sign-in identity. This action '
+                    'cannot be undone.',
                   ),
                   const SizedBox(height: 16),
                   TextField(
@@ -263,10 +263,8 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Deletion receipt ${receipt.requestId}. Your BreatheFree '
-                    'profile and quit plan were deleted. Deleting the Supabase '
-                    'sign-in identity requires the separately approved '
-                    'privileged account service.',
+                    'Deletion receipt ${receipt.requestId}. Your BreatheFree data '
+                    'and sign-in identity were permanently deleted.',
                   ),
                   if (_finishError != null) ...[
                     const SizedBox(height: 12),
@@ -295,8 +293,8 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
                       : _delete,
                   child: Text(
                     _deleting
-                        ? 'Deleting app data…'
-                        : 'Permanently delete app data',
+                        ? 'Deleting account…'
+                        : 'Permanently delete account',
                   ),
                 ),
               ]

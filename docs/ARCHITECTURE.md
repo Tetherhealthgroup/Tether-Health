@@ -7,7 +7,8 @@ iPhone / Android Flutter app
           | HTTPS + Supabase access token
           v
 NestJS API (TypeScript / Node.js)
-          | caller-scoped Supabase client
+          | caller-scoped client (normal data)
+          | server-only admin client (Auth deletion)
           v
 Supabase (PostgreSQL + Auth + Storage)
 ```
@@ -19,9 +20,11 @@ restoration, recent-password verification, and sign-out through an auth
 boundary that is replaceable in tests. Flutter uses the publishable/anonymous
 key only and sends its short-lived access token to the API.
 NestJS validates signature, issuer, audience, expiry, and subject against
-Supabase JWKS, then accesses Supabase with that caller token. PostgreSQL RLS is
-the final authorization boundary. Service-role credentials must never ship in
-Flutter and are not required by the profile API.
+Supabase JWKS, then accesses normal data with that caller token. PostgreSQL RLS
+is the final authorization boundary for app-owned data. Only complete account
+deletion uses a separate server-only service-role client, and it can delete only
+the identity selected from the verified JWT subject. Service-role credentials
+must never ship in Flutter.
 
 ## Trust boundaries
 
@@ -79,14 +82,16 @@ deletion, password recovery, API abuse controls, privacy-safe error boundaries,
 native-screen text scaling/reduced motion, migration policy checks, and
 unsigned/no-codesign release builds.
 
-Deletion is deliberately split at the trust boundary. The caller-scoped
-`delete_my_app_data` function deletes the caller's profile and plan, while the
-API removes the caller's private avatar and returns row/object counts, a request
-ID, completion time, and `authIdentityDeleted: false`. No health payload is
-written to application logs. Deleting `auth.users` requires a privileged
-Supabase Auth administrator and is not implemented with the publishable key.
+Deletion crosses the trust boundary only inside the API. The caller-scoped
+`delete_my_app_data` function deletes the caller's profile, plan, and program
+data; the API removes the caller's private avatar, then a server-only Supabase
+administrator deletes exactly the Auth identity from the verified JWT subject.
+The ordered cleanup is idempotent, so a privileged failure returns 502 and a
+retry safely repeats cleanup before retrying Auth deletion. An already-absent
+identity is treated as a successful retry. No health payload or user identifier
+is written to application logs.
 
 External release dependencies remain: production infrastructure and redirect
-allowlisting, Auth-admin identity deletion/retention policy, final identifiers
-and signing, clinical/legal/privacy approval, professional localization,
+allowlisting, service-role provisioning and identity-retention policy, final
+identifiers and signing, clinical/legal/privacy approval, professional localization,
 vendor penetration testing, store review, and physical-device validation.
