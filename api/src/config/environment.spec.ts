@@ -50,4 +50,24 @@ describe("environmentSchema", () => {
 
     expect(error).toBeUndefined();
   });
+
+  it("rejects a legacy service-role JWT in the anonymous credential slot", () => {
+    const { error } = environmentSchema.validate({
+      ...validEnvironment,
+      SUPABASE_ANON_KEY:
+        "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIn0.synthetic-signature",
+    });
+
+    expect(error?.message).toContain("SUPABASE_ANON_KEY");
+  });
+
+  it("accepts a legacy anonymous-role JWT in the anonymous credential slot", () => {
+    const { error } = environmentSchema.validate({
+      ...validEnvironment,
+      SUPABASE_ANON_KEY:
+        "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiJ9.synthetic-signature",
+    });
+
+    expect(error).toBeUndefined();
+  });
 });

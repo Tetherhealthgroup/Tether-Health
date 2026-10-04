@@ -139,10 +139,14 @@ bounded app-owned dataset as JSON or permanently delete their profile, plan,
 program snapshots, avatar, and Supabase Auth identity. The API sets a durable
 avatar-upload barrier, then performs recursive Storage and Auth cleanup with a
 server-only privileged client scoped to the verified caller; the privileged
-credential is never included in Flutter. Once the API confirms identity
-deletion, Flutter immediately clears account-scoped local data and invalidates
-the session. An encrypted deletion receipt survives app restart and remains
-visible until the user explicitly acknowledges it.
+credential is never included in Flutter. Before calling the destructive
+endpoint, Flutter must persist an encrypted deletion-intent tombstone or it
+aborts. Once a 2xx confirms the endpoint ran, Flutter immediately invalidates
+the session and starts bounded account-scoped local cleanup independently of
+receipt storage. The exact encrypted deletion receipt remains available until
+acknowledgement when its post-success write succeeds; if that write fails or
+times out, the tombstone still drives cleanup after restart and the UI reports
+that no server receipt was restored.
 
 Password-reset email and native recovery deep links are implemented with the
 same `io.breathefree.patient://login-callback` contract as signup confirmation.

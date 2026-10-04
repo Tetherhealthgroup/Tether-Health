@@ -22,17 +22,45 @@ void main() {
       ),
     );
 
-    await store.save(pending);
+    await store.saveIntent(pending.accountId);
+    await store.saveReceipt(pending);
     final restored = await const SecureAccountDeletionReceiptStore().load();
 
     expect(restored?.accountId, 'account-id');
-    expect(restored?.receipt.requestId, 'request-id');
-    expect(restored?.receipt.completedAt, DateTime.utc(2026, 10, 4, 17, 30));
-    expect(restored?.receipt.avatarObjectsDeleted, 3);
-    expect(restored?.receipt.programDataRowsDeleted, 2);
+    expect(restored?.receipt?.requestId, 'request-id');
+    expect(restored?.receipt?.completedAt, DateTime.utc(2026, 10, 4, 17, 30));
+    expect(restored?.receipt?.avatarObjectsDeleted, 3);
+    expect(restored?.receipt?.programDataRowsDeleted, 2);
 
     await store.clear();
     expect(await store.load(), isNull);
+  });
+
+  test('durable intent remains until a receipt can upgrade it', () async {
+    const store = SecureAccountDeletionReceiptStore();
+    await store.saveIntent('account-id');
+
+    final restored = await const SecureAccountDeletionReceiptStore().load();
+
+    expect(restored?.accountId, 'account-id');
+    expect(restored?.receipt, isNull);
+  });
+
+  test('corrupt receipt upgrade falls back to the durable intent', () async {
+    FlutterSecureStorage.setMockInitialValues({
+      'tether.account-deletion-intent.v2': '{"accountId":"account-id"}',
+      'tether.account-deletion-receipt.v2': '{not-json',
+    });
+
+    final restored = await const SecureAccountDeletionReceiptStore().load();
+
+    expect(restored?.accountId, 'account-id');
+    expect(restored?.receipt, isNull);
+    expect(
+      await const FlutterSecureStorage()
+          .read(key: 'tether.account-deletion-receipt.v2'),
+      isNull,
+    );
   });
 
   test('corrupt receipt is removed instead of blocking startup', () async {

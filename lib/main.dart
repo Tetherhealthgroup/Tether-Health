@@ -365,12 +365,12 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
 
   Future<void> _deleteAccountData() async {
     if (!await _ensureSignedIn() || !mounted) return;
-    final receipt = await showAccountDeletionDialog(
+    final completed = await showAccountDeletionDialog(
       context,
       _accountController,
       afterIdentityDeleted: _wipeDeletedAccountData,
     );
-    if (!mounted || receipt == null) return;
+    if (!mounted || completed != true) return;
     if (mounted) _resetJourney(0);
   }
 
@@ -393,12 +393,12 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   Future<void> _showPendingDeletionReceipt() async {
     final navigatorContext = _navigatorKey.currentContext;
     if (navigatorContext == null) return;
-    final receipt = await showAccountDeletionDialog(
+    final completed = await showAccountDeletionDialog(
       navigatorContext,
       _accountController,
       afterIdentityDeleted: _wipeDeletedAccountData,
     );
-    if (!mounted || receipt == null) return;
+    if (!mounted || completed != true) return;
     _resetJourney(0);
   }
 

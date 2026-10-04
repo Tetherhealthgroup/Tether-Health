@@ -14,12 +14,12 @@ Future<void> showAccountExportDialog(
       builder: (_) => _AccountExportDialog(account: account),
     );
 
-Future<AccountDeletionReceipt?> showAccountDeletionDialog(
+Future<bool?> showAccountDeletionDialog(
   BuildContext context,
   AccountController account, {
   Future<void> Function(String accountId)? afterIdentityDeleted,
 }) =>
-    showDialog<AccountDeletionReceipt>(
+    showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (_) => _AccountDeletionDialog(
@@ -154,6 +154,7 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
   final _confirmation = TextEditingController();
   AccountDeletionReceipt? _receipt;
   String? _deletedAccountId;
+  bool _recoveringFromIntent = false;
   bool _deleting = false;
   bool _finishing = false;
   String? _finishError;
@@ -165,6 +166,7 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
     final pending = widget.account.pendingAccountDeletion;
     _receipt = pending?.receipt;
     _deletedAccountId = pending?.accountId;
+    _recoveringFromIntent = pending != null && pending.receipt == null;
   }
 
   @override
@@ -179,19 +181,31 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
       return;
     }
     setState(() => _deleting = true);
-    final receipt = await widget.account.deleteAppData(
+    final completion = await widget.account.deleteAppData(
       password: _password.text,
+      localCleanup: _wipeAccountData,
     );
     _password.clear();
     _confirmation.clear();
     if (!mounted) return;
-    final pending = widget.account.pendingAccountDeletion;
     setState(() {
       _deleting = false;
-      _receipt = receipt;
-      if (receipt != null) _deletedAccountId = pending?.accountId;
+      _receipt = completion?.receipt;
+      if (completion != null) {
+        _recoveringFromIntent = completion.receipt == null;
+        _deletedAccountId = completion.accountId;
+        _localCleanupComplete = completion.localCleanupComplete;
+        if (!completion.localCleanupComplete) {
+          _finishError =
+              'Local data cleanup could not finish. Tap Done to try again.';
+        }
+      }
     });
-    if (receipt != null) await _wipeLocalData();
+  }
+
+  Future<void> _wipeAccountData(String accountId) async {
+    await widget.afterIdentityDeleted?.call(accountId);
+    _localCleanupComplete = true;
   }
 
   Future<bool> _wipeLocalData() async {
@@ -199,7 +213,8 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
     if (_localCleanupComplete) return true;
     if (accountId == null) return false;
     try {
-      await widget.afterIdentityDeleted?.call(accountId);
+      await _wipeAccountData(accountId)
+          .timeout(widget.account.deletionCleanupTimeout);
       _localCleanupComplete = true;
       return true;
     } catch (_) {
@@ -216,7 +231,11 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
   Future<void> _finish() async {
     final receipt = _receipt;
     final accountId = _deletedAccountId;
-    if (receipt == null || accountId == null || _finishing) return;
+    if ((!_recoveringFromIntent && receipt == null) ||
+        accountId == null ||
+        _finishing) {
+      return;
+    }
     setState(() {
       _finishing = true;
       _finishError = null;
@@ -236,21 +255,26 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
       });
       return;
     }
-    if (mounted) Navigator.pop(context, receipt);
+    if (mounted) Navigator.pop(context, true);
   }
 
   @override
   Widget build(BuildContext context) {
     final receipt = _receipt;
+    final deletionRecorded = receipt != null || _recoveringFromIntent;
     return PopScope(
-      canPop: receipt == null && !_deleting,
+      canPop: !deletionRecorded && !_deleting,
       child: AlertDialog(
         key: const ValueKey('account-delete-dialog'),
         scrollable: true,
         title: Text(
-          receipt == null ? 'Delete BreatheFree account?' : 'Account deleted',
+          !deletionRecorded
+              ? 'Delete BreatheFree account?'
+              : receipt == null
+                  ? 'Deletion recovery'
+                  : 'Account deleted',
         ),
-        content: receipt == null
+        content: !deletionRecorded
             ? Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,10 +319,12 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Deletion receipt ${receipt.requestId}. Your BreatheFree data '
-                    'and sign-in identity were permanently deleted.',
-                  ),
+                  Text(receipt == null
+                      ? 'A previous account deletion was interrupted after its '
+                          'recovery marker was saved. Local account data has been '
+                          'cleared; no server receipt was available after restart.'
+                      : 'Deletion receipt ${receipt.requestId}. Your BreatheFree data '
+                          'and sign-in identity were permanently deleted.'),
                   if (_finishError != null) ...[
                     const SizedBox(height: 12),
                     Text(
@@ -310,7 +336,7 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
                   ],
                 ],
               ),
-        actions: receipt == null
+        actions: !deletionRecorded
             ? [
                 TextButton(
                   onPressed: _deleting ? null : () => Navigator.pop(context),

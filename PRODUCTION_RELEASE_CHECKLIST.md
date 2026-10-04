@@ -16,7 +16,8 @@ not be described as production-ready while any release requirement remains open.
 - [x] Recent-password verification before JSON export or app-data deletion.
 - [x] Explicit `DELETE` confirmation, caller-scoped profile/plan/program/avatar
   cleanup, server-side Auth identity deletion, immediate local session/data
-  cleanup, restart-safe encrypted receipt retention, and payload-free logging.
+  cleanup, pre-request encrypted deletion tombstones, best-effort exact receipt
+  retention with intent-only restart fallback, and payload-free logging.
 - [x] Owner-only RLS contracts and static/local migration checks.
 - [x] API JWT validation, DTO whitelisting, 64 KiB default request limit,
   security headers, configurable rate limiting, CORS allowlisting, and redacted

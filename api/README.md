@@ -21,7 +21,8 @@ Deletion first sets a durable database write barrier that drains in-flight avata
 uploads and rejects later writes. The server-only client recursively enumerates
 the verified caller's exact Storage prefix with cursor pagination, removes all
 objects in bounded batches, deletes app rows, and finally deletes that caller's
-Supabase Auth identity. Cleanup is idempotent; a 502 can be retried safely.
+Supabase Auth identity. Cleanup is idempotent; a 502, transport failure, or
+unusable 2xx receipt body can be retried once safely with the same recent token.
 
 Default protections are a 64 KiB body limit, 120 requests/minute/IP, Helmet
 headers, optional explicit CORS allowlisting, DTO whitelisting, and redacted

@@ -711,7 +711,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       await _showSignIn();
       return;
     }
-    final receipt = await showAccountDeletionDialog(
+    final completed = await showAccountDeletionDialog(
       context,
       _accountController,
       afterIdentityDeleted: (accountId) async {
@@ -730,7 +730,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
         if (cleanupError != null) throw cleanupError;
       },
     );
-    if (!mounted || receipt == null) return;
+    if (!mounted || completed != true) return;
     final reset = widget.onSessionReset;
     if (reset != null) {
       reset(0);

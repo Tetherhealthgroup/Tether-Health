@@ -252,17 +252,128 @@ void main() {
     expect(exported?.document['schemaVersion'], '1.0');
     expect(accountData.receivedToken, 'recent-access-token');
 
-    final receipt = await controller.deleteAppData(password: 'password');
-    expect(receipt?.requestId, 'receipt-id');
+    final deletion = await controller.deleteAppData(password: 'password');
+    expect(deletion?.receipt?.requestId, 'receipt-id');
     expect(controller.isSignedIn, isFalse);
     expect(controller.profile, isNull);
     expect(receiptStore.saved?.accountId, 'user-id');
-    expect(receiptStore.saved?.receipt.requestId, 'receipt-id');
-    expect(controller.pendingAccountDeletion?.receipt.requestId, 'receipt-id');
+    expect(receiptStore.saved?.receipt?.requestId, 'receipt-id');
+    expect(controller.pendingAccountDeletion?.receipt?.requestId, 'receipt-id');
 
     await controller.acknowledgeAccountDeletion();
     expect(receiptStore.cleared, isTrue);
     expect(controller.pendingAccountDeletion, isNull);
+  });
+
+  test('deletion aborts before the API when its intent cannot be persisted',
+      () async {
+    final auth = _FakeAuth();
+    final accountData = _FakeAccountDataApi();
+    final receiptStore = _FakeDeletionReceiptStore()..failIntent = true;
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      accountData: accountData,
+      deletionReceipts: receiptStore,
+      deletionStorageTimeout: const Duration(milliseconds: 20),
+    );
+    addTearDown(controller.dispose);
+    await controller.signIn(email: 'person@example.test', password: 'password');
+
+    final deletion = await controller.deleteAppData(password: 'password');
+
+    expect(deletion, isNull);
+    expect(accountData.deleteCalls, 0);
+    expect(controller.isSignedIn, isTrue);
+    expect(controller.errorMessage, contains('recovery state'));
+  });
+
+  test('throwing receipt persistence cannot prevent cleanup after success',
+      () async {
+    final auth = _FakeAuth();
+    final receiptStore = _FakeDeletionReceiptStore()..failReceipt = true;
+    final cleaned = <String>[];
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      accountData: _FakeAccountDataApi(),
+      deletionReceipts: receiptStore,
+      deletionStorageTimeout: const Duration(milliseconds: 20),
+    );
+    addTearDown(controller.dispose);
+    await controller.signIn(email: 'person@example.test', password: 'password');
+
+    final deletion = await controller.deleteAppData(
+      password: 'password',
+      localCleanup: (accountId) async => cleaned.add(accountId),
+    );
+
+    expect(deletion?.receipt?.requestId, 'receipt-id');
+    expect(deletion?.localCleanupComplete, isTrue);
+    expect(cleaned, ['user-id']);
+    expect(controller.isSignedIn, isFalse);
+    expect(controller.pendingAccountDeletion?.receipt?.requestId, 'receipt-id');
+    expect(receiptStore.saved?.accountId, 'user-id');
+    expect(receiptStore.saved?.receipt, isNull);
+  });
+
+  test('non-completing receipt persistence is bounded and cleanup continues',
+      () async {
+    final auth = _FakeAuth();
+    final receiptStore = _FakeDeletionReceiptStore()..hangReceipt = true;
+    var cleaned = false;
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      accountData: _FakeAccountDataApi(),
+      deletionReceipts: receiptStore,
+      deletionStorageTimeout: const Duration(milliseconds: 20),
+    );
+    addTearDown(controller.dispose);
+    await controller.signIn(email: 'person@example.test', password: 'password');
+    final stopwatch = Stopwatch()..start();
+
+    final deletion = await controller.deleteAppData(
+      password: 'password',
+      localCleanup: (_) async {
+        cleaned = true;
+      },
+    );
+    stopwatch.stop();
+
+    expect(deletion?.receipt?.requestId, 'receipt-id');
+    expect(cleaned, isTrue);
+    expect(controller.isSignedIn, isFalse);
+    expect(stopwatch.elapsed, lessThan(const Duration(seconds: 1)));
+  });
+
+  test('unusable successful responses fall back to the intent and clean up',
+      () async {
+    final auth = _FakeAuth();
+    final receiptStore = _FakeDeletionReceiptStore();
+    var cleaned = false;
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      accountData: _UnusableDeletionApi(),
+      deletionReceipts: receiptStore,
+    );
+    addTearDown(controller.dispose);
+    await controller.signIn(email: 'person@example.test', password: 'password');
+
+    final deletion = await controller.deleteAppData(
+      password: 'password',
+      localCleanup: (_) async {
+        cleaned = true;
+      },
+    );
+
+    expect(deletion, isNotNull);
+    expect(deletion?.receipt, isNull);
+    expect(cleaned, isTrue);
+    expect(controller.isSignedIn, isFalse);
+    expect(receiptStore.saved?.accountId, 'user-id');
+    expect(receiptStore.saved?.receipt, isNull);
   });
 
   test('restored receipt invalidates a stale session after app restart',
@@ -290,7 +401,28 @@ void main() {
 
     final restored = await controller.restorePendingAccountDeletion();
 
-    expect(restored?.receipt.requestId, 'restored-receipt');
+    expect(restored?.receipt?.requestId, 'restored-receipt');
+    expect(controller.isSignedIn, isFalse);
+    expect(auth.currentIdentity, isNull);
+  });
+
+  test('restored deletion intent invalidates a stale session after restart',
+      () async {
+    final auth = _FakeAuth();
+    await auth.signIn(email: 'person@example.test', password: 'password');
+    final receiptStore = _FakeDeletionReceiptStore()
+      ..saved = const PendingAccountDeletion(accountId: 'user-id');
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      deletionReceipts: receiptStore,
+    );
+    addTearDown(controller.dispose);
+
+    final restored = await controller.restorePendingAccountDeletion();
+
+    expect(restored?.accountId, 'user-id');
+    expect(restored?.receipt, isNull);
     expect(controller.isSignedIn, isFalse);
     expect(auth.currentIdentity, isNull);
   });
@@ -306,9 +438,9 @@ void main() {
     addTearDown(controller.dispose);
     await controller.signIn(email: 'person@example.test', password: 'password');
 
-    final receipt = await controller.deleteAppData(password: 'password');
+    final deletion = await controller.deleteAppData(password: 'password');
 
-    expect(receipt?.requestId, 'receipt-id');
+    expect(deletion?.receipt?.requestId, 'receipt-id');
     expect(auth.currentIdentity, isNotNull);
     expect(controller.isSignedIn, isFalse);
     expect(controller.accountId, isNull);
@@ -320,6 +452,9 @@ void main() {
 class _FakeDeletionReceiptStore implements AccountDeletionReceiptStore {
   PendingAccountDeletion? saved;
   bool cleared = false;
+  bool failIntent = false;
+  bool failReceipt = false;
+  bool hangReceipt = false;
 
   @override
   Future<void> clear() async {
@@ -331,7 +466,15 @@ class _FakeDeletionReceiptStore implements AccountDeletionReceiptStore {
   Future<PendingAccountDeletion?> load() async => saved;
 
   @override
-  Future<void> save(PendingAccountDeletion deletion) async {
+  Future<void> saveIntent(String accountId) async {
+    if (failIntent) throw StateError('intent unavailable');
+    saved = PendingAccountDeletion(accountId: accountId);
+  }
+
+  @override
+  Future<void> saveReceipt(PendingAccountDeletion deletion) async {
+    if (failReceipt) throw StateError('receipt unavailable');
+    if (hangReceipt) return Completer<void>().future;
     saved = deletion;
   }
 }
@@ -431,6 +574,16 @@ class _FakeAccountDataApi implements AccountDataApiClient {
       authIdentityDeleted: true,
     );
   }
+}
+
+class _UnusableDeletionApi implements AccountDataApiClient {
+  @override
+  Future<AccountDeletionReceipt> deleteAppData(String accessToken) =>
+      Future.error(const AccountDataResponseException(200));
+
+  @override
+  Future<AccountDataExport> exportData(String accessToken) =>
+      throw UnimplementedError();
 }
 
 class _FailingProfileApi implements ProfileApiClient {

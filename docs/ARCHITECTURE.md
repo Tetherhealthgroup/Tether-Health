@@ -93,13 +93,18 @@ idempotent; failures return 502 and retries repeat cleanup safely. An
 already-absent identity is success. No health payload or user identifier is
 written to application logs.
 
-After a successful response confirms Auth identity deletion, Flutter stores the
-bounded receipt in encrypted platform storage before invalidating its local
-session. It then wipes the deleted account's encrypted program snapshots and
-in-memory/persisted quit-plan state immediately; the receipt UI does not defer
-that cleanup until **Done**. On restart, a pending receipt suppresses any stale
-session, retries idempotent local cleanup, and is shown again. Only explicit
-acknowledgement removes the stored receipt.
+Before the destructive request, Flutter persists an encrypted deletion-intent
+tombstone; failure or timeout aborts before the API call. After a 2xx confirms
+the endpoint ran, observable session invalidation, remote sign-out, encrypted
+program-snapshot cleanup, and in-memory/persisted quit-plan cleanup start
+independently of the receipt write and are time-bounded at the coordinator.
+The receipt is written to a separate encrypted key, leaving the tombstone as a
+fallback until **Done**. A throwing or stalled receipt write therefore cannot
+defer local cleanup. On restart either record suppresses a stale session and
+retries idempotent local cleanup. A valid receipt preserves its exact request ID;
+an intent-only recovery makes no claim that a receipt was restored. Unusable 2xx
+deletion bodies are retried once with the same recent token, then fall back to
+the tombstone and local cleanup. Only explicit acknowledgement clears both keys.
 
 External release dependencies remain: production infrastructure and redirect
 allowlisting, service-role provisioning and identity-retention policy, final

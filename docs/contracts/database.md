@@ -84,9 +84,13 @@ retry: the write barrier remains set until the profile is removed, cleanup is
 idempotent, and a missing Auth identity is success. API receipts contain only
 request/completion identifiers and deleted counts, never user payloads.
 
-The Flutter client persists that bounded receipt in encrypted platform storage
-before invalidating its local session. Account-scoped program snapshots and
-quit-plan state are wiped as soon as identity deletion is confirmed, while the
-receipt remains independent of the deleted account/session until the user taps
-**Done**. Pending receipts are restored after app lifecycle interruption and
-local cleanup is safe to repeat.
+The Flutter client persists an encrypted deletion-intent tombstone before it
+calls the destructive API and aborts if that prerequisite fails or times out.
+After a successful response, session invalidation and bounded local program and
+quit-plan cleanup start without waiting for receipt persistence. The exact
+receipt is upgraded into a separate encrypted key while the tombstone remains a
+durable fallback; a throwing or stalled post-success write cannot block cleanup.
+Pending receipts or intent-only tombstones are restored after interruption and
+local cleanup is safe to repeat. **Done** clears both records. An intent-only
+recovery reports that no server receipt was restored rather than inventing an
+identifier or claiming a receipt survived.

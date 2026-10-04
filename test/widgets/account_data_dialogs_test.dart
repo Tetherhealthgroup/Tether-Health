@@ -348,6 +348,48 @@ void main() {
     await tester.pumpAndSettle();
     expect(store.cleared, isTrue);
   });
+
+  testWidgets('app restart resumes local cleanup from deletion intent', (
+    tester,
+  ) async {
+    FlutterSecureStorage.setMockInitialValues({
+      'tether.program.v1.user-id.steady': '{"payload":{},"revision":1}',
+    });
+    final auth = _TestAuth(<String>[]);
+    await auth.signIn(email: 'person@example.test', password: 'password');
+    final store = _TestReceiptStore(
+      const PendingAccountDeletion(accountId: 'user-id'),
+    );
+    final account = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _TestProfileApi()),
+      deletionReceipts: store,
+    );
+    final quitPlan = QuitPlanController.disabled();
+    addTearDown(account.dispose);
+    addTearDown(quitPlan.dispose);
+
+    await tester.pumpWidget(
+      BreatheFreeApp(
+        accountController: account,
+        quitPlanController: quitPlan,
+        programStore: SecureProgramStore(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Deletion recovery'), findsOneWidget);
+    expect(find.textContaining('no server receipt'), findsOneWidget);
+    expect(account.isSignedIn, isFalse);
+    expect(
+      (await const FlutterSecureStorage().readAll()).keys,
+      isNot(contains('tether.program.v1.user-id.steady')),
+    );
+
+    await tester.tap(find.byKey(const ValueKey('account-delete-done')));
+    await tester.pumpAndSettle();
+    expect(store.cleared, isTrue);
+  });
 }
 
 class _TestReceiptStore implements AccountDeletionReceiptStore {
@@ -366,7 +408,12 @@ class _TestReceiptStore implements AccountDeletionReceiptStore {
   Future<PendingAccountDeletion?> load() async => pending;
 
   @override
-  Future<void> save(PendingAccountDeletion deletion) async {
+  Future<void> saveIntent(String accountId) async {
+    pending = PendingAccountDeletion(accountId: accountId);
+  }
+
+  @override
+  Future<void> saveReceipt(PendingAccountDeletion deletion) async {
     pending = deletion;
   }
 }
@@ -390,12 +437,12 @@ class _DeletionHarnessState extends State<_DeletionHarness> {
   bool _complete = false;
 
   Future<void> _delete() async {
-    final receipt = await showAccountDeletionDialog(
+    final completed = await showAccountDeletionDialog(
       context,
       widget.account,
       afterIdentityDeleted: widget.onCleanup,
     );
-    if (!mounted || receipt == null) return;
+    if (!mounted || completed != true) return;
     widget.onComplete();
     setState(() => _complete = true);
   }
