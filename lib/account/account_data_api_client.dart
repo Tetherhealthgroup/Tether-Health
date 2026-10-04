@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -9,6 +10,15 @@ class AccountDataApiException implements Exception {
 
   @override
   String toString() => 'Account data request failed ($statusCode)';
+}
+
+class AccountDataResponseException implements Exception {
+  const AccountDataResponseException(this.statusCode);
+
+  final int statusCode;
+
+  @override
+  String toString() => 'Account data response was unusable ($statusCode)';
 }
 
 class AccountDataExport {
@@ -54,6 +64,18 @@ class AccountDeletionReceipt {
   final int avatarObjectsDeleted;
   final int programDataRowsDeleted;
   final bool authIdentityDeleted;
+
+  Map<String, Object?> toJson() => {
+        'requestId': requestId,
+        'completedAt': completedAt.toUtc().toIso8601String(),
+        'deleted': {
+          'profiles': profileRowsDeleted,
+          'quitPlans': quitPlanRowsDeleted,
+          'avatarObjects': avatarObjectsDeleted,
+          'programData': programDataRowsDeleted,
+        },
+        'authIdentityDeleted': authIdentityDeleted,
+      };
 }
 
 abstract interface class AccountDataApiClient {
@@ -82,14 +104,31 @@ class HttpAccountDataApiClient implements AccountDataApiClient {
 
   @override
   Future<AccountDeletionReceipt> deleteAppData(String accessToken) async {
-    final json = await _send(
-      'DELETE',
-      accessToken,
-      '/v1/account/data',
-      body: const {'confirmation': 'DELETE'},
-    );
-    return AccountDeletionReceipt.fromJson(json);
+    for (var attempt = 0; attempt < 2; attempt++) {
+      try {
+        final json = await _send(
+          'DELETE',
+          accessToken,
+          '/v1/account/data',
+          body: const {'confirmation': 'DELETE'},
+        );
+        try {
+          return AccountDeletionReceipt.fromJson(json);
+        } catch (_) {
+          throw const AccountDataResponseException(200);
+        }
+      } catch (error) {
+        if (attempt == 1 || !_isRetryableDeletionFailure(error)) rethrow;
+      }
+    }
+    throw StateError('Unreachable deletion retry state.');
   }
+
+  bool _isRetryableDeletionFailure(Object error) =>
+      error is TimeoutException ||
+      error is http.ClientException ||
+      error is AccountDataResponseException ||
+      (error is AccountDataApiException && error.statusCode >= 500);
 
   Future<Map<String, Object?>> _send(
     String method,
@@ -110,7 +149,11 @@ class HttpAccountDataApiClient implements AccountDataApiClient {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw AccountDataApiException(response.statusCode);
     }
-    return jsonDecode(response.body) as Map<String, Object?>;
+    try {
+      return (jsonDecode(response.body) as Map).cast<String, Object?>();
+    } catch (_) {
+      throw AccountDataResponseException(response.statusCode);
+    }
   }
 }
 

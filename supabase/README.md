@@ -8,6 +8,7 @@ checks are:
 bash supabase/tests/verify_profiles_migration.sh
 bash supabase/tests/verify_quit_plans_migration.sh
 bash supabase/tests/verify_account_deletion_migration.sh
+bash supabase/tests/verify_avatar_deletion_barrier.sh
 bash supabase/tests/verify_program_data_migration.sh
 ```
 

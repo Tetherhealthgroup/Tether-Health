@@ -15,14 +15,16 @@ cannot choose another user's identity: RLS predicates use `auth.uid()`.
 | `time_zone` | non-empty time-zone identifier, max 64 characters |
 | `onboarding_completed` | boolean, defaults false |
 | `avatar_path` | nullable private path under `<user-id>/`, max 512 characters |
+| `account_deletion_started_at` | nullable server-managed avatar-write barrier; omitted from client/export DTOs |
 | `created_at` / `updated_at` | UTC timestamps; database managed |
 
 Authenticated users may select and update only their row. Insert is performed by
 the trusted signup trigger; direct delete is not granted. The controlled
 `delete_my_app_data('DELETE')` security-definer function derives the caller from
 `auth.uid()`, deletes only that profile and its cascading quit plan, and returns
-row counts. Avatar objects use a private
-bucket and must live under a folder matching `auth.uid()`.
+row counts. Avatar objects use a private bucket and must live under a folder
+matching `auth.uid()`. Inserts and updates lock the caller's profile row and are
+denied after `account_deletion_started_at` is set or the profile no longer exists.
 Profile responses provide a caller-authenticated signed URL with a five-minute
 lifetime for private avatar display.
 
@@ -65,13 +67,30 @@ in `breathefree-dev`; real patient or support-person information is prohibited.
 
 ## Account-data deletion
 
-Migration source of truth:
-`supabase/migrations/202609200001_account_data_deletion.sql`.
+Migration sources of truth:
+`supabase/migrations/202609200001_account_data_deletion.sql` and
+`supabase/migrations/202610030001_avatar_deletion_barrier.sql`.
 
-The NestJS API first removes the caller's configured avatar using the caller JWT
-and Storage RLS, then invokes `delete_my_app_data` with exact confirmation. The
-function has a fixed empty search path, rejects unauthenticated calls, and has
-execute permission only for `authenticated`. It does not access or delete
-`auth.users`; Supabase Auth identity deletion remains a separate privileged
-external workflow. API receipts contain only request/completion identifiers and
-deleted counts, never profile, quit-plan, or program payloads.
+The NestJS API first invokes `begin_account_deletion` with exact confirmation.
+That function updates the caller's profile row, waiting for any upload holding a
+conflicting `FOR SHARE` lock and durably blocking subsequent avatar
+inserts/updates. The
+API's server-only client then uses flat cursor pagination to enumerate every
+object under the exact `<verified-subject>/` prefix and removes those objects in
+bounded batches. It never accepts a user ID in the request body. Only after
+Storage succeeds does `delete_my_app_data` remove database rows, followed by
+deletion of that verified subject's Auth identity. Failed attempts are safe to
+retry: the write barrier remains set until the profile is removed, cleanup is
+idempotent, and a missing Auth identity is success. API receipts contain only
+request/completion identifiers and deleted counts, never user payloads.
+
+The Flutter client persists an encrypted deletion-intent tombstone before it
+calls the destructive API and aborts if that prerequisite fails or times out.
+After a successful response, session invalidation and bounded local program and
+quit-plan cleanup start without waiting for receipt persistence. The exact
+receipt is upgraded into a separate encrypted key while the tombstone remains a
+durable fallback; a throwing or stalled post-success write cannot block cleanup.
+Pending receipts or intent-only tombstones are restored after interruption and
+local cleanup is safe to repeat. **Done** clears both records. An intent-only
+recovery reports that no server receipt was restored rather than inventing an
+identifier or claiming a receipt survived.

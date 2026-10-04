@@ -14,17 +14,17 @@ Future<void> showAccountExportDialog(
       builder: (_) => _AccountExportDialog(account: account),
     );
 
-Future<AccountDeletionReceipt?> showAccountDeletionDialog(
+Future<bool?> showAccountDeletionDialog(
   BuildContext context,
   AccountController account, {
-  Future<void> Function(String accountId)? afterDeletionAcknowledged,
+  Future<void> Function(String accountId)? afterIdentityDeleted,
 }) =>
-    showDialog<AccountDeletionReceipt>(
+    showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (_) => _AccountDeletionDialog(
         account: account,
-        afterDeletionAcknowledged: afterDeletionAcknowledged,
+        afterIdentityDeleted: afterIdentityDeleted,
       ),
     );
 
@@ -139,11 +139,11 @@ class _AccountExportDialogState extends State<_AccountExportDialog> {
 class _AccountDeletionDialog extends StatefulWidget {
   const _AccountDeletionDialog({
     required this.account,
-    this.afterDeletionAcknowledged,
+    this.afterIdentityDeleted,
   });
 
   final AccountController account;
-  final Future<void> Function(String accountId)? afterDeletionAcknowledged;
+  final Future<void> Function(String accountId)? afterIdentityDeleted;
 
   @override
   State<_AccountDeletionDialog> createState() => _AccountDeletionDialogState();
@@ -154,9 +154,20 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
   final _confirmation = TextEditingController();
   AccountDeletionReceipt? _receipt;
   String? _deletedAccountId;
+  bool _recoveringFromIntent = false;
   bool _deleting = false;
   bool _finishing = false;
   String? _finishError;
+  bool _localCleanupComplete = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final pending = widget.account.pendingAccountDeletion;
+    _receipt = pending?.receipt;
+    _deletedAccountId = pending?.accountId;
+    _recoveringFromIntent = pending != null && pending.receipt == null;
+  }
 
   @override
   void dispose() {
@@ -170,30 +181,71 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
       return;
     }
     setState(() => _deleting = true);
-    final receipt = await widget.account.deleteAppData(
+    final completion = await widget.account.deleteAppData(
       password: _password.text,
+      localCleanup: _wipeAccountData,
     );
     _password.clear();
     _confirmation.clear();
     if (!mounted) return;
     setState(() {
       _deleting = false;
-      _receipt = receipt;
-      if (receipt != null) _deletedAccountId = widget.account.accountId;
+      _receipt = completion?.receipt;
+      if (completion != null) {
+        _recoveringFromIntent = completion.receipt == null;
+        _deletedAccountId = completion.accountId;
+        _localCleanupComplete = completion.localCleanupComplete;
+        if (!completion.localCleanupComplete) {
+          _finishError =
+              'Local data cleanup could not finish. Tap Done to try again.';
+        }
+      }
     });
+  }
+
+  Future<void> _wipeAccountData(String accountId) async {
+    await widget.afterIdentityDeleted?.call(accountId);
+    _localCleanupComplete = true;
+  }
+
+  Future<bool> _wipeLocalData() async {
+    final accountId = _deletedAccountId;
+    if (_localCleanupComplete) return true;
+    if (accountId == null) return false;
+    try {
+      await _wipeAccountData(accountId)
+          .timeout(widget.account.deletionCleanupTimeout);
+      _localCleanupComplete = true;
+      return true;
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _finishError =
+              'Local data cleanup could not finish. Tap Done to try again.';
+        });
+      }
+      return false;
+    }
   }
 
   Future<void> _finish() async {
     final receipt = _receipt;
     final accountId = _deletedAccountId;
-    if (receipt == null || accountId == null || _finishing) return;
+    if ((!_recoveringFromIntent && receipt == null) ||
+        accountId == null ||
+        _finishing) {
+      return;
+    }
     setState(() {
       _finishing = true;
       _finishError = null;
     });
     try {
-      await widget.afterDeletionAcknowledged?.call(accountId);
-      await widget.account.signOut();
+      if (!await _wipeLocalData()) {
+        if (mounted) setState(() => _finishing = false);
+        return;
+      }
+      await widget.account.acknowledgeAccountDeletion();
     } catch (_) {
       if (!mounted) return;
       setState(() {
@@ -203,29 +255,34 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
       });
       return;
     }
-    if (mounted) Navigator.pop(context, receipt);
+    if (mounted) Navigator.pop(context, true);
   }
 
   @override
   Widget build(BuildContext context) {
     final receipt = _receipt;
+    final deletionRecorded = receipt != null || _recoveringFromIntent;
     return PopScope(
-      canPop: receipt == null && !_deleting,
+      canPop: !deletionRecorded && !_deleting,
       child: AlertDialog(
         key: const ValueKey('account-delete-dialog'),
         scrollable: true,
         title: Text(
-          receipt == null ? 'Delete BreatheFree app data?' : 'App data deleted',
+          !deletionRecorded
+              ? 'Delete BreatheFree account?'
+              : receipt == null
+                  ? 'Deletion recovery'
+                  : 'Account deleted',
         ),
-        content: receipt == null
+        content: !deletionRecorded
             ? Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
                     'This permanently deletes your BreatheFree profile, saved quit '
-                    'plan, and avatar. Your sign-in identity cannot be deleted by '
-                    'this service yet and remains an external account action.',
+                    'plan, program data, avatar, and sign-in identity. This action '
+                    'cannot be undone.',
                   ),
                   const SizedBox(height: 16),
                   TextField(
@@ -262,12 +319,12 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Deletion receipt ${receipt.requestId}. Your BreatheFree '
-                    'profile and quit plan were deleted. Deleting the Supabase '
-                    'sign-in identity requires the separately approved '
-                    'privileged account service.',
-                  ),
+                  Text(receipt == null
+                      ? 'A previous account deletion was interrupted after its '
+                          'recovery marker was saved. Local account data has been '
+                          'cleared; no server receipt was available after restart.'
+                      : 'Deletion receipt ${receipt.requestId}. Your BreatheFree data '
+                          'and sign-in identity were permanently deleted.'),
                   if (_finishError != null) ...[
                     const SizedBox(height: 12),
                     Text(
@@ -279,7 +336,7 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
                   ],
                 ],
               ),
-        actions: receipt == null
+        actions: !deletionRecorded
             ? [
                 TextButton(
                   onPressed: _deleting ? null : () => Navigator.pop(context),
@@ -295,8 +352,8 @@ class _AccountDeletionDialogState extends State<_AccountDeletionDialog> {
                       : _delete,
                   child: Text(
                     _deleting
-                        ? 'Deleting app data…'
-                        : 'Permanently delete app data',
+                        ? 'Deleting account…'
+                        : 'Permanently delete account',
                   ),
                 ),
               ]

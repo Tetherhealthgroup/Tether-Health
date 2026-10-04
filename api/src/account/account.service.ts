@@ -8,6 +8,7 @@ import { ConfigService } from "@nestjs/config";
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
 import type { AuthUser } from "../auth/auth-user";
+import { SupabaseAdminService } from "../auth/supabase-admin.service";
 import type {
   AccountDataExportResponse,
   AccountDeletionReceipt,
@@ -30,13 +31,22 @@ interface ProgramExportRow {
 export class AccountService {
   private readonly logger = new Logger(AccountService.name);
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(
+    private readonly config: ConfigService,
+    private readonly admin: SupabaseAdminService,
+  ) {}
 
   async export(user: AuthUser): Promise<AccountDataExportResponse> {
     this.requireRecentAuthentication(user);
     const client = this.client(user);
     const [profileResult, planResult, programResult] = await Promise.all([
-      client.from("profiles").select("*").eq("id", user.id).single(),
+      client
+        .from("profiles")
+        .select(
+          "id,display_name,locale,time_zone,onboarding_completed,avatar_path,created_at,updated_at",
+        )
+        .eq("id", user.id)
+        .single(),
       client
         .from("quit_plans")
         .select("*")
@@ -54,7 +64,7 @@ export class AccountService {
     return {
       schemaVersion: "1.0",
       generatedAt: new Date().toISOString(),
-      profile: profileResult.data as Record<string, unknown>,
+      profile: profileResult.data,
       quitPlan: planResult.data as Record<string, unknown> | null,
       programData: programResult.data.map((row) => ({
         programId: row.program_id,
@@ -70,26 +80,23 @@ export class AccountService {
     confirmation: "DELETE",
   ): Promise<AccountDeletionReceipt> {
     this.requireRecentAuthentication(user);
+    const requestId = randomUUID();
     const client = this.client(user);
-    const avatars = client.storage.from("avatars");
-    let avatarObjects = 0;
-    while (true) {
-      const listed = await avatars.list(user.id, {
-        limit: 100,
-        offset: 0,
-        sortBy: { column: "name", order: "asc" },
-      });
-      if (listed.error) {
-        throw new BadGatewayException("Account deletion could not start");
-      }
-      if (listed.data.length === 0) break;
+    const begun = await client.rpc("begin_account_deletion", {
+      p_confirmation: confirmation,
+    });
+    if (begun.error || begun.data !== true) {
+      throw new BadGatewayException("Account deletion could not start");
+    }
 
-      const paths = listed.data.map((object) => `${user.id}/${object.name}`);
-      const removal = await avatars.remove(paths);
-      if (removal.error || removal.data.length !== paths.length) {
-        throw new BadGatewayException("Account deletion could not start");
-      }
-      avatarObjects += removal.data.length;
+    let avatarObjects: number;
+    try {
+      avatarObjects = await this.admin.deleteAvatarObjects(user.id);
+    } catch {
+      this.logger.error(
+        `account_deletion_failed requestId=${requestId} status=avatar_cleanup_failed`,
+      );
+      throw new BadGatewayException("Account deletion could not complete");
     }
 
     const result = await client.rpc("delete_my_app_data", {
@@ -99,8 +106,16 @@ export class AccountService {
       throw new BadGatewayException("Account data was not deleted");
     }
     const counts = result.data as unknown as DeleteCounts;
+    try {
+      await this.admin.deleteAuthIdentity(user.id);
+    } catch {
+      this.logger.error(
+        `account_deletion_failed requestId=${requestId} status=auth_identity_failed`,
+      );
+      throw new BadGatewayException("Account deletion could not complete");
+    }
     const receipt: AccountDeletionReceipt = {
-      requestId: randomUUID(),
+      requestId,
       completedAt: new Date().toISOString(),
       deleted: {
         profiles: counts.profiles,
@@ -108,11 +123,11 @@ export class AccountService {
         avatarObjects,
         programData: counts.program_data,
       },
-      authIdentityDeleted: false,
-      authIdentityStatus: "external-action-required",
+      authIdentityDeleted: true,
+      authIdentityStatus: "deleted",
     };
     this.logger.log(
-      `account_data_deleted requestId=${receipt.requestId} status=completed`,
+      `account_deleted requestId=${receipt.requestId} status=completed`,
     );
     return receipt;
   }

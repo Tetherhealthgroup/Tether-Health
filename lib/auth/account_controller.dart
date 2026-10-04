@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../account/account_data_api_client.dart';
+import '../account/account_deletion_receipt_store.dart';
 import '../profile/profile_api_client.dart';
 import '../profile/avatar_storage.dart';
 import '../profile/profile_repository.dart';
@@ -14,17 +15,34 @@ enum AccountSignUpOutcome {
   accountCreatedSignInRequired,
 }
 
+class AccountDeletionCompletion {
+  const AccountDeletionCompletion({
+    required this.accountId,
+    required this.receipt,
+    required this.localCleanupComplete,
+  });
+
+  final String accountId;
+  final AccountDeletionReceipt? receipt;
+  final bool localCleanupComplete;
+}
+
 class AccountController extends ChangeNotifier {
   AccountController(
       {required AuthGateway auth,
       required ProfileRepository profiles,
       AccountDataApiClient accountData = const DisabledAccountDataApiClient(),
+      AccountDeletionReceiptStore deletionReceipts =
+          const DisabledAccountDeletionReceiptStore(),
       AvatarStorage avatarStorage = const DisabledAvatarStorage(),
+      this.deletionStorageTimeout = const Duration(seconds: 2),
+      this.deletionCleanupTimeout = const Duration(seconds: 5),
       this.enabled = true})
       : _auth = auth,
         _profiles = profiles,
         _avatarStorage = avatarStorage,
-        _accountData = accountData {
+        _accountData = accountData,
+        _deletionReceipts = deletionReceipts {
     final recovery = auth is PasswordRecoveryGateway
         ? auth as PasswordRecoveryGateway
         : null;
@@ -49,19 +67,25 @@ class AccountController extends ChangeNotifier {
   final AuthGateway _auth;
   final ProfileRepository _profiles;
   final AccountDataApiClient _accountData;
+  final AccountDeletionReceiptStore _deletionReceipts;
   final AvatarStorage _avatarStorage;
   final bool enabled;
+  final Duration deletionStorageTimeout;
+  final Duration deletionCleanupTimeout;
   StreamSubscription<void>? _recoverySubscription;
   Timer? _avatarRefreshTimer;
   UserProfile? profile;
   String? errorMessage;
   bool busy = false;
   bool passwordRecoveryPending = false;
+  bool _sessionInvalidated = false;
+  PendingAccountDeletion? pendingAccountDeletion;
 
-  bool get isSignedIn => _auth.currentIdentity != null;
-  String? get email => _auth.currentIdentity?.email;
-  String? get accountId => _auth.currentIdentity?.id;
-  String? get accessToken => _auth.currentIdentity?.accessToken;
+  bool get isSignedIn => !_sessionInvalidated && _auth.currentIdentity != null;
+  String? get email => isSignedIn ? _auth.currentIdentity?.email : null;
+  String? get accountId => isSignedIn ? _auth.currentIdentity?.id : null;
+  String? get accessToken =>
+      isSignedIn ? _auth.currentIdentity?.accessToken : null;
 
   static const int maxAvatarBytes = 5 * 1024 * 1024;
 
@@ -210,6 +234,7 @@ class AccountController extends ChangeNotifier {
     notifyListeners();
     try {
       await _auth.signIn(email: email.trim(), password: password);
+      _sessionInvalidated = false;
       await _loadProfile(notify: false);
       return true;
     } catch (_) {
@@ -240,6 +265,7 @@ class AccountController extends ChangeNotifier {
         email: email.trim(),
         password: password,
       );
+      _sessionInvalidated = false;
       if (result.status == AuthSignUpStatus.emailConfirmationRequired) {
         profile = null;
         _avatarRefreshTimer?.cancel();
@@ -348,22 +374,114 @@ class AccountController extends ChangeNotifier {
     }
   }
 
-  Future<AccountDeletionReceipt?> deleteAppData({
+  Future<AccountDeletionCompletion?> deleteAppData({
     required String password,
+    Future<void> Function(String accountId)? localCleanup,
   }) async {
     final identity = await _reauthenticate(password);
     if (identity == null) return null;
     busy = true;
     notifyListeners();
     try {
-      return await _accountData.deleteAppData(identity.accessToken);
+      try {
+        await _deletionReceipts
+            .saveIntent(identity.id)
+            .timeout(deletionStorageTimeout);
+      } catch (_) {
+        errorMessage =
+            'Account deletion could not start because recovery state could not be saved.';
+        return null;
+      }
+      pendingAccountDeletion = PendingAccountDeletion(accountId: identity.id);
+
+      AccountDeletionReceipt receipt;
+      try {
+        receipt = await _accountData.deleteAppData(identity.accessToken);
+      } on AccountDataResponseException {
+        // A 2xx proves the endpoint ran, but two unusable bodies leave no
+        // receipt to retain. Complete local deletion from the durable intent.
+        return await _completeLocalDeletion(
+          identity: identity,
+          localCleanup: localCleanup,
+        );
+      }
+      if (!receipt.authIdentityDeleted) {
+        throw StateError('The remote identity was not deleted.');
+      }
+      return await _completeLocalDeletion(
+        identity: identity,
+        receipt: receipt,
+        localCleanup: localCleanup,
+      );
     } catch (_) {
-      errorMessage = 'Your app data was not deleted. Please try again.';
+      errorMessage = 'Account deletion could not complete. Please try again.';
       return null;
     } finally {
       busy = false;
       notifyListeners();
     }
+  }
+
+  Future<AccountDeletionCompletion> _completeLocalDeletion({
+    required AuthIdentity identity,
+    AccountDeletionReceipt? receipt,
+    Future<void> Function(String accountId)? localCleanup,
+  }) async {
+    final deletion = PendingAccountDeletion(
+      accountId: identity.id,
+      receipt: receipt,
+    );
+    pendingAccountDeletion = deletion;
+
+    // Change observable auth state synchronously, then start every fallible
+    // post-success operation independently. No storage future can delay
+    // session invalidation or prevent account-scoped cleanup from starting.
+    final signOut = _invalidateLocalSessionImmediately();
+    final cleanup = localCleanup == null
+        ? Future<void>.value()
+        : Future<void>.sync(() => localCleanup(identity.id));
+    final persistReceipt = receipt == null
+        ? Future<void>.value()
+        : Future<void>.sync(() => _deletionReceipts.saveReceipt(deletion));
+
+    var localCleanupComplete = true;
+    await Future.wait<void>([
+      signOut.timeout(deletionCleanupTimeout).catchError((_) {}),
+      cleanup.timeout(deletionCleanupTimeout).catchError((_) {
+        localCleanupComplete = false;
+      }),
+      persistReceipt.timeout(deletionStorageTimeout).catchError((_) {
+        // The durable intent remains as a restart-safe fallback, while the
+        // exact receipt remains in memory for this process until Done.
+      }),
+    ]);
+    return AccountDeletionCompletion(
+      accountId: identity.id,
+      receipt: receipt,
+      localCleanupComplete: localCleanupComplete,
+    );
+  }
+
+  Future<PendingAccountDeletion?> restorePendingAccountDeletion() async {
+    if (pendingAccountDeletion != null) return pendingAccountDeletion;
+    try {
+      pendingAccountDeletion =
+          await _deletionReceipts.load().timeout(deletionStorageTimeout);
+    } catch (_) {
+      return null;
+    }
+    if (pendingAccountDeletion != null) {
+      await _invalidateLocalSessionImmediately()
+          .timeout(deletionCleanupTimeout)
+          .catchError((_) {});
+    }
+    return pendingAccountDeletion;
+  }
+
+  Future<void> acknowledgeAccountDeletion() async {
+    await _deletionReceipts.clear().timeout(deletionStorageTimeout);
+    pendingAccountDeletion = null;
+    notifyListeners();
   }
 
   Future<AuthIdentity?> _reauthenticate(String password) async {
@@ -414,6 +532,15 @@ class AccountController extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
+    await _invalidateLocalSessionImmediately();
+  }
+
+  Future<void> _invalidateLocalSessionImmediately() async {
+    _sessionInvalidated = true;
+    profile = null;
+    _avatarRefreshTimer?.cancel();
+    errorMessage = null;
+    notifyListeners();
     try {
       await _auth.signOut();
     } catch (_) {
@@ -421,10 +548,6 @@ class AccountController extends ChangeNotifier {
       // appearing signed in after asking to sign out. A failed remote
       // sign-out only means the server token may linger until it expires.
     }
-    profile = null;
-    _avatarRefreshTimer?.cancel();
-    errorMessage = null;
-    notifyListeners();
   }
 
   @override

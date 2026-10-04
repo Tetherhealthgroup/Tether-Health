@@ -46,8 +46,8 @@ void main() {
               'quitPlans': 1,
               'avatarObjects': 0,
             },
-            'authIdentityDeleted': false,
-            'authIdentityStatus': 'external-action-required',
+            'authIdentityDeleted': true,
+            'authIdentityStatus': 'deleted',
           }),
           200,
         );
@@ -57,7 +57,106 @@ void main() {
     final result = await client.deleteAppData('recent-token');
     expect(result.requestId, 'receipt-id');
     expect(result.profileRowsDeleted, 1);
-    expect(result.authIdentityDeleted, isFalse);
+    expect(result.authIdentityDeleted, isTrue);
+  });
+
+  test('retries a transient server failure with the same caller token',
+      () async {
+    var attempts = 0;
+    final client = HttpAccountDataApiClient(
+      baseUrl: 'https://api.example.test',
+      client: MockClient((request) async {
+        attempts++;
+        expect(request.headers['authorization'], 'Bearer recent-token');
+        if (attempts == 1) return http.Response('', 502);
+        return http.Response(
+          jsonEncode({
+            'requestId': 'retry-receipt-id',
+            'completedAt': '2026-09-20T00:00:00Z',
+            'deleted': {
+              'profiles': 0,
+              'quitPlans': 0,
+              'avatarObjects': 0,
+              'programData': 0,
+            },
+            'authIdentityDeleted': true,
+            'authIdentityStatus': 'deleted',
+          }),
+          200,
+        );
+      }),
+    );
+
+    final result = await client.deleteAppData('recent-token');
+
+    expect(attempts, 2);
+    expect(result.requestId, 'retry-receipt-id');
+    expect(result.authIdentityDeleted, isTrue);
+  });
+
+  for (final invalidResponse in <String, String>{
+    'empty': '',
+    'malformed': '{"requestId":',
+    'schema-invalid': jsonEncode({
+      'requestId': 'invalid-receipt',
+      'completedAt': '2026-09-20T00:00:00Z',
+      'deleted': {
+        'profiles': 'one',
+        'quitPlans': 1,
+        'avatarObjects': 0,
+      },
+      'authIdentityDeleted': true,
+    }),
+  }.entries) {
+    test('retries ${invalidResponse.key} successful deletion response once',
+        () async {
+      var attempts = 0;
+      final client = HttpAccountDataApiClient(
+        baseUrl: 'https://api.example.test',
+        client: MockClient((request) async {
+          attempts++;
+          expect(request.headers['authorization'], 'Bearer recent-token');
+          if (attempts == 1) return http.Response(invalidResponse.value, 200);
+          return http.Response(
+            jsonEncode({
+              'requestId': 'exact-retry-receipt-id',
+              'completedAt': '2026-09-20T00:00:00Z',
+              'deleted': {
+                'profiles': 0,
+                'quitPlans': 0,
+                'avatarObjects': 0,
+                'programData': 0,
+              },
+              'authIdentityDeleted': true,
+            }),
+            200,
+          );
+        }),
+      );
+
+      final result = await client.deleteAppData('recent-token');
+
+      expect(attempts, 2);
+      expect(result.requestId, 'exact-retry-receipt-id');
+    });
+  }
+
+  test('stops after one retry when successful responses remain unusable',
+      () async {
+    var attempts = 0;
+    final client = HttpAccountDataApiClient(
+      baseUrl: 'https://api.example.test',
+      client: MockClient((_) async {
+        attempts++;
+        return http.Response('', 200);
+      }),
+    );
+
+    await expectLater(
+      client.deleteAppData('recent-token'),
+      throwsA(isA<AccountDataResponseException>()),
+    );
+    expect(attempts, 2);
   });
 
   test('does not expose response bodies through API exceptions', () async {

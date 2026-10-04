@@ -7,7 +7,8 @@ iPhone / Android Flutter app
           | HTTPS + Supabase access token
           v
 NestJS API (TypeScript / Node.js)
-          | caller-scoped Supabase client
+          | caller-scoped client (normal data)
+          | server-only admin client (Auth deletion)
           v
 Supabase (PostgreSQL + Auth + Storage)
 ```
@@ -19,9 +20,11 @@ restoration, recent-password verification, and sign-out through an auth
 boundary that is replaceable in tests. Flutter uses the publishable/anonymous
 key only and sends its short-lived access token to the API.
 NestJS validates signature, issuer, audience, expiry, and subject against
-Supabase JWKS, then accesses Supabase with that caller token. PostgreSQL RLS is
-the final authorization boundary. Service-role credentials must never ship in
-Flutter and are not required by the profile API.
+Supabase JWKS, then accesses normal data with that caller token. PostgreSQL RLS
+is the final authorization boundary for app-owned data. Only complete account
+deletion uses a separate server-only service-role client. It recursively cleans
+the exact avatar prefix and deletes only the identity selected from the verified
+JWT subject. Service-role credentials must never ship in Flutter.
 
 ## Trust boundaries
 
@@ -79,14 +82,31 @@ deletion, password recovery, API abuse controls, privacy-safe error boundaries,
 native-screen text scaling/reduced motion, migration policy checks, and
 unsigned/no-codesign release builds.
 
-Deletion is deliberately split at the trust boundary. The caller-scoped
-`delete_my_app_data` function deletes the caller's profile and plan, while the
-API removes the caller's private avatar and returns row/object counts, a request
-ID, completion time, and `authIdentityDeleted: false`. No health payload is
-written to application logs. Deleting `auth.users` requires a privileged
-Supabase Auth administrator and is not implemented with the publishable key.
+Deletion crosses the trust boundary only inside the API. A caller-scoped RPC
+first sets a durable profile-row barrier. Storage insert/update authorization
+locks that same row, so deletion drains uploads already in flight and blocks new
+ones before cleanup starts. The server-only client then flat-lists every nested
+object under the verified subject's exact prefix with cursor pagination and
+removes bounded batches. Only then does `delete_my_app_data` remove database
+rows and the administrator delete the Auth identity. The ordered cleanup is
+idempotent; failures return 502 and retries repeat cleanup safely. An
+already-absent identity is success. No health payload or user identifier is
+written to application logs.
+
+Before the destructive request, Flutter persists an encrypted deletion-intent
+tombstone; failure or timeout aborts before the API call. After a 2xx confirms
+the endpoint ran, observable session invalidation, remote sign-out, encrypted
+program-snapshot cleanup, and in-memory/persisted quit-plan cleanup start
+independently of the receipt write and are time-bounded at the coordinator.
+The receipt is written to a separate encrypted key, leaving the tombstone as a
+fallback until **Done**. A throwing or stalled receipt write therefore cannot
+defer local cleanup. On restart either record suppresses a stale session and
+retries idempotent local cleanup. A valid receipt preserves its exact request ID;
+an intent-only recovery makes no claim that a receipt was restored. Unusable 2xx
+deletion bodies are retried once with the same recent token, then fall back to
+the tombstone and local cleanup. Only explicit acknowledgement clears both keys.
 
 External release dependencies remain: production infrastructure and redirect
-allowlisting, Auth-admin identity deletion/retention policy, final identifiers
-and signing, clinical/legal/privacy approval, professional localization,
+allowlisting, service-role provisioning and identity-retention policy, final
+identifiers and signing, clinical/legal/privacy approval, professional localization,
 vendor penetration testing, store review, and physical-device validation.

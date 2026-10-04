@@ -14,8 +14,10 @@ not be described as production-ready while any release requirement remains open.
 - [x] Heartwise, Steady, and ClearAir program selection, encrypted local
   persistence, bounded caller-scoped cloud snapshots, and account export/deletion.
 - [x] Recent-password verification before JSON export or app-data deletion.
-- [x] Explicit `DELETE` confirmation, caller-scoped profile/plan/avatar deletion,
-  and payload-free deletion receipt logging.
+- [x] Explicit `DELETE` confirmation, caller-scoped profile/plan/program/avatar
+  cleanup, server-side Auth identity deletion, immediate local session/data
+  cleanup, pre-request encrypted deletion tombstones, best-effort exact receipt
+  retention with intent-only restart fallback, and payload-free logging.
 - [x] Owner-only RLS contracts and static/local migration checks.
 - [x] API JWT validation, DTO whitelisting, 64 KiB default request limit,
   security headers, configurable rate limiting, CORS allowlisting, and redacted
@@ -53,10 +55,9 @@ not be described as production-ready while any release requirement remains open.
   HTTPS, and exact CORS origins.
 - [ ] Allowlist `io.breathefree.patient://login-callback` for confirmation and
   password recovery in production Supabase Auth.
-- [ ] Implement and approve a privileged Supabase Auth identity-deletion path.
-  The MVP deletes all app-owned profile/plan/avatar data and returns
-  `authIdentityDeleted: false`; it cannot delete `auth.users` with a publishable
-  caller token.
+- [ ] Provision, protect, rotate, and operationally approve the API's Supabase
+  service-role credential for Auth identity deletion. The implementation is
+  complete, but no production credential has been configured or exercised.
 - [ ] Commission independent mobile/API/cloud penetration testing and remediate
   findings.
 - [ ] Approve production telemetry/crash service and verify by policy/test that
@@ -88,7 +89,7 @@ not be described as production-ready while any release requirement remains open.
   migration policy scripts are automated.
 - [ ] Physical iOS/Android integration tests pass, including offline retry and
   accessibility checks.
-- [ ] Production environment smoke tests prove export, app-data deletion,
+- [ ] Production environment smoke tests prove export, complete account deletion,
   recovery links, rate limits, alerting, backup/restore, and Auth identity
   deletion.
 - [ ] Clinical, legal, privacy, security, accessibility, and store owners sign

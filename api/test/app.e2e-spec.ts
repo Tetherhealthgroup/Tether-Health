@@ -20,7 +20,7 @@ describe("API (e2e)", () => {
       .useValue({
         verify: () =>
           Promise.resolve({
-            sub: "00000000-0000-0000-0000-000000000001",
+            sub: "00000000-0000-4000-8000-000000000001",
             authTime: Math.floor(Date.now() / 1000),
           }),
       })
@@ -64,8 +64,8 @@ describe("API (e2e)", () => {
               avatarObjects: 0,
               programData: 0,
             },
-            authIdentityDeleted: false,
-            authIdentityStatus: "external-action-required",
+            authIdentityDeleted: true,
+            authIdentityStatus: "deleted",
           }),
       })
       .overrideProvider(ProgramDataService)
@@ -267,6 +267,17 @@ describe("API (e2e)", () => {
     });
     expect(rejected.statusCode).toBe(400);
 
+    const attemptedRetarget = await app.inject({
+      method: "DELETE",
+      url: "/v1/account/data",
+      headers: { authorization: "Bearer test-token" },
+      payload: {
+        confirmation: "DELETE",
+        userId: "00000000-0000-0000-0000-000000000002",
+      },
+    });
+    expect(attemptedRetarget.statusCode).toBe(400);
+
     const accepted = await app.inject({
       method: "DELETE",
       url: "/v1/account/data",
@@ -276,8 +287,8 @@ describe("API (e2e)", () => {
     expect(accepted.statusCode).toBe(200);
     expect(accepted.json()).toMatchObject({
       deleted: { profiles: 1, quitPlans: 1 },
-      authIdentityDeleted: false,
-      authIdentityStatus: "external-action-required",
+      authIdentityDeleted: true,
+      authIdentityStatus: "deleted",
     });
   });
 
