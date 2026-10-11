@@ -24,7 +24,7 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
-      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: sh tool/check_format.sh
       - run: flutter analyze
       - name: Accessibility, offline, and program integration coverage
         run: flutter test test/accessibility test/programs test/profile test/auth
