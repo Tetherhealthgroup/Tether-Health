@@ -28,15 +28,26 @@ Default protections are a 64 KiB body limit, 120 requests/minute/IP, Helmet
 headers, optional explicit CORS allowlisting, DTO whitelisting, and redacted
 error responses. Tune limits with deployment-managed environment values.
 
-Rate limiting is keyed on the client IP. `TRUST_PROXY` sets how many reverse-proxy
-hops are trusted when deriving it from `X-Forwarded-For`: `false` or `0` (no
-proxy) or an integer up to 10. The default is `1` when `NODE_ENV=production`
-(Render's single edge proxy) and `0` otherwise. `true` is rejected because
-trusting every hop lets clients spoof their address. With one hop the client IP
-is the rightmost `X-Forwarded-For` entry, which the proxy appended; entries to
-its left are ignored. Set a higher value only if more proxies (for example a
-CDN in front of Render) are added, and never expose the service directly to
-the internet with a non-zero value.
+Rate limiting is keyed on the client IP (`request.ip`). `TRUST_PROXY` sets how
+many reverse-proxy hops are trusted when deriving it from `X-Forwarded-For`.
+
+- **Default: `0`, in every environment including production.** No proxy is
+  trusted and `X-Forwarded-For` is ignored, so the key is the socket peer
+  address. Behind a proxy this means all clients share the proxy's bucket (a
+  safe, over-restrictive failure) rather than being spoofable.
+- **Meaning of the hop count.** `N` trusts the `N` nearest proxies. The client
+  IP is the `X-Forwarded-For` entry appended by the outermost trusted proxy
+  (counting from the right); entries to its left are client-controlled and
+  ignored. Accepted values: `false`, `0`, or an integer up to 10. `true` and
+  anything else is rejected and aborts startup.
+- **Spoofing risk.** If the value is higher than the real number of proxies
+  in front of the service, or the service is reachable without passing through
+  them, a client can forge its own IP. That lets it evade its rate limit or
+  exhaust the bucket of a chosen victim address.
+- **Owner action required.** The owner must confirm Render's proxy topology
+  (how many proxies sit in front of the service, and that the service cannot be
+  reached around them) before setting a non-zero value. Until then leave it at
+  the default of `0`. No Render documentation has been verified by this change.
 
 ## Development deployment
 
