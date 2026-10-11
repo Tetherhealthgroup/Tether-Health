@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="2796" viewBox="0 0 1290 2796">
+  <defs>
+    <linearGradient id="s24bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBF8F0"/><stop offset="1" stop-color="#F5F2E8"/></linearGradient>
+    <linearGradient id="s24hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#123C37"/><stop offset="1" stop-color="#1D514A"/></linearGradient>
+    <linearGradient id="s24mint" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E8F5ED"/><stop offset="1" stop-color="#C7E6D8"/></linearGradient>
+    <linearGradient id="s24coral" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF0EB"/><stop offset="1" stop-color="#FFE0D7"/></linearGradient>
+    <filter id="s24shadow" x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#123C37" flood-opacity="0.10"/></filter>
+    <filter id="s24navshadow" x="-20%" y="-60%" width="140%" height="200%"><feDropShadow dx="0" dy="-10" stdDeviation="22" flood-color="#123C37" flood-opacity="0.08"/></filter>
+  </defs>
+  <rect width="1290" height="2796" fill="url(#s24bg)"/>
+
+  <!-- iOS status bar -->
+  <g fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700"><text x="74" y="76" font-size="36">9:41</text><g transform="translate(1056 43)"><rect x="0" y="22" width="10" height="15" rx="3"/><rect x="16" y="17" width="10" height="20" rx="3"/><rect x="32" y="11" width="10" height="26" rx="3"/><rect x="48" y="5" width="10" height="32" rx="3"/><path d="M82 28c12-15 31-15 43 0l-7 7c-8-9-21-9-29 0zm10 10c6-7 16-7 22 0l-11 11z"/><rect x="143" y="9" width="61" height="32" rx="9" fill="none" stroke="#123C37" stroke-width="4"/><rect x="207" y="18" width="5" height="14" rx="2"/><rect x="149" y="15" width="45" height="20" rx="5"/></g></g>
+
+  <!-- Header -->
+  <g transform="translate(72 139)"><circle cx="38" cy="38" r="36" fill="#FFFDF7" stroke="#C9D7D2" stroke-width="2"/><path d="M45 23L30 38l15 15" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+  <text x="645" y="190" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="38">Medication center</text>
+  <g transform="translate(1031 143)"><circle cx="44" cy="44" r="44" fill="url(#s24mint)" stroke="#B9DCCB" stroke-width="2"/><path d="M31 44h26M44 31v26" stroke="#123C37" stroke-width="5" stroke-linecap="round"/></g>
+
+  <!-- Safety boundary -->
+  <g transform="translate(72 267)">
+    <rect width="1146" height="104" rx="29" fill="#EFF5F1"/>
+    <circle cx="50" cy="52" r="26" fill="#123C37"/><text x="50" y="61" text-anchor="middle" fill="#D5EF75" font-family="Georgia, serif" font-weight="700" font-size="28">i</text>
+    <text x="94" y="44" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="23">Education and tracking—not prescribing</text>
+    <text x="94" y="76" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">The app never selects a medicine or changes a dose.</text>
+    <text x="1095" y="61" text-anchor="end" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19">Clinical content v3.2</text>
+  </g>
+
+  <!-- Recorded plan hero -->
+  <g transform="translate(72 413)" filter="url(#s24shadow)">
+    <rect width="1146" height="550" rx="45" fill="url(#s24hero)"/>
+    <circle cx="968" cy="120" r="195" fill="#285850" opacity="0.75"/>
+    <circle cx="968" cy="120" r="138" fill="none" stroke="#6C9088" stroke-width="3"/>
+    <circle cx="968" cy="120" r="90" fill="#D5EF75"/>
+    <rect x="918" y="99" width="100" height="42" rx="21" fill="none" stroke="#123C37" stroke-width="7"/><path d="M968 99v42" stroke="#123C37" stroke-width="7"/>
+    <text x="42" y="59" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="21" letter-spacing="3">YOUR RECORDED PLAN</text>
+    <text x="42" y="134" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="52">Nicotine patch</text>
+    <text x="42" y="180" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">Morning · Follow the instructions in your recorded plan</text>
+    <g transform="translate(42 211)"><rect width="243" height="55" rx="27" fill="#234E48" stroke="#557D75" stroke-width="2"/><circle cx="29" cy="28" r="14" fill="#FF7D61"/><text x="144" y="36" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19">ENTERED BY YOU</text><rect x="261" width="249" height="55" rx="27" fill="#234E48" stroke="#557D75" stroke-width="2"/><path d="M285 28h19M295 18v20" stroke="#D5EF75" stroke-width="3" stroke-linecap="round"/><text x="388" y="36" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19">PLAN ACTIVE</text></g>
+    <g transform="translate(24 300)">
+      <rect width="1098" height="218" rx="34" fill="#234E48"/>
+      <circle cx="75" cy="78" r="42" fill="#D5EF75"/><path d="M56 79l13 13 27-34" fill="none" stroke="#123C37" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="139" y="64" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19" letter-spacing="2">TODAY’S STATUS</text>
+      <text x="139" y="105" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="30">Recorded taken at 8:07 AM</text>
+      <text x="139" y="141" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Next reminder: Tomorrow at 8:00 AM</text>
+      <g transform="translate(723 35)"><rect width="337" height="75" rx="37" fill="#D5EF75"/><text x="169" y="49" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24">Update today’s status</text></g>
+      <text x="35" y="191" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="19">This is your report; it does not confirm how the medicine was used.</text>
+    </g>
+  </g>
+
+  <!-- Reminder privacy -->
+  <g transform="translate(72 1005)" filter="url(#s24shadow)">
+    <rect width="1146" height="132" rx="34" fill="#FFFDF7"/>
+    <circle cx="65" cy="66" r="34" fill="#E6F1EA"/><path d="M52 75h26l-4-8V56c0-14-18-14-18 0v11zM59 81c2 6 8 6 10 0" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="119" y="55" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="28">Private reminder previews</text>
+    <text x="119" y="91" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Lock screen shows “You have a BreatheFree reminder.”</text>
+    <g transform="translate(974 41)"><rect width="123" height="53" rx="27" fill="#123C37"/><circle cx="96" cy="27" r="21" fill="#D5EF75"/><text x="43" y="35" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="18">ON</text></g>
+  </g>
+
+  <!-- Education categories -->
+  <text x="72" y="1210" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="36">Learn about quit-smoking medicines</text>
+  <text x="1218" y="1210" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Clinically reviewed</text>
+  <g transform="translate(72 1243)">
+    <g filter="url(#s24shadow)"><rect width="555" height="246" rx="36" fill="#FFFDF7"/><circle cx="73" cy="72" r="43" fill="#E6F1EA"/><rect x="49" y="63" width="48" height="20" rx="10" fill="none" stroke="#123C37" stroke-width="5"/><path d="M73 63v20" stroke="#123C37" stroke-width="5"/><text x="134" y="63" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="29">Nicotine replacement</text><text x="134" y="101" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Patch, gum, lozenge and more</text><line x1="35" y1="145" x2="520" y2="145" stroke="#E1E9E4" stroke-width="2"/><text x="35" y="197" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Benefits · use · precautions</text><path d="M484 183l13 13-13 13" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+    <g transform="translate(591 0)" filter="url(#s24shadow)"><rect width="555" height="246" rx="36" fill="#FFFDF7"/><circle cx="73" cy="72" r="43" fill="#FFF0EB"/><rect x="60" y="45" width="26" height="54" rx="13" fill="none" stroke="#FF7D61" stroke-width="5"/><path d="M60 72h26" stroke="#FF7D61" stroke-width="5"/><text x="134" y="63" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="29">Prescription options</text><text x="134" y="101" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Varenicline · bupropion SR</text><line x1="35" y1="145" x2="520" y2="145" stroke="#E1E9E4" stroke-width="2"/><text x="35" y="197" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Requires a prescriber</text><path d="M484 183l13 13-13 13" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>
+  </g>
+
+  <!-- Pregnancy safeguard -->
+  <g transform="translate(72 1531)" filter="url(#s24shadow)">
+    <rect width="1146" height="137" rx="33" fill="url(#s24coral)" stroke="#FFC6B7" stroke-width="2"/>
+    <circle cx="64" cy="68" r="33" fill="#FF7D61"/><text x="64" y="78" text-anchor="middle" fill="#FFFFFF" font-family="Georgia, serif" font-weight="700" font-size="30">!</text>
+    <text x="118" y="57" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="27">Pregnant, breastfeeding or under 18?</text>
+    <text x="118" y="95" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Talk with a doctor before using quit-smoking medicines.</text>
+    <text x="1097" y="79" text-anchor="end" fill="#FF7D61" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="22">Contact care team ›</text>
+  </g>
+
+  <!-- Plan help -->
+  <text x="72" y="1742" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="35">Plan help</text>
+  <g transform="translate(72 1775)" filter="url(#s24shadow)">
+    <rect width="1146" height="335" rx="39" fill="#FFFDF7"/>
+    <g transform="translate(35 28)"><circle cx="46" cy="46" r="39" fill="#E6F1EA"/><path d="M29 46h34M46 29v34" stroke="#123C37" stroke-width="5" stroke-linecap="round"/><text x="105" y="38" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="27">Missed or unsure about an item?</text><text x="105" y="74" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Review approved instructions or contact a clinician or pharmacist.</text><text x="1050" y="57" text-anchor="end" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="21">Review ›</text></g>
+    <line x1="35" y1="132" x2="1111" y2="132" stroke="#E1E9E4" stroke-width="2"/>
+    <g transform="translate(35 154)"><circle cx="46" cy="46" r="39" fill="#FFF0EB"/><path d="M46 25v30M46 70v2" stroke="#FF7D61" stroke-width="6" stroke-linecap="round"/><text x="105" y="38" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="27">Side effect or concerning symptom</text><text x="105" y="74" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Open the approved safety route; the app does not diagnose.</text><text x="1050" y="57" text-anchor="end" fill="#FF7D61" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="21">Get help ›</text></g>
+    <line x1="35" y1="257" x2="1111" y2="257" stroke="#E1E9E4" stroke-width="2"/>
+    <g transform="translate(35 272)"><text x="0" y="29" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Refill question?</text><text x="1076" y="29" text-anchor="end" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="20">Contact pharmacy or care team ›</text></g>
+  </g>
+
+  <!-- Update plan CTA -->
+  <g transform="translate(72 2151)"><rect width="1146" height="132" rx="31" fill="#123C37"/><text x="573" y="82" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="35">Add or update recorded plan</text><path d="M1052 66h30m-11-11 11 11-11 11" fill="none" stroke="#D5EF75" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></g>
+
+  <!-- Governance and offline -->
+  <g transform="translate(72 2324)"><rect width="1146" height="82" rx="25" fill="#EFF5F1"/><path d="M42 34h25v22H42zM48 34v-7c0-9 14-9 14 0v7" fill="none" stroke="#718A84" stroke-width="4" stroke-linecap="round"/><text x="88" y="51" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Plan remains available offline · Last synced 9:12 AM</text><text x="1095" y="51" text-anchor="end" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19">Approved Aug 2026</text></g>
+
+  <!-- Bottom navigation -->
+  <g transform="translate(0 2453)" filter="url(#s24navshadow)"><path d="M0 32Q0 0 32 0h1226q32 0 32 32v311H0z" fill="#FFFDF7"/><line x1="0" y1="0" x2="1290" y2="0" stroke="#E2E9E5" stroke-width="2"/>
+    <g transform="translate(80 44)"><path d="M49 54l28-25 28 25v31H85V65H69v20H49z" fill="none" stroke="#718A84" stroke-width="5" stroke-linejoin="round"/><text x="77" y="124" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Home</text></g>
+    <g transform="translate(308 35)"><rect width="154" height="102" rx="38" fill="#E6F1EA"/><rect x="50" y="13" width="54" height="69" rx="8" fill="none" stroke="#123C37" stroke-width="5"/><path d="M63 34h28M63 50h28M63 66h20" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round"/><text x="77" y="133" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="21">Plan</text></g>
+    <g transform="translate(542 44)"><path d="M31 70V48M56 70V31M81 70V14" fill="none" stroke="#718A84" stroke-width="8" stroke-linecap="round"/><text x="56" y="124" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Progress</text></g>
+    <g transform="translate(780 44)"><path d="M20 20c19-7 36-4 49 7v52c-13-11-30-14-49-7zM118 20c-19-7-36-4-49 7v52c13-11 30-14 49-7z" fill="none" stroke="#718A84" stroke-width="5" stroke-linejoin="round"/><text x="69" y="124" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Learn</text></g>
+    <g transform="translate(1030 44)"><circle cx="54" cy="29" r="17" fill="none" stroke="#718A84" stroke-width="5"/><path d="M23 78c5-28 57-28 62 0M89 28h25v20H101l-9 9v-9h-3z" fill="none" stroke="#718A84" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><text x="69" y="124" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Support</text></g>
+  </g>
+  <rect x="468" y="2738" width="354" height="16" rx="8" fill="#123C37"/>
+</svg>

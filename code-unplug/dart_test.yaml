@@ -1,0 +1,8 @@
+# `e2e` marks tests that need a running instance of the sync service in
+# `sync/`. They skip themselves when TETHER_SYNC_URL and TETHER_SYNC_TOKEN are
+# unset, so an ordinary `flutter test` stays hermetic; the tag is declared here
+# so the runner does not warn about it, and so CI can say `--exclude-tags e2e`
+# and mean it.
+tags:
+  e2e:
+    description: Needs a live sync service.

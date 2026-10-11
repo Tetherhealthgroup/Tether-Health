@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="2796" viewBox="0 0 1290 2796">
+  <defs>
+    <linearGradient id="s4bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF8F0"/>
+      <stop offset="1" stop-color="#F5F2E8"/>
+    </linearGradient>
+    <filter id="s4shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="15" stdDeviation="25" flood-color="#123C37" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1290" height="2796" fill="url(#s4bg)"/>
+
+  <!-- iOS status bar -->
+  <g fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700">
+    <text x="74" y="76" font-size="36">9:41</text>
+    <g transform="translate(1056 43)">
+      <rect x="0" y="22" width="10" height="15" rx="3"/>
+      <rect x="16" y="17" width="10" height="20" rx="3"/>
+      <rect x="32" y="11" width="10" height="26" rx="3"/>
+      <rect x="48" y="5" width="10" height="32" rx="3"/>
+      <path d="M82 28c12-15 31-15 43 0l-7 7c-8-9-21-9-29 0zm10 10c6-7 16-7 22 0l-11 11z"/>
+      <rect x="143" y="9" width="61" height="32" rx="9" fill="none" stroke="#123C37" stroke-width="4"/>
+      <rect x="207" y="18" width="5" height="14" rx="2"/>
+      <rect x="149" y="15" width="45" height="20" rx="5"/>
+    </g>
+  </g>
+
+  <!-- Navigation header -->
+  <g transform="translate(72 139)">
+    <circle cx="38" cy="38" r="36" fill="#FFFDF7" stroke="#C9D7D2" stroke-width="2"/>
+    <path d="M45 23L30 38l15 15" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="645" y="190" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="38">About your smoking</text>
+  <g transform="translate(1033 149)">
+    <rect width="185" height="64" rx="32" fill="#E6F1EA"/>
+    <text x="93" y="42" text-anchor="middle" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="1.5">1 OF 8</text>
+  </g>
+
+  <!-- Progress -->
+  <g transform="translate(72 278)">
+    <text x="0" y="0" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="3">ASSESSMENT</text>
+    <text x="1146" y="0" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25">12%</text>
+    <rect y="32" width="1146" height="16" rx="8" fill="#DCE6E0"/>
+    <rect y="32" width="143" height="16" rx="8" fill="#FF7D61"/>
+  </g>
+
+  <!-- Intro icon -->
+  <g transform="translate(72 397)">
+    <circle cx="67" cy="67" r="67" fill="#DFF2E7"/>
+    <path d="M44 84V55M67 84V37M90 84V47" fill="none" stroke="#123C37" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="67" cy="27" r="8" fill="#FF7D61"/>
+  </g>
+
+  <text x="72" y="625" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="28" letter-spacing="5">QUESTION 1</text>
+  <text x="72" y="740" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="74" letter-spacing="-2.7">
+    <tspan x="72" dy="0">On a typical day, how many</tspan>
+    <tspan x="72" dy="86">cigarettes do you smoke?</tspan>
+  </text>
+  <text x="72" y="954" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="38">Choose the answer closest to your usual day.</text>
+
+  <!-- Options -->
+  <g transform="translate(72 1054)">
+    <rect width="1146" height="156" rx="30" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="69" cy="78" r="28" fill="#FFFDF7" stroke="#9CB1AA" stroke-width="4"/>
+    <text x="126" y="91" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="36">I don’t smoke every day</text>
+  </g>
+  <g transform="translate(72 1234)">
+    <rect width="1146" height="156" rx="30" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="69" cy="78" r="28" fill="#FFFDF7" stroke="#9CB1AA" stroke-width="4"/>
+    <text x="126" y="91" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="36">10 or fewer cigarettes</text>
+  </g>
+  <g transform="translate(72 1414)" filter="url(#s4shadow)">
+    <rect width="1146" height="156" rx="30" fill="#FFF0EB" stroke="#FF7D61" stroke-width="4"/>
+    <circle cx="69" cy="78" r="29" fill="#FF7D61"/>
+    <circle cx="69" cy="78" r="11" fill="#FFFDF7"/>
+    <text x="126" y="91" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="36">11–20 cigarettes</text>
+    <g transform="translate(994 48)">
+      <rect width="112" height="60" rx="30" fill="#FFFFFF"/>
+      <text x="56" y="40" text-anchor="middle" fill="#FF7D61" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24">Selected</text>
+    </g>
+  </g>
+  <g transform="translate(72 1594)">
+    <rect width="1146" height="156" rx="30" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="69" cy="78" r="28" fill="#FFFDF7" stroke="#9CB1AA" stroke-width="4"/>
+    <text x="126" y="91" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="36">21–30 cigarettes</text>
+  </g>
+  <g transform="translate(72 1774)">
+    <rect width="1146" height="156" rx="30" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="69" cy="78" r="28" fill="#FFFDF7" stroke="#9CB1AA" stroke-width="4"/>
+    <text x="126" y="91" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="36">31 or more cigarettes</text>
+  </g>
+
+  <!-- Why we ask -->
+  <g transform="translate(72 1984)">
+    <rect width="1146" height="206" rx="30" fill="#E4F1E9" stroke="#BDD8CC" stroke-width="2"/>
+    <circle cx="77" cy="103" r="40" fill="#FFFDF7"/>
+    <text x="77" y="117" text-anchor="middle" fill="#123C37" font-family="Georgia, serif" font-weight="700" font-size="42">i</text>
+    <text x="145" y="82" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="32">Why we ask</text>
+    <text x="145" y="128" fill="#5D7772" font-family="Nimbus Sans, Arial, sans-serif" font-size="28">This helps tailor your plan and estimate money saved.</text>
+    <text x="145" y="169" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">It is not a diagnosis or a judgment.</text>
+  </g>
+
+  <!-- Actions -->
+  <g transform="translate(72 2301)">
+    <rect width="1146" height="146" rx="30" fill="#123C37"/>
+    <text x="573" y="91" fill="#FFFFFF" text-anchor="middle" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="39">Next</text>
+    <path d="M1054 73h28m-11-11 11 11-11 11" fill="none" stroke="#D5EF75" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="645" y="2552" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">Your answer is saved automatically.</text>
+
+  <!-- iOS home indicator -->
+  <rect x="468" y="2738" width="354" height="16" rx="8" fill="#123C37"/>
+</svg>

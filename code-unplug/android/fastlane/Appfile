@@ -1,0 +1,15 @@
+# Android Appfile — Tether Health
+#
+# applicationId verified in android/app/build.gradle.kts:
+#   namespace     = "com.TetherHealthLLC.tetherhealth"
+#   applicationId = "com.TetherHealthLLC.tetherhealth"
+
+package_name(ENV["TETHER_ANDROID_PACKAGE_NAME"] || "com.TetherHealthLLC.tetherhealth")
+
+# Path to the Google Play service-account JSON. Never committed; the file and
+# its path both come from the environment.
+#
+#   export PLAY_STORE_JSON_KEY_PATH=/absolute/path/to/play-service-account.json
+#
+# SUPPLY_JSON_KEY is the name fastlane itself looks for, so it is honoured too.
+json_key_file(ENV["PLAY_STORE_JSON_KEY_PATH"] || ENV["SUPPLY_JSON_KEY"] || "")

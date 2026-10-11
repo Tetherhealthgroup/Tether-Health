@@ -1,0 +1,188 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="2796" viewBox="0 0 1290 2796">
+  <defs>
+    <linearGradient id="s9bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF8F0"/>
+      <stop offset="1" stop-color="#F5F2E8"/>
+    </linearGradient>
+    <linearGradient id="s9mint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E8F5ED"/>
+      <stop offset="1" stop-color="#C7E6D8"/>
+    </linearGradient>
+    <filter id="s9shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#123C37" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1290" height="2796" fill="url(#s9bg)"/>
+
+  <!-- iOS status bar -->
+  <g fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700">
+    <text x="74" y="76" font-size="36">9:41</text>
+    <g transform="translate(1056 43)">
+      <rect x="0" y="22" width="10" height="15" rx="3"/>
+      <rect x="16" y="17" width="10" height="20" rx="3"/>
+      <rect x="32" y="11" width="10" height="26" rx="3"/>
+      <rect x="48" y="5" width="10" height="32" rx="3"/>
+      <path d="M82 28c12-15 31-15 43 0l-7 7c-8-9-21-9-29 0zm10 10c6-7 16-7 22 0l-11 11z"/>
+      <rect x="143" y="9" width="61" height="32" rx="9" fill="none" stroke="#123C37" stroke-width="4"/>
+      <rect x="207" y="18" width="5" height="14" rx="2"/>
+      <rect x="149" y="15" width="45" height="20" rx="5"/>
+    </g>
+  </g>
+
+  <!-- Header -->
+  <g transform="translate(72 139)">
+    <circle cx="38" cy="38" r="36" fill="#FFFDF7" stroke="#C9D7D2" stroke-width="2"/>
+    <path d="M45 23L30 38l15 15" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="645" y="190" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="38">My reasons</text>
+  <g transform="translate(1033 149)">
+    <rect width="185" height="64" rx="32" fill="#E6F1EA"/>
+    <text x="93" y="42" text-anchor="middle" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="1.5">3 OF 5</text>
+  </g>
+
+  <!-- Plan progress -->
+  <g transform="translate(72 278)">
+    <text x="0" y="0" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="3">QUIT PLAN</text>
+    <text x="1146" y="0" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25">60%</text>
+    <rect y="32" width="1146" height="16" rx="8" fill="#DCE6E0"/>
+    <rect y="32" width="688" height="16" rx="8" fill="#FF7D61"/>
+  </g>
+
+  <!-- Main copy -->
+  <text x="72" y="414" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="28" letter-spacing="5">YOUR MOTIVATION</text>
+  <text x="72" y="510" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="72" letter-spacing="-3">What are you quitting for?</text>
+  <text x="72" y="586" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="34">Choose everything that matters to you. Tap the star</text>
+  <text x="72" y="631" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="34">to make one your top reason.</text>
+
+  <!-- Selection label -->
+  <text x="72" y="707" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24" letter-spacing="3">SELECT ALL THAT MATTER</text>
+  <g transform="translate(1030 663)">
+    <rect width="188" height="58" rx="29" fill="#E6F1EA"/>
+    <text x="94" y="39" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="23">3 SELECTED</text>
+  </g>
+
+  <!-- Top reason: Protect my family -->
+  <g transform="translate(72 752)" filter="url(#s9shadow)">
+    <rect width="555" height="188" rx="32" fill="url(#s9mint)" stroke="#FF7D61" stroke-width="4"/>
+    <circle cx="70" cy="72" r="39" fill="#FFF0EB"/>
+    <path d="M70 92s-31-19-31-41c0-17 22-24 31-8 9-16 31-9 31 8 0 22-31 41-31 41z" fill="#FF7D61"/>
+    <text x="126" y="68" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">Protect my</text>
+    <text x="126" y="109" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">family</text>
+    <g transform="translate(397 27)">
+      <rect width="130" height="46" rx="23" fill="#FF7D61"/>
+      <path d="M23 15l4 9 10 1-8 7 2 10-8-5-9 5 2-10-7-7 10-1z" fill="#FFFDF7"/>
+      <text x="78" y="31" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="17" letter-spacing="1">TOP</text>
+    </g>
+    <circle cx="505" cy="139" r="22" fill="#123C37"/>
+    <path d="M494 139l8 8 15-19" fill="none" stroke="#D5EF75" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Breathe easier -->
+  <g transform="translate(663 752)" filter="url(#s9shadow)">
+    <rect width="555" height="188" rx="32" fill="url(#s9mint)" stroke="#B9DCCB" stroke-width="3"/>
+    <circle cx="70" cy="72" r="39" fill="#FFFDF7"/>
+    <path d="M69 43v26M68 68c-7-13-24-14-27 3-4 21 12 31 27 17M70 68c7-13 24-14 27 3 4 21-12 31-27 17" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="126" y="68" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">Breathe</text>
+    <text x="126" y="109" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">easier</text>
+    <circle cx="505" cy="139" r="22" fill="#123C37"/>
+    <path d="M494 139l8 8 15-19" fill="none" stroke="#D5EF75" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M465 28l4 9 10 1-8 7 2 10-8-5-9 5 2-10-7-7 10-1z" fill="none" stroke="#96AAA4" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Improve my health -->
+  <g transform="translate(72 970)" filter="url(#s9shadow)">
+    <rect width="555" height="188" rx="32" fill="url(#s9mint)" stroke="#B9DCCB" stroke-width="3"/>
+    <circle cx="70" cy="72" r="39" fill="#FFFDF7"/>
+    <path d="M70 44v56M42 72h56" fill="none" stroke="#FF7D61" stroke-width="9" stroke-linecap="round"/>
+    <text x="126" y="68" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">Improve my</text>
+    <text x="126" y="109" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">health</text>
+    <circle cx="505" cy="139" r="22" fill="#123C37"/>
+    <path d="M494 139l8 8 15-19" fill="none" stroke="#D5EF75" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M465 28l4 9 10 1-8 7 2 10-8-5-9 5 2-10-7-7 10-1z" fill="none" stroke="#96AAA4" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Save money -->
+  <g transform="translate(663 970)">
+    <rect width="555" height="188" rx="32" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="70" cy="72" r="39" fill="#EEF5F0"/>
+    <circle cx="70" cy="72" r="25" fill="none" stroke="#123C37" stroke-width="5"/>
+    <path d="M70 50v44M82 58c-5-6-25-5-25 6 0 12 26 6 26 19 0 11-20 13-28 5" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round"/>
+    <text x="126" y="89" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">Save money</text>
+    <circle cx="505" cy="139" r="22" fill="#FFFDF7" stroke="#9EB1AB" stroke-width="3"/>
+    <path d="M465 28l4 9 10 1-8 7 2 10-8-5-9 5 2-10-7-7 10-1z" fill="none" stroke="#96AAA4" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Feel in control -->
+  <g transform="translate(72 1188)">
+    <rect width="555" height="188" rx="32" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="70" cy="72" r="39" fill="#EEF5F0"/>
+    <path d="M48 73l15 15 31-37" fill="none" stroke="#123C37" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="126" y="68" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">Feel more</text>
+    <text x="126" y="109" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">in control</text>
+    <circle cx="505" cy="139" r="22" fill="#FFFDF7" stroke="#9EB1AB" stroke-width="3"/>
+    <path d="M465 28l4 9 10 1-8 7 2 10-8-5-9 5 2-10-7-7 10-1z" fill="none" stroke="#96AAA4" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Be there for my future -->
+  <g transform="translate(663 1188)">
+    <rect width="555" height="188" rx="32" fill="#FFFDF7" stroke="#CDDAD4" stroke-width="3"/>
+    <circle cx="70" cy="72" r="39" fill="#EEF5F0"/>
+    <path d="M69 96V58M69 69c-13-1-23-9-26-22 15-1 25 6 26 22M70 78c13-1 23-9 26-22-15-1-25 6-26 22" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="126" y="68" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">Be there for</text>
+    <text x="126" y="109" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">my future</text>
+    <circle cx="505" cy="139" r="22" fill="#FFFDF7" stroke="#9EB1AB" stroke-width="3"/>
+    <path d="M465 28l4 9 10 1-8 7 2 10-8-5-9 5 2-10-7-7 10-1z" fill="none" stroke="#96AAA4" stroke-width="3" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Custom reason -->
+  <g transform="translate(72 1414)">
+    <rect width="1146" height="148" rx="30" fill="#FFFDF7" stroke="#AFC6BE" stroke-width="3" stroke-dasharray="12 10"/>
+    <circle cx="74" cy="74" r="35" fill="#E6F1EA"/>
+    <path d="M74 57v34M57 74h34" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round"/>
+    <text x="132" y="66" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="32">Add your own reason</text>
+    <text x="132" y="106" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">Write what matters most in your own words</text>
+    <path d="M1065 62l14 14-14 14" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Motivation preview -->
+  <g transform="translate(72 1608)" filter="url(#s9shadow)">
+    <rect width="1146" height="354" rx="38" fill="#123C37"/>
+    <text x="42" y="57" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="23" letter-spacing="3">MOTIVATION PREVIEW</text>
+    <g transform="translate(1010 31)">
+      <circle cx="38" cy="38" r="38" fill="#234E48"/>
+      <path d="M38 57s-22-14-22-29c0-12 16-17 22-6 6-11 22-6 22 6 0 15-22 29-22 29z" fill="#FF7D61"/>
+    </g>
+    <text x="42" y="134" fill="#D5EF75" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="27">WHEN A CRAVING HITS</text>
+    <text x="42" y="201" fill="#FFFFFF" font-family="Georgia, serif" font-size="39" font-style="italic">“You chose this for your family.</text>
+    <text x="42" y="253" fill="#FFFFFF" font-family="Georgia, serif" font-size="39" font-style="italic">This feeling will pass.”</text>
+    <line x1="42" y1="295" x2="1104" y2="295" stroke="#3F6660" stroke-width="2"/>
+    <text x="42" y="332" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="23">Based on your top reason · You can change it anytime</text>
+  </g>
+
+  <!-- Privacy note -->
+  <g transform="translate(72 2010)">
+    <circle cx="30" cy="30" r="30" fill="#E4F2EA"/>
+    <path d="M20 30l7 7 15-19" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="78" y="39" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="29">Your reasons stay private and are saved automatically.</text>
+  </g>
+
+  <!-- Action -->
+  <g transform="translate(72 2167)">
+    <rect width="1146" height="146" rx="30" fill="#123C37"/>
+    <text x="573" y="91" fill="#FFFFFF" text-anchor="middle" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="39">Save my reasons</text>
+    <path d="M1054 73h28m-11-11 11 11-11 11" fill="none" stroke="#D5EF75" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <g transform="translate(72 2353)">
+    <rect width="1146" height="105" rx="28" fill="#EFF5F1"/>
+    <path d="M45 44h28v25H45zM51 44v-8c0-11 16-11 16 0v8" fill="none" stroke="#718A84" stroke-width="4" stroke-linecap="round"/>
+    <text x="96" y="63" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">Used only to personalize your quit support.</text>
+  </g>
+
+  <text x="645" y="2600" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">3 reasons selected · 1 top reason</text>
+  <text x="645" y="2644" text-anchor="middle" fill="#8BA09A" font-family="Nimbus Sans, Arial, sans-serif" font-size="23">Saved automatically</text>
+
+  <!-- iOS home indicator -->
+  <rect x="468" y="2738" width="354" height="16" rx="8" fill="#123C37"/>
+</svg>

@@ -1,0 +1,28 @@
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+config/*.local.json
+
+# IDE and OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Generated signing and secrets
+supabase/.branches/
+supabase/.temp/
+android/key.properties
+android/app/*.jks
+android/app/*.keystore
+ios/Flutter/ephemeral/
+macos/Flutter/ephemeral/
+
+# Generated local runner files can be recreated with tool/setup_*.

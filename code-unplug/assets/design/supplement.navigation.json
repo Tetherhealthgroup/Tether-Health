@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip.",
+  "$comment": "Action-target corrections only. These change where a button goes, never what it says. A fix here must name the archetype rule it restores, because the only justification for editing a shipped product file from the outside is that the file already contradicts its own machinery.",
+  "fixes": [
+    {
+      "product": "lookup",
+      "screen": "S01",
+      "action": 0,
+      "from": "S03",
+      "to": "S02",
+      "why": "The `welcome` archetype declares its primary action goes to `why`, and S02 is LookUp's `why` screen. The shipped content sends it straight to S03 instead, which leaves S02 unreachable from the flow: a person can never read what the product does before being asked to consent to it. The label is unchanged — 'Get started' is as true of S02 as it was of S03 — and S02's own primary action continues on to S03, so no step is lost."
+    }
+  ]
+}

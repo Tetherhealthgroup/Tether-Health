@@ -1,0 +1,48 @@
+# match configuration — Tether Health
+#
+# THE IMPORTANT PART: this app ships four signable targets, not one. An App
+# Store archive that is missing a profile for any single extension fails at
+# export or at upload, and the error Apple returns names the extension rather
+# than the cause. All four identifiers are listed below; keep them in sync with
+# ios/Runner.xcodeproj/project.pbxproj if a target is ever added or renamed.
+#
+# Verified target -> identifier mapping (productType from the pbxproj):
+#   Runner              com.apple.product-type.application    com.TetherHealthLLC.tetherhealth
+#   UnplugMonitor       com.apple.product-type.app-extension  ...tetherhealth.unplugmonitor
+#   UnplugShield        com.apple.product-type.app-extension  ...tetherhealth.unplugshield
+#   UnplugShieldAction  com.apple.product-type.app-extension  ...tetherhealth.unplugshieldaction
+#
+# RunnerTests (com.apple.product-type.bundle.unit-test) is deliberately absent:
+# a test bundle is never distributed and never needs a distribution profile.
+
+app_identifier([
+  "com.TetherHealthLLC.tetherhealth",
+  "com.TetherHealthLLC.tetherhealth.unplugmonitor",
+  "com.TetherHealthLLC.tetherhealth.unplugshield",
+  "com.TetherHealthLLC.tetherhealth.unplugshieldaction"
+])
+
+# Distribution profiles by default. The `development` lane overrides this.
+type("appstore")
+
+# --- Storage -----------------------------------------------------------------
+# Default is a private git repo holding the encrypted certs and profiles.
+# Set MATCH_GIT_URL to something like git@github.com:TetherHealthLLC/ios-certificates.git
+# That repo must be private: it contains your distribution private key.
+storage_mode(ENV["MATCH_STORAGE_MODE"] || "git")
+
+git_url(ENV["MATCH_GIT_URL"]) if ENV["MATCH_GIT_URL"]
+git_branch(ENV["MATCH_GIT_BRANCH"]) if ENV["MATCH_GIT_BRANCH"]
+
+# Alternative storage: set MATCH_STORAGE_MODE=google_cloud or =s3 and supply
+# the matching bucket variables. See docs/releasing.md.
+google_cloud_bucket_name(ENV["MATCH_GOOGLE_CLOUD_BUCKET_NAME"]) if ENV["MATCH_GOOGLE_CLOUD_BUCKET_NAME"]
+s3_bucket(ENV["MATCH_S3_BUCKET"]) if ENV["MATCH_S3_BUCKET"]
+
+team_id(ENV["FASTLANE_TEAM_ID"]) if ENV["FASTLANE_TEAM_ID"]
+
+# CI must never mint new certificates: a team has a hard cap on distribution
+# certificates, and a runner that silently revokes and recreates one breaks
+# every other machine. Set MATCH_READONLY=true on CI. Locally, leave it unset
+# for the one-time `match_bootstrap` run.
+readonly(ENV["MATCH_READONLY"] == "true")

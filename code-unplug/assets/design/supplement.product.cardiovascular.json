@@ -1,0 +1,181 @@
+{
+  "version": "1.0.0",
+  "id": "steadybeat",
+  "name": "SteadyBeat",
+  "$nameNote": "Placeholder. Not trademark-cleared. Chosen to describe the area, not to be shipped.",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "areaId": "cardiovascular",
+  "serviceLines": [
+    "cardio.risk",
+    "cardio.diet_activity",
+    "cardio.monitoring",
+    "cardio.coordination"
+  ],
+  "status": "design",
+  "locales": [
+    "en"
+  ],
+  "vocabulary": {
+    "behaviour": "daily habits",
+    "urge": "a tough stretch",
+    "lapse": "a missed day",
+    "target": "what you're aiming at this week",
+    "primaryMetric": "home blood pressure readings"
+  },
+  "helplines": [
+    {
+      "locale": "en",
+      "name": "988 Suicide & Crisis Lifeline",
+      "number": "988"
+    },
+    {
+      "locale": "es",
+      "name": "988 Línea de Prevención del Suicidio y Crisis",
+      "number": "988",
+      "$note": "Call or text 988, then press 2 for Spanish."
+    }
+  ],
+  "$helplineNote": "One organisation line was removed before shipping because it could not be verified from this environment: American Heart Association (1-800-242-8721). See design/helplines-to-verify.md. A wrong number on a health screen is worse than no number, so it is absent rather than unchecked. Only 988 and 911, which are fixed national codes, remain.",
+  "screens": [
+    {
+      "id": "S01",
+      "archetype": "welcome",
+      "route": "/welcome",
+      "phase": 1
+    },
+    {
+      "id": "S02",
+      "archetype": "why",
+      "route": "/onboarding/why",
+      "phase": 2
+    },
+    {
+      "id": "S03",
+      "archetype": "consent",
+      "route": "/onboarding/consent",
+      "phase": 2
+    },
+    {
+      "id": "S04",
+      "archetype": "baseline",
+      "route": "/onboarding/baseline",
+      "phase": 2
+    },
+    {
+      "id": "S05",
+      "archetype": "plan_targets",
+      "route": "/plan/targets",
+      "phase": 3
+    },
+    {
+      "id": "S06",
+      "archetype": "plan_review",
+      "route": "/plan/review",
+      "phase": 3
+    },
+    {
+      "id": "S07",
+      "archetype": "home",
+      "route": "/today",
+      "phase": 4
+    },
+    {
+      "id": "S08",
+      "archetype": "checkin",
+      "route": "/checkin",
+      "phase": 4
+    },
+    {
+      "id": "S09",
+      "archetype": "reading_log",
+      "route": "/readings",
+      "phase": 5
+    },
+    {
+      "id": "S10",
+      "archetype": "education",
+      "route": "/learn",
+      "phase": 7
+    },
+    {
+      "id": "S11",
+      "archetype": "progress",
+      "route": "/progress",
+      "phase": 7
+    },
+    {
+      "id": "S12",
+      "archetype": "support_hub",
+      "route": "/support",
+      "phase": 7
+    },
+    {
+      "id": "S13",
+      "archetype": "share_preview",
+      "route": "/share/preview",
+      "phase": 7
+    },
+    {
+      "id": "S14",
+      "archetype": "settings",
+      "route": "/settings",
+      "phase": 8
+    },
+    {
+      "id": "SH1",
+      "archetype": "programs_home",
+      "route": "/programs",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH2",
+      "archetype": "area_directory",
+      "route": "/areas",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH3",
+      "archetype": "program_join",
+      "route": "/areas/join",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH4",
+      "archetype": "record",
+      "route": "/record",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH5",
+      "archetype": "sharing_matrix",
+      "route": "/privacy/sharing",
+      "phase": 8,
+      "$shell": true
+    },
+    {
+      "id": "SH6",
+      "archetype": "crisis_route",
+      "route": "/help-now",
+      "phase": 8,
+      "$shell": true
+    }
+  ],
+  "platformCapabilities": {
+    "blocking": false,
+    "passiveTracking": false,
+    "offlineRescue": true,
+    "cuffIntegration": false,
+    "wearableImport": false,
+    "$note": "No Bluetooth cuff and no wearable import. Readings are typed in by the person. Home readings and clinic readings are not interchangeable and no screen may present them as one series. If a wearable feed is ever added, share_on_request_only has to be reworked first — a continuous feed with a default destination is the opposite of share on request."
+  },
+  "$safeguardNotes": {
+    "no_risk_score": "There is no risk_percentage and no risk_grade anywhere in this product. No screen prints a ten-year figure, a letter, a band, a score out of anything, or a coloured verdict on a reading. The risk service line is delivered as S10's factor material: what a person's own factors are, which ones move, and who calculates an assessment — which is a clinician, in a consultation, not this app.",
+    "out_of_range_routing": "S09 carries the routingCard and S12 carries the crisis card. The threshold is the home number the person recorded from their own clinician, plus the symptoms they can feel. The product publishes no clinical cutoff of its own: an unreviewed cutoff in this file would be the most dangerous string in the repo, and the symptom list routes faster than a number does anyway.",
+    "share_on_request_only": "S13 is the share_preview screen. Nothing leaves the device without passing through it, it lists what is omitted as well as what is included, and no screen offers a send that skips it.",
+    "self_report_only": "S04, S08, S09 and S11 each carry a visible self-report disclaimer. Blood pressure is one measure with two numbers — never two rows, never two trends."
+  }
+}

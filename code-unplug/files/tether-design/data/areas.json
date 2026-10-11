@@ -1,0 +1,900 @@
+{
+  "$schema": "../schema/area.schema.json",
+  "version": "1.1.0",
+  "updated": "2026-09-12",
+  "areas": [
+    {
+      "id": "tobacco",
+      "name": "Tobacco & nicotine",
+      "scope": "Cigarettes, vaping, smokeless tobacco",
+      "status": "in_development",
+      "url": "https://www.tetherhealthgroup.com/programs/tobacco/",
+      "productId": "breathefree",
+      "serviceLines": [
+        {
+          "id": "tobacco.prevention",
+          "name": "Prevention",
+          "description": "Plain-language material on how dependence forms, aimed at people who have not started or have started recently."
+        },
+        {
+          "id": "tobacco.cessation",
+          "name": "Cessation support",
+          "description": "Day-to-day help through a quit attempt: a plan the person owns, craving tools that work offline, and check-ins that take under two minutes."
+        },
+        {
+          "id": "tobacco.relapse",
+          "name": "Relapse prevention",
+          "description": "Treating a slip as information rather than failure, keeping prior progress intact and helping the person restart the same day."
+        },
+        {
+          "id": "tobacco.exposure",
+          "name": "Exposure reduction",
+          "description": "Support for reducing exposure where stopping outright is not the immediate goal, without presenting reduction as a safe endpoint."
+        }
+      ],
+      "measures": [
+        {
+          "id": "cigarettes_avoided",
+          "label": "Cigarettes avoided",
+          "unit": "count",
+          "derived": true,
+          "selfReported": true
+        },
+        {
+          "id": "smokefree_time",
+          "label": "Smoke-free time",
+          "unit": "duration",
+          "derived": true
+        },
+        {
+          "id": "money_saved",
+          "label": "Money saved",
+          "unit": "currency",
+          "derived": true,
+          "estimate": true
+        },
+        {
+          "id": "craving_intensity",
+          "label": "Craving intensity",
+          "unit": "scale_0_10",
+          "selfReported": true
+        }
+      ],
+      "safeguards": [
+        "never_prescribe",
+        "self_report_only",
+        "sensitive_notifications_off",
+        "export_and_delete",
+        "slip_never_resets"
+      ],
+      "screens": {
+        "shared": [
+          "welcome",
+          "why",
+          "consent",
+          "baseline",
+          "trigger_map",
+          "plan_path",
+          "plan_targets",
+          "plan_reasons",
+          "plan_support",
+          "plan_review",
+          "home",
+          "checkin",
+          "next_step",
+          "rescue_start",
+          "rescue_tool",
+          "rescue_active",
+          "rescue_recheck",
+          "rescue_result",
+          "lapse",
+          "education",
+          "progress",
+          "support_hub",
+          "settings"
+        ],
+        "specific": [
+          {
+            "id": "medication_center",
+            "why": "Education and self-tracking for NRT and prescribed aids, without prescribing."
+          }
+        ]
+      }
+    },
+    {
+      "id": "metabolic",
+      "name": "Diabetes & metabolic health",
+      "scope": "Type 2 diabetes, prediabetes, metabolic syndrome",
+      "status": "planned",
+      "url": "https://www.tetherhealthgroup.com/programs/metabolic/",
+      "productId": null,
+      "serviceLines": [
+        {
+          "id": "metabolic.screening",
+          "name": "Screening",
+          "description": "Helping people understand whether they are at risk and what a screening conversation with a clinician involves."
+        },
+        {
+          "id": "metabolic.lifestyle",
+          "name": "Lifestyle support",
+          "description": "Everyday support for the changes that sit outside appointments, built around what a person can actually sustain."
+        },
+        {
+          "id": "metabolic.glucose",
+          "name": "Glucose management education",
+          "description": "Plain-language education about glucose management. Education and self-management support only — never dosing advice."
+        },
+        {
+          "id": "metabolic.complications",
+          "name": "Complication prevention",
+          "description": "Material on the checks and habits that reduce the risk of complications, and when to raise something with a clinician."
+        }
+      ],
+      "measures": [
+        {
+          "id": "glucose_reading",
+          "label": "Glucose reading",
+          "unit": "mg_dl",
+          "selfReported": true,
+          "clinicalThresholds": true
+        },
+        {
+          "id": "activity_minutes",
+          "label": "Activity",
+          "unit": "duration",
+          "selfReported": true
+        }
+      ],
+      "safeguards": [
+        "never_prescribe",
+        "no_dosing_advice",
+        "self_report_only",
+        "out_of_range_routing",
+        "sensitive_notifications_off",
+        "export_and_delete"
+      ],
+      "screens": {
+        "shared": [
+          "welcome",
+          "why",
+          "consent",
+          "baseline",
+          "plan_targets",
+          "plan_review",
+          "home",
+          "checkin",
+          "education",
+          "progress",
+          "support_hub",
+          "settings"
+        ],
+        "specific": [
+          {
+            "id": "reading_log",
+            "why": "Glucose readings, education only, never dosing."
+          }
+        ]
+      }
+    },
+    {
+      "id": "cancer",
+      "name": "Cancer",
+      "scope": "Lung, colorectal, breast, prostate, skin and other cancers",
+      "status": "planned",
+      "url": "https://www.tetherhealthgroup.com/programs/cancer/",
+      "productId": null,
+      "serviceLines": [
+        {
+          "id": "cancer.risk",
+          "name": "Risk reduction",
+          "description": "Information on modifiable risk, connected to the tobacco and nutrition work rather than duplicating it."
+        },
+        {
+          "id": "cancer.screening_awareness",
+          "name": "Screening awareness",
+          "description": "What screening exists, who it is offered to, and how to raise it with a clinician. Awareness only — we do not screen."
+        },
+        {
+          "id": "cancer.treatment_support",
+          "name": "Treatment-support resources",
+          "description": "Practical, reviewed material for people in treatment and the people supporting them."
+        },
+        {
+          "id": "cancer.survivorship",
+          "name": "Survivorship",
+          "description": "Support for the period after treatment, which is long, under-served, and rarely designed for."
+        }
+      ],
+      "measures": [
+        {
+          "id": "symptom_note",
+          "label": "Symptom note",
+          "unit": "text",
+          "selfReported": true
+        },
+        {
+          "id": "appointment_due",
+          "label": "Check due",
+          "unit": "date"
+        }
+      ],
+      "safeguards": [
+        "never_prescribe",
+        "no_screening_claim",
+        "no_risk_score",
+        "self_report_only",
+        "sensitive_notifications_off",
+        "export_and_delete"
+      ],
+      "reuses": [
+        "tobacco.prevention",
+        "nutrition.education"
+      ],
+      "screens": {
+        "shared": [
+          "welcome",
+          "why",
+          "consent",
+          "home",
+          "education",
+          "support_hub",
+          "settings"
+        ],
+        "specific": [
+          {
+            "id": "due_record",
+            "why": "Screening awareness and dates. Awareness only — no screening, no eligibility verdict."
+          }
+        ]
+      }
+    },
+    {
+      "id": "cardiovascular",
+      "name": "Cardiovascular health",
+      "scope": "High blood pressure, heart disease, stroke",
+      "status": "planned",
+      "url": "https://www.tetherhealthgroup.com/programs/cardiovascular/",
+      "productId": null,
+      "serviceLines": [
+        {
+          "id": "cardio.risk",
+          "name": "Risk assessment",
+          "description": "Helping a person understand their own risk factors and what changes them, without presenting it as a clinical assessment."
+        },
+        {
+          "id": "cardio.diet_activity",
+          "name": "Diet and activity support",
+          "description": "The same behaviour-change machinery as the other areas, shaped to what this one needs."
+        },
+        {
+          "id": "cardio.monitoring",
+          "name": "Monitoring and prevention",
+          "description": "Support for readings a person takes at home, and clear guidance on when a number means calling someone rather than logging it."
+        },
+        {
+          "id": "cardio.coordination",
+          "name": "Care-team coordination",
+          "description": "Letting a person hand readings and history to a clinician when they choose to, and never by default."
+        }
+      ],
+      "measures": [
+        {
+          "id": "blood_pressure",
+          "label": "Blood pressure",
+          "unit": "mmhg_pair",
+          "selfReported": true,
+          "clinicalThresholds": true
+        },
+        {
+          "id": "activity_minutes",
+          "label": "Activity",
+          "unit": "duration",
+          "selfReported": true
+        }
+      ],
+      "safeguards": [
+        "never_prescribe",
+        "no_risk_score",
+        "self_report_only",
+        "out_of_range_routing",
+        "share_on_request_only",
+        "export_and_delete"
+      ],
+      "screens": {
+        "shared": [
+          "welcome",
+          "why",
+          "consent",
+          "baseline",
+          "plan_targets",
+          "plan_review",
+          "home",
+          "checkin",
+          "education",
+          "progress",
+          "support_hub",
+          "settings"
+        ],
+        "specific": [
+          {
+            "id": "reading_log",
+            "why": "Home readings with out-of-range routing."
+          },
+          {
+            "id": "share_preview",
+            "why": "Hand readings to a clinician on request only."
+          }
+        ]
+      }
+    },
+    {
+      "id": "nutrition",
+      "name": "Obesity & nutrition",
+      "scope": "Obesity, poor diet, nutritional deficiencies",
+      "status": "planned",
+      "url": "https://www.tetherhealthgroup.com/programs/nutrition/",
+      "productId": null,
+      "serviceLines": [
+        {
+          "id": "nutrition.education",
+          "name": "Nutrition education",
+          "description": "Practical, non-prescriptive education that does not depend on tracking every meal."
+        },
+        {
+          "id": "nutrition.programs",
+          "name": "Healthy-weight programs",
+          "description": "Structured support built around what a person can sustain, with no judgment when a week goes badly."
+        },
+        {
+          "id": "nutrition.activity",
+          "name": "Physical activity",
+          "description": "Activity support that starts from what the person can do now, not from a target."
+        },
+        {
+          "id": "nutrition.between",
+          "name": "Support between appointments",
+          "description": "The long stretches where nothing is scheduled and most of the difficulty actually sits."
+        }
+      ],
+      "measures": [
+        {
+          "id": "activity_minutes",
+          "label": "Activity",
+          "unit": "duration",
+          "selfReported": true
+        },
+        {
+          "id": "sustained_change",
+          "label": "Changes held",
+          "unit": "count",
+          "derived": true
+        }
+      ],
+      "safeguards": [
+        "never_prescribe",
+        "no_calorie_targets",
+        "no_weight_streaks",
+        "disordered_eating_guard",
+        "self_report_only",
+        "export_and_delete"
+      ],
+      "screens": {
+        "shared": [
+          "welcome",
+          "why",
+          "consent",
+          "baseline",
+          "plan_path",
+          "plan_targets",
+          "plan_reasons",
+          "plan_support",
+          "plan_review",
+          "home",
+          "checkin",
+          "next_step",
+          "lapse",
+          "education",
+          "progress",
+          "support_hub",
+          "settings"
+        ],
+        "specific": [
+          {
+            "id": "environment",
+            "why": "Kitchen and shopping setup — the same cue-reduction machinery."
+          }
+        ]
+      }
+    },
+    {
+      "id": "respiratory",
+      "name": "Respiratory health",
+      "scope": "COPD, asthma, smoking-related lung disease",
+      "status": "planned",
+      "url": "https://www.tetherhealthgroup.com/programs/respiratory/",
+      "productId": null,
+      "serviceLines": [
+        {
+          "id": "respiratory.triggers",
+          "name": "Trigger and risk reduction",
+          "description": "Identifying and reducing the exposures that drive symptoms, connected to the tobacco work."
+        },
+        {
+          "id": "respiratory.symptoms",
+          "name": "Symptom monitoring",
+          "description": "Light-touch symptom tracking that is useful to a clinician and not a burden to the person."
+        },
+        {
+          "id": "respiratory.coordination",
+          "name": "Care coordination",
+          "description": "Helping a person keep a care team informed, with nothing shared unless they choose to share it."
+        },
+        {
+          "id": "respiratory.education",
+          "name": "Education and self-management",
+          "description": "Reviewed, plain-language material on managing a long-term respiratory condition day to day."
+        }
+      ],
+      "measures": [
+        {
+          "id": "breathlessness",
+          "label": "Breathlessness",
+          "unit": "scale_0_10",
+          "selfReported": true
+        },
+        {
+          "id": "reliever_use",
+          "label": "Reliever use",
+          "unit": "count",
+          "selfReported": true,
+          "clinicalThresholds": true
+        }
+      ],
+      "safeguards": [
+        "never_prescribe",
+        "self_report_only",
+        "out_of_range_routing",
+        "share_on_request_only",
+        "export_and_delete"
+      ],
+      "reuses": [
+        "tobacco.cessation",
+        "tobacco.exposure"
+      ],
+      "screens": {
+        "shared": [
+          "welcome",
+          "why",
+          "consent",
+          "baseline",
+          "trigger_map",
+          "plan_targets",
+          "plan_review",
+          "home",
+          "checkin",
+          "education",
+          "progress",
+          "support_hub",
+          "settings"
+        ],
+        "specific": [
+          {
+            "id": "reading_log",
+            "why": "Symptom and reliever-use tracking with escalation thresholds."
+          }
+        ]
+      }
+    },
+    {
+      "id": "kidney_liver",
+      "name": "Kidney & liver health",
+      "scope": "Chronic kidney disease, fatty liver disease",
+      "status": "planned",
+      "url": "https://www.tetherhealthgroup.com/programs/kidney-liver/",
+      "productId": null,
+      "serviceLines": [
+        {
+          "id": "kidney.risk",
+          "name": "Risk identification",
+          "description": "Helping people understand whether they are in a group that should be asking about these conditions at all."
+        },
+        {
+          "id": "kidney.monitoring",
+          "name": "Monitoring",
+          "description": "Support for keeping track of results over time and understanding what they mean."
+        },
+        {
+          "id": "kidney.education",
+          "name": "Prevention education",
+          "description": "Plain-language education on what protects these organs, without overstating what any single change achieves."
+        },
+        {
+          "id": "kidney.coordination",
+          "name": "Care-team coordination",
+          "description": "Helping a person keep results and history in one place and share them with a clinician on their terms."
+        }
+      ],
+      "measures": [
+        {
+          "id": "lab_result",
+          "label": "Lab result",
+          "unit": "text",
+          "selfReported": true,
+          "clinicalThresholds": true
+        }
+      ],
+      "safeguards": [
+        "never_prescribe",
+        "no_result_interpretation",
+        "self_report_only",
+        "share_on_request_only",
+        "export_and_delete"
+      ],
+      "screens": {
+        "shared": [
+          "welcome",
+          "why",
+          "consent",
+          "home",
+          "education",
+          "support_hub",
+          "settings"
+        ],
+        "specific": [
+          {
+            "id": "reading_log",
+            "why": "Store and trend results. No interpretation — routes to a clinician."
+          }
+        ]
+      }
+    },
+    {
+      "id": "behavioral",
+      "name": "Mental & behavioral health",
+      "scope": "Stress, anxiety, depression, substance-use concerns",
+      "status": "planned",
+      "url": "https://www.tetherhealthgroup.com/programs/behavioral/",
+      "productId": "lookup",
+      "serviceLines": [
+        {
+          "id": "behavioral.screening",
+          "name": "Screening",
+          "description": "Validated screening instruments used as a prompt to seek help, never as a diagnosis."
+        },
+        {
+          "id": "behavioral.support",
+          "name": "Support resources",
+          "description": "Reviewed self-management material for the periods between appointments."
+        },
+        {
+          "id": "behavioral.referral",
+          "name": "Referral to qualified professionals",
+          "description": "Clear, fast routes to qualified people, and unambiguous escalation to emergency services when that is what is needed."
+        },
+        {
+          "id": "behavioral.crisis",
+          "name": "Crisis routing",
+          "description": "Unambiguous escalation to emergency services and crisis lines, designed before anything else in this area."
+        },
+        {
+          "id": "behavioral.digital",
+          "name": "Digital overuse support",
+          "description": "Support for reducing compulsive social media and device use, built on the same craving and slip machinery as cessation.",
+          "proposed": true
+        }
+      ],
+      "measures": [
+        {
+          "id": "screening_score",
+          "label": "Screening score",
+          "unit": "instrument",
+          "selfReported": true,
+          "neverDiagnostic": true
+        },
+        {
+          "id": "urge_intensity",
+          "label": "Urge intensity",
+          "unit": "scale_0_10",
+          "selfReported": true
+        },
+        {
+          "id": "screen_minutes",
+          "label": "Minutes on chosen apps",
+          "unit": "duration",
+          "platformDependent": true
+        },
+        {
+          "id": "app_opens",
+          "label": "Times opened",
+          "unit": "count",
+          "platformDependent": true
+        }
+      ],
+      "safeguards": [
+        "never_prescribe",
+        "never_diagnose",
+        "crisis_routing_first",
+        "distress_escalation",
+        "self_report_only",
+        "sensitive_notifications_off",
+        "export_and_delete",
+        "slip_never_resets"
+      ],
+      "screens": {
+        "shared": [
+          "welcome",
+          "why",
+          "consent",
+          "home",
+          "checkin",
+          "next_step",
+          "rescue_start",
+          "rescue_active",
+          "rescue_recheck",
+          "education",
+          "support_hub",
+          "settings"
+        ],
+        "specific": [
+          {
+            "id": "instrument",
+            "why": "Validated screening instrument, scored as a prompt to seek help and never as a diagnosis."
+          }
+        ]
+      }
+    },
+    {
+      "id": "preventive",
+      "name": "Preventive health",
+      "scope": "Vaccinations, routine screenings, checkups",
+      "status": "planned",
+      "url": "https://www.tetherhealthgroup.com/programs/preventive/",
+      "productId": null,
+      "serviceLines": [
+        {
+          "id": "preventive.reminders",
+          "name": "Reminders",
+          "description": "Timely, private prompts for the checks a person is due, with notification copy that gives nothing away on a lock screen."
+        },
+        {
+          "id": "preventive.education",
+          "name": "Education",
+          "description": "Why a given check exists and what it involves, in plain language."
+        },
+        {
+          "id": "preventive.screening",
+          "name": "Age- and risk-appropriate screening",
+          "description": "Guidance shaped to the person rather than a generic checklist."
+        },
+        {
+          "id": "preventive.record",
+          "name": "A record the person owns",
+          "description": "One place to see what has been done and what is due, exportable and deletable by the person it describes."
+        }
+      ],
+      "measures": [
+        {
+          "id": "check_due",
+          "label": "Check due",
+          "unit": "date"
+        },
+        {
+          "id": "check_done",
+          "label": "Check done",
+          "unit": "date",
+          "selfReported": true
+        }
+      ],
+      "safeguards": [
+        "never_prescribe",
+        "no_screening_claim",
+        "sensitive_notifications_off",
+        "export_and_delete",
+        "person_owns_record"
+      ],
+      "screens": {
+        "shared": [
+          "welcome",
+          "why",
+          "consent",
+          "home",
+          "education",
+          "support_hub",
+          "settings"
+        ],
+        "specific": [
+          {
+            "id": "due_record",
+            "why": "What has been done and what is due, owned and exportable by the person."
+          }
+        ]
+      }
+    },
+    {
+      "id": "aging",
+      "name": "Healthy aging",
+      "scope": "Mobility, cognitive health, falls",
+      "status": "planned",
+      "url": "https://www.tetherhealthgroup.com/programs/aging/",
+      "productId": null,
+      "serviceLines": [
+        {
+          "id": "aging.prevention",
+          "name": "Prevention",
+          "description": "Support for the things that keep people independent longer, particularly falls."
+        },
+        {
+          "id": "aging.monitoring",
+          "name": "Monitoring",
+          "description": "Light monitoring that a person or a family member can act on, without turning a home into a ward."
+        },
+        {
+          "id": "aging.exercise",
+          "name": "Exercise and support programs",
+          "description": "Structured activity and support built for the range of ability this area actually covers."
+        },
+        {
+          "id": "aging.supporter",
+          "name": "Supporter involvement",
+          "description": "Letting a family member or carer help without taking the person's decisions away from them."
+        }
+      ],
+      "measures": [
+        {
+          "id": "steadiness",
+          "label": "Steadiness",
+          "unit": "scale_0_10",
+          "selfReported": true
+        },
+        {
+          "id": "activity_minutes",
+          "label": "Activity",
+          "unit": "duration",
+          "selfReported": true
+        }
+      ],
+      "safeguards": [
+        "never_prescribe",
+        "self_report_only",
+        "supporter_not_surveillance",
+        "person_retains_decisions",
+        "export_and_delete"
+      ],
+      "accessibilityFloor": {
+        "minTextScale": 2.0,
+        "minTapTarget": 56,
+        "minContrast": 7.0
+      },
+      "screens": {
+        "shared": [
+          "welcome",
+          "why",
+          "consent",
+          "baseline",
+          "plan_targets",
+          "plan_review",
+          "home",
+          "checkin",
+          "next_step",
+          "education",
+          "progress",
+          "support_hub",
+          "settings"
+        ],
+        "specific": [
+          {
+            "id": "supporter_view",
+            "why": "A family member helps without taking decisions away."
+          }
+        ]
+      }
+    },
+    {
+      "id": "digital",
+      "name": "Digital wellbeing",
+      "scope": "Compulsive social media use, screen overuse, sleep disruption",
+      "$scopeNote": "The scope line supplied duplicated Healthy aging's text. Rewritten.",
+      "status": "planned",
+      "url": "https://www.tetherhealthgroup.com/programs/digital/",
+      "productId": "lookup",
+      "serviceLines": [
+        {
+          "id": "digital.prevention",
+          "name": "Prevention",
+          "description": "Plain-language material on how compulsive use forms, aimed at people who have not yet found it a problem."
+        },
+        {
+          "id": "digital.reduction",
+          "name": "Reduction support",
+          "description": "Day-to-day help through cutting back: limits the person owns, urge tools that work offline, and check-ins that take under two minutes."
+        },
+        {
+          "id": "digital.relapse",
+          "name": "Relapse prevention",
+          "description": "Treating a heavy evening as information rather than failure, keeping prior progress intact."
+        },
+        {
+          "id": "digital.environment",
+          "name": "Environment and exposure reduction",
+          "description": "Reducing the cues that drive use — notifications, colour, placement — rather than relying on resisting them."
+        }
+      ],
+      "measures": [
+        {
+          "id": "screen_minutes",
+          "label": "Minutes on chosen apps",
+          "unit": "duration",
+          "platformDependent": true
+        },
+        {
+          "id": "app_opens",
+          "label": "Times opened",
+          "unit": "count",
+          "platformDependent": true
+        },
+        {
+          "id": "urge_intensity",
+          "label": "Urge intensity",
+          "unit": "scale_0_10",
+          "selfReported": true
+        }
+      ],
+      "safeguards": [
+        "never_prescribe",
+        "never_diagnose",
+        "self_report_only",
+        "sensitive_notifications_off",
+        "export_and_delete",
+        "slip_never_resets",
+        "distress_escalation"
+      ],
+      "reuses": [
+        "behavioral.crisis",
+        "behavioral.referral",
+        "tobacco.relapse"
+      ],
+      "$placementNote": "Listed as an eleventh area at the client's request. It may belong as a service line under Mental & behavioral health instead — that is a strategy decision, not a data one.",
+      "screens": {
+        "shared": [
+          "welcome",
+          "why",
+          "consent",
+          "baseline",
+          "trigger_map",
+          "plan_path",
+          "plan_targets",
+          "plan_reasons",
+          "plan_support",
+          "plan_review",
+          "home",
+          "checkin",
+          "next_step",
+          "rescue_start",
+          "rescue_tool",
+          "rescue_active",
+          "rescue_recheck",
+          "rescue_result",
+          "lapse",
+          "education",
+          "progress",
+          "support_hub",
+          "settings"
+        ],
+        "specific": [
+          {
+            "id": "age_gate",
+            "why": "Under-18 ceiling and guardian link."
+          },
+          {
+            "id": "intercept",
+            "why": "Interrupts at the moment of opening. Only possible where the trigger lives in the device."
+          },
+          {
+            "id": "environment",
+            "why": "Cue reduction: greyscale, plain home screen, notifications."
+          }
+        ]
+      }
+    }
+  ]
+}

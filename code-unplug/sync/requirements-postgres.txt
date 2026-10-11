@@ -1,0 +1,11 @@
+-r requirements.txt
+
+# The production driver. Kept in its own file because it needs libpq and there
+# is nothing to install it against in a test sandbox.
+#
+# HONEST NOTE: unlike requirements.txt, this line has NOT been installed or
+# exercised. Everything in this service was developed and tested against
+# SQLite; the Postgres-specific pieces (timestamptz, jsonb, the migration
+# file's DDL) are unverified against a real server. Pin this to a known-good
+# version the first time it is deployed.
+psycopg[binary]>=3.2,<4

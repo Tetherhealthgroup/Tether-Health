@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="2796" viewBox="0 0 1290 2796">
+  <defs>
+    <linearGradient id="s3bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF8F0"/>
+      <stop offset="1" stop-color="#F5F2E8"/>
+    </linearGradient>
+    <linearGradient id="s3shield" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#DFF2E7"/>
+      <stop offset="1" stop-color="#BFE1D2"/>
+    </linearGradient>
+    <filter id="s3shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="17" stdDeviation="27" flood-color="#123C37" flood-opacity="0.10"/>
+    </filter>
+    <filter id="s3soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#123C37" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+
+  <rect width="1290" height="2796" fill="url(#s3bg)"/>
+
+  <!-- iOS status bar -->
+  <g fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700">
+    <text x="74" y="76" font-size="36">9:41</text>
+    <g transform="translate(1056 43)">
+      <rect x="0" y="22" width="10" height="15" rx="3"/>
+      <rect x="16" y="17" width="10" height="20" rx="3"/>
+      <rect x="32" y="11" width="10" height="26" rx="3"/>
+      <rect x="48" y="5" width="10" height="32" rx="3"/>
+      <path d="M82 28c12-15 31-15 43 0l-7 7c-8-9-21-9-29 0zm10 10c6-7 16-7 22 0l-11 11z"/>
+      <rect x="143" y="9" width="61" height="32" rx="9" fill="none" stroke="#123C37" stroke-width="4"/>
+      <rect x="207" y="18" width="5" height="14" rx="2"/>
+      <rect x="149" y="15" width="45" height="20" rx="5"/>
+    </g>
+  </g>
+
+  <!-- Navigation header -->
+  <g transform="translate(72 139)">
+    <circle cx="38" cy="38" r="36" fill="#FFFDF7" stroke="#C9D7D2" stroke-width="2"/>
+    <path d="M45 23L30 38l15 15" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g transform="translate(493 145)">
+    <circle cx="31" cy="31" r="29" fill="none" stroke="#123C37" stroke-width="3"/>
+    <path d="M38 15c-18 5-23 20-12 33 16-1 25-14 20-30-2-4-4-5-8-3z" fill="#FF7D61"/>
+    <path d="M27 48c5-11 11-19 20-26" fill="none" stroke="#FFFDF7" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="76" y="42" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="38" letter-spacing="-1">BreatheFree</text>
+  </g>
+  <g transform="translate(1055 149)">
+    <rect width="163" height="64" rx="32" fill="#E6F1EA"/>
+    <text x="82" y="42" text-anchor="middle" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="2">2 OF 3</text>
+  </g>
+
+  <!-- Privacy illustration -->
+  <g transform="translate(645 488)">
+    <circle r="238" fill="none" stroke="#C6DED4" stroke-width="2"/>
+    <circle r="183" fill="none" stroke="#BCD9CD" stroke-width="3" stroke-dasharray="12 17"/>
+    <circle r="133" fill="#FFFDF7" filter="url(#s3soft)"/>
+    <path d="M0-91C-49-91-87-68-100-58v70c0 69 44 113 100 143 56-30 100-74 100-143v-70C87-68 49-91 0-91z" fill="url(#s3shield)"/>
+    <path d="M-37 18l25 25 52-67" fill="none" stroke="#123C37" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="-180" cy="-100" r="34" fill="#FFF0EB"/>
+    <path d="M-191-100l8 8 17-21" fill="none" stroke="#FF7D61" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="190" cy="88" r="34" fill="#F0F6D6"/>
+    <path d="M180 91v-11c0-15 20-15 20 0v11M177 91h26v23h-26z" fill="none" stroke="#123C37" stroke-width="5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Main copy -->
+  <text x="72" y="795" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="28" letter-spacing="5">YOUR PRIVACY</text>
+  <text x="72" y="909" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="80" letter-spacing="-3">Your story stays yours.</text>
+  <text x="72" y="1020" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="38">
+    <tspan x="72" dy="0">Choose how your information is used. Required items keep</tspan>
+    <tspan x="72" dy="55">the app working; optional choices can change anytime.</tspan>
+  </text>
+
+  <!-- Required consent card -->
+  <g transform="translate(72 1147)">
+    <rect width="1146" height="426" rx="34" fill="#FFFDF7" stroke="#D3DFD9" stroke-width="2" filter="url(#s3shadow)"/>
+    <text x="36" y="53" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24" letter-spacing="4">REQUIRED TO USE BREATHEFREE</text>
+    <rect x="937" y="26" width="173" height="55" rx="28" fill="#E4F2EA"/>
+    <text x="1024" y="62" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="23">Required</text>
+
+    <g transform="translate(36 105)">
+      <rect width="66" height="66" rx="18" fill="#123C37"/>
+      <path d="M19 34l10 10 20-26" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="91" y="28" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">Essential app data</text>
+      <text x="91" y="67" fill="#617B75" font-family="Nimbus Sans, Arial, sans-serif" font-size="27">Save your account, quit plan, and progress securely.</text>
+    </g>
+    <line x1="36" y1="217" x2="1110" y2="217" stroke="#DCE5E0" stroke-width="2"/>
+    <g transform="translate(36 253)">
+      <rect width="66" height="66" rx="18" fill="#123C37"/>
+      <path d="M19 34l10 10 20-26" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="91" y="28" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="33">Health information</text>
+      <text x="91" y="67" fill="#617B75" font-family="Nimbus Sans, Arial, sans-serif" font-size="27">Personalize your plan, support tools, and recovery insights.</text>
+    </g>
+    <text x="36" y="390" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="26" text-decoration="underline">Review Terms and Privacy Notice</text>
+    <path d="M465 381h17m-7-8 8 8-8 8" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Optional consent card -->
+  <g transform="translate(72 1604)">
+    <rect width="1146" height="540" rx="34" fill="#E5F1EA" stroke="#B8D6C8" stroke-width="2"/>
+    <text x="36" y="53" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24" letter-spacing="4">YOUR CHOICES</text>
+    <rect x="945" y="26" width="165" height="55" rx="28" fill="#FFFDF7"/>
+    <text x="1028" y="62" text-anchor="middle" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="23">Optional</text>
+
+    <g transform="translate(36 108)">
+      <circle cx="34" cy="34" r="34" fill="#FFFDF7"/>
+      <path d="M23 23h22v18H32l-9 8z" fill="none" stroke="#123C37" stroke-width="5" stroke-linejoin="round"/>
+      <text x="91" y="27" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="32">Helpful reminders</text>
+      <text x="91" y="67" fill="#617B75" font-family="Nimbus Sans, Arial, sans-serif" font-size="27">Receive private check-ins and plan reminders.</text>
+      <g transform="translate(970 9)">
+        <rect width="102" height="54" rx="27" fill="#123C37"/>
+        <circle cx="75" cy="27" r="21" fill="#FFFFFF"/>
+      </g>
+    </g>
+    <line x1="36" y1="211" x2="1110" y2="211" stroke="#C4D9D0" stroke-width="2"/>
+
+    <g transform="translate(36 250)">
+      <circle cx="34" cy="34" r="34" fill="#FFFDF7"/>
+      <path d="M21 41c0-10 8-18 18-18s18 8 18 18M39 18a10 10 0 1 0 0-20 10 10 0 0 0 0 20z" transform="translate(-5 8)" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round"/>
+      <text x="91" y="27" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="32">Share with my care team</text>
+      <text x="91" y="67" fill="#617B75" font-family="Nimbus Sans, Arial, sans-serif" font-size="27">Allow a connected clinician to view progress summaries.</text>
+      <g transform="translate(970 9)">
+        <rect width="102" height="54" rx="27" fill="#BACBC4"/>
+        <circle cx="27" cy="27" r="21" fill="#FFFFFF"/>
+      </g>
+    </g>
+    <line x1="36" y1="353" x2="1110" y2="353" stroke="#C4D9D0" stroke-width="2"/>
+
+    <g transform="translate(36 392)">
+      <circle cx="34" cy="34" r="34" fill="#FFFDF7"/>
+      <path d="M20 44l10-20 12 13 10-18" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="91" y="27" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="32">Help improve BreatheFree</text>
+      <text x="91" y="67" fill="#617B75" font-family="Nimbus Sans, Arial, sans-serif" font-size="27">Contribute de-identified information to approved research.</text>
+      <g transform="translate(970 9)">
+        <rect width="102" height="54" rx="27" fill="#BACBC4"/>
+        <circle cx="27" cy="27" r="21" fill="#FFFFFF"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Trust statement -->
+  <g transform="translate(72 2186)">
+    <circle cx="26" cy="26" r="26" fill="#FFF0EB"/>
+    <path d="M17 27l7 7 15-19" fill="none" stroke="#FF7D61" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="70" y="22" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="27">No ads. No tobacco-industry funding.</text>
+    <text x="70" y="57" fill="#617B75" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">We never sell patient health information.</text>
+  </g>
+
+  <!-- Primary action -->
+  <g transform="translate(72 2327)">
+    <rect width="1146" height="146" rx="30" fill="#123C37"/>
+    <text x="573" y="91" fill="#FFFFFF" text-anchor="middle" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="39">Agree and continue</text>
+    <path d="M1054 73h28m-11-11 11 11-11 11" fill="none" stroke="#D5EF75" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <text x="645" y="2551" fill="#718A84" text-anchor="middle" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">You can change optional choices anytime in Settings.</text>
+
+  <!-- Onboarding progress -->
+  <g transform="translate(570 2631)">
+    <circle cx="8" cy="8" r="8" fill="#B9C9C3"/>
+    <rect x="28" width="70" height="16" rx="8" fill="#FF7D61"/>
+    <circle cx="126" cy="8" r="8" fill="#B9C9C3"/>
+  </g>
+
+  <!-- iOS home indicator -->
+  <rect x="468" y="2738" width="354" height="16" rx="8" fill="#123C37"/>
+</svg>
