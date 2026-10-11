@@ -34,7 +34,6 @@ import 'widgets/account_data_dialogs.dart';
 import 'widgets/sign_in_dialog.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
   final errors = PrivacySafeErrorReporter();
   FlutterError.onError = errors.recordFlutterError;
   PlatformDispatcher.instance.onError = (error, stack) {
@@ -43,7 +42,12 @@ Future<void> main() async {
   };
   ErrorWidget.builder = errors.buildErrorWidget;
   await runZonedGuarded(
-    () => _bootstrap(),
+    () async {
+      // The binding must be initialised inside the same zone that calls
+      // runApp, or Flutter's debugCheckZone reports a zone mismatch.
+      WidgetsFlutterBinding.ensureInitialized();
+      await _bootstrap();
+    },
     (error, stack) => errors.record(error, stack, source: 'zone'),
   );
 }
