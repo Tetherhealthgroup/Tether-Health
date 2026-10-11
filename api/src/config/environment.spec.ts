@@ -81,17 +81,12 @@ describe("environmentSchema", () => {
       return result.value.TRUST_PROXY;
     };
 
-    it("defaults to exactly one trusted hop in production", () => {
-      expect(hops({})).toBe(1);
-    });
-
-    it.each(["development", "test"])("defaults to no proxy in %s", (env) => {
-      expect(hops({ NODE_ENV: env })).toBe(0);
-    });
-
-    it("defaults to no proxy when NODE_ENV is unset", () => {
-      expect(hops({ NODE_ENV: undefined })).toBe(0);
-    });
+    it.each(["production", "development", "test", undefined])(
+      "defaults to trusting no proxy hops when NODE_ENV is %s",
+      (env) => {
+        expect(hops({ NODE_ENV: env })).toBe(0);
+      },
+    );
 
     it.each([
       ["false", 0],
@@ -102,6 +97,7 @@ describe("environmentSchema", () => {
     ])("accepts explicit %s as %i hops, overriding the default", (raw, n) => {
       expect(hops({ TRUST_PROXY: raw })).toBe(n);
       expect(hops({ NODE_ENV: "test", TRUST_PROXY: raw })).toBe(n);
+      expect(hops({ NODE_ENV: "production", TRUST_PROXY: raw })).toBe(n);
     });
 
     it.each(["true", "True", "-1", "1.5", "01", "11", "abc", "", " 1", "1e0"])(
@@ -114,6 +110,10 @@ describe("environmentSchema", () => {
         expect(error?.message).toContain("TRUST_PROXY");
       },
     );
+
+    it("maps zero hops to no trust and ignores every forwarded address", () => {
+      expect(fastifyTrustProxy(0)).toBe(false);
+    });
 
     it("maps hop counts to the Fastify trustProxy option", () => {
       expect(fastifyTrustProxy(0)).toBe(false);

@@ -107,12 +107,13 @@ export const environmentSchema = Joi.object({
     .max(3600000)
     .default(60000),
   // Number of reverse-proxy hops whose X-Forwarded-For entry is trusted when
-  // deriving the client IP (used by rate limiting). Production defaults to 1
-  // (Render's single edge proxy); other environments default to 0 (no proxy).
+  // deriving the client IP (used by rate limiting). Defaults to 0 (trust no
+  // proxy; forwarded headers are ignored) in EVERY environment, including
+  // production. The owner will set the real hop count after confirming
+  // Render's proxy topology. Setting it higher than the real number of
+  // proxies lets clients spoof their IP and evade or weaponise rate limits.
   TRUST_PROXY: Joi.custom(trustedProxyHops, "trusted proxy hop count").default(
-    Joi.ref("NODE_ENV", {
-      adjust: (nodeEnv: string) => (nodeEnv === "production" ? 1 : 0),
-    }),
+    0,
   ),
   CORS_ALLOWED_ORIGINS: Joi.string().allow("").default(""),
 });

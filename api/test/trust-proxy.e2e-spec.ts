@@ -6,17 +6,21 @@ import {
 import { Test } from "@nestjs/testing";
 import { AppModule } from "../src/app.module";
 import { configureApp } from "../src/configure-app";
-import { fastifyTrustProxy } from "../src/config/environment";
+import { buildFastifyAdapterOptions } from "../src/config/fastify-adapter-options";
 
 const LIMIT = 10; // matches RATE_LIMIT_MAX in ./trust-proxy-env
 const PROXY_ADDRESS = "10.0.0.1"; // socket peer: the single trusted proxy
 
-async function createApp(hops: number): Promise<NestFastifyApplication> {
+// Uses the same builder as main.ts, so the e2e wiring cannot drift from it.
+async function createApp(hops?: number): Promise<NestFastifyApplication> {
+  const env = { ...process.env };
+  delete env.TRUST_PROXY;
+  if (hops !== undefined) env.TRUST_PROXY = String(hops);
   const module = await Test.createTestingModule({
     imports: [AppModule],
   }).compile();
   const app = module.createNestApplication<NestFastifyApplication>(
-    new FastifyAdapter({ trustProxy: fastifyTrustProxy(hops) }),
+    new FastifyAdapter(buildFastifyAdapterOptions(env)),
   );
   await configureApp(app);
   await app.init();
@@ -95,5 +99,26 @@ describe("rate limiting without a trusted proxy (e2e)", () => {
     let n = 0;
     await exhaust(app, () => `198.51.100.${(n += 1)}`);
     expect((await hit(app, "198.51.100.99")).statusCode).toBe(429);
+  });
+});
+
+describe("rate limiting with the default TRUST_PROXY (e2e)", () => {
+  let app: NestFastifyApplication;
+
+  beforeEach(async () => {
+    app = await createApp();
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  it("does not let X-Forwarded-For change the rate-limit key", async () => {
+    let n = 0;
+    await exhaust(app, () => `198.51.100.${(n += 1)}`);
+    expect((await hit(app, "198.51.100.99")).statusCode).toBe(429);
+    expect((await hit(app, "203.0.113.5, 198.51.100.200")).statusCode).toBe(
+      429,
+    );
   });
 });
