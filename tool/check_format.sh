@@ -1,18 +1,31 @@
 #!/bin/sh
 # Canonical Dart format check. Never rewrites files.
 # Checks every .dart file under the repo root, found by walking the filesystem
-# (tracked and untracked alike), except those under third_party/ (vendored,
-# not reformatted), build/, and hidden directories such as .dart_tool/.
-# Exits non-zero if any file would change, or if no Dart files are found.
+# (tracked and untracked alike), except those under top-level third_party/ and
+# build/ (anchored to the repo root, so first-party dirs of the same name
+# deeper in the tree are still checked) and hidden directories at any depth,
+# such as .dart_tool/.
+# Requires `flutter pub get` to have run: without .dart_tool/package_config.json
+# dart format cannot resolve the language version and reports false changes, so
+# the script exits 2 in that case.
+# Exits 1 if any file would change or no Dart files are found.
 set -eu
 
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
 cd "$(dirname "$0")/.."
+
+if [ ! -f .dart_tool/package_config.json ]; then
+  echo "check_format: run 'flutter pub get' first (language version unresolved)" >&2
+  exit 2
+fi
 
 files=$(mktemp)
 trap 'rm -f "$files"' EXIT
 
 find . \
-  \( -name third_party -o -name build -o -name '.?*' \) -prune -o \
+  \( -path ./third_party -o -path ./build -o -name '.?*' \) -prune -o \
   -type f -name '*.dart' -print0 > "$files"
 
 if [ ! -s "$files" ]; then
