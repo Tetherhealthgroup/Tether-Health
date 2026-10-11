@@ -8,10 +8,12 @@ import {
 } from "@nestjs/common";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
+const RATE_LIMITED_STATUS: number = 429;
+
 /**
- * Fastify plugins (e.g. @fastify/rate-limit's 429) throw plain errors that
- * carry a numeric `statusCode` instead of Nest's HttpException. Honour 4xx
- * codes so a rate-limited client sees 429, not a masked 500.
+ * @fastify/rate-limit throws a plain error carrying statusCode 429 instead of
+ * Nest's HttpException. That is the only non-HttpException status honoured;
+ * any other stray error (even one carrying a 4xx statusCode) is masked as 500.
  */
 function statusOf(exception: unknown): number {
   if (exception instanceof HttpException) return exception.getStatus();
@@ -19,15 +21,9 @@ function statusOf(exception: unknown): number {
     typeof exception === "object" && exception !== null
       ? (exception as { statusCode?: unknown }).statusCode
       : undefined;
-  if (
-    typeof candidate === "number" &&
-    Number.isInteger(candidate) &&
-    candidate >= 400 &&
-    candidate <= 499
-  ) {
-    return candidate;
-  }
-  return HttpStatus.INTERNAL_SERVER_ERROR;
+  return candidate === RATE_LIMITED_STATUS
+    ? RATE_LIMITED_STATUS
+    : HttpStatus.INTERNAL_SERVER_ERROR;
 }
 
 @Catch()
@@ -46,6 +42,14 @@ export class PrivacyExceptionFilter implements ExceptionFilter {
     if (status >= 500) {
       this.logger.error(
         `request_failed requestId=${request.id} method=${request.method} route=${route} status=${status} type=${errorType}`,
+      );
+    }
+
+    if (status === RATE_LIMITED_STATUS) {
+      // No IP, query string, headers or body: rate-limit keys are client
+      // identifiers and requests may carry health data.
+      this.logger.warn(
+        `rate_limit_exceeded requestId=${request.id} method=${request.method} route=${route}`,
       );
     }
 
