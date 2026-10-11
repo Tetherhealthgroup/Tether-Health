@@ -1,4 +1,4 @@
-import { environmentSchema } from "./environment";
+import { environmentSchema, fastifyTrustProxy } from "./environment";
 
 const validEnvironment = {
   NODE_ENV: "production",
@@ -69,5 +69,60 @@ describe("environmentSchema", () => {
     });
 
     expect(error).toBeUndefined();
+  });
+
+  describe("TRUST_PROXY", () => {
+    const hops = (overrides: Record<string, unknown>) => {
+      const result = environmentSchema.validate({
+        ...validEnvironment,
+        ...overrides,
+      }) as { error?: Error; value: { TRUST_PROXY: number } };
+      expect(result.error).toBeUndefined();
+      return result.value.TRUST_PROXY;
+    };
+
+    it("defaults to exactly one trusted hop in production", () => {
+      expect(hops({})).toBe(1);
+    });
+
+    it.each(["development", "test"])("defaults to no proxy in %s", (env) => {
+      expect(hops({ NODE_ENV: env })).toBe(0);
+    });
+
+    it("defaults to no proxy when NODE_ENV is unset", () => {
+      expect(hops({ NODE_ENV: undefined })).toBe(0);
+    });
+
+    it.each([
+      ["false", 0],
+      ["0", 0],
+      ["1", 1],
+      ["2", 2],
+      ["10", 10],
+    ])("accepts explicit %s as %i hops, overriding the default", (raw, n) => {
+      expect(hops({ TRUST_PROXY: raw })).toBe(n);
+      expect(hops({ NODE_ENV: "test", TRUST_PROXY: raw })).toBe(n);
+    });
+
+    it.each(["true", "True", "-1", "1.5", "01", "11", "abc", "", " 1", "1e0"])(
+      "rejects invalid value %p",
+      (raw) => {
+        const { error } = environmentSchema.validate({
+          ...validEnvironment,
+          TRUST_PROXY: raw,
+        });
+        expect(error?.message).toContain("TRUST_PROXY");
+      },
+    );
+
+    it("maps hop counts to the Fastify trustProxy option", () => {
+      expect(fastifyTrustProxy(0)).toBe(false);
+      const trustOne = fastifyTrustProxy(1);
+      expect(trustOne).toBeInstanceOf(Function);
+      if (typeof trustOne === "function") {
+        expect(trustOne("10.0.0.1", 0)).toBe(true);
+        expect(trustOne("198.51.100.7", 1)).toBe(false);
+      }
+    });
   });
 });

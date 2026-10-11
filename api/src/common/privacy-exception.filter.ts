@@ -8,6 +8,28 @@ import {
 } from "@nestjs/common";
 import type { FastifyReply, FastifyRequest } from "fastify";
 
+/**
+ * Fastify plugins (e.g. @fastify/rate-limit's 429) throw plain errors that
+ * carry a numeric `statusCode` instead of Nest's HttpException. Honour 4xx
+ * codes so a rate-limited client sees 429, not a masked 500.
+ */
+function statusOf(exception: unknown): number {
+  if (exception instanceof HttpException) return exception.getStatus();
+  const candidate =
+    typeof exception === "object" && exception !== null
+      ? (exception as { statusCode?: unknown }).statusCode
+      : undefined;
+  if (
+    typeof candidate === "number" &&
+    Number.isInteger(candidate) &&
+    candidate >= 400 &&
+    candidate <= 499
+  ) {
+    return candidate;
+  }
+  return HttpStatus.INTERNAL_SERVER_ERROR;
+}
+
 @Catch()
 export class PrivacyExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(PrivacyExceptionFilter.name);
@@ -16,10 +38,7 @@ export class PrivacyExceptionFilter implements ExceptionFilter {
     const context = host.switchToHttp();
     const request = context.getRequest<FastifyRequest>();
     const reply = context.getResponse<FastifyReply>();
-    const status =
-      exception instanceof HttpException
-        ? exception.getStatus()
-        : HttpStatus.INTERNAL_SERVER_ERROR;
+    const status = statusOf(exception);
     const route = request.routeOptions.url ?? request.url.split("?", 1)[0];
     const errorType =
       exception instanceof Error ? exception.constructor.name : "UnknownError";

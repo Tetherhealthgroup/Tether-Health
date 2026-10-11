@@ -28,6 +28,16 @@ Default protections are a 64 KiB body limit, 120 requests/minute/IP, Helmet
 headers, optional explicit CORS allowlisting, DTO whitelisting, and redacted
 error responses. Tune limits with deployment-managed environment values.
 
+Rate limiting is keyed on the client IP. `TRUST_PROXY` sets how many reverse-proxy
+hops are trusted when deriving it from `X-Forwarded-For`: `false` or `0` (no
+proxy) or an integer up to 10. The default is `1` when `NODE_ENV=production`
+(Render's single edge proxy) and `0` otherwise. `true` is rejected because
+trusting every hop lets clients spoof their address. With one hop the client IP
+is the rightmost `X-Forwarded-For` entry, which the proxy appended; entries to
+its left are ignored. Set a higher value only if more proxies (for example a
+CDN in front of Render) are added, and never expose the service directly to
+the internet with a non-zero value.
+
 ## Development deployment
 
 The repository-root `render.yaml` defines a free Render web service for the
