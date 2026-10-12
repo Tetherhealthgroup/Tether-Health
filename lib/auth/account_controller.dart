@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 import '../account/account_data_api_client.dart';
 import '../account/account_deletion_receipt_store.dart';
@@ -37,12 +39,18 @@ class AccountController extends ChangeNotifier {
       AvatarStorage avatarStorage = const DisabledAvatarStorage(),
       this.deletionStorageTimeout = const Duration(seconds: 2),
       this.deletionCleanupTimeout = const Duration(seconds: 5),
+      this.signInProfileRetryDelays = const [
+        Duration.zero,
+        Duration(milliseconds: 750),
+        Duration(seconds: 2),
+      ],
       this.enabled = true})
       : _auth = auth,
         _profiles = profiles,
         _avatarStorage = avatarStorage,
         _accountData = accountData,
         _deletionReceipts = deletionReceipts {
+    assert(signInProfileRetryDelays.isNotEmpty);
     final recovery = auth is PasswordRecoveryGateway
         ? auth as PasswordRecoveryGateway
         : null;
@@ -72,6 +80,7 @@ class AccountController extends ChangeNotifier {
   final bool enabled;
   final Duration deletionStorageTimeout;
   final Duration deletionCleanupTimeout;
+  final List<Duration> signInProfileRetryDelays;
   StreamSubscription<void>? _recoverySubscription;
   Timer? _avatarRefreshTimer;
   UserProfile? profile;
@@ -232,26 +241,60 @@ class AccountController extends ChangeNotifier {
     busy = true;
     errorMessage = null;
     notifyListeners();
+    var authenticated = false;
     try {
       await _auth.signIn(email: email.trim(), password: password);
+      authenticated = true;
       _sessionInvalidated = false;
-      await _loadProfile(notify: false);
+      await _loadProfileForSignIn();
       return true;
+    } on AuthFailure catch (error) {
+      await _discardFailedSignInSession();
+      errorMessage = _signInFailureMessage(error.reason);
+      return false;
     } catch (_) {
-      try {
-        await _auth.signOut();
-      } catch (_) {
-        // Preserve the original sign-in/profile failure for the user.
-      }
-      profile = null;
-      _avatarRefreshTimer?.cancel();
-      errorMessage = 'Sign-in failed. Check your details and connection.';
+      await _discardFailedSignInSession();
+      errorMessage = authenticated
+          ? 'Your email and password were accepted, but your profile is '
+              'temporarily unavailable. Please try again.'
+          : 'Unable to reach the sign-in service. Check your connection and '
+              'try again.';
       return false;
     } finally {
       busy = false;
       notifyListeners();
     }
   }
+
+  Future<void> _discardFailedSignInSession() async {
+    _sessionInvalidated = true;
+    profile = null;
+    _avatarRefreshTimer?.cancel();
+    try {
+      await _auth.signOut();
+    } catch (_) {
+      // Local invalidation remains authoritative if remote sign-out fails.
+    }
+  }
+
+  String _signInFailureMessage(AuthFailureReason reason) => switch (reason) {
+        AuthFailureReason.invalidCredentials =>
+          'Email or password is incorrect.',
+        AuthFailureReason.emailNotConfirmed =>
+          'Confirm your email before signing in, then try again.',
+        AuthFailureReason.rateLimited =>
+          'Too many sign-in attempts. Wait a few minutes and try again.',
+        AuthFailureReason.accountUnavailable =>
+          'This account is temporarily unavailable. Contact support if this '
+              'continues.',
+        AuthFailureReason.network =>
+          'Unable to reach the sign-in service. Check your connection and try '
+              'again.',
+        AuthFailureReason.serviceUnavailable =>
+          'The sign-in service is temporarily unavailable. Try again shortly.',
+        AuthFailureReason.unknown =>
+          'Sign-in could not be completed. Please try again.',
+      };
 
   Future<AccountSignUpOutcome?> signUp({
     required String email,
@@ -561,6 +604,32 @@ class AccountController extends ChangeNotifier {
     profile = await _profiles.load();
     _scheduleAvatarRefresh();
     if (notify) notifyListeners();
+  }
+
+  Future<void> _loadProfileForSignIn() async {
+    for (var index = 0; index < signInProfileRetryDelays.length; index++) {
+      final delay = signInProfileRetryDelays[index];
+      if (delay > Duration.zero) await Future<void>.delayed(delay);
+      try {
+        await _loadProfile(notify: false);
+        return;
+      } catch (error, stackTrace) {
+        final finalAttempt = index == signInProfileRetryDelays.length - 1;
+        if (finalAttempt || !_isRetryableProfileLoad(error)) {
+          Error.throwWithStackTrace(error, stackTrace);
+        }
+      }
+    }
+  }
+
+  bool _isRetryableProfileLoad(Object error) {
+    if (error is TimeoutException || error is http.ClientException) return true;
+    if (error is! ProfileApiException) return false;
+    return error.statusCode == 404 ||
+        error.statusCode == 408 ||
+        error.statusCode == 425 ||
+        error.statusCode == 429 ||
+        error.statusCode >= 500;
   }
 
   void _scheduleAvatarRefresh() {

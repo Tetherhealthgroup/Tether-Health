@@ -34,6 +34,155 @@ void main() {
     expect(controller.profile, isNull);
   });
 
+  test('sign-in retries the profile request after a transient first failure',
+      () async {
+    final auth = _FakeAuth();
+    final api = _FakeProfileApi()..failNextGet = true;
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: api),
+      signInProfileRetryDelays: const [Duration.zero, Duration.zero],
+    );
+
+    expect(
+      await controller.signIn(
+        email: 'person@example.test',
+        password: 'password',
+      ),
+      isTrue,
+    );
+    expect(api.getCalls, 2);
+    expect(controller.isSignedIn, isTrue);
+    expect(controller.errorMessage, isNull);
+  });
+
+  test('sign-in reports authentication failures accurately and safely',
+      () async {
+    const cases = <AuthFailureReason, String>{
+      AuthFailureReason.invalidCredentials: 'Email or password is incorrect.',
+      AuthFailureReason.emailNotConfirmed:
+          'Confirm your email before signing in, then try again.',
+      AuthFailureReason.rateLimited:
+          'Too many sign-in attempts. Wait a few minutes and try again.',
+      AuthFailureReason.network:
+          'Unable to reach the sign-in service. Check your connection and try again.',
+      AuthFailureReason.serviceUnavailable:
+          'The sign-in service is temporarily unavailable. Try again shortly.',
+    };
+
+    for (final entry in cases.entries) {
+      final auth = _FakeAuth(signInFailure: AuthFailure(entry.key));
+      final controller = AccountController(
+        auth: auth,
+        profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      );
+
+      expect(
+        await controller.signIn(
+          email: 'person@example.test',
+          password: 'password',
+        ),
+        isFalse,
+      );
+      expect(controller.errorMessage, entry.value);
+      expect(controller.isSignedIn, isFalse);
+      controller.dispose();
+    }
+  });
+
+  test('profile outage is not mislabeled as bad credentials', () async {
+    final auth = _FakeAuth();
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FailingProfileApi()),
+      signInProfileRetryDelays: const [Duration.zero, Duration.zero],
+    );
+
+    expect(
+      await controller.signIn(
+        email: 'person@example.test',
+        password: 'password',
+      ),
+      isFalse,
+    );
+    expect(
+      controller.errorMessage,
+      contains('email and password were accepted'),
+    );
+    expect(controller.errorMessage, isNot(contains('incorrect')));
+    expect(controller.isSignedIn, isFalse);
+  });
+
+  test('failed auth cleanup cannot expose a retained identity as signed in',
+      () async {
+    final auth = _FakeAuth(
+      failSignOut: true,
+      signInFailure: const AuthFailure(AuthFailureReason.invalidCredentials),
+      retainIdentityOnSignInFailure: true,
+    );
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+    );
+
+    expect(
+      await controller.signIn(
+        email: 'person@example.test',
+        password: 'password',
+      ),
+      isFalse,
+    );
+    expect(auth.currentIdentity, isNotNull);
+    expect(controller.isSignedIn, isFalse);
+    expect(controller.errorMessage, 'Email or password is incorrect.');
+  });
+
+  test('failed remote sign-out cannot leave a failed sign-in locally active',
+      () async {
+    final auth = _FakeAuth(failSignOut: true);
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FailingProfileApi()),
+      signInProfileRetryDelays: const [Duration.zero],
+    );
+
+    expect(
+      await controller.signIn(
+        email: 'person@example.test',
+        password: 'password',
+      ),
+      isFalse,
+    );
+    expect(auth.currentIdentity, isNotNull);
+    expect(controller.isSignedIn, isFalse);
+    expect(controller.profile, isNull);
+  });
+
+  test('sign-in exhausts only the configured transient profile retries',
+      () async {
+    final auth = _FakeAuth();
+    final api = _RetryableFailingProfileApi();
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: api),
+      signInProfileRetryDelays: const [
+        Duration.zero,
+        Duration.zero,
+        Duration.zero,
+      ],
+    );
+
+    expect(
+      await controller.signIn(
+        email: 'person@example.test',
+        password: 'password',
+      ),
+      isFalse,
+    );
+    expect(api.getCalls, 3);
+    expect(controller.isSignedIn, isFalse);
+  });
+
   test('sign-up loads the profile when confirmation is disabled', () async {
     final auth = _FakeAuth();
     final api = _FakeProfileApi();
@@ -481,10 +630,17 @@ class _FakeDeletionReceiptStore implements AccountDeletionReceiptStore {
 
 class _FakeAuth
     implements AuthGateway, RecentAuthGateway, PasswordRecoveryGateway {
-  _FakeAuth({this.requiresConfirmation = false, this.failSignOut = false});
+  _FakeAuth({
+    this.requiresConfirmation = false,
+    this.failSignOut = false,
+    this.signInFailure,
+    this.retainIdentityOnSignInFailure = false,
+  });
 
   final bool requiresConfirmation;
   final bool failSignOut;
+  final Object? signInFailure;
+  final bool retainIdentityOnSignInFailure;
   AuthIdentity? _identity;
   String? resentEmail;
   String? recoveryEmail;
@@ -495,6 +651,17 @@ class _FakeAuth
   @override
   Future<AuthIdentity> signIn(
       {required String email, required String password}) async {
+    final failure = signInFailure;
+    if (failure != null) {
+      if (retainIdentityOnSignInFailure) {
+        _identity = AuthIdentity(
+          id: 'retained-user-id',
+          email: email,
+          accessToken: 'retained-access-token',
+        );
+      }
+      throw failure;
+    }
     return _identity = AuthIdentity(
         id: 'user-id', email: email, accessToken: 'fake-access-token');
   }
@@ -597,6 +764,21 @@ class _FailingProfileApi implements ProfileApiClient {
       Future.error(StateError('profile unavailable'));
 }
 
+class _RetryableFailingProfileApi implements ProfileApiClient {
+  int getCalls = 0;
+
+  @override
+  Future<UserProfile> getProfile(String accessToken) {
+    getCalls++;
+    return Future.error(const ProfileApiException(503));
+  }
+
+  @override
+  Future<UserProfile> updateProfile(
+          String accessToken, Map<String, Object?> update) =>
+      Future.error(const ProfileApiException(503));
+}
+
 class _FakeProfileApi implements ProfileApiClient {
   String? receivedToken;
   Map<String, Object?>? receivedUpdate;
@@ -611,7 +793,7 @@ class _FakeProfileApi implements ProfileApiClient {
     receivedToken = accessToken;
     if (failNextGet) {
       failNextGet = false;
-      throw StateError('profile refresh unavailable');
+      throw TimeoutException('profile refresh timed out');
     }
     return _profile(onboardingCompleted: false);
   }
