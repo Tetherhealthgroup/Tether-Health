@@ -30,6 +30,10 @@ jobs:
         run: flutter test test/accessibility test/programs test/profile test/auth
       - run: flutter test
       - name: Build unsigned Android release bundle
+        env:
+          # Explicit opt-in: Gradle otherwise refuses release builds without an
+          # upload key. The bundle stays unsigned; the debug key is never used.
+          TETHER_ALLOW_UNSIGNED_RELEASE: "1"
         run: flutter build appbundle --release
 
   ios-no-codesign:

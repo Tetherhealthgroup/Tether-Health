@@ -25,7 +25,46 @@ class AppConfig {
       supabaseUrl.isNotEmpty ||
       supabaseAnonKey.isNotEmpty;
 
+  /// Pure check of the two service endpoints for a release build. Returns one
+  /// human-readable problem per failing value (empty list means acceptable).
+  /// Names the dart-define so a misbuilt release is easy to diagnose.
+  static List<String> releaseEndpointProblems({
+    required String supabaseUrl,
+    required String apiBaseUrl,
+  }) {
+    final problems = <String>[];
+    for (final entry in {
+      'SUPABASE_URL': supabaseUrl,
+      'API_BASE_URL': apiBaseUrl,
+    }.entries) {
+      final value = entry.value.trim();
+      if (value.isEmpty) {
+        problems.add('${entry.key} is missing or empty.');
+        continue;
+      }
+      final uri = Uri.tryParse(value);
+      if (uri == null || !uri.hasAuthority || uri.host.isEmpty) {
+        problems.add('${entry.key} is not an absolute URL.');
+      } else if (uri.scheme != 'https') {
+        problems.add('${entry.key} must use https.');
+      }
+    }
+    return problems;
+  }
+
   void validate({bool production = kReleaseMode}) {
+    if (production) {
+      final problems = releaseEndpointProblems(
+        supabaseUrl: supabaseUrl,
+        apiBaseUrl: apiBaseUrl,
+      );
+      if (problems.isNotEmpty) {
+        throw FormatException(
+          'Release build is misconfigured. ${problems.join(' ')} '
+          'Build with --dart-define-from-file (see docs/PLAY_RELEASE.md).',
+        );
+      }
+    }
     if (!isConfigured) {
       throw const FormatException(
           'API_BASE_URL, SUPABASE_URL and SUPABASE_ANON_KEY must be provided together.');

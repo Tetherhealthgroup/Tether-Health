@@ -44,4 +44,68 @@ void main() {
     );
     expect(() => config.validate(production: true), throwsFormatException);
   });
+
+  group('releaseEndpointProblems', () {
+    List<String> problems(String supabase, String api) =>
+        AppConfig.releaseEndpointProblems(
+          supabaseUrl: supabase,
+          apiBaseUrl: api,
+        );
+
+    test('accepts two https URLs', () {
+      expect(
+        problems('https://p.supabase.co', 'https://api.example.test'),
+        isEmpty,
+      );
+    });
+
+    test('reports missing and blank values by variable name', () {
+      expect(problems('', 'https://api.example.test'), [
+        'SUPABASE_URL is missing or empty.',
+      ]);
+      expect(problems('https://p.supabase.co', '   '), [
+        'API_BASE_URL is missing or empty.',
+      ]);
+      expect(problems('', '').length, 2);
+    });
+
+    test('rejects http and scheme-less values', () {
+      expect(problems('http://p.supabase.co', 'https://api.example.test'), [
+        'SUPABASE_URL must use https.',
+      ]);
+      expect(problems('https://p.supabase.co', 'api.example.test'), [
+        'API_BASE_URL is not an absolute URL.',
+      ]);
+      expect(problems('https://', 'https://api.example.test'), [
+        'SUPABASE_URL is not an absolute URL.',
+      ]);
+    });
+
+    test('validate in release names the failing variable', () {
+      const config = AppConfig(
+        apiBaseUrl: 'http://api.example.test',
+        supabaseUrl: 'https://p.supabase.co',
+        supabaseAnonKey: 'public-placeholder',
+      );
+      expect(
+        () => config.validate(production: true),
+        throwsA(
+          isA<FormatException>().having(
+            (e) => e.message,
+            'message',
+            contains('API_BASE_URL'),
+          ),
+        ),
+      );
+    });
+
+    test('debug validation keeps accepting http endpoints', () {
+      const config = AppConfig(
+        apiBaseUrl: 'http://localhost:3000',
+        supabaseUrl: 'http://localhost:54321',
+        supabaseAnonKey: 'public-placeholder',
+      );
+      expect(() => config.validate(production: false), returnsNormally);
+    });
+  });
 }
