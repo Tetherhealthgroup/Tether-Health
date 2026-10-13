@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
+import '../error/privacy_safe_error_reporter.dart';
 import '../theme/app_colors.dart';
 import 'recommended_rescue_tool_screen.dart';
 
@@ -51,6 +52,9 @@ class ActiveCravingRescueScreen extends StatefulWidget {
 }
 
 class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
+  static final PrivacySafeErrorReporter _errorReporter =
+      PrivacySafeErrorReporter();
+
   int get _durationSeconds => widget.tool == RescueTool.move ? 180 : 120;
 
   Timer? _timer;
@@ -171,8 +175,8 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
       await _tts.setSpeechRate(0.42);
       await _tts.setPitch(1.0);
       await _tts.setVolume(1.0);
-    } catch (e) {
-      debugPrint('TTS configuration unavailable: $e');
+    } catch (error, stack) {
+      _errorReporter.record(error, stack, source: 'tts_configure');
     }
   }
 
@@ -312,8 +316,8 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
     try {
       await _tts.awaitSpeakCompletion(true);
       await _tts.speak(message);
-    } catch (e) {
-      debugPrint('Movement voice unavailable: $e');
+    } catch (error, stack) {
+      _errorReporter.record(error, stack, source: 'tts_movement_cue');
     }
   }
 

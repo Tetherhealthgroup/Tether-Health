@@ -20,7 +20,7 @@ export class PrivacyExceptionFilter implements ExceptionFilter {
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
-    const route = request.routeOptions.url ?? request.url.split("?", 1)[0];
+    const route = request.routeOptions.url ?? "unmatched";
     const errorType =
       exception instanceof Error ? exception.constructor.name : "UnknownError";
 
