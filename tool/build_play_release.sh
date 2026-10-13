@@ -7,7 +7,8 @@
 # fails if it is missing or incomplete; the debug key is never used.
 set -euo pipefail
 
-cd "$(dirname "$0")/.."
+# A store build must never inherit the CI-only unsigned-release opt-in.
+unset TETHER_ALLOW_UNSIGNED_RELEASE
 
 env_file=""
 for arg in "$@"; do
@@ -28,12 +29,13 @@ if [ ! -f "$env_file" ]; then
   echo "build_play_release: define file not found: $env_file" >&2
   exit 2
 fi
-# Gradle runs from android/, so hand Flutter an absolute path.
+# Resolve to an absolute path before changing directory (Gradle runs elsewhere).
 env_file="$(cd "$(dirname "$env_file")" && pwd)/$(basename "$env_file")"
+cd "$(dirname "$0")/.."
 
 # Pre-validate the two endpoints (JSON object of strings). Values are never printed.
 python3 -I - "$env_file" <<'PY'
-import json, sys
+import base64, json, sys
 from urllib.parse import urlparse
 
 try:
@@ -55,6 +57,21 @@ for key in ("SUPABASE_URL", "API_BASE_URL"):
 key_value = data.get("SUPABASE_ANON_KEY")
 if not isinstance(key_value, str) or not key_value.strip():
     bad.append("SUPABASE_ANON_KEY is missing or empty")
+else:
+    key_value = key_value.strip()
+    if "service_role" in key_value.lower() or key_value.lower().startswith("sb_secret_"):
+        bad.append("SUPABASE_ANON_KEY is a privileged key")
+    parts = key_value.split(".")
+    if len(parts) == 3 and parts[0].startswith("eyJ"):
+        try:
+            segment = parts[1] + "=" * (-len(parts[1]) % 4)
+            role = json.loads(base64.urlsafe_b64decode(segment)).get("role")
+        except Exception:
+            role = None
+            bad.append("SUPABASE_ANON_KEY looks like a JWT but cannot be decoded")
+        else:
+            if role != "anon":
+                bad.append('SUPABASE_ANON_KEY is a JWT whose role is not "anon"')
 if bad:
     sys.exit("build_play_release: " + "; ".join(bad))
 PY
@@ -84,23 +101,21 @@ fi
 echo
 echo "AAB: $(pwd)/$aab"
 
-# Read back package and versionCode from the bundle's base manifest.
+# Read back package and versionCode from the bundle manifest (needs bundletool).
 if command -v bundletool >/dev/null 2>&1; then
-  manifest="$(bundletool dump manifest --bundle="$aab")"
-  echo "package:     $(printf '%s' "$manifest" | sed -n 's/.*package="\([^"]*\)".*/\1/p' | head -n 1)"
-  echo "versionCode: $(printf '%s' "$manifest" | sed -n 's/.*android:versionCode="\([^"]*\)".*/\1/p' | head -n 1)"
-elif command -v aapt2 >/dev/null 2>&1; then
-  badging="$(aapt2 dump badging "$aab" 2>/dev/null || true)"
-  if [ -n "$badging" ]; then
-    printf '%s\n' "$badging" | sed -n "s/^package: name='\([^']*\)' versionCode='\([^']*\)'.*/package:     \1\nversionCode: \2/p"
-  else
-    echo "package/versionCode read-back unavailable (aapt2 could not read an AAB; install bundletool)"
-  fi
+  echo "package:     $(bundletool dump manifest --bundle="$aab" --xpath=/manifest/@package)"
+  echo "versionCode: $(bundletool dump manifest --bundle="$aab" --xpath=/manifest/@android:versionCode)"
 else
-  echo "package/versionCode read-back unavailable (neither bundletool nor aapt2 on PATH)"
+  pubspec_version="$(sed -n 's/^version: *//p' pubspec.yaml | head -n 1)"
+  echo "package/versionCode read-back unavailable (bundletool not on PATH)."
+  echo "versionCode expected from pubspec.yaml (NOT read from the AAB): version $pubspec_version"
 fi
 
 # Signing certificate. Flag the Android debug certificate.
+if ! command -v keytool >/dev/null 2>&1; then
+  echo "FAIL: keytool not found on PATH; cannot verify the signing certificate." >&2
+  exit 1
+fi
 cert="$(keytool -printcert -jarfile "$aab" 2>&1 || true)"
 echo
 echo "== signing certificate"

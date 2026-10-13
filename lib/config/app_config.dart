@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
 class AppConfig {
@@ -52,6 +54,29 @@ class AppConfig {
     return problems;
   }
 
+  /// Pure check that [key] is safe to embed in a client. Returns a problem
+  /// description (never containing the key) or null. Rejects service-role
+  /// keys, `sb_secret_` keys and JWTs whose payload role is not `anon`.
+  static String? anonKeyProblem(String key) {
+    final lower = key.trim().toLowerCase();
+    if (lower.contains('service_role') || lower.startsWith('sb_secret_')) {
+      return 'SUPABASE_ANON_KEY is a privileged key.';
+    }
+    final parts = key.trim().split('.');
+    if (parts.length == 3 && parts.first.startsWith('eyJ')) {
+      try {
+        final payload = jsonDecode(
+          utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
+        );
+        if (payload is Map && payload['role'] == 'anon') return null;
+        return 'SUPABASE_ANON_KEY is a JWT whose role is not "anon".';
+      } catch (_) {
+        return 'SUPABASE_ANON_KEY looks like a JWT but cannot be decoded.';
+      }
+    }
+    return null;
+  }
+
   void validate({bool production = kReleaseMode}) {
     if (production) {
       final problems = releaseEndpointProblems(
@@ -83,11 +108,10 @@ class AppConfig {
         );
       }
     }
-    final normalizedKey = supabaseAnonKey.toLowerCase();
-    if (normalizedKey.contains('service_role') ||
-        normalizedKey.startsWith('sb_secret_')) {
-      throw const FormatException(
-        'Flutter requires a Supabase publishable or anonymous key.',
+    final keyProblem = anonKeyProblem(supabaseAnonKey);
+    if (keyProblem != null) {
+      throw FormatException(
+        '$keyProblem Flutter requires a Supabase publishable or anonymous key.',
       );
     }
   }

@@ -13,8 +13,11 @@ keytool -genkeypair -v -storetype PKCS12 \
 ```
 
 Back the keystore and both passwords up in a password manager. Never commit
-them. `android/key.properties`, `*.jks` and `*.keystore` are gitignored
-(`android/.gitignore`, root `.gitignore`).
+them. `android/key.properties`, `*.jks`, `*.keystore`, `*.p12` and `*.hprof`
+are gitignored (`android/.gitignore` and the root `.gitignore`).
+
+For a PKCS12 keystore (the default above) `keyPassword` must equal
+`storePassword`; use the same value for both when prompted.
 
 ## 2. `android/key.properties`
 
@@ -26,9 +29,11 @@ keyPassword=<key password>
 ```
 
 Use an absolute `storeFile` (a relative path resolves against `android/app/`).
-If the file is missing or any field is empty, any release Gradle task
-(`bundleRelease`, `assembleRelease`, ...) fails with "Release signing is not
-configured". The debug key is never used for release. Debug builds do not need
+Run `chmod 600 android/key.properties` (and the same for the release define
+file in step 3). If the file is missing, any field is empty or `storeFile` does
+not exist, every `:app` Gradle task whose name contains `Release`
+(`bundleRelease`, `signReleaseBundle`, `packageReleaseBundle`,
+`installRelease`, ...) fails with "Release signing is not configured". The debug key is never used for release. Debug builds do not need
 this file. CI builds an intentionally unsigned bundle by setting
 `TETHER_ALLOW_UNSIGNED_RELEASE=1`; do not set that for store builds.
 
@@ -45,9 +50,13 @@ Create a JSON file outside the repo, for example
 }
 ```
 
-A release build refuses to start (shows a configuration message) if either URL
-is missing or not https. Which production API host to use depends on decision
+Run `chmod 600` on this file. The script rejects a `SUPABASE_ANON_KEY` that
+contains `service_role`, starts with `sb_secret_`, or is a JWT whose role is not
+`anon`; the app applies the same check at startup. A release build refuses to
+start (shows a configuration message) if either URL is missing or not https. Which production API host to use depends on decision
 D2 (the app currently calls the NestJS `api/`); confirm before building.
+D2 was decided 2026-10-12 (production is `Tether-Health-Backend`), but the app
+still calls `api/`, so the app has not yet been moved onto the decided backend.
 
 ## 4. Build
 
@@ -78,13 +87,26 @@ for every upload (`1.0.0+2`, ...), committed before building.
 4. Store listing: title, short and full description, icon, feature graphic,
    phone screenshots. Use synthetic data only in screenshots. Copy about health
    claims needs clinician review (`needs-clinician`).
-5. Privacy policy URL: `https://www.tetherhealthgroup.com/privacy`. Legal text
-   needs counsel review (`needs-counsel`).
+5. Privacy policy URL: `https://www.tetherhealthgroup.com/privacy` (the URL
+   the owner specified). **Blocker:** that page currently states it covers
+   www.tetherhealthgroup.com only and says BreatheFree will have its own
+   in-product privacy notice (`privacy.astro`, `scopeNote`). Before submission
+   the owner and counsel must provide an app privacy policy (at that URL or
+   another) that covers the app's health and account data. No policy text is
+   supplied here (`needs-counsel`).
 6. Data safety form: declare what the app collects. From the code
-   (Observed): account email and authentication through Supabase, profile,
-   quit-plan and program data sent to the backend API, encrypted on-device
-   storage, in-app data export and deletion. Declare health-related data
-   collected; confirm each item with counsel before submitting.
+   (Observed): account email and authentication through the Supabase service;
+   Name (`displayName` in the profile); Photos (avatar upload to Supabase
+   Storage, `lib/profile/avatar_storage.dart`); profile, quit-plan and program
+   data sent to the backend API; encrypted on-device storage; in-app data
+   export and deletion. Declare health-related data collected.
+   - Processors/recipients: Supabase (Observed) and the API host. `render.yaml`
+     defines the API as a Render web service (Inferred; the production host is
+     not confirmed, see D2 above).
+   - Encryption in transit: yes, backed by https enforcement in release builds
+     (`AppConfig.validate`, `tool/build_play_release.sh`). Verify that the
+     production hosts actually serve TLS.
+   - All answers `needs-counsel`; confirm each item before submitting.
 7. Health apps declaration (App content, Health apps): complete the form. The
    app is a smoking-cessation program; answer per the actual features and do
    not claim medical-device or clinical-validation status.
@@ -98,7 +120,7 @@ request deletion of the account and data.
 - In-app: Observed. Settings has "Delete account and data"
   (`lib/screens/settings_privacy_screen.dart`, wired to
   `_deleteAccountData` in `lib/screens/approved_screen_player.dart`), backed by
-  `DELETE /account/data` in `api/src/account/account.controller.ts`.
+  `DELETE /v1/account/data` in `api/src/account/account.controller.ts`.
 - Web URL: **Not found.** No dedicated deletion page exists in the website
   repo (`project/src/pages/` on `master`: privacy, support, terms, ...);
   `privacy.astro` only says deletion can be requested.

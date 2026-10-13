@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:breathefree_patient/config/app_config.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -106,6 +108,43 @@ void main() {
         supabaseAnonKey: 'public-placeholder',
       );
       expect(() => config.validate(production: false), returnsNormally);
+    });
+  });
+
+  group('anonKeyProblem', () {
+    String jwt(String role) {
+      String enc(Map<String, Object> m) =>
+          base64Url.encode(utf8.encode(jsonEncode(m))).replaceAll('=', '');
+      return '${enc({'alg': 'none'})}.${enc({'role': role})}.sig';
+    }
+
+    test('accepts anon JWT, publishable and placeholder keys', () {
+      expect(AppConfig.anonKeyProblem(jwt('anon')), isNull);
+      expect(AppConfig.anonKeyProblem('sb_publishable_abc'), isNull);
+      expect(AppConfig.anonKeyProblem('public-placeholder'), isNull);
+    });
+
+    test('rejects privileged keys without echoing them', () {
+      final token = jwt('service_role');
+      for (final key in [
+        token,
+        jwt('authenticated'),
+        'sb_secret_x',
+        'eyJabc.%%%.sig',
+      ]) {
+        final problem = AppConfig.anonKeyProblem(key);
+        expect(problem, isNotNull);
+        expect(problem, isNot(contains(key)));
+      }
+    });
+
+    test('validate rejects a service-role JWT', () {
+      final config = AppConfig(
+        apiBaseUrl: 'https://api.example.test',
+        supabaseUrl: 'https://project.supabase.co',
+        supabaseAnonKey: jwt('service_role'),
+      );
+      expect(() => config.validate(production: true), throwsFormatException);
     });
   });
 }

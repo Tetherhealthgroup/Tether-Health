@@ -22,6 +22,11 @@ supabase/.temp/
 android/key.properties
 android/app/*.jks
 android/app/*.keystore
+*.jks
+*.keystore
+*.p12
+key.properties
+*.hprof
 ios/Flutter/ephemeral/
 macos/Flutter/ephemeral/
 

@@ -93,13 +93,15 @@ flutter {
 }
 
 // Fail any build that schedules a release variant task (bundleRelease,
-// assembleRelease, packageRelease, flavored variants, ...) without a usable
+// signReleaseBundle, installRelease, flavored variants, ...) without a usable
 // upload key. Checked once the task graph is known, so debug-only invocations
 // (flutter run, assembleDebug, analyze) never trip it.
 gradle.taskGraph.whenReady {
-    val releaseTask = Regex("^(bundle|assemble|package|sign)\\w*Release$")
+    // Any :app task of a release variant (bundleRelease, signReleaseBundle,
+    // packageReleaseBundle, packageReleaseUniversalApk, installRelease,
+    // flavored variants, ...). Debug and profile tasks never contain "Release".
     val buildsRelease = allTasks.any {
-        it.project == project && releaseTask.matches(it.name)
+        it.project == project && it.name.contains("Release")
     }
     if (buildsRelease && !releaseSigningReady && !allowUnsignedRelease) {
         throw GradleException(
