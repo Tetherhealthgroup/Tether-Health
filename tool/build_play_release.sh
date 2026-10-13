@@ -72,10 +72,11 @@ echo "== flutter analyze"
 flutter analyze
 echo "== flutter test"
 flutter test
+aab="build/app/outputs/bundle/release/app-release.aab"
+rm -f "$aab" # never report a stale bundle from an earlier build
 echo "== flutter build appbundle --release"
 flutter build appbundle --release "--dart-define-from-file=$env_file"
 
-aab="build/app/outputs/bundle/release/app-release.aab"
 if [ ! -f "$aab" ]; then
   echo "build_play_release: expected bundle not found at $aab" >&2
   exit 1
