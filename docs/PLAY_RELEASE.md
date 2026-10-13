@@ -5,6 +5,13 @@ publish; every step below is performed by the owner.
 
 ## 1. Create the upload key (once, outside the repo)
 
+> **The first AAB is already uploaded** (1.0.0 (1), 2026-10-12). Play already
+> has an upload certificate on file. Before generating any key, the owner must
+> check Play Console > Test and release > App integrity for the registered
+> upload certificate, and compare its SHA-256 with the key you intend to use.
+> A newly generated key would be rejected. This runbook does not choose a key.
+> Only generate a new one if the owner decides to, via a Play upload-key reset.
+
 ```sh
 mkdir -p ~/secure/tether-health && chmod 700 ~/secure/tether-health
 keytool -genkeypair -v -storetype PKCS12 \
@@ -64,24 +71,44 @@ still calls `api/`, so the app has not yet been moved onto the decided backend.
 bash tool/build_play_release.sh --dart-define-from-file=$HOME/secure/tether-health/release.json
 ```
 
-It validates the file, runs format check, analyze and tests, builds the AAB
-(`build/app/outputs/bundle/release/app-release.aab`) and prints the package,
-versionCode (when `bundletool` or `aapt2` is installed) and the signing
-certificate. It fails if the certificate is `CN=Android Debug`.
+It validates the file, checks the version, runs format check, analyze and
+tests, builds the AAB (`build/app/outputs/bundle/release/app-release.aab`),
+reads the versionCode back from the AAB and prints the signing certificate.
+It fails if the certificate is `CN=Android Debug`.
+
+The versionCode is read with `bundletool` (tried first) or, if that is not
+installed, `aapt2`. If neither is installed the script fails; it does not
+pass silently. Install one and re-run the read-back on the existing bundle:
+`bash tool/build_play_release.sh --verify-aab=build/app/outputs/bundle/release/app-release.aab`.
+
+Options: `--min-version-code N` (default 2) and `--build-number N`. The build
+fails before any build step if the pubspec build number, or `--build-number`,
+is below the minimum, and after the build if the AAB's versionCode is.
+`bash tool/build_play_release.sh --check-version-only` runs just the
+pre-build check. Raise `--min-version-code` after each upload.
 
 ## 5. Version codes
 
-`pubspec.yaml` `version: 1.0.0+1` means versionName `1.0.0`, versionCode `1`.
-Play rejects a versionCode it has already seen, so bump the number after `+`
-for every upload (`1.0.0+2`, ...), committed before building.
+`pubspec.yaml` `version: 1.0.0+2` means versionName `1.0.0`, versionCode `2`.
+
+- versionCode `1` (1.0.0 (1)) was uploaded to Play on 2026-10-12.
+- The next versionCode must be 2 or higher. Play rejects a versionCode it has
+  already seen, so bump the number after `+` for every upload.
+- The bump is committed on the release branch before building (here
+  `1.0.0+2`, on `office/TH-095-version-code`).
+- `tool/build_play_release.sh` enforces this (`--min-version-code`, default 2).
+  After each upload, record the versionCode read back from the AAB.
 
 ## 6. Play Console (owner)
 
-1. Create the app: Create app, package `com.TetherHealthLLC.tetherhealth`
-   (the package cannot change later).
-2. Setup, App signing: enrol in Play App Signing when uploading the first AAB.
-   Google holds the app signing key; the key from step 1 is the upload key.
-   If the upload key is lost, request a reset through Play support.
+1. The app already exists (package `com.TetherHealthLLC.tetherhealth`, bound
+   on first upload; it cannot change). The first AAB (1.0.0 (1)) is already
+   uploaded and an Internal testing release is active (2026-10-12).
+2. Setup, App signing: check Test and release > App integrity for the upload
+   certificate Play registered. The owner confirms it before generating any
+   key (see step 1 of this runbook). Google holds the app signing key; the
+   upload key is the one Play has on file. If the upload key is lost, request
+   a reset through Play support.
 3. Testing, Internal testing: create a release, upload the AAB, add testers,
    roll out to internal testing first.
 4. Store listing: title, short and full description, icon, feature graphic,
