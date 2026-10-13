@@ -76,16 +76,28 @@ tests, builds the AAB (`build/app/outputs/bundle/release/app-release.aab`),
 reads the versionCode back from the AAB and prints the signing certificate.
 It fails if the certificate is `CN=Android Debug`.
 
-The versionCode is read with `bundletool` (tried first) or, if that is not
-installed, `aapt2`. If neither is installed the script fails; it does not
-pass silently. Install one and re-run the read-back on the existing bundle:
+After the build the script checks the signing certificate first, then reads
+the versionCode from the AAB, so a failed read-back never skips the
+certificate check. The versionCode is read with `bundletool` (tried first) or,
+if that is not installed, `aapt2`. aapt2 cannot open an AAB directly, so the
+script repackages the AAB's `base/manifest/AndroidManifest.xml` and
+`base/resources.pb` into a temporary APK (needs `python3`) and dumps that.
+If neither tool is on `PATH` the script fails; it does not pass silently.
+aapt2 lives in the Android SDK (`$ANDROID_HOME/build-tools/<version>/`) and
+is usually not on `PATH`; add that directory. To re-run the certificate and
+read-back checks on an existing bundle without building:
 `bash tool/build_play_release.sh --verify-aab=build/app/outputs/bundle/release/app-release.aab`.
 
 Options: `--min-version-code N` (default 2) and `--build-number N`. The build
 fails before any build step if the pubspec build number, or `--build-number`,
 is below the minimum, and after the build if the AAB's versionCode is.
 `bash tool/build_play_release.sh --check-version-only` runs just the
-pre-build check. Raise `--min-version-code` after each upload.
+pre-build check.
+
+The default of `--min-version-code` is the `min_version_code=2` line near the
+top of `tool/build_play_release.sh`. After each upload, raise that default to
+the next acceptable versionCode in the same commit as the `pubspec.yaml` bump,
+so the guard always sits at the last uploaded code plus one.
 
 ## 5. Version codes
 
@@ -94,8 +106,8 @@ pre-build check. Raise `--min-version-code` after each upload.
 - versionCode `1` (1.0.0 (1)) was uploaded to Play on 2026-10-12.
 - The next versionCode must be 2 or higher. Play rejects a versionCode it has
   already seen, so bump the number after `+` for every upload.
-- The bump is committed on the release branch before building (here
-  `1.0.0+2`, on `office/TH-095-version-code`).
+- The bump is committed on the release branch before building (currently
+  `1.0.0+2`).
 - `tool/build_play_release.sh` enforces this (`--min-version-code`, default 2).
   After each upload, record the versionCode read back from the AAB.
 
