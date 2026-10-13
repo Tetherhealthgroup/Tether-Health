@@ -364,6 +364,7 @@ describe("AccountService logging", () => {
       new AccountService(config, admin).deleteData(recentUser(), "DELETE"),
     ).rejects.toMatchObject({ status: 502 });
 
+    expect(totalLogCalls()).toBe(0);
     expectNoLeak();
   });
 

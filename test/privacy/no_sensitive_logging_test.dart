@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,8 +12,8 @@ import 'package:flutter_test/flutter_test.dart';
 ///  * R3  the arguments of every sink call (allow-listed ones included) must
 ///        not mention health/identity fields (R3a), raw exception objects
 ///        (R3b) or message/body serialisers (R3c).
-///  * R4  `String toString()` overrides must not mention health/identity
-///        fields.
+///  * R4  `toString()` overrides must not mention health/identity fields or
+///        message/body serialisers.
 
 /// The only place in lib/ allowed to write to a log. The line must match
 /// exactly (after trimming) and may occur at most once in the file.
@@ -101,13 +102,16 @@ final Set<String> _rawErrorTokens = kRawErrorNames.map(_norm).toSet();
 final RegExp _identifier = RegExp(r'[A-Za-z_][A-Za-z0-9_]*');
 final RegExp _identChar = RegExp(r'[A-Za-z0-9_$]');
 
-// R1. `debugPrint(` does not match because of the capital P.
-final RegExp _printCall = RegExp(r'(?<![A-Za-z0-9_$])print\s*\(');
+// R1. Matches the identifier `print` (calls and tear-offs such as
+// `xs.forEach(print)`), but not a named argument `print: true`. `debugPrint`
+// does not match because of the capital P.
+final RegExp _printCall =
+    RegExp(r'(?<![A-Za-z0-9_$])print(?![A-Za-z0-9_$])(?!\s*:)');
 
 // R2 sinks matched on code with string contents masked. R3 checks the
 // arguments of the call that each match opens or is followed by.
 final List<RegExp> _sinkPatterns = [
-  RegExp(r'debugPrint\s*\('),
+  RegExp(r'(?<![A-Za-z0-9_$])debugPrint(?![A-Za-z0-9_$])(?!\s*:)'),
   RegExp(r'debugPrintSynchronously'),
   RegExp(r'debugPrintThrottled'),
   RegExp(r'debugPrintStack\s*\('),
@@ -116,6 +120,8 @@ final List<RegExp> _sinkPatterns = [
   RegExp(r'\bstdout\.'),
   RegExp(r'\bstderr\.'),
   RegExp(r'(?<![A-Za-z0-9_])Logger\s*\('),
+  RegExp(r'FlutterError\s*\.\s*(presentError|dumpErrorToConsole)\b'),
+  RegExp(r'\bdebugDump\w*\s*\('),
 ];
 
 // R2 sinks that live inside import strings, so matched with strings intact.
@@ -125,7 +131,11 @@ final List<RegExp> _importSinkPatterns = [
   RegExp(r'package:logger/'),
 ];
 
-final RegExp _toStringOverride = RegExp(r'String\s+toString\s*\(\s*\)');
+// Return type is optional; the `=>` or `{` must follow so plain calls such as
+// `x.toString()` do not match.
+final RegExp _toStringOverride = RegExp(
+  r'(?<![A-Za-z0-9_$.])(?:String\s+)?toString\s*\(\s*\)\s*(?:=>|\{)',
+);
 
 class _Span {
   const _Span(this.end, this.code, this.interpolations);
@@ -216,19 +226,63 @@ _Span _scan(String s, int from, {bool stopAtSemicolon = false}) {
 
 String _blankOut(String text) => text.replaceAll(RegExp(r'[^\n]'), ' ');
 
-/// Replaces comments (block, whole-line and trailing `//`) with spaces, and,
-/// when [maskStrings] is set, string literals too. Newlines are kept so line
-/// numbers stay correct.
-String _sanitize(String s, {required bool maskStrings}) {
-  final out = StringBuffer();
-  var i = 0;
+/// Appends [s] from [start] (a quote) to [out] with the literal text blanked
+/// but every `${...}` body kept (and sanitised recursively), so code hidden in
+/// an interpolation is still scanned. Returns the index past the literal.
+int _maskString(String s, int start, StringBuffer out) {
+  final quote = s[start];
+  final triple = s.startsWith(quote * 3, start);
+  final raw = _isRawQuote(s, start);
+  final close = triple ? quote * 3 : quote;
+  void blank(String text) => out.write(_blankOut(text));
+  blank(close);
+  var i = start + close.length;
+  while (i < s.length) {
+    final c = s[i];
+    if (!raw && c == r'\') {
+      blank(s.substring(i, math.min(i + 2, s.length)));
+      i += 2;
+      continue;
+    }
+    if (s.startsWith(close, i)) {
+      blank(close);
+      return i + close.length;
+    }
+    if (!raw && c == r'$' && i + 1 < s.length && s[i + 1] == '{') {
+      blank(r'${');
+      i = _sanitizeInto(s, i + 2, out, mask: true, untilBrace: true);
+      blank('}');
+      i++;
+      continue;
+    }
+    blank(c);
+    i++;
+  }
+  return s.length;
+}
+
+/// Copies code from [from] into [out] with comments replaced by spaces and,
+/// when [mask] is set, string literal text too. With [untilBrace] it stops at
+/// the unmatched `}` that ends an interpolation and returns its index.
+int _sanitizeInto(
+  String s,
+  int from,
+  StringBuffer out, {
+  required bool mask,
+  bool untilBrace = false,
+}) {
+  var i = from;
+  var depth = 0;
   while (i < s.length) {
     final c = s[i];
     if (c == "'" || c == '"') {
-      final end = _skipString(s, i, null);
-      final literal = s.substring(i, end);
-      out.write(maskStrings ? _blankOut(literal) : literal);
-      i = end;
+      if (mask) {
+        i = _maskString(s, i, out);
+      } else {
+        final end = _skipString(s, i, null);
+        out.write(s.substring(i, end));
+        i = end;
+      }
     } else if (s.startsWith('//', i)) {
       var end = s.indexOf('\n', i);
       if (end == -1) {
@@ -238,13 +292,13 @@ String _sanitize(String s, {required bool maskStrings}) {
       i = end;
     } else if (s.startsWith('/*', i)) {
       var j = i + 2;
-      var depth = 1;
-      while (j < s.length && depth > 0) {
+      var nesting = 1;
+      while (j < s.length && nesting > 0) {
         if (s.startsWith('/*', j)) {
-          depth++;
+          nesting++;
           j += 2;
         } else if (s.startsWith('*/', j)) {
-          depth--;
+          nesting--;
           j += 2;
         } else {
           j++;
@@ -253,10 +307,29 @@ String _sanitize(String s, {required bool maskStrings}) {
       out.write(_blankOut(s.substring(i, j)));
       i = j;
     } else {
+      if (untilBrace) {
+        if (c == '{') {
+          depth++;
+        } else if (c == '}') {
+          if (depth == 0) {
+            return i;
+          }
+          depth--;
+        }
+      }
       out.write(c);
       i++;
     }
   }
+  return s.length;
+}
+
+/// Replaces comments (block, whole-line and trailing `//`) with spaces, and,
+/// when [maskStrings] is set, the text of string literals too (interpolation
+/// bodies are kept). Newlines are kept so line numbers stay correct.
+String _sanitize(String s, {required bool maskStrings}) {
+  final out = StringBuffer();
+  _sanitizeInto(s, 0, out, mask: maskStrings);
   return out.toString();
 }
 
@@ -268,7 +341,7 @@ int _findOpenParen(String code, int from) {
     if (c == '(') {
       return i;
     }
-    if (c == ';' || c == '{' || c == '}') {
+    if (c == ';' || c == '{' || c == '}' || c == ')') {
       return -1;
     }
   }
@@ -340,6 +413,7 @@ List<Violation> scanDartSource(String path, String source) {
 
   // R3, on every sink call including allow-listed ones.
   for (final m in sinkMatches) {
+    // Tear-offs such as `xs.forEach(print)` have no argument span.
     final open =
         m.group(0)!.endsWith('(') ? m.end - 1 : _findOpenParen(code, m.end);
     if (open < 0) {
@@ -365,23 +439,15 @@ List<Violation> scanDartSource(String path, String source) {
 
   // R4
   for (final m in _toStringOverride.allMatches(code)) {
-    var pos = m.end;
-    while (pos < text.length && text[pos].trim().isEmpty) {
-      pos++;
-    }
-    final _Span span;
-    if (text.startsWith('=>', pos)) {
-      span = _scan(text, pos + 2, stopAtSemicolon: true);
-    } else if (pos < text.length && text[pos] == '{') {
-      span = _scan(text, pos + 1);
-    } else {
-      continue;
-    }
+    final _Span span = m.group(0)!.endsWith('{')
+        ? _scan(text, m.end)
+        : _scan(text, m.end, stopAtSemicolon: true);
     final tokens = <String>{..._tokens(span.code)};
     for (final expr in span.interpolations) {
       tokens.addAll(_tokens(expr));
     }
-    if (tokens.any(_healthTokens.contains)) {
+    if (tokens.any(_healthTokens.contains) ||
+        tokens.any(kSerialiserTokens.contains)) {
       add(m.start, 'R4');
     }
   }
@@ -490,7 +556,97 @@ void f() => developer.log('x');
       );
     });
 
+    group('tear-offs, extra sinks and interpolated code', () {
+      test('print and debugPrint tear-offs are flagged', () {
+        expect(_rules('lib/x.dart', 'xs.forEach(print);'), ['R1']);
+        expect(_rules('lib/x.dart', 'xs.forEach(debugPrint);'), ['R2']);
+        expect(
+          _rules('lib/x.dart', "final say = debugPrint;\nsay('hi');"),
+          ['R2'],
+        );
+      });
+
+      test('FlutterError console sinks and debugDump* are R2', () {
+        expect(_rules('lib/x.dart', 'FlutterError.presentError(d);'), ['R2']);
+        expect(
+          _rules('lib/x.dart', 'FlutterError.dumpErrorToConsole(d);'),
+          ['R2'],
+        );
+        expect(_rules('lib/x.dart', 'debugDumpApp();'), ['R2']);
+      });
+
+      test('print inside an interpolated closure is still R1', () {
+        expect(
+          _rules(
+            'lib/x.dart',
+            r"final s = '${(() { print(email); return ''; })()}';",
+          ),
+          contains('R1'),
+        );
+      });
+    });
+
+    group('every rule has a positive self-test', () {
+      test('R3c serialisers inside a sink', () {
+        for (final arg in [
+          'x.toString()',
+          'x.message',
+          'res.body',
+          'jsonEncode(x)',
+        ]) {
+          expect(
+            _rules('lib/x.dart', 'debugPrint($arg);'),
+            contains('R3c'),
+            reason: arg,
+          );
+        }
+      });
+
+      test('other log sinks are R2', () {
+        for (final source in [
+          "stdout.writeln('x');",
+          "stderr.writeln('x');",
+          "final l = Logger('x');",
+          "import 'package:logging/logging.dart';",
+          "import 'package:logger/logger.dart';",
+          "debugPrintStack(label: 'x');",
+          "debugPrintSynchronously('x');",
+          "log('x');",
+        ]) {
+          expect(_rules('lib/x.dart', source), ['R2'], reason: source);
+        }
+      });
+
+      test('R4 without a return type and with serialiser tokens', () {
+        expect(
+          _rules('lib/x.dart', r"toString() => 'Reading $systolic';"),
+          ['R4'],
+        );
+        expect(
+          _rules('lib/x.dart', 'String toString() => jsonEncode(toJson());'),
+          ['R4'],
+        );
+        expect(
+          _rules('lib/x.dart', 'String toString() {\n  return message;\n}'),
+          ['R4'],
+        );
+      });
+    });
+
     group('negative controls', () {
+      test('named print argument is not a tear-off', () {
+        expect(_rules('lib/x.dart', 'final f = Foo(print: true);'), isEmpty);
+      });
+
+      test('trailing comment, raw string and triple-quoted string', () {
+        expect(_rules('lib/x.dart', "final x = 1; // print('x');"), isEmpty);
+        expect(_rules('lib/x.dart', r"final s = r'print($x)';"), isEmpty);
+        expect(
+          _rules('lib/x.dart', "final s = '''\nprint(x)\n''';"),
+          isEmpty,
+        );
+      });
+
       test('math.log is not a sink', () {
         expect(_rules('lib/x.dart', 'final y = math.log(2);'), isEmpty);
       });
