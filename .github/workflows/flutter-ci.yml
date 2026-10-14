@@ -41,6 +41,22 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
+      # TH-112 (TH-099 gap G-7): pin Xcode so the iOS build does not depend on
+      # the runner default. The macos-15 image default is Xcode 16.4, which is
+      # below Apple's minimum (Xcode 26 or later, iOS 26 SDK, for App Store
+      # Connect uploads since 2026-04-28).
+      # Pinned: Xcode 26.3, listed on macos-15 image 20260824.0482.1 (SDK
+      # iphoneos26.2). Sources read 2026-10-13:
+      #   https://github.com/actions/runner-images/blob/main/images/macos/macos-15-Readme.md
+      #   https://developer.apple.com/news/upcoming-requirements/
+      # Runner images rotate; if this step fails with "No such file", re-check
+      # the Readme's Xcode table and update the version here.
+      - name: Select Xcode 26.3 and print versions
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.3.app
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+          xcodebuild -showsdks
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.47.1
