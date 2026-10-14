@@ -33,6 +33,9 @@
 # Automatic signing (the DEVELOPMENT_TEAM in project.pbxproj) on the build Mac;
 # this script adds no certificate, provisioning profile or export options.
 #
+# Errors never print an argument value or a path given as an argument (it may
+# hold a pasted secret or terminal control bytes); they name the option.
+#
 # Exit codes: 0 success, 1 a check or build step failed, 2 usage error.
 set -eu
 # A set CDPATH makes cd print the directory and corrupt resolved paths.
@@ -82,20 +85,23 @@ done
 
 # Resolve file arguments against the caller's working directory, then make them
 # absolute before changing directory (a relative path must never be silently
-# re-read against the repo root).
-abs_path() { echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"; }
+# re-read against the repo root). The path is only prefixed with $PWD: no cd,
+# dirname or basename, so the file used is exactly the one `[ -f ]` checked (cd
+# would resolve `link/..` logically, treat a directory named -P or - as an
+# option, and `$(...)` would strip a trailing newline) and no argument byte is
+# echoed in a tool's error message.
 
 if [ "$inspect_ipa_given" -eq 1 ]; then
   if [ "$env_file_given" -eq 1 ] || [ "$check_only" -eq 1 ]; then
     fail "--inspect-ipa cannot be combined with other arguments" 2
   fi
   [ -n "$inspect_ipa" ] || fail "--inspect-ipa requires a path" 2
-  [ -f "$inspect_ipa" ] || fail "IPA not found: $inspect_ipa" 2
-  inspect_ipa="$(abs_path "$inspect_ipa")"
+  [ -f "$inspect_ipa" ] || fail "IPA not found (path given to --inspect-ipa not shown)" 2
+  case "$inspect_ipa" in /*) ;; *) inspect_ipa="$PWD/$inspect_ipa" ;; esac
 else
   [ -n "$env_file" ] || fail "--dart-define-from-file=<path> is required" 2
-  [ -f "$env_file" ] || fail "define file not found: $env_file" 2
-  env_file="$(abs_path "$env_file")"
+  [ -f "$env_file" ] || fail "define file not found (path given to --dart-define-from-file not shown)" 2
+  case "$env_file" in /*) ;; *) env_file="$PWD/$env_file" ;; esac
 fi
 
 # Run from the repo root (the script's parent directory).
@@ -107,19 +113,20 @@ cd "$(dirname "$0")/.."
 print_ipa_version() {
   python3 -I - "$1" <<'PY' || exit 1
 import plistlib, re, sys, zipfile
+import xml.parsers.expat
 
 path = sys.argv[1]
 try:
     with zipfile.ZipFile(path) as ipa:
         names = [n for n in ipa.namelist() if re.fullmatch(r"Payload/[^/]+\.app/Info\.plist", n)]
         if len(names) != 1:
-            sys.exit(f"build_ios_release: expected one Payload/<app>.app/Info.plist in {path}, found {len(names)}")
+            sys.exit(f"build_ios_release: expected one Payload/<app>.app/Info.plist in the IPA, found {len(names)}")
         info = plistlib.loads(ipa.read(names[0]))
-except (OSError, zipfile.BadZipFile, plistlib.InvalidFileException, ValueError) as exc:
+except (OSError, zipfile.BadZipFile, plistlib.InvalidFileException, ValueError, xml.parsers.expat.ExpatError) as exc:
     sys.exit(f"build_ios_release: cannot read the IPA's Info.plist: {type(exc).__name__}")
 values = [info.get(k) if isinstance(info, dict) else None for k in ("CFBundleShortVersionString", "CFBundleVersion")]
 if not all(isinstance(v, str) and v.strip() for v in values):
-    sys.exit(f"build_ios_release: CFBundleShortVersionString or CFBundleVersion missing in {path}")
+    sys.exit("build_ios_release: CFBundleShortVersionString or CFBundleVersion missing in the IPA")
 print(f"CFBundleShortVersionString: {values[0]}")
 print(f"CFBundleVersion: {values[1]}")
 PY

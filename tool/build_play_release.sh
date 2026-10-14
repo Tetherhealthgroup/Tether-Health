@@ -22,6 +22,10 @@
 #
 # Requires android/key.properties (see docs/PLAY_RELEASE.md). The Gradle build
 # fails if it is missing or incomplete; the debug key is never used.
+#
+# Errors never print an argument value or a path given as an argument (it may
+# hold a pasted secret or terminal control bytes); they name the option. Only
+# values validated as numbers are echoed.
 set -euo pipefail
 
 # A store build must never inherit the CI-only unsigned-release opt-in.
@@ -52,7 +56,7 @@ require_version_code() {
   local name="$1" value="$2"
   case "$value" in
     "" | *[!0-9]*)
-      echo "build_play_release: $name must be a positive integer, got: $value" >&2
+      echo "build_play_release: $name must be a positive integer (value not shown)" >&2
       exit 2
       ;;
   esac
@@ -133,8 +137,11 @@ fi
 
 # Resolve file arguments against the caller's working directory, then make them
 # absolute before changing directory (a relative path must never be silently
-# re-read against the repo root).
-abs_path() { echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"; }
+# re-read against the repo root). The path is only prefixed with $PWD: no cd,
+# dirname or basename, so the file used is exactly the one `[ -f ]` checked (cd
+# would resolve `link/..` logically, treat a directory named -P or - as an
+# option, and `$(...)` would strip a trailing newline) and no argument byte is
+# echoed in a tool's error message.
 if [ "$check_version_only" -eq 0 ]; then
   if [ "$verify_aab_given" -eq 1 ]; then
     if [ -z "$verify_aab" ]; then
@@ -142,20 +149,20 @@ if [ "$check_version_only" -eq 0 ]; then
       exit 2
     fi
     if [ ! -f "$verify_aab" ]; then
-      echo "build_play_release: AAB not found: $verify_aab" >&2
+      echo "build_play_release: AAB not found (path given to --verify-aab not shown)" >&2
       exit 2
     fi
-    verify_aab="$(abs_path "$verify_aab")"
+    case "$verify_aab" in /*) ;; *) verify_aab="$PWD/$verify_aab" ;; esac
   else
     if [ -z "$env_file" ]; then
       echo "build_play_release: --dart-define-from-file=<path> is required" >&2
       exit 2
     fi
     if [ ! -f "$env_file" ]; then
-      echo "build_play_release: define file not found: $env_file" >&2
+      echo "build_play_release: define file not found (path given to --dart-define-from-file not shown)" >&2
       exit 2
     fi
-    env_file="$(abs_path "$env_file")"
+    case "$env_file" in /*) ;; *) env_file="$PWD/$env_file" ;; esac
   fi
 fi
 # Run from the repo root (the script's parent directory) for pubspec.yaml.
@@ -229,12 +236,12 @@ verify_aab_version_code() {
   elif command -v aapt2 >/dev/null 2>&1; then
     code="$(read_version_code_with_aapt2 "$aab_path")" || code=""
   else
-    echo "FAIL: neither bundletool nor aapt2 is installed; cannot read versionCode from the AAB. Install one and re-run with --verify-aab=$aab_path before uploading." >&2
+    echo "FAIL: neither bundletool nor aapt2 is installed; cannot read versionCode from the AAB. Install one and re-run with --verify-aab=<path> before uploading." >&2
     exit 1
   fi
   case "$code" in
     "" | *[!0-9]*)
-      echo "FAIL: could not read a numeric versionCode from $aab_path (got: '$code')." >&2
+      echo "FAIL: could not read a numeric versionCode from the AAB (path and tool output not shown)." >&2
       exit 1
       ;;
   esac
@@ -247,17 +254,32 @@ verify_aab_version_code() {
 }
 
 # Fails (exit 1) if keytool is missing, the bundle has no signing certificate,
-# or it is signed with the Android Debug certificate.
+# or it is signed with the Android Debug certificate. keytool is never given the
+# caller's path: it echoes the path in its errors (FileNotFoundException), which
+# could forge certificate lines or reach the log. It reads a symlink with a
+# fixed name inside a private temporary directory instead.
 check_signing_certificate() {
-  local aab_path="$1" cert
+  local aab_path="$1" cert tmp_dir
   if ! command -v keytool >/dev/null 2>&1; then
     echo "FAIL: keytool not found on PATH; cannot verify the signing certificate." >&2
     exit 1
   fi
-  cert="$(keytool -printcert -jarfile "$aab_path" 2>&1 || true)"
+  case "$aab_path" in /*) ;; *) aab_path="$PWD/$aab_path" ;; esac
+  if ! tmp_dir="$(mktemp -d)"; then
+    echo "FAIL: cannot create a temporary directory to check the signing certificate." >&2
+    exit 1
+  fi
+  if ! ln -s "$aab_path" "$tmp_dir/bundle.aab" 2>/dev/null; then
+    rmdir "$tmp_dir"
+    echo "FAIL: cannot link the bundle to check the signing certificate." >&2
+    exit 1
+  fi
+  cert="$(cd "$tmp_dir" && keytool -printcert -jarfile bundle.aab 2>&1 || true)"
+  rm -f "$tmp_dir/bundle.aab"
+  rmdir "$tmp_dir"
   echo
   echo "== signing certificate"
-  printf '%s\n' "$cert" | grep -E "Owner:|Issuer:|SHA256:|Valid from:|no signature|not signed" || echo "no certificate found: $cert"
+  printf '%s\n' "$cert" | grep -E "Owner:|Issuer:|SHA256:|Valid from:|no signature|not signed" || echo "no certificate found (keytool output not shown)"
   if printf '%s' "$cert" | grep -q "CN=Android Debug"; then
     echo "FAIL: bundle is signed with the Android Debug certificate; do not upload." >&2
     exit 1
