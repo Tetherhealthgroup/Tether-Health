@@ -19,7 +19,9 @@
 #       depth, matched case-insensitively, whose value is not "anon". Every
 #       duplicate role key counts. A segment that is not valid JSON (for
 #       example a raw control character inside a string) but still looks like
-#       a JSON object with a role counts as a non-anon role (TH-137, F2).
+#       a JSON object with a role counts as a non-anon role (TH-137, F2). The
+#       one exception: for SUPABASE_ANON_KEY, if no segment decodes at all,
+#       that case is reported as undecodable, not as a role.
 #   A key that appears twice in the define file (at any depth) is rejected,
 #   because the later one would hide the earlier one.
 #   SUPABASE_ANON_KEY must also be decodable if it has three or more segments,
@@ -102,9 +104,12 @@ def drop_invisible(text):
 
 # Invisible code points outside Cf and Cc (TH-137): default-ignorable ones
 # (Unicode DerivedCoreProperties, including unassigned ranges that may be
-# assigned later) plus U+2800 (braille blank), which renders as a blank.
+# assigned later) plus U+2800 (braille blank), which renders as a blank. The
+# two Cf ranges at U+0890 and U+13439 are listed because an older Python's
+# Unicode table (3.9 has Unicode 13) does not know them as Cf.
 EXTRA_INVISIBLE = (
     (0x034F, 0x034F),      # combining grapheme joiner
+    (0x0890, 0x0891),      # arabic pound/piastre mark above (Cf; Unicode 14)
     (0x115F, 0x1160),      # hangul choseong / jungseong filler
     (0x17B4, 0x17B5),      # khmer inherent vowels
     (0x180B, 0x180D),      # mongolian free variation selectors
@@ -115,6 +120,7 @@ EXTRA_INVISIBLE = (
     (0xFE00, 0xFE0F),      # variation selectors
     (0xFFA0, 0xFFA0),      # halfwidth hangul filler
     (0xFFF0, 0xFFF8),      # unassigned, default-ignorable
+    (0x13439, 0x1343F),    # egyptian hieroglyph format (Cf; Unicode 15)
     (0xE0000, 0xE0FFF),    # tags block and variation selectors supplement
 )
 

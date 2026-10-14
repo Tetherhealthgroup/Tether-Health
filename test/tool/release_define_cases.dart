@@ -26,14 +26,15 @@ String fakeJwt(Map<String, Object?> payload) => [
 /// make. [header] and [payload] are a JSON map or raw JSON text (raw text
 /// allows duplicate keys); [pad] keeps the base64 padding; [extra] appends
 /// that many more segments; [later] are raw JSON texts encoded as segments
-/// placed right after the payload (TH-137). The canary sits in the payload
+/// placed right after the payload (TH-137); an element that is a `List<int>`
+/// is used as raw bytes instead of UTF-8 text. The canary sits in the payload
 /// and signature.
 String shapedJwt({
   Object header = const {'alg': 'HS256', 'typ': 'JWT'},
   required Object payload,
   bool pad = false,
   int extra = 0,
-  List<String> later = const [],
+  List<Object> later = const [],
 }) {
   String seg(Object json) {
     final text = json is String ? json : jsonEncode(json);
@@ -41,10 +42,16 @@ String shapedJwt({
     return pad ? encoded : encoded.replaceAll('=', '');
   }
 
+  String laterSeg(Object item) {
+    if (item is! List<int>) return seg(item);
+    final encoded = base64Url.encode(item);
+    return pad ? encoded : encoded.replaceAll('=', '');
+  }
+
   return [
     seg(header),
     seg(payload),
-    for (final text in later) seg(text),
+    for (final item in later) laterSeg(item),
     '${canary}sig',
     for (var i = 0; i < extra; i++) 'x$canary',
   ].join('.');
@@ -72,12 +79,44 @@ const invisibleOutsideCfCc = <String, String>{
   'U+FE0F variation selector 16': '\uFE0F',
   'U+180B mongolian free variation selector': '\u180B',
   'U+E0100 variation selector 17': '\u{E0100}',
+  'U+0890 arabic pound mark above': '\u0890',
+  'U+13439 egyptian hieroglyph insertion': '\u{13439}',
 };
 
 /// The text of a payload with a raw control character inside a JSON string.
 /// A strict JSON parser rejects it. It has a non-anon role (TH-137, F2).
 const controlCharPayload =
     '{"role":"service_role","note":"a\u0001b","ref":"$canary"}';
+
+/// UTF-16 code units of [text] as bytes, little or big endian, no BOM.
+List<int> utf16Bytes(String text, {required bool bigEndian}) => [
+      for (final unit in text.codeUnits)
+        ...bigEndian ? [unit >> 8, unit & 0xFF] : [unit & 0xFF, unit >> 8],
+    ];
+
+// TH-137 send-back R1: payloads that are not valid JSON (a raw control
+// character) and reach the role check only through one branch of the helper's
+// role-object fallback each. Escaped key, so no literal "role" in the text.
+const _escapedKeyPayload = '{"\\u0072ole":"admin","n":"\u0001"}';
+
+/// Raw later segments for the send-back cases: name -> bytes.
+final opaqueSegments = <String, List<int>>{
+  'an escaped role key and a control character (no literal role)':
+      utf8.encode(_escapedKeyPayload),
+  'a UTF-16LE control-character service_role payload without a BOM':
+      utf16Bytes(controlCharPayload, bigEndian: false),
+  'a UTF-8 BOM and a control-character service_role payload': [
+    0xEF,
+    0xBB,
+    0xBF,
+    ...utf8.encode(controlCharPayload),
+  ],
+  'FE FF, UTF-16BE and an escaped role key': [
+    0xFE,
+    0xFF,
+    ...utf16Bytes(_escapedKeyPayload, bigEndian: true),
+  ],
+};
 
 class DefineCase {
   const DefineCase(this.name, this.contents, this.expected);
@@ -511,6 +550,33 @@ final defineCases = <DefineCase>[
     ),
     [],
   ),
+  // TH-137 send-back R1: each branch of the role-object fallback (backslash-u
+  // escape, NUL removal, BOM removal) is needed by one of these. An anon
+  // segment comes first, so the file is accepted without the fallback.
+  for (final MapEntry(key: name, value: bytes) in opaqueSegments.entries) ...[
+    DefineCase(
+      'anon segment, then $name',
+      _define(
+        key: shapedJwt(
+          payload: {'role': 'anon', 'ref': canary},
+          later: [bytes],
+        ),
+      ),
+      [_anonRole],
+    ),
+    DefineCase(
+      'anon segment, then $name, other key',
+      _define(
+        extra: {
+          'OTHER_TOKEN': shapedJwt(
+            payload: {'role': 'anon', 'ref': canary},
+            later: [bytes],
+          ),
+        },
+      ),
+      ['define key #4 holds a JWT whose role is not "anon"'],
+    ),
+  ],
   // TH-137 (a): invisible characters outside Cf and Cc inside the privileged
   // markers. Each must be removed before the substring checks, in a value, in
   // a nested value and in a key name.
@@ -529,6 +595,11 @@ final defineCases = <DefineCase>[
     DefineCase(
       'sb_secret_ preceded by $name, under another define key',
       _define(extra: {'SERVER_KEY': '${invisible}sb_secret_${canary}secret'}),
+      ['define key #4 holds a privileged key'],
+    ),
+    DefineCase(
+      'sb_secret_ split by $name, under another define key',
+      _define(extra: {'SERVER_KEY': 'sb_se${invisible}cret_${canary}secret'}),
       ['define key #4 holds a privileged key'],
     ),
     DefineCase(
