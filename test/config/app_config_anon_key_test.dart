@@ -24,6 +24,45 @@ void main() {
     'U+0007': '\u0007',
   };
 
+  const roleNotAnon = 'SUPABASE_ANON_KEY is a JWT whose role is not "anon".';
+  const privilegedKey = 'SUPABASE_ANON_KEY is a privileged key.';
+
+  /// TH-141 (R-055): the helper's EXTRA_INVISIBLE code points (a21dd15) that
+  /// Dart's Cf table does not strip, so AppConfig lists them itself. Ends of
+  /// each range and, for the longer ranges, a middle point.
+  const mirroredInvisible = {
+    'U+034F combining grapheme joiner': '\u034F',
+    'U+115F hangul choseong filler': '\u115F',
+    'U+1160 hangul jungseong filler': '\u1160',
+    'U+17B4 khmer inherent vowel aq': '\u17B4',
+    'U+17B5 khmer inherent vowel aa': '\u17B5',
+    'U+180B mongolian free variation selector one': '\u180B',
+    'U+180C mongolian free variation selector two': '\u180C',
+    'U+180D mongolian free variation selector three': '\u180D',
+    'U+180F mongolian free variation selector four': '\u180F',
+    'U+2065 unassigned default-ignorable': '\u2065',
+    'U+2800 braille pattern blank': '\u2800',
+    'U+3164 hangul filler': '\u3164',
+    'U+FE00 variation selector 1': '\uFE00',
+    'U+FE08 variation selector 9': '\uFE08',
+    'U+FE0F variation selector 16': '\uFE0F',
+    'U+FFA0 halfwidth hangul filler': '\uFFA0',
+    'U+FFF0 unassigned default-ignorable (low end)': '\uFFF0',
+    'U+FFF4 unassigned default-ignorable (middle)': '\uFFF4',
+    'U+FFF8 unassigned default-ignorable (high end)': '\uFFF8',
+    'U+E0000 unassigned tag block start': '\u{E0000}',
+    'U+E0100 variation selector 17': '\u{E0100}',
+    'U+E0FFF end of variation selectors supplement': '\u{E0FFF}',
+  };
+
+  /// Helper EXTRA_INVISIBLE entries that Dart's Cf table already strips (so
+  /// nothing is mirrored for them). Pinned so that a change to the table is
+  /// noticed. They pass before TH-141 as well.
+  const coveredByCf = {
+    'U+0890 arabic pound mark above (Cf)': '\u0890',
+    'U+13439 egyptian hieroglyph insertion (Cf)': '\u{13439}',
+  };
+
   /// A random value that exists only while the test runs.
   String newCanary() {
     const chars =
@@ -138,6 +177,10 @@ void main() {
           'sb_secret_ after ${e.key}': '${e.value}sb_secret_$canary',
         'sb_secret_ with inner U+200B': 'sb_\u200Bsecret_$canary',
         'sb_secret_ mixed case after U+200B': '\u200BSB_Secret_$canary',
+        for (final e in {...mirroredInvisible, ...coveredByCf}.entries) ...{
+          'sb_secret_ split by ${e.key}': 'sb_${e.value}secret_$canary',
+          'service_role split by ${e.key}': 'service${e.value}_role-$canary',
+        },
         'escaped backslash before the closing quote': token(
           hs256,
           '{"a":"\\\\","ref":"$canary","role":"admin"}',
@@ -202,11 +245,27 @@ void main() {
             'Bearer ${token(hs256, '{"role":"service_role","ref":"$canary"}')}',
       };
 
+  /// The exact problem text for the cases whose message is pinned: the three
+  /// escape cases (TH-140, nit 2) and the invisible-character cases (TH-141).
+  String? pinnedProblem(String name) {
+    if (name.startsWith('anon payload then escaped role key')) {
+      return roleNotAnon;
+    }
+    if (name.startsWith('sb_secret_ split by U+') ||
+        name.startsWith('service_role split by U+')) {
+      return privilegedKey;
+    }
+    return null;
+  }
+
   group('anonKeyProblem parity with release_define_check.sh', () {
     final canary = newCanary();
     for (final entry in rejected(canary).entries) {
       test('rejects ${entry.key}', () {
-        expect(AppConfig.anonKeyProblem(entry.value), isNotNull);
+        final problem = AppConfig.anonKeyProblem(entry.value);
+        expect(problem, isNotNull);
+        final pinned = pinnedProblem(entry.key);
+        if (pinned != null) expect(problem, pinned);
       });
 
       test('never echoes key material for ${entry.key}', () {
@@ -315,6 +374,35 @@ void main() {
         AppConfig.anonKeyProblem(anonThen(utf8.encode('{"role":"anon"}'))),
         isNull,
       );
+    });
+
+    test(
+        'keeps accepting an ordinary publishable key with an invisible '
+        'character outside a marker (TH-141)', () {
+      for (final e in {...mirroredInvisible, ...coveredByCf}.entries) {
+        for (final key in [
+          'sb_publishable_${e.value}Ab12Cd34Ef56Gh78Ij90Kl12Mn34Op56',
+          'sb_publishable_Ab12Cd34Ef56Gh78Ij90Kl12Mn34Op56${e.value}',
+          '${e.value}sb_publishable_Ab12Cd34Ef56Gh78Ij90Kl12Mn34Op56',
+        ]) {
+          expect(AppConfig.anonKeyProblem(key), isNull, reason: e.key);
+        }
+      }
+    });
+
+    test('does not remove the mirrored characters inside a JWT segment', () {
+      // As in the helper: stripping before decoding would turn this
+      // undecodable key into an accepted one.
+      final payload = b64('{"role":"anon"}');
+      for (final e in mirroredInvisible.entries) {
+        final key = '${b64(hs256)}.${payload.substring(0, 6)}${e.value}'
+            '${payload.substring(6)}.c2ln';
+        expect(
+          AppConfig.anonKeyProblem(key),
+          'SUPABASE_ANON_KEY looks like a JWT but cannot be decoded.',
+          reason: e.key,
+        );
+      }
     });
 
     test('removes zero-width and control characters inside an anon JWT', () {

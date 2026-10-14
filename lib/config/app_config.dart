@@ -58,8 +58,11 @@ class AppConfig {
   /// description (never containing the key) or null. Follows the
   /// SUPABASE_ANON_KEY rules of tool/release_define_check.sh (TH-123, R-055):
   /// - a value that is empty after removing whitespace is rejected;
-  /// - after removing whitespace and Unicode Cf/Cc characters, `sb_secret_` or
-  ///   `service_role` anywhere (case-insensitive) is a privileged key;
+  /// - after removing whitespace, Unicode Cf/Cc characters and the other
+  ///   invisible code points of the helper's EXTRA_INVISIBLE list (TH-141, see
+  ///   [_extraInvisibleRanges]), `sb_secret_` or `service_role` anywhere
+  ///   (case-insensitive) is a privileged key. These are not removed before the
+  ///   JWT decoding, as in the helper;
   /// - a JWT-shaped value (three or more dot-separated segments, any header,
   ///   padded or not, also after a prefix such as "Bearer ") must decode, and
   ///   every `role` key in any segment after the first, at any depth, matched
@@ -71,24 +74,25 @@ class AppConfig {
   ///   or with a backslash-u escape that could spell one (TH-140 tests this
   ///   for UTF-8, UTF-32BE and a BOM plus UTF-16BE); the problem is then
   ///   `role is not "anon"`.
-  /// Known residuals. Only the last one (TH-137) can let a privileged value
-  /// through; the others never accept a non-anon role:
+  /// Known residuals. Only the last one can let a privileged value through;
+  /// the others never accept a non-anon role:
   /// - deep nesting: a payload nested beyond the Python recursion limit with
   ///   only anon roles is accepted here and rejected by the helper;
-  /// - helper-only encodings of an anon payload (NaN, UTF-16/32) are rejected
-  ///   here with `role is not "anon"`, so Dart is stricter than the helper;
+  /// - helper-only encodings of an anon payload (for example NaN, UTF-16/32)
+  ///   are rejected here with `role is not "anon"`, so Dart is stricter than
+  ///   the helper;
   /// - the Cf table is Unicode 16, a superset of the Unicode data of an older
   ///   running Python (3.9 has Unicode 13);
-  /// - TH-137, unchanged: invisible characters outside Cf/Cc (such as U+034F),
-  ///   look-alike letters, and hex, percent or base64-wrapped encodings can
-  ///   let a privileged value through, here and in the helper alike.
+  /// - look-alike letters, and hex, percent or base64-wrapped encodings can
+  ///   let a privileged value through, here and in the helper alike; so can an
+  ///   invisible character that is in neither Cf/Cc nor the mirrored list.
   static String? anonKeyProblem(String key) {
     if (_withoutSpace(key).isEmpty) {
       return 'SUPABASE_ANON_KEY is missing or empty.';
     }
     final text = _withoutInvisible(key);
     final compact = _withoutSpace(text);
-    final compactLower = compact.toLowerCase();
+    final compactLower = _withoutExtraInvisible(compact).toLowerCase();
     if (compactLower.contains('sb_secret_') ||
         compactLower.contains('service_role')) {
       return 'SUPABASE_ANON_KEY is a privileged key.';
@@ -162,6 +166,41 @@ class AppConfig {
     [0xE0001, 0xE0001],
     [0xE0020, 0xE007F],
   ];
+
+  // Invisible code points outside Cf and Cc that the helper removes before its
+  // sb_secret_ and service_role checks (EXTRA_INVISIBLE in
+  // tool/release_define_check.sh at a21dd15, TH-137), copied as a fixed list
+  // so that Dart does not depend on a Unicode table. U+0890-0891 and
+  // U+13439-1343F are in the helper list but are Cf here already
+  // (_formatRanges), so they are not repeated. U+E0000-E0FFF is kept whole,
+  // like the helper's range, although U+E0001 and U+E0020-E007F are also Cf.
+  static const _extraInvisibleRanges = <List<int>>[
+    [0x034F, 0x034F],
+    [0x115F, 0x1160],
+    [0x17B4, 0x17B5],
+    [0x180B, 0x180D],
+    [0x180F, 0x180F],
+    [0x2065, 0x2065],
+    [0x2800, 0x2800],
+    [0x3164, 0x3164],
+    [0xFE00, 0xFE0F],
+    [0xFFA0, 0xFFA0],
+    [0xFFF0, 0xFFF8],
+    [0xE0000, 0xE0FFF],
+  ];
+
+  static bool _isExtraInvisible(int c) {
+    for (final range in _extraInvisibleRanges) {
+      if (c >= range[0] && c <= range[1]) return true;
+    }
+    return false;
+  }
+
+  /// Removes the [_extraInvisibleRanges] code points. Only for the substring
+  /// checks, never for JWT decoding.
+  static String _withoutExtraInvisible(String text) => String.fromCharCodes(
+        text.runes.where((c) => !_isExtraInvisible(c)),
+      );
 
   /// Removes zero-width, format and control characters (not whitespace).
   static String _withoutInvisible(String text) => String.fromCharCodes(
