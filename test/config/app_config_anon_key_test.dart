@@ -74,6 +74,10 @@ void main() {
         for (final unit in text.codeUnits) ...[unit & 0xFF, unit >> 8, 0, 0],
       ];
 
+  List<int> utf32be(String text) => [
+        for (final unit in text.codeUnits) ...[0, 0, unit >> 8, unit & 0xFF],
+      ];
+
   /// Base64url of [json] (padded with spaces until the length is not a multiple
   /// of three) whose last character also sets the unused low bits.
   String nonCanonical(String json) {
@@ -174,6 +178,23 @@ void main() {
         'anon payload then upper-case ROLE with -Infinity (F)': anonThen(
           utf8.encode('{"ROLE":"admin","ref":"$canary","x":-Infinity}'),
         ),
+        // TH-140 (F1 of TH-138): the role key is spelled with a JSON escape
+        // (backslash-u0072 is "r"), so the text has no literal "role" and only
+        // the escape fallback in _pythonOnlyRoles can reject these.
+        'anon payload then escaped role key with NaN (UTF-8)': anonThen(
+          utf8.encode('{"\\u0072ole":"admin","ref":"$canary","x":NaN}'),
+        ),
+        'anon payload then escaped role key (UTF-32BE)': anonThen(
+          utf32be('{"\\u0072ole":"admin","ref":"$canary","x":NaN}'),
+        ),
+        'anon payload then escaped role key (FE FF BOM, UTF-16BE)': anonThen([
+          0xFE,
+          0xFF,
+          ...utf16(
+            '{"\\u0072ole":"admin","ref":"$canary","x":NaN}',
+            bigEndian: true,
+          ),
+        ]),
         'anon payload then non-canonical base64 trailing bits':
             '${b64(hs256)}.${b64('{"role":"anon"}')}.'
                 '${nonCanonical('{"role":"admin","ref":"$canary"}')}',

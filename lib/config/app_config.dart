@@ -67,16 +67,21 @@ class AppConfig {
   ///   least one `role` must be present;
   /// - a segment after the first that Dart cannot decode but Python can (NaN
   ///   or Infinity, UTF-16/32, a BOM, CESU-8, unused base64 bits set) counts
-  ///   as a non-anon role if it still looks like a JSON object with a role.
-  /// Known residuals, none of which lets a non-anon role through:
+  ///   as a non-anon role if it still looks like a JSON object with a role,
+  ///   or with a backslash-u escape that could spell one (TH-140 tests this
+  ///   for UTF-8, UTF-32BE and a BOM plus UTF-16BE); the problem is then
+  ///   `role is not "anon"`.
+  /// Known residuals. Only the last one (TH-137) can let a privileged value
+  /// through; the others never accept a non-anon role:
   /// - deep nesting: a payload nested beyond the Python recursion limit with
   ///   only anon roles is accepted here and rejected by the helper;
   /// - helper-only encodings of an anon payload (NaN, UTF-16/32) are rejected
-  ///   here as undecodable, so Dart is stricter than the helper;
+  ///   here with `role is not "anon"`, so Dart is stricter than the helper;
   /// - the Cf table is Unicode 16, a superset of the Unicode data of an older
   ///   running Python (3.9 has Unicode 13);
   /// - TH-137, unchanged: invisible characters outside Cf/Cc (such as U+034F),
-  ///   look-alike letters, and hex, percent or base64-wrapped encodings.
+  ///   look-alike letters, and hex, percent or base64-wrapped encodings can
+  ///   let a privileged value through, here and in the helper alike.
   static String? anonKeyProblem(String key) {
     if (_withoutSpace(key).isEmpty) {
       return 'SUPABASE_ANON_KEY is missing or empty.';
