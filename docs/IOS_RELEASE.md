@@ -32,8 +32,9 @@ never final here.
 | RunnerTests / Release | `com.TetherHealthLLC.tetherhealth.RunnerTests` | `ios/Runner.xcodeproj/project.pbxproj:429` (`:434`) |
 | RunnerTests / Profile | `com.TetherHealthLLC.tetherhealth.RunnerTests` | `ios/Runner.xcodeproj/project.pbxproj:444` (`:449`) |
 
-All three Runner configurations match the Android application ID and the
-Firebase Android package in `tether-health-llc` (BASELINE.md:104). The
+All three Runner configurations match the Android application ID
+(`android/app/build.gradle.kts:50`) and the Firebase Android package in
+`tether-health-llc` (BASELINE.md:104). The
 Archive action in the shared scheme uses `Release`
 (`ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme:116`).
 
@@ -82,7 +83,8 @@ Archive action in the shared scheme uses `Release`
 | `path_provider_foundation` 2.6.0 (`:538`, `:545`) | No native plugin: Dart FFI (`dartPluginClass` only) over `objective_c` 9.6.0 (`:490`, `:497`), whose native-assets hook ships no privacy manifest | pub cache `path_provider_foundation-2.6.0/pubspec.yaml:11-18`; `objective_c-9.6.0/hook/build.dart` |
 
 The pub-cache rows are Observed on this Mac only; they are not pinned in git
-beyond the version and hash in `pubspec.lock`.
+beyond the version and hash in `pubspec.lock`. Whether the Flutter engine
+framework ships its own privacy manifest was not checked (Unknown).
 
 ### Swift Package Manager, not CocoaPods
 
@@ -162,10 +164,15 @@ beyond the version and hash in `pubspec.lock`.
   Supabase Auth user (`api/src/auth/supabase-admin.service.ts:25-32`).
 - Rule (Assumed, confirm against App Review Guideline **5.1.1(v)** Account
   Sign-In): an app that supports account creation must let users start
-  account deletion inside the app. The code path exists. Whether it works
-  against production depends on the deployed API (gap G-8, owner item O-8).
-  What deletion leaves behind is recorded in the office risk register R-066
-  (guest-scope data on the device, server logs and backups).
+  account deletion inside the app. The code path exists in this repo.
+- **This server path is the NestJS `api/` at `f06b7c7`, not production.**
+  Under owner decision D2 (BASELINE.md:78), production is
+  Tether-Health-Backend and the app must be moved onto it. There, Auth-user
+  deletion is BE-047 and the client move is TH-103; both are Blocked
+  (`tether-health-ai-office/backlog/BE-047.md`, `backlog/TH-103.md`). Whether
+  5.1.1(v) is met against production is therefore **Unknown** (gap G-8, owner
+  item O-8). What deletion leaves behind is recorded in the office risk
+  register R-066 (guest-scope data on the device, server logs and backups).
 
 ## 2. Gaps an engineer can fix later (proposed tickets, not done in TH-099)
 
@@ -199,7 +206,9 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   redirect `io.breathefree.patient://login-callback`
   (`lib/auth/auth_gateway.dart:66-67`; Android
   `android/app/src/main/AndroidManifest.xml:34-35`). It carries the old
-  BreatheFree name, and any app can claim a custom scheme (Inferred). Option:
+  BreatheFree name, and any app can claim a custom scheme (Inferred); the
+  Supabase PKCE flow (R-066 c) partly limits what an interceptor could do with
+  a captured redirect (Inferred). Option:
   move to Universal Links on a Tether Health domain (associated-domains
   entitlement plus an `apple-app-site-association` file on the website), or
   rename the scheme on both platforms. Needs th-security review; touches auth.
@@ -215,20 +224,27 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   (`README.md:3`). Decide iPhone-only (`TARGETED_DEVICE_FAMILY = 1`) or keep
   iPad and test its layouts. Rule (Assumed, confirm in App Store Connect
   screenshot specifications): an iPad-capable app needs iPad screenshots.
-  Landscape behaviour on iPhone is Unknown.
+  Landscape behaviour on iPhone is Unknown. Also weigh: the `tel:` emergency
+  and quitline links cannot place a call on most iPads (Inferred); one path
+  shows "Could not open the Phone app."
+  (`lib/screens/craving_rescue_start_screen.dart:138-147`). Any fallback
+  wording is **needs-clinician**.
 - **G-7 CI toolchain vs Apple's SDK minimum.** CI builds iOS on `macos-15`
   with Flutter 3.47.1, unsigned (`.github/workflows/flutter-ci.yml:39-51`).
   The Xcode/SDK version on that runner is Unknown here. Rule (Assumed, confirm
   against Apple's current "Upcoming requirements" page): App Store uploads
   must be built with a minimum Xcode and iOS SDK. Pin and record the Xcode
   version used for the store build.
-- **G-8 Deletion against production.** The client deletion path depends on
-  the NestJS API at the production `API_BASE_URL` (Unknown) having the
-  Supabase service-role credential to delete the Auth user. Add a smoke test
-  on a synthetic account against the production stack once it exists (owner
-  runs it; links to R-066 and BE-047).
-- **G-9 Release checklist.** `PRODUCTION_RELEASE_CHECKLIST.md:75-79` lists the
-  iOS items as one line each; link them to this runbook once TH-099 merges.
+- **G-8 Deletion against production.** The deletion path in this repo targets
+  the NestJS `api/`; production is Tether-Health-Backend (D2), where deletion
+  lands with BE-047 and the client move with TH-103 (both Blocked). After
+  those merge, add a smoke test on a synthetic account against whichever
+  backend production actually uses, confirming the Auth user is gone (owner
+  runs it; links to R-066).
+- **G-9 Release checklist.** `PRODUCTION_RELEASE_CHECKLIST.md:75-79` has two
+  iOS-related bullets under the distribution heading (`:77`, `:78-79`); link
+  them to this runbook once TH-099 merges. The `:77` bullet (choose final
+  identifiers) is already decided by D3 (BASELINE.md:79).
 
 ## 3. Owner-only items
 
@@ -244,7 +260,9 @@ None of these were started by any agent. Do them in roughly this order.
   store builds with a personal team.
 - **O-3 Register the App ID** `com.TetherHealthLLC.tetherhealth` (explicit, not
   wildcard) under the LLC team. Capabilities needed today: none beyond the
-  default; Keychain Sharing comes from the entitlements file. Add Associated
+  default; Keychain Sharing comes from the entitlements file (Assumed, confirm
+  in the Certificates, Identifiers & Profiles capability list when registering
+  the App ID). Add Associated
   Domains only if G-4 chooses Universal Links, and Push Notifications only if
   O-4 applies.
 - **O-4 Firebase iOS app (conditional).** `tether-health-llc` has only the
@@ -273,9 +291,9 @@ None of these were started by any agent. Do them in roughly this order.
   a privacy policy URL for the app (Assumed, Guideline **5.1.1(i)**). The
   website notice today covers the website only (R-054). Publish an app privacy
   policy and a public account-deletion page that says what is deleted and what
-  remains and for how long (R-066). Both are **needs-counsel**. Confirm the
-  production API that performs deletion is deployed with its service-role
-  credential (G-8). No URL is invented here.
+  remains and for how long (R-066). Both are **needs-counsel**. Do not submit
+  until in-app deletion works against the production backend (D2; BE-047,
+  TH-103, G-8). No URL is invented here.
 - **O-9 Supabase Auth redirect allow-list.** Confirm that
   `io.breathefree.patient://login-callback` (or its G-4 replacement) is in the
   production project's redirect URLs. Current setting Unknown.
@@ -287,8 +305,9 @@ None of these were started by any agent. Do them in roughly this order.
   are Unknown here. Discard any `Pods` noise it creates (section 1, SPM).
   Each upload needs a new `CFBundleVersion` (build number) for the same
   version (Assumed).
-- **O-11 TestFlight.** Internal testers first. External testers require Beta
-  App Review (Assumed, confirm in TestFlight documentation). For App Review,
+- **O-11 TestFlight.** Internal testers first; they must be App Store Connect
+  users on the LLC team (Assumed). External testers require Beta App Review
+  (Assumed, confirm in TestFlight documentation). For App Review,
   give a demo account in the review notes (Assumed, Guideline **2.1**): use a
   synthetic test account, enter its password only in App Store Connect, never
   in a file or repo.
