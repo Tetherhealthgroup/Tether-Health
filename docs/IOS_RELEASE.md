@@ -123,11 +123,11 @@ framework ships its own privacy manifest was not checked (Unknown).
   Connect API key is in the repo (`git ls-tree -r f06b7c7 ios`). That is
   correct; they must stay out.
 
-### Session storage and transport
+### Transport
 
-- The Supabase session is stored with `flutter_secure_storage` (Keychain on
-  iOS): `localStorage: SecureSessionStorage()` (`lib/main.dart:85`,
-  `lib/auth/secure_session_storage.dart:6-10`).
+Session storage is deliberately not listed here: it is not fully satisfied and
+is recorded as gap G-10 in section 2 (R-056).
+
 - Configured hosts must be `https` (`lib/config/app_config.dart:50-51`, and for
   production `:102`). `Info.plist` has no `NSAppTransportSecurity` exception,
   so App Transport Security defaults apply (Inferred).
@@ -206,9 +206,15 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   redirect `io.breathefree.patient://login-callback`
   (`lib/auth/auth_gateway.dart:66-67`; Android
   `android/app/src/main/AndroidManifest.xml:34-35`). It carries the old
-  BreatheFree name, and any app can claim a custom scheme (Inferred); the
+  BreatheFree name, and any app can claim a custom scheme (Inferred). The same
+  redirect is used for sign-up confirmation, confirmation resend and **password
+  recovery** (`lib/auth/auth_gateway.dart:66-67,102,117,132-134`, R-075). The
   Supabase PKCE flow (R-066 c) partly limits what an interceptor could do with
-  a captured redirect (Inferred). Option:
+  a captured redirect, but that rests on the supabase_flutter 2.x default and
+  `Supabase.initialize` does not set `authFlowType` (`lib/main.dart:81-86`;
+  Inferred, R-075, rated Low, Open). Proposal (R-075): set
+  `authFlowType: AuthFlowType.pkce` explicitly so a library default change
+  cannot silently downgrade to implicit. Option:
   move to Universal Links on a Tether Health domain (associated-domains
   entitlement plus an `apple-app-site-association` file on the website), or
   rename the scheme on both platforms. Needs th-security review; touches auth.
@@ -217,7 +223,15 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   version and certificate. No iOS equivalent exists (`git ls-tree f06b7c7
   tool/`). Propose `tool/build_ios_release.sh` that reuses the same
   `--dart-define-from-file` validation and runs `flutter build ipa`, with no
-  signing secrets in the repo.
+  signing secrets in the repo. This is the fix proposed in R-076 and is queued
+  as TH-105 (not yet built). Why it matters (R-055, R-076): the Android script
+  rejects privileged Supabase keys before building (R-076 cites
+  `tool/build_play_release.sh:290-307`), whereas `AppConfig.validate`
+  (`lib/config/app_config.dart:111`) only runs on the device at startup, after
+  the value is already compiled into the IPA uploaded to Apple and TestFlight
+  testers. R-076 rates it Medium and Open and says a privileged key in the
+  define file would ship in the binary (Inferred). Until TH-105 exists, use the
+  manual check in O-10.
 - **G-6 Device family and orientation.** The app targets iPad
   (`TARGETED_DEVICE_FAMILY = "1,2"`) and allows iPhone landscape
   (`Info.plist:69-74`), while the approved design is portrait phone artwork
@@ -228,7 +242,13 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   (`lib/screens/craving_rescue_start_screen.dart:138-147`, which shows "Could
   not open the Phone app." on failure) and the quitline `tel:` link
   (`lib/main.dart:137-142`) cannot place a call on most iPads (Inferred). Any
-  fallback wording is **needs-clinician**.
+  fallback wording is **needs-clinician**. The program safety screens have the
+  same 911 `tel:` links: Heartwise
+  `lib/programs/heartwise/heartwise_safety.dart:21` (`emergencyUri`) and ClearAir
+  `lib/programs/clearair/clearair_safety.dart:24` (`defaultUrgentCareUri`). Both
+  carry a code comment saying the number must be confirmed or made configurable
+  per market before release (`heartwise_safety.dart:19-20`,
+  `clearair_safety.dart:22-23`); the number itself is **needs-clinician**.
 - **G-7 CI toolchain vs Apple's SDK minimum.** CI builds iOS on `macos-15`
   with Flutter 3.47.1, unsigned (`.github/workflows/flutter-ci.yml:39-51`).
   The Xcode/SDK version on that runner is Unknown here. Rule (Assumed, confirm
@@ -245,6 +265,27 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   iOS-related bullets under the distribution heading (`:77`, `:78-79`); link
   them to this runbook once TH-099 merges. The `:77` bullet (choose final
   identifiers) is already decided by D3 (BASELINE.md:79).
+- **G-10 Keychain accessibility for session, program documents and receipts
+  (R-056, open).** The Supabase session is stored with `flutter_secure_storage`
+  (`localStorage: SecureSessionStorage()`, `lib/main.dart:85`,
+  `lib/auth/secure_session_storage.dart:6-10`), but the store is built with
+  default options (`secure_session_storage.dart:7`). The same default is used
+  for program documents, which hold health data
+  (`lib/programs/secure_program_store.dart:12`), and for deletion receipts
+  (`lib/account/account_deletion_receipt_store.dart:44`). Per R-056 the plugin
+  default is `kSecAttrAccessibleWhenUnlocked`, and Apple documents such items as
+  migrating to a new device with encrypted backups, so a session and health
+  data can be restored onto another device (R-056 rates it Medium, Open; the
+  Apple statement is cited there to TH-048 section 11 U14). Only the guest quit
+  plan sets `KeychainAccessibility.unlocked_this_device`
+  (`lib/quit_plan/guest_quit_plan_store.dart:46`). R-056 points to the design fix
+  in `tether-health-ai-office/compliance/TH-048-local-storage-design.md`
+  sections 6, 7.1 and 8: `unlocked_this_device` with synchronizable off for the
+  session and receipts, and moving program documents out of the Keychain. Those
+  sections are a recommendation, not shipped code, and the policy is
+  **needs-counsel** before it is stated in any disclosure. Touches
+  health-data storage; needs th-security review (Tier 3). This bullet does not
+  claim the iOS store build is safe on this point.
 
 ## 3. Owner-only items
 
@@ -274,17 +315,35 @@ None of these were started by any agent. Do them in roughly this order.
   for iOS. Otherwise TestFlight alone is enough.
 - **O-5 Certificates and profiles.** Create an Apple Distribution certificate
   and an App Store provisioning profile for the App ID, or let Xcode automatic
-  signing manage them under the LLC team. Keep the private key and any
-  `.p12` in a password manager or `~/secure/`, never in the repo.
+  signing manage them under the LLC team. Keep the private key, any exported
+  `.p12` certificate file and any `.p8` file (such as an App Store Connect API
+  key, downloadable only once) in the macOS Keychain or a password manager,
+  never in the repo and not as loose files in a folder.
 - **O-6 App Store Connect record.** New app: platform iOS, name (availability
   Unknown), primary language, bundle ID `com.TetherHealthLLC.tetherhealth`,
   SKU. Then category, age rating questionnaire, support URL, and the export
-  compliance answer that feeds G-2.
+  compliance answer that feeds G-2. The export-compliance answer is
+  **needs-counsel**; it is counsel question 12(a) in
+  `tether-health-ai-office/compliance/counsel-questions.md`. Do not answer it,
+  and do not set the G-2 key, on an agent's say-so.
 - **O-7 App Privacy answers, with counsel.** Base them on code evidence:
   email and name for the account, photo (avatar), health-program entries,
   processors Supabase and the API host (R-054, R-066, R-072). Tracking: none
   found in code (no ad or analytics SDK in `pubspec.yaml:9-19`). Every answer
-  is **needs-counsel**. Also review the claims rules for a health app (Assumed,
+  is **needs-counsel**. Read these open register entries first, since the App
+  Privacy answers must not repeat their wrong claims: R-064 (the app told users
+  program health data stays on the device, while signed-in saves send the whole
+  program document to the API; the register says the store declaration must
+  list these program health types as collected when signed in, wording pending
+  counsel); R-067 (data export puts the full account copy, including program
+  health data, on the system clipboard and calls that secure; the register's
+  clipboard-exposure reasoning is written for Android, and whether iOS
+  Universal Clipboard carries it to other devices is not stated there, so it is
+  Inferred only and untested); R-068 (onboarding and rescue screens state
+  privacy and offline properties the code does not have). The register notes
+  that copy fixes for R-064, R-067 and R-068 exist only on the unmerged
+  `office/TH-094-honest-privacy-copy` branch, and that the R-067 clipboard
+  mechanism is unchanged there. Check their current status before submitting. Also review the claims rules for a health app (Assumed,
   confirm against Guidelines **1.4.1** and **5.1.3**): no medical-device or
   clinical-validation claims (**needs-clinician** for any clinical wording).
 - **O-8 Privacy policy URL and deletion page (R-054).** App Store Connect needs
@@ -298,7 +357,14 @@ None of these were started by any agent. Do them in roughly this order.
   `io.breathefree.patient://login-callback` (or its G-4 replacement) is in the
   production project's redirect URLs. Current setting Unknown.
 - **O-10 Build and upload.** On a Mac signed in to the LLC team, with the same
-  release define file as Android (`docs/PLAY_RELEASE.md` section 3):
+  release define file as Android (`docs/PLAY_RELEASE.md` section 3).
+  **Before building, check the key (R-076, G-5):** open the define file and
+  confirm that `SUPABASE_ANON_KEY` starts with `sb_publishable_`, or that
+  `tool/build_play_release.sh` accepted this same, unchanged file (it rejects
+  `sb_secret_` keys and JWTs whose role is not `anon`, `:295-307`). Do not paste
+  the key into chat, tickets or logs. Do not build if the key is anything else:
+  this iOS command has no equivalent check, and the value ends up inside the
+  IPA. Then run:
   `flutter build ipa --release --dart-define-from-file=$HOME/secure/tether-health/release.json`,
   then upload the `.ipa` with Xcode Organizer or Transporter. **This command
   was not run by any agent (NOT RUN)**; its output path and signing behaviour
