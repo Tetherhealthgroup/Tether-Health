@@ -224,11 +224,11 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   (`README.md:3`). Decide iPhone-only (`TARGETED_DEVICE_FAMILY = 1`) or keep
   iPad and test its layouts. Rule (Assumed, confirm in App Store Connect
   screenshot specifications): an iPad-capable app needs iPad screenshots.
-  Landscape behaviour on iPhone is Unknown. Also weigh: the `tel:` emergency
-  and quitline links cannot place a call on most iPads (Inferred); one path
-  shows "Could not open the Phone app."
-  (`lib/screens/craving_rescue_start_screen.dart:138-147`). Any fallback
-  wording is **needs-clinician**.
+  Landscape behaviour on iPhone is Unknown. Also weigh: the 911 button
+  (`lib/screens/craving_rescue_start_screen.dart:138-147`, which shows "Could
+  not open the Phone app." on failure) and the quitline `tel:` link
+  (`lib/main.dart:137-142`) cannot place a call on most iPads (Inferred). Any
+  fallback wording is **needs-clinician**.
 - **G-7 CI toolchain vs Apple's SDK minimum.** CI builds iOS on `macos-15`
   with Flutter 3.47.1, unsigned (`.github/workflows/flutter-ci.yml:39-51`).
   The Xcode/SDK version on that runner is Unknown here. Rule (Assumed, confirm
