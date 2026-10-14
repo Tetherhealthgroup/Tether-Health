@@ -64,23 +64,34 @@ class AppConfig {
   ///   padded or not, also after a prefix such as "Bearer ") must decode, and
   ///   every `role` key in any segment after the first, at any depth, matched
   ///   case-insensitively with every duplicate counted, must be "anon". At
-  ///   least one `role` must be present.
-  /// Not covered (TH-137): invisible characters outside Cf/Cc (such as U+034F),
-  /// look-alike letters, and hex, percent or base64-wrapped encodings.
+  ///   least one `role` must be present;
+  /// - a segment after the first that Dart cannot decode but Python can (NaN
+  ///   or Infinity, UTF-16/32, a BOM, CESU-8, unused base64 bits set) counts
+  ///   as a non-anon role if it still looks like a JSON object with a role.
+  /// Known residuals, none of which lets a non-anon role through:
+  /// - deep nesting: a payload nested beyond the Python recursion limit with
+  ///   only anon roles is accepted here and rejected by the helper;
+  /// - helper-only encodings of an anon payload (NaN, UTF-16/32) are rejected
+  ///   here as undecodable, so Dart is stricter than the helper;
+  /// - the Cf table is Unicode 16, a superset of the Unicode data of an older
+  ///   running Python (3.9 has Unicode 13);
+  /// - TH-137, unchanged: invisible characters outside Cf/Cc (such as U+034F),
+  ///   look-alike letters, and hex, percent or base64-wrapped encodings.
   static String? anonKeyProblem(String key) {
-    final text = _withoutInvisible(key);
-    final squeezed = _withoutSpace(text);
     if (_withoutSpace(key).isEmpty) {
       return 'SUPABASE_ANON_KEY is missing or empty.';
     }
-    final squashed = squeezed.toLowerCase();
-    if (squashed.contains('sb_secret_') || squashed.contains('service_role')) {
+    final text = _withoutInvisible(key);
+    final compact = _withoutSpace(text);
+    final compactLower = compact.toLowerCase();
+    if (compactLower.contains('sb_secret_') ||
+        compactLower.contains('service_role')) {
       return 'SUPABASE_ANON_KEY is a privileged key.';
     }
     var shaped = false;
     var decoded = false;
     final roles = <String?>[];
-    for (final piece in _tokenCandidates(text, squeezed)) {
+    for (final piece in _tokenCandidates(text, compact)) {
       final segments = piece.split('.');
       if (segments.length < 3) continue;
       shaped = true;
@@ -157,7 +168,7 @@ class AppConfig {
 
   /// Candidate tokens: the value with and without whitespace, its
   /// whitespace-separated words, and any dotted run of base64url characters.
-  static Set<String> _tokenCandidates(String text, String squeezed) {
+  static Set<String> _tokenCandidates(String text, String compact) {
     final runes = text.runes.toList();
     var start = 0;
     var end = runes.length;
@@ -167,7 +178,7 @@ class AppConfig {
     while (end > start && _isSpace(runes[end - 1])) {
       end--;
     }
-    final found = <String>{squeezed, String.fromCharCodes(runes, start, end)};
+    final found = <String>{compact, String.fromCharCodes(runes, start, end)};
     final word = StringBuffer();
     for (final c in [...runes, 0x20]) {
       if (!_isSpace(c)) {
@@ -177,46 +188,107 @@ class AppConfig {
         word.clear();
       }
     }
-    final run = RegExp(
-      r'(?<![A-Za-z0-9_=+/-])[A-Za-z0-9_=+/-]+(?:\.[A-Za-z0-9_=+/-]+){2,}',
-    );
-    for (final source in [text, squeezed]) {
-      found.addAll(run.allMatches(source).map((m) => m[0]!));
+    for (final source in [text, compact]) {
+      found.addAll(_dottedRun.allMatches(source).map((m) => m[0]!));
     }
     return found;
   }
 
-  /// Null if [segment] is not base64(url) JSON object, else every value of a
+  static final _dottedRun = RegExp(
+    r'(?<![A-Za-z0-9_=+/-])[A-Za-z0-9_=+/-]+(?:\.[A-Za-z0-9_=+/-]+){2,}',
+  );
+  static final _segmentShape = RegExp(r'^[A-Za-z0-9_+/-]*={0,2}$');
+  static final _jsonString = RegExp(r'"(?:[^"\\]|\\.)*"');
+  static final _jsonColon = RegExp(r'\s*:\s*');
+  static const _base64UrlAlphabet =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+
+  /// Null if [segment] is not a base64(url) JSON object, else every value of a
   /// `role` key at any depth, duplicates included (null for a non-string).
   static List<String?>? _rolesOf(String segment) {
-    if (!RegExp(r'^[A-Za-z0-9_+/-]*={0,2}$').hasMatch(segment)) return null;
+    if (!_segmentShape.hasMatch(segment)) return null;
     final body = segment
         .replaceFirst(RegExp(r'=+$'), '')
         .replaceAll('+', '-')
         .replaceAll('/', '_');
     if (body.length % 4 == 1) return null;
     try {
-      final json = utf8.decode(base64Url.decode(base64Url.normalize(body)));
-      if (jsonDecode(json) is! Map) return null;
+      final bytes =
+          base64Url.decode(base64Url.normalize(_clearSpareBits(body)));
+      final String json;
+      try {
+        json = utf8.decode(bytes);
+        if (jsonDecode(json) is! Map) return null;
+      } catch (_) {
+        return _pythonOnlyRoles(bytes);
+      }
       return _roleValues(json);
     } catch (_) {
       return null;
     }
   }
 
+  /// Clears the unused low bits of the last base64 character (Python ignores
+  /// them, Dart may not): 4 bits when the length is 2 mod 4, 2 bits when 3.
+  static String _clearSpareBits(String body) {
+    final spare = switch (body.length % 4) { 2 => 0x0F, 3 => 0x03, _ => 0 };
+    if (spare == 0) return body;
+    final last = _base64UrlAlphabet.indexOf(body[body.length - 1]);
+    return '${body.substring(0, body.length - 1)}'
+        '${_base64UrlAlphabet[last & ~spare]}';
+  }
+
+  /// For bytes that are not strict UTF-8 JSON: drops NUL bytes, one leading
+  /// BOM and surrounding ASCII whitespace. If what is left looks like a JSON
+  /// object that has a role (or an escape that could spell one), the segment
+  /// counts as a non-anon role, since the release helper may decode it.
+  static List<String?>? _pythonOnlyRoles(List<int> bytes) {
+    var kept = [
+      for (final b in bytes)
+        if (b != 0) b
+    ];
+    const boms = [
+      [0xEF, 0xBB, 0xBF],
+      [0xFE, 0xFF],
+      [0xFF, 0xFE],
+    ];
+    for (final bom in boms) {
+      if (kept.length >= bom.length &&
+          [for (var i = 0; i < bom.length; i++) kept[i] == bom[i]]
+              .every((same) => same)) {
+        kept = kept.sublist(bom.length);
+        break;
+      }
+    }
+    bool blank(int b) => b == 0x20 || b == 0x09 || b == 0x0A || b == 0x0D;
+    var start = 0;
+    var end = kept.length;
+    while (start < end && blank(kept[start])) {
+      start++;
+    }
+    while (end > start && blank(kept[end - 1])) {
+      end--;
+    }
+    final text = latin1.decode(kept.sublist(start, end)).toLowerCase();
+    if (text.startsWith('{') &&
+        text.endsWith('}') &&
+        (text.contains('role') || text.contains(r'\u'))) {
+      return [null];
+    }
+    return null;
+  }
+
   /// Every value of a `role` key (any case, any depth) in valid JSON [json].
   /// jsonDecode keeps only the last duplicate, so the text is scanned: in
   /// valid JSON a string followed by a colon is a key.
   static List<String?> _roleValues(String json) {
-    final string = RegExp(r'"(?:[^"\\]|\\.)*"');
-    final colon = RegExp(r'\s*:\s*');
     final roles = <String?>[];
-    for (final match in string.allMatches(json)) {
-      final afterKey = colon.matchAsPrefix(json, match.end);
+    for (final match in _jsonString.allMatches(json)) {
+      final afterKey = _jsonColon.matchAsPrefix(json, match.end);
       if (afterKey == null) continue;
       final name = jsonDecode(match[0]!) as String;
       if (name.toLowerCase() != 'role') continue;
-      final value = string.matchAsPrefix(json, afterKey.end);
+      final value = _jsonString.matchAsPrefix(json, afterKey.end);
       roles.add(value == null ? null : jsonDecode(value[0]!) as String);
     }
     return roles;

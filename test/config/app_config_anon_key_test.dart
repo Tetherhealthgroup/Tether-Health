@@ -16,10 +16,10 @@ void main() {
 
   const hs256 = '{"alg":"HS256","typ":"JWT"}';
   const secretLead = {
-    'U+200B': '​',
-    'U+FEFF': '﻿',
-    'U+00AD': '­',
-    'U+2060': '⁠',
+    'U+200B': '\u200B',
+    'U+FEFF': '\uFEFF',
+    'U+00AD': '\u00AD',
+    'U+2060': '\u2060',
     'U+0000': '\u0000',
     'U+0007': '\u0007',
   };
@@ -41,16 +41,52 @@ void main() {
   }
 
   /// True if the canary sits in [value] itself or in a decoded segment of it.
+  /// Segments are decoded as raw bytes with NUL bytes dropped, so UTF-16 and
+  /// UTF-32 payloads count; trailing characters are dropped until it decodes.
   bool carries(String value, String canary) {
     if (value.contains(canary)) return true;
     for (final segment in value.split('.')) {
-      try {
-        final text =
-            utf8.decode(base64Url.decode(base64Url.normalize(segment)));
-        if (text.contains(canary)) return true;
-      } catch (_) {}
+      for (var cut = 0; cut < 4 && cut < segment.length; cut++) {
+        try {
+          final bytes = base64Url.decode(
+            base64Url.normalize(segment.substring(0, segment.length - cut)),
+          );
+          final text = latin1.decode(bytes.where((b) => b != 0).toList());
+          if (text.contains(canary)) return true;
+          break;
+        } catch (_) {}
+      }
     }
     return false;
+  }
+
+  /// A token whose payload is a plain anon object and whose last segment is
+  /// [bytes], base64url-encoded without padding (the shape of a signature).
+  String anonThen(List<int> bytes) => '${b64(hs256)}.${b64('{"role":"anon"}')}.'
+      '${base64Url.encode(bytes).replaceAll('=', '')}';
+
+  List<int> utf16(String text, {required bool bigEndian}) => [
+        for (final unit in text.codeUnits)
+          ...bigEndian ? [unit >> 8, unit & 0xFF] : [unit & 0xFF, unit >> 8],
+      ];
+
+  List<int> utf32le(String text) => [
+        for (final unit in text.codeUnits) ...[unit & 0xFF, unit >> 8, 0, 0],
+      ];
+
+  /// Base64url of [json] (padded with spaces until the length is not a multiple
+  /// of three) whose last character also sets the unused low bits.
+  String nonCanonical(String json) {
+    const alphabet =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+    var text = json;
+    while (utf8.encode(text).length % 3 == 0) {
+      text = '$text ';
+    }
+    final body = b64(text);
+    final spare = body.length % 4 == 2 ? 0x0F : 0x03;
+    final last = alphabet.indexOf(body[body.length - 1]) | spare;
+    return '${body.substring(0, body.length - 1)}${alphabet[last]}';
   }
 
   Map<String, String> rejected(String canary) => {
@@ -93,11 +129,54 @@ void main() {
         'plain sb_secret_': 'sb_secret_$canary',
         'sb_secret_ with inner whitespace': 'sb_ secret_$canary',
         'service_role literal': 'service_role-$canary',
-        'service_role with inner invisible': 'service​_role-$canary',
+        'service_role with inner invisible': 'service\u200B_role-$canary',
         for (final e in secretLead.entries)
           'sb_secret_ after ${e.key}': '${e.value}sb_secret_$canary',
-        'sb_secret_ with inner U+200B': 'sb_​secret_$canary',
-        'sb_secret_ mixed case after U+200B': '​SB_Secret_$canary',
+        'sb_secret_ with inner U+200B': 'sb_\u200Bsecret_$canary',
+        'sb_secret_ mixed case after U+200B': '\u200BSB_Secret_$canary',
+        'escaped backslash before the closing quote': token(
+          hs256,
+          '{"a":"\\\\","ref":"$canary","role":"admin"}',
+        ),
+        'anon payload then NaN object (A)': anonThen(
+          utf8.encode('{"role":"admin","ref":"$canary","x":NaN}'),
+        ),
+        'anon payload then NaN object, role last (B)': anonThen(
+          utf8.encode('{"x":NaN,"ref":"$canary","role":"admin"}'),
+        ),
+        'anon payload then UTF-16LE object (C)': anonThen(
+          utf16('{"role":"admin","ref":"$canary"}', bigEndian: false),
+        ),
+        'anon payload then UTF-16BE object': anonThen(
+          utf16('{"role":"admin","ref":"$canary"}', bigEndian: true),
+        ),
+        'anon payload then UTF-32LE object': anonThen(
+          utf32le('{"role":"admin","ref":"$canary"}'),
+        ),
+        'anon payload then UTF-16LE object with BOM': anonThen([
+          0xFF,
+          0xFE,
+          ...utf16('{"role":"admin","ref":"$canary"}', bigEndian: false),
+        ]),
+        'anon payload then object with UTF-8 BOM (D)': anonThen([
+          0xEF,
+          0xBB,
+          0xBF,
+          ...utf8.encode('{"role":"admin","ref":"$canary"}'),
+        ]),
+        'anon payload then CESU surrogate bytes (E)': anonThen([
+          ...utf8.encode('{"role":"admin","ref":"$canary","s":"'),
+          0xED,
+          0xA0,
+          0x80,
+          ...utf8.encode('"}'),
+        ]),
+        'anon payload then upper-case ROLE with -Infinity (F)': anonThen(
+          utf8.encode('{"ROLE":"admin","ref":"$canary","x":-Infinity}'),
+        ),
+        'anon payload then non-canonical base64 trailing bits':
+            '${b64(hs256)}.${b64('{"role":"anon"}')}.'
+                '${nonCanonical('{"role":"admin","ref":"$canary"}')}',
         'Bearer-prefixed non-anon JWT':
             'Bearer ${token(hs256, '{"role":"service_role","ref":"$canary"}')}',
       };
@@ -178,9 +257,48 @@ void main() {
       expect(() => config.validate(production: true), returnsNormally);
     });
 
+    test('accepts quoted and escaped anon payloads (lexer cases)', () {
+      for (final payload in [
+        '{"role":"anon","x":"role"}',
+        '{"role":"anon","note":"\\"role\\":\\"admin\\""}',
+        '{"role":"\\u0061non"}',
+        '{"\\u0072ole":"\\u0061non"}',
+        '{"role":"anon","a":"\\\\"}',
+      ]) {
+        expect(
+          AppConfig.anonKeyProblem(token(hs256, payload)),
+          isNull,
+          reason: payload,
+        );
+      }
+    });
+
+    test('accepts anon tokens whose signature is random bytes', () {
+      for (final length in [32, 64]) {
+        final random = Random(length);
+        for (var i = 0; i < 2000; i++) {
+          final signature = [
+            for (var j = 0; j < length; j++) random.nextInt(256)
+          ];
+          expect(
+            AppConfig.anonKeyProblem(anonThen(signature)),
+            isNull,
+            reason: 'seed $length, signature $i',
+          );
+        }
+      }
+    });
+
+    test('accepts a decodable anon object as the last segment', () {
+      expect(
+        AppConfig.anonKeyProblem(anonThen(utf8.encode('{"role":"anon"}'))),
+        isNull,
+      );
+    });
+
     test('removes zero-width and control characters inside an anon JWT', () {
       final anon = token(hs256, '{"role":"anon"}');
-      expect(AppConfig.anonKeyProblem('​$anon﻿'), isNull);
+      expect(AppConfig.anonKeyProblem('\u200B$anon\uFEFF'), isNull);
     });
   });
 }
