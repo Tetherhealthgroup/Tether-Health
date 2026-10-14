@@ -266,48 +266,12 @@ fi
 # Fail before any build step if the version would be rejected by Play.
 check_version_code
 
-# Pre-validate the two endpoints (JSON object of strings). Values are never printed.
-python3 -I - "$env_file" <<'PY'
-import base64, json, sys
-from urllib.parse import urlparse
-
-try:
-    with open(sys.argv[1], encoding="utf-8") as fh:
-        data = json.load(fh)
-except (OSError, ValueError) as exc:
-    sys.exit(f"build_play_release: cannot read define file as JSON: {type(exc).__name__}")
-if not isinstance(data, dict):
-    sys.exit("build_play_release: define file must be a JSON object")
-bad = []
-for key in ("SUPABASE_URL", "API_BASE_URL"):
-    value = data.get(key)
-    if not isinstance(value, str) or not value.strip():
-        bad.append(f"{key} is missing or empty")
-        continue
-    parsed = urlparse(value.strip())
-    if parsed.scheme != "https" or not parsed.netloc:
-        bad.append(f"{key} must be an absolute https URL")
-key_value = data.get("SUPABASE_ANON_KEY")
-if not isinstance(key_value, str) or not key_value.strip():
-    bad.append("SUPABASE_ANON_KEY is missing or empty")
-else:
-    key_value = key_value.strip()
-    if "service_role" in key_value.lower() or key_value.lower().startswith("sb_secret_"):
-        bad.append("SUPABASE_ANON_KEY is a privileged key")
-    parts = key_value.split(".")
-    if len(parts) == 3 and parts[0].startswith("eyJ"):
-        try:
-            segment = parts[1] + "=" * (-len(parts[1]) % 4)
-            role = json.loads(base64.urlsafe_b64decode(segment)).get("role")
-        except Exception:
-            role = None
-            bad.append("SUPABASE_ANON_KEY looks like a JWT but cannot be decoded")
-        else:
-            if role != "anon":
-                bad.append('SUPABASE_ANON_KEY is a JWT whose role is not "anon"')
-if bad:
-    sys.exit("build_play_release: " + "; ".join(bad))
-PY
+# Pre-validate the endpoints and the key (shared with the iOS script). Values
+# are never printed. Sourced here, not at the top, so the version-only and
+# read-back modes keep working from a copy of this script alone.
+# shellcheck source=tool/release_define_check.sh
+. tool/release_define_check.sh
+check_release_define_file build_play_release "$env_file"
 
 if [ ! -f android/key.properties ]; then
   echo "build_play_release: android/key.properties not found (see docs/PLAY_RELEASE.md)" >&2
