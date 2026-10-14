@@ -47,10 +47,15 @@ void main() {
 
   tearDown(() => root.deleteSync(recursive: true));
 
-  ProcessResult run(List<String> args, {String? cwd}) => Process.runSync(
+  ProcessResult run(
+    List<String> args, {
+    String? cwd,
+    Map<String, String> env = const {},
+  }) =>
+      Process.runSync(
         '/bin/sh',
         [scriptPath, ...args],
-        environment: {'PATH': '${root.path}/bin:/usr/bin:/bin'},
+        environment: {...env, 'PATH': '${root.path}/bin:/usr/bin:/bin'},
         includeParentEnvironment: false,
         workingDirectory: cwd,
       );
@@ -136,6 +141,31 @@ void main() {
       expectRejected(r, 'ios/Podfile exists');
       expect(output(r), isNot(contains('missing or empty')));
     });
+
+    test('an unreadable project.pbxproj fails instead of passing', () {
+      final pbxproj = inRoot('ios/Runner.xcodeproj/project.pbxproj');
+      Process.runSync('chmod', ['000', pbxproj.path]);
+      addTearDown(() => Process.runSync('chmod', ['644', pbxproj.path]));
+      final readable = Process.runSync('/bin/sh', [
+        '-c',
+        'test -r "\$1"',
+        'sh',
+        pbxproj.path,
+      ]);
+      if (readable.exitCode == 0) {
+        markTestSkipped('running as a user who can read a mode-000 file');
+        return;
+      }
+      expectRejected(checkOnly(valid), 'cannot read ios/Runner.xcodeproj');
+    });
+
+    test('a name that merely ends in Pods is not a CocoaPods reference', () {
+      final pbxproj = inRoot('ios/Runner.xcodeproj/project.pbxproj');
+      pbxproj.writeAsStringSync(
+        '${pbxproj.readAsStringSync()}\n/* AirPods.swift */\n',
+      );
+      expect(checkOnly(valid).exitCode, 0);
+    });
   });
 
   group('argument validation', () {
@@ -162,6 +192,29 @@ void main() {
         run(['--dart-define-from-file', define, '--check-only']).exitCode,
         2,
       );
+    });
+
+    test('rejects a repeated --dart-define-from-file', () {
+      final define = writeDefine(valid).path;
+      final r = run([
+        '--dart-define-from-file=$define',
+        '--dart-define-from-file=$define',
+        '--check-only',
+      ]);
+      expect(r.exitCode, 2);
+      expect(output(r), contains('given more than once'));
+    });
+
+    test('a set CDPATH does not corrupt a relative define path', () {
+      final cwd = Directory(join([root.path, 'caller']))..createSync();
+      File(join([cwd.path, 'release.json'])).writeAsStringSync(valid);
+      // cd caller is looked up through CDPATH, which makes cd print it.
+      final r = run(
+        ['--dart-define-from-file=caller/release.json', '--check-only'],
+        cwd: root.path,
+        env: {'CDPATH': root.path},
+      );
+      expect(r.exitCode, 0, reason: output(r));
     });
 
     test('a relative define path resolves against the caller cwd', () {

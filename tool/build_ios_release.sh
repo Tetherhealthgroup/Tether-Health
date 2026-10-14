@@ -30,11 +30,13 @@
 # Without --check-only it runs sh tool/check_format.sh, flutter analyze and
 # flutter test, then flutter build ipa --release with the define file, and
 # prints the IPA path and its version fields. Signing uses the Xcode project's
-# own settings on the build Mac; no team ID, certificate, provisioning profile
-# or export options are kept in this repo.
+# Automatic signing (the DEVELOPMENT_TEAM in project.pbxproj) on the build Mac;
+# this script adds no certificate, provisioning profile or export options.
 #
 # Exit codes: 0 success, 1 a check or build step failed, 2 usage error.
 set -eu
+# A set CDPATH makes cd print the directory and corrupt resolved paths.
+unset CDPATH
 
 env_file=""
 env_file_given=0
@@ -50,6 +52,7 @@ fail() {
 for arg in "$@"; do
   case "$arg" in
     --dart-define-from-file=*)
+      [ "$env_file_given" -eq 0 ] || fail "--dart-define-from-file given more than once" 2
       env_file="${arg#--dart-define-from-file=}"
       env_file_given=1
       ;;
@@ -107,17 +110,26 @@ print(f"CFBundleVersion: {values[1]}")
 PY
 }
 
+# Succeeds if file $2 matches extended regex $1, returns 1 if not, and fails
+# (exit 1) if the file cannot be read, so a grep error never passes the guard.
+file_matches() {
+  grep_status=0
+  grep -qE "$1" "$2" || grep_status=$?
+  [ "$grep_status" -le 1 ] || fail "cannot read $2"
+  return "$grep_status"
+}
+
 # Fails (exit 1) if any CocoaPods integration is present (SPM-only project).
 check_no_cocoapods() {
   if [ -e ios/Podfile ]; then
     fail "ios/Podfile exists; this project uses Swift Package Manager. Remove it (do not commit it)."
   fi
   if [ -f ios/Runner.xcodeproj/project.pbxproj ] &&
-    grep -qE 'Pods[-_/.]|\[CP\]' ios/Runner.xcodeproj/project.pbxproj; then
+    file_matches '(^|[^A-Za-z])Pods[-_/.]|\[CP\]' ios/Runner.xcodeproj/project.pbxproj; then
     fail "ios/Runner.xcodeproj/project.pbxproj references CocoaPods; discard those changes (do not commit them)."
   fi
   for xcconfig in ios/Flutter/*.xcconfig; do
-    if [ -f "$xcconfig" ] && grep -qE '^[[:space:]]*#include.*Pods' "$xcconfig"; then
+    if [ -f "$xcconfig" ] && file_matches '^[[:space:]]*#include.*Pods' "$xcconfig"; then
       fail "$xcconfig includes a CocoaPods file; discard that change (do not commit it)."
     fi
   done
