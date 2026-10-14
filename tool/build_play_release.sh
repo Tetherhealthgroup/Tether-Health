@@ -68,6 +68,26 @@ normalise_int() {
   echo $((10#$value))
 }
 
+# Rejects an unknown argument (exit 2) without echoing its value: a key typed
+# on the command line must not reach terminal or CI logs. Only an option-shaped
+# name (--letters, digits, dashes) before the first '=' is shown.
+unknown_argument() {
+  local name="${1%%=*}"
+  case "$1" in
+    --[A-Za-z0-9]*=*)
+      case "$name" in
+        *[!A-Za-z0-9-]*) ;;
+        *)
+          echo "build_play_release: unknown argument: $name=<value not shown>" >&2
+          exit 2
+          ;;
+      esac
+      ;;
+  esac
+  echo "build_play_release: unknown argument (not shown; see the usage at the top of tool/build_play_release.sh)" >&2
+  exit 2
+}
+
 while [ "$#" -gt 0 ]; do
   arg="$1"
   case "$arg" in
@@ -95,16 +115,7 @@ while [ "$#" -gt 0 ]; do
       verify_aab="${arg#--verify-aab=}"
       verify_aab_given=1
       ;;
-    # Never echo the value: a key typed on the command line must not reach
-    # terminal or CI logs. Show only the option name before the first '='.
-    ?*=*)
-      echo "build_play_release: unknown argument: ${arg%%=*}=<value not shown>" >&2
-      exit 2
-      ;;
-    *)
-      echo "build_play_release: unknown argument (not shown; see the usage at the top of this script)" >&2
-      exit 2
-      ;;
+    *) unknown_argument "$arg" ;;
   esac
   shift
 done

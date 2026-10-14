@@ -49,6 +49,21 @@ fail() {
   exit "${2:-1}"
 }
 
+# Rejects an unknown argument (exit 2) without echoing its value: a key typed
+# on the command line must not reach terminal or CI logs. Only an option-shaped
+# name (--letters, digits, dashes) before the first '=' is shown.
+unknown_argument() {
+  case "$1" in
+    --[A-Za-z0-9]*=*)
+      case "${1%%=*}" in
+        *[!A-Za-z0-9-]*) ;;
+        *) fail "unknown argument: ${1%%=*}=<value not shown>" 2 ;;
+      esac
+      ;;
+  esac
+  fail "unknown argument (not shown; see the usage at the top of tool/build_ios_release.sh)" 2
+}
+
 for arg in "$@"; do
   case "$arg" in
     --dart-define-from-file=*)
@@ -61,10 +76,7 @@ for arg in "$@"; do
       inspect_ipa="${arg#--inspect-ipa=}"
       inspect_ipa_given=1
       ;;
-    # Never echo the value: a key typed on the command line must not reach
-    # terminal or CI logs. Show only the option name before the first '='.
-    ?*=*) fail "unknown argument: ${arg%%=*}=<value not shown>" 2 ;;
-    *) fail "unknown argument (not shown; see the usage at the top of this script)" 2 ;;
+    *) unknown_argument "$arg" ;;
   esac
 done
 

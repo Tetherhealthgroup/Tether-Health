@@ -174,15 +174,26 @@ void main() {
       for (final (arg, shown) in [
         ('--supabase-anon-key=$secret', '--supabase-anon-key'),
         ('--x=a=$secret', '--x'),
+        ('--check-version-only=$secret', '--check-version-only'),
         ('=$secret', null),
         (secret, null),
+        ('$secret==', null), // base64 padding: not an option name
+        ('--foo\n$secret=x', null),
+        ('', null),
       ]) {
         final r = run(['--check-version-only', arg]);
         expect(r.exitCode, 2, reason: arg);
         expect(r.stdout, isNot(contains(secret)), reason: arg);
         expect(r.stderr, isNot(contains(secret)), reason: arg);
-        expect(r.stderr, contains('build_play_release: unknown argument'));
-        if (shown != null) expect(r.stderr, contains(shown));
+        expect(
+          r.stderr,
+          shown == null
+              ? 'build_play_release: unknown argument (not shown; see the '
+                  'usage at the top of tool/build_play_release.sh)\n'
+              : 'build_play_release: unknown argument: '
+                  '$shown=<value not shown>\n',
+          reason: arg,
+        );
       }
     });
 
