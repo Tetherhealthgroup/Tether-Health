@@ -61,7 +61,10 @@ for arg in "$@"; do
       inspect_ipa="${arg#--inspect-ipa=}"
       inspect_ipa_given=1
       ;;
-    *) fail "unknown argument: $arg" 2 ;;
+    # Never echo the value: a key typed on the command line must not reach
+    # terminal or CI logs. Show only the option name before the first '='.
+    ?*=*) fail "unknown argument: ${arg%%=*}=<value not shown>" 2 ;;
+    *) fail "unknown argument (not shown; see the usage at the top of this script)" 2 ;;
   esac
 done
 

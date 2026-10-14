@@ -194,6 +194,25 @@ void main() {
       );
     });
 
+    test('never prints the value of an unknown argument', () {
+      const secret = 'TH121CANARY';
+      final define = writeDefine(valid).path;
+      for (final (arg, shown) in [
+        ('--supabase-anon-key=$secret', '--supabase-anon-key'),
+        ('--x=a=$secret', '--x'),
+        ('=$secret', null),
+        (secret, null),
+      ]) {
+        final r = run(['--dart-define-from-file=$define', '--check-only', arg]);
+        expect(r.exitCode, 2, reason: arg);
+        expect(r.stdout, isNot(contains(secret)), reason: arg);
+        expect(r.stderr, isNot(contains(secret)), reason: arg);
+        expect(r.stderr, contains('build_ios_release: unknown argument'));
+        if (shown != null) expect(r.stderr, contains(shown));
+        expect(flutterMarker.existsSync(), isFalse);
+      }
+    });
+
     test('rejects a repeated --dart-define-from-file', () {
       final define = writeDefine(valid).path;
       final r = run([

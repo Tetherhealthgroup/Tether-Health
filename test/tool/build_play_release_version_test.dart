@@ -168,6 +168,24 @@ void main() {
       expect(run(['--check-version-only', '--bogus']).exitCode, 2);
     });
 
+    test('never prints the value of an unknown argument', () {
+      const secret = 'TH121CANARY';
+      writePubspec('1.0.0+9');
+      for (final (arg, shown) in [
+        ('--supabase-anon-key=$secret', '--supabase-anon-key'),
+        ('--x=a=$secret', '--x'),
+        ('=$secret', null),
+        (secret, null),
+      ]) {
+        final r = run(['--check-version-only', arg]);
+        expect(r.exitCode, 2, reason: arg);
+        expect(r.stdout, isNot(contains(secret)), reason: arg);
+        expect(r.stderr, isNot(contains(secret)), reason: arg);
+        expect(r.stderr, contains('build_play_release: unknown argument'));
+        if (shown != null) expect(r.stderr, contains(shown));
+      }
+    });
+
     test('rejects --verify-aab with --check-version-only', () {
       writePubspec('1.0.0+9');
       final aab = writeAab('app.aab');

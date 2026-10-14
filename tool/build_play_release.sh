@@ -95,8 +95,14 @@ while [ "$#" -gt 0 ]; do
       verify_aab="${arg#--verify-aab=}"
       verify_aab_given=1
       ;;
+    # Never echo the value: a key typed on the command line must not reach
+    # terminal or CI logs. Show only the option name before the first '='.
+    ?*=*)
+      echo "build_play_release: unknown argument: ${arg%%=*}=<value not shown>" >&2
+      exit 2
+      ;;
     *)
-      echo "build_play_release: unknown argument: $arg" >&2
+      echo "build_play_release: unknown argument (not shown; see the usage at the top of this script)" >&2
       exit 2
       ;;
   esac
