@@ -6,6 +6,11 @@ import 'dart:convert';
 
 const canary = 'TH105CANARY';
 
+/// TH-130: an obviously fake, AWS-key-ID-shaped canary used as a define KEY
+/// NAME. It matches [A-Z][A-Z0-9_]{0,63}, the shape the helper once printed.
+/// It must never reach stdout or stderr.
+const keyCanary = 'AKIAFAKECANARY0000000';
+
 String _segment(Map<String, Object?> json) =>
     base64Url.encode(utf8.encode(jsonEncode(json))).replaceAll('=', '');
 
@@ -220,12 +225,12 @@ final defineCases = <DefineCase>[
   DefineCase(
     'sb_secret_ under another define key',
     _define(extra: {'SERVER_KEY': 'sb_secret_${canary}secret'}),
-    ['SERVER_KEY holds a privileged key'],
+    ['define key #4 holds a privileged key'],
   ),
   DefineCase(
     'zero-width sb_secret_ under another define key',
     _define(extra: {'SERVER_KEY': '\u200Bsb_secret_${canary}secret'}),
-    ['SERVER_KEY holds a privileged key'],
+    ['define key #4 holds a privileged key'],
   ),
   DefineCase(
     'service_role JWT under another define key',
@@ -234,7 +239,7 @@ final defineCases = <DefineCase>[
         'OTHER_TOKEN': fakeJwt({'role': 'service_role'}),
       },
     ),
-    ['OTHER_TOKEN holds a JWT whose role is not "anon"'],
+    ['define key #4 holds a JWT whose role is not "anon"'],
   ),
   DefineCase(
     'padded 4-segment service_role JWT with a non-eyJ header under another key',
@@ -248,7 +253,7 @@ final defineCases = <DefineCase>[
         ),
       },
     ),
-    ['OTHER_TOKEN holds a JWT whose role is not "anon"'],
+    ['define key #4 holds a JWT whose role is not "anon"'],
   ),
   DefineCase(
     'duplicate role keys under another define key',
@@ -259,7 +264,7 @@ final defineCases = <DefineCase>[
         ),
       },
     ),
-    ['OTHER_TOKEN holds a JWT whose role is not "anon"'],
+    ['define key #4 holds a JWT whose role is not "anon"'],
   ),
   DefineCase(
     'privileged values nested in a list and an object',
@@ -274,8 +279,8 @@ final defineCases = <DefineCase>[
       },
     ),
     [
-      'NESTED holds a privileged key',
-      'LISTED holds a JWT whose role is not "anon"',
+      'define key #4 holds a privileged key',
+      'define key #5 holds a JWT whose role is not "anon"',
     ],
   ),
   DefineCase(
@@ -313,22 +318,22 @@ final defineCases = <DefineCase>[
   DefineCase(
     'privileged value under a key named like a secret',
     _define(extra: {'sb_secret_${canary}x': 'sb_secret_${canary}v'}),
-    ['a define key holds a privileged key'],
+    ['define key #4 holds a privileged key'],
   ),
   DefineCase(
     'privileged value under a key name with a space',
     _define(extra: {'bad key $canary': 'sb_secret_${canary}v'}),
-    ['a define key holds a privileged key'],
+    ['define key #4 holds a privileged key'],
   ),
   DefineCase(
     'privileged value under an upper-case secret-like key name',
     _define(extra: {'SB_SECRET_${canary}X': 'sb_secret_${canary}v'}),
-    ['a define key holds a privileged key'],
+    ['define key #4 holds a privileged key'],
   ),
   DefineCase(
     'secret-like top-level key name with a harmless value',
     _define(extra: {'sb_secret_${canary}n': 'x'}),
-    ['a define key holds a privileged key'],
+    ['define key #4 holds a privileged key'],
   ),
   DefineCase(
     'secret-like nested key name',
@@ -337,7 +342,7 @@ final defineCases = <DefineCase>[
         'NESTED_NAME': {'sb_secret_${canary}k': 1},
       },
     ),
-    ['NESTED_NAME holds a privileged key'],
+    ['define key #4 holds a privileged key'],
   ),
   DefineCase(
     'service_role JWT in a nested list under a key named like a secret',
@@ -350,7 +355,7 @@ final defineCases = <DefineCase>[
         ],
       },
     ),
-    ['a define key holds a JWT whose role is not "anon"'],
+    ['define key #4 holds a JWT whose role is not "anon"'],
   ),
   const DefineCase(
     'duplicate SUPABASE_ANON_KEY, privileged first',
@@ -366,7 +371,7 @@ final defineCases = <DefineCase>[
         '"API_BASE_URL":"https://api.example.org",'
         '"SUPABASE_ANON_KEY":"sb_publishable_${canary}pub",'
         '"dup_$canary":"a","dup_$canary":"b"}',
-    ['a define key appears more than once in the define file'],
+    ['define key #4 (also #5) appears more than once in the define file'],
   ),
   const DefineCase(
     'duplicate nested key hiding a privileged value',
@@ -374,7 +379,53 @@ final defineCases = <DefineCase>[
         '"API_BASE_URL":"https://api.example.org",'
         '"SUPABASE_ANON_KEY":"sb_publishable_${canary}pub",'
         '"NESTED":{"A":"sb_secret_${canary}s","A":"ok"}}',
-    ['A appears more than once in the define file'],
+    ['define key #4>#1 (also #2) appears more than once in the define file'],
+  ),
+  // TH-130 (R-085): a flagged key is named only if it is allowlisted; any
+  // other key, here the canary, is shown by position and never by name.
+  DefineCase(
+    'privileged value under an allowlisted server key (R1)',
+    _define(extra: {'SUPABASE_SERVICE_ROLE_KEY': 'sb_secret_${canary}s'}),
+    ['SUPABASE_SERVICE_ROLE_KEY holds a privileged key'],
+  ),
+  DefineCase(
+    'canary as a top-level key name holding a privileged value',
+    _define(extra: {keyCanary: 'sb_secret_${canary}v'}),
+    ['define key #4 holds a privileged key'],
+  ),
+  const DefineCase(
+    'canary as a duplicated top-level key name',
+    '{"SUPABASE_URL":"https://example-project.supabase.co",'
+        '"API_BASE_URL":"https://api.example.org",'
+        '"SUPABASE_ANON_KEY":"sb_publishable_${canary}pub",'
+        '"$keyCanary":"a","$keyCanary":"b"}',
+    ['define key #4 (also #5) appears more than once in the define file'],
+  ),
+  const DefineCase(
+    'canary as a duplicated nested key name',
+    '{"SUPABASE_URL":"https://example-project.supabase.co",'
+        '"API_BASE_URL":"https://api.example.org",'
+        '"SUPABASE_ANON_KEY":"sb_publishable_${canary}pub",'
+        '"NESTED":{"$keyCanary":"a","$keyCanary":"b"}}',
+    ['define key #4>#1 (also #2) appears more than once in the define file'],
+  ),
+  const DefineCase(
+    'canary as a duplicated key name in an object inside an array',
+    '{"SUPABASE_URL":"https://example-project.supabase.co",'
+        '"API_BASE_URL":"https://api.example.org",'
+        '"SUPABASE_ANON_KEY":"sb_publishable_${canary}pub",'
+        '"LISTED":[1,{"$keyCanary":"a","$keyCanary":"b"}]}',
+    [
+      'define key #4>[2]>#1 (also #2) appears more than once in the define file'
+    ],
+  ),
+  const DefineCase(
+    'allowlisted duplicate top-level key is named',
+    '{"SUPABASE_URL":"https://example-project.supabase.co",'
+        '"API_BASE_URL":"https://api.example.org",'
+        '"SUPABASE_ANON_KEY":"sb_publishable_${canary}pub",'
+        '"API_BASE_URL":"https://api.example.org"}',
+    ['API_BASE_URL appears more than once in the define file'],
   ),
 ];
 

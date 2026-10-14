@@ -69,6 +69,9 @@ void main() {
         }
       }
       expect(out, isNot(contains(canary)));
+      for (final stream in [r.stdout, r.stderr]) {
+        expect(stream, isNot(contains(keyCanary)));
+      }
       if (c.keyValue case final key? when key.trim().isNotEmpty) {
         expect(out, isNot(contains(key.trim())));
       }

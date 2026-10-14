@@ -27,9 +27,21 @@
 #   Cf and Cc (such as U+034F) are not removed before matching.
 #   Otherwise prints "<prefix>: <problems>" to stderr and returns 1; an
 #   unexpected internal error also returns 1 ("cannot check define file").
-#   Values are never printed. A define key name is printed only if it is
-#   upper-case ([A-Z][A-Z0-9_]{0,63}) and carries no privileged marker or
-#   JWT shape; otherwise "a define key" stands in. Needs python3.
+#   Values are never printed. A define key name is printed only if it is in
+#   the KNOWN_KEYS allowlist below (exact, case-sensitive match); any other
+#   key is shown by position, because an arbitrary key name may itself be a
+#   secret pasted into the wrong slot (R-085, TH-130). Position labels:
+#     define key #3          the 3rd key of the top-level object (1-based, in
+#                            file order)
+#     define key #4>#2       the 2nd key of the object under top-level key #4;
+#                            ">" descends one level, "[n]" is the n-th element
+#                            (1-based) of an array, so #4>[1]>#2 is the 2nd key
+#                            of the object in the first element of the array
+#                            under key #4
+#     define key #3 (also #5)   the same name occurs again at the listed
+#                            positions of the same object (duplicates)
+#   A flagged non-duplicate key under a top-level key is reported as that
+#   top-level key. Needs python3.
 check_release_define_file() {
   python3 -I - "$1" "$2" <<'PY'
 import base64, json, re, sys, unicodedata
@@ -37,7 +49,35 @@ from urllib.parse import urlparse
 
 prefix = sys.argv[1]
 ANON = "SUPABASE_ANON_KEY"
-duplicates = []
+
+# Define keys that may be printed by name. Every entry is a fixed constant of
+# this project, never taken from the file. Sources (file:line at TH-130):
+#   SUPABASE_URL, API_BASE_URL   lib/config/app_config.dart:12-13 and
+#                                checked below in check() (this file)
+#   SUPABASE_ANON_KEY            lib/config/app_config.dart:14 and ANON above
+#   SUPABASE_SERVICE_ROLE_KEY    not read by the release scripts or app_config.
+#                                It is the server-only key name in render.yaml:20
+#                                and api/src/config/environment.ts:46. Listed
+#                                so that the mistake this check exists to catch
+#                                (an sb_secret_ value pasted under that name)
+#                                is reported by its name (R1). The name is a
+#                                public identifier, not a secret.
+# The release scripts (tool/build_play_release.sh, tool/build_ios_release.sh)
+# only pass the file through (--dart-define-from-file=, :94/:309 and :69/:178)
+# and read no key by name.
+KNOWN_KEYS = frozenset((
+    "SUPABASE_URL",
+    "API_BASE_URL",
+    "SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+))
+
+
+class Obj(dict):
+    """A JSON object that remembers every key in file order, duplicates
+    included (a plain dict keeps only the last)."""
+
+    names = ()
 
 
 def drop_invisible(text):
@@ -104,16 +144,21 @@ def squash(text):
     return "".join(drop_invisible(text).split()).lower()
 
 
-def has_marker(text):
-    plain = squash(text).replace("_", "")
-    return "sbsecret" in plain or "servicerole" in plain or jwt_findings(text)[0]
+def step(kind, number):
+    return "#%d" % number if kind == "key" else "[%d]" % number
 
 
-def label(key):
-    """The key name if it is safe to print, else a stand-in."""
-    if re.fullmatch(r"[A-Z][A-Z0-9_]{0,63}", key) and not has_marker(key):
-        return key
-    return "a define key"
+def label(name, path, spots):
+    """The name if it is allowlisted, else its position: path is the steps
+    down to the object holding the key, spots the 1-based positions of the
+    key in that object (more than one for a duplicate)."""
+    if name in KNOWN_KEYS:
+        return name
+    first, *more = spots
+    text = "define key " + ">".join([*(step(*s) for s in path), step("key", first)])
+    if more:
+        text += " (also " + ", ".join(step("key", n) for n in more) + ")"
+    return text
 
 
 def texts(node):
@@ -133,12 +178,37 @@ def texts(node):
 
 
 def load_object(pairs):
-    seen = set()
-    for name, _ in pairs:
-        if name in seen:
-            duplicates.append(name)
-        seen.add(name)
-    return dict(pairs)
+    obj = Obj(pairs)
+    obj.names = [name for name, _ in pairs]
+    return obj
+
+
+def positions(obj):
+    """name -> 1-based positions of that name in obj, in file order."""
+    found = {}
+    for number, name in enumerate(obj.names, 1):
+        found.setdefault(name, []).append(number)
+    return found
+
+
+def duplicate_labels(root):
+    """Labels of every key that occurs twice in one object, at any depth,
+    iteratively so that nesting depth cannot exhaust the stack."""
+    found = []
+    stack = [(root, ())]
+    while stack:
+        node, path = stack.pop()
+        if isinstance(node, Obj):
+            spots = positions(node)
+            for name, at in spots.items():
+                if len(at) > 1:
+                    found.append((path, at[0], label(name, path, at)))
+            for name, child in node.items():
+                stack.append((child, path + (("key", spots[name][-1]),)))
+        elif isinstance(node, list):
+            for number, child in enumerate(node, 1):
+                stack.append((child, path + (("item", number),)))
+    return [text for _, _, text in sorted(found, key=lambda f: f[:2])]
 
 
 def check():
@@ -150,8 +220,9 @@ def check():
     if not isinstance(data, dict):
         sys.exit(f"{prefix}: define file must be a JSON object")
     bad = []
-    for name in dict.fromkeys(duplicates):
-        bad.append(f"{label(name)} appears more than once in the define file")
+    for text in duplicate_labels(data):
+        bad.append(f"{text} appears more than once in the define file")
+    top = positions(data)
     for key in ("SUPABASE_URL", "API_BASE_URL"):
         value = data.get(key)
         if not isinstance(value, str) or not value.strip():
@@ -179,7 +250,7 @@ def check():
                     undecodable = True
                 elif not roles:
                     role_bad = True
-        name = label(key)
+        name = label(key, (), top[key][-1:])
         verb = "is" if is_anon else "holds"
         if privileged:
             bad.append(f"{name} {verb} a privileged key")
