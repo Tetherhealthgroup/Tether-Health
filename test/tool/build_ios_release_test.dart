@@ -97,6 +97,16 @@ void main() {
     }
   });
 
+  test('a define file nested too deeply fails closed without a traceback', () {
+    final r = checkOnly(deepNestingDefine(2000000));
+    final out = output(r);
+    expect(r.exitCode, 1, reason: out);
+    expect(r.stderr, contains('build_ios_release: cannot check define file'));
+    expect(out, isNot(contains('Traceback')));
+    expect(out, isNot(contains(canary)));
+    expect(flutterMarker.existsSync(), isFalse);
+  });
+
   group('--check-only CocoaPods guard', () {
     void expectRejected(ProcessResult r, String fragment) {
       expect(r.exitCode, 1, reason: output(r));

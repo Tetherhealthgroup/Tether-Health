@@ -308,4 +308,80 @@ final defineCases = <DefineCase>[
     ),
     [],
   ),
+  // TH-123 send-back: key names never leak, nested key names are scanned,
+  // duplicate keys are rejected.
+  DefineCase(
+    'privileged value under a key named like a secret',
+    _define(extra: {'sb_secret_${canary}x': 'sb_secret_${canary}v'}),
+    ['a define key holds a privileged key'],
+  ),
+  DefineCase(
+    'privileged value under a key name with a space',
+    _define(extra: {'bad key $canary': 'sb_secret_${canary}v'}),
+    ['a define key holds a privileged key'],
+  ),
+  DefineCase(
+    'privileged value under an upper-case secret-like key name',
+    _define(extra: {'SB_SECRET_${canary}X': 'sb_secret_${canary}v'}),
+    ['a define key holds a privileged key'],
+  ),
+  DefineCase(
+    'secret-like top-level key name with a harmless value',
+    _define(extra: {'sb_secret_${canary}n': 'x'}),
+    ['a define key holds a privileged key'],
+  ),
+  DefineCase(
+    'secret-like nested key name',
+    _define(
+      extra: {
+        'NESTED_NAME': {'sb_secret_${canary}k': 1},
+      },
+    ),
+    ['NESTED_NAME holds a privileged key'],
+  ),
+  DefineCase(
+    'service_role JWT in a nested list under a key named like a secret',
+    _define(
+      extra: {
+        'SB_SECRET_${canary}Y': [
+          [
+            fakeJwt({'role': 'service_role'})
+          ],
+        ],
+      },
+    ),
+    ['a define key holds a JWT whose role is not "anon"'],
+  ),
+  const DefineCase(
+    'duplicate SUPABASE_ANON_KEY, privileged first',
+    '{"SUPABASE_URL":"https://example-project.supabase.co",'
+        '"API_BASE_URL":"https://api.example.org",'
+        '"SUPABASE_ANON_KEY":"sb_secret_${canary}a",'
+        '"SUPABASE_ANON_KEY":"sb_publishable_${canary}pub"}',
+    ['SUPABASE_ANON_KEY appears more than once in the define file'],
+  ),
+  const DefineCase(
+    'duplicate lower-case key',
+    '{"SUPABASE_URL":"https://example-project.supabase.co",'
+        '"API_BASE_URL":"https://api.example.org",'
+        '"SUPABASE_ANON_KEY":"sb_publishable_${canary}pub",'
+        '"dup_$canary":"a","dup_$canary":"b"}',
+    ['a define key appears more than once in the define file'],
+  ),
+  const DefineCase(
+    'duplicate nested key hiding a privileged value',
+    '{"SUPABASE_URL":"https://example-project.supabase.co",'
+        '"API_BASE_URL":"https://api.example.org",'
+        '"SUPABASE_ANON_KEY":"sb_publishable_${canary}pub",'
+        '"NESTED":{"A":"sb_secret_${canary}s","A":"ok"}}',
+    ['A appears more than once in the define file'],
+  ),
 ];
+
+/// A define file whose value is an array nested [depth] deep. The helper must
+/// fail closed or accept it, never crash with a traceback.
+String deepNestingDefine(int depth) =>
+    '{"SUPABASE_URL":"https://example-project.supabase.co",'
+    '"API_BASE_URL":"https://api.example.org",'
+    '"SUPABASE_ANON_KEY":"sb_publishable_${canary}pub",'
+    '"DEEP":${'[' * depth}${']' * depth}}';

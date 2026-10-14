@@ -75,4 +75,14 @@ void main() {
       expect(flutterMarker.existsSync(), isFalse);
     });
   }
+
+  test('a define file nested too deeply fails closed without a traceback', () {
+    final r = run(deepNestingDefine(2000000));
+    final out = '${r.stdout}${r.stderr}';
+    expect(r.exitCode, 1, reason: out);
+    expect(r.stderr, contains('build_play_release: cannot check define file'));
+    expect(out, isNot(contains('Traceback')));
+    expect(out, isNot(contains(canary)));
+    expect(flutterMarker.existsSync(), isFalse);
+  });
 }
