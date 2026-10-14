@@ -9,22 +9,34 @@
 #   in which no define key holds a privileged-looking value (R-055, R-076,
 #   TH-123). Every top-level key is checked, and so are all nested strings and
 #   all key names at any depth. Privileged means:
-#     - sb_secret_, after removing whitespace and zero-width/format characters
+#     - sb_secret_, after removing whitespace, zero-width/format characters
+#       and the other invisible code points listed in EXTRA_INVISIBLE below
 #       (case-insensitive, anywhere in the value);
 #     - for SUPABASE_ANON_KEY only, the literal service_role;
 #     - a JWT-shaped value (three or more dot-separated segments, any header,
 #       padded or not, also after a prefix such as "Bearer ") in which any
 #       segment after the first decodes to JSON that has a "role" key, at any
 #       depth, matched case-insensitively, whose value is not "anon". Every
-#       duplicate role key counts.
+#       duplicate role key counts. A segment that is not valid JSON (for
+#       example a raw control character inside a string) but still looks like
+#       a JSON object with a role counts as a non-anon role (TH-137, F2).
 #   A key that appears twice in the define file (at any depth) is rejected,
 #   because the later one would hide the earlier one.
 #   SUPABASE_ANON_KEY must also be decodable if it has three or more segments,
 #   and its payload must carry role "anon". Other keys need not carry a role.
 #   Trade-off: a non-anon role on ANY JWT-shaped value is rejected, including
 #   a third-party JWT that has nothing to do with Supabase.
-#   Documented residual (N4): invisible characters outside Unicode categories
-#   Cf and Cc (such as U+034F) are not removed before matching.
+#   TH-137: invisible characters outside Unicode categories Cf and Cc (such as
+#   U+034F, U+115F, U+1160, U+3164, U+FFA0, U+2800) are removed before the
+#   sb_secret_ and service_role substring checks, on every key and value. They
+#   are NOT removed before the JWT decoding, so a token that carries one inside
+#   a segment stays undecodable (SUPABASE_ANON_KEY rejects it; another key does
+#   not flag it).
+#   Documented residuals (TH-137): look-alike letters (fullwidth, Cyrillic);
+#   hex, percent and base64-wrapped encodings; a token split across array
+#   elements or keys; a plain service_role under a key other than
+#   SUPABASE_ANON_KEY; an undecodable payload under a key other than
+#   SUPABASE_ANON_KEY.
 #   Otherwise prints "<prefix>: <problems>" to stderr and returns 1; an
 #   unexpected internal error also returns 1 ("cannot check define file").
 #   Values are never printed. A define key name is printed only if it is in
@@ -88,6 +100,30 @@ def drop_invisible(text):
     )
 
 
+# Invisible code points outside Cf and Cc (TH-137): default-ignorable ones
+# (Unicode DerivedCoreProperties, including unassigned ranges that may be
+# assigned later) plus U+2800 (braille blank), which renders as a blank.
+EXTRA_INVISIBLE = (
+    (0x034F, 0x034F),      # combining grapheme joiner
+    (0x115F, 0x1160),      # hangul choseong / jungseong filler
+    (0x17B4, 0x17B5),      # khmer inherent vowels
+    (0x180B, 0x180D),      # mongolian free variation selectors
+    (0x180F, 0x180F),      # mongolian free variation selector four
+    (0x2065, 0x2065),      # unassigned, default-ignorable
+    (0x2800, 0x2800),      # braille pattern blank
+    (0x3164, 0x3164),      # hangul filler
+    (0xFE00, 0xFE0F),      # variation selectors
+    (0xFFA0, 0xFFA0),      # halfwidth hangul filler
+    (0xFFF0, 0xFFF8),      # unassigned, default-ignorable
+    (0xE0000, 0xE0FFF),    # tags block and variation selectors supplement
+)
+
+
+def is_extra_invisible(char):
+    code = ord(char)
+    return any(low <= code <= high for low, high in EXTRA_INVISIBLE)
+
+
 def pieces(value):
     """Candidate tokens: the value with and without whitespace, its
     whitespace-separated words, and any dotted run of base64url characters."""
@@ -101,9 +137,32 @@ def pieces(value):
     return found
 
 
+OPAQUE = object()
+BOMS = (b"\xef\xbb\xbf", b"\xfe\xff", b"\xff\xfe")
+
+
+def looks_like_role_object(raw):
+    """True if bytes that are not valid JSON still look like a JSON object
+    that has a role: after dropping NUL bytes, one leading BOM and surrounding
+    ASCII whitespace the text starts with { and ends with }, and holds "role"
+    (any case) or a backslash-u escape that could spell it. Fail closed
+    (TH-137, F2); this mirrors AppConfig._pythonOnlyRoles."""
+    kept = raw.replace(b"\x00", b"")
+    for bom in BOMS:
+        if kept.startswith(bom):
+            kept = kept[len(bom):]
+            break
+    text = kept.strip(b" \t\n\r").decode("latin-1").lower()
+    return text.startswith("{") and text.endswith("}") and (
+        "role" in text or "\\u" in text
+    )
+
+
 def roles_of(segment):
-    """None if the segment is not a base64(url) JSON object, else the list of
-    every value of a "role" key at any depth (duplicates included)."""
+    """None if the segment is not a base64(url) JSON object, OPAQUE if it
+    decodes to bytes that are not valid JSON but look like an object with a
+    role, else the list of every value of a "role" key at any depth
+    (duplicates included)."""
     if not re.fullmatch(r"[A-Za-z0-9_+/-]*={0,2}", segment):
         return None
     body = segment.rstrip("=").replace("+", "-").replace("/", "_")
@@ -115,17 +174,22 @@ def roles_of(segment):
 
     try:
         body += "=" * (-len(body) % 4)
-        obj = json.loads(base64.urlsafe_b64decode(body), object_pairs_hook=collect)
+        raw = base64.urlsafe_b64decode(body)
     except Exception:
         return None
+    try:
+        obj = json.loads(raw, object_pairs_hook=collect)
+    except Exception:
+        return OPAQUE if looks_like_role_object(raw) else None
     if not isinstance(obj, dict):
         return None
     return [v for k, v in pairs if isinstance(k, str) and k.lower() == "role"]
 
 
 def jwt_findings(value):
-    """(has JWT shape, a payload decoded, every role value) over all pieces."""
-    shape = decoded = False
+    """(has JWT shape, a payload decoded, every role value, an opaque
+    role-looking segment seen) over all pieces."""
+    shape = decoded = opaque = False
     roles = []
     for piece in pieces(value):
         segments = piece.split(".")
@@ -134,14 +198,19 @@ def jwt_findings(value):
         shape = True
         for segment in segments[1:]:
             found = roles_of(segment)
-            if found is not None:
+            if found is OPAQUE:
+                opaque = True
+            elif found is not None:
                 decoded = True
                 roles.extend(found)
-    return shape, decoded, roles
+    return shape, decoded, roles, opaque
 
 
 def squash(text):
-    return "".join(drop_invisible(text).split()).lower()
+    """text for the substring checks: lower case, without whitespace, Cf, Cc
+    or the EXTRA_INVISIBLE code points."""
+    kept = (c for c in drop_invisible(text) if not is_extra_invisible(c))
+    return "".join("".join(kept).split()).lower()
 
 
 def step(kind, number):
@@ -242,8 +311,10 @@ def check():
             cleaned = squash(text)
             if "sb_secret_" in cleaned or (strict and "service_role" in cleaned):
                 privileged = True
-            shape, decoded, roles = jwt_findings(text)
+            shape, decoded, roles, opaque = jwt_findings(text)
             if any(role != "anon" for role in roles):
+                role_bad = True
+            elif opaque and not (strict and not decoded):
                 role_bad = True
             elif strict and shape:
                 if not decoded:

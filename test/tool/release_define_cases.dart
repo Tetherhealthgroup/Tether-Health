@@ -25,12 +25,15 @@ String fakeJwt(Map<String, Object?> payload) => [
 /// A JWT-shaped token built segment by segment, for shapes [fakeJwt] cannot
 /// make. [header] and [payload] are a JSON map or raw JSON text (raw text
 /// allows duplicate keys); [pad] keeps the base64 padding; [extra] appends
-/// that many more segments. The canary sits in the payload and signature.
+/// that many more segments; [later] are raw JSON texts encoded as segments
+/// placed right after the payload (TH-137). The canary sits in the payload
+/// and signature.
 String shapedJwt({
   Object header = const {'alg': 'HS256', 'typ': 'JWT'},
   required Object payload,
   bool pad = false,
   int extra = 0,
+  List<String> later = const [],
 }) {
   String seg(Object json) {
     final text = json is String ? json : jsonEncode(json);
@@ -41,10 +44,40 @@ String shapedJwt({
   return [
     seg(header),
     seg(payload),
+    for (final text in later) seg(text),
     '${canary}sig',
     for (var i = 0; i < extra; i++) 'x$canary',
   ].join('.');
 }
+
+/// Every 8-character window of [text] (TH-137 leak check). Output that holds
+/// one of these holds a fragment of the canary.
+List<String> windows(String text, {int size = 8}) => [
+      for (var i = 0; i + size <= text.length; i++) text.substring(i, i + size),
+    ];
+
+/// The windows of both canaries; none may appear in any script output.
+final canaryWindows = [...windows(canary), ...windows(keyCanary)];
+
+/// TH-137 (R-055): invisible characters outside Unicode Cf and Cc that the
+/// helper must remove before it looks for sb_secret_ or service_role. Each is
+/// written as an escape so that the source shows what it is.
+const invisibleOutsideCfCc = <String, String>{
+  'U+034F combining grapheme joiner': '\u034F',
+  'U+115F hangul choseong filler': '\u115F',
+  'U+1160 hangul jungseong filler': '\u1160',
+  'U+3164 hangul filler': '\u3164',
+  'U+FFA0 halfwidth hangul filler': '\uFFA0',
+  'U+2800 braille pattern blank': '\u2800',
+  'U+FE0F variation selector 16': '\uFE0F',
+  'U+180B mongolian free variation selector': '\u180B',
+  'U+E0100 variation selector 17': '\u{E0100}',
+};
+
+/// The text of a payload with a raw control character inside a JSON string.
+/// A strict JSON parser rejects it. It has a non-anon role (TH-137, F2).
+const controlCharPayload =
+    '{"role":"service_role","note":"a\u0001b","ref":"$canary"}';
 
 class DefineCase {
   const DefineCase(this.name, this.contents, this.expected);
@@ -426,6 +459,99 @@ final defineCases = <DefineCase>[
         '"SUPABASE_ANON_KEY":"sb_publishable_${canary}pub",'
         '"API_BASE_URL":"https://api.example.org"}',
     ['API_BASE_URL appears more than once in the define file'],
+  ),
+  // TH-137 F2: a later segment with a raw control character and a non-anon
+  // role must not hide behind an earlier anon segment.
+  DefineCase(
+    'anon segment, then a control-character service_role segment',
+    _define(
+      key: shapedJwt(
+        payload: {'role': 'anon', 'ref': canary},
+        later: [controlCharPayload],
+      ),
+    ),
+    [_anonRole],
+  ),
+  DefineCase(
+    'control-character service_role segment, then an anon segment',
+    _define(
+      key: shapedJwt(
+        payload: controlCharPayload,
+        later: ['{"role":"anon","ref":"$canary"}'],
+      ),
+    ),
+    [_anonRole],
+  ),
+  DefineCase(
+    'control-character service_role segment as the only payload',
+    _define(key: shapedJwt(payload: controlCharPayload)),
+    ['SUPABASE_ANON_KEY looks like a JWT but cannot be decoded'],
+  ),
+  DefineCase(
+    'anon segment, then a control-character service_role segment, other key',
+    _define(
+      extra: {
+        'OTHER_TOKEN': shapedJwt(
+          payload: {'role': 'anon', 'ref': canary},
+          later: [controlCharPayload],
+        ),
+      },
+    ),
+    ['define key #4 holds a JWT whose role is not "anon"'],
+  ),
+  DefineCase(
+    'control-character segment with no role under another key',
+    _define(
+      extra: {
+        'OTHER_TOKEN': shapedJwt(
+          payload: {'role': 'anon', 'ref': canary},
+          later: ['{"note":"a\u0001b","ref":"$canary"}'],
+        ),
+      },
+    ),
+    [],
+  ),
+  // TH-137 (a): invisible characters outside Cf and Cc inside the privileged
+  // markers. Each must be removed before the substring checks, in a value, in
+  // a nested value and in a key name.
+  for (final MapEntry(key: name, value: invisible)
+      in invisibleOutsideCfCc.entries) ...[
+    DefineCase(
+      'sb_secret_ split by $name',
+      _define(key: 'sb_${invisible}secret_${canary}secret'),
+      [_anonSecret],
+    ),
+    DefineCase(
+      'service_role split by $name',
+      _define(key: 'service${invisible}_role_$canary'),
+      [_anonSecret],
+    ),
+    DefineCase(
+      'sb_secret_ preceded by $name, under another define key',
+      _define(extra: {'SERVER_KEY': '${invisible}sb_secret_${canary}secret'}),
+      ['define key #4 holds a privileged key'],
+    ),
+    DefineCase(
+      'sb_secret_ split by $name, nested',
+      _define(
+        extra: {
+          'NESTED': {
+            'list': ['x', 'sb_secret${invisible}_${canary}secret'],
+          },
+        },
+      ),
+      ['define key #4 holds a privileged key'],
+    ),
+    DefineCase(
+      'sb_secret_ split by $name in a key name',
+      _define(extra: {'sb_${invisible}secret_${canary}n': 'x'}),
+      ['define key #4 holds a privileged key'],
+    ),
+  ],
+  DefineCase(
+    'invisible character inside an ordinary publishable key stays accepted',
+    _define(key: 'sb_publishable_\u3164${canary}pub'),
+    [],
   ),
 ];
 

@@ -89,6 +89,9 @@ void main() {
           expect(out, isNot(contains('no build was run')));
         }
         expect(out, isNot(contains(canary)));
+        for (final window in canaryWindows) {
+          expect(out, isNot(contains(window)), reason: 'canary window leaked');
+        }
         for (final stream in [r.stdout, r.stderr]) {
           expect(stream, isNot(contains(keyCanary)));
         }
