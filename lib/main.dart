@@ -62,7 +62,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
 
   void _goNext() => _goTo(_currentIndex + 1);
 
-  Future<void> _handleTarget(AppTapTarget target) async {
+  Future<void> _handleTarget(BuildContext context, AppTapTarget target) async {
     switch (target.action) {
       case TapAction.navigate:
         if (target.destination != null) _goTo(target.destination!);
@@ -71,13 +71,14 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         _goBack();
         break;
       case TapAction.quitline:
-        await _showQuitlineDialog();
+        await _showQuitlineDialog(context);
         break;
       case TapAction.callbackConsent:
-        await _showCallbackConsent();
+        await _showCallbackConsent(context);
         break;
       case TapAction.exportData:
         await _showInformationDialog(
+          context: context,
           title: 'Prepare your data copy?',
           message:
               'The production service will create a password-protected PDF and JSON export after identity verification.',
@@ -86,6 +87,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         break;
       case TapAction.deleteAccount:
         await _showInformationDialog(
+          context: context,
           title: 'Delete account and data?',
           message:
               'This is a protected demo action. A production build must require recent authentication, a final data summary and explicit confirmation before permanent deletion.',
@@ -95,6 +97,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         break;
       case TapAction.information:
         await _showInformationDialog(
+          context: context,
           title: target.label,
           message:
               'This approved interaction is represented in the UI prototype and is ready to connect to the production API.',
@@ -104,7 +107,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     }
   }
 
-  Future<void> _showQuitlineDialog() async {
+  Future<void> _showQuitlineDialog(BuildContext context) async {
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -118,13 +121,19 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
             child: const Text('Cancel'),
           ),
           FilledButton(
-            onPressed: () {
-              Clipboard.setData(const ClipboardData(text: '1-800-784-8669'));
+            onPressed: () async {
               final messenger = ScaffoldMessenger.of(context);
               Navigator.pop(context);
-              messenger.showSnackBar(
-                const SnackBar(content: Text('Quitline number copied')),
-              );
+              var message = 'Quitline number copied';
+              try {
+                await Clipboard.setData(
+                  const ClipboardData(text: '1-800-784-8669'),
+                );
+              } on Exception {
+                message = 'Could not copy. Call 1-800-784-8669.';
+              }
+              if (!messenger.mounted) return;
+              messenger.showSnackBar(SnackBar(content: Text(message)));
             },
             child: const Text('Copy number'),
           ),
@@ -133,8 +142,9 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     );
   }
 
-  Future<void> _showCallbackConsent() {
+  Future<void> _showCallbackConsent(BuildContext context) {
     return _showInformationDialog(
+      context: context,
       title: 'Request a counselor call-back?',
       message:
           'Before sending a referral, the production app will show the exact contact details, purpose, destination and consent expiration.',
@@ -143,6 +153,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   }
 
   Future<void> _showInformationDialog({
+    required BuildContext context,
     required String title,
     required String message,
     required String confirmLabel,
@@ -179,12 +190,14 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
       debugShowCheckedModeBanner: false,
       restorationScopeId: 'breathefree',
       theme: AppTheme.light(),
-      home: ApprovedScreenPlayer(
-        currentIndex: _currentIndex,
-        onSelectScreen: _goTo,
-        onPrevious: _goBack,
-        onNext: _goNext,
-        onTarget: _handleTarget,
+      home: Builder(
+        builder: (context) => ApprovedScreenPlayer(
+          currentIndex: _currentIndex,
+          onSelectScreen: _goTo,
+          onPrevious: _goBack,
+          onNext: _goNext,
+          onTarget: (target) => _handleTarget(context, target),
+        ),
       ),
     );
   }

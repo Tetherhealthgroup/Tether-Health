@@ -325,8 +325,16 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     final receipt =
         await showAccountDeletionDialog(context, _accountController);
     if (!mounted || receipt == null) return;
+    final sessionWarning = _accountController.errorMessage;
     _quitPlanController.clear();
-    await _quitPlanController.clearGuestPlan();
+    String? deviceWarning;
+    try {
+      await _quitPlanController.clearGuestPlan();
+    } catch (_) {
+      // Cloud deletion is confirmed even when device storage is unavailable.
+      deviceWarning = 'Your on-device quit plan could not be removed. '
+          'It may still be stored on this device. Retry removing it in Settings.';
+    }
     if (!mounted) return;
     await showDialog<void>(
       context: context,
@@ -336,7 +344,9 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         content: Text(
           'Deletion receipt ${receipt.requestId}. Your BreatheFree profile and '
           'quit plan were deleted. Deleting the Supabase sign-in identity '
-          'requires the separately approved privileged account service.',
+          'requires the separately approved privileged account service.'
+          '${sessionWarning == null ? '' : '\n\n$sessionWarning'}'
+          '${deviceWarning == null ? '' : '\n\n$deviceWarning'}',
         ),
         actions: [
           FilledButton(

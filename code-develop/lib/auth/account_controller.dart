@@ -195,11 +195,13 @@ class AccountController extends ChangeNotifier {
   }
 
   Future<AccountDataExport?> exportData({required String password}) async {
-    final identity = await _reauthenticate(password);
-    if (identity == null) return null;
+    if (busy) return null;
     busy = true;
+    errorMessage = null;
     notifyListeners();
     try {
+      final identity = await _reauthenticate(password);
+      if (identity == null) return null;
       return await _accountData.exportData(identity.accessToken);
     } catch (_) {
       errorMessage = 'Your data copy could not be prepared. Please try again.';
@@ -213,14 +215,24 @@ class AccountController extends ChangeNotifier {
   Future<AccountDeletionReceipt?> deleteAppData({
     required String password,
   }) async {
-    final identity = await _reauthenticate(password);
-    if (identity == null) return null;
+    if (busy) return null;
     busy = true;
+    errorMessage = null;
     notifyListeners();
     try {
+      final identity = await _reauthenticate(password);
+      if (identity == null) return null;
       final receipt = await _accountData.deleteAppData(identity.accessToken);
-      await _auth.signOut();
+      // A confirmed deletion must not be reported as failed if session
+      // cleanup fails afterward. Clear the deleted profile regardless, but
+      // leave the gateway as the source of truth for the actual session.
       profile = null;
+      try {
+        await _auth.signOut();
+      } catch (_) {
+        errorMessage = 'Your app data was deleted, but sign-out could not be '
+            'confirmed. Please try signing out again.';
+      }
       return receipt;
     } catch (_) {
       errorMessage = 'Your app data was not deleted. Please try again.';
@@ -235,17 +247,12 @@ class AccountController extends ChangeNotifier {
     final recentAuth =
         _auth is RecentAuthGateway ? _auth as RecentAuthGateway : null;
     if (recentAuth == null || !isSignedIn) return null;
-    busy = true;
-    errorMessage = null;
-    notifyListeners();
+    // The caller owns the busy state for verification AND the data request.
     try {
       return await recentAuth.reauthenticate(password: password);
     } catch (_) {
       errorMessage = 'Password verification failed.';
       return null;
-    } finally {
-      busy = false;
-      notifyListeners();
     }
   }
 

@@ -709,8 +709,16 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     final receipt =
         await showAccountDeletionDialog(context, _accountController);
     if (!mounted || receipt == null) return;
+    final sessionWarning = _accountController.errorMessage;
     _quitPlanController.clear();
-    await _quitPlanController.clearGuestPlan();
+    String? deviceWarning;
+    try {
+      await _quitPlanController.clearGuestPlan();
+    } catch (_) {
+      // Cloud deletion is confirmed even when device storage is unavailable.
+      deviceWarning = 'Your on-device quit plan could not be removed. '
+          'It may still be stored on this device. Retry removing it in Settings.';
+    }
     if (!mounted) return;
     await showDialog<void>(
       context: context,
@@ -720,7 +728,9 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
         content: Text(
           'Deletion receipt ${receipt.requestId}. Your BreatheFree profile and '
           'plan were deleted. Your sign-in identity still requires a separate '
-          'privileged deletion process.',
+          'privileged deletion process.'
+          '${sessionWarning == null ? '' : '\n\n$sessionWarning'}'
+          '${deviceWarning == null ? '' : '\n\n$deviceWarning'}',
         ),
         actions: [
           FilledButton(

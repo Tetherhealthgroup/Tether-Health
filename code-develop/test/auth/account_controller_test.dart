@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:breathefree_patient/quit_plan/guest_quit_plan_store.dart';
+import 'package:breathefree_patient/quit_plan/quit_plan_controller.dart';
+
 import 'package:breathefree_patient/account/account_data_api_client.dart';
 import 'package:breathefree_patient/auth/account_controller.dart';
 import 'package:breathefree_patient/auth/auth_gateway.dart';
@@ -7,6 +10,8 @@ import 'package:breathefree_patient/profile/profile_api_client.dart';
 import 'package:breathefree_patient/profile/profile_repository.dart';
 import 'package:breathefree_patient/profile/user_profile.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart';
+import 'package:breathefree_patient/main.dart';
 
 void main() {
   test('sign-in loads the caller profile through replaceable abstractions',
@@ -149,6 +154,175 @@ void main() {
     expect(receipt?.requestId, 'receipt-id');
     expect(controller.isSignedIn, isFalse);
   });
+
+  for (final clearSession in [false, true]) {
+    test('confirmed deletion survives sign-out failure (cleared=$clearSession)',
+        () async {
+      final auth = _FakeAuth()
+        ..failSignOut = true
+        ..clearSessionBeforeFailure = clearSession;
+      final api = _FakeAccountDataApi();
+      final controller = AccountController(
+        auth: auth,
+        profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+        accountData: api,
+      );
+      addTearDown(controller.dispose);
+      await controller.signIn(
+          email: 'person@example.test', password: 'password');
+
+      final receipt = await controller.deleteAppData(password: 'password');
+      expect(receipt?.requestId, 'receipt-id');
+      expect(api.calls, 1);
+      expect(controller.profile, isNull);
+      expect(controller.isSignedIn, !clearSession);
+      expect(controller.busy, isFalse);
+      expect(
+          controller.errorMessage, contains('sign-out could not be confirmed'));
+    });
+  }
+
+  test('failed data request retains profile and session', () async {
+    final auth = _FakeAuth();
+    final api = _FakeAccountDataApi()..pending = Completer<void>();
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      accountData: api,
+    );
+    addTearDown(controller.dispose);
+    await controller.signIn(email: 'person@example.test', password: 'password');
+    final request = controller.deleteAppData(password: 'password');
+    await Future<void>.delayed(Duration.zero);
+    api.pending!.completeError(StateError('synthetic request failure'));
+    expect(await request, isNull);
+    expect(controller.profile, isNotNull);
+    expect(controller.isSignedIn, isTrue);
+    expect(controller.busy, isFalse);
+    expect(controller.errorMessage, contains('was not deleted'));
+  });
+
+  for (final failStorage in [false, true]) {
+    testWidgets(
+        'deletion receipt survives cleanup (storage failure: $failStorage)',
+        (tester) async {
+      tester.view.physicalSize = const Size(430, 932);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final auth = _FakeAuth()..failSignOut = true;
+      final api = _FakeAccountDataApi();
+      final controller = AccountController(
+        auth: auth,
+        profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+        accountData: api,
+      );
+      addTearDown(controller.dispose);
+      await controller.signIn(
+          email: 'person@example.test', password: 'password');
+      final store = _CleanupGuestStore(failClear: failStorage);
+      final quitPlan = QuitPlanController.disabled(guestStore: store);
+      addTearDown(quitPlan.dispose);
+      await tester.pumpWidget(BreatheFreeApp(
+        quitPlanController: quitPlan,
+        initialScreen: 27,
+        accountController: controller,
+      ));
+      await tester.pumpAndSettle();
+      final deleteAction =
+          find.byKey(const ValueKey('settings-delete-account'));
+      await tester.ensureVisible(deleteAction);
+      await tester.tap(deleteAction);
+      await tester.pumpAndSettle();
+      await tester.enterText(
+          find.byKey(const ValueKey('account-delete-password')), 'password');
+      await tester.enterText(
+          find.byKey(const ValueKey('account-delete-confirmation')), 'DELETE');
+      await tester.pump();
+      await tester.tap(find.byKey(const ValueKey('account-delete-confirm')));
+      await tester.pumpAndSettle();
+      expect(find.text('App data deleted'), findsOneWidget);
+      expect(
+          find.textContaining('Deletion receipt receipt-id'), findsOneWidget);
+      expect(find.textContaining('sign-out could not be confirmed'),
+          findsOneWidget);
+      expect(find.textContaining('was not deleted'), findsNothing);
+      expect(find.textContaining('on-device quit plan could not be removed'),
+          failStorage ? findsOneWidget : findsNothing);
+      expect(store.clearCalls, 1);
+      expect(controller.isSignedIn, isTrue);
+      expect(api.calls, 1);
+      await tester.tap(find.text('Done'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  for (final deleting in [false, true]) {
+    final operation = deleting ? 'deletion' : 'export';
+    test('$operation stays busy and rejects overlaps until completion',
+        () async {
+      final auth = _FakeAuth()..verification = Completer<void>();
+      final api = _FakeAccountDataApi()..pending = Completer<void>();
+      final controller = AccountController(
+        auth: auth,
+        profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+        accountData: api,
+      );
+      addTearDown(controller.dispose);
+      await controller.signIn(
+          email: 'person@example.test', password: 'password');
+      final busyStates = <bool>[];
+      controller.addListener(() => busyStates.add(controller.busy));
+
+      final request = deleting
+          ? controller.deleteAppData(password: 'password')
+          : controller.exportData(password: 'password');
+      expect(controller.busy, isTrue);
+      expect(await controller.exportData(password: 'password'), isNull);
+      expect(await controller.deleteAppData(password: 'password'), isNull);
+      expect(auth.verificationCalls, 1);
+      expect(api.calls, 0);
+
+      auth.verification!.complete();
+      await Future<void>.delayed(Duration.zero);
+      expect(api.calls, 1);
+      expect(controller.busy, isTrue);
+      expect(busyStates, [true]);
+      expect(await controller.exportData(password: 'password'), isNull);
+      expect(await controller.deleteAppData(password: 'password'), isNull);
+
+      api.pending!.complete();
+      expect(await request, isNotNull);
+      expect(busyStates, [true, false]);
+      expect(api.calls, 1);
+    });
+
+    test('$operation releases busy state after verification failure', () async {
+      final auth = _FakeAuth()..verification = Completer<void>();
+      final api = _FakeAccountDataApi();
+      final controller = AccountController(
+        auth: auth,
+        profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+        accountData: api,
+      );
+      addTearDown(controller.dispose);
+      await controller.signIn(
+          email: 'person@example.test', password: 'password');
+      final request = deleting
+          ? controller.deleteAppData(password: 'password')
+          : controller.exportData(password: 'password');
+      auth.verification!.completeError(StateError('synthetic failure'));
+      expect(await request, isNull);
+      expect(controller.busy, isFalse);
+      expect(controller.errorMessage, 'Password verification failed.');
+      expect(api.calls, 0);
+
+      auth.verification = null;
+      expect(await controller.exportData(password: 'password'), isNotNull);
+      expect(controller.errorMessage, isNull);
+    });
+  }
 }
 
 class _FakeAuth
@@ -156,6 +330,10 @@ class _FakeAuth
   _FakeAuth({this.requiresConfirmation = false});
 
   final bool requiresConfirmation;
+  Completer<void>? verification;
+  int verificationCalls = 0;
+  bool failSignOut = false;
+  bool clearSessionBeforeFailure = false;
   AuthIdentity? _identity;
   String? resentEmail;
   String? recoveryEmail;
@@ -203,6 +381,8 @@ class _FakeAuth
 
   @override
   Future<AuthIdentity> reauthenticate({required String password}) async {
+    verificationCalls++;
+    await verification?.future;
     return _identity = const AuthIdentity(
       id: 'user-id',
       email: 'person@example.test',
@@ -216,21 +396,31 @@ class _FakeAuth
   }
 
   @override
-  Future<void> signOut() async => _identity = null;
+  Future<void> signOut() async {
+    if (clearSessionBeforeFailure) _identity = null;
+    if (failSignOut) throw StateError('synthetic sign-out failure');
+    _identity = null;
+  }
 }
 
 class _FakeAccountDataApi implements AccountDataApiClient {
+  Completer<void>? pending;
+  int calls = 0;
   String? receivedToken;
 
   @override
   Future<AccountDataExport> exportData(String accessToken) async {
+    calls++;
     receivedToken = accessToken;
+    await pending?.future;
     return const AccountDataExport(document: {'schemaVersion': '1.0'});
   }
 
   @override
   Future<AccountDeletionReceipt> deleteAppData(String accessToken) async {
+    calls++;
     receivedToken = accessToken;
+    await pending?.future;
     return AccountDeletionReceipt(
       requestId: 'receipt-id',
       completedAt: DateTime.utc(2026, 9, 20),
@@ -283,4 +473,21 @@ class _FakeProfileApi implements ProfileApiClient {
         createdAt: DateTime.utc(2026),
         updatedAt: DateTime.utc(2026),
       );
+}
+
+class _CleanupGuestStore implements GuestQuitPlanStore {
+  _CleanupGuestStore({required this.failClear});
+  final bool failClear;
+  int clearCalls = 0;
+  @override
+  bool get isPersistent => true;
+  @override
+  Future<GuestQuitPlanSnapshot?> load() async => null;
+  @override
+  Future<void> save(GuestQuitPlanSnapshot snapshot) async {}
+  @override
+  Future<void> clear() async {
+    clearCalls++;
+    if (failClear) throw StateError('synthetic storage failure');
+  }
 }
