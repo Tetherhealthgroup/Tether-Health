@@ -111,6 +111,12 @@ final opaqueSegments = <String, List<int>>{
     0xBF,
     ...utf8.encode(controlCharPayload),
   ],
+  // TH-142: specifically exercise the FF FE BOM-removal branch.
+  'FF FE, UTF-16LE and an escaped role key with a control character': [
+    0xFF,
+    0xFE,
+    ...utf16Bytes(_escapedKeyPayload, bigEndian: false),
+  ],
   'FE FF, UTF-16BE and an escaped role key': [
     0xFE,
     0xFF,
