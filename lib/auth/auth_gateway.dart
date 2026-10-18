@@ -15,6 +15,48 @@ class AuthIdentity {
 
 enum AuthSignUpStatus { authenticated, emailConfirmationRequired }
 
+enum AuthFailureReason {
+  invalidCredentials,
+  emailNotConfirmed,
+  rateLimited,
+  accountUnavailable,
+  network,
+  serviceUnavailable,
+  unknown,
+}
+
+class AuthFailure implements Exception {
+  const AuthFailure(this.reason);
+
+  final AuthFailureReason reason;
+}
+
+AuthFailure classifyAuthFailure(AuthException error) {
+  final code = error.code;
+  if (code == 'invalid_credentials' ||
+      code == 'user_not_found' ||
+      code == 'invalid_grant') {
+    return const AuthFailure(AuthFailureReason.invalidCredentials);
+  }
+  if (code == 'email_not_confirmed') {
+    return const AuthFailure(AuthFailureReason.emailNotConfirmed);
+  }
+  if (code == 'over_request_rate_limit' || error.statusCode == '429') {
+    return const AuthFailure(AuthFailureReason.rateLimited);
+  }
+  if (code == 'user_banned') {
+    return const AuthFailure(AuthFailureReason.accountUnavailable);
+  }
+  final status = int.tryParse(error.statusCode ?? '');
+  if (status != null && status >= 500) {
+    return const AuthFailure(AuthFailureReason.serviceUnavailable);
+  }
+  if (error is AuthRetryableFetchException || code == 'request_timeout') {
+    return const AuthFailure(AuthFailureReason.network);
+  }
+  return const AuthFailure(AuthFailureReason.unknown);
+}
+
 class AuthSignUpResult {
   const AuthSignUpResult._({required this.status, this.identity});
 
@@ -82,15 +124,21 @@ class SupabaseAuthGateway
     required String email,
     required String password,
   }) async {
-    final response = await _client.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
-    final identity = _identity(response.session);
-    if (identity == null) {
-      throw const AuthException('No authenticated session was returned.');
+    try {
+      final response = await _client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      final identity = _identity(response.session);
+      if (identity == null) {
+        throw const AuthFailure(AuthFailureReason.unknown);
+      }
+      return identity;
+    } on AuthFailure {
+      rethrow;
+    } on AuthException catch (error) {
+      throw classifyAuthFailure(error);
     }
-    return identity;
   }
 
   @override

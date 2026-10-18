@@ -256,6 +256,44 @@ void main() {
     expect(quitPlan.plan, isNull);
   });
 
+  testWidgets('sign-in displays the specific safe authentication error',
+      (tester) async {
+    tester.view.physicalSize = const Size(430, 932);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final auth = _SuccessfulAuth(
+      signInFailure: const AuthFailure(AuthFailureReason.invalidCredentials),
+    );
+    final account = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _ProfileApi()),
+    );
+    addTearDown(account.dispose);
+
+    await tester.pumpWidget(BreatheFreeApp(accountController: account));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('welcome-sign-in')));
+    await tester.tap(find.byKey(const ValueKey('welcome-sign-in')));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const ValueKey('sign-in-email')),
+      'person@example.test',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('sign-in-password')),
+      'wrong-password',
+    );
+    await tester.tap(find.byKey(const ValueKey('sign-in-submit')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Email or password is incorrect.'), findsOneWidget);
+    expect(
+        find.textContaining('Check your details and connection'), findsNothing);
+  });
+
   testWidgets('successful sign-in confirms success and starts onboarding',
       (tester) async {
     tester.view.physicalSize = const Size(430, 932);
@@ -290,7 +328,11 @@ void main() {
 }
 
 class _SuccessfulAuth implements AuthGateway {
-  _SuccessfulAuth({bool signedIn = false, this.requiresConfirmation = false}) {
+  _SuccessfulAuth({
+    bool signedIn = false,
+    this.requiresConfirmation = false,
+    this.signInFailure,
+  }) {
     if (signedIn) {
       _identity = const AuthIdentity(
         id: 'user-id',
@@ -301,6 +343,7 @@ class _SuccessfulAuth implements AuthGateway {
   }
 
   final bool requiresConfirmation;
+  final Object? signInFailure;
   AuthIdentity? _identity;
   String? resentEmail;
 
@@ -310,6 +353,8 @@ class _SuccessfulAuth implements AuthGateway {
   @override
   Future<AuthIdentity> signIn(
       {required String email, required String password}) async {
+    final failure = signInFailure;
+    if (failure != null) throw failure;
     return _identity = AuthIdentity(
       id: 'user-id',
       email: email,
