@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Tether Health API
-  version: 1.3.0
+  version: 1.4.0
   description: >-
     Development contract for authenticated profiles and bounded program data.
     Real patient, clinical, and support-person data remain prohibited until
@@ -181,6 +181,257 @@ paths:
         '400': {description: Exact explicit confirmation was not supplied}
         '401': {description: Missing, invalid, or insufficiently recent authentication}
         '502': {description: Deletion did not complete}
+  /v1/catalogue/programmes:
+    get:
+      operationId: listProgrammes
+      description: Programme reference data (no user data), ordered by code.
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: The programme catalogue
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeCatalogue'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '502': {description: The catalogue is temporarily unavailable}
+  /v1/enrolments:
+    get:
+      operationId: listMyEnrolments
+      description: >-
+        The caller's enrolments (including left ones) with each enrolment's
+        live programme consents (revoked_at is null). Revoked consent history
+        is not provided by this endpoint. Only the caller's own rows are
+        visible (row-level security). If the full list cannot be returned the
+        request fails with 502 rather than returning part of it.
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: The caller's enrolments
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/EnrolmentList'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '502': {description: Enrolment storage is temporarily unavailable, or the list could not be returned in full}
+    post:
+      operationId: enrolInProgramme
+      description: >-
+        Creates the caller's single enrolment for a programme. Rejoining a left
+        programme is a PATCH of the existing enrolment, never a second POST.
+        At most two enrolments may be in focus.
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateEnrolment'}
+      responses:
+        '201':
+          description: Created enrolment (no consents yet)
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Enrolment'}
+        '400':
+          description: Invalid body (no code), or `mode_not_allowed`
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - {$ref: '#/components/schemas/RequestRejected'}
+                  - {$ref: '#/components/schemas/CodedRequestRejected'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404':
+          description: '`programme_not_found`'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '409':
+          description: '`already_enrolled`, `focus_cap_reached` or `account_deletion_in_progress`'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '502': {description: Enrolment storage is temporarily unavailable}
+  /v1/enrolments/{enrolmentId}:
+    parameters:
+      - name: enrolmentId
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+    patch:
+      operationId: updateMyEnrolment
+      description: >-
+        Changes status and/or mode. Setting `left` keeps the enrolment and its
+        data until "Delete now" or account deletion, and revokes every live
+        consent except core. Changing `left` to another status rejoins on the
+        same enrolment; optional consents must be granted again. A focus swap
+        is two requests: first move one enrolment out of focus, then move the
+        other into focus.
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/UpdateEnrolment'}
+      responses:
+        '200':
+          description: Updated enrolment with its consents
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Enrolment'}
+        '400':
+          description: Invalid body (no code), or `mode_not_allowed`
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - {$ref: '#/components/schemas/RequestRejected'}
+                  - {$ref: '#/components/schemas/CodedRequestRejected'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404':
+          description: '`enrolment_not_found` (also for enrolments of other users)'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '409':
+          description: '`focus_cap_reached`, `enrolment_conflict` or `account_deletion_in_progress` (rejoin after account deletion started)'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '502': {description: Enrolment storage is temporarily unavailable}
+    delete:
+      operationId: deleteMyEnrolmentNow
+      summary: Delete the enrolment row, its consents and its cascaded sync data (not yet for app use)
+      description: >-
+        Not for app use yet. Permanently deletes the enrolment row, all of its
+        programme consents (live and revoked), and rows in tables that
+        reference the enrolment with on delete cascade (sync data tables once
+        they reference enrolments). It does not delete older programme data
+        stored per account (quit_plans, program_data); a later change removes
+        that data too, and only then should the app offer this as "Delete
+        now". Requires the exact confirmation and a recent sign-in, as account
+        deletion does.
+      x-app-use: false
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [confirmation]
+              properties:
+                confirmation: {const: DELETE}
+      responses:
+        '204': {description: The enrolment row, its consents and its cascaded rows were deleted}
+        '400':
+          description: '`confirmation_required` (missing or wrong confirmation), or an invalid enrolment id or body (no code)'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - {$ref: '#/components/schemas/RequestRejected'}
+                  - {$ref: '#/components/schemas/CodedRequestRejected'}
+        '401':
+          description: Missing or invalid token (no code), or `recent_authentication_required`
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - {$ref: '#/components/schemas/RequestRejected'}
+                  - {$ref: '#/components/schemas/CodedRequestRejected'}
+        '404':
+          description: '`enrolment_not_found` (also for enrolments of other users)'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '502': {description: Deletion did not complete}
+  /v1/enrolments/consents:
+    post:
+      operationId: grantProgrammeConsent
+      description: >-
+        Records a consent on one of the caller's enrolments, keeping the
+        version and wording exactly as supplied. Any purpose other than core
+        needs the enrolment's live core consent. A second live grant of the
+        same purpose and recipient is refused with `consent_already_granted`
+        (409) and the existing row is unchanged; to record new wording, revoke
+        and grant again. The share purposes (share_care_team,
+        share_caregiver) are refused with `sharing_not_available` (409) until
+        care connections exist.
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/GrantConsent'}
+      responses:
+        '201':
+          description: Recorded consent
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeConsent'}
+        '400':
+          description: Invalid body
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RequestRejected'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404':
+          description: '`enrolment_not_found` (also for enrolments of other users)'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '409':
+          description: '`sharing_not_available`, `enrolment_left`, `core_consent_required`, `consent_already_granted` or `consent_not_permitted` (for example after account deletion started)'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '502': {description: Consent storage is temporarily unavailable}
+  /v1/enrolments/consents/{consentId}:
+    parameters:
+      - name: consentId
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+    patch:
+      operationId: revokeProgrammeConsent
+      description: >-
+        Revokes a live consent (the only permitted change). The database sets
+        the revocation time. Revoking core revokes every live consent of the
+        enrolment.
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [revoked]
+              properties:
+                revoked: {const: true}
+      responses:
+        '200':
+          description: Revoked consent
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeConsent'}
+        '400':
+          description: Invalid body or consent id
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RequestRejected'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404':
+          description: '`consent_not_found` (also for consents of other users)'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '409':
+          description: '`consent_already_revoked`'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '502': {description: Consent storage is temporarily unavailable}
 components:
   securitySchemes:
     supabaseJwt: {type: http, scheme: bearer, bearerFormat: JWT}
@@ -354,3 +605,150 @@ components:
             createdAt: {type: string, format: date-time}
             updatedAt: {type: string, format: date-time}
       unevaluatedProperties: false
+    RequestRejected:
+      description: Error body. Never contains submitted values or health data.
+      type: object
+      additionalProperties: false
+      required: [statusCode, error, requestId]
+      properties:
+        statusCode: {type: integer}
+        error: {type: string, enum: [Request rejected, Service unavailable]}
+        requestId: {type: string}
+    CodedRequestRejected:
+      description: Error body with a stable code naming the refused rule. Never contains submitted values or health data.
+      type: object
+      additionalProperties: false
+      required: [statusCode, error, code, requestId]
+      properties:
+        statusCode: {type: integer}
+        error: {const: Request rejected}
+        code:
+          type: string
+          enum:
+            - enrolment_not_found
+            - already_enrolled
+            - programme_not_found
+            - mode_not_allowed
+            - focus_cap_reached
+            - enrolment_conflict
+            - enrolment_left
+            - account_deletion_in_progress
+            - core_consent_required
+            - consent_already_granted
+            - consent_not_found
+            - consent_already_revoked
+            - consent_not_permitted
+            - sharing_not_available
+            - confirmation_required
+            - recent_authentication_required
+        requestId: {type: string}
+    Programme:
+      type: object
+      additionalProperties: false
+      required: [code, slug, name, area, archetype, receivesResources]
+      properties:
+        code: {type: string, pattern: '^[a-z]{2}$'}
+        slug: {type: string}
+        name: {type: string}
+        area: {type: string}
+        archetype: {type: string}
+        receivesResources:
+          type: array
+          description: Record categories the programme may receive; empty means never.
+          items: {type: string}
+    ProgrammeCatalogue:
+      type: object
+      additionalProperties: false
+      required: [programmes]
+      properties:
+        programmes:
+          type: array
+          items: {$ref: '#/components/schemas/Programme'}
+    EnrolmentStatus: {type: string, enum: [focus, learn_only, paused, left]}
+    EnrolmentMode:
+      type: [string, 'null']
+      enum: [quit, reduce, null]
+      description: Only BreatheFree (bf) and ScrollFree (sf) take a mode.
+    CreateEnrolment:
+      type: object
+      additionalProperties: false
+      required: [programmeCode, status]
+      properties:
+        programmeCode: {type: string, pattern: '^[a-z]{2}$'}
+        status: {type: string, enum: [focus, learn_only, paused]}
+        mode: {$ref: '#/components/schemas/EnrolmentMode'}
+    UpdateEnrolment:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        status: {$ref: '#/components/schemas/EnrolmentStatus'}
+        mode: {$ref: '#/components/schemas/EnrolmentMode'}
+    ConsentPurpose:
+      type: string
+      enum: [core, reminders, records_import, share_care_team, share_caregiver, research, screen_time]
+    GrantConsent:
+      type: object
+      additionalProperties: false
+      required: [enrolmentId, purpose, consentVersion, consentText]
+      properties:
+        enrolmentId: {type: string, format: uuid}
+        purpose: {$ref: '#/components/schemas/ConsentPurpose'}
+        recipientRef:
+          type: string
+          format: uuid
+          description: >-
+            Care connection or caregiver id for share purposes only. Share
+            purposes are not accepted yet, so any value is currently refused.
+        consentVersion: {type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$'}
+        consentText:
+          type: string
+          minLength: 1
+          maxLength: 8000
+          description: The wording shown to the member, stored exactly as supplied.
+    ProgrammeConsent:
+      type: object
+      additionalProperties: false
+      required: [id, enrolmentId, purpose, recipientRef, consentVersion, consentText, grantedAt, revokedAt]
+      properties:
+        id: {type: string, format: uuid}
+        enrolmentId: {type: string, format: uuid}
+        purpose: {$ref: '#/components/schemas/ConsentPurpose'}
+        recipientRef: {type: [string, 'null']}
+        consentVersion: {type: string}
+        consentText: {type: string}
+        grantedAt: {type: string, format: date-time}
+        revokedAt: {type: [string, 'null'], format: date-time}
+    Enrolment:
+      type: object
+      additionalProperties: false
+      required: [id, programmeCode, status, mode, joinedAt, leftAt, createdAt, updatedAt, consents, reconsentRequired]
+      properties:
+        id: {type: string, format: uuid}
+        programmeCode: {type: string, pattern: '^[a-z]{2}$'}
+        status: {$ref: '#/components/schemas/EnrolmentStatus'}
+        mode: {$ref: '#/components/schemas/EnrolmentMode'}
+        joinedAt: {type: string, format: date-time}
+        leftAt: {type: [string, 'null'], format: date-time}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+        consents:
+          type: array
+          description: >-
+            Live consents of this enrolment (revoked_at is null), oldest
+            first. Revoked history is not included.
+          items: {$ref: '#/components/schemas/ProgrammeConsent'}
+        reconsentRequired:
+          type: boolean
+          description: >-
+            True when the enrolment is not left and its live core consent was
+            given to a version other than `currentCoreConsentVersion`.
+    EnrolmentList:
+      type: object
+      additionalProperties: false
+      required: [currentCoreConsentVersion, enrolments]
+      properties:
+        currentCoreConsentVersion: {type: string}
+        enrolments:
+          type: array
+          items: {$ref: '#/components/schemas/Enrolment'}
