@@ -22,13 +22,19 @@ import { DB_CANARY, FakePostgrest } from "./support/fake-postgrest";
  * request's bearer token and applies the TH-913 RLS policies, grants,
  * constraints and triggers.
  *
- * Fake ordering differences (th-qa D1/D4), which no test here relies on:
- * the fake evaluates check, foreign-key and RLS insert checks in a fixed
- * order of its own (Postgres runs RLS WITH CHECK before constraints, and
- * unique/foreign-key checks later), and its clock advances by 1 ms on every
- * timestamp, so rows written in one request get distinct, strictly
- * increasing times where Postgres's now() would give them the same value.
- * Ordering by granted_at/created_at is therefore never tied in the fake.
+ * Stand-in fidelity (th-qa D1, D2, D4):
+ * - D1: the fake evaluates check, foreign-key and RLS insert checks in a
+ *   fixed order of its own (Postgres runs RLS WITH CHECK before
+ *   constraints, and unique/foreign-key checks later). No test relies on it.
+ * - D2: the fake's clock advances by 1 ms on every timestamp, so rows
+ *   written in one request get distinct, strictly increasing times where
+ *   Postgres's now() would give them the same value. Ordering by
+ *   granted_at/created_at is therefore never tied in the fake. No test
+ *   relies on it.
+ * - D4: the real status, code and message PostgREST returns when the
+ *   deferred focus-cap error is raised at COMMIT are unknown until a local
+ *   database run. The focus-cap tests rely on the fake answering 400, 23514
+ *   and the exact trigger message; TH-974 moves detection to the TH001 code.
  */
 
 type Method = "DELETE" | "GET" | "PATCH" | "POST";
