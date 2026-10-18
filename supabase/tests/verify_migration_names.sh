@@ -2,8 +2,9 @@
 # Checks every file in supabase/migrations:
 #   * the name is YYYYMMDDNNNN_name.sql: a 12-digit version (a real month and
 #     day, sequence 0001-9999), then lowercase letters, digits and underscores;
-#   * versions are unique and strictly increasing in filename order, so the
-#     order the Supabase CLI applies them in is the order they were written;
+#   * versions are unique and strictly increasing in filename order, so no two
+#     files share a version and the apply order is unambiguous (this cannot
+#     tell whether a new file was given a version below an existing one);
 #   * nothing else is in the directory (no 14-digit timestamps, no other files).
 #
 #   bash supabase/tests/verify_migration_names.sh

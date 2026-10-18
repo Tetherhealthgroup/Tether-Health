@@ -22,34 +22,49 @@ begin;
 --   refuses UPDATE for every role. They are deleted only by cascade or by
 --   delete_my_app_data.
 -- * delete_my_app_data also deletes the caller's sync rows and returns
---   sync_answers and sync_lapses counts.
+--   sync_answers, sync_lapses, sync_areas and sync_accounts counts.
 -- * thsync is created NOLOGIN here. Giving it LOGIN is a separate human step
 --   outside migrations; no credential belongs in this repository.
 
 -- Legacy cleanup. An earlier, unmerged design defined sync_* tables keyed by
--- account_id. Drop them if present. If tables with these names exist but do
--- not have that legacy shape, stop instead of dropping them.
+-- account_id. Drop them only if they have that legacy shape and are empty.
+-- Stop instead if a table with one of these names has another shape or holds
+-- rows. The drop has no CASCADE, so an object that depends on these tables
+-- also stops the migration instead of being dropped with them.
 do $legacy$
+declare
+  legacy record;
+  has_rows boolean;
 begin
-  if exists (
-    select 1
-    from pg_catalog.pg_class as c
-    where c.relnamespace = 'public'::regnamespace
-      and c.relname in ('sync_account', 'sync_area', 'sync_answer', 'sync_lapse')
-      and not exists (
+  for legacy in
+    select
+      c.relname,
+      exists (
         select 1
         from pg_catalog.pg_attribute as a
         where a.attrelid = c.oid
           and a.attname = 'account_id'
           and not a.attisdropped
-      )
-  ) then
-    raise exception 'public.sync_* exists without the legacy account_id column; refusing to drop it';
-  end if;
+      ) as is_legacy
+    from pg_catalog.pg_class as c
+    where c.relnamespace = 'public'::regnamespace
+      and c.relname in ('sync_account', 'sync_area', 'sync_answer', 'sync_lapse')
+  loop
+    if not legacy.is_legacy then
+      raise exception 'public.% exists without the legacy account_id column; refusing to drop it',
+        legacy.relname;
+    end if;
+    execute pg_catalog.format('select exists (select 1 from public.%I)', legacy.relname)
+    into has_rows;
+    if has_rows then
+      raise exception 'public.% has rows; export them and confirm with the owner that the remote copy may be discarded, then empty the table before applying this migration',
+        legacy.relname;
+    end if;
+  end loop;
 end;
 $legacy$;
 
-drop table if exists public.sync_lapse, public.sync_answer, public.sync_area, public.sync_account cascade;
+drop table if exists public.sync_lapse, public.sync_answer, public.sync_area, public.sync_account;
 
 -- The service role. No login, no inheritance (it must SET ROLE authenticated
 -- to do anything), no elevated attributes, and it owns nothing.
@@ -71,6 +86,35 @@ end;
 $role$;
 
 grant authenticated to thsync;
+
+-- thsync must hold exactly one membership: authenticated, without admin
+-- option and (where the server records it) without inheritance.
+do $membership$
+declare
+  bad boolean;
+begin
+  select
+    coalesce(array_agg(distinct m.roleid::regrole::text), '{}') <> array['authenticated']
+    or coalesce(bool_or(m.admin_option), false)
+  into bad
+  from pg_catalog.pg_auth_members as m
+  where m.member = 'thsync'::regrole;
+  if not bad and exists (
+    select 1
+    from pg_catalog.pg_attribute
+    where attrelid = 'pg_catalog.pg_auth_members'::regclass
+      and attname = 'inherit_option'
+      and not attisdropped
+  ) then
+    execute 'select exists (select 1 from pg_catalog.pg_auth_members '
+      'where member = ''thsync''::regrole and inherit_option)'
+    into bad;
+  end if;
+  if bad then
+    raise exception 'role thsync must be a member of authenticated only, without admin option or inheritance';
+  end if;
+end;
+$membership$;
 
 -- True only when the database session was opened by the sync service.
 -- session_user is the login role and is not changed by SET ROLE; PostgREST
@@ -367,7 +411,7 @@ from public, anon, authenticated;
 
 -- Account deletion also removes the caller's sync data. Everything earlier
 -- migrations put in this function is kept; the additions are the sync deletes
--- (before enrolments, so their counts are not lost to the cascade), the two
+-- (before enrolments, so their counts are not lost to the cascade), the four
 -- sync counts in the receipt, and a refusal for sync sessions (deletion goes
 -- through the API only).
 create or replace function public.delete_my_app_data(p_confirmation text)
@@ -386,6 +430,8 @@ declare
   deleted_account_consents integer := 0;
   deleted_sync_answers integer := 0;
   deleted_sync_lapses integer := 0;
+  deleted_sync_areas integer := 0;
+  deleted_sync_accounts integer := 0;
 begin
   if caller_id is null then
     raise insufficient_privilege using message = 'Authentication required';
@@ -409,7 +455,9 @@ begin
   delete from public.sync_answer where user_id = caller_id;
   get diagnostics deleted_sync_answers = row_count;
   delete from public.sync_area where user_id = caller_id;
+  get diagnostics deleted_sync_areas = row_count;
   delete from public.sync_account where user_id = caller_id;
+  get diagnostics deleted_sync_accounts = row_count;
   delete from public.programme_consents
   where enrolment_id in (
     select id from public.enrolments where user_id = caller_id
@@ -434,7 +482,9 @@ begin
     'programme_consents', deleted_programme_consents,
     'account_consents', deleted_account_consents,
     'sync_answers', deleted_sync_answers,
-    'sync_lapses', deleted_sync_lapses
+    'sync_lapses', deleted_sync_lapses,
+    'sync_areas', deleted_sync_areas,
+    'sync_accounts', deleted_sync_accounts
   );
 end;
 $$;

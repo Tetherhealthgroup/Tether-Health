@@ -640,12 +640,16 @@ select set_config('th944.a_counts', jsonb_build_object(
   'sync_answers', (select count(*) from public.sync_answer
                    where user_id = '00000000-0000-4000-8000-000000944001'),
   'sync_lapses', (select count(*) from public.sync_lapse
-                  where user_id = '00000000-0000-4000-8000-000000944001')
+                  where user_id = '00000000-0000-4000-8000-000000944001'),
+  'sync_areas', (select count(*) from public.sync_area
+                 where user_id = '00000000-0000-4000-8000-000000944001'),
+  'sync_accounts', (select count(*) from public.sync_account
+                    where user_id = '00000000-0000-4000-8000-000000944001')
 )::text, true);
 select th944_test.ok(
   current_setting('th944.a_counts')::jsonb @> '{"enrolments": 2, "programme_consents": 2,
-    "sync_answers": 2, "sync_lapses": 3}'::jsonb,
-  'A has 2 enrolments, 2 programme consents, 2 sync answers and 3 lapses before deletion');
+    "sync_answers": 2, "sync_lapses": 3, "sync_areas": 1, "sync_accounts": 1}'::jsonb,
+  'A has 2 enrolments, 2 programme consents, 2 sync answers, 3 lapses, 1 area and 1 sync account before deletion');
 
 select th944_test.become('authenticator', '00000000-0000-4000-8000-000000944001');
 select th944_test.ok(public.begin_account_deletion('DELETE'), 'A API: deletion barrier set');
@@ -668,7 +672,7 @@ select th944_test.become('authenticator', '00000000-0000-4000-8000-000000944001'
 select set_config('th944.a_receipt', public.delete_my_app_data('DELETE')::text, true);
 select th944_test.ok(
   current_setting('th944.a_receipt')::jsonb = current_setting('th944.a_counts')::jsonb,
-  'A API: delete_my_app_data returns counts only, including sync_answers and sync_lapses');
+  'A API: delete_my_app_data returns counts only, one per deleted table, including all four sync tables');
 select th944_test.become('thsync', '00000000-0000-4000-8000-000000944001');
 select th944_test.refused(
   'insert into public.sync_account (user_id) values (''00000000-0000-4000-8000-000000944001'')',
@@ -762,17 +766,26 @@ first_line() {
 }
 
 # Legacy cleanup comes first, and only drops the old account_id-keyed tables.
-drop_line=$(first_line '^drop table if exists public\.sync_lapse, public\.sync_answer, public\.sync_area, public\.sync_account cascade;$')
+drop_line=$(first_line '^drop table if exists public\.sync_lapse, public\.sync_answer, public\.sync_area, public\.sync_account;$')
 create_line=$(first_line '^create table ')
 [[ -n "$drop_line" ]] || fail 'legacy sync_* drop missing'
 [[ -n "$create_line" && "$drop_line" -lt "$create_line" ]] || fail 'legacy drop must come before any create table'
 require "a\\.attname = 'account_id'" 'legacy drop guarded on the legacy account_id column'
 require 'refusing to drop' 'legacy guard stops on unexpected sync_* tables'
+require "format\\('select exists \\(select 1 from public\\.%I\\)'" 'legacy guard checks each legacy table for rows'
+require 'has rows; export them' 'legacy guard stops on a non-empty legacy table'
+if grep -Ei '^drop ' "$migration" | grep -Eiq 'cascade'; then
+  fail 'no drop may cascade (a dependent object must stop the migration)'
+fi
 
 # The role: non-privileged, NOLOGIN, NOINHERIT, member of authenticated only.
 require '^    create role thsync nologin noinherit;$' 'thsync created nologin noinherit'
 require 'rolsuper or rolbypassrls or rolcreaterole or rolcreatedb' 'thsync attributes asserted'
 require '^grant authenticated to thsync;$' 'thsync is a member of authenticated'
+require "array_agg\\(distinct m\\.roleid::regrole::text\\), '\\{\\}'\\) <> array\\['authenticated'\\]" 'thsync membership asserted to be exactly authenticated'
+require 'bool_or\(m\.admin_option\)' 'thsync membership asserted without admin option'
+require 'inherit_option\)' 'thsync membership asserted without inheritance'
+require 'must be a member of authenticated only' 'thsync membership assertion raises'
 if grep -Ei '(create|alter) role' "$migration" |
   grep -Eiq '(^|[[:space:]])(login|superuser|createrole|createdb|replication|bypassrls|inherit)([[:space:];]|$)|password'; then
   fail 'thsync must not get login, a credential or an elevated attribute in a migration'
@@ -886,7 +899,7 @@ check_delete_body() {
   done
   grep -q 'delete from public.profiles where id = caller_id' <<<"$body" || fail "$where: deletion covers profiles"
   for k in profiles quit_plans program_data enrolments programme_consents account_consents \
-    sync_answers sync_lapses; do
+    sync_answers sync_lapses sync_areas sync_accounts; do
     grep -Eq "'$k', deleted_$k" <<<"$body" || fail "$where: receipt count $k"
   done
   grep -q "p_confirmation is distinct from 'DELETE'" <<<"$body" || fail "$where: explicit confirmation"

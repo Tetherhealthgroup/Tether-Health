@@ -7,9 +7,11 @@ Migration sources of truth include `supabase/migrations/202609110001_profiles.sq
 
 Every migration file is named `YYYYMMDDNNNN_name.sql`: a 12-digit version (date
 plus a four-digit sequence), then lowercase letters, digits and underscores.
-Versions are unique and strictly increasing in filename order, and a new
-migration sorts after every existing one. `supabase/tests/verify_migration_names.sh`
-enforces this in the static migration checks.
+`supabase/tests/verify_migration_names.sh` checks in the static migration checks
+that every name has this form and that versions are unique and strictly
+increasing in filename order. It cannot tell whether a new file was given a
+version below an existing one, so give each new migration a version later than
+every existing file.
 
 `public.profiles` is a one-to-one extension of `auth.users`; `id` is both its
 primary key and cascading foreign key. A signup trigger creates the row. Clients
@@ -166,8 +168,8 @@ access, and nothing can be deleted directly.
 |---|---|---|
 | `sync_account` | `user_id` → `auth.users(id)`, cascading | per-user change counter `change_seq`; `created_at`, `updated_at`. No health data |
 | `sync_area` | `(user_id, programme_code)`; `user_id` → `sync_account`, `enrolment_id` → `enrolments(id)` (unique), both cascading; `programme_code` → `programmes(code)` | `revision`, `change_seq`, `updated_at`. A trigger requires the enrolment to be the same user's enrolment in the same programme |
-| `sync_answer` | `(user_id, programme_code, screen_id)` → `sync_area`, cascading | `payload`: a JSON object of at most 32 KiB; `screen_id` matches `^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$` (no `/`); `updated_at` |
-| `sync_lapse` | `(user_id, programme_code, ordinal)` → `sync_area`, cascading | `at`, `severity` (up to 64 characters), `context` (a JSON array, at most 32 KiB). Append-only |
+| `sync_answer` | primary key `(user_id, programme_code, screen_id)`; `(user_id, programme_code)` → `sync_area`, cascading | `payload`: a JSON object of at most 32 KiB; `screen_id` matches `^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$` (no `/`); `updated_at` |
+| `sync_lapse` | primary key `(user_id, programme_code, ordinal)`; `(user_id, programme_code)` → `sync_area`, cascading | `at`, `severity` (up to 64 characters), `context` (a JSON array, at most 32 KiB). Append-only |
 
 **Reads.** Authenticated callers select only their own rows
 (`auth.uid() = user_id`). The API's Today, summary and export read these tables
@@ -196,11 +198,20 @@ stored in this repository.
 **Leaving and deletion.** Leaving a programme keeps its sync rows, read-only.
 "Delete now" deletes the enrolment, which cascades to its `sync_area`, answers
 and lapses. Account deletion goes through the API only: `delete_my_app_data`
-deletes the caller's sync rows and refuses to run in a `thsync` session.
+deletes the caller's sync rows, returns a count for each sync table, and
+refuses to run in a `thsync` session.
 
 The migration starts by dropping the earlier `sync_*` tables (keyed by
-`account_id`) if they exist. It stops instead if tables with those names
-exist without that legacy shape.
+`account_id`) if they exist and are empty. It stops instead if a table with
+one of those names has another shape or holds rows, or if another object
+depends on one of them (the drop does not cascade). The migration also stops
+unless `thsync` is a member of `authenticated` only, without admin option or
+inheritance.
+
+The SQL test in `supabase/tests/verify_sync_migration.sh` (run when
+`VERIFY_DB_URL` is set) requires a superuser connection: it uses
+`SET SESSION AUTHORIZATION` to act as the `thsync` and `authenticator` logins,
+and fails if the connection is not a superuser.
 
 ## Quit-plan snapshot
 
@@ -269,8 +280,9 @@ Migration sources of truth:
 `delete_my_app_data` deletes the caller's sync lapses, answers, areas and sync
 account, programme consents, enrolments (and everything that cascades from
 them), account consents, program data, quit plan and profile. It returns counts
-only: `profiles`, `quit_plans`, `program_data`, `enrolments`,
-`programme_consents`, `account_consents`, `sync_answers` and `sync_lapses`.
+only, one for each table it deletes from: `profiles`, `quit_plans`,
+`program_data`, `enrolments`, `programme_consents`, `account_consents`,
+`sync_answers`, `sync_lapses`, `sync_areas` and `sync_accounts`.
 Consent history is deleted with the account; nothing records what was deleted.
 It refuses to run in a sync service (`thsync`) session.
 
