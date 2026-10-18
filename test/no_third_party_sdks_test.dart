@@ -33,6 +33,20 @@ const _rule = 'This app ships no SDK that reports on a person — analytics, '
 /// `com.google.firebase:firebase-bom` are all caught. This check runs on its
 /// own, after the allowlists: a name here stays forbidden even if somebody
 /// also allowlists it.
+///
+/// Known false positives, accepted because failing closed is the safer error:
+/// - Families that are also ordinary words (`ads`, `adjust`, `branch`,
+///   `clarity`, `embrace`, `heap`, `intercom`, `measurement`, `purchases`,
+///   `segment`, `singular`, `telemetry`) match unrelated names that use the
+///   word, e.g. a `heap_sort` package or a `branch` coordinate.
+/// - Joined adjacent words can spell a family by accident (`data` + `transport`
+///   in a name that has nothing to do with Google's DataTransport).
+/// - The whole-file scan below matches these words in comments and strings of
+///   the scanned files, not only in dependency names.
+/// To resolve one, do not rename around the check: change this list in the
+/// same change, with the reason in a comment next to the edit (for example,
+/// replace a broad family with the specific names in [forbiddenPackages]),
+/// and have it reviewed like any allowlist change.
 const forbiddenFamilies = <String>[
   'adjust',
   'admob',
@@ -56,6 +70,7 @@ const forbiddenFamilies = <String>[
   'countly',
   'crashlytics',
   'customerio',
+  'datatransport',
   'datadog',
   'dynatrace',
   'embrace',
@@ -74,6 +89,7 @@ const forbiddenFamilies = <String>[
   'launchdarkly',
   'logrocket',
   'matomo',
+  'measurement',
   'mixpanel',
   'moengage',
   'newrelic',
@@ -474,34 +490,143 @@ List<String> podNames(List<String> podfileLock) {
 
 // --- Android ---------------------------------------------------------------
 
-/// [source] without `/* */` and `//` comments, so prose cannot be read as a
-/// declaration. `//` after a `:` (as in `https://`) is not a comment.
-String stripGradleComments(String source) => source
-    .replaceAll(RegExp(r'/\*[\s\S]*?\*/'), '')
-    .replaceAll(RegExp(r'(^|[^:])//.*$', multiLine: true), r'$1');
+/// The dependency configurations Gradle accepts: the base ones, their variant
+/// and test forms (`debugImplementation`, `testImplementation`, `kaptTest`,
+/// ...), and `classpath`.
+const _configurationPattern =
+    r'(?:[a-z][A-Za-z0-9]*)?(?:[Ii]mplementation|[Aa]pi|[Cc]ompileOnly'
+    r'|[Rr]untimeOnly|[Aa]nnotationProcessor)'
+    r'|kapt[A-Za-z0-9]*|ksp[A-Za-z0-9]*'
+    r'|classpath|coreLibraryDesugaring|lintChecks|lintPublish|wearApp';
+
+final _gradleConfiguration = RegExp(
+  '(?<![A-Za-z0-9_.])($_configurationPattern)(?![A-Za-z0-9_])',
+);
+
+bool _isConfiguration(String name) =>
+    RegExp('^(?:$_configurationPattern)\$').hasMatch(name);
+
+final _identifierChar = RegExp(r'[A-Za-z0-9_]');
+
+/// A Gradle file as a scanner sees it. [code] is the source with comments
+/// blanked; [masked] also blanks the inside of every string literal (the
+/// delimiters stay). Both keep the source's length and line breaks, so an
+/// offset found in [masked] reads back from [code].
+class GradleText {
+  GradleText(this.code, this.masked);
+
+  final String code;
+  final String masked;
+}
+
+/// Whether the `/` at [i] opens a Groovy slashy string (`/g:a:v/`) rather
+/// than dividing: it must be followed by a non-blank character that is not
+/// `/` or `*`, and stand where an expression starts — at a line start, after
+/// one of `( , = [ : { ; ! & | ?`, or after a configuration name and a space.
+bool _slashyStringAt(String source, int i) {
+  if (i + 1 >= source.length) return false;
+  final next = source[i + 1];
+  if (next == '/' || next == '*' || next.trim().isEmpty) return false;
+  var j = i - 1;
+  while (j >= 0 && (source[j] == ' ' || source[j] == '\t')) {
+    j--;
+  }
+  if (j < 0 || source[j] == '\n') return true;
+  if ('(,=[:{;!&|?'.contains(source[j])) return true;
+  if (j < i - 1 && _identifierChar.hasMatch(source[j])) {
+    var k = j;
+    while (k >= 0 && _identifierChar.hasMatch(source[k])) {
+      k--;
+    }
+    return _isConfiguration(source.substring(k + 1, j + 1));
+  }
+  return false;
+}
+
+/// Splits [source] into [GradleText]. String-aware: `//` and `/*` inside
+/// `"..."`, `'...'`, `"""..."""`, `'''...'''` or a slashy string are text,
+/// not comments, so `"**/*.so"` cannot hide what follows it.
+GradleText scanGradle(String source) {
+  final code = StringBuffer();
+  final masked = StringBuffer();
+  void keep(String c) {
+    code.write(c);
+    masked.write(c);
+  }
+
+  void blank(String c, {bool inString = false}) {
+    final space = c == '\n' ? '\n' : ' ';
+    code.write(inString ? c : space);
+    masked.write(space);
+  }
+
+  var i = 0;
+  while (i < source.length) {
+    final c = source[i];
+    if (source.startsWith('//', i)) {
+      while (i < source.length && source[i] != '\n') {
+        blank(source[i++]);
+      }
+      continue;
+    }
+    if (source.startsWith('/*', i)) {
+      final end = source.indexOf('*/', i + 2);
+      final stop = end == -1 ? source.length : end + 2;
+      while (i < stop) {
+        blank(source[i++]);
+      }
+      continue;
+    }
+    final delimiter = source.startsWith('"""', i)
+        ? '"""'
+        : source.startsWith("'''", i)
+            ? "'''"
+            : (c == '"' || c == "'")
+                ? c
+                : (c == '/' && _slashyStringAt(source, i))
+                    ? '/'
+                    : null;
+    if (delimiter == null) {
+      keep(c);
+      i++;
+      continue;
+    }
+    for (var k = 0; k < delimiter.length; k++) {
+      keep(source[i++]);
+    }
+    while (i < source.length) {
+      if (source.startsWith(delimiter, i)) {
+        for (var k = 0; k < delimiter.length; k++) {
+          keep(source[i++]);
+        }
+        break;
+      }
+      // A one-character delimiter does not span lines here; stopping at the
+      // line end keeps an unbalanced quote from swallowing the file.
+      if (delimiter.length == 1 && source[i] == '\n') break;
+      if (source[i] == r'\' && i + 1 < source.length) {
+        blank(source[i++], inString: true);
+      }
+      blank(source[i++], inString: true);
+    }
+  }
+  return GradleText(code.toString(), masked.toString());
+}
+
+/// [source] with its comments blanked (string-aware, see [scanGradle]).
+String stripGradleComments(String source) => scanGradle(source).code;
 
 /// Every quoted Maven coordinate in a Gradle or version-catalog file, as
 /// `group:artifact` (version dropped). Catches a coordinate however it is
 /// used: a dependency in any configuration, `platform(...)`, `classpath`, a
-/// variable, an inline catalog entry.
+/// variable, an inline catalog entry. Runs on the raw text, comments
+/// included: a coordinate in a comment only makes the check fail closed.
 List<String> mavenCoordinates(String source) => [
       for (final match in RegExp(
         r'''["']([A-Za-z][A-Za-z0-9_.\-]*):([A-Za-z0-9_.\-]+)(?::[^"'\s]*)?["']''',
-      ).allMatches(stripGradleComments(source)))
+      ).allMatches(source))
         '${match.group(1)}:${match.group(2)}',
     ];
-
-/// Gradle dependency configurations: the base ones, their variant and test
-/// forms (`debugImplementation`, `testImplementation`, `kaptTest`, ...), and
-/// `classpath`.
-final _gradleConfiguration = RegExp(
-  r'(?<![A-Za-z0-9_.])('
-  r'(?:[a-z][A-Za-z0-9]*)?(?:[Ii]mplementation|[Aa]pi|[Cc]ompileOnly'
-  r'|[Rr]untimeOnly|[Aa]nnotationProcessor)'
-  r'|kapt[A-Za-z0-9]*|ksp[A-Za-z0-9]*'
-  r'|classpath|coreLibraryDesugaring|lintChecks|lintPublish|wearApp'
-  r')(?![A-Za-z0-9_])',
-);
 
 /// One dependency declaration in a Gradle file.
 class GradleDeclaration {
@@ -516,53 +641,114 @@ class GradleDeclaration {
   String toString() => '$configuration($notation)';
 }
 
-int _closingParen(String text, int open) {
+/// Offset of the bracket closing the one at [open] in a masked text (string
+/// interiors are blank there, so every bracket left is code).
+int _closingBracket(String masked, int open) {
   var depth = 0;
-  String? quote;
-  for (var i = open; i < text.length; i++) {
-    final c = text[i];
-    if (quote != null) {
-      if (c == quote && text[i - 1] != r'\') quote = null;
-    } else if (c == '"' || c == "'") {
-      quote = c;
-    } else if (c == '(') {
-      depth++;
-    } else if (c == ')' && --depth == 0) {
-      return i;
-    }
+  for (var i = open; i < masked.length; i++) {
+    final c = masked[i];
+    if (c == '(' || c == '{' || c == '[') depth++;
+    if ((c == ')' || c == '}' || c == ']') && --depth == 0) return i;
   }
-  return text.length;
+  return masked.length;
+}
+
+/// The body ranges (after `{`, before `}`) of every `<name> { ... }` block in
+/// a masked text, nested or not.
+List<(int, int)> _blockBodies(String masked, String name) => [
+      for (final match
+          in RegExp('(?<![A-Za-z0-9_])$name\\s*\\{').allMatches(masked))
+        (match.end, _closingBracket(masked, match.end - 1)),
+    ];
+
+String _lineFrom(String text, int start) {
+  final end = text.indexOf('\n', start);
+  return text.substring(start, end == -1 ? text.length : end).trim();
 }
 
 /// Every dependency declaration in a Gradle file, Kotlin or Groovy DSL:
-/// `implementation("g:a:1")`, `api(platform(...))`, `runtimeOnly libs.x`,
-/// `testImplementation 'g:a:1'`, `classpath "g:a:$v"`, ...
+///
+/// - `configuration(...)` anywhere: `implementation("g:a:1")`,
+///   `api(platform(...))`, `implementation(group = "g", name = "a")`;
+/// - inside `dependencies { }`, a configuration name, a space and any
+///   argument that does not start with `=`, `{` or `.`: `classpath 'g:a:1'`,
+///   `implementation group: 'g', name: 'a'`, `implementation sdk`,
+///   `implementation rootProject.ext.x`, `implementation /g:a:1/`;
+/// - Kotlin's `"implementation"(...)`;
+/// - `add("implementation", ...)`, also as `dependencies.add` or
+///   `project.dependencies.add`.
 List<GradleDeclaration> gradleDeclarations(String source) {
-  final text = stripGradleComments(source);
+  final text = scanGradle(source);
+  final code = text.code;
+  final masked = text.masked;
+  final blocks = _blockBodies(masked, 'dependencies');
+  bool inDependencies(int offset) =>
+      blocks.any((block) => offset >= block.$1 && offset < block.$2);
   final declarations = <GradleDeclaration>[];
-  for (final match in _gradleConfiguration.allMatches(text)) {
+
+  for (final match in _gradleConfiguration.allMatches(masked)) {
     var i = match.end;
-    while (i < text.length && (text[i] == ' ' || text[i] == '\t')) {
+    while (i < masked.length && (masked[i] == ' ' || masked[i] == '\t')) {
       i++;
     }
-    if (i < text.length && text[i] == '(') {
-      final close = _closingParen(text, i);
+    if (i < masked.length && masked[i] == '(') {
+      final close = _closingBracket(masked, i);
       declarations.add(GradleDeclaration(
-          match.group(1)!, text.substring(i + 1, close).trim()));
-    } else if (i > match.end) {
-      final lineEnd = text.indexOf('\n', i);
-      final rest = text.substring(i, lineEnd == -1 ? text.length : lineEnd);
-      // Groovy without parentheses: only when a dependency notation follows,
-      // so `compileSdk 36` and prose are not read as declarations.
-      if (RegExp(
-              r'''^(["']|platform|enforcedPlatform|testFixtures|libs\.|files|fileTree|project|kotlin\s*\()''')
-          .hasMatch(rest)) {
-        declarations.add(GradleDeclaration(match.group(1)!, rest.trim()));
-      }
+          match.group(1)!, code.substring(i + 1, close).trim()));
+    } else if (i > match.end &&
+        i < masked.length &&
+        !'={.\r\n'.contains(masked[i]) &&
+        inDependencies(match.start)) {
+      declarations.add(GradleDeclaration(match.group(1)!, _lineFrom(code, i)));
     }
+  }
+
+  for (final match
+      in RegExp(r'''["']([A-Za-z][A-Za-z0-9]*)["']\s*\(''').allMatches(code)) {
+    // The opening quote must be code, not the inside of another string.
+    if (masked[match.start] == ' ' || !_isConfiguration(match.group(1)!)) {
+      continue;
+    }
+    final open = match.end - 1;
+    declarations.add(GradleDeclaration(match.group(1)!,
+        code.substring(open + 1, _closingBracket(masked, open)).trim()));
+  }
+
+  for (final match in RegExp(
+    r'''(?<![A-Za-z0-9_])add\s*\(\s*["']([A-Za-z][A-Za-z0-9]*)["']\s*,''',
+  ).allMatches(code)) {
+    if (masked.substring(match.start, match.start + 3) != 'add' ||
+        !_isConfiguration(match.group(1)!)) {
+      continue;
+    }
+    final open = masked.indexOf('(', match.start);
+    declarations.add(GradleDeclaration(match.group(1)!,
+        code.substring(match.end, _closingBracket(masked, open)).trim()));
   }
   return declarations;
 }
+
+/// `group:name` of a map-notation declaration (`group: 'g', name: 'a'` or
+/// `group = "g", name = "a"`), or `null` when it is not one with literal
+/// values.
+String? mapNotationCoordinate(String notation) {
+  String? field(String key) =>
+      RegExp('(?<![A-Za-z0-9_])$key\\s*[:=]\\s*["\']([^"\']+)["\']')
+          .firstMatch(notation)
+          ?.group(1);
+  final group = field('group');
+  final name = field('name');
+  return group != null && name != null ? '$group:$name' : null;
+}
+
+/// The coordinates a Gradle file declares: every quoted coordinate in it, and
+/// every map-notation declaration.
+List<String> gradleFileCoordinates(String source) => [
+      ...mavenCoordinates(source),
+      for (final declaration in gradleDeclarations(source))
+        if (mapNotationCoordinate(declaration.notation) case final coordinate?)
+          coordinate,
+    ];
 
 /// Every `libs.` version-catalog accessor in a Gradle file, without the
 /// `libs.` prefix and without a trailing `.get()`: `libs.firebase.bom` is
@@ -579,21 +765,173 @@ List<String> libsReferences(String source) => [
 
 /// Why [declaration] is a notation this file cannot check, or `null`.
 ///
-/// Checkable: quoted coordinates (each goes through the allowlist) and
-/// version-catalog references (each must resolve, and every catalog entry
-/// goes through the allowlist), optionally inside `platform(...)` or
-/// `enforcedPlatform(...)`. Everything else — `files(...)`, `fileTree(...)`,
-/// `project(...)`, a variable, `kotlin("...")`, map notation — could ship
-/// code the allowlist never saw.
+/// Checkable: quoted coordinates and map notation with literal `group` and
+/// `name` (each goes through the allowlist), and version-catalog references
+/// (each must resolve, and every catalog entry goes through the allowlist),
+/// optionally inside `platform(...)` or `enforcedPlatform(...)`. Everything
+/// else — `files(...)`, `fileTree(...)`, `project(...)`, a variable, an ext
+/// property, a slashy string, `kotlin("...")` — could ship code the
+/// allowlist never saw.
 String? unrecognisedNotation(GradleDeclaration declaration) {
   final notation = declaration.notation;
   if (RegExp(r'\b(files|fileTree|project)\s*\(').hasMatch(notation)) {
     return '$declaration is a local file or project dependency';
   }
-  if (mavenCoordinates(notation).isEmpty && libsReferences(notation).isEmpty) {
-    return '$declaration is not a quoted group:artifact or a libs. reference';
+  if (mapNotationCoordinate(notation) == null &&
+      mavenCoordinates(notation).isEmpty &&
+      libsReferences(notation).isEmpty) {
+    return '$declaration is not a quoted group:artifact, map notation with '
+        'literal group and name, or a libs. reference';
   }
   return null;
+}
+
+/// Problems with every `apply from: ...` / `apply(from = ...)` in the Gradle
+/// file at [path]: the script must be a literal relative path that stays
+/// inside `android/` or `third_party/`. A URL, an absolute path, an escape
+/// with `..` or a computed value fails.
+List<String> applyFromViolations(String path, String source) {
+  final text = scanGradle(source);
+  final problems = <String>[];
+  for (final match in RegExp(r'(?<![A-Za-z0-9_])apply\s*\(?\s*from\s*[:=]\s*')
+      .allMatches(text.masked)) {
+    final written = _lineFrom(text.code, match.start);
+    final literal = RegExp(r'''^(["'])([^"'\n]*)\1''')
+        .firstMatch(text.code.substring(match.end));
+    final target = literal?.group(2);
+    if (target == null ||
+        target.contains(':') ||
+        target.startsWith('/') ||
+        target.contains(r'\') ||
+        target.contains(r'$')) {
+      problems.add('"$written" does not apply a literal relative path');
+      continue;
+    }
+    final parts = path.split('/')..removeLast();
+    var escaped = false;
+    for (final segment in target.split('/')) {
+      if (segment.isEmpty || segment == '.') continue;
+      if (segment != '..') {
+        parts.add(segment);
+      } else if (parts.isEmpty) {
+        escaped = true;
+      } else {
+        parts.removeLast();
+      }
+    }
+    final resolved = parts.join('/');
+    if (escaped ||
+        !(resolved.startsWith('android/') ||
+            resolved.startsWith('third_party/'))) {
+      problems.add('"$written" applies $resolved, which is outside android/ '
+          'and third_party/');
+    }
+  }
+  return problems;
+}
+
+/// Every `maven { }` / `maven(...)` in a scanned Gradle file: the call as
+/// written, and the literal URLs in it.
+List<(String, List<String>)> _mavenRepositories(GradleText text) => [
+      for (final match
+          in RegExp(r'(?<![A-Za-z0-9_])maven\s*[({]').allMatches(text.masked))
+        () {
+          var j = match.end - 1;
+          while (j < text.masked.length &&
+              (text.masked[j] == '(' || text.masked[j] == '{')) {
+            j = _closingBracket(text.masked, j) + 1;
+            while (j < text.masked.length &&
+                (text.masked[j] == ' ' || text.masked[j] == '\t')) {
+              j++;
+            }
+          }
+          final body = text.code.substring(match.start, j).trim();
+          return (
+            body,
+            [
+              for (final url
+                  in RegExp(r'''["']([A-Za-z][A-Za-z0-9+.\-]*:[^"']*)["']''')
+                      .allMatches(body))
+                url.group(1)!,
+            ],
+          );
+        }(),
+    ];
+
+/// The literal URL of every Maven repository a Gradle file declares.
+List<String> mavenRepositoryUrls(String source) => [
+      for (final (_, urls) in _mavenRepositories(scanGradle(source))) ...urls,
+    ];
+
+/// Maven repositories the build may use besides `google()`, `mavenCentral()`
+/// and `gradlePluginPortal()`, by URL, each with the reason.
+const allowedMavenRepositories = <String, String>{
+  'https://storage.googleapis.com/download.flutter.io':
+      "Flutter's engine artifacts; the Flutter Gradle plugin adds this "
+          'repository itself.',
+};
+
+const _allowedRepositoryCalls = {
+  'google',
+  'mavenCentral',
+  'gradlePluginPortal'
+};
+
+/// Problems with the repositories a Gradle file declares: every entry of a
+/// `repositories { }` block must be `google()`, `mavenCentral()`,
+/// `gradlePluginPortal()` or `maven`, and every `maven { }` / `maven(...)`
+/// anywhere must name only [allowedMavenRepositories] URLs, as literals.
+List<String> repositoryViolations(String source) {
+  final text = scanGradle(source);
+  final code = text.code;
+  final masked = text.masked;
+  final problems = <String>[];
+
+  int skipBlanks(int i, int end) {
+    while (i < end && (masked[i] == ' ' || masked[i] == '\t')) {
+      i++;
+    }
+    return i;
+  }
+
+  for (final (start, end) in _blockBodies(masked, 'repositories')) {
+    var i = start;
+    while (i < end) {
+      final c = masked[i];
+      if ('({['.contains(c)) {
+        i = _closingBracket(masked, i) + 1;
+        continue;
+      }
+      final word = RegExp(r'[A-Za-z_][A-Za-z0-9_.]*').matchAsPrefix(masked, i);
+      if (word == null) {
+        i++;
+        continue;
+      }
+      var j = skipBlanks(word.end, end);
+      while (j < end && (masked[j] == '(' || masked[j] == '{')) {
+        j = skipBlanks(_closingBracket(masked, j) + 1, end);
+      }
+      final name = word.group(0)!;
+      if (!_allowedRepositoryCalls.contains(name) && name != 'maven') {
+        problems.add('repository "${code.substring(i, j).trim()}" is not '
+            'google(), mavenCentral(), gradlePluginPortal() or maven');
+      }
+      i = j > word.end ? j : word.end;
+    }
+  }
+
+  for (final (body, urls) in _mavenRepositories(text)) {
+    if (urls.isEmpty) {
+      problems.add('"$body" has no literal repository URL');
+    }
+    for (final url in urls) {
+      if (!allowedMavenRepositories.containsKey(url)) {
+        problems.add('maven repository "$url" is not on '
+            'allowedMavenRepositories');
+      }
+    }
+  }
+  return problems;
 }
 
 /// The entries of a Gradle version catalog (`*.versions.toml`).
@@ -752,7 +1090,9 @@ void main() {
   late List<LockedPackage> locked;
   late Map<String, String> gradleFiles;
   late Map<String, VersionCatalog> catalogs;
+  late Map<String, List<String>> gradleCoordinates;
   late List<String> nativeCoordinates;
+  late List<String> repositoryUrls;
   late List<String> pluginIds;
   late String pbxproj;
   late List<String> remoteSwiftPackages;
@@ -776,10 +1116,17 @@ void main() {
             in _filesUnder(root, (name) => name.endsWith('.versions.toml')))
           file.path: parseVersionCatalog(file.readAsLinesSync()),
     };
+    gradleCoordinates = {
+      for (final MapEntry(key: path, value: source) in gradleFiles.entries)
+        path: gradleFileCoordinates(source),
+    };
     nativeCoordinates = [
-      for (final source in gradleFiles.values) ...mavenCoordinates(source),
+      for (final coordinates in gradleCoordinates.values) ...coordinates,
       for (final catalog in catalogs.values)
         ...catalog.libraries.values.whereType<String>(),
+    ];
+    repositoryUrls = [
+      for (final source in gradleFiles.values) ...mavenRepositoryUrls(source),
     ];
     pluginIds = [
       for (final source in gradleFiles.values) ...gradlePluginIds(source),
@@ -832,6 +1179,7 @@ void main() {
       allowedRuntimePackages,
       allowedNativeDependencies,
       allowedGradlePlugins,
+      allowedMavenRepositories,
       allowedSwiftPackageUrls,
       allowedLocalSwiftPackages,
       allowedWebScripts,
@@ -859,6 +1207,7 @@ void main() {
         nativeCoordinates
       ),
       'allowedGradlePlugins': (allowedGradlePlugins, pluginIds),
+      'allowedMavenRepositories': (allowedMavenRepositories, repositoryUrls),
       'allowedSwiftPackageUrls': (
         allowedSwiftPackageUrls,
         [...remoteSwiftPackages, ...swiftManifestUrlsFound],
@@ -915,6 +1264,7 @@ void main() {
         ...allowedRuntimePackages.keys,
         ...allowedNativeDependencies.keys,
         ...allowedGradlePlugins.keys,
+        ...allowedMavenRepositories.keys,
         ...allowedSwiftPackageUrls.keys,
         ...allowedLocalSwiftPackages.keys,
         ...allowedWebScripts.keys,
@@ -925,6 +1275,7 @@ void main() {
       'pubspec.lock': locked.map((package) => package.name),
       'Gradle files and version catalogs': nativeCoordinates,
       'Gradle plugins': pluginIds,
+      'Gradle maven repositories': repositoryUrls,
       'ios/Runner.xcodeproj/project.pbxproj Swift packages':
           remoteSwiftPackages,
       'third_party Package.swift URLs': swiftManifestUrlsFound,
@@ -937,16 +1288,13 @@ void main() {
               (throw TestFailure('$path is not a readable Package.resolved')),
     };
 
-    for (final source in sources.entries) {
-      for (final name in source.value) {
-        expect(
-          forbiddenFamilyOf(name),
-          isNull,
-          reason: '${source.key} contains "$name", which is in the '
-              '"${forbiddenFamilyOf(name)}" family. $_rule',
-        );
-      }
-    }
+    final offenders = [
+      for (final source in sources.entries)
+        for (final name in source.value)
+          if (forbiddenFamilyOf(name) case final family?)
+            '${source.key} contains "$name" ("$family" family)',
+    ];
+    expect(offenders.toSet().toList(), isEmpty, reason: _rule);
   });
 
   test('no forbidden SDK appears anywhere in the build configuration', () {
@@ -960,9 +1308,14 @@ void main() {
       'android/app/src/main/AndroidManifest.xml',
       'ios/Runner/Info.plist',
       'web/index.html',
+      // Every Gradle file and version catalog found, the vendored
+      // third_party/ Groovy builds included.
+      ...gradleFiles.keys,
+      ...catalogs.keys,
     ];
 
-    for (final path in files) {
+    final offenders = <String>[];
+    for (final path in files.toSet()) {
       final file = File(path);
       if (!file.existsSync()) continue;
       final contents = file.readAsStringSync().toLowerCase();
@@ -971,13 +1324,12 @@ void main() {
         // `-` count as boundaries (`firebase_core`, `com.google.firebase`)
         // while `windowSoftInputMode="adjustResize"` is not mistaken for the
         // Adjust SDK.
-        expect(
-          RegExp('(?<![a-z0-9])$fragment(?![a-z0-9])').hasMatch(contents),
-          isFalse,
-          reason: '$path mentions "$fragment". $_rule',
-        );
+        if (RegExp('(?<![a-z0-9])$fragment(?![a-z0-9])').hasMatch(contents)) {
+          offenders.add('$path mentions "$fragment"');
+        }
       }
     }
+    expect(offenders, isEmpty, reason: _rule);
   });
 
   test('every Android dependency, in any configuration, is allowlisted', () {
@@ -987,43 +1339,59 @@ void main() {
         reason: 'the Gradle scan did not see the vendored flutter_tts '
             'kotlin-stdlib dependency, so it is not reading the files');
 
+    final offenders = <String>[
+      for (final MapEntry(key: path, value: source) in gradleFiles.entries) ...[
+        for (final dep in gradleCoordinates[path]!)
+          if (!allowedNativeDependencies.containsKey(dep))
+            '$path: $dep is not on allowedNativeDependencies',
+        for (final declaration in gradleDeclarations(source))
+          if (unrecognisedNotation(declaration) case final problem?)
+            '$path: $problem',
+        for (final reference in libsReferences(source))
+          if (!resolvesInCatalog(reference, catalogs.values))
+            '$path: libs.$reference is not an entry of any version catalog '
+                'in android/gradle/ or gradle/',
+      ],
+      for (final MapEntry(key: path, value: catalog) in catalogs.entries) ...[
+        for (final MapEntry(key: alias, value: module)
+            in catalog.libraries.entries)
+          if (module == null)
+            '$path: library "$alias" has no readable module'
+          else if (!allowedNativeDependencies.containsKey(module))
+            '$path: library "$alias" ($module) is not on '
+                'allowedNativeDependencies',
+        for (final MapEntry(key: alias, value: id) in catalog.plugins.entries)
+          if (id == null) '$path: plugin "$alias" has no readable id',
+      ],
+    ];
     expect(
-      nativeCoordinates
-          .where((dep) => !allowedNativeDependencies.containsKey(dep))
-          .toSet(),
+      offenders.toSet().toList(),
       isEmpty,
-      reason: 'an Android dependency (any configuration, platform(...), '
-          'classpath or version-catalog entry) is not on '
-          'allowedNativeDependencies. Adding one is a decision about what '
-          'ships — add it there, with the reason, or remove it.',
+      reason: 'Adding an Android dependency (any configuration, platform(...), '
+          'classpath or version-catalog entry) is a decision about what ships '
+          '— add it to allowedNativeDependencies with the reason, or remove '
+          'it. Declare it as a quoted group:artifact:version, map notation '
+          'with literal group and name, or a version-catalog entry, so this '
+          'test can see it.',
     );
+  });
 
-    for (final MapEntry(key: path, value: source) in gradleFiles.entries) {
-      for (final declaration in gradleDeclarations(source)) {
-        expect(unrecognisedNotation(declaration), isNull,
-            reason: '$path: ${unrecognisedNotation(declaration)}. Declare '
-                'it as a quoted group:artifact:version or a version-catalog '
-                'entry, so the allowlist can see it.');
-      }
-      for (final reference in libsReferences(source)) {
-        expect(resolvesInCatalog(reference, catalogs.values), isTrue,
-            reason: '$path uses libs.$reference, which is not an entry of '
-                'any version catalog in android/gradle/ or gradle/.');
-      }
-    }
-
-    for (final MapEntry(key: path, value: catalog) in catalogs.entries) {
-      for (final MapEntry(key: alias, value: module)
-          in catalog.libraries.entries) {
-        expect(module, isNotNull,
-            reason: '$path: library "$alias" has no readable module, so the '
-                'allowlist cannot check it.');
-      }
-      for (final MapEntry(key: alias, value: id) in catalog.plugins.entries) {
-        expect(id, isNotNull,
-            reason: '$path: plugin "$alias" has no readable id.');
-      }
-    }
+  test('Gradle fetches only from allowlisted repositories and scripts', () {
+    final offenders = <String>[
+      for (final MapEntry(key: path, value: source) in gradleFiles.entries) ...[
+        for (final problem in repositoryViolations(source)) '$path: $problem',
+        for (final problem in applyFromViolations(path, source))
+          '$path: $problem',
+      ],
+    ];
+    expect(
+      offenders,
+      isEmpty,
+      reason: 'Gradle may resolve from google(), mavenCentral(), '
+          'gradlePluginPortal() and allowedMavenRepositories only, and apply '
+          'only scripts inside android/ or third_party/: another repository '
+          'or a remote script can supply code no allowlist here sees.',
+    );
   });
 
   test('every Gradle plugin is allowlisted', () {
@@ -1165,6 +1533,10 @@ void main() {
         'com.google.gms:play-services-ads',
         'https://github.com/firebase/firebase-ios-sdk',
         'https://cdn.example/analytics.js',
+        // Added in TH-992 round 1.
+        'com.google.android.gms:play-services-measurement-api',
+        'com.google.android.datatransport:transport-runtime',
+        'GoogleDataTransport',
       ]) {
         expect(forbiddenFamilyOf(name), isNotNull, reason: name);
       }
@@ -1191,6 +1563,7 @@ void main() {
         ...allowedRuntimePackages.keys,
         ...allowedNativeDependencies.keys,
         ...allowedGradlePlugins.keys,
+        ...allowedMavenRepositories.keys,
         ...allowedSwiftPackageUrls.keys,
         ...allowedLocalSwiftPackages.keys,
         ...allowedWebScripts.keys,
@@ -1488,7 +1861,10 @@ dependencies {
     implementation(vendorSdk)
 }
 ''';
+      // Raw text: the commented-out coordinates count too (fail closed).
       expect(mavenCoordinates(kts), [
+        'commented.out:in-a-comment',
+        'also.commented:out',
         'org.jetbrains.kotlinx:kotlinx-coroutines-android',
         'com.google.firebase:firebase-analytics',
         'com.google.firebase:firebase-bom',
@@ -1539,7 +1915,7 @@ dependencies {
       expect(
         mavenCoordinates(kts)
             .where((dep) => !allowedNativeDependencies.containsKey(dep)),
-        hasLength(8),
+        hasLength(10),
       );
     });
 
@@ -1583,6 +1959,186 @@ dependencies {
       ]);
       expect(gradlePluginIds(groovy),
           ['com.android.library', 'com.google.gms.google-services']);
+    });
+
+    test('the Gradle scanner is string-aware', () {
+      const kts = """
+android {
+    packaging { resources { excludes += "**/*.so" } }
+}
+dependencies {
+    implementation("com.example:between-globs:1.0")
+}
+val other = "**/*.txt"
+val path = "a//b" // a real comment
+val raw = \"\"\"has // and /* inside\"\"\"
+dependencies { api("com.example:after-raw:1.0") }
+/* api("com.example:in-block-comment:1.0") */
+""";
+      expect(
+        gradleDeclarations(kts).map((d) => d.toString()),
+        [
+          'implementation("com.example:between-globs:1.0")',
+          'api("com.example:after-raw:1.0")',
+        ],
+      );
+      final code = stripGradleComments(kts);
+      expect(code, contains('"a//b"'));
+      expect(code, contains('"**/*.so"'));
+      expect(code, contains('has // and /* inside'));
+      expect(code, isNot(contains('a real comment')));
+      expect(code, isNot(contains('in-block-comment')));
+      expect(code.length, kts.length);
+      // Raw-text coordinates still see the commented one: fail closed.
+      expect(mavenCoordinates(kts), contains('com.example:in-block-comment'));
+    });
+
+    test('Groovy no-paren declarations of every shape are read', () {
+      const groovy = """
+android {
+    compileSdk 36
+    implementation = "not a declaration outside dependencies"
+}
+dependencies {
+    implementation group: 'com.example', name: 'map-notation', version: '1.0'
+    implementation sdk
+    implementation rootProject.ext.vendorSdk
+    implementation /com.example:slashy:1.0/
+    runtimeOnly 'com.example:quoted:1.0'
+    kapt {
+        arguments { arg("x", "y") }
+    }
+    testImplementation.extendsFrom(foo)
+    implementation = files('x')
+}
+""";
+      final declarations = gradleDeclarations(groovy);
+      expect(declarations.map((d) => d.toString()), [
+        "implementation(group: 'com.example', name: 'map-notation', "
+            "version: '1.0')",
+        'implementation(sdk)',
+        'implementation(rootProject.ext.vendorSdk)',
+        'implementation(/com.example:slashy:1.0/)',
+        "runtimeOnly('com.example:quoted:1.0')",
+      ]);
+      expect(
+        declarations
+            .where((d) => unrecognisedNotation(d) != null)
+            .map((d) => d.notation),
+        [
+          'sdk',
+          'rootProject.ext.vendorSdk',
+          '/com.example:slashy:1.0/',
+        ],
+      );
+      expect(
+        mapNotationCoordinate(declarations.first.notation),
+        'com.example:map-notation',
+      );
+      expect(mapNotationCoordinate('group = "g", name = "a"'), 'g:a');
+      expect(mapNotationCoordinate("group: g, name: 'a'"), isNull);
+      expect(gradleFileCoordinates(groovy), [
+        'com.example:quoted',
+        'com.example:map-notation',
+      ]);
+    });
+
+    test('string-invoked and add(...) declarations are read', () {
+      const kts = """
+val keys = buildList { add("android/key.properties not found") }
+dependencies {
+    "implementation"("com.example:string-invoked:1.0")
+    "api"(vendorSdk)
+    add("implementation", "com.example:added:1.0")
+    dependencies.add("runtimeOnly", vendorSdk)
+    project.dependencies.add("kapt", files("x.jar"))
+    add("notAConfiguration", "com.example:ignored:1.0")
+}
+""";
+      final declarations = gradleDeclarations(kts);
+      expect(declarations.map((d) => d.toString()), [
+        'implementation("com.example:string-invoked:1.0")',
+        'api(vendorSdk)',
+        'implementation("com.example:added:1.0")',
+        'runtimeOnly(vendorSdk)',
+        'kapt(files("x.jar"))',
+      ]);
+      expect(
+        declarations
+            .where((d) => unrecognisedNotation(d) != null)
+            .map((d) => d.notation),
+        ['vendorSdk', 'vendorSdk', 'files("x.jar")'],
+      );
+    });
+
+    test('apply from: must stay a relative path inside the build', () {
+      const source = """
+apply from: 'flutter_tts.gradle'
+apply(from = "../app/shared.gradle.kts")
+apply from: "https://example.test/remote.gradle"
+apply(from = "../../tool/outside.gradle")
+apply from: '/etc/absolute.gradle'
+apply from: rootProject.file('computed.gradle')
+apply from: "\$rootDir/templated.gradle"
+apply plugin: 'com.android.library'
+""";
+      final problems = applyFromViolations('android/app/build.gradle', source);
+      expect(problems, hasLength(5));
+      expect(problems[0], contains('example.test/remote.gradle'));
+      expect(problems[1], contains('outside android/ and third_party/'));
+      expect(problems[2], contains('/etc/absolute.gradle'));
+      expect(problems[3], contains('computed.gradle'));
+      expect(problems[4], contains('templated.gradle'));
+      expect(
+          applyFromViolations('third_party/x/android/build.gradle',
+              "apply from: '../../../android/app/ok.gradle'"),
+          isEmpty);
+    });
+
+    test('only allowlisted repositories pass', () {
+      const source = """
+pluginManagement {
+    repositories {
+        google {
+            content { includeGroupByRegex("com\\\\.android.*") }
+        }
+        mavenCentral()
+        gradlePluginPortal()
+        maven { url = uri("https://storage.googleapis.com/download.flutter.io") }
+    }
+}
+allprojects {
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven { url "https://repo.example.test/maven" }
+        maven(url = vendorRepo)
+        flatDir { dirs("libs") }
+    }
+}
+""";
+      final problems = repositoryViolations(source);
+      expect(problems, hasLength(5));
+      expect(problems.where((p) => p.contains('mavenLocal()')), hasLength(1));
+      expect(problems.where((p) => p.contains('jcenter()')), hasLength(1));
+      expect(problems.where((p) => p.contains('flatDir')), hasLength(1));
+      expect(
+        problems.where((p) => p.contains('"https://repo.example.test/maven"')),
+        hasLength(1),
+      );
+      expect(
+        problems.where((p) => p.contains('maven(url = vendorRepo)')),
+        hasLength(1),
+      );
+      expect(mavenRepositoryUrls(source), [
+        'https://storage.googleapis.com/download.flutter.io',
+        'https://repo.example.test/maven',
+      ]);
+      expect(
+        repositoryViolations(
+            'repositories {\n    google()\n    mavenCentral()\n}\n'),
+        isEmpty,
+      );
     });
 
     test('version catalogs are read and libs. references resolved', () {
