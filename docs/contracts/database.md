@@ -103,7 +103,8 @@ recipient. `purpose` is `core`, `reminders`, `records_import`,
 all others, so sharing cannot be consented without a named recipient. Each row
 keeps `consent_version` and the exact `consent_text` shown, plus `granted_at`
 (database set). At most one live (unrevoked) row exists per enrolment, purpose
-and recipient. A row is never edited except to revoke it: the only update
+and recipient, enforced by a partial unique index on live rows only, so a
+revocation never conflicts with earlier history. A row is never edited except to revoke it: the only update
 allowed is setting `revoked_at`, which the database stamps with the current
 time; a revoked row cannot be revived, and a new grant is a new row. Callers
 cannot delete consent rows; they go when the enrolment or the account is
@@ -124,7 +125,8 @@ Consent rows store the wording itself. When approved consent texts exist, a
 
 `public.account_consents` holds account-level items that belong to no
 programme: `essential`, `cross_program_insights` and `diagnostics`. It has the
-same version, wording, single-live-row and revoke-only rules, keyed by
+same version, wording, single-live-row (partial unique index on
+`(user_id, purpose)` where not revoked) and revoke-only rules, keyed by
 `user_id`. It holds no health data.
 
 `public.has_consent(enrolment_id uuid, purpose text, recipient_ref text default null)`

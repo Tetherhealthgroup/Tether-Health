@@ -319,7 +319,7 @@ select th913_test.refused(format(
   'insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
    values (%L, ''core'', ''v2'', ''Synthetic core wording'')',
   current_setting('th913.a_hw')),
-  '23505', '%', 'A: second live consent for the same purpose refused');
+  '23505', '%programme_consents_live_key%', 'A: second live consent for the same purpose refused');
 select th913_test.refused(format(
   'insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text, revoked_at)
    values (%L, ''research'', ''v1'', ''Synthetic wording'', now())',
@@ -408,6 +408,23 @@ select th913_test.ok(
   not public.has_consent(current_setting('th913.a_bf')::uuid, 'share_care_team',
     'synthetic-connection-01'),
   'A: consent on one programme does not carry to another');
+do $loop$
+begin
+  for i in 1..5 loop
+    insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
+    values (current_setting('th913.a_bf')::uuid, 'reminders', 'v1', 'Synthetic reminder wording');
+    update public.programme_consents set revoked_at = now()
+    where enrolment_id = current_setting('th913.a_bf')::uuid
+      and purpose = 'reminders' and revoked_at is null;
+  end loop;
+end;
+$loop$;
+select th913_test.ok(
+  (select count(*) from public.programme_consents
+   where enrolment_id = current_setting('th913.a_bf')::uuid
+     and purpose = 'reminders' and revoked_at is not null) = 5
+  and not public.has_consent(current_setting('th913.a_bf')::uuid, 'reminders'),
+  'A: five grant/revoke cycles in one transaction never fail; all kept as history');
 
 insert into public.account_consents (user_id, purpose, consent_version, consent_text)
 values
@@ -416,6 +433,25 @@ values
 select th913_test.affects(
   'update public.account_consents set revoked_at = now() where purpose = ''diagnostics''',
   1, 'A: revokes an account-level consent');
+select th913_test.refused(
+  'insert into public.account_consents (user_id, purpose, consent_version, consent_text)
+   values (''00000000-0000-4000-8000-000000913001'', ''essential'', ''v2'', ''Synthetic'')',
+  '23505', '%account_consents_live_key%', 'A: second live account consent for a purpose refused');
+do $loop$
+begin
+  for i in 1..5 loop
+    insert into public.account_consents (user_id, purpose, consent_version, consent_text)
+    values ('00000000-0000-4000-8000-000000913001', 'cross_program_insights', 'v1',
+      'Synthetic insights wording');
+    update public.account_consents set revoked_at = now()
+    where purpose = 'cross_program_insights' and revoked_at is null;
+  end loop;
+end;
+$loop$;
+select th913_test.ok(
+  (select count(*) from public.account_consents
+   where purpose = 'cross_program_insights' and revoked_at is not null) = 5,
+  'A: five account grant/revoke cycles in one transaction never fail; all kept');
 
 -- Focus cap: at most two in focus, checked at commit.
 select th913_test.ok(
@@ -600,9 +636,9 @@ select set_config('th913.a_counts', jsonb_build_object(
 )::text, true);
 select th913_test.ok(
   (current_setting('th913.a_counts')::jsonb ->> 'enrolments')::int = 3
-  and (current_setting('th913.a_counts')::jsonb ->> 'programme_consents')::int = 5
-  and (current_setting('th913.a_counts')::jsonb ->> 'account_consents')::int = 2,
-  'A has 3 enrolments, 5 programme consents (3 revoked), 2 account consents before deletion');
+  and (current_setting('th913.a_counts')::jsonb ->> 'programme_consents')::int = 10
+  and (current_setting('th913.a_counts')::jsonb ->> 'account_consents')::int = 7,
+  'A has 3 enrolments, 10 programme consents (8 revoked), 7 account consents before deletion');
 
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000913001', true);
 select set_config('request.jwt.claims',
@@ -677,19 +713,15 @@ fail() {
   exit 1
 }
 
-# Accepts only postgres:// or postgresql:// URLs whose single host is
-# 127.0.0.1 or localhost, with no query string (libpq query parameters such as
-# host= could redirect the connection).
+# Accepts only postgres:// or postgresql:// URLs whose whole authority is
+# [userinfo@]127.0.0.1|localhost[:port]: one '@' at most, no comma host lists,
+# and no query string, fragment or whitespace anywhere (libpq parameters such
+# as host= could redirect the connection).
+url_shape='^postgres(ql)?://([^/]*)(/[^?#[:space:]]*)?$'
+local_authority='^([^@/?#,[:space:]]*@)?(127\.0\.0\.1|localhost)(:[0-9]{1,5})?$'
 db_url_is_local() {
-  local url="$1" rest authority host
-  [[ "$url" =~ ^postgres(ql)?:// ]] || return 1
-  [[ "$url" == *\?* ]] && return 1
-  rest="${url#*://}"
-  authority="${rest%%/*}"
-  host="${authority##*@}"
-  [[ "$host" == \[* ]] && return 1
-  host="${host%%:*}"
-  [[ "$host" == "127.0.0.1" || "$host" == "localhost" ]]
+  [[ "$1" =~ $url_shape ]] || return 1
+  [[ "${BASH_REMATCH[2]}" =~ $local_authority ]]
 }
 
 # Self-test of the guard; runs with the static checks.
@@ -702,7 +734,16 @@ for u in 'postgresql://postgres:postgres@db.example.test:5432/postgres' \
   'postgresql://postgres@localhost:54322/postgres?host=db.example.test' \
   'postgresql://postgres@localhost,db.example.test:5432/postgres' \
   'postgresql:///postgres' 'host=localhost dbname=postgres' \
-  'postgresql://user@db.example.test/x@127.0.0.1'; do
+  'postgresql://user@db.example.test/x@127.0.0.1' \
+  'postgresql://u:p@ss@127.0.0.1/postgres' \
+  'postgresql://u@db.example.test:5432@127.0.0.1/postgres' \
+  'postgresql://u@db.example.test:5432@localhost:54322/postgres' \
+  'postgresql://postgres@localhost:54322/postgres#db.example.test' \
+  'postgresql://postgres@localhost#@db.example.test/postgres' \
+  'postgresql://postgres@localhost:54322/post gres' \
+  'postgresql://post gres@localhost:54322/postgres' \
+  'postgresql://postgres@[::1]:54322/postgres' \
+  'postgresql://postgres@localhost:543221/postgres'; do
   if db_url_is_local "$u"; then fail "local URL guard accepts a non-local URL ($u)"; fi
 done
 
@@ -775,7 +816,12 @@ require 'grant execute on function public\.deletion_barrier_open\(\) to authenti
 
 # Consents.
 require 'enrolment_id uuid not null references public\.enrolments\(id\) on delete cascade' 'programme consent hangs off enrolment'
-require "unique nulls not distinct \\(enrolment_id, purpose, recipient_ref, revoked_at\\)" 'one live consent per enrolment, purpose and recipient'
+require "on public\\.programme_consents \\(enrolment_id, purpose, coalesce\\(recipient_ref, ''\\)\\)" 'one live consent per enrolment, purpose and recipient'
+require "on public\\.account_consents \\(user_id, purpose\\)" 'one live account consent per purpose'
+[[ "$(count '^where revoked_at is null;$')" -eq 2 ]] || fail 'live-row unique indexes must be partial on revoked_at is null'
+if grep -Eiq 'nulls not distinct' "$migration"; then
+  fail 'uniqueness must not include revocation history (use partial indexes on live rows)'
+fi
 require "'core', 'reminders', 'records_import', 'share_care_team'" 'programme consent purposes'
 require "purpose in \\('share_care_team', 'share_caregiver'\\)\\) =" 'sharing needs a named recipient'
 require "purpose in \\('essential', 'cross_program_insights', 'diagnostics'\\)" 'account consent purposes'
@@ -832,7 +878,9 @@ echo 'Enrolments migration static policy checks passed.'
 
 if [[ -n "${VERIFY_DB_URL:-}" ]]; then
   command -v psql >/dev/null || fail 'VERIFY_DB_URL is set but psql is not installed'
-  out=$(print_sql | psql "$VERIFY_DB_URL" -X -q -v ON_ERROR_STOP=1 2>&1) || {
+  # Connection environment variables could override the checked URL.
+  out=$(print_sql | env -u PGHOSTADDR -u PGHOST -u PGPORT -u PGSERVICE -u PGSERVICEFILE \
+    psql "$VERIFY_DB_URL" -X -q -v ON_ERROR_STOP=1 2>&1) || {
     echo "$out" >&2
     fail 'SQL RLS test failed'
   }

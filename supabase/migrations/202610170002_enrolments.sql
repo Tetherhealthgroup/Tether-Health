@@ -243,8 +243,6 @@ create table public.programme_consents (
   consent_text text not null,
   granted_at timestamptz not null default now(),
   revoked_at timestamptz null,
-  constraint programme_consents_live_key
-    unique nulls not distinct (enrolment_id, purpose, recipient_ref, revoked_at),
   constraint programme_consents_purpose_check check (
     purpose in (
       'core', 'reminders', 'records_import', 'share_care_team',
@@ -275,6 +273,12 @@ comment on table public.programme_consents is
 create index programme_consents_enrolment_idx
 on public.programme_consents (enrolment_id);
 
+-- One live row per enrolment, purpose and recipient. Revoked rows are outside
+-- the index, so a revocation can never conflict with history.
+create unique index programme_consents_live_key
+on public.programme_consents (enrolment_id, purpose, coalesce(recipient_ref, ''))
+where revoked_at is null;
+
 create table public.account_consents (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -283,8 +287,6 @@ create table public.account_consents (
   consent_text text not null,
   granted_at timestamptz not null default now(),
   revoked_at timestamptz null,
-  constraint account_consents_live_key
-    unique nulls not distinct (user_id, purpose, revoked_at),
   constraint account_consents_purpose_check check (
     purpose in ('essential', 'cross_program_insights', 'diagnostics')
   ),
@@ -301,6 +303,10 @@ create table public.account_consents (
 
 comment on table public.account_consents is
   'Account-level consent items that belong to no programme. Never holds health data; programme consent is in programme_consents.';
+
+create unique index account_consents_live_key
+on public.account_consents (user_id, purpose)
+where revoked_at is null;
 
 create function public.consent_revoke_only()
 returns trigger
