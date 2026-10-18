@@ -27,10 +27,10 @@ class TodayLoadingScreen extends StatelessWidget {
       tab: 'today',
       children: [
         TSkeleton(lines: 1),
-        TCard(variant: TCardVariant.coral, title: 'Craving or urge?', text: 'Always available', cta: TButton(key: const ValueKey('a:body[1].cta[0]'), label: 'Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
+        TCard(variant: TCardVariant.coral, title: 'Craving or urge?', text: 'One tap · no typing', cta: TButton(key: const ValueKey('a:body[1].cta[0]'), label: 'Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
         TSkeleton(lines: 3),
         TSkeleton(lines: 2),
-        TBody('Rescue renders first from the on-device cache, before anything else loads.', tone: TTextTone.small),
+        TBody('The rest of Today is still loading.', tone: TTextTone.small),
       ],
     );
   }

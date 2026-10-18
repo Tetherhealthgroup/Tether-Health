@@ -12,7 +12,9 @@ banned by the app's privacy-copy regression test. Nothing ships until a
 clinician and counsel approve it.
 
 Source: `screens_shared.py`, `screens_prog_a.py`, `screens_prog_b.py`,
-`screens_additions.py`. Only string contents changed. Components, keys,
+`screens_additions.py`. `review_TH-953.md` was also touched: it adds
+`sf_home_unplug_android` to its clinical/legal review list (th-reviewer
+TH-971 N1). Only string contents changed. Components, keys,
 actions, routes and screen order are unchanged, and `spec/actions.json` is
 byte-identical.
 
@@ -32,7 +34,7 @@ generated screen, not on the screen itself.
 | 4 | `bf_home_quitday` | `body[3].text` (card "I have a craving") | One tap · no typing · offline | One tap · no typing | **CLINICAL/LEGAL REVIEW REQUIRED** |
 | 5 | `today` | `body[3].text` (card "Craving or urge to scroll?") | Help for the next few minutes · works offline | Help for the next few minutes | **CLINICAL/LEGAL REVIEW REQUIRED** |
 | 6 | `today_offline` | `body[2].text` (card "Craving or urge?") | Works offline | One tap · no typing | **CLINICAL/LEGAL REVIEW REQUIRED** |
-| 7 | `checkin` | `footer[1].text` | Private · works offline · skip anything | Skip any question | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 7 | `checkin` | `footer[1].text` | Private · works offline · skip anything | Skip any program question | **CLINICAL/LEGAL REVIEW REQUIRED** |
 | 8 | `ca_home` | `body[2].text` (card "Red-zone plan") | Open it fast, even offline | Open it fast | **CLINICAL/LEGAL REVIEW REQUIRED** |
 | 9 | `ca_red` | `body[4].text` | Stays open until you close it. Works offline. | Stays open until you close it. | **CLINICAL/LEGAL REVIEW REQUIRED** |
 | 10 | `crisis` | `body[5].text` | Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. Works offline. 988 is US-only; localize per region. | Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. 988 is US-only; localize per region. | **CLINICAL/LEGAL REVIEW REQUIRED** |
@@ -41,11 +43,19 @@ generated screen, not on the screen itself.
 | 13 | `auth_session` | `body[1].text` | For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in. | For your security, sessions end after 30 days. | **CLINICAL/LEGAL REVIEW REQUIRED** |
 | 14 | `auth_session_apple` | `body[1].text` | (same as 13) | (same as 13) | **CLINICAL/LEGAL REVIEW REQUIRED** |
 | 15 | `auth_session_google` | `body[1].text` | (same as 13) | (same as 13) | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 20 | `today_loading` | `body[1].text` (card "Craving or urge?") | Always available | One tap · no typing | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 21 | `today_loading` | `body[4].text` | Rescue renders first from the on-device cache, before anything else loads. | The rest of Today is still loading. | **CLINICAL/LEGAL REVIEW REQUIRED** |
 
-Rows 1, 3, 5, 6, 7, 9 and 10 cover the 8 screens first identified for P-22
-(the 8th, `rescue_pick`, carried it in `desc`; row 11). Rows 2, 4, 8 and 12–15
-are close variants found by scanning every generator source, including
-`screens_additions.py`.
+Rows 1, 3, 5, 6, 7, 9, 10 and 11 cover the 8 screens first identified for
+P-22 (`rescue_pick` carried the claim in its `desc`, row 11). Rows 2, 4, 8,
+12–15, 20 and 21 are close variants found by scanning every generator source,
+including `screens_additions.py`. Rows 20 and 21 are stronger forms of the
+same claim: "always available", and a visible note saying Rescue loads from an
+on-device cache.
+
+Row 7: "Skip any question" was not accurate, because the two shared
+check-in questions (feeling, stress) have no skip option. Only the
+per-program questions offer "Skip".
 
 ### P-08: "keep 30 days"
 
@@ -61,17 +71,27 @@ unchanged.
 
 ## Not changed, kept on purpose
 
-"offline" left in the generator sources:
-- `today_offline`: the screen id, route, state name and banner kind, and the banner
-  "Offline · 3 entries will sync when you reconnect." This describes the
-  device's offline state rather than claiming the app works offline. Whether it
-  is true depends on the saved-entries outbox, so it is listed here for the
-  owner.
-- `learn_lesson`: link "Save for offline" and its toast "Saved for offline".
-  This is a lesson-download control. Changing the label would change
-  `actions.json` and the action sweep, which this ticket must not do. Listed for
-  the owner.
-- `records_review`: `banner('offline', …)` is a style kind. The text is "2 items need your review."
+Offline-related copy left in place. **Each item is for H31 review** and
+depends on launch scope:
+- `today_offline` banner: "Offline · 3 entries will sync when you reconnect."
+  **H31.** True only if the saved-entries outbox (TH-927) ships, so that
+  entries made offline are queued and synced.
+- `today_offline` checklist subtitle: "Saved on this phone". **H31.** Depends on
+  the TH-927 outbox, which stores the entry on the device until it syncs.
+- `today_offline` note: "Lessons not downloaded load when you’re back online."
+  **H31.** Implies that downloaded lessons are readable offline. Depends on
+  lesson downloads shipping at launch.
+- `learn_error`: "Check your connection. Downloaded lessons still work."
+  **H31.** Depends on lesson downloads shipping at launch.
+- `learn_lesson` link "Save for offline" and its toast "Saved for offline".
+  **H31.** Depends on lesson downloads shipping at launch. Changing the label
+  would change `actions.json` and the action sweep, which this ticket must not
+  do. If downloads do not ship, the change is a spec (layout/action) decision.
+- `today_loading` rows 20 and 21 above: these replace the "always available"
+  and "on-device cache" claims. **H31.**
+- Not copy: the `today_offline` screen id, route and state name, and the
+  banner style kind `offline` (also used on `records_review`, whose text is
+  "2 items need your review.").
 
 Every remaining standalone "30" in the spec, with the reason it stays:
 - `auth_session`, `auth_session_apple`, `auth_session_google`: "sessions end
@@ -88,3 +108,17 @@ Every remaining standalone "30" in the spec, with the reason it stays:
 - Other values are not durations of data retention: "21–30" (cigarettes per day), "30 min",
   "Move bedtime window 30 min earlier", "Sep 30" dates, "30 seconds",
   "30-second mood check-in", and the Unplug counter value 30.
+
+## Notes for H31 (clinical lead and counsel)
+
+- **No path to delete a program's data after leaving (needs a spec
+  decision).** The new `account_leave` copy says the data is "kept until you
+  delete it or delete your account". Today the only deletion choices are
+  "Delete BreatheFree data now" on `account_leave` itself and full account
+  deletion. Once someone has left a program, no screen lets them delete that
+  program's data later, so "until you delete it" points to a path the spec
+  does not have. A later-delete path, or different wording, needs an owner
+  decision. Tracked to TH-914 and the owner.
+- **`account_deleted`: "Backups are purged within 30 days."** Unchanged.
+  Counsel must confirm it against the actual backup configuration (retention
+  of database backups and point-in-time recovery) before release, or reword it.

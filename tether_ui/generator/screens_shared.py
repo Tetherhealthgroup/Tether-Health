@@ -156,8 +156,8 @@ def shared():
         card(v='mint', tag='ca', tagx='Learn only', title='How your lungs recover after you quit', text='4 min read', action=go('learn_lesson')),
     ], api=['GET /v1/today'], desc='Composed from every Focus enrolment. If a program safety rule fires, its card is pinned first (see Safety state).')
     S('today_loading', 'Today · loading', '/today?state=loading', 'today', phase='daily', tabname='today', variant_of='today', state='loading', hdr=today_hdr, body=[
-        skeleton(1), card(v='coral', title='Craving or urge?', text='Always available', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)), skeleton(3), skeleton(2),
-        text('Rescue renders first from the on-device cache, before anything else loads.', 'small')])
+        skeleton(1), card(v='coral', title='Craving or urge?', text='One tap · no typing', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)), skeleton(3), skeleton(2),
+        text('The rest of Today is still loading.', 'small')])
     S('today_offline', 'Today · offline', '/today?state=offline', 'today', phase='daily', tabname='today', variant_of='today', state='offline', hdr=today_hdr, body=[
         banner('offline', 'Offline · 3 entries will sync when you reconnect.'), title('Good morning, Alex.'),
         card(v='coral', title='Craving or urge?', text='One tap · no typing', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)),
@@ -180,7 +180,7 @@ def shared():
         seg(['Low', 'Some', 'High'], 'High', label='Stress today'),
         card(chips(['No', 'A puff', 'One or more', 'Skip'], ['One or more'], multi=False), tag='bf', accent='bf', title='Since your last check-in, did you smoke?', text='Before quit day this is expected, not a setback.'),
         card(chips(['Better', 'Same', 'Drained', 'Skip'], ['Drained'], multi=False), tag='sf', accent='sf', title='How did you feel after scrolling yesterday?'),
-    ], footer=[button('Save check-in', submit('POST /v1/records/check-ins', rep('checkin_done'))), text('Skip any question', 'small', align='center')], api=['POST /v1/records/check-ins'],
+    ], footer=[button('Save check-in', submit('POST /v1/records/check-ins', rep('checkin_done'))), text('Skip any program question', 'small', align='center')], api=['POST /v1/records/check-ins'],
        desc='Each Focus program adds at most 2 questions. Any self-harm signal routes to Crisis.')
     S('checkin_done', 'Check-in saved', '/check-in/done', 'today', phase='daily', hdr=H('Check-in saved', left='close'), body=[
         illus('✓'), title('Thanks, Alex.', 'l', align='center'), text('One small step for each program today.', align='center'),

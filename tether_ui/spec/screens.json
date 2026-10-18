@@ -3440,7 +3440,7 @@
         "t": "card",
         "variant": "coral",
         "title": "Craving or urge?",
-        "text": "Always available",
+        "text": "One tap · no typing",
         "cta": {
           "t": "button",
           "label": "Rescue",
@@ -3463,7 +3463,7 @@
       },
       {
         "t": "text",
-        "text": "Rescue renders first from the on-device cache, before anything else loads.",
+        "text": "The rest of Today is still loading.",
         "tone": "small"
       }
     ],
@@ -4098,7 +4098,7 @@
       },
       {
         "t": "text",
-        "text": "Skip any question",
+        "text": "Skip any program question",
         "tone": "small",
         "align": "center"
       }

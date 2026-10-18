@@ -27,7 +27,7 @@ class CheckinScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Save check-in', onPressed: () => TNav.submit(context, 'POST /v1/records/check-ins', then: () => TNav.replace(context, Routes.checkinDone)), arrow: true),
-        TBody('Skip any question', tone: TTextTone.small, center: true),
+        TBody('Skip any program question', tone: TTextTone.small, center: true),
       ],
     );
   }
