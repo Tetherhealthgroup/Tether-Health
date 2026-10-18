@@ -8,6 +8,10 @@ analyzer:
     - macos/**
     - linux/**
     - third_party/**
+    # tether_ui/ is its own package, analyzed by the tether_ui CI job with its
+    # own analysis_options.yaml; generator/dart_static is not a package.
+    - tether_ui/generator/**
+    - tether_ui/flutter/**
 include: package:flutter_lints/flutter.yaml
 
 linter:
