@@ -2,8 +2,9 @@
 
 Migration sources of truth include `supabase/migrations/202609110001_profiles.sql`,
 `supabase/migrations/202609260001_program_data.sql`,
-`supabase/migrations/202610170002_enrolments.sql` and
-`supabase/migrations/202610180001_sync_tables.sql`.
+`supabase/migrations/202610170002_enrolments.sql`,
+`supabase/migrations/202610180001_sync_tables.sql` and
+`supabase/migrations/202610180002_service_session_guard.sql`.
 
 Every migration file is named `YYYYMMDDNNNN_name.sql`: a 12-digit version (date
 plus a four-digit sequence), then lowercase letters, digits and underscores.
@@ -195,11 +196,30 @@ insert only. A trigger refuses every update to `sync_lapse`, for every role.
 Giving `thsync` a login is a human step outside migrations; no credential is
 stored in this repository.
 
+**The sync session writes nothing else.** Every insert, update and delete
+policy outside `sync_*` also requires `not public.sync_writer_session()`:
+`profiles`, `quit_plans`, `program_data`, `enrolments`, `programme_consents`,
+`account_consents` and the avatar policies on `storage.objects`. For insert
+and update policies the condition is in `with check` (the row being written),
+so the write fails with `42501`; for delete policies it is in `using`, so no
+row qualifies. The `using` clause of update policies is unchanged, because
+`select … for share` also applies it and `deletion_barrier_open()` reads the
+caller's profile that way during sync writes. Select policies are unchanged,
+so a sync session still reads the caller's enrolments, consents and profile,
+which `has_consent` and `deletion_barrier_open` need. `begin_account_deletion`
+and `delete_my_app_data` refuse a sync session with `TH009`, and
+`save_program_data` refuses it with `TH010`. Source:
+`supabase/migrations/202610180002_service_session_guard.sql`. Any later
+function that writes and is executable by `authenticated` refuses a sync
+session the same way, and any later write policy carries the condition;
+`supabase/tests/verify_service_session_guard.sh` checks both.
+
 **Leaving and deletion.** Leaving a programme keeps its sync rows, read-only.
 "Delete now" deletes the enrolment, which cascades to its `sync_area`, answers
 and lapses. Account deletion goes through the API only: `delete_my_app_data`
 deletes the caller's sync rows, returns a count for each sync table, and
-refuses to run in a `thsync` session.
+refuses to run in a `thsync` session (`TH009`), as does
+`begin_account_deletion`.
 
 The migration starts by dropping the earlier `sync_*` tables (keyed by
 `account_id`) if they exist and are empty. It stops instead if a table with
@@ -208,10 +228,11 @@ depends on one of them (the drop does not cascade). The migration also stops
 unless `thsync` is a member of `authenticated` only, without admin option or
 inheritance.
 
-The SQL test in `supabase/tests/verify_sync_migration.sh` (run when
-`VERIFY_DB_URL` is set) requires a superuser connection: it uses
-`SET SESSION AUTHORIZATION` to act as the `thsync` and `authenticator` logins,
-and fails if the connection is not a superuser.
+The SQL tests in `supabase/tests/verify_sync_migration.sh` and
+`supabase/tests/verify_service_session_guard.sh` (run when `VERIFY_DB_URL` is
+set) require a superuser connection: they use `SET SESSION AUTHORIZATION` to
+act as the `thsync` and `authenticator` logins, and fail if the connection is
+not a superuser.
 
 ## Quit-plan snapshot
 
@@ -274,8 +295,9 @@ in `breathefree-dev`; real patient or support-person information is prohibited.
 Migration sources of truth:
 `supabase/migrations/202609200001_account_data_deletion.sql`,
 `supabase/migrations/202610030001_avatar_deletion_barrier.sql`,
-`supabase/migrations/202610170002_enrolments.sql` and
-`supabase/migrations/202610180001_sync_tables.sql`.
+`supabase/migrations/202610170002_enrolments.sql`,
+`supabase/migrations/202610180001_sync_tables.sql` and
+`supabase/migrations/202610180002_service_session_guard.sql`.
 
 `delete_my_app_data` deletes the caller's sync lapses, answers, areas and sync
 account, programme consents, enrolments (and everything that cascades from
@@ -284,7 +306,8 @@ only, one for each table it deletes from: `profiles`, `quit_plans`,
 `program_data`, `enrolments`, `programme_consents`, `account_consents`,
 `sync_answers`, `sync_lapses`, `sync_areas` and `sync_accounts`.
 Consent history is deleted with the account; nothing records what was deleted.
-It refuses to run in a sync service (`thsync`) session.
+It and `begin_account_deletion` refuse to run in a sync service (`thsync`)
+session (`TH009`).
 
 The NestJS API first invokes `begin_account_deletion` with exact confirmation.
 That function updates the caller's profile row, waiting for any upload holding a
@@ -309,3 +332,35 @@ Pending receipts or intent-only tombstones are restored after interruption and
 local cleanup is safe to repeat. **Done** clears both records. An intent-only
 recovery reports that no server receipt was restored rather than inventing an
 identifier or claiming a receipt survived.
+
+## Error codes
+
+Errors raised by our own database functions and triggers use SQLSTATE class
+`TH`, which PostgreSQL does not use. Each is raised as
+`raise exception using errcode = 'TH0nn', message = '…', hint = '<name>'`,
+where the hint is the snake_case name below. Callers (the API) match the
+`code`, never the message text. PostgREST passes `code`, `message` and `hint`
+through and answers HTTP 400 for codes it does not know; the API maps them to
+its own responses. Messages and hints never contain user data. A new error
+takes the next free code and adds a row here;
+`supabase/tests/verify_service_session_guard.sh` fails when a migration raises
+a `TH` code that is not in this table, or with a different hint.
+
+| Code | Name | Raised by | Message |
+|---|---|---|---|
+| `TH001` | `focus_cap_reached` | `enrolments_focus_cap` (deferred trigger on `enrolments`, at commit) | At most two programmes can be in focus |
+| `TH002` | `consent_already_revoked` | `consent_revoke_only` (update trigger on `programme_consents` and `account_consents`) | Consent is already revoked |
+| `TH003` | `consent_immutable` | `consent_revoke_only` | Consent can only be revoked; Consent records are immutable |
+| `TH004` | `consent_requires_core` | Reserved. Today an optional consent without a live core consent is refused by row-level security (`42501`) | — |
+| `TH005` | `enrolment_left` | Reserved. Today a write to a left enrolment is refused by row-level security (`42501`) | — |
+| `TH006` | `deletion_in_progress` | Reserved. Today a write after `begin_account_deletion` is refused by row-level security (`42501`) | — |
+| `TH007` | `sync_area_mismatch` | `sync_area_match_enrolment` (trigger on `sync_area`) | Sync area must match its enrolment |
+| `TH008` | `lapses_append_only` | `sync_lapse_append_only` (update trigger on `sync_lapse`) | Lapses are append-only |
+| `TH009` | `deletion_via_api_only` | `begin_account_deletion` and `delete_my_app_data` in a sync service session | Account deletion goes through the API |
+| `TH010` | `sync_session_refused` | `save_program_data` in a sync service session | The sync service writes only sync tables |
+
+Standard SQLSTATEs are kept where PostgreSQL defines the condition:
+`42501` for row-level security and privilege refusals and for
+"Authentication required" (no caller); `23514` for check constraints and for
+the deletion functions' "Explicit confirmation required" and "Account deletion
+was not started"; `23505` for unique keys; `23503` for foreign keys.
