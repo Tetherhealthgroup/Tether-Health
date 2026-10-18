@@ -214,6 +214,7 @@ import '../screens/unplug/sf_unplug_health_stopped_screen.dart';
 import '../screens/unplug/sf_unplug_health_android_screen.dart';
 import '../screens/unplug/sf_unplug_off_screen.dart';
 import '../screens/sf/sf_home_unplug_screen.dart';
+import '../screens/sf/sf_home_unplug_android_screen.dart';
 import '../screens/sf/sf_week_unplug_screen.dart';
 import '../screens/plans/program_settings_sf_screen.dart';
 import '../screens/account/account_delete_apple_screen.dart';
@@ -444,6 +445,7 @@ abstract final class AppRouter {
     Routes.sfUnplugHealthAndroid: (_) => const SfUnplugHealthAndroidScreen(),
     Routes.sfUnplugOff: (_) => const SfUnplugOffScreen(),
     Routes.sfHomeUnplug: (_) => const SfHomeUnplugScreen(),
+    Routes.sfHomeUnplugAndroid: (_) => const SfHomeUnplugAndroidScreen(),
     Routes.sfWeekUnplug: (_) => const SfWeekUnplugScreen(),
     Routes.programSettingsSf: (_) => const ProgramSettingsSfScreen(),
     Routes.accountDeleteApple: (_) => const AccountDeleteAppleScreen(),
@@ -680,6 +682,7 @@ abstract final class AppRouter {
     ('sf_unplug_health_android', 'Tracking check (Android) · android', 'ScrollFree · Unplug', Routes.sfUnplugHealthAndroid),
     ('sf_unplug_off', 'Turn off Unplug', 'ScrollFree · Unplug', Routes.sfUnplugOff),
     ('sf_home_unplug', 'ScrollFree home · Unplug on (iPhone) · Unplug on · iPhone', 'ScrollFree', Routes.sfHomeUnplug),
+    ('sf_home_unplug_android', 'ScrollFree home · Unplug on (Android) · Unplug on · Android', 'ScrollFree', Routes.sfHomeUnplugAndroid),
     ('sf_week_unplug', 'Weekly reflection · Unplug on (iPhone) · Unplug on · iPhone', 'ScrollFree', Routes.sfWeekUnplug),
     ('program_settings_sf', 'Program settings · ScrollFree with Unplug · ScrollFree', 'Plans & programs', Routes.programSettingsSf),
     ('account_delete_apple', 'Delete account · Apple account · Apple account', 'Account & data', Routes.accountDeleteApple),

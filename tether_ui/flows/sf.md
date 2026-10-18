@@ -16,6 +16,7 @@ flowchart LR
   sf_slip["Long-scroll recovery"]
   sf_week["Weekly reflection"]
   sf_home_unplug["ScrollFree home · Unplug on (iPhone)"]
+  sf_home_unplug_android["ScrollFree home · Unplug on (Android)"]
   sf_week_unplug["Weekly reflection · Unplug on (iPhone)"]
   sf_screentime_android["Connect usage access (Android)"]
   sf_screentime_android_denied["Usage access off (Android)"]
@@ -46,6 +47,14 @@ flowchart LR
   sf_home_unplug -->|"Goal & windows"| sf_goal
   sf_home_unplug -->|"Buddy"| sf_buddy
   sf_home_unplug -->|"Program settings"| program_settings
+  sf_home_unplug_android -->|"Avatar · Account"| account
+  sf_home_unplug_android -->|"Pause 60"| sf_pause
+  sf_home_unplug_android -->|"Unplug is on"| sf_unplug_home
+  sf_home_unplug_android -->|"This week"| sf_week
+  sf_home_unplug_android -->|"Had a long scroll?"| sf_slip
+  sf_home_unplug_android -->|"Goal & windows"| sf_goal
+  sf_home_unplug_android -->|"Buddy"| sf_buddy
+  sf_home_unplug_android -->|"Program settings"| program_settings
   sf_screentime_android -->|"Open settings"| sf_screentime_android_denied
   account>"Account ↗"]
   class account ext
@@ -82,6 +91,7 @@ flowchart LR
 | [Long-scroll recovery](../screens/png/sf/sf_slip.png) | `/p/sf/slip` | screen | milestone |
 | [Weekly reflection](../screens/png/sf/sf_week.png) | `/p/sf/week` | screen | milestone |
 | [ScrollFree home · Unplug on (iPhone)](../screens/png/sf/sf_home_unplug.png) | `/p/sf/home?state=unplug` | screen · Unplug on · iPhone | daily |
+| [ScrollFree home · Unplug on (Android)](../screens/png/sf/sf_home_unplug_android.png) | `/p/sf/home?state=unplug-android` | screen · Unplug on · Android | daily |
 | [Weekly reflection · Unplug on (iPhone)](../screens/png/sf/sf_week_unplug.png) | `/p/sf/week?state=unplug` | screen · Unplug on · iPhone | milestone |
 | [Connect usage access (Android)](../screens/png/sf/sf_screentime_android.png) | `/p/sf/screen-time?state=android` | screen · android | plan |
 | [Usage access off (Android)](../screens/png/sf/sf_screentime_android_denied.png) | `/p/sf/screen-time?state=android-denied` | screen · android · not allowed | plan |
@@ -143,6 +153,19 @@ flowchart LR
 | ScrollFree home · Unplug on (iPhone) | Tab · Progress | `tab → progress` |
 | ScrollFree home · Unplug on (iPhone) | Tab · Learn | `tab → learn` |
 | ScrollFree home · Unplug on (iPhone) | Tab · Support | `tab → support` |
+| ScrollFree home · Unplug on (Android) | Back | `back` |
+| ScrollFree home · Unplug on (Android) | Avatar · Account | `push → account` |
+| ScrollFree home · Unplug on (Android) | Pause 60 | `push → sf_pause` |
+| ScrollFree home · Unplug on (Android) | Unplug is on | `push → sf_unplug_home` |
+| ScrollFree home · Unplug on (Android) | This week | `push → sf_week` |
+| ScrollFree home · Unplug on (Android) | Had a long scroll? | `push → sf_slip` |
+| ScrollFree home · Unplug on (Android) | Goal & windows | `push → sf_goal` |
+| ScrollFree home · Unplug on (Android) | Buddy | `push → sf_buddy` |
+| ScrollFree home · Unplug on (Android) | Program settings | `push → program_settings` |
+| ScrollFree home · Unplug on (Android) | Tab · Today | `tab → today` |
+| ScrollFree home · Unplug on (Android) | Tab · Progress | `tab → progress` |
+| ScrollFree home · Unplug on (Android) | Tab · Learn | `tab → learn` |
+| ScrollFree home · Unplug on (Android) | Tab · Support | `tab → support` |
 | Weekly reflection · Unplug on (iPhone) | Back | `back` |
 | Weekly reflection · Unplug on (iPhone) | Yes | `toast “Goal set to 75 min” then back` |
 | Weekly reflection · Unplug on (iPhone) | Stay at 90 | `back` |

@@ -7,7 +7,7 @@ import '../../ui/ui.dart';
 
 /// ScrollFree home · Unplug on (iPhone)  ·  route `/p/sf/home?state=unplug`  ·  flow `sf`  ·  kind `screen`
 /// State: Unplug on · iPhone of sf_home · program sf · phase daily
-/// Copy needs clinical/legal review. iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.
+/// Copy needs clinical/legal review. iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android uses the Unplug on · Android state, with figures Tether reads on the phone.
 ///
 /// Actions (generated from spec/screens/sf_home_unplug.json):
 ///   • Back → back

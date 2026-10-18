@@ -76,6 +76,7 @@
       "sf_unplug_health_android",
       "sf_unplug_off",
       "sf_home_unplug",
+      "sf_home_unplug_android",
       "sf_week_unplug",
       "sf_screentime_android",
       "sf_screentime_android_denied"

@@ -8197,6 +8197,110 @@
    "got": "support"
   },
   {
+   "screen": "sf_home_unplug_android",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_home_unplug_android",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "sf_home_unplug_android",
+   "path": "body[3].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_pause"
+  },
+  {
+   "screen": "sf_home_unplug_android",
+   "path": "body[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_home"
+  },
+  {
+   "screen": "sf_home_unplug_android",
+   "path": "body[6].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_week"
+  },
+  {
+   "screen": "sf_home_unplug_android",
+   "path": "body[6].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_slip"
+  },
+  {
+   "screen": "sf_home_unplug_android",
+   "path": "body[6].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_goal"
+  },
+  {
+   "screen": "sf_home_unplug_android",
+   "path": "body[6].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_buddy"
+  },
+  {
+   "screen": "sf_home_unplug_android",
+   "path": "body[6].rows[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "sf_home_unplug_android",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_home_unplug_android",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "sf_home_unplug_android",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "sf_home_unplug_android",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
    "screen": "sf_week_unplug",
    "path": "header.left",
    "force": null,

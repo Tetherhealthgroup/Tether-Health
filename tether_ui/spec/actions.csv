@@ -867,6 +867,19 @@ sf_home_unplug,ScrollFree home · Unplug on (iPhone),Tab · Today,tab,today,tab 
 sf_home_unplug,ScrollFree home · Unplug on (iPhone),Tab · Progress,tab,progress,tab → progress
 sf_home_unplug,ScrollFree home · Unplug on (iPhone),Tab · Learn,tab,learn,tab → learn
 sf_home_unplug,ScrollFree home · Unplug on (iPhone),Tab · Support,tab,support,tab → support
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),Back,back,,back
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),Avatar · Account,push,account,push → account
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),Pause 60,push,sf_pause,push → sf_pause
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),Unplug is on,push,sf_unplug_home,push → sf_unplug_home
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),This week,push,sf_week,push → sf_week
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),Had a long scroll?,push,sf_slip,push → sf_slip
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),Goal & windows,push,sf_goal,push → sf_goal
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),Buddy,push,sf_buddy,push → sf_buddy
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),Program settings,push,program_settings,push → program_settings
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),Tab · Today,tab,today,tab → today
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),Tab · Progress,tab,progress,tab → progress
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),Tab · Learn,tab,learn,tab → learn
+sf_home_unplug_android,ScrollFree home · Unplug on (Android),Tab · Support,tab,support,tab → support
 sf_week_unplug,Weekly reflection · Unplug on (iPhone),Back,back,,back
 sf_week_unplug,Weekly reflection · Unplug on (iPhone),Yes,toast,,toast “Goal set to 75 min” then back
 sf_week_unplug,Weekly reflection · Unplug on (iPhone),Stay at 90,back,,back
