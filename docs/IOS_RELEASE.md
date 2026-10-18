@@ -1,8 +1,20 @@
 # iOS App Store readiness runbook (owner)
 
 > **Note:** Refresh after the tether_ui build (Sign in with Apple, HealthKit, Family Controls, App Groups) — tracked in TH-941/TH-961/TH-968.
+>
+> - The audit below was made at commit `f06b7c7`, not at this branch. Its
+>   file:line citations are not current; re-check each one before acting on it.
+> - Bundle and app IDs (section 1) are pending TH-941. This tree still has
+>   `com.hshanmug12.breathefree` on iOS and `com.breathefree.breathefree_patient`
+>   on Android.
+> - Gap G-5 and the build step in O-10 are superseded by
+>   `tool/build_ios_release.sh` (TH-904). Use that script, not a raw
+>   `flutter build ipa`.
+> - `BASELINE.md`, cited below, is not in this repository; it is part of the
+>   private office notes.
 
-Bundle ID: `com.TetherHealthLLC.tetherhealth`. This is the iOS counterpart to
+Target bundle ID: `com.TetherHealthLLC.tetherhealth` (not yet set in this tree;
+see section 1). This is the iOS counterpart to
 `docs/PLAY_RELEASE.md`. Agents and CI never sign, upload, submit or touch App
 Store Connect, the Apple Developer portal or Firebase; every console step below
 is performed by the owner.
@@ -23,21 +35,21 @@ never final here.
 
 ## 1. Already satisfied (Observed at `f06b7c7`)
 
-### Bundle identifier, per build configuration
+### Bundle identifier, per build configuration (pending TH-941; not satisfied on this branch)
 
-| Target / configuration | `PRODUCT_BUNDLE_IDENTIFIER` | Citation |
+The target bundle ID is `com.TetherHealthLLC.tetherhealth`. This tree does not
+use it yet; TH-941 sets the final identifiers. Current values on this branch:
+
+| Target / configuration | `PRODUCT_BUNDLE_IDENTIFIER` today | Citation |
 |---|---|---|
-| Runner / Debug | `com.TetherHealthLLC.tetherhealth` | `ios/Runner.xcodeproj/project.pbxproj:579` (config named at `:586`) |
-| Runner / Release | `com.TetherHealthLLC.tetherhealth` | `ios/Runner.xcodeproj/project.pbxproj:603` (`:609`) |
-| Runner / Profile | `com.TetherHealthLLC.tetherhealth` | `ios/Runner.xcodeproj/project.pbxproj:396` (`:402`) |
-| RunnerTests / Debug | `com.TetherHealthLLC.tetherhealth.RunnerTests` | `ios/Runner.xcodeproj/project.pbxproj:412` (`:419`) |
-| RunnerTests / Release | `com.TetherHealthLLC.tetherhealth.RunnerTests` | `ios/Runner.xcodeproj/project.pbxproj:429` (`:434`) |
-| RunnerTests / Profile | `com.TetherHealthLLC.tetherhealth.RunnerTests` | `ios/Runner.xcodeproj/project.pbxproj:444` (`:449`) |
+| Runner / Profile, Debug, Release | `com.hshanmug12.breathefree` | `ios/Runner.xcodeproj/project.pbxproj:396`, `:579`, `:603` |
+| RunnerTests / Debug, Release, Profile | `com.hshanmug12.breathefreePatient.RunnerTests` | `ios/Runner.xcodeproj/project.pbxproj:412`, `:429`, `:444` |
 
-All three Runner configurations match the Android application ID
-(`android/app/build.gradle.kts:50`) and the Firebase Android package in
-`tether-health-llc` (BASELINE.md:104). The
-Archive action in the shared scheme uses `Release`
+The Android application ID is `com.breathefree.breathefree_patient`
+(`android/app/build.gradle.kts:50`), so neither platform matches the target ID
+yet. Checklist: after TH-941, confirm every Runner configuration, the Android
+application ID and the Firebase Android package in `tether-health-llc` all use
+the final ID. The Archive action in the shared scheme uses `Release`
 (`ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme:116`).
 
 ### Deployment target and devices
@@ -98,9 +110,9 @@ framework ships its own privacy manifest was not checked (Unknown).
   `Pods` include).
 - Every native iOS plugin above ships a `Package.swift` (Observed in the pub
   cache, and `third_party/flutter_tts/ios/flutter_tts/Package.swift` in git).
-- Per `tether-health-ai-office/AGENTS.md` (iOS builds section): if a build adds
-  `Pods` entries to `project.pbxproj`, an `ios/Podfile` or `#include?` lines to
-  `ios/Flutter/*.xcconfig`, that is tooling noise; never commit it.
+- If a build adds `Pods` entries to `project.pbxproj`, an `ios/Podfile` or
+  `#include?` lines to `ios/Flutter/*.xcconfig`, that is tooling noise; never
+  commit it. `tool/build_ios_release.sh` refuses to run while it is present.
 
 ### Signing settings present in the repo
 
@@ -128,7 +140,7 @@ framework ships its own privacy manifest was not checked (Unknown).
 ### Transport
 
 Session storage is deliberately not listed here: it is not fully satisfied and
-is recorded as gap G-10 in section 2 (R-056).
+is recorded as gap G-10 in section 2.
 
 - Configured hosts must be `https` (`lib/config/app_config.dart:50-51`, and for
   production `:102`). `Info.plist` has no `NSAppTransportSecurity` exception,
@@ -170,11 +182,9 @@ is recorded as gap G-10 in section 2 (R-056).
 - **This server path is the NestJS `api/` at `f06b7c7`, not production.**
   Under owner decision D2 (BASELINE.md:78), production is
   Tether-Health-Backend and the app must be moved onto it. There, Auth-user
-  deletion is BE-047 and the client move is TH-103; both are Blocked
-  (`tether-health-ai-office/backlog/BE-047.md`, `backlog/TH-103.md`). Whether
+  deletion is BE-047 and the client move is TH-103; both are Blocked. Whether
   5.1.1(v) is met against production is therefore **Unknown** (gap G-8, owner
-  item O-8). What deletion leaves behind is recorded in the office risk
-  register R-066 (guest-scope data on the device, server logs and backups).
+  item O-8). For what deletion leaves behind, see the private office notes.
 
 ## 2. Gaps an engineer can fix later (proposed tickets, not done in TH-099)
 
@@ -183,8 +193,7 @@ Each is a proposed ticket for th-lead to file. None was changed here.
 - **G-1 App-level privacy manifest.** No `ios/Runner/PrivacyInfo.xcprivacy`
   exists (absent from `git ls-tree -r f06b7c7 ios`). Add one that declares
   `NSPrivacyTracking` false and the `NSPrivacyCollectedDataTypes` the app
-  actually collects (email, name, photo, health-program entries, per R-054 and
-  R-066), matching the App Privacy answers in O-7. The data-type list is
+  actually collects (email, name, photo, health-program entries), matching the App Privacy answers in O-7. The data-type list is
   **needs-counsel**. Also decide whether any required-reason API is used by
   app code or by the `objective_c` native asset, which ships no manifest
   (Unknown). Rule (Assumed, confirm against Apple's "Privacy manifest files"
@@ -208,32 +217,22 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   redirect `io.breathefree.patient://login-callback`
   (`lib/auth/auth_gateway.dart:66-67`; Android
   `android/app/src/main/AndroidManifest.xml:34-35`). It carries the old
-  BreatheFree name, and any app can claim a custom scheme (Inferred). The same
-  redirect is used for sign-up confirmation, confirmation resend and **password
-  recovery** (`lib/auth/auth_gateway.dart:66-67,102,117,132-134`, R-075). The
-  Supabase PKCE flow (R-066 c) partly limits what an interceptor could do with
-  a captured redirect, but that rests on the supabase_flutter 2.x default and
-  `Supabase.initialize` does not set `authFlowType` (`lib/main.dart:81-86`;
-  Inferred, R-075, rated Low, Open). Proposal (R-075): set
-  `authFlowType: AuthFlowType.pkce` explicitly so a library default change
-  cannot silently downgrade to implicit. Option:
-  move to Universal Links on a Tether Health domain (associated-domains
-  entitlement plus an `apple-app-site-association` file on the website), or
-  rename the scheme on both platforms. Needs th-security review; touches auth.
-- **G-5 iOS release build script.** Android has
-  `tool/build_play_release.sh`, which validates the release define file,
-  version and certificate. No iOS equivalent exists (`git ls-tree f06b7c7
-  tool/`). Propose `tool/build_ios_release.sh` that reuses the same
-  `--dart-define-from-file` validation and runs `flutter build ipa`, with no
-  signing secrets in the repo. This is the fix proposed in R-076 and is queued
-  as TH-105 (not yet built). Why it matters (R-055, R-076): the Android script
-  rejects privileged Supabase keys before building (R-076 cites
-  `tool/build_play_release.sh:290-307`), whereas `AppConfig.validate`
-  (`lib/config/app_config.dart:111`) only runs on the device at startup, after
-  the value is already compiled into the IPA uploaded to Apple and TestFlight
-  testers. R-076 rates it Medium and Open and says a privileged key in the
-  define file would ship in the binary (Inferred). Until TH-105 exists, use the
-  manual check in O-10.
+  BreatheFree name. The same redirect is used for sign-up confirmation,
+  confirmation resend and password recovery
+  (`lib/auth/auth_gateway.dart:66-67,102,117,132-134`). Checklist: confirm the
+  auth redirect uses a verified universal link on a Tether Health domain
+  (associated-domains entitlement plus an `apple-app-site-association` file on
+  the website); see the private office notes. Needs th-security review;
+  touches auth.
+- **G-5 iOS release build script — superseded by `tool/build_ios_release.sh`
+  (TH-904).** The script is the iOS counterpart of
+  `tool/build_play_release.sh`. It runs the release define check shared with
+  the Play script (`tool/release_define_check.sh`) before any build step,
+  refuses CocoaPods drift, then runs the format, analyze and test gates and
+  `flutter build ipa --release`. It adds
+  no signing secrets to the repo. Checklist: confirm the release define check
+  passes (`sh tool/build_ios_release.sh --dart-define-from-file=<path>
+  --check-only`) before every store build. See O-10.
 - **G-6 Device family and orientation.** The app targets iPad
   (`TARGETED_DEVICE_FAMILY = "1,2"`) and allows iPhone landscape
   (`Info.plist:69-74`), while the approved design is portrait phone artwork
@@ -262,32 +261,21 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   lands with BE-047 and the client move with TH-103 (both Blocked). After
   those merge, add a smoke test on a synthetic account against whichever
   backend production actually uses, confirming the Auth user is gone (owner
-  runs it; links to R-066).
+  runs it).
 - **G-9 Release checklist.** `PRODUCTION_RELEASE_CHECKLIST.md:75-79` has two
   iOS-related bullets under the distribution heading (`:77`, `:78-79`); link
   them to this runbook once TH-099 merges. The `:77` bullet (choose final
   identifiers) is already decided by D3 (BASELINE.md:79).
-- **G-10 Keychain accessibility for session, program documents and receipts
-  (R-056, open).** The Supabase session is stored with `flutter_secure_storage`
-  (`localStorage: SecureSessionStorage()`, `lib/main.dart:85`,
-  `lib/auth/secure_session_storage.dart:6-10`), but the store is built with
-  default options (`secure_session_storage.dart:7`). The same default is used
-  for program documents, which hold health data
-  (`lib/programs/secure_program_store.dart:12`), and for deletion receipts
-  (`lib/account/account_deletion_receipt_store.dart:44`). Per R-056 the plugin
-  default is `kSecAttrAccessibleWhenUnlocked`, and Apple documents such items as
-  migrating to a new device with encrypted backups, so a session and health
-  data can be restored onto another device (R-056 rates it Medium, Open; the
-  Apple statement is cited there to TH-048 section 11 U14). Only the guest quit
-  plan sets `KeychainAccessibility.unlocked_this_device`
-  (`lib/quit_plan/guest_quit_plan_store.dart:46`). R-056 points to the design fix
-  in `tether-health-ai-office/compliance/TH-048-local-storage-design.md`
-  sections 6, 7.1 and 8: `unlocked_this_device` with synchronizable off for the
-  session and receipts, and moving program documents out of the Keychain. Those
-  sections are a recommendation, not shipped code, and the policy is
-  **needs-counsel** before it is stated in any disclosure. Touches
-  health-data storage; needs th-security review (Tier 3). This bullet does not
-  claim the iOS store build is safe on this point.
+- **G-10 Keychain storage for session, program documents and receipts (not yet
+  confirmed).** The Supabase session (`lib/auth/secure_session_storage.dart`),
+  program documents, which hold health data
+  (`lib/programs/secure_program_store.dart`), and deletion receipts
+  (`lib/account/account_deletion_receipt_store.dart`) are stored with
+  `flutter_secure_storage`. Checklist: before the store build, confirm the
+  Keychain storage design for these items has been reviewed and shipped; see
+  the private office notes. Any storage policy is **needs-counsel** before it
+  is stated in a disclosure. Touches health-data storage; needs th-security
+  review. This bullet does not claim the iOS store build is safe on this point.
 
 ## 3. Owner-only items
 
@@ -325,52 +313,39 @@ None of these were started by any agent. Do them in roughly this order.
   Unknown), primary language, bundle ID `com.TetherHealthLLC.tetherhealth`,
   SKU. Then category, age rating questionnaire, support URL, and the export
   compliance answer that feeds G-2. The export-compliance answer is
-  **needs-counsel**; it is counsel question 12(a) in
-  `tether-health-ai-office/compliance/counsel-questions.md`. Do not answer it,
+  **needs-counsel**; it is on the counsel question list in the private office
+  notes. Do not answer it,
   and do not set the G-2 key, on an agent's say-so.
 - **O-7 App Privacy answers, with counsel.** Base them on code evidence:
   email and name for the account, photo (avatar), health-program entries,
-  processors Supabase and the API host (R-054, R-066, R-072). Tracking: none
-  found in code (no ad or analytics SDK in `pubspec.yaml:9-19`). Every answer
-  is **needs-counsel**. Read these open register entries first, since the App
-  Privacy answers must not repeat their wrong claims: R-064 (the app told users
-  program health data stays on the device, while signed-in saves send the whole
-  program document to the API; the register says the store declaration must
-  list these program health types as collected when signed in, wording pending
-  counsel); R-067 (data export puts the full account copy, including program
-  health data, on the system clipboard and calls that secure; the register's
-  clipboard-exposure reasoning is written for Android, and whether iOS
-  Universal Clipboard carries it to other devices is not stated there, so it is
-  Inferred only and untested); R-068 (onboarding and rescue screens state
-  privacy and offline properties the code does not have). The register notes
-  that copy fixes for R-064, R-067 and R-068 exist only on the unmerged
-  `office/TH-094-honest-privacy-copy` branch, and that the R-067 clipboard
-  mechanism is unchanged there. Check their current status before submitting. Also review the claims rules for a health app (Assumed,
+  processors Supabase and the API host. Tracking: none found in code (no ad or
+  analytics SDK in `pubspec.yaml:9-19`). Every answer is **needs-counsel**.
+  Checklist: before answering, review the open privacy-copy items in the
+  private office notes, and confirm the answers match what the code actually
+  collects and sends rather than what in-app copy says. Also review the claims rules for a health app (Assumed,
   confirm against Guidelines **1.4.1** and **5.1.3**): no medical-device or
   clinical-validation claims (**needs-clinician** for any clinical wording).
-- **O-8 Privacy policy URL and deletion page (R-054).** App Store Connect needs
+- **O-8 Privacy policy URL and deletion page.** App Store Connect needs
   a privacy policy URL for the app (Assumed, Guideline **5.1.1(i)**). The
-  website notice today covers the website only (R-054). Publish an app privacy
+  website notice today covers the website only. Publish an app privacy
   policy and a public account-deletion page that says what is deleted and what
-  remains and for how long (R-066). Both are **needs-counsel**. Do not submit
+  remains and for how long. Both are **needs-counsel**. Do not submit
   until in-app deletion works against the production backend (D2; BE-047,
   TH-103, G-8). No URL is invented here.
 - **O-9 Supabase Auth redirect allow-list.** Confirm that
   `io.breathefree.patient://login-callback` (or its G-4 replacement) is in the
   production project's redirect URLs. Current setting Unknown.
 - **O-10 Build and upload.** On a Mac signed in to the LLC team, with the same
-  release define file as Android (`docs/PLAY_RELEASE.md` section 3).
-  **Before building, check the key (R-076, G-5):** open the define file and
-  confirm that `SUPABASE_ANON_KEY` starts with `sb_publishable_`, or that
-  `tool/build_play_release.sh` accepted this same, unchanged file (it rejects
-  `sb_secret_` keys and JWTs whose role is not `anon`, `:295-307`). Do not paste
-  the key into chat, tickets or logs. Do not build if the key is anything else:
-  this iOS command has no equivalent check, and the value ends up inside the
-  IPA. Then run:
-  `flutter build ipa --release --dart-define-from-file=$HOME/secure/tether-health/release.json`,
-  then upload the `.ipa` with Xcode Organizer or Transporter. **This command
-  was not run by any agent (NOT RUN)**; its output path and signing behaviour
-  are Unknown here. Discard any `Pods` noise it creates (section 1, SPM).
+  release define file as Android (`docs/PLAY_RELEASE.md` section 3). Use
+  `tool/build_ios_release.sh` (TH-904), not a raw `flutter build ipa`. First
+  confirm the release define check passes:
+  `sh tool/build_ios_release.sh --dart-define-from-file=$HOME/secure/tether-health/release.json --check-only`.
+  Do not build if it fails. Do not paste the key into chat, tickets or logs.
+  Then run the same command without `--check-only`; it builds the IPA and
+  prints its path and version fields. Upload the `.ipa` with Xcode Organizer or
+  Transporter. **No agent has run this against the real release define file or
+  signed a build (NOT RUN)**; signing behaviour on the build Mac is Unknown
+  here. Discard any `Pods` noise a build creates (section 1, SPM).
   Each upload needs a new `CFBundleVersion` (build number) for the same
   version (Assumed).
 - **O-11 TestFlight.** Internal testers first; they must be App Store Connect
@@ -379,6 +354,5 @@ None of these were started by any agent. Do them in roughly this order.
   give a demo account in the review notes (Assumed, Guideline **2.1**): use a
   synthetic test account, enter its password only in App Store Connect, never
   in a file or repo.
-- **O-12 Submit for review.** Tier 4 owner action
-  (`tether-health-ai-office/AGENTS.md`, Approval gates). Not before O-7 and O-8
-  are signed off by counsel.
+- **O-12 Submit for review.** Owner-only action; see the private office notes
+  for the approval gate. Not before O-7 and O-8 are signed off by counsel.
