@@ -10,6 +10,46 @@ import 'package:flutter_test/flutter_test.dart';
 
 String join(List<String> parts) => parts.join(Platform.pathSeparator);
 
+/// The package Play holds for this app (see tool/build_play_release.sh).
+const String appId = 'com.TetherHealthLLC.tetherhealth';
+
+/// Fake bundletool: answers the package query with $FAKE_PACKAGE (default: the
+/// app ID; set but empty means an empty answer) and the versionCode query with
+/// $FAKE_CODE. Synthetic output, shaped like `bundletool dump manifest --xpath`.
+const String bundletoolBody = 'case "\$*" in\n'
+    '  *--xpath=/manifest/@package*) echo "\${FAKE_PACKAGE-$appId}" ;;\n'
+    '  *--xpath=/manifest/@android:versionCode*) echo "\$FAKE_CODE" ;;\n'
+    '  *) echo "error: bad invocation" >&2; exit 1 ;;\n'
+    'esac';
+
+// Fake aapt2 that behaves like the real one on an AAB: it only accepts a
+// zip with AndroidManifest.xml and resources.pb at the root, and otherwise
+// prints the real error. Prints the real output format for the code in
+// $FAKE_CODE and the package in $FAKE_PACKAGE (default: the app ID; set but
+// empty omits the attribute). Synthetic output. A <queries> <package> element
+// is included so the parser must pick the manifest's own package attribute.
+const aapt2Body = 'case "\$1 \$2 \$3 \$4" in\n'
+    '  "dump xmltree --file AndroidManifest.xml") ;;\n'
+    '  *) echo "error: bad invocation" >&2; exit 1 ;;\n'
+    'esac\n'
+    'entries="\$(unzip -Z1 "\$5" 2>/dev/null | sort | tr "\\n" " ")"\n'
+    'if [ "\$entries" != "AndroidManifest.xml resources.pb " ]; then\n'
+    '  echo "\$5: error: could not identify format of APK." >&2\n'
+    '  exit 1\n'
+    'fi\n'
+    'echo "N: android=http://schemas.android.com/apk/res/android"\n'
+    'echo "  E: manifest (line=2)"\n'
+    'echo "    A: http://schemas.android.com/apk/res/android:versionCode'
+    '(0x0101021b)=\$FAKE_CODE (Raw: \\"\$FAKE_CODE\\")"\n'
+    'pkg="\${FAKE_PACKAGE-$appId}"\n'
+    'if [ -n "\$pkg" ]; then\n'
+    '  echo "    A: package=\\"\$pkg\\" (Raw: \\"\$pkg\\")"\n'
+    'fi\n'
+    'echo "    E: queries (line=40)"\n'
+    'echo "      E: package (line=41)"\n'
+    'echo "        A: http://schemas.android.com/apk/res/android:name'
+    '(0x01010003)=\\"com.example.other\\" (Raw: \\"com.example.other\\")"';
+
 void main() {
   late Directory root;
   late Directory fakeBin;
@@ -69,31 +109,30 @@ void main() {
     final entries = withEntries
         ? ['base/manifest/AndroidManifest.xml', 'base/resources.pb']
         : ['BUNDLE-METADATA/readme.txt'];
-    final result = Process.runSync(
-      'python3',
-      [
-        '-I',
-        '-c',
-        'import sys, zipfile\n'
-            'z = zipfile.ZipFile(sys.argv[1], "w")\n'
-            'for n in sys.argv[2:]: z.writestr(n, "x")\n'
-            'z.close()',
-        path,
-        ...entries,
-      ],
-    );
+    final result = Process.runSync('python3', [
+      '-I',
+      '-c',
+      'import sys, zipfile\n'
+          'z = zipfile.ZipFile(sys.argv[1], "w")\n'
+          'for n in sys.argv[2:]: z.writestr(n, "x")\n'
+          'z.close()',
+      path,
+      ...entries,
+    ]);
     expect(result.exitCode, 0, reason: '${result.stderr}');
     return File(path);
   }
 
   group('--check-version-only (pubspec)', () {
-    test('fails when the pubspec build number is below the default minimum',
-        () {
-      writePubspec('1.0.0+1');
-      final r = run(['--check-version-only']);
-      expect(r.exitCode, 1);
-      expect(output(r), contains('below the minimum 2'));
-    });
+    test(
+      'fails when the pubspec build number is below the default minimum',
+      () {
+        writePubspec('1.0.0+1');
+        final r = run(['--check-version-only']);
+        expect(r.exitCode, 1);
+        expect(output(r), contains('below the minimum 2'));
+      },
+    );
 
     test('passes when the build number equals the minimum', () {
       writePubspec('1.0.0+2');
@@ -234,8 +273,9 @@ void main() {
       final cwd = Directory(join([root.path, 'caller']))..createSync();
       File(join([cwd.path, 'release.json'])).writeAsStringSync('{}');
       // Found in cwd: reaches the version check (exit 1), not "not found".
-      final found =
-          run(['--dart-define-from-file=release.json'], cwd: cwd.path);
+      final found = run([
+        '--dart-define-from-file=release.json',
+      ], cwd: cwd.path);
       expect(found.exitCode, 1, reason: output(found));
       expect(output(found), contains('below the minimum 2'));
       // Present only at the repo root: must NOT be picked up silently.
@@ -254,8 +294,9 @@ void main() {
     // this pubspec is below the minimum, so the version check would fail.
     final decoy = Directory(join([root.path, 'decoy']))..createSync();
     Directory(join([decoy.path, 'tool'])).createSync();
-    File(join([decoy.path, 'pubspec.yaml']))
-        .writeAsStringSync('name: x\nversion: 1.0.0+1\n');
+    File(
+      join([decoy.path, 'pubspec.yaml']),
+    ).writeAsStringSync('name: x\nversion: 1.0.0+1\n');
     final r = Process.runSync(
       '/bin/bash',
       ['tool/build_play_release.sh', '--check-version-only'],
@@ -282,7 +323,7 @@ void main() {
     });
 
     test('bundletool: below, equal and above the minimum', () {
-      writeFake('bundletool', 'echo "\$FAKE_CODE"');
+      writeFake('bundletool', bundletoolBody);
       ProcessResult withCode(String code) =>
           run(['--verify-aab=${aab.path}'], env: {'FAKE_CODE': code});
       expect(withCode('1').exitCode, 1);
@@ -290,22 +331,6 @@ void main() {
       expect(withCode('3').exitCode, 0);
       expect(withCode('garbage').exitCode, 1);
     });
-
-    // Fake aapt2 that behaves like the real one on an AAB: it only accepts a
-    // zip with AndroidManifest.xml and resources.pb at the root, and otherwise
-    // prints the real error. Prints the real output format for the code in
-    // $FAKE_CODE.
-    const aapt2Body = 'case "\$1 \$2 \$3 \$4" in\n'
-        '  "dump xmltree --file AndroidManifest.xml") ;;\n'
-        '  *) echo "error: bad invocation" >&2; exit 1 ;;\n'
-        'esac\n'
-        'entries="\$(unzip -Z1 "\$5" 2>/dev/null | sort | tr "\\n" " ")"\n'
-        'if [ "\$entries" != "AndroidManifest.xml resources.pb " ]; then\n'
-        '  echo "\$5: error: could not identify format of APK." >&2\n'
-        '  exit 1\n'
-        'fi\n'
-        'echo "      A: http://schemas.android.com/apk/res/android:versionCode'
-        '(0x0101021b)=\$FAKE_CODE (Raw: \\"\$FAKE_CODE\\")"';
 
     test('aapt2 fallback repackages the AAB (rejects a raw AAB)', () {
       writeFake('aapt2', aapt2Body);
@@ -322,7 +347,98 @@ void main() {
       final bare = writeAab('bare.aab', withEntries: false);
       final r = run(['--verify-aab=${bare.path}'], env: {'FAKE_CODE': '5'});
       expect(r.exitCode, 1);
-      expect(output(r), contains('could not read a numeric versionCode'));
+      // The package is read first, so the missing manifest fails there.
+      expect(output(r), contains('could not read a valid package name'));
+      expect(output(r), isNot(contains('versionCode:')));
+    });
+  });
+
+  group('--verify-aab package check', () {
+    late File aab;
+    setUp(() => aab = writeAab('app.aab'));
+
+    ProcessResult withPackage(String? package, {String code = '5'}) => run(
+          ['--verify-aab=${aab.path}'],
+          env: {
+            'FAKE_CODE': code,
+            if (package != null) 'FAKE_PACKAGE': package
+          },
+        );
+
+    for (final tool in ['bundletool', 'aapt2']) {
+      group(tool, () {
+        setUp(
+          () => writeFake(
+            tool,
+            tool == 'bundletool' ? bundletoolBody : aapt2Body,
+          ),
+        );
+
+        test('passes when the package is the app ID', () {
+          final r = withPackage(null);
+          expect(r.exitCode, 0, reason: output(r));
+          expect(output(r), contains('package: $appId (read from the AAB)'));
+          expect(output(r), contains('versionCode: 5 (read from the AAB)'));
+        });
+
+        test('fails on another package before the versionCode read-back', () {
+          for (final other in [
+            'com.breathefree.breathefree_patient',
+            'com.tetherhealthllc.tetherhealth', // package names are case-sensitive
+            '$appId.debug',
+            'com.example.other',
+          ]) {
+            final r = withPackage(other);
+            expect(r.exitCode, 1, reason: other);
+            expect(
+              output(r),
+              contains('AAB package $other is not $appId'),
+              reason: other,
+            );
+            expect(output(r), contains('Do not upload'), reason: other);
+            expect(output(r), isNot(contains('versionCode:')), reason: other);
+          }
+        });
+
+        test('fails when no package can be read', () {
+          final r = withPackage('');
+          expect(r.exitCode, 1, reason: output(r));
+          expect(output(r), contains('could not read a valid package name'));
+        });
+      });
+    }
+
+    test('never echoes a package value with unexpected characters', () {
+      writeFake('bundletool', bundletoolBody);
+      const canary = 'TH941CANARY';
+      for (final bad in [
+        '$appId;$canary',
+        '$canary\u001b[2J',
+        '$appId $canary',
+        '../$canary',
+      ]) {
+        final r = withPackage(bad);
+        expect(r.exitCode, 1, reason: bad);
+        expect(
+          output(r),
+          contains('could not read a valid package name'),
+          reason: bad,
+        );
+        expect(output(r), isNot(contains(canary)), reason: bad);
+      }
+    });
+
+    test('a full build runs the package check after the certificate check', () {
+      final script = File(scriptPath).readAsStringSync();
+      final tail = script.substring(
+        script.lastIndexOf('check_signing_certificate "\$aab"'),
+      );
+      expect(tail, contains('verify_aab_package "\$aab"'));
+      expect(
+        tail.indexOf('verify_aab_package "\$aab"'),
+        lessThan(tail.indexOf('verify_aab_version_code "\$aab"')),
+      );
+      expect(script, contains('expected_package="$appId"'));
     });
   });
 
@@ -332,11 +448,11 @@ void main() {
     setUp(() {
       aab = writeAab('app.aab');
       marker = File(join([root.path, 'readback_ran']));
-      writeFake('bundletool', 'touch "${marker.path}"; echo 5');
+      writeFake('bundletool', 'touch "${marker.path}"\n$bundletoolBody');
     });
 
     test('passes with a non-debug certificate and then reads back', () {
-      final r = run(['--verify-aab=${aab.path}']);
+      final r = run(['--verify-aab=${aab.path}'], env: {'FAKE_CODE': '5'});
       expect(r.exitCode, 0, reason: output(r));
       expect(marker.existsSync(), isTrue);
     });
