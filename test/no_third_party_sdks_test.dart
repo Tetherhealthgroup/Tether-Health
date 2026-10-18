@@ -41,21 +41,27 @@ const _rule = 'This app ships no SDK that reports on a person — analytics, '
 ///   `heap_sort` package or a `branch` coordinate.
 /// - Joined adjacent words can spell a family by accident (`quantum` +
 ///   `metric` in a name that has nothing to do with Quantum Metric).
+/// - The whole-file scan below matches a family where it appears verbatim as
+///   a word in a scanned file, comments and strings included, so it can flag
+///   prose as well as dependency names.
+/// To resolve one, do not rename around the check: change this list in the
+/// same change, with the reason in a comment next to the edit (for example,
+/// replace a broad family with the specific names in [forbiddenPackages]),
+/// and have it reviewed like any allowlist change.
+///
+/// Dependency coordinates, plugin ids, pod and Swift package names, URLs and
+/// the allowlists are checked word by word, joined families included, through
+/// [forbiddenFamilyOf]; the allowlists then decide what may ship.
+///
 /// Google's telemetry libraries are listed as joined identifiers on purpose,
 /// not as the bare words `measurement` and `datatransport`, which a health app
 /// uses legitimately (`blood_pressure_measurement`, `data_transport_layer`):
 /// `playservicesmeasurement` (every `play-services-measurement*` artifact),
 /// `firebasemeasurement`, `appmeasurement` (`GoogleAppMeasurement`,
-/// `app-measurement`), `measurementconnector`, `androiddatatransport`
+/// `app-measurement`), `androiddatatransport`
 /// (`com.google.android.datatransport`) and `googledatatransport`
-/// (`GoogleDataTransport`).
-///
-/// - The whole-file scan below matches these words in comments and strings of
-///   the scanned files, not only in dependency names.
-/// To resolve one, do not rename around the check: change this list in the
-/// same change, with the reason in a comment next to the edit (for example,
-/// replace a broad family with the specific names in [forbiddenPackages]),
-/// and have it reviewed like any allowlist change.
+/// (`GoogleDataTransport`). `firebase-measurement-connector` is caught by
+/// `firebase`.
 const forbiddenFamilies = <String>[
   'adjust',
   'admob',
@@ -63,8 +69,8 @@ const forbiddenFamilies = <String>[
   'agconnect',
   'airship',
   'amplitude',
-  'androiddatatransport',
   'analytics',
+  'androiddatatransport',
   'appcenter',
   'appdynamics',
   'applovin',
@@ -100,7 +106,6 @@ const forbiddenFamilies = <String>[
   'launchdarkly',
   'logrocket',
   'matomo',
-  'measurementconnector',
   'mixpanel',
   'moengage',
   'newrelic',
@@ -507,18 +512,7 @@ List<String> podNames(List<String> podfileLock) {
 // a literal in a Gradle file or version catalog. They do not try to evaluate
 // Gradle. A coordinate, configuration name, script path or repository URL
 // that is computed at build time is left to review and to Gradle dependency
-// locking (TH-992 part 2). Known limits, not detected here:
-// - `dependencies.<configuration>(x)`;
-// - String.invoke or `add(configuration, x)` with a non-literal
-//   configuration name;
-// - `apply { from(...) }` and `apply(mapOf(...))`;
-// - Groovy `add 'configuration', x` without parentheses;
-// - dollar-slashy strings (`$/.../$`);
-// - `repositories.ivy`, `repositories.flatDir` and `repositories.add(...)`
-//   outside a `repositories { }` block;
-// - a `maven` block that names an allowlisted literal URL and also sets a
-//   computed one (a variable, `artifactUrls(...)`): only literal URLs are
-//   checked, so the block passes.
+// locking (TH-992 part 2).
 
 /// The dependency configurations Gradle accepts: the base ones, their variant
 /// and test forms (`debugImplementation`, `testImplementation`, `kaptTest`,
@@ -1362,7 +1356,9 @@ void main() {
     expect(offenders, isEmpty, reason: _rule);
   });
 
-  test('every literal Android dependency declaration is allowlisted', () {
+  test(
+      'literal Android dependency declarations in the forms this test reads '
+      'are allowlisted', () {
     expect(gradleFiles.keys, contains('android/app/build.gradle.kts'),
         reason: 'the Gradle files were not found');
     expect(nativeCoordinates, contains('org.jetbrains.kotlin:kotlin-stdlib'),
@@ -1571,7 +1567,6 @@ void main() {
         'com.google.android.gms:play-services-measurement-base',
         'com.google.android.gms:play-services-measurement-sdk-api',
         'com.google.firebase:firebase-measurement-connector',
-        'measurement-connector',
         'app-measurement',
         'GoogleAppMeasurement',
         'com.google.android.datatransport:transport-api',
@@ -1596,6 +1591,7 @@ void main() {
         'measurement_units',
         'MeasurementKit',
         'data_transport_layer',
+        'health_measurement_connector',
         'com.example.health:measurement-sync',
       ]) {
         expect(forbiddenFamilyOf(name), isNull, reason: name);
