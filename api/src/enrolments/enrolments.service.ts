@@ -74,7 +74,10 @@ const {
   consentImmutable: CONSENT_IMMUTABLE,
 } = DatabaseErrorCode;
 
-/** The consent revoke-only rules (one trigger, two registry codes). */
+/**
+ * The consent revoke-only rules (one trigger, two registry codes), as they
+ * reach an enrolment update through the revocations leaving cascades into.
+ */
 const isConsentRevokeOnly = (error: PostgrestError) =>
   error.code === CONSENT_ALREADY_REVOKED || error.code === CONSENT_IMMUTABLE;
 
@@ -275,10 +278,12 @@ export class EnrolmentsService {
       .select(CONSENT_COLUMNS)
       .maybeSingle<ConsentRow>();
     if (error) {
-      // The revoke-only trigger refused the update: already revoked (TH002,
-      // a concurrent revocation got there first) or not a pure revocation
-      // (TH003, which this update, setting only revoked_at, does not cause).
-      if (isConsentRevokeOnly(error)) throw conflict("consent_already_revoked");
+      // Already revoked: a concurrent revocation got there first. TH003
+      // (not a pure revocation) leaves the consent live, so it is never
+      // reported as revoked; it fails closed like any other error.
+      if (error.code === CONSENT_ALREADY_REVOKED) {
+        throw conflict("consent_already_revoked");
+      }
       throw new BadGatewayException("Consent could not be revoked");
     }
     if (data) return this.toConsent(data);

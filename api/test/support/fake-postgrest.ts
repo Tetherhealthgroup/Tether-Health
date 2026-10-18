@@ -224,6 +224,11 @@ export class FakePostgrest {
     return this.injected.length;
   }
 
+  /** Drops injected failures that no request consumed. */
+  clearFailures(): void {
+    this.injected = [];
+  }
+
   /** Superuser view for assertions (bypasses RLS). */
   table(name: keyof State): Row[] {
     return structuredClone(this.state[name]);

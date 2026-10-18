@@ -151,19 +151,27 @@ describe("EnrolmentsService", () => {
     ).toEqual(expected);
   });
 
-  it.each(["TH002", "TH003"])(
-    "maps revoke error %s to consent_already_revoked",
-    async (code) => {
-      const { service } = setup({
-        data: null,
-        error: { code, message: "synthetic" },
-      });
-      expect(await codeOf(service.revokeConsent(user, "c1"))).toEqual({
-        status: HttpStatus.CONFLICT,
-        code: "consent_already_revoked",
-      });
-    },
-  );
+  it("maps revoke error TH002 to consent_already_revoked", async () => {
+    const { service } = setup({
+      data: null,
+      error: { code: "TH002", message: "synthetic" },
+    });
+    expect(await codeOf(service.revokeConsent(user, "c1"))).toEqual({
+      status: HttpStatus.CONFLICT,
+      code: "consent_already_revoked",
+    });
+  });
+
+  // TH003 leaves the consent live: it must never be reported as revoked.
+  it("does not report revoke error TH003 as revoked", async () => {
+    const { service } = setup({
+      data: null,
+      error: { code: "TH003", message: "synthetic" },
+    });
+    expect(await codeOf(service.revokeConsent(user, "c1"))).toBeInstanceOf(
+      BadGatewayException,
+    );
+  });
 
   // Message text and hint never decide: only the SQLSTATE code does.
   describe("does not match message text", () => {
@@ -283,7 +291,7 @@ describe("EnrolmentsService", () => {
       });
     }
 
-    if (!["TH002", "TH003"].includes(code)) {
+    if (code !== "TH002") {
       it("revoke consent", async () => {
         const { service } = setup({ data: null, error });
         expectHidden(await codeOf(service.revokeConsent(user, "c1")));

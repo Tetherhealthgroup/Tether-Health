@@ -16,7 +16,12 @@ interface RegistryRow {
   messages: string[];
 }
 
-function readRegistry(): RegistryRow[] {
+const HEADER = "| Code | Name | Raised by | Message |";
+const SEPARATOR = /^\|(?:-+\|)+$/;
+const ROW = /^\| `(TH\d{3})` \| `([a-z_]+)` \| .* \| (.+) \|$/;
+
+/** The registry table's rows, raw: header, separator, then the body. */
+function readTable(): string[] {
   const doc = readFileSync(
     join(__dirname, "..", "..", "docs", "contracts", "database.md"),
     "utf8",
@@ -24,29 +29,46 @@ function readRegistry(): RegistryRow[] {
   const section = doc.split(/^## Error codes$/m)[1]?.split(/^## /m)[0] ?? "";
   return section
     .split("\n")
-    .map((line) =>
-      /^\| `(TH\d{3})` \| `([a-z_]+)` \| .* \| (.+) \|$/.exec(line.trim()),
-    )
-    .filter((match) => match !== null)
-    .map(([, code, hint, message]) => ({
-      code: code as string,
-      hint: hint as string,
-      messages: message === "—" ? [] : (message as string).split("; "),
-    }));
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("|"));
+}
+
+function parseRow(line: string): RegistryRow | null {
+  const match = ROW.exec(line);
+  if (!match) return null;
+  const [, code, hint, message] = match as unknown as [
+    string,
+    string,
+    string,
+    string,
+  ];
+  return {
+    code,
+    hint,
+    messages: message === "—" ? [] : message.split("; "),
+  };
 }
 
 const snakeCase = (name: string) =>
   name.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 
 describe("database error registry", () => {
-  const registry = readRegistry();
+  const table = readTable();
+  const body = table.slice(2);
+  const registry = body
+    .map(parseRow)
+    .filter((row): row is RegistryRow => row !== null);
   const row = (code: string) => {
     const found = registry.find((entry) => entry.code === code);
     if (!found) throw new Error(`${code} is not in the registry`);
     return found;
   };
 
-  it("parses the registry table", () => {
+  it("parses every row of the registry table", () => {
+    expect(table[0]).toBe(HEADER);
+    expect(table[1]).toMatch(SEPARATOR);
+    // A row the parser cannot read fails here instead of being dropped.
+    expect(body.filter((line) => parseRow(line) === null)).toEqual([]);
     expect(registry.length).toBeGreaterThanOrEqual(10);
     expect(new Set(registry.map((entry) => entry.code)).size).toBe(
       registry.length,
@@ -114,6 +136,14 @@ describe("database error registry", () => {
     beforeEach(() => {
       fake = new FakePostgrest();
       fake.addUser(token, userId);
+    });
+
+    // A failure injected but never consumed would break an unrelated later
+    // test: clear it first, then fail the test that left it.
+    afterEach(() => {
+      const pending = fake.pendingFailures;
+      fake.clearFailures();
+      expect(pending).toBe(0);
     });
 
     const enrol = (programme: string) =>

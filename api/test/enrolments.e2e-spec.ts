@@ -106,6 +106,14 @@ describe("Enrolments and consents API (e2e)", () => {
     }
   });
 
+  // A failure injected but never consumed would break an unrelated later
+  // test: clear it first, then fail the test that left it.
+  afterEach(() => {
+    const pending = fake.pendingFailures;
+    fake.clearFailures();
+    expect(pending).toBe(0);
+  });
+
   afterAll(async () => {
     jest.restoreAllMocks();
     await app.close();
@@ -849,6 +857,21 @@ describe("Enrolments and consents API (e2e)", () => {
       const core = await grant(a, id, "core");
       return { a, id, core };
     };
+    /**
+     * Logged since `since`: only the global filter's request_failed line per
+     * 502, never the database error's code, message or hint.
+     */
+    const expectNotLogged = (since: number, error: PgError, failures = 1) => {
+      const lines = logged.slice(since);
+      expect(
+        lines.filter((line) =>
+          /request_failed .*type=BadGatewayException/.test(line),
+        ),
+      ).toHaveLength(failures);
+      for (const detail of [error.code, error.message, error.hint]) {
+        expect(lines.join("\n")).not.toContain(detail);
+      }
+    };
     /** Every injected failure was consumed and nothing was written. */
     const expectRolledBack = (id: string, core: string) => {
       expect(fake.pendingFailures).toBe(0);
@@ -860,27 +883,44 @@ describe("Enrolments and consents API (e2e)", () => {
       ).toMatchObject({ revoked_at: null });
     };
 
-    it.each([
-      ["consent_already_revoked", 0],
-      ["consent_immutable", 0],
-      ["consent_immutable", 1],
-    ] as [DatabaseErrorHint, number][])(
-      "revoke maps %s (message %d) to consent_already_revoked",
-      async (hint, messageIndex) => {
+    it("revoke maps TH002 to consent_already_revoked", async () => {
+      const { a, id, core } = await prepared();
+      fake.failNext(
+        "PATCH",
+        "programme_consents",
+        registryError("consent_already_revoked"),
+      );
+      expectCoded(
+        await call(a, "PATCH", `/v1/enrolments/consents/${core}`, {
+          revoked: true,
+        }),
+        409,
+        "consent_already_revoked",
+      );
+      expectRolledBack(id, core);
+    });
+
+    // The trigger refused the change, so the consent is still live: it is
+    // never reported as revoked.
+    it.each([0, 1])(
+      "revoke fails closed on TH003 (message %d), never reporting it as revoked",
+      async (messageIndex) => {
         const { a, id, core } = await prepared();
-        fake.failNext(
+        const error = registryError("consent_immutable", messageIndex);
+        const since = logged.length;
+        fake.failNext("PATCH", "programme_consents", error);
+        const response = await call(
+          a,
           "PATCH",
-          "programme_consents",
-          registryError(hint, messageIndex),
+          `/v1/enrolments/consents/${core}`,
+          { revoked: true },
         );
-        expectCoded(
-          await call(a, "PATCH", `/v1/enrolments/consents/${core}`, {
-            revoked: true,
-          }),
-          409,
-          "consent_already_revoked",
-        );
+        expectUncoded(response, 502);
+        for (const detail of [error.code, error.message, error.hint]) {
+          expect(response.body).not.toContain(detail);
+        }
         expectRolledBack(id, core);
+        expectNotLogged(since, error);
       },
     );
 
@@ -976,6 +1016,7 @@ describe("Enrolments and consents API (e2e)", () => {
           ],
           ["DELETE", "enrolments", `/v1/enrolments/${id}`, DELETE_BODY],
         ];
+        const since = logged.length;
         for (const [method, table, url, payload] of routes) {
           fake.failNext(method, table, error);
           const response = await call(a, method, url, payload);
@@ -986,7 +1027,7 @@ describe("Enrolments and consents API (e2e)", () => {
           }
         }
         expectRolledBack(id, core);
-        expect(logged.join("\n")).not.toContain(error.message);
+        expectNotLogged(since, error, routes.length);
       },
     );
 
