@@ -178,6 +178,16 @@ void main() {
   const playVersionLine =
       'pubspec.yaml version: 1.0.0+9 (versionCode 9); minimum 2\n';
 
+  // TH-941: the Play script reads the AAB package before the versionCode and
+  // fails unless it is the app ID. This fake bundletool answers the package
+  // query with the app ID and the versionCode query with 5 (synthetic).
+  const appId = 'com.TetherHealthLLC.tetherhealth';
+  const bundletoolOk = 'case "\$*" in\n'
+      '  *--xpath=/manifest/@package*) echo $appId ;;\n'
+      '  *) echo 5 ;;\n'
+      'esac';
+  const packageLine = 'package: $appId (read from the AAB); expected $appId\n';
+
   group('build_play_release.sh', () {
     const notPositive = 'must be a positive integer (value not shown)';
 
@@ -235,14 +245,34 @@ void main() {
 
     test('an unreadable versionCode shows neither path nor tool output', () {
       final aab = hostileAab();
-      writeFake('bundletool', 'printf "%s\\n" "\$FAKE_OUT"');
+      writeFake(
+        'bundletool',
+        'case "\$*" in\n'
+            '  *--xpath=/manifest/@package*) echo $appId ;;\n'
+            '  *) printf "%s\\n" "\$FAKE_OUT" ;;\n'
+            'esac',
+      );
       expectOutput(
         play(['--verify-aab=${aab.path}'], env: {'FAKE_OUT': hostile}),
         1,
-        stdout: certSection,
+        stdout: '$certSection$packageLine',
         stderr: 'FAIL: could not read a numeric versionCode from the AAB '
             '(path and tool output not shown).\n',
       );
+    });
+
+    test('an unreadable package shows neither path nor tool output', () {
+      final aab = hostileAab();
+      writeFake('bundletool', 'printf "%s\\n" "\$FAKE_OUT"');
+      for (final out in [hostile, '$appId\n$canary', '$appId $canary']) {
+        expectOutput(
+          play(['--verify-aab=${aab.path}'], env: {'FAKE_OUT': out}),
+          1,
+          stdout: certSection,
+          stderr: 'FAIL: could not read a valid package name from the AAB '
+              '(path and tool output not shown).\n',
+        );
+      }
     });
 
     group('keytool is never given the caller path', () {
@@ -314,7 +344,7 @@ void main() {
         fakeKeytool(
           'cat "\$3" > "${seen.path}"\necho "Owner: CN=Upload, O=Test"',
         );
-        writeFake('bundletool', 'echo 5');
+        writeFake('bundletool', bundletoolOk);
         final r = play(['--verify-aab=${aab.path}']);
         expectClean(r);
         expect(r.exitCode, 0, reason: '${r.stdout}${r.stderr}');
@@ -345,7 +375,7 @@ void main() {
         'keytool',
         'cat "\$3" > "${seen.path}"\necho "Owner: CN=Upload, O=Test"',
       );
-      writeFake('bundletool', 'echo 5');
+      writeFake('bundletool', bundletoolOk);
       final r = play(['--dart-define-from-file=${define.path}']);
       expectClean(r);
       expect(r.exitCode, 0, reason: '${r.stdout}${r.stderr}');
@@ -508,7 +538,7 @@ void main() {
         'keytool',
         'cat "\$3" > "${seen.path}"\necho "Owner: CN=Upload, O=Test"',
       );
-      writeFake('bundletool', 'echo 5');
+      writeFake('bundletool', bundletoolOk);
       for (final (label, arg) in hazards(
         'app.aab',
         (path, {required named}) => put(path, named ? 'named' : 'decoy'),
@@ -518,7 +548,7 @@ void main() {
         expectOutput(
           r,
           0,
-          stdout: '$certSection'
+          stdout: '$certSection$packageLine'
               'versionCode: 5 (read from the AAB); minimum 2\n',
         );
         expect(seen.readAsStringSync(), 'named', reason: label);
@@ -568,11 +598,11 @@ void main() {
           'keytool',
           'cat "\$3" > "${seen.path}"\necho "Owner: CN=Upload, O=Test"',
         );
-        writeFake('bundletool', 'echo 5');
+        writeFake('bundletool', bundletoolOk);
         expectOutput(
           play(['--verify-aab=$name.aab'], cwd: work.path),
           0,
-          stdout: '$certSection'
+          stdout: '$certSection$packageLine'
               'versionCode: 5 (read from the AAB); minimum 2\n',
         );
         expect(seen.readAsStringSync(), 'named');
