@@ -1,5 +1,7 @@
 # iOS App Store readiness runbook (owner)
 
+> **Note:** Refresh after the tether_ui build (Sign in with Apple, HealthKit, Family Controls, App Groups) — tracked in TH-941/TH-961/TH-968.
+
 Bundle ID: `com.TetherHealthLLC.tetherhealth`. This is the iOS counterpart to
 `docs/PLAY_RELEASE.md`. Agents and CI never sign, upload, submit or touch App
 Store Connect, the Apple Developer portal or Firebase; every console step below
