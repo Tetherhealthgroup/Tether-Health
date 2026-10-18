@@ -53,7 +53,7 @@ not be described as production-ready while any release requirement remains open.
 - [ ] Provision production Supabase and API environments through approved
   account/credential channels; configure backups, monitoring, key rotation,
   HTTPS, and exact CORS origins.
-- [ ] Allowlist `io.breathefree.patient://login-callback` for confirmation and
+- [ ] Allowlist `com.tetherhealthllc.tetherhealth://login-callback` for confirmation and
   password recovery in production Supabase Auth.
 - [ ] Provision, protect, rotate, and operationally approve the API's Supabase
   service-role credential for Auth identity deletion. The implementation is

@@ -31,7 +31,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
-                    android:scheme="io.breathefree.patient"
+                    android:scheme="com.tetherhealthllc.tetherhealth"
                     android:host="login-callback"/>
             </intent-filter>
         </activity>
