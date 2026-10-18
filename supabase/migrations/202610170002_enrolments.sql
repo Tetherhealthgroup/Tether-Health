@@ -13,8 +13,15 @@ begin;
 --   and the exact wording, and are never edited except to revoke them.
 -- * public.has_consent() is the single check later policies use.
 -- * delete_my_app_data also deletes the caller's enrolments and consents.
+-- * Leaving a programme keeps its data until the member deletes it or deletes
+--   the account; there is no automatic purge.
+-- * Leaving, or revoking an enrolment's core consent, revokes its optional
+--   consents. After rejoining they must be granted again.
+-- * At most two enrolments per user are in focus (checked at commit, so a
+--   swap works in one transaction).
 -- * New enrolments and consents are refused once account deletion has started
---   (profiles.account_deletion_started_at) or the profile is gone.
+--   (profiles.account_deletion_started_at) or the profile is gone, through
+--   public.deletion_barrier_open(), which programme-data tables also use.
 
 create table public.programmes (
   code text primary key,
@@ -85,7 +92,6 @@ create table public.enrolments (
   mode text null,
   joined_at timestamptz not null default now(),
   left_at timestamptz null,
-  purge_after timestamptz null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint enrolments_user_programme_key unique (user_id, programme_code),
@@ -98,19 +104,14 @@ create table public.enrolments (
     )
   ),
   constraint enrolments_left_state_check check (
-    (status = 'left') = (left_at is not null) and
-    (status = 'left') = (purge_after is not null)
+    (status = 'left') = (left_at is not null)
   )
 );
 
 comment on table public.enrolments is
-  'One row per user and programme. Programme health data references this row and is deleted with it. Leaving keeps the row with status left until purge_after.';
-comment on column public.enrolments.purge_after is
-  'Set by the database to 30 days after leaving; cleared on rejoin.';
-
-create index enrolments_purge_after_idx
-on public.enrolments (purge_after)
-where purge_after is not null;
+  'One row per user and programme. Programme health data references this row and is deleted with it. Leaving keeps the row and its data (status left) until the member deletes it or the account.';
+comment on column public.enrolments.left_at is
+  'Set by the database when the status changes to left; cleared on rejoin.';
 
 create trigger enrolments_set_updated_at
 before update on public.enrolments
@@ -124,13 +125,10 @@ as $$
 begin
   if new.status = 'left' and old.status is distinct from 'left' then
     new.left_at = now();
-    new.purge_after = now() + interval '30 days';
   elsif new.status <> 'left' then
     new.left_at = null;
-    new.purge_after = null;
   else
     new.left_at = old.left_at;
-    new.purge_after = old.purge_after;
   end if;
   return new;
 end;
@@ -139,6 +137,69 @@ $$;
 create trigger enrolments_manage_leaving
 before update on public.enrolments
 for each row execute function public.enrolments_manage_leaving();
+
+-- Shared deletion barrier for insert checks on enrolments, consents and
+-- programme-data tables. Takes a share lock on the caller's profile row, so
+-- begin_account_deletion (which updates that row) waits for in-flight inserts,
+-- and inserts that arrive later see the committed barrier.
+create function public.deletion_barrier_open()
+returns boolean
+language plpgsql
+volatile
+security invoker
+set search_path = ''
+as $$
+declare
+  caller_id uuid := auth.uid();
+  barrier_open boolean := false;
+begin
+  if caller_id is null then
+    return false;
+  end if;
+
+  select p.account_deletion_started_at is null
+  into barrier_open
+  from public.profiles as p
+  where p.id = caller_id
+  for share;
+
+  return coalesce(barrier_open, false);
+end;
+$$;
+
+comment on function public.deletion_barrier_open() is
+  'True while the caller''s profile exists and account deletion has not started. Use in the insert check of every table that holds the caller''s data.';
+
+create function public.enrolments_focus_cap()
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
+declare
+  focus_count integer;
+begin
+  perform pg_advisory_xact_lock(
+    hashtextextended('enrolments.focus:' || new.user_id::text, 0)
+  );
+
+  select count(*)
+  into focus_count
+  from public.enrolments
+  where user_id = new.user_id and status = 'focus';
+
+  if focus_count > 2 then
+    raise check_violation using message = 'At most two programmes can be in focus';
+  end if;
+  return null;
+end;
+$$;
+
+create constraint trigger enrolments_focus_cap
+after insert or update of status on public.enrolments
+deferrable initially deferred
+for each row
+when (new.status = 'focus')
+execute function public.enrolments_focus_cap();
 
 alter table public.enrolments enable row level security;
 alter table public.enrolments force row level security;
@@ -153,11 +214,7 @@ on public.enrolments for insert
 to authenticated
 with check (
   (select auth.uid()) = user_id and
-  exists (
-    select 1
-    from public.profiles as p
-    where p.id = (select auth.uid()) and p.account_deletion_started_at is null
-  )
+  public.deletion_barrier_open()
 );
 
 create policy "enrolments_update_own"
@@ -213,7 +270,7 @@ create table public.programme_consents (
 );
 
 comment on table public.programme_consents is
-  'Consent per enrolment, purpose and recipient. Keeps the version and wording shown. Rows are never edited except to revoke; a revoked row stays as history until the enrolment or account is deleted.';
+  'Consent per enrolment, purpose and recipient. Keeps the version and wording shown. Rows are never edited except to revoke; a revoked row stays as history until the enrolment or account is deleted. Revoking core revokes every live consent of the enrolment; leaving revokes every live non-core consent.';
 
 create index programme_consents_enrolment_idx
 on public.programme_consents (enrolment_id);
@@ -273,6 +330,55 @@ for each row execute function public.consent_revoke_only();
 create trigger account_consents_revoke_only
 before update on public.account_consents
 for each row execute function public.consent_revoke_only();
+
+-- Revoking core switches off every other consent of the enrolment, so a later
+-- core grant cannot revive old optional grants.
+create function public.programme_consents_revoke_with_core()
+returns trigger
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+begin
+  update public.programme_consents
+  set revoked_at = new.revoked_at
+  where enrolment_id = new.enrolment_id
+    and revoked_at is null;
+  return null;
+end;
+$$;
+
+create trigger programme_consents_revoke_with_core
+after update of revoked_at on public.programme_consents
+for each row
+when (
+  old.purpose = 'core' and old.revoked_at is null and new.revoked_at is not null
+)
+execute function public.programme_consents_revoke_with_core();
+
+-- Leaving switches off every optional consent of the enrolment. Core stays
+-- live but grants nothing while the enrolment is left (see has_consent).
+create function public.enrolments_revoke_on_leave()
+returns trigger
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+begin
+  update public.programme_consents
+  set revoked_at = now()
+  where enrolment_id = new.id
+    and purpose <> 'core'
+    and revoked_at is null;
+  return null;
+end;
+$$;
+
+create trigger enrolments_revoke_on_leave
+after update of status on public.enrolments
+for each row
+when (new.status = 'left' and old.status is distinct from 'left')
+execute function public.enrolments_revoke_on_leave();
 
 create function public.has_consent(
   p_enrolment_id uuid,
@@ -334,12 +440,10 @@ with check (
   exists (
     select 1
     from public.enrolments as e
-    join public.profiles as p on p.id = e.user_id
     where e.id = programme_consents.enrolment_id
       and e.user_id = (select auth.uid())
       and e.status <> 'left'
-      and p.account_deletion_started_at is null
-  ) and (
+  ) and public.deletion_barrier_open() and (
     programme_consents.purpose = 'core' or
     public.has_consent(programme_consents.enrolment_id, 'core')
   )
@@ -384,11 +488,7 @@ on public.account_consents for insert
 to authenticated
 with check (
   (select auth.uid()) = user_id and
-  exists (
-    select 1
-    from public.profiles as p
-    where p.id = (select auth.uid()) and p.account_deletion_started_at is null
-  )
+  public.deletion_barrier_open()
 );
 
 create policy "account_consents_update_own"
@@ -405,6 +505,15 @@ grant update (revoked_at) on table public.account_consents to authenticated;
 
 revoke all on function public.enrolments_manage_leaving()
 from public, anon, authenticated;
+revoke all on function public.enrolments_focus_cap()
+from public, anon, authenticated;
+revoke all on function public.enrolments_revoke_on_leave()
+from public, anon, authenticated;
+revoke all on function public.programme_consents_revoke_with_core()
+from public, anon, authenticated;
+revoke all on function public.deletion_barrier_open()
+from public, anon, authenticated;
+grant execute on function public.deletion_barrier_open() to authenticated;
 revoke all on function public.consent_revoke_only()
 from public, anon, authenticated;
 revoke all on function public.has_consent(uuid, text, text)

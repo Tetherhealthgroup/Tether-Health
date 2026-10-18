@@ -70,7 +70,9 @@ enrolment's live `records_import` consent. Ease and ScrollFree never receive
 records.
 
 `public.enrolments` has one row per user and programme
-(`unique (user_id, programme_code)`); rejoining reuses the row.
+(`unique (user_id, programme_code)`); rejoining reuses the row. Leaving keeps
+the enrolment and its data until the member deletes them ("Delete now") or
+deletes the account; nothing is purged automatically.
 
 | Column | Contract |
 |---|---|
@@ -80,12 +82,19 @@ records.
 | `status` | `focus` (default), `learn_only`, `paused` or `left` |
 | `mode` | null, or `quit` / `reduce` for `bf` and `sf` only |
 | `joined_at` | set on insert |
-| `left_at`, `purge_after` | database managed: leaving sets `left_at = now()` and `purge_after = left_at + 30 days`; rejoining clears both. Clients cannot write them |
+| `left_at` | database managed: set when the status changes to `left`, cleared on rejoin. Clients cannot write it |
 
 Callers select, insert, update and delete only their own rows. Inserts may set
 `user_id`, `programme_code`, `status` (not `left`) and `mode`; updates may set
 `status` and `mode` only. "Delete now" on leaving deletes the row, which
 cascades to its consents and programme data.
+
+At most two enrolments per user may have `status = 'focus'`. A deferred
+constraint trigger checks this at commit, under a per-user advisory lock, so a
+swap (one programme to `focus`, another out of it) succeeds in one transaction
+in either order, while a third focus programme is refused. `learn_only` and
+`paused` are not limited. The default status on insert is `focus`, so a third
+enrolment must be inserted with another status.
 
 `public.programme_consents` records one consent per enrolment × purpose ×
 recipient. `purpose` is `core`, `reminders`, `records_import`,
@@ -102,6 +111,17 @@ deleted. A caller may add a consent only to their own enrolment that is not
 `left`, and any purpose other than `core` requires that enrolment's `core`
 consent to be live.
 
+Revoking an enrolment's `core` consent revokes every live consent of that
+enrolment. Leaving (status changes to `left`) revokes every live consent except
+`core`; the `core` row stays live but grants nothing while the enrolment is
+left. After rejoining, or after granting `core` again, sharing, records import,
+research, screen time and reminders are off until the member grants each one
+again. The revoked rows stay as history. Both rules are triggers that run as
+the caller.
+
+Consent rows store the wording itself. When approved consent texts exist, a
+`consent_documents` reference is planned to identify the exact document version.
+
 `public.account_consents` holds account-level items that belong to no
 programme: `essential`, `cross_program_insights` and `diagnostics`. It has the
 same version, wording, single-live-row and revoke-only rules, keyed by
@@ -115,8 +135,14 @@ not started, a live consent exists for exactly that purpose and recipient, and
 Because it runs as the caller, RLS also applies. Programme-data tables use it
 in their insert checks together with "enrolment is not `left`".
 
-New enrolments and consents are refused once
-`profiles.account_deletion_started_at` is set or the profile no longer exists.
+`public.deletion_barrier_open()` is a `volatile security invoker` function. It
+is true while the caller's profile exists and
+`profiles.account_deletion_started_at` is null. It takes a `FOR SHARE` lock on
+that profile row, so `begin_account_deletion` waits for in-flight inserts, and
+later inserts see the barrier. Every insert policy on enrolments, programme
+consents and account consents uses it. Later tables that hold the caller's data
+must use it in their insert checks too, alongside `has_consent` where the data
+belongs to a programme.
 
 ## Quit-plan snapshot
 

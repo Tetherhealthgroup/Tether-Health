@@ -2,8 +2,9 @@
 # Checks for the programmes, enrolments and consents migration.
 #
 #   bash supabase/tests/verify_enrolments_migration.sh            static checks
-#   VERIFY_DB_URL=postgresql://... bash <this script>             static checks,
-#       then the SQL RLS test against an already-migrated database (psql)
+#   VERIFY_DB_URL=postgresql://...@127.0.0.1:54322/... bash <this script>
+#       static checks, then the SQL RLS test against an already-migrated LOCAL
+#       database (psql). Any host other than 127.0.0.1 or localhost is refused.
 #   bash <this script> --print-sql                                print the SQL test
 #
 # The SQL test uses synthetic identities only, runs in one transaction and
@@ -16,11 +17,6 @@ programs_spec="tether_ui/spec/programs.json"
 print_sql() {
   cat <<'SQL'
 begin;
-
--- Synthetic identities only.
-insert into auth.users (id, email) values
-  ('00000000-0000-4000-8000-000000913001', 'synthetic-user-01@example.test'),
-  ('00000000-0000-4000-8000-000000913002', 'synthetic-user-02@example.test');
 
 create schema th913_test;
 
@@ -50,6 +46,56 @@ begin
   end;
   raise exception 'FAIL % (statement succeeded)', p_label;
 end;
+$f$;
+
+-- Runs statements, then checks deferred constraints at once (the outer
+-- transaction always rolls back, so commit-time checks would never fire).
+create function th913_test.apply_now(p_sql text[])
+returns void language plpgsql set search_path = '' as $f$
+declare
+  stmt text;
+begin
+  foreach stmt in array p_sql loop
+    execute stmt;
+  end loop;
+  set constraints public.enrolments_focus_cap immediate;
+  set constraints public.enrolments_focus_cap deferred;
+end;
+$f$;
+
+-- Privileges held by anon, authenticated and PUBLIC, as one sorted string.
+create function th913_test.table_acl(p_tables regclass[])
+returns text language sql stable set search_path = '' as $f$
+  select coalesce(string_agg(format('%s:%s:%s', c.relname, coalesce(r.rolname, 'PUBLIC'),
+           a.privilege_type), ',' order by c.relname, coalesce(r.rolname, 'PUBLIC'),
+           a.privilege_type), '')
+  from pg_catalog.pg_class as c
+  cross join lateral pg_catalog.aclexplode(c.relacl) as a
+  left join pg_catalog.pg_roles as r on r.oid = a.grantee
+  where c.oid = any (p_tables)
+    and (a.grantee = 0 or r.rolname in ('anon', 'authenticated'));
+$f$;
+
+create function th913_test.column_acl(p_tables regclass[])
+returns text language sql stable set search_path = '' as $f$
+  select coalesce(string_agg(format('%s.%s:%s:%s', c.relname, at.attname,
+           coalesce(r.rolname, 'PUBLIC'), a.privilege_type), ','
+           order by c.relname, at.attname, coalesce(r.rolname, 'PUBLIC'), a.privilege_type), '')
+  from pg_catalog.pg_attribute as at
+  join pg_catalog.pg_class as c on c.oid = at.attrelid
+  cross join lateral pg_catalog.aclexplode(at.attacl) as a
+  left join pg_catalog.pg_roles as r on r.oid = a.grantee
+  where c.oid = any (p_tables) and not at.attisdropped
+    and (a.grantee = 0 or r.rolname in ('anon', 'authenticated'));
+$f$;
+
+create function th913_test.policy_list(p_tables regclass[])
+returns text language sql stable set search_path = '' as $f$
+  select coalesce(string_agg(format('%s:%s:%s:%s', c.relname, p.polname, p.polcmd,
+           p.polpermissive), ',' order by c.relname, p.polname), '')
+  from pg_catalog.pg_policy as p
+  join pg_catalog.pg_class as c on c.oid = p.polrelid
+  where c.oid = any (p_tables);
 $f$;
 
 create function th913_test.affects(p_sql text, p_rows integer, p_label text)
@@ -89,6 +135,94 @@ with check (
 grant usage on schema th913_test to anon, authenticated;
 grant execute on all functions in schema th913_test to anon, authenticated;
 grant select, insert on th913_test.phi_probe to authenticated;
+
+-- Synthetic identities only.
+insert into auth.users (id, email, aud, role) values
+  ('00000000-0000-4000-8000-000000913001', 'synthetic-user-01@example.test',
+   'authenticated', 'authenticated'),
+  ('00000000-0000-4000-8000-000000913002', 'synthetic-user-02@example.test',
+   'authenticated', 'authenticated');
+select th913_test.ok(
+  (select count(*) from public.profiles
+   where id in ('00000000-0000-4000-8000-000000913001',
+                '00000000-0000-4000-8000-000000913002')) = 2,
+  'setup: the signup trigger created both synthetic profiles');
+
+-- Privileges and policies -----------------------------------------------------
+-- Pinned so that an accidental grant or policy change fails this test.
+select th913_test.ok(
+  th913_test.table_acl(array['public.profiles', 'public.quit_plans',
+    'public.program_data']::regclass[]) =
+  'profiles:authenticated:SELECT,'
+  'program_data:authenticated:DELETE,program_data:authenticated:INSERT,'
+  'program_data:authenticated:SELECT,program_data:authenticated:UPDATE,'
+  'quit_plans:authenticated:SELECT',
+  'existing tables: anon/authenticated/PUBLIC table privileges unchanged');
+select th913_test.ok(
+  th913_test.column_acl(array['public.profiles', 'public.quit_plans',
+    'public.program_data']::regclass[]) =
+  'profiles.avatar_path:authenticated:UPDATE,profiles.display_name:authenticated:UPDATE,'
+  'profiles.locale:authenticated:UPDATE,profiles.onboarding_completed:authenticated:UPDATE,'
+  'profiles.time_zone:authenticated:UPDATE,'
+  'quit_plans.care_team_reminder:authenticated:INSERT,quit_plans.care_team_reminder:authenticated:UPDATE,'
+  'quit_plans.custom_quit_reason:authenticated:INSERT,quit_plans.custom_quit_reason:authenticated:UPDATE,'
+  'quit_plans.custom_smoking_trigger:authenticated:INSERT,quit_plans.custom_smoking_trigger:authenticated:UPDATE,'
+  'quit_plans.daily_cigarette_use:authenticated:INSERT,quit_plans.daily_cigarette_use:authenticated:UPDATE,'
+  'quit_plans.preparation_tasks:authenticated:INSERT,quit_plans.preparation_tasks:authenticated:UPDATE,'
+  'quit_plans.quit_date:authenticated:INSERT,quit_plans.quit_date:authenticated:UPDATE,'
+  'quit_plans.quit_day_check_in:authenticated:INSERT,quit_plans.quit_day_check_in:authenticated:UPDATE,'
+  'quit_plans.quit_plan_path:authenticated:INSERT,quit_plans.quit_plan_path:authenticated:UPDATE,'
+  'quit_plans.quit_reasons:authenticated:INSERT,quit_plans.quit_reasons:authenticated:UPDATE,'
+  'quit_plans.readiness_path:authenticated:INSERT,quit_plans.readiness_path:authenticated:UPDATE,'
+  'quit_plans.smoking_triggers:authenticated:INSERT,quit_plans.smoking_triggers:authenticated:UPDATE,'
+  'quit_plans.support_people:authenticated:INSERT,quit_plans.support_people:authenticated:UPDATE,'
+  'quit_plans.top_quit_reason:authenticated:INSERT,quit_plans.top_quit_reason:authenticated:UPDATE,'
+  'quit_plans.treatment_support:authenticated:INSERT,quit_plans.treatment_support:authenticated:UPDATE,'
+  'quit_plans.user_id:authenticated:INSERT,quit_plans.user_id:authenticated:UPDATE',
+  'existing tables: anon/authenticated/PUBLIC column privileges unchanged');
+select th913_test.ok(
+  th913_test.policy_list(array['public.profiles', 'public.quit_plans',
+    'public.program_data']::regclass[]) =
+  'profiles:profiles_select_own:r:t,profiles:profiles_update_own:w:t,'
+  'program_data:program_data_delete_own:d:t,program_data:program_data_insert_own:a:t,'
+  'program_data:program_data_select_own:r:t,program_data:program_data_update_own:w:t,'
+  'quit_plans:quit_plans_insert_own:a:t,quit_plans:quit_plans_select_own:r:t,'
+  'quit_plans:quit_plans_update_own:w:t',
+  'existing tables: policies unchanged');
+select th913_test.ok(
+  th913_test.table_acl(array['public.programmes', 'public.enrolments',
+    'public.programme_consents', 'public.account_consents']::regclass[]) =
+  'account_consents:authenticated:SELECT,'
+  'enrolments:authenticated:DELETE,enrolments:authenticated:SELECT,'
+  'programme_consents:authenticated:SELECT,'
+  'programmes:authenticated:SELECT',
+  'new tables: only the intended table privileges, none for anon');
+select th913_test.ok(
+  th913_test.column_acl(array['public.programmes', 'public.enrolments',
+    'public.programme_consents', 'public.account_consents']::regclass[]) =
+  'account_consents.consent_text:authenticated:INSERT,'
+  'account_consents.consent_version:authenticated:INSERT,'
+  'account_consents.purpose:authenticated:INSERT,'
+  'account_consents.revoked_at:authenticated:UPDATE,'
+  'account_consents.user_id:authenticated:INSERT,'
+  'enrolments.mode:authenticated:INSERT,enrolments.mode:authenticated:UPDATE,'
+  'enrolments.programme_code:authenticated:INSERT,'
+  'enrolments.status:authenticated:INSERT,enrolments.status:authenticated:UPDATE,'
+  'enrolments.user_id:authenticated:INSERT,'
+  'programme_consents.consent_text:authenticated:INSERT,'
+  'programme_consents.consent_version:authenticated:INSERT,'
+  'programme_consents.enrolment_id:authenticated:INSERT,'
+  'programme_consents.purpose:authenticated:INSERT,'
+  'programme_consents.recipient_ref:authenticated:INSERT,'
+  'programme_consents.revoked_at:authenticated:UPDATE',
+  'new tables: only the intended column privileges');
+select th913_test.ok(
+  (select bool_and(relrowsecurity and relforcerowsecurity) from pg_catalog.pg_class
+   where oid in ('public.programmes'::regclass, 'public.enrolments'::regclass,
+                 'public.programme_consents'::regclass, 'public.account_consents'::regclass,
+                 'public.profiles'::regclass, 'public.quit_plans'::regclass,
+                 'public.program_data'::regclass)),
+  'RLS enabled and forced on new and existing tables');
 
 -- Catalogue -----------------------------------------------------------------
 select th913_test.ok(
@@ -234,6 +368,18 @@ select th913_test.ok(
   (select count(*) from public.programme_consents
    where enrolment_id = current_setting('th913.a_hw')::uuid and purpose = 'core') = 2,
   'A: re-grant adds a row and keeps the revoked one as history');
+select th913_test.ok(
+  not public.has_consent(current_setting('th913.a_hw')::uuid, 'share_care_team',
+    'synthetic-connection-01'),
+  'A: sharing stays off after a core re-grant');
+select th913_test.ok(
+  (select count(*) from public.programme_consents
+   where enrolment_id = current_setting('th913.a_hw')::uuid
+     and purpose = 'share_care_team' and revoked_at is not null) = 1
+  and (select count(*) from public.programme_consents
+       where enrolment_id = current_setting('th913.a_hw')::uuid
+         and revoked_at is null) = 1,
+  'A: core revocation revoked the sharing row, kept as history; only the new core is live');
 
 -- Enrolment constraints.
 select th913_test.refused(
@@ -270,6 +416,33 @@ values
 select th913_test.affects(
   'update public.account_consents set revoked_at = now() where purpose = ''diagnostics''',
   1, 'A: revokes an account-level consent');
+
+-- Focus cap: at most two in focus, checked at commit.
+select th913_test.ok(
+  (select count(*) from public.enrolments where status = 'focus') = 2,
+  'A: Heartwise and BreatheFree are in focus');
+select th913_test.refused(
+  'select th913_test.apply_now(array[''insert into public.enrolments (user_id, programme_code)
+     values (''''00000000-0000-4000-8000-000000913001'''', ''''st'''')''])',
+  '23514', '%two programmes%', 'A: a third programme in focus is refused');
+with i as (
+  insert into public.enrolments (user_id, programme_code, status)
+  values ('00000000-0000-4000-8000-000000913001', 'st', 'learn_only') returning id
+) select set_config('th913.a_st', id::text, true) from i;
+select th913_test.refused(format(
+  'select th913_test.apply_now(array[%L])',
+  format('update public.enrolments set status = ''focus'' where id = %L',
+    current_setting('th913.a_st'))),
+  '23514', '%two programmes%', 'A: promoting a third to focus without a swap is refused');
+select th913_test.apply_now(array[
+  format('update public.enrolments set status = ''focus'' where id = %L',
+    current_setting('th913.a_st')),
+  format('update public.enrolments set status = ''learn_only'' where id = %L',
+    current_setting('th913.a_hw'))]);
+select th913_test.ok(
+  (select array_agg(programme_code order by programme_code) from public.enrolments
+   where status = 'focus') = array['bf', 'st'],
+  'A: swap (promote first, then demote) succeeds in one transaction');
 
 -- User B ---------------------------------------------------------------------
 reset role;
@@ -326,6 +499,13 @@ with i as (
 ) select set_config('th913.b_hw', id::text, true) from i;
 insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
 values (current_setting('th913.b_hw')::uuid, 'core', 'v1', 'Synthetic core wording');
+insert into public.programme_consents
+  (enrolment_id, purpose, recipient_ref, consent_version, consent_text)
+values
+  (current_setting('th913.b_hw')::uuid, 'share_care_team', 'synthetic-connection-02',
+   'v1', 'Synthetic sharing wording'),
+  (current_setting('th913.b_hw')::uuid, 'research', null, 'v1', 'Synthetic research wording'),
+  (current_setting('th913.b_hw')::uuid, 'records_import', null, 'v1', 'Synthetic records wording');
 insert into th913_test.phi_probe (enrolment_id, note)
 values (current_setting('th913.b_hw')::uuid, 'synthetic');
 with i as (
@@ -335,15 +515,26 @@ with i as (
 insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
 values (current_setting('th913.b_ca')::uuid, 'core', 'v1', 'Synthetic core wording');
 
--- Leaving: keep for 30 days, then rejoin; or delete now.
+-- Leaving: keep the data (no automatic purge), then rejoin; or delete now.
+select th913_test.ok(
+  public.has_consent(current_setting('th913.b_hw')::uuid, 'share_care_team',
+    'synthetic-connection-02')
+  and public.has_consent(current_setting('th913.b_hw')::uuid, 'research')
+  and public.has_consent(current_setting('th913.b_hw')::uuid, 'records_import'),
+  'B: sharing, research and records import are live before leaving');
 select th913_test.affects(format(
   'update public.enrolments set status = ''left'' where id = %L',
   current_setting('th913.b_hw')), 1, 'B: leaves Heartwise keeping data');
 select th913_test.ok(
-  (select left_at is not null
-      and purge_after = left_at + interval '30 days'
-   from public.enrolments where id = current_setting('th913.b_hw')::uuid),
-  'B: leaving sets left_at and purge_after = left_at + 30 days');
+  (select left_at is not null from public.enrolments
+   where id = current_setting('th913.b_hw')::uuid)
+  and (select count(*) from public.programme_consents
+       where enrolment_id = current_setting('th913.b_hw')::uuid
+         and purpose <> 'core' and revoked_at is null) = 0
+  and (select count(*) from public.programme_consents
+       where enrolment_id = current_setting('th913.b_hw')::uuid
+         and purpose = 'core' and revoked_at is null) = 1,
+  'B: leaving sets left_at and revokes every optional consent; core row stays');
 select th913_test.ok(
   not public.has_consent(current_setting('th913.b_hw')::uuid, 'core'),
   'B: consent is not honoured on a left enrolment');
@@ -357,19 +548,36 @@ select th913_test.refused(format(
   current_setting('th913.b_hw')),
   '42501', '%row-level security%', 'B: no new consent on a left enrolment');
 select th913_test.refused(format(
-  'update public.enrolments set purge_after = now() + interval ''10 years'' where id = %L',
+  'update public.enrolments set left_at = null where id = %L',
   current_setting('th913.b_hw')),
-  '42501', 'permission denied%', 'B: cannot set purge_after directly');
+  '42501', 'permission denied%', 'B: cannot set left_at directly');
 select th913_test.affects(format(
   'update public.enrolments set status = ''focus'' where id = %L',
   current_setting('th913.b_hw')), 1, 'B: rejoins Heartwise');
 select th913_test.ok(
-  (select left_at is null and purge_after is null and status = 'focus'
+  (select left_at is null and status = 'focus'
    from public.enrolments where id = current_setting('th913.b_hw')::uuid)
   and public.has_consent(current_setting('th913.b_hw')::uuid, 'core')
   and (select count(*) from th913_test.phi_probe
        where enrolment_id = current_setting('th913.b_hw')::uuid) = 1,
-  'B: rejoin reuses the row, clears purge, keeps data and consent');
+  'B: rejoin reuses the row, clears left_at, keeps data and the core consent');
+select th913_test.ok(
+  not public.has_consent(current_setting('th913.b_hw')::uuid, 'share_care_team',
+    'synthetic-connection-02')
+  and not public.has_consent(current_setting('th913.b_hw')::uuid, 'research')
+  and not public.has_consent(current_setting('th913.b_hw')::uuid, 'records_import'),
+  'B: after rejoin, sharing, research and records import are off until granted again');
+select th913_test.ok(
+  (select count(*) from public.programme_consents
+   where enrolment_id = current_setting('th913.b_hw')::uuid
+     and purpose in ('share_care_team', 'research', 'records_import')
+     and revoked_at is not null) = 3,
+  'B: the revoked optional consents are kept as history');
+insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
+values (current_setting('th913.b_hw')::uuid, 'research', 'v1', 'Synthetic research wording');
+select th913_test.ok(
+  public.has_consent(current_setting('th913.b_hw')::uuid, 'research'),
+  'B: an optional consent granted again after rejoin is live');
 select th913_test.affects(format(
   'delete from public.enrolments where id = %L',
   current_setting('th913.b_ca')), 1, 'B: leaves ClearAir deleting data now');
@@ -391,10 +599,10 @@ select set_config('th913.a_counts', jsonb_build_object(
                        where user_id = '00000000-0000-4000-8000-000000913001')
 )::text, true);
 select th913_test.ok(
-  (current_setting('th913.a_counts')::jsonb ->> 'enrolments')::int = 2
+  (current_setting('th913.a_counts')::jsonb ->> 'enrolments')::int = 3
   and (current_setting('th913.a_counts')::jsonb ->> 'programme_consents')::int = 5
   and (current_setting('th913.a_counts')::jsonb ->> 'account_consents')::int = 2,
-  'A has 2 enrolments, 5 programme consents (2 revoked), 2 account consents before deletion');
+  'A has 3 enrolments, 5 programme consents (3 revoked), 2 account consents before deletion');
 
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000913001', true);
 select set_config('request.jwt.claims',
@@ -406,7 +614,7 @@ select th913_test.refused('select public.delete_my_app_data(''DELETE'')',
 select th913_test.ok(public.begin_account_deletion('DELETE'), 'A: deletion barrier set');
 select th913_test.refused(
   'insert into public.enrolments (user_id, programme_code)
-   values (''00000000-0000-4000-8000-000000913001'', ''st'')',
+   values (''00000000-0000-4000-8000-000000913001'', ''nu'')',
   '42501', '%row-level security%', 'A: no new enrolment once deletion has started');
 select th913_test.refused(
   'insert into public.account_consents (user_id, purpose, consent_version, consent_text)
@@ -426,7 +634,7 @@ select th913_test.ok(
   'A: delete_my_app_data returns counts only, matching the rows removed');
 select th913_test.refused(
   'insert into public.enrolments (user_id, programme_code)
-   values (''00000000-0000-4000-8000-000000913001'', ''st'')',
+   values (''00000000-0000-4000-8000-000000913001'', ''nu'')',
   '42501', '%row-level security%', 'A: no enrolment after the profile is deleted');
 reset role;
 
@@ -435,7 +643,8 @@ select th913_test.ok(
    where user_id = '00000000-0000-4000-8000-000000913001') = 0
   and (select count(*) from public.programme_consents
        where enrolment_id in (current_setting('th913.a_hw')::uuid,
-                              current_setting('th913.a_bf')::uuid)) = 0
+                              current_setting('th913.a_bf')::uuid,
+                              current_setting('th913.a_st')::uuid)) = 0
   and (select count(*) from public.account_consents
        where user_id = '00000000-0000-4000-8000-000000913001') = 0
   and (select count(*) from th913_test.phi_probe
@@ -448,7 +657,7 @@ select th913_test.ok(
   (select count(*) from public.enrolments
    where user_id = '00000000-0000-4000-8000-000000913002') = 1
   and (select count(*) from public.programme_consents
-       where enrolment_id = current_setting('th913.b_hw')::uuid) = 1
+       where enrolment_id = current_setting('th913.b_hw')::uuid) = 5
   and (select count(*) from th913_test.phi_probe
        where enrolment_id = current_setting('th913.b_hw')::uuid) = 1,
   'deletion left B''s rows untouched');
@@ -467,6 +676,39 @@ fail() {
   echo "Enrolments migration check failed: $1" >&2
   exit 1
 }
+
+# Accepts only postgres:// or postgresql:// URLs whose single host is
+# 127.0.0.1 or localhost, with no query string (libpq query parameters such as
+# host= could redirect the connection).
+db_url_is_local() {
+  local url="$1" rest authority host
+  [[ "$url" =~ ^postgres(ql)?:// ]] || return 1
+  [[ "$url" == *\?* ]] && return 1
+  rest="${url#*://}"
+  authority="${rest%%/*}"
+  host="${authority##*@}"
+  [[ "$host" == \[* ]] && return 1
+  host="${host%%:*}"
+  [[ "$host" == "127.0.0.1" || "$host" == "localhost" ]]
+}
+
+# Self-test of the guard; runs with the static checks.
+for u in 'postgresql://postgres:postgres@127.0.0.1:54322/postgres' \
+  'postgres://postgres@localhost:54322/postgres' 'postgresql://localhost/postgres'; do
+  db_url_is_local "$u" || fail "local URL guard rejects a local URL ($u)"
+done
+for u in 'postgresql://postgres:postgres@db.example.test:5432/postgres' \
+  'postgresql://postgres@127.0.0.1.example.test:5432/postgres' \
+  'postgresql://postgres@localhost:54322/postgres?host=db.example.test' \
+  'postgresql://postgres@localhost,db.example.test:5432/postgres' \
+  'postgresql:///postgres' 'host=localhost dbname=postgres' \
+  'postgresql://user@db.example.test/x@127.0.0.1'; do
+  if db_url_is_local "$u"; then fail "local URL guard accepts a non-local URL ($u)"; fi
+done
+
+if [[ -n "${VERIFY_DB_URL:-}" ]] && ! db_url_is_local "$VERIFY_DB_URL"; then
+  fail 'VERIFY_DB_URL must point at a local database (127.0.0.1 or localhost)'
+fi
 
 [[ -f "$migration" ]] || fail "missing $migration"
 
@@ -491,10 +733,14 @@ seeded=$(sed -n '/^insert into public\.programmes/,/;$/p' "$migration" |
   grep -Eo "^  \('[a-z]{2}'" | tr -d " ('" | sort | tr '\n' ' ')
 expected="be bf ca ck ea hw nu re sd sf st "
 [[ "$seeded" == "$expected" ]] || fail "programmes seed is '$seeded', expected '$expected'"
-if [[ -f "$programs_spec" ]]; then
-  spec_codes=$(python3 -c 'import json,sys; print(" ".join(sorted(p["id"] for p in json.load(open(sys.argv[1])))) + " ")' "$programs_spec")
-  [[ "$spec_codes" == "$expected" ]] || fail "spec programme ids '$spec_codes' differ from seed"
-fi
+[[ -f "$programs_spec" ]] || fail "missing $programs_spec for the seed cross-check"
+spec_rows=$(python3 -c 'import json,sys
+for p in sorted(json.load(open(sys.argv[1])), key=lambda p: p["id"]):
+    print("|".join([p["id"], p["name"], p["area"], p["archetype"]]))' "$programs_spec")
+seed_rows=$(sed -n '/^insert into public\.programmes/,/;$/p' "$migration" |
+  sed -nE "s/^  \('([a-z]{2})', '[a-z0-9_]+', '([^']+)', '([^']+)', '([^']+)',$/\1|\2|\3|\4/p" | sort)
+[[ -n "$spec_rows" && "$spec_rows" == "$seed_rows" ]] ||
+  fail "programmes seed (code, name, area, archetype) differs from $programs_spec"
 grep -A1 "('ea', 'ease'" "$migration" | grep -q "array\[\]::text\[\]" || fail "Ease must receive no records"
 grep -A1 "('sf', 'scrollfree'" "$migration" | grep -q "array\[\]::text\[\]" || fail "ScrollFree must receive no records"
 require 'grant select on table public\.programmes to authenticated' 'catalogue readable by authenticated'
@@ -504,9 +750,28 @@ require 'user_id uuid not null references auth\.users\(id\) on delete cascade' '
 require 'programme_code text not null references public\.programmes\(code\)' 'enrolment programme FK'
 require 'unique \(user_id, programme_code\)' 'one enrolment per user and programme'
 require "status in \\('focus', 'learn_only', 'paused', 'left'\\)" 'enrolment status values'
-require "new\\.purge_after = now\\(\\) \\+ interval '30 days'" 'database-managed 30-day purge date'
+if grep -Eiq 'purge_after|interval .30 days' "$migration"; then
+  fail 'leaving must not schedule a purge (no automatic purge)'
+fi
+require 'new\.left_at = now\(\)' 'database-managed left_at'
 require 'grant update \(status, mode\) on table public\.enrolments' 'enrolment update limited to status and mode'
-require 'account_deletion_started_at is null' 'deletion barrier on inserts'
+require 'create constraint trigger enrolments_focus_cap' 'focus cap trigger'
+require '^deferrable initially deferred$' 'focus cap checked at commit'
+require "pg_advisory_xact_lock\\($" 'focus cap serialised per user'
+require 'focus_count > 2' 'at most two in focus'
+
+# Deletion barrier helper, used by every insert check in this migration.
+barrier_body=$(sed -n '/create function public\.deletion_barrier_open()/,/^\$\$;/p' "$migration")
+grep -Eq '^security invoker$' <<<"$barrier_body" || fail 'deletion_barrier_open must be security invoker'
+grep -Eq '^volatile$' <<<"$barrier_body" || fail 'deletion_barrier_open must be volatile'
+grep -Eq '^  for share;$' <<<"$barrier_body" || fail 'deletion_barrier_open must lock the profile row for share'
+grep -Eq 'account_deletion_started_at is null' <<<"$barrier_body" || fail 'deletion_barrier_open checks the barrier'
+insert_policies=$(count '^on public\.(enrolments|programme_consents|account_consents) for insert$')
+barrier_uses=$(grep -Ev '^(create|revoke|grant|comment) |^ *--' "$migration" |
+  grep -Eo 'public\.deletion_barrier_open\(\)' | wc -l | tr -d ' ')
+[[ "$insert_policies" -eq 3 && "$barrier_uses" -eq 3 ]] ||
+  fail "every insert policy must use deletion_barrier_open ($insert_policies policies, $barrier_uses uses)"
+require 'grant execute on function public\.deletion_barrier_open\(\) to authenticated' 'barrier helper granted'
 
 # Consents.
 require 'enrolment_id uuid not null references public\.enrolments\(id\) on delete cascade' 'programme consent hangs off enrolment'
@@ -518,6 +783,11 @@ require 'consent_version text not null' 'consent version kept'
 require 'consent_text text not null' 'consent wording kept'
 require 'grant update \(revoked_at\) on table public\.programme_consents' 'programme consent update limited to revocation'
 require 'grant update \(revoked_at\) on table public\.account_consents' 'account consent update limited to revocation'
+require 'create trigger programme_consents_revoke_with_core' 'core revocation revokes the enrolment consents'
+require "old\\.purpose = 'core' and old\\.revoked_at is null and new\\.revoked_at is not null" 'core revocation trigger condition'
+require 'create trigger enrolments_revoke_on_leave' 'leaving revokes optional consents'
+require "when \\(new\\.status = 'left' and old\\.status is distinct from 'left'\\)" 'leave trigger condition'
+require "purpose <> 'core'" 'leaving keeps only core'
 require 'create function public\.has_consent\(' 'has_consent defined'
 require "public\\.has_consent\\(programme_consents\\.enrolment_id, 'core'\\)" 'optional consent gated on core'
 has_consent_body=$(sed -n '/create function public\.has_consent(/,/^\$\$;/p' "$migration")
