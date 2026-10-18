@@ -36,11 +36,20 @@ const _rule = 'This app ships no SDK that reports on a person — analytics, '
 ///
 /// Known false positives, accepted because failing closed is the safer error:
 /// - Families that are also ordinary words (`ads`, `adjust`, `branch`,
-///   `clarity`, `embrace`, `heap`, `intercom`, `measurement`, `purchases`,
-///   `segment`, `singular`, `telemetry`) match unrelated names that use the
-///   word, e.g. a `heap_sort` package or a `branch` coordinate.
-/// - Joined adjacent words can spell a family by accident (`data` + `transport`
-///   in a name that has nothing to do with Google's DataTransport).
+///   `clarity`, `embrace`, `heap`, `intercom`, `purchases`, `segment`,
+///   `singular`, `telemetry`) match unrelated names that use the word, e.g. a
+///   `heap_sort` package or a `branch` coordinate.
+/// - Joined adjacent words can spell a family by accident (`quantum` +
+///   `metric` in a name that has nothing to do with Quantum Metric).
+/// Google's telemetry libraries are listed as joined identifiers on purpose,
+/// not as the bare words `measurement` and `datatransport`, which a health app
+/// uses legitimately (`blood_pressure_measurement`, `data_transport_layer`):
+/// `playservicesmeasurement` (every `play-services-measurement*` artifact),
+/// `firebasemeasurement`, `appmeasurement` (`GoogleAppMeasurement`,
+/// `app-measurement`), `measurementconnector`, `androiddatatransport`
+/// (`com.google.android.datatransport`) and `googledatatransport`
+/// (`GoogleDataTransport`).
+///
 /// - The whole-file scan below matches these words in comments and strings of
 ///   the scanned files, not only in dependency names.
 /// To resolve one, do not rename around the check: change this list in the
@@ -54,6 +63,7 @@ const forbiddenFamilies = <String>[
   'agconnect',
   'airship',
   'amplitude',
+  'androiddatatransport',
   'analytics',
   'appcenter',
   'appdynamics',
@@ -70,16 +80,17 @@ const forbiddenFamilies = <String>[
   'countly',
   'crashlytics',
   'customerio',
-  'datatransport',
   'datadog',
   'dynatrace',
   'embrace',
   'facebook',
   'fbsdk',
   'firebase',
+  'firebasemeasurement',
   'flurry',
   'fullstory',
   'glassbox',
+  'googledatatransport',
   'heap',
   'hotjar',
   'instabug',
@@ -89,13 +100,14 @@ const forbiddenFamilies = <String>[
   'launchdarkly',
   'logrocket',
   'matomo',
-  'measurement',
+  'measurementconnector',
   'mixpanel',
   'moengage',
   'newrelic',
   'onesignal',
   'opentelemetry',
   'pendo',
+  'playservicesmeasurement',
   'posthog',
   'purchases',
   'quantummetric',
@@ -489,6 +501,24 @@ List<String> podNames(List<String> podfileLock) {
 }
 
 // --- Android ---------------------------------------------------------------
+//
+// Threat model. These checks catch the accidental addition of an Android
+// dependency, plugin, repository or applied script: one that is written as
+// a literal in a Gradle file or version catalog. They do not try to evaluate
+// Gradle. A coordinate, configuration name, script path or repository URL
+// that is computed at build time is left to review and to Gradle dependency
+// locking (TH-992 part 2). Known limits, not detected here:
+// - `dependencies.<configuration>(x)`;
+// - String.invoke or `add(configuration, x)` with a non-literal
+//   configuration name;
+// - `apply { from(...) }` and `apply(mapOf(...))`;
+// - Groovy `add 'configuration', x` without parentheses;
+// - dollar-slashy strings (`$/.../$`);
+// - `repositories.ivy`, `repositories.flatDir` and `repositories.add(...)`
+//   outside a `repositories { }` block;
+// - a `maven` block that names an allowlisted literal URL and also sets a
+//   computed one (a variable, `artifactUrls(...)`): only literal URLs are
+//   checked, so the block passes.
 
 /// The dependency configurations Gradle accepts: the base ones, their variant
 /// and test forms (`debugImplementation`, `testImplementation`, `kaptTest`,
@@ -1332,7 +1362,7 @@ void main() {
     expect(offenders, isEmpty, reason: _rule);
   });
 
-  test('every Android dependency, in any configuration, is allowlisted', () {
+  test('every literal Android dependency declaration is allowlisted', () {
     expect(gradleFiles.keys, contains('android/app/build.gradle.kts'),
         reason: 'the Gradle files were not found');
     expect(nativeCoordinates, contains('org.jetbrains.kotlin:kotlin-stdlib'),
@@ -1537,6 +1567,14 @@ void main() {
         'com.google.android.gms:play-services-measurement-api',
         'com.google.android.datatransport:transport-runtime',
         'GoogleDataTransport',
+        // Narrowed in TH-992 round 2.
+        'com.google.android.gms:play-services-measurement-base',
+        'com.google.android.gms:play-services-measurement-sdk-api',
+        'com.google.firebase:firebase-measurement-connector',
+        'measurement-connector',
+        'app-measurement',
+        'GoogleAppMeasurement',
+        'com.google.android.datatransport:transport-api',
       ]) {
         expect(forbiddenFamilyOf(name), isNotNull, reason: name);
       }
@@ -1553,6 +1591,12 @@ void main() {
         'org.jetbrains.kotlin:kotlin-stdlib',
         'flutter_bootstrap.js',
         'windowSoftInputMode',
+        // Health-app names that use the bare words.
+        'blood_pressure_measurement',
+        'measurement_units',
+        'MeasurementKit',
+        'data_transport_layer',
+        'com.example.health:measurement-sync',
       ]) {
         expect(forbiddenFamilyOf(name), isNull, reason: name);
       }
@@ -1998,6 +2042,7 @@ dependencies { api("com.example:after-raw:1.0") }
 android {
     compileSdk 36
     implementation = "not a declaration outside dependencies"
+    implementation outsideDependenciesIsNotRead
 }
 dependencies {
     implementation group: 'com.example', name: 'map-notation', version: '1.0'
@@ -2041,6 +2086,36 @@ dependencies {
         'com.example:quoted',
         'com.example:map-notation',
       ]);
+    });
+
+    test('slashy strings are told apart from division', () {
+      // Division: after `)`, before a blank, or after a word that is not a
+      // configuration name. Nothing is masked.
+      for (final source in [
+        'def r = (a)/b/c',
+        'def r = width / height / 2',
+        'def r = foo /bar/ baz',
+        'def r = a/b',
+      ]) {
+        expect(scanGradle(source).masked, source, reason: source);
+      }
+      // Slashy strings: where an expression starts, or after a configuration
+      // name and a space. The inside is masked, the delimiters stay.
+      expect(scanGradle('def p = /g:a:1/').masked, 'def p = /     /');
+      expect(scanGradle('x(/g:a:1/)').masked, 'x(/     /)');
+      expect(scanGradle('implementation /g:a:1/').masked,
+          'implementation /     /');
+    });
+
+    test('a configuration name inside another string is not a declaration', () {
+      const kts = """
+val hint = "use 'implementation'(x) or \\"api\\"(y) here"
+dependencies {
+    "implementation"(vendorSdk)
+}
+""";
+      expect(gradleDeclarations(kts).map((d) => d.toString()),
+          ['implementation(vendorSdk)']);
     });
 
     test('string-invoked and add(...) declarations are read', () {
