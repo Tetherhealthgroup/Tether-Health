@@ -202,10 +202,61 @@ void main() {
     final sh = File('tool/setup_macos_linux.sh').readAsStringSync();
     expect(sh, contains('breathefree_platforms="macos"'));
     expect(sh, contains('breathefree_platforms="linux"'));
+    // Any assignment, not only the two branches above, must leave the tracked
+    // runners alone.
+    final assignments = RegExp(
+      r"""breathefree_platforms=["']?([^"'\s;]*)""",
+    ).allMatches(sh).toList();
+    expect(assignments, hasLength(greaterThanOrEqualTo(2)));
+    for (final m in assignments) {
+      final platforms = m[1]!.split(',').map((p) => p.trim()).toList();
+      expect(platforms.where((p) => p.isNotEmpty), isNotEmpty, reason: m[0]);
+      for (final tracked in ['android', 'ios', 'web', 'windows']) {
+        expect(platforms, isNot(contains(tracked)), reason: m[0]);
+      }
+    }
     // Every runner the Windows script uses is tracked: it creates none.
     expect(
       File('tool/setup_windows.bat').readAsStringSync(),
       isNot(contains('flutter create')),
     );
+  });
+
+  test('macOS/Linux setup restores pubspec.lock and .metadata before pub get',
+      () {
+    // flutter create . re-resolves pubspec.lock and rewrites .metadata; pub get
+    // would then keep the newer versions and leave the tree changed.
+    final sh = File('tool/setup_macos_linux.sh').readAsStringSync();
+    const files = 'for file in pubspec.lock .metadata; do';
+    const backup = 'cp -p "\$file" "\$create_backup/\$file"';
+    const restore = 'cp -p "\$create_backup/\$file" "\$file"';
+    final restoreFn = RegExp(
+      r'\nrestore_create_files\(\) \{\n([\s\S]*?)\n\}\n',
+    ).firstMatch(sh);
+    expect(restoreFn, isNotNull);
+    expect(restoreFn![1], contains(files));
+    expect(restoreFn[1], contains(restore));
+
+    final create = sh.indexOf('\nflutter create . ');
+    final pubGet = sh.indexOf('\nflutter pub get\n');
+    expect(create, greaterThan(0));
+    expect(pubGet, greaterThan(create));
+    expect('\nflutter create . '.allMatches(sh), hasLength(1));
+    expect('\nflutter pub get\n'.allMatches(sh), hasLength(1));
+
+    // Both files are copied aside before flutter create ...
+    final backupLoop = sh.lastIndexOf('\n$files', create);
+    expect(backupLoop, greaterThan(0));
+    final beforeCreate = sh.substring(backupLoop, create);
+    expect(beforeCreate, contains(backup));
+    expect(beforeCreate, isNot(contains(restore)));
+    // ... and put back after it, before flutter pub get.
+    final restoreCall = sh.indexOf('\nrestore_create_files\n', create);
+    expect(restoreCall, greaterThan(create));
+    expect(restoreCall, lessThan(pubGet));
+    // The temp copy is removed on every exit.
+    expect(sh, contains('mktemp -d'));
+    expect(sh, contains('rm -rf "\$create_backup"'));
+    expect(sh, contains('trap cleanup EXIT'));
   });
 }
