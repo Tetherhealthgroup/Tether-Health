@@ -17,8 +17,12 @@
 # --build-number N      Passed to flutter build; overrides the pubspec number.
 # --check-version-only  Run only the pre-build version check, then exit. Needs
 #                       no define file and never builds.
-# --verify-aab=<path>   Run only the post-build versionCode read-back on an
-#                       existing AAB, then exit. Never builds.
+# --verify-aab=<path>   Run only the post-build checks (signing certificate,
+#                       package name, versionCode) on an existing AAB, then
+#                       exit. Never builds.
+#
+# The AAB's package must be com.TetherHealthLLC.tetherhealth (the Play app's
+# package, fixed at first upload); any other package fails the build.
 #
 # Requires android/key.properties (see docs/PLAY_RELEASE.md). The Gradle build
 # fails if it is missing or incomplete; the debug key is never used.
@@ -35,6 +39,8 @@ unset CDPATH
 unset TETHER_ALLOW_UNSIGNED_RELEASE
 
 max_version_code=2100000000 # Play's upper limit
+# The package Play holds for this app; it cannot change after the first upload.
+expected_package="com.TetherHealthLLC.tetherhealth"
 env_file=""
 min_version_code=2
 build_number=""
@@ -210,8 +216,8 @@ check_version_code() {
 
 # aapt2 cannot open an AAB (manifest is at base/manifest/, resources at
 # base/resources.pb). Repackage those two entries as a minimal APK with both at
-# the root, then dump its manifest. Prints the versionCode, or nothing on error.
-read_version_code_with_aapt2() {
+# the root, then dump its manifest tree. Prints nothing (and fails) on error.
+dump_manifest_with_aapt2() {
   local aab_path="$1" tmp_dir
   tmp_dir="$(mktemp -d)" || return 1
   # shellcheck disable=SC2064 # expand tmp_dir now so cleanup survives scope exit
@@ -226,21 +232,63 @@ try:
 except (OSError, KeyError, zipfile.BadZipFile):
     sys.exit(1)
 PY
-  aapt2 dump xmltree --file AndroidManifest.xml "$tmp_dir/manifest.apk" 2>/dev/null |
+  aapt2 dump xmltree --file AndroidManifest.xml "$tmp_dir/manifest.apk" 2>/dev/null
+}
+
+# Prints the versionCode from the aapt2 manifest dump, or nothing on error.
+read_version_code_with_aapt2() {
+  dump_manifest_with_aapt2 "$1" |
     sed -n 's/.*android:versionCode([^)]*)=\([0-9][0-9]*\).*/\1/p' | head -n 1
+}
+
+# Prints the manifest package from the aapt2 manifest dump, or nothing on error.
+read_package_with_aapt2() {
+  dump_manifest_with_aapt2 "$1" |
+    sed -n 's/^[[:space:]]*A: package="\([^"]*\)".*/\1/p' | head -n 1
+}
+
+# Fails (exit 1) if neither bundletool nor aapt2 is installed.
+require_manifest_reader() {
+  if ! command -v bundletool >/dev/null 2>&1 && ! command -v aapt2 >/dev/null 2>&1; then
+    echo "FAIL: neither bundletool nor aapt2 is installed; cannot read the package and versionCode from the AAB. Install one and re-run with --verify-aab=<path> before uploading." >&2
+    exit 1
+  fi
+}
+
+# Reads the manifest package from an AAB with bundletool, else aapt2, and fails
+# (exit 1) unless it is exactly $expected_package. A value is echoed only after
+# it passed the package-name character check.
+verify_aab_package() {
+  local aab_path="$1" package=""
+  require_manifest_reader
+  if command -v bundletool >/dev/null 2>&1; then
+    package="$(bundletool dump manifest --bundle="$aab_path" --xpath=/manifest/@package 2>/dev/null)" || package=""
+  else
+    package="$(read_package_with_aapt2 "$aab_path")" || package=""
+  fi
+  package="${package%$'\r'}"
+  case "$package" in
+    "" | *[!A-Za-z0-9_.]*)
+      echo "FAIL: could not read a valid package name from the AAB (path and tool output not shown)." >&2
+      exit 1
+      ;;
+  esac
+  echo "package: $package (read from the AAB); expected $expected_package"
+  if [ "$package" != "$expected_package" ]; then
+    echo "FAIL: AAB package $package is not $expected_package; Play would reject it as a different app. Do not upload." >&2
+    exit 1
+  fi
 }
 
 # Reads versionCode from an AAB with bundletool, else aapt2, and fails (exit 1)
 # if neither is installed, the read fails, or the value is below the minimum.
 verify_aab_version_code() {
   local aab_path="$1" code=""
+  require_manifest_reader
   if command -v bundletool >/dev/null 2>&1; then
     code="$(bundletool dump manifest --bundle="$aab_path" --xpath=/manifest/@android:versionCode 2>/dev/null)" || code=""
-  elif command -v aapt2 >/dev/null 2>&1; then
-    code="$(read_version_code_with_aapt2 "$aab_path")" || code=""
   else
-    echo "FAIL: neither bundletool nor aapt2 is installed; cannot read versionCode from the AAB. Install one and re-run with --verify-aab=<path> before uploading." >&2
-    exit 1
+    code="$(read_version_code_with_aapt2 "$aab_path")" || code=""
   fi
   case "$code" in
     "" | *[!0-9]*)
@@ -301,6 +349,7 @@ if [ "$check_version_only" -eq 1 ]; then
 fi
 if [ "$verify_aab_given" -eq 1 ]; then
   check_signing_certificate "$verify_aab"
+  verify_aab_package "$verify_aab"
   verify_aab_version_code "$verify_aab"
   exit 0
 fi
@@ -345,10 +394,8 @@ echo
 echo "AAB: $(pwd)/$aab"
 
 # Certificate first, so a failed read-back can never skip it; then read back
-# versionCode (bundletool, else aapt2).
+# the package and versionCode (bundletool, else aapt2).
 check_signing_certificate "$aab"
 echo
-if command -v bundletool >/dev/null 2>&1; then
-  echo "package:     $(bundletool dump manifest --bundle="$aab" --xpath=/manifest/@package)"
-fi
+verify_aab_package "$aab"
 verify_aab_version_code "$aab"
