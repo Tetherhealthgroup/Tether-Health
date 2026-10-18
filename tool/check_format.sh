@@ -1,9 +1,10 @@
 #!/bin/sh
 # Canonical Dart format check. Never rewrites files.
 # Checks every .dart file under the repo root, found by walking the filesystem
-# (tracked and untracked alike), except those under top-level third_party/ and
-# build/ (anchored to the repo root, so first-party dirs of the same name
-# deeper in the tree are still checked) and hidden directories at any depth,
+# (tracked and untracked alike), except those under top-level third_party/,
+# tether_ui/ (generated package, checked by its own CI job) and build/
+# (anchored to the repo root, so first-party dirs of the same name deeper in
+# the tree are still checked) and hidden directories at any depth,
 # such as .dart_tool/.
 # Requires `flutter pub get` to have run: without .dart_tool/package_config.json
 # dart format cannot resolve the language version and reports false changes, so
@@ -25,7 +26,7 @@ files=$(mktemp)
 trap 'rm -f "$files"' EXIT
 
 find . \
-  \( -path ./third_party -o -path ./build -o -name '.?*' \) -prune -o \
+  \( -path ./third_party -o -path ./tether_ui -o -path ./build -o -name '.?*' \) -prune -o \
   -type f -name '*.dart' -print0 > "$files"
 
 if [ ! -s "$files" ]; then
