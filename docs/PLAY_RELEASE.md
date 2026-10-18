@@ -3,8 +3,6 @@
 App ID: `com.TetherHealthLLC.tetherhealth`. Agents and CI never sign, upload or
 publish; every step below is performed by the owner.
 
-> **Do not build for Play until applicationId is changed to com.TetherHealthLLC.tetherhealth; this tree still builds com.breathefree.breathefree_patient.**
-
 ## 1. Create the upload key (once, outside the repo)
 
 > **The first AAB is already uploaded** (1.0.0 (1), 2026-10-12). Play already
@@ -98,8 +96,9 @@ reads the versionCode back from the AAB and prints the signing certificate.
 It fails if the certificate is `CN=Android Debug`.
 
 After the build the script checks the signing certificate first, then reads
-the versionCode from the AAB, so a failed read-back never skips the
-certificate check. The versionCode is read with `bundletool` (tried first) or,
+the package and the versionCode from the AAB, so a failed read-back never
+skips the certificate check. It fails unless the package is
+`com.TetherHealthLLC.tetherhealth`. Both are read with `bundletool` (tried first) or,
 if that is not installed, `aapt2`. aapt2 cannot open an AAB directly, so the
 script repackages the AAB's `base/manifest/AndroidManifest.xml` and
 `base/resources.pb` into a temporary APK (needs `python3`) and dumps that.
