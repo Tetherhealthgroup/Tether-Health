@@ -4,17 +4,14 @@
 >
 > - The audit below was made at commit `f06b7c7`, not at this branch. Its
 >   file:line citations are not current; re-check each one before acting on it.
-> - Bundle and app IDs (section 1) are pending TH-941. This tree still has
->   `com.hshanmug12.breathefree` on iOS and `com.breathefree.breathefree_patient`
->   on Android.
 > - Gap G-5 and the build step in O-10 are superseded by
 >   `tool/build_ios_release.sh` (TH-904). Use that script, not a raw
 >   `flutter build ipa`.
 > - `BASELINE.md`, cited below, is not in this repository; it is part of the
 >   private office notes.
 
-Target bundle ID: `com.TetherHealthLLC.tetherhealth` (not yet set in this tree;
-see section 1). This is the iOS counterpart to
+Bundle ID: `com.TetherHealthLLC.tetherhealth` (see section 1). This is the
+iOS counterpart to
 `docs/PLAY_RELEASE.md`. Agents and CI never sign, upload, submit or touch App
 Store Connect, the Apple Developer portal or Firebase; every console step below
 is performed by the owner.
@@ -35,21 +32,22 @@ never final here.
 
 ## 1. Already satisfied (Observed at `f06b7c7`)
 
-### Bundle identifier, per build configuration (pending TH-941; not satisfied on this branch)
+### Bundle identifier, per build configuration (set by TH-941)
 
-The target bundle ID is `com.TetherHealthLLC.tetherhealth`. This tree does not
-use it yet; TH-941 sets the final identifiers. Current values on this branch:
+The bundle ID is `com.TetherHealthLLC.tetherhealth` on every Runner
+configuration (TH-941; `test/config/app_identity_test.dart` guards it):
 
-| Target / configuration | `PRODUCT_BUNDLE_IDENTIFIER` today | Citation |
+| Target / configuration | `PRODUCT_BUNDLE_IDENTIFIER` | Citation |
 |---|---|---|
-| Runner / Profile, Debug, Release | `com.hshanmug12.breathefree` | `ios/Runner.xcodeproj/project.pbxproj:396`, `:579`, `:603` |
-| RunnerTests / Debug, Release, Profile | `com.hshanmug12.breathefreePatient.RunnerTests` | `ios/Runner.xcodeproj/project.pbxproj:412`, `:429`, `:444` |
+| Runner / Profile, Debug, Release | `com.TetherHealthLLC.tetherhealth` | `ios/Runner.xcodeproj/project.pbxproj:397`, `:582`, `:606` |
+| RunnerTests / Debug, Release, Profile | `com.TetherHealthLLC.tetherhealth.RunnerTests` | `ios/Runner.xcodeproj/project.pbxproj:413`, `:430`, `:445` |
 
-The Android application ID is `com.breathefree.breathefree_patient`
-(`android/app/build.gradle.kts:50`), so neither platform matches the target ID
-yet. Checklist: after TH-941, confirm every Runner configuration, the Android
-application ID and the Firebase Android package in `tether-health-llc` all use
-the final ID. The Archive action in the shared scheme uses `Release`
+The Android application ID and namespace are also
+`com.TetherHealthLLC.tetherhealth` (`android/app/build.gradle.kts:39`, `:50`).
+The Unplug App Group identifier `group.com.TetherHealthLLC.tetherhealth.unplug`
+is the project build setting `TETHER_APP_GROUP_IDENTIFIER`; its capability and
+entitlement are not added yet. Checklist: confirm the Firebase Android package
+in `tether-health-llc` uses the same ID. The Archive action in the shared scheme uses `Release`
 (`ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme:116`).
 
 ### Deployment target and devices
