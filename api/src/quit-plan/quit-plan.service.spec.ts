@@ -147,6 +147,66 @@ describe("QuitPlanService", () => {
     });
   });
 
+  it("saves the explore-first path with an explore readiness path", async () => {
+    const explorePlan: PutQuitPlanDto = {
+      ...plan,
+      readinessPath: "explore",
+      quitPlanPath: "exploreFirst",
+      smokingTriggers: ["scrolling", "beforeBed"],
+    };
+    const exploreRow = {
+      ...row,
+      readiness_path: "explore",
+      quit_plan_path: "exploreFirst",
+      smoking_triggers: ["scrolling", "beforeBed"],
+    };
+    const single = jest
+      .fn()
+      .mockResolvedValue({ data: exploreRow, error: null });
+    const selectAfterUpsert = jest.fn().mockReturnValue({ single });
+    const upsert = jest.fn().mockReturnValue({ select: selectAfterUpsert });
+    const from = jest.fn().mockReturnValue({ upsert });
+    mockedCreateClient.mockReturnValue({ from } as never);
+
+    const service = new QuitPlanService(config);
+    await expect(service.put(user, explorePlan)).resolves.toMatchObject({
+      readinessPath: "explore",
+      quitPlanPath: "exploreFirst",
+      smokingTriggers: ["scrolling", "beforeBed"],
+    });
+    expect(upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        user_id: user.id,
+        readiness_path: "explore",
+        quit_plan_path: "exploreFirst",
+        smoking_triggers: ["scrolling", "beforeBed"],
+      }),
+      { onConflict: "user_id" },
+    );
+  });
+
+  it.each(["prepare", "connect"] as const)(
+    "rejects exploreFirst with readiness path %s before any write",
+    async (readinessPath) => {
+      const service = new QuitPlanService(config);
+      await expect(
+        service.put(user, {
+          ...plan,
+          readinessPath,
+          quitPlanPath: "exploreFirst",
+        }),
+      ).rejects.toMatchObject({ status: 400 });
+      await expect(
+        service.create(user, {
+          ...plan,
+          readinessPath,
+          quitPlanPath: "exploreFirst",
+        }),
+      ).rejects.toMatchObject({ status: 400 });
+      expect(mockedCreateClient).not.toHaveBeenCalled();
+    },
+  );
+
   it("rejects a top reason outside the selected reasons", async () => {
     const service = new QuitPlanService(config);
     await expect(

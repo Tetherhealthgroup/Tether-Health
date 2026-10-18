@@ -99,6 +99,14 @@ export class QuitPlanService {
         "customQuitReason is required only when custom is selected",
       );
     }
+    if (
+      plan.quitPlanPath === "exploreFirst" &&
+      plan.readinessPath !== "explore"
+    ) {
+      throw new BadRequestException(
+        "exploreFirst requires readinessPath explore",
+      );
+    }
   }
 
   private toRow(user: AuthUser, plan: PutQuitPlanDto) {
