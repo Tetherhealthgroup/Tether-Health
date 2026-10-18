@@ -250,14 +250,15 @@ read_package_with_aapt2() {
 # Fails (exit 1) if neither bundletool nor aapt2 is installed.
 require_manifest_reader() {
   if ! command -v bundletool >/dev/null 2>&1 && ! command -v aapt2 >/dev/null 2>&1; then
-    echo "FAIL: neither bundletool nor aapt2 is installed; cannot read versionCode from the AAB. Install one and re-run with --verify-aab=<path> before uploading." >&2
+    echo "FAIL: neither bundletool nor aapt2 is installed; cannot read the package or versionCode from the AAB. Install one and re-run with --verify-aab=<path> before uploading." >&2
     exit 1
   fi
 }
 
 # Reads the manifest package from an AAB with bundletool, else aapt2, and fails
 # (exit 1) unless it is exactly $expected_package. A value is echoed only after
-# it passed the package-name character check.
+# it passed the package-name character check, which runs in the C locale: in a
+# UTF-8 locale the ranges A-Z/a-z can match non-ASCII letters such as e-acute.
 verify_aab_package() {
   local aab_path="$1" package=""
   require_manifest_reader
@@ -267,6 +268,7 @@ verify_aab_package() {
     package="$(read_package_with_aapt2 "$aab_path")" || package=""
   fi
   package="${package%$'\r'}"
+  local LC_ALL=C
   case "$package" in
     "" | *[!A-Za-z0-9_.]*)
       echo "FAIL: could not read a valid package name from the AAB (path and tool output not shown)." >&2

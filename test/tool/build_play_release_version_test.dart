@@ -109,30 +109,31 @@ void main() {
     final entries = withEntries
         ? ['base/manifest/AndroidManifest.xml', 'base/resources.pb']
         : ['BUNDLE-METADATA/readme.txt'];
-    final result = Process.runSync('python3', [
-      '-I',
-      '-c',
-      'import sys, zipfile\n'
-          'z = zipfile.ZipFile(sys.argv[1], "w")\n'
-          'for n in sys.argv[2:]: z.writestr(n, "x")\n'
-          'z.close()',
-      path,
-      ...entries,
-    ]);
+    final result = Process.runSync(
+      'python3',
+      [
+        '-I',
+        '-c',
+        'import sys, zipfile\n'
+            'z = zipfile.ZipFile(sys.argv[1], "w")\n'
+            'for n in sys.argv[2:]: z.writestr(n, "x")\n'
+            'z.close()',
+        path,
+        ...entries,
+      ],
+    );
     expect(result.exitCode, 0, reason: '${result.stderr}');
     return File(path);
   }
 
   group('--check-version-only (pubspec)', () {
-    test(
-      'fails when the pubspec build number is below the default minimum',
-      () {
-        writePubspec('1.0.0+1');
-        final r = run(['--check-version-only']);
-        expect(r.exitCode, 1);
-        expect(output(r), contains('below the minimum 2'));
-      },
-    );
+    test('fails when the pubspec build number is below the default minimum',
+        () {
+      writePubspec('1.0.0+1');
+      final r = run(['--check-version-only']);
+      expect(r.exitCode, 1);
+      expect(output(r), contains('below the minimum 2'));
+    });
 
     test('passes when the build number equals the minimum', () {
       writePubspec('1.0.0+2');
@@ -273,9 +274,8 @@ void main() {
       final cwd = Directory(join([root.path, 'caller']))..createSync();
       File(join([cwd.path, 'release.json'])).writeAsStringSync('{}');
       // Found in cwd: reaches the version check (exit 1), not "not found".
-      final found = run([
-        '--dart-define-from-file=release.json',
-      ], cwd: cwd.path);
+      final found =
+          run(['--dart-define-from-file=release.json'], cwd: cwd.path);
       expect(found.exitCode, 1, reason: output(found));
       expect(output(found), contains('below the minimum 2'));
       // Present only at the repo root: must NOT be picked up silently.
@@ -294,9 +294,8 @@ void main() {
     // this pubspec is below the minimum, so the version check would fail.
     final decoy = Directory(join([root.path, 'decoy']))..createSync();
     Directory(join([decoy.path, 'tool'])).createSync();
-    File(
-      join([decoy.path, 'pubspec.yaml']),
-    ).writeAsStringSync('name: x\nversion: 1.0.0+1\n');
+    File(join([decoy.path, 'pubspec.yaml']))
+        .writeAsStringSync('name: x\nversion: 1.0.0+1\n');
     final r = Process.runSync(
       '/bin/bash',
       ['tool/build_play_release.sh', '--check-version-only'],
@@ -425,6 +424,37 @@ void main() {
           reason: bad,
         );
         expect(output(r), isNot(contains(canary)), reason: bad);
+      }
+    });
+
+    test('never echoes a non-ASCII package value, even in a UTF-8 locale', () {
+      // th-security L1: in a UTF-8 locale, bash matches e-acute against
+      // [A-Za-z]; the script's character check must run in the C locale.
+      writeFake('bundletool', bundletoolBody);
+      const canary = 'TH941CANARY';
+      for (final locale in ['en_US.UTF-8', 'C.UTF-8']) {
+        for (final bad in [
+          'com.TetherHealthLLC.tetherh\u00e9alth',
+          'com.$canary.caf\u00e9',
+        ]) {
+          final r = run(
+            ['--verify-aab=${aab.path}'],
+            env: {
+              'FAKE_CODE': '5',
+              'FAKE_PACKAGE': bad,
+              'LANG': locale,
+              'LC_ALL': locale,
+            },
+          );
+          expect(r.exitCode, 1, reason: '$locale $bad');
+          expect(
+            output(r),
+            contains('could not read a valid package name'),
+            reason: '$locale $bad',
+          );
+          expect(output(r), isNot(contains('\u00e9')), reason: '$locale $bad');
+          expect(output(r), isNot(contains(canary)), reason: '$locale $bad');
+        }
       }
     });
 
