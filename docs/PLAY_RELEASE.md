@@ -86,6 +86,16 @@ still calls `api/`, so the app has not yet been moved onto the decided backend.
 
 ## 4. Build
 
+Toolchain: build with Flutter 3.47.1, the version CI pins
+(`.github/workflows/flutter-ci.yml`); its `pub get` leaves `pubspec.lock` unchanged.
+Older SDKs (3.44.2 was tested) downgrade some packages in `pubspec.lock` on
+`pub get`, so the bundle would not match CI. The Android project uses AGP
+9.1.0, Kotlin Gradle plugin 2.4.0, Gradle 9.3.1 and JDK 17, with
+`android.builtInKotlin=false` and `android.newDsl=false` (the Flutter template
+values). With `builtInKotlin=true`, Flutter 3.44.2 fails in the `app_links`
+plugin ("The 'org.jetbrains.kotlin.android' plugin is no longer required");
+3.47.1 builds either way.
+
 ```sh
 bash tool/build_play_release.sh --dart-define-from-file=$HOME/secure/tether-health/release.json
 ```
