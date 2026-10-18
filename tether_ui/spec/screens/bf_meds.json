@@ -1,0 +1,180 @@
+{
+  "id": "bf_meds",
+  "name": "Medication center",
+  "route": "/p/bf/meds",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Medication center",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "info",
+      "text": "Education and tracking, not prescribing. The app never selects a medicine or changes a dose."
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Your recorded plan",
+      "title": "Nicotine patch · morning",
+      "text": "Entered by you · follow your clinician’s instructions",
+      "children": [
+        {
+          "t": "buttons",
+          "items": [
+            {
+              "t": "button",
+              "label": "Taken today",
+              "action": {
+                "type": "toast",
+                "value": "Recorded: taken at 8:07 AM"
+              },
+              "variant": "primary",
+              "arrow": false,
+              "small": true
+            },
+            {
+              "t": "button",
+              "label": "Not today",
+              "action": {
+                "type": "toast",
+                "value": "Recorded: not taken"
+              },
+              "variant": "secondary",
+              "arrow": false,
+              "small": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Learn",
+      "rows": [
+        {
+          "label": "Nicotine replacement",
+          "sub": "Patch, gum, lozenge",
+          "action": {
+            "type": "push",
+            "to": "learn_lesson"
+          }
+        },
+        {
+          "label": "Prescription options",
+          "sub": "Varenicline · bupropion SR",
+          "action": {
+            "type": "push",
+            "to": "learn_lesson"
+          }
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "warn",
+      "title": "Pregnant, breastfeeding or under 18?",
+      "text": "Talk with a doctor before using quit medicines."
+    },
+    {
+      "t": "card",
+      "variant": "urgent",
+      "title": "Side effect or worrying symptom?",
+      "text": "Contact your care team or pharmacist. Emergency: 911.",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      }
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Add or update recorded plan",
+      "action": {
+        "type": "push",
+        "to": "bf_meds_edit"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Taken today",
+      "path": "body[1].children[0].items[0]",
+      "action": {
+        "type": "toast",
+        "value": "Recorded: taken at 8:07 AM"
+      },
+      "summary": "toast “Recorded: taken at 8:07 AM”"
+    },
+    {
+      "element": "Not today",
+      "path": "body[1].children[0].items[1]",
+      "action": {
+        "type": "toast",
+        "value": "Recorded: not taken"
+      },
+      "summary": "toast “Recorded: not taken”"
+    },
+    {
+      "element": "Nicotine replacement",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "Prescription options",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "Side effect or worrying symptom?",
+      "path": "body[4]",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "summary": "push → support_message_care"
+    },
+    {
+      "element": "Add or update recorded plan",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_meds_edit"
+      },
+      "summary": "push → bf_meds_edit"
+    }
+  ]
+}

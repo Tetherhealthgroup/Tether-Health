@@ -1,0 +1,37 @@
+{
+  "generated": "2026-10-17T21:56:20+00:00",
+  "screens": 183,
+  "flows": 20,
+  "actions": 771,
+  "flutter": {
+    "total": 1288,
+    "passed": 1288,
+    "render_tests": [
+      366,
+      366
+    ],
+    "action_sweep": [
+      853,
+      853
+    ],
+    "scenarios": [
+      68,
+      68
+    ]
+  },
+  "prototype": {
+    "scenarios": [
+      68,
+      68
+    ],
+    "action_sweep": [
+      853,
+      853
+    ],
+    "js_errors": 0
+  },
+  "action_coverage": [
+    771,
+    771
+  ]
+}

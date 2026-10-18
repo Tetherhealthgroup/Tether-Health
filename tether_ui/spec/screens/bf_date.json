@@ -1,0 +1,93 @@
+{
+  "id": "bf_date",
+  "name": "Select quit date",
+  "route": "/p/bf/plan/date",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Quit date",
+    "left": "back",
+    "pill": "Plan 2 of 3"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Choose a day to begin.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "7–14 days away gives you time to prepare without losing momentum.",
+      "tone": "muted"
+    },
+    {
+      "t": "calendar",
+      "month": "August 2026",
+      "selected": 28,
+      "window": [
+        28,
+        29,
+        30,
+        31
+      ],
+      "today": 21
+    },
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Your quit date",
+      "title": "Friday, August 28, 2026",
+      "text": "7 days to prepare · Pacific Time"
+    },
+    {
+      "t": "toggle",
+      "label": "Quit-day check-in at 7:00 AM",
+      "sub": "Lock screen: “You have a Tether reminder.”",
+      "on": true,
+      "key": "quit_day_check_in_at_7_00_am"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Confirm this date",
+      "action": {
+        "type": "push",
+        "to": "bf_support"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Confirm this date",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_support"
+      },
+      "summary": "push → bf_support"
+    }
+  ]
+}

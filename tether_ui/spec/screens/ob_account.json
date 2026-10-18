@@ -1,0 +1,313 @@
+{
+  "id": "ob_account",
+  "name": "Save your progress",
+  "route": "/onboarding/account",
+  "flow": "onboarding",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Save your progress",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Create your account",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Keeps your plans safe if you change phones. You can also continue on this phone only.",
+      "tone": "muted"
+    },
+    {
+      "t": "authbuttons",
+      "items": [
+        {
+          "t": "authbtn",
+          "provider": "apple",
+          "label": "Continue with Apple",
+          "action": {
+            "type": "branch",
+            "question": "Sign in with Apple result",
+            "provider": "apple",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Success",
+                "action": {
+                  "type": "push",
+                  "to": "auth_merge"
+                }
+              },
+              {
+                "label": "Email already has a Tether account",
+                "action": {
+                  "type": "push",
+                  "to": "auth_link"
+                }
+              },
+              {
+                "label": "Cancelled",
+                "action": {
+                  "type": "toast",
+                  "value": "Sign-in cancelled"
+                }
+              },
+              {
+                "label": "Error",
+                "action": {
+                  "type": "push",
+                  "to": "auth_social_error"
+                }
+              }
+            ]
+          },
+          "platforms": [
+            "ios"
+          ]
+        },
+        {
+          "t": "authbtn",
+          "provider": "google",
+          "label": "Continue with Google",
+          "action": {
+            "type": "branch",
+            "question": "Sign in with Google result",
+            "provider": "google",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Success",
+                "action": {
+                  "type": "push",
+                  "to": "auth_merge"
+                }
+              },
+              {
+                "label": "Email already has a Tether account",
+                "action": {
+                  "type": "push",
+                  "to": "auth_link"
+                }
+              },
+              {
+                "label": "Cancelled",
+                "action": {
+                  "type": "toast",
+                  "value": "Sign-in cancelled"
+                }
+              },
+              {
+                "label": "Error",
+                "action": {
+                  "type": "push",
+                  "to": "auth_social_error"
+                }
+              }
+            ]
+          },
+          "platforms": [
+            "ios",
+            "android"
+          ]
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Sign in with Apple can hide your email: we use Apple’s private relay address.",
+      "tone": "small"
+    },
+    {
+      "t": "eyebrow",
+      "text": "Or with email"
+    },
+    {
+      "t": "field",
+      "label": "Email",
+      "value": "alex@example.com",
+      "kind": "email",
+      "key": "email"
+    },
+    {
+      "t": "field",
+      "label": "Password",
+      "value": "••••••••••••",
+      "hint": "At least 12 characters. A passphrase works well.",
+      "kind": "password",
+      "key": "password"
+    },
+    {
+      "t": "checklist",
+      "items": [
+        {
+          "label": "I’m 18 or older",
+          "done": true
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Guest plans are encrypted on this phone. If you sign up later, we ask before uploading them.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Create account",
+      "action": {
+        "type": "submit",
+        "api": "POST supabase /auth/v1/signup",
+        "then": {
+          "type": "push",
+          "to": "auth_verify"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Continue on this phone only",
+      "action": {
+        "type": "reset",
+        "to": "today"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [
+    "POST supabase /auth/v1/signup"
+  ],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Continue with Apple",
+      "path": "body[2].items[0]",
+      "action": {
+        "type": "branch",
+        "question": "Sign in with Apple result",
+        "provider": "apple",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Success",
+            "action": {
+              "type": "push",
+              "to": "auth_merge"
+            }
+          },
+          {
+            "label": "Email already has a Tether account",
+            "action": {
+              "type": "push",
+              "to": "auth_link"
+            }
+          },
+          {
+            "label": "Cancelled",
+            "action": {
+              "type": "toast",
+              "value": "Sign-in cancelled"
+            }
+          },
+          {
+            "label": "Error",
+            "action": {
+              "type": "push",
+              "to": "auth_social_error"
+            }
+          }
+        ]
+      },
+      "summary": "auth (apple): Sign in with Apple result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+    },
+    {
+      "element": "Continue with Google",
+      "path": "body[2].items[1]",
+      "action": {
+        "type": "branch",
+        "question": "Sign in with Google result",
+        "provider": "google",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Success",
+            "action": {
+              "type": "push",
+              "to": "auth_merge"
+            }
+          },
+          {
+            "label": "Email already has a Tether account",
+            "action": {
+              "type": "push",
+              "to": "auth_link"
+            }
+          },
+          {
+            "label": "Cancelled",
+            "action": {
+              "type": "toast",
+              "value": "Sign-in cancelled"
+            }
+          },
+          {
+            "label": "Error",
+            "action": {
+              "type": "push",
+              "to": "auth_social_error"
+            }
+          }
+        ]
+      },
+      "summary": "auth (google): Sign in with Google result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+    },
+    {
+      "element": "Create account",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST supabase /auth/v1/signup",
+        "then": {
+          "type": "push",
+          "to": "auth_verify"
+        }
+      },
+      "summary": "POST supabase /auth/v1/signup then push → auth_verify"
+    },
+    {
+      "element": "Continue on this phone only",
+      "path": "footer[1]",
+      "action": {
+        "type": "reset",
+        "to": "today"
+      },
+      "summary": "reset → today"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "id": "sf_q1",
+  "name": "Baseline: use",
+  "route": "/p/sf/onboarding/1",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "About your use",
+    "left": "back",
+    "pill": "1 of 2"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 1,
+      "total": 2
+    },
+    {
+      "t": "title",
+      "text": "On a typical day, how long on social apps?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "A rough guess is fine.",
+      "tone": "muted"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Less than 1 hour"
+        },
+        {
+          "label": "1–2 hours"
+        },
+        {
+          "label": "3–4 hours"
+        },
+        {
+          "label": "5+ hours"
+        }
+      ],
+      "selected": 2,
+      "key": "value"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Short video",
+        "Feeds",
+        "Messaging",
+        "Games",
+        "News"
+      ],
+      "selected": [
+        "Short video",
+        "Feeds"
+      ],
+      "multi": true,
+      "label": "Which pull hardest? (categories only)",
+      "key": "which_pull_hardest_categories_on"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next",
+      "action": {
+        "type": "push",
+        "to": "sf_q2"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Next",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_q2"
+      },
+      "summary": "push → sf_q2"
+    }
+  ]
+}

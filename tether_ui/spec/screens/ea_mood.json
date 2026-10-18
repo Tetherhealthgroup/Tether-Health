@@ -1,0 +1,166 @@
+{
+  "id": "ea_mood",
+  "name": "Mood check-in",
+  "route": "/p/ea/mood",
+  "flow": "ea",
+  "program": "ea",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Mood check-in",
+    "left": "back",
+    "pill": "Ease"
+  },
+  "body": [
+    {
+      "t": "segmented",
+      "options": [
+        "Very low",
+        "Low",
+        "Okay",
+        "Good",
+        "Great"
+      ],
+      "selected": "Low",
+      "label": "How are you right now?",
+      "key": "how_are_you_right_now"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Work",
+        "Money",
+        "Family",
+        "Health",
+        "Lonely",
+        "Sleep",
+        "Thoughts of harming myself",
+        "Not sure"
+      ],
+      "selected": [
+        "Work",
+        "Sleep"
+      ],
+      "multi": true,
+      "label": "What’s going on?",
+      "key": "going_on"
+    },
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Try now · 2 min",
+      "title": "Grounding: 5 things you can see",
+      "cta": {
+        "t": "button",
+        "label": "Start",
+        "action": {
+          "type": "push",
+          "to": "rescue_active"
+        },
+        "variant": "lime",
+        "arrow": false,
+        "small": true
+      }
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/ea/moods",
+        "then": {
+          "type": "branch",
+          "question": "Self-harm option selected?",
+          "on": null,
+          "decide": "ea.selfharm",
+          "cases": [
+            {
+              "label": "No",
+              "action": {
+                "type": "toast",
+                "value": "Saved",
+                "then": {
+                  "type": "back"
+                }
+              }
+            },
+            {
+              "label": "Yes",
+              "action": {
+                "type": "replace",
+                "to": "crisis"
+              }
+            }
+          ]
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Start",
+      "path": "body[2].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "rescue_active"
+      },
+      "summary": "push → rescue_active"
+    },
+    {
+      "element": "Save",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/ea/moods",
+        "then": {
+          "type": "branch",
+          "question": "Self-harm option selected?",
+          "on": null,
+          "decide": "ea.selfharm",
+          "cases": [
+            {
+              "label": "No",
+              "action": {
+                "type": "toast",
+                "value": "Saved",
+                "then": {
+                  "type": "back"
+                }
+              }
+            },
+            {
+              "label": "Yes",
+              "action": {
+                "type": "replace",
+                "to": "crisis"
+              }
+            }
+          ]
+        }
+      },
+      "summary": "POST /v1/program-data/ea/moods then decide ea.selfharm: Self-harm option selected? → No: toast “Saved” then back | Yes: replace → crisis"
+    }
+  ]
+}

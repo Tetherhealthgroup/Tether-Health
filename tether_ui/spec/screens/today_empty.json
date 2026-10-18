@@ -1,0 +1,164 @@
+{
+  "id": "today_empty",
+  "name": "Today · nothing in focus",
+  "route": "/today?state=empty",
+  "flow": "today",
+  "program": null,
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "today",
+  "variantOf": "today",
+  "state": "empty",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Today",
+    "left": "logo",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Good evening, Alex.",
+      "size": "m"
+    },
+    {
+      "t": "illus",
+      "glyph": "+",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "Nothing in focus right now",
+      "size": "m",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Your programs are paused or in Learn only. Pick one for daily support, or keep exploring.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "button",
+      "label": "Choose a focus program",
+      "action": {
+        "type": "push",
+        "to": "account_programs"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Browse lessons",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "title": "Need help now?",
+      "text": "Rescue and Support still work",
+      "cta": {
+        "t": "button",
+        "label": "Support",
+        "action": {
+          "type": "tab",
+          "to": "support"
+        },
+        "variant": "secondary",
+        "arrow": false,
+        "small": true
+      }
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Choose a focus program",
+      "path": "body[4]",
+      "action": {
+        "type": "push",
+        "to": "account_programs"
+      },
+      "summary": "push → account_programs"
+    },
+    {
+      "element": "Browse lessons",
+      "path": "body[5]",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Support",
+      "path": "body[6].cta[0]",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    },
+    {
+      "element": "Tab · Plans",
+      "path": "tabbar.plans",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

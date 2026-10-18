@@ -1,0 +1,130 @@
+{
+  "id": "records_search",
+  "name": "Find your provider",
+  "route": "/records/search",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Directory built from Epic’s published patient-facing FHIR endpoints plus partner registries.",
+  "header": {
+    "t": "header",
+    "title": "Find your provider",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "field",
+      "label": "Search",
+      "value": "Patel",
+      "placeholder": "Search hospital, clinic or doctor",
+      "kind": "search",
+      "key": "query"
+    },
+    {
+      "t": "list",
+      "title": "Results",
+      "rows": [
+        {
+          "label": "Patel Family Medicine",
+          "sub": "Epic · San Jose, CA",
+          "action": {
+            "type": "push",
+            "to": "records_consent"
+          },
+          "lead": {
+            "icon": "E"
+          }
+        },
+        {
+          "label": "Patel Heart Institute",
+          "sub": "Epic · Fremont, CA",
+          "action": {
+            "type": "push",
+            "to": "records_consent"
+          },
+          "lead": {
+            "icon": "E"
+          }
+        },
+        {
+          "label": "Stanford Health Care",
+          "sub": "Epic · Palo Alto, CA",
+          "action": {
+            "type": "push",
+            "to": "records_consent"
+          },
+          "lead": {
+            "icon": "E"
+          }
+        }
+      ]
+    },
+    {
+      "t": "link",
+      "label": "Can’t find it? Enter a FHIR address",
+      "action": {
+        "type": "push",
+        "to": "records_fhir_url"
+      },
+      "align": "center"
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [
+    "GET /v1/records/fhir/directory?q="
+  ],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Patel Family Medicine",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "records_consent"
+      },
+      "summary": "push → records_consent"
+    },
+    {
+      "element": "Patel Heart Institute",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "records_consent"
+      },
+      "summary": "push → records_consent"
+    },
+    {
+      "element": "Stanford Health Care",
+      "path": "body[1].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "records_consent"
+      },
+      "summary": "push → records_consent"
+    },
+    {
+      "element": "Can’t find it? Enter a FHIR address",
+      "path": "body[2]",
+      "action": {
+        "type": "push",
+        "to": "records_fhir_url"
+      },
+      "summary": "push → records_fhir_url"
+    }
+  ]
+}

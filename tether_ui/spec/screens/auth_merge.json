@@ -1,0 +1,98 @@
+{
+  "id": "auth_merge",
+  "name": "Guest plan merge",
+  "route": "/auth/merge",
+  "flow": "auth",
+  "program": null,
+  "phase": "account",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Create-only import: a concurrent cloud plan returns 409 and both plans are kept.",
+  "header": null,
+  "body": [
+    {
+      "t": "eyebrow",
+      "text": "You’re signed in"
+    },
+    {
+      "t": "title",
+      "text": "Upload the plan on this phone?",
+      "size": "m"
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "BreatheFree plan · this phone",
+          "sub": "Quit date Aug 28 · 3 reasons",
+          "lead": {
+            "program": "bf"
+          }
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Your account already has a BreatheFree plan from Aug 12.",
+      "tone": "small"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Keep both, choose later",
+          "sub": "Nothing is overwritten",
+          "badge": "Safest"
+        },
+        {
+          "label": "Use this phone’s plan"
+        },
+        {
+          "label": "Use the account’s plan"
+        }
+      ],
+      "selected": 0,
+      "key": "value"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/quit-plan/guest-import",
+        "then": {
+          "type": "reset",
+          "to": "today"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": "Today",
+  "api": [
+    "POST /v1/quit-plan/guest-import"
+  ],
+  "actions": [
+    {
+      "element": "Continue",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/quit-plan/guest-import",
+        "then": {
+          "type": "reset",
+          "to": "today"
+        }
+      },
+      "summary": "POST /v1/quit-plan/guest-import then reset → today"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+{
+  "id": "ca_noplan",
+  "name": "No action plan yet",
+  "route": "/p/ca/plan?state=none",
+  "flow": "ca",
+  "program": "ca",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "ca_plan",
+  "state": "empty",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "No action plan",
+    "left": "back",
+    "pill": "Learn"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "i",
+      "tone": "warn"
+    },
+    {
+      "t": "title",
+      "text": "Let’s get you a plan first",
+      "size": "m",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Zone checks need a plan from your clinician. Until then you can learn, log symptoms and prepare questions.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Symptom diary",
+          "sub": "Shareable with your clinician",
+          "action": {
+            "type": "push",
+            "to": "ca_symptoms"
+          }
+        },
+        {
+          "label": "Questions for my next visit",
+          "action": {
+            "type": "push",
+            "to": "learn_lesson"
+          }
+        },
+        {
+          "label": "Message my care team",
+          "action": {
+            "type": "push",
+            "to": "support_message_care"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue to ClearAir",
+      "action": {
+        "type": "replace",
+        "to": "ca_home",
+        "context": {
+          "onboarding": "ob_setup"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Symptom diary",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "ca_symptoms"
+      },
+      "summary": "push → ca_symptoms"
+    },
+    {
+      "element": "Questions for my next visit",
+      "path": "body[3].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "Message my care team",
+      "path": "body[3].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "summary": "push → support_message_care"
+    },
+    {
+      "element": "Continue to ClearAir",
+      "path": "footer[0]",
+      "action": {
+        "type": "replace",
+        "to": "ca_home",
+        "context": {
+          "onboarding": "ob_setup"
+        }
+      },
+      "summary": "replace → ca_home (onboarding: ob_setup)"
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+{
+  "id": "bf_slip",
+  "name": "Slip recovery",
+  "route": "/p/bf/slip",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "milestone",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Append-only lapse event. No counter decreases.",
+  "header": {
+    "t": "header",
+    "title": "Slip recovery",
+    "left": "close",
+    "pill": "Private"
+  },
+  "body": [
+    {
+      "t": "eyebrow",
+      "text": "Your progress is still here"
+    },
+    {
+      "t": "title",
+      "text": "A slip is information, not the end.",
+      "size": "m"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Smoke-free days so far",
+          "6 of 7 · kept"
+        ]
+      ]
+    },
+    {
+      "t": "chips",
+      "options": [
+        "A puff or two",
+        "One cigarette",
+        "More",
+        "Prefer not to say"
+      ],
+      "selected": [
+        "A puff or two"
+      ],
+      "multi": false,
+      "label": "What happened?",
+      "key": "what_happened"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Stress",
+        "Around smokers",
+        "Alcohol",
+        "Scrolling late"
+      ],
+      "selected": [
+        "Stress"
+      ],
+      "multi": true,
+      "label": "What was going on? (optional)",
+      "key": "what_was_going_on_optional"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Continue from this moment",
+          "sub": "Keep your plan",
+          "badge": "Recommended"
+        },
+        {
+          "label": "Choose a new quit time"
+        }
+      ],
+      "selected": 0,
+      "key": "next"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save and start a 2-min Rescue",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/lapses",
+        "then": {
+          "type": "branch",
+          "question": "Selected option",
+          "on": "radio",
+          "decide": "choice:bf_slip.next",
+          "cases": [
+            {
+              "label": "Continue from this moment",
+              "action": {
+                "type": "replace",
+                "to": "rescue_active"
+              }
+            },
+            {
+              "label": "Choose a new quit time",
+              "action": {
+                "type": "replace",
+                "to": "bf_date"
+              }
+            }
+          ]
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Skip for now",
+      "action": {
+        "type": "back"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [
+    "POST /v1/records/lapses"
+  ],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Save and start a 2-min Rescue",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/lapses",
+        "then": {
+          "type": "branch",
+          "question": "Selected option",
+          "on": "radio",
+          "decide": "choice:bf_slip.next",
+          "cases": [
+            {
+              "label": "Continue from this moment",
+              "action": {
+                "type": "replace",
+                "to": "rescue_active"
+              }
+            },
+            {
+              "label": "Choose a new quit time",
+              "action": {
+                "type": "replace",
+                "to": "bf_date"
+              }
+            }
+          ]
+        }
+      },
+      "summary": "POST /v1/records/lapses then decide choice:bf_slip.next: Selected option → Continue from this moment: replace → rescue_active | Choose a new quit time: replace → bf_date"
+    },
+    {
+      "element": "Skip for now",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

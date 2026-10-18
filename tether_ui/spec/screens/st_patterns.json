@@ -1,0 +1,94 @@
+{
+  "id": "st_patterns",
+  "name": "Patterns",
+  "route": "/p/st/patterns",
+  "flow": "st",
+  "program": "st",
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Patterns",
+    "left": "back",
+    "pill": "Steady"
+  },
+  "body": [
+    {
+      "t": "segmented",
+      "options": [
+        "7 days",
+        "14 days",
+        "30 days"
+      ],
+      "selected": "14 days",
+      "key": "value"
+    },
+    {
+      "t": "chart",
+      "kind": "line",
+      "values": [
+        196,
+        182,
+        175,
+        190,
+        168,
+        160,
+        172,
+        158,
+        165,
+        150,
+        162,
+        149
+      ],
+      "color": "st",
+      "title": "After meals",
+      "unit": "mg/dL · range ≤ 180",
+      "band": [
+        80,
+        180
+      ]
+    },
+    {
+      "t": "stats",
+      "items": [
+        {
+          "label": "In your range",
+          "value": "71%",
+          "sub": "of 38 readings"
+        },
+        {
+          "label": "Lows",
+          "value": "1",
+          "sub": "Oct 9 · treated"
+        }
+      ],
+      "cols": 2
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "eyebrow": "Pattern",
+      "title": "Readings were higher on nights with less than 6 h sleep."
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

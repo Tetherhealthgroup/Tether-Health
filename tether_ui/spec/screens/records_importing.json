@@ -1,0 +1,124 @@
+{
+  "id": "records_importing",
+  "name": "Importing",
+  "route": "/records/importing",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "loading",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Importing",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Importing your records…",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Usually under a minute. You can leave this screen.",
+      "tone": "muted"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Conditions",
+              "sub": "4 found",
+              "done": true
+            },
+            {
+              "label": "Vital signs",
+              "sub": "12 blood pressure readings",
+              "done": true
+            },
+            {
+              "label": "Lab results",
+              "sub": "9 results",
+              "done": true
+            },
+            {
+              "label": "Immunizations",
+              "sub": "Checking…"
+            },
+            {
+              "label": "Smoking status",
+              "sub": "Waiting"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "skeleton",
+      "lines": 2
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Review imported data",
+      "action": {
+        "type": "replace",
+        "to": "records_review"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Cancel import",
+      "action": {
+        "type": "popto",
+        "to": "records_hub"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [
+    "POST /v1/records/fhir/sources/:id/sync"
+  ],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Review imported data",
+      "path": "footer[0]",
+      "action": {
+        "type": "replace",
+        "to": "records_review"
+      },
+      "summary": "replace → records_review"
+    },
+    {
+      "element": "Cancel import",
+      "path": "footer[1]",
+      "action": {
+        "type": "popto",
+        "to": "records_hub"
+      },
+      "summary": "popto → records_hub"
+    }
+  ]
+}

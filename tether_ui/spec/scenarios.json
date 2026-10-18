@@ -1,0 +1,1745 @@
+[
+  {
+    "id": "auth-email",
+    "program": null,
+    "function": "Sign-in",
+    "title": "Create account with email, verify, keep both plans",
+    "start": "ob_account",
+    "steps": [
+      [
+        "tap",
+        "Create account"
+      ],
+      [
+        "expect",
+        "auth_verify"
+      ],
+      [
+        "tap",
+        "I’ve confirmed my email"
+      ],
+      [
+        "expect",
+        "auth_merge"
+      ],
+      [
+        "tap",
+        "Continue"
+      ]
+    ],
+    "expect": "today"
+  },
+  {
+    "id": "auth-apple",
+    "program": null,
+    "function": "Sign-in",
+    "title": "Sign in with Apple (iPhone)",
+    "start": "welcome",
+    "steps": [
+      [
+        "tap",
+        "I already have an account"
+      ],
+      [
+        "choose",
+        "Success"
+      ],
+      [
+        "tap",
+        "Continue with Apple"
+      ]
+    ],
+    "expect": "today"
+  },
+  {
+    "id": "auth-google",
+    "program": null,
+    "function": "Sign-in",
+    "title": "Sign in with Google (Android)",
+    "start": "welcome",
+    "steps": [
+      [
+        "tap",
+        "I already have an account"
+      ],
+      [
+        "choose",
+        "Success"
+      ],
+      [
+        "tap",
+        "Continue with Google"
+      ]
+    ],
+    "expect": "today"
+  },
+  {
+    "id": "auth-apple-new",
+    "program": null,
+    "function": "Sign-in",
+    "title": "New Apple ID starts onboarding with an account",
+    "start": "welcome",
+    "steps": [
+      [
+        "tap",
+        "I already have an account"
+      ],
+      [
+        "choose",
+        "New Apple ID, no Tether account"
+      ],
+      [
+        "tap",
+        "Continue with Apple"
+      ],
+      [
+        "expect",
+        "auth_social_new"
+      ],
+      [
+        "tap",
+        "Create my account"
+      ]
+    ],
+    "expect": "ob_programs"
+  },
+  {
+    "id": "auth-google-link",
+    "program": null,
+    "function": "Sign-in",
+    "title": "Google email already used → link accounts",
+    "start": "ob_account",
+    "steps": [
+      [
+        "choose",
+        "Email already has a Tether account"
+      ],
+      [
+        "tap",
+        "Continue with Google"
+      ],
+      [
+        "expect",
+        "auth_link"
+      ],
+      [
+        "tap",
+        "Link and sign in"
+      ]
+    ],
+    "expect": "today"
+  },
+  {
+    "id": "auth-google-error",
+    "program": null,
+    "function": "Sign-in",
+    "title": "Google sign-in fails → error with email fallback",
+    "start": "ob_account",
+    "steps": [
+      [
+        "choose",
+        "Error"
+      ],
+      [
+        "tap",
+        "Continue with Google"
+      ],
+      [
+        "expect",
+        "auth_social_error"
+      ],
+      [
+        "tap",
+        "Use email instead"
+      ]
+    ],
+    "expect": "auth_signin"
+  },
+  {
+    "id": "auth-wrong-password",
+    "program": null,
+    "function": "Sign-in",
+    "title": "Wrong password shows inline error",
+    "start": "welcome",
+    "steps": [
+      [
+        "tap",
+        "I already have an account"
+      ],
+      [
+        "choose",
+        "Wrong password"
+      ],
+      [
+        "tap",
+        "Sign in"
+      ]
+    ],
+    "expect": "auth_signin_error"
+  },
+  {
+    "id": "onboarding",
+    "program": null,
+    "function": "Setup",
+    "title": "First run: 2 programs, consent, BreatheFree plan, guest",
+    "start": "welcome",
+    "steps": [
+      [
+        "tap",
+        "Get started"
+      ],
+      [
+        "tap",
+        "Continue with 2 programs"
+      ],
+      [
+        "tap",
+        "Continue"
+      ],
+      [
+        "tap",
+        "Agree and continue"
+      ],
+      [
+        "tap",
+        "Continue"
+      ],
+      [
+        "expect",
+        "ob_setup"
+      ],
+      [
+        "tap",
+        "BreatheFree"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Save my reasons"
+      ],
+      [
+        "tap",
+        "Continue with this path"
+      ],
+      [
+        "tap",
+        "Confirm this date"
+      ],
+      [
+        "tap",
+        "Review my plan"
+      ],
+      [
+        "tap",
+        "Start my plan"
+      ],
+      [
+        "expect",
+        "ob_setup"
+      ],
+      [
+        "tap",
+        "Continue"
+      ],
+      [
+        "choose",
+        "Allowed"
+      ],
+      [
+        "tap",
+        "Turn on reminders"
+      ],
+      [
+        "tap",
+        "Continue on this phone only"
+      ]
+    ],
+    "expect": "today"
+  },
+  {
+    "id": "fhir-epic",
+    "program": null,
+    "function": "Health records",
+    "title": "Connect Epic MyChart, review, resolve conflict, add to programs",
+    "start": "records_hub",
+    "steps": [
+      [
+        "tap",
+        "Add a source"
+      ],
+      [
+        "tap",
+        "Hospital or clinic"
+      ],
+      [
+        "tap",
+        "Patel Family Medicine"
+      ],
+      [
+        "choose",
+        "Approved"
+      ],
+      [
+        "tap",
+        "Continue to MyChart"
+      ],
+      [
+        "expect",
+        "records_importing"
+      ],
+      [
+        "tap",
+        "Review imported data"
+      ],
+      [
+        "expect",
+        "records_review"
+      ],
+      [
+        "tap",
+        "Review conflicts first"
+      ],
+      [
+        "tap",
+        "From Patel Family Medicine (Epic): 7.6%"
+      ],
+      [
+        "tap",
+        "Save choices"
+      ],
+      [
+        "expect",
+        "records_review"
+      ],
+      [
+        "tap",
+        "Add 21 items to my programs"
+      ]
+    ],
+    "expect": "records_hub"
+  },
+  {
+    "id": "fhir-bluebutton",
+    "program": null,
+    "function": "Health records",
+    "title": "Connect Medicare Blue Button 2.0",
+    "start": "records_add",
+    "steps": [
+      [
+        "tap",
+        "Medicare · Blue Button 2.0"
+      ],
+      [
+        "choose",
+        "Approved"
+      ],
+      [
+        "tap",
+        "Continue to Medicare.gov"
+      ],
+      [
+        "tap",
+        "Review imported data"
+      ]
+    ],
+    "expect": "records_review"
+  },
+  {
+    "id": "fhir-denied",
+    "program": null,
+    "function": "Health records",
+    "title": "Provider sign-in denied → error with options",
+    "start": "records_add",
+    "steps": [
+      [
+        "tap",
+        "Hospital or clinic"
+      ],
+      [
+        "tap",
+        "Patel Family Medicine"
+      ],
+      [
+        "choose",
+        "Denied or error"
+      ],
+      [
+        "tap",
+        "Continue to MyChart"
+      ],
+      [
+        "expect",
+        "records_error"
+      ],
+      [
+        "tap",
+        "Enter manually instead"
+      ]
+    ],
+    "expect": "records_manual"
+  },
+  {
+    "id": "fhir-custom",
+    "program": null,
+    "function": "Health records",
+    "title": "Other FHIR server: capability check fails",
+    "start": "records_add",
+    "steps": [
+      [
+        "tap",
+        "Other FHIR server"
+      ],
+      [
+        "choose",
+        "Not a FHIR R4 server"
+      ],
+      [
+        "tap",
+        "Check and continue"
+      ]
+    ],
+    "expect": "records_error"
+  },
+  {
+    "id": "fhir-manual-ok",
+    "program": null,
+    "function": "Health records",
+    "title": "Manual A1C within range is saved",
+    "start": "records_manual",
+    "steps": [
+      [
+        "enter",
+        "records_manual.value",
+        "7.4"
+      ],
+      [
+        "tap",
+        "Save"
+      ]
+    ],
+    "expect": "records_hub"
+  },
+  {
+    "id": "fhir-manual-range",
+    "program": null,
+    "function": "Health records",
+    "title": "Manual A1C 74 is held as out of range",
+    "start": "records_manual",
+    "steps": [
+      [
+        "enter",
+        "records_manual.value",
+        "74"
+      ],
+      [
+        "tap",
+        "Save"
+      ]
+    ],
+    "expect": "records_manual_error"
+  },
+  {
+    "id": "fhir-disconnect",
+    "program": null,
+    "function": "Health records",
+    "title": "Disconnect a source and delete its data",
+    "start": "records_hub",
+    "steps": [
+      [
+        "tap",
+        "Patel Family Medicine"
+      ],
+      [
+        "tap",
+        "Disconnect"
+      ],
+      [
+        "tap",
+        "Delete data imported from this source"
+      ],
+      [
+        "tap",
+        "Disconnect source"
+      ]
+    ],
+    "expect": "records_hub"
+  },
+  {
+    "id": "bf-date",
+    "program": "bf",
+    "function": "Setup",
+    "title": "Set a quit date path",
+    "start": "bf_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up BreatheFree"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Save my reasons"
+      ],
+      [
+        "tap",
+        "Continue with this path"
+      ],
+      [
+        "expect",
+        "bf_date"
+      ],
+      [
+        "tap",
+        "Confirm this date"
+      ],
+      [
+        "tap",
+        "Review my plan"
+      ],
+      [
+        "tap",
+        "Start my plan"
+      ]
+    ],
+    "expect": "bf_home"
+  },
+  {
+    "id": "bf-today",
+    "program": "bf",
+    "function": "Setup",
+    "title": "Quit today path skips the calendar",
+    "start": "bf_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up BreatheFree"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Save my reasons"
+      ],
+      [
+        "tap",
+        "Quit today"
+      ],
+      [
+        "tap",
+        "Continue with this path"
+      ],
+      [
+        "expect",
+        "bf_support"
+      ]
+    ],
+    "expect": "bf_support"
+  },
+  {
+    "id": "bf-reduce",
+    "program": "bf",
+    "function": "Setup",
+    "title": "Reduce gradually path → step-down schedule",
+    "start": "bf_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up BreatheFree"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Save my reasons"
+      ],
+      [
+        "tap",
+        "Reduce gradually"
+      ],
+      [
+        "tap",
+        "Continue with this path"
+      ],
+      [
+        "expect",
+        "bf_stepdown"
+      ],
+      [
+        "tap",
+        "Save schedule"
+      ]
+    ],
+    "expect": "bf_support"
+  },
+  {
+    "id": "bf-explore",
+    "program": "bf",
+    "function": "Setup",
+    "title": "Explore first path never asks for a date",
+    "start": "bf_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up BreatheFree"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Save my reasons"
+      ],
+      [
+        "tap",
+        "Explore first"
+      ],
+      [
+        "tap",
+        "Continue with this path"
+      ]
+    ],
+    "expect": "bf_home_explore"
+  },
+  {
+    "id": "bf-rescue",
+    "program": "bf",
+    "function": "Rescue",
+    "title": "Craving rescue from BreatheFree home",
+    "start": "bf_home",
+    "steps": [
+      [
+        "tap",
+        "Rescue"
+      ],
+      [
+        "tap",
+        "A cigarette"
+      ],
+      [
+        "tap",
+        "I’m done"
+      ],
+      [
+        "tap",
+        "Back to Today"
+      ]
+    ],
+    "expect": "today"
+  },
+  {
+    "id": "bf-slip",
+    "program": "bf",
+    "function": "Milestone",
+    "title": "Slip recovery keeps the plan and starts a rescue",
+    "start": "bf_home_quitday",
+    "steps": [
+      [
+        "tap",
+        "I smoked or had a slip"
+      ],
+      [
+        "tap",
+        "Save and start a 2-min Rescue"
+      ]
+    ],
+    "expect": "rescue_active"
+  },
+  {
+    "id": "bf-slip-newdate",
+    "program": "bf",
+    "function": "Milestone",
+    "title": "Slip recovery → choose a new quit time",
+    "start": "bf_slip",
+    "steps": [
+      [
+        "tap",
+        "Choose a new quit time"
+      ],
+      [
+        "tap",
+        "Save and start a 2-min Rescue"
+      ]
+    ],
+    "expect": "bf_date"
+  },
+  {
+    "id": "bf-meds",
+    "program": "bf",
+    "function": "Daily",
+    "title": "Record nicotine patch taken",
+    "start": "bf_meds",
+    "steps": [
+      [
+        "tap",
+        "Taken today"
+      ],
+      [
+        "tap",
+        "Add or update recorded plan"
+      ],
+      [
+        "tap",
+        "Save plan"
+      ]
+    ],
+    "expect": "bf_meds"
+  },
+  {
+    "id": "sf-setup",
+    "program": "sf",
+    "function": "Setup",
+    "title": "ScrollFree setup with Screen Time allowed",
+    "start": "sf_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up ScrollFree"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Connect Screen Time"
+      ],
+      [
+        "choose",
+        "Allowed"
+      ],
+      [
+        "tap",
+        "Allow access"
+      ],
+      [
+        "expect",
+        "sf_goal"
+      ],
+      [
+        "tap",
+        "Save my goal"
+      ],
+      [
+        "tap",
+        "Save and finish"
+      ]
+    ],
+    "expect": "sf_home"
+  },
+  {
+    "id": "sf-denied",
+    "program": "sf",
+    "function": "Setup",
+    "title": "Screen Time denied → self-report fallback",
+    "start": "sf_goal",
+    "steps": [
+      [
+        "tap",
+        "Connect Screen Time"
+      ],
+      [
+        "choose",
+        "Not allowed"
+      ],
+      [
+        "tap",
+        "Allow access"
+      ]
+    ],
+    "expect": "sf_screentime_denied"
+  },
+  {
+    "id": "sf-pause",
+    "program": "sf",
+    "function": "Rescue",
+    "title": "Pause 60 → put the phone down",
+    "start": "sf_home",
+    "steps": [
+      [
+        "tap",
+        "Pause 60"
+      ],
+      [
+        "tap",
+        "I’m good, put it down"
+      ]
+    ],
+    "expect": "today"
+  },
+  {
+    "id": "sf-slip",
+    "program": "sf",
+    "function": "Milestone",
+    "title": "Long-scroll recovery",
+    "start": "sf_home",
+    "steps": [
+      [
+        "tap",
+        "Had a long scroll?"
+      ],
+      [
+        "tap",
+        "Save"
+      ]
+    ],
+    "expect": "sf_home"
+  },
+  {
+    "id": "ca-setup",
+    "program": "ca",
+    "function": "Setup",
+    "title": "ClearAir setup with a written plan",
+    "start": "ca_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up ClearAir"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "expect",
+        "ca_plan"
+      ],
+      [
+        "tap",
+        "Save plan"
+      ]
+    ],
+    "expect": "ca_home"
+  },
+  {
+    "id": "ca-noplan",
+    "program": "ca",
+    "function": "Setup",
+    "title": "No action plan → learn route",
+    "start": "ca_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up ClearAir"
+      ],
+      [
+        "tap",
+        "No"
+      ],
+      [
+        "tap",
+        "Next"
+      ]
+    ],
+    "expect": "ca_noplan"
+  },
+  {
+    "id": "ca-green",
+    "program": "ca",
+    "function": "Daily",
+    "title": "Peak flow 420, no symptoms → green",
+    "start": "ca_zone",
+    "steps": [
+      [
+        "enter",
+        "ca_zone.peak_flow",
+        "420"
+      ],
+      [
+        "tap",
+        "Wheezing"
+      ],
+      [
+        "tap",
+        "Save and see my steps"
+      ]
+    ],
+    "expect": "ca_home"
+  },
+  {
+    "id": "ca-yellow",
+    "program": "ca",
+    "function": "Daily",
+    "title": "Peak flow 310 → yellow steps",
+    "start": "ca_zone",
+    "steps": [
+      [
+        "enter",
+        "ca_zone.peak_flow",
+        "310"
+      ],
+      [
+        "tap",
+        "Save and see my steps"
+      ]
+    ],
+    "expect": "ca_yellow"
+  },
+  {
+    "id": "ca-red",
+    "program": "ca",
+    "function": "Safety",
+    "title": "Peak flow 150 → red zone",
+    "start": "ca_zone",
+    "steps": [
+      [
+        "enter",
+        "ca_zone.peak_flow",
+        "150"
+      ],
+      [
+        "tap",
+        "Save and see my steps"
+      ]
+    ],
+    "expect": "ca_red"
+  },
+  {
+    "id": "ca-red-symptom",
+    "program": "ca",
+    "function": "Safety",
+    "title": "Can’t speak in full sentences → red regardless of peak flow",
+    "start": "ca_zone",
+    "steps": [
+      [
+        "enter",
+        "ca_zone.peak_flow",
+        "420"
+      ],
+      [
+        "tap",
+        "Can’t speak in full sentences"
+      ],
+      [
+        "tap",
+        "Save and see my steps"
+      ]
+    ],
+    "expect": "ca_red"
+  },
+  {
+    "id": "ca-invalid",
+    "program": "ca",
+    "function": "Validation",
+    "title": "Peak flow 2000 is rejected",
+    "start": "ca_zone",
+    "steps": [
+      [
+        "enter",
+        "ca_zone.peak_flow",
+        "2000"
+      ],
+      [
+        "tap",
+        "Save and see my steps"
+      ]
+    ],
+    "expect": "ca_zone"
+  },
+  {
+    "id": "hw-setup",
+    "program": "hw",
+    "function": "Setup",
+    "title": "Add Heartwise by swapping a focus slot",
+    "start": "hw_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Heartwise"
+      ],
+      [
+        "tap",
+        "Swap with ScrollFree"
+      ],
+      [
+        "tap",
+        "Continue"
+      ],
+      [
+        "expect",
+        "hw_q1"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Save targets"
+      ]
+    ],
+    "expect": "hw_home"
+  },
+  {
+    "id": "hw-learn",
+    "program": "hw",
+    "function": "Setup",
+    "title": "Add Heartwise as Learn only",
+    "start": "hw_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Heartwise"
+      ],
+      [
+        "tap",
+        "Continue"
+      ]
+    ],
+    "expect": "plans"
+  },
+  {
+    "id": "hw-normal",
+    "program": "hw",
+    "function": "Daily",
+    "title": "Two readings 138/86 + 132/84 → saved",
+    "start": "hw_home",
+    "steps": [
+      [
+        "tap",
+        "Log blood pressure"
+      ],
+      [
+        "tap",
+        "Next reading"
+      ],
+      [
+        "tap",
+        "Save readings"
+      ]
+    ],
+    "expect": "hw_result"
+  },
+  {
+    "id": "hw-crisis",
+    "program": "hw",
+    "function": "Safety",
+    "title": "Reading 186/122 → symptom check → re-check",
+    "start": "hw_home",
+    "steps": [
+      [
+        "tap",
+        "Log blood pressure"
+      ],
+      [
+        "enter",
+        "hw_log.systolic",
+        "186"
+      ],
+      [
+        "enter",
+        "hw_log.diastolic",
+        "122"
+      ],
+      [
+        "tap",
+        "Next reading"
+      ],
+      [
+        "tap",
+        "Save readings"
+      ],
+      [
+        "expect",
+        "hw_crisis"
+      ],
+      [
+        "tap",
+        "No symptoms · re-check in 5 min"
+      ]
+    ],
+    "expect": "hw_recheck"
+  },
+  {
+    "id": "hw-invalid",
+    "program": "hw",
+    "function": "Validation",
+    "title": "Diastolic 310 → fix-it message",
+    "start": "hw_log",
+    "steps": [
+      [
+        "tap",
+        "Next reading"
+      ],
+      [
+        "enter",
+        "hw_log2.diastolic",
+        "310"
+      ],
+      [
+        "tap",
+        "Save readings"
+      ]
+    ],
+    "expect": "hw_log_error"
+  },
+  {
+    "id": "hw-summary",
+    "program": "hw",
+    "function": "Resources",
+    "title": "Visit summary sent to care team",
+    "start": "hw_home",
+    "steps": [
+      [
+        "tap",
+        "Visit summary"
+      ],
+      [
+        "tap",
+        "Send summary"
+      ]
+    ],
+    "expect": "hw_home"
+  },
+  {
+    "id": "st-setup",
+    "program": "st",
+    "function": "Setup",
+    "title": "Steady setup with range and low plan",
+    "start": "st_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Steady"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Save range"
+      ]
+    ],
+    "expect": "st_home"
+  },
+  {
+    "id": "st-normal",
+    "program": "st",
+    "function": "Daily",
+    "title": "Reading 142 → saved",
+    "start": "st_home",
+    "steps": [
+      [
+        "tap",
+        "Log a reading"
+      ],
+      [
+        "enter",
+        "st_log.reading",
+        "142"
+      ],
+      [
+        "tap",
+        "Save reading"
+      ]
+    ],
+    "expect": "st_home"
+  },
+  {
+    "id": "st-low",
+    "program": "st",
+    "function": "Safety",
+    "title": "Reading 62 → low plan with timer",
+    "start": "st_home",
+    "steps": [
+      [
+        "tap",
+        "Log a reading"
+      ],
+      [
+        "enter",
+        "st_log.reading",
+        "62"
+      ],
+      [
+        "tap",
+        "Save reading"
+      ]
+    ],
+    "expect": "st_low"
+  },
+  {
+    "id": "st-low-custom",
+    "program": "st",
+    "function": "Safety",
+    "title": "Clinician low of 80: reading 75 → low plan",
+    "start": "st_range",
+    "steps": [
+      [
+        "enter",
+        "st_range.low",
+        "80"
+      ],
+      [
+        "tap",
+        "Save range"
+      ],
+      [
+        "tap",
+        "Log a reading"
+      ],
+      [
+        "enter",
+        "st_log.reading",
+        "75"
+      ],
+      [
+        "tap",
+        "Save reading"
+      ]
+    ],
+    "expect": "st_low"
+  },
+  {
+    "id": "st-invalid",
+    "program": "st",
+    "function": "Validation",
+    "title": "Reading 900 is rejected",
+    "start": "st_log",
+    "steps": [
+      [
+        "enter",
+        "st_log.reading",
+        "900"
+      ],
+      [
+        "tap",
+        "Save reading"
+      ]
+    ],
+    "expect": "st_log"
+  },
+  {
+    "id": "re-setup",
+    "program": "re",
+    "function": "Setup",
+    "title": "Renew risk check and plan",
+    "start": "re_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Renew"
+      ],
+      [
+        "tap",
+        "See what this means"
+      ],
+      [
+        "tap",
+        "Save my plan"
+      ]
+    ],
+    "expect": "re_home"
+  },
+  {
+    "id": "re-labs",
+    "program": "re",
+    "function": "Milestone",
+    "title": "Add labs → history",
+    "start": "re_home",
+    "steps": [
+      [
+        "tap",
+        "Add lab results"
+      ],
+      [
+        "tap",
+        "Save results"
+      ]
+    ],
+    "expect": "re_history"
+  },
+  {
+    "id": "re-import",
+    "program": "re",
+    "function": "Health records",
+    "title": "Import labs from health record",
+    "start": "re_labs",
+    "steps": [
+      [
+        "tap",
+        "Import from my health record"
+      ]
+    ],
+    "expect": "records_add"
+  },
+  {
+    "id": "re-symptom",
+    "program": "re",
+    "function": "Safety",
+    "title": "Yellow eyes → care team today",
+    "start": "re_home",
+    "steps": [
+      [
+        "tap",
+        "Check symptoms"
+      ],
+      [
+        "tap",
+        "Contact my care team"
+      ]
+    ],
+    "expect": "support_message_care"
+  },
+  {
+    "id": "nu-setup",
+    "program": "nu",
+    "function": "Setup",
+    "title": "Nourish weekly habit",
+    "start": "nu_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Nourish"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Start this habit"
+      ]
+    ],
+    "expect": "nu_home"
+  },
+  {
+    "id": "nu-protect",
+    "program": "nu",
+    "function": "Safety",
+    "title": "Eating-history yes → protective mode",
+    "start": "nu_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Nourish"
+      ],
+      [
+        "tap",
+        "Yes"
+      ],
+      [
+        "tap",
+        "Next"
+      ]
+    ],
+    "expect": "nu_protect"
+  },
+  {
+    "id": "nu-reset",
+    "program": "nu",
+    "function": "Rescue",
+    "title": "Off track → make it smaller",
+    "start": "nu_home",
+    "steps": [
+      [
+        "tap",
+        "Busy week?"
+      ],
+      [
+        "tap",
+        "Make it smaller"
+      ],
+      [
+        "tap",
+        "Continue"
+      ]
+    ],
+    "expect": "nu_home"
+  },
+  {
+    "id": "sd-setup",
+    "program": "sd",
+    "function": "Setup",
+    "title": "Stride falls check and plan",
+    "start": "sd_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Stride"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "Start plan"
+      ]
+    ],
+    "expect": "sd_home"
+  },
+  {
+    "id": "sd-session",
+    "program": "sd",
+    "function": "Daily",
+    "title": "Complete a session",
+    "start": "sd_home",
+    "steps": [
+      [
+        "tap",
+        "Start"
+      ],
+      [
+        "tap",
+        "Finish session"
+      ]
+    ],
+    "expect": "sd_home"
+  },
+  {
+    "id": "sd-fell",
+    "program": "sd",
+    "function": "Safety",
+    "title": "I fell → okay → fall logged",
+    "start": "sd_home",
+    "steps": [
+      [
+        "tap",
+        "I fell"
+      ],
+      [
+        "tap",
+        "I’m okay, log this fall"
+      ]
+    ],
+    "expect": "sd_home"
+  },
+  {
+    "id": "ea-setup",
+    "program": "ea",
+    "function": "Setup",
+    "title": "Ease screener → result",
+    "start": "ea_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Ease"
+      ],
+      [
+        "tap",
+        "Next"
+      ]
+    ],
+    "expect": "ea_result"
+  },
+  {
+    "id": "ea-skip",
+    "program": "ea",
+    "function": "Setup",
+    "title": "Skip screener → safety plan → home",
+    "start": "ea_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Ease"
+      ],
+      [
+        "tap",
+        "Skip the check"
+      ],
+      [
+        "tap",
+        "Save plan"
+      ]
+    ],
+    "expect": "ea_home"
+  },
+  {
+    "id": "ea-mood",
+    "program": "ea",
+    "function": "Daily",
+    "title": "Mood check-in without self-harm → saved",
+    "start": "ea_home",
+    "steps": [
+      [
+        "tap",
+        "Start"
+      ],
+      [
+        "tap",
+        "Save"
+      ]
+    ],
+    "expect": "ea_home"
+  },
+  {
+    "id": "ea-crisis",
+    "program": "ea",
+    "function": "Safety",
+    "title": "Self-harm option → crisis screen",
+    "start": "ea_home",
+    "steps": [
+      [
+        "tap",
+        "Start"
+      ],
+      [
+        "tap",
+        "Thoughts of harming myself"
+      ],
+      [
+        "tap",
+        "Save"
+      ]
+    ],
+    "expect": "crisis"
+  },
+  {
+    "id": "ck-setup",
+    "program": "ck",
+    "function": "Setup",
+    "title": "Checkup builds a due list",
+    "start": "ck_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Checkup"
+      ],
+      [
+        "tap",
+        "Build my list"
+      ]
+    ],
+    "expect": "ck_list"
+  },
+  {
+    "id": "ck-done",
+    "program": "ck",
+    "function": "Milestone",
+    "title": "Mark flu vaccine done",
+    "start": "ck_list",
+    "steps": [
+      [
+        "tap",
+        "I got it"
+      ],
+      [
+        "tap",
+        "Save"
+      ]
+    ],
+    "expect": "ck_list"
+  },
+  {
+    "id": "be-risk",
+    "program": "be",
+    "function": "Setup",
+    "title": "Beacon: lowering my risk",
+    "start": "be_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Beacon"
+      ],
+      [
+        "tap",
+        "Next"
+      ],
+      [
+        "tap",
+        "See my plan"
+      ]
+    ],
+    "expect": "be_home"
+  },
+  {
+    "id": "be-tx",
+    "program": "be",
+    "function": "Setup",
+    "title": "Beacon: going through treatment",
+    "start": "be_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Beacon"
+      ],
+      [
+        "tap",
+        "Going through treatment"
+      ],
+      [
+        "tap",
+        "Next"
+      ]
+    ],
+    "expect": "be_tx"
+  },
+  {
+    "id": "be-survivor",
+    "program": "be",
+    "function": "Setup",
+    "title": "Beacon: after treatment",
+    "start": "be_intro",
+    "steps": [
+      [
+        "tap",
+        "Set up Beacon"
+      ],
+      [
+        "tap",
+        "After treatment"
+      ],
+      [
+        "tap",
+        "Next"
+      ]
+    ],
+    "expect": "be_survivor"
+  },
+  {
+    "id": "be-diary",
+    "program": "be",
+    "function": "Daily",
+    "title": "Treatment diary saved",
+    "start": "be_tx",
+    "steps": [
+      [
+        "tap",
+        "Today’s side-effect diary"
+      ],
+      [
+        "tap",
+        "Save"
+      ]
+    ],
+    "expect": "be_tx"
+  },
+  {
+    "id": "today-tabs",
+    "program": null,
+    "function": "Navigation",
+    "title": "Every tab from Today",
+    "start": "today",
+    "steps": [
+      [
+        "tap",
+        "Plans"
+      ],
+      [
+        "expect",
+        "plans"
+      ],
+      [
+        "tap",
+        "Progress"
+      ],
+      [
+        "expect",
+        "progress"
+      ],
+      [
+        "tap",
+        "Learn"
+      ],
+      [
+        "expect",
+        "learn"
+      ],
+      [
+        "tap",
+        "Support"
+      ],
+      [
+        "expect",
+        "support"
+      ],
+      [
+        "tap",
+        "Today"
+      ]
+    ],
+    "expect": "today"
+  },
+  {
+    "id": "checkin",
+    "program": null,
+    "function": "Daily",
+    "title": "Combined check-in → one step per program",
+    "start": "today",
+    "steps": [
+      [
+        "tap",
+        "Start"
+      ],
+      [
+        "tap",
+        "Save check-in"
+      ],
+      [
+        "expect",
+        "checkin_done"
+      ],
+      [
+        "tap",
+        "Back to Today"
+      ]
+    ],
+    "expect": "today"
+  },
+  {
+    "id": "delete",
+    "program": null,
+    "function": "Account",
+    "title": "Delete account with receipt",
+    "start": "account",
+    "steps": [
+      [
+        "tap",
+        "Your data"
+      ],
+      [
+        "tap",
+        "Delete account and all data"
+      ],
+      [
+        "tap",
+        "Delete everything"
+      ],
+      [
+        "expect",
+        "account_deleted"
+      ],
+      [
+        "tap",
+        "Done"
+      ]
+    ],
+    "expect": "welcome"
+  }
+]

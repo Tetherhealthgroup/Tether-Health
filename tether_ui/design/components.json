@@ -1,0 +1,172 @@
+{
+  "header": {
+    "widget": "THeader (in TScreen)",
+    "props": "title, left: back|close|none|logo, pill, avatar → Account",
+    "behavior": "Back/close always 44pt; large title on tab roots"
+  },
+  "steps": {
+    "widget": "TSteps",
+    "props": "n, total",
+    "behavior": "Announces “Step n of total”"
+  },
+  "eyebrow": {
+    "widget": "TEyebrow",
+    "props": "text",
+    "behavior": "Caps label"
+  },
+  "title": {
+    "widget": "TTitle",
+    "props": "text, size m|l|xl, center",
+    "behavior": "Semantics header"
+  },
+  "text": {
+    "widget": "TBody",
+    "props": "text, tone body|muted|small, center",
+    "behavior": ""
+  },
+  "chips": {
+    "widget": "TChips",
+    "props": "options, selected, multi, dots, label",
+    "behavior": "Single or multi select; local state + onChanged"
+  },
+  "segmented": {
+    "widget": "TSegmented",
+    "props": "options, selected, label",
+    "behavior": ""
+  },
+  "radio": {
+    "widget": "TRadioList",
+    "props": "items(label, sub, badge), selected, label",
+    "behavior": "Drives radio-based branches"
+  },
+  "checklist": {
+    "widget": "TChecklist",
+    "props": "items(label, sub, done), label",
+    "behavior": ""
+  },
+  "toggle": {
+    "widget": "TToggleRow",
+    "props": "label, sub, value",
+    "behavior": "Switch.adaptive"
+  },
+  "field": {
+    "widget": "TField",
+    "props": "label, value, unit, hint, error, placeholder, kind",
+    "behavior": "Error text says how to fix; kinds: text number email password phone date select multiline search"
+  },
+  "fieldrow": {
+    "widget": "TFieldRow",
+    "props": "children",
+    "behavior": "Two fields side by side"
+  },
+  "slider": {
+    "widget": "TSliderField",
+    "props": "label, value, min, max, minLabel, maxLabel, color",
+    "behavior": ""
+  },
+  "banner": {
+    "widget": "TBanner",
+    "props": "kind offline|error|success|info|urgent, text, actionLabel, onAction",
+    "behavior": "Live region for error/urgent"
+  },
+  "card": {
+    "widget": "TCard",
+    "props": "variant plain|dark|dark2|coral|mint|urgent|warn|flat, tag, eyebrow, title, text, accent, onTap, cta, children",
+    "behavior": "Whole card tappable when onTap"
+  },
+  "kv": {
+    "widget": "TKeyValue",
+    "props": "rows [(key, value)]",
+    "behavior": ""
+  },
+  "list": {
+    "widget": "TListGroup / TListRow",
+    "props": "title, rows(label, sub, value, lead, pill, danger, onTap)",
+    "behavior": "Chevron shown only when tappable"
+  },
+  "tiles": {
+    "widget": "TTileGrid / TTile",
+    "props": "columns, tiles(label, sub, program|glyph, selected, onTap)",
+    "behavior": "Selection grid or navigation tiles"
+  },
+  "stats": {
+    "widget": "TStatGrid / TStat",
+    "props": "columns, stats(label, value, sub, program)",
+    "behavior": ""
+  },
+  "chart": {
+    "widget": "TBarChart / TLineChart",
+    "props": "values, color, title, unit, missing, target, band, labels, caption, tag, onTap",
+    "behavior": "Missing days drawn hatched, never zero"
+  },
+  "zone": {
+    "widget": "TZoneSelector",
+    "props": "selected green|yellow|red",
+    "behavior": "Drives zone branch"
+  },
+  "ring": {
+    "widget": "TBreathRing",
+    "props": "value, label, palette",
+    "behavior": "Respects Reduce Motion"
+  },
+  "big": {
+    "widget": "TBigNumber",
+    "props": "value, unit, caption",
+    "behavior": "Scales down to fit"
+  },
+  "button": {
+    "widget": "TButton",
+    "props": "label, onPressed, variant primary|rescue|secondary|danger|lime|white|ghostDark, small, arrow",
+    "behavior": "Disabled when onPressed is null"
+  },
+  "buttons": {
+    "widget": "TButtonRow",
+    "props": "children",
+    "behavior": "Wraps"
+  },
+  "link": {
+    "widget": "TLink",
+    "props": "label, onTap, alignLeft",
+    "behavior": "44pt target"
+  },
+  "quote": {
+    "widget": "TQuote",
+    "props": "text, caption",
+    "behavior": "Member’s own words"
+  },
+  "illus": {
+    "widget": "TIllustration",
+    "props": "glyph, tone",
+    "behavior": "Decorative, excluded from semantics"
+  },
+  "emergency": {
+    "widget": "TEmergencyCard",
+    "props": "text, actions",
+    "behavior": "988 / 911 routes"
+  },
+  "skeleton": {
+    "widget": "TSkeleton",
+    "props": "lines",
+    "behavior": "Loading"
+  },
+  "progtag": {
+    "widget": "TProgramTag",
+    "props": "program, extra",
+    "behavior": ""
+  },
+  "calendar": {
+    "widget": "TCalendar",
+    "props": "month, selected, window, today",
+    "behavior": ""
+  },
+  "timer": {
+    "widget": "TTimer",
+    "props": "value, label",
+    "behavior": "Live region"
+  },
+  "spacer": {
+    "widget": "SizedBox",
+    "props": "h",
+    "behavior": ""
+  }
+}

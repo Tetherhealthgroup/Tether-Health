@@ -1,0 +1,108 @@
+{
+  "id": "bf_meds_edit",
+  "name": "Edit recorded plan",
+  "route": "/p/bf/meds/edit",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Recorded plan",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Record the plan from your clinician",
+      "size": "m"
+    },
+    {
+      "t": "field",
+      "label": "Medicine",
+      "value": "Nicotine patch",
+      "kind": "select",
+      "key": "medicine"
+    },
+    {
+      "t": "field",
+      "label": "Strength",
+      "value": "21 mg / 24 h",
+      "kind": "text",
+      "key": "strength"
+    },
+    {
+      "t": "field",
+      "label": "When",
+      "value": "Every morning",
+      "kind": "select",
+      "key": "when"
+    },
+    {
+      "t": "toggle",
+      "label": "Private reminder",
+      "sub": "Lock screen hides the medicine name",
+      "on": true,
+      "key": "private_reminder"
+    },
+    {
+      "t": "text",
+      "text": "You’re recording, not changing, your plan. Ask your clinician about any change.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save plan",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/bf/meds",
+        "then": {
+          "type": "toast",
+          "value": "Plan saved",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save plan",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/bf/meds",
+        "then": {
+          "type": "toast",
+          "value": "Plan saved",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "summary": "PUT /v1/program-data/bf/meds then toast “Plan saved” then back"
+    }
+  ]
+}

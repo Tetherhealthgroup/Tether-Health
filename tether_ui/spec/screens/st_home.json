@@ -1,0 +1,212 @@
+{
+  "id": "st_home",
+  "name": "Steady home",
+  "route": "/p/st/home",
+  "flow": "st",
+  "program": "st",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Steady",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Last reading · 2 h after lunch",
+      "children": [
+        {
+          "t": "big",
+          "value": "142",
+          "unit": "mg/dL",
+          "caption": "Within your after-meal range (below 180)"
+        }
+      ]
+    },
+    {
+      "t": "button",
+      "label": "Log a reading",
+      "action": {
+        "type": "push",
+        "to": "st_log"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Meal energy reset",
+          "sub": "3 minutes",
+          "action": {
+            "type": "push",
+            "to": "st_reset"
+          }
+        },
+        {
+          "label": "Patterns",
+          "sub": "71% in range · 14 days",
+          "action": {
+            "type": "push",
+            "to": "st_patterns"
+          }
+        },
+        {
+          "label": "A1C history",
+          "sub": "7.4% · Oct 1",
+          "action": {
+            "type": "push",
+            "to": "st_a1c"
+          }
+        },
+        {
+          "label": "My range & low plan",
+          "action": {
+            "type": "push",
+            "to": "st_range"
+          }
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "Steady never counts calories. A high reading is information, not failure."
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Log a reading",
+      "path": "body[1]",
+      "action": {
+        "type": "push",
+        "to": "st_log"
+      },
+      "summary": "push → st_log"
+    },
+    {
+      "element": "Meal energy reset",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "st_reset"
+      },
+      "summary": "push → st_reset"
+    },
+    {
+      "element": "Patterns",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "st_patterns"
+      },
+      "summary": "push → st_patterns"
+    },
+    {
+      "element": "A1C history",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "st_a1c"
+      },
+      "summary": "push → st_a1c"
+    },
+    {
+      "element": "My range & low plan",
+      "path": "body[2].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "st_range"
+      },
+      "summary": "push → st_range"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[2].rows[4]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

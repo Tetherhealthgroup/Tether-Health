@@ -1,0 +1,162 @@
+{
+  "id": "ob_consent",
+  "name": "Layered consent",
+  "route": "/onboarding/consent",
+  "flow": "onboarding",
+  "program": null,
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your privacy",
+    "left": "back",
+    "pill": "3 of 5"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 3,
+      "total": 5
+    },
+    {
+      "t": "title",
+      "text": "Your story stays yours.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Each program keeps its own data. Optional choices start off.",
+      "tone": "muted"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Account · required",
+      "children": [
+        {
+          "t": "toggle",
+          "label": "Essential app data",
+          "sub": "Account, plans and progress, encrypted. Required.",
+          "on": true,
+          "key": "essential_app_data"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "bf",
+      "accent": "bf",
+      "children": [
+        {
+          "t": "toggle",
+          "label": "Private reminders",
+          "sub": "Lock screen: “You have a Tether reminder.”",
+          "on": true,
+          "key": "private_reminders"
+        },
+        {
+          "t": "toggle",
+          "label": "Share summaries with my care team",
+          "sub": "You preview every share",
+          "on": false,
+          "key": "share_summaries_with_my_care_tea"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "sf",
+      "accent": "sf",
+      "children": [
+        {
+          "t": "toggle",
+          "label": "Connect Screen Time",
+          "sub": "Optional · totals only, never content",
+          "on": false,
+          "key": "connect_screen_time"
+        },
+        {
+          "t": "toggle",
+          "label": "De-identified research",
+          "on": false,
+          "key": "de_identified_research"
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "No ads. No tobacco-industry funding. We never sell health information.",
+      "tone": "small"
+    },
+    {
+      "t": "link",
+      "label": "Read the Privacy Notice",
+      "action": {
+        "type": "external",
+        "value": "https://www.tetherhealthgroup.com/privacy/"
+      },
+      "align": "left"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Agree and continue",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/enrolments/consents",
+        "then": {
+          "type": "push",
+          "to": "ob_basics"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [
+    "POST /v1/enrolments/consents"
+  ],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Read the Privacy Notice",
+      "path": "body[7]",
+      "action": {
+        "type": "external",
+        "value": "https://www.tetherhealthgroup.com/privacy/"
+      },
+      "summary": "external https://www.tetherhealthgroup.com/privacy/"
+    },
+    {
+      "element": "Agree and continue",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/enrolments/consents",
+        "then": {
+          "type": "push",
+          "to": "ob_basics"
+        }
+      },
+      "summary": "POST /v1/enrolments/consents then push → ob_basics"
+    }
+  ]
+}

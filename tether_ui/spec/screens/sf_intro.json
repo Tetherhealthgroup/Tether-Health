@@ -1,0 +1,116 @@
+{
+  "id": "sf_intro",
+  "name": "ScrollFree intro",
+  "route": "/p/sf",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Entry from Choose programs, Catalog or a Learn-only row.",
+  "header": {
+    "t": "header",
+    "title": "ScrollFree",
+    "left": "back",
+    "pill": "~1 min/day"
+  },
+  "body": [
+    {
+      "t": "progtag",
+      "program": "sf",
+      "extra": "Social media use"
+    },
+    {
+      "t": "title",
+      "text": "Your attention is yours.",
+      "size": "l"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Goal",
+          "minutes a day + app-free times"
+        ],
+        [
+          "Pause 60",
+          "intent check, not a lock"
+        ],
+        [
+          "Never",
+          "reads messages or feeds"
+        ]
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Notice what pulls you in, set a goal that feels doable, and pause for 60 seconds when the urge hits. Never called “addiction”.",
+      "tone": "muted"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Set up ScrollFree",
+      "action": {
+        "type": "push",
+        "to": "sf_q1"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Add as Learn only",
+      "action": {
+        "type": "toast",
+        "value": "ScrollFree added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Set up ScrollFree",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_q1"
+      },
+      "summary": "push → sf_q1"
+    },
+    {
+      "element": "Add as Learn only",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "ScrollFree added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "summary": "toast “ScrollFree added as Learn only” then tab → plans"
+    }
+  ]
+}

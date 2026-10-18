@@ -1,0 +1,362 @@
+{
+  "id": "auth_signin",
+  "name": "Sign in",
+  "route": "/auth/signin",
+  "flow": "auth",
+  "program": null,
+  "phase": "account",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": null,
+  "body": [
+    {
+      "t": "title",
+      "text": "Welcome back",
+      "size": "m"
+    },
+    {
+      "t": "authbuttons",
+      "items": [
+        {
+          "t": "authbtn",
+          "provider": "apple",
+          "label": "Continue with Apple",
+          "action": {
+            "type": "branch",
+            "question": "Sign in with Apple result",
+            "provider": "apple",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Success",
+                "action": {
+                  "type": "reset",
+                  "to": "today"
+                }
+              },
+              {
+                "label": "Success · guest plan on phone",
+                "action": {
+                  "type": "push",
+                  "to": "auth_merge"
+                }
+              },
+              {
+                "label": "New Apple ID, no Tether account",
+                "action": {
+                  "type": "push",
+                  "to": "auth_social_new"
+                }
+              },
+              {
+                "label": "Cancelled",
+                "action": {
+                  "type": "toast",
+                  "value": "Sign-in cancelled"
+                }
+              },
+              {
+                "label": "Error",
+                "action": {
+                  "type": "push",
+                  "to": "auth_social_error"
+                }
+              }
+            ]
+          },
+          "platforms": [
+            "ios"
+          ]
+        },
+        {
+          "t": "authbtn",
+          "provider": "google",
+          "label": "Continue with Google",
+          "action": {
+            "type": "branch",
+            "question": "Sign in with Google result",
+            "provider": "google",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Success",
+                "action": {
+                  "type": "reset",
+                  "to": "today"
+                }
+              },
+              {
+                "label": "Success · guest plan on phone",
+                "action": {
+                  "type": "push",
+                  "to": "auth_merge"
+                }
+              },
+              {
+                "label": "New Google account, no Tether account",
+                "action": {
+                  "type": "push",
+                  "to": "auth_social_new"
+                }
+              },
+              {
+                "label": "Cancelled",
+                "action": {
+                  "type": "toast",
+                  "value": "Sign-in cancelled"
+                }
+              },
+              {
+                "label": "Error",
+                "action": {
+                  "type": "push",
+                  "to": "auth_social_error"
+                }
+              }
+            ]
+          },
+          "platforms": [
+            "ios",
+            "android"
+          ]
+        }
+      ]
+    },
+    {
+      "t": "eyebrow",
+      "text": "Or with email"
+    },
+    {
+      "t": "field",
+      "label": "Email",
+      "value": "alex@example.com",
+      "kind": "email",
+      "key": "email"
+    },
+    {
+      "t": "field",
+      "label": "Password",
+      "value": "••••••••",
+      "kind": "password",
+      "key": "password"
+    },
+    {
+      "t": "link",
+      "label": "Forgot password?",
+      "action": {
+        "type": "push",
+        "to": "auth_forgot"
+      },
+      "align": "left"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Sign in",
+      "action": {
+        "type": "branch",
+        "question": "Sign-in result",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Success",
+            "action": {
+              "type": "reset",
+              "to": "today"
+            }
+          },
+          {
+            "label": "Success · guest plan on phone",
+            "action": {
+              "type": "push",
+              "to": "auth_merge"
+            }
+          },
+          {
+            "label": "Wrong password",
+            "action": {
+              "type": "push",
+              "to": "auth_signin_error"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Cancel",
+      "action": {
+        "type": "close"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": "Welcome",
+  "api": [
+    "POST supabase /auth/v1/token"
+  ],
+  "actions": [
+    {
+      "element": "Continue with Apple",
+      "path": "body[1].items[0]",
+      "action": {
+        "type": "branch",
+        "question": "Sign in with Apple result",
+        "provider": "apple",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Success",
+            "action": {
+              "type": "reset",
+              "to": "today"
+            }
+          },
+          {
+            "label": "Success · guest plan on phone",
+            "action": {
+              "type": "push",
+              "to": "auth_merge"
+            }
+          },
+          {
+            "label": "New Apple ID, no Tether account",
+            "action": {
+              "type": "push",
+              "to": "auth_social_new"
+            }
+          },
+          {
+            "label": "Cancelled",
+            "action": {
+              "type": "toast",
+              "value": "Sign-in cancelled"
+            }
+          },
+          {
+            "label": "Error",
+            "action": {
+              "type": "push",
+              "to": "auth_social_error"
+            }
+          }
+        ]
+      },
+      "summary": "auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+    },
+    {
+      "element": "Continue with Google",
+      "path": "body[1].items[1]",
+      "action": {
+        "type": "branch",
+        "question": "Sign in with Google result",
+        "provider": "google",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Success",
+            "action": {
+              "type": "reset",
+              "to": "today"
+            }
+          },
+          {
+            "label": "Success · guest plan on phone",
+            "action": {
+              "type": "push",
+              "to": "auth_merge"
+            }
+          },
+          {
+            "label": "New Google account, no Tether account",
+            "action": {
+              "type": "push",
+              "to": "auth_social_new"
+            }
+          },
+          {
+            "label": "Cancelled",
+            "action": {
+              "type": "toast",
+              "value": "Sign-in cancelled"
+            }
+          },
+          {
+            "label": "Error",
+            "action": {
+              "type": "push",
+              "to": "auth_social_error"
+            }
+          }
+        ]
+      },
+      "summary": "auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+    },
+    {
+      "element": "Forgot password?",
+      "path": "body[5]",
+      "action": {
+        "type": "push",
+        "to": "auth_forgot"
+      },
+      "summary": "push → auth_forgot"
+    },
+    {
+      "element": "Sign in",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Sign-in result",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Success",
+            "action": {
+              "type": "reset",
+              "to": "today"
+            }
+          },
+          {
+            "label": "Success · guest plan on phone",
+            "action": {
+              "type": "push",
+              "to": "auth_merge"
+            }
+          },
+          {
+            "label": "Wrong password",
+            "action": {
+              "type": "push",
+              "to": "auth_signin_error"
+            }
+          }
+        ]
+      },
+      "summary": "branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error"
+    },
+    {
+      "element": "Cancel",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "support_message",
+  "name": "Preview message",
+  "route": "/support/message",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": null,
+  "body": [
+    {
+      "t": "title",
+      "text": "Send to Jordan?",
+      "size": "m"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "eyebrow": "Preview",
+      "title": "“Can you stay with me for the next 10 minutes?”",
+      "text": "Sent from your phone’s Messages app. Tether never sends on its own."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Open Messages",
+      "action": {
+        "type": "sms",
+        "value": "Jordan"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Cancel",
+      "action": {
+        "type": "close"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": "Support",
+  "api": [],
+  "actions": [
+    {
+      "element": "Open Messages",
+      "path": "footer[0]",
+      "action": {
+        "type": "sms",
+        "value": "Jordan"
+      },
+      "summary": "sms Jordan"
+    },
+    {
+      "element": "Cancel",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}

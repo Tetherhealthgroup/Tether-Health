@@ -1,0 +1,102 @@
+{
+  "id": "be_questions",
+  "name": "Visit questions",
+  "route": "/p/be/questions",
+  "flow": "be",
+  "program": "be",
+  "phase": "milestone",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Questions for my visit",
+    "left": "back",
+    "pill": "Oct 22"
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "plain",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "What side effects should I call about?",
+              "done": true
+            },
+            {
+              "label": "Can I keep working during treatment?"
+            },
+            {
+              "label": "Who do I call after hours?"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "field",
+      "label": "Add a question",
+      "placeholder": "Type a question…",
+      "kind": "text",
+      "key": "add_a_question"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Share with my care team",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "button",
+      "label": "Done",
+      "action": {
+        "type": "back"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Share with my care team",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "summary": "push → support_message_care"
+    },
+    {
+      "element": "Done",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "id": "hw_log",
+  "name": "Log BP · reading 1",
+  "route": "/p/hw/log",
+  "flow": "hw",
+  "program": "hw",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Log blood pressure",
+    "left": "back",
+    "pill": "1 of 2"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Sit quietly for 5 minutes first.",
+      "size": "m"
+    },
+    {
+      "t": "fieldrow",
+      "fields": [
+        {
+          "t": "field",
+          "label": "Top (systolic)",
+          "value": "138",
+          "unit": "mmHg",
+          "kind": "number",
+          "key": "systolic"
+        },
+        {
+          "t": "field",
+          "label": "Bottom (diastolic)",
+          "value": "86",
+          "unit": "mmHg",
+          "kind": "number",
+          "key": "diastolic"
+        }
+      ]
+    },
+    {
+      "t": "field",
+      "label": "Pulse (optional)",
+      "value": "72",
+      "unit": "bpm",
+      "kind": "number",
+      "key": "pulse_optional"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Left arm",
+        "Right arm"
+      ],
+      "selected": [
+        "Left arm"
+      ],
+      "multi": false,
+      "key": "value"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Tip",
+      "text": "Take a second reading after 1 minute. We’ll average them."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next reading",
+      "action": {
+        "type": "push",
+        "to": "hw_log2"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Next reading",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "hw_log2"
+      },
+      "summary": "push → hw_log2"
+    }
+  ]
+}

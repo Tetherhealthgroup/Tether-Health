@@ -1,0 +1,131 @@
+{
+  "id": "sd_session",
+  "name": "Session player",
+  "route": "/p/sd/session",
+  "flow": "sd",
+  "program": "sd",
+  "phase": "daily",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": true,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Balance · 8 min",
+    "left": "close",
+    "pill": "2 of 6",
+    "dark": true
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "⇅",
+      "tone": "dark"
+    },
+    {
+      "t": "title",
+      "text": "Heel-to-toe stand",
+      "size": "xl",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Hold the chair. Place one foot in front of the other. Hold 10 seconds.",
+      "tone": "body",
+      "align": "center"
+    },
+    {
+      "t": "ring",
+      "value": "7",
+      "label": "SECONDS",
+      "palette": "teal"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Audio on",
+        "Large text",
+        "Captions"
+      ],
+      "selected": [
+        "Audio on",
+        "Large text",
+        "Captions"
+      ],
+      "multi": true,
+      "key": "value"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next exercise",
+      "action": {
+        "type": "toast",
+        "value": "Exercise 3 of 6"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Finish session",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/sd/sessions",
+        "then": {
+          "type": "toast",
+          "value": "Session saved",
+          "then": {
+            "type": "replace",
+            "to": "sd_home"
+          }
+        }
+      },
+      "variant": "white",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Next exercise",
+      "path": "footer[0]",
+      "action": {
+        "type": "toast",
+        "value": "Exercise 3 of 6"
+      },
+      "summary": "toast “Exercise 3 of 6”"
+    },
+    {
+      "element": "Finish session",
+      "path": "footer[1]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/sd/sessions",
+        "then": {
+          "type": "toast",
+          "value": "Session saved",
+          "then": {
+            "type": "replace",
+            "to": "sd_home"
+          }
+        }
+      },
+      "summary": "POST /v1/program-data/sd/sessions then toast “Session saved” then replace → sd_home"
+    }
+  ]
+}

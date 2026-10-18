@@ -1,0 +1,111 @@
+{
+  "id": "ck_intro",
+  "name": "Checkup intro",
+  "route": "/p/ck",
+  "flow": "ck",
+  "program": "ck",
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Entry from Choose programs, Catalog or a Learn-only row.",
+  "header": {
+    "t": "header",
+    "title": "Checkup",
+    "left": "back",
+    "pill": "~1 min/week"
+  },
+  "body": [
+    {
+      "t": "progtag",
+      "program": "ck",
+      "extra": "Preventive health"
+    },
+    {
+      "t": "title",
+      "text": "What’s due for you, in one place.",
+      "size": "l"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Personal list",
+          "USPSTF / CDC guidance"
+        ],
+        [
+          "Reminders",
+          "weekly, quiet"
+        ],
+        [
+          "Records",
+          "mark done, add dates"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Set up Checkup",
+      "action": {
+        "type": "push",
+        "to": "ck_q1"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Add as Learn only",
+      "action": {
+        "type": "toast",
+        "value": "Checkup added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Set up Checkup",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "ck_q1"
+      },
+      "summary": "push → ck_q1"
+    },
+    {
+      "element": "Add as Learn only",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "Checkup added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "summary": "toast “Checkup added as Learn only” then tab → plans"
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "id": "sd_q1",
+  "name": "Falls check",
+  "route": "/p/sd/onboarding/1",
+  "flow": "sd",
+  "program": "sd",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "How you move",
+    "left": "back",
+    "pill": "1 of 1"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 1,
+      "total": 1
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "No",
+        "Once",
+        "2+ times"
+      ],
+      "selected": "Once",
+      "label": "In the last year, have you fallen?",
+      "key": "in_the_last_year_have_you_fallen"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "No",
+        "Sometimes",
+        "Often"
+      ],
+      "selected": "Sometimes",
+      "label": "Do you feel unsteady standing or walking?",
+      "key": "do_you_feel_unsteady_standing_or"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "No",
+        "A little",
+        "A lot"
+      ],
+      "selected": "A little",
+      "label": "Do you worry about falling?",
+      "key": "do_you_worry_about_falling"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "A fall plus feeling unsteady is worth mentioning to your clinician. We’ll add it to your visit list."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next",
+      "action": {
+        "type": "push",
+        "to": "sd_plan"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Next",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "sd_plan"
+      },
+      "summary": "push → sd_plan"
+    }
+  ]
+}

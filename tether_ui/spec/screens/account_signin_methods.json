@@ -1,0 +1,165 @@
+{
+  "id": "account_signin_methods",
+  "name": "Sign-in methods",
+  "route": "/account/sign-in",
+  "flow": "account",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "iPhone shows Apple first (App Store rule 4.8 when Google is offered); Android shows Google.",
+  "header": {
+    "t": "header",
+    "title": "Sign-in methods",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "text",
+      "text": "Use any connected method to sign in. Keep at least one.",
+      "tone": "muted"
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Apple",
+          "sub": "Connected · Hide My Email",
+          "lead": {
+            "icon": ""
+          },
+          "pill": "Primary"
+        },
+        {
+          "label": "Google",
+          "sub": "Not connected",
+          "action": {
+            "type": "branch",
+            "question": "Sign in with Google result",
+            "provider": "google",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Success",
+                "action": {
+                  "type": "toast",
+                  "value": "Google connected"
+                }
+              },
+              {
+                "label": "Email already has a Tether account",
+                "action": {
+                  "type": "push",
+                  "to": "auth_link"
+                }
+              },
+              {
+                "label": "Cancelled",
+                "action": {
+                  "type": "toast",
+                  "value": "Cancelled"
+                }
+              },
+              {
+                "label": "Error",
+                "action": {
+                  "type": "push",
+                  "to": "auth_social_error"
+                }
+              }
+            ]
+          },
+          "lead": {
+            "icon": "G"
+          }
+        },
+        {
+          "label": "Email & password",
+          "sub": "alex@example.com · set a password",
+          "action": {
+            "type": "push",
+            "to": "auth_newpass"
+          },
+          "lead": {
+            "icon": "@"
+          }
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "To remove Apple, add another method first. Removing a method never deletes your data."
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Google",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "branch",
+        "question": "Sign in with Google result",
+        "provider": "google",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Success",
+            "action": {
+              "type": "toast",
+              "value": "Google connected"
+            }
+          },
+          {
+            "label": "Email already has a Tether account",
+            "action": {
+              "type": "push",
+              "to": "auth_link"
+            }
+          },
+          {
+            "label": "Cancelled",
+            "action": {
+              "type": "toast",
+              "value": "Cancelled"
+            }
+          },
+          {
+            "label": "Error",
+            "action": {
+              "type": "push",
+              "to": "auth_social_error"
+            }
+          }
+        ]
+      },
+      "summary": "auth (google): Sign in with Google result → Success: toast “Google connected” | Email already has a Tether account: push → auth_link | Cancelled: toast “Cancelled” | Error: push → auth_social_error"
+    },
+    {
+      "element": "Email & password",
+      "path": "body[1].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "auth_newpass"
+      },
+      "summary": "push → auth_newpass"
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "id": "bf_q1",
+  "name": "Baseline: amount",
+  "route": "/p/bf/onboarding/1",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "About your smoking",
+    "left": "back",
+    "pill": "1 of 3"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 1,
+      "total": 3
+    },
+    {
+      "t": "eyebrow",
+      "text": "Question 1 of 3"
+    },
+    {
+      "t": "title",
+      "text": "On a typical day, how many cigarettes?",
+      "size": "m"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "I don’t smoke every day"
+        },
+        {
+          "label": "10 or fewer"
+        },
+        {
+          "label": "11–20"
+        },
+        {
+          "label": "21–30"
+        },
+        {
+          "label": "31 or more"
+        }
+      ],
+      "selected": 2,
+      "key": "value"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Why we ask",
+      "text": "Tailors your plan and estimates money saved. Not a diagnosis."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next",
+      "action": {
+        "type": "push",
+        "to": "bf_q2"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Next",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_q2"
+      },
+      "summary": "push → bf_q2"
+    }
+  ]
+}

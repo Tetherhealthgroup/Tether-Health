@@ -1,0 +1,115 @@
+{
+  "id": "ea_q1",
+  "name": "Optional screener",
+  "route": "/p/ea/onboarding/1",
+  "flow": "ea",
+  "program": "ea",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "4 questions in production (PHQ-2 + GAD-2); one shown.",
+  "header": {
+    "t": "header",
+    "title": "Optional check",
+    "left": "back",
+    "pill": "1 of 4"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 1,
+      "total": 4
+    },
+    {
+      "t": "text",
+      "text": "Over the last 2 weeks, how often have you been bothered by…",
+      "tone": "small"
+    },
+    {
+      "t": "title",
+      "text": "Little interest or pleasure in doing things?",
+      "size": "m"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Not at all"
+        },
+        {
+          "label": "Several days"
+        },
+        {
+          "label": "More than half the days"
+        },
+        {
+          "label": "Nearly every day"
+        }
+      ],
+      "selected": 1,
+      "key": "value"
+    },
+    {
+      "t": "text",
+      "text": "PHQ-2 / GAD-2 · validated questions · skippable",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next",
+      "action": {
+        "type": "push",
+        "to": "ea_result"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Skip the check",
+      "action": {
+        "type": "push",
+        "to": "ea_plan"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Next",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "ea_result"
+      },
+      "summary": "push → ea_result"
+    },
+    {
+      "element": "Skip the check",
+      "path": "footer[1]",
+      "action": {
+        "type": "push",
+        "to": "ea_plan"
+      },
+      "summary": "push → ea_plan"
+    }
+  ]
+}

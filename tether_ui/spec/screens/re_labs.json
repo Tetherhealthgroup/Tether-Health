@@ -1,0 +1,127 @@
+{
+  "id": "re_labs",
+  "name": "Add labs",
+  "route": "/p/re/labs",
+  "flow": "re",
+  "program": "re",
+  "phase": "milestone",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Add lab results",
+    "left": "back",
+    "pill": "Lab"
+  },
+  "body": [
+    {
+      "t": "field",
+      "label": "eGFR",
+      "value": "58",
+      "unit": "mL/min/1.73m²",
+      "kind": "number",
+      "key": "egfr"
+    },
+    {
+      "t": "field",
+      "label": "Urine ACR",
+      "value": "42",
+      "unit": "mg/g",
+      "kind": "number",
+      "key": "urine_acr"
+    },
+    {
+      "t": "field",
+      "label": "ALT (liver)",
+      "unit": "U/L",
+      "placeholder": "Optional",
+      "kind": "number",
+      "key": "alt_liver"
+    },
+    {
+      "t": "field",
+      "label": "Lab date",
+      "value": "Oct 3, 2026",
+      "kind": "date",
+      "key": "lab_date"
+    },
+    {
+      "t": "text",
+      "text": "Copy numbers exactly from your report. Renew shows trends; your clinician explains them.",
+      "tone": "small"
+    },
+    {
+      "t": "link",
+      "label": "Import from my health record",
+      "action": {
+        "type": "push",
+        "to": "records_add"
+      },
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save results",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/re/labs",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "replace",
+            "to": "re_history"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Import from my health record",
+      "path": "body[5]",
+      "action": {
+        "type": "push",
+        "to": "records_add"
+      },
+      "summary": "push → records_add"
+    },
+    {
+      "element": "Save results",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/re/labs",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "replace",
+            "to": "re_history"
+          }
+        }
+      },
+      "summary": "POST /v1/program-data/re/labs then toast “Saved” then replace → re_history"
+    }
+  ]
+}

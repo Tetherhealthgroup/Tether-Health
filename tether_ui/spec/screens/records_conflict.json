@@ -1,0 +1,125 @@
+{
+  "id": "records_conflict",
+  "name": "Resolve conflicts",
+  "route": "/records/conflicts",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Needs review",
+    "left": "back",
+    "pill": "2 items"
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "A1C · Oct 1, 2026",
+      "title": "Two values for the same test",
+      "children": [
+        {
+          "t": "radio",
+          "items": [
+            {
+              "label": "From Patel Family Medicine (Epic): 7.6%",
+              "sub": "Lab result · final · LOINC 4548-4"
+            },
+            {
+              "label": "Entered by you: 7.4%",
+              "sub": "Oct 1, 2026"
+            },
+            {
+              "label": "Keep both",
+              "sub": "Your clinician’s value is used in summaries"
+            }
+          ],
+          "selected": 0,
+          "key": "a1c"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Blood pressure · Aug 4, 2026",
+      "title": "1290/80 is outside the possible range",
+      "children": [
+        {
+          "t": "radio",
+          "items": [
+            {
+              "label": "Discard",
+              "sub": "Likely a typo in the source"
+            },
+            {
+              "label": "Keep as 129/80",
+              "sub": "Corrected by you, marked as edited"
+            },
+            {
+              "label": "Ask my care team",
+              "sub": "Sends a question with the original value"
+            }
+          ],
+          "selected": 1,
+          "key": "bp"
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save choices",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/fhir/conflicts",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save choices",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/fhir/conflicts",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "summary": "POST /v1/records/fhir/conflicts then toast “Saved” then back"
+    }
+  ]
+}

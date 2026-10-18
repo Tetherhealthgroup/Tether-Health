@@ -1,0 +1,157 @@
+{
+  "id": "ca_plan",
+  "name": "Enter action plan",
+  "route": "/p/ca/plan",
+  "flow": "ca",
+  "program": "ca",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your action plan",
+    "left": "back",
+    "pill": "2 of 2"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 2,
+      "total": 2
+    },
+    {
+      "t": "title",
+      "text": "Copy your plan from your clinician.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "ClearAir never creates or changes zones.",
+      "tone": "muted"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Green zone",
+      "children": [
+        {
+          "t": "field",
+          "label": "Peak flow from",
+          "value": "400",
+          "unit": "L/min",
+          "kind": "number",
+          "key": "green_from"
+        },
+        {
+          "t": "field",
+          "label": "Daily medicine",
+          "value": "Controller inhaler · 2 puffs AM/PM",
+          "kind": "text",
+          "key": "daily_medicine"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Yellow zone",
+      "children": [
+        {
+          "t": "field",
+          "label": "Peak flow",
+          "value": "200–399",
+          "unit": "L/min",
+          "kind": "text",
+          "key": "peak_flow"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Red zone",
+      "children": [
+        {
+          "t": "field",
+          "label": "Below",
+          "value": "200",
+          "unit": "L/min",
+          "kind": "number",
+          "key": "red_below"
+        }
+      ]
+    },
+    {
+      "t": "button",
+      "label": "Add a photo of my plan",
+      "action": {
+        "type": "toast",
+        "value": "Camera opened"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save plan",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/ca/plan",
+        "then": {
+          "type": "replace",
+          "to": "ca_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Add a photo of my plan",
+      "path": "body[6]",
+      "action": {
+        "type": "toast",
+        "value": "Camera opened"
+      },
+      "summary": "toast “Camera opened”"
+    },
+    {
+      "element": "Save plan",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/ca/plan",
+        "then": {
+          "type": "replace",
+          "to": "ca_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "summary": "PUT /v1/program-data/ca/plan then replace → ca_home (onboarding: ob_setup)"
+    }
+  ]
+}

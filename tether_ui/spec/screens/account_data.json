@@ -1,0 +1,108 @@
+{
+  "id": "account_data",
+  "name": "Your data",
+  "route": "/account/data",
+  "flow": "account",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your data",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "list",
+      "title": "Export",
+      "rows": [
+        {
+          "label": "Download everything",
+          "sub": "Every program · PDF + JSON",
+          "action": {
+            "type": "submit",
+            "api": "POST /v1/account/export",
+            "then": {
+              "type": "toast",
+              "value": "We’re preparing your file. We’ll notify you when it’s ready."
+            }
+          }
+        },
+        {
+          "label": "Export a care summary",
+          "sub": "Choose dates and preview every detail",
+          "action": {
+            "type": "push",
+            "to": "hw_summary"
+          }
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Delete",
+      "rows": [
+        {
+          "label": "Delete account and all data",
+          "sub": "Permanent · requires confirmation",
+          "action": {
+            "type": "push",
+            "to": "account_delete"
+          },
+          "danger": true
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Download everything",
+      "path": "body[0].rows[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/account/export",
+        "then": {
+          "type": "toast",
+          "value": "We’re preparing your file. We’ll notify you when it’s ready."
+        }
+      },
+      "summary": "POST /v1/account/export then toast “We’re preparing your file. We’ll notify you when it’s ready.”"
+    },
+    {
+      "element": "Export a care summary",
+      "path": "body[0].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "hw_summary"
+      },
+      "summary": "push → hw_summary"
+    },
+    {
+      "element": "Delete account and all data",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "account_delete"
+      },
+      "summary": "push → account_delete"
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+{
+  "id": "records_manual_error",
+  "name": "Enter a value · out of range",
+  "route": "/records/manual?state=error",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "records_manual",
+  "state": "error",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Enter a value",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Add a health value",
+      "size": "m"
+    },
+    {
+      "t": "field",
+      "label": "Test",
+      "value": "A1C",
+      "kind": "select",
+      "key": "test"
+    },
+    {
+      "t": "field",
+      "label": "Value",
+      "value": "74",
+      "unit": "%",
+      "error": "A1C is usually between 4% and 15%. Did you mean 7.4?",
+      "kind": "number",
+      "key": "value"
+    },
+    {
+      "t": "field",
+      "label": "Date",
+      "value": "Oct 1, 2026",
+      "kind": "date",
+      "key": "date"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/manual",
+        "then": {
+          "type": "branch",
+          "question": "Validation",
+          "on": null,
+          "decide": "rec.manual",
+          "cases": [
+            {
+              "label": "Valid",
+              "action": {
+                "type": "toast",
+                "value": "Saved · shared with Steady",
+                "then": {
+                  "type": "popto",
+                  "to": "records_hub"
+                }
+              }
+            },
+            {
+              "label": "Outside expected range",
+              "action": {
+                "type": "toast",
+                "value": "Still outside the expected range"
+              }
+            }
+          ]
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Ask my care team instead",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/manual",
+        "then": {
+          "type": "branch",
+          "question": "Validation",
+          "on": null,
+          "decide": "rec.manual",
+          "cases": [
+            {
+              "label": "Valid",
+              "action": {
+                "type": "toast",
+                "value": "Saved · shared with Steady",
+                "then": {
+                  "type": "popto",
+                  "to": "records_hub"
+                }
+              }
+            },
+            {
+              "label": "Outside expected range",
+              "action": {
+                "type": "toast",
+                "value": "Still outside the expected range"
+              }
+            }
+          ]
+        }
+      },
+      "summary": "POST /v1/records/manual then decide rec.manual: Validation → Valid: toast “Saved · shared with Steady” then popto → records_hub | Outside expected range: toast “Still outside the expected range”"
+    },
+    {
+      "element": "Ask my care team instead",
+      "path": "footer[1]",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "summary": "push → support_message_care"
+    }
+  ]
+}

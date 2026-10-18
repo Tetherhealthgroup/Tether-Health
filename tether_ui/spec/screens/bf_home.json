@@ -1,0 +1,240 @@
+{
+  "id": "bf_home",
+  "name": "BreatheFree home",
+  "route": "/p/bf/home",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Pre-quit state. Quit-day and Explore states are variants.",
+  "header": {
+    "t": "header",
+    "title": "BreatheFree",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Your quit day",
+      "children": [
+        {
+          "t": "big",
+          "value": "7 days",
+          "caption": "Friday, August 28 · Pacific Time"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "Craving now?",
+      "text": "One tap · works offline",
+      "cta": {
+        "t": "button",
+        "label": "Rescue",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "variant": "rescue",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Today’s step",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Stock gum, water or healthy snacks",
+              "sub": "About 3 minutes"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "eyebrow": "Your top reason",
+      "children": [
+        {
+          "t": "quote",
+          "text": "Protect my family."
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Daily check-in",
+          "sub": "About 60 seconds",
+          "action": {
+            "type": "sheet",
+            "to": "checkin"
+          }
+        },
+        {
+          "label": "Medication center",
+          "sub": "Nicotine patch · recorded plan",
+          "action": {
+            "type": "push",
+            "to": "bf_meds"
+          }
+        },
+        {
+          "label": "Progress",
+          "sub": "Saved $42.70 so far",
+          "action": {
+            "type": "push",
+            "to": "bf_progress"
+          }
+        },
+        {
+          "label": "Edit my plan",
+          "action": {
+            "type": "push",
+            "to": "bf_review"
+          }
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Rescue",
+      "path": "body[1].cta[0]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
+    },
+    {
+      "element": "Daily check-in",
+      "path": "body[4].rows[0]",
+      "action": {
+        "type": "sheet",
+        "to": "checkin"
+      },
+      "summary": "sheet → checkin"
+    },
+    {
+      "element": "Medication center",
+      "path": "body[4].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "bf_meds"
+      },
+      "summary": "push → bf_meds"
+    },
+    {
+      "element": "Progress",
+      "path": "body[4].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "bf_progress"
+      },
+      "summary": "push → bf_progress"
+    },
+    {
+      "element": "Edit my plan",
+      "path": "body[4].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "bf_review"
+      },
+      "summary": "push → bf_review"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[4].rows[4]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

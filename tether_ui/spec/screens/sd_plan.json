@@ -1,0 +1,116 @@
+{
+  "id": "sd_plan",
+  "name": "Movement plan",
+  "route": "/p/sd/plan",
+  "flow": "sd",
+  "program": "sd",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your movement plan",
+    "left": "back",
+    "pill": "Plan"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Three short sessions a week",
+      "size": "m"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Mon",
+          "Balance · 8 min"
+        ],
+        [
+          "Wed",
+          "Strength (chair) · 10 min"
+        ],
+        [
+          "Fri",
+          "Walk + balance · 12 min"
+        ]
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Do sessions near a sturdy chair",
+              "done": true
+            },
+            {
+              "label": "Tell my caregiver when I finish"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Check with your clinician before starting a new exercise program.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Start plan",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/sd/plan",
+        "then": {
+          "type": "replace",
+          "to": "sd_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Start plan",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/sd/plan",
+        "then": {
+          "type": "replace",
+          "to": "sd_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "summary": "PUT /v1/program-data/sd/plan then replace → sd_home (onboarding: ob_setup)"
+    }
+  ]
+}

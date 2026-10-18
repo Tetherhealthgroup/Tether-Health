@@ -1,0 +1,113 @@
+{
+  "id": "support_callback",
+  "name": "Request call-back",
+  "route": "/support/callback",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": null,
+  "body": [
+    {
+      "t": "title",
+      "text": "Request a counselor call-back?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Review exactly what will be sent before you agree.",
+      "tone": "muted"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Sent to",
+          "California Smokers’ Helpline"
+        ],
+        [
+          "Shared",
+          "First name, phone, preferred time"
+        ],
+        [
+          "Not shared",
+          "Your plan, check-ins, health details"
+        ],
+        [
+          "Consent expires",
+          "30 days"
+        ]
+      ]
+    },
+    {
+      "t": "field",
+      "label": "Best time to call",
+      "value": "Weekdays after 5 PM",
+      "kind": "select",
+      "key": "best_time_to_call"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Send referral",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/care/referrals",
+        "then": {
+          "type": "toast",
+          "value": "Request sent. Expect a call within 2 business days.",
+          "then": {
+            "type": "close"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Cancel",
+      "action": {
+        "type": "close"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": "Support",
+  "api": [],
+  "actions": [
+    {
+      "element": "Send referral",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/care/referrals",
+        "then": {
+          "type": "toast",
+          "value": "Request sent. Expect a call within 2 business days.",
+          "then": {
+            "type": "close"
+          }
+        }
+      },
+      "summary": "POST /v1/care/referrals then toast “Request sent. Expect a call within 2 business days.” then close"
+    },
+    {
+      "element": "Cancel",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}

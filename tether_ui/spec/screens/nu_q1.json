@@ -1,0 +1,140 @@
+{
+  "id": "nu_q1",
+  "name": "Goals & screen",
+  "route": "/p/nu/onboarding/1",
+  "flow": "nu",
+  "program": "nu",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "What matters",
+    "left": "back",
+    "pill": "1 of 1"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 1,
+      "total": 1
+    },
+    {
+      "t": "title",
+      "text": "What would you like more of?",
+      "size": "m"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Energy",
+        "Easy meals",
+        "More plants",
+        "More water",
+        "Move more",
+        "Save on food",
+        "Feel better about food"
+      ],
+      "selected": [
+        "Energy",
+        "Easy meals",
+        "More water"
+      ],
+      "multi": true,
+      "key": "value"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "title": "Have you struggled with eating, like restricting, bingeing or purging?",
+      "text": "If yes, we adjust Nourish and share support options.",
+      "children": [
+        {
+          "t": "segmented",
+          "options": [
+            "No",
+            "Yes",
+            "Prefer not to say"
+          ],
+          "selected": "No",
+          "key": "eating"
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next",
+      "action": {
+        "type": "branch",
+        "question": "Eating-history answer",
+        "on": "segmented",
+        "decide": "choice:nu_q1.eating",
+        "cases": [
+          {
+            "label": "No",
+            "action": {
+              "type": "push",
+              "to": "nu_habit"
+            }
+          },
+          {
+            "label": "Yes / Prefer not to say",
+            "action": {
+              "type": "push",
+              "to": "nu_protect"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Next",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Eating-history answer",
+        "on": "segmented",
+        "decide": "choice:nu_q1.eating",
+        "cases": [
+          {
+            "label": "No",
+            "action": {
+              "type": "push",
+              "to": "nu_habit"
+            }
+          },
+          {
+            "label": "Yes / Prefer not to say",
+            "action": {
+              "type": "push",
+              "to": "nu_protect"
+            }
+          }
+        ]
+      },
+      "summary": "decide choice:nu_q1.eating: Eating-history answer → No: push → nu_habit | Yes / Prefer not to say: push → nu_protect"
+    }
+  ]
+}

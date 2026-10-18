@@ -1,0 +1,196 @@
+{
+  "id": "be_tx",
+  "name": "Treatment support",
+  "route": "/p/be/treatment",
+  "flow": "be",
+  "program": "be",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Beacon",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Next appointment",
+      "title": "Oct 22 · Oncology · 10:30 AM",
+      "cta": {
+        "t": "button",
+        "label": "Questions",
+        "action": {
+          "type": "push",
+          "to": "be_questions"
+        },
+        "variant": "lime",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "urgent",
+      "title": "Fever of 100.4°F (38°C) or higher during chemo?",
+      "text": "Call your oncology team now, day or night.",
+      "cta": {
+        "t": "button",
+        "label": "Call",
+        "action": {
+          "type": "call",
+          "value": "(555) 010-7000",
+          "label": "Call oncology team"
+        },
+        "variant": "danger",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Today’s side-effect diary",
+          "sub": "About 1 minute",
+          "action": {
+            "type": "push",
+            "to": "be_diary"
+          }
+        },
+        {
+          "label": "Feeling worried?",
+          "sub": "Tools in Ease",
+          "action": {
+            "type": "push",
+            "to": "ea_intro"
+          }
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Questions",
+      "path": "body[0].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "be_questions"
+      },
+      "summary": "push → be_questions"
+    },
+    {
+      "element": "Call",
+      "path": "body[1].cta[0]",
+      "action": {
+        "type": "call",
+        "value": "(555) 010-7000",
+        "label": "Call oncology team"
+      },
+      "summary": "call (555) 010-7000"
+    },
+    {
+      "element": "Today’s side-effect diary",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "be_diary"
+      },
+      "summary": "push → be_diary"
+    },
+    {
+      "element": "Feeling worried?",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "ea_intro"
+      },
+      "summary": "push → ea_intro"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

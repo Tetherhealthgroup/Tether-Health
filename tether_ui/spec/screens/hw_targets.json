@@ -1,0 +1,150 @@
+{
+  "id": "hw_targets",
+  "name": "Clinician targets",
+  "route": "/p/hw/plan/targets",
+  "flow": "hw",
+  "program": "hw",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your targets",
+    "left": "back",
+    "pill": "2 of 2"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 2,
+      "total": 2
+    },
+    {
+      "t": "title",
+      "text": "What target did your clinician give you?",
+      "size": "m"
+    },
+    {
+      "t": "fieldrow",
+      "fields": [
+        {
+          "t": "field",
+          "label": "Top below",
+          "value": "130",
+          "unit": "mmHg",
+          "kind": "number",
+          "key": "top_below"
+        },
+        {
+          "t": "field",
+          "label": "Bottom below",
+          "value": "80",
+          "unit": "mmHg",
+          "kind": "number",
+          "key": "bottom_below"
+        }
+      ]
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "I don’t have a target yet",
+          "sub": "Readings show without a target line"
+        }
+      ],
+      "selected": -1,
+      "key": "value"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Morning",
+        "Evening",
+        "Both"
+      ],
+      "selected": [
+        "Both"
+      ],
+      "multi": false,
+      "label": "When should we remind you?",
+      "key": "when_should_we_remind_you"
+    },
+    {
+      "t": "text",
+      "text": "Heartwise never sets or grades targets.",
+      "tone": "small"
+    },
+    {
+      "t": "link",
+      "label": "Import from my health record",
+      "action": {
+        "type": "push",
+        "to": "records_add"
+      },
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save targets",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/hw/targets",
+        "then": {
+          "type": "replace",
+          "to": "hw_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Import from my health record",
+      "path": "body[6]",
+      "action": {
+        "type": "push",
+        "to": "records_add"
+      },
+      "summary": "push → records_add"
+    },
+    {
+      "element": "Save targets",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/hw/targets",
+        "then": {
+          "type": "replace",
+          "to": "hw_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "summary": "PUT /v1/program-data/hw/targets then replace → hw_home (onboarding: ob_setup)"
+    }
+  ]
+}

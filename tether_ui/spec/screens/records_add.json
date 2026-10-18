@@ -1,0 +1,203 @@
+{
+  "id": "records_add",
+  "name": "Add a source",
+  "route": "/records/add",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Add a source",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Where is your health information?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "You sign in with your provider. Tether never sees that password.",
+      "tone": "muted"
+    },
+    {
+      "t": "list",
+      "title": "Connect",
+      "rows": [
+        {
+          "label": "Hospital or clinic",
+          "sub": "Epic MyChart · find yours",
+          "action": {
+            "type": "push",
+            "to": "records_search"
+          },
+          "lead": {
+            "icon": "E"
+          }
+        },
+        {
+          "label": "Oracle Health (Cerner)",
+          "sub": "Patient portal",
+          "action": {
+            "type": "push",
+            "to": "records_search"
+          },
+          "lead": {
+            "icon": "O"
+          }
+        },
+        {
+          "label": "Medicare · Blue Button 2.0",
+          "sub": "Claims, prescriptions, diagnoses",
+          "action": {
+            "type": "push",
+            "to": "records_consent_bb"
+          },
+          "lead": {
+            "icon": "M"
+          }
+        },
+        {
+          "label": "Apple Health Records",
+          "sub": "iPhone · records you already added to Health",
+          "action": {
+            "type": "push",
+            "to": "records_consent_device"
+          },
+          "lead": {
+            "icon": ""
+          }
+        },
+        {
+          "label": "Health Connect",
+          "sub": "Android · readings from your devices",
+          "action": {
+            "type": "push",
+            "to": "records_consent_device"
+          },
+          "lead": {
+            "icon": "H"
+          }
+        },
+        {
+          "label": "Other FHIR server",
+          "sub": "Enter the address your provider gave you",
+          "action": {
+            "type": "push",
+            "to": "records_fhir_url"
+          },
+          "lead": {
+            "icon": "F"
+          }
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Or",
+      "rows": [
+        {
+          "label": "Enter manually",
+          "sub": "Type a value from a paper report",
+          "action": {
+            "type": "push",
+            "to": "records_manual"
+          },
+          "lead": {
+            "icon": "+"
+          }
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Uses SMART on FHIR R4 with OAuth 2.0 + PKCE in your phone’s browser.",
+      "tone": "small"
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Hospital or clinic",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "records_search"
+      },
+      "summary": "push → records_search"
+    },
+    {
+      "element": "Oracle Health (Cerner)",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "records_search"
+      },
+      "summary": "push → records_search"
+    },
+    {
+      "element": "Medicare · Blue Button 2.0",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "records_consent_bb"
+      },
+      "summary": "push → records_consent_bb"
+    },
+    {
+      "element": "Apple Health Records",
+      "path": "body[2].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "records_consent_device"
+      },
+      "summary": "push → records_consent_device"
+    },
+    {
+      "element": "Health Connect",
+      "path": "body[2].rows[4]",
+      "action": {
+        "type": "push",
+        "to": "records_consent_device"
+      },
+      "summary": "push → records_consent_device"
+    },
+    {
+      "element": "Other FHIR server",
+      "path": "body[2].rows[5]",
+      "action": {
+        "type": "push",
+        "to": "records_fhir_url"
+      },
+      "summary": "push → records_fhir_url"
+    },
+    {
+      "element": "Enter manually",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "records_manual"
+      },
+      "summary": "push → records_manual"
+    }
+  ]
+}

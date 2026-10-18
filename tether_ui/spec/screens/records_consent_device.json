@@ -1,0 +1,143 @@
+{
+  "id": "records_consent_device",
+  "name": "Consent: phone health data",
+  "route": "/records/consent?source=device",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "records_consent",
+  "state": "Apple Health / Health Connect",
+  "dark": false,
+  "bg": null,
+  "desc": "HealthKit clinical records (HKClinicalType) on iOS; Health Connect permissions on Android. Data stays on the device until you review it.",
+  "header": {
+    "t": "header",
+    "title": "Connect",
+    "left": "back",
+    "pill": "Read-only"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Use health data on this phone?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "iPhone: Apple Health Records (FHIR) and readings. Android: Health Connect readings. You choose each type in the system screen next.",
+      "tone": "muted"
+    },
+    {
+      "t": "checklist",
+      "items": [
+        {
+          "label": "Blood pressure",
+          "done": true
+        },
+        {
+          "label": "Blood glucose",
+          "done": true
+        },
+        {
+          "label": "Clinical records (iPhone)",
+          "sub": "Labs, immunizations, conditions",
+          "done": true
+        },
+        {
+          "label": "Steps and sleep",
+          "sub": "Not requested"
+        }
+      ],
+      "label": "What Tether will ask for"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue",
+      "action": {
+        "type": "branch",
+        "question": "System permission result",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Allowed",
+            "action": {
+              "type": "push",
+              "to": "records_importing"
+            }
+          },
+          {
+            "label": "Not allowed",
+            "action": {
+              "type": "push",
+              "to": "records_error"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Not now",
+      "action": {
+        "type": "back"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Continue",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "System permission result",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Allowed",
+            "action": {
+              "type": "push",
+              "to": "records_importing"
+            }
+          },
+          {
+            "label": "Not allowed",
+            "action": {
+              "type": "push",
+              "to": "records_error"
+            }
+          }
+        ]
+      },
+      "summary": "branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error"
+    },
+    {
+      "element": "Not now",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

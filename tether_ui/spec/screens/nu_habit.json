@@ -1,0 +1,113 @@
+{
+  "id": "nu_habit",
+  "name": "Weekly habit",
+  "route": "/p/nu/plan",
+  "flow": "nu",
+  "program": "nu",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "This week’s habit",
+    "left": "back",
+    "pill": "Plan"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Pick one habit for this week.",
+      "size": "m"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Add a vegetable to dinner",
+          "sub": "5 nights this week",
+          "badge": "Suggested"
+        },
+        {
+          "label": "Water before each meal",
+          "sub": "Every day"
+        },
+        {
+          "label": "Cook at home",
+          "sub": "3 times this week"
+        },
+        {
+          "label": "10-minute walk after a meal",
+          "sub": "4 times"
+        }
+      ],
+      "selected": 0,
+      "key": "value"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "children": [
+        {
+          "t": "toggle",
+          "label": "Track weight",
+          "sub": "Off by default · can stay off forever",
+          "on": false,
+          "key": "track_weight"
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Start this habit",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/nu/habit",
+        "then": {
+          "type": "replace",
+          "to": "nu_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Start this habit",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/nu/habit",
+        "then": {
+          "type": "replace",
+          "to": "nu_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "summary": "PUT /v1/program-data/nu/habit then replace → nu_home (onboarding: ob_setup)"
+    }
+  ]
+}

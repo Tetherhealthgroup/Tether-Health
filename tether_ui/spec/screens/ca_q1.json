@@ -1,0 +1,138 @@
+{
+  "id": "ca_q1",
+  "name": "Diagnosis & plan",
+  "route": "/p/ca/onboarding/1",
+  "flow": "ca",
+  "program": "ca",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "About your breathing",
+    "left": "back",
+    "pill": "1 of 2"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 1,
+      "total": 2
+    },
+    {
+      "t": "title",
+      "text": "Which applies to you?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "As told by a clinician.",
+      "tone": "muted"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Asthma"
+        },
+        {
+          "label": "COPD"
+        },
+        {
+          "label": "Other lung condition"
+        },
+        {
+          "label": "Not diagnosed: I want to learn"
+        }
+      ],
+      "selected": 0,
+      "key": "value"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "Yes",
+        "No",
+        "Not sure"
+      ],
+      "selected": "Yes",
+      "label": "Do you have a written action plan?",
+      "key": "has_plan"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next",
+      "action": {
+        "type": "branch",
+        "question": "Has a written action plan?",
+        "on": "segmented",
+        "decide": "choice:ca_q1.has_plan",
+        "cases": [
+          {
+            "label": "Yes",
+            "action": {
+              "type": "push",
+              "to": "ca_plan"
+            }
+          },
+          {
+            "label": "No / Not sure",
+            "action": {
+              "type": "push",
+              "to": "ca_noplan"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Next",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Has a written action plan?",
+        "on": "segmented",
+        "decide": "choice:ca_q1.has_plan",
+        "cases": [
+          {
+            "label": "Yes",
+            "action": {
+              "type": "push",
+              "to": "ca_plan"
+            }
+          },
+          {
+            "label": "No / Not sure",
+            "action": {
+              "type": "push",
+              "to": "ca_noplan"
+            }
+          }
+        ]
+      },
+      "summary": "decide choice:ca_q1.has_plan: Has a written action plan? → Yes: push → ca_plan | No / Not sure: push → ca_noplan"
+    }
+  ]
+}

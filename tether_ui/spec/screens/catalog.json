@@ -1,0 +1,278 @@
+{
+  "id": "catalog",
+  "name": "Add a program",
+  "route": "/programs",
+  "flow": "plans",
+  "program": null,
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Catalog is served by the catalogue service so a program can launch without an app release.",
+  "header": {
+    "t": "header",
+    "title": "All programs",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Choose what you want support with.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Mirrors tetherhealthgroup.com. Status shows what’s available today.",
+      "tone": "muted"
+    },
+    {
+      "t": "list",
+      "title": "Quit · Manage",
+      "rows": [
+        {
+          "label": "BreatheFree",
+          "sub": "Tobacco & nicotine · Quit / Reduce",
+          "action": {
+            "type": "push",
+            "to": "bf_intro"
+          },
+          "lead": {
+            "program": "bf"
+          }
+        },
+        {
+          "label": "ScrollFree",
+          "sub": "Social media use · Quit / Reduce",
+          "action": {
+            "type": "push",
+            "to": "sf_intro"
+          },
+          "lead": {
+            "program": "sf"
+          }
+        },
+        {
+          "label": "ClearAir",
+          "sub": "Respiratory health · Manage",
+          "action": {
+            "type": "push",
+            "to": "ca_intro"
+          },
+          "lead": {
+            "program": "ca"
+          }
+        },
+        {
+          "label": "Heartwise",
+          "sub": "Cardiovascular health · Manage",
+          "action": {
+            "type": "push",
+            "to": "hw_intro"
+          },
+          "lead": {
+            "program": "hw"
+          }
+        },
+        {
+          "label": "Steady",
+          "sub": "Diabetes & metabolic health · Manage",
+          "action": {
+            "type": "push",
+            "to": "st_intro"
+          },
+          "lead": {
+            "program": "st"
+          }
+        },
+        {
+          "label": "Renew",
+          "sub": "Kidney & liver health · Manage",
+          "action": {
+            "type": "push",
+            "to": "re_intro"
+          },
+          "lead": {
+            "program": "re"
+          }
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Habits · Support · Prevent",
+      "rows": [
+        {
+          "label": "Nourish",
+          "sub": "Obesity & nutrition · Build habits",
+          "action": {
+            "type": "push",
+            "to": "nu_intro"
+          },
+          "lead": {
+            "program": "nu"
+          }
+        },
+        {
+          "label": "Stride",
+          "sub": "Healthy aging · Build habits",
+          "action": {
+            "type": "push",
+            "to": "sd_intro"
+          },
+          "lead": {
+            "program": "sd"
+          }
+        },
+        {
+          "label": "Ease",
+          "sub": "Mental & behavioral health · Support",
+          "action": {
+            "type": "push",
+            "to": "ea_intro"
+          },
+          "lead": {
+            "program": "ea"
+          }
+        },
+        {
+          "label": "Checkup",
+          "sub": "Preventive health · Prevent",
+          "action": {
+            "type": "push",
+            "to": "ck_intro"
+          },
+          "lead": {
+            "program": "ck"
+          }
+        },
+        {
+          "label": "Beacon",
+          "sub": "Cancer · Prevent",
+          "action": {
+            "type": "push",
+            "to": "be_intro"
+          },
+          "lead": {
+            "program": "be"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "BreatheFree",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_intro"
+      },
+      "summary": "push → bf_intro"
+    },
+    {
+      "element": "ScrollFree",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "sf_intro"
+      },
+      "summary": "push → sf_intro"
+    },
+    {
+      "element": "ClearAir",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "ca_intro"
+      },
+      "summary": "push → ca_intro"
+    },
+    {
+      "element": "Heartwise",
+      "path": "body[2].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "hw_intro"
+      },
+      "summary": "push → hw_intro"
+    },
+    {
+      "element": "Steady",
+      "path": "body[2].rows[4]",
+      "action": {
+        "type": "push",
+        "to": "st_intro"
+      },
+      "summary": "push → st_intro"
+    },
+    {
+      "element": "Renew",
+      "path": "body[2].rows[5]",
+      "action": {
+        "type": "push",
+        "to": "re_intro"
+      },
+      "summary": "push → re_intro"
+    },
+    {
+      "element": "Nourish",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "nu_intro"
+      },
+      "summary": "push → nu_intro"
+    },
+    {
+      "element": "Stride",
+      "path": "body[3].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "sd_intro"
+      },
+      "summary": "push → sd_intro"
+    },
+    {
+      "element": "Ease",
+      "path": "body[3].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "ea_intro"
+      },
+      "summary": "push → ea_intro"
+    },
+    {
+      "element": "Checkup",
+      "path": "body[3].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "ck_intro"
+      },
+      "summary": "push → ck_intro"
+    },
+    {
+      "element": "Beacon",
+      "path": "body[3].rows[4]",
+      "action": {
+        "type": "push",
+        "to": "be_intro"
+      },
+      "summary": "push → be_intro"
+    }
+  ]
+}

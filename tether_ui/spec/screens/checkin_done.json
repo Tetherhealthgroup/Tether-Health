@@ -1,0 +1,132 @@
+{
+  "id": "checkin_done",
+  "name": "Check-in saved",
+  "route": "/check-in/done",
+  "flow": "today",
+  "program": null,
+  "phase": "daily",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Check-in saved",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "✓",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "Thanks, Alex.",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "One small step for each program today.",
+      "tone": "body",
+      "align": "center"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "bf",
+      "title": "Try a 3-minute stress reset",
+      "text": "You reported high stress",
+      "cta": {
+        "t": "button",
+        "label": "Start",
+        "action": {
+          "type": "push",
+          "to": "rescue_active"
+        },
+        "variant": "primary",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "sf",
+      "title": "Set a 10 PM wind-down",
+      "text": "You felt drained after scrolling",
+      "cta": {
+        "t": "button",
+        "label": "Set it",
+        "action": {
+          "type": "push",
+          "to": "sf_goal"
+        },
+        "variant": "secondary",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "text",
+      "text": "Recommendations use only today’s answers · v1.0",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Back to Today",
+      "action": {
+        "type": "reset",
+        "to": "today"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Start",
+      "path": "body[3].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "rescue_active"
+      },
+      "summary": "push → rescue_active"
+    },
+    {
+      "element": "Set it",
+      "path": "body[4].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_goal"
+      },
+      "summary": "push → sf_goal"
+    },
+    {
+      "element": "Back to Today",
+      "path": "footer[0]",
+      "action": {
+        "type": "reset",
+        "to": "today"
+      },
+      "summary": "reset → today"
+    }
+  ]
+}

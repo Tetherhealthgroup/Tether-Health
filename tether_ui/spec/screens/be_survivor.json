@@ -1,0 +1,185 @@
+{
+  "id": "be_survivor",
+  "name": "Survivorship",
+  "route": "/p/be/survivorship",
+  "flow": "be",
+  "program": "be",
+  "phase": "milestone",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Beacon",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "How have the last 3 months been?",
+      "size": "m"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "Hard",
+        "Mixed",
+        "Good"
+      ],
+      "selected": "Mixed",
+      "key": "value"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "title": "Worried about it coming back?",
+      "text": "Very common. Ease has tools for this, and your team can help.",
+      "cta": {
+        "t": "button",
+        "label": "Open Ease",
+        "action": {
+          "type": "push",
+          "to": "ea_intro"
+        },
+        "variant": "secondary",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Next follow-up",
+          "Jan 14, 2027"
+        ]
+      ]
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Program settings",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save check-in",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/be/survivorship",
+        "then": {
+          "type": "toast",
+          "value": "Saved"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Open Ease",
+      "path": "body[2].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "ea_intro"
+      },
+      "summary": "push → ea_intro"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[4].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Save check-in",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/be/survivorship",
+        "then": {
+          "type": "toast",
+          "value": "Saved"
+        }
+      },
+      "summary": "POST /v1/program-data/be/survivorship then toast “Saved”"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

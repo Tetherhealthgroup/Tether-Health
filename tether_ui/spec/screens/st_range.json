@@ -1,0 +1,159 @@
+{
+  "id": "st_range",
+  "name": "Range & low plan",
+  "route": "/p/st/plan/range",
+  "flow": "st",
+  "program": "st",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your range",
+    "left": "back",
+    "pill": "2 of 2"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 2,
+      "total": 2
+    },
+    {
+      "t": "title",
+      "text": "Enter the range your clinician gave you.",
+      "size": "m"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "mg/dL",
+        "mmol/L"
+      ],
+      "selected": "mg/dL",
+      "key": "value"
+    },
+    {
+      "t": "fieldrow",
+      "fields": [
+        {
+          "t": "field",
+          "label": "Before meals from",
+          "value": "80",
+          "unit": "mg/dL",
+          "kind": "number",
+          "key": "before_meals_from"
+        },
+        {
+          "t": "field",
+          "label": "to",
+          "value": "130",
+          "unit": "mg/dL",
+          "kind": "number",
+          "key": "to"
+        }
+      ]
+    },
+    {
+      "t": "field",
+      "label": "2 h after meals below",
+      "value": "180",
+      "unit": "mg/dL",
+      "kind": "number",
+      "key": "2_h_after_meals_below"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Your low plan",
+      "children": [
+        {
+          "t": "field",
+          "label": "Low below",
+          "value": "70",
+          "unit": "mg/dL",
+          "kind": "number",
+          "key": "low"
+        },
+        {
+          "t": "field",
+          "label": "My low steps",
+          "value": "15 g fast sugar, re-check in 15 min",
+          "kind": "multiline",
+          "key": "my_low_steps"
+        }
+      ]
+    },
+    {
+      "t": "link",
+      "label": "Import from my health record",
+      "action": {
+        "type": "push",
+        "to": "records_add"
+      },
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save range",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/st/range",
+        "then": {
+          "type": "replace",
+          "to": "st_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Import from my health record",
+      "path": "body[6]",
+      "action": {
+        "type": "push",
+        "to": "records_add"
+      },
+      "summary": "push → records_add"
+    },
+    {
+      "element": "Save range",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/st/range",
+        "then": {
+          "type": "replace",
+          "to": "st_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "summary": "PUT /v1/program-data/st/range then replace → st_home (onboarding: ob_setup)"
+    }
+  ]
+}

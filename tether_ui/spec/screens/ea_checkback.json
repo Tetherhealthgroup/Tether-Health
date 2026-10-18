@@ -1,0 +1,125 @@
+{
+  "id": "ea_checkback",
+  "name": "Check-back day",
+  "route": "/p/ea/check-back",
+  "flow": "ea",
+  "program": "ea",
+  "phase": "milestone",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Check-back",
+    "left": "back",
+    "pill": "2 weeks"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "It’s been two weeks. How are things?",
+      "size": "m"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "Worse",
+        "Same",
+        "Better"
+      ],
+      "selected": "Same",
+      "key": "value"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Yes, I have an appointment",
+        "Not yet",
+        "I don’t want to"
+      ],
+      "selected": [
+        "Not yet"
+      ],
+      "multi": false,
+      "label": "Did you reach out to someone?",
+      "key": "did_you_reach_out_to_someone"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "That’s okay. Would a short list of what to say help?",
+      "cta": {
+        "t": "button",
+        "label": "Show me",
+        "action": {
+          "type": "push",
+          "to": "learn_lesson"
+        },
+        "variant": "primary",
+        "arrow": false,
+        "small": true
+      }
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/ea/check-backs",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Show me",
+      "path": "body[3].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "Save",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/ea/check-backs",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "summary": "POST /v1/program-data/ea/check-backs then toast “Saved” then back"
+    }
+  ]
+}

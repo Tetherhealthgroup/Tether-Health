@@ -1,0 +1,102 @@
+{
+  "id": "ck_done",
+  "name": "Mark done",
+  "route": "/p/ck/done",
+  "flow": "ck",
+  "program": "ck",
+  "phase": "milestone",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Mark as done",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "field",
+      "label": "What",
+      "value": "Flu vaccine",
+      "kind": "select",
+      "key": "what"
+    },
+    {
+      "t": "field",
+      "label": "Date",
+      "value": "Oct 12, 2026",
+      "kind": "date",
+      "key": "date"
+    },
+    {
+      "t": "field",
+      "label": "Where (optional)",
+      "value": "Main St Pharmacy",
+      "kind": "text",
+      "key": "where_optional"
+    },
+    {
+      "t": "checklist",
+      "items": [
+        {
+          "label": "Remind me next year",
+          "done": true
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/ck/done",
+        "then": {
+          "type": "toast",
+          "value": "Saved · next due Sep 2027",
+          "then": {
+            "type": "replace",
+            "to": "ck_list"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/ck/done",
+        "then": {
+          "type": "toast",
+          "value": "Saved · next due Sep 2027",
+          "then": {
+            "type": "replace",
+            "to": "ck_list"
+          }
+        }
+      },
+      "summary": "POST /v1/program-data/ck/done then toast “Saved · next due Sep 2027” then replace → ck_list"
+    }
+  ]
+}

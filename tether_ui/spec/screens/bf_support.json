@@ -1,0 +1,137 @@
+{
+  "id": "bf_support",
+  "name": "Support & preparation",
+  "route": "/p/bf/plan/support",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Support",
+    "left": "back",
+    "pill": "Plan 3 of 3"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "You don’t have to do this alone.",
+      "size": "m"
+    },
+    {
+      "t": "list",
+      "title": "Your support circle",
+      "rows": [
+        {
+          "label": "Jordan",
+          "sub": "Friend · text message · evening before",
+          "action": {
+            "type": "push",
+            "to": "support_add_person"
+          },
+          "lead": {
+            "avatar": "J"
+          }
+        },
+        {
+          "label": "Add a supporter",
+          "action": {
+            "type": "push",
+            "to": "support_add_person"
+          },
+          "lead": {
+            "icon": "+"
+          }
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Prepare your space · 2 of 3",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Remove cigarettes, lighters, ashtrays",
+              "done": true
+            },
+            {
+              "label": "Make home and car smoke-free",
+              "done": true
+            },
+            {
+              "label": "Stock gum, water or snacks"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "toggle",
+      "label": "Remind me to discuss quit medicines with my care team",
+      "sub": "Education only. The app never prescribes.",
+      "on": true,
+      "key": "remind_me_to_discuss_quit_medici"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Review my plan",
+      "action": {
+        "type": "push",
+        "to": "bf_review"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Jordan",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "support_add_person"
+      },
+      "summary": "push → support_add_person"
+    },
+    {
+      "element": "Add a supporter",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "support_add_person"
+      },
+      "summary": "push → support_add_person"
+    },
+    {
+      "element": "Review my plan",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_review"
+      },
+      "summary": "push → bf_review"
+    }
+  ]
+}

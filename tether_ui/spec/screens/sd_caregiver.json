@@ -1,0 +1,108 @@
+{
+  "id": "sd_caregiver",
+  "name": "Caregiver access",
+  "route": "/p/sd/caregiver",
+  "flow": "sd",
+  "program": "sd",
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Caregiver access",
+    "left": "back",
+    "pill": "Optional"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Let someone help",
+      "size": "m"
+    },
+    {
+      "t": "field",
+      "label": "Name",
+      "value": "Rosa",
+      "kind": "text",
+      "key": "name"
+    },
+    {
+      "t": "field",
+      "label": "Phone",
+      "value": "(555) 010-2244",
+      "kind": "phone",
+      "key": "phone"
+    },
+    {
+      "t": "checklist",
+      "items": [
+        {
+          "label": "When I finish a session",
+          "done": true
+        },
+        {
+          "label": "If I log a fall",
+          "done": true
+        },
+        {
+          "label": "My other programs",
+          "sub": "Never available to caregivers"
+        }
+      ],
+      "label": "Rosa can see"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Send invite",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/care/caregivers",
+        "then": {
+          "type": "toast",
+          "value": "Invite sent to Rosa",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Send invite",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/care/caregivers",
+        "then": {
+          "type": "toast",
+          "value": "Invite sent to Rosa",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "summary": "POST /v1/care/caregivers then toast “Invite sent to Rosa” then back"
+    }
+  ]
+}
