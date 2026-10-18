@@ -1,8 +1,11 @@
 #!/bin/bash
 # Rebuild everything from the spec and validate it end to end.
 # Needs: python3, playwright (pip install playwright && playwright install chromium), Flutter 3.22+.
-# Exits non-zero if the spec validator, flutter analyze, any Flutter test, or
-# any prototype scenario / sweep case fails. The report is still written first.
+# Exits non-zero on any failure. A failing flutter analyze, Flutter test or
+# prototype scenario / sweep case is reported after validation/ is rewritten.
+# If the first build_all.py run (with its spec validator), pub get,
+# check_prototype.py or report.py itself fails, the script stops there and no
+# report is written.
 set -euo pipefail
 cd "$(dirname "$0")"
 python3 build_all.py --images
