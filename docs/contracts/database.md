@@ -44,8 +44,9 @@ Migration sources of truth:
 `supabase/migrations/202609150001_quit_plans.sql`,
 `supabase/migrations/202609150002_quit_plan_validator_grant.sql`,
 `supabase/migrations/202609150003_quit_plan_upsert_grant.sql`,
-`supabase/migrations/202609150004_quit_plan_integrity.sql`, and
-`supabase/migrations/202609150005_quit_plan_contract_hardening.sql`.
+`supabase/migrations/202609150004_quit_plan_integrity.sql`,
+`supabase/migrations/202609150005_quit_plan_contract_hardening.sql`, and
+`supabase/migrations/202610170001_quit_plan_options.sql`.
 
 `public.quit_plans` stores one complete plan snapshot per authenticated user.
 `user_id` is both the primary key and a cascading foreign key to `profiles.id`.
@@ -60,6 +61,34 @@ bounded synthetic support-person objects, preparation tasks, and treatment or
 care-team reminder preferences. PostgreSQL checks constrain every enum, array
 size, custom text length, nested support-person shape, and top-reason membership.
 The database manages creation and update timestamps.
+
+### Quit-plan option values
+
+The BreatheFree onboarding screens in the `tether_ui` spec show labels; clients
+store the values below. The API (`PUT /v1/quit-plan`,
+`POST /v1/quit-plan/guest-import`) and the PostgreSQL checks accept exactly
+these values. Changes are additive: a value accepted earlier stays accepted, so
+existing rows remain valid.
+
+| Field | Spec screen | Label → stored value |
+|---|---|---|
+| `daily_cigarette_use` | `bf_q1` | "I don’t smoke every day" → `notEveryDay`; "10 or fewer" → `tenOrFewer`; "11–20" → `elevenToTwenty`; "21–30" → `twentyOneToThirty`; "31 or more" → `thirtyOneOrMore` |
+| `smoking_triggers` | `bf_q2` | "Stress" → `stress`; "After meals" → `afterMeals`; "Driving" → `driving`; "With coffee" → `coffee`; "Social" → `socialSettings`; "Work breaks" → `workBreaks`; "Alcohol" → `alcohol`; "Boredom" → `boredom`; "Morning" → `morning`; "Scrolling" → `scrolling` |
+| `custom_smoking_trigger` | `bf_q2` | "Add your own" free text, 1–120 trimmed characters |
+| `quit_reasons`, `top_quit_reason` | `bf_q3` | "Protect my family" → `family`; "Breathe easier" → `breatheEasier`; "Save money" → `saveMoney`; "Feel in control" → `control`; "My health" → `improveHealth`; "Be there for my future" → `future` |
+| `quit_plan_path` | `bf_path` | "Set a quit date" → `setQuitDate`; "Quit today" → `quitToday`; "Reduce gradually" → `reduceGradually`; "Explore first" → `exploreFirst` |
+| `readiness_path` | `bf_path` | "Explore first" → `explore` (required with `exploreFirst`); the other three paths use the default `prepare` |
+| `preparation_tasks` | `bf_support` | "Remove cigarettes, lighters, ashtrays" → `removeSupplies`; "Make home and car smoke-free" → `smokeFreeSpaces`; "Stock gum, water or snacks" → `stockAlternatives` |
+
+Legacy values that the current screens no longer offer stay valid for existing
+rows and older clients: trigger `beforeBed`, reason `custom` (with
+`custom_quit_reason`), and readiness `connect`. Because `beforeBed` and
+`scrolling` are both allowed, `smoking_triggers` holds up to 11 unique values.
+`quit_plan_path = 'exploreFirst'` requires `readiness_path = 'explore'`; both the
+API (HTTP 400) and a check constraint enforce it. `quit_date` is still required
+on every row. The spec's "Explore first" branch sets no date and does not call
+`PUT /v1/quit-plan`, so storing an explore-only plan without a date would need
+a separate contract change.
 
 This table is development-only until privacy, clinical, consent, retention,
 deletion, and compliance review is complete. Only synthetic data may be entered

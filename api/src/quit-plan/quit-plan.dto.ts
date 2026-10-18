@@ -32,7 +32,9 @@ export const smokingTriggerValues = [
   "alcohol",
   "boredom",
   "morning",
+  // Legacy: no longer offered by onboarding; kept valid for existing plans.
   "beforeBed",
+  "scrolling",
 ] as const;
 
 export const readinessPathValues = ["prepare", "explore", "connect"] as const;
@@ -40,6 +42,8 @@ export const quitPlanPathValues = [
   "setQuitDate",
   "quitToday",
   "reduceGradually",
+  // Requires readinessPath "explore" (validated in QuitPlanService).
+  "exploreFirst",
 ] as const;
 export const quitReasonValues = [
   "family",
@@ -100,7 +104,7 @@ export class PutQuitPlanDto {
   dailyCigaretteUse!: DailyCigaretteUse | null;
 
   @IsArray()
-  @ArrayMaxSize(10)
+  @ArrayMaxSize(smokingTriggerValues.length)
   @ArrayUnique()
   @IsIn(smokingTriggerValues, { each: true })
   smokingTriggers!: SmokingTrigger[];
