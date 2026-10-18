@@ -26096,7 +26096,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Shown before anything is switched on, so nobody later reads a number that does not exist. Resolves the \"not a lock\" contradiction by keeping Pause 60 an intent check and naming Unplug as the optional lock.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Shown before anything is switched on, so nobody later reads a number that does not exist. Keeps Pause 60 an intent check and names Unplug as the optional lock.",
     "header": {
       "t": "header",
       "title": "Unplug",
@@ -26137,6 +26137,10 @@
           [
             "Stays",
             "On this phone. Your app list never reaches Tether"
+          ],
+          [
+            "Never paused",
+            "Tether, phone calls and emergency calls"
           ]
         ]
       }
@@ -26181,9 +26185,8 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 (what Unplug can and cannot see; screen A \"What this can see\")",
-      "Source: lib/unplug/screens/unplug_screen_a.dart, models/platform_ceiling.dart"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: lib/unplug/screens/unplug_screen_a.dart, lib/unplug/models/platform_ceiling.dart"
     ],
     "over": null,
     "api": [],
@@ -26246,7 +26249,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. approved → choose apps, denied → denied state, unavailable → unavailable state.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. approved → choose apps, denied → denied state, unavailable → unavailable state.",
     "header": {
       "t": "header",
       "title": "Unplug",
@@ -26336,9 +26339,8 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 permission states",
-      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module requestAuthorization(individual) / PlatformAuthorizationStatus"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module requestAuthorization(individual), PlatformAuthorizationStatus"
     ],
     "over": null,
     "api": [],
@@ -26408,7 +26410,7 @@
     "state": "permission denied",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Unplug",
@@ -26480,8 +26482,7 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 permission states",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAuthorizationStatus.denied"
     ],
     "over": null,
@@ -26553,7 +26554,7 @@
     "state": "unavailable",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Unplug",
@@ -26589,8 +26590,7 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 permission states",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAuthorizationStatus.unavailable"
     ],
     "over": null,
@@ -26627,7 +26627,7 @@
     "state": "android",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Android has no single prompt: usage access and the overlay permission are separate settings pages, checked again when the person returns (authorizationStatus on resume). The foreground service needs a visible notification; its text is generic.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Android has no single prompt: usage access and the overlay permission are separate settings pages, checked again when the person returns (authorizationStatus on resume). The foreground service needs a visible notification; its text is generic.",
     "header": {
       "t": "header",
       "title": "Unplug",
@@ -26713,8 +26713,7 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 permission states (Android)",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: android/.../unplug/UnplugHost.kt (PACKAGE_USAGE_STATS, SYSTEM_ALERT_WINDOW, foreground service)"
     ],
     "over": null,
@@ -26786,7 +26785,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. iPhone host screen around Apple’s FamilyActivityPicker. presentAppPicker returns only a count; app identities stay as device-local tokens.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone host screen around Apple’s FamilyActivityPicker. presentAppPicker returns only a count; app identities stay as device-local tokens.",
     "header": {
       "t": "header",
       "title": "Choose apps",
@@ -26809,6 +26808,11 @@
         "variant": "mint",
         "title": "Start small",
         "text": "One or two apps that pull you in most is a good start. You can change this anytime."
+      },
+      {
+        "t": "text",
+        "text": "Tether, the phone dialer and emergency calling can never be chosen or paused.",
+        "tone": "small"
       }
     ],
     "footer": [
@@ -26833,9 +26837,9 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 1 (app selection host)",
-      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()",
+      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
     ],
     "over": null,
     "api": [],
@@ -26880,7 +26884,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Placeholder for the system picker. In the app this sheet is Apple’s; the buttons stand for the picker’s own Done / Cancel.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Placeholder for the system picker. In the app this sheet is Apple’s; the buttons stand for the picker’s own Done / Cancel.",
     "header": null,
     "body": [
       {
@@ -26931,9 +26935,9 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 1, TNativeSlot",
-      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()",
+      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
     ],
     "over": "Choose apps",
     "api": [],
@@ -26987,7 +26991,7 @@
     "state": "android",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Android draws its own picker (AppPickerActivity, native layout per TH-969). App names shown here are generic examples; the real list is the phone’s launchable apps.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Android draws its own picker (AppPickerActivity, native layout must match this screen). App names shown here are generic examples; the real list is the phone’s launchable apps.",
     "header": {
       "t": "header",
       "title": "Choose apps",
@@ -27031,6 +27035,11 @@
           }
         ],
         "label": "Apps on this phone"
+      },
+      {
+        "t": "text",
+        "text": "Tether, the Phone app and emergency calling aren’t in this list. They can never be paused.",
+        "tone": "small"
       }
     ],
     "footer": [
@@ -27054,9 +27063,9 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 1 (Android picker; TH-969 layout must match)",
-      "Source: android/.../unplug/AppPickerActivity.kt"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: android/.../unplug/AppPickerActivity.kt",
+      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation. On Android the picker leaves them out of the list."
     ],
     "over": null,
     "api": [],
@@ -27101,7 +27110,7 @@
     "state": "apps chosen",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. PlatformAppSelection carries only the person’s group labels and counts. Proposal: group names are device-only (not synced); owner to confirm.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. PlatformAppSelection carries only the person’s group labels and counts. Proposal: group names are device-only (not synced).",
     "header": {
       "t": "header",
       "title": "Choose apps",
@@ -27165,8 +27174,7 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 1",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAppSelection(groupLabels, groupAppCounts, totalApps)"
     ],
     "over": null,
@@ -27213,7 +27221,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Levels map to PlatformModuleConfig.tier (Notice 1, Pause 2, Pause + step 3, Firm 5 = no overrides). Small step maps to gate breath | commitment | puzzle. Device-only: nothing here is sent to Tether. The 24-hour loosening delay comes from the feat branch tier model and is a proposal.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Levels map to PlatformModuleConfig.tier (Notice 1, Pause 2, Pause + step 3, Firm 5 = no overrides). Small step maps to gate breath | commitment | puzzle. Device-only: nothing here is sent to Tether. The loosening delay comes from the feat branch tier model and is a proposal.",
     "header": {
       "t": "header",
       "title": "Limits",
@@ -27315,6 +27323,11 @@
         "t": "text",
         "text": "Stricter limits apply now. Looser limits start tomorrow, so one hard moment doesn’t change your plan.",
         "tone": "small"
+      },
+      {
+        "t": "text",
+        "text": "Every pause screen has a Get support button. Tether, the phone dialer and emergency calling can never be chosen or paused.",
+        "tone": "small"
       }
     ],
     "footer": [
@@ -27338,9 +27351,9 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 items 2-3 (shield/effort-gate configuration, thresholds)",
-      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformThresholds(minutes, opens), PlatformModuleConfig(tier, overrideAllowance, gate none|breath|commitment|puzzle, strict); lib/unplug/screens/unplug_screen_f.dart (tier, cool-off)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformThresholds(minutes, opens), PlatformModuleConfig(tier, overrideAllowance, gate none|breath|commitment|puzzle, strict); lib/unplug/screens/unplug_screen_f.dart (tier, cool-off)",
+      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
     ],
     "over": null,
     "api": [],
@@ -27385,7 +27398,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Reached from ScrollFree home (state \"Unplug on\") and ScrollFree settings. Everything shown is read from this phone.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Reached from ScrollFree home (state \"Unplug on\") and ScrollFree settings. Everything shown is read from this phone.",
     "header": {
       "t": "header",
       "title": "Unplug",
@@ -27498,8 +27511,7 @@
     ],
     "footer": [],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 8 (Unplug settings)",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module"
     ],
     "over": null,
@@ -27609,7 +27621,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Device-only. Proposal: Tether (and so Rescue / 988) and phone calls are never paused.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Device-only. Tether (and so Rescue and 988), the phone dialer and emergency calling are never paused.",
     "header": {
       "t": "header",
       "title": "Focus session",
@@ -27645,7 +27657,7 @@
           },
           {
             "label": "Everything except apps I allow",
-            "sub": "Phone calls and Tether always stay open"
+            "sub": "Tether, phone calls and emergency calls always stay open"
           }
         ],
         "selected": 0,
@@ -27683,9 +27695,9 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 4 (session start)",
-      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module startSession(durationSeconds, PlatformShieldScope selectedApps|everythingExceptAllowlist, strict)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module startSession(durationSeconds, PlatformShieldScope selectedApps|everythingExceptAllowlist, strict)",
+      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
     ],
     "over": null,
     "api": [],
@@ -27726,7 +27738,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Close leaves the session running. The session ends by itself at the end time (see Session complete).",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Close leaves the session running. The session ends by itself at the end time (see Session complete).",
     "header": {
       "t": "header",
       "title": "Focus session",
@@ -27741,7 +27753,7 @@
       },
       {
         "t": "text",
-        "text": "Video apps and Feeds are paused. Tether and phone calls stay open.",
+        "text": "Video apps and Feeds are paused. Tether, phone calls and emergency calls stay open.",
         "tone": "body",
         "align": "center"
       },
@@ -27776,8 +27788,7 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 4 (active session)",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: lib/unplug/screens/unplug_screen_g.dart"
     ],
     "over": null,
@@ -27824,7 +27835,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. End session works only after a reason is chosen or typed (rule sf.unplug.reason).",
     "header": null,
     "body": [
       {
@@ -27834,7 +27845,7 @@
       },
       {
         "t": "text",
-        "text": "This is a strict session. Your reason is kept with the session on this phone. Nothing resets.",
+        "text": "This is a strict session. Choose or type a reason; it is kept with the session on this phone. Nothing resets.",
         "tone": "muted"
       },
       {
@@ -27863,12 +27874,30 @@
         "t": "button",
         "label": "End session",
         "action": {
-          "type": "submit",
-          "api": "CALL device:unplug/endSession",
-          "then": {
-            "type": "replace",
-            "to": "sf_unplug_session_done_early"
-          }
+          "type": "branch",
+          "question": "Strict session: reason given?",
+          "on": null,
+          "decide": "sf.unplug.reason",
+          "cases": [
+            {
+              "label": "Reason given",
+              "action": {
+                "type": "submit",
+                "api": "CALL device:unplug/endSession",
+                "then": {
+                  "type": "replace",
+                  "to": "sf_unplug_session_done_early"
+                }
+              }
+            },
+            {
+              "label": "No reason yet",
+              "action": {
+                "type": "toast",
+                "value": "Choose or type a reason to end a strict session."
+              }
+            }
+          ]
         },
         "variant": "danger",
         "arrow": false
@@ -27884,8 +27913,7 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 4 (end with override reason)",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession(overrideReason)"
     ],
     "over": "Focus session",
@@ -27895,14 +27923,32 @@
         "element": "End session",
         "path": "footer[0]",
         "action": {
-          "type": "submit",
-          "api": "CALL device:unplug/endSession",
-          "then": {
-            "type": "replace",
-            "to": "sf_unplug_session_done_early"
-          }
+          "type": "branch",
+          "question": "Strict session: reason given?",
+          "on": null,
+          "decide": "sf.unplug.reason",
+          "cases": [
+            {
+              "label": "Reason given",
+              "action": {
+                "type": "submit",
+                "api": "CALL device:unplug/endSession",
+                "then": {
+                  "type": "replace",
+                  "to": "sf_unplug_session_done_early"
+                }
+              }
+            },
+            {
+              "label": "No reason yet",
+              "action": {
+                "type": "toast",
+                "value": "Choose or type a reason to end a strict session."
+              }
+            }
+          ]
         },
-        "summary": "CALL device:unplug/endSession then replace → sf_unplug_session_done_early"
+        "summary": "decide sf.unplug.reason: Strict session: reason given? → Reason given: CALL device:unplug/endSession then replace → sf_unplug_session_done_early | No reason yet: toast “Choose or type a reason to end a strict session.”"
       },
       {
         "element": "Keep going",
@@ -27927,7 +27973,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Opened from the session-finished notification (generic text) or when the timer ends in the app.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Opened from the session-finished notification (generic text) or when the timer ends in the app.",
     "header": {
       "t": "header",
       "title": "Focus session",
@@ -27965,8 +28011,7 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 4 (session end)",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession()"
     ],
     "over": null,
@@ -27996,7 +28041,7 @@
     "state": "ended early",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Focus session",
@@ -28041,8 +28086,7 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 4 (session end with override)",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession(overrideReason)"
     ],
     "over": null,
@@ -28072,7 +28116,7 @@
     "state": "default",
     "dark": true,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. iPhone system shield (UnplugShield, ShieldConfiguration). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for TH-968. A ShieldAction cannot open Tether directly; the proposal is a local notification the person taps to finish the small step (needs device validation, H39).",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield. Take a breath posts a local notification with two actions: Take my breath and Get support (opens Rescue without the small step). Needs device validation.",
     "header": null,
     "body": [
       {
@@ -28103,10 +28147,28 @@
         "label": "Take a breath",
         "action": {
           "type": "toast",
-          "value": "Notification: tap to take your breath in Tether",
+          "value": "Notification: open Tether to take your breath, or get support",
           "then": {
-            "type": "push",
-            "to": "sf_unplug_gate"
+            "type": "branch",
+            "question": "Notification action",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Take my breath",
+                "action": {
+                  "type": "push",
+                  "to": "sf_unplug_gate"
+                }
+              },
+              {
+                "label": "Get support",
+                "action": {
+                  "type": "sheet",
+                  "to": "rescue_pick"
+                }
+              }
+            ]
           }
         },
         "variant": "lime",
@@ -28126,9 +28188,9 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 5 (iOS shield appearance)",
-      "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift, ios/UnplugShieldAction/UnplugShieldActionExtension.swift, assets/unplug/intercept_tokens.json"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift, ios/UnplugShieldAction/UnplugShieldActionExtension.swift, assets/unplug/intercept_tokens.json",
+      "A shield button cannot open Tether directly. Proposal: it posts a local notification; tapping it opens Tether. Needs device validation. The notification has two actions: Take my breath (opens the small step) and Get support (opens Rescue directly, without the small step). Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
     ],
     "over": null,
     "api": [],
@@ -28138,13 +28200,31 @@
         "path": "footer[0]",
         "action": {
           "type": "toast",
-          "value": "Notification: tap to take your breath in Tether",
+          "value": "Notification: open Tether to take your breath, or get support",
           "then": {
-            "type": "push",
-            "to": "sf_unplug_gate"
+            "type": "branch",
+            "question": "Notification action",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Take my breath",
+                "action": {
+                  "type": "push",
+                  "to": "sf_unplug_gate"
+                }
+              },
+              {
+                "label": "Get support",
+                "action": {
+                  "type": "sheet",
+                  "to": "rescue_pick"
+                }
+              }
+            ]
           }
         },
-        "summary": "toast “Notification: tap to take your breath in Tether” then push → sf_unplug_gate"
+        "summary": "toast “Notification: open Tether to take your breath, or get support” then branch: Notification action → Take my breath: push → sf_unplug_gate | Get support: sheet → rescue_pick"
       },
       {
         "element": "Open anyway",
@@ -28173,7 +28253,7 @@
     "state": "no “open anyway” left",
     "dark": true,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. iPhone system shield (UnplugShield, ShieldConfiguration). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for TH-968.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield. The second button is Get support: it posts a local notification that opens Rescue. Needs device validation.",
     "header": null,
     "body": [
       {
@@ -28211,12 +28291,25 @@
         },
         "variant": "lime",
         "arrow": false
+      },
+      {
+        "t": "link",
+        "label": "Get support",
+        "action": {
+          "type": "toast",
+          "value": "Notification: tap to open Rescue in Tether",
+          "then": {
+            "type": "sheet",
+            "to": "rescue_pick"
+          }
+        },
+        "align": "center"
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 5 (iOS shield, Firm level or overrides used up)",
-      "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift",
+      "A shield button cannot open Tether directly. Proposal: it posts a local notification; tapping it opens Tether. Needs device validation. The second shield button is always Get support when no “open anyway” is left. Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
     ],
     "over": null,
     "api": [],
@@ -28232,6 +28325,19 @@
           }
         },
         "summary": "toast “The app stays closed.” then close"
+      },
+      {
+        "element": "Get support",
+        "path": "footer[1]",
+        "action": {
+          "type": "toast",
+          "value": "Notification: tap to open Rescue in Tether",
+          "then": {
+            "type": "sheet",
+            "to": "rescue_pick"
+          }
+        },
+        "summary": "toast “Notification: tap to open Rescue in Tether” then sheet → rescue_pick"
       }
     ]
   },
@@ -28248,7 +28354,7 @@
     "state": "default",
     "dark": true,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Drawn over the opened app by the foreground service (SYSTEM_ALERT_WINDOW), 0.5–1.5 s after it opens. The typed-sentence and quick-sum steps use the same layouts as the in-app small-step states. Not an app route: reference for TH-969.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Drawn over the opened app by the foreground service (SYSTEM_ALERT_WINDOW), 0.5–1.5 s after it opens. Get support opens Tether at Rescue. The typed-sentence and quick-sum steps use the same layouts as the in-app small-step states. Not an app route: reference for the native overlay.",
     "header": null,
     "body": [
       {
@@ -28295,6 +28401,16 @@
         "arrow": false
       },
       {
+        "t": "button",
+        "label": "Get support",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "variant": "rescue",
+        "arrow": false
+      },
+      {
         "t": "link",
         "label": "Open anyway",
         "action": {
@@ -28308,9 +28424,9 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 6 (Android intercept overlay; TH-969 layout must match)",
-      "Source: android/.../unplug/InterceptOverlay.kt, assets/unplug/intercept_tokens.json"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: android/.../unplug/InterceptOverlay.kt, assets/unplug/intercept_tokens.json",
+      "Native requirement: Get support opens Tether at Rescue and is always shown, whatever the level or overrides left. Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
     ],
     "over": null,
     "api": [],
@@ -28328,8 +28444,17 @@
         "summary": "toast “The app stays closed.” then close"
       },
       {
-        "element": "Open anyway",
+        "element": "Get support",
         "path": "footer[1]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
+      },
+      {
+        "element": "Open anyway",
+        "path": "footer[2]",
         "action": {
           "type": "toast",
           "value": "Opened · 1 “open anyway” left today",
@@ -28354,7 +28479,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. The ShieldAction defers to the app because the gate needs input the extension has no time or UI for. Clearing it grants the pass length the level allows.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. The shield action hands off to the app because the step needs input the extension has no time or UI for. Clearing it grants the pass length the level allows. Get support opens Rescue without doing the step.",
     "header": {
       "t": "header",
       "title": "Small step",
@@ -28378,6 +28503,23 @@
         "text": "Breathe in as the circle grows, out as it shrinks.",
         "tone": "body",
         "align": "center"
+      },
+      {
+        "t": "card",
+        "variant": "coral",
+        "title": "Need help right now?",
+        "text": "Rescue opens in one tap.",
+        "cta": {
+          "t": "button",
+          "label": "Get support",
+          "action": {
+            "type": "sheet",
+            "to": "rescue_pick"
+          },
+          "variant": "rescue",
+          "arrow": false,
+          "small": true
+        }
       }
     ],
     "footer": [
@@ -28402,15 +28544,15 @@
           "type": "toast",
           "value": "Open for 10 minutes. The pause screen comes back after.",
           "then": {
-            "type": "close"
+            "type": "reset",
+            "to": "sf_home"
           }
         },
         "align": "center"
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 2 (effort gate: breath)",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.breath; lib/unplug/screens/unplug_screen_d.dart"
     ],
     "over": null,
@@ -28423,6 +28565,15 @@
           "type": "close"
         },
         "summary": "close"
+      },
+      {
+        "element": "Get support",
+        "path": "body[3].cta[0]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
       },
       {
         "element": "Keep it closed",
@@ -28444,10 +28595,11 @@
           "type": "toast",
           "value": "Open for 10 minutes. The pause screen comes back after.",
           "then": {
-            "type": "close"
+            "type": "reset",
+            "to": "sf_home"
           }
         },
-        "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then close"
+        "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home"
       }
     ]
   },
@@ -28464,7 +28616,7 @@
     "state": "typed sentence",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Open it works only after the sentence is typed in full (rule sf.unplug.sentence).",
     "header": {
       "t": "header",
       "title": "Small step",
@@ -28488,6 +28640,23 @@
         "placeholder": "I can come back to this later",
         "kind": "text",
         "key": "sentence"
+      },
+      {
+        "t": "card",
+        "variant": "coral",
+        "title": "Need help right now?",
+        "text": "Rescue opens in one tap.",
+        "cta": {
+          "t": "button",
+          "label": "Get support",
+          "action": {
+            "type": "sheet",
+            "to": "rescue_pick"
+          },
+          "variant": "rescue",
+          "arrow": false,
+          "small": true
+        }
       }
     ],
     "footer": [
@@ -28509,18 +28678,36 @@
         "t": "link",
         "label": "Open it for 10 minutes",
         "action": {
-          "type": "toast",
-          "value": "Open for 10 minutes. The pause screen comes back after.",
-          "then": {
-            "type": "close"
-          }
+          "type": "branch",
+          "question": "Small step done?",
+          "on": null,
+          "decide": "sf.unplug.sentence",
+          "cases": [
+            {
+              "label": "Step done",
+              "action": {
+                "type": "toast",
+                "value": "Open for 10 minutes. The pause screen comes back after.",
+                "then": {
+                  "type": "reset",
+                  "to": "sf_home"
+                }
+              }
+            },
+            {
+              "label": "Step not done",
+              "action": {
+                "type": "toast",
+                "value": "Type the whole sentence first."
+              }
+            }
+          ]
         },
         "align": "center"
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 2 (effort gate: commitment)",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.commitment"
     ],
     "over": null,
@@ -28533,6 +28720,15 @@
           "type": "close"
         },
         "summary": "close"
+      },
+      {
+        "element": "Get support",
+        "path": "body[3].cta[0]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
       },
       {
         "element": "Keep it closed",
@@ -28551,13 +28747,32 @@
         "element": "Open it for 10 minutes",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "Open for 10 minutes. The pause screen comes back after.",
-          "then": {
-            "type": "close"
-          }
+          "type": "branch",
+          "question": "Small step done?",
+          "on": null,
+          "decide": "sf.unplug.sentence",
+          "cases": [
+            {
+              "label": "Step done",
+              "action": {
+                "type": "toast",
+                "value": "Open for 10 minutes. The pause screen comes back after.",
+                "then": {
+                  "type": "reset",
+                  "to": "sf_home"
+                }
+              }
+            },
+            {
+              "label": "Step not done",
+              "action": {
+                "type": "toast",
+                "value": "Type the whole sentence first."
+              }
+            }
+          ]
         },
-        "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then close"
+        "summary": "decide sf.unplug.sentence: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Type the whole sentence first.”"
       }
     ]
   },
@@ -28574,7 +28789,7 @@
     "state": "quick sum",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Open it works only after the right answer is typed (rule sf.unplug.sum).",
     "header": {
       "t": "header",
       "title": "Small step",
@@ -28597,6 +28812,23 @@
         "placeholder": "?",
         "kind": "number",
         "key": "answer"
+      },
+      {
+        "t": "card",
+        "variant": "coral",
+        "title": "Need help right now?",
+        "text": "Rescue opens in one tap.",
+        "cta": {
+          "t": "button",
+          "label": "Get support",
+          "action": {
+            "type": "sheet",
+            "to": "rescue_pick"
+          },
+          "variant": "rescue",
+          "arrow": false,
+          "small": true
+        }
       }
     ],
     "footer": [
@@ -28618,18 +28850,36 @@
         "t": "link",
         "label": "Open it for 10 minutes",
         "action": {
-          "type": "toast",
-          "value": "Open for 10 minutes. The pause screen comes back after.",
-          "then": {
-            "type": "close"
-          }
+          "type": "branch",
+          "question": "Small step done?",
+          "on": null,
+          "decide": "sf.unplug.sum",
+          "cases": [
+            {
+              "label": "Step done",
+              "action": {
+                "type": "toast",
+                "value": "Open for 10 minutes. The pause screen comes back after.",
+                "then": {
+                  "type": "reset",
+                  "to": "sf_home"
+                }
+              }
+            },
+            {
+              "label": "Step not done",
+              "action": {
+                "type": "toast",
+                "value": "Answer the sum first."
+              }
+            }
+          ]
         },
         "align": "center"
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 2 (effort gate: puzzle)",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.puzzle"
     ],
     "over": null,
@@ -28642,6 +28892,15 @@
           "type": "close"
         },
         "summary": "close"
+      },
+      {
+        "element": "Get support",
+        "path": "body[3].cta[0]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
       },
       {
         "element": "Keep it closed",
@@ -28660,13 +28919,32 @@
         "element": "Open it for 10 minutes",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "Open for 10 minutes. The pause screen comes back after.",
-          "then": {
-            "type": "close"
-          }
+          "type": "branch",
+          "question": "Small step done?",
+          "on": null,
+          "decide": "sf.unplug.sum",
+          "cases": [
+            {
+              "label": "Step done",
+              "action": {
+                "type": "toast",
+                "value": "Open for 10 minutes. The pause screen comes back after.",
+                "then": {
+                  "type": "reset",
+                  "to": "sf_home"
+                }
+              }
+            },
+            {
+              "label": "Step not done",
+              "action": {
+                "type": "toast",
+                "value": "Answer the sum first."
+              }
+            }
+          ]
         },
-        "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then close"
+        "summary": "decide sf.unplug.sum: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Answer the sum first.”"
       }
     ]
   },
@@ -28683,7 +28961,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Tracking check",
@@ -28734,8 +29012,7 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 7 (tracking health)",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module trackingHealth() (iOS: authorization, schedule, App Group)"
     ],
     "over": null,
@@ -28772,7 +29049,7 @@
     "state": "tracking stopped",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Also opened from the \"Unplug needs attention\" notification (generic text, no program name).",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Also opened from the \"Unplug needs attention\" notification (generic text, no program name).",
     "header": {
       "t": "header",
       "title": "Tracking check",
@@ -28845,8 +29122,7 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 7 (\"tracking stopped\", onTrackingStopped)",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module UnplugFlutterApi.onTrackingStopped(checkName, detail)"
     ],
     "over": null,
@@ -28910,7 +29186,7 @@
     "state": "android",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Tracking check",
@@ -28970,8 +29246,7 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 7 (Android)",
+      "Proposal for owner review. Copy needs clinical/legal review.",
       "Source: android/.../unplug/UnplugHost.kt trackingHealth() (usage access, foreground service alive, overlay permission)"
     ],
     "over": null,
@@ -29016,7 +29291,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Unplug only: liftShield + purgeLocalData(0). With Screen Time: also revokes the ScrollFree screen_time consent (then the same purge).",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Unplug only: liftShield + purgeLocalData(0). With Screen Time: also revokes the ScrollFree screen_time consent (then the same purge).",
     "header": null,
     "body": [
       {
@@ -29102,9 +29377,8 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 8 (\"turn off\")",
-      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module liftShield(reason), purgeLocalData(0); A.4 \"Turn off anytime\" = revoke screen_time consent"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module liftShield(reason), purgeLocalData(0); ScrollFree screen_time consent"
     ],
     "over": "Unplug",
     "api": [],
@@ -29175,7 +29449,7 @@
     "state": "Unplug not set up (proposal)",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Identical to ScrollFree home plus one optional card that opens Unplug setup.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Identical to ScrollFree home plus one optional card that opens Unplug setup.",
     "header": {
       "t": "header",
       "title": "ScrollFree",
@@ -29297,8 +29571,8 @@
     ],
     "footer": [],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · entry point to Unplug from ScrollFree"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: sf_home in this spec (body copied unchanged, one card added)"
     ],
     "over": null,
     "api": [],
@@ -29434,7 +29708,7 @@
     "state": "Unplug on · iPhone (proposal)",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.",
     "header": {
       "t": "header",
       "title": "ScrollFree",
@@ -29557,9 +29831,8 @@
     ],
     "footer": [],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 9 (TNativeSlot for the iOS DeviceActivityReport minutes) and B.4 \"label server figures as self-report\"",
-      "Source: TH-902b B.4: UnplugReport (DeviceActivityReport extension, new in TH-968)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: DeviceActivityReport extension (new); ios/Runner/Unplug/UnplugHost.swift readUsage (iOS returns no minutes)"
     ],
     "over": null,
     "api": [],
@@ -29695,7 +29968,7 @@
     "state": "Unplug on · iPhone (proposal)",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Apple’s weekly report sits above the person’s own estimates, which are what Tether stores and charts.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Apple’s weekly report sits above the person’s own estimates, which are what Tether stores and charts.",
     "header": {
       "t": "header",
       "title": "Week 2",
@@ -29812,9 +30085,8 @@
     ],
     "footer": [],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 9 (TNativeSlot on sf_week)",
-      "Source: TH-902b B.4: UnplugReport (DeviceActivityReport extension)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: DeviceActivityReport extension (new); sf_week in this spec"
     ],
     "over": null,
     "api": [],
@@ -29862,7 +30134,7 @@
     "state": "ScrollFree with Unplug (proposal)",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Program settings shown with ScrollFree data. Leaving ScrollFree or deleting the account also runs purgeLocalData(0) (TH-933).",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Program settings shown with ScrollFree data. Leaving ScrollFree or deleting the account also runs purgeLocalData(0).",
     "header": {
       "t": "header",
       "title": "ScrollFree settings",
@@ -29997,8 +30269,8 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 · B.4 item 8 (Unplug settings and \"turn off\" in Account → ScrollFree)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: program_settings in this spec (same layout, ScrollFree data); pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module purgeLocalData(0)"
     ],
     "over": null,
     "api": [
@@ -30089,7 +30361,7 @@
     "state": "iPhone report wording (proposal)",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Same layout as Connect Screen Time with \"reads\" changed to \"shows\". Owner picks this wording or legal accepts \"reads\".",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Same layout as Connect Screen Time with \"reads\" changed to \"shows\". The owner picks this wording, or legal accepts \"reads\".",
     "header": {
       "t": "header",
       "title": "Screen Time",
@@ -30175,9 +30447,8 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-30 / B.4 copy contradiction: sf_screentime says Tether \"reads\" totals; on iPhone the report extension only shows them",
-      "Source: ios/Runner/Unplug/UnplugHost.swift:239-253 (no API hands the app a number of minutes)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: ios/Runner/Unplug/UnplugHost.swift:239-253 @ origin/feat/unplug-v2.1-module (no API hands the app a number of minutes)"
     ],
     "over": null,
     "api": [],
@@ -30243,7 +30514,7 @@
     "state": "Apple account",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Apple re-auth for the same provider; the returned user id must match (TH-935). Delete runs only after Success.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Apple re-auth for the same provider; the returned user id must match the signed-in user. Delete runs only after Success.",
     "header": {
       "t": "header",
       "title": "Delete account",
@@ -30356,9 +30627,8 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-36 (social-user account_delete) · TH-935 social re-auth",
-      "Source: ARCH-TH-902 A.5 \"Social re-auth fix\""
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: account_delete in this spec; lib/auth/auth_gateway.dart RecentAuthGateway.reauthenticate (password only today)"
     ],
     "over": null,
     "api": [
@@ -30443,7 +30713,7 @@
     "state": "Google account",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Google re-auth for the same provider; the returned user id must match (TH-935). Delete runs only after Success.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Google re-auth for the same provider; the returned user id must match the signed-in user. Delete runs only after Success.",
     "header": {
       "t": "header",
       "title": "Delete account",
@@ -30556,9 +30826,8 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-36 (social-user account_delete) · TH-935 social re-auth",
-      "Source: ARCH-TH-902 A.5 \"Social re-auth fix\""
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: account_delete in this spec; lib/auth/auth_gateway.dart RecentAuthGateway.reauthenticate (password only today)"
     ],
     "over": null,
     "api": [
@@ -30643,7 +30912,7 @@
     "state": "Apple account",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Apple button.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Apple button.",
     "header": null,
     "body": [
       {
@@ -30716,9 +30985,8 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-36 (social-user auth_session) · TH-935",
-      "Source: ARCH-TH-902 A.5"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: auth_session in this spec; Supabase signInWithIdToken"
     ],
     "over": "Today",
     "api": [
@@ -30782,7 +31050,7 @@
     "state": "Google account",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Google button.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Google button.",
     "header": null,
     "body": [
       {
@@ -30856,9 +31124,8 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-36 (social-user auth_session) · TH-935",
-      "Source: ARCH-TH-902 A.5"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: auth_session in this spec; Supabase signInWithIdToken"
     ],
     "over": "Today",
     "api": [
@@ -30922,7 +31189,7 @@
     "state": "android",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Android has no permission prompt for usage access; the person turns it on in Settings and the app checks again on return.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Android has no permission prompt for usage access; the person turns it on in Settings and the app checks again on return.",
     "header": {
       "t": "header",
       "title": "Screen Time",
@@ -31023,9 +31290,8 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-36 (Android variant of sf_screentime)",
-      "Source: ARCH-TH-902 A.4: Android opens usage-access settings and reads authorizationStatus() on resume"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: sf_screentime in this spec; android/.../unplug/UsageReader.kt (usage access, checked on resume)"
     ],
     "over": null,
     "api": [],
@@ -31091,7 +31357,7 @@
     "state": "android · not allowed",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Screen Time",
@@ -31136,8 +31402,8 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-36 (Android variant of sf_screentime_denied)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: sf_screentime_denied in this spec (same copy, Android wording in the banner)"
     ],
     "over": null,
     "api": [],
@@ -31181,7 +31447,7 @@
     "state": "android",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Same as Update required; Update now opens Google Play. The iPhone App Store URL in the base screen still needs the real App Store ID.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Update required; Update now opens Google Play. The iPhone App Store URL in the base screen still needs the real App Store ID.",
     "header": {
       "t": "header",
       "title": "Update needed",
@@ -31229,9 +31495,8 @@
       }
     ],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-36 (sys_update Play Store URL per platform)",
-      "Source: P-28 app ID com.TetherHealthLLC.tetherhealth"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: sys_update in this spec; app ID com.TetherHealthLLC.tetherhealth"
     ],
     "over": null,
     "api": [],
@@ -31269,7 +31534,7 @@
     "state": "default",
     "dark": true,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.",
     "header": {
       "t": "header",
       "title": "iPhone widget",
@@ -31316,9 +31581,8 @@
     ],
     "footer": [],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-32 / P-48 · B.5 (rescue_pick entry: \"Home-screen widget / Siri: Rescue\")",
-      "Source: ARCH-TH-902 B.5 TH-966 (WidgetKit, static)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: rescue_pick entry \"Home-screen widget / Siri: Rescue\" in this spec; WidgetKit, static content"
     ],
     "over": null,
     "api": [],
@@ -31355,7 +31619,7 @@
     "state": "default",
     "dark": true,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Android widget",
@@ -31402,9 +31666,8 @@
     ],
     "footer": [],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-32 / P-48 · B.5 (rescue_pick entry)",
-      "Source: ARCH-TH-902 B.5 TH-967 (RemoteViews widget)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: rescue_pick entry in this spec; Android RemoteViews widget"
     ],
     "over": null,
     "api": [],
@@ -31441,7 +31704,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. App Intents exposed as App Shortcuts. The My plan intent is donated only while enrolled in ClearAir and opens the ClearAir red-zone plan.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review. App Intents exposed as App Shortcuts. The My plan intent is offered only while enrolled in ClearAir and opens the ClearAir red-zone plan.",
     "header": {
       "t": "header",
       "title": "Siri & Shortcuts",
@@ -31490,9 +31753,8 @@
     ],
     "footer": [],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-32 / P-48 · B.5 (rescue_pick Siri entry; ca_red \"Shortcut: ClearAir red-zone plan\")",
-      "Source: ARCH-TH-902 B.5 TH-966 (OpenRescueIntent, OpenClearAirRedZoneIntent)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: rescue_pick and ca_red entries in this spec; App Intents (OpenRescueIntent, OpenClearAirRedZoneIntent)"
     ],
     "over": null,
     "api": [],
@@ -31538,7 +31800,7 @@
     "state": "Show sensitive details on",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Siri & Shortcuts",
@@ -31582,8 +31844,8 @@
     ],
     "footer": [],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-48 (program names only with sensitive_details)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: surface_shortcuts_ios plus the Show sensitive details toggle on account_notifications in this spec"
     ],
     "over": null,
     "api": [],
@@ -31629,7 +31891,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "App shortcuts",
@@ -31678,9 +31940,8 @@
     ],
     "footer": [],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-32 / P-48 · B.5 (rescue_pick, ca_red entries)",
-      "Source: ARCH-TH-902 B.5 TH-967 (shortcuts.xml + ShortcutManager)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager"
     ],
     "over": null,
     "api": [],
@@ -31726,7 +31987,7 @@
     "state": "Show sensitive details on",
     "dark": false,
     "bg": null,
-    "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "App shortcuts",
@@ -31770,8 +32031,8 @@
     ],
     "footer": [],
     "notes": [
-      "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-      "Serves: P-48 (program names only with sensitive_details)"
+      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Source: surface_shortcuts_android plus the Show sensitive details toggle on account_notifications in this spec"
     ],
     "over": null,
     "api": [],

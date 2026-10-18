@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. approved → choose apps, denied → denied state, unavailable → unavailable state.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. approved → choose apps, denied → denied state, unavailable → unavailable state.",
   "header": {
     "t": "header",
     "title": "Unplug",
@@ -101,9 +101,8 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 permission states",
-    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module requestAuthorization(individual) / PlatformAuthorizationStatus"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module requestAuthorization(individual), PlatformAuthorizationStatus"
   ],
   "over": null,
   "api": [],

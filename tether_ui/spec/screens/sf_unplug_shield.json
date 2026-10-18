@@ -11,7 +11,7 @@
   "state": "default",
   "dark": true,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. iPhone system shield (UnplugShield, ShieldConfiguration). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for TH-968. A ShieldAction cannot open Tether directly; the proposal is a local notification the person taps to finish the small step (needs device validation, H39).",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield. Take a breath posts a local notification with two actions: Take my breath and Get support (opens Rescue without the small step). Needs device validation.",
   "header": null,
   "body": [
     {
@@ -42,10 +42,28 @@
       "label": "Take a breath",
       "action": {
         "type": "toast",
-        "value": "Notification: tap to take your breath in Tether",
+        "value": "Notification: open Tether to take your breath, or get support",
         "then": {
-          "type": "push",
-          "to": "sf_unplug_gate"
+          "type": "branch",
+          "question": "Notification action",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Take my breath",
+              "action": {
+                "type": "push",
+                "to": "sf_unplug_gate"
+              }
+            },
+            {
+              "label": "Get support",
+              "action": {
+                "type": "sheet",
+                "to": "rescue_pick"
+              }
+            }
+          ]
         }
       },
       "variant": "lime",
@@ -65,9 +83,9 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 item 5 (iOS shield appearance)",
-    "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift, ios/UnplugShieldAction/UnplugShieldActionExtension.swift, assets/unplug/intercept_tokens.json"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift, ios/UnplugShieldAction/UnplugShieldActionExtension.swift, assets/unplug/intercept_tokens.json",
+    "A shield button cannot open Tether directly. Proposal: it posts a local notification; tapping it opens Tether. Needs device validation. The notification has two actions: Take my breath (opens the small step) and Get support (opens Rescue directly, without the small step). Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
   ],
   "over": null,
   "api": [],
@@ -77,13 +95,31 @@
       "path": "footer[0]",
       "action": {
         "type": "toast",
-        "value": "Notification: tap to take your breath in Tether",
+        "value": "Notification: open Tether to take your breath, or get support",
         "then": {
-          "type": "push",
-          "to": "sf_unplug_gate"
+          "type": "branch",
+          "question": "Notification action",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Take my breath",
+              "action": {
+                "type": "push",
+                "to": "sf_unplug_gate"
+              }
+            },
+            {
+              "label": "Get support",
+              "action": {
+                "type": "sheet",
+                "to": "rescue_pick"
+              }
+            }
+          ]
         }
       },
-      "summary": "toast “Notification: tap to take your breath in Tether” then push → sf_unplug_gate"
+      "summary": "toast “Notification: open Tether to take your breath, or get support” then branch: Notification action → Take my breath: push → sf_unplug_gate | Get support: sheet → rescue_pick"
     },
     {
       "element": "Open anyway",

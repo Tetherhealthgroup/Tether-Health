@@ -11,7 +11,7 @@
   "state": "android · not allowed",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review.",
   "header": {
     "t": "header",
     "title": "Screen Time",
@@ -56,8 +56,8 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-36 (Android variant of sf_screentime_denied)"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: sf_screentime_denied in this spec (same copy, Android wording in the banner)"
   ],
   "over": null,
   "api": [],

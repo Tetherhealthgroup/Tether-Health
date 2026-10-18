@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Levels map to PlatformModuleConfig.tier (Notice 1, Pause 2, Pause + step 3, Firm 5 = no overrides). Small step maps to gate breath | commitment | puzzle. Device-only: nothing here is sent to Tether. The 24-hour loosening delay comes from the feat branch tier model and is a proposal.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Levels map to PlatformModuleConfig.tier (Notice 1, Pause 2, Pause + step 3, Firm 5 = no overrides). Small step maps to gate breath | commitment | puzzle. Device-only: nothing here is sent to Tether. The loosening delay comes from the feat branch tier model and is a proposal.",
   "header": {
     "t": "header",
     "title": "Limits",
@@ -113,6 +113,11 @@
       "t": "text",
       "text": "Stricter limits apply now. Looser limits start tomorrow, so one hard moment doesn’t change your plan.",
       "tone": "small"
+    },
+    {
+      "t": "text",
+      "text": "Every pause screen has a Get support button. Tether, the phone dialer and emergency calling can never be chosen or paused.",
+      "tone": "small"
     }
   ],
   "footer": [
@@ -136,9 +141,9 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 items 2-3 (shield/effort-gate configuration, thresholds)",
-    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformThresholds(minutes, opens), PlatformModuleConfig(tier, overrideAllowance, gate none|breath|commitment|puzzle, strict); lib/unplug/screens/unplug_screen_f.dart (tier, cool-off)"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformThresholds(minutes, opens), PlatformModuleConfig(tier, overrideAllowance, gate none|breath|commitment|puzzle, strict); lib/unplug/screens/unplug_screen_f.dart (tier, cool-off)",
+    "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
   ],
   "over": null,
   "api": [],

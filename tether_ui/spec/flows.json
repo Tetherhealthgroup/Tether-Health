@@ -356,8 +356,8 @@
   },
   {
     "id": "unplug",
-    "title": "ScrollFree · Unplug (TH-953 proposal)",
-    "description": "Optional app limits for ScrollFree: what Unplug can see, Screen Time / Android permissions, choosing apps, limits and the pause screen, focus sessions, the iPhone shield and Android overlay, the small-step gate, tracking check and turning it off. Proposal for owner review (H32). Related states elsewhere: ScrollFree home (Unplug offer, Unplug on), Weekly reflection (Unplug on), Program settings (ScrollFree with Unplug), Connect Screen Time (Android, iPhone report wording).",
+    "title": "ScrollFree · Unplug (proposal)",
+    "description": "Optional app limits for ScrollFree: what Unplug can see, Screen Time / Android permissions, choosing apps, limits and the pause screen, focus sessions, the iPhone shield and Android overlay, the small-step gate, tracking check and turning it off. Proposal for owner review. Every pause surface reaches Rescue. Related states elsewhere: ScrollFree home (Unplug offer, Unplug on), Weekly reflection (Unplug on), Program settings (ScrollFree with Unplug), Connect Screen Time (Android, iPhone report wording).",
     "program": "sf",
     "screens": [
       "sf_unplug_intro",
@@ -390,8 +390,8 @@
   },
   {
     "id": "entries",
-    "title": "Home screen, Siri & shortcuts (TH-953 proposal)",
-    "description": "How Tether looks outside the app: the home-screen widget, Siri and App Shortcuts on iPhone, and launcher shortcuts and the widget on Android. Labels are generic by default (P-48); program names appear only when Show sensitive details is on. These are references for the native work (TH-966, TH-967), not app routes.",
+    "title": "Home screen, Siri & shortcuts (proposal)",
+    "description": "How Tether looks outside the app: the home-screen widget, Siri and App Shortcuts on iPhone, and launcher shortcuts and the widget on Android. Labels are generic by default; program names appear only when Show sensitive details is on. These are references for the native widget and shortcut work, not app routes.",
     "program": null,
     "screens": [
       "surface_widget_ios",

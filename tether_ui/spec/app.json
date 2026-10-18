@@ -58,19 +58,19 @@
     },
     {
       "screen": "surface_widget_ios",
-      "trigger": "Reference: iPhone home-screen widget (TH-966)"
+      "trigger": "Reference: iPhone home-screen widget"
     },
     {
       "screen": "surface_widget_android",
-      "trigger": "Reference: Android home-screen widget (TH-967)"
+      "trigger": "Reference: Android home-screen widget"
     },
     {
       "screen": "surface_shortcuts_ios",
-      "trigger": "Reference: Siri & App Shortcuts (TH-966)"
+      "trigger": "Reference: Siri & App Shortcuts"
     },
     {
       "screen": "surface_shortcuts_android",
-      "trigger": "Reference: Android launcher shortcuts (TH-967)"
+      "trigger": "Reference: Android launcher shortcuts"
     }
   ],
   "tabs": {

@@ -11,7 +11,7 @@
   "state": "permission denied",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review.",
   "header": {
     "t": "header",
     "title": "Unplug",
@@ -83,8 +83,7 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 permission states",
+    "Proposal for owner review. Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAuthorizationStatus.denied"
   ],
   "over": null,

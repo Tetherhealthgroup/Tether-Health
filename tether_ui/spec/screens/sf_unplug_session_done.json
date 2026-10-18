@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Opened from the session-finished notification (generic text) or when the timer ends in the app.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Opened from the session-finished notification (generic text) or when the timer ends in the app.",
   "header": {
     "t": "header",
     "title": "Focus session",
@@ -49,8 +49,7 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 item 4 (session end)",
+    "Proposal for owner review. Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession()"
   ],
   "over": null,

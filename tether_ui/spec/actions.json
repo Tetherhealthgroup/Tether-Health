@@ -8468,11 +8468,11 @@
     "screen_name": "End session early",
     "element": "End session",
     "path": "footer[0]",
-    "type": "submit",
+    "type": "branch",
     "targets": [
       "sf_unplug_session_done_early"
     ],
-    "summary": "CALL device:unplug/endSession then replace → sf_unplug_session_done_early"
+    "summary": "decide sf.unplug.reason: Strict session: reason given? → Reason given: CALL device:unplug/endSession then replace → sf_unplug_session_done_early | No reason yet: toast “Choose or type a reason to end a strict session.”"
   },
   {
     "screen": "sf_unplug_session_end",
@@ -8512,9 +8512,10 @@
     "path": "footer[0]",
     "type": "toast",
     "targets": [
-      "sf_unplug_gate"
+      "sf_unplug_gate",
+      "rescue_pick"
     ],
-    "summary": "toast “Notification: tap to take your breath in Tether” then push → sf_unplug_gate"
+    "summary": "toast “Notification: open Tether to take your breath, or get support” then branch: Notification action → Take my breath: push → sf_unplug_gate | Get support: sheet → rescue_pick"
   },
   {
     "screen": "sf_unplug_shield",
@@ -8535,6 +8536,17 @@
     "summary": "toast “The app stays closed.” then close"
   },
   {
+    "screen": "sf_unplug_shield_firm",
+    "screen_name": "Pause screen (iPhone shield, firm)",
+    "element": "Get support",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "toast “Notification: tap to open Rescue in Tether” then sheet → rescue_pick"
+  },
+  {
     "screen": "sf_unplug_overlay",
     "screen_name": "Pause screen (Android overlay)",
     "element": "Close the app",
@@ -8546,8 +8558,19 @@
   {
     "screen": "sf_unplug_overlay",
     "screen_name": "Pause screen (Android overlay)",
-    "element": "Open anyway",
+    "element": "Get support",
     "path": "footer[1]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "sf_unplug_overlay",
+    "screen_name": "Pause screen (Android overlay)",
+    "element": "Open anyway",
+    "path": "footer[2]",
     "type": "toast",
     "targets": [],
     "summary": "toast “Opened · 1 “open anyway” left today” then close"
@@ -8564,6 +8587,17 @@
   {
     "screen": "sf_unplug_gate",
     "screen_name": "Small step: one breath",
+    "element": "Get support",
+    "path": "body[3].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "sf_unplug_gate",
+    "screen_name": "Small step: one breath",
     "element": "Keep it closed",
     "path": "footer[0]",
     "type": "toast",
@@ -8578,8 +8612,10 @@
     "element": "Open it for 10 minutes",
     "path": "footer[1]",
     "type": "toast",
-    "targets": [],
-    "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then close"
+    "targets": [
+      "sf_home"
+    ],
+    "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home"
   },
   {
     "screen": "sf_unplug_gate_commit",
@@ -8589,6 +8625,17 @@
     "type": "close",
     "targets": [],
     "summary": "close"
+  },
+  {
+    "screen": "sf_unplug_gate_commit",
+    "screen_name": "Small step: type a sentence",
+    "element": "Get support",
+    "path": "body[3].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
   },
   {
     "screen": "sf_unplug_gate_commit",
@@ -8606,9 +8653,11 @@
     "screen_name": "Small step: type a sentence",
     "element": "Open it for 10 minutes",
     "path": "footer[1]",
-    "type": "toast",
-    "targets": [],
-    "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then close"
+    "type": "branch",
+    "targets": [
+      "sf_home"
+    ],
+    "summary": "decide sf.unplug.sentence: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Type the whole sentence first.”"
   },
   {
     "screen": "sf_unplug_gate_sum",
@@ -8618,6 +8667,17 @@
     "type": "close",
     "targets": [],
     "summary": "close"
+  },
+  {
+    "screen": "sf_unplug_gate_sum",
+    "screen_name": "Small step: quick sum",
+    "element": "Get support",
+    "path": "body[3].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
   },
   {
     "screen": "sf_unplug_gate_sum",
@@ -8635,9 +8695,11 @@
     "screen_name": "Small step: quick sum",
     "element": "Open it for 10 minutes",
     "path": "footer[1]",
-    "type": "toast",
-    "targets": [],
-    "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then close"
+    "type": "branch",
+    "targets": [
+      "sf_home"
+    ],
+    "summary": "decide sf.unplug.sum: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Answer the sum first.”"
   },
   {
     "screen": "sf_unplug_health",

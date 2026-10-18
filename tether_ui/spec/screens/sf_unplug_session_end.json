@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. End session works only after a reason is chosen or typed (rule sf.unplug.reason).",
   "header": null,
   "body": [
     {
@@ -21,7 +21,7 @@
     },
     {
       "t": "text",
-      "text": "This is a strict session. Your reason is kept with the session on this phone. Nothing resets.",
+      "text": "This is a strict session. Choose or type a reason; it is kept with the session on this phone. Nothing resets.",
       "tone": "muted"
     },
     {
@@ -50,12 +50,30 @@
       "t": "button",
       "label": "End session",
       "action": {
-        "type": "submit",
-        "api": "CALL device:unplug/endSession",
-        "then": {
-          "type": "replace",
-          "to": "sf_unplug_session_done_early"
-        }
+        "type": "branch",
+        "question": "Strict session: reason given?",
+        "on": null,
+        "decide": "sf.unplug.reason",
+        "cases": [
+          {
+            "label": "Reason given",
+            "action": {
+              "type": "submit",
+              "api": "CALL device:unplug/endSession",
+              "then": {
+                "type": "replace",
+                "to": "sf_unplug_session_done_early"
+              }
+            }
+          },
+          {
+            "label": "No reason yet",
+            "action": {
+              "type": "toast",
+              "value": "Choose or type a reason to end a strict session."
+            }
+          }
+        ]
       },
       "variant": "danger",
       "arrow": false
@@ -71,8 +89,7 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 item 4 (end with override reason)",
+    "Proposal for owner review. Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession(overrideReason)"
   ],
   "over": "Focus session",
@@ -82,14 +99,32 @@
       "element": "End session",
       "path": "footer[0]",
       "action": {
-        "type": "submit",
-        "api": "CALL device:unplug/endSession",
-        "then": {
-          "type": "replace",
-          "to": "sf_unplug_session_done_early"
-        }
+        "type": "branch",
+        "question": "Strict session: reason given?",
+        "on": null,
+        "decide": "sf.unplug.reason",
+        "cases": [
+          {
+            "label": "Reason given",
+            "action": {
+              "type": "submit",
+              "api": "CALL device:unplug/endSession",
+              "then": {
+                "type": "replace",
+                "to": "sf_unplug_session_done_early"
+              }
+            }
+          },
+          {
+            "label": "No reason yet",
+            "action": {
+              "type": "toast",
+              "value": "Choose or type a reason to end a strict session."
+            }
+          }
+        ]
       },
-      "summary": "CALL device:unplug/endSession then replace → sf_unplug_session_done_early"
+      "summary": "decide sf.unplug.reason: Strict session: reason given? → Reason given: CALL device:unplug/endSession then replace → sf_unplug_session_done_early | No reason yet: toast “Choose or type a reason to end a strict session.”"
     },
     {
       "element": "Keep going",

@@ -11,7 +11,7 @@
   "state": "Unplug on · iPhone (proposal)",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.",
   "header": {
     "t": "header",
     "title": "ScrollFree",
@@ -134,9 +134,8 @@
   ],
   "footer": [],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 item 9 (TNativeSlot for the iOS DeviceActivityReport minutes) and B.4 \"label server figures as self-report\"",
-    "Source: TH-902b B.4: UnplugReport (DeviceActivityReport extension, new in TH-968)"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: DeviceActivityReport extension (new); ios/Runner/Unplug/UnplugHost.swift readUsage (iOS returns no minutes)"
   ],
   "over": null,
   "api": [],

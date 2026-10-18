@@ -813,24 +813,29 @@ sf_unplug_session,Start a focus session,Start session,submit,sf_unplug_session_a
 sf_unplug_session_active,Focus session running,Close,close,,close
 sf_unplug_session_active,Focus session running,Pause 60,push,sf_pause,push → sf_pause
 sf_unplug_session_active,Focus session running,End early,sheet,sf_unplug_session_end,sheet → sf_unplug_session_end
-sf_unplug_session_end,End session early,End session,submit,sf_unplug_session_done_early,CALL device:unplug/endSession then replace → sf_unplug_session_done_early
+sf_unplug_session_end,End session early,End session,branch,sf_unplug_session_done_early,decide sf.unplug.reason: Strict session: reason given? → Reason given: CALL device:unplug/endSession then replace → sf_unplug_session_done_early | No reason yet: toast “Choose or type a reason to end a strict session.”
 sf_unplug_session_end,End session early,Keep going,close,,close
 sf_unplug_session_done,Session complete,Done,replace,sf_unplug_home,replace → sf_unplug_home
 sf_unplug_session_done_early,Session ended early,Done,replace,sf_unplug_home,replace → sf_unplug_home
-sf_unplug_shield,Pause screen (iPhone shield),Take a breath,toast,sf_unplug_gate,toast “Notification: tap to take your breath in Tether” then push → sf_unplug_gate
+sf_unplug_shield,Pause screen (iPhone shield),Take a breath,toast,sf_unplug_gate rescue_pick,"toast “Notification: open Tether to take your breath, or get support” then branch: Notification action → Take my breath: push → sf_unplug_gate | Get support: sheet → rescue_pick"
 sf_unplug_shield,Pause screen (iPhone shield),Open anyway,toast,,toast “Opened · 1 “open anyway” left today” then close
 sf_unplug_shield_firm,"Pause screen (iPhone shield, firm)",Close the app,toast,,toast “The app stays closed.” then close
+sf_unplug_shield_firm,"Pause screen (iPhone shield, firm)",Get support,toast,rescue_pick,toast “Notification: tap to open Rescue in Tether” then sheet → rescue_pick
 sf_unplug_overlay,Pause screen (Android overlay),Close the app,toast,,toast “The app stays closed.” then close
+sf_unplug_overlay,Pause screen (Android overlay),Get support,sheet,rescue_pick,sheet → rescue_pick
 sf_unplug_overlay,Pause screen (Android overlay),Open anyway,toast,,toast “Opened · 1 “open anyway” left today” then close
 sf_unplug_gate,Small step: one breath,Close,close,,close
+sf_unplug_gate,Small step: one breath,Get support,sheet,rescue_pick,sheet → rescue_pick
 sf_unplug_gate,Small step: one breath,Keep it closed,toast,sf_home,toast “Nice. The app stays closed.” then reset → sf_home
-sf_unplug_gate,Small step: one breath,Open it for 10 minutes,toast,,toast “Open for 10 minutes. The pause screen comes back after.” then close
+sf_unplug_gate,Small step: one breath,Open it for 10 minutes,toast,sf_home,toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home
 sf_unplug_gate_commit,Small step: type a sentence,Close,close,,close
+sf_unplug_gate_commit,Small step: type a sentence,Get support,sheet,rescue_pick,sheet → rescue_pick
 sf_unplug_gate_commit,Small step: type a sentence,Keep it closed,toast,sf_home,toast “Nice. The app stays closed.” then reset → sf_home
-sf_unplug_gate_commit,Small step: type a sentence,Open it for 10 minutes,toast,,toast “Open for 10 minutes. The pause screen comes back after.” then close
+sf_unplug_gate_commit,Small step: type a sentence,Open it for 10 minutes,branch,sf_home,decide sf.unplug.sentence: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Type the whole sentence first.”
 sf_unplug_gate_sum,Small step: quick sum,Close,close,,close
+sf_unplug_gate_sum,Small step: quick sum,Get support,sheet,rescue_pick,sheet → rescue_pick
 sf_unplug_gate_sum,Small step: quick sum,Keep it closed,toast,sf_home,toast “Nice. The app stays closed.” then reset → sf_home
-sf_unplug_gate_sum,Small step: quick sum,Open it for 10 minutes,toast,,toast “Open for 10 minutes. The pause screen comes back after.” then close
+sf_unplug_gate_sum,Small step: quick sum,Open it for 10 minutes,branch,sf_home,decide sf.unplug.sum: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Answer the sum first.”
 sf_unplug_health,Tracking check,Back,back,,back
 sf_unplug_health,Tracking check,Done,back,,back
 sf_unplug_health_stopped,Tracking stopped,Back,back,,back

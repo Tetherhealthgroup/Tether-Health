@@ -11,7 +11,7 @@
   "state": "typed sentence",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Open it works only after the sentence is typed in full (rule sf.unplug.sentence).",
   "header": {
     "t": "header",
     "title": "Small step",
@@ -35,6 +35,23 @@
       "placeholder": "I can come back to this later",
       "kind": "text",
       "key": "sentence"
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "Need help right now?",
+      "text": "Rescue opens in one tap.",
+      "cta": {
+        "t": "button",
+        "label": "Get support",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "variant": "rescue",
+        "arrow": false,
+        "small": true
+      }
     }
   ],
   "footer": [
@@ -56,18 +73,36 @@
       "t": "link",
       "label": "Open it for 10 minutes",
       "action": {
-        "type": "toast",
-        "value": "Open for 10 minutes. The pause screen comes back after.",
-        "then": {
-          "type": "close"
-        }
+        "type": "branch",
+        "question": "Small step done?",
+        "on": null,
+        "decide": "sf.unplug.sentence",
+        "cases": [
+          {
+            "label": "Step done",
+            "action": {
+              "type": "toast",
+              "value": "Open for 10 minutes. The pause screen comes back after.",
+              "then": {
+                "type": "reset",
+                "to": "sf_home"
+              }
+            }
+          },
+          {
+            "label": "Step not done",
+            "action": {
+              "type": "toast",
+              "value": "Type the whole sentence first."
+            }
+          }
+        ]
       },
       "align": "center"
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 item 2 (effort gate: commitment)",
+    "Proposal for owner review. Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.commitment"
   ],
   "over": null,
@@ -80,6 +115,15 @@
         "type": "close"
       },
       "summary": "close"
+    },
+    {
+      "element": "Get support",
+      "path": "body[3].cta[0]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
     },
     {
       "element": "Keep it closed",
@@ -98,13 +142,32 @@
       "element": "Open it for 10 minutes",
       "path": "footer[1]",
       "action": {
-        "type": "toast",
-        "value": "Open for 10 minutes. The pause screen comes back after.",
-        "then": {
-          "type": "close"
-        }
+        "type": "branch",
+        "question": "Small step done?",
+        "on": null,
+        "decide": "sf.unplug.sentence",
+        "cases": [
+          {
+            "label": "Step done",
+            "action": {
+              "type": "toast",
+              "value": "Open for 10 minutes. The pause screen comes back after.",
+              "then": {
+                "type": "reset",
+                "to": "sf_home"
+              }
+            }
+          },
+          {
+            "label": "Step not done",
+            "action": {
+              "type": "toast",
+              "value": "Type the whole sentence first."
+            }
+          }
+        ]
       },
-      "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then close"
+      "summary": "decide sf.unplug.sentence: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Type the whole sentence first.”"
     }
   ]
 }

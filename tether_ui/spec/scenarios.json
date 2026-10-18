@@ -1741,5 +1741,173 @@
       ]
     ],
     "expect": "welcome"
+  },
+  {
+    "id": "sf_unplug_strict_end",
+    "program": "sf",
+    "function": "Unplug",
+    "title": "Strict session needs a reason to end early",
+    "start": "sf_unplug_session_active",
+    "steps": [
+      [
+        "tap",
+        "End early"
+      ],
+      [
+        "expect",
+        "sf_unplug_session_end"
+      ],
+      [
+        "tap",
+        "End session"
+      ],
+      [
+        "expect",
+        "sf_unplug_session_end"
+      ],
+      [
+        "tap",
+        "Expecting a message"
+      ],
+      [
+        "tap",
+        "End session"
+      ]
+    ],
+    "expect": "sf_unplug_session_done_early"
+  },
+  {
+    "id": "sf_unplug_gate_sum",
+    "program": "sf",
+    "function": "Unplug",
+    "title": "Quick sum must be right before the app opens",
+    "start": "sf_unplug_gate_sum",
+    "steps": [
+      [
+        "tap",
+        "Open it for 10 minutes"
+      ],
+      [
+        "expect",
+        "sf_unplug_gate_sum"
+      ],
+      [
+        "enter",
+        "sf_unplug_gate_sum.answer",
+        "9"
+      ],
+      [
+        "tap",
+        "Open it for 10 minutes"
+      ],
+      [
+        "expect",
+        "sf_unplug_gate_sum"
+      ],
+      [
+        "enter",
+        "sf_unplug_gate_sum.answer",
+        "12"
+      ],
+      [
+        "tap",
+        "Open it for 10 minutes"
+      ]
+    ],
+    "expect": "sf_home"
+  },
+  {
+    "id": "sf_unplug_gate_sentence",
+    "program": "sf",
+    "function": "Unplug",
+    "title": "Sentence must be typed in full before the app opens",
+    "start": "sf_unplug_gate_commit",
+    "steps": [
+      [
+        "tap",
+        "Open it for 10 minutes"
+      ],
+      [
+        "expect",
+        "sf_unplug_gate_commit"
+      ],
+      [
+        "enter",
+        "sf_unplug_gate_commit.sentence",
+        "I can come back"
+      ],
+      [
+        "tap",
+        "Open it for 10 minutes"
+      ],
+      [
+        "expect",
+        "sf_unplug_gate_commit"
+      ],
+      [
+        "enter",
+        "sf_unplug_gate_commit.sentence",
+        "i can come back to this later."
+      ],
+      [
+        "tap",
+        "Open it for 10 minutes"
+      ]
+    ],
+    "expect": "sf_home"
+  },
+  {
+    "id": "sf_unplug_overlay_support",
+    "program": "sf",
+    "function": "Unplug",
+    "title": "Android pause screen reaches Rescue and Emergency",
+    "start": "sf_unplug_overlay",
+    "steps": [
+      [
+        "tap",
+        "Get support"
+      ],
+      [
+        "expect",
+        "rescue_pick"
+      ],
+      [
+        "tap",
+        "Emergency"
+      ]
+    ],
+    "expect": "crisis"
+  },
+  {
+    "id": "sf_unplug_shield_support",
+    "program": "sf",
+    "function": "Unplug",
+    "title": "iPhone shield reaches Rescue without the small step",
+    "start": "sf_unplug_shield",
+    "steps": [
+      [
+        "choose",
+        "Get support"
+      ],
+      [
+        "tap",
+        "Take a breath"
+      ]
+    ],
+    "expect": "rescue_pick"
+  },
+  {
+    "id": "sf_unplug_shield_firm_support",
+    "program": "sf",
+    "function": "Unplug",
+    "title": "Firm iPhone shield reaches Rescue",
+    "start": "sf_unplug_shield_firm",
+    "steps": [
+      [
+        "tap",
+        "Get support"
+      ]
+    ],
+    "expect": "rescue_pick"
   }
 ]

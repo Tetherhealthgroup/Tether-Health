@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Shown before anything is switched on, so nobody later reads a number that does not exist. Resolves the \"not a lock\" contradiction by keeping Pause 60 an intent check and naming Unplug as the optional lock.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Shown before anything is switched on, so nobody later reads a number that does not exist. Keeps Pause 60 an intent check and names Unplug as the optional lock.",
   "header": {
     "t": "header",
     "title": "Unplug",
@@ -52,6 +52,10 @@
         [
           "Stays",
           "On this phone. Your app list never reaches Tether"
+        ],
+        [
+          "Never paused",
+          "Tether, phone calls and emergency calls"
         ]
       ]
     }
@@ -96,9 +100,8 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 (what Unplug can and cannot see; screen A \"What this can see\")",
-    "Source: lib/unplug/screens/unplug_screen_a.dart, models/platform_ceiling.dart"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: lib/unplug/screens/unplug_screen_a.dart, lib/unplug/models/platform_ceiling.dart"
   ],
   "over": null,
   "api": [],

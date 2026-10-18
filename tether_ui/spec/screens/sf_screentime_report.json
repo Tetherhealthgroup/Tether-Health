@@ -11,7 +11,7 @@
   "state": "iPhone report wording (proposal)",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Same layout as Connect Screen Time with \"reads\" changed to \"shows\". Owner picks this wording or legal accepts \"reads\".",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Same layout as Connect Screen Time with \"reads\" changed to \"shows\". The owner picks this wording, or legal accepts \"reads\".",
   "header": {
     "t": "header",
     "title": "Screen Time",
@@ -97,9 +97,8 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 / B.4 copy contradiction: sf_screentime says Tether \"reads\" totals; on iPhone the report extension only shows them",
-    "Source: ios/Runner/Unplug/UnplugHost.swift:239-253 (no API hands the app a number of minutes)"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: ios/Runner/Unplug/UnplugHost.swift:239-253 @ origin/feat/unplug-v2.1-module (no API hands the app a number of minutes)"
   ],
   "over": null,
   "api": [],

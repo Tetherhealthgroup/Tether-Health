@@ -11,7 +11,7 @@
   "state": "android",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Same as Update required; Update now opens Google Play. The iPhone App Store URL in the base screen still needs the real App Store ID.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Update required; Update now opens Google Play. The iPhone App Store URL in the base screen still needs the real App Store ID.",
   "header": {
     "t": "header",
     "title": "Update needed",
@@ -59,9 +59,8 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-36 (sys_update Play Store URL per platform)",
-    "Source: P-28 app ID com.TetherHealthLLC.tetherhealth"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: sys_update in this spec; app ID com.TetherHealthLLC.tetherhealth"
   ],
   "over": null,
   "api": [],

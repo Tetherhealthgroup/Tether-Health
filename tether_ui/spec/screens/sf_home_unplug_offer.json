@@ -11,7 +11,7 @@
   "state": "Unplug not set up (proposal)",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Identical to ScrollFree home plus one optional card that opens Unplug setup.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Identical to ScrollFree home plus one optional card that opens Unplug setup.",
   "header": {
     "t": "header",
     "title": "ScrollFree",
@@ -133,8 +133,8 @@
   ],
   "footer": [],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · entry point to Unplug from ScrollFree"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: sf_home in this spec (body copied unchanged, one card added)"
   ],
   "over": null,
   "api": [],

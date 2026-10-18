@@ -11,7 +11,7 @@
   "state": "Google account",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Google button.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Google button.",
   "header": null,
   "body": [
     {
@@ -85,9 +85,8 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-36 (social-user auth_session) · TH-935",
-    "Source: ARCH-TH-902 A.5"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: auth_session in this spec; Supabase signInWithIdToken"
   ],
   "over": "Today",
   "api": [

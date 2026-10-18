@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Close leaves the session running. The session ends by itself at the end time (see Session complete).",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Close leaves the session running. The session ends by itself at the end time (see Session complete).",
   "header": {
     "t": "header",
     "title": "Focus session",
@@ -26,7 +26,7 @@
     },
     {
       "t": "text",
-      "text": "Video apps and Feeds are paused. Tether and phone calls stay open.",
+      "text": "Video apps and Feeds are paused. Tether, phone calls and emergency calls stay open.",
       "tone": "body",
       "align": "center"
     },
@@ -61,8 +61,7 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 item 4 (active session)",
+    "Proposal for owner review. Copy needs clinical/legal review.",
     "Source: lib/unplug/screens/unplug_screen_g.dart"
   ],
   "over": null,

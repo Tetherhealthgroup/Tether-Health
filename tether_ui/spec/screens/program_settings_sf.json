@@ -11,7 +11,7 @@
   "state": "ScrollFree with Unplug (proposal)",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Program settings shown with ScrollFree data. Leaving ScrollFree or deleting the account also runs purgeLocalData(0) (TH-933).",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Program settings shown with ScrollFree data. Leaving ScrollFree or deleting the account also runs purgeLocalData(0).",
   "header": {
     "t": "header",
     "title": "ScrollFree settings",
@@ -146,8 +146,8 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 item 8 (Unplug settings and \"turn off\" in Account → ScrollFree)"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: program_settings in this spec (same layout, ScrollFree data); pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module purgeLocalData(0)"
   ],
   "over": null,
   "api": [

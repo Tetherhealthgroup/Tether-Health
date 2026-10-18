@@ -11,7 +11,7 @@
   "state": "android",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Android has no single prompt: usage access and the overlay permission are separate settings pages, checked again when the person returns (authorizationStatus on resume). The foreground service needs a visible notification; its text is generic.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Android has no single prompt: usage access and the overlay permission are separate settings pages, checked again when the person returns (authorizationStatus on resume). The foreground service needs a visible notification; its text is generic.",
   "header": {
     "t": "header",
     "title": "Unplug",
@@ -97,8 +97,7 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 permission states (Android)",
+    "Proposal for owner review. Copy needs clinical/legal review.",
     "Source: android/.../unplug/UnplugHost.kt (PACKAGE_USAGE_STATS, SYSTEM_ALERT_WINDOW, foreground service)"
   ],
   "over": null,

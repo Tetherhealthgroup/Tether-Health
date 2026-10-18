@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review.",
   "header": {
     "t": "header",
     "title": "App shortcuts",
@@ -60,9 +60,8 @@
   ],
   "footer": [],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-32 / P-48 · B.5 (rescue_pick, ca_red entries)",
-    "Source: ARCH-TH-902 B.5 TH-967 (shortcuts.xml + ShortcutManager)"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager"
   ],
   "over": null,
   "api": [],

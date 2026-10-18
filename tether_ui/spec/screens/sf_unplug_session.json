@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Device-only. Proposal: Tether (and so Rescue / 988) and phone calls are never paused.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Device-only. Tether (and so Rescue and 988), the phone dialer and emergency calling are never paused.",
   "header": {
     "t": "header",
     "title": "Focus session",
@@ -47,7 +47,7 @@
         },
         {
           "label": "Everything except apps I allow",
-          "sub": "Phone calls and Tether always stay open"
+          "sub": "Tether, phone calls and emergency calls always stay open"
         }
       ],
       "selected": 0,
@@ -85,9 +85,9 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 item 4 (session start)",
-    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module startSession(durationSeconds, PlatformShieldScope selectedApps|everythingExceptAllowlist, strict)"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module startSession(durationSeconds, PlatformShieldScope selectedApps|everythingExceptAllowlist, strict)",
+    "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
   ],
   "over": null,
   "api": [],

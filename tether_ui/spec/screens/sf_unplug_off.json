@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Unplug only: liftShield + purgeLocalData(0). With Screen Time: also revokes the ScrollFree screen_time consent (then the same purge).",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Unplug only: liftShield + purgeLocalData(0). With Screen Time: also revokes the ScrollFree screen_time consent (then the same purge).",
   "header": null,
   "body": [
     {
@@ -97,9 +97,8 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 item 8 (\"turn off\")",
-    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module liftShield(reason), purgeLocalData(0); A.4 \"Turn off anytime\" = revoke screen_time consent"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module liftShield(reason), purgeLocalData(0); ScrollFree screen_time consent"
   ],
   "over": "Unplug",
   "api": [],

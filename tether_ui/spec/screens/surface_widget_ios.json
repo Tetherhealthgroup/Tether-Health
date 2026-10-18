@@ -11,7 +11,7 @@
   "state": "default",
   "dark": true,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.",
   "header": {
     "t": "header",
     "title": "iPhone widget",
@@ -58,9 +58,8 @@
   ],
   "footer": [],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-32 / P-48 · B.5 (rescue_pick entry: \"Home-screen widget / Siri: Rescue\")",
-    "Source: ARCH-TH-902 B.5 TH-966 (WidgetKit, static)"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: rescue_pick entry \"Home-screen widget / Siri: Rescue\" in this spec; WidgetKit, static content"
   ],
   "over": null,
   "api": [],

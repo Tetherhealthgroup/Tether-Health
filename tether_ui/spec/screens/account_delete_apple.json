@@ -11,7 +11,7 @@
   "state": "Apple account",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Apple re-auth for the same provider; the returned user id must match (TH-935). Delete runs only after Success.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Apple re-auth for the same provider; the returned user id must match the signed-in user. Delete runs only after Success.",
   "header": {
     "t": "header",
     "title": "Delete account",
@@ -124,9 +124,8 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-36 (social-user account_delete) · TH-935 social re-auth",
-    "Source: ARCH-TH-902 A.5 \"Social re-auth fix\""
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: account_delete in this spec; lib/auth/auth_gateway.dart RecentAuthGateway.reauthenticate (password only today)"
   ],
   "over": null,
   "api": [

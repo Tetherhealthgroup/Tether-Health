@@ -11,7 +11,7 @@
   "state": "android",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Android has no permission prompt for usage access; the person turns it on in Settings and the app checks again on return.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. Android has no permission prompt for usage access; the person turns it on in Settings and the app checks again on return.",
   "header": {
     "t": "header",
     "title": "Screen Time",
@@ -112,9 +112,8 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-36 (Android variant of sf_screentime)",
-    "Source: ARCH-TH-902 A.4: Android opens usage-access settings and reads authorizationStatus() on resume"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: sf_screentime in this spec; android/.../unplug/UsageReader.kt (usage access, checked on resume)"
   ],
   "over": null,
   "api": [],

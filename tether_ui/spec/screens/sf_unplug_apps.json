@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. iPhone host screen around Apple’s FamilyActivityPicker. presentAppPicker returns only a count; app identities stay as device-local tokens.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone host screen around Apple’s FamilyActivityPicker. presentAppPicker returns only a count; app identities stay as device-local tokens.",
   "header": {
     "t": "header",
     "title": "Choose apps",
@@ -34,6 +34,11 @@
       "variant": "mint",
       "title": "Start small",
       "text": "One or two apps that pull you in most is a good start. You can change this anytime."
+    },
+    {
+      "t": "text",
+      "text": "Tether, the phone dialer and emergency calling can never be chosen or paused.",
+      "tone": "small"
     }
   ],
   "footer": [
@@ -58,9 +63,9 @@
     }
   ],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-30 · B.4 item 1 (app selection host)",
-    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()",
+    "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
   ],
   "over": null,
   "api": [],

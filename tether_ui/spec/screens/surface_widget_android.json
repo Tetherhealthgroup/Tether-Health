@@ -11,7 +11,7 @@
   "state": "default",
   "dark": true,
   "bg": null,
-  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+  "desc": "Proposal for owner review. Copy needs clinical/legal review.",
   "header": {
     "t": "header",
     "title": "Android widget",
@@ -58,9 +58,8 @@
   ],
   "footer": [],
   "notes": [
-    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
-    "Serves: P-32 / P-48 · B.5 (rescue_pick entry)",
-    "Source: ARCH-TH-902 B.5 TH-967 (RemoteViews widget)"
+    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Source: rescue_pick entry in this spec; Android RemoteViews widget"
   ],
   "over": null,
   "api": [],
