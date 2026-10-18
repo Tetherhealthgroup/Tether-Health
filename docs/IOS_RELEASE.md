@@ -217,8 +217,10 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   `android/app/src/main/AndroidManifest.xml:34-35`). It replaced the earlier
   BreatheFree-named scheme. The same redirect is used for sign-up confirmation,
   confirmation resend and password recovery
-  (`lib/auth/auth_gateway.dart:66-67,102,117,132-134`). Checklist: confirm the
-  auth redirect uses a verified universal link on a Tether Health domain
+  (`SupabaseAuthGateway` in `lib/auth/auth_gateway.dart`: its `_emailRedirectTo`
+  default, `signUp`, `resendSignUpConfirmation` and `requestPasswordReset`).
+  Checklist: confirm the auth redirect uses a verified universal link on a
+  Tether Health domain
   (associated-domains entitlement plus an `apple-app-site-association` file on
   the website); see the private office notes. Needs th-security review;
   touches auth.

@@ -67,6 +67,20 @@ const _acceptedLinks = <String>[
   'com.tetherhealthllc.tetherhealth://login-callback?code=synthetic-code&type=recovery',
 ];
 
+/// Query keys that disqualify a link even when it also has a valid `code`.
+const _deniedKeys = <String>[
+  'access_token',
+  'refresh_token',
+  'provider_token',
+  'provider_refresh_token',
+  'expires_in',
+  'expires_at',
+  'token_type',
+  'error',
+  'error_code',
+  'error_description',
+];
+
 const _verifierKey =
     '${SecurePkceStorage.keyPrefix}supabase.auth.token-code-verifier';
 
@@ -90,6 +104,14 @@ void main() {
       });
     }
 
+    for (final key in _deniedKeys) {
+      test('ignores a code callback that also carries $key', () {
+        final link = 'com.tetherhealthllc.tetherhealth://login-callback'
+            '?code=synthetic-code&$key=synthetic-value';
+        expect(isAuthCallbackUri(Uri.parse(link)), isFalse);
+      });
+    }
+
     for (final link in _acceptedLinks) {
       test('accepts $link', () {
         expect(isAuthCallbackUri(Uri.parse(link)), isTrue);
@@ -105,6 +127,23 @@ void main() {
     expect(options.detectSessionInUriPredicate, same(isAuthCallbackUri));
     expect(options.localStorage, isA<SecureSessionStorage>());
     expect(options.pkceAsyncStorage, isA<SecurePkceStorage>());
+
+    // The library also defaults to PKCE, so only the source shows the
+    // explicit pin.
+    final optionsSource = RegExp(
+      r'FlutterAuthClientOptions breatheFreeAuthClientOptions\(\) =>(.*?);',
+      dotAll: true,
+    ).firstMatch(File('lib/auth/auth_deep_link.dart').readAsStringSync());
+    expect(optionsSource, isNotNull);
+    expect(
+      RegExp(r'^\s*authFlowType: AuthFlowType\.pkce,$', multiLine: true)
+          .allMatches(optionsSource!.group(1)!),
+      hasLength(1),
+    );
+    expect(
+      RegExp(r'authFlowType').allMatches(optionsSource.group(1)!),
+      hasLength(1),
+    );
 
     final mainSource = File('lib/main.dart').readAsStringSync();
     expect(mainSource, contains('authOptions: breatheFreeAuthClientOptions()'));
