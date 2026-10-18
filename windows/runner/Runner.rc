@@ -92,9 +92,9 @@ BEGIN
             VALUE "CompanyName", "com.TetherHealthLLC" "\0"
             VALUE "FileDescription", "Tether Health" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "tether_health" "\0"
+            VALUE "InternalName", "tetherhealth" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.TetherHealthLLC. All rights reserved." "\0"
-            VALUE "OriginalFilename", "tether_health.exe" "\0"
+            VALUE "OriginalFilename", "tetherhealth.exe" "\0"
             VALUE "ProductName", "Tether Health" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END

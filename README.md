@@ -64,13 +64,13 @@ flutter run -d linux
 
 ## Manual setup
 
-Flutter creates machine-specific runner folders without changing the approved application source. `--project-name` is the Dart package name and must match `pubspec.yaml`. The app ID is `com.TetherHealthLLC.tetherhealth`; set it by hand in any runner folder this command creates (macOS, Linux):
+The Android, iOS, web and Windows runner folders are tracked in the repo and already use the app ID `com.TetherHealthLLC.tetherhealth`. Flutter creates only the untracked macOS and Linux runners. `--org` plus `--project-name` form their app ID, so `--project-name tetherhealth` gives `com.TetherHealthLLC.tetherhealth`; `flutter create .` does not rename the Dart package in `pubspec.yaml`:
 
 ```bash
 flutter create . \
-  --project-name breathefree_patient \
+  --project-name tetherhealth \
   --org com.TetherHealthLLC \
-  --platforms android,ios,web,windows,macos,linux
+  --platforms macos,linux
 flutter pub get
 flutter analyze
 flutter test

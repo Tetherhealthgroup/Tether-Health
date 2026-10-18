@@ -161,15 +161,51 @@ void main() {
     }
     expect(
       File('windows/CMakeLists.txt').readAsStringSync(),
-      contains('set(BINARY_NAME "tether_health")'),
+      contains('set(BINARY_NAME "tetherhealth")'),
     );
     expect(
       File('windows/runner/Runner.rc').readAsStringSync(),
-      contains('VALUE "OriginalFilename", "tether_health.exe"'),
+      contains('VALUE "OriginalFilename", "tetherhealth.exe"'),
     );
     expect(
       File('web/index.html').readAsStringSync(),
       contains('<title>Tether Health</title>'),
+    );
+  });
+
+  test('flutter create guidance yields the app ID and spares tracked runners',
+      () {
+    // flutter create derives the macOS/Linux app ID from --org and
+    // --project-name; breathefree_patient would also add a second Android
+    // MainActivity under com/TetherHealthLLC/breathefree_patient.
+    for (final path in [
+      'README.md',
+      'tool/setup_macos_linux.sh',
+      'tool/setup_windows.bat',
+    ]) {
+      final text = File(path).readAsStringSync();
+      expect(text, isNot(contains('--project-name breathefree_patient')),
+          reason: path);
+      expect(text, isNot(contains('--org com.breathefree')), reason: path);
+      for (final m in RegExp(r'--platforms[ =]"?([^"\s]+)').allMatches(text)) {
+        final platforms = m[1]!.split(',');
+        for (final tracked in ['android', 'ios', 'web', 'windows']) {
+          expect(platforms, isNot(contains(tracked)), reason: '$path: ${m[0]}');
+        }
+      }
+    }
+    for (final path in ['README.md', 'tool/setup_macos_linux.sh']) {
+      final text = File(path).readAsStringSync();
+      expect(text, contains('--project-name tetherhealth'), reason: path);
+      expect(text, contains('--org com.TetherHealthLLC'), reason: path);
+    }
+    final sh = File('tool/setup_macos_linux.sh').readAsStringSync();
+    expect(sh, contains('breathefree_platforms="macos"'));
+    expect(sh, contains('breathefree_platforms="linux"'));
+    // Every runner the Windows script uses is tracked: it creates none.
+    expect(
+      File('tool/setup_windows.bat').readAsStringSync(),
+      isNot(contains('flutter create')),
     );
   });
 }

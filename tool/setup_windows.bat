@@ -10,9 +10,8 @@ if errorlevel 1 (
 
 cd /d "%~dp0\.."
 
-echo Creating Android, web and Windows runner files...
-flutter create . --project-name breathefree_patient --org com.TetherHealthLLC --platforms=android,web,windows
-if errorlevel 1 exit /b 1
+rem The Android, web and Windows runners are tracked in the repo with the app ID
+rem com.TetherHealthLLC.tetherhealth, so this script does not regenerate any runner.
 
 echo Downloading packages...
 flutter pub get
