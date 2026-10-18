@@ -148,6 +148,20 @@ select th913_test.ok(
                 '00000000-0000-4000-8000-000000913002')) = 2,
   'setup: the signup trigger created both synthetic profiles');
 
+-- Synthetic consent documents: consent rows take their text from these.
+insert into public.consent_documents (purpose, version, locale, body, effective_from) values
+  ('core', 'v1', 'en', 'Synthetic core wording', now()),
+  ('core', 'v2', 'en', 'Synthetic core wording v2', now()),
+  ('core', 'v9', 'en', 'Synthetic wording', now()),
+  ('reminders', 'v1', 'en', 'Synthetic reminder wording', now()),
+  ('share_care_team', 'v1', 'en', 'Synthetic sharing wording', now()),
+  ('research', 'v1', 'en', 'Synthetic research wording', now()),
+  ('records_import', 'v1', 'en', 'Synthetic records wording', now()),
+  ('essential', 'v1', 'en', 'Synthetic essential wording', now()),
+  ('essential', 'v2', 'en', 'Synthetic', now()),
+  ('diagnostics', 'v1', 'en', 'Synthetic diagnostics wording', now()),
+  ('cross_program_insights', 'v1', 'en', 'Synthetic insights wording', now());
+
 -- Privileges and policies -----------------------------------------------------
 -- Pinned so that an accidental grant or policy change fails this test.
 select th913_test.ok(
@@ -200,8 +214,8 @@ select th913_test.ok(
 select th913_test.ok(
   th913_test.column_acl(array['public.programmes', 'public.enrolments',
     'public.programme_consents', 'public.account_consents']::regclass[]) =
-  'account_consents.consent_text:authenticated:INSERT,'
   'account_consents.consent_version:authenticated:INSERT,'
+  'account_consents.locale:authenticated:INSERT,'
   'account_consents.purpose:authenticated:INSERT,'
   'account_consents.revoked_at:authenticated:UPDATE,'
   'account_consents.user_id:authenticated:INSERT,'
@@ -209,12 +223,13 @@ select th913_test.ok(
   'enrolments.programme_code:authenticated:INSERT,'
   'enrolments.status:authenticated:INSERT,enrolments.status:authenticated:UPDATE,'
   'enrolments.user_id:authenticated:INSERT,'
-  'programme_consents.consent_text:authenticated:INSERT,'
   'programme_consents.consent_version:authenticated:INSERT,'
   'programme_consents.enrolment_id:authenticated:INSERT,'
+  'programme_consents.locale:authenticated:INSERT,'
   'programme_consents.purpose:authenticated:INSERT,'
   'programme_consents.recipient_ref:authenticated:INSERT,'
-  'programme_consents.revoked_at:authenticated:UPDATE',
+  'programme_consents.revoked_at:authenticated:UPDATE,'
+  'programme_consents.superseded_by:authenticated:UPDATE',
   'new tables: only the intended column privileges');
 select th913_test.ok(
   (select bool_and(relrowsecurity and relforcerowsecurity) from pg_catalog.pg_class
@@ -262,8 +277,8 @@ select th913_test.ok(
   not public.has_consent(current_setting('th913.a_hw')::uuid, 'core'),
   'A: no core consent yet');
 select th913_test.refused(format(
-  'insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-   values (%L, ''reminders'', ''v1'', ''Synthetic reminder wording'')',
+  'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+   values (%L, ''reminders'', ''v1'', ''en'')',
   current_setting('th913.a_hw')),
   '42501', '%row-level security%',
   'A: optional programme consent refused without core consent');
@@ -273,8 +288,8 @@ select th913_test.refused(format(
   '42501', '%row-level security%',
   'A: consent-gated programme-data insert refused without core consent');
 
-insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-values (current_setting('th913.a_hw')::uuid, 'core', 'v1', 'Synthetic core wording');
+insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+values (current_setting('th913.a_hw')::uuid, 'core', 'v1', 'en');
 select th913_test.ok(
   public.has_consent(current_setting('th913.a_hw')::uuid, 'core'),
   'A: core consent live after grant');
@@ -289,25 +304,25 @@ select th913_test.affects(format(
   current_setting('th913.a_hw')), 1,
   'A: consent-gated insert accepted once core consent is live');
 
-insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-values (current_setting('th913.a_hw')::uuid, 'reminders', 'v1', 'Synthetic reminder wording');
+insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+values (current_setting('th913.a_hw')::uuid, 'reminders', 'v1', 'en');
 select th913_test.ok(
   public.has_consent(current_setting('th913.a_hw')::uuid, 'reminders'),
   'A: reminders consent live');
 select th913_test.refused(format(
-  'insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-   values (%L, ''share_care_team'', ''v1'', ''Synthetic sharing wording'')',
+  'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+   values (%L, ''share_care_team'', ''v1'', ''en'')',
   current_setting('th913.a_hw')),
   '23514', '%', 'A: sharing consent without a named recipient refused');
 select th913_test.refused(format(
-  'insert into public.programme_consents (enrolment_id, purpose, recipient_ref, consent_version, consent_text)
-   values (%L, ''research'', ''synthetic-recipient'', ''v1'', ''Synthetic wording'')',
+  'insert into public.programme_consents (enrolment_id, purpose, recipient_ref, consent_version, locale)
+   values (%L, ''research'', ''synthetic-recipient'', ''v1'', ''en'')',
   current_setting('th913.a_hw')),
   '23514', '%', 'A: recipient on a non-sharing purpose refused');
 insert into public.programme_consents
-  (enrolment_id, purpose, recipient_ref, consent_version, consent_text)
+  (enrolment_id, purpose, recipient_ref, consent_version, locale)
 values (current_setting('th913.a_hw')::uuid, 'share_care_team',
-  'synthetic-connection-01', 'v1', 'Synthetic sharing wording');
+  'synthetic-connection-01', 'v1', 'en');
 select th913_test.ok(
   public.has_consent(current_setting('th913.a_hw')::uuid, 'share_care_team',
     'synthetic-connection-01')
@@ -316,13 +331,13 @@ select th913_test.ok(
   and not public.has_consent(current_setting('th913.a_hw')::uuid, 'share_care_team'),
   'A: sharing consent is per recipient');
 select th913_test.refused(format(
-  'insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-   values (%L, ''core'', ''v2'', ''Synthetic core wording'')',
+  'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+   values (%L, ''core'', ''v2'', ''en'')',
   current_setting('th913.a_hw')),
-  '23505', '%programme_consents_live_key%', 'A: second live consent for the same purpose refused');
+  '23505', '%programme_consents_live_core_key%', 'A: second live consent for the same purpose refused');
 select th913_test.refused(format(
-  'insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text, revoked_at)
-   values (%L, ''research'', ''v1'', ''Synthetic wording'', now())',
+  'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale, revoked_at)
+   values (%L, ''research'', ''v1'', ''en'', now())',
   current_setting('th913.a_hw')),
   '42501', 'permission denied%', 'A: cannot insert a pre-revoked consent');
 
@@ -362,8 +377,8 @@ select th913_test.refused(format(
   current_setting('th913.a_hw')),
   '42501', '%row-level security%',
   'A: consent-gated insert refused after core revocation');
-insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-values (current_setting('th913.a_hw')::uuid, 'core', 'v2', 'Synthetic core wording v2');
+insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+values (current_setting('th913.a_hw')::uuid, 'core', 'v2', 'en');
 select th913_test.ok(
   (select count(*) from public.programme_consents
    where enrolment_id = current_setting('th913.a_hw')::uuid and purpose = 'core') = 2,
@@ -402,8 +417,8 @@ with i as (
   insert into public.enrolments (user_id, programme_code, mode)
   values ('00000000-0000-4000-8000-000000913001', 'bf', 'reduce') returning id
 ) select set_config('th913.a_bf', id::text, true) from i;
-insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-values (current_setting('th913.a_bf')::uuid, 'core', 'v1', 'Synthetic core wording');
+insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+values (current_setting('th913.a_bf')::uuid, 'core', 'v1', 'en');
 select th913_test.ok(
   not public.has_consent(current_setting('th913.a_bf')::uuid, 'share_care_team',
     'synthetic-connection-01'),
@@ -411,8 +426,8 @@ select th913_test.ok(
 do $loop$
 begin
   for i in 1..5 loop
-    insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-    values (current_setting('th913.a_bf')::uuid, 'reminders', 'v1', 'Synthetic reminder wording');
+    insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+    values (current_setting('th913.a_bf')::uuid, 'reminders', 'v1', 'en');
     update public.programme_consents set revoked_at = now()
     where enrolment_id = current_setting('th913.a_bf')::uuid
       and purpose = 'reminders' and revoked_at is null;
@@ -426,23 +441,23 @@ select th913_test.ok(
   and not public.has_consent(current_setting('th913.a_bf')::uuid, 'reminders'),
   'A: five grant/revoke cycles in one transaction never fail; all kept as history');
 
-insert into public.account_consents (user_id, purpose, consent_version, consent_text)
+insert into public.account_consents (user_id, purpose, consent_version, locale)
 values
-  ('00000000-0000-4000-8000-000000913001', 'essential', 'v1', 'Synthetic essential wording'),
-  ('00000000-0000-4000-8000-000000913001', 'diagnostics', 'v1', 'Synthetic diagnostics wording');
+  ('00000000-0000-4000-8000-000000913001', 'essential', 'v1', 'en'),
+  ('00000000-0000-4000-8000-000000913001', 'diagnostics', 'v1', 'en');
 select th913_test.affects(
   'update public.account_consents set revoked_at = now() where purpose = ''diagnostics''',
   1, 'A: revokes an account-level consent');
 select th913_test.refused(
-  'insert into public.account_consents (user_id, purpose, consent_version, consent_text)
-   values (''00000000-0000-4000-8000-000000913001'', ''essential'', ''v2'', ''Synthetic'')',
+  'insert into public.account_consents (user_id, purpose, consent_version, locale)
+   values (''00000000-0000-4000-8000-000000913001'', ''essential'', ''v2'', ''en'')',
   '23505', '%account_consents_live_key%', 'A: second live account consent for a purpose refused');
 do $loop$
 begin
   for i in 1..5 loop
-    insert into public.account_consents (user_id, purpose, consent_version, consent_text)
+    insert into public.account_consents (user_id, purpose, consent_version, locale)
     values ('00000000-0000-4000-8000-000000913001', 'cross_program_insights', 'v1',
-      'Synthetic insights wording');
+      'en');
     update public.account_consents set revoked_at = now()
     where purpose = 'cross_program_insights' and revoked_at is null;
   end loop;
@@ -516,13 +531,13 @@ select th913_test.refused(
    values (''00000000-0000-4000-8000-000000913001'', ''st'')',
   '42501', '%row-level security%', 'B: cannot enrol A');
 select th913_test.refused(format(
-  'insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-   values (%L, ''core'', ''v9'', ''Synthetic wording'')',
+  'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+   values (%L, ''core'', ''v9'', ''en'')',
   current_setting('th913.a_bf')),
   '42501', '%row-level security%', 'B: cannot add consent to A''s enrolment');
 select th913_test.refused(
-  'insert into public.account_consents (user_id, purpose, consent_version, consent_text)
-   values (''00000000-0000-4000-8000-000000913001'', ''essential'', ''v1'', ''Synthetic'')',
+  'insert into public.account_consents (user_id, purpose, consent_version, locale)
+   values (''00000000-0000-4000-8000-000000913001'', ''essential'', ''v1'', ''en'')',
   '42501', '%row-level security%', 'B: cannot add account consent for A');
 select th913_test.refused(format(
   'insert into th913_test.phi_probe (enrolment_id, note) values (%L, ''synthetic'')',
@@ -533,23 +548,23 @@ with i as (
   insert into public.enrolments (user_id, programme_code)
   values ('00000000-0000-4000-8000-000000913002', 'hw') returning id
 ) select set_config('th913.b_hw', id::text, true) from i;
-insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-values (current_setting('th913.b_hw')::uuid, 'core', 'v1', 'Synthetic core wording');
+insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+values (current_setting('th913.b_hw')::uuid, 'core', 'v1', 'en');
 insert into public.programme_consents
-  (enrolment_id, purpose, recipient_ref, consent_version, consent_text)
+  (enrolment_id, purpose, recipient_ref, consent_version, locale)
 values
   (current_setting('th913.b_hw')::uuid, 'share_care_team', 'synthetic-connection-02',
-   'v1', 'Synthetic sharing wording'),
-  (current_setting('th913.b_hw')::uuid, 'research', null, 'v1', 'Synthetic research wording'),
-  (current_setting('th913.b_hw')::uuid, 'records_import', null, 'v1', 'Synthetic records wording');
+   'v1', 'en'),
+  (current_setting('th913.b_hw')::uuid, 'research', null, 'v1', 'en'),
+  (current_setting('th913.b_hw')::uuid, 'records_import', null, 'v1', 'en');
 insert into th913_test.phi_probe (enrolment_id, note)
 values (current_setting('th913.b_hw')::uuid, 'synthetic');
 with i as (
   insert into public.enrolments (user_id, programme_code)
   values ('00000000-0000-4000-8000-000000913002', 'ca') returning id
 ) select set_config('th913.b_ca', id::text, true) from i;
-insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-values (current_setting('th913.b_ca')::uuid, 'core', 'v1', 'Synthetic core wording');
+insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+values (current_setting('th913.b_ca')::uuid, 'core', 'v1', 'en');
 
 -- Leaving: keep the data (no automatic purge), then rejoin; or delete now.
 select th913_test.ok(
@@ -579,8 +594,8 @@ select th913_test.refused(format(
   current_setting('th913.b_hw')),
   '42501', '%row-level security%', 'B: no new data on a left enrolment');
 select th913_test.refused(format(
-  'insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-   values (%L, ''research'', ''v1'', ''Synthetic wording'')',
+  'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+   values (%L, ''research'', ''v1'', ''en'')',
   current_setting('th913.b_hw')),
   '42501', '%row-level security%', 'B: no new consent on a left enrolment');
 select th913_test.refused(format(
@@ -609,8 +624,8 @@ select th913_test.ok(
      and purpose in ('share_care_team', 'research', 'records_import')
      and revoked_at is not null) = 3,
   'B: the revoked optional consents are kept as history');
-insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-values (current_setting('th913.b_hw')::uuid, 'research', 'v1', 'Synthetic research wording');
+insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+values (current_setting('th913.b_hw')::uuid, 'research', 'v1', 'en');
 select th913_test.ok(
   public.has_consent(current_setting('th913.b_hw')::uuid, 'research'),
   'B: an optional consent granted again after rejoin is live');
@@ -654,8 +669,8 @@ select th913_test.refused(
    values (''00000000-0000-4000-8000-000000913001'', ''nu'')',
   '42501', '%row-level security%', 'A: no new enrolment once deletion has started');
 select th913_test.refused(
-  'insert into public.account_consents (user_id, purpose, consent_version, consent_text)
-   values (''00000000-0000-4000-8000-000000913001'', ''cross_program_insights'', ''v1'', ''Synthetic'')',
+  'insert into public.account_consents (user_id, purpose, consent_version, locale)
+   values (''00000000-0000-4000-8000-000000913001'', ''cross_program_insights'', ''v1'', ''en'')',
   '42501', '%row-level security%', 'A: no new account consent once deletion has started');
 select th913_test.ok(
   not public.has_consent(current_setting('th913.a_bf')::uuid, 'core'),

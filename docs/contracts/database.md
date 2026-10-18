@@ -3,8 +3,9 @@
 Migration sources of truth include `supabase/migrations/202609110001_profiles.sql`,
 `supabase/migrations/202609260001_program_data.sql`,
 `supabase/migrations/202610170002_enrolments.sql`,
-`supabase/migrations/202610180001_sync_tables.sql` and
-`supabase/migrations/202610180002_service_session_guard.sql`.
+`supabase/migrations/202610180001_sync_tables.sql`,
+`supabase/migrations/202610180002_service_session_guard.sql` and
+`supabase/migrations/202610180003_enrolment_consent_followups.sql`.
 
 Every migration file is named `YYYYMMDDNNNN_name.sql`: a 12-digit version (date
 plus a four-digit sequence), then lowercase letters, digits and underscores.
@@ -51,7 +52,8 @@ sync after offline saves. Program payloads are prohibited from logs.
 
 ## Programmes, enrolments and consents
 
-Migration source of truth: `supabase/migrations/202610170002_enrolments.sql`.
+Migration sources of truth: `supabase/migrations/202610170002_enrolments.sql`
+and `supabase/migrations/202610180003_enrolment_consent_followups.sql`.
 Programme health data hangs off an enrolment, never off the account, and
 consent is recorded per enrolment, purpose and recipient. Every table below
 has row-level security enabled and forced; `anon` has no access.
@@ -106,17 +108,35 @@ in either order, while a third focus programme is refused. `learn_only` and
 `paused` are not limited. The default status on insert is `focus`, so a third
 enrolment must be inserted with another status.
 
+`public.swap_focus(p_demote uuid, p_promote uuid)` is the focus swap. It runs
+as the caller (row-level security applies), locks both of the caller's
+enrolments, sets `p_demote` to `learn_only` and `p_promote` to `focus` in one
+transaction, checks the focus cap before it returns (`TH001`), and returns
+both rows (demoted first). Either everything changes or nothing does. It
+refuses: an enrolment that is not the caller's (`TH012`); a `p_promote` that
+is `left` (`TH005`); a `p_demote` that is not in focus, a `p_promote` already
+in focus, or the same enrolment twice (`TH013`); and a sync service session
+(`TH010`).
+
 `public.programme_consents` records one consent per enrolment × purpose ×
 recipient. `purpose` is `core`, `reminders`, `records_import`,
 `share_care_team`, `share_caregiver`, `research` or `screen_time`.
 `recipient_ref` is required for the two sharing purposes and must be null for
 all others, so sharing cannot be consented without a named recipient. Each row
-keeps `consent_version` and the exact `consent_text` shown, plus `granted_at`
-(database set). At most one live (unrevoked) row exists per enrolment, purpose
-and recipient, enforced by a partial unique index on live rows only, so a
-revocation never conflicts with earlier history. A row is never edited except to revoke it: the only update
-allowed is setting `revoked_at`, which the database stamps with the current
-time; a revoked row cannot be revived, and a new grant is a new row. Callers
+keeps `consent_version`, `locale` and the exact `consent_text` shown, plus
+`granted_at` (database set). The caller sends `purpose`, `consent_version` and
+`locale` (and `recipient_ref`); the database copies `consent_text` from the
+matching `consent_documents` row (see below), and callers cannot write
+`consent_text`. At most one live (unrevoked) row exists per enrolment, purpose
+and recipient, so a revocation never conflicts with earlier history: for
+`core` through the deferrable unique constraint
+`programme_consents_live_core_key` (on the database-managed
+`live_core_enrolment_id`, which is the enrolment id while the row is the live
+core consent), for every other purpose through the partial unique index
+`programme_consents_live_key`. Both raise `23505`. A row is never edited
+except to revoke it: the only update allowed is setting `revoked_at` (with
+`superseded_by` during a supersession), which the database stamps with the
+current time; a revoked row cannot be revived, and a new grant is a new row. Callers
 cannot delete consent rows; they go when the enrolment or the account is
 deleted. A caller may add a consent only to their own enrolment that is not
 `left`, and any purpose other than `core` requires that enrolment's `core`
@@ -130,14 +150,71 @@ research, screen time and reminders are off until the member grants each one
 again. The revoked rows stay as history. Both rules are triggers that run as
 the caller.
 
-Consent rows store the wording itself. When approved consent texts exist, a
-`consent_documents` reference is planned to identify the exact document version.
+**Core consent supersession.** A new core wording is not the member revoking
+consent. `public.supersede_core_consent(p_enrolment uuid, p_version text,
+p_locale text)` runs as the caller and, in one transaction, inserts a new core
+row for the `core` document `p_version`/`p_locale` (text from the document,
+never from the caller) and revokes the old live core row with `superseded_by`
+set to the new row's id. Both rows stay as history. The revoke-with-core
+cascade skips a row revoked with `superseded_by` set, so the optional consents
+stay live; only when the new document has `cascades_optional = true` does the
+function also revoke them. It returns the old row, then the new one. It
+refuses: an enrolment that is not the caller's (`TH012`); a `left` enrolment
+(`TH005`); once account deletion has started (`TH006`); an enrolment without a
+live core consent (`TH004`); a version that is not an available `core`
+document for that locale (`TH011`); the version and locale the live core row
+already has (`TH014`); and a sync service session (`TH010`). `superseded_by`
+can only name the live core consent of the same enrolment that replaces the
+row (`TH003` otherwise), so a plain revocation cannot skip the cascade.
+
+## Consent documents
+
+Migration source of truth:
+`supabase/migrations/202610180003_enrolment_consent_followups.sql`.
+`public.consent_documents` holds every consent text the app may show. It is
+reference data with row-level security enabled and forced: authenticated
+callers can read it, `anon` has no access, and there are no client writes.
+
+| Column | Contract |
+|---|---|
+| `purpose`, `version`, `locale` | primary key. `purpose` is one of the programme purposes above or `essential`, `cross_program_insights`, `diagnostics`; `version` matches `^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$`; `locale` is `en` or `es` |
+| `body` | the text, 1–8000 characters |
+| `body_sha256` | database managed: hex SHA-256 of the UTF-8 body |
+| `effective_from` | when the version may first be granted |
+| `retired_at` | nullable; from then on the version can no longer be granted |
+| `approved_ref` | nullable reference to the approval of this exact text; null means not approved |
+| `cascades_optional` | `core` only, default false: moving to this version also revokes optional consents |
+| `created_at` | database managed |
+
+`purpose`, `version`, `locale` and `body` never change (`TH015`); a new text is
+a new version. Consent rows reference their document with a foreign key on
+`(purpose, consent_version, locale)`, so a referenced document cannot be
+removed. A consent can be granted for a document that is effective
+(`effective_from <= now()`) and not retired; anything else raises `TH011`.
+Rows stored before consent documents existed have a null `locale` and keep the
+text they were stored with.
+
+`public.current_consent_documents()` (`stable security invoker`) returns the
+current document per purpose and locale: the latest `effective_from <= now()`
+that is not retired. The API shows and records that version.
+
+The seeded documents are placeholders: version `v1-draft` for every purpose in
+`en` and `es`, effective from 2026-10-18, with `approved_ref` null and a body
+that says it is a draft. They are not consent wording. A release check must
+fail while this returns any row:
+
+```sql
+select purpose, version, locale
+from public.current_consent_documents()
+where approved_ref is null;
+```
 
 `public.account_consents` holds account-level items that belong to no
 programme: `essential`, `cross_program_insights` and `diagnostics`. It has the
 same version, wording, single-live-row (partial unique index on
 `(user_id, purpose)` where not revoked) and revoke-only rules, keyed by
-`user_id`. It holds no health data.
+`user_id`. Its `consent_text` is also copied from `consent_documents`
+(callers send `consent_version` and `locale`). It holds no health data.
 
 `public.has_consent(enrolment_id uuid, purpose text, recipient_ref text default null)`
 is a `stable security invoker` function. It is true only when the caller owns
@@ -212,8 +289,10 @@ update still fails its `with check` (`42501`). Select policies are unchanged,
 so a sync session still reads the caller's enrolments, consents and profile,
 which `has_consent` and `deletion_barrier_open` need. `begin_account_deletion`
 and `delete_my_app_data` refuse a sync session with `TH009`, and
-`save_program_data` refuses it with `TH010`. Source:
-`supabase/migrations/202610180002_service_session_guard.sql`. Any later
+`save_program_data`, `swap_focus` and `supersede_core_consent` refuse it with
+`TH010`. Sources:
+`supabase/migrations/202610180002_service_session_guard.sql` and
+`supabase/migrations/202610180003_enrolment_consent_followups.sql`. Any later
 function that writes and is executable by `authenticated` refuses a sync
 session the same way, and any later write policy carries the condition;
 `supabase/tests/verify_service_session_guard.sh` checks both.
@@ -357,14 +436,19 @@ function": every later function that writes and refuses a sync session raises
 |---|---|---|---|
 | `TH001` | `focus_cap_reached` | `enrolments_focus_cap` (deferred trigger on `enrolments`, at commit) | At most two programmes can be in focus |
 | `TH002` | `consent_already_revoked` | `consent_revoke_only` (update trigger on `programme_consents` and `account_consents`) | Consent is already revoked |
-| `TH003` | `consent_immutable` | `consent_revoke_only` | Consent can only be revoked; Consent records are immutable |
-| `TH004` | `consent_requires_core` | Reserved. Today an optional consent without a live core consent is refused by row-level security (`42501`) | — |
-| `TH005` | `enrolment_left` | Reserved. Today a write to a left enrolment is refused by row-level security (`42501`) | — |
-| `TH006` | `deletion_in_progress` | Reserved. Today a write after `begin_account_deletion` is refused by row-level security (`42501`) | — |
+| `TH003` | `consent_immutable` | `consent_revoke_only`; `programme_consents_check_supersede` (update trigger on `programme_consents`: `superseded_by` must name the live core consent that replaces the row) | Consent can only be revoked; Consent records are immutable |
+| `TH004` | `consent_requires_core` | `supersede_core_consent` when the enrolment has no live core consent. A direct insert of an optional consent without a live core consent is still refused by row-level security (`42501`) | A live core consent is required |
+| `TH005` | `enrolment_left` | `swap_focus` (programme to promote is left) and `supersede_core_consent`. A direct write to a left enrolment is still refused by row-level security (`42501`) | The programme has been left |
+| `TH006` | `deletion_in_progress` | `supersede_core_consent` after `begin_account_deletion`. Direct writes after it are still refused by row-level security (`42501`) | Account deletion has started |
 | `TH007` | `sync_area_mismatch` | `sync_area_match_enrolment` (trigger on `sync_area`) | Sync area must match its enrolment |
 | `TH008` | `lapses_append_only` | `sync_lapse_append_only` (update trigger on `sync_lapse`) | Lapses are append-only |
 | `TH009` | `deletion_via_api_only` | `begin_account_deletion` and `delete_my_app_data` in a sync service session | Account deletion goes through the API |
-| `TH010` | `sync_session_refused` | `save_program_data` in a sync service session; the shared code for every later writing function that refuses a sync session | The sync service writes only sync tables |
+| `TH010` | `sync_session_refused` | `save_program_data`, `swap_focus` and `supersede_core_consent` in a sync service session; the shared code for every later writing function that refuses a sync session | The sync service writes only sync tables |
+| `TH011` | `consent_document_unavailable` | `consent_fill_text` (insert trigger on `programme_consents` and `account_consents`) and `supersede_core_consent`: no effective, unretired document for that purpose, version and locale | No consent document is available for this purpose, version and locale |
+| `TH012` | `enrolment_not_found` | `swap_focus` and `supersede_core_consent`: no such enrolment for the caller | Enrolment not found |
+| `TH013` | `focus_swap_invalid` | `swap_focus`: the programme to demote is not in focus, the one to promote is already in focus, or both are the same | A swap needs one programme in focus and another not in focus |
+| `TH014` | `consent_version_unchanged` | `supersede_core_consent`: the live core consent already has that version and locale | The core consent is already on this version |
+| `TH015` | `consent_document_immutable` | `consent_documents_guard` (update trigger on `consent_documents`) | Consent documents are immutable; publish a new version |
 
 Standard SQLSTATEs are kept where PostgreSQL defines the condition:
 `42501` for row-level security and privilege refusals and for
