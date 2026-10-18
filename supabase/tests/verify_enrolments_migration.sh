@@ -632,7 +632,8 @@ select set_config('th913.a_counts', jsonb_build_object(
                          join public.enrolments e on e.id = c.enrolment_id
                          where e.user_id = '00000000-0000-4000-8000-000000913001'),
   'account_consents', (select count(*) from public.account_consents
-                       where user_id = '00000000-0000-4000-8000-000000913001')
+                       where user_id = '00000000-0000-4000-8000-000000913001'),
+  'sync_answers', 0, 'sync_lapses', 0
 )::text, true);
 select th913_test.ok(
   (current_setting('th913.a_counts')::jsonb ->> 'enrolments')::int = 3
