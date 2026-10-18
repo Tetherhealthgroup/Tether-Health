@@ -1,0 +1,504 @@
+{
+  "about": "Screens in tether_ui/spec/screens that are not in manifest.json and are allowed because an owner decision added them. See README.md.",
+  "additions": [
+    {
+      "screen": "account_delete_apple",
+      "name": "Delete account · Apple account",
+      "decisions": [
+        "P-47",
+        "P-36"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "account_delete_google",
+      "name": "Delete account · Google account",
+      "decisions": [
+        "P-47",
+        "P-36"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "auth_session_apple",
+      "name": "Session expired · Apple account",
+      "decisions": [
+        "P-47",
+        "P-36"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "auth_session_google",
+      "name": "Session expired · Google account",
+      "decisions": [
+        "P-47",
+        "P-36"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "program_settings_sf",
+      "name": "Program settings · ScrollFree with Unplug",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_home_unplug",
+      "name": "ScrollFree home · Unplug on (iPhone)",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_home_unplug_android",
+      "name": "ScrollFree home · Unplug on (Android)",
+      "decisions": [
+        "N3"
+      ],
+      "tickets": [
+        "TH-971"
+      ],
+      "status": "owner prototype check pending"
+    },
+    {
+      "screen": "sf_screentime_android",
+      "name": "Connect usage access (Android)",
+      "decisions": [
+        "P-47",
+        "P-36"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_screentime_android_denied",
+      "name": "Usage access off (Android)",
+      "decisions": [
+        "P-47",
+        "P-36"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_apps",
+      "name": "Choose apps",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_apps_android",
+      "name": "Choose apps (Android)",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_apps_chosen",
+      "name": "Name your groups",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_auth",
+      "name": "Allow Screen Time",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_auth_android",
+      "name": "Android permissions for Unplug",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_auth_denied",
+      "name": "Screen Time not allowed",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_auth_notifications",
+      "name": "Notifications off",
+      "decisions": [
+        "P-47",
+        "P-47 decision 13"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_auth_unavailable",
+      "name": "Screen Time unavailable",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_gate",
+      "name": "Small step: one breath",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_gate_commit",
+      "name": "Small step: type a sentence",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_gate_sum",
+      "name": "Small step: quick sum",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_health",
+      "name": "Tracking check",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_health_android",
+      "name": "Tracking check (Android)",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_health_notifications",
+      "name": "Tracking check · notifications off",
+      "decisions": [
+        "P-47",
+        "P-47 decision 13"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_health_stopped",
+      "name": "Tracking stopped",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_home",
+      "name": "Unplug",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_intro",
+      "name": "Unplug intro",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_limits",
+      "name": "Limits & pause screen",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_off",
+      "name": "Turn off Unplug",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_overlay",
+      "name": "Pause screen (Android overlay)",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_picker_ios",
+      "name": "Apple app picker",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_session",
+      "name": "Start a focus session",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_session_active",
+      "name": "Focus session running",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_session_done",
+      "name": "Session complete",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_session_done_early",
+      "name": "Session ended early",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_session_end",
+      "name": "End session early",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_shield",
+      "name": "Pause screen (iPhone shield)",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_unplug_shield_firm",
+      "name": "Pause screen (iPhone shield, firm)",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sf_week_unplug",
+      "name": "Weekly reflection · Unplug on (iPhone)",
+      "decisions": [
+        "P-47",
+        "P-30"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "surface_shortcuts_android",
+      "name": "Launcher shortcuts (Android)",
+      "decisions": [
+        "P-47",
+        "P-32",
+        "P-48"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "surface_shortcuts_android_named",
+      "name": "Launcher shortcuts (sensitive details on)",
+      "decisions": [
+        "P-47",
+        "P-48"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "surface_shortcuts_ios",
+      "name": "Siri & App Shortcuts (iPhone)",
+      "decisions": [
+        "P-47",
+        "P-32",
+        "P-48"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "surface_shortcuts_ios_named",
+      "name": "Siri & App Shortcuts (sensitive details on)",
+      "decisions": [
+        "P-47",
+        "P-48"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "surface_widget_android",
+      "name": "Home-screen widget (Android)",
+      "decisions": [
+        "P-47",
+        "P-32",
+        "P-48"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "surface_widget_ios",
+      "name": "Home-screen widget (iPhone)",
+      "decisions": [
+        "P-47",
+        "P-32",
+        "P-48"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    },
+    {
+      "screen": "sys_update_android",
+      "name": "Update required (Android)",
+      "decisions": [
+        "P-47",
+        "P-36"
+      ],
+      "tickets": [
+        "TH-953"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,203 @@
+{
+  "about": "Approved screens allowed to differ from manifest.json. sha256 is the reviewed current content of tether_ui/spec/screens/<screen>.json. See deviations.md.",
+  "deviations": [
+    {
+      "screen": "account_leave",
+      "decisions": [
+        "P-08"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "9cc8a70a2161a30db72504df135ad61d64b4858d878da22b7dc1938299329beb",
+      "change": "Leave sheet, option 1: \"Keep my data for 30 days\" / \"Rejoin anytime and pick up where you left off\" -> \"Keep my data\" / \"Kept until you delete it or delete your account. Rejoin anytime.\""
+    },
+    {
+      "screen": "auth_session",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "64be737afb4e9f55b09bf6bcd1345e3bcb4e6f9e3e68d2e4f12ab54addb5e0af",
+      "change": "body text: drops \"Anything you logged offline is kept and syncs after you sign in.\""
+    },
+    {
+      "screen": "bf_home",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "f26a17f65071f015c743c5de4778c6b90ee28d000bc4ee429d0a259769f32acf",
+      "change": "Craving card: \"One tap · works offline\" -> \"One tap · no typing\""
+    },
+    {
+      "screen": "bf_home_quitday",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "74749816f93345176c7a63395e7921adf94d84ba167bf4e885f817e97b6ef7a8",
+      "change": "Craving card: \"One tap · no typing · offline\" -> \"One tap · no typing\""
+    },
+    {
+      "screen": "bf_intro",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "fee51a4e3b73a6c2be91d3be96ad55fd183c3608befdae5a01fa1cd794add6b7",
+      "change": "Row value: \"one tap, offline\" -> \"one tap, no typing\""
+    },
+    {
+      "screen": "ca_home",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "88a0761af33bdc92c918a82dbbab61847f090306b0839704d54c6a4cf796d1bc",
+      "change": "Red-zone plan card: \"Open it fast, even offline\" -> \"Open it fast\""
+    },
+    {
+      "screen": "ca_red",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "320af76a59c9a8dac35d2be500114848957b3425e081df86039efacdfb16a485",
+      "change": "Note: drops \"Works offline.\""
+    },
+    {
+      "screen": "checkin",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "e7ccebb4c836902b41f548a4e98b95ce36e624e4923a2d298862e1e8beaf9f63",
+      "change": "Footer: \"Private · works offline · skip anything\" -> \"Skip any program question\""
+    },
+    {
+      "screen": "crisis",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "f4f781d1dd23ded44fc78d8105f7dbb07e43801031ba8b64d89f49338c704b01",
+      "change": "Note: drops \"Works offline.\""
+    },
+    {
+      "screen": "ea_plan",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "b3d01b1750aea752b783f0726ce34c3845ea0d1a6c12e6ad315a0ed06424fa7c",
+      "change": "Developer description: drops \"; available offline\""
+    },
+    {
+      "screen": "program_settings",
+      "decisions": [
+        "P-08"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "866d29061b7c6592f5ff7c5d91c13b1752fe9579595718499f29bc177f93835f",
+      "change": "Leave row subtitle: \"Keep data 30 days or delete now\" -> \"Keep your data or delete it now\""
+    },
+    {
+      "screen": "rescue_pick",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "7e895e9ef5adc34d917ae3be46bcff35bed5808fb7159ab3a441ee8af18782be",
+      "change": "Developer description: drops \"Works offline.\""
+    },
+    {
+      "screen": "sf_home",
+      "decisions": [
+        "P-47 decision 1"
+      ],
+      "tickets": [
+        "TH-953"
+      ],
+      "sha256": "356d34c7e5a4a33918a4781f32059a76dddba3a022e53b387c80e1977b78ec77",
+      "change": "New Unplug entry card (\"Want firmer limits?\", Set up -> sf_unplug_intro) between the Urge card and Today's step; one new action; later action paths shift from body[3] to body[4]"
+    },
+    {
+      "screen": "sf_screentime",
+      "decisions": [
+        "P-47 decision 3"
+      ],
+      "tickets": [
+        "TH-953"
+      ],
+      "sha256": "59d6b66a1dd3b8c4df7721d8267309281508fdf065003fc0161bd3324b7ec568",
+      "change": "iPhone copy says Screen Time \"shows\" totals, not that Tether \"reads\" them (4 strings)"
+    },
+    {
+      "screen": "today",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "7a587f7cbc04c6ef3f2ee6ef9e94f554cedf871fc1157dd57d24a35a86be6b0f",
+      "change": "Craving card: drops \" · works offline\""
+    },
+    {
+      "screen": "today_loading",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "7950b963b3d7f03f15ac1087a1dfe83dad482a410d2aab8a3a5ade95ada50a1f",
+      "change": "Craving card \"Always available\" -> \"One tap · no typing\"; note about the on-device cache -> \"The rest of Today is still loading.\""
+    },
+    {
+      "screen": "today_offline",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "b22352326632984d6dbd6299f3def523863cb726b4a63b212b5a8e1d765154ff",
+      "change": "Craving card: \"Works offline\" -> \"One tap · no typing\""
+    },
+    {
+      "screen": "welcome",
+      "decisions": [
+        "P-22"
+      ],
+      "tickets": [
+        "TH-942"
+      ],
+      "sha256": "52091cb3139341cf90acb546f4b30bc2b5b64a90e15ba1e7e55a1a151887bdbe",
+      "change": "Row value: \"Works offline\" -> \"No typing needed\""
+    }
+  ]
+}
