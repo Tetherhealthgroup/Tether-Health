@@ -29,25 +29,35 @@ headers, optional explicit CORS allowlisting, DTO whitelisting, and redacted
 error responses. Tune limits with deployment-managed environment values.
 
 Rate limiting is keyed on the client IP (`request.ip`). `TRUST_PROXY` sets how
-many reverse-proxy hops are trusted when deriving it from `X-Forwarded-For`.
+many reverse-proxy hops are trusted when deriving it from `X-Forwarded-For`,
+and `TRUST_PROXY_CIDRS` lists the proxy addresses those hops may come from.
 
 - **Default: `0`, in every environment including production.** No proxy is
   trusted and `X-Forwarded-For` is ignored, so the key is the socket peer
   address. Behind a proxy this means all clients share the proxy's bucket (a
   safe, over-restrictive failure) rather than being spoofable.
-- **Meaning of the hop count.** `N` trusts the `N` nearest proxies. The client
-  IP is the `X-Forwarded-For` entry appended by the outermost trusted proxy
-  (counting from the right); entries to its left are client-controlled and
-  ignored. Accepted values: `false`, `0`, or an integer up to 10. `true` and
-  anything else is rejected and aborts startup.
-- **Spoofing risk.** If the value is higher than the real number of proxies
-  in front of the service, or the service is reachable without passing through
-  them, a client can forge its own IP. That lets it evade its rate limit or
-  exhaust the bucket of a chosen victim address.
+- **Meaning of the hop count.** `N` trusts at most the `N` nearest proxies.
+  The client IP is the first untrusted address, counting from the socket peer
+  and then `X-Forwarded-For` from the right; entries to its left are
+  client-controlled and ignored. Accepted values: `false`, `0`, or an integer
+  up to 10. `true` and anything else is rejected and aborts startup.
+- **Proxy allowlist.** A non-zero `TRUST_PROXY` requires `TRUST_PROXY_CIDRS`:
+  a comma-separated list of IPv4/IPv6 addresses or CIDR ranges, for example
+  `10.0.0.0/8, 2001:db8::/32`. Startup fails if it is missing, empty, or has an
+  invalid entry (including a `/0` range). A hop is trusted only if it is within
+  the hop count **and** its address is in the list, so a peer outside the list
+  (for example, a client connecting to the service directly) keeps its own
+  socket address and its `X-Forwarded-*` headers are ignored. With more than
+  one hop, every proxy in the chain must be listed. Use the narrowest ranges
+  that cover the proxies. The list is ignored when `TRUST_PROXY` is `0`.
+- **Spoofing risk.** If the hop count is higher than the real number of
+  proxies, or the allowlist covers addresses that clients can connect from, a
+  client can forge its own IP. That lets it evade its rate limit or exhaust
+  the bucket of a chosen victim address.
 - **Owner action required.** The owner must confirm Render's proxy topology
-  (how many proxies sit in front of the service, and that the service cannot be
-  reached around them) before setting a non-zero value. Until then leave it at
-  the default of `0`. No Render documentation has been verified by this change.
+  (how many proxies sit in front of the service and which addresses they
+  connect from) before setting a non-zero value. Until then leave it at the
+  default of `0`. No Render documentation has been verified by this change.
 
 ## Development deployment
 
