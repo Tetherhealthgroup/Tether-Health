@@ -1,4 +1,5 @@
 import * as Joi from "joi";
+import { BlockList, isIP } from "node:net";
 
 function decodedSupabaseRole(value: string): string | undefined {
   const segments = value.split(".");
@@ -43,22 +44,94 @@ function trustedProxyHops(
   return hops <= MAX_TRUSTED_PROXY_HOPS ? hops : helpers.error("any.invalid");
 }
 
+export interface TrustedProxyRange {
+  family: "ipv4" | "ipv6";
+  address: string;
+  /** Prefix length; undefined for a single address. */
+  prefix?: number;
+}
+
+const MAX_PREFIX = { ipv4: 32, ipv6: 128 } as const;
+
+function trustedProxyRange(entry: string): TrustedProxyRange | undefined {
+  const parts = entry.split("/");
+  if (parts.length > 2) return undefined;
+  const [address = "", prefixText] = parts;
+  // isIP accepts IPv6 zone IDs (fe80::1%eth0); a socket peer never has one.
+  if (address.includes("%")) return undefined;
+  const version = isIP(address);
+  if (version === 0) return undefined;
+  const family = version === 4 ? "ipv4" : "ipv6";
+  if (prefixText === undefined) return { family, address };
+  // Decimal prefix without leading zeros. /0 is rejected: it matches every
+  // address, which is the rejected TRUST_PROXY=true.
+  if (!/^[1-9][0-9]{0,2}$/.test(prefixText)) return undefined;
+  const prefix = Number(prefixText);
+  return prefix <= MAX_PREFIX[family] ? { family, address, prefix } : undefined;
+}
+
 /**
- * Fastify `trustProxy` option for a validated hop count (0 disables it).
+ * Parses TRUST_PROXY_CIDRS: a comma-separated list of IPv4/IPv6 addresses or
+ * CIDR ranges (e.g. "10.0.0.0/8, 2001:db8::/32"). An empty value is an empty
+ * list. Errors never include the offending value.
+ */
+function trustedProxyRanges(
+  value: unknown,
+  helpers: Joi.CustomHelpers,
+): TrustedProxyRange[] | Joi.ErrorReport {
+  if (typeof value !== "string") return helpers.error("any.invalid");
+  if (value.trim() === "") return [];
+  const ranges: TrustedProxyRange[] = [];
+  for (const entry of value.split(",")) {
+    const range = trustedProxyRange(entry.trim());
+    if (!range) return helpers.error("any.invalid");
+    ranges.push(range);
+  }
+  return ranges;
+}
+
+function nonEmptyRanges(
+  value: TrustedProxyRange[],
+  helpers: Joi.CustomHelpers,
+): TrustedProxyRange[] | Joi.ErrorReport {
+  return value.length > 0 ? value : helpers.error("any.required");
+}
+
+/**
+ * Fastify `trustProxy` option for a validated hop count and proxy allowlist
+ * (a hop count of 0 disables it).
  *
  * Fastify 5.12 deliberately ignores a bare numeric `trustProxy` (it fails
  * closed and trusts nothing), so the hop count is expressed as a trust
- * function: hop 0 is the socket peer (the reverse proxy) and hops below
- * `hops` are trusted, so the client IP is the first untrusted
- * X-Forwarded-For entry counting from the right, i.e. the address the
- * outermost trusted proxy appended. Entries to its left are client-controlled
- * and ignored.
+ * function. Hop 0 is the socket peer and hop N is the Nth X-Forwarded-For
+ * entry counting from the right. A hop is trusted only if it is below `hops`
+ * AND its address is in `ranges`, so a peer outside the allowlist (including
+ * a direct client at hop 0) is never trusted and its forwarded headers are
+ * ignored. The client IP is the first untrusted address.
  */
 export function fastifyTrustProxy(
   hops: number,
+  ranges: readonly TrustedProxyRange[] = [],
 ): false | ((address: string, hop: number) => boolean) {
-  return hops > 0 ? (_address, hop) => hop < hops : false;
+  if (hops <= 0 || ranges.length === 0) return false;
+  const allowlist = new BlockList();
+  for (const { family, address, prefix } of ranges) {
+    if (prefix === undefined) allowlist.addAddress(address, family);
+    else allowlist.addSubnet(address, prefix, family);
+  }
+  return (address, hop) => {
+    if (hop >= hops) return false;
+    const version = isIP(address);
+    if (version === 0) return false;
+    // BlockList also matches IPv4-mapped IPv6 peers (::ffff:a.b.c.d).
+    return allowlist.check(address, version === 4 ? "ipv4" : "ipv6");
+  };
 }
+
+const trustedProxyList = Joi.custom(
+  trustedProxyRanges,
+  "trusted proxy address list",
+);
 
 export const environmentSchema = Joi.object({
   NODE_ENV: Joi.string()
@@ -115,5 +188,14 @@ export const environmentSchema = Joi.object({
   TRUST_PROXY: Joi.custom(trustedProxyHops, "trusted proxy hop count").default(
     0,
   ),
+  // Addresses or CIDR ranges of the reverse proxies allowed to set
+  // X-Forwarded-For. Required when TRUST_PROXY is above 0: a hop is trusted
+  // only if its address is in this list, so a client connecting directly
+  // cannot forge its IP. Ignored when TRUST_PROXY is 0.
+  TRUST_PROXY_CIDRS: Joi.when("TRUST_PROXY", {
+    is: 0,
+    then: trustedProxyList.default([]),
+    otherwise: trustedProxyList.required().custom(nonEmptyRanges),
+  }),
   CORS_ALLOWED_ORIGINS: Joi.string().allow("").default(""),
 });
