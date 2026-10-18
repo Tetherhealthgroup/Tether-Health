@@ -1,7 +1,8 @@
 # Database contract v1
 
-Migration sources of truth include `supabase/migrations/202609110001_profiles.sql`
-and `supabase/migrations/202609260001_program_data.sql`.
+Migration sources of truth include `supabase/migrations/202609110001_profiles.sql`,
+`supabase/migrations/202609260001_program_data.sql` and
+`supabase/migrations/202610170002_enrolments.sql`.
 
 `public.profiles` is a one-to-one extension of `auth.users`; `id` is both its
 primary key and cascading foreign key. A signup trigger creates the row. Clients
@@ -37,6 +38,113 @@ update, and delete. Payloads must be JSON objects no larger than 32 KiB and use 
 bounded positive revision. Flutter keeps the same snapshot in platform secure
 storage, partitioned by account ID (or an isolated guest scope), and retries
 sync after offline saves. Program payloads are prohibited from logs.
+
+## Programmes, enrolments and consents
+
+Migration source of truth: `supabase/migrations/202610170002_enrolments.sql`.
+Programme health data hangs off an enrolment, never off the account, and
+consent is recorded per enrolment, purpose and recipient. Every table below
+has row-level security enabled and forced; `anon` has no access.
+
+`public.programmes` is read-only reference data, readable by authenticated
+users. It holds exactly the 11 programmes of the `tether_ui` spec, keyed by a
+stable two-letter `code`:
+
+| `code` | `slug` | Name | `receives_resources` |
+|---|---|---|---|
+| `bf` | `breathefree` | BreatheFree | `smoking_status` |
+| `sf` | `scrollfree` | ScrollFree | none |
+| `ca` | `clearair` | ClearAir | none |
+| `hw` | `heartwise` | Heartwise | `blood_pressure`, `lipids` |
+| `st` | `steady` | Steady | `a1c`, `glucose` |
+| `re` | `renew` | Renew | `egfr` |
+| `nu` | `nourish` | Nourish | none |
+| `sd` | `stride` | Stride | none |
+| `ea` | `ease` | Ease | none |
+| `ck` | `checkup` | Checkup | `immunizations` |
+| `be` | `beacon` | Beacon | none |
+
+`receives_resources` lists the health-record categories a programme may
+receive, taken from the `records_consent` screen; routing also needs that
+enrolment's live `records_import` consent. Ease and ScrollFree never receive
+records.
+
+`public.enrolments` has one row per user and programme
+(`unique (user_id, programme_code)`); rejoining reuses the row. Leaving keeps
+the enrolment and its data until the member deletes them ("Delete now") or
+deletes the account; nothing is purged automatically.
+
+| Column | Contract |
+|---|---|
+| `id` | UUID; programme data references it with `on delete cascade` |
+| `user_id` | `auth.users(id)`, cascading |
+| `programme_code` | `programmes(code)` |
+| `status` | `focus` (default), `learn_only`, `paused` or `left` |
+| `mode` | null, or `quit` / `reduce` for `bf` and `sf` only |
+| `joined_at` | set on insert |
+| `left_at` | database managed: set when the status changes to `left`, cleared on rejoin. Clients cannot write it |
+
+Callers select, insert, update and delete only their own rows. Inserts may set
+`user_id`, `programme_code`, `status` (not `left`) and `mode`; updates may set
+`status` and `mode` only. "Delete now" on leaving deletes the row, which
+cascades to its consents and programme data.
+
+At most two enrolments per user may have `status = 'focus'`. A deferred
+constraint trigger checks this at commit, under a per-user advisory lock, so a
+swap (one programme to `focus`, another out of it) succeeds in one transaction
+in either order, while a third focus programme is refused. `learn_only` and
+`paused` are not limited. The default status on insert is `focus`, so a third
+enrolment must be inserted with another status.
+
+`public.programme_consents` records one consent per enrolment × purpose ×
+recipient. `purpose` is `core`, `reminders`, `records_import`,
+`share_care_team`, `share_caregiver`, `research` or `screen_time`.
+`recipient_ref` is required for the two sharing purposes and must be null for
+all others, so sharing cannot be consented without a named recipient. Each row
+keeps `consent_version` and the exact `consent_text` shown, plus `granted_at`
+(database set). At most one live (unrevoked) row exists per enrolment, purpose
+and recipient, enforced by a partial unique index on live rows only, so a
+revocation never conflicts with earlier history. A row is never edited except to revoke it: the only update
+allowed is setting `revoked_at`, which the database stamps with the current
+time; a revoked row cannot be revived, and a new grant is a new row. Callers
+cannot delete consent rows; they go when the enrolment or the account is
+deleted. A caller may add a consent only to their own enrolment that is not
+`left`, and any purpose other than `core` requires that enrolment's `core`
+consent to be live.
+
+Revoking an enrolment's `core` consent revokes every live consent of that
+enrolment. Leaving (status changes to `left`) revokes every live consent except
+`core`; the `core` row stays live but grants nothing while the enrolment is
+left. After rejoining, or after granting `core` again, sharing, records import,
+research, screen time and reminders are off until the member grants each one
+again. The revoked rows stay as history. Both rules are triggers that run as
+the caller.
+
+Consent rows store the wording itself. When approved consent texts exist, a
+`consent_documents` reference is planned to identify the exact document version.
+
+`public.account_consents` holds account-level items that belong to no
+programme: `essential`, `cross_program_insights` and `diagnostics`. It has the
+same version, wording, single-live-row (partial unique index on
+`(user_id, purpose)` where not revoked) and revoke-only rules, keyed by
+`user_id`. It holds no health data.
+
+`public.has_consent(enrolment_id uuid, purpose text, recipient_ref text default null)`
+is a `stable security invoker` function. It is true only when the caller owns
+the enrolment, the enrolment is not `left`, the caller's account deletion has
+not started, a live consent exists for exactly that purpose and recipient, and
+— for any purpose other than `core` — the enrolment's `core` consent is live.
+Because it runs as the caller, RLS also applies. Programme-data tables use it
+in their insert checks together with "enrolment is not `left`".
+
+`public.deletion_barrier_open()` is a `volatile security invoker` function. It
+is true while the caller's profile exists and
+`profiles.account_deletion_started_at` is null. It takes a `FOR SHARE` lock on
+that profile row, so `begin_account_deletion` waits for in-flight inserts, and
+later inserts see the barrier. Every insert policy on enrolments, programme
+consents and account consents uses it. Later tables that hold the caller's data
+must use it in their insert checks too, alongside `has_consent` where the data
+belongs to a programme.
 
 ## Quit-plan snapshot
 
@@ -97,8 +205,15 @@ in `breathefree-dev`; real patient or support-person information is prohibited.
 ## Account-data deletion
 
 Migration sources of truth:
-`supabase/migrations/202609200001_account_data_deletion.sql` and
-`supabase/migrations/202610030001_avatar_deletion_barrier.sql`.
+`supabase/migrations/202609200001_account_data_deletion.sql`,
+`supabase/migrations/202610030001_avatar_deletion_barrier.sql` and
+`supabase/migrations/202610170002_enrolments.sql`.
+
+`delete_my_app_data` deletes the caller's programme consents, enrolments (and
+everything that cascades from them), account consents, program data, quit plan
+and profile. It returns counts only: `profiles`, `quit_plans`, `program_data`,
+`enrolments`, `programme_consents` and `account_consents`. Consent history is
+deleted with the account; nothing records what was deleted.
 
 The NestJS API first invokes `begin_account_deletion` with exact confirmation.
 That function updates the caller's profile row, waiting for any upload holding a
