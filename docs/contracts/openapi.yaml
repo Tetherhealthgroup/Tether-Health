@@ -303,13 +303,16 @@ components:
         smokingTriggers:
           type: array
           uniqueItems: true
-          maxItems: 10
+          maxItems: 11
           items:
             type: string
-            enum: [stress, afterMeals, driving, coffee, socialSettings, workBreaks, alcohol, boredom, morning, beforeBed]
+            enum: [stress, afterMeals, driving, coffee, socialSettings, workBreaks, alcohol, boredom, morning, beforeBed, scrolling]
         customSmokingTrigger: {type: [string, 'null'], minLength: 1, maxLength: 120}
         readinessPath: {type: string, enum: [prepare, explore, connect]}
-        quitPlanPath: {type: string, enum: [setQuitDate, quitToday, reduceGradually]}
+        quitPlanPath:
+          type: string
+          enum: [setQuitDate, quitToday, reduceGradually, exploreFirst]
+          description: exploreFirst requires readinessPath explore.
         quitDate: {type: string, format: date}
         quitDayCheckIn: {type: boolean}
         quitReasons:
