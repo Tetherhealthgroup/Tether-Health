@@ -302,9 +302,12 @@ def main():
     # flutter
     G.generate(os.path.join(OUT, 'flutter'), describe, os.path.join(HERE, 'dart_static'))
     sim.dart_tests(os.path.join(OUT, 'flutter'))
-    # generator copy
-    gdir = os.path.join(OUT, 'generator'); shutil.rmtree(gdir, ignore_errors=True)
-    shutil.copytree(HERE, gdir, ignore=shutil.ignore_patterns('__pycache__', 'run_*.py', 'shots.py', '*.pyc', 'proto_check*.json'))
+    # generator copy. Skipped when running in place (OUT/generator is this
+    # directory): removing it first would delete the generator itself.
+    gdir = os.path.join(OUT, 'generator')
+    if not (os.path.isdir(gdir) and os.path.samefile(gdir, HERE)):
+        shutil.rmtree(gdir, ignore_errors=True)
+        shutil.copytree(HERE, gdir, ignore=shutil.ignore_patterns('__pycache__', 'run_*.py', 'shots.py', '*.pyc', 'proto_check*.json'))
     sp = os.path.join(OUT, 'validation', 'summary.json')
     w('README.md', mapping.readme(json.load(open(sp)) if os.path.exists(sp) else {}, edges))
     if '--images' in sys.argv:
