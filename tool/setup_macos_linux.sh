@@ -24,7 +24,7 @@ esac
 
 flutter create . \
   --project-name breathefree_patient \
-  --org com.breathefree \
+  --org com.TetherHealthLLC \
   --platforms="$breathefree_platforms"
 flutter pub get
 flutter analyze

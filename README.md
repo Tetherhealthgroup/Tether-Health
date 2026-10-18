@@ -64,12 +64,12 @@ flutter run -d linux
 
 ## Manual setup
 
-Flutter creates machine-specific runner folders without changing the approved application source:
+Flutter creates machine-specific runner folders without changing the approved application source. `--project-name` is the Dart package name and must match `pubspec.yaml`. The app ID is `com.TetherHealthLLC.tetherhealth`; set it by hand in any runner folder this command creates (macOS, Linux):
 
 ```bash
 flutter create . \
   --project-name breathefree_patient \
-  --org com.breathefree \
+  --org com.TetherHealthLLC \
   --platforms android,ios,web,windows,macos,linux
 flutter pub get
 flutter analyze
@@ -94,7 +94,7 @@ An iPhone build must be created on a Mac because Apple requires Xcode:
 3. Connect the unlocked iPhone and tap **Trust This Computer**.
 4. Open `ios/Runner.xcworkspace` in Xcode.
 5. Select **Runner → Signing & Capabilities** and choose your Apple Development Team.
-6. Change the bundle identifier from `com.breathefree.breathefreePatient` if needed.
+6. Keep the bundle identifier `com.TetherHealthLLC.tetherhealth`; it is the store identity shared with Android.
 7. Select the iPhone and press Run, or use `flutter run -d <device-id>`.
 
 A free Apple ID can install a development build on a personal device. Publishing through TestFlight or the App Store requires the Apple Developer Program and App Store Connect.
