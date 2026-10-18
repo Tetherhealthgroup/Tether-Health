@@ -27,9 +27,12 @@ class AppConfig {
       supabaseUrl.isNotEmpty ||
       supabaseAnonKey.isNotEmpty;
 
-  /// Pure check of the two service endpoints for a release build. Returns one
-  /// human-readable problem per failing value (empty list means acceptable).
-  /// Names the dart-define so a misbuilt release is easy to diagnose.
+  /// Pure check of the two service endpoints for a release build. Returns the
+  /// human-readable problems of each failing value (empty list means
+  /// acceptable). Names the dart-define, never the value, so a misbuilt
+  /// release is easy to diagnose. Neither URL may carry user info, a query or
+  /// a fragment, and SUPABASE_URL may not have a path beyond "/", as in
+  /// tool/release_define_check.sh.
   static List<String> releaseEndpointProblems({
     required String supabaseUrl,
     required String apiBaseUrl,
@@ -50,15 +53,40 @@ class AppConfig {
       } else if (uri.scheme != 'https') {
         problems.add('${entry.key} must use https.');
       }
+      // Only for an absolute URL; anything else is reported above.
+      if (uri == null || !uri.hasAuthority || uri.host.isEmpty) continue;
+      if (_rawAuthority(value).contains('@') ||
+          uri.hasQuery ||
+          uri.hasFragment) {
+        problems.add(
+          '${entry.key} must not contain user info, a query or a fragment.',
+        );
+      }
+      if (entry.key == 'SUPABASE_URL' &&
+          uri.path.isNotEmpty &&
+          uri.path != '/') {
+        problems
+            .add('${entry.key} must be scheme and host only, without a path.');
+      }
     }
     return problems;
+  }
+
+  /// The authority text of [value] as written: after "//" up to the first
+  /// "/", "?" or "#". Empty if there is no "//".
+  static String _rawAuthority(String value) {
+    final start = value.indexOf('//');
+    if (start < 0) return '';
+    final rest = value.substring(start + 2);
+    final end = rest.indexOf(RegExp('[/?#]'));
+    return end < 0 ? rest : rest.substring(0, end);
   }
 
   /// Pure check that [key] is safe to embed in a client. Returns a problem
   /// description (never containing the key) or null. Follows the
   /// SUPABASE_ANON_KEY rules of tool/release_define_check.sh (TH-123, R-055).
   ///
-  /// TH-904 (th-security M1): the final verdict is an ALLOWLIST. [key],
+  /// TH-904: the final verdict is an allowlist. [key],
   /// exactly as given (no trimming), must match `^sb_publishable_[A-Za-z0-9_-]+$`
   /// or be a JWT of exactly three base64url segments (optionally `=`-padded)
   /// whose payload is strict UTF-8 JSON: an object with a top-level `role` of
@@ -82,20 +110,7 @@ class AppConfig {
   ///   or with a backslash-u escape that could spell one (TH-140 tests this
   ///   for UTF-8, UTF-32BE and a BOM plus UTF-16BE); the problem is then
   ///   `role is not "anon"`.
-  /// Known residuals. None can let a privileged value through any more: the
-  /// allowlist accepts only an ASCII publishable key or a decodable anon JWT,
-  /// so the last item below now only decides which problem is reported:
-  /// - deep nesting: a payload nested beyond the Python recursion limit with
-  ///   only anon roles is accepted here and rejected by the helper;
-  /// - helper-only encodings of an anon payload (for example NaN, UTF-16/32)
-  ///   are rejected here with `role is not "anon"`, so Dart is stricter than
-  ///   the helper;
-  /// - the Cf table is Unicode 16, a superset of the Unicode data of an older
-  ///   running Python (3.9 has Unicode 13);
-  /// - look-alike letters, hex, percent or base64-wrapped encodings, and an
-  ///   invisible character that is in neither Cf/Cc nor the mirrored list
-  ///   escape the denylist, here and in the helper alike, and are then
-  ///   rejected by the allowlist.
+  /// The denylist only chooses the message; the allowlist decides acceptance.
   static String? anonKeyProblem(String key) {
     if (_withoutSpace(key).isEmpty) {
       return 'SUPABASE_ANON_KEY is missing or empty.';
@@ -138,7 +153,7 @@ class AppConfig {
   static final _jwtSegment = RegExp(r'^[A-Za-z0-9_-]+={0,2}$');
 
   /// True if [key] is exactly three base64url segments whose payload is strict
-  /// UTF-8 JSON: an object with a top-level `role` of `anon` (TH-904, M1).
+  /// UTF-8 JSON: an object with a top-level `role` of `anon` (TH-904).
   /// Mirrors is_anon_jwt in tool/release_define_check.sh.
   static bool _isAnonJwt(String key) {
     final segments = key.split('.');

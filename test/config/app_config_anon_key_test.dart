@@ -411,7 +411,7 @@ void main() {
     });
   });
 
-  // TH-904 (th-security M1): SUPABASE_ANON_KEY is an allowlist, as in
+  // TH-904: SUPABASE_ANON_KEY is an allowlist, as in
   // tool/release_define_check.sh. Each value passed the old denylist.
   group('anonKeyProblem allowlist (TH-904)', () {
     final canary = newCanary();

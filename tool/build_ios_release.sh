@@ -10,7 +10,8 @@
 #                   Required unless --inspect-ipa is given. A relative path is
 #                   resolved against the caller's working directory. Before any
 #                   build step the file must be a JSON object holding only
-#                   https SUPABASE_URL and API_BASE_URL (no .invalid host) and
+#                   https SUPABASE_URL and API_BASE_URL (no .invalid host, user
+#                   info, query or fragment; SUPABASE_URL without a path) and
 #                   a SUPABASE_ANON_KEY that is an sb_publishable_ key or an
 #                   anon JWT (allowlist, TH-904); the rules live in
 #                   tool/release_define_check.sh, shared with the Play script.

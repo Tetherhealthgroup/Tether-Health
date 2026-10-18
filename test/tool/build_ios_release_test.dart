@@ -88,6 +88,9 @@ void main() {
           }
           expect(out, isNot(contains('no build was run')));
         }
+        for (final fragment in c.absent) {
+          expect(out, isNot(contains(fragment)));
+        }
         expect(out, isNot(contains(canary)));
         for (final window in canaryWindows) {
           expect(out, isNot(contains(window)), reason: 'canary window leaked');

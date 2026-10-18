@@ -248,7 +248,7 @@ void main() {
     });
   });
 
-  test('a set CDPATH does not send the script to another tree (L2)', () {
+  test('a set CDPATH does not send the script to another tree', () {
     writePubspec('1.0.0+2');
     // Decoy: with CDPATH set, the relative `cd tool/..` would land here, and
     // this pubspec is below the minimum, so the version check would fail.

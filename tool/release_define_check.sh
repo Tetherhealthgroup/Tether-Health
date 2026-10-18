@@ -5,10 +5,11 @@
 #
 # check_release_define_file <prefix> <path>
 #   Succeeds if <path> is a JSON object whose SUPABASE_URL and API_BASE_URL are
-#   absolute https URLs whose host is not a .invalid placeholder, whose
-#   SUPABASE_ANON_KEY is a non-privileged key, and in which no define key holds
-#   a privileged-looking value (R-055, R-076, TH-123).
-#   TH-904 (th-security M1): the check is an ALLOWLIST first.
+#   absolute https URLs whose host is not a .invalid placeholder, without user
+#   info, a query or a fragment (SUPABASE_URL also without a path beyond "/"),
+#   whose SUPABASE_ANON_KEY is a non-privileged key, and in which no define key
+#   holds a privileged-looking value (R-055, R-076, TH-123).
+#   TH-904: the check is an allowlist first.
 #     - The top-level keys must be among SUPABASE_URL, API_BASE_URL and
 #       SUPABASE_ANON_KEY; any other key is rejected, whatever its value.
 #     - SUPABASE_ANON_KEY, exactly as written (no trimming), must either match
@@ -18,7 +19,7 @@
 #       lib/config/app_config.dart (AppConfig.anonKeyProblem) applies the same
 #       rule.
 #   NaN, Infinity and -Infinity are rejected as invalid JSON (Dart's decoder
-#   rejects them, and Flutter would echo the define content; th-security L1).
+#   rejects them, and Flutter would echo the define content).
 #   The denylist checks below still run on every key, so the more specific
 #   problem is reported where one applies. Every top-level key is checked, and
 #   so are all nested strings and all key names at any depth. Privileged means:
@@ -47,12 +48,7 @@
 #   are NOT removed before the JWT decoding, so a token that carries one inside
 #   a segment stays undecodable (SUPABASE_ANON_KEY rejects it; another key does
 #   not flag it).
-#   Documented residuals (TH-137), now inside the three allowed keys only,
-#   because any other top-level key is rejected (TH-904): look-alike letters
-#   (fullwidth, Cyrillic); hex, percent and base64-wrapped encodings; a token
-#   split across array elements; a plain service_role or an undecodable
-#   payload under SUPABASE_URL or API_BASE_URL (which must still be https
-#   URLs).
+#   The denylist is a diagnostic aid; the allowlists above decide acceptance.
 #   Otherwise prints "<prefix>: <problems>" to stderr and returns 1; an
 #   unexpected internal error also returns 1 ("cannot check define file").
 #   Values are never printed. A define key name is printed only if it is in
@@ -77,8 +73,9 @@ from urllib.parse import urlparse
 
 prefix = sys.argv[1]
 ANON = "SUPABASE_ANON_KEY"
-# The only top-level keys a release define file may hold (TH-904, M1): the
-# three values AppConfig.fromEnvironment reads (lib/config/app_config.dart).
+# Reject unexpected keys: the only top-level keys a release define file may
+# hold are the three values AppConfig.fromEnvironment reads
+# (lib/config/app_config.dart).
 ALLOWED_KEYS = ("SUPABASE_URL", "API_BASE_URL", ANON)
 PUBLISHABLE = re.compile(r"sb_publishable_[A-Za-z0-9_-]+")
 JWT_SEGMENT = re.compile(r"[A-Za-z0-9_-]+={0,2}")
@@ -328,7 +325,7 @@ def is_anon_jwt(value):
 
 
 def anon_key_allowed(value):
-    """The SUPABASE_ANON_KEY allowlist (TH-904, M1); mirrors AppConfig."""
+    """The SUPABASE_ANON_KEY allowlist (TH-904); mirrors AppConfig."""
     return isinstance(value, str) and (
         PUBLISHABLE.fullmatch(value) is not None or is_anon_jwt(value)
     )
@@ -364,6 +361,13 @@ def check():
             bad.append(f"{key} must be an absolute https URL")
         elif placeholder_host(parsed):
             bad.append(f"{key} must not use a placeholder .invalid host")
+        if not parsed.netloc:
+            continue  # Not absolute; reported above.
+        # Checked on the raw text: urlparse drops an empty query or fragment.
+        if "@" in parsed.netloc or "?" in value or "#" in value:
+            bad.append(f"{key} must not contain user info, a query or a fragment")
+        if key == "SUPABASE_URL" and parsed.path not in ("", "/"):
+            bad.append(f"{key} must be scheme and host only, without a path")
     key_value = data.get(ANON)
     key_missing = not isinstance(key_value, str) or not key_value.strip()
     if key_missing:

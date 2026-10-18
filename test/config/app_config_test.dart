@@ -101,6 +101,62 @@ void main() {
       );
     });
 
+    test('rejects user info, a query or a fragment without echoing it', () {
+      const canary = 'TH904URLCANARY';
+      for (final url in [
+        'https://postgres:$canary@db.example.test',
+        'https://$canary@db.example.test',
+        'https://p.supabase.co/?apikey=$canary',
+        'https://p.supabase.co/?',
+        'https://p.supabase.co/#$canary',
+      ]) {
+        final asSupabase = problems(url, 'https://api.example.test');
+        expect(
+            asSupabase,
+            [
+              'SUPABASE_URL must not contain user info, a query or a fragment.',
+            ],
+            reason: url);
+        final asApi = problems('https://p.supabase.co', url);
+        expect(
+            asApi,
+            [
+              'API_BASE_URL must not contain user info, a query or a fragment.',
+            ],
+            reason: url);
+        for (final (supabase, api) in [
+          (url, 'https://api.example.test'),
+          ('https://p.supabase.co', url),
+        ]) {
+          final config = AppConfig(
+            apiBaseUrl: api,
+            supabaseUrl: supabase,
+            supabaseAnonKey: 'sb_publishable_synthetic-placeholder',
+          );
+          Object? thrown;
+          try {
+            config.validate(production: true);
+          } catch (e) {
+            thrown = e;
+          }
+          expect(thrown, isA<FormatException>(), reason: url);
+          expect(thrown.toString(), isNot(contains(canary)), reason: url);
+        }
+        expect(asSupabase.join(), isNot(contains(canary)));
+        expect(asApi.join(), isNot(contains(canary)));
+      }
+    });
+
+    test('SUPABASE_URL is scheme and host only; API_BASE_URL may have a path',
+        () {
+      expect(problems('https://p.supabase.co/rest/v1', 'https://a.test/v1'), [
+        'SUPABASE_URL must be scheme and host only, without a path.',
+      ]);
+      expect(problems('https://p.supabase.co:443/', 'https://a.test/v1/'),
+          isEmpty);
+      expect(problems('https://p.supabase.co', 'https://a.test'), isEmpty);
+    });
+
     test('debug validation keeps accepting http endpoints', () {
       const config = AppConfig(
         apiBaseUrl: 'http://localhost:3000',

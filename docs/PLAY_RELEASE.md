@@ -3,7 +3,7 @@
 App ID: `com.TetherHealthLLC.tetherhealth`. Agents and CI never sign, upload or
 publish; every step below is performed by the owner.
 
-> **Do not build for Play until TH-941 sets applicationId to com.TetherHealthLLC.tetherhealth; this tree still builds com.breathefree.breathefree_patient.**
+> **Do not build for Play until applicationId is changed to com.TetherHealthLLC.tetherhealth; this tree still builds com.breathefree.breathefree_patient.**
 
 ## 1. Create the upload key (once, outside the repo)
 
@@ -69,8 +69,10 @@ stops if any rule fails:
   letters, digits, `_` or `-`) or an anon JWT (three segments whose payload has
   role `anon`), with no surrounding spaces or prefix. Anything else, including
   `sb_secret_` and `service_role` keys, is rejected.
-- Both URLs must be absolute `https` URLs, and a `.invalid` placeholder host
-  (as in `config/dart_defines.example.json`) is rejected.
+- Both URLs must be absolute `https` URLs without user info, a query or a
+  fragment, and a `.invalid` placeholder host (as in
+  `config/dart_defines.example.json`) is rejected. `SUPABASE_URL` is the
+  scheme and host only (an optional port and a trailing `/` are allowed).
 - `NaN`, `Infinity` and `-Infinity` are not accepted as JSON.
 - Error messages name the failing key (or its position) and never print a
   value from the file.

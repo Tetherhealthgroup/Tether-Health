@@ -125,7 +125,8 @@ final opaqueSegments = <String, List<int>>{
 };
 
 class DefineCase {
-  const DefineCase(this.name, this.contents, this.expected);
+  const DefineCase(this.name, this.contents, this.expected,
+      {this.absent = const []});
 
   final String name;
 
@@ -135,6 +136,10 @@ class DefineCase {
   /// Message fragments the script must print on rejection; empty if the file
   /// must be accepted.
   final List<String> expected;
+
+  /// Message fragments the script must NOT print (documents what a case is
+  /// not rejected for).
+  final List<String> absent;
 
   bool get accepted => expected.isEmpty;
 
@@ -170,6 +175,7 @@ const _notAllowedKey =
 const _notAllowed = 'is not an allowed define key (allowed: SUPABASE_URL, '
     'API_BASE_URL, SUPABASE_ANON_KEY)';
 const _invalidHost = 'must not use a placeholder .invalid host';
+const _urlExtras = 'must not contain user info, a query or a fragment';
 
 final defineCases = <DefineCase>[
   DefineCase('sb_publishable_ key', _define(), []),
@@ -384,8 +390,9 @@ final defineCases = <DefineCase>[
     ),
     [],
   ),
-  // TH-904 (th-security M1): accepted before; any top-level key outside the
-  // three allowed ones is now rejected, whatever its value.
+  // TH-904: accepted before; any top-level key outside the three allowed
+  // ones is now rejected, whatever its value. The values themselves are still
+  // not flagged.
   DefineCase(
     'anon JWT and publishable key under another define keys',
     _define(
@@ -400,6 +407,7 @@ final defineCases = <DefineCase>[
     [
       for (var n = 4; n <= 8; n++) 'define key #$n $_notAllowed',
     ],
+    absent: ['role is not "anon"', 'privileged'],
   ),
   // TH-123 send-back: key names never leak, nested key names are scanned,
   // duplicate keys are rejected.
@@ -566,6 +574,7 @@ final defineCases = <DefineCase>[
     ),
     // TH-904: accepted before; OTHER_TOKEN is not an allowed key.
     ['define key #4 $_notAllowed'],
+    absent: ['role is not "anon"'],
   ),
   // TH-137 send-back R1: each branch of the role-object fallback (backslash-u
   // escape, NUL removal, BOM removal) is needed by one of these. An anon
@@ -642,8 +651,9 @@ final defineCases = <DefineCase>[
     'invisible character inside an otherwise publishable key',
     _define(key: 'sb_publishable_\u3164${canary}pub'),
     [_notAllowedKey],
+    absent: ['privileged'],
   ),
-  // TH-904 (th-security M1): values that passed the old denylist. Each is a
+  // TH-904: values that passed the old denylist. Each is a
   // synthetic canary, never a real key.
   DefineCase(
     'raw JWT-signing-secret-shaped string as the anon key',
@@ -738,7 +748,40 @@ final defineCases = <DefineCase>[
     _define(api: 'https://invalid-api.example.org'),
     [],
   ),
-  // TH-904 (th-security L1): Python json accepts these constants, Dart does
+  // URLs must not carry user info, a query or a fragment; SUPABASE_URL is
+  // scheme and host only. The canary sits where a credential would.
+  for (final (name, url) in [
+    ('user info', 'https://postgres:$canary@db.example.test'),
+    ('user name only', 'https://$canary@db.example.test'),
+    ('a query', 'https://example-project.supabase.co/?apikey=$canary'),
+    ('an empty query', 'https://example-project.supabase.co/?'),
+    ('a fragment', 'https://example-project.supabase.co/#$canary'),
+  ]) ...[
+    DefineCase(
+      'SUPABASE_URL with $name',
+      _define(url: url),
+      ['SUPABASE_URL $_urlExtras'],
+    ),
+    DefineCase(
+      'API_BASE_URL with $name',
+      _define(api: url),
+      ['API_BASE_URL $_urlExtras'],
+    ),
+  ],
+  DefineCase(
+    'SUPABASE_URL with a path',
+    _define(url: 'https://example-project.supabase.co/rest/v1'),
+    ['SUPABASE_URL must be scheme and host only, without a path'],
+  ),
+  DefineCase(
+    'SUPABASE_URL with a port and a trailing slash, API_BASE_URL with a path',
+    _define(
+      url: 'https://example-project.supabase.co:443/',
+      api: 'https://api.example.org/v1/',
+    ),
+    [],
+  ),
+  // TH-904: Python json accepts these constants, Dart does
   // not, and Flutter would print the define content in its error.
   for (final constant in ['NaN', 'Infinity', '-Infinity'])
     DefineCase(
