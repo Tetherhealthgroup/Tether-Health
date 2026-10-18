@@ -7,12 +7,14 @@ import 'package:flutter_test/flutter_test.dart';
 // Initialising it before the zone makes Flutter's debugCheckZone report a zone
 // mismatch at runApp.
 //
-// This is a source-structure test, not a behavioural one. Under flutter test
-// the test binding is already initialised, in the test's own zone, before any
-// test code runs, so calling main() would make ensureInitialized a no-op
-// wherever it sits and the zone mismatch could not be observed. The test reads
-// lib/main.dart with comments and string literals blanked out, finds the body
-// of main(), and checks where the calls sit.
+// This is a source-structure test, not a behavioural one. A behavioural test
+// would have to run the real main(), which runs _bootstrap: platform
+// SystemChrome calls, AppConfig and Supabase initialisation, and the real
+// runApp with its secure storage. That is not practical inside a widget test.
+// Instead the test reads lib/main.dart with comments and string literals
+// blanked out, finds the body of main(), and checks where the calls sit,
+// including that _bootstrap (which calls runApp) is only called inside the
+// zone body.
 
 const _ensureInitialized = 'WidgetsFlutterBinding.ensureInitialized(';
 
@@ -131,6 +133,21 @@ void main() {
       expect(outside, isEmpty,
           reason: '$call must not be called in main() outside '
               'runZonedGuarded');
+    }
+  });
+
+  test('_bootstrap is called only inside the runZonedGuarded body', () {
+    final definition =
+        RegExp(r'\b_bootstrap\s*\(\s*\)\s*(async\s*)?\{').firstMatch(code);
+    expect(definition, isNotNull, reason: 'lib/main.dart has no _bootstrap()');
+    final calls = _allIndexes(code, '_bootstrap(', 0, code.length)
+        .where((i) => i != definition!.start)
+        .toList();
+    expect(calls, isNotEmpty, reason: 'main() must call _bootstrap()');
+    for (final call in calls) {
+      expect(call >= zoneStart && call < zoneBodyEnd, isTrue,
+          reason: '_bootstrap() runs runApp, so it must only be called inside '
+              'the body passed to runZonedGuarded in main()');
     }
   });
 
