@@ -15,6 +15,10 @@ void main() {
     final gradle = File('android/app/build.gradle.kts').readAsStringSync();
     expect(gradle, contains('namespace = "$kAppId"'));
     expect(gradle, contains('applicationId = "$kAppId"'));
+    // A second applicationId (flavor, build type, or a stale template line)
+    // could ship a different package than the one asserted above.
+    expect(RegExp('applicationId').allMatches(gradle), hasLength(1));
+    expect(gradle, isNot(contains('Specify your own unique Application ID')));
   });
 
   test('MainActivity lives in the app ID package', () {
@@ -119,5 +123,89 @@ void main() {
         reason: path,
       );
     }
+  });
+  test('no retired app ID remains in setup docs, scripts, web or Windows', () {
+    final retired = RegExp(r'hshanmug12|com\.breathefree|breathefreePatient');
+    for (final path in [
+      'README.md',
+      'tool/setup_macos_linux.sh',
+      'tool/setup_windows.bat',
+      'web/index.html',
+      'web/manifest.json',
+      'windows/CMakeLists.txt',
+      'windows/runner/Runner.rc',
+      'windows/runner/main.cpp',
+    ]) {
+      expect(
+        retired.hasMatch(File(path).readAsStringSync()),
+        isFalse,
+        reason: path,
+      );
+    }
+  });
+
+  test('web and Windows titles and binary name use the Tether name', () {
+    // breathefree_patient stays only as the Dart package name (pubspec.yaml).
+    for (final path in [
+      'web/index.html',
+      'web/manifest.json',
+      'windows/CMakeLists.txt',
+      'windows/runner/Runner.rc',
+      'windows/runner/main.cpp',
+    ]) {
+      expect(
+        File(path).readAsStringSync(),
+        isNot(contains('breathefree_patient')),
+        reason: path,
+      );
+    }
+    expect(
+      File('windows/CMakeLists.txt').readAsStringSync(),
+      contains('set(BINARY_NAME "tetherhealth")'),
+    );
+    expect(
+      File('windows/runner/Runner.rc').readAsStringSync(),
+      contains('VALUE "OriginalFilename", "tetherhealth.exe"'),
+    );
+    expect(
+      File('web/index.html').readAsStringSync(),
+      contains('<title>Tether Health</title>'),
+    );
+  });
+
+  test('flutter create guidance yields the app ID and spares tracked runners',
+      () {
+    // flutter create derives the macOS/Linux app ID from --org and
+    // --project-name; breathefree_patient would also add a second Android
+    // MainActivity under com/TetherHealthLLC/breathefree_patient.
+    for (final path in [
+      'README.md',
+      'tool/setup_macos_linux.sh',
+      'tool/setup_windows.bat',
+    ]) {
+      final text = File(path).readAsStringSync();
+      expect(text, isNot(contains('--project-name breathefree_patient')),
+          reason: path);
+      expect(text, isNot(contains('--org com.breathefree')), reason: path);
+      for (final m in RegExp(r'--platforms[ =]"?([^"\s]+)').allMatches(text)) {
+        final platforms = m[1]!.split(',');
+        for (final tracked in ['android', 'ios', 'web', 'windows']) {
+          expect(platforms, isNot(contains(tracked)), reason: '$path: ${m[0]}');
+        }
+      }
+    }
+    for (final path in ['README.md', 'tool/setup_macos_linux.sh']) {
+      final text = File(path).readAsStringSync();
+      expect(text, contains('--project-name tetherhealth'), reason: path);
+      expect(text, contains('--org com.TetherHealthLLC'), reason: path);
+    }
+    final sh = File('tool/setup_macos_linux.sh').readAsStringSync();
+    expect(sh, contains('breathefree_platforms="macos"'));
+    expect(sh, contains('breathefree_platforms="linux"'));
+    // Every runner the Windows script uses is tracked: it creates none.
+    expect(
+      File('tool/setup_windows.bat').readAsStringSync(),
+      isNot(contains('flutter create')),
+    );
   });
 }

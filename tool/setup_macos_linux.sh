@@ -11,10 +11,10 @@ fi
 
 case "$(uname -s)" in
   Darwin)
-    breathefree_platforms="android,ios,web,macos"
+    breathefree_platforms="macos"
     ;;
   Linux)
-    breathefree_platforms="android,web,linux"
+    breathefree_platforms="linux"
     ;;
   *)
     echo "Use tool/setup_windows.bat on Windows."
@@ -23,8 +23,8 @@ case "$(uname -s)" in
 esac
 
 flutter create . \
-  --project-name breathefree_patient \
-  --org com.breathefree \
+  --project-name tetherhealth \
+  --org com.TetherHealthLLC \
   --platforms="$breathefree_platforms"
 flutter pub get
 flutter analyze
