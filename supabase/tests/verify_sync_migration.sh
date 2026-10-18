@@ -406,12 +406,12 @@ select th944_test.refused(format(
   'insert into public.sync_area (user_id, enrolment_id, programme_code, revision, change_seq)
    values (''00000000-0000-4000-8000-000000944001'', %L, ''st'', 1, 3)',
   current_setting('th944.a_bf')),
-  array['23514'], '%must match its enrolment%',
+  array['TH007'], '%must match its enrolment%',
   'A sync: cannot file a programme with no enrolment under another programme''s enrolment');
 select th944_test.refused(
   'insert into public.sync_area (user_id, enrolment_id, programme_code, revision, change_seq)
    values (''00000000-0000-4000-8000-000000944001'', gen_random_uuid(), ''st'', 1, 3)',
-  array['23514'], '%must match its enrolment%', 'A sync: area without an enrolment refused');
+  array['TH007'], '%must match its enrolment%', 'A sync: area without an enrolment refused');
 
 select th944_test.affects(
   'insert into public.sync_answer (user_id, programme_code, screen_id, payload) values
@@ -485,7 +485,7 @@ select th944_test.refused('update public.sync_lapse set severity = ''changed''',
 select th944_test.refused('delete from public.sync_lapse',
   array['42501'], 'permission denied%', 'A sync: cannot delete a lapse');
 select th944_test.refused('select public.delete_my_app_data(''DELETE'')',
-  array['42501'], '%through the API%', 'A sync: the sync service cannot delete the account');
+  array['TH009'], '%through the API%', 'A sync: the sync service cannot delete the account');
 
 -- Revoking one programme's core consent stops its writes, and only its writes.
 select th944_test.become('authenticator', '00000000-0000-4000-8000-000000944001');
@@ -528,7 +528,7 @@ select th944_test.affects(
 -- Even a privileged role cannot rewrite a lapse.
 select th944_test.become(current_setting('th944.superuser'), '');
 select th944_test.refused('update public.sync_lapse set severity = ''changed''',
-  array['23514'], '%append-only%', 'superuser: the trigger refuses any lapse update');
+  array['TH008'], '%append-only%', 'superuser: the trigger refuses any lapse update');
 
 -- User B ---------------------------------------------------------------------
 select th944_test.become('thsync', '00000000-0000-4000-8000-000000944002');
@@ -557,7 +557,7 @@ select th944_test.refused(format(
   'insert into public.sync_area (user_id, enrolment_id, programme_code, revision, change_seq)
    values (''00000000-0000-4000-8000-000000944002'', %L, ''bf'', 1, 1)',
   current_setting('th944.a_bf')),
-  array['23514', '42501'], '%', 'B sync: cannot attach an area to A''s enrolment');
+  array['TH007', '42501'], '%', 'B sync: cannot attach an area to A''s enrolment');
 select th944_test.become('authenticator', '00000000-0000-4000-8000-000000944002');
 select th944_test.ok(
   (select count(*) from public.sync_answer) = 0 and (select count(*) from public.sync_lapse) = 0,
@@ -582,7 +582,7 @@ select th944_test.refused(
 select th944_test.refused(
   'insert into public.sync_area (user_id, enrolment_id, programme_code, revision, change_seq)
    values (''00000000-0000-4000-8000-000000944001'', gen_random_uuid(), ''ca'', 1, 1)',
-  array['42501', '23514'], '%', 'A API: cannot create a sync area');
+  array['42501', 'TH007'], '%', 'A API: cannot create a sync area');
 select th944_test.affects('update public.sync_answer set payload = ''{}''',
   0, 'A API: cannot update sync answers');
 select th944_test.affects('update public.sync_account set change_seq = 99',

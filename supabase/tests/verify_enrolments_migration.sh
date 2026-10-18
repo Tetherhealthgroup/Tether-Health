@@ -338,7 +338,7 @@ select th913_test.refused(format(
   'update public.programme_consents set revoked_at = null
    where enrolment_id = %L and purpose = ''reminders''',
   current_setting('th913.a_hw')),
-  '23514', '%already revoked%', 'A: cannot un-revoke a consent');
+  'TH002', '%already revoked%', 'A: cannot un-revoke a consent');
 select th913_test.refused(format(
   'update public.programme_consents set consent_text = ''changed''
    where enrolment_id = %L and purpose = ''core''',
@@ -460,7 +460,7 @@ select th913_test.ok(
 select th913_test.refused(
   'select th913_test.apply_now(array[''insert into public.enrolments (user_id, programme_code)
      values (''''00000000-0000-4000-8000-000000913001'''', ''''st'''')''])',
-  '23514', '%two programmes%', 'A: a third programme in focus is refused');
+  'TH001', '%two programmes%', 'A: a third programme in focus is refused');
 with i as (
   insert into public.enrolments (user_id, programme_code, status)
   values ('00000000-0000-4000-8000-000000913001', 'st', 'learn_only') returning id
@@ -469,7 +469,7 @@ select th913_test.refused(format(
   'select th913_test.apply_now(array[%L])',
   format('update public.enrolments set status = ''focus'' where id = %L',
     current_setting('th913.a_st'))),
-  '23514', '%two programmes%', 'A: promoting a third to focus without a swap is refused');
+  'TH001', '%two programmes%', 'A: promoting a third to focus without a swap is refused');
 select th913_test.apply_now(array[
   format('update public.enrolments set status = ''focus'' where id = %L',
     current_setting('th913.a_st')),
