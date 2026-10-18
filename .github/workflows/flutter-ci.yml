@@ -95,14 +95,17 @@ jobs:
       - uses: supabase/setup-cli@v3
         with:
           version: latest
-      - run: bash supabase/tests/verify_profiles_migration.sh
-      - run: bash supabase/tests/verify_quit_plans_migration.sh
-      - run: bash supabase/tests/verify_account_deletion_migration.sh
-      - run: bash supabase/tests/verify_program_data_migration.sh
+      - name: Static migration checks
+        run: for f in supabase/tests/verify_*.sh; do bash "$f" || exit 1; done
       - name: Apply all migrations to local Supabase
         run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor
       - run: supabase db reset --local --no-seed
       - run: supabase db lint --local --level warning
+      - name: Migration checks against the local database
+        env:
+          # Local CLI database (supabase/config.toml port); not a remote project.
+          VERIFY_DB_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: for f in supabase/tests/verify_*.sh; do bash "$f" || exit 1; done
 
   # TH-906: the vendored UI package (tether_ui/, P-01). Generated files are
   # never hand-edited (P-02): regenerating from tether_ui/generator must
