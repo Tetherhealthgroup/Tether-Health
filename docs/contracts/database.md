@@ -1,8 +1,17 @@
 # Database contract v1
 
 Migration sources of truth include `supabase/migrations/202609110001_profiles.sql`,
-`supabase/migrations/202609260001_program_data.sql` and
-`supabase/migrations/202610170002_enrolments.sql`.
+`supabase/migrations/202609260001_program_data.sql`,
+`supabase/migrations/202610170002_enrolments.sql` and
+`supabase/migrations/202610180001_sync_tables.sql`.
+
+Every migration file is named `YYYYMMDDNNNN_name.sql`: a 12-digit version (date
+plus a four-digit sequence), then lowercase letters, digits and underscores.
+`supabase/tests/verify_migration_names.sh` checks in the static migration checks
+that every name has this form and that versions are unique and strictly
+increasing in filename order. It cannot tell whether a new file was given a
+version below an existing one, so give each new migration a version later than
+every existing file.
 
 `public.profiles` is a one-to-one extension of `auth.users`; `id` is both its
 primary key and cascading foreign key. A signup trigger creates the row. Clients
@@ -146,6 +155,64 @@ consents and account consents uses it. Later tables that hold the caller's data
 must use it in their insert checks too, alongside `has_consent` where the data
 belongs to a programme.
 
+## Sync tables
+
+Migration source of truth: `supabase/migrations/202610180001_sync_tables.sql`.
+The `sync/` service stores plan and questionnaire answers and lapses here, per
+programme. Enrolment and consent are not stored here: they stay in
+`enrolments` and `programme_consents`, so sync is never a second consent store.
+Every table below has row-level security enabled and forced; `anon` has no
+access, and nothing can be deleted directly.
+
+| Table | Key | Contents |
+|---|---|---|
+| `sync_account` | `user_id` → `auth.users(id)`, cascading | per-user change counter `change_seq`; `created_at`, `updated_at`. No health data |
+| `sync_area` | `(user_id, programme_code)`; `user_id` → `sync_account`, `enrolment_id` → `enrolments(id)` (unique), both cascading; `programme_code` → `programmes(code)` | `revision`, `change_seq`, `updated_at`. A trigger requires the enrolment to be the same user's enrolment in the same programme |
+| `sync_answer` | primary key `(user_id, programme_code, screen_id)`; `(user_id, programme_code)` → `sync_area`, cascading | `payload`: a JSON object of at most 32 KiB; `screen_id` matches `^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$` (no `/`); `updated_at` |
+| `sync_lapse` | primary key `(user_id, programme_code, ordinal)`; `(user_id, programme_code)` → `sync_area`, cascading | `at`, `severity` (up to 64 characters), `context` (a JSON array, at most 32 KiB). Append-only |
+
+**Reads.** Authenticated callers select only their own rows
+(`auth.uid() = user_id`). The API's Today, summary and export read these tables
+with the caller's token.
+
+**Writes.** Only the sync service writes. It connects as the role `thsync`:
+`NOLOGIN NOINHERIT` in the migration, never superuser and never `BYPASSRLS`,
+owning nothing, with no direct grants, and a member of `authenticated` only.
+Per transaction it runs `SET LOCAL ROLE authenticated` and sets
+`request.jwt.claims` to `{"sub":"<verified subject>","role":"authenticated"}`,
+so the same `auth.uid()` policies apply as through PostgREST. Insert and update
+policies also require `public.sync_writer_session()` (the session user is
+`thsync`), so a PostgREST session cannot write sync data. Every insert and
+update check also requires `deletion_barrier_open()`, and for areas, answers
+and lapses the enrolment's live `core` consent (`has_consent`). So no data is
+written for a programme without an enrolment and core consent, after leaving
+it, after its core consent is revoked, or once account deletion has started.
+Column grants limit writes to: `sync_account` insert `user_id`, update
+`change_seq`; `sync_area` insert `user_id, enrolment_id, programme_code,
+revision, change_seq`, update `revision, change_seq`; `sync_answer` insert
+`user_id, programme_code, screen_id, payload`, update `payload`; `sync_lapse`
+insert only. A trigger refuses every update to `sync_lapse`, for every role.
+Giving `thsync` a login is a human step outside migrations; no credential is
+stored in this repository.
+
+**Leaving and deletion.** Leaving a programme keeps its sync rows, read-only.
+"Delete now" deletes the enrolment, which cascades to its `sync_area`, answers
+and lapses. Account deletion goes through the API only: `delete_my_app_data`
+deletes the caller's sync rows, returns a count for each sync table, and
+refuses to run in a `thsync` session.
+
+The migration starts by dropping the earlier `sync_*` tables (keyed by
+`account_id`) if they exist and are empty. It stops instead if a table with
+one of those names has another shape or holds rows, or if another object
+depends on one of them (the drop does not cascade). The migration also stops
+unless `thsync` is a member of `authenticated` only, without admin option or
+inheritance.
+
+The SQL test in `supabase/tests/verify_sync_migration.sh` (run when
+`VERIFY_DB_URL` is set) requires a superuser connection: it uses
+`SET SESSION AUTHORIZATION` to act as the `thsync` and `authenticator` logins,
+and fails if the connection is not a superuser.
+
 ## Quit-plan snapshot
 
 Migration sources of truth:
@@ -206,14 +273,18 @@ in `breathefree-dev`; real patient or support-person information is prohibited.
 
 Migration sources of truth:
 `supabase/migrations/202609200001_account_data_deletion.sql`,
-`supabase/migrations/202610030001_avatar_deletion_barrier.sql` and
-`supabase/migrations/202610170002_enrolments.sql`.
+`supabase/migrations/202610030001_avatar_deletion_barrier.sql`,
+`supabase/migrations/202610170002_enrolments.sql` and
+`supabase/migrations/202610180001_sync_tables.sql`.
 
-`delete_my_app_data` deletes the caller's programme consents, enrolments (and
-everything that cascades from them), account consents, program data, quit plan
-and profile. It returns counts only: `profiles`, `quit_plans`, `program_data`,
-`enrolments`, `programme_consents` and `account_consents`. Consent history is
-deleted with the account; nothing records what was deleted.
+`delete_my_app_data` deletes the caller's sync lapses, answers, areas and sync
+account, programme consents, enrolments (and everything that cascades from
+them), account consents, program data, quit plan and profile. It returns counts
+only, one for each table it deletes from: `profiles`, `quit_plans`,
+`program_data`, `enrolments`, `programme_consents`, `account_consents`,
+`sync_answers`, `sync_lapses`, `sync_areas` and `sync_accounts`.
+Consent history is deleted with the account; nothing records what was deleted.
+It refuses to run in a sync service (`thsync`) session.
 
 The NestJS API first invokes `begin_account_deletion` with exact confirmation.
 That function updates the caller's profile row, waiting for any upload holding a
