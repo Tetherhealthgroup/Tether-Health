@@ -41,3 +41,15 @@ ios/Flutter/ephemeral/
 macos/Flutter/ephemeral/
 
 # Generated local runner files can be recreated with tool/setup_*.
+
+# tether_ui (TH-906): PNG renders are not committed (P-18); regenerate them
+# with tether_ui/generator/build_all.py --images. Python caches and the
+# package lock file stay untracked: the generator deletes and recreates
+# tether_ui/flutter/ on every run, and the package has no third-party deps.
+tether_ui/screens/png/
+tether_ui/screens/sheets/
+tether_ui/flows/png/
+tether_ui/screens/**/*.png
+tether_ui/flows/**/*.png
+tether_ui/**/__pycache__/
+tether_ui/flutter/pubspec.lock
