@@ -39,6 +39,38 @@
     {
       "screen": "records_hub",
       "trigger": "Account → Health records"
+    },
+    {
+      "screen": "sf_unplug_shield",
+      "trigger": "System: opening a paused app on iPhone (Unplug shield)"
+    },
+    {
+      "screen": "sf_unplug_overlay",
+      "trigger": "System: opening a paused app on Android (Unplug overlay)"
+    },
+    {
+      "screen": "sf_unplug_session_done",
+      "trigger": "Notification: focus session finished (generic text)"
+    },
+    {
+      "screen": "sf_unplug_health_stopped",
+      "trigger": "Notification: Unplug needs attention (generic text)"
+    },
+    {
+      "screen": "surface_widget_ios",
+      "trigger": "Reference: iPhone home-screen widget"
+    },
+    {
+      "screen": "surface_widget_android",
+      "trigger": "Reference: Android home-screen widget"
+    },
+    {
+      "screen": "surface_shortcuts_ios",
+      "trigger": "Reference: Siri & App Shortcuts"
+    },
+    {
+      "screen": "surface_shortcuts_android",
+      "trigger": "Reference: Android launcher shortcuts"
     }
   ],
   "tabs": {
@@ -1339,6 +1371,314 @@
       "flow": "records",
       "variantOf": null,
       "state": "default"
+    },
+    "sf_unplug_intro": {
+      "route": "/p/sf/unplug",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_auth": {
+      "route": "/p/sf/unplug/permission",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_auth_denied": {
+      "route": "/p/sf/unplug/permission?state=denied",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_auth",
+      "state": "permission denied"
+    },
+    "sf_unplug_auth_unavailable": {
+      "route": "/p/sf/unplug/permission?state=unavailable",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_auth",
+      "state": "unavailable"
+    },
+    "sf_unplug_auth_notifications": {
+      "route": "/p/sf/unplug/permission?state=notifications",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_auth",
+      "state": "notifications off"
+    },
+    "sf_unplug_auth_android": {
+      "route": "/p/sf/unplug/permission?state=android",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_auth",
+      "state": "android"
+    },
+    "sf_unplug_apps": {
+      "route": "/p/sf/unplug/apps",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_picker_ios": {
+      "route": "/p/sf/unplug/apps/picker",
+      "kind": "sheet",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_apps_android": {
+      "route": "/p/sf/unplug/apps?state=android",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_apps",
+      "state": "android"
+    },
+    "sf_unplug_apps_chosen": {
+      "route": "/p/sf/unplug/apps?state=chosen",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_apps",
+      "state": "apps chosen"
+    },
+    "sf_unplug_limits": {
+      "route": "/p/sf/unplug/limits",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_home": {
+      "route": "/p/sf/unplug/home",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_session": {
+      "route": "/p/sf/unplug/session",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_session_active": {
+      "route": "/p/sf/unplug/session/active",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_session_end": {
+      "route": "/p/sf/unplug/session/end",
+      "kind": "sheet",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_session_done": {
+      "route": "/p/sf/unplug/session/done",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_session_done_early": {
+      "route": "/p/sf/unplug/session/done?state=early",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_session_done",
+      "state": "ended early"
+    },
+    "sf_unplug_shield": {
+      "route": "/system/unplug/shield",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_shield_firm": {
+      "route": "/system/unplug/shield?state=firm",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_shield",
+      "state": "no “open anyway” left"
+    },
+    "sf_unplug_overlay": {
+      "route": "/system/unplug/overlay",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_gate": {
+      "route": "/p/sf/unplug/step",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_gate_commit": {
+      "route": "/p/sf/unplug/step?state=sentence",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_gate",
+      "state": "typed sentence"
+    },
+    "sf_unplug_gate_sum": {
+      "route": "/p/sf/unplug/step?state=sum",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_gate",
+      "state": "quick sum"
+    },
+    "sf_unplug_health": {
+      "route": "/p/sf/unplug/health",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_health_notifications": {
+      "route": "/p/sf/unplug/health?state=notifications",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_health",
+      "state": "notifications off"
+    },
+    "sf_unplug_health_stopped": {
+      "route": "/p/sf/unplug/health?state=stopped",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_health",
+      "state": "tracking stopped"
+    },
+    "sf_unplug_health_android": {
+      "route": "/p/sf/unplug/health?state=android",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_health",
+      "state": "android"
+    },
+    "sf_unplug_off": {
+      "route": "/p/sf/unplug/off",
+      "kind": "sheet",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_home_unplug": {
+      "route": "/p/sf/home?state=unplug",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": "sf_home",
+      "state": "Unplug on · iPhone"
+    },
+    "sf_week_unplug": {
+      "route": "/p/sf/week?state=unplug",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": "sf_week",
+      "state": "Unplug on · iPhone"
+    },
+    "program_settings_sf": {
+      "route": "/p/:program/settings?state=sf-unplug",
+      "kind": "screen",
+      "flow": "plans",
+      "variantOf": "program_settings",
+      "state": "ScrollFree"
+    },
+    "account_delete_apple": {
+      "route": "/account/delete?state=apple",
+      "kind": "screen",
+      "flow": "account",
+      "variantOf": "account_delete",
+      "state": "Apple account"
+    },
+    "account_delete_google": {
+      "route": "/account/delete?state=google",
+      "kind": "screen",
+      "flow": "account",
+      "variantOf": "account_delete",
+      "state": "Google account"
+    },
+    "auth_session_apple": {
+      "route": "/auth/session?state=apple",
+      "kind": "sheet",
+      "flow": "auth",
+      "variantOf": "auth_session",
+      "state": "Apple account"
+    },
+    "auth_session_google": {
+      "route": "/auth/session?state=google",
+      "kind": "sheet",
+      "flow": "auth",
+      "variantOf": "auth_session",
+      "state": "Google account"
+    },
+    "sf_screentime_android": {
+      "route": "/p/sf/screen-time?state=android",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": "sf_screentime",
+      "state": "android"
+    },
+    "sf_screentime_android_denied": {
+      "route": "/p/sf/screen-time?state=android-denied",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": "sf_screentime",
+      "state": "android · not allowed"
+    },
+    "sys_update_android": {
+      "route": "/system/update?state=android",
+      "kind": "fullscreen",
+      "flow": "system",
+      "variantOf": "sys_update",
+      "state": "android"
+    },
+    "surface_widget_ios": {
+      "route": "/surface/widget/ios",
+      "kind": "fullscreen",
+      "flow": "entries",
+      "variantOf": null,
+      "state": "default"
+    },
+    "surface_widget_android": {
+      "route": "/surface/widget/android",
+      "kind": "fullscreen",
+      "flow": "entries",
+      "variantOf": null,
+      "state": "default"
+    },
+    "surface_shortcuts_ios": {
+      "route": "/surface/shortcuts/ios",
+      "kind": "screen",
+      "flow": "entries",
+      "variantOf": null,
+      "state": "default"
+    },
+    "surface_shortcuts_ios_named": {
+      "route": "/surface/shortcuts/ios?state=named",
+      "kind": "screen",
+      "flow": "entries",
+      "variantOf": "surface_shortcuts_ios",
+      "state": "Show sensitive details on"
+    },
+    "surface_shortcuts_android": {
+      "route": "/surface/shortcuts/android",
+      "kind": "screen",
+      "flow": "entries",
+      "variantOf": null,
+      "state": "default"
+    },
+    "surface_shortcuts_android_named": {
+      "route": "/surface/shortcuts/android?state=named",
+      "kind": "screen",
+      "flow": "entries",
+      "variantOf": "surface_shortcuts_android",
+      "state": "Show sensitive details on"
     }
   },
   "action_types": {

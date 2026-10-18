@@ -1,0 +1,87 @@
+{
+  "id": "sys_update_android",
+  "name": "Update required (Android)",
+  "route": "/system/update?state=android",
+  "flow": "system",
+  "program": null,
+  "phase": "account",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": "sys_update",
+  "state": "android",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review. Same as Update required; Update now opens Google Play. The iPhone App Store URL in the base screen still needs the real App Store ID.",
+  "header": {
+    "t": "header",
+    "title": "Update needed",
+    "left": "none"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "↑",
+      "tone": "warn"
+    },
+    {
+      "t": "title",
+      "text": "A safety update is ready",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "This version has important fixes. Rescue and Support still work until you update.",
+      "tone": "muted",
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Update now",
+      "action": {
+        "type": "external",
+        "value": "https://play.google.com/store/apps/details?id=com.TetherHealthLLC.tetherhealth"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Open Rescue",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "variant": "rescue",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: sys_update in this spec; app ID com.TetherHealthLLC.tetherhealth"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Update now",
+      "path": "footer[0]",
+      "action": {
+        "type": "external",
+        "value": "https://play.google.com/store/apps/details?id=com.TetherHealthLLC.tetherhealth"
+      },
+      "summary": "external https://play.google.com/store/apps/details?id=com.TetherHealthLLC.tetherhealth"
+    },
+    {
+      "element": "Open Rescue",
+      "path": "footer[1]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
+    }
+  ]
+}

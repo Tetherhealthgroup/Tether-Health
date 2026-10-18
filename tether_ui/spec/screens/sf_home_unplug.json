@@ -1,0 +1,260 @@
+{
+  "id": "sf_home_unplug",
+  "name": "ScrollFree home · Unplug on (iPhone)",
+  "route": "/p/sf/home?state=unplug",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": "sf_home",
+  "state": "Unplug on · iPhone",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review. iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.",
+  "header": {
+    "t": "header",
+    "title": "ScrollFree",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "nativeslot",
+      "id": "ios.deviceActivityReport.today",
+      "label": "Screen Time today",
+      "caption": "Shown by Apple’s Screen Time on this phone. Tether can’t read, store or share these minutes.",
+      "platform": "ios",
+      "height": 132
+    },
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Yesterday · your estimate",
+      "children": [
+        {
+          "t": "big",
+          "value": "2h 10m",
+          "caption": "Goal 90 min · down from 3h"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "Urge to scroll?",
+      "text": "Take 60 seconds first",
+      "cta": {
+        "t": "button",
+        "label": "Pause 60",
+        "action": {
+          "type": "push",
+          "to": "sf_pause"
+        },
+        "variant": "rescue",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Unplug is on",
+      "text": "2 groups · pause screen after 60 min",
+      "action": {
+        "type": "push",
+        "to": "sf_unplug_home"
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Today’s step",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Charge your phone outside the bedroom",
+              "sub": "Tonight · bedtime window 10 PM"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "This week",
+          "sub": "5 of 7 phone-free nights",
+          "action": {
+            "type": "push",
+            "to": "sf_week"
+          }
+        },
+        {
+          "label": "Had a long scroll?",
+          "sub": "Reflect, nothing resets",
+          "action": {
+            "type": "push",
+            "to": "sf_slip"
+          }
+        },
+        {
+          "label": "Goal & windows",
+          "sub": "90 min · bedtime",
+          "action": {
+            "type": "push",
+            "to": "sf_goal"
+          }
+        },
+        {
+          "label": "Buddy",
+          "sub": "Sam · weekly message",
+          "action": {
+            "type": "push",
+            "to": "sf_buddy"
+          }
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: DeviceActivityReport extension (new); ios/Runner/Unplug/UnplugHost.swift readUsage (iOS returns no minutes)"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Pause 60",
+      "path": "body[2].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_pause"
+      },
+      "summary": "push → sf_pause"
+    },
+    {
+      "element": "Unplug is on",
+      "path": "body[3]",
+      "action": {
+        "type": "push",
+        "to": "sf_unplug_home"
+      },
+      "summary": "push → sf_unplug_home"
+    },
+    {
+      "element": "This week",
+      "path": "body[5].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_week"
+      },
+      "summary": "push → sf_week"
+    },
+    {
+      "element": "Had a long scroll?",
+      "path": "body[5].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "sf_slip"
+      },
+      "summary": "push → sf_slip"
+    },
+    {
+      "element": "Goal & windows",
+      "path": "body[5].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "sf_goal"
+      },
+      "summary": "push → sf_goal"
+    },
+    {
+      "element": "Buddy",
+      "path": "body[5].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "sf_buddy"
+      },
+      "summary": "push → sf_buddy"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[5].rows[4]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

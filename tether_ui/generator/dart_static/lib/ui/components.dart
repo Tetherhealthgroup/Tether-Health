@@ -1743,3 +1743,61 @@ class TAuthButton extends StatelessWidget {
     );
   }
 }
+
+// ============================================================== native views
+
+/// A slot for a native platform view that Flutter cannot draw, such as the
+/// iOS DeviceActivityReport minutes view or Apple's app picker.
+///
+/// The app registers a builder per [id] with [TNativeSlot.register] (for
+/// example a `UiKitView` backed by the DeviceActivityReport extension). Where
+/// nothing is registered for [id] — the dev gallery, tests, other platforms —
+/// a labelled placeholder of the same height is shown, so layouts can be
+/// reviewed without the native view.
+class TNativeSlot extends StatelessWidget {
+  const TNativeSlot({super.key, required this.id, required this.label, this.caption, this.platform = 'ios', this.height = 120});
+  final String id;
+  final String label;
+  final String? caption;
+  final String platform;
+  final double height;
+
+  static final Map<String, WidgetBuilder> _builders = <String, WidgetBuilder>{};
+
+  /// Registers the platform view drawn for [id]. Call once at app startup.
+  static void register(String id, WidgetBuilder builder) => _builders[id] = builder;
+
+  @override
+  Widget build(BuildContext context) {
+    final builder = _builders[id];
+    if (builder != null) {
+      return Semantics(container: true, label: label, child: SizedBox(height: height, child: builder(context)));
+    }
+    return Semantics(
+      container: true,
+      label: '$label, native view placeholder',
+      child: Container(
+        constraints: BoxConstraints(minHeight: height),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: TColors.mintTint,
+          borderRadius: BorderRadius.circular(TRadius.card),
+          border: Border.all(color: TColors.line, width: 1.5),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TPill('NATIVE VIEW · ${platform.toUpperCase()}'),
+            const SizedBox(height: 8),
+            Text(label, style: TText.cardTitle),
+            if (caption != null) ...[
+              const SizedBox(height: 4),
+              Text(caption!, style: TText.cardText),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}

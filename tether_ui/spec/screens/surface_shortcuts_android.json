@@ -1,0 +1,98 @@
+{
+  "id": "surface_shortcuts_android",
+  "name": "Launcher shortcuts (Android)",
+  "route": "/surface/shortcuts/android",
+  "flow": "entries",
+  "program": null,
+  "phase": "rescue",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review.",
+  "header": {
+    "t": "header",
+    "title": "App shortcuts",
+    "left": "close",
+    "pill": "Reference"
+  },
+  "body": [
+    {
+      "t": "text",
+      "text": "Shown when someone long-presses the Tether icon.",
+      "tone": "muted"
+    },
+    {
+      "t": "list",
+      "title": "Tether Health",
+      "rows": [
+        {
+          "label": "Rescue",
+          "sub": "Static shortcut · always there",
+          "action": {
+            "type": "sheet",
+            "to": "rescue_pick"
+          },
+          "lead": {
+            "icon": "✚"
+          }
+        },
+        {
+          "label": "My plan",
+          "sub": "Dynamic shortcut · only while ClearAir is a focus program",
+          "action": {
+            "type": "push",
+            "to": "ca_red"
+          },
+          "lead": {
+            "icon": "▤"
+          }
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "Labels stay generic so the home screen doesn’t reveal which programs you use. Turn on Show sensitive details to see program names."
+    }
+  ],
+  "footer": [],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager",
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+  ],
+  "over": null,
+  "api": [],
+  "reference": true,
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Rescue",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
+    },
+    {
+      "element": "My plan",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "ca_red"
+      },
+      "summary": "push → ca_red"
+    }
+  ]
+}

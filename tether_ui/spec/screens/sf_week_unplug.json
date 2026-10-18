@@ -1,0 +1,166 @@
+{
+  "id": "sf_week_unplug",
+  "name": "Weekly reflection · Unplug on (iPhone)",
+  "route": "/p/sf/week?state=unplug",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "milestone",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "sf_week",
+  "state": "Unplug on · iPhone",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review. Apple’s weekly report sits above the person’s own estimates, which are what Tether stores and charts.",
+  "header": {
+    "t": "header",
+    "title": "Week 2",
+    "left": "back",
+    "pill": "ScrollFree"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Your week, honestly.",
+      "size": "m"
+    },
+    {
+      "t": "nativeslot",
+      "id": "ios.deviceActivityReport.week",
+      "label": "Screen Time this week",
+      "caption": "Shown by Apple’s Screen Time on this phone. Tether can’t read, store or share these minutes.",
+      "platform": "ios",
+      "height": 200
+    },
+    {
+      "t": "chart",
+      "kind": "bars",
+      "values": [
+        190,
+        160,
+        130,
+        0,
+        110,
+        95,
+        85
+      ],
+      "color": "sf",
+      "title": "Your estimates · minutes / day",
+      "missing": [
+        3
+      ],
+      "target": 90,
+      "labels": [
+        "M",
+        "T",
+        "W",
+        "T",
+        "F",
+        "S",
+        "S"
+      ],
+      "caption": "Thursday: no check-in · not counted as zero"
+    },
+    {
+      "t": "stats",
+      "items": [
+        {
+          "label": "Phone-free nights",
+          "value": "5/7"
+        },
+        {
+          "label": "Urges paused",
+          "value": "11",
+          "sub": "7 put down"
+        }
+      ],
+      "cols": 2
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "eyebrow": "You said",
+      "text": "“Drained” was 4× less common on phone-free nights.",
+      "children": [
+        {
+          "t": "quote",
+          "text": "I feel drained after long scrolls."
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Next week",
+      "title": "Step down to 75 min?",
+      "children": [
+        {
+          "t": "buttons",
+          "items": [
+            {
+              "t": "button",
+              "label": "Yes",
+              "action": {
+                "type": "toast",
+                "value": "Goal set to 75 min",
+                "then": {
+                  "type": "back"
+                }
+              },
+              "variant": "primary",
+              "arrow": false,
+              "small": true
+            },
+            {
+              "t": "button",
+              "label": "Stay at 90",
+              "action": {
+                "type": "back"
+              },
+              "variant": "secondary",
+              "arrow": false,
+              "small": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: DeviceActivityReport extension (new); sf_week in this spec"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Yes",
+      "path": "body[5].children[0].items[0]",
+      "action": {
+        "type": "toast",
+        "value": "Goal set to 75 min",
+        "then": {
+          "type": "back"
+        }
+      },
+      "summary": "toast “Goal set to 75 min” then back"
+    },
+    {
+      "element": "Stay at 90",
+      "path": "body[5].children[0].items[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

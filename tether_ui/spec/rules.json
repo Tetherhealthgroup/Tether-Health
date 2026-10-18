@@ -123,5 +123,53 @@
     },
     "logic": "Value must be within the plausible range for the chosen test, else held for review. Duplicates of an imported FHIR value (same LOINC, date, value) are not added twice.",
     "source": "Plausibility ranges, not clinical targets."
+  },
+  "sf.unplug.reason": {
+    "title": "Strict session: reason before ending early",
+    "program": "sf",
+    "inputs": [
+      "sf_unplug_session_end.reason",
+      "sf_unplug_session_end.note"
+    ],
+    "params": {},
+    "outcomes": {
+      "given": "Reason given",
+      "missing": "No reason yet"
+    },
+    "logic": "A strict session ends early only when a reason chip is selected or a note is typed.",
+    "source": "endSession(overrideReason) in pigeons/unplug_api.dart. Product rule, not clinical."
+  },
+  "sf.unplug.sentence": {
+    "title": "Small step: typed sentence",
+    "program": "sf",
+    "inputs": [
+      "sf_unplug_gate_commit.sentence"
+    ],
+    "params": {
+      "sentence": "I can come back to this later"
+    },
+    "outcomes": {
+      "done": "Step done",
+      "not_done": "Step not done"
+    },
+    "logic": "Done when the typed text equals the sentence, ignoring case, extra spaces and a final full stop.",
+    "source": "PlatformEffortGate.commitment. Product rule, not clinical."
+  },
+  "sf.unplug.sum": {
+    "title": "Small step: quick sum",
+    "program": "sf",
+    "inputs": [
+      "sf_unplug_gate_sum.answer"
+    ],
+    "params": {
+      "a": 7,
+      "b": 5
+    },
+    "outcomes": {
+      "done": "Step done",
+      "not_done": "Step not done"
+    },
+    "logic": "Done when the answer equals a + b.",
+    "source": "PlatformEffortGate.puzzle. Product rule, not clinical."
   }
 }

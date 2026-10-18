@@ -1,0 +1,139 @@
+{
+  "id": "sf_unplug_shield",
+  "name": "Pause screen (iPhone shield)",
+  "route": "/system/unplug/shield",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": true,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review. iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield. Take a breath posts a local notification with two actions: Take my breath and Get support (opens Rescue without the small step). Needs device validation.",
+  "header": null,
+  "body": [
+    {
+      "t": "spacer",
+      "h": 60
+    },
+    {
+      "t": "illus",
+      "glyph": "T",
+      "tone": "dark"
+    },
+    {
+      "t": "title",
+      "text": "Paused for a moment",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "You asked to slow this one down. Video apps is on your list. 2 of 3 “open anyway” left today. Open Tether for support.",
+      "tone": "body",
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Take a breath",
+      "action": {
+        "type": "toast",
+        "value": "Notification: open Tether to take your breath, or get support",
+        "then": {
+          "type": "branch",
+          "question": "Notification action",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Take my breath",
+              "action": {
+                "type": "push",
+                "to": "sf_unplug_gate"
+              }
+            },
+            {
+              "label": "Get support",
+              "action": {
+                "type": "sheet",
+                "to": "rescue_pick"
+              }
+            }
+          ]
+        }
+      },
+      "variant": "lime",
+      "arrow": false
+    },
+    {
+      "t": "link",
+      "label": "Open anyway",
+      "action": {
+        "type": "toast",
+        "value": "Opened · 1 “open anyway” left today",
+        "then": {
+          "type": "close"
+        }
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift, ios/UnplugShieldAction/UnplugShieldActionExtension.swift, assets/unplug/intercept_tokens.json",
+    "A shield button cannot open Tether directly: it posts a local notification; tapping it opens Tether. If notifications are off, the subtitle tells the person to open Tether for support. Needs device validation. The notification has two actions: Take my breath (opens the small step) and Get support (opens Rescue directly, without the small step). Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+  ],
+  "over": null,
+  "api": [],
+  "reference": true,
+  "actions": [
+    {
+      "element": "Take a breath",
+      "path": "footer[0]",
+      "action": {
+        "type": "toast",
+        "value": "Notification: open Tether to take your breath, or get support",
+        "then": {
+          "type": "branch",
+          "question": "Notification action",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Take my breath",
+              "action": {
+                "type": "push",
+                "to": "sf_unplug_gate"
+              }
+            },
+            {
+              "label": "Get support",
+              "action": {
+                "type": "sheet",
+                "to": "rescue_pick"
+              }
+            }
+          ]
+        }
+      },
+      "summary": "toast “Notification: open Tether to take your breath, or get support” then branch: Notification action → Take my breath: push → sf_unplug_gate | Get support: sheet → rescue_pick"
+    },
+    {
+      "element": "Open anyway",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "Opened · 1 “open anyway” left today",
+        "then": {
+          "type": "close"
+        }
+      },
+      "summary": "toast “Opened · 1 “open anyway” left today” then close"
+    }
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "id": "sf_unplug_gate",
+  "name": "Small step: one breath",
+  "route": "/p/sf/unplug/step",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review. The shield action hands off to the app because the step needs input the extension has no time or UI for. Clearing it grants the pass length the level allows. Get support opens Rescue without doing the step.",
+  "header": {
+    "t": "header",
+    "title": "Small step",
+    "left": "close",
+    "pill": "Unplug"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "One breath, then decide.",
+      "size": "l"
+    },
+    {
+      "t": "ring",
+      "value": "30",
+      "label": "SECONDS",
+      "palette": "teal"
+    },
+    {
+      "t": "text",
+      "text": "Breathe in as the circle grows, out as it shrinks.",
+      "tone": "body",
+      "align": "center"
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "Need help right now?",
+      "text": "Rescue opens in one tap.",
+      "cta": {
+        "t": "button",
+        "label": "Get support",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "variant": "rescue",
+        "arrow": false,
+        "small": true
+      }
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Keep it closed",
+      "action": {
+        "type": "toast",
+        "value": "Nice. The app stays closed.",
+        "then": {
+          "type": "reset",
+          "to": "sf_home"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Open it for 10 minutes",
+      "action": {
+        "type": "toast",
+        "value": "Open for 10 minutes. The pause screen comes back after.",
+        "then": {
+          "type": "reset",
+          "to": "sf_home"
+        }
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.breath; lib/unplug/screens/unplug_screen_d.dart"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Get support",
+      "path": "body[3].cta[0]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
+    },
+    {
+      "element": "Keep it closed",
+      "path": "footer[0]",
+      "action": {
+        "type": "toast",
+        "value": "Nice. The app stays closed.",
+        "then": {
+          "type": "reset",
+          "to": "sf_home"
+        }
+      },
+      "summary": "toast “Nice. The app stays closed.” then reset → sf_home"
+    },
+    {
+      "element": "Open it for 10 minutes",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "Open for 10 minutes. The pause screen comes back after.",
+        "then": {
+          "type": "reset",
+          "to": "sf_home"
+        }
+      },
+      "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home"
+    }
+  ]
+}

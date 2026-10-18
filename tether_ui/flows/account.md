@@ -14,6 +14,8 @@ flowchart LR
   account_delete["Delete account"]
   account_deleted["Deletion receipt"]
   account_signout{{"Sign out"}}
+  account_delete_apple["Delete account · Apple account"]
+  account_delete_google["Delete account · Google account"]
   account -->|"Health records"| records_hub
   account -->|"Sign-in methods"| account_signin_methods
   account -->|"Programs & sharing"| account_programs
@@ -34,6 +36,10 @@ flowchart LR
   account_delete -->|"Delete everything"| account_deleted
   account_deleted -->|"Done"| welcome
   account_signout -->|"Sign out"| welcome
+  account_delete_apple -->|"Download a copy first"| account_data
+  account_delete_apple -->|"Delete everything"| account_deleted
+  account_delete_google -->|"Download a copy first"| account_data
+  account_delete_google -->|"Delete everything"| account_deleted
   auth_link>"Link accounts ↗"]
   class auth_link ext
   auth_newpass>"Set new password ↗"]
@@ -71,6 +77,8 @@ flowchart LR
 | [Delete account](../screens/png/account/account_delete.png) | `/account/delete` | screen | account |
 | [Deletion receipt](../screens/png/account/account_deleted.png) | `/account/deleted` | screen | account |
 | [Sign out](../screens/png/account/account_signout.png) | `/account/signout` | sheet | account |
+| [Delete account · Apple account](../screens/png/account/account_delete_apple.png) | `/account/delete?state=apple` | screen · Apple account | account |
+| [Delete account · Google account](../screens/png/account/account_delete_google.png) | `/account/delete?state=google` | screen · Google account | account |
 
 ## Button & action map
 
@@ -117,3 +125,9 @@ flowchart LR
 | Deletion receipt | Done | `reset → welcome` |
 | Sign out | Sign out | `reset → welcome` |
 | Sign out | Cancel | `close` |
+| Delete account · Apple account | Back | `back` |
+| Delete account · Apple account | Download a copy first | `push → account_data` |
+| Delete account · Apple account | Delete everything | `auth (apple): Sign in with Apple result → Success: DELETE /v1/account/data then replace → account_deleted | Different account: toast “That’s a different Apple account. Use the one you signed in with.” | Cancelled: toast “Nothing was deleted.” | Error: toast “Couldn’t reach Apple. Nothing was deleted.”` |
+| Delete account · Google account | Back | `back` |
+| Delete account · Google account | Download a copy first | `push → account_data` |
+| Delete account · Google account | Delete everything | `auth (google): Sign in with Google result → Success: DELETE /v1/account/data then replace → account_deleted | Different account: toast “That’s a different Google account. Use the one you signed in with.” | Cancelled: toast “Nothing was deleted.” | Error: toast “Couldn’t reach Google. Nothing was deleted.”` |

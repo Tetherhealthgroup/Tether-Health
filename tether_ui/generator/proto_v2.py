@@ -34,6 +34,9 @@ const RULES = {
  'ea.selfharm': ()=> list(SESSION.get('ea_mood.going_on')).some(x=>RULESPEC['ea.selfharm'].params.triggers.includes(x))?'Yes':'No',
  'rec.manual': ()=>{ const R=RULESPEC['rec.manual'].params.ranges; const test=SESSION.get('records_manual.test')||'A1C'; const v=num(latest(['records_manual.value','records_manual_error.value'])); if(v==null) return null;
    const r=R[test]||[0,Infinity]; return (v<r[0]||v>r[1])?'Outside expected range':'Valid'; },
+ 'sf.unplug.reason': ()=> (list(SESSION.get('sf_unplug_session_end.reason')).length || String(SESSION.get('sf_unplug_session_end.note')||'').trim()) ? 'Reason given' : 'No reason yet',
+ 'sf.unplug.sentence': ()=>{ const n=s=>String(s||'').toLowerCase().trim().replace(/\s+/g,' ').replace(/[.!]+$/,''); return n(SESSION.get('sf_unplug_gate_commit.sentence'))===n(RULESPEC['sf.unplug.sentence'].params.sentence)?'Step done':'Step not done' },
+ 'sf.unplug.sum': ()=>{ const P=RULESPEC['sf.unplug.sum'].params; return num(SESSION.get('sf_unplug_gate_sum.answer'))===P.a+P.b?'Step done':'Step not done' },
 };
 function decide(d){ if(!d) return null; if(d.startsWith('choice:')) return SESSION.get(d.slice(7)); return RULES[d]?RULES[d]():null }
 function match(sel, labels){ if(sel==null) return null; const s=String(sel).toLowerCase(); const L=labels.map(l=>l.toLowerCase());

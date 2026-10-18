@@ -23,9 +23,9 @@ class SfScreentimeScreen extends StatelessWidget {
       header: THeader(title: 'Screen Time', pill: 'Optional'),
       children: [
         TIllustration(glyph: '◷'),
-        TTitle('See real totals, if you want.', center: true),
-        TBody('Tether reads daily totals by category only. Never apps’ content, messages or contacts.', tone: TTextTone.muted, center: true),
-        TKeyValue(rows: [('Reads', 'Minutes per category'), ('Never reads', 'Content, messages, contacts'), ('Turn off', 'Anytime in Account')]),
+        TTitle('See your Screen Time here, if you want.', center: true),
+        TBody('Apple’s Screen Time shows your daily totals by category inside Tether. Tether can’t read, store or share those minutes.', tone: TTextTone.muted, center: true),
+        TKeyValue(rows: [('Shows', 'Minutes per category, on this phone'), ('Never reads', 'Content, messages, contacts'), ('Turn off', 'Anytime in Account')]),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Allow access', onPressed: () => TNav.branch(context, 'iOS Screen Time permission', <String, VoidCallback>{'Allowed': () => TNav.toast(context, 'Screen Time connected', then: () => TNav.back(context)), 'Not allowed': () => TNav.replace(context, Routes.sfScreentimeDenied)}), arrow: true),

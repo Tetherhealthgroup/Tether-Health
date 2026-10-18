@@ -366,4 +366,92 @@ abstract final class Routes {
   static const recordsManualError = '/records/manual?state=error';
   /// Imported values
   static const recordsItem = '/records/item';
+  /// Unplug intro
+  static const sfUnplugIntro = '/p/sf/unplug';
+  /// Allow Screen Time
+  static const sfUnplugAuth = '/p/sf/unplug/permission';
+  /// Screen Time not allowed (permission denied)
+  static const sfUnplugAuthDenied = '/p/sf/unplug/permission?state=denied';
+  /// Screen Time unavailable (unavailable)
+  static const sfUnplugAuthUnavailable = '/p/sf/unplug/permission?state=unavailable';
+  /// Notifications off (notifications off)
+  static const sfUnplugAuthNotifications = '/p/sf/unplug/permission?state=notifications';
+  /// Android permissions for Unplug (android)
+  static const sfUnplugAuthAndroid = '/p/sf/unplug/permission?state=android';
+  /// Choose apps
+  static const sfUnplugApps = '/p/sf/unplug/apps';
+  /// Apple app picker
+  static const sfUnplugPickerIos = '/p/sf/unplug/apps/picker';
+  /// Choose apps (Android) (android)
+  static const sfUnplugAppsAndroid = '/p/sf/unplug/apps?state=android';
+  /// Name your groups (apps chosen)
+  static const sfUnplugAppsChosen = '/p/sf/unplug/apps?state=chosen';
+  /// Limits & pause screen
+  static const sfUnplugLimits = '/p/sf/unplug/limits';
+  /// Unplug
+  static const sfUnplugHome = '/p/sf/unplug/home';
+  /// Start a focus session
+  static const sfUnplugSession = '/p/sf/unplug/session';
+  /// Focus session running
+  static const sfUnplugSessionActive = '/p/sf/unplug/session/active';
+  /// End session early
+  static const sfUnplugSessionEnd = '/p/sf/unplug/session/end';
+  /// Session complete
+  static const sfUnplugSessionDone = '/p/sf/unplug/session/done';
+  /// Session ended early (ended early)
+  static const sfUnplugSessionDoneEarly = '/p/sf/unplug/session/done?state=early';
+  /// Pause screen (iPhone shield)
+  static const sfUnplugShield = '/system/unplug/shield';
+  /// Pause screen (iPhone shield, firm) (no “open anyway” left)
+  static const sfUnplugShieldFirm = '/system/unplug/shield?state=firm';
+  /// Pause screen (Android overlay)
+  static const sfUnplugOverlay = '/system/unplug/overlay';
+  /// Small step: one breath
+  static const sfUnplugGate = '/p/sf/unplug/step';
+  /// Small step: type a sentence (typed sentence)
+  static const sfUnplugGateCommit = '/p/sf/unplug/step?state=sentence';
+  /// Small step: quick sum (quick sum)
+  static const sfUnplugGateSum = '/p/sf/unplug/step?state=sum';
+  /// Tracking check
+  static const sfUnplugHealth = '/p/sf/unplug/health';
+  /// Tracking check · notifications off (notifications off)
+  static const sfUnplugHealthNotifications = '/p/sf/unplug/health?state=notifications';
+  /// Tracking stopped (tracking stopped)
+  static const sfUnplugHealthStopped = '/p/sf/unplug/health?state=stopped';
+  /// Tracking check (Android) (android)
+  static const sfUnplugHealthAndroid = '/p/sf/unplug/health?state=android';
+  /// Turn off Unplug
+  static const sfUnplugOff = '/p/sf/unplug/off';
+  /// ScrollFree home · Unplug on (iPhone) (Unplug on · iPhone)
+  static const sfHomeUnplug = '/p/sf/home?state=unplug';
+  /// Weekly reflection · Unplug on (iPhone) (Unplug on · iPhone)
+  static const sfWeekUnplug = '/p/sf/week?state=unplug';
+  /// Program settings · ScrollFree with Unplug (ScrollFree)
+  static const programSettingsSf = '/p/:program/settings?state=sf-unplug';
+  /// Delete account · Apple account (Apple account)
+  static const accountDeleteApple = '/account/delete?state=apple';
+  /// Delete account · Google account (Google account)
+  static const accountDeleteGoogle = '/account/delete?state=google';
+  /// Session expired · Apple account (Apple account)
+  static const authSessionApple = '/auth/session?state=apple';
+  /// Session expired · Google account (Google account)
+  static const authSessionGoogle = '/auth/session?state=google';
+  /// Connect usage access (Android) (android)
+  static const sfScreentimeAndroid = '/p/sf/screen-time?state=android';
+  /// Usage access off (Android) (android · not allowed)
+  static const sfScreentimeAndroidDenied = '/p/sf/screen-time?state=android-denied';
+  /// Update required (Android) (android)
+  static const sysUpdateAndroid = '/system/update?state=android';
+  /// Home-screen widget (iPhone)
+  static const surfaceWidgetIos = '/surface/widget/ios';
+  /// Home-screen widget (Android)
+  static const surfaceWidgetAndroid = '/surface/widget/android';
+  /// Siri & App Shortcuts (iPhone)
+  static const surfaceShortcutsIos = '/surface/shortcuts/ios';
+  /// Siri & App Shortcuts (sensitive details on) (Show sensitive details on)
+  static const surfaceShortcutsIosNamed = '/surface/shortcuts/ios?state=named';
+  /// Launcher shortcuts (Android)
+  static const surfaceShortcutsAndroid = '/surface/shortcuts/android';
+  /// Launcher shortcuts (sensitive details on) (Show sensitive details on)
+  static const surfaceShortcutsAndroidNamed = '/surface/shortcuts/android?state=named';
 }

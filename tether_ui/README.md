@@ -1,15 +1,15 @@
 # Tether Health · UI for development
 
-Single source of truth for the Tether Health mobile app (iOS + Android, Flutter): **183 screens and states**, **20 flows**, **771 wired actions**, 11 programs, sign-in with **email, Apple and Google**, and **health records** from Epic, Medicare Blue Button and any SMART on FHIR server, or entered by hand.
+Single source of truth for the Tether Health mobile app (iOS + Android, Flutter): **227 screens and states**, **22 flows**, **911 wired actions**, 11 programs, sign-in with **email, Apple and Google**, and **health records** from Epic, Medicare Blue Button and any SMART on FHIR server, or entered by hand.
 Everything here is generated from one spec, so the design, the clickable prototype + simulator, the screenshots and the Flutter code always match.
 
 ## Validation (latest run)
 
 | Check | Flutter | Prototype |
 |---|---|---|
-| End-to-end scenarios: setup and functions of every program, sign-in, health records | 68 / 68 | 68 / 68 |
-| Button-flow sweep: every element × every outcome lands where the spec says | 853 / 853 | 853 / 853 |
-| Render tests: every screen at 100% and 130% text, no overflow | 366 / 366 | — |
+| End-to-end scenarios: setup and functions of every program, sign-in, health records | 75 / 75 | 75 / 75 |
+| Button-flow sweep: every element × every outcome lands where the spec says | 1023 / 1023 | 1023 / 1023 |
+| Render tests: every screen at 100% and 130% text, no overflow | 454 / 454 | — |
 | Static analysis | `flutter analyze`: no issues | JS errors: 0 |
 | Spec validator | 0 loose ends: every target exists, every screen reachable, no dead ends | |
 
@@ -27,7 +27,7 @@ tether_ui/
 │   ├── screens.json, screens/<id>.json   ← every screen: route, kind, state, inputs (keys), actions, API
 │   ├── flows.json · programs.json · app.json (entries, tabs, routes, action types)
 │   ├── rules.json            ← decision rules (BP, glucose, zones, self-harm, manual values) with thresholds
-│   ├── scenarios.json        ← 68 end-to-end scenarios with simulated data
+│   ├── scenarios.json        ← 75 end-to-end scenarios with simulated data
 │   ├── actions.json/.csv     ← flat button → action → target map
 │   ├── develop_mapping.json  ← develop-branch file for each screen + logic to keep
 │   └── validation.md         ← spec validator output
@@ -47,7 +47,7 @@ tether_ui/
 ```bash
 cd flutter
 flutter pub get
-flutter run                                  # developer gallery of all 183 screens
+flutter run                                  # developer gallery of all 227 screens
 flutter run --dart-define=START=/welcome     # real first-run flow
 flutter analyze && flutter test              # render tests + action sweep + scenarios
 ```
@@ -82,15 +82,15 @@ flutter analyze && flutter test              # render tests + action sweep + sce
 | Flow | Screens | What it covers |
 |---|---|---|
 | [First run](flows/onboarding.md) | 10 | Welcome → choose programs → focus → consent → basics → set up each focus program → reminders → save progress → Today. |
-| [Account & sign-in](flows/auth.md) | 11 | Sign up, verify email, sign in (with error), password reset, guest-plan merge, session expiry. |
+| [Account & sign-in](flows/auth.md) | 13 | Sign up, verify email, sign in (with error), password reset, guest-plan merge, session expiry. |
 | [Today](flows/today.md) | 7 | The shared home: Rescue first, one step per focus program, combined check-in, milestones and Learn-only lessons. Every state is specified. |
 | [Universal Rescue](flows/rescue.md) | 6 | One entry for every Quit program. Opens the last helpful tool; offers a person when intensity stays high; distress always routes to 988. |
-| [Plans & programs](flows/plans.md) | 4 | My plans hub, program catalog (the 11 programs from tetherhealthgroup.com), focus-slot rules and per-program settings. |
+| [Plans & programs](flows/plans.md) | 5 | My plans hub, program catalog (the 11 programs from tetherhealthgroup.com), focus-slot rules and per-program settings. |
 | [Progress, Learn & Support](flows/tabs.md) | 13 | Shared tabs that read every enrolment. |
-| [Account & data](flows/account.md) | 10 | Settings, programs & sharing, notifications, privacy, export, deletion with receipt, sign out. |
-| [System states](flows/system.md) | 1 | App-wide events: forced update. |
+| [Account & data](flows/account.md) | 12 | Settings, programs & sharing, notifications, privacy, export, deletion with receipt, sign out. |
+| [System states](flows/system.md) | 2 | App-wide events: forced update. |
 | [BreatheFree](flows/bf.md) | 17 | Tobacco & nicotine · Quit / Reduce. Four real quit paths, craving rescue, slip recovery, medication education. |
-| [ScrollFree](flows/sf.md) | 11 | Social media use · Quit / Reduce. Self-report first, minute goal + app-free windows, Pause 60, buddy, weekly reflection. |
+| [ScrollFree](flows/sf.md) | 15 | Social media use · Quit / Reduce. Self-report first, minute goal + app-free windows, Pause 60, buddy, weekly reflection. |
 | [ClearAir](flows/ca.md) | 10 | Respiratory · Manage. Clinician action plan, zone check, yellow-zone steps with re-check, red-zone route, progress against own zones. |
 | [Heartwise](flows/hw.md) | 13 | Cardiovascular · Manage. Clinician targets, two-reading BP log, validation, symptom-gated crisis route, trends, lipid panel, previewed visit summary. |
 | [Steady](flows/st.md) | 9 | Diabetes & metabolic · Manage. Clinician range + own low plan, reading log, low route with 15-min timer, meal reset, patterns, A1C. |
@@ -101,6 +101,8 @@ flutter analyze && flutter test              # render tests + action sweep + sce
 | [Checkup](flows/ck.md) | 7 | Preventive · Prevent. Personal due list from USPSTF/CDC guidance, item detail with options and cost, mark done, screening-day prep. |
 | [Beacon](flows/be.md) | 8 | Cancer · Prevent. Four journey paths: lowering risk, in treatment, after treatment, caregiver. Fever rule on the treatment path. |
 | [Health records (FHIR & manual)](flows/records.md) | 17 | Connect Epic MyChart, Oracle Health, Medicare Blue Button 2.0, Apple Health Records / Health Connect or any SMART on FHIR R4 server, or enter values by hand. Every value is validated (units, plausibility, duplicates, conflicts) and reviewed before it reaches a program. |
+| [ScrollFree · Unplug](flows/unplug.md) | 28 | Optional app limits for ScrollFree: what Unplug can see, Screen Time / Android permissions, choosing apps, limits and the pause screen, focus sessions, the iPhone shield and Android overlay, the small-step gate, tracking check and turning it off. Every pause surface reaches Rescue. Entry: the Unplug card on ScrollFree home. Related states elsewhere: ScrollFree home (Unplug on), Weekly reflection (Unplug on), Program settings (ScrollFree), Connect Screen Time (Android). |
+| [Home screen, Siri & shortcuts](flows/entries.md) | 6 | How Tether looks outside the app: the home-screen widget, Siri and App Shortcuts on iPhone, and launcher shortcuts and the widget on Android. Labels are generic by default; program names appear only when Show sensitive details is on. These are reference surfaces for the native widget and shortcut work, not app routes, and are excluded from release-check counts. |
 
 ## Not decided here
 

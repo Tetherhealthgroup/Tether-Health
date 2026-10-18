@@ -3965,8 +3965,19 @@
   {
     "screen": "sf_home",
     "screen_name": "ScrollFree home",
+    "element": "Set up",
+    "path": "body[2].cta[0]",
+    "type": "push",
+    "targets": [
+      "sf_unplug_intro"
+    ],
+    "summary": "push → sf_unplug_intro"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
     "element": "This week",
-    "path": "body[3].rows[0]",
+    "path": "body[4].rows[0]",
     "type": "push",
     "targets": [
       "sf_week"
@@ -3977,7 +3988,7 @@
     "screen": "sf_home",
     "screen_name": "ScrollFree home",
     "element": "Had a long scroll?",
-    "path": "body[3].rows[1]",
+    "path": "body[4].rows[1]",
     "type": "push",
     "targets": [
       "sf_slip"
@@ -3988,7 +3999,7 @@
     "screen": "sf_home",
     "screen_name": "ScrollFree home",
     "element": "Goal & windows",
-    "path": "body[3].rows[2]",
+    "path": "body[4].rows[2]",
     "type": "push",
     "targets": [
       "sf_goal"
@@ -3999,7 +4010,7 @@
     "screen": "sf_home",
     "screen_name": "ScrollFree home",
     "element": "Buddy",
-    "path": "body[3].rows[3]",
+    "path": "body[4].rows[3]",
     "type": "push",
     "targets": [
       "sf_buddy"
@@ -4010,7 +4021,7 @@
     "screen": "sf_home",
     "screen_name": "ScrollFree home",
     "element": "Program settings",
-    "path": "body[3].rows[4]",
+    "path": "body[4].rows[4]",
     "type": "push",
     "targets": [
       "program_settings"
@@ -8040,5 +8051,1414 @@
       "hw_trends"
     ],
     "summary": "push → hw_trends"
+  },
+  {
+    "screen": "sf_unplug_intro",
+    "screen_name": "Unplug intro",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_intro",
+    "screen_name": "Unplug intro",
+    "element": "Set up Unplug",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "sf_unplug_auth",
+      "sf_unplug_auth_android"
+    ],
+    "summary": "branch: Platform → iPhone: push → sf_unplug_auth | Android: push → sf_unplug_auth_android"
+  },
+  {
+    "screen": "sf_unplug_intro",
+    "screen_name": "Unplug intro",
+    "element": "Not now",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_auth",
+    "screen_name": "Allow Screen Time",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_auth",
+    "screen_name": "Allow Screen Time",
+    "element": "Continue",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "sf_unplug_apps",
+      "sf_unplug_auth_notifications",
+      "sf_unplug_auth_denied",
+      "sf_unplug_auth_unavailable"
+    ],
+    "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Approved · notifications off: replace → sf_unplug_auth_notifications | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
+  },
+  {
+    "screen": "sf_unplug_auth",
+    "screen_name": "Allow Screen Time",
+    "element": "Not now",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_auth_denied",
+    "screen_name": "Screen Time not allowed",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_auth_denied",
+    "screen_name": "Screen Time not allowed",
+    "element": "Try again",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "sf_unplug_apps"
+    ],
+    "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: toast “Still not allowed. You can turn it on later in Settings.”"
+  },
+  {
+    "screen": "sf_unplug_auth_denied",
+    "screen_name": "Screen Time not allowed",
+    "element": "Open phone settings",
+    "path": "footer[1]",
+    "type": "os_settings",
+    "targets": [],
+    "summary": "os_settings"
+  },
+  {
+    "screen": "sf_unplug_auth_denied",
+    "screen_name": "Screen Time not allowed",
+    "element": "Not now",
+    "path": "footer[2]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_auth_unavailable",
+    "screen_name": "Screen Time unavailable",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_auth_unavailable",
+    "screen_name": "Screen Time unavailable",
+    "element": "Back to ScrollFree",
+    "path": "footer[0]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_auth_notifications",
+    "screen_name": "Notifications off",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_auth_notifications",
+    "screen_name": "Notifications off",
+    "element": "Open phone settings",
+    "path": "footer[0]",
+    "type": "os_settings",
+    "targets": [],
+    "summary": "os_settings"
+  },
+  {
+    "screen": "sf_unplug_auth_notifications",
+    "screen_name": "Notifications off",
+    "element": "Check again",
+    "path": "footer[1]",
+    "type": "branch",
+    "targets": [
+      "sf_unplug_apps",
+      "sf_unplug_apps_android"
+    ],
+    "summary": "branch: Notification permission (checked on return) → On (iPhone): replace → sf_unplug_apps | On (Android): replace → sf_unplug_apps_android | Still off: toast “Notifications are still off. You can turn them on later in Settings.”"
+  },
+  {
+    "screen": "sf_unplug_auth_notifications",
+    "screen_name": "Notifications off",
+    "element": "Continue without notifications",
+    "path": "footer[2]",
+    "type": "branch",
+    "targets": [
+      "sf_unplug_apps",
+      "sf_unplug_apps_android"
+    ],
+    "summary": "branch: Platform → iPhone: replace → sf_unplug_apps | Android: replace → sf_unplug_apps_android"
+  },
+  {
+    "screen": "sf_unplug_auth_android",
+    "screen_name": "Android permissions for Unplug",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_auth_android",
+    "screen_name": "Android permissions for Unplug",
+    "element": "Turn on display over apps",
+    "path": "footer[0]",
+    "type": "os_settings",
+    "targets": [],
+    "summary": "os_settings"
+  },
+  {
+    "screen": "sf_unplug_auth_android",
+    "screen_name": "Android permissions for Unplug",
+    "element": "Turn on usage access",
+    "path": "footer[1]",
+    "type": "os_settings",
+    "targets": [],
+    "summary": "os_settings"
+  },
+  {
+    "screen": "sf_unplug_auth_android",
+    "screen_name": "Android permissions for Unplug",
+    "element": "I’ve turned them on",
+    "path": "footer[2]",
+    "type": "branch",
+    "targets": [
+      "sf_unplug_apps_android",
+      "sf_unplug_auth_notifications"
+    ],
+    "summary": "branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Notifications off: replace → sf_unplug_auth_notifications | Missing: toast “Unplug still needs both settings.”"
+  },
+  {
+    "screen": "sf_unplug_apps",
+    "screen_name": "Choose apps",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_apps",
+    "screen_name": "Choose apps",
+    "element": "Open app picker",
+    "path": "footer[0]",
+    "type": "sheet",
+    "targets": [
+      "sf_unplug_picker_ios"
+    ],
+    "summary": "sheet → sf_unplug_picker_ios"
+  },
+  {
+    "screen": "sf_unplug_apps",
+    "screen_name": "Choose apps",
+    "element": "Not now",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_picker_ios",
+    "screen_name": "Apple app picker",
+    "element": "Done",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "sf_unplug_apps_chosen"
+    ],
+    "summary": "branch: System app picker result → Apps chosen: replace → sf_unplug_apps_chosen | Cancelled: close"
+  },
+  {
+    "screen": "sf_unplug_picker_ios",
+    "screen_name": "Apple app picker",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sf_unplug_apps_android",
+    "screen_name": "Choose apps (Android)",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_apps_android",
+    "screen_name": "Choose apps (Android)",
+    "element": "Done · 3 apps",
+    "path": "footer[0]",
+    "type": "replace",
+    "targets": [
+      "sf_unplug_apps_chosen"
+    ],
+    "summary": "replace → sf_unplug_apps_chosen"
+  },
+  {
+    "screen": "sf_unplug_apps_android",
+    "screen_name": "Choose apps (Android)",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_apps_chosen",
+    "screen_name": "Name your groups",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_apps_chosen",
+    "screen_name": "Name your groups",
+    "element": "Add another group",
+    "path": "body[4]",
+    "type": "sheet",
+    "targets": [
+      "sf_unplug_picker_ios"
+    ],
+    "summary": "sheet → sf_unplug_picker_ios"
+  },
+  {
+    "screen": "sf_unplug_apps_chosen",
+    "screen_name": "Name your groups",
+    "element": "Next: limits",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "sf_unplug_limits"
+    ],
+    "summary": "push → sf_unplug_limits"
+  },
+  {
+    "screen": "sf_unplug_limits",
+    "screen_name": "Limits & pause screen",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_limits",
+    "screen_name": "Limits & pause screen",
+    "element": "Save limits",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "sf_unplug_home"
+    ],
+    "summary": "CALL device:unplug/setThresholds+applyShield then toast “Unplug is on” then replace → sf_unplug_home"
+  },
+  {
+    "screen": "sf_unplug_home",
+    "screen_name": "Unplug",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_home",
+    "screen_name": "Unplug",
+    "element": "Start",
+    "path": "body[1].cta[0]",
+    "type": "push",
+    "targets": [
+      "sf_unplug_session"
+    ],
+    "summary": "push → sf_unplug_session"
+  },
+  {
+    "screen": "sf_unplug_home",
+    "screen_name": "Unplug",
+    "element": "Apps",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "sf_unplug_apps_chosen"
+    ],
+    "summary": "push → sf_unplug_apps_chosen"
+  },
+  {
+    "screen": "sf_unplug_home",
+    "screen_name": "Unplug",
+    "element": "Limits & pause screen",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "sf_unplug_limits"
+    ],
+    "summary": "push → sf_unplug_limits"
+  },
+  {
+    "screen": "sf_unplug_home",
+    "screen_name": "Unplug",
+    "element": "Preview the pause screen",
+    "path": "body[2].rows[2]",
+    "type": "branch",
+    "targets": [
+      "sf_unplug_shield",
+      "sf_unplug_overlay"
+    ],
+    "summary": "branch: Platform → iPhone: push → sf_unplug_shield | Android: push → sf_unplug_overlay"
+  },
+  {
+    "screen": "sf_unplug_home",
+    "screen_name": "Unplug",
+    "element": "Tracking check",
+    "path": "body[2].rows[3]",
+    "type": "push",
+    "targets": [
+      "sf_unplug_health"
+    ],
+    "summary": "push → sf_unplug_health"
+  },
+  {
+    "screen": "sf_unplug_home",
+    "screen_name": "Unplug",
+    "element": "How Unplug works",
+    "path": "body[3].rows[0]",
+    "type": "push",
+    "targets": [
+      "sf_unplug_intro"
+    ],
+    "summary": "push → sf_unplug_intro"
+  },
+  {
+    "screen": "sf_unplug_home",
+    "screen_name": "Unplug",
+    "element": "Turn off Unplug",
+    "path": "body[3].rows[1]",
+    "type": "sheet",
+    "targets": [
+      "sf_unplug_off"
+    ],
+    "summary": "sheet → sf_unplug_off"
+  },
+  {
+    "screen": "sf_unplug_session",
+    "screen_name": "Start a focus session",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_session",
+    "screen_name": "Start a focus session",
+    "element": "Start session",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "sf_unplug_session_active"
+    ],
+    "summary": "CALL device:unplug/startSession then replace → sf_unplug_session_active"
+  },
+  {
+    "screen": "sf_unplug_session_active",
+    "screen_name": "Focus session running",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sf_unplug_session_active",
+    "screen_name": "Focus session running",
+    "element": "Pause 60",
+    "path": "body[2].cta[0]",
+    "type": "push",
+    "targets": [
+      "sf_pause"
+    ],
+    "summary": "push → sf_pause"
+  },
+  {
+    "screen": "sf_unplug_session_active",
+    "screen_name": "Focus session running",
+    "element": "End early",
+    "path": "footer[0]",
+    "type": "sheet",
+    "targets": [
+      "sf_unplug_session_end"
+    ],
+    "summary": "sheet → sf_unplug_session_end"
+  },
+  {
+    "screen": "sf_unplug_session_end",
+    "screen_name": "End session early",
+    "element": "End session",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "sf_unplug_session_done_early"
+    ],
+    "summary": "decide sf.unplug.reason: Strict session: reason given? → Reason given: CALL device:unplug/endSession then replace → sf_unplug_session_done_early | No reason yet: toast “Choose or type a reason to end a strict session.”"
+  },
+  {
+    "screen": "sf_unplug_session_end",
+    "screen_name": "End session early",
+    "element": "Keep going",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sf_unplug_session_done",
+    "screen_name": "Session complete",
+    "element": "Done",
+    "path": "footer[0]",
+    "type": "replace",
+    "targets": [
+      "sf_unplug_home"
+    ],
+    "summary": "replace → sf_unplug_home"
+  },
+  {
+    "screen": "sf_unplug_session_done_early",
+    "screen_name": "Session ended early",
+    "element": "Done",
+    "path": "footer[0]",
+    "type": "replace",
+    "targets": [
+      "sf_unplug_home"
+    ],
+    "summary": "replace → sf_unplug_home"
+  },
+  {
+    "screen": "sf_unplug_shield",
+    "screen_name": "Pause screen (iPhone shield)",
+    "element": "Take a breath",
+    "path": "footer[0]",
+    "type": "toast",
+    "targets": [
+      "sf_unplug_gate",
+      "rescue_pick"
+    ],
+    "summary": "toast “Notification: open Tether to take your breath, or get support” then branch: Notification action → Take my breath: push → sf_unplug_gate | Get support: sheet → rescue_pick"
+  },
+  {
+    "screen": "sf_unplug_shield",
+    "screen_name": "Pause screen (iPhone shield)",
+    "element": "Open anyway",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Opened · 1 “open anyway” left today” then close"
+  },
+  {
+    "screen": "sf_unplug_shield_firm",
+    "screen_name": "Pause screen (iPhone shield, firm)",
+    "element": "Close the app",
+    "path": "footer[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “The app stays closed.” then close"
+  },
+  {
+    "screen": "sf_unplug_shield_firm",
+    "screen_name": "Pause screen (iPhone shield, firm)",
+    "element": "Get support",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "toast “Notification: tap to open Rescue in Tether” then sheet → rescue_pick"
+  },
+  {
+    "screen": "sf_unplug_overlay",
+    "screen_name": "Pause screen (Android overlay)",
+    "element": "Close the app",
+    "path": "footer[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “The app stays closed.” then close"
+  },
+  {
+    "screen": "sf_unplug_overlay",
+    "screen_name": "Pause screen (Android overlay)",
+    "element": "Get support",
+    "path": "footer[1]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "sf_unplug_overlay",
+    "screen_name": "Pause screen (Android overlay)",
+    "element": "Open anyway",
+    "path": "footer[2]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Opened · 1 “open anyway” left today” then close"
+  },
+  {
+    "screen": "sf_unplug_gate",
+    "screen_name": "Small step: one breath",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sf_unplug_gate",
+    "screen_name": "Small step: one breath",
+    "element": "Get support",
+    "path": "body[3].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "sf_unplug_gate",
+    "screen_name": "Small step: one breath",
+    "element": "Keep it closed",
+    "path": "footer[0]",
+    "type": "toast",
+    "targets": [
+      "sf_home"
+    ],
+    "summary": "toast “Nice. The app stays closed.” then reset → sf_home"
+  },
+  {
+    "screen": "sf_unplug_gate",
+    "screen_name": "Small step: one breath",
+    "element": "Open it for 10 minutes",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "sf_home"
+    ],
+    "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home"
+  },
+  {
+    "screen": "sf_unplug_gate_commit",
+    "screen_name": "Small step: type a sentence",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sf_unplug_gate_commit",
+    "screen_name": "Small step: type a sentence",
+    "element": "Get support",
+    "path": "body[3].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "sf_unplug_gate_commit",
+    "screen_name": "Small step: type a sentence",
+    "element": "Keep it closed",
+    "path": "footer[0]",
+    "type": "toast",
+    "targets": [
+      "sf_home"
+    ],
+    "summary": "toast “Nice. The app stays closed.” then reset → sf_home"
+  },
+  {
+    "screen": "sf_unplug_gate_commit",
+    "screen_name": "Small step: type a sentence",
+    "element": "Open it for 10 minutes",
+    "path": "footer[1]",
+    "type": "branch",
+    "targets": [
+      "sf_home"
+    ],
+    "summary": "decide sf.unplug.sentence: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Type the whole sentence first.”"
+  },
+  {
+    "screen": "sf_unplug_gate_sum",
+    "screen_name": "Small step: quick sum",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sf_unplug_gate_sum",
+    "screen_name": "Small step: quick sum",
+    "element": "Get support",
+    "path": "body[3].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "sf_unplug_gate_sum",
+    "screen_name": "Small step: quick sum",
+    "element": "Keep it closed",
+    "path": "footer[0]",
+    "type": "toast",
+    "targets": [
+      "sf_home"
+    ],
+    "summary": "toast “Nice. The app stays closed.” then reset → sf_home"
+  },
+  {
+    "screen": "sf_unplug_gate_sum",
+    "screen_name": "Small step: quick sum",
+    "element": "Open it for 10 minutes",
+    "path": "footer[1]",
+    "type": "branch",
+    "targets": [
+      "sf_home"
+    ],
+    "summary": "decide sf.unplug.sum: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Answer the sum first.”"
+  },
+  {
+    "screen": "sf_unplug_health",
+    "screen_name": "Tracking check",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_health",
+    "screen_name": "Tracking check",
+    "element": "Done",
+    "path": "footer[0]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_health_notifications",
+    "screen_name": "Tracking check · notifications off",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_health_notifications",
+    "screen_name": "Tracking check · notifications off",
+    "element": "Open phone settings",
+    "path": "footer[0]",
+    "type": "os_settings",
+    "targets": [],
+    "summary": "os_settings"
+  },
+  {
+    "screen": "sf_unplug_health_notifications",
+    "screen_name": "Tracking check · notifications off",
+    "element": "Check again",
+    "path": "footer[1]",
+    "type": "branch",
+    "targets": [
+      "sf_unplug_health"
+    ],
+    "summary": "branch: Notification permission (checked on return) → On: replace → sf_unplug_health | Still off: toast “Notifications are still off.”"
+  },
+  {
+    "screen": "sf_unplug_health_stopped",
+    "screen_name": "Tracking stopped",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_health_stopped",
+    "screen_name": "Tracking stopped",
+    "element": "Open phone settings",
+    "path": "footer[0]",
+    "type": "os_settings",
+    "targets": [],
+    "summary": "os_settings"
+  },
+  {
+    "screen": "sf_unplug_health_stopped",
+    "screen_name": "Tracking stopped",
+    "element": "Check again",
+    "path": "footer[1]",
+    "type": "branch",
+    "targets": [
+      "sf_unplug_health"
+    ],
+    "summary": "branch: Tracking health result → All pass: replace → sf_unplug_health | Still failing: toast “Still not working. Turn Screen Time access on again in Settings.”"
+  },
+  {
+    "screen": "sf_unplug_health_android",
+    "screen_name": "Tracking check (Android)",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_health_android",
+    "screen_name": "Tracking check (Android)",
+    "element": "Battery settings",
+    "path": "footer[0]",
+    "type": "os_settings",
+    "targets": [],
+    "summary": "os_settings"
+  },
+  {
+    "screen": "sf_unplug_health_android",
+    "screen_name": "Tracking check (Android)",
+    "element": "Done",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_unplug_off",
+    "screen_name": "Turn off Unplug",
+    "element": "Turn off",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "sf_home",
+      "sf_home"
+    ],
+    "summary": "decide choice:sf_unplug_off.scope: Chosen option → Unplug only: CALL device:unplug/liftShield+purgeLocalData then toast “Unplug is off” then reset → sf_home | Unplug and Screen Time: PATCH /v1/enrolments/consents then toast “Unplug and Screen Time are off” then reset → sf_home"
+  },
+  {
+    "screen": "sf_unplug_off",
+    "screen_name": "Turn off Unplug",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "Pause 60",
+    "path": "body[2].cta[0]",
+    "type": "push",
+    "targets": [
+      "sf_pause"
+    ],
+    "summary": "push → sf_pause"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "Unplug is on",
+    "path": "body[3]",
+    "type": "push",
+    "targets": [
+      "sf_unplug_home"
+    ],
+    "summary": "push → sf_unplug_home"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "This week",
+    "path": "body[5].rows[0]",
+    "type": "push",
+    "targets": [
+      "sf_week"
+    ],
+    "summary": "push → sf_week"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "Had a long scroll?",
+    "path": "body[5].rows[1]",
+    "type": "push",
+    "targets": [
+      "sf_slip"
+    ],
+    "summary": "push → sf_slip"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "Goal & windows",
+    "path": "body[5].rows[2]",
+    "type": "push",
+    "targets": [
+      "sf_goal"
+    ],
+    "summary": "push → sf_goal"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "Buddy",
+    "path": "body[5].rows[3]",
+    "type": "push",
+    "targets": [
+      "sf_buddy"
+    ],
+    "summary": "push → sf_buddy"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "Program settings",
+    "path": "body[5].rows[4]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "sf_home_unplug",
+    "screen_name": "ScrollFree home · Unplug on (iPhone)",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "sf_week_unplug",
+    "screen_name": "Weekly reflection · Unplug on (iPhone)",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_week_unplug",
+    "screen_name": "Weekly reflection · Unplug on (iPhone)",
+    "element": "Yes",
+    "path": "body[5].children[0].items[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Goal set to 75 min” then back"
+  },
+  {
+    "screen": "sf_week_unplug",
+    "screen_name": "Weekly reflection · Unplug on (iPhone)",
+    "element": "Stay at 90",
+    "path": "body[5].children[0].items[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "program_settings_sf",
+    "screen_name": "Program settings · ScrollFree with Unplug",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "program_settings_sf",
+    "screen_name": "Program settings · ScrollFree with Unplug",
+    "element": "Unplug",
+    "path": "body[3].rows[0]",
+    "type": "push",
+    "targets": [
+      "sf_unplug_home"
+    ],
+    "summary": "push → sf_unplug_home"
+  },
+  {
+    "screen": "program_settings_sf",
+    "screen_name": "Program settings · ScrollFree with Unplug",
+    "element": "Screen Time access",
+    "path": "body[3].rows[1]",
+    "type": "push",
+    "targets": [
+      "sf_screentime"
+    ],
+    "summary": "push → sf_screentime"
+  },
+  {
+    "screen": "program_settings_sf",
+    "screen_name": "Program settings · ScrollFree with Unplug",
+    "element": "Turn off Unplug or Screen Time",
+    "path": "body[3].rows[2]",
+    "type": "sheet",
+    "targets": [
+      "sf_unplug_off"
+    ],
+    "summary": "sheet → sf_unplug_off"
+  },
+  {
+    "screen": "program_settings_sf",
+    "screen_name": "Program settings · ScrollFree with Unplug",
+    "element": "Export ScrollFree data",
+    "path": "body[4].rows[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Export is being prepared. We’ll notify you.”"
+  },
+  {
+    "screen": "program_settings_sf",
+    "screen_name": "Program settings · ScrollFree with Unplug",
+    "element": "Leave ScrollFree",
+    "path": "body[4].rows[1]",
+    "type": "sheet",
+    "targets": [
+      "account_leave"
+    ],
+    "summary": "sheet → account_leave"
+  },
+  {
+    "screen": "program_settings_sf",
+    "screen_name": "Program settings · ScrollFree with Unplug",
+    "element": "Save changes",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "PATCH /v1/enrolments/:id then toast “Saved” then back"
+  },
+  {
+    "screen": "account_delete_apple",
+    "screen_name": "Delete account · Apple account",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "account_delete_apple",
+    "screen_name": "Delete account · Apple account",
+    "element": "Download a copy first",
+    "path": "body[3]",
+    "type": "push",
+    "targets": [
+      "account_data"
+    ],
+    "summary": "push → account_data"
+  },
+  {
+    "screen": "account_delete_apple",
+    "screen_name": "Delete account · Apple account",
+    "element": "Delete everything",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "account_deleted"
+    ],
+    "summary": "auth (apple): Sign in with Apple result → Success: DELETE /v1/account/data then replace → account_deleted | Different account: toast “That’s a different Apple account. Use the one you signed in with.” | Cancelled: toast “Nothing was deleted.” | Error: toast “Couldn’t reach Apple. Nothing was deleted.”"
+  },
+  {
+    "screen": "account_delete_google",
+    "screen_name": "Delete account · Google account",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "account_delete_google",
+    "screen_name": "Delete account · Google account",
+    "element": "Download a copy first",
+    "path": "body[3]",
+    "type": "push",
+    "targets": [
+      "account_data"
+    ],
+    "summary": "push → account_data"
+  },
+  {
+    "screen": "account_delete_google",
+    "screen_name": "Delete account · Google account",
+    "element": "Delete everything",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "account_deleted"
+    ],
+    "summary": "auth (google): Sign in with Google result → Success: DELETE /v1/account/data then replace → account_deleted | Different account: toast “That’s a different Google account. Use the one you signed in with.” | Cancelled: toast “Nothing was deleted.” | Error: toast “Couldn’t reach Google. Nothing was deleted.”"
+  },
+  {
+    "screen": "auth_session_apple",
+    "screen_name": "Session expired · Apple account",
+    "element": "Continue with Apple",
+    "path": "footer[0].items[0]",
+    "type": "branch",
+    "targets": [
+      "auth_social_error"
+    ],
+    "summary": "auth (apple): Sign in with Apple result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error"
+  },
+  {
+    "screen": "auth_session_apple",
+    "screen_name": "Session expired · Apple account",
+    "element": "Use Face ID",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "auth_session_google",
+    "screen_name": "Session expired · Google account",
+    "element": "Continue with Google",
+    "path": "footer[0].items[0]",
+    "type": "branch",
+    "targets": [
+      "auth_social_error"
+    ],
+    "summary": "auth (google): Sign in with Google result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error"
+  },
+  {
+    "screen": "auth_session_google",
+    "screen_name": "Session expired · Google account",
+    "element": "Use Face ID",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sf_screentime_android",
+    "screen_name": "Connect usage access (Android)",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_screentime_android",
+    "screen_name": "Connect usage access (Android)",
+    "element": "Open settings",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "sf_screentime_android_denied"
+    ],
+    "summary": "branch: Android usage access (checked on return) → Allowed: toast “Usage access on” then back | Not allowed: replace → sf_screentime_android_denied"
+  },
+  {
+    "screen": "sf_screentime_android",
+    "screen_name": "Connect usage access (Android)",
+    "element": "Not now",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_screentime_android_denied",
+    "screen_name": "Usage access off (Android)",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_screentime_android_denied",
+    "screen_name": "Usage access off (Android)",
+    "element": "Continue with self-report",
+    "path": "footer[0]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_screentime_android_denied",
+    "screen_name": "Usage access off (Android)",
+    "element": "Open settings",
+    "path": "footer[1]",
+    "type": "os_settings",
+    "targets": [],
+    "summary": "os_settings"
+  },
+  {
+    "screen": "sys_update_android",
+    "screen_name": "Update required (Android)",
+    "element": "Update now",
+    "path": "footer[0]",
+    "type": "external",
+    "targets": [],
+    "summary": "external https://play.google.com/store/apps/details?id=com.TetherHealthLLC.tetherhealth"
+  },
+  {
+    "screen": "sys_update_android",
+    "screen_name": "Update required (Android)",
+    "element": "Open Rescue",
+    "path": "footer[1]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "surface_widget_ios",
+    "screen_name": "Home-screen widget (iPhone)",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "surface_widget_ios",
+    "screen_name": "Home-screen widget (iPhone)",
+    "element": "Rescue",
+    "path": "body[1]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "surface_widget_android",
+    "screen_name": "Home-screen widget (Android)",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "surface_widget_android",
+    "screen_name": "Home-screen widget (Android)",
+    "element": "Rescue",
+    "path": "body[1]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "surface_shortcuts_ios",
+    "screen_name": "Siri & App Shortcuts (iPhone)",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "surface_shortcuts_ios",
+    "screen_name": "Siri & App Shortcuts (iPhone)",
+    "element": "Rescue",
+    "path": "body[1].rows[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "surface_shortcuts_ios",
+    "screen_name": "Siri & App Shortcuts (iPhone)",
+    "element": "My plan",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "ca_red"
+    ],
+    "summary": "push → ca_red"
+  },
+  {
+    "screen": "surface_shortcuts_ios_named",
+    "screen_name": "Siri & App Shortcuts (sensitive details on)",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "surface_shortcuts_ios_named",
+    "screen_name": "Siri & App Shortcuts (sensitive details on)",
+    "element": "Rescue",
+    "path": "body[1].rows[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "surface_shortcuts_ios_named",
+    "screen_name": "Siri & App Shortcuts (sensitive details on)",
+    "element": "ClearAir red-zone plan",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "ca_red"
+    ],
+    "summary": "push → ca_red"
+  },
+  {
+    "screen": "surface_shortcuts_android",
+    "screen_name": "Launcher shortcuts (Android)",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "surface_shortcuts_android",
+    "screen_name": "Launcher shortcuts (Android)",
+    "element": "Rescue",
+    "path": "body[1].rows[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "surface_shortcuts_android",
+    "screen_name": "Launcher shortcuts (Android)",
+    "element": "My plan",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "ca_red"
+    ],
+    "summary": "push → ca_red"
+  },
+  {
+    "screen": "surface_shortcuts_android_named",
+    "screen_name": "Launcher shortcuts (sensitive details on)",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "surface_shortcuts_android_named",
+    "screen_name": "Launcher shortcuts (sensitive details on)",
+    "element": "Rescue",
+    "path": "body[1].rows[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "surface_shortcuts_android_named",
+    "screen_name": "Launcher shortcuts (sensitive details on)",
+    "element": "ClearAir red-zone plan",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "ca_red"
+    ],
+    "summary": "push → ca_red"
   }
 ]

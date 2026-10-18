@@ -1,0 +1,90 @@
+{
+  "id": "sf_screentime_android_denied",
+  "name": "Usage access off (Android)",
+  "route": "/p/sf/screen-time?state=android-denied",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "sf_screentime",
+  "state": "android · not allowed",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review.",
+  "header": {
+    "t": "header",
+    "title": "Screen Time",
+    "left": "back",
+    "pill": "Optional"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "info",
+      "text": "Usage access is still off."
+    },
+    {
+      "t": "title",
+      "text": "Self-report works just as well.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "We’ll ask for a quick estimate in your evening check-in. You can connect later in Account → ScrollFree.",
+      "tone": "muted"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue with self-report",
+      "action": {
+        "type": "back"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Open settings",
+      "action": {
+        "type": "os_settings"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: sf_screentime_denied in this spec (same copy, Android wording in the banner)"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Continue with self-report",
+      "path": "footer[0]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Open settings",
+      "path": "footer[1]",
+      "action": {
+        "type": "os_settings"
+      },
+      "summary": "os_settings"
+    }
+  ]
+}

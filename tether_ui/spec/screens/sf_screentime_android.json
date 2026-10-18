@@ -1,0 +1,168 @@
+{
+  "id": "sf_screentime_android",
+  "name": "Connect usage access (Android)",
+  "route": "/p/sf/screen-time?state=android",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "sf_screentime",
+  "state": "android",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review. Android has no permission prompt for usage access; the person turns it on in Settings and the app checks again on return.",
+  "header": {
+    "t": "header",
+    "title": "Screen Time",
+    "left": "back",
+    "pill": "Optional"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "◷",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "See real totals, if you want.",
+      "size": "m",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Tether reads daily totals by category only. Never apps’ content, messages or contacts.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Reads",
+          "Minutes per category"
+        ],
+        [
+          "Never reads",
+          "Content, messages, contacts"
+        ],
+        [
+          "Turn off",
+          "Anytime in Account"
+        ]
+      ]
+    },
+    {
+      "t": "checklist",
+      "items": [
+        {
+          "label": "Tap Open settings"
+        },
+        {
+          "label": "Find Tether Health"
+        },
+        {
+          "label": "Turn on “Permit usage access”"
+        }
+      ],
+      "label": "Android asks in Settings"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Open settings",
+      "action": {
+        "type": "branch",
+        "question": "Android usage access (checked on return)",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Allowed",
+            "action": {
+              "type": "toast",
+              "value": "Usage access on",
+              "then": {
+                "type": "back"
+              }
+            }
+          },
+          {
+            "label": "Not allowed",
+            "action": {
+              "type": "replace",
+              "to": "sf_screentime_android_denied"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Not now",
+      "action": {
+        "type": "back"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: sf_screentime in this spec; android/.../unplug/UsageReader.kt (usage access, checked on resume)"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Open settings",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Android usage access (checked on return)",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Allowed",
+            "action": {
+              "type": "toast",
+              "value": "Usage access on",
+              "then": {
+                "type": "back"
+              }
+            }
+          },
+          {
+            "label": "Not allowed",
+            "action": {
+              "type": "replace",
+              "to": "sf_screentime_android_denied"
+            }
+          }
+        ]
+      },
+      "summary": "branch: Android usage access (checked on return) → Allowed: toast “Usage access on” then back | Not allowed: replace → sf_screentime_android_denied"
+    },
+    {
+      "element": "Not now",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "id": "sf_unplug_session_active",
+  "name": "Focus session running",
+  "route": "/p/sf/unplug/session/active",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review. Close leaves the session running. The session ends by itself at the end time (see Session complete).",
+  "header": {
+    "t": "header",
+    "title": "Focus session",
+    "left": "close",
+    "pill": "Strict"
+  },
+  "body": [
+    {
+      "t": "timer",
+      "value": "32:18",
+      "label": "left of 45 min · until 3:45 PM"
+    },
+    {
+      "t": "text",
+      "text": "Video apps and Feeds are paused. Tether, phone calls and emergency calls stay open.",
+      "tone": "body",
+      "align": "center"
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "Urge to check?",
+      "text": "Take 60 seconds first",
+      "cta": {
+        "t": "button",
+        "label": "Pause 60",
+        "action": {
+          "type": "push",
+          "to": "sf_pause"
+        },
+        "variant": "rescue",
+        "arrow": false,
+        "small": true
+      }
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "End early",
+      "action": {
+        "type": "sheet",
+        "to": "sf_unplug_session_end"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: lib/unplug/screens/unplug_screen_g.dart"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Pause 60",
+      "path": "body[2].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_pause"
+      },
+      "summary": "push → sf_pause"
+    },
+    {
+      "element": "End early",
+      "path": "footer[0]",
+      "action": {
+        "type": "sheet",
+        "to": "sf_unplug_session_end"
+      },
+      "summary": "sheet → sf_unplug_session_end"
+    }
+  ]
+}

@@ -66,6 +66,8 @@ abstract final class TRules {
   static const redSymptoms = ['Can’t speak in full sentences'];
   static const selfHarm = ['Thoughts of harming myself'];
   static const manualRanges = <String, (double, double)>{'A1C': (3, 20), 'LDL': (10, 400), 'eGFR': (1, 150), 'Glucose': (20, 600)};
+  static const unplugSentence = 'I can come back to this later';
+  static const unplugSum = (a: 7, b: 5);
 
   /// Returns the outcome label for [rule], or null when inputs are missing.
   static String? decide(String rule, Map<String, Object?> v) {
@@ -104,6 +106,14 @@ abstract final class TRules {
         if (value == null) return null;
         final range = manualRanges[test] ?? (0.0, double.infinity);
         return (value < range.$1 || value > range.$2) ? 'Outside expected range' : 'Valid';
+      case 'sf.unplug.reason':
+        final note = v['sf_unplug_session_end.note']?.toString().trim() ?? '';
+        return (_list(v['sf_unplug_session_end.reason']).isNotEmpty || note.isNotEmpty) ? 'Reason given' : 'No reason yet';
+      case 'sf.unplug.sentence':
+        String norm(Object? s) => (s?.toString() ?? '').toLowerCase().trim().replaceAll(RegExp(r'\s+'), ' ').replaceAll(RegExp(r'[.!]+$'), '');
+        return norm(v['sf_unplug_gate_commit.sentence']) == norm(unplugSentence) ? 'Step done' : 'Step not done';
+      case 'sf.unplug.sum':
+        return _num(v['sf_unplug_gate_sum.answer']) == (unplugSum.a + unplugSum.b) ? 'Step done' : 'Step not done';
     }
     return null;
   }

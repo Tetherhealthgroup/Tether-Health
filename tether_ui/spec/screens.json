@@ -12180,13 +12180,13 @@
       },
       {
         "t": "title",
-        "text": "See real totals, if you want.",
+        "text": "See your Screen Time here, if you want.",
         "size": "m",
         "align": "center"
       },
       {
         "t": "text",
-        "text": "Tether reads daily totals by category only. Never apps’ content, messages or contacts.",
+        "text": "Apple’s Screen Time shows your daily totals by category inside Tether. Tether can’t read, store or share those minutes.",
         "tone": "muted",
         "align": "center"
       },
@@ -12194,8 +12194,8 @@
         "t": "kv",
         "rows": [
           [
-            "Reads",
-            "Minutes per category"
+            "Shows",
+            "Minutes per category, on this phone"
           ],
           [
             "Never reads",
@@ -12586,6 +12586,23 @@
       {
         "t": "card",
         "variant": "plain",
+        "title": "Want firmer limits?",
+        "text": "Unplug can pause apps you choose, after limits you set. Optional.",
+        "cta": {
+          "t": "button",
+          "label": "Set up",
+          "action": {
+            "type": "push",
+            "to": "sf_unplug_intro"
+          },
+          "variant": "secondary",
+          "arrow": false,
+          "small": true
+        }
+      },
+      {
+        "t": "card",
+        "variant": "plain",
         "eyebrow": "Today’s step",
         "children": [
           {
@@ -12677,8 +12694,17 @@
         "summary": "push → sf_pause"
       },
       {
+        "element": "Set up",
+        "path": "body[2].cta[0]",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_intro"
+        },
+        "summary": "push → sf_unplug_intro"
+      },
+      {
         "element": "This week",
-        "path": "body[3].rows[0]",
+        "path": "body[4].rows[0]",
         "action": {
           "type": "push",
           "to": "sf_week"
@@ -12687,7 +12713,7 @@
       },
       {
         "element": "Had a long scroll?",
-        "path": "body[3].rows[1]",
+        "path": "body[4].rows[1]",
         "action": {
           "type": "push",
           "to": "sf_slip"
@@ -12696,7 +12722,7 @@
       },
       {
         "element": "Goal & windows",
-        "path": "body[3].rows[2]",
+        "path": "body[4].rows[2]",
         "action": {
           "type": "push",
           "to": "sf_goal"
@@ -12705,7 +12731,7 @@
       },
       {
         "element": "Buddy",
-        "path": "body[3].rows[3]",
+        "path": "body[4].rows[3]",
         "action": {
           "type": "push",
           "to": "sf_buddy"
@@ -12714,7 +12740,7 @@
       },
       {
         "element": "Program settings",
-        "path": "body[3].rows[4]",
+        "path": "body[4].rows[4]",
         "action": {
           "type": "push",
           "to": "program_settings"
@@ -26080,6 +26106,5974 @@
           "to": "hw_trends"
         },
         "summary": "push → hw_trends"
+      }
+    ]
+  },
+  "sf_unplug_intro": {
+    "id": "sf_unplug_intro",
+    "name": "Unplug intro",
+    "route": "/p/sf/unplug",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Shown before anything is switched on, so nobody later reads a number that does not exist. Pause 60 stays an intent check; Unplug is the optional lock.",
+    "header": {
+      "t": "header",
+      "title": "Unplug",
+      "left": "back",
+      "pill": "Optional"
+    },
+    "body": [
+      {
+        "t": "progtag",
+        "program": "sf",
+        "extra": "Unplug"
+      },
+      {
+        "t": "title",
+        "text": "Pause the apps you choose, when you choose.",
+        "size": "l"
+      },
+      {
+        "t": "text",
+        "text": "Unplug is optional. It adds a pause screen to apps you pick, after limits you set. Pause 60 stays the same: a moment to check in, never a lock.",
+        "tone": "muted"
+      },
+      {
+        "t": "kv",
+        "rows": [
+          [
+            "Can",
+            "Pause apps you pick, after your limits"
+          ],
+          [
+            "Can’t",
+            "See what you do inside any app"
+          ],
+          [
+            "On iPhone",
+            "Apple doesn’t share app names or minutes with Tether"
+          ],
+          [
+            "Stays",
+            "On this phone. Your app list never reaches Tether"
+          ],
+          [
+            "Never paused",
+            "Tether, phone calls and emergency calls"
+          ]
+        ]
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Set up Unplug",
+        "action": {
+          "type": "branch",
+          "question": "Platform",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "iPhone",
+              "action": {
+                "type": "push",
+                "to": "sf_unplug_auth"
+              }
+            },
+            {
+              "label": "Android",
+              "action": {
+                "type": "push",
+                "to": "sf_unplug_auth_android"
+              }
+            }
+          ]
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Not now",
+        "action": {
+          "type": "back"
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: lib/unplug/screens/unplug_screen_a.dart, lib/unplug/models/platform_ceiling.dart"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Set up Unplug",
+        "path": "footer[0]",
+        "action": {
+          "type": "branch",
+          "question": "Platform",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "iPhone",
+              "action": {
+                "type": "push",
+                "to": "sf_unplug_auth"
+              }
+            },
+            {
+              "label": "Android",
+              "action": {
+                "type": "push",
+                "to": "sf_unplug_auth_android"
+              }
+            }
+          ]
+        },
+        "summary": "branch: Platform → iPhone: push → sf_unplug_auth | Android: push → sf_unplug_auth_android"
+      },
+      {
+        "element": "Not now",
+        "path": "footer[1]",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      }
+    ]
+  },
+  "sf_unplug_auth": {
+    "id": "sf_unplug_auth",
+    "name": "Allow Screen Time",
+    "route": "/p/sf/unplug/permission",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. Then the app checks notification permission. approved → choose apps, approved with notifications off → notifications-off state, denied → denied state, unavailable → unavailable state.",
+    "header": {
+      "t": "header",
+      "title": "Unplug",
+      "left": "back",
+      "pill": "Step 1 of 3"
+    },
+    "body": [
+      {
+        "t": "illus",
+        "glyph": "◷",
+        "tone": "mint"
+      },
+      {
+        "t": "title",
+        "text": "Allow Screen Time for Unplug",
+        "size": "m",
+        "align": "center"
+      },
+      {
+        "t": "text",
+        "text": "Apple will ask you to let Tether Health use Screen Time. This lets Unplug pause apps. It doesn’t let Tether see what you do in them.",
+        "tone": "muted",
+        "align": "center"
+      },
+      {
+        "t": "kv",
+        "rows": [
+          [
+            "Lets Unplug",
+            "Pause apps you choose"
+          ],
+          [
+            "Never shares",
+            "App names, content, messages"
+          ],
+          [
+            "Turn off",
+            "Anytime in Account → ScrollFree"
+          ]
+        ]
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Continue",
+        "action": {
+          "type": "branch",
+          "question": "Screen Time authorization (iOS Family Controls, individual)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Approved",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps"
+              }
+            },
+            {
+              "label": "Approved · notifications off",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_auth_notifications"
+              }
+            },
+            {
+              "label": "Denied",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_auth_denied"
+              }
+            },
+            {
+              "label": "Unavailable",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_auth_unavailable"
+              }
+            }
+          ]
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Not now",
+        "action": {
+          "type": "back"
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module requestAuthorization(individual), PlatformAuthorizationStatus; notification permission check"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Continue",
+        "path": "footer[0]",
+        "action": {
+          "type": "branch",
+          "question": "Screen Time authorization (iOS Family Controls, individual)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Approved",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps"
+              }
+            },
+            {
+              "label": "Approved · notifications off",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_auth_notifications"
+              }
+            },
+            {
+              "label": "Denied",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_auth_denied"
+              }
+            },
+            {
+              "label": "Unavailable",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_auth_unavailable"
+              }
+            }
+          ]
+        },
+        "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Approved · notifications off: replace → sf_unplug_auth_notifications | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
+      },
+      {
+        "element": "Not now",
+        "path": "footer[1]",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      }
+    ]
+  },
+  "sf_unplug_auth_denied": {
+    "id": "sf_unplug_auth_denied",
+    "name": "Screen Time not allowed",
+    "route": "/p/sf/unplug/permission?state=denied",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_unplug_auth",
+    "state": "permission denied",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review.",
+    "header": {
+      "t": "header",
+      "title": "Unplug",
+      "left": "back",
+      "pill": "Step 1 of 3"
+    },
+    "body": [
+      {
+        "t": "banner",
+        "kind": "info",
+        "text": "Screen Time access was not allowed."
+      },
+      {
+        "t": "title",
+        "text": "Unplug needs Screen Time to pause apps.",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "Everything else in ScrollFree works without it: your goal, Pause 60 and check-ins.",
+        "tone": "muted"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Try again",
+        "action": {
+          "type": "branch",
+          "question": "Screen Time authorization (iOS Family Controls, individual)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Approved",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps"
+              }
+            },
+            {
+              "label": "Denied",
+              "action": {
+                "type": "toast",
+                "value": "Still not allowed. You can turn it on later in Settings."
+              }
+            }
+          ]
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Open phone settings",
+        "action": {
+          "type": "os_settings"
+        },
+        "variant": "secondary",
+        "arrow": false
+      },
+      {
+        "t": "link",
+        "label": "Not now",
+        "action": {
+          "type": "back"
+        },
+        "align": "center"
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAuthorizationStatus.denied"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Try again",
+        "path": "footer[0]",
+        "action": {
+          "type": "branch",
+          "question": "Screen Time authorization (iOS Family Controls, individual)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Approved",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps"
+              }
+            },
+            {
+              "label": "Denied",
+              "action": {
+                "type": "toast",
+                "value": "Still not allowed. You can turn it on later in Settings."
+              }
+            }
+          ]
+        },
+        "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: toast “Still not allowed. You can turn it on later in Settings.”"
+      },
+      {
+        "element": "Open phone settings",
+        "path": "footer[1]",
+        "action": {
+          "type": "os_settings"
+        },
+        "summary": "os_settings"
+      },
+      {
+        "element": "Not now",
+        "path": "footer[2]",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      }
+    ]
+  },
+  "sf_unplug_auth_unavailable": {
+    "id": "sf_unplug_auth_unavailable",
+    "name": "Screen Time unavailable",
+    "route": "/p/sf/unplug/permission?state=unavailable",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_unplug_auth",
+    "state": "unavailable",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review.",
+    "header": {
+      "t": "header",
+      "title": "Unplug",
+      "left": "back",
+      "pill": "Optional"
+    },
+    "body": [
+      {
+        "t": "banner",
+        "kind": "info",
+        "text": "Screen Time isn’t available on this phone."
+      },
+      {
+        "t": "title",
+        "text": "Unplug can’t run here.",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "This can happen when Screen Time is managed by an organization or limited by a parent. ScrollFree still works without Unplug.",
+        "tone": "muted"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Back to ScrollFree",
+        "action": {
+          "type": "back"
+        },
+        "variant": "primary",
+        "arrow": true
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAuthorizationStatus.unavailable"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Back to ScrollFree",
+        "path": "footer[0]",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      }
+    ]
+  },
+  "sf_unplug_auth_notifications": {
+    "id": "sf_unplug_auth_notifications",
+    "name": "Notifications off",
+    "route": "/p/sf/unplug/permission?state=notifications",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_unplug_auth",
+    "state": "notifications off",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Shown during setup when Screen Time / Android permissions are granted but notifications are off. Open phone settings fixes it; Check again reads the permission on return.",
+    "header": {
+      "t": "header",
+      "title": "Unplug",
+      "left": "back",
+      "pill": "Step 1 of 3"
+    },
+    "body": [
+      {
+        "t": "banner",
+        "kind": "info",
+        "text": "Notifications are off for Tether."
+      },
+      {
+        "t": "title",
+        "text": "Turn on notifications for Unplug?",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "When a pause screen sends you to Tether, including Get support, it uses a notification. With notifications off, Unplug still pauses apps, and the pause screen tells you to open Tether yourself for support.",
+        "tone": "muted"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Open phone settings",
+        "action": {
+          "type": "os_settings"
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Check again",
+        "action": {
+          "type": "branch",
+          "question": "Notification permission (checked on return)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "On (iPhone)",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps"
+              }
+            },
+            {
+              "label": "On (Android)",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps_android"
+              }
+            },
+            {
+              "label": "Still off",
+              "action": {
+                "type": "toast",
+                "value": "Notifications are still off. You can turn them on later in Settings."
+              }
+            }
+          ]
+        },
+        "variant": "secondary",
+        "arrow": false
+      },
+      {
+        "t": "link",
+        "label": "Continue without notifications",
+        "action": {
+          "type": "branch",
+          "question": "Platform",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "iPhone",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps"
+              }
+            },
+            {
+              "label": "Android",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps_android"
+              }
+            }
+          ]
+        },
+        "align": "center"
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: Notification permission check (iOS UNUserNotificationCenter, Android POST_NOTIFICATIONS)"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Open phone settings",
+        "path": "footer[0]",
+        "action": {
+          "type": "os_settings"
+        },
+        "summary": "os_settings"
+      },
+      {
+        "element": "Check again",
+        "path": "footer[1]",
+        "action": {
+          "type": "branch",
+          "question": "Notification permission (checked on return)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "On (iPhone)",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps"
+              }
+            },
+            {
+              "label": "On (Android)",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps_android"
+              }
+            },
+            {
+              "label": "Still off",
+              "action": {
+                "type": "toast",
+                "value": "Notifications are still off. You can turn them on later in Settings."
+              }
+            }
+          ]
+        },
+        "summary": "branch: Notification permission (checked on return) → On (iPhone): replace → sf_unplug_apps | On (Android): replace → sf_unplug_apps_android | Still off: toast “Notifications are still off. You can turn them on later in Settings.”"
+      },
+      {
+        "element": "Continue without notifications",
+        "path": "footer[2]",
+        "action": {
+          "type": "branch",
+          "question": "Platform",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "iPhone",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps"
+              }
+            },
+            {
+              "label": "Android",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps_android"
+              }
+            }
+          ]
+        },
+        "summary": "branch: Platform → iPhone: replace → sf_unplug_apps | Android: replace → sf_unplug_apps_android"
+      }
+    ]
+  },
+  "sf_unplug_auth_android": {
+    "id": "sf_unplug_auth_android",
+    "name": "Android permissions for Unplug",
+    "route": "/p/sf/unplug/permission?state=android",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_unplug_auth",
+    "state": "android",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Android has no single prompt: usage access and the overlay permission are separate settings pages, checked again when the person returns (authorizationStatus on resume). The foreground service needs a visible notification; its text is generic.",
+    "header": {
+      "t": "header",
+      "title": "Unplug",
+      "left": "back",
+      "pill": "Step 1 of 3"
+    },
+    "body": [
+      {
+        "t": "title",
+        "text": "Two Android settings for Unplug",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "Android asks for each one separately. You can turn either off later, and Unplug will tell you if it stops working.",
+        "tone": "muted"
+      },
+      {
+        "t": "checklist",
+        "items": [
+          {
+            "label": "Usage access",
+            "sub": "On · lets Unplug see which app is open and for how long",
+            "done": true
+          },
+          {
+            "label": "Display over other apps",
+            "sub": "Off · lets Unplug show the pause screen"
+          },
+          {
+            "label": "Notifications",
+            "sub": "Android shows a quiet “Tether is running” notice while Unplug is on"
+          }
+        ],
+        "label": "Needed"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Turn on display over apps",
+        "action": {
+          "type": "os_settings"
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Turn on usage access",
+        "action": {
+          "type": "os_settings"
+        },
+        "variant": "secondary",
+        "arrow": false
+      },
+      {
+        "t": "link",
+        "label": "I’ve turned them on",
+        "action": {
+          "type": "branch",
+          "question": "Android permissions (checked on return)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "All on",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps_android"
+              }
+            },
+            {
+              "label": "Notifications off",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_auth_notifications"
+              }
+            },
+            {
+              "label": "Missing",
+              "action": {
+                "type": "toast",
+                "value": "Unplug still needs both settings."
+              }
+            }
+          ]
+        },
+        "align": "center"
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: android/.../unplug/UnplugHost.kt (PACKAGE_USAGE_STATS, SYSTEM_ALERT_WINDOW, foreground service)"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Turn on display over apps",
+        "path": "footer[0]",
+        "action": {
+          "type": "os_settings"
+        },
+        "summary": "os_settings"
+      },
+      {
+        "element": "Turn on usage access",
+        "path": "footer[1]",
+        "action": {
+          "type": "os_settings"
+        },
+        "summary": "os_settings"
+      },
+      {
+        "element": "I’ve turned them on",
+        "path": "footer[2]",
+        "action": {
+          "type": "branch",
+          "question": "Android permissions (checked on return)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "All on",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps_android"
+              }
+            },
+            {
+              "label": "Notifications off",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_auth_notifications"
+              }
+            },
+            {
+              "label": "Missing",
+              "action": {
+                "type": "toast",
+                "value": "Unplug still needs both settings."
+              }
+            }
+          ]
+        },
+        "summary": "branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Notifications off: replace → sf_unplug_auth_notifications | Missing: toast “Unplug still needs both settings.”"
+      }
+    ]
+  },
+  "sf_unplug_apps": {
+    "id": "sf_unplug_apps",
+    "name": "Choose apps",
+    "route": "/p/sf/unplug/apps",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. iPhone host screen around Apple’s FamilyActivityPicker. presentAppPicker returns only a count; app identities stay as device-local tokens.",
+    "header": {
+      "t": "header",
+      "title": "Choose apps",
+      "left": "back",
+      "pill": "Step 2 of 3"
+    },
+    "body": [
+      {
+        "t": "title",
+        "text": "Which apps should Unplug pause?",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "Apple’s app picker opens next. Tether never sees which apps you pick: Apple keeps that choice on this phone.",
+        "tone": "muted"
+      },
+      {
+        "t": "card",
+        "variant": "mint",
+        "title": "Start small",
+        "text": "One or two apps that pull you in most is a good start. You can change this anytime."
+      },
+      {
+        "t": "text",
+        "text": "Tether, the phone dialer and emergency calling can never be chosen or paused.",
+        "tone": "small"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Open app picker",
+        "action": {
+          "type": "sheet",
+          "to": "sf_unplug_picker_ios"
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Not now",
+        "action": {
+          "type": "back"
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()",
+      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Open app picker",
+        "path": "footer[0]",
+        "action": {
+          "type": "sheet",
+          "to": "sf_unplug_picker_ios"
+        },
+        "summary": "sheet → sf_unplug_picker_ios"
+      },
+      {
+        "element": "Not now",
+        "path": "footer[1]",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      }
+    ]
+  },
+  "sf_unplug_picker_ios": {
+    "id": "sf_unplug_picker_ios",
+    "name": "Apple app picker",
+    "route": "/p/sf/unplug/apps/picker",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "sheet",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Placeholder for the system picker. In the app this sheet is Apple’s; the buttons stand for the picker’s own Done / Cancel.",
+    "header": null,
+    "body": [
+      {
+        "t": "nativeslot",
+        "id": "ios.familyActivityPicker",
+        "label": "Apple’s app picker",
+        "caption": "System sheet drawn by iOS (FamilyActivityPicker). Tether can’t style it or read the app names.",
+        "platform": "ios",
+        "height": 320
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Done",
+        "action": {
+          "type": "branch",
+          "question": "System app picker result",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Apps chosen",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps_chosen"
+              }
+            },
+            {
+              "label": "Cancelled",
+              "action": {
+                "type": "close"
+              }
+            }
+          ]
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Cancel",
+        "action": {
+          "type": "close"
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()",
+      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    ],
+    "over": "Choose apps",
+    "api": [],
+    "reference": true,
+    "actions": [
+      {
+        "element": "Done",
+        "path": "footer[0]",
+        "action": {
+          "type": "branch",
+          "question": "System app picker result",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Apps chosen",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps_chosen"
+              }
+            },
+            {
+              "label": "Cancelled",
+              "action": {
+                "type": "close"
+              }
+            }
+          ]
+        },
+        "summary": "branch: System app picker result → Apps chosen: replace → sf_unplug_apps_chosen | Cancelled: close"
+      },
+      {
+        "element": "Cancel",
+        "path": "footer[1]",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      }
+    ]
+  },
+  "sf_unplug_apps_android": {
+    "id": "sf_unplug_apps_android",
+    "name": "Choose apps (Android)",
+    "route": "/p/sf/unplug/apps?state=android",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_unplug_apps",
+    "state": "android",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Android draws its own picker (AppPickerActivity, native layout must match this screen). App names shown here are generic examples; the real list is the phone’s launchable apps.",
+    "header": {
+      "t": "header",
+      "title": "Choose apps",
+      "left": "back",
+      "pill": "Step 2 of 3"
+    },
+    "body": [
+      {
+        "t": "title",
+        "text": "Choose the apps to pause",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "This choice stays on this phone. Tether never receives it.",
+        "tone": "muted"
+      },
+      {
+        "t": "checklist",
+        "items": [
+          {
+            "label": "Short-video app",
+            "done": true
+          },
+          {
+            "label": "Photo feed app",
+            "done": true
+          },
+          {
+            "label": "Video app",
+            "done": true
+          },
+          {
+            "label": "News app"
+          },
+          {
+            "label": "Games app"
+          },
+          {
+            "label": "Shopping app"
+          }
+        ],
+        "label": "Apps on this phone"
+      },
+      {
+        "t": "text",
+        "text": "Tether, the Phone app and emergency calling aren’t in this list. They can never be paused.",
+        "tone": "small"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Done · 3 apps",
+        "action": {
+          "type": "replace",
+          "to": "sf_unplug_apps_chosen"
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "link",
+        "label": "Cancel",
+        "action": {
+          "type": "back"
+        },
+        "align": "center"
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: android/.../unplug/AppPickerActivity.kt",
+      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation. On Android the picker leaves them out of the list.",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    ],
+    "over": null,
+    "api": [],
+    "reference": true,
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Done · 3 apps",
+        "path": "footer[0]",
+        "action": {
+          "type": "replace",
+          "to": "sf_unplug_apps_chosen"
+        },
+        "summary": "replace → sf_unplug_apps_chosen"
+      },
+      {
+        "element": "Cancel",
+        "path": "footer[1]",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      }
+    ]
+  },
+  "sf_unplug_apps_chosen": {
+    "id": "sf_unplug_apps_chosen",
+    "name": "Name your groups",
+    "route": "/p/sf/unplug/apps?state=chosen",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_unplug_apps",
+    "state": "apps chosen",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. PlatformAppSelection carries only the person’s group labels and counts. Group names are device-only (not synced).",
+    "header": {
+      "t": "header",
+      "title": "Choose apps",
+      "left": "back",
+      "pill": "Step 2 of 3"
+    },
+    "body": [
+      {
+        "t": "title",
+        "text": "Name your groups",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "iPhone doesn’t tell Tether the app names, so give each group a name you’ll recognize. Group names stay on this phone.",
+        "tone": "muted"
+      },
+      {
+        "t": "list",
+        "title": "Your groups",
+        "rows": [
+          {
+            "label": "Video apps",
+            "sub": "3 apps"
+          },
+          {
+            "label": "Feeds",
+            "sub": "2 apps"
+          }
+        ]
+      },
+      {
+        "t": "field",
+        "label": "New group name",
+        "placeholder": "e.g. Games",
+        "kind": "text",
+        "key": "group_name"
+      },
+      {
+        "t": "button",
+        "label": "Add another group",
+        "action": {
+          "type": "sheet",
+          "to": "sf_unplug_picker_ios"
+        },
+        "variant": "secondary",
+        "arrow": false,
+        "small": true
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Next: limits",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_limits"
+        },
+        "variant": "primary",
+        "arrow": true
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAppSelection(groupLabels, groupAppCounts, totalApps)"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Add another group",
+        "path": "body[4]",
+        "action": {
+          "type": "sheet",
+          "to": "sf_unplug_picker_ios"
+        },
+        "summary": "sheet → sf_unplug_picker_ios"
+      },
+      {
+        "element": "Next: limits",
+        "path": "footer[0]",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_limits"
+        },
+        "summary": "push → sf_unplug_limits"
+      }
+    ]
+  },
+  "sf_unplug_limits": {
+    "id": "sf_unplug_limits",
+    "name": "Limits & pause screen",
+    "route": "/p/sf/unplug/limits",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Levels map to PlatformModuleConfig.tier (Notice 1, Pause 2, Pause + step 3, Firm 5 = no overrides). Small step maps to gate breath | commitment | puzzle. Device-only: nothing here is sent to Tether. Looser limits take effect the next day.",
+    "header": {
+      "t": "header",
+      "title": "Limits",
+      "left": "back",
+      "pill": "Step 3 of 3"
+    },
+    "body": [
+      {
+        "t": "title",
+        "text": "When should Unplug step in?",
+        "size": "m"
+      },
+      {
+        "t": "card",
+        "variant": "plain",
+        "children": [
+          {
+            "t": "slider",
+            "label": "Daily time in these apps",
+            "value": 60,
+            "min": 15,
+            "max": 240,
+            "minLabel": "15 min",
+            "maxLabel": "4 h",
+            "color": "sf",
+            "suffix": " min",
+            "key": "daily_minutes"
+          },
+          {
+            "t": "slider",
+            "label": "Opens a day",
+            "value": 20,
+            "min": 5,
+            "max": 60,
+            "minLabel": "5",
+            "maxLabel": "60",
+            "color": "sf",
+            "key": "daily_opens"
+          },
+          {
+            "t": "text",
+            "text": "On iPhone, opens are counted from pause screens shown, so the number is approximate.",
+            "tone": "small"
+          }
+        ]
+      },
+      {
+        "t": "radio",
+        "items": [
+          {
+            "label": "Notice only",
+            "sub": "Count time, no pause screen"
+          },
+          {
+            "label": "Pause screen",
+            "sub": "A pause before the app opens"
+          },
+          {
+            "label": "Pause and one small step",
+            "sub": "A breath, a typed sentence or a quick sum first",
+            "badge": "Suggested"
+          },
+          {
+            "label": "Firm",
+            "sub": "No “open anyway” until tomorrow"
+          }
+        ],
+        "selected": 2,
+        "label": "When you reach a limit",
+        "key": "level"
+      },
+      {
+        "t": "chips",
+        "options": [
+          "One breath",
+          "Type a sentence",
+          "Quick sum"
+        ],
+        "selected": [
+          "One breath"
+        ],
+        "multi": false,
+        "label": "Small step",
+        "key": "gate"
+      },
+      {
+        "t": "segmented",
+        "options": [
+          "0",
+          "1",
+          "3",
+          "5"
+        ],
+        "selected": "3",
+        "label": "“Open anyway” per day",
+        "key": "overrides"
+      },
+      {
+        "t": "text",
+        "text": "Stricter limits apply now. Looser limits start tomorrow, so one hard moment doesn’t change your plan.",
+        "tone": "small"
+      },
+      {
+        "t": "text",
+        "text": "Every pause screen has a Get support button. Tether, the phone dialer and emergency calling can never be chosen or paused.",
+        "tone": "small"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Save limits",
+        "action": {
+          "type": "submit",
+          "api": "CALL device:unplug/setThresholds+applyShield",
+          "then": {
+            "type": "toast",
+            "value": "Unplug is on",
+            "then": {
+              "type": "replace",
+              "to": "sf_unplug_home"
+            }
+          }
+        },
+        "variant": "primary",
+        "arrow": true
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformThresholds(minutes, opens), PlatformModuleConfig(tier, overrideAllowance, gate none|breath|commitment|puzzle, strict); lib/unplug/screens/unplug_screen_f.dart (tier, cool-off)",
+      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Save limits",
+        "path": "footer[0]",
+        "action": {
+          "type": "submit",
+          "api": "CALL device:unplug/setThresholds+applyShield",
+          "then": {
+            "type": "toast",
+            "value": "Unplug is on",
+            "then": {
+              "type": "replace",
+              "to": "sf_unplug_home"
+            }
+          }
+        },
+        "summary": "CALL device:unplug/setThresholds+applyShield then toast “Unplug is on” then replace → sf_unplug_home"
+      }
+    ]
+  },
+  "sf_unplug_home": {
+    "id": "sf_unplug_home",
+    "name": "Unplug",
+    "route": "/p/sf/unplug/home",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "daily",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Reached from ScrollFree home (state \"Unplug on\") and ScrollFree settings. Everything shown is read from this phone.",
+    "header": {
+      "t": "header",
+      "title": "Unplug",
+      "left": "back",
+      "pill": "On"
+    },
+    "body": [
+      {
+        "t": "card",
+        "variant": "mint",
+        "title": "Unplug is on",
+        "text": "5 apps in 2 groups · pause screen after 60 min or 20 opens"
+      },
+      {
+        "t": "card",
+        "variant": "dark",
+        "eyebrow": "Focus session",
+        "title": "Need to focus?",
+        "text": "Pause your chosen apps for a set time",
+        "cta": {
+          "t": "button",
+          "label": "Start",
+          "action": {
+            "type": "push",
+            "to": "sf_unplug_session"
+          },
+          "variant": "lime",
+          "arrow": false,
+          "small": true
+        }
+      },
+      {
+        "t": "list",
+        "title": "Settings",
+        "rows": [
+          {
+            "label": "Apps",
+            "sub": "Video apps · 3, Feeds · 2",
+            "action": {
+              "type": "push",
+              "to": "sf_unplug_apps_chosen"
+            }
+          },
+          {
+            "label": "Limits & pause screen",
+            "sub": "60 min · 20 opens · one breath first",
+            "action": {
+              "type": "push",
+              "to": "sf_unplug_limits"
+            }
+          },
+          {
+            "label": "Preview the pause screen",
+            "sub": "iPhone shield or Android overlay",
+            "action": {
+              "type": "branch",
+              "question": "Platform",
+              "on": null,
+              "decide": null,
+              "cases": [
+                {
+                  "label": "iPhone",
+                  "action": {
+                    "type": "push",
+                    "to": "sf_unplug_shield"
+                  }
+                },
+                {
+                  "label": "Android",
+                  "action": {
+                    "type": "push",
+                    "to": "sf_unplug_overlay"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "label": "Tracking check",
+            "sub": "All checks pass",
+            "action": {
+              "type": "push",
+              "to": "sf_unplug_health"
+            }
+          }
+        ]
+      },
+      {
+        "t": "list",
+        "rows": [
+          {
+            "label": "How Unplug works",
+            "sub": "What it can and can’t see",
+            "action": {
+              "type": "push",
+              "to": "sf_unplug_intro"
+            }
+          },
+          {
+            "label": "Turn off Unplug",
+            "sub": "Paused apps open normally again",
+            "action": {
+              "type": "sheet",
+              "to": "sf_unplug_off"
+            },
+            "danger": true
+          }
+        ]
+      }
+    ],
+    "footer": [],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Start",
+        "path": "body[1].cta[0]",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_session"
+        },
+        "summary": "push → sf_unplug_session"
+      },
+      {
+        "element": "Apps",
+        "path": "body[2].rows[0]",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_apps_chosen"
+        },
+        "summary": "push → sf_unplug_apps_chosen"
+      },
+      {
+        "element": "Limits & pause screen",
+        "path": "body[2].rows[1]",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_limits"
+        },
+        "summary": "push → sf_unplug_limits"
+      },
+      {
+        "element": "Preview the pause screen",
+        "path": "body[2].rows[2]",
+        "action": {
+          "type": "branch",
+          "question": "Platform",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "iPhone",
+              "action": {
+                "type": "push",
+                "to": "sf_unplug_shield"
+              }
+            },
+            {
+              "label": "Android",
+              "action": {
+                "type": "push",
+                "to": "sf_unplug_overlay"
+              }
+            }
+          ]
+        },
+        "summary": "branch: Platform → iPhone: push → sf_unplug_shield | Android: push → sf_unplug_overlay"
+      },
+      {
+        "element": "Tracking check",
+        "path": "body[2].rows[3]",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_health"
+        },
+        "summary": "push → sf_unplug_health"
+      },
+      {
+        "element": "How Unplug works",
+        "path": "body[3].rows[0]",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_intro"
+        },
+        "summary": "push → sf_unplug_intro"
+      },
+      {
+        "element": "Turn off Unplug",
+        "path": "body[3].rows[1]",
+        "action": {
+          "type": "sheet",
+          "to": "sf_unplug_off"
+        },
+        "summary": "sheet → sf_unplug_off"
+      }
+    ]
+  },
+  "sf_unplug_session": {
+    "id": "sf_unplug_session",
+    "name": "Start a focus session",
+    "route": "/p/sf/unplug/session",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "rescue",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Device-only. Tether (and so Rescue and 988), the phone dialer and emergency calling are never paused.",
+    "header": {
+      "t": "header",
+      "title": "Focus session",
+      "left": "back"
+    },
+    "body": [
+      {
+        "t": "title",
+        "text": "Pause your apps for a while.",
+        "size": "m"
+      },
+      {
+        "t": "chips",
+        "options": [
+          "25 min",
+          "45 min",
+          "60 min",
+          "90 min"
+        ],
+        "selected": [
+          "45 min"
+        ],
+        "multi": false,
+        "label": "How long",
+        "key": "duration"
+      },
+      {
+        "t": "radio",
+        "items": [
+          {
+            "label": "Only my chosen apps",
+            "sub": "Video apps, Feeds"
+          },
+          {
+            "label": "Everything except apps I allow",
+            "sub": "Tether, phone calls and emergency calls always stay open"
+          }
+        ],
+        "selected": 0,
+        "label": "What to pause",
+        "key": "scope"
+      },
+      {
+        "t": "card",
+        "variant": "plain",
+        "children": [
+          {
+            "t": "toggle",
+            "label": "Strict",
+            "sub": "Ending early asks for a reason, kept on this phone",
+            "on": false,
+            "key": "strict"
+          }
+        ]
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Start session",
+        "action": {
+          "type": "submit",
+          "api": "CALL device:unplug/startSession",
+          "then": {
+            "type": "replace",
+            "to": "sf_unplug_session_active"
+          }
+        },
+        "variant": "primary",
+        "arrow": true
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module startSession(durationSeconds, PlatformShieldScope selectedApps|everythingExceptAllowlist, strict)",
+      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Start session",
+        "path": "footer[0]",
+        "action": {
+          "type": "submit",
+          "api": "CALL device:unplug/startSession",
+          "then": {
+            "type": "replace",
+            "to": "sf_unplug_session_active"
+          }
+        },
+        "summary": "CALL device:unplug/startSession then replace → sf_unplug_session_active"
+      }
+    ]
+  },
+  "sf_unplug_session_active": {
+    "id": "sf_unplug_session_active",
+    "name": "Focus session running",
+    "route": "/p/sf/unplug/session/active",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "rescue",
+    "kind": "fullscreen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Close leaves the session running. The session ends by itself at the end time (see Session complete).",
+    "header": {
+      "t": "header",
+      "title": "Focus session",
+      "left": "close",
+      "pill": "Strict"
+    },
+    "body": [
+      {
+        "t": "timer",
+        "value": "32:18",
+        "label": "left of 45 min · until 3:45 PM"
+      },
+      {
+        "t": "text",
+        "text": "Video apps and Feeds are paused. Tether, phone calls and emergency calls stay open.",
+        "tone": "body",
+        "align": "center"
+      },
+      {
+        "t": "card",
+        "variant": "coral",
+        "title": "Urge to check?",
+        "text": "Take 60 seconds first",
+        "cta": {
+          "t": "button",
+          "label": "Pause 60",
+          "action": {
+            "type": "push",
+            "to": "sf_pause"
+          },
+          "variant": "rescue",
+          "arrow": false,
+          "small": true
+        }
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "End early",
+        "action": {
+          "type": "sheet",
+          "to": "sf_unplug_session_end"
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: lib/unplug/screens/unplug_screen_g.dart"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Close",
+        "path": "header.left",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      },
+      {
+        "element": "Pause 60",
+        "path": "body[2].cta[0]",
+        "action": {
+          "type": "push",
+          "to": "sf_pause"
+        },
+        "summary": "push → sf_pause"
+      },
+      {
+        "element": "End early",
+        "path": "footer[0]",
+        "action": {
+          "type": "sheet",
+          "to": "sf_unplug_session_end"
+        },
+        "summary": "sheet → sf_unplug_session_end"
+      }
+    ]
+  },
+  "sf_unplug_session_end": {
+    "id": "sf_unplug_session_end",
+    "name": "End session early",
+    "route": "/p/sf/unplug/session/end",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "rescue",
+    "kind": "sheet",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. End session works only after a reason is chosen or typed (rule sf.unplug.reason).",
+    "header": null,
+    "body": [
+      {
+        "t": "title",
+        "text": "End your session early?",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "This is a strict session. Choose or type a reason; it is kept with the session on this phone. Nothing resets.",
+        "tone": "muted"
+      },
+      {
+        "t": "chips",
+        "options": [
+          "Need an app for work",
+          "Expecting a message",
+          "Changed my mind",
+          "Other"
+        ],
+        "selected": [],
+        "multi": false,
+        "label": "Reason",
+        "key": "reason"
+      },
+      {
+        "t": "field",
+        "label": "Anything to add?",
+        "placeholder": "Optional",
+        "kind": "multiline",
+        "key": "note"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "End session",
+        "action": {
+          "type": "branch",
+          "question": "Strict session: reason given?",
+          "on": null,
+          "decide": "sf.unplug.reason",
+          "cases": [
+            {
+              "label": "Reason given",
+              "action": {
+                "type": "submit",
+                "api": "CALL device:unplug/endSession",
+                "then": {
+                  "type": "replace",
+                  "to": "sf_unplug_session_done_early"
+                }
+              }
+            },
+            {
+              "label": "No reason yet",
+              "action": {
+                "type": "toast",
+                "value": "Choose or type a reason to end a strict session."
+              }
+            }
+          ]
+        },
+        "variant": "danger",
+        "arrow": false
+      },
+      {
+        "t": "button",
+        "label": "Keep going",
+        "action": {
+          "type": "close"
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession(overrideReason)"
+    ],
+    "over": "Focus session",
+    "api": [],
+    "actions": [
+      {
+        "element": "End session",
+        "path": "footer[0]",
+        "action": {
+          "type": "branch",
+          "question": "Strict session: reason given?",
+          "on": null,
+          "decide": "sf.unplug.reason",
+          "cases": [
+            {
+              "label": "Reason given",
+              "action": {
+                "type": "submit",
+                "api": "CALL device:unplug/endSession",
+                "then": {
+                  "type": "replace",
+                  "to": "sf_unplug_session_done_early"
+                }
+              }
+            },
+            {
+              "label": "No reason yet",
+              "action": {
+                "type": "toast",
+                "value": "Choose or type a reason to end a strict session."
+              }
+            }
+          ]
+        },
+        "summary": "decide sf.unplug.reason: Strict session: reason given? → Reason given: CALL device:unplug/endSession then replace → sf_unplug_session_done_early | No reason yet: toast “Choose or type a reason to end a strict session.”"
+      },
+      {
+        "element": "Keep going",
+        "path": "footer[1]",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      }
+    ]
+  },
+  "sf_unplug_session_done": {
+    "id": "sf_unplug_session_done",
+    "name": "Session complete",
+    "route": "/p/sf/unplug/session/done",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "milestone",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Opened from the session-finished notification (generic text) or when the timer ends in the app.",
+    "header": {
+      "t": "header",
+      "title": "Focus session",
+      "left": "none"
+    },
+    "body": [
+      {
+        "t": "illus",
+        "glyph": "✓",
+        "tone": "mint"
+      },
+      {
+        "t": "big",
+        "value": "45",
+        "unit": "min",
+        "caption": "Session complete · your apps are open again"
+      },
+      {
+        "t": "text",
+        "text": "Want to make this a habit? You can start one from ScrollFree anytime.",
+        "tone": "muted",
+        "align": "center"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Done",
+        "action": {
+          "type": "replace",
+          "to": "sf_unplug_home"
+        },
+        "variant": "primary",
+        "arrow": true
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession()"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Done",
+        "path": "footer[0]",
+        "action": {
+          "type": "replace",
+          "to": "sf_unplug_home"
+        },
+        "summary": "replace → sf_unplug_home"
+      }
+    ]
+  },
+  "sf_unplug_session_done_early": {
+    "id": "sf_unplug_session_done_early",
+    "name": "Session ended early",
+    "route": "/p/sf/unplug/session/done?state=early",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "milestone",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_unplug_session_done",
+    "state": "ended early",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review.",
+    "header": {
+      "t": "header",
+      "title": "Focus session",
+      "left": "none"
+    },
+    "body": [
+      {
+        "t": "big",
+        "value": "18",
+        "unit": "min",
+        "caption": "Ended early · your apps are open again"
+      },
+      {
+        "t": "kv",
+        "rows": [
+          [
+            "Reason",
+            "Expecting a message"
+          ],
+          [
+            "Kept",
+            "On this phone only"
+          ]
+        ]
+      },
+      {
+        "t": "text",
+        "text": "Nothing resets. 18 focused minutes still count.",
+        "tone": "muted"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Done",
+        "action": {
+          "type": "replace",
+          "to": "sf_unplug_home"
+        },
+        "variant": "primary",
+        "arrow": true
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession(overrideReason)"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Done",
+        "path": "footer[0]",
+        "action": {
+          "type": "replace",
+          "to": "sf_unplug_home"
+        },
+        "summary": "replace → sf_unplug_home"
+      }
+    ]
+  },
+  "sf_unplug_shield": {
+    "id": "sf_unplug_shield",
+    "name": "Pause screen (iPhone shield)",
+    "route": "/system/unplug/shield",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "rescue",
+    "kind": "fullscreen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": true,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield. Take a breath posts a local notification with two actions: Take my breath and Get support (opens Rescue without the small step). Needs device validation.",
+    "header": null,
+    "body": [
+      {
+        "t": "spacer",
+        "h": 60
+      },
+      {
+        "t": "illus",
+        "glyph": "T",
+        "tone": "dark"
+      },
+      {
+        "t": "title",
+        "text": "Paused for a moment",
+        "size": "l",
+        "align": "center"
+      },
+      {
+        "t": "text",
+        "text": "You asked to slow this one down. Video apps is on your list. 2 of 3 “open anyway” left today. Open Tether for support.",
+        "tone": "body",
+        "align": "center"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Take a breath",
+        "action": {
+          "type": "toast",
+          "value": "Notification: open Tether to take your breath, or get support",
+          "then": {
+            "type": "branch",
+            "question": "Notification action",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Take my breath",
+                "action": {
+                  "type": "push",
+                  "to": "sf_unplug_gate"
+                }
+              },
+              {
+                "label": "Get support",
+                "action": {
+                  "type": "sheet",
+                  "to": "rescue_pick"
+                }
+              }
+            ]
+          }
+        },
+        "variant": "lime",
+        "arrow": false
+      },
+      {
+        "t": "link",
+        "label": "Open anyway",
+        "action": {
+          "type": "toast",
+          "value": "Opened · 1 “open anyway” left today",
+          "then": {
+            "type": "close"
+          }
+        },
+        "align": "center"
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift, ios/UnplugShieldAction/UnplugShieldActionExtension.swift, assets/unplug/intercept_tokens.json",
+      "A shield button cannot open Tether directly: it posts a local notification; tapping it opens Tether. If notifications are off, the subtitle tells the person to open Tether for support. Needs device validation. The notification has two actions: Take my breath (opens the small step) and Get support (opens Rescue directly, without the small step). Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    ],
+    "over": null,
+    "api": [],
+    "reference": true,
+    "actions": [
+      {
+        "element": "Take a breath",
+        "path": "footer[0]",
+        "action": {
+          "type": "toast",
+          "value": "Notification: open Tether to take your breath, or get support",
+          "then": {
+            "type": "branch",
+            "question": "Notification action",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Take my breath",
+                "action": {
+                  "type": "push",
+                  "to": "sf_unplug_gate"
+                }
+              },
+              {
+                "label": "Get support",
+                "action": {
+                  "type": "sheet",
+                  "to": "rescue_pick"
+                }
+              }
+            ]
+          }
+        },
+        "summary": "toast “Notification: open Tether to take your breath, or get support” then branch: Notification action → Take my breath: push → sf_unplug_gate | Get support: sheet → rescue_pick"
+      },
+      {
+        "element": "Open anyway",
+        "path": "footer[1]",
+        "action": {
+          "type": "toast",
+          "value": "Opened · 1 “open anyway” left today",
+          "then": {
+            "type": "close"
+          }
+        },
+        "summary": "toast “Opened · 1 “open anyway” left today” then close"
+      }
+    ]
+  },
+  "sf_unplug_shield_firm": {
+    "id": "sf_unplug_shield_firm",
+    "name": "Pause screen (iPhone shield, firm)",
+    "route": "/system/unplug/shield?state=firm",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "rescue",
+    "kind": "fullscreen",
+    "tab": null,
+    "variantOf": "sf_unplug_shield",
+    "state": "no “open anyway” left",
+    "dark": true,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield. The second button is Get support: it posts a local notification that opens Rescue. Needs device validation.",
+    "header": null,
+    "body": [
+      {
+        "t": "spacer",
+        "h": 60
+      },
+      {
+        "t": "illus",
+        "glyph": "T",
+        "tone": "dark"
+      },
+      {
+        "t": "title",
+        "text": "Paused for a moment",
+        "size": "l",
+        "align": "center"
+      },
+      {
+        "t": "text",
+        "text": "You asked to slow this one down. Video apps is on your list. No “open anyway” left today. Open Tether for support.",
+        "tone": "body",
+        "align": "center"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Close the app",
+        "action": {
+          "type": "toast",
+          "value": "The app stays closed.",
+          "then": {
+            "type": "close"
+          }
+        },
+        "variant": "lime",
+        "arrow": false
+      },
+      {
+        "t": "link",
+        "label": "Get support",
+        "action": {
+          "type": "toast",
+          "value": "Notification: tap to open Rescue in Tether",
+          "then": {
+            "type": "sheet",
+            "to": "rescue_pick"
+          }
+        },
+        "align": "center"
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift",
+      "A shield button cannot open Tether directly: it posts a local notification; tapping it opens Tether. If notifications are off, the subtitle tells the person to open Tether for support. Needs device validation. The second shield button is always Get support when no “open anyway” is left. Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    ],
+    "over": null,
+    "api": [],
+    "reference": true,
+    "actions": [
+      {
+        "element": "Close the app",
+        "path": "footer[0]",
+        "action": {
+          "type": "toast",
+          "value": "The app stays closed.",
+          "then": {
+            "type": "close"
+          }
+        },
+        "summary": "toast “The app stays closed.” then close"
+      },
+      {
+        "element": "Get support",
+        "path": "footer[1]",
+        "action": {
+          "type": "toast",
+          "value": "Notification: tap to open Rescue in Tether",
+          "then": {
+            "type": "sheet",
+            "to": "rescue_pick"
+          }
+        },
+        "summary": "toast “Notification: tap to open Rescue in Tether” then sheet → rescue_pick"
+      }
+    ]
+  },
+  "sf_unplug_overlay": {
+    "id": "sf_unplug_overlay",
+    "name": "Pause screen (Android overlay)",
+    "route": "/system/unplug/overlay",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "rescue",
+    "kind": "fullscreen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": true,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Drawn over the opened app by the foreground service (SYSTEM_ALERT_WINDOW), 0.5–1.5 s after it opens. Get support opens Tether at Rescue. The typed-sentence and quick-sum steps use the same layouts as the in-app small-step states. Not an app route: reference for the native overlay.",
+    "header": null,
+    "body": [
+      {
+        "t": "spacer",
+        "h": 24
+      },
+      {
+        "t": "title",
+        "text": "Paused for a moment",
+        "size": "l",
+        "align": "center"
+      },
+      {
+        "t": "text",
+        "text": "You asked to slow this one down. Video apps is on your list.",
+        "tone": "body",
+        "align": "center"
+      },
+      {
+        "t": "ring",
+        "value": "30",
+        "label": "SECONDS",
+        "palette": "teal"
+      },
+      {
+        "t": "text",
+        "text": "Breathe with the circle. 2 of 3 “open anyway” left today.",
+        "tone": "small",
+        "align": "center"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Close the app",
+        "action": {
+          "type": "toast",
+          "value": "The app stays closed.",
+          "then": {
+            "type": "close"
+          }
+        },
+        "variant": "lime",
+        "arrow": false
+      },
+      {
+        "t": "button",
+        "label": "Get support",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "variant": "rescue",
+        "arrow": false
+      },
+      {
+        "t": "link",
+        "label": "Open anyway",
+        "action": {
+          "type": "toast",
+          "value": "Opened · 1 “open anyway” left today",
+          "then": {
+            "type": "close"
+          }
+        },
+        "align": "center"
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: android/.../unplug/InterceptOverlay.kt, assets/unplug/intercept_tokens.json",
+      "Native requirement: Get support opens Tether at Rescue and is always shown, whatever the level or overrides left. Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    ],
+    "over": null,
+    "api": [],
+    "reference": true,
+    "actions": [
+      {
+        "element": "Close the app",
+        "path": "footer[0]",
+        "action": {
+          "type": "toast",
+          "value": "The app stays closed.",
+          "then": {
+            "type": "close"
+          }
+        },
+        "summary": "toast “The app stays closed.” then close"
+      },
+      {
+        "element": "Get support",
+        "path": "footer[1]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
+      },
+      {
+        "element": "Open anyway",
+        "path": "footer[2]",
+        "action": {
+          "type": "toast",
+          "value": "Opened · 1 “open anyway” left today",
+          "then": {
+            "type": "close"
+          }
+        },
+        "summary": "toast “Opened · 1 “open anyway” left today” then close"
+      }
+    ]
+  },
+  "sf_unplug_gate": {
+    "id": "sf_unplug_gate",
+    "name": "Small step: one breath",
+    "route": "/p/sf/unplug/step",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "rescue",
+    "kind": "fullscreen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. The shield action hands off to the app because the step needs input the extension has no time or UI for. Clearing it grants the pass length the level allows. Get support opens Rescue without doing the step.",
+    "header": {
+      "t": "header",
+      "title": "Small step",
+      "left": "close",
+      "pill": "Unplug"
+    },
+    "body": [
+      {
+        "t": "title",
+        "text": "One breath, then decide.",
+        "size": "l"
+      },
+      {
+        "t": "ring",
+        "value": "30",
+        "label": "SECONDS",
+        "palette": "teal"
+      },
+      {
+        "t": "text",
+        "text": "Breathe in as the circle grows, out as it shrinks.",
+        "tone": "body",
+        "align": "center"
+      },
+      {
+        "t": "card",
+        "variant": "coral",
+        "title": "Need help right now?",
+        "text": "Rescue opens in one tap.",
+        "cta": {
+          "t": "button",
+          "label": "Get support",
+          "action": {
+            "type": "sheet",
+            "to": "rescue_pick"
+          },
+          "variant": "rescue",
+          "arrow": false,
+          "small": true
+        }
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Keep it closed",
+        "action": {
+          "type": "toast",
+          "value": "Nice. The app stays closed.",
+          "then": {
+            "type": "reset",
+            "to": "sf_home"
+          }
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "link",
+        "label": "Open it for 10 minutes",
+        "action": {
+          "type": "toast",
+          "value": "Open for 10 minutes. The pause screen comes back after.",
+          "then": {
+            "type": "reset",
+            "to": "sf_home"
+          }
+        },
+        "align": "center"
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.breath; lib/unplug/screens/unplug_screen_d.dart"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Close",
+        "path": "header.left",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      },
+      {
+        "element": "Get support",
+        "path": "body[3].cta[0]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
+      },
+      {
+        "element": "Keep it closed",
+        "path": "footer[0]",
+        "action": {
+          "type": "toast",
+          "value": "Nice. The app stays closed.",
+          "then": {
+            "type": "reset",
+            "to": "sf_home"
+          }
+        },
+        "summary": "toast “Nice. The app stays closed.” then reset → sf_home"
+      },
+      {
+        "element": "Open it for 10 minutes",
+        "path": "footer[1]",
+        "action": {
+          "type": "toast",
+          "value": "Open for 10 minutes. The pause screen comes back after.",
+          "then": {
+            "type": "reset",
+            "to": "sf_home"
+          }
+        },
+        "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home"
+      }
+    ]
+  },
+  "sf_unplug_gate_commit": {
+    "id": "sf_unplug_gate_commit",
+    "name": "Small step: type a sentence",
+    "route": "/p/sf/unplug/step?state=sentence",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "rescue",
+    "kind": "fullscreen",
+    "tab": null,
+    "variantOf": "sf_unplug_gate",
+    "state": "typed sentence",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Open it works only after the sentence is typed in full (rule sf.unplug.sentence).",
+    "header": {
+      "t": "header",
+      "title": "Small step",
+      "left": "close",
+      "pill": "Unplug"
+    },
+    "body": [
+      {
+        "t": "title",
+        "text": "Type it out, then decide.",
+        "size": "l"
+      },
+      {
+        "t": "text",
+        "text": "“I can come back to this later”",
+        "tone": "body"
+      },
+      {
+        "t": "field",
+        "label": "Type the sentence",
+        "placeholder": "I can come back to this later",
+        "kind": "text",
+        "key": "sentence"
+      },
+      {
+        "t": "card",
+        "variant": "coral",
+        "title": "Need help right now?",
+        "text": "Rescue opens in one tap.",
+        "cta": {
+          "t": "button",
+          "label": "Get support",
+          "action": {
+            "type": "sheet",
+            "to": "rescue_pick"
+          },
+          "variant": "rescue",
+          "arrow": false,
+          "small": true
+        }
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Keep it closed",
+        "action": {
+          "type": "toast",
+          "value": "Nice. The app stays closed.",
+          "then": {
+            "type": "reset",
+            "to": "sf_home"
+          }
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "link",
+        "label": "Open it for 10 minutes",
+        "action": {
+          "type": "branch",
+          "question": "Small step done?",
+          "on": null,
+          "decide": "sf.unplug.sentence",
+          "cases": [
+            {
+              "label": "Step done",
+              "action": {
+                "type": "toast",
+                "value": "Open for 10 minutes. The pause screen comes back after.",
+                "then": {
+                  "type": "reset",
+                  "to": "sf_home"
+                }
+              }
+            },
+            {
+              "label": "Step not done",
+              "action": {
+                "type": "toast",
+                "value": "Type the whole sentence first."
+              }
+            }
+          ]
+        },
+        "align": "center"
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.commitment"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Close",
+        "path": "header.left",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      },
+      {
+        "element": "Get support",
+        "path": "body[3].cta[0]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
+      },
+      {
+        "element": "Keep it closed",
+        "path": "footer[0]",
+        "action": {
+          "type": "toast",
+          "value": "Nice. The app stays closed.",
+          "then": {
+            "type": "reset",
+            "to": "sf_home"
+          }
+        },
+        "summary": "toast “Nice. The app stays closed.” then reset → sf_home"
+      },
+      {
+        "element": "Open it for 10 minutes",
+        "path": "footer[1]",
+        "action": {
+          "type": "branch",
+          "question": "Small step done?",
+          "on": null,
+          "decide": "sf.unplug.sentence",
+          "cases": [
+            {
+              "label": "Step done",
+              "action": {
+                "type": "toast",
+                "value": "Open for 10 minutes. The pause screen comes back after.",
+                "then": {
+                  "type": "reset",
+                  "to": "sf_home"
+                }
+              }
+            },
+            {
+              "label": "Step not done",
+              "action": {
+                "type": "toast",
+                "value": "Type the whole sentence first."
+              }
+            }
+          ]
+        },
+        "summary": "decide sf.unplug.sentence: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Type the whole sentence first.”"
+      }
+    ]
+  },
+  "sf_unplug_gate_sum": {
+    "id": "sf_unplug_gate_sum",
+    "name": "Small step: quick sum",
+    "route": "/p/sf/unplug/step?state=sum",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "rescue",
+    "kind": "fullscreen",
+    "tab": null,
+    "variantOf": "sf_unplug_gate",
+    "state": "quick sum",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Open it works only after the right answer is typed (rule sf.unplug.sum).",
+    "header": {
+      "t": "header",
+      "title": "Small step",
+      "left": "close",
+      "pill": "Unplug"
+    },
+    "body": [
+      {
+        "t": "title",
+        "text": "A quick sum, then decide.",
+        "size": "l"
+      },
+      {
+        "t": "big",
+        "value": "7 + 5"
+      },
+      {
+        "t": "field",
+        "label": "Answer",
+        "placeholder": "?",
+        "kind": "number",
+        "key": "answer"
+      },
+      {
+        "t": "card",
+        "variant": "coral",
+        "title": "Need help right now?",
+        "text": "Rescue opens in one tap.",
+        "cta": {
+          "t": "button",
+          "label": "Get support",
+          "action": {
+            "type": "sheet",
+            "to": "rescue_pick"
+          },
+          "variant": "rescue",
+          "arrow": false,
+          "small": true
+        }
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Keep it closed",
+        "action": {
+          "type": "toast",
+          "value": "Nice. The app stays closed.",
+          "then": {
+            "type": "reset",
+            "to": "sf_home"
+          }
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "link",
+        "label": "Open it for 10 minutes",
+        "action": {
+          "type": "branch",
+          "question": "Small step done?",
+          "on": null,
+          "decide": "sf.unplug.sum",
+          "cases": [
+            {
+              "label": "Step done",
+              "action": {
+                "type": "toast",
+                "value": "Open for 10 minutes. The pause screen comes back after.",
+                "then": {
+                  "type": "reset",
+                  "to": "sf_home"
+                }
+              }
+            },
+            {
+              "label": "Step not done",
+              "action": {
+                "type": "toast",
+                "value": "Answer the sum first."
+              }
+            }
+          ]
+        },
+        "align": "center"
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.puzzle"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Close",
+        "path": "header.left",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      },
+      {
+        "element": "Get support",
+        "path": "body[3].cta[0]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
+      },
+      {
+        "element": "Keep it closed",
+        "path": "footer[0]",
+        "action": {
+          "type": "toast",
+          "value": "Nice. The app stays closed.",
+          "then": {
+            "type": "reset",
+            "to": "sf_home"
+          }
+        },
+        "summary": "toast “Nice. The app stays closed.” then reset → sf_home"
+      },
+      {
+        "element": "Open it for 10 minutes",
+        "path": "footer[1]",
+        "action": {
+          "type": "branch",
+          "question": "Small step done?",
+          "on": null,
+          "decide": "sf.unplug.sum",
+          "cases": [
+            {
+              "label": "Step done",
+              "action": {
+                "type": "toast",
+                "value": "Open for 10 minutes. The pause screen comes back after.",
+                "then": {
+                  "type": "reset",
+                  "to": "sf_home"
+                }
+              }
+            },
+            {
+              "label": "Step not done",
+              "action": {
+                "type": "toast",
+                "value": "Answer the sum first."
+              }
+            }
+          ]
+        },
+        "summary": "decide sf.unplug.sum: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Answer the sum first.”"
+      }
+    ]
+  },
+  "sf_unplug_health": {
+    "id": "sf_unplug_health",
+    "name": "Tracking check",
+    "route": "/p/sf/unplug/health",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "daily",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review.",
+    "header": {
+      "t": "header",
+      "title": "Tracking check",
+      "left": "back"
+    },
+    "body": [
+      {
+        "t": "banner",
+        "kind": "success",
+        "text": "Unplug is working. All 4 checks pass."
+      },
+      {
+        "t": "checklist",
+        "items": [
+          {
+            "label": "Screen Time permission",
+            "sub": "Allowed",
+            "done": true
+          },
+          {
+            "label": "Daily schedule",
+            "sub": "Running",
+            "done": true
+          },
+          {
+            "label": "Settings shared with the pause screen",
+            "sub": "Ready",
+            "done": true
+          },
+          {
+            "label": "Notifications",
+            "sub": "On · lets the pause screen open Tether for support",
+            "done": true
+          }
+        ],
+        "label": "iPhone checks"
+      },
+      {
+        "t": "text",
+        "text": "If a check fails, Unplug stops counting and pausing. We’ll tell you instead of letting you think it’s still on.",
+        "tone": "small"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Done",
+        "action": {
+          "type": "back"
+        },
+        "variant": "primary",
+        "arrow": true
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module trackingHealth() (iOS: authorization, schedule, App Group); notification permission"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Done",
+        "path": "footer[0]",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      }
+    ]
+  },
+  "sf_unplug_health_notifications": {
+    "id": "sf_unplug_health_notifications",
+    "name": "Tracking check · notifications off",
+    "route": "/p/sf/unplug/health?state=notifications",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "daily",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_unplug_health",
+    "state": "notifications off",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Same check on both platforms. Unplug keeps working; only the hand-off from the pause screen to Tether needs notifications.",
+    "header": {
+      "t": "header",
+      "title": "Tracking check",
+      "left": "back"
+    },
+    "body": [
+      {
+        "t": "banner",
+        "kind": "info",
+        "text": "Notifications are off. Unplug still pauses apps, but the pause screen can’t open Tether for you. Open Tether yourself for support."
+      },
+      {
+        "t": "checklist",
+        "items": [
+          {
+            "label": "Screen Time permission",
+            "sub": "Allowed",
+            "done": true
+          },
+          {
+            "label": "Daily schedule",
+            "sub": "Running",
+            "done": true
+          },
+          {
+            "label": "Settings shared with the pause screen",
+            "sub": "Ready",
+            "done": true
+          },
+          {
+            "label": "Notifications",
+            "sub": "Off in Settings"
+          }
+        ],
+        "label": "Checks"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Open phone settings",
+        "action": {
+          "type": "os_settings"
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Check again",
+        "action": {
+          "type": "branch",
+          "question": "Notification permission (checked on return)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "On",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_health"
+              }
+            },
+            {
+              "label": "Still off",
+              "action": {
+                "type": "toast",
+                "value": "Notifications are still off."
+              }
+            }
+          ]
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: Notification permission check (iOS UNUserNotificationCenter, Android POST_NOTIFICATIONS)"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Open phone settings",
+        "path": "footer[0]",
+        "action": {
+          "type": "os_settings"
+        },
+        "summary": "os_settings"
+      },
+      {
+        "element": "Check again",
+        "path": "footer[1]",
+        "action": {
+          "type": "branch",
+          "question": "Notification permission (checked on return)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "On",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_health"
+              }
+            },
+            {
+              "label": "Still off",
+              "action": {
+                "type": "toast",
+                "value": "Notifications are still off."
+              }
+            }
+          ]
+        },
+        "summary": "branch: Notification permission (checked on return) → On: replace → sf_unplug_health | Still off: toast “Notifications are still off.”"
+      }
+    ]
+  },
+  "sf_unplug_health_stopped": {
+    "id": "sf_unplug_health_stopped",
+    "name": "Tracking stopped",
+    "route": "/p/sf/unplug/health?state=stopped",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "daily",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_unplug_health",
+    "state": "tracking stopped",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Also opened from the \"Unplug needs attention\" notification (generic text, no program name).",
+    "header": {
+      "t": "header",
+      "title": "Tracking check",
+      "left": "back"
+    },
+    "body": [
+      {
+        "t": "banner",
+        "kind": "error",
+        "text": "Unplug has stopped. Nothing is being counted or paused until this is fixed."
+      },
+      {
+        "t": "checklist",
+        "items": [
+          {
+            "label": "Screen Time permission",
+            "sub": "Turned off in Settings"
+          },
+          {
+            "label": "Daily schedule",
+            "sub": "Running",
+            "done": true
+          },
+          {
+            "label": "Settings shared with the pause screen",
+            "sub": "Ready",
+            "done": true
+          }
+        ],
+        "label": "iPhone checks"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Open phone settings",
+        "action": {
+          "type": "os_settings"
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Check again",
+        "action": {
+          "type": "branch",
+          "question": "Tracking health result",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "All pass",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_health"
+              }
+            },
+            {
+              "label": "Still failing",
+              "action": {
+                "type": "toast",
+                "value": "Still not working. Turn Screen Time access on again in Settings."
+              }
+            }
+          ]
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module UnplugFlutterApi.onTrackingStopped(checkName, detail)"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Open phone settings",
+        "path": "footer[0]",
+        "action": {
+          "type": "os_settings"
+        },
+        "summary": "os_settings"
+      },
+      {
+        "element": "Check again",
+        "path": "footer[1]",
+        "action": {
+          "type": "branch",
+          "question": "Tracking health result",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "All pass",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_health"
+              }
+            },
+            {
+              "label": "Still failing",
+              "action": {
+                "type": "toast",
+                "value": "Still not working. Turn Screen Time access on again in Settings."
+              }
+            }
+          ]
+        },
+        "summary": "branch: Tracking health result → All pass: replace → sf_unplug_health | Still failing: toast “Still not working. Turn Screen Time access on again in Settings.”"
+      }
+    ]
+  },
+  "sf_unplug_health_android": {
+    "id": "sf_unplug_health_android",
+    "name": "Tracking check (Android)",
+    "route": "/p/sf/unplug/health?state=android",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "daily",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_unplug_health",
+    "state": "android",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review.",
+    "header": {
+      "t": "header",
+      "title": "Tracking check",
+      "left": "back"
+    },
+    "body": [
+      {
+        "t": "banner",
+        "kind": "success",
+        "text": "Unplug is working. All 4 checks pass."
+      },
+      {
+        "t": "checklist",
+        "items": [
+          {
+            "label": "Usage access",
+            "sub": "On",
+            "done": true
+          },
+          {
+            "label": "Display over other apps",
+            "sub": "On",
+            "done": true
+          },
+          {
+            "label": "Unplug running in the background",
+            "sub": "Checked 12 s ago",
+            "done": true
+          },
+          {
+            "label": "Notifications",
+            "sub": "On · needed for the “Tether is running” notice",
+            "done": true
+          }
+        ],
+        "label": "Android checks"
+      },
+      {
+        "t": "text",
+        "text": "Some phones stop background apps to save battery. If Unplug keeps stopping, let Tether run in the background.",
+        "tone": "small"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Battery settings",
+        "action": {
+          "type": "os_settings"
+        },
+        "variant": "secondary",
+        "arrow": false
+      },
+      {
+        "t": "button",
+        "label": "Done",
+        "action": {
+          "type": "back"
+        },
+        "variant": "primary",
+        "arrow": true
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: android/.../unplug/UnplugHost.kt trackingHealth() (usage access, foreground service alive, overlay permission)"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Battery settings",
+        "path": "footer[0]",
+        "action": {
+          "type": "os_settings"
+        },
+        "summary": "os_settings"
+      },
+      {
+        "element": "Done",
+        "path": "footer[1]",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      }
+    ]
+  },
+  "sf_unplug_off": {
+    "id": "sf_unplug_off",
+    "name": "Turn off Unplug",
+    "route": "/p/sf/unplug/off",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "account",
+    "kind": "sheet",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Unplug only: liftShield + purgeLocalData(0). With Screen Time: also revokes the ScrollFree screen_time consent (then the same purge).",
+    "header": null,
+    "body": [
+      {
+        "t": "title",
+        "text": "Turn off Unplug?",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "Paused apps open normally again. Your ScrollFree goal, check-ins and Pause 60 stay.",
+        "tone": "muted"
+      },
+      {
+        "t": "radio",
+        "items": [
+          {
+            "label": "Unplug only",
+            "sub": "Removes app choices, limits and session history from this phone",
+            "badge": "Default"
+          },
+          {
+            "label": "Unplug and Screen Time access",
+            "sub": "ScrollFree goes back to your own estimates"
+          }
+        ],
+        "selected": 0,
+        "key": "scope"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Turn off",
+        "action": {
+          "type": "branch",
+          "question": "Chosen option",
+          "on": "radio",
+          "decide": "choice:sf_unplug_off.scope",
+          "cases": [
+            {
+              "label": "Unplug only",
+              "action": {
+                "type": "submit",
+                "api": "CALL device:unplug/liftShield+purgeLocalData",
+                "then": {
+                  "type": "toast",
+                  "value": "Unplug is off",
+                  "then": {
+                    "type": "reset",
+                    "to": "sf_home"
+                  }
+                }
+              }
+            },
+            {
+              "label": "Unplug and Screen Time",
+              "action": {
+                "type": "submit",
+                "api": "PATCH /v1/enrolments/consents",
+                "then": {
+                  "type": "toast",
+                  "value": "Unplug and Screen Time are off",
+                  "then": {
+                    "type": "reset",
+                    "to": "sf_home"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "variant": "danger",
+        "arrow": false
+      },
+      {
+        "t": "button",
+        "label": "Cancel",
+        "action": {
+          "type": "close"
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module liftShield(reason), purgeLocalData(0); ScrollFree screen_time consent"
+    ],
+    "over": "Unplug",
+    "api": [],
+    "actions": [
+      {
+        "element": "Turn off",
+        "path": "footer[0]",
+        "action": {
+          "type": "branch",
+          "question": "Chosen option",
+          "on": "radio",
+          "decide": "choice:sf_unplug_off.scope",
+          "cases": [
+            {
+              "label": "Unplug only",
+              "action": {
+                "type": "submit",
+                "api": "CALL device:unplug/liftShield+purgeLocalData",
+                "then": {
+                  "type": "toast",
+                  "value": "Unplug is off",
+                  "then": {
+                    "type": "reset",
+                    "to": "sf_home"
+                  }
+                }
+              }
+            },
+            {
+              "label": "Unplug and Screen Time",
+              "action": {
+                "type": "submit",
+                "api": "PATCH /v1/enrolments/consents",
+                "then": {
+                  "type": "toast",
+                  "value": "Unplug and Screen Time are off",
+                  "then": {
+                    "type": "reset",
+                    "to": "sf_home"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "summary": "decide choice:sf_unplug_off.scope: Chosen option → Unplug only: CALL device:unplug/liftShield+purgeLocalData then toast “Unplug is off” then reset → sf_home | Unplug and Screen Time: PATCH /v1/enrolments/consents then toast “Unplug and Screen Time are off” then reset → sf_home"
+      },
+      {
+        "element": "Cancel",
+        "path": "footer[1]",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      }
+    ]
+  },
+  "sf_home_unplug": {
+    "id": "sf_home_unplug",
+    "name": "ScrollFree home · Unplug on (iPhone)",
+    "route": "/p/sf/home?state=unplug",
+    "flow": "sf",
+    "program": "sf",
+    "phase": "daily",
+    "kind": "screen",
+    "tab": "plans",
+    "variantOf": "sf_home",
+    "state": "Unplug on · iPhone",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.",
+    "header": {
+      "t": "header",
+      "title": "ScrollFree",
+      "left": "back",
+      "avatar": "A",
+      "avatarAction": {
+        "type": "push",
+        "to": "account"
+      }
+    },
+    "body": [
+      {
+        "t": "nativeslot",
+        "id": "ios.deviceActivityReport.today",
+        "label": "Screen Time today",
+        "caption": "Shown by Apple’s Screen Time on this phone. Tether can’t read, store or share these minutes.",
+        "platform": "ios",
+        "height": 132
+      },
+      {
+        "t": "card",
+        "variant": "dark",
+        "eyebrow": "Yesterday · your estimate",
+        "children": [
+          {
+            "t": "big",
+            "value": "2h 10m",
+            "caption": "Goal 90 min · down from 3h"
+          }
+        ]
+      },
+      {
+        "t": "card",
+        "variant": "coral",
+        "title": "Urge to scroll?",
+        "text": "Take 60 seconds first",
+        "cta": {
+          "t": "button",
+          "label": "Pause 60",
+          "action": {
+            "type": "push",
+            "to": "sf_pause"
+          },
+          "variant": "rescue",
+          "arrow": false,
+          "small": true
+        }
+      },
+      {
+        "t": "card",
+        "variant": "mint",
+        "title": "Unplug is on",
+        "text": "2 groups · pause screen after 60 min",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_home"
+        }
+      },
+      {
+        "t": "card",
+        "variant": "plain",
+        "eyebrow": "Today’s step",
+        "children": [
+          {
+            "t": "checklist",
+            "items": [
+              {
+                "label": "Charge your phone outside the bedroom",
+                "sub": "Tonight · bedtime window 10 PM"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "t": "list",
+        "rows": [
+          {
+            "label": "This week",
+            "sub": "5 of 7 phone-free nights",
+            "action": {
+              "type": "push",
+              "to": "sf_week"
+            }
+          },
+          {
+            "label": "Had a long scroll?",
+            "sub": "Reflect, nothing resets",
+            "action": {
+              "type": "push",
+              "to": "sf_slip"
+            }
+          },
+          {
+            "label": "Goal & windows",
+            "sub": "90 min · bedtime",
+            "action": {
+              "type": "push",
+              "to": "sf_goal"
+            }
+          },
+          {
+            "label": "Buddy",
+            "sub": "Sam · weekly message",
+            "action": {
+              "type": "push",
+              "to": "sf_buddy"
+            }
+          },
+          {
+            "label": "Program settings",
+            "sub": "Status, sharing, export, leave",
+            "action": {
+              "type": "push",
+              "to": "program_settings"
+            }
+          }
+        ]
+      }
+    ],
+    "footer": [],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: DeviceActivityReport extension (new); ios/Runner/Unplug/UnplugHost.swift readUsage (iOS returns no minutes)"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Avatar · Account",
+        "path": "header.avatar",
+        "action": {
+          "type": "push",
+          "to": "account"
+        },
+        "summary": "push → account"
+      },
+      {
+        "element": "Pause 60",
+        "path": "body[2].cta[0]",
+        "action": {
+          "type": "push",
+          "to": "sf_pause"
+        },
+        "summary": "push → sf_pause"
+      },
+      {
+        "element": "Unplug is on",
+        "path": "body[3]",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_home"
+        },
+        "summary": "push → sf_unplug_home"
+      },
+      {
+        "element": "This week",
+        "path": "body[5].rows[0]",
+        "action": {
+          "type": "push",
+          "to": "sf_week"
+        },
+        "summary": "push → sf_week"
+      },
+      {
+        "element": "Had a long scroll?",
+        "path": "body[5].rows[1]",
+        "action": {
+          "type": "push",
+          "to": "sf_slip"
+        },
+        "summary": "push → sf_slip"
+      },
+      {
+        "element": "Goal & windows",
+        "path": "body[5].rows[2]",
+        "action": {
+          "type": "push",
+          "to": "sf_goal"
+        },
+        "summary": "push → sf_goal"
+      },
+      {
+        "element": "Buddy",
+        "path": "body[5].rows[3]",
+        "action": {
+          "type": "push",
+          "to": "sf_buddy"
+        },
+        "summary": "push → sf_buddy"
+      },
+      {
+        "element": "Program settings",
+        "path": "body[5].rows[4]",
+        "action": {
+          "type": "push",
+          "to": "program_settings"
+        },
+        "summary": "push → program_settings"
+      },
+      {
+        "element": "Tab · Today",
+        "path": "tabbar.today",
+        "action": {
+          "type": "tab",
+          "to": "today"
+        },
+        "summary": "tab → today"
+      },
+      {
+        "element": "Tab · Progress",
+        "path": "tabbar.progress",
+        "action": {
+          "type": "tab",
+          "to": "progress"
+        },
+        "summary": "tab → progress"
+      },
+      {
+        "element": "Tab · Learn",
+        "path": "tabbar.learn",
+        "action": {
+          "type": "tab",
+          "to": "learn"
+        },
+        "summary": "tab → learn"
+      },
+      {
+        "element": "Tab · Support",
+        "path": "tabbar.support",
+        "action": {
+          "type": "tab",
+          "to": "support"
+        },
+        "summary": "tab → support"
+      }
+    ]
+  },
+  "sf_week_unplug": {
+    "id": "sf_week_unplug",
+    "name": "Weekly reflection · Unplug on (iPhone)",
+    "route": "/p/sf/week?state=unplug",
+    "flow": "sf",
+    "program": "sf",
+    "phase": "milestone",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_week",
+    "state": "Unplug on · iPhone",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Apple’s weekly report sits above the person’s own estimates, which are what Tether stores and charts.",
+    "header": {
+      "t": "header",
+      "title": "Week 2",
+      "left": "back",
+      "pill": "ScrollFree"
+    },
+    "body": [
+      {
+        "t": "title",
+        "text": "Your week, honestly.",
+        "size": "m"
+      },
+      {
+        "t": "nativeslot",
+        "id": "ios.deviceActivityReport.week",
+        "label": "Screen Time this week",
+        "caption": "Shown by Apple’s Screen Time on this phone. Tether can’t read, store or share these minutes.",
+        "platform": "ios",
+        "height": 200
+      },
+      {
+        "t": "chart",
+        "kind": "bars",
+        "values": [
+          190,
+          160,
+          130,
+          0,
+          110,
+          95,
+          85
+        ],
+        "color": "sf",
+        "title": "Your estimates · minutes / day",
+        "missing": [
+          3
+        ],
+        "target": 90,
+        "labels": [
+          "M",
+          "T",
+          "W",
+          "T",
+          "F",
+          "S",
+          "S"
+        ],
+        "caption": "Thursday: no check-in · not counted as zero"
+      },
+      {
+        "t": "stats",
+        "items": [
+          {
+            "label": "Phone-free nights",
+            "value": "5/7"
+          },
+          {
+            "label": "Urges paused",
+            "value": "11",
+            "sub": "7 put down"
+          }
+        ],
+        "cols": 2
+      },
+      {
+        "t": "card",
+        "variant": "mint",
+        "eyebrow": "You said",
+        "text": "“Drained” was 4× less common on phone-free nights.",
+        "children": [
+          {
+            "t": "quote",
+            "text": "I feel drained after long scrolls."
+          }
+        ]
+      },
+      {
+        "t": "card",
+        "variant": "plain",
+        "eyebrow": "Next week",
+        "title": "Step down to 75 min?",
+        "children": [
+          {
+            "t": "buttons",
+            "items": [
+              {
+                "t": "button",
+                "label": "Yes",
+                "action": {
+                  "type": "toast",
+                  "value": "Goal set to 75 min",
+                  "then": {
+                    "type": "back"
+                  }
+                },
+                "variant": "primary",
+                "arrow": false,
+                "small": true
+              },
+              {
+                "t": "button",
+                "label": "Stay at 90",
+                "action": {
+                  "type": "back"
+                },
+                "variant": "secondary",
+                "arrow": false,
+                "small": true
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "footer": [],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: DeviceActivityReport extension (new); sf_week in this spec"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Yes",
+        "path": "body[5].children[0].items[0]",
+        "action": {
+          "type": "toast",
+          "value": "Goal set to 75 min",
+          "then": {
+            "type": "back"
+          }
+        },
+        "summary": "toast “Goal set to 75 min” then back"
+      },
+      {
+        "element": "Stay at 90",
+        "path": "body[5].children[0].items[1]",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      }
+    ]
+  },
+  "program_settings_sf": {
+    "id": "program_settings_sf",
+    "name": "Program settings · ScrollFree with Unplug",
+    "route": "/p/:program/settings?state=sf-unplug",
+    "flow": "plans",
+    "program": null,
+    "phase": "account",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "program_settings",
+    "state": "ScrollFree",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. The ScrollFree instance of the parameterized Program settings (the base screen is shown with BreatheFree data). Only ScrollFree has the Screen Time & Unplug section. Leaving ScrollFree or deleting the account also runs purgeLocalData(0).",
+    "header": {
+      "t": "header",
+      "title": "ScrollFree settings",
+      "left": "back"
+    },
+    "body": [
+      {
+        "t": "list",
+        "rows": [
+          {
+            "label": "ScrollFree",
+            "sub": "Focus since Aug 14",
+            "lead": {
+              "program": "sf"
+            }
+          }
+        ],
+        "flat": true
+      },
+      {
+        "t": "radio",
+        "items": [
+          {
+            "label": "Focus",
+            "sub": "Daily steps and reminders"
+          },
+          {
+            "label": "Learn only",
+            "sub": "Keep lessons, stop tracking"
+          },
+          {
+            "label": "Pause",
+            "sub": "Stop reminders; keep everything"
+          }
+        ],
+        "selected": 0,
+        "label": "Status",
+        "key": "status"
+      },
+      {
+        "t": "card",
+        "variant": "plain",
+        "eyebrow": "Sharing",
+        "children": [
+          {
+            "t": "toggle",
+            "label": "Care team sharing",
+            "sub": "Off · ScrollFree isn’t shared",
+            "on": false,
+            "key": "care_team_sharing"
+          },
+          {
+            "t": "toggle",
+            "label": "De-identified research",
+            "on": false,
+            "key": "de_identified_research"
+          }
+        ]
+      },
+      {
+        "t": "list",
+        "title": "Screen Time & Unplug",
+        "rows": [
+          {
+            "label": "Unplug",
+            "sub": "On · 2 groups · 60 min limit",
+            "action": {
+              "type": "push",
+              "to": "sf_unplug_home"
+            }
+          },
+          {
+            "label": "Screen Time access",
+            "sub": "Connected · totals only",
+            "action": {
+              "type": "push",
+              "to": "sf_screentime"
+            }
+          },
+          {
+            "label": "Turn off Unplug or Screen Time",
+            "sub": "Anytime",
+            "action": {
+              "type": "sheet",
+              "to": "sf_unplug_off"
+            },
+            "danger": true
+          }
+        ]
+      },
+      {
+        "t": "list",
+        "title": "Data",
+        "rows": [
+          {
+            "label": "Export ScrollFree data",
+            "sub": "PDF + JSON",
+            "action": {
+              "type": "toast",
+              "value": "Export is being prepared. We’ll notify you."
+            }
+          },
+          {
+            "label": "Leave ScrollFree",
+            "sub": "Keep data 30 days or delete now",
+            "action": {
+              "type": "sheet",
+              "to": "account_leave"
+            },
+            "danger": true
+          }
+        ]
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Save changes",
+        "action": {
+          "type": "submit",
+          "api": "PATCH /v1/enrolments/:id",
+          "then": {
+            "type": "toast",
+            "value": "Saved",
+            "then": {
+              "type": "back"
+            }
+          }
+        },
+        "variant": "primary",
+        "arrow": true
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: program_settings in this spec (same layout, ScrollFree data); pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module purgeLocalData(0)"
+    ],
+    "over": null,
+    "api": [
+      "PATCH /v1/enrolments/:id"
+    ],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Unplug",
+        "path": "body[3].rows[0]",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_home"
+        },
+        "summary": "push → sf_unplug_home"
+      },
+      {
+        "element": "Screen Time access",
+        "path": "body[3].rows[1]",
+        "action": {
+          "type": "push",
+          "to": "sf_screentime"
+        },
+        "summary": "push → sf_screentime"
+      },
+      {
+        "element": "Turn off Unplug or Screen Time",
+        "path": "body[3].rows[2]",
+        "action": {
+          "type": "sheet",
+          "to": "sf_unplug_off"
+        },
+        "summary": "sheet → sf_unplug_off"
+      },
+      {
+        "element": "Export ScrollFree data",
+        "path": "body[4].rows[0]",
+        "action": {
+          "type": "toast",
+          "value": "Export is being prepared. We’ll notify you."
+        },
+        "summary": "toast “Export is being prepared. We’ll notify you.”"
+      },
+      {
+        "element": "Leave ScrollFree",
+        "path": "body[4].rows[1]",
+        "action": {
+          "type": "sheet",
+          "to": "account_leave"
+        },
+        "summary": "sheet → account_leave"
+      },
+      {
+        "element": "Save changes",
+        "path": "footer[0]",
+        "action": {
+          "type": "submit",
+          "api": "PATCH /v1/enrolments/:id",
+          "then": {
+            "type": "toast",
+            "value": "Saved",
+            "then": {
+              "type": "back"
+            }
+          }
+        },
+        "summary": "PATCH /v1/enrolments/:id then toast “Saved” then back"
+      }
+    ]
+  },
+  "account_delete_apple": {
+    "id": "account_delete_apple",
+    "name": "Delete account · Apple account",
+    "route": "/account/delete?state=apple",
+    "flow": "account",
+    "program": null,
+    "phase": "account",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "account_delete",
+    "state": "Apple account",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Apple re-auth for the same provider; the returned user id must match the signed-in user. Delete runs only after Success.",
+    "header": {
+      "t": "header",
+      "title": "Delete account",
+      "left": "back"
+    },
+    "body": [
+      {
+        "t": "title",
+        "text": "Delete your account and all data?",
+        "size": "m"
+      },
+      {
+        "t": "kv",
+        "rows": [
+          [
+            "Programs",
+            "4"
+          ],
+          [
+            "Check-ins",
+            "63"
+          ],
+          [
+            "Readings & logs",
+            "118"
+          ],
+          [
+            "Shared with care team",
+            "3 summaries (their copies stay with them)"
+          ]
+        ]
+      },
+      {
+        "t": "text",
+        "text": "This can’t be undone. Download a copy first if you want one.",
+        "tone": "small"
+      },
+      {
+        "t": "button",
+        "label": "Download a copy first",
+        "action": {
+          "type": "push",
+          "to": "account_data"
+        },
+        "variant": "secondary",
+        "arrow": false
+      },
+      {
+        "t": "field",
+        "label": "Type DELETE to confirm",
+        "value": "DELETE",
+        "kind": "text",
+        "key": "type_delete_to_confirm"
+      },
+      {
+        "t": "card",
+        "variant": "mint",
+        "eyebrow": "Confirm it’s you",
+        "title": "Signed in with Apple",
+        "text": "When you tap Delete everything, Apple asks you to confirm. Use the same Apple account you signed in with."
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Delete everything",
+        "action": {
+          "type": "branch",
+          "question": "Sign in with Apple result",
+          "provider": "apple",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Success",
+              "action": {
+                "type": "submit",
+                "api": "DELETE /v1/account/data",
+                "then": {
+                  "type": "replace",
+                  "to": "account_deleted"
+                }
+              }
+            },
+            {
+              "label": "Different account",
+              "action": {
+                "type": "toast",
+                "value": "That’s a different Apple account. Use the one you signed in with."
+              }
+            },
+            {
+              "label": "Cancelled",
+              "action": {
+                "type": "toast",
+                "value": "Nothing was deleted."
+              }
+            },
+            {
+              "label": "Error",
+              "action": {
+                "type": "toast",
+                "value": "Couldn’t reach Apple. Nothing was deleted."
+              }
+            }
+          ]
+        },
+        "variant": "danger",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: account_delete in this spec; lib/auth/auth_gateway.dart RecentAuthGateway.reauthenticate (password only today)"
+    ],
+    "over": null,
+    "api": [
+      "DELETE /v1/account/data"
+    ],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Download a copy first",
+        "path": "body[3]",
+        "action": {
+          "type": "push",
+          "to": "account_data"
+        },
+        "summary": "push → account_data"
+      },
+      {
+        "element": "Delete everything",
+        "path": "footer[0]",
+        "action": {
+          "type": "branch",
+          "question": "Sign in with Apple result",
+          "provider": "apple",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Success",
+              "action": {
+                "type": "submit",
+                "api": "DELETE /v1/account/data",
+                "then": {
+                  "type": "replace",
+                  "to": "account_deleted"
+                }
+              }
+            },
+            {
+              "label": "Different account",
+              "action": {
+                "type": "toast",
+                "value": "That’s a different Apple account. Use the one you signed in with."
+              }
+            },
+            {
+              "label": "Cancelled",
+              "action": {
+                "type": "toast",
+                "value": "Nothing was deleted."
+              }
+            },
+            {
+              "label": "Error",
+              "action": {
+                "type": "toast",
+                "value": "Couldn’t reach Apple. Nothing was deleted."
+              }
+            }
+          ]
+        },
+        "summary": "auth (apple): Sign in with Apple result → Success: DELETE /v1/account/data then replace → account_deleted | Different account: toast “That’s a different Apple account. Use the one you signed in with.” | Cancelled: toast “Nothing was deleted.” | Error: toast “Couldn’t reach Apple. Nothing was deleted.”"
+      }
+    ]
+  },
+  "account_delete_google": {
+    "id": "account_delete_google",
+    "name": "Delete account · Google account",
+    "route": "/account/delete?state=google",
+    "flow": "account",
+    "program": null,
+    "phase": "account",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "account_delete",
+    "state": "Google account",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Google re-auth for the same provider; the returned user id must match the signed-in user. Delete runs only after Success.",
+    "header": {
+      "t": "header",
+      "title": "Delete account",
+      "left": "back"
+    },
+    "body": [
+      {
+        "t": "title",
+        "text": "Delete your account and all data?",
+        "size": "m"
+      },
+      {
+        "t": "kv",
+        "rows": [
+          [
+            "Programs",
+            "4"
+          ],
+          [
+            "Check-ins",
+            "63"
+          ],
+          [
+            "Readings & logs",
+            "118"
+          ],
+          [
+            "Shared with care team",
+            "3 summaries (their copies stay with them)"
+          ]
+        ]
+      },
+      {
+        "t": "text",
+        "text": "This can’t be undone. Download a copy first if you want one.",
+        "tone": "small"
+      },
+      {
+        "t": "button",
+        "label": "Download a copy first",
+        "action": {
+          "type": "push",
+          "to": "account_data"
+        },
+        "variant": "secondary",
+        "arrow": false
+      },
+      {
+        "t": "field",
+        "label": "Type DELETE to confirm",
+        "value": "DELETE",
+        "kind": "text",
+        "key": "type_delete_to_confirm"
+      },
+      {
+        "t": "card",
+        "variant": "mint",
+        "eyebrow": "Confirm it’s you",
+        "title": "Signed in with Google",
+        "text": "When you tap Delete everything, Google asks you to confirm. Use the same Google account you signed in with."
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Delete everything",
+        "action": {
+          "type": "branch",
+          "question": "Sign in with Google result",
+          "provider": "google",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Success",
+              "action": {
+                "type": "submit",
+                "api": "DELETE /v1/account/data",
+                "then": {
+                  "type": "replace",
+                  "to": "account_deleted"
+                }
+              }
+            },
+            {
+              "label": "Different account",
+              "action": {
+                "type": "toast",
+                "value": "That’s a different Google account. Use the one you signed in with."
+              }
+            },
+            {
+              "label": "Cancelled",
+              "action": {
+                "type": "toast",
+                "value": "Nothing was deleted."
+              }
+            },
+            {
+              "label": "Error",
+              "action": {
+                "type": "toast",
+                "value": "Couldn’t reach Google. Nothing was deleted."
+              }
+            }
+          ]
+        },
+        "variant": "danger",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: account_delete in this spec; lib/auth/auth_gateway.dart RecentAuthGateway.reauthenticate (password only today)"
+    ],
+    "over": null,
+    "api": [
+      "DELETE /v1/account/data"
+    ],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Download a copy first",
+        "path": "body[3]",
+        "action": {
+          "type": "push",
+          "to": "account_data"
+        },
+        "summary": "push → account_data"
+      },
+      {
+        "element": "Delete everything",
+        "path": "footer[0]",
+        "action": {
+          "type": "branch",
+          "question": "Sign in with Google result",
+          "provider": "google",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Success",
+              "action": {
+                "type": "submit",
+                "api": "DELETE /v1/account/data",
+                "then": {
+                  "type": "replace",
+                  "to": "account_deleted"
+                }
+              }
+            },
+            {
+              "label": "Different account",
+              "action": {
+                "type": "toast",
+                "value": "That’s a different Google account. Use the one you signed in with."
+              }
+            },
+            {
+              "label": "Cancelled",
+              "action": {
+                "type": "toast",
+                "value": "Nothing was deleted."
+              }
+            },
+            {
+              "label": "Error",
+              "action": {
+                "type": "toast",
+                "value": "Couldn’t reach Google. Nothing was deleted."
+              }
+            }
+          ]
+        },
+        "summary": "auth (google): Sign in with Google result → Success: DELETE /v1/account/data then replace → account_deleted | Different account: toast “That’s a different Google account. Use the one you signed in with.” | Cancelled: toast “Nothing was deleted.” | Error: toast “Couldn’t reach Google. Nothing was deleted.”"
+      }
+    ]
+  },
+  "auth_session_apple": {
+    "id": "auth_session_apple",
+    "name": "Session expired · Apple account",
+    "route": "/auth/session?state=apple",
+    "flow": "auth",
+    "program": null,
+    "phase": "account",
+    "kind": "sheet",
+    "tab": null,
+    "variantOf": "auth_session",
+    "state": "Apple account",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Apple button.",
+    "header": null,
+    "body": [
+      {
+        "t": "title",
+        "text": "Please sign in again",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in.",
+        "tone": "muted"
+      },
+      {
+        "t": "text",
+        "text": "You signed in with Apple, so there’s no password to type.",
+        "tone": "small"
+      }
+    ],
+    "footer": [
+      {
+        "t": "authbuttons",
+        "items": [
+          {
+            "t": "authbtn",
+            "provider": "apple",
+            "label": "Continue with Apple",
+            "action": {
+              "type": "branch",
+              "question": "Sign in with Apple result",
+              "provider": "apple",
+              "on": null,
+              "decide": null,
+              "cases": [
+                {
+                  "label": "Success",
+                  "action": {
+                    "type": "close"
+                  }
+                },
+                {
+                  "label": "Cancelled",
+                  "action": {
+                    "type": "toast",
+                    "value": "Still signed out. Rescue works without signing in."
+                  }
+                },
+                {
+                  "label": "Error",
+                  "action": {
+                    "type": "push",
+                    "to": "auth_social_error"
+                  }
+                }
+              ]
+            },
+            "platforms": [
+              "ios"
+            ]
+          }
+        ]
+      },
+      {
+        "t": "button",
+        "label": "Use Face ID",
+        "action": {
+          "type": "close"
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: auth_session in this spec; Supabase signInWithIdToken"
+    ],
+    "over": "Today",
+    "api": [
+      "POST supabase /auth/v1/token?grant_type=id_token"
+    ],
+    "actions": [
+      {
+        "element": "Continue with Apple",
+        "path": "footer[0].items[0]",
+        "action": {
+          "type": "branch",
+          "question": "Sign in with Apple result",
+          "provider": "apple",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Success",
+              "action": {
+                "type": "close"
+              }
+            },
+            {
+              "label": "Cancelled",
+              "action": {
+                "type": "toast",
+                "value": "Still signed out. Rescue works without signing in."
+              }
+            },
+            {
+              "label": "Error",
+              "action": {
+                "type": "push",
+                "to": "auth_social_error"
+              }
+            }
+          ]
+        },
+        "summary": "auth (apple): Sign in with Apple result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error"
+      },
+      {
+        "element": "Use Face ID",
+        "path": "footer[1]",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      }
+    ]
+  },
+  "auth_session_google": {
+    "id": "auth_session_google",
+    "name": "Session expired · Google account",
+    "route": "/auth/session?state=google",
+    "flow": "auth",
+    "program": null,
+    "phase": "account",
+    "kind": "sheet",
+    "tab": null,
+    "variantOf": "auth_session",
+    "state": "Google account",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Google button.",
+    "header": null,
+    "body": [
+      {
+        "t": "title",
+        "text": "Please sign in again",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in.",
+        "tone": "muted"
+      },
+      {
+        "t": "text",
+        "text": "You signed in with Google, so there’s no password to type.",
+        "tone": "small"
+      }
+    ],
+    "footer": [
+      {
+        "t": "authbuttons",
+        "items": [
+          {
+            "t": "authbtn",
+            "provider": "google",
+            "label": "Continue with Google",
+            "action": {
+              "type": "branch",
+              "question": "Sign in with Google result",
+              "provider": "google",
+              "on": null,
+              "decide": null,
+              "cases": [
+                {
+                  "label": "Success",
+                  "action": {
+                    "type": "close"
+                  }
+                },
+                {
+                  "label": "Cancelled",
+                  "action": {
+                    "type": "toast",
+                    "value": "Still signed out. Rescue works without signing in."
+                  }
+                },
+                {
+                  "label": "Error",
+                  "action": {
+                    "type": "push",
+                    "to": "auth_social_error"
+                  }
+                }
+              ]
+            },
+            "platforms": [
+              "ios",
+              "android"
+            ]
+          }
+        ]
+      },
+      {
+        "t": "button",
+        "label": "Use Face ID",
+        "action": {
+          "type": "close"
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: auth_session in this spec; Supabase signInWithIdToken"
+    ],
+    "over": "Today",
+    "api": [
+      "POST supabase /auth/v1/token?grant_type=id_token"
+    ],
+    "actions": [
+      {
+        "element": "Continue with Google",
+        "path": "footer[0].items[0]",
+        "action": {
+          "type": "branch",
+          "question": "Sign in with Google result",
+          "provider": "google",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Success",
+              "action": {
+                "type": "close"
+              }
+            },
+            {
+              "label": "Cancelled",
+              "action": {
+                "type": "toast",
+                "value": "Still signed out. Rescue works without signing in."
+              }
+            },
+            {
+              "label": "Error",
+              "action": {
+                "type": "push",
+                "to": "auth_social_error"
+              }
+            }
+          ]
+        },
+        "summary": "auth (google): Sign in with Google result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error"
+      },
+      {
+        "element": "Use Face ID",
+        "path": "footer[1]",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      }
+    ]
+  },
+  "sf_screentime_android": {
+    "id": "sf_screentime_android",
+    "name": "Connect usage access (Android)",
+    "route": "/p/sf/screen-time?state=android",
+    "flow": "sf",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_screentime",
+    "state": "android",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Android has no permission prompt for usage access; the person turns it on in Settings and the app checks again on return.",
+    "header": {
+      "t": "header",
+      "title": "Screen Time",
+      "left": "back",
+      "pill": "Optional"
+    },
+    "body": [
+      {
+        "t": "illus",
+        "glyph": "◷",
+        "tone": "mint"
+      },
+      {
+        "t": "title",
+        "text": "See real totals, if you want.",
+        "size": "m",
+        "align": "center"
+      },
+      {
+        "t": "text",
+        "text": "Tether reads daily totals by category only. Never apps’ content, messages or contacts.",
+        "tone": "muted",
+        "align": "center"
+      },
+      {
+        "t": "kv",
+        "rows": [
+          [
+            "Reads",
+            "Minutes per category"
+          ],
+          [
+            "Never reads",
+            "Content, messages, contacts"
+          ],
+          [
+            "Turn off",
+            "Anytime in Account"
+          ]
+        ]
+      },
+      {
+        "t": "checklist",
+        "items": [
+          {
+            "label": "Tap Open settings"
+          },
+          {
+            "label": "Find Tether Health"
+          },
+          {
+            "label": "Turn on “Permit usage access”"
+          }
+        ],
+        "label": "Android asks in Settings"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Open settings",
+        "action": {
+          "type": "branch",
+          "question": "Android usage access (checked on return)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Allowed",
+              "action": {
+                "type": "toast",
+                "value": "Usage access on",
+                "then": {
+                  "type": "back"
+                }
+              }
+            },
+            {
+              "label": "Not allowed",
+              "action": {
+                "type": "replace",
+                "to": "sf_screentime_android_denied"
+              }
+            }
+          ]
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Not now",
+        "action": {
+          "type": "back"
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: sf_screentime in this spec; android/.../unplug/UsageReader.kt (usage access, checked on resume)"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Open settings",
+        "path": "footer[0]",
+        "action": {
+          "type": "branch",
+          "question": "Android usage access (checked on return)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Allowed",
+              "action": {
+                "type": "toast",
+                "value": "Usage access on",
+                "then": {
+                  "type": "back"
+                }
+              }
+            },
+            {
+              "label": "Not allowed",
+              "action": {
+                "type": "replace",
+                "to": "sf_screentime_android_denied"
+              }
+            }
+          ]
+        },
+        "summary": "branch: Android usage access (checked on return) → Allowed: toast “Usage access on” then back | Not allowed: replace → sf_screentime_android_denied"
+      },
+      {
+        "element": "Not now",
+        "path": "footer[1]",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      }
+    ]
+  },
+  "sf_screentime_android_denied": {
+    "id": "sf_screentime_android_denied",
+    "name": "Usage access off (Android)",
+    "route": "/p/sf/screen-time?state=android-denied",
+    "flow": "sf",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_screentime",
+    "state": "android · not allowed",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review.",
+    "header": {
+      "t": "header",
+      "title": "Screen Time",
+      "left": "back",
+      "pill": "Optional"
+    },
+    "body": [
+      {
+        "t": "banner",
+        "kind": "info",
+        "text": "Usage access is still off."
+      },
+      {
+        "t": "title",
+        "text": "Self-report works just as well.",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "We’ll ask for a quick estimate in your evening check-in. You can connect later in Account → ScrollFree.",
+        "tone": "muted"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Continue with self-report",
+        "action": {
+          "type": "back"
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Open settings",
+        "action": {
+          "type": "os_settings"
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: sf_screentime_denied in this spec (same copy, Android wording in the banner)"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Continue with self-report",
+        "path": "footer[0]",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Open settings",
+        "path": "footer[1]",
+        "action": {
+          "type": "os_settings"
+        },
+        "summary": "os_settings"
+      }
+    ]
+  },
+  "sys_update_android": {
+    "id": "sys_update_android",
+    "name": "Update required (Android)",
+    "route": "/system/update?state=android",
+    "flow": "system",
+    "program": null,
+    "phase": "account",
+    "kind": "fullscreen",
+    "tab": null,
+    "variantOf": "sys_update",
+    "state": "android",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Same as Update required; Update now opens Google Play. The iPhone App Store URL in the base screen still needs the real App Store ID.",
+    "header": {
+      "t": "header",
+      "title": "Update needed",
+      "left": "none"
+    },
+    "body": [
+      {
+        "t": "illus",
+        "glyph": "↑",
+        "tone": "warn"
+      },
+      {
+        "t": "title",
+        "text": "A safety update is ready",
+        "size": "l",
+        "align": "center"
+      },
+      {
+        "t": "text",
+        "text": "This version has important fixes. Rescue and Support still work until you update.",
+        "tone": "muted",
+        "align": "center"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Update now",
+        "action": {
+          "type": "external",
+          "value": "https://play.google.com/store/apps/details?id=com.TetherHealthLLC.tetherhealth"
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Open Rescue",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "variant": "rescue",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: sys_update in this spec; app ID com.TetherHealthLLC.tetherhealth"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Update now",
+        "path": "footer[0]",
+        "action": {
+          "type": "external",
+          "value": "https://play.google.com/store/apps/details?id=com.TetherHealthLLC.tetherhealth"
+        },
+        "summary": "external https://play.google.com/store/apps/details?id=com.TetherHealthLLC.tetherhealth"
+      },
+      {
+        "element": "Open Rescue",
+        "path": "footer[1]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
+      }
+    ]
+  },
+  "surface_widget_ios": {
+    "id": "surface_widget_ios",
+    "name": "Home-screen widget (iPhone)",
+    "route": "/surface/widget/ios",
+    "flow": "entries",
+    "program": null,
+    "phase": "rescue",
+    "kind": "fullscreen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": true,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.",
+    "header": {
+      "t": "header",
+      "title": "iPhone widget",
+      "left": "close",
+      "pill": "Reference",
+      "dark": true
+    },
+    "body": [
+      {
+        "t": "eyebrow",
+        "text": "Home screen · small widget"
+      },
+      {
+        "t": "card",
+        "variant": "coral",
+        "title": "Rescue",
+        "text": "Help for the next few minutes",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        }
+      },
+      {
+        "t": "kv",
+        "rows": [
+          [
+            "Label",
+            "Rescue (generic)"
+          ],
+          [
+            "Shows",
+            "No health data, no program names"
+          ],
+          [
+            "Tap",
+            "Opens Rescue, even when signed out"
+          ],
+          [
+            "Data",
+            "None. No App Group needed"
+          ]
+        ]
+      }
+    ],
+    "footer": [],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: rescue_pick entry \"Home-screen widget / Siri: Rescue\" in this spec; WidgetKit, static content",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    ],
+    "over": null,
+    "api": [],
+    "reference": true,
+    "actions": [
+      {
+        "element": "Close",
+        "path": "header.left",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      },
+      {
+        "element": "Rescue",
+        "path": "body[1]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
+      }
+    ]
+  },
+  "surface_widget_android": {
+    "id": "surface_widget_android",
+    "name": "Home-screen widget (Android)",
+    "route": "/surface/widget/android",
+    "flow": "entries",
+    "program": null,
+    "phase": "rescue",
+    "kind": "fullscreen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": true,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review.",
+    "header": {
+      "t": "header",
+      "title": "Android widget",
+      "left": "close",
+      "pill": "Reference",
+      "dark": true
+    },
+    "body": [
+      {
+        "t": "eyebrow",
+        "text": "Home screen · 2×1 widget"
+      },
+      {
+        "t": "card",
+        "variant": "coral",
+        "title": "Rescue",
+        "text": "Help for the next few minutes",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        }
+      },
+      {
+        "t": "kv",
+        "rows": [
+          [
+            "Label",
+            "Rescue (generic)"
+          ],
+          [
+            "Shows",
+            "No health data, no program names"
+          ],
+          [
+            "Tap",
+            "Opens Rescue, even when signed out"
+          ],
+          [
+            "Built with",
+            "RemoteViews, no extra library"
+          ]
+        ]
+      }
+    ],
+    "footer": [],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: rescue_pick entry in this spec; Android RemoteViews widget",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    ],
+    "over": null,
+    "api": [],
+    "reference": true,
+    "actions": [
+      {
+        "element": "Close",
+        "path": "header.left",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      },
+      {
+        "element": "Rescue",
+        "path": "body[1]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
+      }
+    ]
+  },
+  "surface_shortcuts_ios": {
+    "id": "surface_shortcuts_ios",
+    "name": "Siri & App Shortcuts (iPhone)",
+    "route": "/surface/shortcuts/ios",
+    "flow": "entries",
+    "program": null,
+    "phase": "rescue",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. App Intents exposed as App Shortcuts. The My plan intent is offered only while enrolled in ClearAir and opens the ClearAir red-zone plan.",
+    "header": {
+      "t": "header",
+      "title": "Siri & Shortcuts",
+      "left": "close",
+      "pill": "Reference"
+    },
+    "body": [
+      {
+        "t": "text",
+        "text": "What people see in the Shortcuts app and Spotlight, and can say to Siri.",
+        "tone": "muted"
+      },
+      {
+        "t": "list",
+        "title": "Tether Health · App Shortcuts",
+        "rows": [
+          {
+            "label": "Rescue",
+            "sub": "“Rescue in Tether” · opens Rescue",
+            "action": {
+              "type": "sheet",
+              "to": "rescue_pick"
+            },
+            "lead": {
+              "icon": "✚"
+            }
+          },
+          {
+            "label": "My plan",
+            "sub": "“Show my plan in Tether” · only while ClearAir is a focus program",
+            "action": {
+              "type": "push",
+              "to": "ca_red"
+            },
+            "lead": {
+              "icon": "▤"
+            }
+          }
+        ]
+      },
+      {
+        "t": "card",
+        "variant": "mint",
+        "text": "Labels stay generic so a locked phone doesn’t reveal which programs you use. Turn on Show sensitive details to see program names."
+      }
+    ],
+    "footer": [],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: rescue_pick and ca_red entries in this spec; App Intents (OpenRescueIntent, OpenClearAirRedZoneIntent)",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    ],
+    "over": null,
+    "api": [],
+    "reference": true,
+    "actions": [
+      {
+        "element": "Close",
+        "path": "header.left",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      },
+      {
+        "element": "Rescue",
+        "path": "body[1].rows[0]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
+      },
+      {
+        "element": "My plan",
+        "path": "body[1].rows[1]",
+        "action": {
+          "type": "push",
+          "to": "ca_red"
+        },
+        "summary": "push → ca_red"
+      }
+    ]
+  },
+  "surface_shortcuts_ios_named": {
+    "id": "surface_shortcuts_ios_named",
+    "name": "Siri & App Shortcuts (sensitive details on)",
+    "route": "/surface/shortcuts/ios?state=named",
+    "flow": "entries",
+    "program": null,
+    "phase": "rescue",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "surface_shortcuts_ios",
+    "state": "Show sensitive details on",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review.",
+    "header": {
+      "t": "header",
+      "title": "Siri & Shortcuts",
+      "left": "close",
+      "pill": "Reference"
+    },
+    "body": [
+      {
+        "t": "text",
+        "text": "With Show sensitive details on (Account → Notifications), shortcuts use program names.",
+        "tone": "muted"
+      },
+      {
+        "t": "list",
+        "title": "Tether Health · App Shortcuts",
+        "rows": [
+          {
+            "label": "Rescue",
+            "sub": "“Rescue in Tether” · opens Rescue",
+            "action": {
+              "type": "sheet",
+              "to": "rescue_pick"
+            },
+            "lead": {
+              "icon": "✚"
+            }
+          },
+          {
+            "label": "ClearAir red-zone plan",
+            "sub": "“Show my ClearAir plan in Tether”",
+            "action": {
+              "type": "push",
+              "to": "ca_red"
+            },
+            "lead": {
+              "program": "ca"
+            }
+          }
+        ]
+      }
+    ],
+    "footer": [],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: surface_shortcuts_ios plus the Show sensitive details toggle on account_notifications in this spec",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    ],
+    "over": null,
+    "api": [],
+    "reference": true,
+    "actions": [
+      {
+        "element": "Close",
+        "path": "header.left",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      },
+      {
+        "element": "Rescue",
+        "path": "body[1].rows[0]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
+      },
+      {
+        "element": "ClearAir red-zone plan",
+        "path": "body[1].rows[1]",
+        "action": {
+          "type": "push",
+          "to": "ca_red"
+        },
+        "summary": "push → ca_red"
+      }
+    ]
+  },
+  "surface_shortcuts_android": {
+    "id": "surface_shortcuts_android",
+    "name": "Launcher shortcuts (Android)",
+    "route": "/surface/shortcuts/android",
+    "flow": "entries",
+    "program": null,
+    "phase": "rescue",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": null,
+    "state": "default",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review.",
+    "header": {
+      "t": "header",
+      "title": "App shortcuts",
+      "left": "close",
+      "pill": "Reference"
+    },
+    "body": [
+      {
+        "t": "text",
+        "text": "Shown when someone long-presses the Tether icon.",
+        "tone": "muted"
+      },
+      {
+        "t": "list",
+        "title": "Tether Health",
+        "rows": [
+          {
+            "label": "Rescue",
+            "sub": "Static shortcut · always there",
+            "action": {
+              "type": "sheet",
+              "to": "rescue_pick"
+            },
+            "lead": {
+              "icon": "✚"
+            }
+          },
+          {
+            "label": "My plan",
+            "sub": "Dynamic shortcut · only while ClearAir is a focus program",
+            "action": {
+              "type": "push",
+              "to": "ca_red"
+            },
+            "lead": {
+              "icon": "▤"
+            }
+          }
+        ]
+      },
+      {
+        "t": "card",
+        "variant": "mint",
+        "text": "Labels stay generic so the home screen doesn’t reveal which programs you use. Turn on Show sensitive details to see program names."
+      }
+    ],
+    "footer": [],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    ],
+    "over": null,
+    "api": [],
+    "reference": true,
+    "actions": [
+      {
+        "element": "Close",
+        "path": "header.left",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      },
+      {
+        "element": "Rescue",
+        "path": "body[1].rows[0]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
+      },
+      {
+        "element": "My plan",
+        "path": "body[1].rows[1]",
+        "action": {
+          "type": "push",
+          "to": "ca_red"
+        },
+        "summary": "push → ca_red"
+      }
+    ]
+  },
+  "surface_shortcuts_android_named": {
+    "id": "surface_shortcuts_android_named",
+    "name": "Launcher shortcuts (sensitive details on)",
+    "route": "/surface/shortcuts/android?state=named",
+    "flow": "entries",
+    "program": null,
+    "phase": "rescue",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "surface_shortcuts_android",
+    "state": "Show sensitive details on",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review.",
+    "header": {
+      "t": "header",
+      "title": "App shortcuts",
+      "left": "close",
+      "pill": "Reference"
+    },
+    "body": [
+      {
+        "t": "text",
+        "text": "With Show sensitive details on (Account → Notifications), shortcuts use program names.",
+        "tone": "muted"
+      },
+      {
+        "t": "list",
+        "title": "Tether Health",
+        "rows": [
+          {
+            "label": "Rescue",
+            "sub": "Static shortcut · always there",
+            "action": {
+              "type": "sheet",
+              "to": "rescue_pick"
+            },
+            "lead": {
+              "icon": "✚"
+            }
+          },
+          {
+            "label": "ClearAir red-zone plan",
+            "sub": "Dynamic shortcut",
+            "action": {
+              "type": "push",
+              "to": "ca_red"
+            },
+            "lead": {
+              "program": "ca"
+            }
+          }
+        ]
+      }
+    ],
+    "footer": [],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: surface_shortcuts_android plus the Show sensitive details toggle on account_notifications in this spec",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    ],
+    "over": null,
+    "api": [],
+    "reference": true,
+    "actions": [
+      {
+        "element": "Close",
+        "path": "header.left",
+        "action": {
+          "type": "close"
+        },
+        "summary": "close"
+      },
+      {
+        "element": "Rescue",
+        "path": "body[1].rows[0]",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "summary": "sheet → rescue_pick"
+      },
+      {
+        "element": "ClearAir red-zone plan",
+        "path": "body[1].rows[1]",
+        "action": {
+          "type": "push",
+          "to": "ca_red"
+        },
+        "summary": "push → ca_red"
       }
     ]
   }

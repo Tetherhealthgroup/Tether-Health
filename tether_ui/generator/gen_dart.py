@@ -137,6 +137,7 @@ def node(n, top=False, path=''):
     if t == 'progtag': return f"TProgramTag({args(program=S_(n['program']), extra=S_(n['extra']) if n.get('extra') else None)})"
     if t == 'calendar': return f"TCalendar({args(month=S_(n['month']), selected=str(n['selected']), window=lst([str(w) for w in n['window']]), today=str(n['today']) if n.get('today') else None)})"
     if t == 'timer': return f"TTimer(value: {S_(n['value'])}, label: {S_(n['label'])})"
+    if t == 'nativeslot': return f"TNativeSlot({args(id=S_(n['id']), label=S_(n['label']), caption=S_(n['caption']) if n.get('caption') else None, platform=S_(n['platform']) if n.get('platform', 'ios') != 'ios' else None, height=str(float(n['height'])) if n.get('height', 120) != 120 else None)})"
     raise ValueError(t)
 
 def ind(code, level=3):

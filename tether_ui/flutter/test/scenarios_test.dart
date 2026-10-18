@@ -58,10 +58,17 @@ import 'package:tether_ui/screens/records/records_manual_screen.dart';
 import 'package:tether_ui/screens/records/records_manual_error_screen.dart';
 import 'package:tether_ui/screens/records/records_review_screen.dart';
 import 'package:tether_ui/screens/rescue/rescue_active_screen.dart';
+import 'package:tether_ui/screens/rescue/rescue_pick_screen.dart';
 import 'package:tether_ui/screens/sd/sd_home_screen.dart';
 import 'package:tether_ui/screens/sf/sf_goal_screen.dart';
 import 'package:tether_ui/screens/sf/sf_home_screen.dart';
 import 'package:tether_ui/screens/sf/sf_screentime_denied_screen.dart';
+import 'package:tether_ui/screens/unplug/sf_unplug_apps_screen.dart';
+import 'package:tether_ui/screens/unplug/sf_unplug_auth_notifications_screen.dart';
+import 'package:tether_ui/screens/unplug/sf_unplug_gate_commit_screen.dart';
+import 'package:tether_ui/screens/unplug/sf_unplug_gate_sum_screen.dart';
+import 'package:tether_ui/screens/unplug/sf_unplug_session_done_early_screen.dart';
+import 'package:tether_ui/screens/unplug/sf_unplug_session_end_screen.dart';
 import 'package:tether_ui/screens/st/st_home_screen.dart';
 import 'package:tether_ui/screens/st/st_log_screen.dart';
 import 'package:tether_ui/screens/st/st_low_screen.dart';
@@ -1049,6 +1056,107 @@ void main() {
         expect(find.byType(AccountDeletedScreen), findsOneWidget, reason: 'expected account_deleted');
         await _tap(tester, 'Done');
         expect(find.byType(WelcomeScreen), findsOneWidget, reason: 'expected welcome');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario sf_unplug_strict_end · Strict session needs a reason to end early', (tester) async {
+    await _start(tester, Routes.sfUnplugSessionActive, ios: false);
+    try {
+        await _tap(tester, 'End early');
+        expect(find.byType(SfUnplugSessionEndScreen), findsOneWidget, reason: 'expected sf_unplug_session_end');
+        await _tap(tester, 'End session');
+        expect(find.byType(SfUnplugSessionEndScreen), findsOneWidget, reason: 'expected sf_unplug_session_end');
+        await _tap(tester, 'Expecting a message');
+        await _tap(tester, 'End session');
+        expect(find.byType(SfUnplugSessionDoneEarlyScreen), findsOneWidget, reason: 'expected sf_unplug_session_done_early');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario sf_unplug_gate_sum · Quick sum must be right before the app opens', (tester) async {
+    await _start(tester, Routes.sfUnplugGateSum, ios: false);
+    try {
+        await _tap(tester, 'Open it for 10 minutes');
+        expect(find.byType(SfUnplugGateSumScreen), findsOneWidget, reason: 'expected sf_unplug_gate_sum');
+        await _enter(tester, 'sf_unplug_gate_sum.answer', '9');
+        await _tap(tester, 'Open it for 10 minutes');
+        expect(find.byType(SfUnplugGateSumScreen), findsOneWidget, reason: 'expected sf_unplug_gate_sum');
+        await _enter(tester, 'sf_unplug_gate_sum.answer', '12');
+        await _tap(tester, 'Open it for 10 minutes');
+        expect(find.byType(SfHomeScreen), findsOneWidget, reason: 'expected sf_home');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario sf_unplug_gate_sentence · Sentence must be typed in full before the app opens', (tester) async {
+    await _start(tester, Routes.sfUnplugGateCommit, ios: false);
+    try {
+        await _tap(tester, 'Open it for 10 minutes');
+        expect(find.byType(SfUnplugGateCommitScreen), findsOneWidget, reason: 'expected sf_unplug_gate_commit');
+        await _enter(tester, 'sf_unplug_gate_commit.sentence', 'I can come back');
+        await _tap(tester, 'Open it for 10 minutes');
+        expect(find.byType(SfUnplugGateCommitScreen), findsOneWidget, reason: 'expected sf_unplug_gate_commit');
+        await _enter(tester, 'sf_unplug_gate_commit.sentence', 'i can come back to this later.');
+        await _tap(tester, 'Open it for 10 minutes');
+        expect(find.byType(SfHomeScreen), findsOneWidget, reason: 'expected sf_home');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario sf_unplug_overlay_support · Android pause screen reaches Rescue and Emergency', (tester) async {
+    await _start(tester, Routes.sfUnplugOverlay, ios: false);
+    try {
+        await _tap(tester, 'Get support');
+        expect(find.byType(RescuePickScreen), findsOneWidget, reason: 'expected rescue_pick');
+        await _tap(tester, 'Emergency');
+        expect(find.byType(CrisisScreen), findsOneWidget, reason: 'expected crisis');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario sf_unplug_shield_support · iPhone shield reaches Rescue without the small step', (tester) async {
+    await _start(tester, Routes.sfUnplugShield, ios: false);
+    try {
+        TSim.queue.add('Get support');
+        await _tap(tester, 'Take a breath');
+        expect(find.byType(RescuePickScreen), findsOneWidget, reason: 'expected rescue_pick');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario sf_unplug_shield_firm_support · Firm iPhone shield reaches Rescue', (tester) async {
+    await _start(tester, Routes.sfUnplugShieldFirm, ios: false);
+    try {
+        await _tap(tester, 'Get support');
+        expect(find.byType(RescuePickScreen), findsOneWidget, reason: 'expected rescue_pick');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario sf_unplug_notifications_off · Notifications off during setup → fix and continue', (tester) async {
+    await _start(tester, Routes.sfUnplugAuth, ios: false);
+    try {
+        TSim.queue.add('Approved · notifications off');
+        await _tap(tester, 'Continue');
+        expect(find.byType(SfUnplugAuthNotificationsScreen), findsOneWidget, reason: 'expected sf_unplug_auth_notifications');
+        TSim.queue.add('On (iPhone)');
+        await _tap(tester, 'Check again');
+        expect(find.byType(SfUnplugAppsScreen), findsOneWidget, reason: 'expected sf_unplug_apps');
         expect(tester.takeException(), isNull);
         await tester.pump(const Duration(seconds: 3));
     } finally {

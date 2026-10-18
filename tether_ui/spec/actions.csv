@@ -378,6 +378,7 @@ sf_buddy,Accountability buddy,Skip for now,replace,sf_home ob_setup,replace → 
 sf_home,ScrollFree home,Back,back,,back
 sf_home,ScrollFree home,Avatar · Account,push,account,push → account
 sf_home,ScrollFree home,Pause 60,push,sf_pause,push → sf_pause
+sf_home,ScrollFree home,Set up,push,sf_unplug_intro,push → sf_unplug_intro
 sf_home,ScrollFree home,This week,push,sf_week,push → sf_week
 sf_home,ScrollFree home,Had a long scroll?,push,sf_slip,push → sf_slip
 sf_home,ScrollFree home,Goal & windows,push,sf_goal,push → sf_goal
@@ -771,3 +772,142 @@ records_manual_error,Enter a value · out of range,Save,submit,records_hub,POST 
 records_manual_error,Enter a value · out of range,Ask my care team instead,push,support_message_care,push → support_message_care
 records_item,Imported values,Back,back,,back
 records_item,Imported values,Open in Heartwise,push,hw_trends,push → hw_trends
+sf_unplug_intro,Unplug intro,Back,back,,back
+sf_unplug_intro,Unplug intro,Set up Unplug,branch,sf_unplug_auth sf_unplug_auth_android,branch: Platform → iPhone: push → sf_unplug_auth | Android: push → sf_unplug_auth_android
+sf_unplug_intro,Unplug intro,Not now,back,,back
+sf_unplug_auth,Allow Screen Time,Back,back,,back
+sf_unplug_auth,Allow Screen Time,Continue,branch,sf_unplug_apps sf_unplug_auth_notifications sf_unplug_auth_denied sf_unplug_auth_unavailable,"branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Approved · notifications off: replace → sf_unplug_auth_notifications | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
+sf_unplug_auth,Allow Screen Time,Not now,back,,back
+sf_unplug_auth_denied,Screen Time not allowed,Back,back,,back
+sf_unplug_auth_denied,Screen Time not allowed,Try again,branch,sf_unplug_apps,"branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: toast “Still not allowed. You can turn it on later in Settings.”"
+sf_unplug_auth_denied,Screen Time not allowed,Open phone settings,os_settings,,os_settings
+sf_unplug_auth_denied,Screen Time not allowed,Not now,back,,back
+sf_unplug_auth_unavailable,Screen Time unavailable,Back,back,,back
+sf_unplug_auth_unavailable,Screen Time unavailable,Back to ScrollFree,back,,back
+sf_unplug_auth_notifications,Notifications off,Back,back,,back
+sf_unplug_auth_notifications,Notifications off,Open phone settings,os_settings,,os_settings
+sf_unplug_auth_notifications,Notifications off,Check again,branch,sf_unplug_apps sf_unplug_apps_android,branch: Notification permission (checked on return) → On (iPhone): replace → sf_unplug_apps | On (Android): replace → sf_unplug_apps_android | Still off: toast “Notifications are still off. You can turn them on later in Settings.”
+sf_unplug_auth_notifications,Notifications off,Continue without notifications,branch,sf_unplug_apps sf_unplug_apps_android,branch: Platform → iPhone: replace → sf_unplug_apps | Android: replace → sf_unplug_apps_android
+sf_unplug_auth_android,Android permissions for Unplug,Back,back,,back
+sf_unplug_auth_android,Android permissions for Unplug,Turn on display over apps,os_settings,,os_settings
+sf_unplug_auth_android,Android permissions for Unplug,Turn on usage access,os_settings,,os_settings
+sf_unplug_auth_android,Android permissions for Unplug,I’ve turned them on,branch,sf_unplug_apps_android sf_unplug_auth_notifications,branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Notifications off: replace → sf_unplug_auth_notifications | Missing: toast “Unplug still needs both settings.”
+sf_unplug_apps,Choose apps,Back,back,,back
+sf_unplug_apps,Choose apps,Open app picker,sheet,sf_unplug_picker_ios,sheet → sf_unplug_picker_ios
+sf_unplug_apps,Choose apps,Not now,back,,back
+sf_unplug_picker_ios,Apple app picker,Done,branch,sf_unplug_apps_chosen,branch: System app picker result → Apps chosen: replace → sf_unplug_apps_chosen | Cancelled: close
+sf_unplug_picker_ios,Apple app picker,Cancel,close,,close
+sf_unplug_apps_android,Choose apps (Android),Back,back,,back
+sf_unplug_apps_android,Choose apps (Android),Done · 3 apps,replace,sf_unplug_apps_chosen,replace → sf_unplug_apps_chosen
+sf_unplug_apps_android,Choose apps (Android),Cancel,back,,back
+sf_unplug_apps_chosen,Name your groups,Back,back,,back
+sf_unplug_apps_chosen,Name your groups,Add another group,sheet,sf_unplug_picker_ios,sheet → sf_unplug_picker_ios
+sf_unplug_apps_chosen,Name your groups,Next: limits,push,sf_unplug_limits,push → sf_unplug_limits
+sf_unplug_limits,Limits & pause screen,Back,back,,back
+sf_unplug_limits,Limits & pause screen,Save limits,submit,sf_unplug_home,CALL device:unplug/setThresholds+applyShield then toast “Unplug is on” then replace → sf_unplug_home
+sf_unplug_home,Unplug,Back,back,,back
+sf_unplug_home,Unplug,Start,push,sf_unplug_session,push → sf_unplug_session
+sf_unplug_home,Unplug,Apps,push,sf_unplug_apps_chosen,push → sf_unplug_apps_chosen
+sf_unplug_home,Unplug,Limits & pause screen,push,sf_unplug_limits,push → sf_unplug_limits
+sf_unplug_home,Unplug,Preview the pause screen,branch,sf_unplug_shield sf_unplug_overlay,branch: Platform → iPhone: push → sf_unplug_shield | Android: push → sf_unplug_overlay
+sf_unplug_home,Unplug,Tracking check,push,sf_unplug_health,push → sf_unplug_health
+sf_unplug_home,Unplug,How Unplug works,push,sf_unplug_intro,push → sf_unplug_intro
+sf_unplug_home,Unplug,Turn off Unplug,sheet,sf_unplug_off,sheet → sf_unplug_off
+sf_unplug_session,Start a focus session,Back,back,,back
+sf_unplug_session,Start a focus session,Start session,submit,sf_unplug_session_active,CALL device:unplug/startSession then replace → sf_unplug_session_active
+sf_unplug_session_active,Focus session running,Close,close,,close
+sf_unplug_session_active,Focus session running,Pause 60,push,sf_pause,push → sf_pause
+sf_unplug_session_active,Focus session running,End early,sheet,sf_unplug_session_end,sheet → sf_unplug_session_end
+sf_unplug_session_end,End session early,End session,branch,sf_unplug_session_done_early,decide sf.unplug.reason: Strict session: reason given? → Reason given: CALL device:unplug/endSession then replace → sf_unplug_session_done_early | No reason yet: toast “Choose or type a reason to end a strict session.”
+sf_unplug_session_end,End session early,Keep going,close,,close
+sf_unplug_session_done,Session complete,Done,replace,sf_unplug_home,replace → sf_unplug_home
+sf_unplug_session_done_early,Session ended early,Done,replace,sf_unplug_home,replace → sf_unplug_home
+sf_unplug_shield,Pause screen (iPhone shield),Take a breath,toast,sf_unplug_gate rescue_pick,"toast “Notification: open Tether to take your breath, or get support” then branch: Notification action → Take my breath: push → sf_unplug_gate | Get support: sheet → rescue_pick"
+sf_unplug_shield,Pause screen (iPhone shield),Open anyway,toast,,toast “Opened · 1 “open anyway” left today” then close
+sf_unplug_shield_firm,"Pause screen (iPhone shield, firm)",Close the app,toast,,toast “The app stays closed.” then close
+sf_unplug_shield_firm,"Pause screen (iPhone shield, firm)",Get support,toast,rescue_pick,toast “Notification: tap to open Rescue in Tether” then sheet → rescue_pick
+sf_unplug_overlay,Pause screen (Android overlay),Close the app,toast,,toast “The app stays closed.” then close
+sf_unplug_overlay,Pause screen (Android overlay),Get support,sheet,rescue_pick,sheet → rescue_pick
+sf_unplug_overlay,Pause screen (Android overlay),Open anyway,toast,,toast “Opened · 1 “open anyway” left today” then close
+sf_unplug_gate,Small step: one breath,Close,close,,close
+sf_unplug_gate,Small step: one breath,Get support,sheet,rescue_pick,sheet → rescue_pick
+sf_unplug_gate,Small step: one breath,Keep it closed,toast,sf_home,toast “Nice. The app stays closed.” then reset → sf_home
+sf_unplug_gate,Small step: one breath,Open it for 10 minutes,toast,sf_home,toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home
+sf_unplug_gate_commit,Small step: type a sentence,Close,close,,close
+sf_unplug_gate_commit,Small step: type a sentence,Get support,sheet,rescue_pick,sheet → rescue_pick
+sf_unplug_gate_commit,Small step: type a sentence,Keep it closed,toast,sf_home,toast “Nice. The app stays closed.” then reset → sf_home
+sf_unplug_gate_commit,Small step: type a sentence,Open it for 10 minutes,branch,sf_home,decide sf.unplug.sentence: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Type the whole sentence first.”
+sf_unplug_gate_sum,Small step: quick sum,Close,close,,close
+sf_unplug_gate_sum,Small step: quick sum,Get support,sheet,rescue_pick,sheet → rescue_pick
+sf_unplug_gate_sum,Small step: quick sum,Keep it closed,toast,sf_home,toast “Nice. The app stays closed.” then reset → sf_home
+sf_unplug_gate_sum,Small step: quick sum,Open it for 10 minutes,branch,sf_home,decide sf.unplug.sum: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Answer the sum first.”
+sf_unplug_health,Tracking check,Back,back,,back
+sf_unplug_health,Tracking check,Done,back,,back
+sf_unplug_health_notifications,Tracking check · notifications off,Back,back,,back
+sf_unplug_health_notifications,Tracking check · notifications off,Open phone settings,os_settings,,os_settings
+sf_unplug_health_notifications,Tracking check · notifications off,Check again,branch,sf_unplug_health,branch: Notification permission (checked on return) → On: replace → sf_unplug_health | Still off: toast “Notifications are still off.”
+sf_unplug_health_stopped,Tracking stopped,Back,back,,back
+sf_unplug_health_stopped,Tracking stopped,Open phone settings,os_settings,,os_settings
+sf_unplug_health_stopped,Tracking stopped,Check again,branch,sf_unplug_health,branch: Tracking health result → All pass: replace → sf_unplug_health | Still failing: toast “Still not working. Turn Screen Time access on again in Settings.”
+sf_unplug_health_android,Tracking check (Android),Back,back,,back
+sf_unplug_health_android,Tracking check (Android),Battery settings,os_settings,,os_settings
+sf_unplug_health_android,Tracking check (Android),Done,back,,back
+sf_unplug_off,Turn off Unplug,Turn off,branch,sf_home sf_home,decide choice:sf_unplug_off.scope: Chosen option → Unplug only: CALL device:unplug/liftShield+purgeLocalData then toast “Unplug is off” then reset → sf_home | Unplug and Screen Time: PATCH /v1/enrolments/consents then toast “Unplug and Screen Time are off” then reset → sf_home
+sf_unplug_off,Turn off Unplug,Cancel,close,,close
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Back,back,,back
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Avatar · Account,push,account,push → account
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Pause 60,push,sf_pause,push → sf_pause
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Unplug is on,push,sf_unplug_home,push → sf_unplug_home
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),This week,push,sf_week,push → sf_week
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Had a long scroll?,push,sf_slip,push → sf_slip
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Goal & windows,push,sf_goal,push → sf_goal
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Buddy,push,sf_buddy,push → sf_buddy
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Program settings,push,program_settings,push → program_settings
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Tab · Today,tab,today,tab → today
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Tab · Progress,tab,progress,tab → progress
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Tab · Learn,tab,learn,tab → learn
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Tab · Support,tab,support,tab → support
+sf_week_unplug,Weekly reflection · Unplug on (iPhone),Back,back,,back
+sf_week_unplug,Weekly reflection · Unplug on (iPhone),Yes,toast,,toast “Goal set to 75 min” then back
+sf_week_unplug,Weekly reflection · Unplug on (iPhone),Stay at 90,back,,back
+program_settings_sf,Program settings · ScrollFree with Unplug,Back,back,,back
+program_settings_sf,Program settings · ScrollFree with Unplug,Unplug,push,sf_unplug_home,push → sf_unplug_home
+program_settings_sf,Program settings · ScrollFree with Unplug,Screen Time access,push,sf_screentime,push → sf_screentime
+program_settings_sf,Program settings · ScrollFree with Unplug,Turn off Unplug or Screen Time,sheet,sf_unplug_off,sheet → sf_unplug_off
+program_settings_sf,Program settings · ScrollFree with Unplug,Export ScrollFree data,toast,,toast “Export is being prepared. We’ll notify you.”
+program_settings_sf,Program settings · ScrollFree with Unplug,Leave ScrollFree,sheet,account_leave,sheet → account_leave
+program_settings_sf,Program settings · ScrollFree with Unplug,Save changes,submit,,PATCH /v1/enrolments/:id then toast “Saved” then back
+account_delete_apple,Delete account · Apple account,Back,back,,back
+account_delete_apple,Delete account · Apple account,Download a copy first,push,account_data,push → account_data
+account_delete_apple,Delete account · Apple account,Delete everything,branch,account_deleted,auth (apple): Sign in with Apple result → Success: DELETE /v1/account/data then replace → account_deleted | Different account: toast “That’s a different Apple account. Use the one you signed in with.” | Cancelled: toast “Nothing was deleted.” | Error: toast “Couldn’t reach Apple. Nothing was deleted.”
+account_delete_google,Delete account · Google account,Back,back,,back
+account_delete_google,Delete account · Google account,Download a copy first,push,account_data,push → account_data
+account_delete_google,Delete account · Google account,Delete everything,branch,account_deleted,auth (google): Sign in with Google result → Success: DELETE /v1/account/data then replace → account_deleted | Different account: toast “That’s a different Google account. Use the one you signed in with.” | Cancelled: toast “Nothing was deleted.” | Error: toast “Couldn’t reach Google. Nothing was deleted.”
+auth_session_apple,Session expired · Apple account,Continue with Apple,branch,auth_social_error,auth (apple): Sign in with Apple result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error
+auth_session_apple,Session expired · Apple account,Use Face ID,close,,close
+auth_session_google,Session expired · Google account,Continue with Google,branch,auth_social_error,auth (google): Sign in with Google result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error
+auth_session_google,Session expired · Google account,Use Face ID,close,,close
+sf_screentime_android,Connect usage access (Android),Back,back,,back
+sf_screentime_android,Connect usage access (Android),Open settings,branch,sf_screentime_android_denied,branch: Android usage access (checked on return) → Allowed: toast “Usage access on” then back | Not allowed: replace → sf_screentime_android_denied
+sf_screentime_android,Connect usage access (Android),Not now,back,,back
+sf_screentime_android_denied,Usage access off (Android),Back,back,,back
+sf_screentime_android_denied,Usage access off (Android),Continue with self-report,back,,back
+sf_screentime_android_denied,Usage access off (Android),Open settings,os_settings,,os_settings
+sys_update_android,Update required (Android),Update now,external,,external https://play.google.com/store/apps/details?id=com.TetherHealthLLC.tetherhealth
+sys_update_android,Update required (Android),Open Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_widget_ios,Home-screen widget (iPhone),Close,close,,close
+surface_widget_ios,Home-screen widget (iPhone),Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_widget_android,Home-screen widget (Android),Close,close,,close
+surface_widget_android,Home-screen widget (Android),Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_shortcuts_ios,Siri & App Shortcuts (iPhone),Close,close,,close
+surface_shortcuts_ios,Siri & App Shortcuts (iPhone),Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_shortcuts_ios,Siri & App Shortcuts (iPhone),My plan,push,ca_red,push → ca_red
+surface_shortcuts_ios_named,Siri & App Shortcuts (sensitive details on),Close,close,,close
+surface_shortcuts_ios_named,Siri & App Shortcuts (sensitive details on),Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_shortcuts_ios_named,Siri & App Shortcuts (sensitive details on),ClearAir red-zone plan,push,ca_red,push → ca_red
+surface_shortcuts_android,Launcher shortcuts (Android),Close,close,,close
+surface_shortcuts_android,Launcher shortcuts (Android),Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_shortcuts_android,Launcher shortcuts (Android),My plan,push,ca_red,push → ca_red
+surface_shortcuts_android_named,Launcher shortcuts (sensitive details on),Close,close,,close
+surface_shortcuts_android_named,Launcher shortcuts (sensitive details on),Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_shortcuts_android_named,Launcher shortcuts (sensitive details on),ClearAir red-zone plan,push,ca_red,push → ca_red

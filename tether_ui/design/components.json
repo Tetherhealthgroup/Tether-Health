@@ -168,5 +168,10 @@
     "widget": "SizedBox",
     "props": "h",
     "behavior": ""
+  },
+  "nativeslot": {
+    "widget": "TNativeSlot",
+    "props": "id, label, caption, platform, height",
+    "behavior": "Platform view registered for id (TNativeSlot.register) in the app; labelled placeholder of the same height in preview, tests and other platforms"
   }
 }

@@ -1,0 +1,87 @@
+{
+  "id": "surface_widget_ios",
+  "name": "Home-screen widget (iPhone)",
+  "route": "/surface/widget/ios",
+  "flow": "entries",
+  "program": null,
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": true,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review. WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.",
+  "header": {
+    "t": "header",
+    "title": "iPhone widget",
+    "left": "close",
+    "pill": "Reference",
+    "dark": true
+  },
+  "body": [
+    {
+      "t": "eyebrow",
+      "text": "Home screen · small widget"
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "Rescue",
+      "text": "Help for the next few minutes",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      }
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Label",
+          "Rescue (generic)"
+        ],
+        [
+          "Shows",
+          "No health data, no program names"
+        ],
+        [
+          "Tap",
+          "Opens Rescue, even when signed out"
+        ],
+        [
+          "Data",
+          "None. No App Group needed"
+        ]
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: rescue_pick entry \"Home-screen widget / Siri: Rescue\" in this spec; WidgetKit, static content",
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+  ],
+  "over": null,
+  "api": [],
+  "reference": true,
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Rescue",
+      "path": "body[1]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
+    }
+  ]
+}

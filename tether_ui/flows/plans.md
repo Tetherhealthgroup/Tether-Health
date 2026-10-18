@@ -8,6 +8,7 @@ flowchart LR
   catalog["Add a program"]
   focus_full{{"Focus slots full"}}
   program_settings["Program settings"]
+  program_settings_sf["Program settings · ScrollFree with Unplug"]
   plans -->|"Avatar · Account"| account
   plans -->|"BreatheFree"| bf_home
   plans -->|"ScrollFree"| sf_home
@@ -29,6 +30,10 @@ flowchart LR
   focus_full -->|"Continue"| plans
   focus_full -->|"Continue"| hw_q1
   program_settings -->|"Leave BreatheFree"| account_leave
+  program_settings_sf -->|"Unplug"| sf_unplug_home
+  program_settings_sf -->|"Screen Time access"| sf_screentime
+  program_settings_sf -->|"Turn off Unplug or Screen Ti"| sf_unplug_off
+  program_settings_sf -->|"Leave ScrollFree"| account_leave
   account>"Account ↗"]
   class account ext
   account_leave>"Leave a program ↗"]
@@ -63,6 +68,12 @@ flowchart LR
   class sf_home ext
   sf_intro>"ScrollFree intro ↗"]
   class sf_intro ext
+  sf_screentime>"Connect Screen Time ↗"]
+  class sf_screentime ext
+  sf_unplug_home>"Unplug ↗"]
+  class sf_unplug_home ext
+  sf_unplug_off>"Turn off Unplug ↗"]
+  class sf_unplug_off ext
   st_intro>"Steady intro ↗"]
   class st_intro ext
   classDef ext fill:#FFFDF7,stroke:#B6C8C2,stroke-dasharray: 4 3
@@ -78,6 +89,7 @@ flowchart LR
 | [Add a program](../screens/png/plans/catalog.png) | `/programs` | screen | welcome |
 | [Focus slots full](../screens/png/plans/focus_full.png) | `/programs/focus-full` | sheet | plan |
 | [Program settings](../screens/png/plans/program_settings.png) | `/p/:program/settings` | screen | account |
+| [Program settings · ScrollFree with Unplug](../screens/png/plans/program_settings_sf.png) | `/p/:program/settings?state=sf-unplug` | screen · ScrollFree | account |
 
 ## Button & action map
 
@@ -112,3 +124,10 @@ flowchart LR
 | Program settings | Export BreatheFree data | `toast “Export is being prepared. We’ll notify you.”` |
 | Program settings | Leave BreatheFree | `sheet → account_leave` |
 | Program settings | Save changes | `PATCH /v1/enrolments/:id then toast “Saved” then back` |
+| Program settings · ScrollFree with Unplug | Back | `back` |
+| Program settings · ScrollFree with Unplug | Unplug | `push → sf_unplug_home` |
+| Program settings · ScrollFree with Unplug | Screen Time access | `push → sf_screentime` |
+| Program settings · ScrollFree with Unplug | Turn off Unplug or Screen Time | `sheet → sf_unplug_off` |
+| Program settings · ScrollFree with Unplug | Export ScrollFree data | `toast “Export is being prepared. We’ll notify you.”` |
+| Program settings · ScrollFree with Unplug | Leave ScrollFree | `sheet → account_leave` |
+| Program settings · ScrollFree with Unplug | Save changes | `PATCH /v1/enrolments/:id then toast “Saved” then back` |

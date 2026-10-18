@@ -140,8 +140,8 @@ def programs_a():
         rows([row('Connect Screen Time', 'Optional · totals only', action=go('sf_screentime'))]),
     ], footer=[button('Save my goal', go('sf_buddy'))])
     S('sf_screentime', 'Connect Screen Time', '/p/sf/screen-time', 'sf', program='sf', phase='plan', hdr=H('Screen Time', pill='Optional'), body=[
-        illus('◷'), title('See real totals, if you want.', align='center'), text('Tether reads daily totals by category only. Never apps’ content, messages or contacts.', 'muted', align='center'),
-        kv([('Reads', 'Minutes per category'), ('Never reads', 'Content, messages, contacts'), ('Turn off', 'Anytime in Account')]),
+        illus('◷'), title('See your Screen Time here, if you want.', align='center'), text('Apple’s Screen Time shows your daily totals by category inside Tether. Tether can’t read, store or share those minutes.', 'muted', align='center'),
+        kv([('Shows', 'Minutes per category, on this phone'), ('Never reads', 'Content, messages, contacts'), ('Turn off', 'Anytime in Account')]),
     ], footer=[button('Allow access', branch('iOS Screen Time permission', [('Allowed', toast('Screen Time connected', back())), ('Not allowed', rep('sf_screentime_denied'))])), button('Not now', back(), v='secondary')])
     S('sf_screentime_denied', 'Screen Time denied', '/p/sf/screen-time?state=denied', 'sf', program='sf', phase='plan', variant_of='sf_screentime', state='permission denied', hdr=H('Screen Time', pill='Optional'), body=[
         banner('info', 'Screen Time access was not allowed.'), title('Self-report works just as well.'),
@@ -155,6 +155,7 @@ def programs_a():
     S('sf_home', 'ScrollFree home', '/p/sf/home', 'sf', program='sf', phase='daily', tabname='plans', hdr=home_hdr('sf'), body=[
         card(v='dark', eyebrow='Yesterday', children=[big('2h 10m', None, 'Goal 90 min · down from 3h')]),
         card(v='coral', title='Urge to scroll?', text='Take 60 seconds first', cta=button('Pause 60', go('sf_pause'), v='rescue', small=True)),
+        card(title='Want firmer limits?', text='Unplug can pause apps you choose, after limits you set. Optional.', cta=button('Set up', go('sf_unplug_intro'), v='secondary', small=True)),
         card(checklist([ci('Charge your phone outside the bedroom', 'Tonight · bedtime window 10 PM')]), eyebrow='Today’s step'),
         rows([row('This week', '5 of 7 phone-free nights', action=go('sf_week')), row('Had a long scroll?', 'Reflect, nothing resets', action=go('sf_slip')),
               row('Goal & windows', '90 min · bedtime', action=go('sf_goal')), row('Buddy', 'Sam · weekly message', action=go('sf_buddy')), settings_row('sf')]),

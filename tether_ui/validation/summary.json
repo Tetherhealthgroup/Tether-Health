@@ -1,37 +1,55 @@
 {
-  "generated": "2026-10-17T21:56:20+00:00",
-  "screens": 183,
-  "flows": 20,
-  "actions": 771,
+  "generated": "2026-10-18T07:12:52+00:00",
+  "screens": 227,
+  "flows": 22,
+  "actions": 911,
   "flutter": {
-    "total": 1288,
-    "passed": 1288,
+    "total": 1553,
+    "passed": 1553,
     "render_tests": [
-      366,
-      366
+      454,
+      454
     ],
     "action_sweep": [
-      853,
-      853
+      1023,
+      1023
     ],
     "scenarios": [
-      68,
-      68
+      75,
+      75
     ]
   },
   "prototype": {
     "scenarios": [
-      68,
-      68
+      75,
+      75
     ],
     "action_sweep": [
-      853,
-      853
+      1023,
+      1023
     ],
     "js_errors": 0
   },
   "action_coverage": [
-    771,
-    771
-  ]
+    911,
+    911
+  ],
+  "release_check": {
+    "note": "Release acceptance counts exclude reference surfaces (spec screens with reference: true), which are checked by device screenshots.",
+    "screens": 216,
+    "actions": 883,
+    "reference_screens": [
+      "sf_unplug_apps_android",
+      "sf_unplug_overlay",
+      "sf_unplug_picker_ios",
+      "sf_unplug_shield",
+      "sf_unplug_shield_firm",
+      "surface_shortcuts_android",
+      "surface_shortcuts_android_named",
+      "surface_shortcuts_ios",
+      "surface_shortcuts_ios_named",
+      "surface_widget_android",
+      "surface_widget_ios"
+    ]
+  }
 }

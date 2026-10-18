@@ -1,14 +1,14 @@
 # Validation report
 
-Generated 2026-10-17T21:56:20+00:00 from the spec, the Flutter package and the HTML prototype.
+Generated 2026-10-18T07:12:52+00:00 from the spec, the Flutter package and the HTML prototype.
 
 | Check | Flutter | Prototype |
 |---|---|---|
-| End-to-end scenarios (all programs) | 68 / 68 | 68 / 68 |
-| Button-flow sweep (every element × every outcome) | 853 / 853 | 853 / 853 |
-| Render tests (every screen at 100% and 130% text) | 366 / 366 | — |
+| End-to-end scenarios (all programs) | 75 / 75 | 75 / 75 |
+| Button-flow sweep (every element × every outcome) | 1023 / 1023 | 1023 / 1023 |
+| Render tests (every screen at 100% and 130% text) | 454 / 454 | — |
 | Static analysis | `flutter analyze`: see analyze.txt | JS errors: 0 |
-| Spec validator (loose ends) | 0 errors · 771 actions, every target exists, every screen reachable | |
+| Spec validator (loose ends) | 0 errors · 911 actions, every target exists, every screen reachable | |
 
 ## Scenarios by program and function
 
@@ -99,6 +99,13 @@ Generated 2026-10-17T21:56:20+00:00 from the spec, the Flutter package and the H
 | today-tabs: Every tab from Today | — | tap “Plans” → at plans → tap “Progress” → at progress → tap “Learn” → at learn → tap “Support” → at support → tap “Today” | `today` | ✅ | ✅ |
 | checkin: Combined check-in → one step per program | — | tap “Start” → tap “Save check-in” → at checkin_done → tap “Back to Today” | `today` | ✅ | ✅ |
 | delete: Delete account with receipt | — | tap “Your data” → tap “Delete account and all data” → tap “Delete everything” → at account_deleted → tap “Done” | `welcome` | ✅ | ✅ |
+| sf_unplug_strict_end: Strict session needs a reason to end early | ScrollFree | tap “End early” → at sf_unplug_session_end → tap “End session” → at sf_unplug_session_end → tap “Expecting a message” → tap “End session” | `sf_unplug_session_done_early` | ✅ | ✅ |
+| sf_unplug_gate_sum: Quick sum must be right before the app opens | ScrollFree | tap “Open it for 10 minutes” → at sf_unplug_gate_sum → enter sf_unplug_gate_sum.answer=9 → tap “Open it for 10 minutes” → at sf_unplug_gate_sum → enter sf_unplug_gate_sum.answer=12 → tap “Open it for 10 minutes” | `sf_home` | ✅ | ✅ |
+| sf_unplug_gate_sentence: Sentence must be typed in full before the app opens | ScrollFree | tap “Open it for 10 minutes” → at sf_unplug_gate_commit → enter sf_unplug_gate_commit.sentence=I can come back → tap “Open it for 10 minutes” → at sf_unplug_gate_commit → enter sf_unplug_gate_commit.sentence=i can come back to this later. → tap “Open it for 10 minutes” | `sf_home` | ✅ | ✅ |
+| sf_unplug_overlay_support: Android pause screen reaches Rescue and Emergency | ScrollFree | tap “Get support” → at rescue_pick → tap “Emergency” | `crisis` | ✅ | ✅ |
+| sf_unplug_shield_support: iPhone shield reaches Rescue without the small step | ScrollFree | outcome “Get support” → tap “Take a breath” | `rescue_pick` | ✅ | ✅ |
+| sf_unplug_shield_firm_support: Firm iPhone shield reaches Rescue | ScrollFree | tap “Get support” | `rescue_pick` | ✅ | ✅ |
+| sf_unplug_notifications_off: Notifications off during setup → fix and continue | ScrollFree | outcome “Approved · notifications off” → tap “Continue” → at sf_unplug_auth_notifications → outcome “On (iPhone)” → tap “Check again” | `sf_unplug_apps` | ✅ | ✅ |
 
 ## Decision rules exercised
 
@@ -107,6 +114,9 @@ Generated 2026-10-17T21:56:20+00:00 from the spec, the Flutter package and the H
 - **ca.zone** · Asthma/COPD zone from action plan: Peak flow outside 50–900 → Invalid. A red symptom or peak flow below the plan’s red threshold → Red. Peak flow below the green threshold or any symptom → Yellow. Otherwise Green. Thresholds come only from the member’s plan. _NAEPP asthma action plan zones. Needs pulmonology sign-off._
 - **ea.selfharm** · Self-harm signal: If the member selects a self-harm option the crisis screen opens immediately (988/911). _Safe messaging guidance. Needs psychiatry sign-off._
 - **rec.manual** · Manual health value check: Value must be within the plausible range for the chosen test, else held for review. Duplicates of an imported FHIR value (same LOINC, date, value) are not added twice. _Plausibility ranges, not clinical targets._
+- **sf.unplug.reason** · Strict session: reason before ending early: A strict session ends early only when a reason chip is selected or a note is typed. _endSession(overrideReason) in pigeons/unplug_api.dart. Product rule, not clinical._
+- **sf.unplug.sentence** · Small step: typed sentence: Done when the typed text equals the sentence, ignoring case, extra spaces and a final full stop. _PlatformEffortGate.commitment. Product rule, not clinical._
+- **sf.unplug.sum** · Small step: quick sum: Done when the answer equals a + b. _PlatformEffortGate.puzzle. Product rule, not clinical._
 
 ## Failures
 

@@ -75,6 +75,7 @@ COMPONENTS = {
     'illus': ('TIllustration', 'glyph, tone', 'Decorative, excluded from semantics'), 'emergency': ('TEmergencyCard', 'text, actions', '988 / 911 routes'),
     'skeleton': ('TSkeleton', 'lines', 'Loading'), 'progtag': ('TProgramTag', 'program, extra', ''), 'calendar': ('TCalendar', 'month, selected, window, today', ''),
     'timer': ('TTimer', 'value, label', 'Live region'), 'spacer': ('SizedBox', 'h', ''),
+    'nativeslot': ('TNativeSlot', 'id, label, caption, platform, height', 'Platform view registered for id (TNativeSlot.register) in the app; labelled placeholder of the same height in preview, tests and other platforms'),
 }
 
 def flow_markdown(fid, describe):

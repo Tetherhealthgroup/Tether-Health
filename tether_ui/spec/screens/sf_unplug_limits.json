@@ -1,0 +1,177 @@
+{
+  "id": "sf_unplug_limits",
+  "name": "Limits & pause screen",
+  "route": "/p/sf/unplug/limits",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review. Levels map to PlatformModuleConfig.tier (Notice 1, Pause 2, Pause + step 3, Firm 5 = no overrides). Small step maps to gate breath | commitment | puzzle. Device-only: nothing here is sent to Tether. Looser limits take effect the next day.",
+  "header": {
+    "t": "header",
+    "title": "Limits",
+    "left": "back",
+    "pill": "Step 3 of 3"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "When should Unplug step in?",
+      "size": "m"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "children": [
+        {
+          "t": "slider",
+          "label": "Daily time in these apps",
+          "value": 60,
+          "min": 15,
+          "max": 240,
+          "minLabel": "15 min",
+          "maxLabel": "4 h",
+          "color": "sf",
+          "suffix": " min",
+          "key": "daily_minutes"
+        },
+        {
+          "t": "slider",
+          "label": "Opens a day",
+          "value": 20,
+          "min": 5,
+          "max": 60,
+          "minLabel": "5",
+          "maxLabel": "60",
+          "color": "sf",
+          "key": "daily_opens"
+        },
+        {
+          "t": "text",
+          "text": "On iPhone, opens are counted from pause screens shown, so the number is approximate.",
+          "tone": "small"
+        }
+      ]
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Notice only",
+          "sub": "Count time, no pause screen"
+        },
+        {
+          "label": "Pause screen",
+          "sub": "A pause before the app opens"
+        },
+        {
+          "label": "Pause and one small step",
+          "sub": "A breath, a typed sentence or a quick sum first",
+          "badge": "Suggested"
+        },
+        {
+          "label": "Firm",
+          "sub": "No “open anyway” until tomorrow"
+        }
+      ],
+      "selected": 2,
+      "label": "When you reach a limit",
+      "key": "level"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "One breath",
+        "Type a sentence",
+        "Quick sum"
+      ],
+      "selected": [
+        "One breath"
+      ],
+      "multi": false,
+      "label": "Small step",
+      "key": "gate"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "0",
+        "1",
+        "3",
+        "5"
+      ],
+      "selected": "3",
+      "label": "“Open anyway” per day",
+      "key": "overrides"
+    },
+    {
+      "t": "text",
+      "text": "Stricter limits apply now. Looser limits start tomorrow, so one hard moment doesn’t change your plan.",
+      "tone": "small"
+    },
+    {
+      "t": "text",
+      "text": "Every pause screen has a Get support button. Tether, the phone dialer and emergency calling can never be chosen or paused.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save limits",
+      "action": {
+        "type": "submit",
+        "api": "CALL device:unplug/setThresholds+applyShield",
+        "then": {
+          "type": "toast",
+          "value": "Unplug is on",
+          "then": {
+            "type": "replace",
+            "to": "sf_unplug_home"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformThresholds(minutes, opens), PlatformModuleConfig(tier, overrideAllowance, gate none|breath|commitment|puzzle, strict); lib/unplug/screens/unplug_screen_f.dart (tier, cool-off)",
+    "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save limits",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "CALL device:unplug/setThresholds+applyShield",
+        "then": {
+          "type": "toast",
+          "value": "Unplug is on",
+          "then": {
+            "type": "replace",
+            "to": "sf_unplug_home"
+          }
+        }
+      },
+      "summary": "CALL device:unplug/setThresholds+applyShield then toast “Unplug is on” then replace → sf_unplug_home"
+    }
+  ]
+}

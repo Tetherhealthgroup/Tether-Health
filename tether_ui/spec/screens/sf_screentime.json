@@ -26,13 +26,13 @@
     },
     {
       "t": "title",
-      "text": "See real totals, if you want.",
+      "text": "See your Screen Time here, if you want.",
       "size": "m",
       "align": "center"
     },
     {
       "t": "text",
-      "text": "Tether reads daily totals by category only. Never apps’ content, messages or contacts.",
+      "text": "Apple’s Screen Time shows your daily totals by category inside Tether. Tether can’t read, store or share those minutes.",
       "tone": "muted",
       "align": "center"
     },
@@ -40,8 +40,8 @@
       "t": "kv",
       "rows": [
         [
-          "Reads",
-          "Minutes per category"
+          "Shows",
+          "Minutes per category, on this phone"
         ],
         [
           "Never reads",

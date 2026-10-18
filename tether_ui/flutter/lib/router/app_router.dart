@@ -185,6 +185,50 @@ import '../screens/records/records_disconnect_screen.dart';
 import '../screens/records/records_manual_screen.dart';
 import '../screens/records/records_manual_error_screen.dart';
 import '../screens/records/records_item_screen.dart';
+import '../screens/unplug/sf_unplug_intro_screen.dart';
+import '../screens/unplug/sf_unplug_auth_screen.dart';
+import '../screens/unplug/sf_unplug_auth_denied_screen.dart';
+import '../screens/unplug/sf_unplug_auth_unavailable_screen.dart';
+import '../screens/unplug/sf_unplug_auth_notifications_screen.dart';
+import '../screens/unplug/sf_unplug_auth_android_screen.dart';
+import '../screens/unplug/sf_unplug_apps_screen.dart';
+import '../screens/unplug/sf_unplug_picker_ios_screen.dart';
+import '../screens/unplug/sf_unplug_apps_android_screen.dart';
+import '../screens/unplug/sf_unplug_apps_chosen_screen.dart';
+import '../screens/unplug/sf_unplug_limits_screen.dart';
+import '../screens/unplug/sf_unplug_home_screen.dart';
+import '../screens/unplug/sf_unplug_session_screen.dart';
+import '../screens/unplug/sf_unplug_session_active_screen.dart';
+import '../screens/unplug/sf_unplug_session_end_screen.dart';
+import '../screens/unplug/sf_unplug_session_done_screen.dart';
+import '../screens/unplug/sf_unplug_session_done_early_screen.dart';
+import '../screens/unplug/sf_unplug_shield_screen.dart';
+import '../screens/unplug/sf_unplug_shield_firm_screen.dart';
+import '../screens/unplug/sf_unplug_overlay_screen.dart';
+import '../screens/unplug/sf_unplug_gate_screen.dart';
+import '../screens/unplug/sf_unplug_gate_commit_screen.dart';
+import '../screens/unplug/sf_unplug_gate_sum_screen.dart';
+import '../screens/unplug/sf_unplug_health_screen.dart';
+import '../screens/unplug/sf_unplug_health_notifications_screen.dart';
+import '../screens/unplug/sf_unplug_health_stopped_screen.dart';
+import '../screens/unplug/sf_unplug_health_android_screen.dart';
+import '../screens/unplug/sf_unplug_off_screen.dart';
+import '../screens/sf/sf_home_unplug_screen.dart';
+import '../screens/sf/sf_week_unplug_screen.dart';
+import '../screens/plans/program_settings_sf_screen.dart';
+import '../screens/account/account_delete_apple_screen.dart';
+import '../screens/account/account_delete_google_screen.dart';
+import '../screens/auth/auth_session_apple_screen.dart';
+import '../screens/auth/auth_session_google_screen.dart';
+import '../screens/sf/sf_screentime_android_screen.dart';
+import '../screens/sf/sf_screentime_android_denied_screen.dart';
+import '../screens/system/sys_update_android_screen.dart';
+import '../screens/entries/surface_widget_ios_screen.dart';
+import '../screens/entries/surface_widget_android_screen.dart';
+import '../screens/entries/surface_shortcuts_ios_screen.dart';
+import '../screens/entries/surface_shortcuts_ios_named_screen.dart';
+import '../screens/entries/surface_shortcuts_android_screen.dart';
+import '../screens/entries/surface_shortcuts_android_named_screen.dart';
 
 abstract final class AppRouter {
   static final Map<String, WidgetBuilder> screens = <String, WidgetBuilder>{
@@ -371,10 +415,54 @@ abstract final class AppRouter {
     Routes.recordsManual: (_) => const RecordsManualScreen(),
     Routes.recordsManualError: (_) => const RecordsManualErrorScreen(),
     Routes.recordsItem: (_) => const RecordsItemScreen(),
+    Routes.sfUnplugIntro: (_) => const SfUnplugIntroScreen(),
+    Routes.sfUnplugAuth: (_) => const SfUnplugAuthScreen(),
+    Routes.sfUnplugAuthDenied: (_) => const SfUnplugAuthDeniedScreen(),
+    Routes.sfUnplugAuthUnavailable: (_) => const SfUnplugAuthUnavailableScreen(),
+    Routes.sfUnplugAuthNotifications: (_) => const SfUnplugAuthNotificationsScreen(),
+    Routes.sfUnplugAuthAndroid: (_) => const SfUnplugAuthAndroidScreen(),
+    Routes.sfUnplugApps: (_) => const SfUnplugAppsScreen(),
+    Routes.sfUnplugPickerIos: (_) => const SfUnplugPickerIosScreen(),
+    Routes.sfUnplugAppsAndroid: (_) => const SfUnplugAppsAndroidScreen(),
+    Routes.sfUnplugAppsChosen: (_) => const SfUnplugAppsChosenScreen(),
+    Routes.sfUnplugLimits: (_) => const SfUnplugLimitsScreen(),
+    Routes.sfUnplugHome: (_) => const SfUnplugHomeScreen(),
+    Routes.sfUnplugSession: (_) => const SfUnplugSessionScreen(),
+    Routes.sfUnplugSessionActive: (_) => const SfUnplugSessionActiveScreen(),
+    Routes.sfUnplugSessionEnd: (_) => const SfUnplugSessionEndScreen(),
+    Routes.sfUnplugSessionDone: (_) => const SfUnplugSessionDoneScreen(),
+    Routes.sfUnplugSessionDoneEarly: (_) => const SfUnplugSessionDoneEarlyScreen(),
+    Routes.sfUnplugShield: (_) => const SfUnplugShieldScreen(),
+    Routes.sfUnplugShieldFirm: (_) => const SfUnplugShieldFirmScreen(),
+    Routes.sfUnplugOverlay: (_) => const SfUnplugOverlayScreen(),
+    Routes.sfUnplugGate: (_) => const SfUnplugGateScreen(),
+    Routes.sfUnplugGateCommit: (_) => const SfUnplugGateCommitScreen(),
+    Routes.sfUnplugGateSum: (_) => const SfUnplugGateSumScreen(),
+    Routes.sfUnplugHealth: (_) => const SfUnplugHealthScreen(),
+    Routes.sfUnplugHealthNotifications: (_) => const SfUnplugHealthNotificationsScreen(),
+    Routes.sfUnplugHealthStopped: (_) => const SfUnplugHealthStoppedScreen(),
+    Routes.sfUnplugHealthAndroid: (_) => const SfUnplugHealthAndroidScreen(),
+    Routes.sfUnplugOff: (_) => const SfUnplugOffScreen(),
+    Routes.sfHomeUnplug: (_) => const SfHomeUnplugScreen(),
+    Routes.sfWeekUnplug: (_) => const SfWeekUnplugScreen(),
+    Routes.programSettingsSf: (_) => const ProgramSettingsSfScreen(),
+    Routes.accountDeleteApple: (_) => const AccountDeleteAppleScreen(),
+    Routes.accountDeleteGoogle: (_) => const AccountDeleteGoogleScreen(),
+    Routes.authSessionApple: (_) => const AuthSessionAppleScreen(),
+    Routes.authSessionGoogle: (_) => const AuthSessionGoogleScreen(),
+    Routes.sfScreentimeAndroid: (_) => const SfScreentimeAndroidScreen(),
+    Routes.sfScreentimeAndroidDenied: (_) => const SfScreentimeAndroidDeniedScreen(),
+    Routes.sysUpdateAndroid: (_) => const SysUpdateAndroidScreen(),
+    Routes.surfaceWidgetIos: (_) => const SurfaceWidgetIosScreen(),
+    Routes.surfaceWidgetAndroid: (_) => const SurfaceWidgetAndroidScreen(),
+    Routes.surfaceShortcutsIos: (_) => const SurfaceShortcutsIosScreen(),
+    Routes.surfaceShortcutsIosNamed: (_) => const SurfaceShortcutsIosNamedScreen(),
+    Routes.surfaceShortcutsAndroid: (_) => const SurfaceShortcutsAndroidScreen(),
+    Routes.surfaceShortcutsAndroidNamed: (_) => const SurfaceShortcutsAndroidNamedScreen(),
   };
 
   /// Routes presented as modal bottom sheets.
-  static const Set<String> sheets = {Routes.obThird, Routes.authSignin, Routes.authSigninError, Routes.authMerge, Routes.authSession, Routes.checkin, Routes.rescuePick, Routes.rescueTools, Routes.focusFull, Routes.supportCallback, Routes.supportMessage, Routes.accountLeave, Routes.accountSignout, Routes.bfEstimates, Routes.recordsDisconnect};
+  static const Set<String> sheets = {Routes.obThird, Routes.authSignin, Routes.authSigninError, Routes.authMerge, Routes.authSession, Routes.checkin, Routes.rescuePick, Routes.rescueTools, Routes.focusFull, Routes.supportCallback, Routes.supportMessage, Routes.accountLeave, Routes.accountSignout, Routes.bfEstimates, Routes.recordsDisconnect, Routes.sfUnplugPickerIos, Routes.sfUnplugSessionEnd, Routes.sfUnplugOff, Routes.authSessionApple, Routes.authSessionGoogle};
 
   static const Map<String, String> tabRoutes = {'today': Routes.today, 'plans': Routes.plans, 'progress': Routes.progress, 'learn': Routes.learn, 'support': Routes.support};
 
@@ -563,6 +651,50 @@ abstract final class AppRouter {
     ('records_manual', 'Enter a value', 'Health records (FHIR & manual)', Routes.recordsManual),
     ('records_manual_error', 'Enter a value · out of range · error', 'Health records (FHIR & manual)', Routes.recordsManualError),
     ('records_item', 'Imported values', 'Health records (FHIR & manual)', Routes.recordsItem),
+    ('sf_unplug_intro', 'Unplug intro', 'ScrollFree · Unplug', Routes.sfUnplugIntro),
+    ('sf_unplug_auth', 'Allow Screen Time', 'ScrollFree · Unplug', Routes.sfUnplugAuth),
+    ('sf_unplug_auth_denied', 'Screen Time not allowed · permission denied', 'ScrollFree · Unplug', Routes.sfUnplugAuthDenied),
+    ('sf_unplug_auth_unavailable', 'Screen Time unavailable · unavailable', 'ScrollFree · Unplug', Routes.sfUnplugAuthUnavailable),
+    ('sf_unplug_auth_notifications', 'Notifications off · notifications off', 'ScrollFree · Unplug', Routes.sfUnplugAuthNotifications),
+    ('sf_unplug_auth_android', 'Android permissions for Unplug · android', 'ScrollFree · Unplug', Routes.sfUnplugAuthAndroid),
+    ('sf_unplug_apps', 'Choose apps', 'ScrollFree · Unplug', Routes.sfUnplugApps),
+    ('sf_unplug_picker_ios', 'Apple app picker', 'ScrollFree · Unplug', Routes.sfUnplugPickerIos),
+    ('sf_unplug_apps_android', 'Choose apps (Android) · android', 'ScrollFree · Unplug', Routes.sfUnplugAppsAndroid),
+    ('sf_unplug_apps_chosen', 'Name your groups · apps chosen', 'ScrollFree · Unplug', Routes.sfUnplugAppsChosen),
+    ('sf_unplug_limits', 'Limits & pause screen', 'ScrollFree · Unplug', Routes.sfUnplugLimits),
+    ('sf_unplug_home', 'Unplug', 'ScrollFree · Unplug', Routes.sfUnplugHome),
+    ('sf_unplug_session', 'Start a focus session', 'ScrollFree · Unplug', Routes.sfUnplugSession),
+    ('sf_unplug_session_active', 'Focus session running', 'ScrollFree · Unplug', Routes.sfUnplugSessionActive),
+    ('sf_unplug_session_end', 'End session early', 'ScrollFree · Unplug', Routes.sfUnplugSessionEnd),
+    ('sf_unplug_session_done', 'Session complete', 'ScrollFree · Unplug', Routes.sfUnplugSessionDone),
+    ('sf_unplug_session_done_early', 'Session ended early · ended early', 'ScrollFree · Unplug', Routes.sfUnplugSessionDoneEarly),
+    ('sf_unplug_shield', 'Pause screen (iPhone shield)', 'ScrollFree · Unplug', Routes.sfUnplugShield),
+    ('sf_unplug_shield_firm', 'Pause screen (iPhone shield, firm) · no “open anyway” left', 'ScrollFree · Unplug', Routes.sfUnplugShieldFirm),
+    ('sf_unplug_overlay', 'Pause screen (Android overlay)', 'ScrollFree · Unplug', Routes.sfUnplugOverlay),
+    ('sf_unplug_gate', 'Small step: one breath', 'ScrollFree · Unplug', Routes.sfUnplugGate),
+    ('sf_unplug_gate_commit', 'Small step: type a sentence · typed sentence', 'ScrollFree · Unplug', Routes.sfUnplugGateCommit),
+    ('sf_unplug_gate_sum', 'Small step: quick sum · quick sum', 'ScrollFree · Unplug', Routes.sfUnplugGateSum),
+    ('sf_unplug_health', 'Tracking check', 'ScrollFree · Unplug', Routes.sfUnplugHealth),
+    ('sf_unplug_health_notifications', 'Tracking check · notifications off · notifications off', 'ScrollFree · Unplug', Routes.sfUnplugHealthNotifications),
+    ('sf_unplug_health_stopped', 'Tracking stopped · tracking stopped', 'ScrollFree · Unplug', Routes.sfUnplugHealthStopped),
+    ('sf_unplug_health_android', 'Tracking check (Android) · android', 'ScrollFree · Unplug', Routes.sfUnplugHealthAndroid),
+    ('sf_unplug_off', 'Turn off Unplug', 'ScrollFree · Unplug', Routes.sfUnplugOff),
+    ('sf_home_unplug', 'ScrollFree home · Unplug on (iPhone) · Unplug on · iPhone', 'ScrollFree', Routes.sfHomeUnplug),
+    ('sf_week_unplug', 'Weekly reflection · Unplug on (iPhone) · Unplug on · iPhone', 'ScrollFree', Routes.sfWeekUnplug),
+    ('program_settings_sf', 'Program settings · ScrollFree with Unplug · ScrollFree', 'Plans & programs', Routes.programSettingsSf),
+    ('account_delete_apple', 'Delete account · Apple account · Apple account', 'Account & data', Routes.accountDeleteApple),
+    ('account_delete_google', 'Delete account · Google account · Google account', 'Account & data', Routes.accountDeleteGoogle),
+    ('auth_session_apple', 'Session expired · Apple account · Apple account', 'Account & sign-in', Routes.authSessionApple),
+    ('auth_session_google', 'Session expired · Google account · Google account', 'Account & sign-in', Routes.authSessionGoogle),
+    ('sf_screentime_android', 'Connect usage access (Android) · android', 'ScrollFree', Routes.sfScreentimeAndroid),
+    ('sf_screentime_android_denied', 'Usage access off (Android) · android · not allowed', 'ScrollFree', Routes.sfScreentimeAndroidDenied),
+    ('sys_update_android', 'Update required (Android) · android', 'System states', Routes.sysUpdateAndroid),
+    ('surface_widget_ios', 'Home-screen widget (iPhone)', 'Home screen, Siri & shortcuts', Routes.surfaceWidgetIos),
+    ('surface_widget_android', 'Home-screen widget (Android)', 'Home screen, Siri & shortcuts', Routes.surfaceWidgetAndroid),
+    ('surface_shortcuts_ios', 'Siri & App Shortcuts (iPhone)', 'Home screen, Siri & shortcuts', Routes.surfaceShortcutsIos),
+    ('surface_shortcuts_ios_named', 'Siri & App Shortcuts (sensitive details on) · Show sensitive details on', 'Home screen, Siri & shortcuts', Routes.surfaceShortcutsIosNamed),
+    ('surface_shortcuts_android', 'Launcher shortcuts (Android)', 'Home screen, Siri & shortcuts', Routes.surfaceShortcutsAndroid),
+    ('surface_shortcuts_android_named', 'Launcher shortcuts (sensitive details on) · Show sensitive details on', 'Home screen, Siri & shortcuts', Routes.surfaceShortcutsAndroidNamed),
   ];
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {

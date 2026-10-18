@@ -1,0 +1,227 @@
+{
+  "id": "program_settings_sf",
+  "name": "Program settings · ScrollFree with Unplug",
+  "route": "/p/:program/settings?state=sf-unplug",
+  "flow": "plans",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "program_settings",
+  "state": "ScrollFree",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review. The ScrollFree instance of the parameterized Program settings (the base screen is shown with BreatheFree data). Only ScrollFree has the Screen Time & Unplug section. Leaving ScrollFree or deleting the account also runs purgeLocalData(0).",
+  "header": {
+    "t": "header",
+    "title": "ScrollFree settings",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "ScrollFree",
+          "sub": "Focus since Aug 14",
+          "lead": {
+            "program": "sf"
+          }
+        }
+      ],
+      "flat": true
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Focus",
+          "sub": "Daily steps and reminders"
+        },
+        {
+          "label": "Learn only",
+          "sub": "Keep lessons, stop tracking"
+        },
+        {
+          "label": "Pause",
+          "sub": "Stop reminders; keep everything"
+        }
+      ],
+      "selected": 0,
+      "label": "Status",
+      "key": "status"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Sharing",
+      "children": [
+        {
+          "t": "toggle",
+          "label": "Care team sharing",
+          "sub": "Off · ScrollFree isn’t shared",
+          "on": false,
+          "key": "care_team_sharing"
+        },
+        {
+          "t": "toggle",
+          "label": "De-identified research",
+          "on": false,
+          "key": "de_identified_research"
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Screen Time & Unplug",
+      "rows": [
+        {
+          "label": "Unplug",
+          "sub": "On · 2 groups · 60 min limit",
+          "action": {
+            "type": "push",
+            "to": "sf_unplug_home"
+          }
+        },
+        {
+          "label": "Screen Time access",
+          "sub": "Connected · totals only",
+          "action": {
+            "type": "push",
+            "to": "sf_screentime"
+          }
+        },
+        {
+          "label": "Turn off Unplug or Screen Time",
+          "sub": "Anytime",
+          "action": {
+            "type": "sheet",
+            "to": "sf_unplug_off"
+          },
+          "danger": true
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Data",
+      "rows": [
+        {
+          "label": "Export ScrollFree data",
+          "sub": "PDF + JSON",
+          "action": {
+            "type": "toast",
+            "value": "Export is being prepared. We’ll notify you."
+          }
+        },
+        {
+          "label": "Leave ScrollFree",
+          "sub": "Keep data 30 days or delete now",
+          "action": {
+            "type": "sheet",
+            "to": "account_leave"
+          },
+          "danger": true
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save changes",
+      "action": {
+        "type": "submit",
+        "api": "PATCH /v1/enrolments/:id",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: program_settings in this spec (same layout, ScrollFree data); pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module purgeLocalData(0)"
+  ],
+  "over": null,
+  "api": [
+    "PATCH /v1/enrolments/:id"
+  ],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Unplug",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_unplug_home"
+      },
+      "summary": "push → sf_unplug_home"
+    },
+    {
+      "element": "Screen Time access",
+      "path": "body[3].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "sf_screentime"
+      },
+      "summary": "push → sf_screentime"
+    },
+    {
+      "element": "Turn off Unplug or Screen Time",
+      "path": "body[3].rows[2]",
+      "action": {
+        "type": "sheet",
+        "to": "sf_unplug_off"
+      },
+      "summary": "sheet → sf_unplug_off"
+    },
+    {
+      "element": "Export ScrollFree data",
+      "path": "body[4].rows[0]",
+      "action": {
+        "type": "toast",
+        "value": "Export is being prepared. We’ll notify you."
+      },
+      "summary": "toast “Export is being prepared. We’ll notify you.”"
+    },
+    {
+      "element": "Leave ScrollFree",
+      "path": "body[4].rows[1]",
+      "action": {
+        "type": "sheet",
+        "to": "account_leave"
+      },
+      "summary": "sheet → account_leave"
+    },
+    {
+      "element": "Save changes",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PATCH /v1/enrolments/:id",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "summary": "PATCH /v1/enrolments/:id then toast “Saved” then back"
+    }
+  ]
+}

@@ -55,6 +55,23 @@
     {
       "t": "card",
       "variant": "plain",
+      "title": "Want firmer limits?",
+      "text": "Unplug can pause apps you choose, after limits you set. Optional.",
+      "cta": {
+        "t": "button",
+        "label": "Set up",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_intro"
+        },
+        "variant": "secondary",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
       "eyebrow": "Today’s step",
       "children": [
         {
@@ -146,8 +163,17 @@
       "summary": "push → sf_pause"
     },
     {
+      "element": "Set up",
+      "path": "body[2].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_unplug_intro"
+      },
+      "summary": "push → sf_unplug_intro"
+    },
+    {
       "element": "This week",
-      "path": "body[3].rows[0]",
+      "path": "body[4].rows[0]",
       "action": {
         "type": "push",
         "to": "sf_week"
@@ -156,7 +182,7 @@
     },
     {
       "element": "Had a long scroll?",
-      "path": "body[3].rows[1]",
+      "path": "body[4].rows[1]",
       "action": {
         "type": "push",
         "to": "sf_slip"
@@ -165,7 +191,7 @@
     },
     {
       "element": "Goal & windows",
-      "path": "body[3].rows[2]",
+      "path": "body[4].rows[2]",
       "action": {
         "type": "push",
         "to": "sf_goal"
@@ -174,7 +200,7 @@
     },
     {
       "element": "Buddy",
-      "path": "body[3].rows[3]",
+      "path": "body[4].rows[3]",
       "action": {
         "type": "push",
         "to": "sf_buddy"
@@ -183,7 +209,7 @@
     },
     {
       "element": "Program settings",
-      "path": "body[3].rows[4]",
+      "path": "body[4].rows[4]",
       "action": {
         "type": "push",
         "to": "program_settings"

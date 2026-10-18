@@ -407,6 +407,48 @@
    "ok": true,
    "why": "",
    "end": "welcome"
+  },
+  {
+   "id": "sf_unplug_strict_end",
+   "ok": true,
+   "why": "",
+   "end": "sf_unplug_session_done_early"
+  },
+  {
+   "id": "sf_unplug_gate_sum",
+   "ok": true,
+   "why": "",
+   "end": "sf_home"
+  },
+  {
+   "id": "sf_unplug_gate_sentence",
+   "ok": true,
+   "why": "",
+   "end": "sf_home"
+  },
+  {
+   "id": "sf_unplug_overlay_support",
+   "ok": true,
+   "why": "",
+   "end": "crisis"
+  },
+  {
+   "id": "sf_unplug_shield_support",
+   "ok": true,
+   "why": "",
+   "end": "rescue_pick"
+  },
+  {
+   "id": "sf_unplug_shield_firm_support",
+   "ok": true,
+   "why": "",
+   "end": "rescue_pick"
+  },
+  {
+   "id": "sf_unplug_notifications_off",
+   "ok": true,
+   "why": "",
+   "end": "sf_unplug_apps"
   }
  ],
  "sweep": [
@@ -3788,7 +3830,15 @@
   },
   {
    "screen": "sf_home",
-   "path": "body[3].rows[0]",
+   "path": "body[2].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_intro"
+  },
+  {
+   "screen": "sf_home",
+   "path": "body[4].rows[0]",
    "force": null,
    "onboarding": false,
    "ok": true,
@@ -3796,7 +3846,7 @@
   },
   {
    "screen": "sf_home",
-   "path": "body[3].rows[1]",
+   "path": "body[4].rows[1]",
    "force": null,
    "onboarding": false,
    "ok": true,
@@ -3804,7 +3854,7 @@
   },
   {
    "screen": "sf_home",
-   "path": "body[3].rows[2]",
+   "path": "body[4].rows[2]",
    "force": null,
    "onboarding": false,
    "ok": true,
@@ -3812,7 +3862,7 @@
   },
   {
    "screen": "sf_home",
-   "path": "body[3].rows[3]",
+   "path": "body[4].rows[3]",
    "force": null,
    "onboarding": false,
    "ok": true,
@@ -3820,7 +3870,7 @@
   },
   {
    "screen": "sf_home",
-   "path": "body[3].rows[4]",
+   "path": "body[4].rows[4]",
    "force": null,
    "onboarding": false,
    "ok": true,
@@ -7233,6 +7283,1358 @@
    "onboarding": false,
    "ok": true,
    "got": "hw_trends"
+  },
+  {
+   "screen": "sf_unplug_intro",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_intro",
+   "path": "footer[0]",
+   "force": "iPhone",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_auth"
+  },
+  {
+   "screen": "sf_unplug_intro",
+   "path": "footer[0]",
+   "force": "Android",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_auth_android"
+  },
+  {
+   "screen": "sf_unplug_intro",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_auth",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_auth",
+   "path": "footer[0]",
+   "force": "Approved",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_apps"
+  },
+  {
+   "screen": "sf_unplug_auth",
+   "path": "footer[0]",
+   "force": "Approved · notifications off",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_auth_notifications"
+  },
+  {
+   "screen": "sf_unplug_auth",
+   "path": "footer[0]",
+   "force": "Denied",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_auth_denied"
+  },
+  {
+   "screen": "sf_unplug_auth",
+   "path": "footer[0]",
+   "force": "Unavailable",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_auth_unavailable"
+  },
+  {
+   "screen": "sf_unplug_auth",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_auth_denied",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_auth_denied",
+   "path": "footer[0]",
+   "force": "Approved",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_apps"
+  },
+  {
+   "screen": "sf_unplug_auth_denied",
+   "path": "footer[0]",
+   "force": "Denied",
+   "onboarding": false,
+   "ok": true,
+   "got": "Still not allowed. You can turn it on later in Settings."
+  },
+  {
+   "screen": "sf_unplug_auth_denied",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "os_settings:"
+  },
+  {
+   "screen": "sf_unplug_auth_denied",
+   "path": "footer[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_auth_unavailable",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_auth_unavailable",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_auth_notifications",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_auth_notifications",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "os_settings:"
+  },
+  {
+   "screen": "sf_unplug_auth_notifications",
+   "path": "footer[1]",
+   "force": "On (iPhone)",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_apps"
+  },
+  {
+   "screen": "sf_unplug_auth_notifications",
+   "path": "footer[1]",
+   "force": "On (Android)",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_apps_android"
+  },
+  {
+   "screen": "sf_unplug_auth_notifications",
+   "path": "footer[1]",
+   "force": "Still off",
+   "onboarding": false,
+   "ok": true,
+   "got": "Notifications are still off. You can turn them on later in Settings."
+  },
+  {
+   "screen": "sf_unplug_auth_notifications",
+   "path": "footer[2]",
+   "force": "iPhone",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_apps"
+  },
+  {
+   "screen": "sf_unplug_auth_notifications",
+   "path": "footer[2]",
+   "force": "Android",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_apps_android"
+  },
+  {
+   "screen": "sf_unplug_auth_android",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_auth_android",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "os_settings:"
+  },
+  {
+   "screen": "sf_unplug_auth_android",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "os_settings:"
+  },
+  {
+   "screen": "sf_unplug_auth_android",
+   "path": "footer[2]",
+   "force": "All on",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_apps_android"
+  },
+  {
+   "screen": "sf_unplug_auth_android",
+   "path": "footer[2]",
+   "force": "Notifications off",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_auth_notifications"
+  },
+  {
+   "screen": "sf_unplug_auth_android",
+   "path": "footer[2]",
+   "force": "Missing",
+   "onboarding": false,
+   "ok": true,
+   "got": "Unplug still needs both settings."
+  },
+  {
+   "screen": "sf_unplug_apps",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_apps",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_picker_ios"
+  },
+  {
+   "screen": "sf_unplug_apps",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_picker_ios",
+   "path": "footer[0]",
+   "force": "Apps chosen",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_apps_chosen"
+  },
+  {
+   "screen": "sf_unplug_picker_ios",
+   "path": "footer[0]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_picker_ios",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_apps_android",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_apps_android",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_apps_chosen"
+  },
+  {
+   "screen": "sf_unplug_apps_android",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_apps_chosen",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_apps_chosen",
+   "path": "body[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_picker_ios"
+  },
+  {
+   "screen": "sf_unplug_apps_chosen",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_limits"
+  },
+  {
+   "screen": "sf_unplug_limits",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_limits",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_home"
+  },
+  {
+   "screen": "sf_unplug_home",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_home",
+   "path": "body[1].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_session"
+  },
+  {
+   "screen": "sf_unplug_home",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_apps_chosen"
+  },
+  {
+   "screen": "sf_unplug_home",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_limits"
+  },
+  {
+   "screen": "sf_unplug_home",
+   "path": "body[2].rows[2]",
+   "force": "iPhone",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_shield"
+  },
+  {
+   "screen": "sf_unplug_home",
+   "path": "body[2].rows[2]",
+   "force": "Android",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_overlay"
+  },
+  {
+   "screen": "sf_unplug_home",
+   "path": "body[2].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_health"
+  },
+  {
+   "screen": "sf_unplug_home",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_intro"
+  },
+  {
+   "screen": "sf_unplug_home",
+   "path": "body[3].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_off"
+  },
+  {
+   "screen": "sf_unplug_session",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_session",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_session_active"
+  },
+  {
+   "screen": "sf_unplug_session_active",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_session_active",
+   "path": "body[2].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_pause"
+  },
+  {
+   "screen": "sf_unplug_session_active",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_session_end"
+  },
+  {
+   "screen": "sf_unplug_session_end",
+   "path": "footer[0]",
+   "force": "Reason given",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_session_done_early"
+  },
+  {
+   "screen": "sf_unplug_session_end",
+   "path": "footer[0]",
+   "force": "No reason yet",
+   "onboarding": false,
+   "ok": true,
+   "got": "Choose or type a reason to end a strict session."
+  },
+  {
+   "screen": "sf_unplug_session_end",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_session_done",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_home"
+  },
+  {
+   "screen": "sf_unplug_session_done_early",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_home"
+  },
+  {
+   "screen": "sf_unplug_shield",
+   "path": "footer[0]",
+   "force": "Take my breath",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_gate"
+  },
+  {
+   "screen": "sf_unplug_shield",
+   "path": "footer[0]",
+   "force": "Get support",
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "sf_unplug_shield",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_shield_firm",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_shield_firm",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "sf_unplug_overlay",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_overlay",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "sf_unplug_overlay",
+   "path": "footer[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_gate",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_gate",
+   "path": "body[3].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "sf_unplug_gate",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "sf_unplug_gate",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "sf_unplug_gate_commit",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_gate_commit",
+   "path": "body[3].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "sf_unplug_gate_commit",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "sf_unplug_gate_commit",
+   "path": "footer[1]",
+   "force": "Step done",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "sf_unplug_gate_commit",
+   "path": "footer[1]",
+   "force": "Step not done",
+   "onboarding": false,
+   "ok": true,
+   "got": "Type the whole sentence first."
+  },
+  {
+   "screen": "sf_unplug_gate_sum",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_gate_sum",
+   "path": "body[3].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "sf_unplug_gate_sum",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "sf_unplug_gate_sum",
+   "path": "footer[1]",
+   "force": "Step done",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "sf_unplug_gate_sum",
+   "path": "footer[1]",
+   "force": "Step not done",
+   "onboarding": false,
+   "ok": true,
+   "got": "Answer the sum first."
+  },
+  {
+   "screen": "sf_unplug_health",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_health",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_health_notifications",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_health_notifications",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "os_settings:"
+  },
+  {
+   "screen": "sf_unplug_health_notifications",
+   "path": "footer[1]",
+   "force": "On",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_health"
+  },
+  {
+   "screen": "sf_unplug_health_notifications",
+   "path": "footer[1]",
+   "force": "Still off",
+   "onboarding": false,
+   "ok": true,
+   "got": "Notifications are still off."
+  },
+  {
+   "screen": "sf_unplug_health_stopped",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_health_stopped",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "os_settings:"
+  },
+  {
+   "screen": "sf_unplug_health_stopped",
+   "path": "footer[1]",
+   "force": "All pass",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_health"
+  },
+  {
+   "screen": "sf_unplug_health_stopped",
+   "path": "footer[1]",
+   "force": "Still failing",
+   "onboarding": false,
+   "ok": true,
+   "got": "Still not working. Turn Screen Time access on again in Settings."
+  },
+  {
+   "screen": "sf_unplug_health_android",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_health_android",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "os_settings:"
+  },
+  {
+   "screen": "sf_unplug_health_android",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_unplug_off",
+   "path": "footer[0]",
+   "force": "Unplug only",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "sf_unplug_off",
+   "path": "footer[0]",
+   "force": "Unplug and Screen Time",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "sf_unplug_off",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "body[2].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_pause"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_home"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "body[5].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_week"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "body[5].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_slip"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "body[5].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_goal"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "body[5].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_buddy"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "body[5].rows[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "sf_home_unplug",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "sf_week_unplug",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_week_unplug",
+   "path": "body[5].children[0].items[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_week_unplug",
+   "path": "body[5].children[0].items[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "program_settings_sf",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "program_settings_sf",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_home"
+  },
+  {
+   "screen": "program_settings_sf",
+   "path": "body[3].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_screentime"
+  },
+  {
+   "screen": "program_settings_sf",
+   "path": "body[3].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_unplug_off"
+  },
+  {
+   "screen": "program_settings_sf",
+   "path": "body[4].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Export is being prepared. We’ll notify you."
+  },
+  {
+   "screen": "program_settings_sf",
+   "path": "body[4].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_leave"
+  },
+  {
+   "screen": "program_settings_sf",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account_delete_apple",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account_delete_apple",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_data"
+  },
+  {
+   "screen": "account_delete_apple",
+   "path": "footer[0]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "account_deleted"
+  },
+  {
+   "screen": "account_delete_apple",
+   "path": "footer[0]",
+   "force": "Different account",
+   "onboarding": false,
+   "ok": true,
+   "got": "That’s a different Apple account. Use the one you signed in with."
+  },
+  {
+   "screen": "account_delete_apple",
+   "path": "footer[0]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Nothing was deleted."
+  },
+  {
+   "screen": "account_delete_apple",
+   "path": "footer[0]",
+   "force": "Error",
+   "onboarding": false,
+   "ok": true,
+   "got": "Couldn’t reach Apple. Nothing was deleted."
+  },
+  {
+   "screen": "account_delete_google",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account_delete_google",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_data"
+  },
+  {
+   "screen": "account_delete_google",
+   "path": "footer[0]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "account_deleted"
+  },
+  {
+   "screen": "account_delete_google",
+   "path": "footer[0]",
+   "force": "Different account",
+   "onboarding": false,
+   "ok": true,
+   "got": "That’s a different Google account. Use the one you signed in with."
+  },
+  {
+   "screen": "account_delete_google",
+   "path": "footer[0]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Nothing was deleted."
+  },
+  {
+   "screen": "account_delete_google",
+   "path": "footer[0]",
+   "force": "Error",
+   "onboarding": false,
+   "ok": true,
+   "got": "Couldn’t reach Google. Nothing was deleted."
+  },
+  {
+   "screen": "auth_session_apple",
+   "path": "footer[0].items[0]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_session_apple",
+   "path": "footer[0].items[0]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Still signed out. Rescue works without signing in."
+  },
+  {
+   "screen": "auth_session_apple",
+   "path": "footer[0].items[0]",
+   "force": "Error",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_error"
+  },
+  {
+   "screen": "auth_session_apple",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_session_google",
+   "path": "footer[0].items[0]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_session_google",
+   "path": "footer[0].items[0]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Still signed out. Rescue works without signing in."
+  },
+  {
+   "screen": "auth_session_google",
+   "path": "footer[0].items[0]",
+   "force": "Error",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_error"
+  },
+  {
+   "screen": "auth_session_google",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_screentime_android",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_screentime_android",
+   "path": "footer[0]",
+   "force": "Allowed",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_screentime_android",
+   "path": "footer[0]",
+   "force": "Not allowed",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_screentime_android_denied"
+  },
+  {
+   "screen": "sf_screentime_android",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_screentime_android_denied",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_screentime_android_denied",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_screentime_android_denied",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "os_settings:"
+  },
+  {
+   "screen": "sys_update_android",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "external:https://play.google.com/store/apps/details?id=com.TetherHealthLLC.tetherhealth"
+  },
+  {
+   "screen": "sys_update_android",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "surface_widget_ios",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "surface_widget_ios",
+   "path": "body[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "surface_widget_android",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "surface_widget_android",
+   "path": "body[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "surface_shortcuts_ios",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "surface_shortcuts_ios",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "surface_shortcuts_ios",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_red"
+  },
+  {
+   "screen": "surface_shortcuts_ios_named",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "surface_shortcuts_ios_named",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "surface_shortcuts_ios_named",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_red"
+  },
+  {
+   "screen": "surface_shortcuts_android",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "surface_shortcuts_android",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "surface_shortcuts_android",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_red"
+  },
+  {
+   "screen": "surface_shortcuts_android_named",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "surface_shortcuts_android_named",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "surface_shortcuts_android_named",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_red"
   }
  ],
  "errors": []

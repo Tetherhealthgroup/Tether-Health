@@ -15,6 +15,8 @@ flowchart LR
   auth_newpass["Set new password"]
   auth_merge{{"Guest plan merge"}}
   auth_session{{"Session expired"}}
+  auth_session_apple{{"Session expired · Apple account"}}
+  auth_session_google{{"Session expired · Google account"}}
   auth_verify -->|"I’ve confirmed my email"| auth_merge
   auth_signin -->|"Continue with Apple"| today
   auth_signin -->|"Continue with Apple"| auth_merge
@@ -36,6 +38,8 @@ flowchart LR
   auth_forgot_sent -->|"Back to welcome"| welcome
   auth_newpass -->|"Save password"| today
   auth_merge -->|"Continue"| today
+  auth_session_apple -->|"Continue with Apple"| auth_social_error
+  auth_session_google -->|"Continue with Google"| auth_social_error
   ob_programs>"Choose programs ↗"]
   class ob_programs ext
   today>"Today ↗"]
@@ -62,6 +66,8 @@ flowchart LR
 | [Set new password](../screens/png/auth/auth_newpass.png) | `/auth/reset` | screen | account |
 | [Guest plan merge](../screens/png/auth/auth_merge.png) | `/auth/merge` | sheet | account |
 | [Session expired](../screens/png/auth/auth_session.png) | `/auth/session` | sheet | account |
+| [Session expired · Apple account](../screens/png/auth/auth_session_apple.png) | `/auth/session?state=apple` | sheet · Apple account | account |
+| [Session expired · Google account](../screens/png/auth/auth_session_google.png) | `/auth/session?state=google` | sheet · Google account | account |
 
 ## Button & action map
 
@@ -100,3 +106,7 @@ flowchart LR
 | Guest plan merge | Continue | `POST /v1/quit-plan/guest-import then reset → today` |
 | Session expired | Sign in | `POST supabase /auth/v1/token then close` |
 | Session expired | Use Face ID | `close` |
+| Session expired · Apple account | Continue with Apple | `auth (apple): Sign in with Apple result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error` |
+| Session expired · Apple account | Use Face ID | `close` |
+| Session expired · Google account | Continue with Google | `auth (google): Sign in with Google result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error` |
+| Session expired · Google account | Use Face ID | `close` |

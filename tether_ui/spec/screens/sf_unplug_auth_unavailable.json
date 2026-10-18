@@ -1,0 +1,73 @@
+{
+  "id": "sf_unplug_auth_unavailable",
+  "name": "Screen Time unavailable",
+  "route": "/p/sf/unplug/permission?state=unavailable",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "sf_unplug_auth",
+  "state": "unavailable",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review.",
+  "header": {
+    "t": "header",
+    "title": "Unplug",
+    "left": "back",
+    "pill": "Optional"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "info",
+      "text": "Screen Time isn’t available on this phone."
+    },
+    {
+      "t": "title",
+      "text": "Unplug can’t run here.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "This can happen when Screen Time is managed by an organization or limited by a parent. ScrollFree still works without Unplug.",
+      "tone": "muted"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Back to ScrollFree",
+      "action": {
+        "type": "back"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAuthorizationStatus.unavailable"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Back to ScrollFree",
+      "path": "footer[0]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

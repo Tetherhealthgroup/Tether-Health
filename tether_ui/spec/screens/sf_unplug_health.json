@@ -1,0 +1,93 @@
+{
+  "id": "sf_unplug_health",
+  "name": "Tracking check",
+  "route": "/p/sf/unplug/health",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review.",
+  "header": {
+    "t": "header",
+    "title": "Tracking check",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "success",
+      "text": "Unplug is working. All 4 checks pass."
+    },
+    {
+      "t": "checklist",
+      "items": [
+        {
+          "label": "Screen Time permission",
+          "sub": "Allowed",
+          "done": true
+        },
+        {
+          "label": "Daily schedule",
+          "sub": "Running",
+          "done": true
+        },
+        {
+          "label": "Settings shared with the pause screen",
+          "sub": "Ready",
+          "done": true
+        },
+        {
+          "label": "Notifications",
+          "sub": "On · lets the pause screen open Tether for support",
+          "done": true
+        }
+      ],
+      "label": "iPhone checks"
+    },
+    {
+      "t": "text",
+      "text": "If a check fails, Unplug stops counting and pausing. We’ll tell you instead of letting you think it’s still on.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Done",
+      "action": {
+        "type": "back"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module trackingHealth() (iOS: authorization, schedule, App Group); notification permission"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Done",
+      "path": "footer[0]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

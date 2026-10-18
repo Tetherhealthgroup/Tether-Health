@@ -180,6 +180,7 @@ def render(n, p=''):
             cells += f'<span class="{cls}">{d}</span>'
         return f'<div class="card cal"><div class="row sp"><b class="cht">{e(n["month"])}</b><span class="chu">‹ ›</span></div><div class="cg">{days}{cells}</div><p class="cx">Recommended window: Aug 28 – Aug 31</p></div>'
     if t == 'timer': return f'<div class="timer"><b>{e(n["value"])}</b><span>{e(n["label"])}</span></div>'
+    if t == 'nativeslot': return f'<div class="card" role="img" aria-label="{e(n["label"])}" data-native="{e(n["id"])}" style="min-height:{n.get("height", 120)}px;border:1.5px dashed var(--line);background:repeating-linear-gradient(135deg,#F1F5F1 0 10px,#FBFAF5 10px 20px);display:flex;flex-direction:column;justify-content:center;gap:4px"><span class="pill" style="align-self:flex-start">NATIVE VIEW · {e(n.get("platform", "ios").upper())}</span><p class="ct" style="color:var(--teal)">{e(n["label"])}</p>{("<p class=cx style=color:var(--teal2)>" + e(n["caption"]) + "</p>") if n.get("caption") else ""}</div>'
     raise ValueError(t)
 
 def render_header(h, dark):

@@ -2,9 +2,9 @@ import json
 from dsl import *
 
 def load():
-    import screens_shared, screens_prog_a, screens_prog_b, screens_records
+    import screens_shared, screens_prog_a, screens_prog_b, screens_records, screens_additions
     if not SCREENS:
-        screens_shared.shared(); screens_prog_a.programs_a(); screens_prog_b.programs_b(); screens_records.records()
+        screens_shared.shared(); screens_prog_a.programs_a(); screens_prog_b.programs_b(); screens_records.records(); screens_additions.additions()
     return SCREENS
 
 def validate():

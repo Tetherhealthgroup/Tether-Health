@@ -50,6 +50,7 @@ def main():
         'flutter': {'total': f_total, 'passed': f_pass, 'render_tests': [render_pass, len(render_names)], 'action_sweep': [sweep_pass, len(sweep_names)], 'scenarios': [sum(1 for v in f_sc.values() if v == 'success'), len(SCENARIOS)]},
         'prototype': {'scenarios': [sum(1 for r in pr['scenarios'] if r['ok']), len(pr['scenarios'])], 'action_sweep': [p_sw_pass, len(pr['sweep'])], 'js_errors': len(pr['errors'])},
         'action_coverage': [len(covered_actions & all_actions), len(all_actions)],
+        'release_check': {'note': 'Release acceptance counts exclude reference surfaces (spec screens with reference: true), which are checked by device screenshots.', 'screens': sum(1 for s in SCREENS.values() if not s.get('reference')), 'actions': sum(1 for sid, p in all_actions if not SCREENS[sid].get('reference')), 'reference_screens': sorted(sid for sid, s in SCREENS.items() if s.get('reference'))},
     }
     json.dump(summary, open(os.path.join(vdir, 'summary.json'), 'w'), indent=2)
     json.dump(fr, open(os.path.join(vdir, 'flutter_results.json'), 'w'), indent=1, ensure_ascii=False)

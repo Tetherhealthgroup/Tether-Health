@@ -1,0 +1,153 @@
+{
+  "id": "sf_unplug_intro",
+  "name": "Unplug intro",
+  "route": "/p/sf/unplug",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review. Shown before anything is switched on, so nobody later reads a number that does not exist. Pause 60 stays an intent check; Unplug is the optional lock.",
+  "header": {
+    "t": "header",
+    "title": "Unplug",
+    "left": "back",
+    "pill": "Optional"
+  },
+  "body": [
+    {
+      "t": "progtag",
+      "program": "sf",
+      "extra": "Unplug"
+    },
+    {
+      "t": "title",
+      "text": "Pause the apps you choose, when you choose.",
+      "size": "l"
+    },
+    {
+      "t": "text",
+      "text": "Unplug is optional. It adds a pause screen to apps you pick, after limits you set. Pause 60 stays the same: a moment to check in, never a lock.",
+      "tone": "muted"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Can",
+          "Pause apps you pick, after your limits"
+        ],
+        [
+          "Can’t",
+          "See what you do inside any app"
+        ],
+        [
+          "On iPhone",
+          "Apple doesn’t share app names or minutes with Tether"
+        ],
+        [
+          "Stays",
+          "On this phone. Your app list never reaches Tether"
+        ],
+        [
+          "Never paused",
+          "Tether, phone calls and emergency calls"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Set up Unplug",
+      "action": {
+        "type": "branch",
+        "question": "Platform",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "iPhone",
+            "action": {
+              "type": "push",
+              "to": "sf_unplug_auth"
+            }
+          },
+          {
+            "label": "Android",
+            "action": {
+              "type": "push",
+              "to": "sf_unplug_auth_android"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Not now",
+      "action": {
+        "type": "back"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: lib/unplug/screens/unplug_screen_a.dart, lib/unplug/models/platform_ceiling.dart"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Set up Unplug",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Platform",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "iPhone",
+            "action": {
+              "type": "push",
+              "to": "sf_unplug_auth"
+            }
+          },
+          {
+            "label": "Android",
+            "action": {
+              "type": "push",
+              "to": "sf_unplug_auth_android"
+            }
+          }
+        ]
+      },
+      "summary": "branch: Platform → iPhone: push → sf_unplug_auth | Android: push → sf_unplug_auth_android"
+    },
+    {
+      "element": "Not now",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

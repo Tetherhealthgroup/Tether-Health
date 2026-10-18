@@ -1,0 +1,144 @@
+{
+  "id": "sf_unplug_auth_denied",
+  "name": "Screen Time not allowed",
+  "route": "/p/sf/unplug/permission?state=denied",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "sf_unplug_auth",
+  "state": "permission denied",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review.",
+  "header": {
+    "t": "header",
+    "title": "Unplug",
+    "left": "back",
+    "pill": "Step 1 of 3"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "info",
+      "text": "Screen Time access was not allowed."
+    },
+    {
+      "t": "title",
+      "text": "Unplug needs Screen Time to pause apps.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Everything else in ScrollFree works without it: your goal, Pause 60 and check-ins.",
+      "tone": "muted"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Try again",
+      "action": {
+        "type": "branch",
+        "question": "Screen Time authorization (iOS Family Controls, individual)",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Approved",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_apps"
+            }
+          },
+          {
+            "label": "Denied",
+            "action": {
+              "type": "toast",
+              "value": "Still not allowed. You can turn it on later in Settings."
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Open phone settings",
+      "action": {
+        "type": "os_settings"
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "link",
+      "label": "Not now",
+      "action": {
+        "type": "back"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAuthorizationStatus.denied"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Try again",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Screen Time authorization (iOS Family Controls, individual)",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Approved",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_apps"
+            }
+          },
+          {
+            "label": "Denied",
+            "action": {
+              "type": "toast",
+              "value": "Still not allowed. You can turn it on later in Settings."
+            }
+          }
+        ]
+      },
+      "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: toast “Still not allowed. You can turn it on later in Settings.”"
+    },
+    {
+      "element": "Open phone settings",
+      "path": "footer[1]",
+      "action": {
+        "type": "os_settings"
+      },
+      "summary": "os_settings"
+    },
+    {
+      "element": "Not now",
+      "path": "footer[2]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

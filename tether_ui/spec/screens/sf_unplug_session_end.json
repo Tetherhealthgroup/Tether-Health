@@ -1,0 +1,138 @@
+{
+  "id": "sf_unplug_session_end",
+  "name": "End session early",
+  "route": "/p/sf/unplug/session/end",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "rescue",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Copy needs clinical/legal review. End session works only after a reason is chosen or typed (rule sf.unplug.reason).",
+  "header": null,
+  "body": [
+    {
+      "t": "title",
+      "text": "End your session early?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "This is a strict session. Choose or type a reason; it is kept with the session on this phone. Nothing resets.",
+      "tone": "muted"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Need an app for work",
+        "Expecting a message",
+        "Changed my mind",
+        "Other"
+      ],
+      "selected": [],
+      "multi": false,
+      "label": "Reason",
+      "key": "reason"
+    },
+    {
+      "t": "field",
+      "label": "Anything to add?",
+      "placeholder": "Optional",
+      "kind": "multiline",
+      "key": "note"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "End session",
+      "action": {
+        "type": "branch",
+        "question": "Strict session: reason given?",
+        "on": null,
+        "decide": "sf.unplug.reason",
+        "cases": [
+          {
+            "label": "Reason given",
+            "action": {
+              "type": "submit",
+              "api": "CALL device:unplug/endSession",
+              "then": {
+                "type": "replace",
+                "to": "sf_unplug_session_done_early"
+              }
+            }
+          },
+          {
+            "label": "No reason yet",
+            "action": {
+              "type": "toast",
+              "value": "Choose or type a reason to end a strict session."
+            }
+          }
+        ]
+      },
+      "variant": "danger",
+      "arrow": false
+    },
+    {
+      "t": "button",
+      "label": "Keep going",
+      "action": {
+        "type": "close"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession(overrideReason)"
+  ],
+  "over": "Focus session",
+  "api": [],
+  "actions": [
+    {
+      "element": "End session",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Strict session: reason given?",
+        "on": null,
+        "decide": "sf.unplug.reason",
+        "cases": [
+          {
+            "label": "Reason given",
+            "action": {
+              "type": "submit",
+              "api": "CALL device:unplug/endSession",
+              "then": {
+                "type": "replace",
+                "to": "sf_unplug_session_done_early"
+              }
+            }
+          },
+          {
+            "label": "No reason yet",
+            "action": {
+              "type": "toast",
+              "value": "Choose or type a reason to end a strict session."
+            }
+          }
+        ]
+      },
+      "summary": "decide sf.unplug.reason: Strict session: reason given? → Reason given: CALL device:unplug/endSession then replace → sf_unplug_session_done_early | No reason yet: toast “Choose or type a reason to end a strict session.”"
+    },
+    {
+      "element": "Keep going",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}
