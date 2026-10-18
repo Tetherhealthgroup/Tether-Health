@@ -21,7 +21,7 @@
     },
     {
       "t": "text",
-      "text": "For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in.",
+      "text": "For your security, sessions end after 30 days.",
       "tone": "muted"
     },
     {

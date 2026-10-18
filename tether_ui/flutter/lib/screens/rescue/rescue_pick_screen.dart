@@ -7,7 +7,7 @@ import '../../ui/ui.dart';
 
 /// Rescue  ·  route `/rescue`  ·  flow `rescue`  ·  kind `sheet`
 /// Default state · phase rescue
-/// Works offline. With one Quit program, the app skips this screen and opens the last helpful tool.
+/// With one Quit program, the app skips this screen and opens the last helpful tool.
 ///
 /// Actions (generated from spec/screens/rescue_pick.json):
 ///   • A cigarette → replace → rescue_active

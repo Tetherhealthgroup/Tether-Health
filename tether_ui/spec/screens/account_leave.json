@@ -28,8 +28,8 @@
       "t": "radio",
       "items": [
         {
-          "label": "Keep my data for 30 days",
-          "sub": "Rejoin anytime and pick up where you left off",
+          "label": "Keep my data",
+          "sub": "Kept until you delete it or delete your account. Rejoin anytime.",
           "badge": "Default"
         },
         {

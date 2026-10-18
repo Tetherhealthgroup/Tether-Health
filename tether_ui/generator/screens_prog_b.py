@@ -179,7 +179,7 @@ def programs_b():
         title('Make a plan for hard moments'), text('Based on the Stanley-Brown safety plan. Only you can see this.', 'small'),
         field('My warning signs', 'Not sleeping, pulling away from friends', kind='multiline'), field('Things that help me', 'Walk the dog, shower, music'), field('People I can reach', 'Sam · (555) 010-3311'),
         kv([('Crisis line', '988 · call or text'), ('Emergency', '911')]),
-    ], footer=[button('Save plan', submit('PUT device:encrypted/ea/safety-plan', onboarding_or('ea_home')))], desc='Stored encrypted on the device only; available offline.')
+    ], footer=[button('Save plan', submit('PUT device:encrypted/ea/safety-plan', onboarding_or('ea_home')))], desc='Stored encrypted on the device only.')
     S('ea_home', 'Ease home', '/p/ea/home', 'ea', program='ea', phase='daily', tabname='plans', hdr=home_hdr('ea'), body=[
         card(v='dark', eyebrow='How are you right now?', title='30-second mood check-in', cta=button('Start', go('ea_mood'), v='lime', small=True)),
         rows([row('My safety plan', 'Updated Oct 2', action=go('ea_plan')), row('Check-back', 'In 6 days', action=go('ea_checkback')), row('Find a professional', None, action=go('ea_result')), settings_row('ea')]),

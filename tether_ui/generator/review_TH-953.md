@@ -167,6 +167,8 @@ All visible text on the 44 added screens, plus the new copy on `sf_home`
 - the "Confirm it's you" card
 - the Play URL (the base App Store URL still lacks the real App Store ID)
 - the shortcut labels and Siri phrases
+- `sf_home_unplug_android` (TH-971): the measured-usage stats, the
+  "Measured by Tether on this phone" line and the Unplug status card
 
 ## Generator changes outside the screen modules
 

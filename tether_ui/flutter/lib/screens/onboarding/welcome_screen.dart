@@ -27,7 +27,7 @@ class WelcomeScreen extends StatelessWidget {
         TEyebrow('Welcome to Tether Health'),
         TTitle('Care that meets you where you are.', size: TTitleSize.xl),
         TBody('Small steps, practical support and no judgment, for the parts of your health you choose.'),
-        TKeyValue(rows: [('Private by design', 'No ads · never sold'), ('Help in one tap', 'Works offline'), ('Your pace', 'Pause anytime')]),
+        TKeyValue(rows: [('Private by design', 'No ads · never sold'), ('Help in one tap', 'No typing needed'), ('Your pace', 'Pause anytime')]),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Get started', onPressed: () => TNav.push(context, Routes.obPrograms), arrow: true),

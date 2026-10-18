@@ -10,7 +10,7 @@ def shared():
         illus('✿'),
         eyebrow('Welcome to Tether Health'), title('Care that meets you where you are.', 'xl'),
         text('Small steps, practical support and no judgment, for the parts of your health you choose.'),
-        kv([('Private by design', 'No ads · never sold'), ('Help in one tap', 'Works offline'), ('Your pace', 'Pause anytime')]),
+        kv([('Private by design', 'No ads · never sold'), ('Help in one tap', 'No typing needed'), ('Your pace', 'Pause anytime')]),
     ], footer=[
         button('Get started', go('ob_programs')),
         link('I already have an account', sheet('auth_signin')),
@@ -138,7 +138,7 @@ def shared():
        desc='Create-only import: a concurrent cloud plan returns 409 and both plans are kept.')
 
     S('auth_session', 'Session expired', '/auth/session', 'auth', phase='account', kind='sheet', over='Today', body=[
-        title('Please sign in again'), text('For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in.', 'muted'),
+        title('Please sign in again'), text('For your security, sessions end after 30 days.', 'muted'),
         field('Password', None, placeholder='Password', kind='password'),
     ], footer=[button('Sign in', submit('POST supabase /auth/v1/token', close())), button('Use Face ID', close(), v='secondary')])
 
@@ -148,7 +148,7 @@ def shared():
     S('today', 'Today', '/today', 'today', phase='daily', tabname='today', hdr=today_hdr, body=[
         eyebrow('Friday, August 21'), title('Good morning, Alex.'),
         chips(['All', 'BreatheFree', 'ScrollFree'], ['All'], multi=False, dots={'BreatheFree': 'bf', 'ScrollFree': 'sf'}),
-        card(v='coral', title='Craving or urge to scroll?', text='Help for the next few minutes · works offline', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)),
+        card(v='coral', title='Craving or urge to scroll?', text='Help for the next few minutes', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)),
         card(checklist([ci('Stock gum, water or snacks', 'BreatheFree · 3 min', True), ci('Charge your phone outside the bedroom', 'ScrollFree · tonight')]), eyebrow='Today · 2 small steps'),
         card(v='dark', eyebrow='Check-in · about 90 sec', title='Covers both programs', cta=button('Start', sheet('checkin'), v='lime', small=True)),
         stats([st('Quit day', '7 days', 'Fri, Aug 28', 'bf'), st('Yesterday', '2h 10m', 'goal 90 min', 'sf')]),
@@ -160,7 +160,7 @@ def shared():
         text('Rescue renders first from the on-device cache, before anything else loads.', 'small')])
     S('today_offline', 'Today · offline', '/today?state=offline', 'today', phase='daily', tabname='today', variant_of='today', state='offline', hdr=today_hdr, body=[
         banner('offline', 'Offline · 3 entries will sync when you reconnect.'), title('Good morning, Alex.'),
-        card(v='coral', title='Craving or urge?', text='Works offline', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)),
+        card(v='coral', title='Craving or urge?', text='One tap · no typing', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)),
         card(checklist([ci('Stock gum, water or snacks', 'Saved on this phone', True)]), eyebrow='Today'),
         text('Lessons not downloaded load when you’re back online.', 'small')])
     S('today_empty', 'Today · nothing in focus', '/today?state=empty', 'today', phase='daily', tabname='today', variant_of='today', state='empty', hdr=today_hdr, body=[
@@ -180,7 +180,7 @@ def shared():
         seg(['Low', 'Some', 'High'], 'High', label='Stress today'),
         card(chips(['No', 'A puff', 'One or more', 'Skip'], ['One or more'], multi=False), tag='bf', accent='bf', title='Since your last check-in, did you smoke?', text='Before quit day this is expected, not a setback.'),
         card(chips(['Better', 'Same', 'Drained', 'Skip'], ['Drained'], multi=False), tag='sf', accent='sf', title='How did you feel after scrolling yesterday?'),
-    ], footer=[button('Save check-in', submit('POST /v1/records/check-ins', rep('checkin_done'))), text('Private · works offline · skip anything', 'small', align='center')], api=['POST /v1/records/check-ins'],
+    ], footer=[button('Save check-in', submit('POST /v1/records/check-ins', rep('checkin_done'))), text('Skip any question', 'small', align='center')], api=['POST /v1/records/check-ins'],
        desc='Each Focus program adds at most 2 questions. Any self-harm signal routes to Crisis.')
     S('checkin_done', 'Check-in saved', '/check-in/done', 'today', phase='daily', hdr=H('Check-in saved', left='close'), body=[
         illus('✓'), title('Thanks, Alex.', 'l', align='center'), text('One small step for each program today.', align='center'),
@@ -197,7 +197,7 @@ def shared():
                tl('Stress', 'Shared tool', glyph='~', action=rep('rescue_active')), tl('Not sure', 'We’ll suggest one', glyph='?', action=rep('rescue_active'))]),
         card(v='dark', eyebrow='Helped last time · 6 → 3', title='Slow breathing · 2 min', cta=button('Start', rep('rescue_active'), v='lime', small=True)),
         buttons(button('Talk to a person', tab('support'), v='secondary', small=True), button('Emergency', go('crisis'), v='danger', small=True)),
-    ], desc='Works offline. With one Quit program, the app skips this screen and opens the last helpful tool.')
+    ], desc='With one Quit program, the app skips this screen and opens the last helpful tool.')
     S('rescue_active', 'Active tool', '/rescue/breathing', 'rescue', phase='rescue', kind='fullscreen', dark=True, hdr=H('Slow breathing', left='close', pill='1:32 left', dark=True), body=[
         eyebrow('Breathe out · slowly'), ring('5'), text('The urge is a wave. Let it rise and pass.', align='center'),
         chips(['Voice on', 'Haptics on', 'Reduced motion'], ['Voice on', 'Haptics on']),
@@ -222,7 +222,7 @@ def shared():
         banner('urgent', 'If you might act on thoughts of harming yourself, get help now.'),
         button('Call 988', call('988'), v='danger', arrow=False), button('Text 988', sms('988'), v='secondary'), button('Call 911', call('911'), v='secondary'),
         card(eyebrow='Your safety plan', title='Things that help: walk the dog, shower, music', text='Reach out: Sam · (555) 010-3311', action=go('ea_plan')),
-        text('Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. Works offline. 988 is US-only; localize per region.', 'small'),
+        text('Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. 988 is US-only; localize per region.', 'small'),
     ], desc='Global crisis screen used by every program.')
 
     # ================================================================ PLANS
@@ -246,7 +246,7 @@ def shared():
         rows([row('BreatheFree', 'Focus since Aug 14', lead=L_prog('bf'))], flat=True),
         radio([ri('Focus', 'Daily steps and reminders'), ri('Learn only', 'Keep lessons, stop tracking'), ri('Pause', 'Stop reminders; keep everything')], 0, label='Status'),
         card(toggle('Care team · Dr. Patel’s clinic', 'Manual: you approve each summary', True), toggle('De-identified research', None, False), eyebrow='Sharing'),
-        rows([row('Export BreatheFree data', 'PDF + JSON', action=toast('Export is being prepared. We’ll notify you.')), row('Leave BreatheFree', 'Keep data 30 days or delete now', action=sheet('account_leave'), danger=True)], title='Data'),
+        rows([row('Export BreatheFree data', 'PDF + JSON', action=toast('Export is being prepared. We’ll notify you.')), row('Leave BreatheFree', 'Keep your data or delete it now', action=sheet('account_leave'), danger=True)], title='Data'),
     ], footer=[button('Save changes', submit('PATCH /v1/enrolments/:id', toast('Saved', back())))], api=['PATCH /v1/enrolments/:id'],
        desc='Parameterized by program. Shown here with BreatheFree data.')
 
@@ -340,7 +340,7 @@ def shared():
     ], footer=[button('Add a program', go('catalog'), v='secondary')])
     S('account_leave', 'Leave a program', '/account/programs/leave', 'account', phase='account', kind='sheet', over='Programs & sharing', body=[
         title('Leave BreatheFree?'), text('Reminders stop right away. Your other programs are not affected.', 'muted'),
-        radio([ri('Keep my data for 30 days', 'Rejoin anytime and pick up where you left off', 'Default'), ri('Delete BreatheFree data now', '63 check-ins, 14 rescues, 1 plan')]),
+        radio([ri('Keep my data', 'Kept until you delete it or delete your account. Rejoin anytime.', 'Default'), ri('Delete BreatheFree data now', '63 check-ins, 14 rescues, 1 plan')]),
     ], footer=[button('Leave BreatheFree', submit('DELETE /v1/enrolments/:id', toast('You left BreatheFree', reset('plans'))), v='danger'), button('Cancel', close(), v='secondary')])
     S('account_notifications', 'Notifications', '/account/notifications', 'account', phase='account', hdr=H('Notifications'), body=[
         card(toggle('Check-ins and plan reminders', 'At most 2 a day', True), toggle('Show sensitive details', 'Off: program names and health data hidden', False), toggle('Quiet hours', '9:00 PM – 7:00 AM · safety alerts still come through', True)),

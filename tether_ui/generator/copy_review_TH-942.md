@@ -1,0 +1,90 @@
+# TH-942 copy corrections: review list
+
+Owner decisions:
+- **P-22:** remove the "works offline" claim from the spec.
+- **P-08:** no automatic purge. After someone leaves a program, its data is kept
+  until they delete it ("delete now") or delete their account, so no copy may
+  promise "30 days".
+
+Every replacement below is a **draft**. It must not make an offline,
+privacy-strength or clinical claim, and it contains none of the phrases
+banned by the app's privacy-copy regression test. Nothing ships until a
+clinician and counsel approve it.
+
+Source: `screens_shared.py`, `screens_prog_a.py`, `screens_prog_b.py`,
+`screens_additions.py`. Only string contents changed. Components, keys,
+actions, routes and screen order are unchanged, and `spec/actions.json` is
+byte-identical.
+
+## Changed strings
+
+Field paths are the ones in `spec/screens/<id>.json`. A `desc` is the
+developer description; it appears in the spec and as the doc comment of the
+generated screen, not on the screen itself.
+
+### P-22: "works offline" and close variants
+
+| # | Screen id | Field | Old | New | Review |
+|---|---|---|---|---|---|
+| 1 | `welcome` | `body[5].rows[1][1]` (value for "Help in one tap") | Works offline | No typing needed | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 2 | `bf_intro` | `body[2].rows[0][1]` (value for "Help when cravings hit") | one tap, offline | one tap, no typing | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 3 | `bf_home` | `body[1].text` (card "Craving now?") | One tap · works offline | One tap · no typing | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 4 | `bf_home_quitday` | `body[3].text` (card "I have a craving") | One tap · no typing · offline | One tap · no typing | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 5 | `today` | `body[3].text` (card "Craving or urge to scroll?") | Help for the next few minutes · works offline | Help for the next few minutes | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 6 | `today_offline` | `body[2].text` (card "Craving or urge?") | Works offline | One tap · no typing | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 7 | `checkin` | `footer[1].text` | Private · works offline · skip anything | Skip any question | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 8 | `ca_home` | `body[2].text` (card "Red-zone plan") | Open it fast, even offline | Open it fast | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 9 | `ca_red` | `body[4].text` | Stays open until you close it. Works offline. | Stays open until you close it. | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 10 | `crisis` | `body[5].text` | Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. Works offline. 988 is US-only; localize per region. | Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. 988 is US-only; localize per region. | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 11 | `rescue_pick` | `desc` | Works offline. With one Quit program, the app skips this screen and opens the last helpful tool. | With one Quit program, the app skips this screen and opens the last helpful tool. | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 12 | `ea_plan` | `desc` | Stored encrypted on the device only; available offline. | Stored encrypted on the device only. | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 13 | `auth_session` | `body[1].text` | For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in. | For your security, sessions end after 30 days. | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 14 | `auth_session_apple` | `body[1].text` | (same as 13) | (same as 13) | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 15 | `auth_session_google` | `body[1].text` | (same as 13) | (same as 13) | **CLINICAL/LEGAL REVIEW REQUIRED** |
+
+Rows 1, 3, 5, 6, 7, 9 and 10 cover the 8 screens first identified for P-22
+(the 8th, `rescue_pick`, carried it in `desc`; row 11). Rows 2, 4, 8 and 12–15
+are close variants found by scanning every generator source, including
+`screens_additions.py`.
+
+### P-08: "keep 30 days"
+
+| # | Screen id | Field | Old | New | Review |
+|---|---|---|---|---|---|
+| 16 | `program_settings` | `body[3].rows[1].sub` (row "Leave BreatheFree") | Keep data 30 days or delete now | Keep your data or delete it now | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 17 | `program_settings_sf` | `body[4].rows[1].sub` (row "Leave ScrollFree") | Keep data 30 days or delete now | Keep your data or delete it now | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 18 | `account_leave` | `body[2].items[0].label` (radio option 1) | Keep my data for 30 days | Keep my data | **CLINICAL/LEGAL REVIEW REQUIRED** |
+| 19 | `account_leave` | `body[2].items[0].sub` (radio option 1) | Rejoin anytime and pick up where you left off | Kept until you delete it or delete your account. Rejoin anytime. | **CLINICAL/LEGAL REVIEW REQUIRED** |
+
+The second `account_leave` option ("Delete BreatheFree data now") is
+unchanged.
+
+## Not changed, kept on purpose
+
+"offline" left in the generator sources:
+- `today_offline`: the screen id, route, state name and banner kind, and the banner
+  "Offline · 3 entries will sync when you reconnect." This describes the
+  device's offline state rather than claiming the app works offline. Whether it
+  is true depends on the saved-entries outbox, so it is listed here for the
+  owner.
+- `learn_lesson`: link "Save for offline" and its toast "Saved for offline".
+  This is a lesson-download control. Changing the label would change
+  `actions.json` and the action sweep, which this ticket must not do. Listed for
+  the owner.
+- `records_review`: `banner('offline', …)` is a style kind. The text is "2 items need your review."
+
+Every remaining standalone "30" in the spec, with the reason it stays:
+- `auth_session`, `auth_session_apple`, `auth_session_google`: "sessions end
+  after 30 days" describes how long a sign-in session lasts, not how long data is kept.
+- `progress`, `bf_progress`, `hw_trends`, `st_patterns`: "30 days" chart range
+  options. `hw_home` "30-day average", `hw_trends` "30-day avg" and `sd_home`
+  "last 30 days" are display windows.
+- `support_callback`: "Consent expires · 30 days" is how long the call-back
+  consent lasts, not data retention.
+- `account_deleted`: "Backups are purged within 30 days." This concerns backup
+  copies after account deletion, not program data kept after leaving (P-08).
+  It is still a time promise whose truth depends on the backup configuration,
+  so it is **listed for counsel and the owner to confirm or reword**.
+- Other values are not durations of data retention: "21–30" (cigarettes per day), "30 min",
+  "Move bedtime window 30 min earlier", "Sep 30" dates, "30 seconds",
+  "30-second mood check-in", and the Unplug counter value 30.

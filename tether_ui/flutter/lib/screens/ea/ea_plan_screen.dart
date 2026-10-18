@@ -7,7 +7,7 @@ import '../../ui/ui.dart';
 
 /// Safety plan  ·  route `/p/ea/plan`  ·  flow `ea`  ·  kind `screen`
 /// Default state · program ea · phase plan
-/// Stored encrypted on the device only; available offline.
+/// Stored encrypted on the device only.
 ///
 /// Actions (generated from spec/screens/ea_plan.json):
 ///   • Back → back

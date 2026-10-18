@@ -44,7 +44,7 @@
       "t": "card",
       "variant": "urgent",
       "title": "Red-zone plan",
-      "text": "Open it fast, even offline",
+      "text": "Open it fast",
       "action": {
         "type": "push",
         "to": "ca_red"

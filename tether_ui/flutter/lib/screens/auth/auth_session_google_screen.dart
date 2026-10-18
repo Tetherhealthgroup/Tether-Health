@@ -21,7 +21,7 @@ class AuthSessionGoogleScreen extends StatelessWidget {
     return TSheet(
       children: [
         TTitle('Please sign in again'),
-        TBody('For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in.', tone: TTextTone.muted),
+        TBody('For your security, sessions end after 30 days.', tone: TTextTone.muted),
         TBody('You signed in with Google, so there’s no password to type.', tone: TTextTone.small),
       ],
       footer: [

@@ -85,7 +85,7 @@
         },
         {
           "label": "Leave BreatheFree",
-          "sub": "Keep data 30 days or delete now",
+          "sub": "Keep your data or delete it now",
           "action": {
             "type": "sheet",
             "to": "account_leave"

@@ -34,7 +34,7 @@ class CaHomeScreen extends StatelessWidget {
       children: [
         TCard(variant: TCardVariant.dark, eyebrow: 'Today’s zone', title: 'Green · 410 L/min', text: 'Checked 7:40 AM · from your plan'),
         TButton(key: const ValueKey('a:body[1]'), label: 'Check my zone', onPressed: () => TNav.push(context, Routes.caZone), arrow: true),
-        TCard(key: const ValueKey('a:body[2]'), variant: TCardVariant.urgent, title: 'Red-zone plan', text: 'Open it fast, even offline', onTap: () => TNav.push(context, Routes.caRed)),
+        TCard(key: const ValueKey('a:body[2]'), variant: TCardVariant.urgent, title: 'Red-zone plan', text: 'Open it fast', onTap: () => TNav.push(context, Routes.caRed)),
         TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'Log symptoms', onTap: () => TNav.push(context, Routes.caSymptoms)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: 'Progress', sub: '10 green · 2 yellow · 0 red', onTap: () => TNav.push(context, Routes.caProgress)), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: 'My action plan', sub: 'Entered Sep 3', onTap: () => TNav.push(context, Routes.caPlan)), TListRow(key: const ValueKey('a:body[3].rows[3]'), label: 'Program settings', sub: 'Status, sharing, export, leave', onTap: () => TNav.push(context, Routes.programSettings))]),
       ],
     );

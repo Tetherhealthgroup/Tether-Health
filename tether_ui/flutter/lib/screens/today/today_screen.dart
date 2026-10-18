@@ -33,7 +33,7 @@ class TodayScreen extends StatelessWidget {
         TEyebrow('Friday, August 21'),
         TTitle('Good morning, Alex.'),
         TChips(fieldKey: 'today.value', options: ['All', 'BreatheFree', 'ScrollFree'], selected: ['All'], multi: false, dots: {'BreatheFree': TColors.program('bf'), 'ScrollFree': TColors.program('sf')}),
-        TCard(variant: TCardVariant.coral, title: 'Craving or urge to scroll?', text: 'Help for the next few minutes · works offline', cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: 'Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
+        TCard(variant: TCardVariant.coral, title: 'Craving or urge to scroll?', text: 'Help for the next few minutes', cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: 'Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
         TCard(eyebrow: 'Today · 2 small steps', children: [TChecklist(items: [TCheckItem('Stock gum, water or snacks', sub: 'BreatheFree · 3 min', done: true), TCheckItem('Charge your phone outside the bedroom', sub: 'ScrollFree · tonight')])]),
         TCard(variant: TCardVariant.dark, eyebrow: 'Check-in · about 90 sec', title: 'Covers both programs', cta: TButton(key: const ValueKey('a:body[5].cta[0]'), label: 'Start', onPressed: () => TNav.sheet(context, Routes.checkin), variant: TButtonVariant.lime, small: true)),
         TStatGrid(stats: [TStat(label: 'Quit day', value: '7 days', sub: 'Fri, Aug 28', program: 'bf'), TStat(label: 'Yesterday', value: '2h 10m', sub: 'goal 90 min', program: 'sf')]),
