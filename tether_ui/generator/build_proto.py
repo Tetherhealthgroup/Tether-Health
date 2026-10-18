@@ -3,7 +3,7 @@ from dsl import *
 from render_html import render_screen, CSS, e
 from validate import validate
 
-OUT = os.path.expanduser('~/tether/tether_ui')
+OUT = os.path.abspath('tether_ui')
 
 def describe(a):
     if not a: return 'disabled'
