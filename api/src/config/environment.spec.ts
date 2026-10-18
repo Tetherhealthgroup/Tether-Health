@@ -72,7 +72,7 @@ describe("environmentSchema", () => {
   });
 
   describe("TRUST_PROXY", () => {
-    const PROXY_CIDRS = "10.0.0.0/8";
+    const PROXY_CIDRS = "192.0.2.0/24";
     const hops = (overrides: Record<string, unknown>) => {
       const result = environmentSchema.validate({
         ...validEnvironment,
@@ -117,18 +117,18 @@ describe("environmentSchema", () => {
     it("maps zero hops to no trust and ignores every forwarded address", () => {
       expect(fastifyTrustProxy(0)).toBe(false);
       expect(
-        fastifyTrustProxy(0, [{ family: "ipv4", address: "10.0.0.1" }]),
+        fastifyTrustProxy(0, [{ family: "ipv4", address: "192.0.2.1" }]),
       ).toBe(false);
     });
 
     it("maps hop counts to a trust function limited to the allowlist", () => {
       const trustOne = fastifyTrustProxy(1, [
-        { family: "ipv4", address: "10.0.0.0", prefix: 8 },
+        { family: "ipv4", address: "192.0.2.0", prefix: 24 },
       ]);
       expect(trustOne).toBeInstanceOf(Function);
       if (typeof trustOne === "function") {
-        expect(trustOne("10.0.0.1", 0)).toBe(true);
-        expect(trustOne("10.0.0.2", 1)).toBe(false);
+        expect(trustOne("192.0.2.1", 0)).toBe(true);
+        expect(trustOne("192.0.2.2", 1)).toBe(false);
         expect(trustOne("198.51.100.7", 0)).toBe(false);
         expect(trustOne("198.51.100.7", 1)).toBe(false);
       }
@@ -168,39 +168,89 @@ describe("environmentSchema", () => {
     it("parses addresses and CIDR ranges of both families", () => {
       const { error, value } = validate({
         TRUST_PROXY: "2",
-        TRUST_PROXY_CIDRS: "10.0.0.0/8, 192.0.2.1,2001:db8::/32 ,::1",
+        TRUST_PROXY_CIDRS: "192.0.2.0/24, 198.51.100.1,2001:db8::/32 ,::1",
       });
       expect(error).toBeUndefined();
       expect(value.TRUST_PROXY_CIDRS).toEqual([
-        { family: "ipv4", address: "10.0.0.0", prefix: 8 },
-        { family: "ipv4", address: "192.0.2.1" },
+        { family: "ipv4", address: "192.0.2.0", prefix: 24 },
+        { family: "ipv4", address: "198.51.100.1" },
         { family: "ipv6", address: "2001:db8::", prefix: 32 },
         { family: "ipv6", address: "::1" },
       ]);
     });
 
     it.each([
-      "10.0.0.0/0",
+      "192.0.2.0/0",
       "::/0",
-      "10.0.0.0/33",
+      "192.0.2.0/33",
       "2001:db8::/129",
-      "10.0.0.0/08",
-      "10.0.0.0/",
-      "10.0.0.0/8/8",
-      "010.0.0.1",
-      "10.0.0",
+      "192.0.2.0/024",
+      "192.0.2.0/",
+      "192.0.2.0/24/24",
+      "0192.0.2.1",
+      "192.0.2",
       "fe80::1%eth0",
       "[::1]",
       "localhost",
-      "10.0.0.1,",
-      "10.0.0.1,,10.0.0.2",
-      "10.0.0.1;10.0.0.2",
+      "192.0.2.1,",
+      "192.0.2.1,,192.0.2.2",
+      "192.0.2.1;192.0.2.2",
     ])("rejects invalid entry %p", (cidrs) => {
       const { error } = validate({
         TRUST_PROXY: "1",
         TRUST_PROXY_CIDRS: cidrs,
       });
       expect(error?.message).toContain("TRUST_PROXY_CIDRS");
+    });
+
+    it.each([
+      // Broader than the minimum prefix (/8 for IPv4, /32 for IPv6).
+      "0.0.0.0/1",
+      "128.0.0.0/1",
+      "10.0.0.0/7",
+      "2001:db8::/31",
+      // IPv6 ranges that BlockList would match against IPv4 peers.
+      "::/1",
+      "::/32",
+      "::/80",
+      "::ffff:0:0/96",
+      "::ffff:0:0/104",
+      "::ffff:192.0.2.1",
+      "::ffff:c000:200/120",
+      // Host bits are masked: these are ::/32 and ::/80.
+      "0:0:1::/32",
+      "::ffff:0:0/80",
+      "::/96",
+    ])("rejects over-broad or IPv4-mapped range %p", (cidrs) => {
+      const { error } = validate({
+        TRUST_PROXY: "1",
+        TRUST_PROXY_CIDRS: cidrs,
+      });
+      expect(error?.message).toContain("TRUST_PROXY_CIDRS");
+      expect(error?.message).not.toContain(cidrs);
+    });
+
+    it("rejects a list that only covers everything when combined", () => {
+      const { error } = validate({
+        TRUST_PROXY: "1",
+        TRUST_PROXY_CIDRS: "0.0.0.0/1, 128.0.0.0/1",
+      });
+      expect(error?.message).toContain("TRUST_PROXY_CIDRS");
+    });
+
+    it.each([
+      "192.0.2.0/24",
+      "198.51.100.0/24, 203.0.113.0/24",
+      "10.0.0.0/8",
+      "2001:db8::/32",
+      "2001:db8::/48",
+      "2001:db8::1",
+      "::1",
+      "64:ff9b::/96",
+    ])("accepts the narrow range %p", (cidrs) => {
+      expect(
+        validate({ TRUST_PROXY: "1", TRUST_PROXY_CIDRS: cidrs }).error,
+      ).toBeUndefined();
     });
 
     it("validates the syntax even when TRUST_PROXY is 0", () => {
@@ -212,11 +262,11 @@ describe("environmentSchema", () => {
       const canary = "synthetic-canary-4f1c";
       const { error } = validate({
         TRUST_PROXY: "1",
-        TRUST_PROXY_CIDRS: `10.0.0.1,${canary}`,
+        TRUST_PROXY_CIDRS: `192.0.2.1,${canary}`,
       });
       expect(error?.message).toContain("TRUST_PROXY_CIDRS");
       expect(error?.message).not.toContain(canary);
-      expect(error?.message).not.toContain("10.0.0.1");
+      expect(error?.message).not.toContain("192.0.2.1");
     });
   });
 });

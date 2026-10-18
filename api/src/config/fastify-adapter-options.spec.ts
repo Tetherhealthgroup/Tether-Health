@@ -13,7 +13,7 @@ type TrustProxy = ReturnType<typeof buildFastifyAdapterOptions>["trustProxy"];
 async function requestSeenBy(
   trustProxy: TrustProxy,
   headers: Record<string, string>,
-  remoteAddress = "10.0.0.1",
+  remoteAddress = "192.0.2.1",
 ): Promise<{ ip: string; host: string; protocol: string }> {
   const app = Fastify({ trustProxy });
   app.get("/ip", (request) => ({
@@ -34,7 +34,7 @@ async function requestSeenBy(
 async function clientIp(
   trustProxy: TrustProxy,
   forwardedFor: string,
-  remoteAddress = "10.0.0.1",
+  remoteAddress = "192.0.2.1",
 ): Promise<string> {
   return (
     await requestSeenBy(
@@ -45,7 +45,7 @@ async function clientIp(
   ).ip;
 }
 
-const proxyEnv = (hops: number, cidrs = "10.0.0.0/24") => ({
+const proxyEnv = (hops: number, cidrs = "192.0.2.0/24") => ({
   ...baseEnv,
   TRUST_PROXY: String(hops),
   TRUST_PROXY_CIDRS: cidrs,
@@ -60,9 +60,9 @@ describe("buildFastifyAdapterOptions", () => {
 
   it("with the default, X-Forwarded-For does not change request.ip", async () => {
     const { trustProxy } = buildFastifyAdapterOptions(baseEnv);
-    expect(await clientIp(trustProxy, "203.0.113.9")).toBe("10.0.0.1");
+    expect(await clientIp(trustProxy, "203.0.113.9")).toBe("192.0.2.1");
     expect(await clientIp(trustProxy, "203.0.113.9, 198.51.100.7")).toBe(
-      "10.0.0.1",
+      "192.0.2.1",
     );
   });
 
@@ -76,15 +76,18 @@ describe("buildFastifyAdapterOptions", () => {
     ).toBe(false);
   });
 
-  it.each([1, 2, 10])("trusts exactly %i hop(s) for TRUST_PROXY=%i", (n) => {
-    const { trustProxy } = buildFastifyAdapterOptions(proxyEnv(n));
-    expect(trustProxy).toBeInstanceOf(Function);
-    if (typeof trustProxy === "function") {
-      expect(trustProxy("10.0.0.1", n - 1)).toBe(true);
-      expect(trustProxy("10.0.0.1", n)).toBe(false);
-      expect(trustProxy("198.51.100.7", n - 1)).toBe(false);
-    }
-  });
+  it.each([1, 2, 10])(
+    "trusts exactly %i hop(s) for that TRUST_PROXY value",
+    (n) => {
+      const { trustProxy } = buildFastifyAdapterOptions(proxyEnv(n));
+      expect(trustProxy).toBeInstanceOf(Function);
+      if (typeof trustProxy === "function") {
+        expect(trustProxy("192.0.2.1", n - 1)).toBe(true);
+        expect(trustProxy("192.0.2.1", n)).toBe(false);
+        expect(trustProxy("198.51.100.7", n - 1)).toBe(false);
+      }
+    },
+  );
 
   it("with one hop, request.ip is the entry an allowlisted proxy appended", async () => {
     const { trustProxy } = buildFastifyAdapterOptions(proxyEnv(1));
@@ -95,7 +98,7 @@ describe("buildFastifyAdapterOptions", () => {
 
   it("matches an allowlisted proxy that connects as an IPv4-mapped IPv6 address", async () => {
     const { trustProxy } = buildFastifyAdapterOptions(proxyEnv(1));
-    expect(await clientIp(trustProxy, "198.51.100.7", "::ffff:10.0.0.1")).toBe(
+    expect(await clientIp(trustProxy, "198.51.100.7", "::ffff:192.0.2.1")).toBe(
       "198.51.100.7",
     );
   });
@@ -128,9 +131,9 @@ describe("buildFastifyAdapterOptions", () => {
 
   it("with two hops, trusts the inner hop only if it is also allowlisted", async () => {
     const { trustProxy } = buildFastifyAdapterOptions(proxyEnv(2));
-    // 10.0.0.2 is an allowlisted inner proxy: the client is the entry it added.
+    // 192.0.2.2 is an allowlisted inner proxy: the client is the entry it added.
     expect(
-      await clientIp(trustProxy, "203.0.113.9, 198.51.100.7, 10.0.0.2"),
+      await clientIp(trustProxy, "203.0.113.9, 198.51.100.7, 192.0.2.2"),
     ).toBe("198.51.100.7");
     // 198.51.100.8 is not a proxy: the stop is there, the spoof is ignored.
     expect(await clientIp(trustProxy, "203.0.113.9, 198.51.100.8")).toBe(
@@ -175,7 +178,7 @@ describe("buildFastifyAdapterOptions", () => {
         buildFastifyAdapterOptions({
           ...baseEnv,
           TRUST_PROXY: raw,
-          TRUST_PROXY_CIDRS: "10.0.0.0/24",
+          TRUST_PROXY_CIDRS: "192.0.2.0/24",
         }),
       ).toThrow(/"TRUST_PROXY"/);
     },

@@ -44,12 +44,16 @@ and `TRUST_PROXY_CIDRS` lists the proxy addresses those hops may come from.
 - **Proxy allowlist.** A non-zero `TRUST_PROXY` requires `TRUST_PROXY_CIDRS`:
   a comma-separated list of IPv4/IPv6 addresses or CIDR ranges, for example
   `10.0.0.0/8, 2001:db8::/32`. Startup fails if it is missing, empty, or has an
-  invalid entry (including a `/0` range). A hop is trusted only if it is within
+  invalid entry: IPv4 ranges must be `/8` or narrower and IPv6 ranges `/32` or
+  narrower, and IPv6 entries may not overlap the IPv4-mapped space
+  (`::ffff:0:0/96`) or be broader than `/104` within `::/80`, so IPv4 proxies
+  must be written in IPv4 form. A hop is trusted only if it is within
   the hop count **and** its address is in the list, so a peer outside the list
   (for example, a client connecting to the service directly) keeps its own
   socket address and its `X-Forwarded-*` headers are ignored. With more than
   one hop, every proxy in the chain must be listed. Use the narrowest ranges
-  that cover the proxies. The list is ignored when `TRUST_PROXY` is `0`.
+  that cover the proxies. The list is not used when `TRUST_PROXY` is `0`, but
+  it must be empty or valid even when `TRUST_PROXY` is `0`.
 - **Spoofing risk.** If the hop count is higher than the real number of
   proxies, or the allowlist covers addresses that clients can connect from, a
   client can forge its own IP. That lets it evade its rate limit or exhaust

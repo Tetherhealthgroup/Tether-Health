@@ -52,6 +52,52 @@ export interface TrustedProxyRange {
 }
 
 const MAX_PREFIX = { ipv4: 32, ipv6: 128 } as const;
+// Broadest accepted range per family. Broader ranges are rejected because
+// several of them together can cover every address (e.g. two IPv4 /1s).
+const MIN_PREFIX = { ipv4: 8, ipv6: 32 } as const;
+
+/** Eight 16-bit groups of an address that isIP() reports as IPv6. */
+function ipv6Groups(address: string): number[] {
+  let text = address;
+  const lastColon = text.lastIndexOf(":");
+  const tail = text.slice(lastColon + 1);
+  if (tail.includes(".")) {
+    const [a = 0, b = 0, c = 0, d = 0] = tail.split(".").map(Number);
+    text = `${text.slice(0, lastColon + 1)}${((a << 8) | b).toString(16)}:${((c << 8) | d).toString(16)}`;
+  }
+  const [head = "", rest] = text.split("::");
+  const parse = (part: string) =>
+    part === "" ? [] : part.split(":").map((group) => parseInt(group, 16));
+  const left = parse(head);
+  const right = rest === undefined ? [] : parse(rest);
+  const zeros = new Array<number>(8 - left.length - right.length).fill(0);
+  return [...left, ...zeros, ...right];
+}
+
+/** True if the first `bits` bits of two IPv6 group arrays are equal. */
+function sameLeadingBits(a: number[], b: number[], bits: number): boolean {
+  for (let i = 0; i < 8 && bits > 0; i += 1, bits -= 16) {
+    const mask = bits >= 16 ? 0xffff : (0xffff << (16 - bits)) & 0xffff;
+    if (((a[i] ?? 0) & mask) !== ((b[i] ?? 0) & mask)) return false;
+  }
+  return true;
+}
+
+const IPV4_MAPPED = [0, 0, 0, 0, 0, 0xffff, 0, 0]; // ::ffff:0:0/96
+const ZERO = [0, 0, 0, 0, 0, 0, 0, 0];
+
+/**
+ * BlockList matches IPv4 peers against IPv6 ranges that cover the
+ * IPv4-mapped space, so an IPv6 range overlapping it could trust every IPv4
+ * address. Rejects any range overlapping ::ffff:0:0/96 (IPv4 proxies must be
+ * written in IPv4 form) and any range in ::/80 broader than /104. Host bits
+ * are masked first, as BlockList does.
+ */
+function overlapsIpv4Space(address: string, prefix: number): boolean {
+  const groups = ipv6Groups(address);
+  if (sameLeadingBits(groups, IPV4_MAPPED, Math.min(prefix, 96))) return true;
+  return prefix < 104 && sameLeadingBits(groups, ZERO, Math.min(prefix, 80));
+}
 
 function trustedProxyRange(entry: string): TrustedProxyRange | undefined {
   const parts = entry.split("/");
@@ -62,12 +108,21 @@ function trustedProxyRange(entry: string): TrustedProxyRange | undefined {
   const version = isIP(address);
   if (version === 0) return undefined;
   const family = version === 4 ? "ipv4" : "ipv6";
-  if (prefixText === undefined) return { family, address };
-  // Decimal prefix without leading zeros. /0 is rejected: it matches every
-  // address, which is the rejected TRUST_PROXY=true.
-  if (!/^[1-9][0-9]{0,2}$/.test(prefixText)) return undefined;
-  const prefix = Number(prefixText);
-  return prefix <= MAX_PREFIX[family] ? { family, address, prefix } : undefined;
+  // Decimal prefix without leading zeros.
+  if (prefixText !== undefined && !/^[1-9][0-9]{0,2}$/.test(prefixText)) {
+    return undefined;
+  }
+  const prefix =
+    prefixText === undefined ? MAX_PREFIX[family] : Number(prefixText);
+  if (prefix < MIN_PREFIX[family] || prefix > MAX_PREFIX[family]) {
+    return undefined;
+  }
+  if (family === "ipv6" && overlapsIpv4Space(address, prefix)) {
+    return undefined;
+  }
+  return prefixText === undefined
+    ? { family, address }
+    : { family, address, prefix };
 }
 
 /**
@@ -191,7 +246,8 @@ export const environmentSchema = Joi.object({
   // Addresses or CIDR ranges of the reverse proxies allowed to set
   // X-Forwarded-For. Required when TRUST_PROXY is above 0: a hop is trusted
   // only if its address is in this list, so a client connecting directly
-  // cannot forge its IP. Ignored when TRUST_PROXY is 0.
+  // cannot forge its IP. Not used when TRUST_PROXY is 0, but must still be
+  // empty or valid.
   TRUST_PROXY_CIDRS: Joi.when("TRUST_PROXY", {
     is: 0,
     then: trustedProxyList.default([]),
