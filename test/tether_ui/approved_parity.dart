@@ -28,6 +28,39 @@ bool _nonBlankStrings(Object? v) =>
     v.isNotEmpty &&
     v.every((e) => e is String && e.trim().isNotEmpty);
 
+/// Decision IDs as used in the registry: `P-22`, `P-30b`,
+/// `N3`, `P-47 decision 3`.
+final decisionId = RegExp(r'^(P-\d+[a-z]?|N\d+|P-47 decision \d+)$');
+
+/// Ticket IDs: `TH-942`, `TH-972a`.
+final ticketId = RegExp(r'^TH-\d+[a-z]?$');
+
+/// Values in [v] (already known to be non-blank strings) that are not IDs.
+List<String> _badIds(Object? v, RegExp form) => [
+      for (final e in v! as List)
+        if (!form.hasMatch(e as String)) e
+    ];
+
+void _checkIds(
+    List<String> failures, String what, Object? decisions, Object? tickets) {
+  if (_nonBlankStrings(decisions)) {
+    final bad = _badIds(decisions, decisionId);
+    if (bad.isNotEmpty) {
+      failures.add('$what has decisions that are not owner decision IDs: '
+          '$bad. Use the decision ID (e.g. "P-22", "N3", "P-47 decision 3"); '
+          'without an owner decision there is no entry: get an owner decision, '
+          'then record it in a reviewed change (see $approvedDir/README.md).');
+    }
+  }
+  if (_nonBlankStrings(tickets)) {
+    final bad = _badIds(tickets, ticketId);
+    if (bad.isNotEmpty) {
+      failures.add('$what has tickets that are not ticket IDs: $bad. Use the '
+          'ticket that made the change (e.g. "TH-942").');
+    }
+  }
+}
+
 /// Returns one message per problem; an empty list means the tree matches the
 /// owner-approved design.
 ///
@@ -106,6 +139,7 @@ List<String> checkApprovedParity({
         failures.add('Deviation "$id" has no ticket. Every entry needs '
             '"decisions" and "tickets" (the ticket that made the change).');
       }
+      _checkIds(failures, 'Deviation "$id"', e['decisions'], e['tickets']);
       if (sha is! String || !_hex64.hasMatch(sha)) {
         failures.add('Deviation "$id" has no valid "sha256" of the reviewed '
             'screen. $_procedure');
@@ -147,6 +181,7 @@ List<String> checkApprovedParity({
         failures.add('Addition "$id" has no ticket. Every entry needs '
             '"decisions" and "tickets".');
       }
+      _checkIds(failures, 'Addition "$id"', e['decisions'], e['tickets']);
       if (!current.containsKey(id)) {
         failures.add('Addition "$id" is listed in additions.json but '
             '$screensDir/$id.json does not exist. Remove the entry, or '

@@ -75,7 +75,8 @@
       ],
       "tickets": [
         "TH-971"
-      ]
+      ],
+      "status": "owner prototype check pending"
     },
     {
       "screen": "sf_screentime_android",

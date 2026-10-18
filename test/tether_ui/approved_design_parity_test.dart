@@ -19,32 +19,79 @@ const approvedScreenCount = 183;
 const ownerManifestDigest =
     '540be2a16c7fa2342c6dc401b9f4165b2359a038912369629ff20326ac39776a';
 
-Object? _readJson(String path) =>
-    jsonDecode(File(path).readAsStringSync()) as Object?;
+const _regen = 'Regenerate from the repo root with '
+    '`python3 tether_ui/generator/build_all.py`, or restore it from git';
 
-Map<String, String> _currentScreens() {
-  final out = <String, String>{};
-  for (final f in Directory(screensDir).listSync().whereType<File>()) {
-    final name = f.uri.pathSegments.last;
-    if (name.endsWith('.json')) {
-      out[name.substring(0, name.length - 5)] = sha256Hex(f.readAsBytesSync());
+/// Loads the registry and the screens under [root] and runs the check. Missing
+/// or unreadable inputs are reported as failures (never skipped), with the
+/// file and what to do.
+List<String> checkTree(
+  String root, {
+  int approvedCount = approvedScreenCount,
+  String manifestDigest = ownerManifestDigest,
+}) {
+  final failures = <String>[];
+
+  Object? readJson(String name) {
+    final path = '$approvedDir/$name';
+    final file = File('$root/$path');
+    if (!file.existsSync()) {
+      failures.add('$path is missing. Restore it from git '
+          '(git checkout -- $path); it is part of the approved-design '
+          'registry.');
+      return null;
+    }
+    try {
+      return jsonDecode(file.readAsStringSync()) as Object?;
+    } on FormatException catch (e) {
+      failures.add('$path is not valid JSON (${e.message}). Restore it from '
+          'git, or fix it in a reviewed change.');
+    } on FileSystemException catch (e) {
+      failures.add('$path cannot be read (${e.message}). Restore it from git.');
+    }
+    return null;
+  }
+
+  final manifest = readJson('manifest.json');
+  final deviations = readJson('deviations.json');
+  final additions = readJson('additions.json');
+
+  final current = <String, String>{};
+  final dir = Directory('$root/$screensDir');
+  if (!dir.existsSync()) {
+    failures.add('$screensDir is missing (a generator run that failed part '
+        'way leaves spec/ removed). $_regen (git checkout -- tether_ui/spec).');
+  } else {
+    try {
+      for (final f in dir.listSync().whereType<File>()) {
+        final name = f.uri.pathSegments.last;
+        if (name.endsWith('.json')) {
+          current[name.substring(0, name.length - 5)] =
+              sha256Hex(f.readAsBytesSync());
+        }
+      }
+    } on FileSystemException catch (e) {
+      failures.add('$screensDir cannot be read (${e.message}). $_regen.');
     }
   }
-  return out;
+
+  // Fail closed: with any input missing, report that alone.
+  if (failures.isNotEmpty) return failures;
+  return checkApprovedParity(
+    manifest: manifest,
+    deviations: deviations,
+    additions: additions,
+    current: current,
+    approvedCount: approvedCount,
+    manifestDigest: manifestDigest,
+  );
 }
 
 String _h(String s) => sha256Hex(utf8.encode(s));
 
 void main() {
   test('every screen matches the owner-approved design', () {
-    final failures = checkApprovedParity(
-      manifest: _readJson('$approvedDir/manifest.json'),
-      deviations: _readJson('$approvedDir/deviations.json'),
-      additions: _readJson('$approvedDir/additions.json'),
-      current: _currentScreens(),
-      approvedCount: approvedScreenCount,
-      manifestDigest: ownerManifestDigest,
-    );
+    final failures = checkTree(Directory.current.path);
     expect(failures, isEmpty, reason: '\n${failures.join('\n\n')}\n');
   });
 
@@ -169,6 +216,36 @@ void main() {
       expectOne(run(), ['Deviation "two" has no ticket']);
     });
 
+    test('decision and ticket values that are not IDs', () {
+      final d = (deviations['deviations']! as List).first as Map;
+      final a = (additions['additions']! as List).first as Map;
+      d['decisions'] = ['TBD'];
+      a['tickets'] = ['none'];
+      final failures = run();
+      expect(failures, hasLength(2), reason: failures.join('\n'));
+      expect(
+          failures.join('\n'),
+          contains('Deviation "two" has decisions '
+              'that are not owner decision IDs: [TBD]'));
+      expect(
+          failures.join('\n'),
+          contains(
+              'Addition "extra" has tickets that are not ticket IDs: [none]'));
+      d['decisions'] = ['none'];
+      a['tickets'] = ['TBD'];
+      expect(run(), hasLength(2));
+      d['decisions'] = ['P-22 ', 'decision 3'];
+      a['tickets'] = ['th-942'];
+      expect(run(), hasLength(2));
+    });
+
+    test('the decision and ticket ID forms in use are accepted', () {
+      ((deviations['deviations']! as List).first as Map)
+        ..['decisions'] = ['P-22', 'P-30b', 'N3', 'P-47 decision 13']
+        ..['tickets'] = ['TH-942', 'TH-972a'];
+      expect(run(), isEmpty);
+    });
+
     test('a deviation left behind after a screen is reverted', () {
       current['two'] = _h('two');
       expectOne(run(), ['"two" matches the owner\'s snapshot again']);
@@ -193,4 +270,62 @@ void main() {
       expect(failures.join('\n'), contains('no longer matches'));
     });
   });
+
+  group('missing or malformed inputs fail with a clear message', () {
+    late Directory root;
+
+    // A small synthetic tree, so these checks do not depend on the real one.
+    final screens = {'one': _h('one'), 'two': _h('two'), 'three': _h('three')};
+    final digest = sha256Hex(utf8.encode(manifestCanonicalText(screens)));
+    List<String> runTree() =>
+        checkTree(root.path, approvedCount: 3, manifestDigest: digest);
+
+    setUp(() {
+      root = Directory.systemTemp.createTempSync('approved_parity');
+      void write(String path, String content) =>
+          File(_mkParents('${root.path}/$path')).writeAsStringSync(content);
+      write('$approvedDir/manifest.json', jsonEncode({'screens': screens}));
+      write('$approvedDir/deviations.json', jsonEncode({'deviations': []}));
+      write('$approvedDir/additions.json', jsonEncode({'additions': []}));
+      for (final id in screens.keys) {
+        write('$screensDir/$id.json', id);
+      }
+    });
+
+    tearDown(() => root.deleteSync(recursive: true));
+
+    test('the synthetic tree passes', () {
+      expect(runTree(), isEmpty);
+    });
+
+    test('spec/screens is missing', () {
+      Directory('${root.path}/$screensDir').deleteSync(recursive: true);
+      final failures = runTree();
+      expect(failures, hasLength(1));
+      expect(failures.single, contains('$screensDir is missing'));
+      expect(failures.single, contains('tether_ui/generator/build_all.py'));
+    });
+
+    for (final name in ['manifest.json', 'deviations.json', 'additions.json']) {
+      test('$name is missing', () {
+        File('${root.path}/$approvedDir/$name').deleteSync();
+        final failures = runTree();
+        expect(failures, hasLength(1));
+        expect(failures.single, contains('$approvedDir/$name is missing'));
+        expect(failures.single, contains('git checkout'));
+      });
+
+      test('$name is not valid JSON', () {
+        File('${root.path}/$approvedDir/$name').writeAsStringSync('{"x": ');
+        final failures = runTree();
+        expect(failures, hasLength(1));
+        expect(failures.single, contains('$approvedDir/$name is not valid'));
+      });
+    }
+  });
+}
+
+String _mkParents(String path) {
+  File(path).parent.createSync(recursive: true);
+  return path;
 }

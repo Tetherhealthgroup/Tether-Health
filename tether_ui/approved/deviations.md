@@ -16,6 +16,11 @@ the current file:
 
 All replacement copy still needs clinical/legal review before release.
 
+Additions (new screens, not deviations) are in `additions.json`. One of them,
+`sf_home_unplug_android` (decision N3, TH-971), has
+`"status": "owner prototype check pending"`: the guard allows it, but the
+owner has not yet checked it in the prototype.
+
 ## P-22: "works offline" copy removed (TH-942)
 
 | Screen | Field | Change | Copy review row |
