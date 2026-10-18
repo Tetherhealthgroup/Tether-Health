@@ -89,7 +89,7 @@ describe("EnrolmentsService", () => {
 
   it.each([
     [
-      { code: "23514", message: "At most two programmes can be in focus" },
+      { code: "TH001", message: "synthetic", hint: "focus_cap_reached" },
       { status: HttpStatus.CONFLICT, code: "focus_cap_reached" },
     ],
     [
@@ -124,14 +124,171 @@ describe("EnrolmentsService", () => {
     expect(error).toBeInstanceOf(BadGatewayException);
   });
 
-  it("maps a non-cap check violation on update to enrolment_conflict", async () => {
+  it.each([
+    [
+      { code: "TH001" },
+      { status: HttpStatus.CONFLICT, code: "focus_cap_reached" },
+    ],
+    [
+      { code: "23514" },
+      { status: HttpStatus.CONFLICT, code: "enrolment_conflict" },
+    ],
+    [
+      { code: "TH002" },
+      { status: HttpStatus.CONFLICT, code: "enrolment_conflict" },
+    ],
+    [
+      { code: "TH003" },
+      { status: HttpStatus.CONFLICT, code: "enrolment_conflict" },
+    ],
+  ])("maps update error %j", async (error, expected) => {
     const { service } = setup(
       { data: enrolmentRow(), error: null },
-      { data: null, error: { code: "23514", message: "other check" } },
+      { data: null, error: { ...error, message: "synthetic" } },
     );
     expect(
       await codeOf(service.update(user, ENROLMENT_ID, { status: "paused" })),
-    ).toEqual({ status: HttpStatus.CONFLICT, code: "enrolment_conflict" });
+    ).toEqual(expected);
+  });
+
+  it.each(["TH002", "TH003"])(
+    "maps revoke error %s to consent_already_revoked",
+    async (code) => {
+      const { service } = setup({
+        data: null,
+        error: { code, message: "synthetic" },
+      });
+      expect(await codeOf(service.revokeConsent(user, "c1"))).toEqual({
+        status: HttpStatus.CONFLICT,
+        code: "consent_already_revoked",
+      });
+    },
+  );
+
+  // Message text and hint never decide: only the SQLSTATE code does.
+  describe("does not match message text", () => {
+    const capText = {
+      message: "At most two programmes can be in focus",
+      hint: "focus_cap_reached",
+    };
+
+    it.each(["23514", "P0001", "XX000"])(
+      "create: focus-cap text under %s is not the focus cap",
+      async (code) => {
+        const { service } = setup({ data: null, error: { code, ...capText } });
+        expect(
+          await codeOf(
+            service.create(user, { programmeCode: "bf", status: "focus" }),
+          ),
+        ).toBeInstanceOf(BadGatewayException);
+      },
+    );
+
+    it("update: focus-cap text under 23514 is an ordinary check violation", async () => {
+      const { service } = setup(
+        { data: enrolmentRow(), error: null },
+        { data: null, error: { code: "23514", ...capText } },
+      );
+      expect(
+        await codeOf(service.update(user, ENROLMENT_ID, { status: "focus" })),
+      ).toEqual({ status: HttpStatus.CONFLICT, code: "enrolment_conflict" });
+    });
+
+    it("revoke: already-revoked text under 23514 is not the revoke-only rule", async () => {
+      const { service } = setup({
+        data: null,
+        error: {
+          code: "23514",
+          message: "Consent is already revoked",
+          hint: "consent_already_revoked",
+        },
+      });
+      expect(await codeOf(service.revokeConsent(user, "c1"))).toBeInstanceOf(
+        BadGatewayException,
+      );
+    });
+  });
+
+  // Unmapped TH codes (including TH009/TH010, which a member session never
+  // sees) fail closed on every route, with a fixed message.
+  describe.each([
+    "TH001",
+    "TH002",
+    "TH003",
+    "TH007",
+    "TH009",
+    "TH010",
+    "TH999",
+  ])("fails closed on %s where it is not mapped", (code) => {
+    const error = { code, message: "synthetic detail", hint: "synthetic_hint" };
+    const recent = () => ({
+      ...user,
+      authenticatedAt: Math.floor(Date.now() / 1000),
+    });
+    const expectHidden = (result: unknown) => {
+      expect(result).toBeInstanceOf(BadGatewayException);
+      const response = JSON.stringify(
+        (result as BadGatewayException).getResponse(),
+      );
+      expect(response).not.toContain("synthetic");
+      expect(response).not.toContain(code);
+    };
+
+    it("grant consent", async () => {
+      const { service } = setup(
+        { data: enrolmentRow(), error: null },
+        { data: null, error },
+      );
+      expectHidden(
+        await codeOf(
+          service.grantConsent(user, {
+            enrolmentId: ENROLMENT_ID,
+            purpose: "core",
+            consentVersion: "v1",
+            consentText: "Synthetic wording",
+          }),
+        ),
+      );
+    });
+
+    it("delete now", async () => {
+      const { service } = setup({ data: null, error });
+      expectHidden(
+        await codeOf(service.deleteNow(recent(), ENROLMENT_ID, "DELETE")),
+      );
+    });
+
+    if (!["TH001"].includes(code)) {
+      it("create", async () => {
+        const { service } = setup({ data: null, error });
+        expectHidden(
+          await codeOf(
+            service.create(user, { programmeCode: "bf", status: "focus" }),
+          ),
+        );
+      });
+    }
+
+    if (!["TH001", "TH002", "TH003"].includes(code)) {
+      it("update", async () => {
+        const { service } = setup(
+          { data: enrolmentRow(), error: null },
+          { data: null, error },
+        );
+        expectHidden(
+          await codeOf(
+            service.update(user, ENROLMENT_ID, { status: "paused" }),
+          ),
+        );
+      });
+    }
+
+    if (!["TH002", "TH003"].includes(code)) {
+      it("revoke consent", async () => {
+        const { service } = setup({ data: null, error });
+        expectHidden(await codeOf(service.revokeConsent(user, "c1")));
+      });
+    }
   });
 
   it("checks the deletion barrier only when rejoining", async () => {
