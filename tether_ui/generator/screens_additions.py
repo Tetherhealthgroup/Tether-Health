@@ -5,8 +5,8 @@ screens changed as a result and are edited in place in screens_prog_a.py
 (``sf_home`` gains the Unplug card, ``sf_screentime`` says "shows"); every
 other existing screen is untouched, and other per-platform or per-state
 differences are state variants (``variant_of=``). Screens marked
-``reference=True`` are native or system surfaces (shield, overlay, widget,
-shortcuts): they keep render tests but are excluded from release-check
+``reference=True`` are native or system surfaces (shield, overlay, app pickers,
+widget, shortcuts): they keep render tests but are excluded from release-check
 counts, which use device screenshots instead. Traceability is in the review
 notes in this folder.
 
@@ -237,14 +237,14 @@ def unplug():
     ], footer=[button('Open app picker', sheet('sf_unplug_picker_ios')), button('Not now', back(), v='secondary')],
        source=src + ' presentAppPicker()', native=NATIVE_NEVER_PAUSED,
        desc='iPhone host screen around Apple’s FamilyActivityPicker. presentAppPicker returns only a count; app identities stay as device-local tokens.')
-    P('sf_unplug_picker_ios', 'Apple app picker', '/p/sf/unplug/apps/picker', 'unplug', program='sf', phase='plan', kind='sheet', over='Choose apps', body=[
+    P('sf_unplug_picker_ios', 'Apple app picker', '/p/sf/unplug/apps/picker', 'unplug', reference=True, program='sf', phase='plan', kind='sheet', over='Choose apps', body=[
         nativeslot('ios.familyActivityPicker', 'Apple’s app picker', 'System sheet drawn by iOS (FamilyActivityPicker). Tether can’t style it or read the app names.', 'ios', 320),
     ], footer=[
         button('Done', branch('System app picker result', [('Apps chosen', rep('sf_unplug_apps_chosen')), ('Cancelled', close())])),
         button('Cancel', close(), v='secondary'),
     ], source=src + ' presentAppPicker()', native=NATIVE_NEVER_PAUSED,
        desc='Placeholder for the system picker. In the app this sheet is Apple’s; the buttons stand for the picker’s own Done / Cancel.')
-    P('sf_unplug_apps_android', 'Choose apps (Android)', '/p/sf/unplug/apps?state=android', 'unplug', program='sf', phase='plan',
+    P('sf_unplug_apps_android', 'Choose apps (Android)', '/p/sf/unplug/apps?state=android', 'unplug', reference=True, program='sf', phase='plan',
       variant_of='sf_unplug_apps', state='android', hdr=H('Choose apps', pill='Step 2 of 3'), body=[
         title('Choose the apps to pause'), text('This choice stays on this phone. Tether never receives it.', 'muted'),
         checklist([ci('Short-video app', done=True), ci('Photo feed app', done=True), ci('Video app', done=True), ci('News app'), ci('Games app'), ci('Shopping app')], label='Apps on this phone'),

@@ -27187,10 +27187,12 @@
     "notes": [
       "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()",
-      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
+      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
     ],
     "over": "Choose apps",
     "api": [],
+    "reference": true,
     "actions": [
       {
         "element": "Done",
@@ -27315,10 +27317,12 @@
     "notes": [
       "Copy needs clinical/legal review.",
       "Source: android/.../unplug/AppPickerActivity.kt",
-      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation. On Android the picker leaves them out of the list."
+      "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation. On Android the picker leaves them out of the list.",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
     ],
     "over": null,
     "api": [],
+    "reference": true,
     "actions": [
       {
         "element": "Back",

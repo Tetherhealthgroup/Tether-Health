@@ -57,8 +57,8 @@ checked by device screenshots, render tests kept.
 | `sf_unplug_auth_notifications` | Notifications off | `/p/sf/unplug/permission?state=notifications` | ScrollFree · Unplug | notifications off of `sf_unplug_auth` |  | P-47 decision 13 |
 | `sf_unplug_auth_android` | Android permissions for Unplug | `/p/sf/unplug/permission?state=android` | ScrollFree · Unplug | android of `sf_unplug_auth` |  | P-30, B.4 |
 | `sf_unplug_apps` | Choose apps | `/p/sf/unplug/apps` | ScrollFree · Unplug | screen |  | P-30, B.4 item 1 |
-| `sf_unplug_picker_ios` | Apple app picker | `/p/sf/unplug/apps/picker` | ScrollFree · Unplug | sheet |  | P-30, B.4 item 1 |
-| `sf_unplug_apps_android` | Choose apps (Android) | `/p/sf/unplug/apps?state=android` | ScrollFree · Unplug | android of `sf_unplug_apps` |  | P-30, B.4 item 1, TH-969 |
+| `sf_unplug_picker_ios` | Apple app picker | `/p/sf/unplug/apps/picker` | ScrollFree · Unplug | sheet | yes | P-30, B.4 item 1 |
+| `sf_unplug_apps_android` | Choose apps (Android) | `/p/sf/unplug/apps?state=android` | ScrollFree · Unplug | android of `sf_unplug_apps` | yes | P-30, B.4 item 1, TH-969 |
 | `sf_unplug_apps_chosen` | Name your groups | `/p/sf/unplug/apps?state=chosen` | ScrollFree · Unplug | apps chosen of `sf_unplug_apps` |  | P-30, B.4 item 1 |
 | `sf_unplug_limits` | Limits & pause screen | `/p/sf/unplug/limits` | ScrollFree · Unplug | screen |  | P-30, B.4 items 2-3 |
 | `sf_unplug_home` | Unplug | `/p/sf/unplug/home` | ScrollFree · Unplug | screen |  | P-30, B.4 item 8 |
@@ -114,8 +114,9 @@ checked by device screenshots, render tests kept.
 11. Keep the pre-selected defaults. The "Suggested" badge on
     `sf_unplug_limits` goes to clinical review.
 12. Reference screens are excluded from release-check counts. Done:
-    `reference: true` on 9 screens; `validation/summary.json` →
-    `release_check` (screens 218, actions 888, plus the list). TH-952
+    `reference: true` on 11 screens (9 named in the decision plus the 2 app
+    pickers); `validation/summary.json` → `release_check` (screens 216,
+    actions 883, plus the list). TH-952
     should use these counts.
 13. Notifications-off fallback. Done:
     - Both shield subtitles add "Open Tether for support."
@@ -129,11 +130,11 @@ checked by device screenshots, render tests kept.
 14. The three Unplug rules (`sf.unplug.reason`, `.sentence`, `.sum`) are
     product rules, not clinical. The `source` field in rules.json says so.
 
-Open question for the coordinator: the two app pickers
-(`sf_unplug_picker_ios`, Apple's system sheet, and `sf_unplug_apps_android`,
-a native Activity) are also drawn outside Flutter. They are **not** marked
-reference, because decision 12 names shield, overlay, widget and shortcuts.
-Decide whether they should be.
+App pickers (coordinator decision under decision 12, owner may override):
+`sf_unplug_picker_ios` (Apple's system sheet) and `sf_unplug_apps_android`
+(a native Activity) are marked `reference: true`. Decision 12's principle is
+that native surfaces Flutter goldens cannot capture are checked by device
+screenshots. That makes 11 reference screens.
 
 ## Safety requirements (th-qa round 1)
 
