@@ -238,7 +238,7 @@ void main() {
         1,
         stdout: certSection,
         stderr: 'FAIL: neither bundletool nor aapt2 is installed; cannot read '
-            'versionCode from the AAB. Install one and re-run with '
+            'the package or versionCode from the AAB. Install one and re-run with '
             '--verify-aab=<path> before uploading.\n',
       );
     });
@@ -353,9 +353,10 @@ void main() {
       });
     });
 
-    test('a full invocation checks the certificate of the relative AAB', () {
-      // Fake flutter writes the AAB where the script expects it, relative to
-      // the repo root; keytool must still find it through the link.
+    /// Runs a full Play invocation. Fake flutter writes the AAB where the
+    /// script expects it, relative to the repo root; keytool records what it
+    /// read in [seen]; bundletool runs [bundletool].
+    ProcessResult fullPlayBuild(String bundletool, File seen) {
       Directory(join([root.path, 'android'])).createSync();
       File(join([root.path, 'android', 'key.properties']))
           .writeAsStringSync('');
@@ -370,18 +371,61 @@ void main() {
             '  printf built > build/app/outputs/bundle/release/app-release.aab\n'
             '  ;; esac',
       );
-      final seen = File(join([root.path, 'seen']));
       writeFake(
         'keytool',
         'cat "\$3" > "${seen.path}"\necho "Owner: CN=Upload, O=Test"',
       );
-      writeFake('bundletool', bundletoolOk);
-      final r = play(['--dart-define-from-file=${define.path}']);
+      writeFake('bundletool', bundletool);
+      return play(['--dart-define-from-file=${define.path}']);
+    }
+
+    test('a full invocation checks the certificate of the relative AAB', () {
+      // keytool must still find the relative AAB through the link.
+      final seen = File(join([root.path, 'seen']));
+      final r = fullPlayBuild(bundletoolOk, seen);
       expectClean(r);
       expect(r.exitCode, 0, reason: '${r.stdout}${r.stderr}');
       expect(seen.readAsStringSync(), 'built');
       expect(
           r.stdout, contains('Signing certificate is not the Android Debug'));
+      // TH-941: the full build reads the package back, then the versionCode.
+      expect(
+        r.stdout,
+        contains('Signing certificate is not the Android Debug certificate.\n'
+            '\n$packageLine'
+            'versionCode: 5 (read from the AAB); minimum 2\n'),
+      );
+    });
+
+    test('a full invocation fails when the AAB has another package', () {
+      final seen = File(join([root.path, 'seen']));
+      for (final other in [
+        'com.breathefree.breathefree_patient',
+        '$appId.debug',
+      ]) {
+        final r = fullPlayBuild(
+          'case "\$*" in\n'
+          '  *--xpath=/manifest/@package*) echo $other ;;\n'
+          '  *) echo 5 ;;\n'
+          'esac',
+          seen,
+        );
+        expectClean(r);
+        expect(r.exitCode, 1, reason: '$other: ${r.stdout}${r.stderr}');
+        expect(seen.readAsStringSync(), 'built', reason: other);
+        expect(
+          r.stdout,
+          contains('package: $other (read from the AAB); expected $appId\n'),
+          reason: other,
+        );
+        expect(
+          r.stderr,
+          'FAIL: AAB package $other is not $appId; Play would reject it as a '
+          'different app. Do not upload.\n',
+          reason: other,
+        );
+        expect(r.stdout, isNot(contains('versionCode: 5')), reason: other);
+      }
     });
   });
 

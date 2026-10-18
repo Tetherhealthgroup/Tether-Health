@@ -61,6 +61,25 @@ void main() {
     );
   });
 
+  test('no xcconfig or Gradle setting overrides the app ID', () {
+    // An xcconfig PRODUCT_BUNDLE_IDENTIFIER or a Gradle applicationIdSuffix
+    // would silently change the ID that is built and uploaded.
+    final xcconfigs = Directory('ios')
+        .listSync(recursive: true, followLinks: false)
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.xcconfig'))
+        .toList();
+    expect(xcconfigs.map((f) => f.path.replaceAll(r'\', '/')),
+        contains('ios/Flutter/Release.xcconfig'));
+    for (final file in xcconfigs) {
+      expect(
+          file.readAsStringSync(), isNot(contains('PRODUCT_BUNDLE_IDENTIFIER')),
+          reason: file.path);
+    }
+    final gradle = File('android/app/build.gradle.kts').readAsStringSync();
+    expect(gradle, isNot(contains('applicationIdSuffix')));
+  });
+
   test('the App Group identifier is defined once per configuration', () {
     final pbx = File('ios/Runner.xcodeproj/project.pbxproj').readAsStringSync();
     final groups = RegExp(
