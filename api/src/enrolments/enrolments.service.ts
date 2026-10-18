@@ -6,6 +6,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import type { PostgrestError } from "@supabase/supabase-js";
 import type { AuthUser } from "../auth/auth-user";
+import { DatabaseErrorCode } from "../common/database-errors";
 import { CURRENT_CORE_CONSENT_VERSION } from "./consent-versions";
 import {
   badRequest,
@@ -59,16 +60,26 @@ const ENROLMENT_COLUMNS =
 const CONSENT_COLUMNS =
   "id,enrolment_id,purpose,recipient_ref,consent_version,consent_text,granted_at,revoked_at";
 
-// Raised by public.enrolments_focus_cap() (deferred, so it surfaces at commit).
-const FOCUS_CAP_MESSAGE = "At most two programmes can be in focus";
+// Database errors are told apart by SQLSTATE code only, never by message.
+const {
+  uniqueViolation: UNIQUE_VIOLATION,
+  foreignKeyViolation: FOREIGN_KEY_VIOLATION,
+  checkViolation: CHECK_VIOLATION,
+  insufficientPrivilege: INSUFFICIENT_PRIVILEGE,
+  // Raised by public.enrolments_focus_cap(), deferred, so it surfaces at commit.
+  focusCapReached: FOCUS_CAP_REACHED,
+  // Raised by public.consent_revoke_only() on programme_consents updates,
+  // including the revocations that leaving an enrolment cascades into.
+  consentAlreadyRevoked: CONSENT_ALREADY_REVOKED,
+  consentImmutable: CONSENT_IMMUTABLE,
+} = DatabaseErrorCode;
 
-const UNIQUE_VIOLATION = "23505";
-const FOREIGN_KEY_VIOLATION = "23503";
-const CHECK_VIOLATION = "23514";
-const INSUFFICIENT_PRIVILEGE = "42501";
-
-const isFocusCap = (error: PostgrestError) =>
-  error.code === CHECK_VIOLATION && error.message === FOCUS_CAP_MESSAGE;
+/**
+ * The consent revoke-only rules (one trigger, two registry codes), as they
+ * reach an enrolment update through the revocations leaving cascades into.
+ */
+const isConsentRevokeOnly = (error: PostgrestError) =>
+  error.code === CONSENT_ALREADY_REVOKED || error.code === CONSENT_IMMUTABLE;
 
 /**
  * Enrolments and per-programme consents. Every query runs as the caller
@@ -131,7 +142,7 @@ export class EnrolmentsService {
       if (error.code === FOREIGN_KEY_VIOLATION) {
         throw notFound("programme_not_found");
       }
-      if (isFocusCap(error)) throw conflict("focus_cap_reached");
+      if (error.code === FOCUS_CAP_REACHED) throw conflict("focus_cap_reached");
       // The insert policy pins user_id to the caller, so a refusal here is
       // the deletion barrier.
       if (error.code === INSUFFICIENT_PRIVILEGE) {
@@ -173,8 +184,13 @@ export class EnrolmentsService {
       .select(ENROLMENT_COLUMNS)
       .maybeSingle<EnrolmentRow>();
     if (error) {
-      if (isFocusCap(error)) throw conflict("focus_cap_reached");
-      if (error.code === CHECK_VIOLATION) throw conflict("enrolment_conflict");
+      if (error.code === FOCUS_CAP_REACHED) throw conflict("focus_cap_reached");
+      // A check constraint on enrolments, or a consent rule refusing the
+      // revocations that leaving cascades into: the change conflicts with the
+      // row's current state.
+      if (error.code === CHECK_VIOLATION || isConsentRevokeOnly(error)) {
+        throw conflict("enrolment_conflict");
+      }
       throw new BadGatewayException("Enrolment could not be updated");
     }
     if (!data) throw notFound("enrolment_not_found");
@@ -262,7 +278,10 @@ export class EnrolmentsService {
       .select(CONSENT_COLUMNS)
       .maybeSingle<ConsentRow>();
     if (error) {
-      if (error.code === CHECK_VIOLATION) {
+      // Already revoked: a concurrent revocation got there first. TH003
+      // (not a pure revocation) leaves the consent live, so it is never
+      // reported as revoked; it fails closed like any other error.
+      if (error.code === CONSENT_ALREADY_REVOKED) {
         throw conflict("consent_already_revoked");
       }
       throw new BadGatewayException("Consent could not be revoked");

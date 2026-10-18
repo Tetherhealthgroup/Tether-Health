@@ -11,7 +11,17 @@ import { TokenVerifier } from "../src/auth/token-verifier";
 import { configureApp } from "../src/configure-app";
 import { CURRENT_CORE_CONSENT_VERSION } from "../src/enrolments/consent-versions";
 import { UserSupabaseClientFactory } from "../src/enrolments/user-supabase-client";
-import { DB_CANARY, FakePostgrest } from "./support/fake-postgrest";
+import {
+  DATABASE_ERRORS,
+  databaseError,
+  type DatabaseErrorHint,
+} from "./support/database-errors";
+import {
+  DB_CANARY,
+  FakePostgrest,
+  registryError,
+  type PgError,
+} from "./support/fake-postgrest";
 
 /**
  * Enrolments and consents, end to end through the real Nest app, the real
@@ -31,10 +41,14 @@ import { DB_CANARY, FakePostgrest } from "./support/fake-postgrest";
  *   Postgres's now() would give them the same value. Ordering by
  *   granted_at/created_at is therefore never tied in the fake. No test
  *   relies on it.
- * - D4: the real status, code and message PostgREST returns when the
- *   deferred focus-cap error is raised at COMMIT are unknown until a local
- *   database run. The focus-cap tests rely on the fake answering 400, 23514
- *   and the exact trigger message; TH-974 moves detection to the TH001 code.
+ * - D4: the database's own errors (focus cap, consent revoke-only rules)
+ *   carry the registry's TH codes, messages and hints
+ *   (test/support/database-errors.ts, checked against
+ *   docs/contracts/database.md by test/database-errors.e2e-spec.ts). The
+ *   fake answers them with HTTP 400, as PostgREST does for SQLSTATEs it does
+ *   not know; that the real deferred focus-cap error at COMMIT arrives the
+ *   same way is unverified until a local database run. The API matches the
+ *   code only, so the status and message do not affect the mapping.
  */
 
 type Method = "DELETE" | "GET" | "PATCH" | "POST";
@@ -90,6 +104,14 @@ describe("Enrolments and consents API (e2e)", () => {
           logged.push(JSON.stringify(args));
         });
     }
+  });
+
+  // A failure injected but never consumed would break an unrelated later
+  // test: clear it first, then fail the test that left it.
+  afterEach(() => {
+    const pending = fake.pendingFailures;
+    fake.clearFailures();
+    expect(pending).toBe(0);
   });
 
   afterAll(async () => {
@@ -824,6 +846,246 @@ describe("Enrolments and consents API (e2e)", () => {
       expect(byId.get(old)).toBe(true);
       expect(byId.get(current)).toBe(false);
       expect(byId.get(none)).toBe(false);
+    });
+  });
+
+  describe("database error codes", () => {
+    /** An enrolment with a live core consent, ready for every route. */
+    const prepared = async () => {
+      const a = newCaller();
+      const id = await enrol(a, "hw", "learn_only");
+      const core = await grant(a, id, "core");
+      return { a, id, core };
+    };
+    /**
+     * Logged since `since`: only the global filter's request_failed line per
+     * 502, never the database error's code, message or hint.
+     */
+    const expectNotLogged = (since: number, error: PgError, failures = 1) => {
+      const lines = logged.slice(since);
+      expect(
+        lines.filter((line) =>
+          /request_failed .*type=BadGatewayException/.test(line),
+        ),
+      ).toHaveLength(failures);
+      for (const detail of [error.code, error.message, error.hint]) {
+        expect(lines.join("\n")).not.toContain(detail);
+      }
+    };
+    /** Every injected failure was consumed and nothing was written. */
+    const expectRolledBack = (id: string, core: string) => {
+      expect(fake.pendingFailures).toBe(0);
+      expect(fake.table("enrolments").find((r) => r.id === id)).toMatchObject({
+        status: "learn_only",
+      });
+      expect(
+        fake.table("programme_consents").find((r) => r.id === core),
+      ).toMatchObject({ revoked_at: null });
+    };
+
+    it("revoke maps TH002 to consent_already_revoked", async () => {
+      const { a, id, core } = await prepared();
+      fake.failNext(
+        "PATCH",
+        "programme_consents",
+        registryError("consent_already_revoked"),
+      );
+      expectCoded(
+        await call(a, "PATCH", `/v1/enrolments/consents/${core}`, {
+          revoked: true,
+        }),
+        409,
+        "consent_already_revoked",
+      );
+      expectRolledBack(id, core);
+    });
+
+    // The trigger refused the change, so the consent is still live: it is
+    // never reported as revoked.
+    it.each([0, 1])(
+      "revoke fails closed on TH003 (message %d), never reporting it as revoked",
+      async (messageIndex) => {
+        const { a, id, core } = await prepared();
+        const error = registryError("consent_immutable", messageIndex);
+        const since = logged.length;
+        fake.failNext("PATCH", "programme_consents", error);
+        const response = await call(
+          a,
+          "PATCH",
+          `/v1/enrolments/consents/${core}`,
+          { revoked: true },
+        );
+        expectUncoded(response, 502);
+        for (const detail of [error.code, error.message, error.hint]) {
+          expect(response.body).not.toContain(detail);
+        }
+        expectRolledBack(id, core);
+        expectNotLogged(since, error);
+      },
+    );
+
+    it.each([
+      ["consent_already_revoked", 0],
+      ["consent_immutable", 0],
+      ["consent_immutable", 1],
+    ] as [DatabaseErrorHint, number][])(
+      "enrolment update maps %s (message %d) to enrolment_conflict",
+      async (hint, messageIndex) => {
+        const { a, id, core } = await prepared();
+        fake.failNext("PATCH", "enrolments", registryError(hint, messageIndex));
+        expectCoded(
+          await call(a, "PATCH", `/v1/enrolments/${id}`, { status: "left" }),
+          409,
+          "enrolment_conflict",
+        );
+        expectRolledBack(id, core);
+      },
+    );
+
+    it("create and update map TH001 to focus_cap_reached", async () => {
+      const { a, id, core } = await prepared();
+      fake.failNext("POST", "enrolments", registryError("focus_cap_reached"));
+      expectCoded(
+        await call(a, "POST", "/v1/enrolments", {
+          programmeCode: "st",
+          status: "focus",
+        }),
+        409,
+        "focus_cap_reached",
+      );
+      fake.failNext("PATCH", "enrolments", registryError("focus_cap_reached"));
+      expectCoded(
+        await call(a, "PATCH", `/v1/enrolments/${id}`, { status: "focus" }),
+        409,
+        "focus_cap_reached",
+      );
+      expectRolledBack(id, core);
+    });
+
+    // Every other TH code, raised or reserved, and one not in the registry.
+    const unmapped: PgError[] = [
+      ...DATABASE_ERRORS.filter(
+        (entry) =>
+          !["TH001", "TH002", "TH003"].includes(entry.code) &&
+          entry.messages.length > 0,
+      ).map((entry) => registryError(entry.hint)),
+      ...DATABASE_ERRORS.filter((entry) => entry.messages.length === 0).map(
+        (entry) => ({
+          status: 400,
+          code: entry.code,
+          message: `Synthetic ${entry.hint} message`,
+          hint: entry.hint,
+        }),
+      ),
+      {
+        status: 400,
+        code: "TH999",
+        message: "Synthetic unregistered rule",
+        hint: "synthetic_unregistered",
+      },
+    ];
+
+    it.each(unmapped.map((error) => [error.code, error] as const))(
+      "every route fails closed on %s without echoing it",
+      async (_code, error) => {
+        const { a, id, core } = await prepared();
+        const routes: [Method, string, string, unknown][] = [
+          [
+            "POST",
+            "enrolments",
+            "/v1/enrolments",
+            { programmeCode: "st", status: "focus" },
+          ],
+          ["PATCH", "enrolments", `/v1/enrolments/${id}`, { status: "paused" }],
+          [
+            "POST",
+            "programme_consents",
+            "/v1/enrolments/consents",
+            {
+              enrolmentId: id,
+              purpose: "research",
+              consentVersion: "v1",
+              consentText: "Synthetic research wording",
+            },
+          ],
+          [
+            "PATCH",
+            "programme_consents",
+            `/v1/enrolments/consents/${core}`,
+            { revoked: true },
+          ],
+          ["DELETE", "enrolments", `/v1/enrolments/${id}`, DELETE_BODY],
+        ];
+        const since = logged.length;
+        for (const [method, table, url, payload] of routes) {
+          fake.failNext(method, table, error);
+          const response = await call(a, method, url, payload);
+          expectUncoded(response, 502);
+          expect(fake.pendingFailures).toBe(0);
+          for (const detail of [error.code, error.message, error.hint]) {
+            expect(response.body).not.toContain(detail);
+          }
+        }
+        expectRolledBack(id, core);
+        expectNotLogged(since, error, routes.length);
+      },
+    );
+
+    it("does not take message text or hint under another code for a TH rule", async () => {
+      const { a, id, core } = await prepared();
+      const lookalike = (code: string, hint: DatabaseErrorHint): PgError => ({
+        status: 400,
+        code,
+        message: databaseError(hint).messages[0] as string,
+        hint,
+      });
+      // Focus-cap text under the generic check-violation code: create has no
+      // mapping for 23514, update treats it as an ordinary check constraint.
+      fake.failNext(
+        "POST",
+        "enrolments",
+        lookalike("23514", "focus_cap_reached"),
+      );
+      expectUncoded(
+        await call(a, "POST", "/v1/enrolments", {
+          programmeCode: "st",
+          status: "focus",
+        }),
+        502,
+      );
+      fake.failNext(
+        "PATCH",
+        "enrolments",
+        lookalike("23514", "focus_cap_reached"),
+      );
+      expectCoded(
+        await call(a, "PATCH", `/v1/enrolments/${id}`, { status: "focus" }),
+        409,
+        "enrolment_conflict",
+      );
+      // The same text under raise's default code P0001.
+      fake.failNext(
+        "PATCH",
+        "enrolments",
+        lookalike("P0001", "focus_cap_reached"),
+      );
+      expectUncoded(
+        await call(a, "PATCH", `/v1/enrolments/${id}`, { status: "focus" }),
+        502,
+      );
+      // Already-revoked text under 23514 is no longer the revoke-only rule.
+      fake.failNext(
+        "PATCH",
+        "programme_consents",
+        lookalike("23514", "consent_already_revoked"),
+      );
+      expectUncoded(
+        await call(a, "PATCH", `/v1/enrolments/consents/${core}`, {
+          revoked: true,
+        }),
+        502,
+      );
+      expectRolledBack(id, core);
     });
   });
 

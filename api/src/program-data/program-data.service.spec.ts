@@ -64,6 +64,28 @@ describe("ProgramDataService", () => {
     expect(mockedCreateClient).not.toHaveBeenCalled();
   });
 
+  it("fails closed when the database refuses the session (TH010)", async () => {
+    const maybeSingle = jest.fn().mockResolvedValue({
+      data: null,
+      error: {
+        code: "TH010",
+        message: "The sync service writes only sync tables",
+        hint: "sync_session_refused",
+      },
+    });
+    const rpc = jest.fn().mockReturnValue({
+      select: jest.fn().mockReturnValue({ maybeSingle }),
+    });
+    mockedCreateClient.mockReturnValue({ rpc } as never);
+
+    const error: unknown = await new ProgramDataService(config)
+      .put(user, "steady", { payload: { readings: [] }, revision: 2 })
+      .catch((reason: unknown) => reason);
+    expect(error).toMatchObject({ status: 502 });
+    expect(JSON.stringify(error)).not.toContain("TH010");
+    expect(JSON.stringify(error)).not.toContain("sync tables");
+  });
+
   it("rejects stale or out-of-order revisions instead of overwriting", async () => {
     const maybeSingle = jest
       .fn()

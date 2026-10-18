@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { databaseError, type DatabaseErrorHint } from "./database-errors";
 
 /**
  * In-memory stand-in for PostgREST over the TH-913 schema
@@ -16,7 +17,11 @@ import { randomUUID } from "node:crypto";
  * - the triggers: left_at management, revoke-only consents, core revocation
  *   cascade, revoke-on-leave, the deferred focus cap of two, and the
  *   delete cascade from enrolments to consents;
- * - the deletion_barrier_open() RPC.
+ * - the deletion_barrier_open() RPC;
+ * - error bodies: standard SQLSTATEs for constraints and RLS, and the
+ *   database's own `TH` codes with the registry's exact message and hint
+ *   (test/support/database-errors.ts), answered as HTTP 400 the way
+ *   PostgREST answers SQLSTATEs it does not know.
  *
  * It is not Postgres: it implements only the filters and headers the API
  * sends (eq, is.null, in, order, limit, select, Prefer return=representation,
@@ -32,10 +37,11 @@ interface State {
   programme_consents: Row[];
 }
 
-interface PgError {
+export interface PgError {
   status: number;
   code: string;
   message: string;
+  hint: string | null;
 }
 
 export interface RecordedRequest {
@@ -43,8 +49,6 @@ export interface RecordedRequest {
   path: string;
   token: string | null;
 }
-
-const FOCUS_CAP_MESSAGE = "At most two programmes can be in focus";
 
 /**
  * Marker the fake puts into the `details` of every constraint error (23503,
@@ -135,7 +139,25 @@ class PgFailure extends Error {
 }
 
 const fail = (status: number, code: string, message: string): never => {
-  throw new PgFailure({ status, code, message });
+  throw new PgFailure({ status, code, message, hint: null });
+};
+
+/**
+ * The error body PostgREST returns when a migration raises a registry code:
+ * `raise exception using errcode = 'TH0nn', message = …, hint = …`.
+ * `messageIndex` picks one of the code's messages (TH003 has two).
+ */
+export const registryError = (
+  hint: DatabaseErrorHint,
+  messageIndex = 0,
+): PgError => {
+  const entry = databaseError(hint);
+  const message = entry.messages[messageIndex];
+  if (message === undefined) throw new Error(`${hint} has no such message`);
+  return { status: 400, code: entry.code, message, hint: entry.hint };
+};
+const raise = (hint: DatabaseErrorHint, messageIndex = 0): never => {
+  throw new PgFailure(registryError(hint, messageIndex));
 };
 const checkViolation = (name: string) => {
   const table = /^(enrolments|programme_consents)_\w+_check$/.exec(name)?.[1];
@@ -159,6 +181,7 @@ export class FakePostgrest {
   /** Emulates PostgREST db-max-rows for reads; null means no limit. */
   maxRows: number | null = null;
   private readonly tokens = new Map<string, string>();
+  private injected: { method: string; table: string; error: PgError }[] = [];
   private clock = Date.parse("2026-10-18T09:00:00.000Z");
   private state: State = {
     profiles: [],
@@ -185,6 +208,25 @@ export class FakePostgrest {
   startAccountDeletion(userId: string): void {
     const profile = this.state.profiles.find((row) => row.id === userId);
     if (profile) profile.account_deletion_started_at = this.now();
+  }
+
+  /**
+   * Makes the next `method` request on `table` fail with `error` (rolled
+   * back like any failure), for errors the API cannot provoke on its own,
+   * such as one caused by a concurrent transaction.
+   */
+  failNext(method: string, table: string, error: PgError): void {
+    this.injected.push({ method, table, error });
+  }
+
+  /** Injected failures that no request has consumed yet. */
+  get pendingFailures(): number {
+    return this.injected.length;
+  }
+
+  /** Drops injected failures that no request consumed. */
+  clearFailures(): void {
+    this.injected = [];
   }
 
   /** Superuser view for assertions (bypasses RLS). */
@@ -245,7 +287,7 @@ export class FakePostgrest {
           details: leaky
             ? `Failing row contains (${submitted}). ${DB_CANARY}`
             : null,
-          hint: null,
+          hint: error.pg.hint,
         });
       }
       throw error;
@@ -267,6 +309,13 @@ export class FakePostgrest {
       return fail(404, "PGRST205", "Table not found");
     }
     const table = path as keyof State;
+    const injected = this.injected.find(
+      (entry) => entry.method === method && entry.table === table,
+    );
+    if (injected) {
+      this.injected = this.injected.filter((entry) => entry !== injected);
+      throw new PgFailure(injected.error);
+    }
     let rows: Row[];
     let status = 200;
     if (method === "GET") {
@@ -490,10 +539,9 @@ export class FakePostgrest {
         }
       } else {
         // consent_revoke_only
-        if (row.revoked_at !== null)
-          checkViolation("Consent is already revoked");
+        if (row.revoked_at !== null) raise("consent_already_revoked");
         if (change.revoked_at === null || change.revoked_at === undefined) {
-          checkViolation("Consent can only be revoked");
+          raise("consent_immutable", 0);
         }
         const at = this.now();
         row.revoked_at = at;
@@ -553,7 +601,7 @@ export class FakePostgrest {
         focus.set(row.user_id, (focus.get(row.user_id) ?? 0) + 1);
     }
     if ([...focus.values()].some((count) => count > 2))
-      checkViolation(FOCUS_CAP_MESSAGE);
+      raise("focus_cap_reached");
   }
 
   private barrierOpen(uid: string): boolean {

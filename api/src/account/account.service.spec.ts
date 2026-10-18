@@ -192,6 +192,38 @@ describe("AccountService", () => {
     expect(deleteAuthIdentity).not.toHaveBeenCalled();
   });
 
+  // TH009 is raised only in a sync service session, which the API never
+  // uses; if it ever arrives it fails closed like any database error.
+  it.each(["begin_account_deletion", "delete_my_app_data"])(
+    "fails closed when %s raises TH009",
+    async (failing) => {
+      const rpc = jest.fn((name: string) =>
+        Promise.resolve(
+          name === failing
+            ? {
+                data: null,
+                error: {
+                  code: "TH009",
+                  message: "Account deletion goes through the API",
+                  hint: "deletion_via_api_only",
+                },
+              }
+            : { data: true, error: null },
+        ),
+      );
+      mockedCreateClient.mockReturnValue({ rpc } as never);
+
+      const service = new AccountService(config, admin);
+      const error: unknown = await service
+        .deleteData(user(Math.floor(Date.now() / 1000)), "DELETE")
+        .catch((reason: unknown) => reason);
+      expect(error).toMatchObject({ status: 502 });
+      expect(JSON.stringify(error)).not.toContain("TH009");
+      expect(JSON.stringify(error)).not.toContain("goes through the API");
+      expect(deleteAuthIdentity).not.toHaveBeenCalled();
+    },
+  );
+
   it("safely retries after Auth deletion succeeds but its response is lost", async () => {
     const rpc = jest
       .fn()
