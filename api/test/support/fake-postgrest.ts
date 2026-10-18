@@ -45,6 +45,15 @@ export interface RecordedRequest {
 }
 
 const FOCUS_CAP_MESSAGE = "At most two programmes can be in focus";
+
+/**
+ * Marker the fake puts into the `details` of every constraint error (23503,
+ * 23505, 23514), next to the submitted values, the way real PostgREST
+ * returns "Failing row contains (...)" / "Key (...)=(...)". It must never
+ * reach an API response or log line.
+ */
+export const DB_CANARY = "synthetic-db-detail-canary-5b2d";
+const LEAKY_CODES = ["23503", "23505", "23514"];
 const STATUSES = ["focus", "learn_only", "paused", "left"];
 const PURPOSES = [
   "core",
@@ -128,7 +137,16 @@ class PgFailure extends Error {
 const fail = (status: number, code: string, message: string): never => {
   throw new PgFailure({ status, code, message });
 };
-const checkViolation = (message: string) => fail(400, "23514", message);
+const checkViolation = (name: string) => {
+  const table = /^(enrolments|programme_consents)_\w+_check$/.exec(name)?.[1];
+  return fail(
+    400,
+    "23514",
+    table
+      ? `new row for relation "${table}" violates check constraint "${name}"`
+      : name,
+  );
+};
 const rlsViolation = (table: string) =>
   fail(
     403,
@@ -138,6 +156,8 @@ const rlsViolation = (table: string) =>
 
 export class FakePostgrest {
   readonly requests: RecordedRequest[] = [];
+  /** Emulates PostgREST db-max-rows for reads; null means no limit. */
+  maxRows: number | null = null;
   private readonly tokens = new Map<string, string>();
   private clock = Date.parse("2026-10-18T09:00:00.000Z");
   private state: State = {
@@ -193,6 +213,7 @@ export class FakePostgrest {
     this.requests.push({ method, path: url.pathname, token });
 
     const uid = token ? this.tokens.get(token) : undefined;
+    const countExact = (headers.get("prefer") ?? "").includes("count=exact");
     if (!uid)
       return this.respond(401, { code: "PGRST301", message: "JWT invalid" });
 
@@ -203,14 +224,27 @@ export class FakePostgrest {
           ? (JSON.parse(init.body) as unknown)
           : undefined;
       const result = this.handle(uid, method, url, headers, body);
-      return this.respond(result.status, result.body);
+      return this.respond(
+        result.status,
+        result.body,
+        countExact ? result.total : undefined,
+      );
     } catch (error) {
       this.state = snapshot; // roll back the request's transaction
       if (error instanceof PgFailure) {
+        const leaky = LEAKY_CODES.includes(error.pg.code);
+        const submitted =
+          typeof init?.body === "string"
+            ? Object.values(JSON.parse(init.body) as Row)
+                .map(text)
+                .join(", ")
+            : "";
         return this.respond(error.pg.status, {
           code: error.pg.code,
           message: error.pg.message,
-          details: null,
+          details: leaky
+            ? `Failing row contains (${submitted}). ${DB_CANARY}`
+            : null,
           hint: null,
         });
       }
@@ -224,7 +258,7 @@ export class FakePostgrest {
     url: URL,
     headers: Headers,
     body: unknown,
-  ): { status: number; body: unknown } {
+  ): { status: number; body: unknown; total?: number } {
     const path = url.pathname.replace(/^\/rest\/v1\//, "");
     if (path === "rpc/deletion_barrier_open" && method === "POST") {
       return { status: 200, body: this.barrierOpen(uid) };
@@ -255,9 +289,15 @@ export class FakePostgrest {
       (headers.get("prefer") ?? "").includes("return=representation");
     if (!representation)
       return { status: method === "POST" ? 201 : 204, body: null };
-    const projected = this.order(rows, url).map((row) =>
-      this.project(row, url),
-    );
+    const ordered = this.order(rows, url);
+    const total = ordered.length;
+    // PostgREST's server-side row limit (db-max-rows) truncates reads; the
+    // exact count still reports the full total.
+    const limited =
+      method === "GET" && this.maxRows !== null
+        ? ordered.slice(0, this.maxRows)
+        : ordered;
+    const projected = limited.map((row) => this.project(row, url));
     if (
       (headers.get("accept") ?? "").includes(
         "application/vnd.pgrst.object+json",
@@ -270,9 +310,9 @@ export class FakePostgrest {
           "JSON object requested, multiple (or no) rows returned",
         );
       }
-      return { status, body: projected[0] };
+      return { status, body: projected[0], total };
     }
-    return { status, body: projected };
+    return { status, body: projected, total };
   }
 
   // ---- RLS: USING clauses -------------------------------------------------
@@ -610,10 +650,17 @@ export class FakePostgrest {
     return new Date(this.clock).toISOString();
   }
 
-  private respond(status: number, body: unknown): Response {
+  private respond(status: number, body: unknown, total?: number): Response {
+    const headers: Record<string, string> = {
+      "content-type": "application/json",
+    };
+    if (total !== undefined && Array.isArray(body)) {
+      headers["content-range"] =
+        body.length === 0 ? `*/${total}` : `0-${body.length - 1}/${total}`;
+    }
     return new Response(body === null ? null : JSON.stringify(body), {
       status,
-      headers: { "content-type": "application/json" },
+      headers,
     });
   }
 }

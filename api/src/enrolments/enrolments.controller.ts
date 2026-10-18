@@ -13,7 +13,11 @@ import {
 import type { AuthUser } from "../auth/auth-user";
 import { RequestUser } from "../auth/request-user.decorator";
 import { EnrolmentsExceptionFilter } from "./enrolment-errors";
-import { CreateEnrolmentDto, UpdateEnrolmentDto } from "./enrolments.dto";
+import {
+  CreateEnrolmentDto,
+  DeleteEnrolmentDto,
+  UpdateEnrolmentDto,
+} from "./enrolments.dto";
 import { EnrolmentsService } from "./enrolments.service";
 
 @Controller("v1/enrolments")
@@ -46,7 +50,8 @@ export class EnrolmentsController {
   async deleteNow(
     @RequestUser() user: AuthUser,
     @Param("id", ParseUUIDPipe) id: string,
+    @Body() dto: DeleteEnrolmentDto,
   ) {
-    await this.enrolments.deleteNow(user, id);
+    await this.enrolments.deleteNow(user, id, dto.confirmation);
   }
 }

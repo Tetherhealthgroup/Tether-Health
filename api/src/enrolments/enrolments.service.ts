@@ -3,10 +3,16 @@ import {
   BadRequestException,
   Injectable,
 } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import type { PostgrestError } from "@supabase/supabase-js";
 import type { AuthUser } from "../auth/auth-user";
 import { CURRENT_CORE_CONSENT_VERSION } from "./consent-versions";
-import { badRequest, conflict, notFound } from "./enrolment-errors";
+import {
+  badRequest,
+  conflict,
+  notFound,
+  unauthorized,
+} from "./enrolment-errors";
 import {
   modeProgrammeCodes,
   sharePurposes,
@@ -72,17 +78,21 @@ const isFocusCap = (error: PostgrestError) =>
  */
 @Injectable()
 export class EnrolmentsService {
-  constructor(private readonly clients: UserSupabaseClientFactory) {}
+  constructor(
+    private readonly clients: UserSupabaseClientFactory,
+    private readonly config: ConfigService,
+  ) {}
 
   async list(user: AuthUser): Promise<EnrolmentListResponse> {
     const client = this.clients.forUser(user);
-    const { data, error } = await client
+    const { data, error, count } = await client
       .from("enrolments")
-      .select(ENROLMENT_COLUMNS)
+      .select(ENROLMENT_COLUMNS, { count: "exact" })
       .eq("user_id", user.id)
       .order("created_at", { ascending: true })
       .returns<EnrolmentRow[]>();
     if (error) throw new BadGatewayException("Enrolments are unavailable");
+    this.requireComplete(data.length, count);
     const consents = await this.consentsFor(
       client,
       data.map((row) => row.id),
@@ -171,8 +181,18 @@ export class EnrolmentsService {
     return this.toEnrolment(data, await this.consentsFor(client, [data.id]));
   }
 
-  /** "Delete now": removes the enrolment and everything cascaded from it. */
-  async deleteNow(user: AuthUser, id: string): Promise<void> {
+  /**
+   * "Delete now": removes the enrolment and every row that references it with
+   * on delete cascade (today its programme consents). Needs an explicit
+   * confirmation and a recent sign-in, like account deletion.
+   */
+  async deleteNow(
+    user: AuthUser,
+    id: string,
+    confirmation: unknown,
+  ): Promise<void> {
+    if (confirmation !== "DELETE") throw badRequest("confirmation_required");
+    this.requireRecentAuthentication(user);
     const deleted = await this.deleteEnrolmentNow(
       this.clients.forUser(user),
       user,
@@ -185,10 +205,12 @@ export class EnrolmentsService {
     user: AuthUser,
     dto: GrantConsentDto,
   ): Promise<ConsentResponse> {
-    if (
-      sharePurposes.includes(dto.purpose) !==
-      (dto.recipientRef !== undefined)
-    ) {
+    // Sharing needs a validated care connection or caregiver as recipient;
+    // until those exist, share purposes are not accepted.
+    if (sharePurposes.includes(dto.purpose)) {
+      throw conflict("sharing_not_available");
+    }
+    if (dto.recipientRef !== undefined) {
       throw new BadRequestException("recipientRef does not match purpose");
     }
     const client = this.clients.forUser(user);
@@ -207,7 +229,7 @@ export class EnrolmentsService {
       .insert({
         enrolment_id: enrolment.id,
         purpose: dto.purpose,
-        recipient_ref: dto.recipientRef ?? null,
+        recipient_ref: null,
         consent_version: dto.consentVersion,
         consent_text: dto.consentText,
       })
@@ -316,14 +338,36 @@ export class EnrolmentsService {
     enrolmentIds: string[],
   ): Promise<ConsentRow[]> {
     if (enrolmentIds.length === 0) return [];
-    const { data, error } = await client
+    // Live rows only: bounded by the one-live-row-per-purpose index.
+    const { data, error, count } = await client
       .from("programme_consents")
-      .select(CONSENT_COLUMNS)
+      .select(CONSENT_COLUMNS, { count: "exact" })
       .in("enrolment_id", enrolmentIds)
+      .is("revoked_at", null)
       .order("granted_at", { ascending: true })
       .returns<ConsentRow[]>();
     if (error) throw new BadGatewayException("Consents are unavailable");
+    this.requireComplete(data.length, count);
     return data;
+  }
+
+  /** Refuses to answer with a partial list (e.g. a server row limit). */
+  private requireComplete(received: number, total: number | null) {
+    if (total === null || received !== total) {
+      throw new BadGatewayException("Incomplete result");
+    }
+  }
+
+  // Same rule as account export and deletion: the sign-in behind the token
+  // must be recent (RECENT_AUTH_MAX_AGE_SECONDS).
+  private requireRecentAuthentication(user: AuthUser): void {
+    const maxAge = this.config.getOrThrow<number>(
+      "RECENT_AUTH_MAX_AGE_SECONDS",
+    );
+    const age = Math.floor(Date.now() / 1000) - user.authenticatedAt;
+    if (age < 0 || age > maxAge) {
+      throw unauthorized("recent_authentication_required");
+    }
   }
 
   // Rejoining is refused once account deletion has started.

@@ -26,6 +26,9 @@ export const enrolmentErrorCodes = [
   "consent_not_found",
   "consent_already_revoked",
   "consent_not_permitted",
+  "sharing_not_available",
+  "confirmation_required",
+  "recent_authentication_required",
 ] as const;
 export type EnrolmentErrorCode = (typeof enrolmentErrorCodes)[number];
 
@@ -44,6 +47,8 @@ export const conflict = (code: EnrolmentErrorCode) =>
   new CodedHttpException(code, HttpStatus.CONFLICT);
 export const badRequest = (code: EnrolmentErrorCode) =>
   new CodedHttpException(code, HttpStatus.BAD_REQUEST);
+export const unauthorized = (code: EnrolmentErrorCode) =>
+  new CodedHttpException(code, HttpStatus.UNAUTHORIZED);
 
 /**
  * Adds the stable `code` to coded errors; every other error is answered by

@@ -1,10 +1,11 @@
 import { BadGatewayException, HttpStatus } from "@nestjs/common";
+import type { ConfigService } from "@nestjs/config";
 import type { AuthUser } from "../auth/auth-user";
 import { CodedHttpException } from "./enrolment-errors";
 import { EnrolmentsService } from "./enrolments.service";
 import type { UserSupabaseClientFactory } from "./user-supabase-client";
 
-type Result = { data: unknown; error: unknown };
+type Result = { data: unknown; error: unknown; count?: number | null };
 
 /**
  * A chainable stand-in for one supabase-js query: every builder method
@@ -40,7 +41,10 @@ function setup(...results: Result[]) {
   };
   const forUser = jest.fn(() => client);
   const factory = { forUser } as unknown as UserSupabaseClientFactory;
-  return { service: new EnrolmentsService(factory), calls, forUser };
+  const config = {
+    getOrThrow: jest.fn(() => 600),
+  } as unknown as ConfigService;
+  return { service: new EnrolmentsService(factory, config), calls, forUser };
 }
 
 const user: AuthUser = {
@@ -75,8 +79,8 @@ async function codeOf(promise: Promise<unknown>) {
 describe("EnrolmentsService", () => {
   it("acts as the caller and filters enrolments on the caller id", async () => {
     const { service, calls, forUser } = setup(
-      { data: [enrolmentRow()], error: null },
-      { data: [], error: null },
+      { data: [enrolmentRow()], error: null, count: 1 },
+      { data: [], error: null, count: 0 },
     );
     await service.list(user);
     expect(forUser).toHaveBeenCalledWith(user);
@@ -148,15 +152,57 @@ describe("EnrolmentsService", () => {
     const pause = setup(
       { data: enrolmentRow("focus"), error: null },
       { data: enrolmentRow("paused"), error: null },
-      { data: [], error: null },
+      { data: [], error: null, count: 0 },
     );
     await pause.service.update(user, ENROLMENT_ID, { status: "paused" });
     expect(pause.calls.some((call) => call[0] === "rpc")).toBe(false);
   });
 
+  it("refuses a partial list (server row limit) instead of dropping rows", async () => {
+    const { service } = setup(
+      { data: [enrolmentRow()], error: null, count: 1 },
+      { data: [], error: null, count: 3 },
+    );
+    expect(await codeOf(service.list(user))).toBeInstanceOf(
+      BadGatewayException,
+    );
+  });
+
+  it("asks only for live consents", async () => {
+    const { service, calls } = setup(
+      { data: [enrolmentRow()], error: null, count: 1 },
+      { data: [], error: null, count: 0 },
+    );
+    await service.list(user);
+    expect(calls).toContainEqual(["is", '"revoked_at"', "null"]);
+  });
+
+  it("delete now needs the confirmation and a recent sign-in", async () => {
+    const recent = { ...user, authenticatedAt: Math.floor(Date.now() / 1000) };
+    const wrong = setup();
+    expect(
+      await codeOf(wrong.service.deleteNow(recent, ENROLMENT_ID, "delete")),
+    ).toEqual({
+      status: HttpStatus.BAD_REQUEST,
+      code: "confirmation_required",
+    });
+    const stale = setup();
+    expect(
+      await codeOf(stale.service.deleteNow(user, ENROLMENT_ID, "DELETE")),
+    ).toEqual({
+      status: HttpStatus.UNAUTHORIZED,
+      code: "recent_authentication_required",
+    });
+    expect(wrong.calls).toEqual([]);
+    expect(stale.calls).toEqual([]);
+  });
+
   it("deletes now with the caller-scoped client and reports missing rows", async () => {
     const { service, calls } = setup({ data: [], error: null });
-    expect(await codeOf(service.deleteNow(user, ENROLMENT_ID))).toEqual({
+    const recent = { ...user, authenticatedAt: Math.floor(Date.now() / 1000) };
+    expect(
+      await codeOf(service.deleteNow(recent, ENROLMENT_ID, "DELETE")),
+    ).toEqual({
       status: HttpStatus.NOT_FOUND,
       code: "enrolment_not_found",
     });
@@ -169,6 +215,25 @@ describe("EnrolmentsService", () => {
       ]),
     );
   });
+
+  it.each(["share_care_team", "share_caregiver"] as const)(
+    "refuses %s before touching the database",
+    async (purpose) => {
+      const { service, calls } = setup();
+      expect(
+        await codeOf(
+          service.grantConsent(user, {
+            enrolmentId: ENROLMENT_ID,
+            purpose,
+            recipientRef: "00000000-0000-4000-8000-0000000000c1",
+            consentVersion: "v1",
+            consentText: "Synthetic wording",
+          }),
+        ),
+      ).toEqual({ status: HttpStatus.CONFLICT, code: "sharing_not_available" });
+      expect(calls).toEqual([]);
+    },
+  );
 
   it("inserts consents plainly (never upsert) and maps a duplicate", async () => {
     const { service, calls } = setup(

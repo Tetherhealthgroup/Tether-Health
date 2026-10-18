@@ -198,9 +198,11 @@ paths:
     get:
       operationId: listMyEnrolments
       description: >-
-        The caller's enrolments (including left ones) with each enrolment's live
-        and revoked programme consents. Only the caller's own rows are visible
-        (row-level security).
+        The caller's enrolments (including left ones) with each enrolment's
+        live programme consents (revoked_at is null). Revoked consent history
+        is not provided by this endpoint. Only the caller's own rows are
+        visible (row-level security). If the full list cannot be returned the
+        request fails with 502 rather than returning part of it.
       security: [{supabaseJwt: []}]
       responses:
         '200':
@@ -209,7 +211,7 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/EnrolmentList'}
         '401': {$ref: '#/components/responses/Unauthorized'}
-        '502': {description: Enrolment storage is temporarily unavailable}
+        '502': {description: Enrolment storage is temporarily unavailable, or the list could not be returned in full}
     post:
       operationId: enrolInProgramme
       description: >-
@@ -297,14 +299,46 @@ paths:
         '502': {description: Enrolment storage is temporarily unavailable}
     delete:
       operationId: deleteMyEnrolmentNow
+      summary: Delete the enrolment row, its consents and its cascaded sync data (not yet for app use)
       description: >-
-        "Delete now": permanently deletes the enrolment and everything that
-        cascades from it, including its consent history.
+        Not for app use yet. Permanently deletes the enrolment row, all of its
+        programme consents (live and revoked), and rows in tables that
+        reference the enrolment with on delete cascade (sync data tables once
+        they reference enrolments). It does not delete older programme data
+        stored per account (quit_plans, program_data); a later change removes
+        that data too, and only then should the app offer this as "Delete
+        now". Requires the exact confirmation and a recent sign-in, as account
+        deletion does.
+      x-app-use: false
       security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [confirmation]
+              properties:
+                confirmation: {const: DELETE}
       responses:
-        '204': {description: Enrolment and its data deleted}
-        '400': {description: Malformed enrolment id}
-        '401': {$ref: '#/components/responses/Unauthorized'}
+        '204': {description: The enrolment row, its consents and its cascaded rows were deleted}
+        '400':
+          description: '`confirmation_required` (missing or wrong confirmation), or an invalid enrolment id or body (no code)'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - {$ref: '#/components/schemas/RequestRejected'}
+                  - {$ref: '#/components/schemas/CodedRequestRejected'}
+        '401':
+          description: Missing or invalid token (no code), or `recent_authentication_required`
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - {$ref: '#/components/schemas/RequestRejected'}
+                  - {$ref: '#/components/schemas/CodedRequestRejected'}
         '404':
           description: '`enrolment_not_found` (also for enrolments of other users)'
           content:
@@ -320,7 +354,9 @@ paths:
         needs the enrolment's live core consent. A second live grant of the
         same purpose and recipient is refused with `consent_already_granted`
         (409) and the existing row is unchanged; to record new wording, revoke
-        and grant again.
+        and grant again. The share purposes (share_care_team,
+        share_caregiver) are refused with `sharing_not_available` (409) until
+        care connections exist.
       security: [{supabaseJwt: []}]
       requestBody:
         required: true
@@ -345,7 +381,7 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
         '409':
-          description: '`enrolment_left`, `core_consent_required`, `consent_already_granted` or `consent_not_permitted`'
+          description: '`sharing_not_available`, `enrolment_left`, `core_consent_required`, `consent_already_granted` or `consent_not_permitted` (for example after account deletion started)'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
@@ -602,6 +638,9 @@ components:
             - consent_not_found
             - consent_already_revoked
             - consent_not_permitted
+            - sharing_not_available
+            - confirmation_required
+            - recent_authentication_required
         requestId: {type: string}
     Programme:
       type: object
@@ -657,9 +696,10 @@ components:
         purpose: {$ref: '#/components/schemas/ConsentPurpose'}
         recipientRef:
           type: string
-          minLength: 1
-          maxLength: 200
-          description: Required for share_care_team and share_caregiver; refused otherwise.
+          format: uuid
+          description: >-
+            Care connection or caregiver id for share purposes only. Share
+            purposes are not accepted yet, so any value is currently refused.
         consentVersion: {type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$'}
         consentText:
           type: string
@@ -694,7 +734,9 @@ components:
         updatedAt: {type: string, format: date-time}
         consents:
           type: array
-          description: Live and revoked consents of this enrolment, oldest first.
+          description: >-
+            Live consents of this enrolment (revoked_at is null), oldest
+            first. Revoked history is not included.
           items: {$ref: '#/components/schemas/ProgrammeConsent'}
         reconsentRequired:
           type: boolean

@@ -11,7 +11,7 @@ import { TokenVerifier } from "../src/auth/token-verifier";
 import { configureApp } from "../src/configure-app";
 import { CURRENT_CORE_CONSENT_VERSION } from "../src/enrolments/consent-versions";
 import { UserSupabaseClientFactory } from "../src/enrolments/user-supabase-client";
-import { FakePostgrest } from "./support/fake-postgrest";
+import { DB_CANARY, FakePostgrest } from "./support/fake-postgrest";
 
 /**
  * Enrolments and consents, end to end through the real Nest app, the real
@@ -21,6 +21,14 @@ import { FakePostgrest } from "./support/fake-postgrest";
  * PostgREST (test/support/fake-postgrest.ts) that derives the user from the
  * request's bearer token and applies the TH-913 RLS policies, grants,
  * constraints and triggers.
+ *
+ * Fake ordering differences (th-qa D1/D4), which no test here relies on:
+ * the fake evaluates check, foreign-key and RLS insert checks in a fixed
+ * order of its own (Postgres runs RLS WITH CHECK before constraints, and
+ * unique/foreign-key checks later), and its clock advances by 1 ms on every
+ * timestamp, so rows written in one request get distinct, strictly
+ * increasing times where Postgres's now() would give them the same value.
+ * Ordering by granted_at/created_at is therefore never tied in the fake.
  */
 
 type Method = "DELETE" | "GET" | "PATCH" | "POST";
@@ -28,16 +36,20 @@ type Method = "DELETE" | "GET" | "PATCH" | "POST";
 interface Caller {
   token: string;
   id: string;
+  /** Own documentation-range address, so the per-IP rate limit is per caller. */
+  address: string;
 }
 
 const CANARY = "synthetic-canary-7c1e";
+const TOKEN_CANARY = "synthetic-bearer-canary";
+const DELETE_BODY = { confirmation: "DELETE" };
 const CORE_TEXT =
   "  Synthetic core wording, línea dos —\n kept exactly (tabs\tand trailing space) ";
 
 describe("Enrolments and consents API (e2e)", () => {
   let app: NestFastifyApplication;
   let fake: FakePostgrest;
-  const users = new Map<string, string>();
+  const users = new Map<string, { sub: string; authTime: number }>();
   const logged: string[] = [];
 
   beforeAll(async () => {
@@ -46,9 +58,9 @@ describe("Enrolments and consents API (e2e)", () => {
       .overrideProvider(TokenVerifier)
       .useValue({
         verify: (token: string) => {
-          const sub = users.get(token);
-          return sub
-            ? Promise.resolve({ sub, authTime: Math.floor(Date.now() / 1000) })
+          const user = users.get(token);
+          return user
+            ? Promise.resolve(user)
             : Promise.reject(new Error("invalid token"));
         },
       })
@@ -80,29 +92,44 @@ describe("Enrolments and consents API (e2e)", () => {
   });
 
   let counter = 0;
-  const newCaller = (): Caller => {
+  /** authAgeSeconds: how long ago the synthetic sign-in happened. */
+  const newCaller = (authAgeSeconds = 0): Caller => {
     counter += 1;
     const caller = {
-      token: `synthetic-token-${counter}`,
+      token: `${TOKEN_CANARY}-${counter}`,
       id: randomUUID(),
+      address: `${counter <= 250 ? "198.51.100" : "203.0.113"}.${counter % 250}`,
     };
-    users.set(caller.token, caller.id);
+    users.set(caller.token, {
+      sub: caller.id,
+      authTime: Math.floor(Date.now() / 1000) - authAgeSeconds,
+    });
     fake.addUser(caller.token, caller.id);
     return caller;
   };
 
-  const call = (
+  /**
+   * Every response is checked: it never contains a bearer token or the
+   * database's error details (submitted values + DB_CANARY).
+   */
+  const call = async (
     caller: Caller | null,
     method: Method,
     url: string,
     payload?: unknown,
-  ) =>
-    app.inject({
+  ) => {
+    const response = await app.inject({
       method,
       url,
+      remoteAddress: caller?.address ?? "192.0.2.1",
       headers: caller ? { authorization: `Bearer ${caller.token}` } : {},
       ...(payload === undefined ? {} : { payload: payload as object }),
     });
+    expect(response.body).not.toContain(TOKEN_CANARY);
+    expect(response.body).not.toContain(DB_CANARY);
+    expect(response.body).not.toContain("Failing row contains");
+    return response;
+  };
 
   const enrol = async (
     caller: Caller,
@@ -146,7 +173,11 @@ describe("Enrolments and consents API (e2e)", () => {
     expect(Object.keys(body).sort()).toEqual(
       ["code", "error", "requestId", "statusCode"].sort(),
     );
-    expect(body).toMatchObject({ statusCode: status, code });
+    expect(body).toMatchObject({
+      statusCode: status,
+      error: "Request rejected",
+      code,
+    });
   };
 
   const expectUncoded = (
@@ -154,8 +185,13 @@ describe("Enrolments and consents API (e2e)", () => {
     status: number,
   ) => {
     expect(response.statusCode).toBe(status);
-    expect(Object.keys(response.json() as object).sort()).toEqual(
+    const body = response.json() as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(
       ["error", "requestId", "statusCode"].sort(),
+    );
+    expect(body.statusCode).toBe(status);
+    expect(body.error).toBe(
+      status >= 500 ? "Service unavailable" : "Request rejected",
     );
   };
 
@@ -165,7 +201,7 @@ describe("Enrolments and consents API (e2e)", () => {
       ["GET", "/v1/enrolments", undefined],
       ["POST", "/v1/enrolments", { programmeCode: "bf", status: "focus" }],
       ["PATCH", `/v1/enrolments/${id}`, { status: "paused" }],
-      ["DELETE", `/v1/enrolments/${id}`, undefined],
+      ["DELETE", `/v1/enrolments/${id}`, DELETE_BODY],
       ["POST", "/v1/enrolments/consents", {}],
       ["PATCH", `/v1/enrolments/consents/${id}`, { revoked: true }],
       ["GET", "/v1/catalogue/programmes", undefined],
@@ -335,12 +371,9 @@ describe("Enrolments and consents API (e2e)", () => {
         consents: { id: string; revokedAt: string | null }[];
       }>();
       expect(leftBody.leftAt).not.toBeNull();
-      expect(
-        leftBody.consents.find((c) => c.id === core)?.revokedAt,
-      ).toBeNull();
-      expect(
-        leftBody.consents.find((c) => c.id === reminders)?.revokedAt,
-      ).not.toBeNull();
+      // The response lists live consents only: core stays, reminders went.
+      expect(leftBody.consents.map((c) => c.id)).toEqual([core]);
+      expect(leftBody.consents[0]?.revokedAt).toBeNull();
 
       // Consents cannot be granted on a left enrolment.
       expectCoded(
@@ -417,7 +450,12 @@ describe("Enrolments and consents API (e2e)", () => {
       const a = newCaller();
       const id = await enrol(a, "ea", "learn_only");
       await grant(a, id, "core");
-      const response = await call(a, "DELETE", `/v1/enrolments/${id}`);
+      const response = await call(
+        a,
+        "DELETE",
+        `/v1/enrolments/${id}`,
+        DELETE_BODY,
+      );
       expect(response.statusCode).toBe(204);
       expect(response.body).toBe("");
       expect(fake.table("enrolments").some((r) => r.id === id)).toBe(false);
@@ -425,11 +463,57 @@ describe("Enrolments and consents API (e2e)", () => {
         fake.table("programme_consents").some((r) => r.enrolment_id === id),
       ).toBe(false);
       expectCoded(
-        await call(a, "DELETE", `/v1/enrolments/${id}`),
+        await call(a, "DELETE", `/v1/enrolments/${id}`, DELETE_BODY),
         404,
         "enrolment_not_found",
       );
     });
+
+    it.each([
+      ["no body", undefined],
+      ["an empty body", {}],
+      ["a lower-case confirmation", { confirmation: "delete" }],
+      ["a non-string confirmation", { confirmation: true }],
+    ])("DELETE refuses %s with confirmation_required", async (_l, payload) => {
+      const a = newCaller();
+      const id = await enrol(a, "ck", "learn_only");
+      expectCoded(
+        await call(a, "DELETE", `/v1/enrolments/${id}`, payload),
+        400,
+        "confirmation_required",
+      );
+      expect(fake.table("enrolments").some((r) => r.id === id)).toBe(true);
+    });
+
+    it("DELETE refuses unknown body fields", async () => {
+      const a = newCaller();
+      const id = await enrol(a, "ck", "learn_only");
+      expectUncoded(
+        await call(a, "DELETE", `/v1/enrolments/${id}`, {
+          ...DELETE_BODY,
+          userId: randomUUID(),
+        }),
+        400,
+      );
+      expect(fake.table("enrolments").some((r) => r.id === id)).toBe(true);
+    });
+
+    it.each([
+      ["stale", 3600],
+      ["in the future", -120],
+    ])(
+      "DELETE needs a recent sign-in (%s auth time)",
+      async (_label, authAgeSeconds) => {
+        const a = newCaller(authAgeSeconds);
+        const id = await enrol(a, "ck", "learn_only");
+        expectCoded(
+          await call(a, "DELETE", `/v1/enrolments/${id}`, DELETE_BODY),
+          401,
+          "recent_authentication_required",
+        );
+        expect(fake.table("enrolments").some((r) => r.id === id)).toBe(true);
+      },
+    );
 
     it("refuses new enrolments and rejoining once account deletion started", async () => {
       const c = newCaller();
@@ -520,11 +604,15 @@ describe("Enrolments and consents API (e2e)", () => {
     });
 
     it.each([
-      ["share without recipient", { purpose: "share_care_team" }],
       [
-        "recipient on a non-share purpose",
-        { purpose: "research", recipientRef: "synthetic-clinic-01" },
+        "a recipient on a non-share purpose",
+        { purpose: "core", recipientRef: randomUUID() },
       ],
+      [
+        "a recipient that is not a UUID",
+        { purpose: "share_care_team", recipientRef: "synthetic-clinic-01" },
+      ],
+      ["a null recipient", { purpose: "core", recipientRef: null }],
       ["a bad version", { purpose: "core", consentVersion: "v 1" }],
       ["empty text", { purpose: "core", consentText: "" }],
       ["text over 8000", { purpose: "core", consentText: "x".repeat(8001) }],
@@ -546,21 +634,111 @@ describe("Enrolments and consents API (e2e)", () => {
       ).toBe(false);
     });
 
-    it("grants a share consent with a recipient", async () => {
+    it.each([
+      ["share_care_team", { recipientRef: randomUUID() }],
+      ["share_caregiver", { recipientRef: randomUUID() }],
+      ["share_care_team", {}],
+      ["share_caregiver", {}],
+    ])(
+      "refuses %s with sharing_not_available until care connections exist",
+      async (purpose, extra) => {
+        const a = newCaller();
+        const id = await enrol(a, "hw");
+        await grant(a, id, "core");
+        expectCoded(
+          await call(a, "POST", "/v1/enrolments/consents", {
+            enrolmentId: id,
+            purpose,
+            consentVersion: "v1",
+            consentText: "Synthetic sharing wording",
+            ...extra,
+          }),
+          409,
+          "sharing_not_available",
+        );
+        expect(
+          fake
+            .table("programme_consents")
+            .filter((r) => r.enrolment_id === id)
+            .map((r) => r.purpose),
+        ).toEqual(["core"]);
+      },
+    );
+
+    it("refuses grants once account deletion started (consent_not_permitted)", async () => {
       const a = newCaller();
-      const id = await enrol(a, "hw");
+      const withCore = await enrol(a, "re", "learn_only");
+      const withoutCore = await enrol(a, "nu", "learn_only");
+      await grant(a, withCore, "core");
+      fake.startAccountDeletion(a.id);
+      for (const [enrolmentId, purpose] of [
+        [withoutCore, "core"],
+        [withCore, "research"],
+      ]) {
+        expectCoded(
+          await call(a, "POST", "/v1/enrolments/consents", {
+            enrolmentId,
+            purpose,
+            consentVersion: "v1",
+            consentText: `Synthetic wording ${CANARY}`,
+          }),
+          409,
+          "consent_not_permitted",
+        );
+      }
+      expect(
+        fake
+          .table("programme_consents")
+          .filter((r) =>
+            [withCore, withoutCore].includes(r.enrolment_id as string),
+          )
+          .map((r) => r.purpose),
+      ).toEqual(["core"]);
+    });
+
+    it("GET lists every live consent and no revoked ones", async () => {
+      const a = newCaller();
+      const id = await enrol(a, "bf", "focus", "quit");
+      const optional = [
+        "reminders",
+        "records_import",
+        "research",
+        "screen_time",
+      ];
+      const core = await grant(a, id, "core");
+      const granted = [core];
+      for (const purpose of optional) granted.push(await grant(a, id, purpose));
+      const research = granted[optional.indexOf("research") + 1] as string;
+      const revoked = await call(
+        a,
+        "PATCH",
+        `/v1/enrolments/consents/${research}`,
+        { revoked: true },
+      );
+      expect(revoked.statusCode).toBe(200);
+
+      const listed = await call(a, "GET", "/v1/enrolments");
+      const [enrolment] = listed.json<{
+        enrolments: { consents: { id: string; revokedAt: unknown }[] }[];
+      }>().enrolments;
+      expect(enrolment?.consents.map((c) => c.id)).toEqual(
+        granted.filter((consentId) => consentId !== research),
+      );
+      expect(enrolment?.consents.every((c) => c.revokedAt === null)).toBe(true);
+    });
+
+    it("GET fails rather than returning a list cut short by a server row limit", async () => {
+      const a = newCaller();
+      const id = await enrol(a, "ca", "learn_only");
       await grant(a, id, "core");
-      const response = await call(a, "POST", "/v1/enrolments/consents", {
-        enrolmentId: id,
-        purpose: "share_care_team",
-        recipientRef: "synthetic-connection-01",
-        consentVersion: "v1",
-        consentText: "Synthetic sharing wording",
-      });
-      expect(response.statusCode).toBe(201);
-      expect(response.json()).toMatchObject({
-        recipientRef: "synthetic-connection-01",
-      });
+      await grant(a, id, "reminders");
+      fake.maxRows = 1;
+      try {
+        expectUncoded(await call(a, "GET", "/v1/enrolments"), 502);
+      } finally {
+        fake.maxRows = null;
+      }
+      expect((await call(a, "GET", "/v1/enrolments")).statusCode).toBe(200);
     });
 
     it("revokes only, once; revoking core revokes the rest", async () => {
@@ -672,7 +850,7 @@ describe("Enrolments and consents API (e2e)", () => {
       }
       // Delete now.
       expectCoded(
-        await call(b, "DELETE", `/v1/enrolments/${enrolment}`),
+        await call(b, "DELETE", `/v1/enrolments/${enrolment}`, DELETE_BODY),
         404,
         "enrolment_not_found",
       );
@@ -730,5 +908,33 @@ describe("Enrolments and consents API (e2e)", () => {
     });
     await call(a, "PATCH", `/v1/enrolments/${id}`, { mode: CANARY });
     expect(logged.join("\n")).not.toContain(CANARY);
+  });
+
+  it("never logs a bearer token or database error details", async () => {
+    const a = newCaller();
+    const id = await enrol(a, "sd", "learn_only");
+    await grant(a, id, "core");
+    // A database constraint error (details carry DB_CANARY) ...
+    expectCoded(
+      await call(a, "POST", "/v1/enrolments", {
+        programmeCode: "sd",
+        status: "learn_only",
+      }),
+      409,
+      "already_enrolled",
+    );
+    // ... and a logged 5xx.
+    const before = logged.length;
+    fake.maxRows = 0;
+    try {
+      expectUncoded(await call(a, "GET", "/v1/enrolments"), 502);
+    } finally {
+      fake.maxRows = null;
+    }
+    expect(logged.length).toBeGreaterThan(before);
+    const lines = logged.join("\n");
+    expect(lines).not.toContain(TOKEN_CANARY);
+    expect(lines).not.toContain(a.token);
+    expect(lines).not.toContain(DB_CANARY);
   });
 });

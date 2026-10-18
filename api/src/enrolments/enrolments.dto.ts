@@ -77,13 +77,13 @@ export class GrantConsentDto {
   @IsIn(consentPurposes)
   purpose!: ConsentPurpose;
 
-  /** Required for share purposes and refused for every other purpose. */
-  @ValidateIf(
-    (dto: GrantConsentDto) =>
-      sharePurposes.includes(dto.purpose) || dto.recipientRef !== undefined,
-  )
-  @IsString()
-  @Length(1, 200)
+  /**
+   * A care connection or caregiver id (UUID) for share purposes only. Share
+   * purposes are refused until care connections exist, so today any value is
+   * refused; a value that is not a UUID is invalid input.
+   */
+  @ValidateIf((dto: GrantConsentDto) => dto.recipientRef !== undefined)
+  @IsUUID()
   recipientRef?: string;
 
   @IsString()
@@ -94,6 +94,15 @@ export class GrantConsentDto {
   @IsString()
   @Length(1, 8000)
   consentText!: string;
+}
+
+/**
+ * Body of "Delete now". The value is checked by the service so that a
+ * missing or wrong confirmation gets a stable code.
+ */
+export class DeleteEnrolmentDto {
+  @IsOptional()
+  confirmation?: unknown;
 }
 
 export class RevokeConsentDto {
@@ -121,7 +130,10 @@ export interface EnrolmentResponse {
   leftAt: string | null;
   createdAt: string;
   updatedAt: string;
-  /** Live and revoked consents of this enrolment, oldest first. */
+  /**
+   * Live consents of this enrolment (revoked_at is null), oldest first.
+   * Revoked history is not part of this response.
+   */
   consents: ConsentResponse[];
   /**
    * True when the enrolment is not left and its live core consent was given
