@@ -129,35 +129,76 @@ $f$;
 grant usage on schema th972_test to public;
 grant execute on all functions in schema th972_test to public;
 
+-- True when the deparsed policy expression p_expr ends with the top-level
+-- conjunct "AND (NOT sync_writer_session())": the guard is the last argument
+-- of the outermost AND, so no OR or nested expression can bypass it. String
+-- literals are skipped when counting parentheses.
+create function th972_test.guard_top_level(p_expr text)
+returns boolean language plpgsql immutable set search_path = '' as $f$
+declare
+  suffix_at integer;
+  depth integer := 0;
+  in_quote boolean := false;
+  ch text;
+begin
+  if p_expr is null
+     or p_expr !~ ' AND \(NOT (public\.)?sync_writer_session\(\)\)\)$'
+     or left(p_expr, 1) <> '(' then
+    return false;
+  end if;
+  suffix_at := length(p_expr) - length(substring(p_expr from ' AND \(NOT (?:public\.)?sync_writer_session\(\)\)\)$')) + 1;
+  for i in 1 .. suffix_at - 1 loop
+    ch := substr(p_expr, i, 1);
+    if ch = '''' then
+      in_quote := not in_quote;
+    elsif not in_quote and ch = '(' then
+      depth := depth + 1;
+    elsif not in_quote and ch = ')' then
+      depth := depth - 1;
+      if depth < 1 then
+        return false;  -- the outermost parenthesis closed before the guard
+      end if;
+    end if;
+  end loop;
+  return depth = 1 and not in_quote;
+end;
+$f$;
+grant execute on function th972_test.guard_top_level(text) to public;
+
 -- Catalogue -------------------------------------------------------------------
--- Every insert/update policy outside sync_* checks the written row with
--- "not sync_writer_session()", and every delete policy checks it in using.
+-- The guard check itself, on real deparsed policies: a guard under OR, or
+-- nested inside another expression, does not count.
+create table th972_test.guard_probe (x integer);
+create policy guard_probe_or on th972_test.guard_probe for insert to authenticated
+  with check (x = 1 or not public.sync_writer_session());
+create policy guard_probe_nested on th972_test.guard_probe for insert to authenticated
+  with check (x = 1 or (x = 2 and not public.sync_writer_session()));
+create policy guard_probe_quoted on th972_test.guard_probe for insert to authenticated
+  with check (x::text = ')' and not public.sync_writer_session());
+create policy guard_probe_ok on th972_test.guard_probe for insert to authenticated
+  with check ((x = 1 or x = 2) and not public.sync_writer_session());
+select th972_test.ok(
+  (select string_agg(policyname || '=' || th972_test.guard_top_level(with_check)::text, ','
+     order by policyname)
+   from pg_catalog.pg_policies where schemaname = 'th972_test') =
+  'guard_probe_nested=false,guard_probe_ok=true,guard_probe_or=false,guard_probe_quoted=true',
+  'guard check: only a top-level trailing AND (NOT sync_writer_session()) counts');
+
+-- Every insert/update policy outside sync_* checks the written row, every
+-- update and delete policy limits the rows it can target, with a top-level
+-- "AND (NOT sync_writer_session())". The one exception is the using clause of
+-- profiles_update_own, read FOR SHARE by deletion_barrier_open().
 select th972_test.ok(
   not exists (
     select 1 from pg_catalog.pg_policies
-    where schemaname = 'public' and tablename !~ '^sync_'
-      and cmd in ('INSERT', 'UPDATE')
-      and coalesce(with_check, '') !~ 'NOT (public\.)?sync_writer_session\(\)')
-  and not exists (
-    select 1 from pg_catalog.pg_policies
-    where schemaname = 'public' and tablename !~ '^sync_'
-      and cmd = 'DELETE'
-      and coalesce(qual, '') !~ 'NOT (public\.)?sync_writer_session\(\)')
-  and not exists (
-    select 1 from pg_catalog.pg_policies
-    where schemaname = 'public' and tablename !~ '^sync_' and cmd = 'ALL'),
-  'every public write policy outside sync_* refuses a sync session; no FOR ALL policies');
-select th972_test.ok(
-  not exists (
-    select 1 from pg_catalog.pg_policies
-    where schemaname = 'storage' and tablename = 'objects'
-      and policyname like 'avatars\_%'
-      and ((cmd in ('INSERT', 'UPDATE')
-            and coalesce(with_check, '') !~ 'NOT (public\.)?sync_writer_session\(\)')
-        or (cmd = 'DELETE'
-            and coalesce(qual, '') !~ 'NOT (public\.)?sync_writer_session\(\)')
-        or cmd = 'ALL')),
-  'every avatar write policy on storage.objects refuses a sync session');
+    where ((schemaname = 'public' and tablename !~ '^sync_')
+           or (schemaname = 'storage' and tablename = 'objects' and policyname like 'avatars\_%'))
+      and (cmd = 'ALL'
+        or (cmd in ('INSERT', 'UPDATE') and not th972_test.guard_top_level(with_check))
+        or (cmd = 'DELETE' and not th972_test.guard_top_level(qual))
+        or (cmd = 'UPDATE' and policyname <> 'profiles_update_own'
+            and not th972_test.guard_top_level(qual)))),
+  'every write policy outside sync_* (avatars included) refuses a sync session with a top-level guard; no FOR ALL policies');
 select th972_test.ok(
   (select string_agg(schemaname || '.' || tablename || ':' || policyname, ','
      order by schemaname, tablename, policyname)
@@ -187,6 +228,34 @@ select th972_test.ok(
   and (select coalesce(qual, '') !~ 'sync_writer_session' from pg_catalog.pg_policies
        where schemaname = 'public' and policyname = 'profiles_update_own'),
   'select policies, and the profile update using clause read by deletion_barrier_open, are unchanged for sync sessions');
+
+-- Tripwire: every public relation authenticated can write is a sync table or
+-- on this reviewed list, and has row-level security enabled and forced; and
+-- schema public has no views, whose owner's rights would bypass these policies.
+select th972_test.ok(
+  (select string_agg(c.relname, ',' order by c.relname)
+   from pg_catalog.pg_class as c
+   where c.relnamespace = 'public'::regnamespace
+     and c.relname !~ '^sync_'
+     and (has_any_column_privilege('authenticated', c.oid, 'INSERT')
+          or has_any_column_privilege('authenticated', c.oid, 'UPDATE')
+          or has_table_privilege('authenticated', c.oid, 'DELETE'))) =
+  'account_consents,enrolments,profiles,program_data,programme_consents,quit_plans',
+  'tables authenticated can write outside sync_* are exactly the reviewed set');
+select th972_test.ok(
+  not exists (
+    select 1 from pg_catalog.pg_class as c
+    where c.relnamespace = 'public'::regnamespace
+      and (has_any_column_privilege('authenticated', c.oid, 'INSERT')
+           or has_any_column_privilege('authenticated', c.oid, 'UPDATE')
+           or has_table_privilege('authenticated', c.oid, 'DELETE'))
+      and not (c.relkind in ('r', 'p') and c.relrowsecurity and c.relforcerowsecurity)),
+  'every public table authenticated can write has row-level security enabled and forced');
+select th972_test.ok(
+  not exists (
+    select 1 from pg_catalog.pg_class
+    where relnamespace = 'public'::regnamespace and relkind in ('v', 'm')),
+  'schema public has no views or materialized views');
 
 -- Every function authenticated can execute in public is listed here, so a new
 -- one has to be reviewed for the sync-session refusal before this passes.
@@ -256,12 +325,10 @@ select th972_test.affects(
 select th972_test.affects(
   'update public.profiles set display_name = ''Synthetic Member''',
   1, 'B API: updates the profile');
--- The first save returns the stored row (an existing quirk returns it twice);
--- the stored state is checked below.
 select th972_test.ok(
-  (select count(*) >= 1 and bool_and(revision = 1)
+  (select count(*) = 1 and bool_and(revision = 1)
    from public.save_program_data('heartwise', '{"step":1}'::jsonb, 1)),
-  'B API: saves program data through save_program_data');
+  'B API: a first save_program_data returns exactly one row, revision 1');
 select th972_test.affects(
   'insert into storage.objects (bucket_id, name)
    values (''avatars'', ''00000000-0000-4000-8000-000000972002/avatar.png'')',
@@ -312,10 +379,9 @@ select th972_test.refused(
   'insert into public.enrolments (user_id, programme_code, status)
    values (''00000000-0000-4000-8000-000000972002'', ''st'', ''learn_only'')',
   array['42501'], '%row-level security%', 'B sync: cannot insert an enrolment');
-select th972_test.refused(format(
+select th972_test.affects(format(
   'update public.enrolments set status = ''paused'' where id = %L',
-  current_setting('th972.b_hw')),
-  array['42501'], '%row-level security%', 'B sync: cannot update an enrolment');
+  current_setting('th972.b_hw')), 0, 'B sync: cannot update an enrolment (no row qualifies)');
 select th972_test.affects(format(
   'delete from public.enrolments where id = %L', current_setting('th972.b_bf')),
   0, 'B sync: cannot delete an enrolment (no row qualifies)');
@@ -324,18 +390,17 @@ select th972_test.refused(format(
    values (%L, ''reminders'', ''v1'', ''Synthetic reminder wording'')',
   current_setting('th972.b_hw')),
   array['42501'], '%row-level security%', 'B sync: cannot grant a programme consent');
-select th972_test.refused(format(
+select th972_test.affects(format(
   'update public.programme_consents set revoked_at = now()
    where enrolment_id = %L and purpose = ''research''',
-  current_setting('th972.b_hw')),
-  array['42501'], '%row-level security%', 'B sync: cannot revoke a programme consent');
+  current_setting('th972.b_hw')), 0, 'B sync: cannot revoke a programme consent (no row qualifies)');
 select th972_test.refused(
   'insert into public.account_consents (user_id, purpose, consent_version, consent_text)
    values (''00000000-0000-4000-8000-000000972002'', ''diagnostics'', ''v1'', ''Synthetic'')',
   array['42501'], '%row-level security%', 'B sync: cannot grant an account consent');
-select th972_test.refused(
+select th972_test.affects(
   'update public.account_consents set revoked_at = now() where purpose = ''essential''',
-  array['42501'], '%row-level security%', 'B sync: cannot revoke an account consent');
+  0, 'B sync: cannot revoke an account consent (no row qualifies)');
 select th972_test.refused(
   'update public.profiles set display_name = ''Changed by sync''',
   array['42501'], '%row-level security%', 'B sync: cannot update the profile');
@@ -347,9 +412,9 @@ select th972_test.refused(
   'insert into public.program_data (user_id, program_id, payload)
    values (''00000000-0000-4000-8000-000000972002'', ''steady'', ''{}'')',
   array['42501'], '%row-level security%', 'B sync: cannot insert program data');
-select th972_test.refused(
+select th972_test.affects(
   'update public.program_data set payload = ''{}'' where program_id = ''heartwise''',
-  array['42501'], '%row-level security%', 'B sync: cannot update program data');
+  0, 'B sync: cannot update program data (no row qualifies)');
 select th972_test.affects('delete from public.program_data',
   0, 'B sync: cannot delete program data (no row qualifies)');
 select th972_test.refused(
@@ -360,10 +425,25 @@ select th972_test.refused(
   'insert into storage.objects (bucket_id, name)
    values (''avatars'', ''00000000-0000-4000-8000-000000972002/sync.png'')',
   array['42501'], '%row-level security%', 'B sync: cannot upload an avatar object');
-select th972_test.refused(
+select th972_test.affects(
   'update storage.objects set name = ''00000000-0000-4000-8000-000000972002/moved.png''
    where name = ''00000000-0000-4000-8000-000000972002/avatar.png''',
-  array['42501'], '%row-level security%', 'B sync: cannot update an avatar object');
+  0, 'B sync: cannot update an avatar object (no row qualifies)');
+-- Row locks: a sync session cannot lock a member's consent or enrolment rows
+-- (which would stall a revocation through the API). It can still lock the
+-- profile row FOR SHARE / FOR UPDATE, which deletion_barrier_open() needs.
+select th972_test.ok(
+  (select count(*) from (select 1 from public.programme_consents for update) as l) = 0
+  and (select count(*) from (select 1 from public.account_consents for update) as l) = 0
+  and (select count(*) from (select 1 from public.enrolments for update) as l) = 0
+  and (select count(*) from (select 1 from public.enrolments for share) as l) = 0
+  and (select count(*) from (select 1 from public.program_data for update) as l) = 0
+  and (select count(*) from (select 1 from storage.objects for update) as l) = 0,
+  'B sync: select ... for update/share locks no consent, enrolment, program data or avatar row');
+select th972_test.ok(
+  (select count(*) from (select 1 from public.profiles for update) as l) = 1
+  and (select count(*) from (select 1 from public.profiles for share) as l) = 1,
+  'B sync: the profile row can still be locked (the profiles_update_own using exception)');
 select th972_test.affects(
   'delete from storage.objects where bucket_id = ''avatars''',
   0, 'B sync: cannot delete an avatar object (no row qualifies)');
@@ -438,6 +518,18 @@ select th972_test.affects(
 select th972_test.affects(
   'update public.quit_plans set quit_day_check_in = false',
   1, 'B API: updates the quit plan');
+select th972_test.become('thsync', '00000000-0000-4000-8000-000000972002');
+select th972_test.affects(
+  'update public.quit_plans set quit_day_check_in = true',
+  0, 'B sync: cannot update the quit plan (no row qualifies)');
+select th972_test.ok(
+  (select count(*) from (select 1 from public.quit_plans for update) as l) = 0
+  and (select count(*) from public.quit_plans) = 1,
+  'B sync: reads the quit plan but cannot lock it');
+select th972_test.become('authenticator', '00000000-0000-4000-8000-000000972002');
+select th972_test.ok(
+  (select not quit_day_check_in from public.quit_plans),
+  'B API: the quit plan is unchanged by the sync session');
 select th972_test.ok(
   (select count(*) = 1 and min(revision) = 2
    from public.save_program_data('heartwise', '{"step":2}'::jsonb, 2)),
@@ -628,25 +720,46 @@ while IFS= read -r -d '' path; do
 done < <(find "$migrations_dir" -mindepth 1 -maxdepth 1 -name '*.sql' -print0 | LC_ALL=C sort -z)
 
 # Final write policies, across all migrations in apply order -------------------
-# Prints "<table> <name> <command> <guard-in-using> <guard-in-check>" for every
-# policy that still exists after the last migration ("drop policy" removes one).
+# Prints "<table> <name> <command> <using-guard> <check-guard>" for every policy
+# that still exists after the last migration ("drop policy" removes one). A
+# guard state is 1 when the clause ends with the top-level conjunct
+# "and not public.sync_writer_session()", 2 when the guard appears anywhere
+# else (under OR, nested), and 0 when it is absent. String literals are skipped
+# when counting parentheses.
 final_policies() {
   awk '
-    function flush() {
+    function gstate(clause,   g, c, start, i, pos, depth, inq, ch, before, after) {
+      g = "not public.sync_writer_session()"
+      c = clause
+      gsub(/[ \t]+/, " ", c); sub(/^ +/, "", c); sub(/[ ;]+$/, "", c)
+      sub(/^(using|with check) /, "", c)
+      if (index(c, g) == 0) return 0
+      pos = 0; start = 1
+      while ((i = index(substr(c, start), g)) > 0) { pos = start + i - 1; start = pos + 1 }
+      if (substr(c, 1, 1) != "(") return 2
+      depth = 0; inq = 0
+      for (i = 1; i < pos; i++) {
+        ch = substr(c, i, 1)
+        if (ch == q) inq = !inq
+        else if (!inq && ch == "(") depth++
+        else if (!inq && ch == ")") { depth--; if (depth < 1) return 2 }
+      }
+      before = substr(c, 1, pos - 1); sub(/ +$/, "", before)
+      after = substr(c, pos + length(g)); gsub(/ /, "", after)
+      return (depth == 1 && !inq && before ~ /(^|[ (])and$/ && after == ")") ? 1 : 2
+    }
+    function flush(   name, tbl, cmd, u, w, using, check) {
       if (buf == "") return
       name = buf; sub(/^create policy "/, "", name); sub(/".*/, "", name)
       tbl = ""
       if (match(buf, / on [a-z_]+\.[a-z_]+ /)) tbl = substr(buf, RSTART + 4, RLENGTH - 5)
       cmd = "all"
       if (match(buf, / for (select|insert|update|delete|all) /)) cmd = substr(buf, RSTART + 5, RLENGTH - 6)
-      using = buf; check = ""
-      if (index(buf, " with check ")) {
-        using = substr(buf, 1, index(buf, " with check ") - 1)
-        check = substr(buf, index(buf, " with check "))
-      }
-      g = "not public.sync_writer_session()"
-      key = tbl " " name
-      def[key] = cmd " " (index(using, g) ? 1 : 0) " " (index(check, g) ? 1 : 0)
+      u = index(buf, " using "); w = index(buf, " with check ")
+      using = ""; check = ""
+      if (u) using = (w > u) ? substr(buf, u + 1, w - u - 1) : substr(buf, u + 1)
+      if (w) check = substr(buf, w + 1)
+      def[tbl " " name] = cmd " " gstate(using) " " gstate(check)
       buf = ""
     }
     /^create policy "/ { buf = $0; grab = 1; if ($0 ~ /;$/) { grab = 0; flush() }; next }
@@ -658,10 +771,36 @@ final_policies() {
       delete def[t " " n]
     }
     END { for (k in def) print k, def[k] }
-  ' "${migration_files[@]}" | LC_ALL=C sort
+  ' q="'" "$@" | LC_ALL=C sort
 }
 
-policies=$(final_policies)
+# Self-test of the parser; runs every time.
+parser_sample=$(final_policies <(printf '%s\n' \
+  'create policy "p_or"' \
+  'on public.t for insert to authenticated' \
+  'with check (x = 1 or not public.sync_writer_session());' \
+  'create policy "p_nested"' \
+  'on public.t for update to authenticated' \
+  'using ((x = 1 or (y and not public.sync_writer_session())))' \
+  'with check (x = 1 and' \
+  '  not public.sync_writer_session());' \
+  'create policy "p_quoted"' \
+  "on public.t for delete to authenticated" \
+  "using (x = ')' and not public.sync_writer_session());" \
+  'create policy "p_gone" on public.t for insert to authenticated with check (true);' \
+  'drop policy "p_gone" on public.t;'))
+[[ "$parser_sample" == $'public.t p_nested update 2 1\npublic.t p_or insert 0 2\npublic.t p_quoted delete 1 0' ]] ||
+  fail "policy parser self-test failed: $parser_sample"
+
+# alter policy changes a predicate in place, which the parser above does not
+# follow. Re-create the policy instead (drop policy + create policy).
+for f in "${migration_files[@]}"; do
+  if tr '\n' ' ' <"$f" | grep -Eiq 'alter policy +"?[a-z_]+"? +on +(public|storage)\.'; then
+    fail "$f uses alter policy on a public or storage table; re-create the policy (drop + create) so this check can follow it, and run the SQL test in this script"
+  fi
+done
+
+policies=$(final_policies "${migration_files[@]}")
 guarded=()
 while read -r tbl name cmd in_using in_check; do
   [[ -n "$tbl" ]] || continue
@@ -672,9 +811,22 @@ while read -r tbl name cmd in_using in_check; do
     *) continue ;;
   esac
   case "$cmd" in
-    select) continue ;;
-    insert|update) [[ "$in_check" == 1 ]] || fail "$tbl $name: with check must include 'not public.sync_writer_session()'" ;;
-    delete) [[ "$in_using" == 1 ]] || fail "$tbl $name: using must include 'not public.sync_writer_session()'" ;;
+    select)
+      [[ "$in_using" == 0 && "$in_check" == 0 ]] || fail "$tbl $name: select policies stay readable by sync sessions"
+      continue ;;
+    insert)
+      [[ "$in_check" == 1 ]] || fail "$tbl $name: with check must end with a top-level 'and not public.sync_writer_session()'" ;;
+    update)
+      [[ "$in_check" == 1 ]] || fail "$tbl $name: with check must end with a top-level 'and not public.sync_writer_session()'"
+      if [[ "$tbl:$name" == public.profiles:profiles_update_own ]]; then
+        # deletion_barrier_open() reads the profile FOR SHARE, which applies
+        # this using clause; a guard there would stop every sync write.
+        [[ "$in_using" == 0 ]] || fail 'profiles_update_own: its using clause stays unguarded (read FOR SHARE by deletion_barrier_open)'
+      else
+        [[ "$in_using" == 1 ]] || fail "$tbl $name: using must end with a top-level 'and not public.sync_writer_session()'"
+      fi ;;
+    delete)
+      [[ "$in_using" == 1 ]] || fail "$tbl $name: using must end with a top-level 'and not public.sync_writer_session()'" ;;
     *) fail "$tbl $name: use per-command policies (for $cmd), so sync sessions can keep reading" ;;
   esac
   guarded+=("$tbl:$name")
@@ -693,10 +845,6 @@ for expected in public.profiles:profiles_update_own \
   storage.objects:avatars_delete_own; do
   printf '%s\n' "${guarded[@]}" | grep -Fxq "$expected" || fail "missing guarded write policy $expected"
 done
-# deletion_barrier_open() reads the profile FOR SHARE, which applies the update
-# policy's using clause; a guard there would stop every sync write.
-grep -Eq '^public\.profiles profiles_update_own update 0 1$' <<<"$policies" ||
-  fail 'profiles_update_own: guard belongs in with check only (its using clause is read by deletion_barrier_open)'
 
 # Latest definition of each function ------------------------------------------
 latest_body() {
@@ -729,8 +877,8 @@ for pair in enrolments_focus_cap:TH001 consent_revoke_only:TH002 consent_revoke_
   fi
 done
 
-# Registry: every TH code raised in a migration is in the contract with the
-# same snake_case name, and every raise carries that name as its hint.
+# Registry: every TH code in a migration is in the contract, and every raise
+# of one carries the registered snake_case name as its hint.
 # The backticks are literal Markdown, not command substitution.
 # shellcheck disable=SC2016
 registry=$(sed -nE 's/^\| `(TH[0-9]{3})` \| `([a-z_]+)` \|.*/\1 \2/p' "$contract")
@@ -740,16 +888,56 @@ registry=$(sed -nE 's/^\| `(TH[0-9]{3})` \| `([a-z_]+)` \|.*/\1 \2/p' "$contract
 for code in TH001 TH002 TH003 TH004 TH005 TH006 TH007 TH008 TH009 TH010; do
   grep -Eq "^$code " <<<"$registry" || fail "registry is missing $code"
 done
-raises=$(awk '
-  /errcode = .TH[0-9][0-9][0-9]./ { code = $0; sub(/.*errcode = ./, "", code); code = substr(code, 1, 5); next }
-  code != "" && /hint = ./ { h = $0; sub(/.*hint = ./, "", h); sub(/.;?$/, "", h); print code, h; code = "" }
-' "${migration_files[@]}" | sort -u)
+
+# Prints "<code> <hint>" (hint "-" when missing) for every raise statement that
+# names a TH code, as errcode = 'THnnn' (any spacing) or raise sqlstate 'THnnn'.
+scan_raises() {
+  awk '
+    function emit(stmt,   ls, code, hint, frag) {
+      ls = tolower(stmt); code = ""; hint = "-"
+      if (match(ls, "errcode[ \t]*=[ \t]*" q "th[0-9a-z][0-9a-z][0-9a-z]" q) ||
+          match(ls, "sqlstate[ \t]+" q "th[0-9a-z][0-9a-z][0-9a-z]" q)) {
+        frag = substr(stmt, RSTART, RLENGTH)
+        code = toupper(substr(frag, length(frag) - 5, 5))
+      }
+      if (code == "") return
+      if (match(ls, "hint[ \t]*=[ \t]*" q "[a-z_]+" q)) {
+        frag = substr(ls, RSTART, RLENGTH); sub("^[^" q "]*" q, "", frag); sub(q "$", "", frag)
+        hint = frag
+      }
+      print code, hint
+    }
+    { line = $0; sub(/--.*/, "", line) }
+    !inraise && tolower(line) ~ /(^|[^a-z_])raise([^a-z_]|$)/ { inraise = 1; stmt = "" }
+    inraise { stmt = stmt " " line; if (line ~ /;[ \t]*$/) { emit(stmt); inraise = 0 } }
+  ' q="'" "$@"
+}
+
+# Self-test of the scanner; runs every time.
+scanner_sample=$(scan_raises <(printf '%s\n' \
+  "  raise exception using errcode = 'TH001', message = 'x', hint = 'focus_cap_reached';" \
+  "  raise sqlstate 'TH009' using hint = 'deletion_via_api_only';" \
+  "  raise exception using errcode='TH007'," \
+  "    hint='sync_area_mismatch';" \
+  "  raise exception using errcode  =  'TH002', message = 'no hint';" \
+  "  raise notice 'unrelated';"))
+[[ "$scanner_sample" == $'TH001 focus_cap_reached\nTH009 deletion_via_api_only\nTH007 sync_area_mismatch\nTH002 -' ]] ||
+  fail "raise scanner self-test failed: $scanner_sample"
+
+# Any quoted TH code anywhere in a migration (outside comments) is registered.
+while read -r code; do
+  [[ -n "$code" ]] || continue
+  grep -Eq "^$code " <<<"$registry" || fail "$code is used in a migration but is not in the registry in $contract"
+done < <(sed 's/--.*$//' "${migration_files[@]}" | grep -Eio "'TH[0-9A-Z]{3}'" | tr -d "'" | tr '[:lower:]' '[:upper:]' | sort -u)
+
+raises=$(scan_raises "${migration_files[@]}" | sort -u)
 [[ -n "$raises" ]] || fail 'no TH errors raised in migrations'
 while read -r code hint; do
+  [[ "$hint" != - ]] || fail "$code is raised without a hint"
   grep -Fxq "$code $hint" <<<"$registry" || fail "$code is raised with hint '$hint', which does not match the registry"
 done <<<"$raises"
-[[ "$(grep -Ec "errcode = 'TH[0-9]{3}'" "$migration")" -eq "$(grep -Ec "^ +hint = '[a-z_]+';?$" "$migration")" ]] ||
-  fail 'every TH raise needs a hint'
+[[ "$(scan_raises "$migration" | wc -l | tr -d ' ')" -eq 9 ]] ||
+  fail "expected 9 TH raises in $migration"
 
 # Never loosen ----------------------------------------------------------------
 functions=$(grep -Ec '^create (or replace )?function ' "$migration")

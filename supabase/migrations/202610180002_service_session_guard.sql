@@ -10,15 +10,19 @@ begin;
 --   avatar policies on storage.objects. Each policy is re-created with its
 --   existing condition unchanged plus "and not public.sync_writer_session()":
 --   in the with check clause of insert and update policies (the row being
---   written) and in the using clause of delete policies. Update policies keep
---   their using clause as it was, because SELECT ... FOR SHARE also applies the
---   update policy's using clause, and deletion_barrier_open() reads the
---   caller's profile that way during sync writes.
+--   written) and in the using clause of update and delete policies (the rows
+--   that can be targeted or locked with SELECT ... FOR UPDATE / FOR SHARE).
+-- * One exception: the using clause of profiles_update_own stays as it was.
+--   SELECT ... FOR SHARE also applies the update policy's using clause, and
+--   deletion_barrier_open() reads the caller's profile that way during every
+--   sync write. A sync session's profile update still fails its with check.
 -- * Select policies are unchanged, so has_consent() and
 --   deletion_barrier_open() still work in a sync session.
 -- * begin_account_deletion and delete_my_app_data refuse a sync session
---   (TH009), and save_program_data refuses it too (TH010). Everything else in
---   these functions is unchanged.
+--   (TH009), and save_program_data refuses it too (TH010). save_program_data
+--   also returns after a first insert instead of running the update as well,
+--   so a first save returns its row once. Everything else in these functions
+--   is unchanged.
 -- * Custom errors use the SQLSTATE class TH, listed in
 --   docs/contracts/database.md: the focus cap (TH001), consent revoke-only
 --   rules (TH002, TH003), the sync area enrolment match (TH007), append-only
@@ -48,7 +52,8 @@ drop policy "avatars_update_own" on storage.objects;
 create policy "avatars_update_own"
 on storage.objects for update to authenticated
 using (
-  bucket_id = 'avatars' and public.avatar_write_allowed(name)
+  bucket_id = 'avatars' and public.avatar_write_allowed(name) and
+  not public.sync_writer_session()
 )
 with check (
   bucket_id = 'avatars' and public.avatar_write_allowed(name) and
@@ -75,7 +80,7 @@ drop policy "quit_plans_update_own" on public.quit_plans;
 create policy "quit_plans_update_own"
 on public.quit_plans for update
 to authenticated
-using ((select auth.uid()) = user_id)
+using ((select auth.uid()) = user_id and not public.sync_writer_session())
 with check ((select auth.uid()) = user_id and not public.sync_writer_session());
 
 -- Program data -------------------------------------------------------------------
@@ -88,7 +93,7 @@ with check ((select auth.uid()) = user_id and not public.sync_writer_session());
 drop policy "program_data_update_own" on public.program_data;
 create policy "program_data_update_own"
 on public.program_data for update to authenticated
-using ((select auth.uid()) = user_id)
+using ((select auth.uid()) = user_id and not public.sync_writer_session())
 with check ((select auth.uid()) = user_id and not public.sync_writer_session());
 
 drop policy "program_data_delete_own" on public.program_data;
@@ -112,7 +117,7 @@ drop policy "enrolments_update_own" on public.enrolments;
 create policy "enrolments_update_own"
 on public.enrolments for update
 to authenticated
-using ((select auth.uid()) = user_id)
+using ((select auth.uid()) = user_id and not public.sync_writer_session())
 with check ((select auth.uid()) = user_id and not public.sync_writer_session());
 
 drop policy "enrolments_delete_own" on public.enrolments;
@@ -151,7 +156,8 @@ using (
     from public.enrolments as e
     where e.id = programme_consents.enrolment_id
       and e.user_id = (select auth.uid())
-  )
+  ) and
+  not public.sync_writer_session()
 )
 with check (
   exists (
@@ -179,7 +185,7 @@ drop policy "account_consents_update_own" on public.account_consents;
 create policy "account_consents_update_own"
 on public.account_consents for update
 to authenticated
-using ((select auth.uid()) = user_id)
+using ((select auth.uid()) = user_id and not public.sync_writer_session())
 with check ((select auth.uid()) = user_id and not public.sync_writer_session());
 
 -- Functions that write, callable by authenticated -----------------------------------
@@ -258,6 +264,7 @@ begin
       insert into public.program_data (user_id, program_id, payload, revision)
       values (caller_id, p_program_id, p_payload, p_revision)
       returning *;
+    return;
   end if;
 
   if p_revision <> current_revision + 1 then

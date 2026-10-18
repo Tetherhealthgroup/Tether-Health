@@ -199,12 +199,16 @@ stored in this repository.
 **The sync session writes nothing else.** Every insert, update and delete
 policy outside `sync_*` also requires `not public.sync_writer_session()`:
 `profiles`, `quit_plans`, `program_data`, `enrolments`, `programme_consents`,
-`account_consents` and the avatar policies on `storage.objects`. For insert
-and update policies the condition is in `with check` (the row being written),
-so the write fails with `42501`; for delete policies it is in `using`, so no
-row qualifies. The `using` clause of update policies is unchanged, because
-`select … for share` also applies it and `deletion_barrier_open()` reads the
-caller's profile that way during sync writes. Select policies are unchanged,
+`account_consents` and the avatar policies on `storage.objects`. It is the
+last top-level condition of the `with check` clause of insert and update
+policies (the row being written) and of the `using` clause of update and
+delete policies (the rows a statement can target, or lock with
+`select … for update` / `for share`). So a sync session's insert fails with
+`42501`, and its updates, deletes and row locks find no row. The one exception
+is the `using` clause of `profiles_update_own`, which stays unguarded:
+`select … for share` applies it, and `deletion_barrier_open()` reads the
+caller's profile that way during every sync write. A sync session's profile
+update still fails its `with check` (`42501`). Select policies are unchanged,
 so a sync session still reads the caller's enrolments, consents and profile,
 which `has_consent` and `deletion_barrier_open` need. `begin_account_deletion`
 and `delete_my_app_data` refuse a sync session with `TH009`, and
@@ -345,6 +349,9 @@ its own responses. Messages and hints never contain user data. A new error
 takes the next free code and adds a row here;
 `supabase/tests/verify_service_session_guard.sh` fails when a migration raises
 a `TH` code that is not in this table, or with a different hint.
+`TH010` is the one code for "a sync service session may not call this
+function": every later function that writes and refuses a sync session raises
+`TH010`; no new code is added for that case.
 
 | Code | Name | Raised by | Message |
 |---|---|---|---|
@@ -357,7 +364,7 @@ a `TH` code that is not in this table, or with a different hint.
 | `TH007` | `sync_area_mismatch` | `sync_area_match_enrolment` (trigger on `sync_area`) | Sync area must match its enrolment |
 | `TH008` | `lapses_append_only` | `sync_lapse_append_only` (update trigger on `sync_lapse`) | Lapses are append-only |
 | `TH009` | `deletion_via_api_only` | `begin_account_deletion` and `delete_my_app_data` in a sync service session | Account deletion goes through the API |
-| `TH010` | `sync_session_refused` | `save_program_data` in a sync service session | The sync service writes only sync tables |
+| `TH010` | `sync_session_refused` | `save_program_data` in a sync service session; the shared code for every later writing function that refuses a sync session | The sync service writes only sync tables |
 
 Standard SQLSTATEs are kept where PostgreSQL defines the condition:
 `42501` for row-level security and privilege refusals and for
