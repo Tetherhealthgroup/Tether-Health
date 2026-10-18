@@ -1,4 +1,4 @@
-package com.breathefree.breathefree_patient
+package com.TetherHealthLLC.tetherhealth
 
 import io.flutter.embedding.android.FlutterActivity
 

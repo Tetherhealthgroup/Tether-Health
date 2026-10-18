@@ -36,7 +36,7 @@ val releaseSigningReady = signingProblems.isEmpty()
 val allowUnsignedRelease = System.getenv("TETHER_ALLOW_UNSIGNED_RELEASE") == "1"
 
 android {
-    namespace = "com.breathefree.breathefree_patient"
+    namespace = "com.TetherHealthLLC.tetherhealth"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -47,7 +47,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.breathefree.breathefree_patient"
+        applicationId = "com.TetherHealthLLC.tetherhealth"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
