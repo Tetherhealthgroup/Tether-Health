@@ -596,6 +596,42 @@ void main() {
     expect(controller.accessToken, isNull);
     expect(controller.profile, isNull);
   });
+
+  test(
+      'deletion and export do nothing after the session is invalidated '
+      'while the gateway still holds an identity', () async {
+    final auth = _FakeAuth(failSignOut: true);
+    final api = _FakeAccountDataApi();
+    final receipts = _FakeDeletionReceiptStore();
+    final controller = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _FakeProfileApi()),
+      accountData: api,
+      deletionReceipts: receipts,
+    );
+    addTearDown(controller.dispose);
+    await controller.signIn(email: 'person@example.test', password: 'password');
+    await controller.signOut();
+
+    // Precondition: the gateway still holds the identity, so only the
+    // controller's own invalidation flag stands between it and the server.
+    expect(auth.currentIdentity, isNotNull);
+    expect(controller.isSignedIn, isFalse);
+
+    final deletion = await controller.deleteAppData(password: 'password');
+    final export = await controller.exportData(password: 'password');
+
+    expect(auth.reauthCalls, 0);
+    expect(api.deleteCalls, 0);
+    expect(api.exportCalls, 0);
+    expect(api.receivedToken, isNull);
+    expect(receipts.intentSaves, 0);
+    expect(receipts.saved, isNull);
+    expect(controller.pendingAccountDeletion, isNull);
+    expect(controller.errorMessage, isNull);
+    expect(deletion, isNull);
+    expect(export, isNull);
+  });
 }
 
 class _FakeDeletionReceiptStore implements AccountDeletionReceiptStore {
@@ -604,6 +640,7 @@ class _FakeDeletionReceiptStore implements AccountDeletionReceiptStore {
   bool failIntent = false;
   bool failReceipt = false;
   bool hangReceipt = false;
+  int intentSaves = 0;
 
   @override
   Future<void> clear() async {
@@ -616,6 +653,7 @@ class _FakeDeletionReceiptStore implements AccountDeletionReceiptStore {
 
   @override
   Future<void> saveIntent(String accountId) async {
+    intentSaves++;
     if (failIntent) throw StateError('intent unavailable');
     saved = PendingAccountDeletion(accountId: accountId);
   }
@@ -645,6 +683,7 @@ class _FakeAuth
   String? resentEmail;
   String? recoveryEmail;
   String? updatedPassword;
+  int reauthCalls = 0;
   final _recoveryEvents = StreamController<void>.broadcast();
   @override
   AuthIdentity? get currentIdentity => _identity;
@@ -699,6 +738,7 @@ class _FakeAuth
 
   @override
   Future<AuthIdentity> reauthenticate({required String password}) async {
+    reauthCalls++;
     return _identity = const AuthIdentity(
       id: 'user-id',
       email: 'person@example.test',
@@ -721,9 +761,11 @@ class _FakeAuth
 class _FakeAccountDataApi implements AccountDataApiClient {
   String? receivedToken;
   int deleteCalls = 0;
+  int exportCalls = 0;
 
   @override
   Future<AccountDataExport> exportData(String accessToken) async {
+    exportCalls++;
     receivedToken = accessToken;
     return const AccountDataExport(document: {'schemaVersion': '1.0'});
   }
