@@ -1,0 +1,916 @@
+screen,screen_name,element,type,targets,summary
+welcome,Welcome,Get started,push,ob_programs,push → ob_programs
+welcome,Welcome,I already have an account,sheet,auth_signin,sheet → auth_signin
+welcome,Welcome,Terms and Privacy Notice,external,,external https://www.tetherhealthgroup.com/privacy/
+ob_programs,Choose programs,Back,back,,back
+ob_programs,Choose programs,See all 11 programs,push,catalog,push → catalog
+ob_programs,Choose programs,Continue with 2 programs,push,ob_focus,push → ob_focus
+ob_focus,Focus slots,Back,back,,back
+ob_focus,Focus slots,Add a third program,sheet,ob_third,sheet → ob_third
+ob_focus,Focus slots,Continue,push,ob_consent,push → ob_consent
+ob_third,Third program sheet,Continue,toast,,toast “Heartwise added as Learn only” then close
+ob_third,Third program sheet,Cancel,close,,close
+ob_consent,Layered consent,Back,back,,back
+ob_consent,Layered consent,Read the Privacy Notice,external,,external https://www.tetherhealthgroup.com/privacy/
+ob_consent,Layered consent,Agree and continue,submit,ob_basics,POST /v1/enrolments/consents then push → ob_basics
+ob_basics,Shared basics,Back,back,,back
+ob_basics,Shared basics,Continue,push,ob_setup,push → ob_setup
+ob_setup,Set up focus programs,Back,back,,back
+ob_setup,Set up focus programs,BreatheFree,push,bf_q1,push → bf_q1
+ob_setup,Set up focus programs,ScrollFree,push,sf_q1,push → sf_q1
+ob_setup,Set up focus programs,Health records (optional),push,records_add,push → records_add
+ob_setup,Set up focus programs,Continue,push,ob_reminders,push → ob_reminders
+ob_setup,Set up focus programs,Set up later,push,ob_reminders,push → ob_reminders
+ob_reminders,Reminder prime,Back,back,,back
+ob_reminders,Reminder prime,Turn on reminders,branch,ob_account ob_reminders_denied,branch: System permission prompt → Allowed: push → ob_account | Not allowed: push → ob_reminders_denied
+ob_reminders,Reminder prime,Not now,push,ob_account,push → ob_account
+ob_reminders_denied,Reminders denied,Back,back,,back
+ob_reminders_denied,Reminders denied,Open phone settings,os_settings,,os_settings
+ob_reminders_denied,Reminders denied,Continue without reminders,push,ob_account,push → ob_account
+ob_account,Save your progress,Close,close,,close
+ob_account,Save your progress,Continue with Apple,branch,auth_merge auth_link auth_social_error,auth (apple): Sign in with Apple result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error
+ob_account,Save your progress,Continue with Google,branch,auth_merge auth_link auth_social_error,auth (google): Sign in with Google result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error
+ob_account,Save your progress,Create account,submit,auth_verify,POST supabase /auth/v1/signup then push → auth_verify
+ob_account,Save your progress,Continue on this phone only,reset,today,reset → today
+auth_verify,Verify email,Back,back,,back
+auth_verify,Verify email,Open email app,external,,external message://
+auth_verify,Verify email,I’ve confirmed my email,push,auth_merge,push → auth_merge
+auth_verify,Verify email,Resend link (available in 0:42),toast,,toast “Link sent again”
+auth_signin,Sign in,Continue with Apple,branch,today auth_merge auth_social_new auth_social_error,"auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+auth_signin,Sign in,Continue with Google,branch,today auth_merge auth_social_new auth_social_error,"auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+auth_signin,Sign in,Forgot password?,push,auth_forgot,push → auth_forgot
+auth_signin,Sign in,Sign in,branch,today auth_merge auth_signin_error,branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error
+auth_signin,Sign in,Cancel,close,,close
+auth_signin_error,Sign-in error,Continue with Apple,branch,today auth_merge auth_social_new auth_social_error,"auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+auth_signin_error,Sign-in error,Continue with Google,branch,today auth_merge auth_social_new auth_social_error,"auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+auth_signin_error,Sign-in error,Forgot password?,push,auth_forgot,push → auth_forgot
+auth_signin_error,Sign-in error,Try again,branch,today auth_signin_error,branch: Sign-in result → Success: reset → today | Wrong password: replace → auth_signin_error
+auth_signin_error,Sign-in error,Cancel,close,,close
+auth_social_new,New account from Apple or Google,Back,back,,back
+auth_social_new,New account from Apple or Google,Create my account,submit,ob_programs,POST supabase /auth/v1/token?grant_type=id_token then push → ob_programs
+auth_social_new,New account from Apple or Google,Use a different account,back,,back
+auth_link,Link accounts,Back,back,,back
+auth_link,Link accounts,Forgot password?,push,auth_forgot,push → auth_forgot
+auth_link,Link accounts,Link and sign in,submit,today,POST supabase /auth/v1/user/identities (linkIdentity) then reset → today
+auth_link,Link accounts,Cancel,back,,back
+auth_social_error,Apple / Google sign-in failed,Close,close,,close
+auth_social_error,Apple / Google sign-in failed,Try again,branch,today,auth (google): Sign in with Google result → Success: reset → today | Error: toast “Still can’t reach Google. Try email.”
+auth_social_error,Apple / Google sign-in failed,Use email instead,replace,auth_signin,replace → auth_signin
+auth_forgot,Reset password,Back,back,,back
+auth_forgot,Reset password,Send reset link,submit,auth_forgot_sent,POST supabase /auth/v1/recover then replace → auth_forgot_sent
+auth_forgot_sent,Reset link sent,Back,back,,back
+auth_forgot_sent,Reset link sent,Back to welcome,reset,welcome,reset → welcome
+auth_newpass,Set new password,Close,close,,close
+auth_newpass,Set new password,Save password,submit,today,PUT supabase /auth/v1/user then reset → today
+auth_merge,Guest plan merge,Continue,submit,today,POST /v1/quit-plan/guest-import then reset → today
+auth_session,Session expired,Sign in,submit,,POST supabase /auth/v1/token then close
+auth_session,Session expired,Use Face ID,close,,close
+today,Today,Avatar · Account,push,account,push → account
+today,Today,Rescue,sheet,rescue_pick,sheet → rescue_pick
+today,Today,Start,sheet,checkin,sheet → checkin
+today,Today,BreatheFree home,push,bf_home,push → bf_home
+today,Today,ScrollFree home,push,sf_home,push → sf_home
+today,Today,How your lungs recover after you quit,push,learn_lesson,push → learn_lesson
+today,Today,Tab · Plans,tab,plans,tab → plans
+today,Today,Tab · Progress,tab,progress,tab → progress
+today,Today,Tab · Learn,tab,learn,tab → learn
+today,Today,Tab · Support,tab,support,tab → support
+today_loading,Today · loading,Avatar · Account,push,account,push → account
+today_loading,Today · loading,Rescue,sheet,rescue_pick,sheet → rescue_pick
+today_loading,Today · loading,Tab · Plans,tab,plans,tab → plans
+today_loading,Today · loading,Tab · Progress,tab,progress,tab → progress
+today_loading,Today · loading,Tab · Learn,tab,learn,tab → learn
+today_loading,Today · loading,Tab · Support,tab,support,tab → support
+today_offline,Today · offline,Avatar · Account,push,account,push → account
+today_offline,Today · offline,Rescue,sheet,rescue_pick,sheet → rescue_pick
+today_offline,Today · offline,Tab · Plans,tab,plans,tab → plans
+today_offline,Today · offline,Tab · Progress,tab,progress,tab → progress
+today_offline,Today · offline,Tab · Learn,tab,learn,tab → learn
+today_offline,Today · offline,Tab · Support,tab,support,tab → support
+today_empty,Today · nothing in focus,Avatar · Account,push,account,push → account
+today_empty,Today · nothing in focus,Choose a focus program,push,account_programs,push → account_programs
+today_empty,Today · nothing in focus,Browse lessons,tab,learn,tab → learn
+today_empty,Today · nothing in focus,Support,tab,support,tab → support
+today_empty,Today · nothing in focus,Tab · Plans,tab,plans,tab → plans
+today_empty,Today · nothing in focus,Tab · Progress,tab,progress,tab → progress
+today_empty,Today · nothing in focus,Tab · Learn,tab,learn,tab → learn
+today_empty,Today · nothing in focus,Tab · Support,tab,support,tab → support
+today_safety,Today · safety pinned,Avatar · Account,push,account,push → account
+today_safety,Today · safety pinned,Yes · call 911,call,,call 911
+today_safety,Today · safety pinned,No symptoms,push,hw_recheck,push → hw_recheck
+today_safety,Today · safety pinned,Tab · Plans,tab,plans,tab → plans
+today_safety,Today · safety pinned,Tab · Progress,tab,progress,tab → progress
+today_safety,Today · safety pinned,Tab · Learn,tab,learn,tab → learn
+today_safety,Today · safety pinned,Tab · Support,tab,support,tab → support
+checkin,Daily check-in,Save check-in,submit,checkin_done,POST /v1/records/check-ins then replace → checkin_done
+checkin_done,Check-in saved,Close,close,,close
+checkin_done,Check-in saved,Start,push,rescue_active,push → rescue_active
+checkin_done,Check-in saved,Set it,push,sf_goal,push → sf_goal
+checkin_done,Check-in saved,Back to Today,reset,today,reset → today
+rescue_pick,Rescue,A cigarette,replace,rescue_active,replace → rescue_active
+rescue_pick,Rescue,Urge to scroll,replace,sf_pause,replace → sf_pause
+rescue_pick,Rescue,Stress,replace,rescue_active,replace → rescue_active
+rescue_pick,Rescue,Not sure,replace,rescue_active,replace → rescue_active
+rescue_pick,Rescue,Start,replace,rescue_active,replace → rescue_active
+rescue_pick,Rescue,Talk to a person,tab,support,tab → support
+rescue_pick,Rescue,Emergency,push,crisis,push → crisis
+rescue_active,Active tool,Close,close,,close
+rescue_active,Active tool,Switch tool,sheet,rescue_tools,sheet → rescue_tools
+rescue_active,Active tool,Get support,push,rescue_escalate,push → rescue_escalate
+rescue_active,Active tool,I’m done,replace,rescue_result,replace → rescue_result
+rescue_tools,Switch tool,Start this tool,replace,rescue_active,replace → rescue_active
+rescue_tools,Switch tool,Cancel,close,,close
+rescue_result,Recheck + result,Close,close,,close
+rescue_result,Recheck + result,Still strong? Get more help,push,rescue_escalate,push → rescue_escalate
+rescue_result,Recheck + result,Back to Today,submit,today,POST /v1/records/rescues then reset → today
+rescue_escalate,Add a person,Close,close,,close
+rescue_escalate,Add a person,Call,call,,call 1-800-784-8669
+rescue_escalate,Add a person,Text Jordan,sheet,support_message,sheet → support_message
+rescue_escalate,Add a person,Call or text 988,push,crisis,push → crisis
+rescue_escalate,Add a person,Call 911,call,,call 911
+rescue_escalate,Add a person,Try another tool,sheet,rescue_tools,sheet → rescue_tools
+crisis,Crisis support,Close,close,,close
+crisis,Crisis support,Call 988,call,,call 988
+crisis,Crisis support,Text 988,sms,,sms 988
+crisis,Crisis support,Call 911,call,,call 911
+crisis,Crisis support,"Things that help: walk the dog, shower, music",push,ea_plan,push → ea_plan
+plans,My plans,Avatar · Account,push,account,push → account
+plans,My plans,BreatheFree,push,bf_home,push → bf_home
+plans,My plans,ScrollFree,push,sf_home,push → sf_home
+plans,My plans,ClearAir,push,ca_intro,push → ca_intro
+plans,My plans,Medication center,push,bf_meds,push → bf_meds
+plans,My plans,Programs & sharing,push,account_programs,push → account_programs
+plans,My plans,Add a program,push,catalog,push → catalog
+plans,My plans,Tab · Today,tab,today,tab → today
+plans,My plans,Tab · Progress,tab,progress,tab → progress
+plans,My plans,Tab · Learn,tab,learn,tab → learn
+plans,My plans,Tab · Support,tab,support,tab → support
+catalog,Add a program,Back,back,,back
+catalog,Add a program,BreatheFree,push,bf_intro,push → bf_intro
+catalog,Add a program,ScrollFree,push,sf_intro,push → sf_intro
+catalog,Add a program,ClearAir,push,ca_intro,push → ca_intro
+catalog,Add a program,Heartwise,push,hw_intro,push → hw_intro
+catalog,Add a program,Steady,push,st_intro,push → st_intro
+catalog,Add a program,Renew,push,re_intro,push → re_intro
+catalog,Add a program,Nourish,push,nu_intro,push → nu_intro
+catalog,Add a program,Stride,push,sd_intro,push → sd_intro
+catalog,Add a program,Ease,push,ea_intro,push → ea_intro
+catalog,Add a program,Checkup,push,ck_intro,push → ck_intro
+catalog,Add a program,Beacon,push,be_intro,push → be_intro
+focus_full,Focus slots full,Continue,branch,plans hw_q1,decide choice:focus_full.option: Chosen option → Learn only: toast “Heartwise added as Learn only” then tab → plans | Swap: replace → hw_q1
+focus_full,Focus slots full,Cancel,close,,close
+program_settings,Program settings,Back,back,,back
+program_settings,Program settings,Export BreatheFree data,toast,,toast “Export is being prepared. We’ll notify you.”
+program_settings,Program settings,Leave BreatheFree,sheet,account_leave,sheet → account_leave
+program_settings,Program settings,Save changes,submit,,PATCH /v1/enrolments/:id then toast “Saved” then back
+progress,Progress,Avatar · Account,push,account,push → account
+progress,Progress,Cigarettes / day,push,bf_progress,push → bf_progress
+progress,Progress,Social minutes / day,push,sf_week,push → sf_week
+progress,Progress,Manage,push,account_privacy,push → account_privacy
+progress,Progress,Tab · Today,tab,today,tab → today
+progress,Progress,Tab · Plans,tab,plans,tab → plans
+progress,Progress,Tab · Learn,tab,learn,tab → learn
+progress,Progress,Tab · Support,tab,support,tab → support
+progress_empty,Progress · empty,Avatar · Account,push,account,push → account
+progress_empty,Progress · empty,Do a check-in,sheet,checkin,sheet → checkin
+progress_empty,Progress · empty,Tab · Today,tab,today,tab → today
+progress_empty,Progress · empty,Tab · Plans,tab,plans,tab → plans
+progress_empty,Progress · empty,Tab · Learn,tab,learn,tab → learn
+progress_empty,Progress · empty,Tab · Support,tab,support,tab → support
+progress_error,Progress · error,Avatar · Account,push,account,push → account
+progress_error,Progress · error,Try again,replace,progress,replace → progress
+progress_error,Progress · error,Tab · Today,tab,today,tab → today
+progress_error,Progress · error,Tab · Plans,tab,plans,tab → plans
+progress_error,Progress · error,Tab · Learn,tab,learn,tab → learn
+progress_error,Progress · error,Tab · Support,tab,support,tab → support
+learn,Learn,Avatar · Account,push,account,push → account
+learn,Learn,Cravings: what to expect today,push,learn_lesson,push → learn_lesson
+learn,Learn,Why “one more video” never feels like enough,push,learn_lesson,push → learn_lesson
+learn,Learn,How your lungs recover after you quit,push,learn_lesson,push → learn_lesson
+learn,Learn,Tab · Today,tab,today,tab → today
+learn,Learn,Tab · Plans,tab,plans,tab → plans
+learn,Learn,Tab · Progress,tab,progress,tab → progress
+learn,Learn,Tab · Support,tab,support,tab → support
+learn_error,Learn · error,Avatar · Account,push,account,push → account
+learn_error,Learn · error,Try again,replace,learn,replace → learn
+learn_error,Learn · error,Open downloads,push,learn_lesson,push → learn_lesson
+learn_error,Learn · error,Tab · Today,tab,today,tab → today
+learn_error,Learn · error,Tab · Plans,tab,plans,tab → plans
+learn_error,Learn · error,Tab · Progress,tab,progress,tab → progress
+learn_error,Learn · error,Tab · Support,tab,support,tab → support
+learn_lesson,Lesson,Back,back,,back
+learn_lesson,Lesson,Play,toast,,toast “Playing audio”
+learn_lesson,Lesson,Transcript,toast,,toast “Transcript opened”
+learn_lesson,Lesson,Mark complete,submit,,POST /v1/records/lessons then toast “Lesson complete” then back
+learn_lesson,Lesson,Save for offline,toast,,toast “Saved for offline”
+support,Support,Avatar · Account,push,account,push → account
+support,Support,Call now,call,,call 1-800-784-8669
+support,Support,Request call-back,sheet,support_callback,sheet → support_callback
+support,Support,Jordan,sheet,support_message,sheet → support_message
+support,Support,Add a ScrollFree buddy,push,sf_buddy,push → sf_buddy
+support,Support,Dr. Patel’s clinic,push,support_message_care,push → support_message_care
+support,Support,Call or text 988,push,crisis,push → crisis
+support,Support,Call 911,call,,call 911
+support,Support,Tab · Today,tab,today,tab → today
+support,Support,Tab · Plans,tab,plans,tab → plans
+support,Support,Tab · Progress,tab,progress,tab → progress
+support,Support,Tab · Learn,tab,learn,tab → learn
+support_empty,Support · empty,Avatar · Account,push,account,push → account
+support_empty,Support · empty,Call,call,,call 1-800-784-8669
+support_empty,Support · empty,Add,push,support_add_person,push → support_add_person
+support_empty,Support · empty,Connect,push,support_connect,push → support_connect
+support_empty,Support · empty,Call or text 988,push,crisis,push → crisis
+support_empty,Support · empty,Call 911,call,,call 911
+support_empty,Support · empty,Tab · Today,tab,today,tab → today
+support_empty,Support · empty,Tab · Plans,tab,plans,tab → plans
+support_empty,Support · empty,Tab · Progress,tab,progress,tab → progress
+support_empty,Support · empty,Tab · Learn,tab,learn,tab → learn
+support_callback,Request call-back,Send referral,submit,,POST /v1/care/referrals then toast “Request sent. Expect a call within 2 business days.” then close
+support_callback,Request call-back,Cancel,close,,close
+support_message,Preview message,Open Messages,sms,,sms Jordan
+support_message,Preview message,Cancel,close,,close
+support_message_care,Message care team,Back,back,,back
+support_message_care,Message care team,Call or text 988,push,crisis,push → crisis
+support_message_care,Message care team,Call 911,call,,call 911
+support_message_care,Message care team,Send message,submit,,POST /v1/care/messages then toast “Message sent” then back
+support_add_person,Add a supporter,Back,back,,back
+support_add_person,Add a supporter,Save supporter,submit,,POST /v1/care/supporters then toast “Jordan added” then back
+support_connect,Connect a clinic,Back,back,,back
+support_connect,Connect a clinic,Connect,submit,,POST /v1/care/connections then toast “Connected to Dr. Patel’s clinic” then back
+account,Account,Close,close,,close
+account,Account,Health records,push,records_hub,push → records_hub
+account,Account,Sign-in methods,push,account_signin_methods,push → account_signin_methods
+account,Account,Programs & sharing,push,account_programs,push → account_programs
+account,Account,Notifications,push,account_notifications,push → account_notifications
+account,Account,Privacy & consent,push,account_privacy,push → account_privacy
+account,Account,Your data,push,account_data,push → account_data
+account,Account,Text size & contrast,os_settings,,os_settings
+account,Account,Language,toast,,toast “Language set to English”
+account,Account,Help & legal,external,,external https://www.tetherhealthgroup.com/support/
+account,Account,Sign out,sheet,account_signout,sheet → account_signout
+account_signin_methods,Sign-in methods,Back,back,,back
+account_signin_methods,Sign-in methods,Google,branch,auth_link auth_social_error,auth (google): Sign in with Google result → Success: toast “Google connected” | Email already has a Tether account: push → auth_link | Cancelled: toast “Cancelled” | Error: push → auth_social_error
+account_signin_methods,Sign-in methods,Email & password,push,auth_newpass,push → auth_newpass
+account_programs,Programs & sharing,Back,back,,back
+account_programs,Programs & sharing,BreatheFree,push,program_settings,push → program_settings
+account_programs,Programs & sharing,ScrollFree,push,program_settings,push → program_settings
+account_programs,Programs & sharing,ClearAir,push,program_settings,push → program_settings
+account_programs,Programs & sharing,Heartwise,push,program_settings,push → program_settings
+account_programs,Programs & sharing,Add a program,push,catalog,push → catalog
+account_leave,Leave a program,Leave BreatheFree,submit,plans,DELETE /v1/enrolments/:id then toast “You left BreatheFree” then reset → plans
+account_leave,Leave a program,Cancel,close,,close
+account_notifications,Notifications,Back,back,,back
+account_notifications,Notifications,BreatheFree,toast,,toast “Reminder time saved”
+account_notifications,Notifications,ScrollFree,toast,,toast “Reminder time saved”
+account_notifications,Notifications,Save,submit,,PATCH /v1/notifications/preferences then toast “Saved” then back
+account_privacy,Privacy & consent,Back,back,,back
+account_privacy,Privacy & consent,Care-team sharing,push,account_programs,push → account_programs
+account_privacy,Privacy & consent,Consent history,toast,,toast “Consent history opened”
+account_privacy,Privacy & consent,Privacy Notice,external,,external https://www.tetherhealthgroup.com/privacy/
+account_privacy,Privacy & consent,Save,submit,,PATCH /v1/enrolments/consents then toast “Saved” then back
+account_data,Your data,Back,back,,back
+account_data,Your data,Download everything,submit,,POST /v1/account/export then toast “We’re preparing your file. We’ll notify you when it’s ready.”
+account_data,Your data,Export a care summary,push,hw_summary,push → hw_summary
+account_data,Your data,Delete account and all data,push,account_delete,push → account_delete
+account_delete,Delete account,Back,back,,back
+account_delete,Delete account,Download a copy first,push,account_data,push → account_data
+account_delete,Delete account,Delete everything,submit,account_deleted,DELETE /v1/account/data then replace → account_deleted
+account_deleted,Deletion receipt,Done,reset,welcome,reset → welcome
+account_signout,Sign out,Sign out,reset,welcome,reset → welcome
+account_signout,Sign out,Cancel,close,,close
+sys_update,Update required,Update now,external,,external https://apps.apple.com/app/tether-health
+sys_update,Update required,Open Rescue,sheet,rescue_pick,sheet → rescue_pick
+bf_intro,BreatheFree intro,Back,back,,back
+bf_intro,BreatheFree intro,Set up BreatheFree,push,bf_q1,push → bf_q1
+bf_intro,BreatheFree intro,Add as Learn only,toast,plans,toast “BreatheFree added as Learn only” then tab → plans
+bf_q1,Baseline: amount,Back,back,,back
+bf_q1,Baseline: amount,Next,push,bf_q2,push → bf_q2
+bf_q2,Baseline: triggers,Back,back,,back
+bf_q2,Baseline: triggers,Next,push,bf_q3,push → bf_q3
+bf_q3,Baseline: reasons,Back,back,,back
+bf_q3,Baseline: reasons,Save my reasons,push,bf_path,push → bf_path
+bf_path,Choose path,Back,back,,back
+bf_path,Choose path,Talk to a person first?,tab,support,tab → support
+bf_path,Choose path,Continue with this path,branch,bf_date bf_support bf_stepdown bf_home_explore ob_setup,decide choice:bf_path.path: Selected path → Set a quit date: push → bf_date | Quit today: push → bf_support | Reduce gradually: push → bf_stepdown | Explore first: replace → bf_home_explore (onboarding: ob_setup)
+bf_date,Select quit date,Back,back,,back
+bf_date,Select quit date,Confirm this date,push,bf_support,push → bf_support
+bf_stepdown,Step-down schedule,Back,back,,back
+bf_stepdown,Step-down schedule,Save schedule,push,bf_support,push → bf_support
+bf_support,Support & preparation,Back,back,,back
+bf_support,Support & preparation,Jordan,push,support_add_person,push → support_add_person
+bf_support,Support & preparation,Add a supporter,push,support_add_person,push → support_add_person
+bf_support,Support & preparation,Review my plan,push,bf_review,push → bf_review
+bf_review,Review plan,Back,back,,back
+bf_review,Review plan,Quit approach,push,bf_path,push → bf_path
+bf_review,Review plan,Quit date,push,bf_date,push → bf_date
+bf_review,Review plan,Top reason,push,bf_q3,push → bf_q3
+bf_review,Review plan,Support,push,bf_support,push → bf_support
+bf_review,Review plan,Space,push,bf_support,push → bf_support
+bf_review,Review plan,Start my plan,submit,bf_home ob_setup,PUT /v1/quit-plan then replace → bf_home (onboarding: ob_setup)
+bf_review,Review plan,Save and finish later,tab,plans,tab → plans
+bf_home,BreatheFree home,Back,back,,back
+bf_home,BreatheFree home,Avatar · Account,push,account,push → account
+bf_home,BreatheFree home,Rescue,sheet,rescue_pick,sheet → rescue_pick
+bf_home,BreatheFree home,Daily check-in,sheet,checkin,sheet → checkin
+bf_home,BreatheFree home,Medication center,push,bf_meds,push → bf_meds
+bf_home,BreatheFree home,Progress,push,bf_progress,push → bf_progress
+bf_home,BreatheFree home,Edit my plan,push,bf_review,push → bf_review
+bf_home,BreatheFree home,Program settings,push,program_settings,push → program_settings
+bf_home,BreatheFree home,Tab · Today,tab,today,tab → today
+bf_home,BreatheFree home,Tab · Progress,tab,progress,tab → progress
+bf_home,BreatheFree home,Tab · Learn,tab,learn,tab → learn
+bf_home,BreatheFree home,Tab · Support,tab,support,tab → support
+bf_home_quitday,BreatheFree · quit day,Back,back,,back
+bf_home_quitday,BreatheFree · quit day,Avatar · Account,push,account,push → account
+bf_home_quitday,BreatheFree · quit day,Rescue,sheet,rescue_pick,sheet → rescue_pick
+bf_home_quitday,BreatheFree · quit day,I smoked or had a slip,push,bf_slip,push → bf_slip
+bf_home_quitday,BreatheFree · quit day,Morning check-in,sheet,checkin,sheet → checkin
+bf_home_quitday,BreatheFree · quit day,Medication center,push,bf_meds,push → bf_meds
+bf_home_quitday,BreatheFree · quit day,Tab · Today,tab,today,tab → today
+bf_home_quitday,BreatheFree · quit day,Tab · Progress,tab,progress,tab → progress
+bf_home_quitday,BreatheFree · quit day,Tab · Learn,tab,learn,tab → learn
+bf_home_quitday,BreatheFree · quit day,Tab · Support,tab,support,tab → support
+bf_home_explore,BreatheFree · explore,Back,back,,back
+bf_home_explore,BreatheFree · explore,Avatar · Account,push,account,push → account
+bf_home_explore,BreatheFree · explore,Rescue,sheet,rescue_pick,sheet → rescue_pick
+bf_home_explore,BreatheFree · explore,Cravings: what to expect,push,learn_lesson,push → learn_lesson
+bf_home_explore,BreatheFree · explore,What quit medicines can do,push,learn_lesson,push → learn_lesson
+bf_home_explore,BreatheFree · explore,Choose a path,push,bf_path,push → bf_path
+bf_home_explore,BreatheFree · explore,Tab · Today,tab,today,tab → today
+bf_home_explore,BreatheFree · explore,Tab · Progress,tab,progress,tab → progress
+bf_home_explore,BreatheFree · explore,Tab · Learn,tab,learn,tab → learn
+bf_home_explore,BreatheFree · explore,Tab · Support,tab,support,tab → support
+bf_slip,Slip recovery,Close,close,,close
+bf_slip,Slip recovery,Save and start a 2-min Rescue,submit,rescue_active bf_date,POST /v1/records/lapses then decide choice:bf_slip.next: Selected option → Continue from this moment: replace → rescue_active | Choose a new quit time: replace → bf_date
+bf_slip,Slip recovery,Skip for now,back,,back
+bf_meds,Medication center,Back,back,,back
+bf_meds,Medication center,Taken today,toast,,toast “Recorded: taken at 8:07 AM”
+bf_meds,Medication center,Not today,toast,,toast “Recorded: not taken”
+bf_meds,Medication center,Nicotine replacement,push,learn_lesson,push → learn_lesson
+bf_meds,Medication center,Prescription options,push,learn_lesson,push → learn_lesson
+bf_meds,Medication center,Side effect or worrying symptom?,push,support_message_care,push → support_message_care
+bf_meds,Medication center,Add or update recorded plan,push,bf_meds_edit,push → bf_meds_edit
+bf_meds_edit,Edit recorded plan,Back,back,,back
+bf_meds_edit,Edit recorded plan,Save plan,submit,,PUT /v1/program-data/bf/meds then toast “Plan saved” then back
+bf_progress,BreatheFree progress,Back,back,,back
+bf_progress,BreatheFree progress,How estimates work,sheet,bf_estimates,sheet → bf_estimates
+bf_estimates,How estimates work,Edit numbers,toast,,toast “Opened baseline settings” then close
+bf_estimates,How estimates work,Done,close,,close
+sf_intro,ScrollFree intro,Back,back,,back
+sf_intro,ScrollFree intro,Set up ScrollFree,push,sf_q1,push → sf_q1
+sf_intro,ScrollFree intro,Add as Learn only,toast,plans,toast “ScrollFree added as Learn only” then tab → plans
+sf_q1,Baseline: use,Back,back,,back
+sf_q1,Baseline: use,Next,push,sf_q2,push → sf_q2
+sf_q2,Baseline: triggers,Back,back,,back
+sf_q2,Baseline: triggers,Next,push,sf_goal,push → sf_goal
+sf_goal,Goal & windows,Back,back,,back
+sf_goal,Goal & windows,Connect Screen Time,push,sf_screentime,push → sf_screentime
+sf_goal,Goal & windows,Save my goal,push,sf_buddy,push → sf_buddy
+sf_screentime,Connect Screen Time,Back,back,,back
+sf_screentime,Connect Screen Time,Allow access,branch,sf_screentime_denied,branch: iOS Screen Time permission → Allowed: toast “Screen Time connected” then back | Not allowed: replace → sf_screentime_denied
+sf_screentime,Connect Screen Time,Not now,back,,back
+sf_screentime_denied,Screen Time denied,Back,back,,back
+sf_screentime_denied,Screen Time denied,Continue with self-report,back,,back
+sf_screentime_denied,Screen Time denied,Open phone settings,os_settings,,os_settings
+sf_buddy,Accountability buddy,Back,back,,back
+sf_buddy,Accountability buddy,Save and finish,submit,sf_home ob_setup,PUT /v1/program-data/sf/plan then replace → sf_home (onboarding: ob_setup)
+sf_buddy,Accountability buddy,Skip for now,replace,sf_home ob_setup,replace → sf_home (onboarding: ob_setup)
+sf_home,ScrollFree home,Back,back,,back
+sf_home,ScrollFree home,Avatar · Account,push,account,push → account
+sf_home,ScrollFree home,Pause 60,push,sf_pause,push → sf_pause
+sf_home,ScrollFree home,This week,push,sf_week,push → sf_week
+sf_home,ScrollFree home,Had a long scroll?,push,sf_slip,push → sf_slip
+sf_home,ScrollFree home,Goal & windows,push,sf_goal,push → sf_goal
+sf_home,ScrollFree home,Buddy,push,sf_buddy,push → sf_buddy
+sf_home,ScrollFree home,Program settings,push,program_settings,push → program_settings
+sf_home,ScrollFree home,Tab · Today,tab,today,tab → today
+sf_home,ScrollFree home,Tab · Progress,tab,progress,tab → progress
+sf_home,ScrollFree home,Tab · Learn,tab,learn,tab → learn
+sf_home,ScrollFree home,Tab · Support,tab,support,tab → support
+sf_pause,Pause 60,Close,close,,close
+sf_pause,Pause 60,"I’m good, put it down",submit,today,POST /v1/program-data/sf/pauses then toast “Nice. Logged as a pause.” then reset → today
+sf_pause,Pause 60,Open anyway (logged as information),toast,,toast “Logged. No judgment.” then close
+sf_slip,Long-scroll recovery,Back,back,,back
+sf_slip,Long-scroll recovery,Save,submit,sf_home,POST /v1/records/lapses then toast “Saved” then replace → sf_home
+sf_week,Weekly reflection,Back,back,,back
+sf_week,Weekly reflection,Yes,toast,,toast “Goal set to 75 min” then back
+sf_week,Weekly reflection,Stay at 90,back,,back
+ca_intro,ClearAir intro,Back,back,,back
+ca_intro,ClearAir intro,Set up ClearAir,push,ca_q1,push → ca_q1
+ca_intro,ClearAir intro,Add as Learn only,toast,plans,toast “ClearAir added as Learn only” then tab → plans
+ca_q1,Diagnosis & plan,Back,back,,back
+ca_q1,Diagnosis & plan,Next,branch,ca_plan ca_noplan,decide choice:ca_q1.has_plan: Has a written action plan? → Yes: push → ca_plan | No / Not sure: push → ca_noplan
+ca_plan,Enter action plan,Back,back,,back
+ca_plan,Enter action plan,Add a photo of my plan,toast,,toast “Camera opened”
+ca_plan,Enter action plan,Save plan,submit,ca_home ob_setup,PUT /v1/program-data/ca/plan then replace → ca_home (onboarding: ob_setup)
+ca_noplan,No action plan yet,Back,back,,back
+ca_noplan,No action plan yet,Symptom diary,push,ca_symptoms,push → ca_symptoms
+ca_noplan,No action plan yet,Questions for my next visit,push,learn_lesson,push → learn_lesson
+ca_noplan,No action plan yet,Message my care team,push,support_message_care,push → support_message_care
+ca_noplan,No action plan yet,Continue to ClearAir,replace,ca_home ob_setup,replace → ca_home (onboarding: ob_setup)
+ca_home,ClearAir home,Back,back,,back
+ca_home,ClearAir home,Avatar · Account,push,account,push → account
+ca_home,ClearAir home,Check my zone,push,ca_zone,push → ca_zone
+ca_home,ClearAir home,Red-zone plan,push,ca_red,push → ca_red
+ca_home,ClearAir home,Log symptoms,push,ca_symptoms,push → ca_symptoms
+ca_home,ClearAir home,Progress,push,ca_progress,push → ca_progress
+ca_home,ClearAir home,My action plan,push,ca_plan,push → ca_plan
+ca_home,ClearAir home,Program settings,push,program_settings,push → program_settings
+ca_home,ClearAir home,Tab · Today,tab,today,tab → today
+ca_home,ClearAir home,Tab · Progress,tab,progress,tab → progress
+ca_home,ClearAir home,Tab · Learn,tab,learn,tab → learn
+ca_home,ClearAir home,Tab · Support,tab,support,tab → support
+ca_zone,Zone check,Back,back,,back
+ca_zone,Zone check,Save and see my steps,submit,ca_home ca_yellow ca_red,POST /v1/program-data/ca/zone-checks then decide ca.zone: Computed zone → Green: toast “Green zone · follow your daily routine” then replace → ca_home | Yellow: replace → ca_yellow | Red: replace → ca_red | Invalid peak flow: toast “Check your peak flow: 50–900 L/min”
+ca_yellow,Yellow zone,Back,back,,back
+ca_yellow,Yellow zone,Getting worse or can’t speak in full sentences?,replace,ca_red,replace → ca_red
+ca_yellow,Yellow zone,Remind me in 20 min,toast,ca_home,toast “Reminder set for 20 minutes” then replace → ca_home
+ca_yellow,Yellow zone,Message care team,push,support_message_care,push → support_message_care
+ca_red,Red zone,Close,close,,close
+ca_red,Red zone,Call 911,call,,call 911
+ca_red,Red zone,Tell Maria,sheet,support_message,sheet → support_message
+ca_symptoms,Symptom log,Back,back,,back
+ca_symptoms,Symptom log,Save,submit,,POST /v1/program-data/ca/symptoms then toast “Saved” then back
+ca_progress,ClearAir progress,Back,back,,back
+ca_progress,ClearAir progress,Create visit summary,push,hw_summary,push → hw_summary
+hw_intro,Heartwise intro,Back,back,,back
+hw_intro,Heartwise intro,Set up Heartwise,sheet,focus_full,sheet → focus_full
+hw_intro,Heartwise intro,Add as Learn only,toast,plans,toast “Heartwise added as Learn only” then tab → plans
+hw_q1,Baseline,Back,back,,back
+hw_q1,Baseline,Next,push,hw_targets,push → hw_targets
+hw_targets,Clinician targets,Back,back,,back
+hw_targets,Clinician targets,Import from my health record,push,records_add,push → records_add
+hw_targets,Clinician targets,Save targets,submit,hw_home ob_setup,PUT /v1/program-data/hw/targets then replace → hw_home (onboarding: ob_setup)
+hw_home,Heartwise home,Back,back,,back
+hw_home,Heartwise home,Avatar · Account,push,account,push → account
+hw_home,Heartwise home,Log blood pressure,push,hw_log,push → hw_log
+hw_home,Heartwise home,Trends,push,hw_trends,push → hw_trends
+hw_home,Heartwise home,Cholesterol panel,push,hw_lipids,push → hw_lipids
+hw_home,Heartwise home,Visit summary,push,hw_summary,push → hw_summary
+hw_home,Heartwise home,From your health record,push,records_item,push → records_item
+hw_home,Heartwise home,My targets,push,hw_targets,push → hw_targets
+hw_home,Heartwise home,Program settings,push,program_settings,push → program_settings
+hw_home,Heartwise home,Call 911,call,,call 911
+hw_home,Heartwise home,Tab · Today,tab,today,tab → today
+hw_home,Heartwise home,Tab · Progress,tab,progress,tab → progress
+hw_home,Heartwise home,Tab · Learn,tab,learn,tab → learn
+hw_home,Heartwise home,Tab · Support,tab,support,tab → support
+hw_log,Log BP · reading 1,Back,back,,back
+hw_log,Log BP · reading 1,Next reading,push,hw_log2,push → hw_log2
+hw_log2,Log BP · reading 2,Back,back,,back
+hw_log2,Log BP · reading 2,Save readings,submit,hw_result hw_log_error hw_crisis,POST /v1/program-data/hw/readings then decide hw.bp: Validated average → Valid · below crisis range: replace → hw_result | Invalid value: replace → hw_log_error | ≥180 top or ≥120 bottom: replace → hw_crisis
+hw_log_error,Log BP · validation,Back,back,,back
+hw_log_error,Log BP · validation,Save readings,disabled,,disabled
+hw_log_error,Log BP · validation,Edit reading,replace,hw_log2,replace → hw_log2
+hw_result,Reading saved,Close,close,,close
+hw_result,Reading saved,See trends,replace,hw_trends,replace → hw_trends
+hw_result,Reading saved,Back to Heartwise,replace,hw_home,replace → hw_home
+hw_crisis,Crisis range,Close,close,,close
+hw_crisis,Crisis range,Yes · call 911,call,,call 911
+hw_crisis,Crisis range,No symptoms · re-check in 5 min,replace,hw_recheck,replace → hw_recheck
+hw_recheck,Re-check timer,Close,close,,close
+hw_recheck,Re-check timer,Call 911,call,,call 911
+hw_recheck,Re-check timer,Re-check now,replace,hw_log,replace → hw_log
+hw_recheck,Re-check timer,Contact my clinician,push,support_message_care,push → support_message_care
+hw_trends,Trends,Back,back,,back
+hw_trends,Trends,Create visit summary,push,hw_summary,push → hw_summary
+hw_lipids,Cholesterol panel,Back,back,,back
+hw_lipids,Cholesterol panel,Save panel,submit,,POST /v1/program-data/hw/lipids then toast “Panel saved” then back
+hw_summary,Visit summary,Back,back,,back
+hw_summary,Visit summary,Send summary,submit,,POST /v1/care/summaries then toast “Summary sent to Dr. Patel’s clinic” then back
+hw_summary,Visit summary,Save as PDF,toast,,toast “PDF saved to Files”
+st_intro,Steady intro,Back,back,,back
+st_intro,Steady intro,Set up Steady,push,st_q1,push → st_q1
+st_intro,Steady intro,Add as Learn only,toast,plans,toast “Steady added as Learn only” then tab → plans
+st_q1,Type & device,Back,back,,back
+st_q1,Type & device,Next,push,st_range,push → st_range
+st_range,Range & low plan,Back,back,,back
+st_range,Range & low plan,Import from my health record,push,records_add,push → records_add
+st_range,Range & low plan,Save range,submit,st_home ob_setup,PUT /v1/program-data/st/range then replace → st_home (onboarding: ob_setup)
+st_home,Steady home,Back,back,,back
+st_home,Steady home,Avatar · Account,push,account,push → account
+st_home,Steady home,Log a reading,push,st_log,push → st_log
+st_home,Steady home,Meal energy reset,push,st_reset,push → st_reset
+st_home,Steady home,Patterns,push,st_patterns,push → st_patterns
+st_home,Steady home,A1C history,push,st_a1c,push → st_a1c
+st_home,Steady home,My range & low plan,push,st_range,push → st_range
+st_home,Steady home,Program settings,push,program_settings,push → program_settings
+st_home,Steady home,Tab · Today,tab,today,tab → today
+st_home,Steady home,Tab · Progress,tab,progress,tab → progress
+st_home,Steady home,Tab · Learn,tab,learn,tab → learn
+st_home,Steady home,Tab · Support,tab,support,tab → support
+st_log,Log reading,Back,back,,back
+st_log,Log reading,Save reading,submit,st_home st_low,POST /v1/program-data/st/readings then decide st.glucose: Reading vs. your range → In or above range: toast “Saved” then replace → st_home | Below your low: replace → st_low | Invalid (outside 20–600): toast “Check your meter reading”
+st_low,Low reading,Close,close,,close
+st_low,Low reading,Call 911,call,,call 911
+st_low,Low reading,Re-check now,replace,st_log,replace → st_log
+st_reset,Meal energy reset,Back,back,,back
+st_reset,Meal energy reset,Done,toast,,toast “Nice work” then back
+st_patterns,Patterns,Back,back,,back
+st_a1c,A1C,Back,back,,back
+st_a1c,A1C,Save,submit,,POST /v1/program-data/st/a1c then toast “Saved” then back
+re_intro,Renew intro,Back,back,,back
+re_intro,Renew intro,Set up Renew,push,re_q1,push → re_q1
+re_intro,Renew intro,Add as Learn only,toast,plans,toast “Renew added as Learn only” then tab → plans
+re_q1,Risk check,Back,back,,back
+re_q1,Risk check,See what this means,push,re_result,push → re_result
+re_result,Risk result,Back,back,,back
+re_result,Risk result,Also see Heartwise and Steady,push,catalog,push → catalog
+re_result,Risk result,Save my plan,submit,re_home ob_setup,PUT /v1/program-data/re/plan then replace → re_home (onboarding: ob_setup)
+re_home,Renew home,Back,back,,back
+re_home,Renew home,Avatar · Account,push,account,push → account
+re_home,Renew home,Add lab results,push,re_labs,push → re_labs
+re_home,Renew home,Lab history,push,re_history,push → re_history
+re_home,Renew home,Check symptoms,push,re_symptoms,push → re_symptoms
+re_home,Renew home,Program settings,push,program_settings,push → program_settings
+re_home,Renew home,Tab · Today,tab,today,tab → today
+re_home,Renew home,Tab · Progress,tab,progress,tab → progress
+re_home,Renew home,Tab · Learn,tab,learn,tab → learn
+re_home,Renew home,Tab · Support,tab,support,tab → support
+re_labs,Add labs,Back,back,,back
+re_labs,Add labs,Import from my health record,push,records_add,push → records_add
+re_labs,Add labs,Save results,submit,re_history,POST /v1/program-data/re/labs then toast “Saved” then replace → re_history
+re_history,Lab history,Back,back,,back
+re_history,Lab history,Create visit summary,push,hw_summary,push → hw_summary
+re_symptoms,Symptom check,Close,close,,close
+re_symptoms,Symptom check,Contact my care team,push,support_message_care,push → support_message_care
+re_symptoms,Symptom check,Vomiting blood or confused? Call 911,call,,call 911
+nu_intro,Nourish intro,Back,back,,back
+nu_intro,Nourish intro,Set up Nourish,push,nu_q1,push → nu_q1
+nu_intro,Nourish intro,Add as Learn only,toast,plans,toast “Nourish added as Learn only” then tab → plans
+nu_q1,Goals & screen,Back,back,,back
+nu_q1,Goals & screen,Next,branch,nu_habit nu_protect,decide choice:nu_q1.eating: Eating-history answer → No: push → nu_habit | Yes / Prefer not to say: push → nu_protect
+nu_habit,Weekly habit,Back,back,,back
+nu_habit,Weekly habit,Start this habit,submit,nu_home ob_setup,PUT /v1/program-data/nu/habit then replace → nu_home (onboarding: ob_setup)
+nu_home,Nourish home,Back,back,,back
+nu_home,Nourish home,Avatar · Account,push,account,push → account
+nu_home,Nourish home,Done today,toast,,toast “Nice. 4 of 5 nights.”
+nu_home,Nourish home,Bean and veggie tacos,push,learn_lesson,push → learn_lesson
+nu_home,Nourish home,Busy week?,push,nu_reset,push → nu_reset
+nu_home,Nourish home,Week 4 milestone,push,nu_week4,push → nu_week4
+nu_home,Nourish home,Change habit,push,nu_habit,push → nu_habit
+nu_home,Nourish home,Program settings,push,program_settings,push → program_settings
+nu_home,Nourish home,Tab · Today,tab,today,tab → today
+nu_home,Nourish home,Tab · Progress,tab,progress,tab → progress
+nu_home,Nourish home,Tab · Learn,tab,learn,tab → learn
+nu_home,Nourish home,Tab · Support,tab,support,tab → support
+nu_reset,Off-track reset,Back,back,,back
+nu_reset,Off-track reset,Continue,branch,nu_home nu_home nu_habit,decide choice:nu_reset.option: Selected option → Keep this habit: toast “Fresh start today” then replace → nu_home | Make it smaller: toast “Goal set to 3 nights” then replace → nu_home | Pick a different habit: replace → nu_habit
+nu_week4,Week 4 milestone,Back,back,,back
+nu_week4,Week 4 milestone,Choose next habit,replace,nu_habit,replace → nu_habit
+nu_protect,Protective mode,Back,back,,back
+nu_protect,Protective mode,Prepare,push,support_message_care,push → support_message_care
+nu_protect,Protective mode,Call or text 988,push,crisis,push → crisis
+nu_protect,Protective mode,Call 911,call,,call 911
+nu_protect,Protective mode,Continue with gentle habits,replace,nu_habit nu_habit,replace → nu_habit (onboarding: nu_habit)
+sd_intro,Stride intro,Back,back,,back
+sd_intro,Stride intro,Set up Stride,push,sd_q1,push → sd_q1
+sd_intro,Stride intro,Add as Learn only,toast,plans,toast “Stride added as Learn only” then tab → plans
+sd_q1,Falls check,Back,back,,back
+sd_q1,Falls check,Next,push,sd_plan,push → sd_plan
+sd_plan,Movement plan,Back,back,,back
+sd_plan,Movement plan,Start plan,submit,sd_home ob_setup,PUT /v1/program-data/sd/plan then replace → sd_home (onboarding: ob_setup)
+sd_home,Stride home,Back,back,,back
+sd_home,Stride home,Avatar · Account,push,account,push → account
+sd_home,Stride home,Start,push,sd_session,push → sd_session
+sd_home,Stride home,I fell,push,sd_fell,push → sd_fell
+sd_home,Stride home,Home safety checklist,push,sd_safety,push → sd_safety
+sd_home,Stride home,Caregiver access,push,sd_caregiver,push → sd_caregiver
+sd_home,Stride home,Movement plan,push,sd_plan,push → sd_plan
+sd_home,Stride home,Program settings,push,program_settings,push → program_settings
+sd_home,Stride home,Tab · Today,tab,today,tab → today
+sd_home,Stride home,Tab · Progress,tab,progress,tab → progress
+sd_home,Stride home,Tab · Learn,tab,learn,tab → learn
+sd_home,Stride home,Tab · Support,tab,support,tab → support
+sd_session,Session player,Close,close,,close
+sd_session,Session player,Next exercise,toast,,toast “Exercise 3 of 6”
+sd_session,Session player,Finish session,submit,sd_home,POST /v1/program-data/sd/sessions then toast “Session saved” then replace → sd_home
+sd_fell,I fell,Close,close,,close
+sd_fell,I fell,I hit my head or can’t get up · Call 911,call,,call 911
+sd_fell,I fell,Call Rosa,call,,call (555) 010-2244
+sd_fell,I fell,How to get up safely,push,learn_lesson,push → learn_lesson
+sd_fell,I fell,"I’m okay, log this fall",submit,sd_home,POST /v1/program-data/sd/falls then toast “Fall logged. Added to your visit list.” then replace → sd_home
+sd_safety,Home safety,Back,back,,back
+sd_safety,Home safety,Save,submit,,PUT /v1/program-data/sd/safety then toast “Saved” then back
+sd_caregiver,Caregiver access,Back,back,,back
+sd_caregiver,Caregiver access,Send invite,submit,,POST /v1/care/caregivers then toast “Invite sent to Rosa” then back
+ea_intro,Ease intro,Back,back,,back
+ea_intro,Ease intro,Set up Ease,push,ea_q1,push → ea_q1
+ea_intro,Ease intro,Add as Learn only,toast,plans,toast “Ease added as Learn only” then tab → plans
+ea_q1,Optional screener,Back,back,,back
+ea_q1,Optional screener,Next,push,ea_result,push → ea_result
+ea_q1,Optional screener,Skip the check,push,ea_plan,push → ea_plan
+ea_result,Screener result,Back,back,,back
+ea_result,Screener result,Find a therapist near me,external,,external https://findtreatment.gov
+ea_result,Screener result,Talk to my primary care doctor,push,support_message_care,push → support_message_care
+ea_result,Screener result,Not now,push,ea_plan,push → ea_plan
+ea_result,Screener result,Call or text 988,push,crisis,push → crisis
+ea_result,Screener result,Call 911,call,,call 911
+ea_plan,Safety plan,Back,back,,back
+ea_plan,Safety plan,Save plan,submit,ea_home ob_setup,PUT device:encrypted/ea/safety-plan then replace → ea_home (onboarding: ob_setup)
+ea_home,Ease home,Back,back,,back
+ea_home,Ease home,Avatar · Account,push,account,push → account
+ea_home,Ease home,Start,push,ea_mood,push → ea_mood
+ea_home,Ease home,My safety plan,push,ea_plan,push → ea_plan
+ea_home,Ease home,Check-back,push,ea_checkback,push → ea_checkback
+ea_home,Ease home,Find a professional,push,ea_result,push → ea_result
+ea_home,Ease home,Program settings,push,program_settings,push → program_settings
+ea_home,Ease home,Sleep and mood: 3 small changes,push,learn_lesson,push → learn_lesson
+ea_home,Ease home,Call or text 988,push,crisis,push → crisis
+ea_home,Ease home,Call 911,call,,call 911
+ea_home,Ease home,Tab · Today,tab,today,tab → today
+ea_home,Ease home,Tab · Progress,tab,progress,tab → progress
+ea_home,Ease home,Tab · Learn,tab,learn,tab → learn
+ea_home,Ease home,Tab · Support,tab,support,tab → support
+ea_mood,Mood check-in,Back,back,,back
+ea_mood,Mood check-in,Start,push,rescue_active,push → rescue_active
+ea_mood,Mood check-in,Save,submit,crisis,POST /v1/program-data/ea/moods then decide ea.selfharm: Self-harm option selected? → No: toast “Saved” then back | Yes: replace → crisis
+ea_checkback,Check-back day,Back,back,,back
+ea_checkback,Check-back day,Show me,push,learn_lesson,push → learn_lesson
+ea_checkback,Check-back day,Save,submit,,POST /v1/program-data/ea/check-backs then toast “Saved” then back
+ck_intro,Checkup intro,Back,back,,back
+ck_intro,Checkup intro,Set up Checkup,push,ck_q1,push → ck_q1
+ck_intro,Checkup intro,Add as Learn only,toast,plans,toast “Checkup added as Learn only” then tab → plans
+ck_q1,About you,Back,back,,back
+ck_q1,About you,Import vaccination history,push,records_add,push → records_add
+ck_q1,About you,Build my list,submit,ck_list ob_setup,PUT /v1/program-data/ck/profile then replace → ck_list (onboarding: ob_setup)
+ck_list,Due list,Back,back,,back
+ck_list,Due list,Avatar · Account,push,account,push → account
+ck_list,Due list,Find a pharmacy,external,,external https://www.vaccines.gov
+ck_list,Due list,I got it,push,ck_done,push → ck_done
+ck_list,Due list,Colorectal screening,push,ck_item,push → ck_item
+ck_list,Due list,Mammogram,push,ck_day,push → ck_day
+ck_list,Due list,Lung cancer screening,push,ck_item,push → ck_item
+ck_list,Due list,Program settings,push,program_settings,push → program_settings
+ck_list,Due list,Tab · Today,tab,today,tab → today
+ck_list,Due list,Tab · Progress,tab,progress,tab → progress
+ck_list,Due list,Tab · Learn,tab,learn,tab → learn
+ck_list,Due list,Tab · Support,tab,support,tab → support
+ck_uptodate,Up to date,Back,back,,back
+ck_uptodate,Up to date,Avatar · Account,push,account,push → account
+ck_uptodate,Up to date,See full schedule,replace,ck_list,replace → ck_list
+ck_uptodate,Up to date,Tab · Today,tab,today,tab → today
+ck_uptodate,Up to date,Tab · Progress,tab,progress,tab → progress
+ck_uptodate,Up to date,Tab · Learn,tab,learn,tab → learn
+ck_uptodate,Up to date,Tab · Support,tab,support,tab → support
+ck_item,Item detail,Back,back,,back
+ck_item,Item detail,Message my care team,push,support_message_care,push → support_message_care
+ck_item,Item detail,Mark as done,push,ck_done,push → ck_done
+ck_done,Mark done,Back,back,,back
+ck_done,Mark done,Save,submit,ck_list,POST /v1/program-data/ck/done then toast “Saved · next due Sep 2027” then replace → ck_list
+ck_day,Screening day,Back,back,,back
+ck_day,Screening day,2-min breathing,push,rescue_active,push → rescue_active
+ck_day,Screening day,Add to calendar,toast,,toast “Added to your calendar”
+ck_day,Screening day,Mark as done,push,ck_done,push → ck_done
+be_intro,Beacon intro,Back,back,,back
+be_intro,Beacon intro,Set up Beacon,push,be_q1,push → be_q1
+be_intro,Beacon intro,Add as Learn only,toast,plans,toast “Beacon added as Learn only” then tab → plans
+be_q1,Journey stage,Back,back,,back
+be_q1,Journey stage,Next,branch,be_q2 be_tx ob_setup be_survivor ob_setup learn,decide choice:be_q1.stage: Journey stage → Lowering my risk: push → be_q2 | Going through treatment: replace → be_tx (onboarding: ob_setup) | After treatment: replace → be_survivor (onboarding: ob_setup) | Supporting someone: tab → learn
+be_q2,Family history,Back,back,,back
+be_q2,Family history,See my plan,submit,be_home ob_setup,PUT /v1/program-data/be/profile then replace → be_home (onboarding: ob_setup)
+be_home,Beacon home,Back,back,,back
+be_home,Beacon home,Avatar · Account,push,account,push → account
+be_home,Beacon home,Quitting smoking,push,bf_home,push → bf_home
+be_home,Beacon home,Monthly skin self-check,push,learn_lesson,push → learn_lesson
+be_home,Beacon home,Ask about genetic counseling,push,support_message_care,push → support_message_care
+be_home,Beacon home,Open Checkup,push,ck_list,push → ck_list
+be_home,Beacon home,Change my journey stage,push,be_q1,push → be_q1
+be_home,Beacon home,Program settings,push,program_settings,push → program_settings
+be_home,Beacon home,Tab · Today,tab,today,tab → today
+be_home,Beacon home,Tab · Progress,tab,progress,tab → progress
+be_home,Beacon home,Tab · Learn,tab,learn,tab → learn
+be_home,Beacon home,Tab · Support,tab,support,tab → support
+be_tx,Treatment support,Back,back,,back
+be_tx,Treatment support,Avatar · Account,push,account,push → account
+be_tx,Treatment support,Questions,push,be_questions,push → be_questions
+be_tx,Treatment support,Call,call,,call (555) 010-7000
+be_tx,Treatment support,Today’s side-effect diary,push,be_diary,push → be_diary
+be_tx,Treatment support,Feeling worried?,push,ea_intro,push → ea_intro
+be_tx,Treatment support,Program settings,push,program_settings,push → program_settings
+be_tx,Treatment support,Tab · Today,tab,today,tab → today
+be_tx,Treatment support,Tab · Progress,tab,progress,tab → progress
+be_tx,Treatment support,Tab · Learn,tab,learn,tab → learn
+be_tx,Treatment support,Tab · Support,tab,support,tab → support
+be_diary,Treatment diary,Back,back,,back
+be_diary,Treatment diary,Call,call,,call (555) 010-7000
+be_diary,Treatment diary,Save,submit,,POST /v1/program-data/be/diary then toast “Saved” then back
+be_questions,Visit questions,Back,back,,back
+be_questions,Visit questions,Share with my care team,push,support_message_care,push → support_message_care
+be_questions,Visit questions,Done,back,,back
+be_survivor,Survivorship,Back,back,,back
+be_survivor,Survivorship,Avatar · Account,push,account,push → account
+be_survivor,Survivorship,Open Ease,push,ea_intro,push → ea_intro
+be_survivor,Survivorship,Program settings,push,program_settings,push → program_settings
+be_survivor,Survivorship,Save check-in,submit,,POST /v1/program-data/be/survivorship then toast “Saved”
+be_survivor,Survivorship,Tab · Today,tab,today,tab → today
+be_survivor,Survivorship,Tab · Progress,tab,progress,tab → progress
+be_survivor,Survivorship,Tab · Learn,tab,learn,tab → learn
+be_survivor,Survivorship,Tab · Support,tab,support,tab → support
+records_hub,Health records,Back,back,,back
+records_hub,Health records,Patel Family Medicine,push,records_source,push → records_source
+records_hub,Health records,Medicare,push,records_source,push → records_source
+records_hub,Health records,Blood pressure,push,records_item,push → records_item
+records_hub,Health records,Lab results,push,records_item,push → records_item
+records_hub,Health records,Immunizations,push,records_item,push → records_item
+records_hub,Health records,Smoking status,push,records_item,push → records_item
+records_hub,Health records,Medications & conditions,push,records_item,push → records_item
+records_hub,Health records,2 items need your review,push,records_conflict,push → records_conflict
+records_hub,Health records,Add a source,push,records_add,push → records_add
+records_hub,Health records,Enter a value manually,push,records_manual,push → records_manual
+records_hub_empty,Health records · empty,Back,back,,back
+records_hub_empty,Health records · empty,Connect a health system,push,records_add,push → records_add
+records_hub_empty,Health records · empty,Enter a value manually,push,records_manual,push → records_manual
+records_add,Add a source,Back,back,,back
+records_add,Add a source,Hospital or clinic,push,records_search,push → records_search
+records_add,Add a source,Oracle Health (Cerner),push,records_search,push → records_search
+records_add,Add a source,Medicare · Blue Button 2.0,push,records_consent_bb,push → records_consent_bb
+records_add,Add a source,Apple Health Records,push,records_consent_device,push → records_consent_device
+records_add,Add a source,Health Connect,push,records_consent_device,push → records_consent_device
+records_add,Add a source,Other FHIR server,push,records_fhir_url,push → records_fhir_url
+records_add,Add a source,Enter manually,push,records_manual,push → records_manual
+records_search,Find your provider,Back,back,,back
+records_search,Find your provider,Patel Family Medicine,push,records_consent,push → records_consent
+records_search,Find your provider,Patel Heart Institute,push,records_consent,push → records_consent
+records_search,Find your provider,Stanford Health Care,push,records_consent,push → records_consent
+records_search,Find your provider,Can’t find it? Enter a FHIR address,push,records_fhir_url,push → records_fhir_url
+records_fhir_url,Other FHIR server,Back,back,,back
+records_fhir_url,Other FHIR server,Check and continue,branch,records_consent records_error,branch: Server check → SMART on FHIR R4 supported: push → records_consent | Not a FHIR R4 server: push → records_error
+records_consent,Consent: Epic,Back,back,,back
+records_consent,Consent: Epic,Continue to MyChart,branch,records_importing records_error,branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error
+records_consent,Consent: Epic,Not now,back,,back
+records_consent_bb,Consent: Medicare,Back,back,,back
+records_consent_bb,Consent: Medicare,Continue to Medicare.gov,branch,records_importing records_error,branch: Medicare sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error
+records_consent_bb,Consent: Medicare,Not now,back,,back
+records_consent_device,Consent: phone health data,Back,back,,back
+records_consent_device,Consent: phone health data,Continue,branch,records_importing records_error,branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error
+records_consent_device,Consent: phone health data,Not now,back,,back
+records_importing,Importing,Close,close,,close
+records_importing,Importing,Review imported data,replace,records_review,replace → records_review
+records_importing,Importing,Cancel import,popto,records_hub,popto → records_hub
+records_review,Review imported data,Close,close,,close
+records_review,Review imported data,Review,push,records_conflict,push → records_conflict
+records_review,Review imported data,Add 21 items to my programs,submit,records_hub,"POST /v1/records/fhir/accept then toast “Added to Heartwise, Steady, Checkup, BreatheFree and Renew” then popto → records_hub"
+records_review,Review imported data,Review conflicts first,push,records_conflict,push → records_conflict
+records_conflict,Resolve conflicts,Back,back,,back
+records_conflict,Resolve conflicts,Save choices,submit,,POST /v1/records/fhir/conflicts then toast “Saved” then back
+records_error,Connection problem,Back,back,,back
+records_error,Connection problem,Try again,back,,back
+records_error,Connection problem,Choose another source,replace,records_add,replace → records_add
+records_error,Connection problem,Enter manually instead,replace,records_manual,replace → records_manual
+records_source,Source details,Back,back,,back
+records_source,Source details,Sync now,submit,,POST /v1/records/fhir/sources/:id/sync then toast “Synced · 2 new results”
+records_source,Source details,What we read,push,records_consent,push → records_consent
+records_source,Source details,Disconnect,sheet,records_disconnect,sheet → records_disconnect
+records_disconnect,Disconnect source,Disconnect source,submit,records_hub,DELETE /v1/records/fhir/sources/:id then toast “Disconnected” then popto → records_hub
+records_disconnect,Disconnect source,Cancel,close,,close
+records_manual,Enter a value,Back,back,,back
+records_manual,Enter a value,Save,submit,records_hub records_manual_error,POST /v1/records/manual then decide rec.manual: Validation → Valid: toast “Saved · shared with Steady” then popto → records_hub | Outside expected range: replace → records_manual_error | Matches an imported value: toast “Already in your records from Epic. Not added twice.” then back
+records_manual_error,Enter a value · out of range,Back,back,,back
+records_manual_error,Enter a value · out of range,Save,submit,records_hub,POST /v1/records/manual then decide rec.manual: Validation → Valid: toast “Saved · shared with Steady” then popto → records_hub | Outside expected range: toast “Still outside the expected range”
+records_manual_error,Enter a value · out of range,Ask my care team instead,push,support_message_care,push → support_message_care
+records_item,Imported values,Back,back,,back
+records_item,Imported values,Open in Heartwise,push,hw_trends,push → hw_trends
+sf_unplug_intro,Unplug intro,Back,back,,back
+sf_unplug_intro,Unplug intro,Set up Unplug,branch,sf_unplug_auth sf_unplug_auth_android,branch: Platform → iPhone: push → sf_unplug_auth | Android: push → sf_unplug_auth_android
+sf_unplug_intro,Unplug intro,Not now,back,,back
+sf_unplug_auth,Allow Screen Time,Back,back,,back
+sf_unplug_auth,Allow Screen Time,Continue,branch,sf_unplug_apps sf_unplug_auth_denied sf_unplug_auth_unavailable,"branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
+sf_unplug_auth,Allow Screen Time,Not now,back,,back
+sf_unplug_auth_denied,Screen Time not allowed,Back,back,,back
+sf_unplug_auth_denied,Screen Time not allowed,Try again,branch,sf_unplug_apps,"branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: toast “Still not allowed. You can turn it on later in Settings.”"
+sf_unplug_auth_denied,Screen Time not allowed,Open phone settings,os_settings,,os_settings
+sf_unplug_auth_denied,Screen Time not allowed,Not now,back,,back
+sf_unplug_auth_unavailable,Screen Time unavailable,Back,back,,back
+sf_unplug_auth_unavailable,Screen Time unavailable,Back to ScrollFree,back,,back
+sf_unplug_auth_android,Android permissions for Unplug,Back,back,,back
+sf_unplug_auth_android,Android permissions for Unplug,Turn on display over apps,os_settings,,os_settings
+sf_unplug_auth_android,Android permissions for Unplug,Turn on usage access,os_settings,,os_settings
+sf_unplug_auth_android,Android permissions for Unplug,I’ve turned them on,branch,sf_unplug_apps_android,branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Missing: toast “Unplug still needs both settings.”
+sf_unplug_apps,Choose apps,Back,back,,back
+sf_unplug_apps,Choose apps,Open app picker,sheet,sf_unplug_picker_ios,sheet → sf_unplug_picker_ios
+sf_unplug_apps,Choose apps,Not now,back,,back
+sf_unplug_picker_ios,Apple app picker,Done,branch,sf_unplug_apps_chosen,branch: System app picker result → Apps chosen: replace → sf_unplug_apps_chosen | Cancelled: close
+sf_unplug_picker_ios,Apple app picker,Cancel,close,,close
+sf_unplug_apps_android,Choose apps (Android),Back,back,,back
+sf_unplug_apps_android,Choose apps (Android),Done · 3 apps,replace,sf_unplug_apps_chosen,replace → sf_unplug_apps_chosen
+sf_unplug_apps_android,Choose apps (Android),Cancel,back,,back
+sf_unplug_apps_chosen,Name your groups,Back,back,,back
+sf_unplug_apps_chosen,Name your groups,Add another group,sheet,sf_unplug_picker_ios,sheet → sf_unplug_picker_ios
+sf_unplug_apps_chosen,Name your groups,Next: limits,push,sf_unplug_limits,push → sf_unplug_limits
+sf_unplug_limits,Limits & pause screen,Back,back,,back
+sf_unplug_limits,Limits & pause screen,Save limits,submit,sf_unplug_home,CALL device:unplug/setThresholds+applyShield then toast “Unplug is on” then replace → sf_unplug_home
+sf_unplug_home,Unplug,Back,back,,back
+sf_unplug_home,Unplug,Start,push,sf_unplug_session,push → sf_unplug_session
+sf_unplug_home,Unplug,Apps,push,sf_unplug_apps_chosen,push → sf_unplug_apps_chosen
+sf_unplug_home,Unplug,Limits & pause screen,push,sf_unplug_limits,push → sf_unplug_limits
+sf_unplug_home,Unplug,Preview the pause screen,branch,sf_unplug_shield sf_unplug_overlay,branch: Platform → iPhone: push → sf_unplug_shield | Android: push → sf_unplug_overlay
+sf_unplug_home,Unplug,Tracking check,push,sf_unplug_health,push → sf_unplug_health
+sf_unplug_home,Unplug,How Unplug works,push,sf_unplug_intro,push → sf_unplug_intro
+sf_unplug_home,Unplug,Turn off Unplug,sheet,sf_unplug_off,sheet → sf_unplug_off
+sf_unplug_session,Start a focus session,Back,back,,back
+sf_unplug_session,Start a focus session,Start session,submit,sf_unplug_session_active,CALL device:unplug/startSession then replace → sf_unplug_session_active
+sf_unplug_session_active,Focus session running,Close,close,,close
+sf_unplug_session_active,Focus session running,Pause 60,push,sf_pause,push → sf_pause
+sf_unplug_session_active,Focus session running,End early,sheet,sf_unplug_session_end,sheet → sf_unplug_session_end
+sf_unplug_session_end,End session early,End session,submit,sf_unplug_session_done_early,CALL device:unplug/endSession then replace → sf_unplug_session_done_early
+sf_unplug_session_end,End session early,Keep going,close,,close
+sf_unplug_session_done,Session complete,Done,replace,sf_unplug_home,replace → sf_unplug_home
+sf_unplug_session_done_early,Session ended early,Done,replace,sf_unplug_home,replace → sf_unplug_home
+sf_unplug_shield,Pause screen (iPhone shield),Take a breath,toast,sf_unplug_gate,toast “Notification: tap to take your breath in Tether” then push → sf_unplug_gate
+sf_unplug_shield,Pause screen (iPhone shield),Open anyway,toast,,toast “Opened · 1 “open anyway” left today” then close
+sf_unplug_shield_firm,"Pause screen (iPhone shield, firm)",Close the app,toast,,toast “The app stays closed.” then close
+sf_unplug_overlay,Pause screen (Android overlay),Close the app,toast,,toast “The app stays closed.” then close
+sf_unplug_overlay,Pause screen (Android overlay),Open anyway,toast,,toast “Opened · 1 “open anyway” left today” then close
+sf_unplug_gate,Small step: one breath,Close,close,,close
+sf_unplug_gate,Small step: one breath,Keep it closed,toast,sf_home,toast “Nice. The app stays closed.” then reset → sf_home
+sf_unplug_gate,Small step: one breath,Open it for 10 minutes,toast,,toast “Open for 10 minutes. The pause screen comes back after.” then close
+sf_unplug_gate_commit,Small step: type a sentence,Close,close,,close
+sf_unplug_gate_commit,Small step: type a sentence,Keep it closed,toast,sf_home,toast “Nice. The app stays closed.” then reset → sf_home
+sf_unplug_gate_commit,Small step: type a sentence,Open it for 10 minutes,toast,,toast “Open for 10 minutes. The pause screen comes back after.” then close
+sf_unplug_gate_sum,Small step: quick sum,Close,close,,close
+sf_unplug_gate_sum,Small step: quick sum,Keep it closed,toast,sf_home,toast “Nice. The app stays closed.” then reset → sf_home
+sf_unplug_gate_sum,Small step: quick sum,Open it for 10 minutes,toast,,toast “Open for 10 minutes. The pause screen comes back after.” then close
+sf_unplug_health,Tracking check,Back,back,,back
+sf_unplug_health,Tracking check,Done,back,,back
+sf_unplug_health_stopped,Tracking stopped,Back,back,,back
+sf_unplug_health_stopped,Tracking stopped,Open phone settings,os_settings,,os_settings
+sf_unplug_health_stopped,Tracking stopped,Check again,branch,sf_unplug_health,branch: Tracking health result → All pass: replace → sf_unplug_health | Still failing: toast “Still not working. Turn Screen Time access on again in Settings.”
+sf_unplug_health_android,Tracking check (Android),Back,back,,back
+sf_unplug_health_android,Tracking check (Android),Battery settings,os_settings,,os_settings
+sf_unplug_health_android,Tracking check (Android),Done,back,,back
+sf_unplug_off,Turn off Unplug,Turn off,branch,sf_home sf_home,decide choice:sf_unplug_off.scope: Chosen option → Unplug only: CALL device:unplug/liftShield+purgeLocalData then toast “Unplug is off” then reset → sf_home | Unplug and Screen Time: PATCH /v1/enrolments/consents then toast “Unplug and Screen Time are off” then reset → sf_home
+sf_unplug_off,Turn off Unplug,Cancel,close,,close
+sf_home_unplug_offer,ScrollFree home · Unplug offer,Back,back,,back
+sf_home_unplug_offer,ScrollFree home · Unplug offer,Avatar · Account,push,account,push → account
+sf_home_unplug_offer,ScrollFree home · Unplug offer,Pause 60,push,sf_pause,push → sf_pause
+sf_home_unplug_offer,ScrollFree home · Unplug offer,Set up,push,sf_unplug_intro,push → sf_unplug_intro
+sf_home_unplug_offer,ScrollFree home · Unplug offer,This week,push,sf_week,push → sf_week
+sf_home_unplug_offer,ScrollFree home · Unplug offer,Had a long scroll?,push,sf_slip,push → sf_slip
+sf_home_unplug_offer,ScrollFree home · Unplug offer,Goal & windows,push,sf_goal,push → sf_goal
+sf_home_unplug_offer,ScrollFree home · Unplug offer,Buddy,push,sf_buddy,push → sf_buddy
+sf_home_unplug_offer,ScrollFree home · Unplug offer,Program settings,push,program_settings,push → program_settings
+sf_home_unplug_offer,ScrollFree home · Unplug offer,Tab · Today,tab,today,tab → today
+sf_home_unplug_offer,ScrollFree home · Unplug offer,Tab · Progress,tab,progress,tab → progress
+sf_home_unplug_offer,ScrollFree home · Unplug offer,Tab · Learn,tab,learn,tab → learn
+sf_home_unplug_offer,ScrollFree home · Unplug offer,Tab · Support,tab,support,tab → support
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Back,back,,back
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Avatar · Account,push,account,push → account
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Pause 60,push,sf_pause,push → sf_pause
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Unplug is on,push,sf_unplug_home,push → sf_unplug_home
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),This week,push,sf_week,push → sf_week
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Had a long scroll?,push,sf_slip,push → sf_slip
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Goal & windows,push,sf_goal,push → sf_goal
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Buddy,push,sf_buddy,push → sf_buddy
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Program settings,push,program_settings,push → program_settings
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Tab · Today,tab,today,tab → today
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Tab · Progress,tab,progress,tab → progress
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Tab · Learn,tab,learn,tab → learn
+sf_home_unplug,ScrollFree home · Unplug on (iPhone),Tab · Support,tab,support,tab → support
+sf_week_unplug,Weekly reflection · Unplug on (iPhone),Back,back,,back
+sf_week_unplug,Weekly reflection · Unplug on (iPhone),Yes,toast,,toast “Goal set to 75 min” then back
+sf_week_unplug,Weekly reflection · Unplug on (iPhone),Stay at 90,back,,back
+program_settings_sf,Program settings · ScrollFree with Unplug,Back,back,,back
+program_settings_sf,Program settings · ScrollFree with Unplug,Unplug,push,sf_unplug_home,push → sf_unplug_home
+program_settings_sf,Program settings · ScrollFree with Unplug,Screen Time access,push,sf_screentime,push → sf_screentime
+program_settings_sf,Program settings · ScrollFree with Unplug,Turn off Unplug or Screen Time,sheet,sf_unplug_off,sheet → sf_unplug_off
+program_settings_sf,Program settings · ScrollFree with Unplug,Export ScrollFree data,toast,,toast “Export is being prepared. We’ll notify you.”
+program_settings_sf,Program settings · ScrollFree with Unplug,Leave ScrollFree,sheet,account_leave,sheet → account_leave
+program_settings_sf,Program settings · ScrollFree with Unplug,Save changes,submit,,PATCH /v1/enrolments/:id then toast “Saved” then back
+sf_screentime_report,Connect Screen Time · iPhone report wording,Back,back,,back
+sf_screentime_report,Connect Screen Time · iPhone report wording,Allow access,branch,sf_screentime_denied,branch: iOS Screen Time permission → Allowed: toast “Screen Time connected” then back | Not allowed: replace → sf_screentime_denied
+sf_screentime_report,Connect Screen Time · iPhone report wording,Not now,back,,back
+account_delete_apple,Delete account · Apple account,Back,back,,back
+account_delete_apple,Delete account · Apple account,Download a copy first,push,account_data,push → account_data
+account_delete_apple,Delete account · Apple account,Delete everything,branch,account_deleted,auth (apple): Sign in with Apple result → Success: DELETE /v1/account/data then replace → account_deleted | Different account: toast “That’s a different Apple account. Use the one you signed in with.” | Cancelled: toast “Nothing was deleted.” | Error: toast “Couldn’t reach Apple. Nothing was deleted.”
+account_delete_google,Delete account · Google account,Back,back,,back
+account_delete_google,Delete account · Google account,Download a copy first,push,account_data,push → account_data
+account_delete_google,Delete account · Google account,Delete everything,branch,account_deleted,auth (google): Sign in with Google result → Success: DELETE /v1/account/data then replace → account_deleted | Different account: toast “That’s a different Google account. Use the one you signed in with.” | Cancelled: toast “Nothing was deleted.” | Error: toast “Couldn’t reach Google. Nothing was deleted.”
+auth_session_apple,Session expired · Apple account,Continue with Apple,branch,auth_social_error,auth (apple): Sign in with Apple result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error
+auth_session_apple,Session expired · Apple account,Use Face ID,close,,close
+auth_session_google,Session expired · Google account,Continue with Google,branch,auth_social_error,auth (google): Sign in with Google result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error
+auth_session_google,Session expired · Google account,Use Face ID,close,,close
+sf_screentime_android,Connect usage access (Android),Back,back,,back
+sf_screentime_android,Connect usage access (Android),Open settings,branch,sf_screentime_android_denied,branch: Android usage access (checked on return) → Allowed: toast “Usage access on” then back | Not allowed: replace → sf_screentime_android_denied
+sf_screentime_android,Connect usage access (Android),Not now,back,,back
+sf_screentime_android_denied,Usage access off (Android),Back,back,,back
+sf_screentime_android_denied,Usage access off (Android),Continue with self-report,back,,back
+sf_screentime_android_denied,Usage access off (Android),Open settings,os_settings,,os_settings
+sys_update_android,Update required (Android),Update now,external,,external https://play.google.com/store/apps/details?id=com.TetherHealthLLC.tetherhealth
+sys_update_android,Update required (Android),Open Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_widget_ios,Home-screen widget (iPhone),Close,close,,close
+surface_widget_ios,Home-screen widget (iPhone),Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_widget_android,Home-screen widget (Android),Close,close,,close
+surface_widget_android,Home-screen widget (Android),Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_shortcuts_ios,Siri & App Shortcuts (iPhone),Close,close,,close
+surface_shortcuts_ios,Siri & App Shortcuts (iPhone),Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_shortcuts_ios,Siri & App Shortcuts (iPhone),My plan,push,ca_red,push → ca_red
+surface_shortcuts_ios_named,Siri & App Shortcuts (sensitive details on),Close,close,,close
+surface_shortcuts_ios_named,Siri & App Shortcuts (sensitive details on),Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_shortcuts_ios_named,Siri & App Shortcuts (sensitive details on),ClearAir red-zone plan,push,ca_red,push → ca_red
+surface_shortcuts_android,Launcher shortcuts (Android),Close,close,,close
+surface_shortcuts_android,Launcher shortcuts (Android),Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_shortcuts_android,Launcher shortcuts (Android),My plan,push,ca_red,push → ca_red
+surface_shortcuts_android_named,Launcher shortcuts (sensitive details on),Close,close,,close
+surface_shortcuts_android_named,Launcher shortcuts (sensitive details on),Rescue,sheet,rescue_pick,sheet → rescue_pick
+surface_shortcuts_android_named,Launcher shortcuts (sensitive details on),ClearAir red-zone plan,push,ca_red,push → ca_red

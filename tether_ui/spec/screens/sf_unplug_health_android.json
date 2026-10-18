@@ -1,0 +1,106 @@
+{
+  "id": "sf_unplug_health_android",
+  "name": "Tracking check (Android)",
+  "route": "/p/sf/unplug/health?state=android",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "sf_unplug_health",
+  "state": "android",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+  "header": {
+    "t": "header",
+    "title": "Tracking check",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "success",
+      "text": "Unplug is working. All 3 checks pass."
+    },
+    {
+      "t": "checklist",
+      "items": [
+        {
+          "label": "Usage access",
+          "sub": "On",
+          "done": true
+        },
+        {
+          "label": "Display over other apps",
+          "sub": "On",
+          "done": true
+        },
+        {
+          "label": "Unplug running in the background",
+          "sub": "Checked 12 s ago",
+          "done": true
+        }
+      ],
+      "label": "Android checks"
+    },
+    {
+      "t": "text",
+      "text": "Some phones stop background apps to save battery. If Unplug keeps stopping, let Tether run in the background.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Battery settings",
+      "action": {
+        "type": "os_settings"
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "button",
+      "label": "Done",
+      "action": {
+        "type": "back"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 item 7 (Android)",
+    "Source: android/.../unplug/UnplugHost.kt trackingHealth() (usage access, foreground service alive, overlay permission)"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Battery settings",
+      "path": "footer[0]",
+      "action": {
+        "type": "os_settings"
+      },
+      "summary": "os_settings"
+    },
+    {
+      "element": "Done",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

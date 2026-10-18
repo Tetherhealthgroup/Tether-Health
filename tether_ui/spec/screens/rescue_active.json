@@ -1,0 +1,141 @@
+{
+  "id": "rescue_active",
+  "name": "Active tool",
+  "route": "/rescue/breathing",
+  "flow": "rescue",
+  "program": null,
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": true,
+  "bg": null,
+  "desc": "Timer pauses when the app is backgrounded. Reduce Motion → no scaling, countdown only.",
+  "header": {
+    "t": "header",
+    "title": "Slow breathing",
+    "left": "close",
+    "pill": "1:32 left",
+    "dark": true
+  },
+  "body": [
+    {
+      "t": "eyebrow",
+      "text": "Breathe out · slowly"
+    },
+    {
+      "t": "ring",
+      "value": "5",
+      "label": "SECONDS",
+      "palette": "teal"
+    },
+    {
+      "t": "text",
+      "text": "The urge is a wave. Let it rise and pass.",
+      "tone": "body",
+      "align": "center"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Voice on",
+        "Haptics on",
+        "Reduced motion"
+      ],
+      "selected": [
+        "Voice on",
+        "Haptics on"
+      ],
+      "multi": true,
+      "key": "value"
+    },
+    {
+      "t": "card",
+      "variant": "dark2",
+      "title": "Still strong?",
+      "text": "Switch tool or reach a person. This check-in is kept.",
+      "children": [
+        {
+          "t": "buttons",
+          "items": [
+            {
+              "t": "button",
+              "label": "Switch tool",
+              "action": {
+                "type": "sheet",
+                "to": "rescue_tools"
+              },
+              "variant": "lime",
+              "arrow": false,
+              "small": true
+            },
+            {
+              "t": "button",
+              "label": "Get support",
+              "action": {
+                "type": "push",
+                "to": "rescue_escalate"
+              },
+              "variant": "ghostdark",
+              "arrow": false,
+              "small": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "I’m done",
+      "action": {
+        "type": "replace",
+        "to": "rescue_result"
+      },
+      "variant": "white",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Switch tool",
+      "path": "body[4].children[0].items[0]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_tools"
+      },
+      "summary": "sheet → rescue_tools"
+    },
+    {
+      "element": "Get support",
+      "path": "body[4].children[0].items[1]",
+      "action": {
+        "type": "push",
+        "to": "rescue_escalate"
+      },
+      "summary": "push → rescue_escalate"
+    },
+    {
+      "element": "I’m done",
+      "path": "footer[0]",
+      "action": {
+        "type": "replace",
+        "to": "rescue_result"
+      },
+      "summary": "replace → rescue_result"
+    }
+  ]
+}

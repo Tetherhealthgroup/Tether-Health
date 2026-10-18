@@ -1,0 +1,151 @@
+{
+  "id": "ea_result",
+  "name": "Screener result",
+  "route": "/p/ea/result",
+  "flow": "ea",
+  "program": "ea",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your answers",
+    "left": "back",
+    "pill": "Not a diagnosis"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Talking to someone could help.",
+      "size": "m"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "Your answers suggest you’ve been carrying a lot lately. A doctor, counselor or therapist can help figure out what would make the biggest difference."
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Find a therapist near me",
+          "sub": "In-network filters",
+          "action": {
+            "type": "external",
+            "value": "https://findtreatment.gov"
+          }
+        },
+        {
+          "label": "Talk to my primary care doctor",
+          "sub": "We’ll help you prepare",
+          "action": {
+            "type": "push",
+            "to": "support_message_care"
+          }
+        },
+        {
+          "label": "Not now",
+          "sub": "Keep using Ease tools",
+          "action": {
+            "type": "push",
+            "to": "ea_plan"
+          }
+        }
+      ]
+    },
+    {
+      "t": "emergency",
+      "text": "Thoughts of harming yourself? Call or text 988. Emergency: 911.",
+      "actions": [
+        {
+          "t": "button",
+          "label": "Call or text 988",
+          "action": {
+            "type": "push",
+            "to": "crisis"
+          },
+          "variant": "danger",
+          "arrow": false,
+          "small": true
+        },
+        {
+          "t": "button",
+          "label": "Call 911",
+          "action": {
+            "type": "call",
+            "value": "911",
+            "label": "911"
+          },
+          "variant": "secondary",
+          "arrow": false,
+          "small": true
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Find a therapist near me",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "external",
+        "value": "https://findtreatment.gov"
+      },
+      "summary": "external https://findtreatment.gov"
+    },
+    {
+      "element": "Talk to my primary care doctor",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "summary": "push → support_message_care"
+    },
+    {
+      "element": "Not now",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "ea_plan"
+      },
+      "summary": "push → ea_plan"
+    },
+    {
+      "element": "Call or text 988",
+      "path": "body[3].actions[0]",
+      "action": {
+        "type": "push",
+        "to": "crisis"
+      },
+      "summary": "push → crisis"
+    },
+    {
+      "element": "Call 911",
+      "path": "body[3].actions[1]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    }
+  ]
+}

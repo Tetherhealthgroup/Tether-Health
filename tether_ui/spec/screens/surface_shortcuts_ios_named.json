@@ -1,0 +1,91 @@
+{
+  "id": "surface_shortcuts_ios_named",
+  "name": "Siri & App Shortcuts (sensitive details on)",
+  "route": "/surface/shortcuts/ios?state=named",
+  "flow": "entries",
+  "program": null,
+  "phase": "rescue",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "surface_shortcuts_ios",
+  "state": "Show sensitive details on",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+  "header": {
+    "t": "header",
+    "title": "Siri & Shortcuts",
+    "left": "close",
+    "pill": "Reference"
+  },
+  "body": [
+    {
+      "t": "text",
+      "text": "With Show sensitive details on (Account → Notifications), shortcuts use program names.",
+      "tone": "muted"
+    },
+    {
+      "t": "list",
+      "title": "Tether Health · App Shortcuts",
+      "rows": [
+        {
+          "label": "Rescue",
+          "sub": "“Rescue in Tether” · opens Rescue",
+          "action": {
+            "type": "sheet",
+            "to": "rescue_pick"
+          },
+          "lead": {
+            "icon": "✚"
+          }
+        },
+        {
+          "label": "ClearAir red-zone plan",
+          "sub": "“Show my ClearAir plan in Tether”",
+          "action": {
+            "type": "push",
+            "to": "ca_red"
+          },
+          "lead": {
+            "program": "ca"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-48 (program names only with sensitive_details)"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Rescue",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
+    },
+    {
+      "element": "ClearAir red-zone plan",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "ca_red"
+      },
+      "summary": "push → ca_red"
+    }
+  ]
+}

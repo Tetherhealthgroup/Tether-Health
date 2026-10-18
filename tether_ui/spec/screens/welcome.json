@@ -1,0 +1,129 @@
+{
+  "id": "welcome",
+  "name": "Welcome",
+  "route": "/welcome",
+  "flow": "onboarding",
+  "program": null,
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Language is chosen once for the whole account. No data is collected on this screen.",
+  "header": {
+    "t": "header",
+    "title": "",
+    "left": "logo"
+  },
+  "body": [
+    {
+      "t": "segmented",
+      "options": [
+        "English",
+        "Español"
+      ],
+      "selected": "English",
+      "key": "value"
+    },
+    {
+      "t": "illus",
+      "glyph": "✿",
+      "tone": "mint"
+    },
+    {
+      "t": "eyebrow",
+      "text": "Welcome to Tether Health"
+    },
+    {
+      "t": "title",
+      "text": "Care that meets you where you are.",
+      "size": "xl"
+    },
+    {
+      "t": "text",
+      "text": "Small steps, practical support and no judgment, for the parts of your health you choose.",
+      "tone": "body"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Private by design",
+          "No ads · never sold"
+        ],
+        [
+          "Help in one tap",
+          "Works offline"
+        ],
+        [
+          "Your pace",
+          "Pause anytime"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Get started",
+      "action": {
+        "type": "push",
+        "to": "ob_programs"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "I already have an account",
+      "action": {
+        "type": "sheet",
+        "to": "auth_signin"
+      },
+      "align": "center"
+    },
+    {
+      "t": "link",
+      "label": "Terms and Privacy Notice",
+      "action": {
+        "type": "external",
+        "value": "https://www.tetherhealthgroup.com/privacy/"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Get started",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "ob_programs"
+      },
+      "summary": "push → ob_programs"
+    },
+    {
+      "element": "I already have an account",
+      "path": "footer[1]",
+      "action": {
+        "type": "sheet",
+        "to": "auth_signin"
+      },
+      "summary": "sheet → auth_signin"
+    },
+    {
+      "element": "Terms and Privacy Notice",
+      "path": "footer[2]",
+      "action": {
+        "type": "external",
+        "value": "https://www.tetherhealthgroup.com/privacy/"
+      },
+      "summary": "external https://www.tetherhealthgroup.com/privacy/"
+    }
+  ]
+}

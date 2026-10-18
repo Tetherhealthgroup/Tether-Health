@@ -1,0 +1,113 @@
+{
+  "id": "ck_item",
+  "name": "Item detail",
+  "route": "/p/ck/item/:id",
+  "flow": "ck",
+  "program": "ck",
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Colorectal screening",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Your options",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "All are recommended. Talk with your clinician about which fits.",
+      "tone": "muted"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Stool test (FIT)",
+          "at home · yearly"
+        ],
+        [
+          "Stool DNA test",
+          "at home · every 1–3 yrs"
+        ],
+        [
+          "Colonoscopy",
+          "clinic · every 10 yrs"
+        ]
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Cost",
+      "text": "Screening is often covered with no cost-sharing. Check with your insurer."
+    },
+    {
+      "t": "text",
+      "text": "Source: USPSTF 2021 · reviewed Aug 2026",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Message my care team",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Mark as done",
+      "action": {
+        "type": "push",
+        "to": "ck_done"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Message my care team",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "summary": "push → support_message_care"
+    },
+    {
+      "element": "Mark as done",
+      "path": "footer[1]",
+      "action": {
+        "type": "push",
+        "to": "ck_done"
+      },
+      "summary": "push → ck_done"
+    }
+  ]
+}

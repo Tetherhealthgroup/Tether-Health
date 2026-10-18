@@ -1,0 +1,111 @@
+{
+  "id": "be_intro",
+  "name": "Beacon intro",
+  "route": "/p/be",
+  "flow": "be",
+  "program": "be",
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Entry from Choose programs, Catalog or a Learn-only row.",
+  "header": {
+    "t": "header",
+    "title": "Beacon",
+    "left": "back",
+    "pill": "~1 min/week"
+  },
+  "body": [
+    {
+      "t": "progtag",
+      "program": "be",
+      "extra": "Cancer"
+    },
+    {
+      "t": "title",
+      "text": "Lower your risk. Know your options.",
+      "size": "l"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Risk steps",
+          "smoking, sun, alcohol, activity"
+        ],
+        [
+          "Screening",
+          "linked with Checkup"
+        ],
+        [
+          "Treatment support",
+          "questions, side-effect diary"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Set up Beacon",
+      "action": {
+        "type": "push",
+        "to": "be_q1"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Add as Learn only",
+      "action": {
+        "type": "toast",
+        "value": "Beacon added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Set up Beacon",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "be_q1"
+      },
+      "summary": "push → be_q1"
+    },
+    {
+      "element": "Add as Learn only",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "Beacon added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "summary": "toast “Beacon added as Learn only” then tab → plans"
+    }
+  ]
+}

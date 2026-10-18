@@ -1,0 +1,71 @@
+{
+  "id": "account_signout",
+  "name": "Sign out",
+  "route": "/account/signout",
+  "flow": "account",
+  "program": null,
+  "phase": "account",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": null,
+  "body": [
+    {
+      "t": "title",
+      "text": "Sign out of Tether?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Encrypted program data on this phone is removed. Your account data stays safe in the cloud.",
+      "tone": "muted"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Sign out",
+      "action": {
+        "type": "reset",
+        "to": "welcome"
+      },
+      "variant": "danger",
+      "arrow": false
+    },
+    {
+      "t": "button",
+      "label": "Cancel",
+      "action": {
+        "type": "close"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": "Account",
+  "api": [],
+  "actions": [
+    {
+      "element": "Sign out",
+      "path": "footer[0]",
+      "action": {
+        "type": "reset",
+        "to": "welcome"
+      },
+      "summary": "reset → welcome"
+    },
+    {
+      "element": "Cancel",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}

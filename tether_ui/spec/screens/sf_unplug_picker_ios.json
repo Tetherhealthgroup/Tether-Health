@@ -1,0 +1,107 @@
+{
+  "id": "sf_unplug_picker_ios",
+  "name": "Apple app picker",
+  "route": "/p/sf/unplug/apps/picker",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Placeholder for the system picker. In the app this sheet is Apple’s; the buttons stand for the picker’s own Done / Cancel.",
+  "header": null,
+  "body": [
+    {
+      "t": "nativeslot",
+      "id": "ios.familyActivityPicker",
+      "label": "Apple’s app picker",
+      "caption": "System sheet drawn by iOS (FamilyActivityPicker). Tether can’t style it or read the app names.",
+      "platform": "ios",
+      "height": 320
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Done",
+      "action": {
+        "type": "branch",
+        "question": "System app picker result",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Apps chosen",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_apps_chosen"
+            }
+          },
+          {
+            "label": "Cancelled",
+            "action": {
+              "type": "close"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Cancel",
+      "action": {
+        "type": "close"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 item 1, TNativeSlot",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()"
+  ],
+  "over": "Choose apps",
+  "api": [],
+  "actions": [
+    {
+      "element": "Done",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "System app picker result",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Apps chosen",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_apps_chosen"
+            }
+          },
+          {
+            "label": "Cancelled",
+            "action": {
+              "type": "close"
+            }
+          }
+        ]
+      },
+      "summary": "branch: System app picker result → Apps chosen: replace → sf_unplug_apps_chosen | Cancelled: close"
+    },
+    {
+      "element": "Cancel",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "id": "bf_intro",
+  "name": "BreatheFree intro",
+  "route": "/p/bf",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Entry from Choose programs, Catalog or a Learn-only row.",
+  "header": {
+    "t": "header",
+    "title": "BreatheFree",
+    "left": "back",
+    "pill": "~3 min/day"
+  },
+  "body": [
+    {
+      "t": "progtag",
+      "program": "bf",
+      "extra": "Tobacco & nicotine"
+    },
+    {
+      "t": "title",
+      "text": "Your next breath can be different.",
+      "size": "l"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Help when cravings hit",
+          "one tap, offline"
+        ],
+        [
+          "Plan your way",
+          "date · today · reduce · explore"
+        ],
+        [
+          "Medicines",
+          "education only"
+        ]
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Plan, practice and get through cravings, with no judgment. A slip never erases your wins.",
+      "tone": "muted"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Set up BreatheFree",
+      "action": {
+        "type": "push",
+        "to": "bf_q1"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Add as Learn only",
+      "action": {
+        "type": "toast",
+        "value": "BreatheFree added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Set up BreatheFree",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_q1"
+      },
+      "summary": "push → bf_q1"
+    },
+    {
+      "element": "Add as Learn only",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "BreatheFree added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "summary": "toast “BreatheFree added as Learn only” then tab → plans"
+    }
+  ]
+}

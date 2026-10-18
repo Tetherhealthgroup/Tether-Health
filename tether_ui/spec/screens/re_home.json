@@ -1,0 +1,197 @@
+{
+  "id": "re_home",
+  "name": "Renew home",
+  "route": "/p/re/home",
+  "flow": "re",
+  "program": "re",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Renew",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Latest eGFR · Oct 3",
+      "children": [
+        {
+          "t": "big",
+          "value": "58",
+          "unit": "mL/min",
+          "caption": "Next check Apr 2027 · from your clinician"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Today",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Medicine reminder · 8:00 AM",
+              "sub": "As entered from your clinician",
+              "done": true
+            },
+            {
+              "label": "Water reminder",
+              "sub": "Only if your clinician hasn’t limited fluids"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Add lab results",
+          "action": {
+            "type": "push",
+            "to": "re_labs"
+          }
+        },
+        {
+          "label": "Lab history",
+          "sub": "2 years",
+          "action": {
+            "type": "push",
+            "to": "re_history"
+          }
+        },
+        {
+          "label": "Check symptoms",
+          "action": {
+            "type": "push",
+            "to": "re_symptoms"
+          }
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Over-the-counter pain relief?",
+      "text": "Some (like ibuprofen) can affect kidneys. Ask your pharmacist."
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Add lab results",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "re_labs"
+      },
+      "summary": "push → re_labs"
+    },
+    {
+      "element": "Lab history",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "re_history"
+      },
+      "summary": "push → re_history"
+    },
+    {
+      "element": "Check symptoms",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "re_symptoms"
+      },
+      "summary": "push → re_symptoms"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[2].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

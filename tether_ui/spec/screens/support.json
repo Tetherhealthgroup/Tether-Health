@@ -1,0 +1,253 @@
+{
+  "id": "support",
+  "name": "Support",
+  "route": "/support",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": "support",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Support",
+    "left": "none",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Free & confidential · BreatheFree",
+      "title": "Quitline counselor",
+      "text": "1-800-QUIT-NOW · Español 1-855-335-3569",
+      "children": [
+        {
+          "t": "buttons",
+          "items": [
+            {
+              "t": "button",
+              "label": "Call now",
+              "action": {
+                "type": "call",
+                "value": "1-800-784-8669",
+                "label": "Call 1-800-QUIT-NOW"
+              },
+              "variant": "lime",
+              "arrow": false,
+              "small": true
+            },
+            {
+              "t": "button",
+              "label": "Request call-back",
+              "action": {
+                "type": "sheet",
+                "to": "support_callback"
+              },
+              "variant": "ghostdark",
+              "arrow": false,
+              "small": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Your people",
+      "rows": [
+        {
+          "label": "Jordan",
+          "sub": "Supporter · BreatheFree only",
+          "action": {
+            "type": "sheet",
+            "to": "support_message"
+          },
+          "lead": {
+            "avatar": "J"
+          }
+        },
+        {
+          "label": "Add a ScrollFree buddy",
+          "action": {
+            "type": "push",
+            "to": "sf_buddy"
+          },
+          "lead": {
+            "icon": "+"
+          }
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Care team",
+      "rows": [
+        {
+          "label": "Dr. Patel’s clinic",
+          "sub": "Heartwise · ClearAir",
+          "action": {
+            "type": "push",
+            "to": "support_message_care"
+          },
+          "lead": {
+            "icon": "+"
+          }
+        }
+      ]
+    },
+    {
+      "t": "emergency",
+      "text": "Thoughts of harming yourself? Call or text 988. Emergency: 911.",
+      "actions": [
+        {
+          "t": "button",
+          "label": "Call or text 988",
+          "action": {
+            "type": "push",
+            "to": "crisis"
+          },
+          "variant": "danger",
+          "arrow": false,
+          "small": true
+        },
+        {
+          "t": "button",
+          "label": "Call 911",
+          "action": {
+            "type": "call",
+            "value": "911",
+            "label": "911"
+          },
+          "variant": "secondary",
+          "arrow": false,
+          "small": true
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Call now",
+      "path": "body[0].children[0].items[0]",
+      "action": {
+        "type": "call",
+        "value": "1-800-784-8669",
+        "label": "Call 1-800-QUIT-NOW"
+      },
+      "summary": "call 1-800-784-8669"
+    },
+    {
+      "element": "Request call-back",
+      "path": "body[0].children[0].items[1]",
+      "action": {
+        "type": "sheet",
+        "to": "support_callback"
+      },
+      "summary": "sheet → support_callback"
+    },
+    {
+      "element": "Jordan",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "sheet",
+        "to": "support_message"
+      },
+      "summary": "sheet → support_message"
+    },
+    {
+      "element": "Add a ScrollFree buddy",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "sf_buddy"
+      },
+      "summary": "push → sf_buddy"
+    },
+    {
+      "element": "Dr. Patel’s clinic",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "summary": "push → support_message_care"
+    },
+    {
+      "element": "Call or text 988",
+      "path": "body[3].actions[0]",
+      "action": {
+        "type": "push",
+        "to": "crisis"
+      },
+      "summary": "push → crisis"
+    },
+    {
+      "element": "Call 911",
+      "path": "body[3].actions[1]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Plans",
+      "path": "tabbar.plans",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    }
+  ]
+}

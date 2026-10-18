@@ -1,0 +1,159 @@
+{
+  "id": "sf_unplug_off",
+  "name": "Turn off Unplug",
+  "route": "/p/sf/unplug/off",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "account",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Unplug only: liftShield + purgeLocalData(0). With Screen Time: also revokes the ScrollFree screen_time consent (then the same purge).",
+  "header": null,
+  "body": [
+    {
+      "t": "title",
+      "text": "Turn off Unplug?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Paused apps open normally again. Your ScrollFree goal, check-ins and Pause 60 stay.",
+      "tone": "muted"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Unplug only",
+          "sub": "Removes app choices, limits and session history from this phone",
+          "badge": "Default"
+        },
+        {
+          "label": "Unplug and Screen Time access",
+          "sub": "ScrollFree goes back to your own estimates"
+        }
+      ],
+      "selected": 0,
+      "key": "scope"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Turn off",
+      "action": {
+        "type": "branch",
+        "question": "Chosen option",
+        "on": "radio",
+        "decide": "choice:sf_unplug_off.scope",
+        "cases": [
+          {
+            "label": "Unplug only",
+            "action": {
+              "type": "submit",
+              "api": "CALL device:unplug/liftShield+purgeLocalData",
+              "then": {
+                "type": "toast",
+                "value": "Unplug is off",
+                "then": {
+                  "type": "reset",
+                  "to": "sf_home"
+                }
+              }
+            }
+          },
+          {
+            "label": "Unplug and Screen Time",
+            "action": {
+              "type": "submit",
+              "api": "PATCH /v1/enrolments/consents",
+              "then": {
+                "type": "toast",
+                "value": "Unplug and Screen Time are off",
+                "then": {
+                  "type": "reset",
+                  "to": "sf_home"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "variant": "danger",
+      "arrow": false
+    },
+    {
+      "t": "button",
+      "label": "Cancel",
+      "action": {
+        "type": "close"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 item 8 (\"turn off\")",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module liftShield(reason), purgeLocalData(0); A.4 \"Turn off anytime\" = revoke screen_time consent"
+  ],
+  "over": "Unplug",
+  "api": [],
+  "actions": [
+    {
+      "element": "Turn off",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Chosen option",
+        "on": "radio",
+        "decide": "choice:sf_unplug_off.scope",
+        "cases": [
+          {
+            "label": "Unplug only",
+            "action": {
+              "type": "submit",
+              "api": "CALL device:unplug/liftShield+purgeLocalData",
+              "then": {
+                "type": "toast",
+                "value": "Unplug is off",
+                "then": {
+                  "type": "reset",
+                  "to": "sf_home"
+                }
+              }
+            }
+          },
+          {
+            "label": "Unplug and Screen Time",
+            "action": {
+              "type": "submit",
+              "api": "PATCH /v1/enrolments/consents",
+              "then": {
+                "type": "toast",
+                "value": "Unplug and Screen Time are off",
+                "then": {
+                  "type": "reset",
+                  "to": "sf_home"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "summary": "decide choice:sf_unplug_off.scope: Chosen option → Unplug only: CALL device:unplug/liftShield+purgeLocalData then toast “Unplug is off” then reset → sf_home | Unplug and Screen Time: PATCH /v1/enrolments/consents then toast “Unplug and Screen Time are off” then reset → sf_home"
+    },
+    {
+      "element": "Cancel",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}

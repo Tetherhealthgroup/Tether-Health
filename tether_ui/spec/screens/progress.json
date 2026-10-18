@@ -1,0 +1,204 @@
+{
+  "id": "progress",
+  "name": "Progress",
+  "route": "/progress",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": "progress",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Progress",
+    "left": "none",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "segmented",
+      "options": [
+        "7 days",
+        "30 days",
+        "All"
+      ],
+      "selected": "7 days",
+      "key": "value"
+    },
+    {
+      "t": "text",
+      "text": "Patterns, not grades. Missing check-ins are never counted as zero.",
+      "tone": "small"
+    },
+    {
+      "t": "chart",
+      "kind": "bars",
+      "values": [
+        10,
+        7,
+        4,
+        3,
+        1,
+        1,
+        0
+      ],
+      "color": "bf",
+      "title": "Cigarettes / day",
+      "missing": [
+        3
+      ],
+      "labels": [
+        "M",
+        "T",
+        "W",
+        "T",
+        "F",
+        "S",
+        "S"
+      ],
+      "caption": "Saved $42.70 · avoided 61",
+      "tag": "bf",
+      "action": {
+        "type": "push",
+        "to": "bf_progress"
+      }
+    },
+    {
+      "t": "chart",
+      "kind": "bars",
+      "values": [
+        190,
+        160,
+        150,
+        115,
+        130,
+        95,
+        85
+      ],
+      "color": "sf",
+      "title": "Social minutes / day",
+      "target": 90,
+      "labels": [
+        "M",
+        "T",
+        "W",
+        "T",
+        "F",
+        "S",
+        "S"
+      ],
+      "caption": "Goal 90 min · reclaimed 5h 40m",
+      "tag": "sf",
+      "action": {
+        "type": "push",
+        "to": "sf_week"
+      }
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "eyebrow": "Connection we noticed",
+      "title": "Late scrolling came before 3 of your 4 strongest cravings.",
+      "text": "Shown because both programs are yours.",
+      "cta": {
+        "t": "button",
+        "label": "Manage",
+        "action": {
+          "type": "push",
+          "to": "account_privacy"
+        },
+        "variant": "secondary",
+        "arrow": false,
+        "small": true
+      }
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [
+    "GET /v1/records/summary?range=7d"
+  ],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Cigarettes / day",
+      "path": "body[2]",
+      "action": {
+        "type": "push",
+        "to": "bf_progress"
+      },
+      "summary": "push → bf_progress"
+    },
+    {
+      "element": "Social minutes / day",
+      "path": "body[3]",
+      "action": {
+        "type": "push",
+        "to": "sf_week"
+      },
+      "summary": "push → sf_week"
+    },
+    {
+      "element": "Manage",
+      "path": "body[4].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "account_privacy"
+      },
+      "summary": "push → account_privacy"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Plans",
+      "path": "tabbar.plans",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "id": "sf_unplug_shield_firm",
+  "name": "Pause screen (iPhone shield, firm)",
+  "route": "/system/unplug/shield?state=firm",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": "sf_unplug_shield",
+  "state": "no “open anyway” left",
+  "dark": true,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. iPhone system shield (UnplugShield, ShieldConfiguration). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for TH-968.",
+  "header": null,
+  "body": [
+    {
+      "t": "spacer",
+      "h": 60
+    },
+    {
+      "t": "illus",
+      "glyph": "T",
+      "tone": "dark"
+    },
+    {
+      "t": "title",
+      "text": "Paused for a moment",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "You asked to slow this one down. Video apps is on your list. No “open anyway” left today.",
+      "tone": "body",
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Close the app",
+      "action": {
+        "type": "toast",
+        "value": "The app stays closed.",
+        "then": {
+          "type": "close"
+        }
+      },
+      "variant": "lime",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 item 5 (iOS shield, Firm level or overrides used up)",
+    "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close the app",
+      "path": "footer[0]",
+      "action": {
+        "type": "toast",
+        "value": "The app stays closed.",
+        "then": {
+          "type": "close"
+        }
+      },
+      "summary": "toast “The app stays closed.” then close"
+    }
+  ]
+}

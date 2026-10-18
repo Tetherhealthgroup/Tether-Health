@@ -1,0 +1,133 @@
+{
+  "id": "learn_error",
+  "name": "Learn · error",
+  "route": "/learn?state=error",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": "learn",
+  "variantOf": "learn",
+  "state": "error",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Learn",
+    "left": "none",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "!",
+      "tone": "warn"
+    },
+    {
+      "t": "title",
+      "text": "Can’t load lessons",
+      "size": "m",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Check your connection. Downloaded lessons still work.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "button",
+      "label": "Try again",
+      "action": {
+        "type": "replace",
+        "to": "learn"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Open downloads",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Try again",
+      "path": "body[3]",
+      "action": {
+        "type": "replace",
+        "to": "learn"
+      },
+      "summary": "replace → learn"
+    },
+    {
+      "element": "Open downloads",
+      "path": "body[4]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Plans",
+      "path": "tabbar.plans",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

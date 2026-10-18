@@ -1,0 +1,114 @@
+{
+  "id": "sf_unplug_apps_android",
+  "name": "Choose apps (Android)",
+  "route": "/p/sf/unplug/apps?state=android",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "sf_unplug_apps",
+  "state": "android",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Android draws its own picker (AppPickerActivity, native layout per TH-969). App names shown here are generic examples; the real list is the phone’s launchable apps.",
+  "header": {
+    "t": "header",
+    "title": "Choose apps",
+    "left": "back",
+    "pill": "Step 2 of 3"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Choose the apps to pause",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "This choice stays on this phone. Tether never receives it.",
+      "tone": "muted"
+    },
+    {
+      "t": "checklist",
+      "items": [
+        {
+          "label": "Short-video app",
+          "done": true
+        },
+        {
+          "label": "Photo feed app",
+          "done": true
+        },
+        {
+          "label": "Video app",
+          "done": true
+        },
+        {
+          "label": "News app"
+        },
+        {
+          "label": "Games app"
+        },
+        {
+          "label": "Shopping app"
+        }
+      ],
+      "label": "Apps on this phone"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Done · 3 apps",
+      "action": {
+        "type": "replace",
+        "to": "sf_unplug_apps_chosen"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Cancel",
+      "action": {
+        "type": "back"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 item 1 (Android picker; TH-969 layout must match)",
+    "Source: android/.../unplug/AppPickerActivity.kt"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Done · 3 apps",
+      "path": "footer[0]",
+      "action": {
+        "type": "replace",
+        "to": "sf_unplug_apps_chosen"
+      },
+      "summary": "replace → sf_unplug_apps_chosen"
+    },
+    {
+      "element": "Cancel",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "id": "sf_goal",
+  "name": "Goal & windows",
+  "route": "/p/sf/plan/goal",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your goal",
+    "left": "back",
+    "pill": "Plan"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Set a goal that feels doable.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "From about 3 hours a day.",
+      "tone": "muted"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "children": [
+        {
+          "t": "slider",
+          "label": "Daily social time",
+          "value": 90,
+          "min": 30,
+          "max": 240,
+          "minLabel": "30 min",
+          "maxLabel": "4 h",
+          "color": "sf",
+          "suffix": " min",
+          "key": "daily_social_time"
+        },
+        {
+          "t": "toggle",
+          "label": "Step down 15 min each week",
+          "on": true,
+          "key": "step_down_15_min_each_week"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "App-free times",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Bedtime",
+              "sub": "10:00 PM – 7:00 AM",
+              "done": true
+            },
+            {
+              "label": "Meals",
+              "sub": "When you mark a meal",
+              "done": true
+            },
+            {
+              "label": "First hour awake"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Connect Screen Time",
+          "sub": "Optional · totals only",
+          "action": {
+            "type": "push",
+            "to": "sf_screentime"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save my goal",
+      "action": {
+        "type": "push",
+        "to": "sf_buddy"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Connect Screen Time",
+      "path": "body[4].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_screentime"
+      },
+      "summary": "push → sf_screentime"
+    },
+    {
+      "element": "Save my goal",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_buddy"
+      },
+      "summary": "push → sf_buddy"
+    }
+  ]
+}

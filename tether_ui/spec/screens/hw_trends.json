@@ -1,0 +1,108 @@
+{
+  "id": "hw_trends",
+  "name": "Trends",
+  "route": "/p/hw/trends",
+  "flow": "hw",
+  "program": "hw",
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Trends",
+    "left": "back",
+    "pill": "Heartwise"
+  },
+  "body": [
+    {
+      "t": "segmented",
+      "options": [
+        "7 days",
+        "30 days",
+        "90 days"
+      ],
+      "selected": "30 days",
+      "key": "value"
+    },
+    {
+      "t": "chart",
+      "kind": "line",
+      "values": [
+        142,
+        140,
+        138,
+        139,
+        135,
+        133,
+        136,
+        131,
+        129,
+        130,
+        128,
+        127
+      ],
+      "color": "hw",
+      "title": "Systolic · morning avg",
+      "unit": "target < 130",
+      "band": [
+        110,
+        130
+      ],
+      "caption": "Shaded: your clinician’s target"
+    },
+    {
+      "t": "stats",
+      "items": [
+        {
+          "label": "30-day avg",
+          "value": "132/82"
+        },
+        {
+          "label": "Readings",
+          "value": "48",
+          "sub": "4 days missed"
+        }
+      ],
+      "cols": 2
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Create visit summary",
+      "action": {
+        "type": "push",
+        "to": "hw_summary"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Create visit summary",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "hw_summary"
+      },
+      "summary": "push → hw_summary"
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "id": "auth_verify",
+  "name": "Verify email",
+  "route": "/auth/verify",
+  "flow": "auth",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Check your email",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "@",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "Confirm your email",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "We sent a link to alex@example.com. Open it on this phone to finish.",
+      "tone": "body",
+      "align": "center"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "Your plan is saved on this phone while you wait. Nothing is lost if you close the app."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Open email app",
+      "action": {
+        "type": "external",
+        "value": "message://"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "I’ve confirmed my email",
+      "action": {
+        "type": "push",
+        "to": "auth_merge"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Resend link (available in 0:42)",
+      "action": {
+        "type": "toast",
+        "value": "Link sent again"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Open email app",
+      "path": "footer[0]",
+      "action": {
+        "type": "external",
+        "value": "message://"
+      },
+      "summary": "external message://"
+    },
+    {
+      "element": "I’ve confirmed my email",
+      "path": "footer[1]",
+      "action": {
+        "type": "push",
+        "to": "auth_merge"
+      },
+      "summary": "push → auth_merge"
+    },
+    {
+      "element": "Resend link (available in 0:42)",
+      "path": "footer[2]",
+      "action": {
+        "type": "toast",
+        "value": "Link sent again"
+      },
+      "summary": "toast “Link sent again”"
+    }
+  ]
+}

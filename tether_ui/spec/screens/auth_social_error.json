@@ -1,0 +1,136 @@
+{
+  "id": "auth_social_error",
+  "name": "Apple / Google sign-in failed",
+  "route": "/auth/social/error",
+  "flow": "auth",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Sign in",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "!",
+      "tone": "error"
+    },
+    {
+      "t": "title",
+      "text": "Couldn’t sign in",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Google sign-in didn’t finish. Check your connection and try again, or use email.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Nothing was saved or shared.",
+      "tone": "small",
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Try again",
+      "action": {
+        "type": "branch",
+        "question": "Sign in with Google result",
+        "provider": "google",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Success",
+            "action": {
+              "type": "reset",
+              "to": "today"
+            }
+          },
+          {
+            "label": "Error",
+            "action": {
+              "type": "toast",
+              "value": "Still can’t reach Google. Try email."
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Use email instead",
+      "action": {
+        "type": "replace",
+        "to": "auth_signin"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Try again",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Sign in with Google result",
+        "provider": "google",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Success",
+            "action": {
+              "type": "reset",
+              "to": "today"
+            }
+          },
+          {
+            "label": "Error",
+            "action": {
+              "type": "toast",
+              "value": "Still can’t reach Google. Try email."
+            }
+          }
+        ]
+      },
+      "summary": "auth (google): Sign in with Google result → Success: reset → today | Error: toast “Still can’t reach Google. Try email.”"
+    },
+    {
+      "element": "Use email instead",
+      "path": "footer[1]",
+      "action": {
+        "type": "replace",
+        "to": "auth_signin"
+      },
+      "summary": "replace → auth_signin"
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "id": "st_q1",
+  "name": "Type & device",
+  "route": "/p/st/onboarding/1",
+  "flow": "st",
+  "program": "st",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "About you",
+    "left": "back",
+    "pill": "1 of 2"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 1,
+      "total": 2
+    },
+    {
+      "t": "title",
+      "text": "Which describes you?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "As told by a clinician.",
+      "tone": "muted"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Type 2 diabetes"
+        },
+        {
+          "label": "Prediabetes"
+        },
+        {
+          "label": "Type 1 diabetes",
+          "sub": "Logging only; follow your care team for insulin"
+        },
+        {
+          "label": "Gestational diabetes",
+          "sub": "Education only; talk with your care team"
+        },
+        {
+          "label": "Not diagnosed: learn"
+        }
+      ],
+      "selected": 0,
+      "key": "value"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "Meter",
+        "CGM",
+        "Lab only"
+      ],
+      "selected": "Meter",
+      "label": "How do you check?",
+      "key": "how_do_you_check"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next",
+      "action": {
+        "type": "push",
+        "to": "st_range"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Next",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "st_range"
+      },
+      "summary": "push → st_range"
+    }
+  ]
+}

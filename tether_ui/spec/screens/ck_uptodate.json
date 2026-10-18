@@ -1,0 +1,122 @@
+{
+  "id": "ck_uptodate",
+  "name": "Up to date",
+  "route": "/p/ck/home?state=empty",
+  "flow": "ck",
+  "program": "ck",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": "ck_list",
+  "state": "empty",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Checkup",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "✓",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "You’re up to date",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Next: flu vaccine in Sep 2027. We’ll remind you a month before.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "button",
+      "label": "See full schedule",
+      "action": {
+        "type": "replace",
+        "to": "ck_list"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "See full schedule",
+      "path": "body[3]",
+      "action": {
+        "type": "replace",
+        "to": "ck_list"
+      },
+      "summary": "replace → ck_list"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

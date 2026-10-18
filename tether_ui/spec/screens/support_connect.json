@@ -1,0 +1,87 @@
+{
+  "id": "support_connect",
+  "name": "Connect a clinic",
+  "route": "/support/connect",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Connect a clinic",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Enter your clinic’s invite code",
+      "size": "m"
+    },
+    {
+      "t": "field",
+      "label": "Invite code",
+      "value": "PATEL-4821",
+      "kind": "text",
+      "key": "invite_code"
+    },
+    {
+      "t": "text",
+      "text": "Your clinic gave you this code. Connecting shares nothing until you approve a summary.",
+      "tone": "muted"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Connect",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/care/connections",
+        "then": {
+          "type": "toast",
+          "value": "Connected to Dr. Patel’s clinic",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Connect",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/care/connections",
+        "then": {
+          "type": "toast",
+          "value": "Connected to Dr. Patel’s clinic",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "summary": "POST /v1/care/connections then toast “Connected to Dr. Patel’s clinic” then back"
+    }
+  ]
+}

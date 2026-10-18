@@ -1,0 +1,144 @@
+{
+  "id": "sd_fell",
+  "name": "I fell",
+  "route": "/p/sd/fell",
+  "flow": "sd",
+  "program": "sd",
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "I fell",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Are you hurt?",
+      "size": "m"
+    },
+    {
+      "t": "button",
+      "label": "I hit my head or can’t get up · Call 911",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "variant": "danger",
+      "arrow": false
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Call Rosa",
+          "sub": "Caregiver",
+          "action": {
+            "type": "call",
+            "value": "(555) 010-2244",
+            "label": "Call Rosa"
+          },
+          "lead": {
+            "avatar": "R"
+          }
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "How to get up safely",
+      "text": "Roll to your side, crawl to a sturdy chair, kneel, then rise slowly.",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      }
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "I’m okay, log this fall",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/sd/falls",
+        "then": {
+          "type": "toast",
+          "value": "Fall logged. Added to your visit list.",
+          "then": {
+            "type": "replace",
+            "to": "sd_home"
+          }
+        }
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "I hit my head or can’t get up · Call 911",
+      "path": "body[1]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "Call Rosa",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "call",
+        "value": "(555) 010-2244",
+        "label": "Call Rosa"
+      },
+      "summary": "call (555) 010-2244"
+    },
+    {
+      "element": "How to get up safely",
+      "path": "body[3]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "I’m okay, log this fall",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/sd/falls",
+        "then": {
+          "type": "toast",
+          "value": "Fall logged. Added to your visit list.",
+          "then": {
+            "type": "replace",
+            "to": "sd_home"
+          }
+        }
+      },
+      "summary": "POST /v1/program-data/sd/falls then toast “Fall logged. Added to your visit list.” then replace → sd_home"
+    }
+  ]
+}

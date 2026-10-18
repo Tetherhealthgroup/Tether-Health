@@ -1,0 +1,224 @@
+{
+  "id": "sf_unplug_home",
+  "name": "Unplug",
+  "route": "/p/sf/unplug/home",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Reached from ScrollFree home (state \"Unplug on\") and ScrollFree settings. Everything shown is read from this phone.",
+  "header": {
+    "t": "header",
+    "title": "Unplug",
+    "left": "back",
+    "pill": "On"
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Unplug is on",
+      "text": "5 apps in 2 groups · pause screen after 60 min or 20 opens"
+    },
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Focus session",
+      "title": "Need to focus?",
+      "text": "Pause your chosen apps for a set time",
+      "cta": {
+        "t": "button",
+        "label": "Start",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_session"
+        },
+        "variant": "lime",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "list",
+      "title": "Settings",
+      "rows": [
+        {
+          "label": "Apps",
+          "sub": "Video apps · 3, Feeds · 2",
+          "action": {
+            "type": "push",
+            "to": "sf_unplug_apps_chosen"
+          }
+        },
+        {
+          "label": "Limits & pause screen",
+          "sub": "60 min · 20 opens · one breath first",
+          "action": {
+            "type": "push",
+            "to": "sf_unplug_limits"
+          }
+        },
+        {
+          "label": "Preview the pause screen",
+          "sub": "iPhone shield or Android overlay",
+          "action": {
+            "type": "branch",
+            "question": "Platform",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "iPhone",
+                "action": {
+                  "type": "push",
+                  "to": "sf_unplug_shield"
+                }
+              },
+              {
+                "label": "Android",
+                "action": {
+                  "type": "push",
+                  "to": "sf_unplug_overlay"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "label": "Tracking check",
+          "sub": "All checks pass",
+          "action": {
+            "type": "push",
+            "to": "sf_unplug_health"
+          }
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "How Unplug works",
+          "sub": "What it can and can’t see",
+          "action": {
+            "type": "push",
+            "to": "sf_unplug_intro"
+          }
+        },
+        {
+          "label": "Turn off Unplug",
+          "sub": "Paused apps open normally again",
+          "action": {
+            "type": "sheet",
+            "to": "sf_unplug_off"
+          },
+          "danger": true
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 item 8 (Unplug settings)",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Start",
+      "path": "body[1].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_unplug_session"
+      },
+      "summary": "push → sf_unplug_session"
+    },
+    {
+      "element": "Apps",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_unplug_apps_chosen"
+      },
+      "summary": "push → sf_unplug_apps_chosen"
+    },
+    {
+      "element": "Limits & pause screen",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "sf_unplug_limits"
+      },
+      "summary": "push → sf_unplug_limits"
+    },
+    {
+      "element": "Preview the pause screen",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "branch",
+        "question": "Platform",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "iPhone",
+            "action": {
+              "type": "push",
+              "to": "sf_unplug_shield"
+            }
+          },
+          {
+            "label": "Android",
+            "action": {
+              "type": "push",
+              "to": "sf_unplug_overlay"
+            }
+          }
+        ]
+      },
+      "summary": "branch: Platform → iPhone: push → sf_unplug_shield | Android: push → sf_unplug_overlay"
+    },
+    {
+      "element": "Tracking check",
+      "path": "body[2].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "sf_unplug_health"
+      },
+      "summary": "push → sf_unplug_health"
+    },
+    {
+      "element": "How Unplug works",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_unplug_intro"
+      },
+      "summary": "push → sf_unplug_intro"
+    },
+    {
+      "element": "Turn off Unplug",
+      "path": "body[3].rows[1]",
+      "action": {
+        "type": "sheet",
+        "to": "sf_unplug_off"
+      },
+      "summary": "sheet → sf_unplug_off"
+    }
+  ]
+}

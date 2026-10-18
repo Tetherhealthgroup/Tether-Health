@@ -1,0 +1,196 @@
+{
+  "id": "bf_review",
+  "name": "Review plan",
+  "route": "/p/bf/plan/review",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Review your plan",
+    "left": "back",
+    "pill": "Ready"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Your plan is ready.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Tap any item to edit.",
+      "tone": "muted"
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Quit approach",
+          "sub": "Set a quit date",
+          "action": {
+            "type": "push",
+            "to": "bf_path"
+          }
+        },
+        {
+          "label": "Quit date",
+          "sub": "Fri, Aug 28 · 7 days to prepare",
+          "action": {
+            "type": "push",
+            "to": "bf_date"
+          }
+        },
+        {
+          "label": "Top reason",
+          "sub": "Protect my family",
+          "action": {
+            "type": "push",
+            "to": "bf_q3"
+          }
+        },
+        {
+          "label": "Support",
+          "sub": "Jordan · evening before",
+          "action": {
+            "type": "push",
+            "to": "bf_support"
+          }
+        },
+        {
+          "label": "Space",
+          "sub": "2 of 3 tasks done",
+          "action": {
+            "type": "push",
+            "to": "bf_support"
+          }
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Starting turns on your preparation tasks and reminders. Support messages always need your approval.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Start my plan",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/quit-plan",
+        "then": {
+          "type": "replace",
+          "to": "bf_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Save and finish later",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [
+    "PUT /v1/quit-plan"
+  ],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Quit approach",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_path"
+      },
+      "summary": "push → bf_path"
+    },
+    {
+      "element": "Quit date",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "bf_date"
+      },
+      "summary": "push → bf_date"
+    },
+    {
+      "element": "Top reason",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "bf_q3"
+      },
+      "summary": "push → bf_q3"
+    },
+    {
+      "element": "Support",
+      "path": "body[2].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "bf_support"
+      },
+      "summary": "push → bf_support"
+    },
+    {
+      "element": "Space",
+      "path": "body[2].rows[4]",
+      "action": {
+        "type": "push",
+        "to": "bf_support"
+      },
+      "summary": "push → bf_support"
+    },
+    {
+      "element": "Start my plan",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/quit-plan",
+        "then": {
+          "type": "replace",
+          "to": "bf_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "summary": "PUT /v1/quit-plan then replace → bf_home (onboarding: ob_setup)"
+    },
+    {
+      "element": "Save and finish later",
+      "path": "footer[1]",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    }
+  ]
+}

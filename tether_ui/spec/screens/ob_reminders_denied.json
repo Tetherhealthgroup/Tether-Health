@@ -1,0 +1,88 @@
+{
+  "id": "ob_reminders_denied",
+  "name": "Reminders denied",
+  "route": "/onboarding/reminders?state=denied",
+  "flow": "onboarding",
+  "program": null,
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "ob_reminders",
+  "state": "permission denied",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Reminders",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "info",
+      "text": "Notifications are off in your phone settings."
+    },
+    {
+      "t": "title",
+      "text": "You can still use everything.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Today shows your steps when you open the app. To get reminders, allow notifications for Tether in Settings.",
+      "tone": "muted"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Open phone settings",
+      "action": {
+        "type": "os_settings"
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "button",
+      "label": "Continue without reminders",
+      "action": {
+        "type": "push",
+        "to": "ob_account"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Open phone settings",
+      "path": "footer[0]",
+      "action": {
+        "type": "os_settings"
+      },
+      "summary": "os_settings"
+    },
+    {
+      "element": "Continue without reminders",
+      "path": "footer[1]",
+      "action": {
+        "type": "push",
+        "to": "ob_account"
+      },
+      "summary": "push → ob_account"
+    }
+  ]
+}

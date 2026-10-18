@@ -1,0 +1,134 @@
+{
+  "id": "sf_pause",
+  "name": "Pause 60",
+  "route": "/p/sf/pause",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": true,
+  "bg": "indigo",
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Pause 60",
+    "left": "close",
+    "pill": "Urge rescue",
+    "dark": true
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Before you open it, one breath.",
+      "size": "l"
+    },
+    {
+      "t": "text",
+      "text": "What did you pick up your phone for?",
+      "tone": "body"
+    },
+    {
+      "t": "ring",
+      "value": "42",
+      "label": "SECONDS",
+      "palette": "indigo"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Message someone",
+        "Bored",
+        "Avoiding something",
+        "Can’t sleep"
+      ],
+      "selected": [
+        "Bored"
+      ],
+      "multi": false,
+      "key": "value"
+    },
+    {
+      "t": "card",
+      "variant": "dark2",
+      "title": "Bored? Try instead:",
+      "text": "2-min walk · text one real person · a short lesson"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "I’m good, put it down",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/sf/pauses",
+        "then": {
+          "type": "toast",
+          "value": "Nice. Logged as a pause.",
+          "then": {
+            "type": "reset",
+            "to": "today"
+          }
+        }
+      },
+      "variant": "white",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Open anyway (logged as information)",
+      "action": {
+        "type": "toast",
+        "value": "Logged. No judgment.",
+        "then": {
+          "type": "close"
+        }
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "I’m good, put it down",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/sf/pauses",
+        "then": {
+          "type": "toast",
+          "value": "Nice. Logged as a pause.",
+          "then": {
+            "type": "reset",
+            "to": "today"
+          }
+        }
+      },
+      "summary": "POST /v1/program-data/sf/pauses then toast “Nice. Logged as a pause.” then reset → today"
+    },
+    {
+      "element": "Open anyway (logged as information)",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "Logged. No judgment.",
+        "then": {
+          "type": "close"
+        }
+      },
+      "summary": "toast “Logged. No judgment.” then close"
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "id": "sf_screentime",
+  "name": "Connect Screen Time",
+  "route": "/p/sf/screen-time",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Screen Time",
+    "left": "back",
+    "pill": "Optional"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "◷",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "See real totals, if you want.",
+      "size": "m",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Tether reads daily totals by category only. Never apps’ content, messages or contacts.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Reads",
+          "Minutes per category"
+        ],
+        [
+          "Never reads",
+          "Content, messages, contacts"
+        ],
+        [
+          "Turn off",
+          "Anytime in Account"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Allow access",
+      "action": {
+        "type": "branch",
+        "question": "iOS Screen Time permission",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Allowed",
+            "action": {
+              "type": "toast",
+              "value": "Screen Time connected",
+              "then": {
+                "type": "back"
+              }
+            }
+          },
+          {
+            "label": "Not allowed",
+            "action": {
+              "type": "replace",
+              "to": "sf_screentime_denied"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Not now",
+      "action": {
+        "type": "back"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Allow access",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "iOS Screen Time permission",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Allowed",
+            "action": {
+              "type": "toast",
+              "value": "Screen Time connected",
+              "then": {
+                "type": "back"
+              }
+            }
+          },
+          {
+            "label": "Not allowed",
+            "action": {
+              "type": "replace",
+              "to": "sf_screentime_denied"
+            }
+          }
+        ]
+      },
+      "summary": "branch: iOS Screen Time permission → Allowed: toast “Screen Time connected” then back | Not allowed: replace → sf_screentime_denied"
+    },
+    {
+      "element": "Not now",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

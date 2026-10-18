@@ -1,0 +1,127 @@
+{
+  "id": "crisis",
+  "name": "Crisis support",
+  "route": "/crisis",
+  "flow": "rescue",
+  "program": null,
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Global crisis screen used by every program.",
+  "header": {
+    "t": "header",
+    "title": "You’re not alone",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "urgent",
+      "text": "If you might act on thoughts of harming yourself, get help now."
+    },
+    {
+      "t": "button",
+      "label": "Call 988",
+      "action": {
+        "type": "call",
+        "value": "988",
+        "label": "988"
+      },
+      "variant": "danger",
+      "arrow": false
+    },
+    {
+      "t": "button",
+      "label": "Text 988",
+      "action": {
+        "type": "sms",
+        "value": "988"
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "button",
+      "label": "Call 911",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Your safety plan",
+      "title": "Things that help: walk the dog, shower, music",
+      "text": "Reach out: Sam · (555) 010-3311",
+      "action": {
+        "type": "push",
+        "to": "ea_plan"
+      }
+    },
+    {
+      "t": "text",
+      "text": "Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. Works offline. 988 is US-only; localize per region.",
+      "tone": "small"
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Call 988",
+      "path": "body[1]",
+      "action": {
+        "type": "call",
+        "value": "988",
+        "label": "988"
+      },
+      "summary": "call 988"
+    },
+    {
+      "element": "Text 988",
+      "path": "body[2]",
+      "action": {
+        "type": "sms",
+        "value": "988"
+      },
+      "summary": "sms 988"
+    },
+    {
+      "element": "Call 911",
+      "path": "body[3]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "Things that help: walk the dog, shower, music",
+      "path": "body[4]",
+      "action": {
+        "type": "push",
+        "to": "ea_plan"
+      },
+      "summary": "push → ea_plan"
+    }
+  ]
+}

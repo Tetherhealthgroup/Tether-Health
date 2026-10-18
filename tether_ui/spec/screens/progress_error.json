@@ -1,0 +1,120 @@
+{
+  "id": "progress_error",
+  "name": "Progress · error",
+  "route": "/progress?state=error",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": "progress",
+  "variantOf": "progress",
+  "state": "error",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Progress",
+    "left": "none",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "!",
+      "tone": "error"
+    },
+    {
+      "t": "title",
+      "text": "Something went wrong on our side",
+      "size": "m",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Your data is safe on this phone. Try again in a moment.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "button",
+      "label": "Try again",
+      "action": {
+        "type": "replace",
+        "to": "progress"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "text",
+      "text": "Reference 5xx-2F91 · reports never include health data",
+      "tone": "small",
+      "align": "center"
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Try again",
+      "path": "body[3]",
+      "action": {
+        "type": "replace",
+        "to": "progress"
+      },
+      "summary": "replace → progress"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Plans",
+      "path": "tabbar.plans",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

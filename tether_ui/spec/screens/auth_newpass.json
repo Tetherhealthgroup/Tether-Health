@@ -1,0 +1,84 @@
+{
+  "id": "auth_newpass",
+  "name": "Set new password",
+  "route": "/auth/reset",
+  "flow": "auth",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Opened from the reset email deep link.",
+  "header": {
+    "t": "header",
+    "title": "New password",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Choose a new password",
+      "size": "m"
+    },
+    {
+      "t": "field",
+      "label": "New password",
+      "value": "••••••••••••",
+      "hint": "At least 12 characters.",
+      "kind": "password",
+      "key": "new_password"
+    },
+    {
+      "t": "field",
+      "label": "Confirm password",
+      "value": "••••••••••••",
+      "kind": "password",
+      "key": "confirm_password"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save password",
+      "action": {
+        "type": "submit",
+        "api": "PUT supabase /auth/v1/user",
+        "then": {
+          "type": "reset",
+          "to": "today"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Save password",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT supabase /auth/v1/user",
+        "then": {
+          "type": "reset",
+          "to": "today"
+        }
+      },
+      "summary": "PUT supabase /auth/v1/user then reset → today"
+    }
+  ]
+}

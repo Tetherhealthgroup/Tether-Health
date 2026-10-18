@@ -1,0 +1,146 @@
+{
+  "id": "account_programs",
+  "name": "Programs & sharing",
+  "route": "/account/programs",
+  "flow": "account",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Programs & sharing",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "text",
+      "text": "2 of 2 focus slots used",
+      "tone": "small"
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "BreatheFree",
+          "sub": "Focus · sharing manual",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          },
+          "lead": {
+            "program": "bf"
+          }
+        },
+        {
+          "label": "ScrollFree",
+          "sub": "Focus · not shared",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          },
+          "lead": {
+            "program": "sf"
+          }
+        },
+        {
+          "label": "ClearAir",
+          "sub": "Learn only · no data",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          },
+          "lead": {
+            "program": "ca"
+          }
+        },
+        {
+          "label": "Heartwise",
+          "sub": "Paused Sep 2 · data kept",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          },
+          "lead": {
+            "program": "hw"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Add a program",
+      "action": {
+        "type": "push",
+        "to": "catalog"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "BreatheFree",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "ScrollFree",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "ClearAir",
+      "path": "body[1].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Heartwise",
+      "path": "body[1].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Add a program",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "catalog"
+      },
+      "summary": "push → catalog"
+    }
+  ]
+}

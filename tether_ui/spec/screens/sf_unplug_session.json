@@ -1,0 +1,117 @@
+{
+  "id": "sf_unplug_session",
+  "name": "Start a focus session",
+  "route": "/p/sf/unplug/session",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "rescue",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Device-only. Proposal: Tether (and so Rescue / 988) and phone calls are never paused.",
+  "header": {
+    "t": "header",
+    "title": "Focus session",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Pause your apps for a while.",
+      "size": "m"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "25 min",
+        "45 min",
+        "60 min",
+        "90 min"
+      ],
+      "selected": [
+        "45 min"
+      ],
+      "multi": false,
+      "label": "How long",
+      "key": "duration"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Only my chosen apps",
+          "sub": "Video apps, Feeds"
+        },
+        {
+          "label": "Everything except apps I allow",
+          "sub": "Phone calls and Tether always stay open"
+        }
+      ],
+      "selected": 0,
+      "label": "What to pause",
+      "key": "scope"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "children": [
+        {
+          "t": "toggle",
+          "label": "Strict",
+          "sub": "Ending early asks for a reason, kept on this phone",
+          "on": false,
+          "key": "strict"
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Start session",
+      "action": {
+        "type": "submit",
+        "api": "CALL device:unplug/startSession",
+        "then": {
+          "type": "replace",
+          "to": "sf_unplug_session_active"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 item 4 (session start)",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module startSession(durationSeconds, PlatformShieldScope selectedApps|everythingExceptAllowlist, strict)"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Start session",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "CALL device:unplug/startSession",
+        "then": {
+          "type": "replace",
+          "to": "sf_unplug_session_active"
+        }
+      },
+      "summary": "CALL device:unplug/startSession then replace → sf_unplug_session_active"
+    }
+  ]
+}

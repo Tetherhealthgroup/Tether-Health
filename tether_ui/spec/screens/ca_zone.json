@@ -1,0 +1,182 @@
+{
+  "id": "ca_zone",
+  "name": "Zone check",
+  "route": "/p/ca/zone",
+  "flow": "ca",
+  "program": "ca",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "\"Can’t speak in full sentences\" routes to red regardless of peak flow.",
+  "header": {
+    "t": "header",
+    "title": "Zone check",
+    "left": "back",
+    "pill": "Today"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "How is your breathing?",
+      "size": "m"
+    },
+    {
+      "t": "field",
+      "label": "Peak flow (optional)",
+      "value": "310",
+      "unit": "L/min",
+      "hint": "50–900 L/min",
+      "kind": "number",
+      "key": "peak_flow"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Coughing",
+        "Wheezing",
+        "Short of breath",
+        "Chest tightness",
+        "Woke at night",
+        "Can’t speak in full sentences"
+      ],
+      "selected": [
+        "Wheezing"
+      ],
+      "multi": true,
+      "label": "Symptoms now",
+      "key": "symptoms"
+    },
+    {
+      "t": "eyebrow",
+      "text": "Your zone · updates as you type"
+    },
+    {
+      "t": "zone",
+      "selected": "yellow",
+      "rule": "ca.zone"
+    },
+    {
+      "t": "text",
+      "text": "Worked out only from the plan you entered (green from 400, red below 200).",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save and see my steps",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/ca/zone-checks",
+        "then": {
+          "type": "branch",
+          "question": "Computed zone",
+          "on": null,
+          "decide": "ca.zone",
+          "cases": [
+            {
+              "label": "Green",
+              "action": {
+                "type": "toast",
+                "value": "Green zone · follow your daily routine",
+                "then": {
+                  "type": "replace",
+                  "to": "ca_home"
+                }
+              }
+            },
+            {
+              "label": "Yellow",
+              "action": {
+                "type": "replace",
+                "to": "ca_yellow"
+              }
+            },
+            {
+              "label": "Red",
+              "action": {
+                "type": "replace",
+                "to": "ca_red"
+              }
+            },
+            {
+              "label": "Invalid peak flow",
+              "action": {
+                "type": "toast",
+                "value": "Check your peak flow: 50–900 L/min"
+              }
+            }
+          ]
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save and see my steps",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/ca/zone-checks",
+        "then": {
+          "type": "branch",
+          "question": "Computed zone",
+          "on": null,
+          "decide": "ca.zone",
+          "cases": [
+            {
+              "label": "Green",
+              "action": {
+                "type": "toast",
+                "value": "Green zone · follow your daily routine",
+                "then": {
+                  "type": "replace",
+                  "to": "ca_home"
+                }
+              }
+            },
+            {
+              "label": "Yellow",
+              "action": {
+                "type": "replace",
+                "to": "ca_yellow"
+              }
+            },
+            {
+              "label": "Red",
+              "action": {
+                "type": "replace",
+                "to": "ca_red"
+              }
+            },
+            {
+              "label": "Invalid peak flow",
+              "action": {
+                "type": "toast",
+                "value": "Check your peak flow: 50–900 L/min"
+              }
+            }
+          ]
+        }
+      },
+      "summary": "POST /v1/program-data/ca/zone-checks then decide ca.zone: Computed zone → Green: toast “Green zone · follow your daily routine” then replace → ca_home | Yellow: replace → ca_yellow | Red: replace → ca_red | Invalid peak flow: toast “Check your peak flow: 50–900 L/min”"
+    }
+  ]
+}

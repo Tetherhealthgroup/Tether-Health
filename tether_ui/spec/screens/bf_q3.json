@@ -1,0 +1,101 @@
+{
+  "id": "bf_q3",
+  "name": "Baseline: reasons",
+  "route": "/p/bf/onboarding/3",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your reasons",
+    "left": "back",
+    "pill": "3 of 3"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 3,
+      "total": 3
+    },
+    {
+      "t": "title",
+      "text": "What are you quitting for?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Choose all that matter. Your top reason appears when a craving hits.",
+      "tone": "muted"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Protect my family",
+        "Breathe easier",
+        "Save money",
+        "Feel in control",
+        "My health",
+        "Be there for my future"
+      ],
+      "selected": [
+        "Protect my family",
+        "Breathe easier",
+        "Save money"
+      ],
+      "multi": true,
+      "key": "value"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "eyebrow": "When a craving hits",
+      "children": [
+        {
+          "t": "quote",
+          "text": "You chose this for your family. This feeling will pass."
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save my reasons",
+      "action": {
+        "type": "push",
+        "to": "bf_path"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save my reasons",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_path"
+      },
+      "summary": "push → bf_path"
+    }
+  ]
+}

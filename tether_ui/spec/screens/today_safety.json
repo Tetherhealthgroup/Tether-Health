@@ -1,0 +1,161 @@
+{
+  "id": "today_safety",
+  "name": "Today · safety pinned",
+  "route": "/today?state=safety",
+  "flow": "today",
+  "program": null,
+  "phase": "rescue",
+  "kind": "screen",
+  "tab": "today",
+  "variantOf": "today",
+  "state": "safety",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Today",
+    "left": "logo",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "urgent",
+      "text": "Your last blood pressure was in the crisis range."
+    },
+    {
+      "t": "card",
+      "variant": "urgent",
+      "title": "Any chest pain, shortness of breath, weakness, vision change or trouble speaking?",
+      "text": "Heartwise · from your 8:10 AM reading",
+      "children": [
+        {
+          "t": "buttons",
+          "items": [
+            {
+              "t": "button",
+              "label": "Yes · call 911",
+              "action": {
+                "type": "call",
+                "value": "911",
+                "label": "911"
+              },
+              "variant": "danger",
+              "arrow": false,
+              "small": true
+            },
+            {
+              "t": "button",
+              "label": "No symptoms",
+              "action": {
+                "type": "push",
+                "to": "hw_recheck"
+              },
+              "variant": "secondary",
+              "arrow": false,
+              "small": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Other steps are paused until you answer. Safety always comes first.",
+      "tone": "small"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Today · paused",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Stock gum, water or snacks"
+            },
+            {
+              "label": "Charge phone outside the bedroom"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Yes · call 911",
+      "path": "body[1].children[0].items[0]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "No symptoms",
+      "path": "body[1].children[0].items[1]",
+      "action": {
+        "type": "push",
+        "to": "hw_recheck"
+      },
+      "summary": "push → hw_recheck"
+    },
+    {
+      "element": "Tab · Plans",
+      "path": "tabbar.plans",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

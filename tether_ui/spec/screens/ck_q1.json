@@ -1,0 +1,139 @@
+{
+  "id": "ck_q1",
+  "name": "About you",
+  "route": "/p/ck/onboarding/1",
+  "flow": "ck",
+  "program": "ck",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "About you",
+    "left": "back",
+    "pill": "1 of 1"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 1,
+      "total": 1
+    },
+    {
+      "t": "title",
+      "text": "A few details to personalize",
+      "size": "m"
+    },
+    {
+      "t": "field",
+      "label": "Age",
+      "value": "52",
+      "kind": "number",
+      "key": "age"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "Female",
+        "Male",
+        "Intersex",
+        "Skip"
+      ],
+      "selected": "Female",
+      "label": "Sex assigned at birth",
+      "key": "sex_assigned_at_birth"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Smoke or used to",
+        "Diabetes",
+        "Family history of cancer",
+        "Pregnant",
+        "None"
+      ],
+      "selected": [
+        "Smoke or used to"
+      ],
+      "multi": true,
+      "label": "Any of these?",
+      "key": "any_of_these"
+    },
+    {
+      "t": "text",
+      "text": "Used only to build your list. Change anytime.",
+      "tone": "small"
+    },
+    {
+      "t": "link",
+      "label": "Import vaccination history",
+      "action": {
+        "type": "push",
+        "to": "records_add"
+      },
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Build my list",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/ck/profile",
+        "then": {
+          "type": "replace",
+          "to": "ck_list",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Import vaccination history",
+      "path": "body[6]",
+      "action": {
+        "type": "push",
+        "to": "records_add"
+      },
+      "summary": "push → records_add"
+    },
+    {
+      "element": "Build my list",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/ck/profile",
+        "then": {
+          "type": "replace",
+          "to": "ck_list",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "summary": "PUT /v1/program-data/ck/profile then replace → ck_list (onboarding: ob_setup)"
+    }
+  ]
+}

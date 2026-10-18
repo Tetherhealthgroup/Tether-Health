@@ -1,0 +1,1703 @@
+{
+  "entries": [
+    {
+      "screen": "welcome",
+      "trigger": "First launch"
+    },
+    {
+      "screen": "today",
+      "trigger": "Returning launch"
+    },
+    {
+      "screen": "checkin",
+      "trigger": "Notification: daily check-in"
+    },
+    {
+      "screen": "rescue_pick",
+      "trigger": "Home-screen widget / Siri: Rescue"
+    },
+    {
+      "screen": "auth_newpass",
+      "trigger": "Deep link: password reset email"
+    },
+    {
+      "screen": "auth_session",
+      "trigger": "Event: session expired"
+    },
+    {
+      "screen": "sys_update",
+      "trigger": "Event: minimum version above installed"
+    },
+    {
+      "screen": "today_safety",
+      "trigger": "Event: program safety rule fired"
+    },
+    {
+      "screen": "ca_red",
+      "trigger": "Shortcut: ClearAir red-zone plan"
+    },
+    {
+      "screen": "records_hub",
+      "trigger": "Account → Health records"
+    },
+    {
+      "screen": "sf_unplug_shield",
+      "trigger": "System: opening a paused app on iPhone (Unplug shield)"
+    },
+    {
+      "screen": "sf_unplug_overlay",
+      "trigger": "System: opening a paused app on Android (Unplug overlay)"
+    },
+    {
+      "screen": "sf_unplug_session_done",
+      "trigger": "Notification: focus session finished (generic text)"
+    },
+    {
+      "screen": "sf_unplug_health_stopped",
+      "trigger": "Notification: Unplug needs attention (generic text)"
+    },
+    {
+      "screen": "surface_widget_ios",
+      "trigger": "Reference: iPhone home-screen widget (TH-966)"
+    },
+    {
+      "screen": "surface_widget_android",
+      "trigger": "Reference: Android home-screen widget (TH-967)"
+    },
+    {
+      "screen": "surface_shortcuts_ios",
+      "trigger": "Reference: Siri & App Shortcuts (TH-966)"
+    },
+    {
+      "screen": "surface_shortcuts_android",
+      "trigger": "Reference: Android launcher shortcuts (TH-967)"
+    }
+  ],
+  "tabs": {
+    "today": "/today",
+    "plans": "/plans",
+    "progress": "/progress",
+    "learn": "/learn",
+    "support": "/support"
+  },
+  "phases": [
+    "welcome",
+    "onboarding",
+    "plan",
+    "daily",
+    "rescue",
+    "milestone",
+    "resources",
+    "account"
+  ],
+  "routes": {
+    "welcome": {
+      "route": "/welcome",
+      "kind": "screen",
+      "flow": "onboarding",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ob_programs": {
+      "route": "/onboarding/programs",
+      "kind": "screen",
+      "flow": "onboarding",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ob_focus": {
+      "route": "/onboarding/focus",
+      "kind": "screen",
+      "flow": "onboarding",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ob_third": {
+      "route": "/onboarding/focus/third",
+      "kind": "sheet",
+      "flow": "onboarding",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ob_consent": {
+      "route": "/onboarding/consent",
+      "kind": "screen",
+      "flow": "onboarding",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ob_basics": {
+      "route": "/onboarding/basics",
+      "kind": "screen",
+      "flow": "onboarding",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ob_setup": {
+      "route": "/onboarding/setup",
+      "kind": "screen",
+      "flow": "onboarding",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ob_reminders": {
+      "route": "/onboarding/reminders",
+      "kind": "screen",
+      "flow": "onboarding",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ob_reminders_denied": {
+      "route": "/onboarding/reminders?state=denied",
+      "kind": "screen",
+      "flow": "onboarding",
+      "variantOf": "ob_reminders",
+      "state": "permission denied"
+    },
+    "ob_account": {
+      "route": "/onboarding/account",
+      "kind": "screen",
+      "flow": "onboarding",
+      "variantOf": null,
+      "state": "default"
+    },
+    "auth_verify": {
+      "route": "/auth/verify",
+      "kind": "screen",
+      "flow": "auth",
+      "variantOf": null,
+      "state": "default"
+    },
+    "auth_signin": {
+      "route": "/auth/signin",
+      "kind": "sheet",
+      "flow": "auth",
+      "variantOf": null,
+      "state": "default"
+    },
+    "auth_signin_error": {
+      "route": "/auth/signin?state=error",
+      "kind": "sheet",
+      "flow": "auth",
+      "variantOf": "auth_signin",
+      "state": "error"
+    },
+    "auth_social_new": {
+      "route": "/auth/social/new",
+      "kind": "screen",
+      "flow": "auth",
+      "variantOf": null,
+      "state": "default"
+    },
+    "auth_link": {
+      "route": "/auth/link",
+      "kind": "screen",
+      "flow": "auth",
+      "variantOf": null,
+      "state": "default"
+    },
+    "auth_social_error": {
+      "route": "/auth/social/error",
+      "kind": "screen",
+      "flow": "auth",
+      "variantOf": null,
+      "state": "default"
+    },
+    "auth_forgot": {
+      "route": "/auth/forgot",
+      "kind": "screen",
+      "flow": "auth",
+      "variantOf": null,
+      "state": "default"
+    },
+    "auth_forgot_sent": {
+      "route": "/auth/forgot/sent",
+      "kind": "screen",
+      "flow": "auth",
+      "variantOf": null,
+      "state": "default"
+    },
+    "auth_newpass": {
+      "route": "/auth/reset",
+      "kind": "screen",
+      "flow": "auth",
+      "variantOf": null,
+      "state": "default"
+    },
+    "auth_merge": {
+      "route": "/auth/merge",
+      "kind": "sheet",
+      "flow": "auth",
+      "variantOf": null,
+      "state": "default"
+    },
+    "auth_session": {
+      "route": "/auth/session",
+      "kind": "sheet",
+      "flow": "auth",
+      "variantOf": null,
+      "state": "default"
+    },
+    "today": {
+      "route": "/today",
+      "kind": "screen",
+      "flow": "today",
+      "variantOf": null,
+      "state": "default"
+    },
+    "today_loading": {
+      "route": "/today?state=loading",
+      "kind": "screen",
+      "flow": "today",
+      "variantOf": "today",
+      "state": "loading"
+    },
+    "today_offline": {
+      "route": "/today?state=offline",
+      "kind": "screen",
+      "flow": "today",
+      "variantOf": "today",
+      "state": "offline"
+    },
+    "today_empty": {
+      "route": "/today?state=empty",
+      "kind": "screen",
+      "flow": "today",
+      "variantOf": "today",
+      "state": "empty"
+    },
+    "today_safety": {
+      "route": "/today?state=safety",
+      "kind": "screen",
+      "flow": "today",
+      "variantOf": "today",
+      "state": "safety"
+    },
+    "checkin": {
+      "route": "/check-in",
+      "kind": "sheet",
+      "flow": "today",
+      "variantOf": null,
+      "state": "default"
+    },
+    "checkin_done": {
+      "route": "/check-in/done",
+      "kind": "screen",
+      "flow": "today",
+      "variantOf": null,
+      "state": "default"
+    },
+    "rescue_pick": {
+      "route": "/rescue",
+      "kind": "sheet",
+      "flow": "rescue",
+      "variantOf": null,
+      "state": "default"
+    },
+    "rescue_active": {
+      "route": "/rescue/breathing",
+      "kind": "fullscreen",
+      "flow": "rescue",
+      "variantOf": null,
+      "state": "default"
+    },
+    "rescue_tools": {
+      "route": "/rescue/tools",
+      "kind": "sheet",
+      "flow": "rescue",
+      "variantOf": null,
+      "state": "default"
+    },
+    "rescue_result": {
+      "route": "/rescue/result",
+      "kind": "screen",
+      "flow": "rescue",
+      "variantOf": null,
+      "state": "default"
+    },
+    "rescue_escalate": {
+      "route": "/rescue/escalate",
+      "kind": "screen",
+      "flow": "rescue",
+      "variantOf": null,
+      "state": "default"
+    },
+    "crisis": {
+      "route": "/crisis",
+      "kind": "fullscreen",
+      "flow": "rescue",
+      "variantOf": null,
+      "state": "default"
+    },
+    "plans": {
+      "route": "/plans",
+      "kind": "screen",
+      "flow": "plans",
+      "variantOf": null,
+      "state": "default"
+    },
+    "catalog": {
+      "route": "/programs",
+      "kind": "screen",
+      "flow": "plans",
+      "variantOf": null,
+      "state": "default"
+    },
+    "focus_full": {
+      "route": "/programs/focus-full",
+      "kind": "sheet",
+      "flow": "plans",
+      "variantOf": null,
+      "state": "default"
+    },
+    "program_settings": {
+      "route": "/p/:program/settings",
+      "kind": "screen",
+      "flow": "plans",
+      "variantOf": null,
+      "state": "default"
+    },
+    "progress": {
+      "route": "/progress",
+      "kind": "screen",
+      "flow": "tabs",
+      "variantOf": null,
+      "state": "default"
+    },
+    "progress_empty": {
+      "route": "/progress?state=empty",
+      "kind": "screen",
+      "flow": "tabs",
+      "variantOf": "progress",
+      "state": "empty"
+    },
+    "progress_error": {
+      "route": "/progress?state=error",
+      "kind": "screen",
+      "flow": "tabs",
+      "variantOf": "progress",
+      "state": "error"
+    },
+    "learn": {
+      "route": "/learn",
+      "kind": "screen",
+      "flow": "tabs",
+      "variantOf": null,
+      "state": "default"
+    },
+    "learn_error": {
+      "route": "/learn?state=error",
+      "kind": "screen",
+      "flow": "tabs",
+      "variantOf": "learn",
+      "state": "error"
+    },
+    "learn_lesson": {
+      "route": "/learn/:lesson",
+      "kind": "screen",
+      "flow": "tabs",
+      "variantOf": null,
+      "state": "default"
+    },
+    "support": {
+      "route": "/support",
+      "kind": "screen",
+      "flow": "tabs",
+      "variantOf": null,
+      "state": "default"
+    },
+    "support_empty": {
+      "route": "/support?state=empty",
+      "kind": "screen",
+      "flow": "tabs",
+      "variantOf": "support",
+      "state": "empty"
+    },
+    "support_callback": {
+      "route": "/support/callback",
+      "kind": "sheet",
+      "flow": "tabs",
+      "variantOf": null,
+      "state": "default"
+    },
+    "support_message": {
+      "route": "/support/message",
+      "kind": "sheet",
+      "flow": "tabs",
+      "variantOf": null,
+      "state": "default"
+    },
+    "support_message_care": {
+      "route": "/support/care-team",
+      "kind": "screen",
+      "flow": "tabs",
+      "variantOf": null,
+      "state": "default"
+    },
+    "support_add_person": {
+      "route": "/support/people/new",
+      "kind": "screen",
+      "flow": "tabs",
+      "variantOf": null,
+      "state": "default"
+    },
+    "support_connect": {
+      "route": "/support/connect",
+      "kind": "screen",
+      "flow": "tabs",
+      "variantOf": null,
+      "state": "default"
+    },
+    "account": {
+      "route": "/account",
+      "kind": "screen",
+      "flow": "account",
+      "variantOf": null,
+      "state": "default"
+    },
+    "account_signin_methods": {
+      "route": "/account/sign-in",
+      "kind": "screen",
+      "flow": "account",
+      "variantOf": null,
+      "state": "default"
+    },
+    "account_programs": {
+      "route": "/account/programs",
+      "kind": "screen",
+      "flow": "account",
+      "variantOf": null,
+      "state": "default"
+    },
+    "account_leave": {
+      "route": "/account/programs/leave",
+      "kind": "sheet",
+      "flow": "account",
+      "variantOf": null,
+      "state": "default"
+    },
+    "account_notifications": {
+      "route": "/account/notifications",
+      "kind": "screen",
+      "flow": "account",
+      "variantOf": null,
+      "state": "default"
+    },
+    "account_privacy": {
+      "route": "/account/privacy",
+      "kind": "screen",
+      "flow": "account",
+      "variantOf": null,
+      "state": "default"
+    },
+    "account_data": {
+      "route": "/account/data",
+      "kind": "screen",
+      "flow": "account",
+      "variantOf": null,
+      "state": "default"
+    },
+    "account_delete": {
+      "route": "/account/delete",
+      "kind": "screen",
+      "flow": "account",
+      "variantOf": null,
+      "state": "default"
+    },
+    "account_deleted": {
+      "route": "/account/deleted",
+      "kind": "screen",
+      "flow": "account",
+      "variantOf": null,
+      "state": "default"
+    },
+    "account_signout": {
+      "route": "/account/signout",
+      "kind": "sheet",
+      "flow": "account",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sys_update": {
+      "route": "/system/update",
+      "kind": "fullscreen",
+      "flow": "system",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_intro": {
+      "route": "/p/bf",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_q1": {
+      "route": "/p/bf/onboarding/1",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_q2": {
+      "route": "/p/bf/onboarding/2",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_q3": {
+      "route": "/p/bf/onboarding/3",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_path": {
+      "route": "/p/bf/plan/path",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_date": {
+      "route": "/p/bf/plan/date",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_stepdown": {
+      "route": "/p/bf/plan/reduce",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_support": {
+      "route": "/p/bf/plan/support",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_review": {
+      "route": "/p/bf/plan/review",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_home": {
+      "route": "/p/bf/home",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_home_quitday": {
+      "route": "/p/bf/home?state=quit-day",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": "bf_home",
+      "state": "quit day"
+    },
+    "bf_home_explore": {
+      "route": "/p/bf/home?state=explore",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": "bf_home",
+      "state": "explore"
+    },
+    "bf_slip": {
+      "route": "/p/bf/slip",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_meds": {
+      "route": "/p/bf/meds",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_meds_edit": {
+      "route": "/p/bf/meds/edit",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_progress": {
+      "route": "/p/bf/progress",
+      "kind": "screen",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "bf_estimates": {
+      "route": "/p/bf/progress/estimates",
+      "kind": "sheet",
+      "flow": "bf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_intro": {
+      "route": "/p/sf",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_q1": {
+      "route": "/p/sf/onboarding/1",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_q2": {
+      "route": "/p/sf/onboarding/2",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_goal": {
+      "route": "/p/sf/plan/goal",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_screentime": {
+      "route": "/p/sf/screen-time",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_screentime_denied": {
+      "route": "/p/sf/screen-time?state=denied",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": "sf_screentime",
+      "state": "permission denied"
+    },
+    "sf_buddy": {
+      "route": "/p/sf/plan/buddy",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_home": {
+      "route": "/p/sf/home",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_pause": {
+      "route": "/p/sf/pause",
+      "kind": "fullscreen",
+      "flow": "sf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_slip": {
+      "route": "/p/sf/slip",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_week": {
+      "route": "/p/sf/week",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ca_intro": {
+      "route": "/p/ca",
+      "kind": "screen",
+      "flow": "ca",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ca_q1": {
+      "route": "/p/ca/onboarding/1",
+      "kind": "screen",
+      "flow": "ca",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ca_plan": {
+      "route": "/p/ca/plan",
+      "kind": "screen",
+      "flow": "ca",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ca_noplan": {
+      "route": "/p/ca/plan?state=none",
+      "kind": "screen",
+      "flow": "ca",
+      "variantOf": "ca_plan",
+      "state": "empty"
+    },
+    "ca_home": {
+      "route": "/p/ca/home",
+      "kind": "screen",
+      "flow": "ca",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ca_zone": {
+      "route": "/p/ca/zone",
+      "kind": "screen",
+      "flow": "ca",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ca_yellow": {
+      "route": "/p/ca/zone/yellow",
+      "kind": "screen",
+      "flow": "ca",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ca_red": {
+      "route": "/p/ca/zone/red",
+      "kind": "fullscreen",
+      "flow": "ca",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ca_symptoms": {
+      "route": "/p/ca/symptoms",
+      "kind": "screen",
+      "flow": "ca",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ca_progress": {
+      "route": "/p/ca/progress",
+      "kind": "screen",
+      "flow": "ca",
+      "variantOf": null,
+      "state": "default"
+    },
+    "hw_intro": {
+      "route": "/p/hw",
+      "kind": "screen",
+      "flow": "hw",
+      "variantOf": null,
+      "state": "default"
+    },
+    "hw_q1": {
+      "route": "/p/hw/onboarding/1",
+      "kind": "screen",
+      "flow": "hw",
+      "variantOf": null,
+      "state": "default"
+    },
+    "hw_targets": {
+      "route": "/p/hw/plan/targets",
+      "kind": "screen",
+      "flow": "hw",
+      "variantOf": null,
+      "state": "default"
+    },
+    "hw_home": {
+      "route": "/p/hw/home",
+      "kind": "screen",
+      "flow": "hw",
+      "variantOf": null,
+      "state": "default"
+    },
+    "hw_log": {
+      "route": "/p/hw/log",
+      "kind": "screen",
+      "flow": "hw",
+      "variantOf": null,
+      "state": "default"
+    },
+    "hw_log2": {
+      "route": "/p/hw/log/2",
+      "kind": "screen",
+      "flow": "hw",
+      "variantOf": null,
+      "state": "default"
+    },
+    "hw_log_error": {
+      "route": "/p/hw/log/2?state=error",
+      "kind": "screen",
+      "flow": "hw",
+      "variantOf": "hw_log2",
+      "state": "error"
+    },
+    "hw_result": {
+      "route": "/p/hw/log/result",
+      "kind": "screen",
+      "flow": "hw",
+      "variantOf": null,
+      "state": "default"
+    },
+    "hw_crisis": {
+      "route": "/p/hw/crisis",
+      "kind": "fullscreen",
+      "flow": "hw",
+      "variantOf": null,
+      "state": "default"
+    },
+    "hw_recheck": {
+      "route": "/p/hw/crisis/recheck",
+      "kind": "screen",
+      "flow": "hw",
+      "variantOf": null,
+      "state": "default"
+    },
+    "hw_trends": {
+      "route": "/p/hw/trends",
+      "kind": "screen",
+      "flow": "hw",
+      "variantOf": null,
+      "state": "default"
+    },
+    "hw_lipids": {
+      "route": "/p/hw/lipids",
+      "kind": "screen",
+      "flow": "hw",
+      "variantOf": null,
+      "state": "default"
+    },
+    "hw_summary": {
+      "route": "/p/hw/summary",
+      "kind": "screen",
+      "flow": "hw",
+      "variantOf": null,
+      "state": "default"
+    },
+    "st_intro": {
+      "route": "/p/st",
+      "kind": "screen",
+      "flow": "st",
+      "variantOf": null,
+      "state": "default"
+    },
+    "st_q1": {
+      "route": "/p/st/onboarding/1",
+      "kind": "screen",
+      "flow": "st",
+      "variantOf": null,
+      "state": "default"
+    },
+    "st_range": {
+      "route": "/p/st/plan/range",
+      "kind": "screen",
+      "flow": "st",
+      "variantOf": null,
+      "state": "default"
+    },
+    "st_home": {
+      "route": "/p/st/home",
+      "kind": "screen",
+      "flow": "st",
+      "variantOf": null,
+      "state": "default"
+    },
+    "st_log": {
+      "route": "/p/st/log",
+      "kind": "screen",
+      "flow": "st",
+      "variantOf": null,
+      "state": "default"
+    },
+    "st_low": {
+      "route": "/p/st/low",
+      "kind": "fullscreen",
+      "flow": "st",
+      "variantOf": null,
+      "state": "default"
+    },
+    "st_reset": {
+      "route": "/p/st/reset",
+      "kind": "screen",
+      "flow": "st",
+      "variantOf": null,
+      "state": "default"
+    },
+    "st_patterns": {
+      "route": "/p/st/patterns",
+      "kind": "screen",
+      "flow": "st",
+      "variantOf": null,
+      "state": "default"
+    },
+    "st_a1c": {
+      "route": "/p/st/a1c",
+      "kind": "screen",
+      "flow": "st",
+      "variantOf": null,
+      "state": "default"
+    },
+    "re_intro": {
+      "route": "/p/re",
+      "kind": "screen",
+      "flow": "re",
+      "variantOf": null,
+      "state": "default"
+    },
+    "re_q1": {
+      "route": "/p/re/onboarding/1",
+      "kind": "screen",
+      "flow": "re",
+      "variantOf": null,
+      "state": "default"
+    },
+    "re_result": {
+      "route": "/p/re/plan",
+      "kind": "screen",
+      "flow": "re",
+      "variantOf": null,
+      "state": "default"
+    },
+    "re_home": {
+      "route": "/p/re/home",
+      "kind": "screen",
+      "flow": "re",
+      "variantOf": null,
+      "state": "default"
+    },
+    "re_labs": {
+      "route": "/p/re/labs",
+      "kind": "screen",
+      "flow": "re",
+      "variantOf": null,
+      "state": "default"
+    },
+    "re_history": {
+      "route": "/p/re/history",
+      "kind": "screen",
+      "flow": "re",
+      "variantOf": null,
+      "state": "default"
+    },
+    "re_symptoms": {
+      "route": "/p/re/symptoms",
+      "kind": "screen",
+      "flow": "re",
+      "variantOf": null,
+      "state": "default"
+    },
+    "nu_intro": {
+      "route": "/p/nu",
+      "kind": "screen",
+      "flow": "nu",
+      "variantOf": null,
+      "state": "default"
+    },
+    "nu_q1": {
+      "route": "/p/nu/onboarding/1",
+      "kind": "screen",
+      "flow": "nu",
+      "variantOf": null,
+      "state": "default"
+    },
+    "nu_habit": {
+      "route": "/p/nu/plan",
+      "kind": "screen",
+      "flow": "nu",
+      "variantOf": null,
+      "state": "default"
+    },
+    "nu_home": {
+      "route": "/p/nu/home",
+      "kind": "screen",
+      "flow": "nu",
+      "variantOf": null,
+      "state": "default"
+    },
+    "nu_reset": {
+      "route": "/p/nu/reset",
+      "kind": "screen",
+      "flow": "nu",
+      "variantOf": null,
+      "state": "default"
+    },
+    "nu_week4": {
+      "route": "/p/nu/milestone",
+      "kind": "screen",
+      "flow": "nu",
+      "variantOf": null,
+      "state": "default"
+    },
+    "nu_protect": {
+      "route": "/p/nu/support",
+      "kind": "screen",
+      "flow": "nu",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sd_intro": {
+      "route": "/p/sd",
+      "kind": "screen",
+      "flow": "sd",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sd_q1": {
+      "route": "/p/sd/onboarding/1",
+      "kind": "screen",
+      "flow": "sd",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sd_plan": {
+      "route": "/p/sd/plan",
+      "kind": "screen",
+      "flow": "sd",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sd_home": {
+      "route": "/p/sd/home",
+      "kind": "screen",
+      "flow": "sd",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sd_session": {
+      "route": "/p/sd/session",
+      "kind": "fullscreen",
+      "flow": "sd",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sd_fell": {
+      "route": "/p/sd/fell",
+      "kind": "fullscreen",
+      "flow": "sd",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sd_safety": {
+      "route": "/p/sd/safety",
+      "kind": "screen",
+      "flow": "sd",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sd_caregiver": {
+      "route": "/p/sd/caregiver",
+      "kind": "screen",
+      "flow": "sd",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ea_intro": {
+      "route": "/p/ea",
+      "kind": "screen",
+      "flow": "ea",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ea_q1": {
+      "route": "/p/ea/onboarding/1",
+      "kind": "screen",
+      "flow": "ea",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ea_result": {
+      "route": "/p/ea/result",
+      "kind": "screen",
+      "flow": "ea",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ea_plan": {
+      "route": "/p/ea/plan",
+      "kind": "screen",
+      "flow": "ea",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ea_home": {
+      "route": "/p/ea/home",
+      "kind": "screen",
+      "flow": "ea",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ea_mood": {
+      "route": "/p/ea/mood",
+      "kind": "screen",
+      "flow": "ea",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ea_checkback": {
+      "route": "/p/ea/check-back",
+      "kind": "screen",
+      "flow": "ea",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ck_intro": {
+      "route": "/p/ck",
+      "kind": "screen",
+      "flow": "ck",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ck_q1": {
+      "route": "/p/ck/onboarding/1",
+      "kind": "screen",
+      "flow": "ck",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ck_list": {
+      "route": "/p/ck/home",
+      "kind": "screen",
+      "flow": "ck",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ck_uptodate": {
+      "route": "/p/ck/home?state=empty",
+      "kind": "screen",
+      "flow": "ck",
+      "variantOf": "ck_list",
+      "state": "empty"
+    },
+    "ck_item": {
+      "route": "/p/ck/item/:id",
+      "kind": "screen",
+      "flow": "ck",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ck_done": {
+      "route": "/p/ck/done",
+      "kind": "screen",
+      "flow": "ck",
+      "variantOf": null,
+      "state": "default"
+    },
+    "ck_day": {
+      "route": "/p/ck/day",
+      "kind": "screen",
+      "flow": "ck",
+      "variantOf": null,
+      "state": "default"
+    },
+    "be_intro": {
+      "route": "/p/be",
+      "kind": "screen",
+      "flow": "be",
+      "variantOf": null,
+      "state": "default"
+    },
+    "be_q1": {
+      "route": "/p/be/onboarding/1",
+      "kind": "screen",
+      "flow": "be",
+      "variantOf": null,
+      "state": "default"
+    },
+    "be_q2": {
+      "route": "/p/be/onboarding/2",
+      "kind": "screen",
+      "flow": "be",
+      "variantOf": null,
+      "state": "default"
+    },
+    "be_home": {
+      "route": "/p/be/home",
+      "kind": "screen",
+      "flow": "be",
+      "variantOf": null,
+      "state": "default"
+    },
+    "be_tx": {
+      "route": "/p/be/treatment",
+      "kind": "screen",
+      "flow": "be",
+      "variantOf": null,
+      "state": "default"
+    },
+    "be_diary": {
+      "route": "/p/be/diary",
+      "kind": "screen",
+      "flow": "be",
+      "variantOf": null,
+      "state": "default"
+    },
+    "be_questions": {
+      "route": "/p/be/questions",
+      "kind": "screen",
+      "flow": "be",
+      "variantOf": null,
+      "state": "default"
+    },
+    "be_survivor": {
+      "route": "/p/be/survivorship",
+      "kind": "screen",
+      "flow": "be",
+      "variantOf": null,
+      "state": "default"
+    },
+    "records_hub": {
+      "route": "/records",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": null,
+      "state": "default"
+    },
+    "records_hub_empty": {
+      "route": "/records?state=empty",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": "records_hub",
+      "state": "empty"
+    },
+    "records_add": {
+      "route": "/records/add",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": null,
+      "state": "default"
+    },
+    "records_search": {
+      "route": "/records/search",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": null,
+      "state": "default"
+    },
+    "records_fhir_url": {
+      "route": "/records/fhir-url",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": null,
+      "state": "default"
+    },
+    "records_consent": {
+      "route": "/records/consent",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": null,
+      "state": "default"
+    },
+    "records_consent_bb": {
+      "route": "/records/consent?source=medicare",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": "records_consent",
+      "state": "Medicare"
+    },
+    "records_consent_device": {
+      "route": "/records/consent?source=device",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": "records_consent",
+      "state": "Apple Health / Health Connect"
+    },
+    "records_importing": {
+      "route": "/records/importing",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": null,
+      "state": "loading"
+    },
+    "records_review": {
+      "route": "/records/review",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": null,
+      "state": "default"
+    },
+    "records_conflict": {
+      "route": "/records/conflicts",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": null,
+      "state": "default"
+    },
+    "records_error": {
+      "route": "/records/error",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": null,
+      "state": "error"
+    },
+    "records_source": {
+      "route": "/records/source",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": null,
+      "state": "default"
+    },
+    "records_disconnect": {
+      "route": "/records/source/disconnect",
+      "kind": "sheet",
+      "flow": "records",
+      "variantOf": null,
+      "state": "default"
+    },
+    "records_manual": {
+      "route": "/records/manual",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": null,
+      "state": "default"
+    },
+    "records_manual_error": {
+      "route": "/records/manual?state=error",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": "records_manual",
+      "state": "error"
+    },
+    "records_item": {
+      "route": "/records/item",
+      "kind": "screen",
+      "flow": "records",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_intro": {
+      "route": "/p/sf/unplug",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_auth": {
+      "route": "/p/sf/unplug/permission",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_auth_denied": {
+      "route": "/p/sf/unplug/permission?state=denied",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_auth",
+      "state": "permission denied"
+    },
+    "sf_unplug_auth_unavailable": {
+      "route": "/p/sf/unplug/permission?state=unavailable",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_auth",
+      "state": "unavailable"
+    },
+    "sf_unplug_auth_android": {
+      "route": "/p/sf/unplug/permission?state=android",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_auth",
+      "state": "android"
+    },
+    "sf_unplug_apps": {
+      "route": "/p/sf/unplug/apps",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_picker_ios": {
+      "route": "/p/sf/unplug/apps/picker",
+      "kind": "sheet",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_apps_android": {
+      "route": "/p/sf/unplug/apps?state=android",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_apps",
+      "state": "android"
+    },
+    "sf_unplug_apps_chosen": {
+      "route": "/p/sf/unplug/apps?state=chosen",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_apps",
+      "state": "apps chosen"
+    },
+    "sf_unplug_limits": {
+      "route": "/p/sf/unplug/limits",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_home": {
+      "route": "/p/sf/unplug/home",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_session": {
+      "route": "/p/sf/unplug/session",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_session_active": {
+      "route": "/p/sf/unplug/session/active",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_session_end": {
+      "route": "/p/sf/unplug/session/end",
+      "kind": "sheet",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_session_done": {
+      "route": "/p/sf/unplug/session/done",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_session_done_early": {
+      "route": "/p/sf/unplug/session/done?state=early",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_session_done",
+      "state": "ended early"
+    },
+    "sf_unplug_shield": {
+      "route": "/system/unplug/shield",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_shield_firm": {
+      "route": "/system/unplug/shield?state=firm",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_shield",
+      "state": "no “open anyway” left"
+    },
+    "sf_unplug_overlay": {
+      "route": "/system/unplug/overlay",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_gate": {
+      "route": "/p/sf/unplug/step",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_gate_commit": {
+      "route": "/p/sf/unplug/step?state=sentence",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_gate",
+      "state": "typed sentence"
+    },
+    "sf_unplug_gate_sum": {
+      "route": "/p/sf/unplug/step?state=sum",
+      "kind": "fullscreen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_gate",
+      "state": "quick sum"
+    },
+    "sf_unplug_health": {
+      "route": "/p/sf/unplug/health",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_unplug_health_stopped": {
+      "route": "/p/sf/unplug/health?state=stopped",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_health",
+      "state": "tracking stopped"
+    },
+    "sf_unplug_health_android": {
+      "route": "/p/sf/unplug/health?state=android",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_health",
+      "state": "android"
+    },
+    "sf_unplug_off": {
+      "route": "/p/sf/unplug/off",
+      "kind": "sheet",
+      "flow": "unplug",
+      "variantOf": null,
+      "state": "default"
+    },
+    "sf_home_unplug_offer": {
+      "route": "/p/sf/home?state=unplug-offer",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": "sf_home",
+      "state": "Unplug not set up (proposal)"
+    },
+    "sf_home_unplug": {
+      "route": "/p/sf/home?state=unplug",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": "sf_home",
+      "state": "Unplug on · iPhone (proposal)"
+    },
+    "sf_week_unplug": {
+      "route": "/p/sf/week?state=unplug",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": "sf_week",
+      "state": "Unplug on · iPhone (proposal)"
+    },
+    "program_settings_sf": {
+      "route": "/p/:program/settings?state=sf-unplug",
+      "kind": "screen",
+      "flow": "plans",
+      "variantOf": "program_settings",
+      "state": "ScrollFree with Unplug (proposal)"
+    },
+    "sf_screentime_report": {
+      "route": "/p/sf/screen-time?state=ios-report",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": "sf_screentime",
+      "state": "iPhone report wording (proposal)"
+    },
+    "account_delete_apple": {
+      "route": "/account/delete?state=apple",
+      "kind": "screen",
+      "flow": "account",
+      "variantOf": "account_delete",
+      "state": "Apple account"
+    },
+    "account_delete_google": {
+      "route": "/account/delete?state=google",
+      "kind": "screen",
+      "flow": "account",
+      "variantOf": "account_delete",
+      "state": "Google account"
+    },
+    "auth_session_apple": {
+      "route": "/auth/session?state=apple",
+      "kind": "sheet",
+      "flow": "auth",
+      "variantOf": "auth_session",
+      "state": "Apple account"
+    },
+    "auth_session_google": {
+      "route": "/auth/session?state=google",
+      "kind": "sheet",
+      "flow": "auth",
+      "variantOf": "auth_session",
+      "state": "Google account"
+    },
+    "sf_screentime_android": {
+      "route": "/p/sf/screen-time?state=android",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": "sf_screentime",
+      "state": "android"
+    },
+    "sf_screentime_android_denied": {
+      "route": "/p/sf/screen-time?state=android-denied",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": "sf_screentime",
+      "state": "android · not allowed"
+    },
+    "sys_update_android": {
+      "route": "/system/update?state=android",
+      "kind": "fullscreen",
+      "flow": "system",
+      "variantOf": "sys_update",
+      "state": "android"
+    },
+    "surface_widget_ios": {
+      "route": "/surface/widget/ios",
+      "kind": "fullscreen",
+      "flow": "entries",
+      "variantOf": null,
+      "state": "default"
+    },
+    "surface_widget_android": {
+      "route": "/surface/widget/android",
+      "kind": "fullscreen",
+      "flow": "entries",
+      "variantOf": null,
+      "state": "default"
+    },
+    "surface_shortcuts_ios": {
+      "route": "/surface/shortcuts/ios",
+      "kind": "screen",
+      "flow": "entries",
+      "variantOf": null,
+      "state": "default"
+    },
+    "surface_shortcuts_ios_named": {
+      "route": "/surface/shortcuts/ios?state=named",
+      "kind": "screen",
+      "flow": "entries",
+      "variantOf": "surface_shortcuts_ios",
+      "state": "Show sensitive details on"
+    },
+    "surface_shortcuts_android": {
+      "route": "/surface/shortcuts/android",
+      "kind": "screen",
+      "flow": "entries",
+      "variantOf": null,
+      "state": "default"
+    },
+    "surface_shortcuts_android_named": {
+      "route": "/surface/shortcuts/android?state=named",
+      "kind": "screen",
+      "flow": "entries",
+      "variantOf": "surface_shortcuts_android",
+      "state": "Show sensitive details on"
+    }
+  },
+  "action_types": {
+    "push": "navigate forward",
+    "replace": "replace current screen",
+    "tab": "switch tab (clears stack)",
+    "reset": "leave flow, clear stack, end onboarding",
+    "back": "pop",
+    "close": "dismiss sheet/modal",
+    "sheet": "open bottom sheet",
+    "call": "phone call",
+    "sms": "open Messages",
+    "external": "open URL",
+    "os_settings": "open OS settings",
+    "toast": "snackbar, optional then",
+    "submit": "API call (api) then action",
+    "branch": "outcome decided by logic or a visible choice (on)"
+  },
+  "context": {
+    "onboarding": "If TFlow.onboarding is true, actions with context.onboarding go there instead of `to`."
+  }
+}

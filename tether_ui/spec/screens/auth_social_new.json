@@ -1,0 +1,122 @@
+{
+  "id": "auth_social_new",
+  "name": "New account from Apple or Google",
+  "route": "/auth/social/new",
+  "flow": "auth",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Supabase signInWithIdToken (provider apple|google). First sign-in creates the identity, then onboarding starts with the account attached.",
+  "header": {
+    "t": "header",
+    "title": "Create account",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "A",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "Create your Tether account?",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "No Tether account uses this Apple ID or Google account yet.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Name",
+          "Alex (shared by Apple)"
+        ],
+        [
+          "Email",
+          "Private relay · Hide My Email"
+        ],
+        [
+          "Password",
+          "None needed"
+        ]
+      ]
+    },
+    {
+      "t": "text",
+      "text": "You can add email & password or another sign-in method later in Account → Sign-in methods.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Create my account",
+      "action": {
+        "type": "submit",
+        "api": "POST supabase /auth/v1/token?grant_type=id_token",
+        "then": {
+          "type": "push",
+          "to": "ob_programs"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Use a different account",
+      "action": {
+        "type": "back"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [
+    "POST supabase /auth/v1/token?grant_type=id_token"
+  ],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Create my account",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST supabase /auth/v1/token?grant_type=id_token",
+        "then": {
+          "type": "push",
+          "to": "ob_programs"
+        }
+      },
+      "summary": "POST supabase /auth/v1/token?grant_type=id_token then push → ob_programs"
+    },
+    {
+      "element": "Use a different account",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

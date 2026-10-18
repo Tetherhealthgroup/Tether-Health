@@ -1,0 +1,92 @@
+{
+  "id": "hw_crisis",
+  "name": "Crisis range",
+  "route": "/p/hw/crisis",
+  "flow": "hw",
+  "program": "hw",
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Check this reading",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "urgent",
+      "text": "186/122 is in a range that needs attention now."
+    },
+    {
+      "t": "card",
+      "variant": "urgent",
+      "title": "Do you have any of these right now?",
+      "text": "Chest pain · shortness of breath · back pain · numbness or weakness · vision change · trouble speaking"
+    },
+    {
+      "t": "button",
+      "label": "Yes · call 911",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "variant": "danger",
+      "arrow": false
+    },
+    {
+      "t": "button",
+      "label": "No symptoms · re-check in 5 min",
+      "action": {
+        "type": "replace",
+        "to": "hw_recheck"
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "text",
+      "text": "If it’s still this high on re-check, contact your clinician today. Heartwise doesn’t diagnose.",
+      "tone": "small"
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Yes · call 911",
+      "path": "body[2]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "No symptoms · re-check in 5 min",
+      "path": "body[3]",
+      "action": {
+        "type": "replace",
+        "to": "hw_recheck"
+      },
+      "summary": "replace → hw_recheck"
+    }
+  ]
+}

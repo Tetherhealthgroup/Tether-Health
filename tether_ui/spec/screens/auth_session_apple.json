@@ -1,0 +1,139 @@
+{
+  "id": "auth_session_apple",
+  "name": "Session expired · Apple account",
+  "route": "/auth/session?state=apple",
+  "flow": "auth",
+  "program": null,
+  "phase": "account",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": "auth_session",
+  "state": "Apple account",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Apple button.",
+  "header": null,
+  "body": [
+    {
+      "t": "title",
+      "text": "Please sign in again",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in.",
+      "tone": "muted"
+    },
+    {
+      "t": "text",
+      "text": "You signed in with Apple, so there’s no password to type.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "authbuttons",
+      "items": [
+        {
+          "t": "authbtn",
+          "provider": "apple",
+          "label": "Continue with Apple",
+          "action": {
+            "type": "branch",
+            "question": "Sign in with Apple result",
+            "provider": "apple",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Success",
+                "action": {
+                  "type": "close"
+                }
+              },
+              {
+                "label": "Cancelled",
+                "action": {
+                  "type": "toast",
+                  "value": "Still signed out. Rescue works without signing in."
+                }
+              },
+              {
+                "label": "Error",
+                "action": {
+                  "type": "push",
+                  "to": "auth_social_error"
+                }
+              }
+            ]
+          },
+          "platforms": [
+            "ios"
+          ]
+        }
+      ]
+    },
+    {
+      "t": "button",
+      "label": "Use Face ID",
+      "action": {
+        "type": "close"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-36 (social-user auth_session) · TH-935",
+    "Source: ARCH-TH-902 A.5"
+  ],
+  "over": "Today",
+  "api": [
+    "POST supabase /auth/v1/token?grant_type=id_token"
+  ],
+  "actions": [
+    {
+      "element": "Continue with Apple",
+      "path": "footer[0].items[0]",
+      "action": {
+        "type": "branch",
+        "question": "Sign in with Apple result",
+        "provider": "apple",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Success",
+            "action": {
+              "type": "close"
+            }
+          },
+          {
+            "label": "Cancelled",
+            "action": {
+              "type": "toast",
+              "value": "Still signed out. Rescue works without signing in."
+            }
+          },
+          {
+            "label": "Error",
+            "action": {
+              "type": "push",
+              "to": "auth_social_error"
+            }
+          }
+        ]
+      },
+      "summary": "auth (apple): Sign in with Apple result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error"
+    },
+    {
+      "element": "Use Face ID",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}

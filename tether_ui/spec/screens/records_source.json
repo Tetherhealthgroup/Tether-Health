@@ -1,0 +1,126 @@
+{
+  "id": "records_source",
+  "name": "Source details",
+  "route": "/records/source",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Patel Family Medicine",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Connection",
+          "Epic MyChart · SMART on FHIR R4"
+        ],
+        [
+          "Last sync",
+          "Today 7:02 AM"
+        ],
+        [
+          "Next sync",
+          "Tomorrow"
+        ],
+        [
+          "Access",
+          "Read-only · 6 categories"
+        ],
+        [
+          "Connected",
+          "Oct 3, 2026"
+        ]
+      ]
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Sync now",
+          "action": {
+            "type": "submit",
+            "api": "POST /v1/records/fhir/sources/:id/sync",
+            "then": {
+              "type": "toast",
+              "value": "Synced · 2 new results"
+            }
+          }
+        },
+        {
+          "label": "What we read",
+          "action": {
+            "type": "push",
+            "to": "records_consent"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Disconnect",
+      "action": {
+        "type": "sheet",
+        "to": "records_disconnect"
+      },
+      "variant": "danger",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Sync now",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/fhir/sources/:id/sync",
+        "then": {
+          "type": "toast",
+          "value": "Synced · 2 new results"
+        }
+      },
+      "summary": "POST /v1/records/fhir/sources/:id/sync then toast “Synced · 2 new results”"
+    },
+    {
+      "element": "What we read",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "records_consent"
+      },
+      "summary": "push → records_consent"
+    },
+    {
+      "element": "Disconnect",
+      "path": "footer[0]",
+      "action": {
+        "type": "sheet",
+        "to": "records_disconnect"
+      },
+      "summary": "sheet → records_disconnect"
+    }
+  ]
+}

@@ -1,0 +1,166 @@
+{
+  "id": "be_q1",
+  "name": "Journey stage",
+  "route": "/p/be/onboarding/1",
+  "flow": "be",
+  "program": "be",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Where are you?",
+    "left": "back",
+    "pill": "1 of 2"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 1,
+      "total": 2
+    },
+    {
+      "t": "title",
+      "text": "Which fits you best?",
+      "size": "m"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Lowering my risk",
+          "sub": "Prevention and screening"
+        },
+        {
+          "label": "Going through treatment",
+          "sub": "Support between appointments"
+        },
+        {
+          "label": "After treatment",
+          "sub": "Survivorship"
+        },
+        {
+          "label": "Supporting someone",
+          "sub": "Caregiver resources"
+        }
+      ],
+      "selected": 0,
+      "key": "stage"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next",
+      "action": {
+        "type": "branch",
+        "question": "Journey stage",
+        "on": "radio",
+        "decide": "choice:be_q1.stage",
+        "cases": [
+          {
+            "label": "Lowering my risk",
+            "action": {
+              "type": "push",
+              "to": "be_q2"
+            }
+          },
+          {
+            "label": "Going through treatment",
+            "action": {
+              "type": "replace",
+              "to": "be_tx",
+              "context": {
+                "onboarding": "ob_setup"
+              }
+            }
+          },
+          {
+            "label": "After treatment",
+            "action": {
+              "type": "replace",
+              "to": "be_survivor",
+              "context": {
+                "onboarding": "ob_setup"
+              }
+            }
+          },
+          {
+            "label": "Supporting someone",
+            "action": {
+              "type": "tab",
+              "to": "learn"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Next",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Journey stage",
+        "on": "radio",
+        "decide": "choice:be_q1.stage",
+        "cases": [
+          {
+            "label": "Lowering my risk",
+            "action": {
+              "type": "push",
+              "to": "be_q2"
+            }
+          },
+          {
+            "label": "Going through treatment",
+            "action": {
+              "type": "replace",
+              "to": "be_tx",
+              "context": {
+                "onboarding": "ob_setup"
+              }
+            }
+          },
+          {
+            "label": "After treatment",
+            "action": {
+              "type": "replace",
+              "to": "be_survivor",
+              "context": {
+                "onboarding": "ob_setup"
+              }
+            }
+          },
+          {
+            "label": "Supporting someone",
+            "action": {
+              "type": "tab",
+              "to": "learn"
+            }
+          }
+        ]
+      },
+      "summary": "decide choice:be_q1.stage: Journey stage → Lowering my risk: push → be_q2 | Going through treatment: replace → be_tx (onboarding: ob_setup) | After treatment: replace → be_survivor (onboarding: ob_setup) | Supporting someone: tab → learn"
+    }
+  ]
+}

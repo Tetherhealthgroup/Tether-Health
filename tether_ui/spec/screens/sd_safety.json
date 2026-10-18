@@ -1,0 +1,109 @@
+{
+  "id": "sd_safety",
+  "name": "Home safety",
+  "route": "/p/sd/safety",
+  "flow": "sd",
+  "program": "sd",
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Home safety",
+    "left": "back",
+    "pill": "Checklist"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Make your home safer",
+      "size": "m"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Remove loose rugs",
+              "done": true
+            },
+            {
+              "label": "Night lights in hallway and bathroom",
+              "done": true
+            },
+            {
+              "label": "Grab bar in shower"
+            },
+            {
+              "label": "Stair rails on both sides"
+            },
+            {
+              "label": "Vision check this year"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "2 of 5 done",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/sd/safety",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/sd/safety",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "summary": "PUT /v1/program-data/sd/safety then toast “Saved” then back"
+    }
+  ]
+}

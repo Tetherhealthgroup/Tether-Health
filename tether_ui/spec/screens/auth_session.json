@@ -1,0 +1,84 @@
+{
+  "id": "auth_session",
+  "name": "Session expired",
+  "route": "/auth/session",
+  "flow": "auth",
+  "program": null,
+  "phase": "account",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": null,
+  "body": [
+    {
+      "t": "title",
+      "text": "Please sign in again",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in.",
+      "tone": "muted"
+    },
+    {
+      "t": "field",
+      "label": "Password",
+      "placeholder": "Password",
+      "kind": "password",
+      "key": "password"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Sign in",
+      "action": {
+        "type": "submit",
+        "api": "POST supabase /auth/v1/token",
+        "then": {
+          "type": "close"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Use Face ID",
+      "action": {
+        "type": "close"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": "Today",
+  "api": [],
+  "actions": [
+    {
+      "element": "Sign in",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST supabase /auth/v1/token",
+        "then": {
+          "type": "close"
+        }
+      },
+      "summary": "POST supabase /auth/v1/token then close"
+    },
+    {
+      "element": "Use Face ID",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}

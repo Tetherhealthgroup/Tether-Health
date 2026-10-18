@@ -1,0 +1,110 @@
+{
+  "id": "sf_unplug_gate_commit",
+  "name": "Small step: type a sentence",
+  "route": "/p/sf/unplug/step?state=sentence",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": "sf_unplug_gate",
+  "state": "typed sentence",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+  "header": {
+    "t": "header",
+    "title": "Small step",
+    "left": "close",
+    "pill": "Unplug"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Type it out, then decide.",
+      "size": "l"
+    },
+    {
+      "t": "text",
+      "text": "“I can come back to this later”",
+      "tone": "body"
+    },
+    {
+      "t": "field",
+      "label": "Type the sentence",
+      "placeholder": "I can come back to this later",
+      "kind": "text",
+      "key": "sentence"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Keep it closed",
+      "action": {
+        "type": "toast",
+        "value": "Nice. The app stays closed.",
+        "then": {
+          "type": "reset",
+          "to": "sf_home"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Open it for 10 minutes",
+      "action": {
+        "type": "toast",
+        "value": "Open for 10 minutes. The pause screen comes back after.",
+        "then": {
+          "type": "close"
+        }
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 item 2 (effort gate: commitment)",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.commitment"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Keep it closed",
+      "path": "footer[0]",
+      "action": {
+        "type": "toast",
+        "value": "Nice. The app stays closed.",
+        "then": {
+          "type": "reset",
+          "to": "sf_home"
+        }
+      },
+      "summary": "toast “Nice. The app stays closed.” then reset → sf_home"
+    },
+    {
+      "element": "Open it for 10 minutes",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "Open for 10 minutes. The pause screen comes back after.",
+        "then": {
+          "type": "close"
+        }
+      },
+      "summary": "toast “Open for 10 minutes. The pause screen comes back after.” then close"
+    }
+  ]
+}

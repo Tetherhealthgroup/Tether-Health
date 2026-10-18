@@ -1,0 +1,116 @@
+{
+  "id": "ca_intro",
+  "name": "ClearAir intro",
+  "route": "/p/ca",
+  "flow": "ca",
+  "program": "ca",
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Entry from Choose programs, Catalog or a Learn-only row.",
+  "header": {
+    "t": "header",
+    "title": "ClearAir",
+    "left": "back",
+    "pill": "~1 min/day"
+  },
+  "body": [
+    {
+      "t": "progtag",
+      "program": "ca",
+      "extra": "Respiratory health"
+    },
+    {
+      "t": "title",
+      "text": "Follow your action plan, day by day.",
+      "size": "l"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Zone check",
+          "green · yellow · red"
+        ],
+        [
+          "Red zone",
+          "one tap to 911"
+        ],
+        [
+          "Zones",
+          "from your clinician only"
+        ]
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Check your zone, log symptoms and know exactly what to do, using the plan your clinician gave you.",
+      "tone": "muted"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Set up ClearAir",
+      "action": {
+        "type": "push",
+        "to": "ca_q1"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Add as Learn only",
+      "action": {
+        "type": "toast",
+        "value": "ClearAir added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Set up ClearAir",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "ca_q1"
+      },
+      "summary": "push → ca_q1"
+    },
+    {
+      "element": "Add as Learn only",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "ClearAir added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "summary": "toast “ClearAir added as Learn only” then tab → plans"
+    }
+  ]
+}

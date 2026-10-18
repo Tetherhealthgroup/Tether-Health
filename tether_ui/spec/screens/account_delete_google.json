@@ -1,0 +1,200 @@
+{
+  "id": "account_delete_google",
+  "name": "Delete account · Google account",
+  "route": "/account/delete?state=google",
+  "flow": "account",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "account_delete",
+  "state": "Google account",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Google re-auth for the same provider; the returned user id must match (TH-935). Delete runs only after Success.",
+  "header": {
+    "t": "header",
+    "title": "Delete account",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Delete your account and all data?",
+      "size": "m"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Programs",
+          "4"
+        ],
+        [
+          "Check-ins",
+          "63"
+        ],
+        [
+          "Readings & logs",
+          "118"
+        ],
+        [
+          "Shared with care team",
+          "3 summaries (their copies stay with them)"
+        ]
+      ]
+    },
+    {
+      "t": "text",
+      "text": "This can’t be undone. Download a copy first if you want one.",
+      "tone": "small"
+    },
+    {
+      "t": "button",
+      "label": "Download a copy first",
+      "action": {
+        "type": "push",
+        "to": "account_data"
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "field",
+      "label": "Type DELETE to confirm",
+      "value": "DELETE",
+      "kind": "text",
+      "key": "type_delete_to_confirm"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "eyebrow": "Confirm it’s you",
+      "title": "Signed in with Google",
+      "text": "When you tap Delete everything, Google asks you to confirm. Use the same Google account you signed in with."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Delete everything",
+      "action": {
+        "type": "branch",
+        "question": "Sign in with Google result",
+        "provider": "google",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Success",
+            "action": {
+              "type": "submit",
+              "api": "DELETE /v1/account/data",
+              "then": {
+                "type": "replace",
+                "to": "account_deleted"
+              }
+            }
+          },
+          {
+            "label": "Different account",
+            "action": {
+              "type": "toast",
+              "value": "That’s a different Google account. Use the one you signed in with."
+            }
+          },
+          {
+            "label": "Cancelled",
+            "action": {
+              "type": "toast",
+              "value": "Nothing was deleted."
+            }
+          },
+          {
+            "label": "Error",
+            "action": {
+              "type": "toast",
+              "value": "Couldn’t reach Google. Nothing was deleted."
+            }
+          }
+        ]
+      },
+      "variant": "danger",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-36 (social-user account_delete) · TH-935 social re-auth",
+    "Source: ARCH-TH-902 A.5 \"Social re-auth fix\""
+  ],
+  "over": null,
+  "api": [
+    "DELETE /v1/account/data"
+  ],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Download a copy first",
+      "path": "body[3]",
+      "action": {
+        "type": "push",
+        "to": "account_data"
+      },
+      "summary": "push → account_data"
+    },
+    {
+      "element": "Delete everything",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Sign in with Google result",
+        "provider": "google",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Success",
+            "action": {
+              "type": "submit",
+              "api": "DELETE /v1/account/data",
+              "then": {
+                "type": "replace",
+                "to": "account_deleted"
+              }
+            }
+          },
+          {
+            "label": "Different account",
+            "action": {
+              "type": "toast",
+              "value": "That’s a different Google account. Use the one you signed in with."
+            }
+          },
+          {
+            "label": "Cancelled",
+            "action": {
+              "type": "toast",
+              "value": "Nothing was deleted."
+            }
+          },
+          {
+            "label": "Error",
+            "action": {
+              "type": "toast",
+              "value": "Couldn’t reach Google. Nothing was deleted."
+            }
+          }
+        ]
+      },
+      "summary": "auth (google): Sign in with Google result → Success: DELETE /v1/account/data then replace → account_deleted | Different account: toast “That’s a different Google account. Use the one you signed in with.” | Cancelled: toast “Nothing was deleted.” | Error: toast “Couldn’t reach Google. Nothing was deleted.”"
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "id": "be_q2",
+  "name": "Family history",
+  "route": "/p/be/onboarding/2",
+  "flow": "be",
+  "program": "be",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Family history",
+    "left": "back",
+    "pill": "2 of 2"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 2,
+      "total": 2
+    },
+    {
+      "t": "title",
+      "text": "Has a close relative had cancer?",
+      "size": "m"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Breast",
+        "Ovarian",
+        "Colorectal",
+        "Prostate",
+        "Pancreatic",
+        "Melanoma",
+        "None",
+        "Not sure"
+      ],
+      "selected": [
+        "Breast"
+      ],
+      "multi": true,
+      "key": "value"
+    },
+    {
+      "t": "field",
+      "label": "Relative’s age at diagnosis (if known)",
+      "value": "44",
+      "kind": "number",
+      "key": "relative_s_age_at_diagnosis_if_k"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "A relative diagnosed before 50 may mean earlier screening or genetic counseling. We’ll add this to your visit list."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "See my plan",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/be/profile",
+        "then": {
+          "type": "replace",
+          "to": "be_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "See my plan",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/be/profile",
+        "then": {
+          "type": "replace",
+          "to": "be_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "summary": "PUT /v1/program-data/be/profile then replace → be_home (onboarding: ob_setup)"
+    }
+  ]
+}

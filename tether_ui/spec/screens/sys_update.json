@@ -1,0 +1,84 @@
+{
+  "id": "sys_update",
+  "name": "Update required",
+  "route": "/system/update",
+  "flow": "system",
+  "program": null,
+  "phase": "account",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Update needed",
+    "left": "none"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "↑",
+      "tone": "warn"
+    },
+    {
+      "t": "title",
+      "text": "A safety update is ready",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "This version has important fixes. Rescue and Support still work until you update.",
+      "tone": "muted",
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Update now",
+      "action": {
+        "type": "external",
+        "value": "https://apps.apple.com/app/tether-health"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Open Rescue",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "variant": "rescue",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Update now",
+      "path": "footer[0]",
+      "action": {
+        "type": "external",
+        "value": "https://apps.apple.com/app/tether-health"
+      },
+      "summary": "external https://apps.apple.com/app/tether-health"
+    },
+    {
+      "element": "Open Rescue",
+      "path": "footer[1]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
+    }
+  ]
+}

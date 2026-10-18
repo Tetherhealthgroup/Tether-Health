@@ -1,0 +1,114 @@
+{
+  "id": "sf_slip",
+  "name": "Long-scroll recovery",
+  "route": "/p/sf/slip",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "milestone",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Long scroll",
+    "left": "back",
+    "pill": "Private"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "That happens. What pulled you in?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Nothing resets. Your phone-free nights still count.",
+      "tone": "muted"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Couldn’t sleep",
+        "Bored",
+        "Stressed",
+        "Didn’t notice time"
+      ],
+      "selected": [
+        "Couldn’t sleep"
+      ],
+      "multi": true,
+      "key": "value"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Keep my goal, try again tonight",
+          "badge": "Recommended"
+        },
+        {
+          "label": "Make tomorrow’s goal easier"
+        },
+        {
+          "label": "Move bedtime window 30 min earlier"
+        }
+      ],
+      "selected": 0,
+      "key": "value_2"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/lapses",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "replace",
+            "to": "sf_home"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/lapses",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "replace",
+            "to": "sf_home"
+          }
+        }
+      },
+      "summary": "POST /v1/records/lapses then toast “Saved” then replace → sf_home"
+    }
+  ]
+}

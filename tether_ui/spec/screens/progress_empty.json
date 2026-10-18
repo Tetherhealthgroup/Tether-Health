@@ -1,0 +1,114 @@
+{
+  "id": "progress_empty",
+  "name": "Progress · empty",
+  "route": "/progress?state=empty",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": "progress",
+  "variantOf": "progress",
+  "state": "empty",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Progress",
+    "left": "none",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "0",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "Your progress shows up here",
+      "size": "m",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "After your first check-in or reading, you’ll see patterns for each program.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "button",
+      "label": "Do a check-in",
+      "action": {
+        "type": "sheet",
+        "to": "checkin"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Do a check-in",
+      "path": "body[3]",
+      "action": {
+        "type": "sheet",
+        "to": "checkin"
+      },
+      "summary": "sheet → checkin"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Plans",
+      "path": "tabbar.plans",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

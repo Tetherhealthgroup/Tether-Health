@@ -1,0 +1,94 @@
+{
+  "id": "sf_unplug_apps",
+  "name": "Choose apps",
+  "route": "/p/sf/unplug/apps",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. iPhone host screen around Apple’s FamilyActivityPicker. presentAppPicker returns only a count; app identities stay as device-local tokens.",
+  "header": {
+    "t": "header",
+    "title": "Choose apps",
+    "left": "back",
+    "pill": "Step 2 of 3"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Which apps should Unplug pause?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Apple’s app picker opens next. Tether never sees which apps you pick: Apple keeps that choice on this phone.",
+      "tone": "muted"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Start small",
+      "text": "One or two apps that pull you in most is a good start. You can change this anytime."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Open app picker",
+      "action": {
+        "type": "sheet",
+        "to": "sf_unplug_picker_ios"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Not now",
+      "action": {
+        "type": "back"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 item 1 (app selection host)",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Open app picker",
+      "path": "footer[0]",
+      "action": {
+        "type": "sheet",
+        "to": "sf_unplug_picker_ios"
+      },
+      "summary": "sheet → sf_unplug_picker_ios"
+    },
+    {
+      "element": "Not now",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

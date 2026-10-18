@@ -1,0 +1,69 @@
+{
+  "id": "sf_unplug_session_done",
+  "name": "Session complete",
+  "route": "/p/sf/unplug/session/done",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "milestone",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Opened from the session-finished notification (generic text) or when the timer ends in the app.",
+  "header": {
+    "t": "header",
+    "title": "Focus session",
+    "left": "none"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "✓",
+      "tone": "mint"
+    },
+    {
+      "t": "big",
+      "value": "45",
+      "unit": "min",
+      "caption": "Session complete · your apps are open again"
+    },
+    {
+      "t": "text",
+      "text": "Want to make this a habit? You can start one from ScrollFree anytime.",
+      "tone": "muted",
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Done",
+      "action": {
+        "type": "replace",
+        "to": "sf_unplug_home"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 item 4 (session end)",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession()"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Done",
+      "path": "footer[0]",
+      "action": {
+        "type": "replace",
+        "to": "sf_unplug_home"
+      },
+      "summary": "replace → sf_unplug_home"
+    }
+  ]
+}

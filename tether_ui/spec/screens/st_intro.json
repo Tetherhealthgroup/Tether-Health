@@ -1,0 +1,116 @@
+{
+  "id": "st_intro",
+  "name": "Steady intro",
+  "route": "/p/st",
+  "flow": "st",
+  "program": "st",
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Entry from Choose programs, Catalog or a Learn-only row.",
+  "header": {
+    "t": "header",
+    "title": "Steady",
+    "left": "back",
+    "pill": "~2 min/day"
+  },
+  "body": [
+    {
+      "t": "progtag",
+      "program": "st",
+      "extra": "Diabetes & metabolic health"
+    },
+    {
+      "t": "title",
+      "text": "Notice glucose patterns, without judgment.",
+      "size": "l"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Readings",
+          "meter or CGM entries"
+        ],
+        [
+          "Range",
+          "from your clinician"
+        ],
+        [
+          "A high reading is",
+          "information, not failure"
+        ]
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Log readings, see patterns around meals and sleep, and follow the low plan your clinician gave you. Steady never counts calories.",
+      "tone": "muted"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Set up Steady",
+      "action": {
+        "type": "push",
+        "to": "st_q1"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Add as Learn only",
+      "action": {
+        "type": "toast",
+        "value": "Steady added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Set up Steady",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "st_q1"
+      },
+      "summary": "push → st_q1"
+    },
+    {
+      "element": "Add as Learn only",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "Steady added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "summary": "toast “Steady added as Learn only” then tab → plans"
+    }
+  ]
+}

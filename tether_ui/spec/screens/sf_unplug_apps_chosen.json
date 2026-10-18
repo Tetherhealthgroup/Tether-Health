@@ -1,0 +1,112 @@
+{
+  "id": "sf_unplug_apps_chosen",
+  "name": "Name your groups",
+  "route": "/p/sf/unplug/apps?state=chosen",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "sf_unplug_apps",
+  "state": "apps chosen",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. PlatformAppSelection carries only the person’s group labels and counts. Proposal: group names are device-only (not synced); owner to confirm.",
+  "header": {
+    "t": "header",
+    "title": "Choose apps",
+    "left": "back",
+    "pill": "Step 2 of 3"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Name your groups",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "iPhone doesn’t tell Tether the app names, so give each group a name you’ll recognize. Group names stay on this phone.",
+      "tone": "muted"
+    },
+    {
+      "t": "list",
+      "title": "Your groups",
+      "rows": [
+        {
+          "label": "Video apps",
+          "sub": "3 apps"
+        },
+        {
+          "label": "Feeds",
+          "sub": "2 apps"
+        }
+      ]
+    },
+    {
+      "t": "field",
+      "label": "New group name",
+      "placeholder": "e.g. Games",
+      "kind": "text",
+      "key": "group_name"
+    },
+    {
+      "t": "button",
+      "label": "Add another group",
+      "action": {
+        "type": "sheet",
+        "to": "sf_unplug_picker_ios"
+      },
+      "variant": "secondary",
+      "arrow": false,
+      "small": true
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next: limits",
+      "action": {
+        "type": "push",
+        "to": "sf_unplug_limits"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 item 1",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAppSelection(groupLabels, groupAppCounts, totalApps)"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Add another group",
+      "path": "body[4]",
+      "action": {
+        "type": "sheet",
+        "to": "sf_unplug_picker_ios"
+      },
+      "summary": "sheet → sf_unplug_picker_ios"
+    },
+    {
+      "element": "Next: limits",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_unplug_limits"
+      },
+      "summary": "push → sf_unplug_limits"
+    }
+  ]
+}

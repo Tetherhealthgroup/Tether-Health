@@ -1,0 +1,101 @@
+{
+  "id": "hw_log_error",
+  "name": "Log BP · validation",
+  "route": "/p/hw/log/2?state=error",
+  "flow": "hw",
+  "program": "hw",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "hw_log2",
+  "state": "error",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Log blood pressure",
+    "left": "back",
+    "pill": "Check"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Let’s double-check that.",
+      "size": "m"
+    },
+    {
+      "t": "fieldrow",
+      "fields": [
+        {
+          "t": "field",
+          "label": "Top (systolic)",
+          "value": "128",
+          "unit": "mmHg",
+          "kind": "number",
+          "key": "top_systolic"
+        },
+        {
+          "t": "field",
+          "label": "Bottom (diastolic)",
+          "value": "310",
+          "unit": "mmHg",
+          "error": "Too high for the bottom number. Did you mean 81?",
+          "kind": "number",
+          "key": "bottom_diastolic"
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Valid range: top 70–250, bottom 40–150, bottom lower than top.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save readings",
+      "variant": "primary",
+      "state": "disabled",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Edit reading",
+      "action": {
+        "type": "replace",
+        "to": "hw_log2"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save readings",
+      "path": "footer[0]",
+      "action": null,
+      "summary": "disabled"
+    },
+    {
+      "element": "Edit reading",
+      "path": "footer[1]",
+      "action": {
+        "type": "replace",
+        "to": "hw_log2"
+      },
+      "summary": "replace → hw_log2"
+    }
+  ]
+}

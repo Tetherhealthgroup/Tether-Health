@@ -1,0 +1,102 @@
+{
+  "id": "re_q1",
+  "name": "Risk check",
+  "route": "/p/re/onboarding/1",
+  "flow": "re",
+  "program": "re",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Risk check",
+    "left": "back",
+    "pill": "1 of 1"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 1,
+      "total": 1
+    },
+    {
+      "t": "title",
+      "text": "Do any of these apply?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "These raise the chance of kidney or liver problems.",
+      "tone": "muted"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Diabetes",
+        "High blood pressure",
+        "Heart disease",
+        "Family history of kidney disease",
+        "Regular alcohol",
+        "Hepatitis B or C",
+        "None"
+      ],
+      "selected": [
+        "Diabetes",
+        "High blood pressure"
+      ],
+      "multi": true,
+      "key": "value"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "Kidney",
+        "Liver",
+        "Both",
+        "No"
+      ],
+      "selected": "No",
+      "label": "Known condition?",
+      "key": "known_condition"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "See what this means",
+      "action": {
+        "type": "push",
+        "to": "re_result"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "See what this means",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "re_result"
+      },
+      "summary": "push → re_result"
+    }
+  ]
+}

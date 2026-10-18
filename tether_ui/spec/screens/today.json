@@ -1,0 +1,263 @@
+{
+  "id": "today",
+  "name": "Today",
+  "route": "/today",
+  "flow": "today",
+  "program": null,
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "today",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Composed from every Focus enrolment. If a program safety rule fires, its card is pinned first (see Safety state).",
+  "header": {
+    "t": "header",
+    "title": "Today",
+    "left": "logo",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "eyebrow",
+      "text": "Friday, August 21"
+    },
+    {
+      "t": "title",
+      "text": "Good morning, Alex.",
+      "size": "m"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "All",
+        "BreatheFree",
+        "ScrollFree"
+      ],
+      "selected": [
+        "All"
+      ],
+      "multi": false,
+      "dots": {
+        "BreatheFree": "bf",
+        "ScrollFree": "sf"
+      },
+      "key": "value"
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "Craving or urge to scroll?",
+      "text": "Help for the next few minutes · works offline",
+      "cta": {
+        "t": "button",
+        "label": "Rescue",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "variant": "rescue",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Today · 2 small steps",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Stock gum, water or snacks",
+              "sub": "BreatheFree · 3 min",
+              "done": true
+            },
+            {
+              "label": "Charge your phone outside the bedroom",
+              "sub": "ScrollFree · tonight"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Check-in · about 90 sec",
+      "title": "Covers both programs",
+      "cta": {
+        "t": "button",
+        "label": "Start",
+        "action": {
+          "type": "sheet",
+          "to": "checkin"
+        },
+        "variant": "lime",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "stats",
+      "items": [
+        {
+          "label": "Quit day",
+          "value": "7 days",
+          "sub": "Fri, Aug 28",
+          "program": "bf"
+        },
+        {
+          "label": "Yesterday",
+          "value": "2h 10m",
+          "sub": "goal 90 min",
+          "program": "sf"
+        }
+      ],
+      "cols": 2
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "BreatheFree home",
+          "sub": "Plan, medicines, progress",
+          "action": {
+            "type": "push",
+            "to": "bf_home"
+          },
+          "lead": {
+            "program": "bf"
+          }
+        },
+        {
+          "label": "ScrollFree home",
+          "sub": "Goal, Pause 60, week",
+          "action": {
+            "type": "push",
+            "to": "sf_home"
+          },
+          "lead": {
+            "program": "sf"
+          }
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "tag": "ca",
+      "tagExtra": "Learn only",
+      "title": "How your lungs recover after you quit",
+      "text": "4 min read",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      }
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [
+    "GET /v1/today"
+  ],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Rescue",
+      "path": "body[3].cta[0]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
+    },
+    {
+      "element": "Start",
+      "path": "body[5].cta[0]",
+      "action": {
+        "type": "sheet",
+        "to": "checkin"
+      },
+      "summary": "sheet → checkin"
+    },
+    {
+      "element": "BreatheFree home",
+      "path": "body[7].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_home"
+      },
+      "summary": "push → bf_home"
+    },
+    {
+      "element": "ScrollFree home",
+      "path": "body[7].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "sf_home"
+      },
+      "summary": "push → sf_home"
+    },
+    {
+      "element": "How your lungs recover after you quit",
+      "path": "body[8]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "Tab · Plans",
+      "path": "tabbar.plans",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

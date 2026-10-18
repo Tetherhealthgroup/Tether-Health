@@ -1,0 +1,98 @@
+{
+  "id": "hw_q1",
+  "name": "Baseline",
+  "route": "/p/hw/onboarding/1",
+  "flow": "hw",
+  "program": "hw",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "About you",
+    "left": "back",
+    "pill": "1 of 2"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 1,
+      "total": 2
+    },
+    {
+      "t": "title",
+      "text": "Has a clinician talked with you about…",
+      "size": "m"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "High blood pressure",
+        "High cholesterol",
+        "Heart disease",
+        "Stroke",
+        "None of these"
+      ],
+      "selected": [
+        "High blood pressure"
+      ],
+      "multi": true,
+      "key": "value"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "Yes",
+        "No",
+        "Not sure"
+      ],
+      "selected": "Yes",
+      "label": "Do you have a home BP monitor?",
+      "key": "do_you_have_a_home_bp_monitor"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "No monitor? Many pharmacies have free kiosks. We’ll show how to measure correctly."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next",
+      "action": {
+        "type": "push",
+        "to": "hw_targets"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Next",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "hw_targets"
+      },
+      "summary": "push → hw_targets"
+    }
+  ]
+}

@@ -1,0 +1,162 @@
+{
+  "id": "sf_unplug_auth",
+  "name": "Allow Screen Time",
+  "route": "/p/sf/unplug/permission",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. approved → choose apps, denied → denied state, unavailable → unavailable state.",
+  "header": {
+    "t": "header",
+    "title": "Unplug",
+    "left": "back",
+    "pill": "Step 1 of 3"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "◷",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "Allow Screen Time for Unplug",
+      "size": "m",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Apple will ask you to let Tether Health use Screen Time. This lets Unplug pause apps. It doesn’t let Tether see what you do in them.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Lets Unplug",
+          "Pause apps you choose"
+        ],
+        [
+          "Never shares",
+          "App names, content, messages"
+        ],
+        [
+          "Turn off",
+          "Anytime in Account → ScrollFree"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue",
+      "action": {
+        "type": "branch",
+        "question": "Screen Time authorization (iOS Family Controls, individual)",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Approved",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_apps"
+            }
+          },
+          {
+            "label": "Denied",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_auth_denied"
+            }
+          },
+          {
+            "label": "Unavailable",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_auth_unavailable"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Not now",
+      "action": {
+        "type": "back"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 permission states",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module requestAuthorization(individual) / PlatformAuthorizationStatus"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Continue",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Screen Time authorization (iOS Family Controls, individual)",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Approved",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_apps"
+            }
+          },
+          {
+            "label": "Denied",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_auth_denied"
+            }
+          },
+          {
+            "label": "Unavailable",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_auth_unavailable"
+            }
+          }
+        ]
+      },
+      "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
+    },
+    {
+      "element": "Not now",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

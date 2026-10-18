@@ -1,0 +1,239 @@
+{
+  "id": "records_review",
+  "name": "Review imported data",
+  "route": "/records/review",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Validation pipeline: FHIR R4 schema → code mapping (LOINC, SNOMED CT, CVX, RxNorm) → unit normalisation (UCUM) → plausibility ranges → duplicate detection (code + date + value) → conflict with manual entries → member review.",
+  "header": {
+    "t": "header",
+    "title": "Review",
+    "left": "close",
+    "pill": "Not added yet"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Review before adding",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Nothing reaches your programs until you confirm.",
+      "tone": "muted"
+    },
+    {
+      "t": "banner",
+      "kind": "offline",
+      "text": "2 items need your review.",
+      "action": {
+        "type": "push",
+        "to": "records_conflict"
+      },
+      "actionLabel": "Review"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "hw",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "12 blood pressure readings",
+              "sub": "Jun – Oct 2026",
+              "done": true
+            },
+            {
+              "label": "Lipid panel",
+              "sub": "LDL 138 · Sep 30",
+              "done": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "st",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "A1C 7.6%",
+              "sub": "Oct 1 · differs from your entry (7.4%)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "ck",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Flu vaccine",
+              "sub": "Oct 12, 2025",
+              "done": true
+            },
+            {
+              "label": "Tdap",
+              "sub": "2019",
+              "done": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "bf",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Smoking status: every day smoker",
+              "sub": "Aug 2026 · sets your baseline",
+              "done": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "re",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "eGFR 58",
+              "sub": "Oct 3",
+              "done": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "eyebrow",
+      "text": "Checked automatically"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Units converted",
+          "2 glucose results · mmol/L → mg/dL"
+        ],
+        [
+          "Duplicates skipped",
+          "3 readings you already entered"
+        ],
+        [
+          "Held as likely typo",
+          "1 · BP 1290/80"
+        ],
+        [
+          "Future dates rejected",
+          "0"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Add 21 items to my programs",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/fhir/accept",
+        "then": {
+          "type": "toast",
+          "value": "Added to Heartwise, Steady, Checkup, BreatheFree and Renew",
+          "then": {
+            "type": "popto",
+            "to": "records_hub"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Review conflicts first",
+      "action": {
+        "type": "push",
+        "to": "records_conflict"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Review",
+      "path": "body[2]",
+      "action": {
+        "type": "push",
+        "to": "records_conflict"
+      },
+      "summary": "push → records_conflict"
+    },
+    {
+      "element": "Add 21 items to my programs",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/fhir/accept",
+        "then": {
+          "type": "toast",
+          "value": "Added to Heartwise, Steady, Checkup, BreatheFree and Renew",
+          "then": {
+            "type": "popto",
+            "to": "records_hub"
+          }
+        }
+      },
+      "summary": "POST /v1/records/fhir/accept then toast “Added to Heartwise, Steady, Checkup, BreatheFree and Renew” then popto → records_hub"
+    },
+    {
+      "element": "Review conflicts first",
+      "path": "footer[1]",
+      "action": {
+        "type": "push",
+        "to": "records_conflict"
+      },
+      "summary": "push → records_conflict"
+    }
+  ]
+}

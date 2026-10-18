@@ -1,0 +1,199 @@
+{
+  "id": "records_consent",
+  "name": "Consent: Epic",
+  "route": "/records/consent",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Authorization code + PKCE in ASWebAuthenticationSession / Custom Tabs. The code is exchanged by records-service; refresh tokens are stored encrypted server-side, never on the phone.",
+  "header": {
+    "t": "header",
+    "title": "Connect",
+    "left": "back",
+    "pill": "Read-only"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Connect Patel Family Medicine?",
+      "size": "m"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Source",
+          "Epic MyChart · SMART on FHIR R4"
+        ],
+        [
+          "Access",
+          "Read-only"
+        ],
+        [
+          "Refresh",
+          "Daily while connected"
+        ],
+        [
+          "Stop",
+          "Disconnect anytime"
+        ]
+      ]
+    },
+    {
+      "t": "checklist",
+      "items": [
+        {
+          "label": "Conditions",
+          "sub": "Condition",
+          "done": true
+        },
+        {
+          "label": "Vital signs",
+          "sub": "Observation · blood pressure, weight",
+          "done": true
+        },
+        {
+          "label": "Lab results",
+          "sub": "Observation · A1C, lipids, eGFR",
+          "done": true
+        },
+        {
+          "label": "Medications",
+          "sub": "MedicationRequest",
+          "done": true
+        },
+        {
+          "label": "Immunizations",
+          "sub": "Immunization",
+          "done": true
+        },
+        {
+          "label": "Smoking status",
+          "sub": "Observation · LOINC 72166-2",
+          "done": true
+        },
+        {
+          "label": "Clinical notes",
+          "sub": "Not requested"
+        }
+      ],
+      "label": "What Tether will read"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Only the programs you joined get data",
+      "text": "Heartwise ← blood pressure, lipids · Steady ← A1C, glucose · Renew ← eGFR · Checkup ← immunizations · BreatheFree ← smoking status. Ease and ScrollFree get nothing."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue to MyChart",
+      "action": {
+        "type": "branch",
+        "question": "MyChart sign-in result",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Approved",
+            "action": {
+              "type": "push",
+              "to": "records_importing"
+            }
+          },
+          {
+            "label": "Cancelled",
+            "action": {
+              "type": "toast",
+              "value": "Connection cancelled. Nothing was imported."
+            }
+          },
+          {
+            "label": "Denied or error",
+            "action": {
+              "type": "push",
+              "to": "records_error"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Not now",
+      "action": {
+        "type": "back"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [
+    "GET /v1/records/fhir/authorize (PKCE) → system browser",
+    "POST /v1/records/fhir/callback (code exchange on server)"
+  ],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Continue to MyChart",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "MyChart sign-in result",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Approved",
+            "action": {
+              "type": "push",
+              "to": "records_importing"
+            }
+          },
+          {
+            "label": "Cancelled",
+            "action": {
+              "type": "toast",
+              "value": "Connection cancelled. Nothing was imported."
+            }
+          },
+          {
+            "label": "Denied or error",
+            "action": {
+              "type": "push",
+              "to": "records_error"
+            }
+          }
+        ]
+      },
+      "summary": "branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error"
+    },
+    {
+      "element": "Not now",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

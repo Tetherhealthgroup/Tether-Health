@@ -1,0 +1,103 @@
+{
+  "id": "account_leave",
+  "name": "Leave a program",
+  "route": "/account/programs/leave",
+  "flow": "account",
+  "program": null,
+  "phase": "account",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": null,
+  "body": [
+    {
+      "t": "title",
+      "text": "Leave BreatheFree?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Reminders stop right away. Your other programs are not affected.",
+      "tone": "muted"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Keep my data for 30 days",
+          "sub": "Rejoin anytime and pick up where you left off",
+          "badge": "Default"
+        },
+        {
+          "label": "Delete BreatheFree data now",
+          "sub": "63 check-ins, 14 rescues, 1 plan"
+        }
+      ],
+      "selected": 0,
+      "key": "value"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Leave BreatheFree",
+      "action": {
+        "type": "submit",
+        "api": "DELETE /v1/enrolments/:id",
+        "then": {
+          "type": "toast",
+          "value": "You left BreatheFree",
+          "then": {
+            "type": "reset",
+            "to": "plans"
+          }
+        }
+      },
+      "variant": "danger",
+      "arrow": false
+    },
+    {
+      "t": "button",
+      "label": "Cancel",
+      "action": {
+        "type": "close"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": "Programs & sharing",
+  "api": [],
+  "actions": [
+    {
+      "element": "Leave BreatheFree",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "DELETE /v1/enrolments/:id",
+        "then": {
+          "type": "toast",
+          "value": "You left BreatheFree",
+          "then": {
+            "type": "reset",
+            "to": "plans"
+          }
+        }
+      },
+      "summary": "DELETE /v1/enrolments/:id then toast “You left BreatheFree” then reset → plans"
+    },
+    {
+      "element": "Cancel",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}

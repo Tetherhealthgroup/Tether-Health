@@ -1,0 +1,116 @@
+{
+  "id": "hw_intro",
+  "name": "Heartwise intro",
+  "route": "/p/hw",
+  "flow": "hw",
+  "program": "hw",
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Entry from Choose programs, Catalog or a Learn-only row.",
+  "header": {
+    "t": "header",
+    "title": "Heartwise",
+    "left": "back",
+    "pill": "~2 min/day"
+  },
+  "body": [
+    {
+      "t": "progtag",
+      "program": "hw",
+      "extra": "Cardiovascular health"
+    },
+    {
+      "t": "title",
+      "text": "Know your numbers. Share them on your terms.",
+      "size": "l"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Readings",
+          "BP + cholesterol panels"
+        ],
+        [
+          "Targets",
+          "from your clinician"
+        ],
+        [
+          "A reading is",
+          "information, not a grade"
+        ]
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Log blood pressure and cholesterol, see trends and prepare for visits. Both focus slots are in use, so you’ll choose how to add it.",
+      "tone": "muted"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Set up Heartwise",
+      "action": {
+        "type": "sheet",
+        "to": "focus_full"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Add as Learn only",
+      "action": {
+        "type": "toast",
+        "value": "Heartwise added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Set up Heartwise",
+      "path": "footer[0]",
+      "action": {
+        "type": "sheet",
+        "to": "focus_full"
+      },
+      "summary": "sheet → focus_full"
+    },
+    {
+      "element": "Add as Learn only",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "Heartwise added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "summary": "toast “Heartwise added as Learn only” then tab → plans"
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "id": "re_result",
+  "name": "Risk result",
+  "route": "/p/re/plan",
+  "flow": "re",
+  "program": "re",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your result",
+    "left": "back",
+    "pill": "Not a diagnosis"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Worth asking about a kidney check.",
+      "size": "m"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "People with diabetes and high blood pressure are usually advised to have yearly kidney tests: a blood test (eGFR) and a urine test (ACR)."
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Ask about eGFR and urine ACR at my next visit",
+              "done": true
+            },
+            {
+              "label": "Remind me 1 week before my visit"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "title": "Also see Heartwise and Steady",
+      "text": "Managing BP and glucose protects your kidneys.",
+      "action": {
+        "type": "push",
+        "to": "catalog"
+      }
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save my plan",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/re/plan",
+        "then": {
+          "type": "replace",
+          "to": "re_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Also see Heartwise and Steady",
+      "path": "body[3]",
+      "action": {
+        "type": "push",
+        "to": "catalog"
+      },
+      "summary": "push → catalog"
+    },
+    {
+      "element": "Save my plan",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/re/plan",
+        "then": {
+          "type": "replace",
+          "to": "re_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "summary": "PUT /v1/program-data/re/plan then replace → re_home (onboarding: ob_setup)"
+    }
+  ]
+}

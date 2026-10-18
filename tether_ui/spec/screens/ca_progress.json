@@ -1,0 +1,108 @@
+{
+  "id": "ca_progress",
+  "name": "ClearAir progress",
+  "route": "/p/ca/progress",
+  "flow": "ca",
+  "program": "ca",
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Progress",
+    "left": "back",
+    "pill": "ClearAir"
+  },
+  "body": [
+    {
+      "t": "chart",
+      "kind": "line",
+      "values": [
+        410,
+        405,
+        398,
+        380,
+        360,
+        310,
+        330,
+        350,
+        372,
+        390,
+        401,
+        404
+      ],
+      "color": "ca",
+      "title": "Peak flow · 12 days",
+      "unit": "L/min",
+      "band": [
+        400,
+        450
+      ],
+      "caption": "Shaded: your green zone, from your plan"
+    },
+    {
+      "t": "stats",
+      "items": [
+        {
+          "label": "Green",
+          "value": "10"
+        },
+        {
+          "label": "Yellow",
+          "value": "2"
+        },
+        {
+          "label": "Red",
+          "value": "0"
+        }
+      ],
+      "cols": 3
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Most common symptom",
+      "title": "Wheezing at night (3×)",
+      "text": "Worth mentioning at your next visit."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Create visit summary",
+      "action": {
+        "type": "push",
+        "to": "hw_summary"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Create visit summary",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "hw_summary"
+      },
+      "summary": "push → hw_summary"
+    }
+  ]
+}

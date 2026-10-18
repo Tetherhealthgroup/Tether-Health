@@ -1,0 +1,159 @@
+{
+  "id": "sf_unplug_auth_android",
+  "name": "Android permissions for Unplug",
+  "route": "/p/sf/unplug/permission?state=android",
+  "flow": "unplug",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "sf_unplug_auth",
+  "state": "android",
+  "dark": false,
+  "bg": null,
+  "desc": "TH-953 proposal for owner review (H32). Copy needs clinical/legal review. Android has no single prompt: usage access and the overlay permission are separate settings pages, checked again when the person returns (authorizationStatus on resume). The foreground service needs a visible notification; its text is generic.",
+  "header": {
+    "t": "header",
+    "title": "Unplug",
+    "left": "back",
+    "pill": "Step 1 of 3"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Two Android settings for Unplug",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Android asks for each one separately. You can turn either off later, and Unplug will tell you if it stops working.",
+      "tone": "muted"
+    },
+    {
+      "t": "checklist",
+      "items": [
+        {
+          "label": "Usage access",
+          "sub": "On · lets Unplug see which app is open and for how long",
+          "done": true
+        },
+        {
+          "label": "Display over other apps",
+          "sub": "Off · lets Unplug show the pause screen"
+        },
+        {
+          "label": "Notifications",
+          "sub": "Android shows a quiet “Tether is running” notice while Unplug is on"
+        }
+      ],
+      "label": "Needed"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Turn on display over apps",
+      "action": {
+        "type": "os_settings"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Turn on usage access",
+      "action": {
+        "type": "os_settings"
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "link",
+      "label": "I’ve turned them on",
+      "action": {
+        "type": "branch",
+        "question": "Android permissions (checked on return)",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "All on",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_apps_android"
+            }
+          },
+          {
+            "label": "Missing",
+            "action": {
+              "type": "toast",
+              "value": "Unplug still needs both settings."
+            }
+          }
+        ]
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [
+    "TH-953 proposal for owner review (H32). Copy needs clinical/legal review.",
+    "Serves: P-30 · B.4 permission states (Android)",
+    "Source: android/.../unplug/UnplugHost.kt (PACKAGE_USAGE_STATS, SYSTEM_ALERT_WINDOW, foreground service)"
+  ],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Turn on display over apps",
+      "path": "footer[0]",
+      "action": {
+        "type": "os_settings"
+      },
+      "summary": "os_settings"
+    },
+    {
+      "element": "Turn on usage access",
+      "path": "footer[1]",
+      "action": {
+        "type": "os_settings"
+      },
+      "summary": "os_settings"
+    },
+    {
+      "element": "I’ve turned them on",
+      "path": "footer[2]",
+      "action": {
+        "type": "branch",
+        "question": "Android permissions (checked on return)",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "All on",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_apps_android"
+            }
+          },
+          {
+            "label": "Missing",
+            "action": {
+              "type": "toast",
+              "value": "Unplug still needs both settings."
+            }
+          }
+        ]
+      },
+      "summary": "branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Missing: toast “Unplug still needs both settings.”"
+    }
+  ]
+}

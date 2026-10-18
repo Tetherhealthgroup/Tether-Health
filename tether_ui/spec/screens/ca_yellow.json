@@ -1,0 +1,133 @@
+{
+  "id": "ca_yellow",
+  "name": "Yellow zone",
+  "route": "/p/ca/zone/yellow",
+  "flow": "ca",
+  "program": "ca",
+  "phase": "rescue",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Yellow zone",
+    "left": "back",
+    "pill": "Your plan"
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "warn",
+      "title": "Follow your yellow-zone steps",
+      "text": "From the plan you entered on Sep 3"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Reliever inhaler · 2–4 puffs",
+              "sub": "As written in your plan",
+              "done": true
+            },
+            {
+              "label": "Re-check in 20 minutes",
+              "sub": "We’ll remind you"
+            },
+            {
+              "label": "Tell your care team if no better",
+              "sub": "As your plan directs"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "urgent",
+      "title": "Getting worse or can’t speak in full sentences?",
+      "text": "Go to your red-zone plan",
+      "action": {
+        "type": "replace",
+        "to": "ca_red"
+      }
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Remind me in 20 min",
+      "action": {
+        "type": "toast",
+        "value": "Reminder set for 20 minutes",
+        "then": {
+          "type": "replace",
+          "to": "ca_home"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Message care team",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Getting worse or can’t speak in full sentences?",
+      "path": "body[2]",
+      "action": {
+        "type": "replace",
+        "to": "ca_red"
+      },
+      "summary": "replace → ca_red"
+    },
+    {
+      "element": "Remind me in 20 min",
+      "path": "footer[0]",
+      "action": {
+        "type": "toast",
+        "value": "Reminder set for 20 minutes",
+        "then": {
+          "type": "replace",
+          "to": "ca_home"
+        }
+      },
+      "summary": "toast “Reminder set for 20 minutes” then replace → ca_home"
+    },
+    {
+      "element": "Message care team",
+      "path": "footer[1]",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "summary": "push → support_message_care"
+    }
+  ]
+}

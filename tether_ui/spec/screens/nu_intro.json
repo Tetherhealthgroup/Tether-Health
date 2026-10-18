@@ -1,0 +1,111 @@
+{
+  "id": "nu_intro",
+  "name": "Nourish intro",
+  "route": "/p/nu",
+  "flow": "nu",
+  "program": "nu",
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Entry from Choose programs, Catalog or a Learn-only row.",
+  "header": {
+    "t": "header",
+    "title": "Nourish",
+    "left": "back",
+    "pill": "~1 min/day"
+  },
+  "body": [
+    {
+      "t": "progtag",
+      "program": "nu",
+      "extra": "Obesity & nutrition"
+    },
+    {
+      "t": "title",
+      "text": "Food without judgment.",
+      "size": "l"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Weekly habit",
+          "one at a time"
+        ],
+        [
+          "Weight",
+          "off by default"
+        ],
+        [
+          "Approach",
+          "add, don’t restrict"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Set up Nourish",
+      "action": {
+        "type": "push",
+        "to": "nu_q1"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Add as Learn only",
+      "action": {
+        "type": "toast",
+        "value": "Nourish added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Set up Nourish",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "nu_q1"
+      },
+      "summary": "push → nu_q1"
+    },
+    {
+      "element": "Add as Learn only",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "Nourish added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "summary": "toast “Nourish added as Learn only” then tab → plans"
+    }
+  ]
+}
