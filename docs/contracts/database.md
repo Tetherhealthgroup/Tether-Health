@@ -110,7 +110,8 @@ enrolment must be inserted with another status.
 
 `public.swap_focus(p_demote uuid, p_promote uuid)` is the focus swap. It runs
 as the caller (row-level security applies), locks both of the caller's
-enrolments, sets `p_demote` to `learn_only` and `p_promote` to `focus` in one
+enrolments, sets `p_demote` to `paused` (its data is kept) and `p_promote` to
+`focus` in one
 transaction, checks the focus cap before it returns (`TH001`), and returns
 both rows (demoted first). Either everything changes or nothing does. It
 refuses: an enrolment that is not the caller's (`TH012`); a `p_promote` that
@@ -155,17 +156,31 @@ consent. `public.supersede_core_consent(p_enrolment uuid, p_version text,
 p_locale text)` runs as the caller and, in one transaction, inserts a new core
 row for the `core` document `p_version`/`p_locale` (text from the document,
 never from the caller) and revokes the old live core row with `superseded_by`
-set to the new row's id. Both rows stay as history. The revoke-with-core
-cascade skips a row revoked with `superseded_by` set, so the optional consents
-stay live; only when the new document has `cascades_optional = true` does the
-function also revoke them. It returns the old row, then the new one. It
-refuses: an enrolment that is not the caller's (`TH012`); a `left` enrolment
-(`TH005`); once account deletion has started (`TH006`); an enrolment without a
-live core consent (`TH004`); a version that is not an available `core`
-document for that locale (`TH011`); the version and locale the live core row
-already has (`TH014`); and a sync service session (`TH010`). `superseded_by`
-can only name the live core consent of the same enrolment that replaces the
-row (`TH003` otherwise), so a plain revocation cannot skip the cascade.
+set to the new row's id. Both rows stay as history. It returns the old row,
+then the new one. It refuses: an enrolment that is not the caller's
+(`TH012`); a `left` enrolment (`TH005`); once account deletion has started
+(`TH006`); an enrolment without a live core consent (`TH004`); a version that
+is not an available `core` document for that locale (`TH011`); a version that
+is not later than the live one (`TH014`, below); and a sync service session
+(`TH010`).
+
+These rules hold for any write that sets `superseded_by`, not only through
+the function, because triggers on `programme_consents` enforce them:
+
+- `superseded_by` can only name the live core consent of the same enrolment
+  that replaces the row (`TH003` otherwise).
+- The replacement must be a later version: its document's `effective_from`
+  must be later than the old row's document's. The same version in another
+  locale is also allowed (a language change). Anything else, including the
+  same version and locale, raises `TH014`. A row stored before consent
+  documents existed (null `locale`) counts as older than every document.
+- The revoke-with-core cascade skips a superseded row, so the optional
+  consents stay live, unless the version changes and some `core` document for
+  the replacement's locale with `cascades_optional = true` has an
+  `effective_from` after the old document's and no later than the new one's
+  (for a null-locale old row: no later than the new one's). Then every live
+  optional consent of the enrolment is revoked in the same transaction. A
+  move to another locale of the same version never revokes them.
 
 ## Consent documents
 
@@ -173,7 +188,10 @@ Migration source of truth:
 `supabase/migrations/202610180003_enrolment_consent_followups.sql`.
 `public.consent_documents` holds every consent text the app may show. It is
 reference data with row-level security enabled and forced: authenticated
-callers can read it, `anon` has no access, and there are no client writes.
+callers can read the documents already in effect (`effective_from <= now()`),
+`anon` has no access, and there are no client writes. Only a role that
+bypasses row-level security (a migration, `postgres` or `service_role`) adds
+or changes documents.
 
 | Column | Contract |
 |---|---|
@@ -182,12 +200,16 @@ callers can read it, `anon` has no access, and there are no client writes.
 | `body_sha256` | database managed: hex SHA-256 of the UTF-8 body |
 | `effective_from` | when the version may first be granted |
 | `retired_at` | nullable; from then on the version can no longer be granted |
-| `approved_ref` | nullable reference to the approval of this exact text; null means not approved |
-| `cascades_optional` | `core` only, default false: moving to this version also revokes optional consents |
+| `approved_ref` | nullable reference to the approval of this exact text; null means not approved. Set once |
+| `cascades_optional` | `core` only, default false: superseding past this version also revokes optional consents. The same for every locale of a version |
 | `created_at` | database managed |
 
-`purpose`, `version`, `locale` and `body` never change (`TH015`); a new text is
-a new version. Consent rows reference their document with a foreign key on
+`purpose`, `version`, `locale` and `body` never change; a new text is a new
+version. `approved_ref` can be set once and never changed afterwards.
+`cascades_optional` and `effective_from` cannot change once any consent row
+references the document. `retired_at` can always be set. Each refusal raises
+`TH015`. Publishing a replacement version means setting `retired_at` on the
+version it replaces. Consent rows reference their document with a foreign key on
 `(purpose, consent_version, locale)`, so a referenced document cannot be
 removed. A consent can be granted for a document that is effective
 (`effective_from <= now()`) and not retired; anything else raises `TH011`.
@@ -196,42 +218,76 @@ text they were stored with.
 
 `public.current_consent_documents()` (`stable security invoker`) returns the
 current document per purpose and locale: the latest `effective_from <= now()`
-that is not retired. The API shows and records that version.
+that is not retired (ties broken by version, so the result is always one
+row per purpose and locale). The API shows and records that version.
 
 The seeded documents are placeholders: version `v1-draft` for every purpose in
 `en` and `es`, effective from 2026-10-18, with `approved_ref` null and a body
-that says it is a draft. They are not consent wording. A release check must
-fail while this returns any row:
+that says it is a draft. They are not consent wording.
 
+### Consent release gate
+
+A release must not ship while the query below returns any row. Run it as a
+role that bypasses row-level security, such as `postgres` or `service_role`;
+under any other role it returns a `role_without_rls_bypass` row, and with no
+documents visible it returns `no_documents`, so it cannot pass by seeing
+nothing. The other rows name the failing document or consent:
+
+- `unapproved`: a document that is not retired (grantable now or in future)
+  has no `approved_ref`;
+- `missing_locale`: a version that is not retired lacks an unretired `en` or
+  `es` document;
+- `cascades_optional_differs`: the locales of one version disagree on
+  `cascades_optional`;
+- `consent_without_document`: a live programme or account consent has no
+  document (a row stored before consent documents existed, null `locale`).
+
+<!-- release-gate:begin -->
 ```sql
-select purpose, version, locale
-from public.current_consent_documents()
-where approved_ref is null;
+select 'role_without_rls_bypass' as reason, current_user::text as purpose,
+  null::text as version, null::text as locale
+where not exists (
+  select 1 from pg_catalog.pg_roles as r
+  where r.rolname = current_user and (r.rolsuper or r.rolbypassrls)
+)
+union all
+select 'no_documents', null, null, null
+where not exists (select 1 from public.consent_documents)
+union all
+select 'unapproved', d.purpose, d.version, d.locale
+from public.consent_documents as d
+where d.approved_ref is null and (d.retired_at is null or d.retired_at > now())
+union all
+select 'missing_locale', v.purpose, v.version, l.locale
+from (
+  select distinct d.purpose, d.version
+  from public.consent_documents as d
+  where d.retired_at is null or d.retired_at > now()
+) as v
+cross join (values ('en'), ('es')) as l(locale)
+where not exists (
+  select 1 from public.consent_documents as d
+  where d.purpose = v.purpose and d.version = v.version and d.locale = l.locale
+    and (d.retired_at is null or d.retired_at > now())
+)
+union all
+select 'cascades_optional_differs', d.purpose, d.version, null
+from public.consent_documents as d
+group by d.purpose, d.version
+having count(distinct d.cascades_optional) > 1
+union all
+select 'consent_without_document', c.purpose, c.consent_version, null
+from public.programme_consents as c
+where c.revoked_at is null and c.locale is null
+union all
+select 'consent_without_document', c.purpose, c.consent_version, null
+from public.account_consents as c
+where c.revoked_at is null and c.locale is null
 ```
+<!-- release-gate:end -->
 
-`public.account_consents` holds account-level items that belong to no
-programme: `essential`, `cross_program_insights` and `diagnostics`. It has the
-same version, wording, single-live-row (partial unique index on
-`(user_id, purpose)` where not revoked) and revoke-only rules, keyed by
-`user_id`. Its `consent_text` is also copied from `consent_documents`
-(callers send `consent_version` and `locale`). It holds no health data.
-
-`public.has_consent(enrolment_id uuid, purpose text, recipient_ref text default null)`
-is a `stable security invoker` function. It is true only when the caller owns
-the enrolment, the enrolment is not `left`, the caller's account deletion has
-not started, a live consent exists for exactly that purpose and recipient, and
-— for any purpose other than `core` — the enrolment's `core` consent is live.
-Because it runs as the caller, RLS also applies. Programme-data tables use it
-in their insert checks together with "enrolment is not `left`".
-
-`public.deletion_barrier_open()` is a `volatile security invoker` function. It
-is true while the caller's profile exists and
-`profiles.account_deletion_started_at` is null. It takes a `FOR SHARE` lock on
-that profile row, so `begin_account_deletion` waits for in-flight inserts, and
-later inserts see the barrier. Every insert policy on enrolments, programme
-consents and account consents uses it. Later tables that hold the caller's data
-must use it in their insert checks too, alongside `has_consent` where the data
-belongs to a programme.
+`supabase/tests/verify_enrolment_consent_followups.sh` runs this exact block
+(taken from this file) against each failing condition.
 
 ## Sync tables
 
@@ -447,8 +503,8 @@ function": every later function that writes and refuses a sync session raises
 | `TH011` | `consent_document_unavailable` | `consent_fill_text` (insert trigger on `programme_consents` and `account_consents`) and `supersede_core_consent`: no effective, unretired document for that purpose, version and locale | No consent document is available for this purpose, version and locale |
 | `TH012` | `enrolment_not_found` | `swap_focus` and `supersede_core_consent`: no such enrolment for the caller | Enrolment not found |
 | `TH013` | `focus_swap_invalid` | `swap_focus`: the programme to demote is not in focus, the one to promote is already in focus, or both are the same | A swap needs one programme in focus and another not in focus |
-| `TH014` | `consent_version_unchanged` | `supersede_core_consent`: the live core consent already has that version and locale | The core consent is already on this version |
-| `TH015` | `consent_document_immutable` | `consent_documents_guard` (update trigger on `consent_documents`) | Consent documents are immutable; publish a new version |
+| `TH014` | `consent_version_unchanged` | `programme_consents_check_supersede` (update trigger on `programme_consents`, so also `supersede_core_consent`): the replacement core version is not later than the one it replaces, or is the same version and locale | The core consent is already on this version or a later one |
+| `TH015` | `consent_document_immutable` | `consent_documents_guard` (update trigger on `consent_documents`): purpose, version, locale or body changed; approved_ref changed after it was set; cascades_optional or effective_from changed on a referenced document | Consent documents are immutable; publish a new version |
 
 Standard SQLSTATEs are kept where PostgreSQL defines the condition:
 `42501` for row-level security and privilege refusals and for

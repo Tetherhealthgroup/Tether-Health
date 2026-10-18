@@ -4,11 +4,13 @@ begin;
 --
 -- * public.consent_documents holds every consent text the app may show, per
 --   purpose, version and locale. It is reference data: authenticated callers
---   can read it, nobody can write it through the API. A document's purpose,
---   version, locale and body never change (TH015); the database computes
---   body_sha256. approved_ref stays null until the text is approved, so a
---   release check can refuse any current document that is not approved.
---   The seeded v1-draft rows are placeholders, not consent wording.
+--   can read the documents already in effect, nobody can write it through
+--   the API. A document's purpose, version, locale and body never change;
+--   approved_ref is set once; cascades_optional and effective_from are fixed
+--   once a consent row references the document (TH015). The database
+--   computes body_sha256. approved_ref stays null until the text is approved,
+--   so a release check can refuse unapproved documents. The seeded v1-draft
+--   rows are placeholders, not consent wording.
 -- * public.current_consent_documents() returns the current document per
 --   purpose and locale: the latest effective_from <= now() that is not retired.
 -- * The server fills in consent text. Clients send purpose, consent_version
@@ -18,14 +20,19 @@ begin;
 --   ties each new consent row to its document. Rows stored before this
 --   migration have no locale and keep the text they were stored with.
 -- * public.swap_focus(p_demote, p_promote) moves one of the caller's
---   enrolments out of focus (to learn_only) and another into focus, in one
+--   enrolments out of focus (to paused) and another into focus, in one
 --   transaction, and checks the focus cap (TH001) before it returns.
 -- * public.supersede_core_consent(p_enrolment, p_version, p_locale) replaces
 --   the live core consent with one for a new document version: the old row is
---   revoked with superseded_by set to the new row. A supersession is not the
---   member revoking consent, so optional consents stay live, unless the new
---   document is marked cascades_optional. The one-live-core key is deferrable
---   so both rows can exist inside that transaction.
+--   revoked with superseded_by set to the new row. The new version must be
+--   later than the old one (TH014); a move to another locale of the same
+--   version is allowed. A supersession is not the member revoking consent,
+--   so optional consents stay live, unless the version changes and a core
+--   document for the new locale marked cascades_optional takes effect after
+--   the old version and no later than the new one. That rule is enforced by
+--   triggers on programme_consents, so it holds however the rows are written.
+--   The one-live-core key is deferrable so both rows can exist inside that
+--   transaction.
 -- * Both functions run as the caller (row-level security applies) and refuse
 --   a sync service session (TH010).
 
@@ -74,9 +81,9 @@ create table public.consent_documents (
 comment on table public.consent_documents is
   'Consent texts per purpose, version and locale (reference data, no user data). Consent rows copy the body of their document. A new wording is a new version; purpose, version, locale and body never change.';
 comment on column public.consent_documents.approved_ref is
-  'Reference to the approval of this exact text. Null means not approved; a release must not ship while a current document is unapproved.';
+  'Reference to the approval of this exact text, set once. Null means not approved; a release must not ship while an unretired document is unapproved.';
 comment on column public.consent_documents.cascades_optional is
-  'Core documents only. True when moving to this version must also revoke the enrolment''s optional consents (supersede_core_consent does so).';
+  'Core documents only. True when moving past this version must also revoke the enrolment''s optional consents. Must be the same for every locale of a version. Fixed once a consent references the document.';
 
 create function public.consent_documents_guard()
 returns trigger
@@ -84,15 +91,39 @@ language plpgsql
 set search_path = ''
 as $$
 begin
-  if tg_op = 'UPDATE' and (
-    new.purpose is distinct from old.purpose or
-    new.version is distinct from old.version or
-    new.locale is distinct from old.locale or
-    new.body is distinct from old.body
-  ) then
-    raise exception using errcode = 'TH015',
-      message = 'Consent documents are immutable; publish a new version',
-      hint = 'consent_document_immutable';
+  if tg_op = 'UPDATE' then
+    if new.purpose is distinct from old.purpose or
+       new.version is distinct from old.version or
+       new.locale is distinct from old.locale or
+       new.body is distinct from old.body then
+      raise exception using errcode = 'TH015',
+        message = 'Consent documents are immutable; publish a new version',
+        hint = 'consent_document_immutable';
+    end if;
+    -- An approval is recorded once.
+    if old.approved_ref is not null and
+       new.approved_ref is distinct from old.approved_ref then
+      raise exception using errcode = 'TH015',
+        message = 'Consent documents are immutable; publish a new version',
+        hint = 'consent_document_immutable';
+    end if;
+    -- What a granted consent relied on stays fixed. retired_at may change.
+    if (new.cascades_optional is distinct from old.cascades_optional or
+        new.effective_from is distinct from old.effective_from) and (
+      exists (
+        select 1 from public.programme_consents as c
+        where c.purpose = old.purpose and c.consent_version = old.version
+          and c.locale = old.locale
+      ) or exists (
+        select 1 from public.account_consents as c
+        where c.purpose = old.purpose and c.consent_version = old.version
+          and c.locale = old.locale
+      )
+    ) then
+      raise exception using errcode = 'TH015',
+        message = 'Consent documents are immutable; publish a new version',
+        hint = 'consent_document_immutable';
+    end if;
   end if;
   new.body_sha256 = pg_catalog.encode(
     pg_catalog.sha256(pg_catalog.convert_to(new.body, 'UTF8')), 'hex'
@@ -123,7 +154,7 @@ alter table public.consent_documents force row level security;
 create policy "consent_documents_select_authenticated"
 on public.consent_documents for select
 to authenticated
-using (true);
+using (effective_from <= now());
 
 revoke all on table public.consent_documents from anon, authenticated;
 grant select on table public.consent_documents to authenticated;
@@ -273,29 +304,118 @@ end;
 $$;
 
 -- A row may name only the live core consent of the same enrolment that
--- replaces it. Without this, setting superseded_by on a plain revocation would
--- skip the cascade below.
+-- replaces it, for a later version of the core document (or the same version
+-- in another locale). Rows stored before consent documents existed (null
+-- locale) count as older than every document.
 create function public.programme_consents_check_supersede()
 returns trigger
 language plpgsql
 security invoker
 set search_path = ''
 as $$
+declare
+  replacement public.programme_consents;
+  old_effective timestamptz;
+  new_effective timestamptz;
 begin
-  if not exists (
-    select 1
-    from public.programme_consents as r
-    where r.id = new.superseded_by
-      and r.id <> old.id
-      and r.enrolment_id = old.enrolment_id
-      and r.purpose = 'core'
-      and r.revoked_at is null
-  ) then
+  select r.*
+  into replacement
+  from public.programme_consents as r
+  where r.id = new.superseded_by
+    and r.id <> old.id
+    and r.enrolment_id = old.enrolment_id
+    and r.purpose = 'core'
+    and r.revoked_at is null;
+
+  if replacement.id is null then
     raise exception using errcode = 'TH003',
       message = 'Consent records are immutable',
       hint = 'consent_immutable';
   end if;
+
+  if old.locale is not null and replacement.consent_version = old.consent_version then
+    if replacement.locale is not distinct from old.locale then
+      raise exception using errcode = 'TH014',
+        message = 'The core consent is already on this version or a later one',
+        hint = 'consent_version_unchanged';
+    end if;
+    return new;
+  end if;
+
+  if old.locale is null then
+    old_effective := '-infinity';
+  else
+    select d.effective_from into old_effective
+    from public.consent_documents as d
+    where d.purpose = 'core' and d.version = old.consent_version
+      and d.locale = old.locale;
+  end if;
+  select d.effective_from into new_effective
+  from public.consent_documents as d
+  where d.purpose = 'core' and d.version = replacement.consent_version
+    and d.locale = replacement.locale;
+
+  if old_effective is null or new_effective is null or new_effective <= old_effective then
+    raise exception using errcode = 'TH014',
+      message = 'The core consent is already on this version or a later one',
+      hint = 'consent_version_unchanged';
+  end if;
   return new;
+end;
+$$;
+
+-- A supersession that moves to a new version revokes the enrolment's optional
+-- consents when a core document for the new locale marked cascades_optional
+-- takes effect after the old version and no later than the new one. A move
+-- to another locale of the same version never does.
+create function public.programme_consents_supersede_cascade()
+returns trigger
+language plpgsql
+security invoker
+set search_path = ''
+as $$
+declare
+  replacement public.programme_consents;
+  old_effective timestamptz;
+  new_effective timestamptz;
+begin
+  select r.* into replacement
+  from public.programme_consents as r
+  where r.id = new.superseded_by;
+
+  if old.locale is not null and replacement.consent_version = old.consent_version then
+    return null;
+  end if;
+
+  if old.locale is null then
+    old_effective := '-infinity';
+  else
+    select d.effective_from into old_effective
+    from public.consent_documents as d
+    where d.purpose = 'core' and d.version = old.consent_version
+      and d.locale = old.locale;
+  end if;
+  select d.effective_from into new_effective
+  from public.consent_documents as d
+  where d.purpose = 'core' and d.version = replacement.consent_version
+    and d.locale = replacement.locale;
+
+  if exists (
+    select 1
+    from public.consent_documents as d
+    where d.purpose = 'core'
+      and d.locale = replacement.locale
+      and d.cascades_optional
+      and d.effective_from > old_effective
+      and d.effective_from <= new_effective
+  ) then
+    update public.programme_consents
+    set revoked_at = now()
+    where enrolment_id = new.enrolment_id
+      and purpose <> 'core'
+      and revoked_at is null;
+  end if;
+  return null;
 end;
 $$;
 
@@ -304,6 +424,12 @@ before update of superseded_by on public.programme_consents
 for each row
 when (new.superseded_by is distinct from old.superseded_by)
 execute function public.programme_consents_check_supersede();
+
+create trigger programme_consents_supersede_cascade
+after update of superseded_by on public.programme_consents
+for each row
+when (old.superseded_by is null and new.superseded_by is not null)
+execute function public.programme_consents_supersede_cascade();
 
 -- Revoking core still switches off every other consent of the enrolment, but
 -- a superseded core row (revoked with superseded_by set) does not.
@@ -374,7 +500,7 @@ begin
   end if;
 
   return query
-    update public.enrolments set status = 'learn_only'
+    update public.enrolments set status = 'paused'
     where id = p_demote and user_id = caller_id
     returning *;
   return query
@@ -390,7 +516,7 @@ end;
 $$;
 
 comment on function public.swap_focus(uuid, uuid) is
-  'Moves p_demote from focus to learn_only and p_promote (not left, not in focus) to focus, in one transaction; returns both rows. Security invoker; refuses a sync service session (TH010).';
+  'Moves p_demote from focus to paused and p_promote (not left, not in focus) to focus, in one transaction; returns both rows. Security invoker; refuses a sync service session (TH010).';
 
 -- Core consent supersession --------------------------------------------------------
 
@@ -473,15 +599,12 @@ begin
       message = 'No consent document is available for this purpose, version and locale',
       hint = 'consent_document_unavailable';
   end if;
-  if old_row.consent_version = p_version and old_row.locale is not distinct from p_locale then
-    raise exception using errcode = 'TH014',
-      message = 'The core consent is already on this version',
-      hint = 'consent_version_unchanged';
-  end if;
 
   set constraints public.programme_consents_live_core_key deferred;
 
-  -- consent_fill_text sets consent_text from the document.
+  -- consent_fill_text sets consent_text from the document. The update below
+  -- runs programme_consents_check_supersede (version must be later: TH014)
+  -- and programme_consents_supersede_cascade (optional consents).
   insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
   values (p_enrolment, 'core', doc.version, doc.locale)
   returning * into new_row;
@@ -491,14 +614,6 @@ begin
   where id = old_row.id
   returning * into old_row;
 
-  if doc.cascades_optional then
-    update public.programme_consents
-    set revoked_at = now()
-    where enrolment_id = p_enrolment
-      and purpose <> 'core'
-      and revoked_at is null;
-  end if;
-
   set constraints public.programme_consents_live_core_key immediate;
 
   return next old_row;
@@ -507,7 +622,7 @@ end;
 $$;
 
 comment on function public.supersede_core_consent(uuid, text, text) is
-  'Replaces the caller''s live core consent on an enrolment with one for core document p_version/p_locale, in one transaction. The old row is revoked with superseded_by set; optional consents stay live unless the document cascades_optional. Returns the old row, then the new one. Security invoker; refuses a sync service session (TH010).';
+  'Replaces the caller''s live core consent on an enrolment with one for core document p_version/p_locale, in one transaction. The old row is revoked with superseded_by set. The version must be later than the old one, or the same version in another locale (TH014). Optional consents stay live unless the version changes past a cascades_optional core document. Returns the old row, then the new one. Security invoker; refuses a sync service session (TH010).';
 
 -- Privileges ---------------------------------------------------------------------
 
@@ -518,6 +633,8 @@ from public, anon, authenticated;
 revoke all on function public.consent_revoke_only()
 from public, anon, authenticated;
 revoke all on function public.programme_consents_check_supersede()
+from public, anon, authenticated;
+revoke all on function public.programme_consents_supersede_cascade()
 from public, anon, authenticated;
 revoke all on function public.current_consent_documents()
 from public, anon, authenticated;
