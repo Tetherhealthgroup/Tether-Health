@@ -5,10 +5,23 @@
 #
 # check_release_define_file <prefix> <path>
 #   Succeeds if <path> is a JSON object whose SUPABASE_URL and API_BASE_URL are
-#   absolute https URLs, whose SUPABASE_ANON_KEY is a non-privileged key, and
-#   in which no define key holds a privileged-looking value (R-055, R-076,
-#   TH-123). Every top-level key is checked, and so are all nested strings and
-#   all key names at any depth. Privileged means:
+#   absolute https URLs whose host is not a .invalid placeholder, whose
+#   SUPABASE_ANON_KEY is a non-privileged key, and in which no define key holds
+#   a privileged-looking value (R-055, R-076, TH-123).
+#   TH-904 (th-security M1): the check is an ALLOWLIST first.
+#     - The top-level keys must be among SUPABASE_URL, API_BASE_URL and
+#       SUPABASE_ANON_KEY; any other key is rejected, whatever its value.
+#     - SUPABASE_ANON_KEY, exactly as written (no trimming), must either match
+#       ^sb_publishable_[A-Za-z0-9_-]+$ or be a JWT of exactly three
+#       base64url segments (optionally "="-padded) whose payload decodes as
+#       strict UTF-8 JSON to an object with a top-level "role" of "anon".
+#       lib/config/app_config.dart (AppConfig.anonKeyProblem) applies the same
+#       rule.
+#   NaN, Infinity and -Infinity are rejected as invalid JSON (Dart's decoder
+#   rejects them, and Flutter would echo the define content; th-security L1).
+#   The denylist checks below still run on every key, so the more specific
+#   problem is reported where one applies. Every top-level key is checked, and
+#   so are all nested strings and all key names at any depth. Privileged means:
 #     - sb_secret_, after removing whitespace, zero-width/format characters
 #       and the other invisible code points listed in EXTRA_INVISIBLE below
 #       (case-insensitive, anywhere in the value);
@@ -34,11 +47,12 @@
 #   are NOT removed before the JWT decoding, so a token that carries one inside
 #   a segment stays undecodable (SUPABASE_ANON_KEY rejects it; another key does
 #   not flag it).
-#   Documented residuals (TH-137): look-alike letters (fullwidth, Cyrillic);
-#   hex, percent and base64-wrapped encodings; a token split across array
-#   elements or keys; a plain service_role under a key other than
-#   SUPABASE_ANON_KEY; an undecodable payload under a key other than
-#   SUPABASE_ANON_KEY.
+#   Documented residuals (TH-137), now inside the three allowed keys only,
+#   because any other top-level key is rejected (TH-904): look-alike letters
+#   (fullwidth, Cyrillic); hex, percent and base64-wrapped encodings; a token
+#   split across array elements; a plain service_role or an undecodable
+#   payload under SUPABASE_URL or API_BASE_URL (which must still be https
+#   URLs).
 #   Otherwise prints "<prefix>: <problems>" to stderr and returns 1; an
 #   unexpected internal error also returns 1 ("cannot check define file").
 #   Values are never printed. A define key name is printed only if it is in
@@ -63,6 +77,11 @@ from urllib.parse import urlparse
 
 prefix = sys.argv[1]
 ANON = "SUPABASE_ANON_KEY"
+# The only top-level keys a release define file may hold (TH-904, M1): the
+# three values AppConfig.fromEnvironment reads (lib/config/app_config.dart).
+ALLOWED_KEYS = ("SUPABASE_URL", "API_BASE_URL", ANON)
+PUBLISHABLE = re.compile(r"sb_publishable_[A-Za-z0-9_-]+")
+JWT_SEGMENT = re.compile(r"[A-Za-z0-9_-]+={0,2}")
 
 # Define keys that may be printed by name. Every entry is a fixed constant of
 # this project, never taken from the file. Sources (file:line at TH-130):
@@ -286,10 +305,47 @@ def duplicate_labels(root):
     return [text for _, _, text in sorted(found, key=lambda f: f[:2])]
 
 
+def reject_constant(name):
+    """parse_constant hook: NaN, Infinity and -Infinity are not JSON to Dart."""
+    raise ValueError("non-finite number")
+
+
+def is_anon_jwt(value):
+    """True if value is exactly three base64url segments whose payload is
+    strict UTF-8 JSON: an object with a top-level "role" of "anon"."""
+    segments = value.split(".")
+    if len(segments) != 3 or not all(JWT_SEGMENT.fullmatch(s) for s in segments):
+        return False
+    body = segments[1].rstrip("=")
+    if len(body) % 4 == 1:
+        return False
+    try:
+        raw = base64.urlsafe_b64decode(body + "=" * (-len(body) % 4))
+        payload = json.loads(raw.decode("utf-8"), parse_constant=reject_constant)
+    except Exception:
+        return False
+    return isinstance(payload, dict) and payload.get("role") == "anon"
+
+
+def anon_key_allowed(value):
+    """The SUPABASE_ANON_KEY allowlist (TH-904, M1); mirrors AppConfig."""
+    return isinstance(value, str) and (
+        PUBLISHABLE.fullmatch(value) is not None or is_anon_jwt(value)
+    )
+
+
+def placeholder_host(parsed):
+    """True for a .invalid host (RFC 2606), as AppConfig.validate rejects."""
+    host = (parsed.hostname or "").rstrip(".")
+    return host == "invalid" or host.endswith(".invalid")
+
+
 def check():
     try:
         with open(sys.argv[2], encoding="utf-8") as fh:
-            data = json.load(fh, object_pairs_hook=load_object)
+            data = json.load(
+                fh, object_pairs_hook=load_object, parse_constant=reject_constant
+            )
     except (OSError, ValueError) as exc:
         sys.exit(f"{prefix}: cannot read define file as JSON: {type(exc).__name__}")
     if not isinstance(data, dict):
@@ -306,8 +362,11 @@ def check():
         parsed = urlparse(value.strip())
         if parsed.scheme != "https" or not parsed.netloc:
             bad.append(f"{key} must be an absolute https URL")
+        elif placeholder_host(parsed):
+            bad.append(f"{key} must not use a placeholder .invalid host")
     key_value = data.get(ANON)
-    if not isinstance(key_value, str) or not key_value.strip():
+    key_missing = not isinstance(key_value, str) or not key_value.strip()
+    if key_missing:
         bad.append(f"{ANON} is missing or empty")
     for key, value in data.items():
         is_anon = key == ANON
@@ -335,6 +394,18 @@ def check():
             bad.append(f"{name} looks like a JWT but cannot be decoded")
         if role_bad:
             bad.append(f'{name} {verb} a JWT whose role is not "anon"')
+        if is_anon and not key_missing and not (privileged or undecodable or role_bad):
+            if not anon_key_allowed(value):
+                bad.append(
+                    f"{name} is not a publishable key (sb_publishable_...) "
+                    "or an anon JWT"
+                )
+        if key not in ALLOWED_KEYS:
+            bad.append(
+                f"{name} is not an allowed define key (allowed: "
+                + ", ".join(ALLOWED_KEYS)
+                + ")"
+            )
     if bad:
         sys.exit(f"{prefix}: " + "; ".join(dict.fromkeys(bad)))
 

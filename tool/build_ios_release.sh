@@ -9,10 +9,10 @@
 #                   Release define file (see docs/PLAY_RELEASE.md section 3).
 #                   Required unless --inspect-ipa is given. A relative path is
 #                   resolved against the caller's working directory. Before any
-#                   build step the file must be a JSON object with https
-#                   SUPABASE_URL and API_BASE_URL and a non-privileged
-#                   SUPABASE_ANON_KEY (no sb_secret_, no service_role, JWTs must
-#                   have role "anon"); the rules live in
+#                   build step the file must be a JSON object holding only
+#                   https SUPABASE_URL and API_BASE_URL (no .invalid host) and
+#                   a SUPABASE_ANON_KEY that is an sb_publishable_ key or an
+#                   anon JWT (allowlist, TH-904); the rules live in
 #                   tool/release_define_check.sh, shared with the Play script.
 #                   No value from the file is ever printed.
 # --check-only      Run every pre-build check (arguments, CocoaPods, define

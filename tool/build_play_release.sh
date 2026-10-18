@@ -27,6 +27,9 @@
 # hold a pasted secret or terminal control bytes); they name the option. Only
 # values validated as numbers are echoed.
 set -euo pipefail
+# A set CDPATH makes cd print the directory and can send the relative
+# `cd "$(dirname "$0")/.."` below to another tree (th-security L2).
+unset CDPATH
 
 # A store build must never inherit the CI-only unsigned-release opt-in.
 unset TETHER_ALLOW_UNSIGNED_RELEASE

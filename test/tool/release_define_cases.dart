@@ -164,6 +164,12 @@ String _define({
 
 const _anonRole = 'SUPABASE_ANON_KEY is a JWT whose role is not "anon"';
 const _anonSecret = 'SUPABASE_ANON_KEY is a privileged key';
+const _notAllowedKey =
+    'SUPABASE_ANON_KEY is not a publishable key (sb_publishable_...) '
+    'or an anon JWT';
+const _notAllowed = 'is not an allowed define key (allowed: SUPABASE_URL, '
+    'API_BASE_URL, SUPABASE_ANON_KEY)';
+const _invalidHost = 'must not use a placeholder .invalid host';
 
 final defineCases = <DefineCase>[
   DefineCase('sb_publishable_ key', _define(), []),
@@ -378,6 +384,8 @@ final defineCases = <DefineCase>[
     ),
     [],
   ),
+  // TH-904 (th-security M1): accepted before; any top-level key outside the
+  // three allowed ones is now rejected, whatever its value.
   DefineCase(
     'anon JWT and publishable key under another define keys',
     _define(
@@ -389,7 +397,9 @@ final defineCases = <DefineCase>[
         'HOST': 'a.b.c',
       },
     ),
-    [],
+    [
+      for (var n = 4; n <= 8; n++) 'define key #$n $_notAllowed',
+    ],
   ),
   // TH-123 send-back: key names never leak, nested key names are scanned,
   // duplicate keys are rejected.
@@ -554,7 +564,8 @@ final defineCases = <DefineCase>[
         ),
       },
     ),
-    [],
+    // TH-904: accepted before; OTHER_TOKEN is not an allowed key.
+    ['define key #4 $_notAllowed'],
   ),
   // TH-137 send-back R1: each branch of the role-object fallback (backslash-u
   // escape, NUL removal, BOM removal) is needed by one of these. An anon
@@ -625,11 +636,118 @@ final defineCases = <DefineCase>[
       ['define key #4 holds a privileged key'],
     ),
   ],
+  // TH-904: accepted before (only the sb_secret_/service_role markers were
+  // checked); the allowlist admits only [A-Za-z0-9_-] after sb_publishable_.
   DefineCase(
-    'invisible character inside an ordinary publishable key stays accepted',
+    'invisible character inside an otherwise publishable key',
     _define(key: 'sb_publishable_\u3164${canary}pub'),
+    [_notAllowedKey],
+  ),
+  // TH-904 (th-security M1): values that passed the old denylist. Each is a
+  // synthetic canary, never a real key.
+  DefineCase(
+    'raw JWT-signing-secret-shaped string as the anon key',
+    _define(key: '${canary}rawSigningSecret0123456789abcdefABCDEF+/='),
+    [_notAllowedKey],
+  ),
+  DefineCase(
+    'hex secret-shaped string as the anon key',
+    _define(key: '0f1e2d3c4b5a69788796a5b4c3d2e1f0$canary'),
+    [_notAllowedKey],
+  ),
+  DefineCase('sk_live_ key as the anon key', _define(key: 'sk_live_$canary'), [
+    _notAllowedKey,
+  ]),
+  DefineCase(
+    'publishable key with surrounding whitespace',
+    _define(key: ' sb_publishable_${canary}pub '),
+    [_notAllowedKey],
+  ),
+  DefineCase(
+    'publishable key with a trailing newline',
+    _define(key: 'sb_publishable_${canary}pub\n'),
+    [_notAllowedKey],
+  ),
+  // The bare prefix 'sb_publishable_' is tested in app_config_anon_key_test:
+  // here the no-echo check could not tell the value from the message.
+  DefineCase(
+    'sb_publishable_ prefix followed by a disallowed character',
+    _define(key: 'sb_publishable_!$canary'),
+    [_notAllowedKey],
+  ),
+  DefineCase(
+    'anon JWT with four segments',
+    _define(key: shapedJwt(payload: {'role': 'anon', 'ref': canary}, extra: 1)),
+    [_notAllowedKey],
+  ),
+  DefineCase(
+    'anon JWT after a Bearer prefix',
+    _define(key: 'Bearer ${fakeJwt({'role': 'anon'})}'),
+    [_notAllowedKey],
+  ),
+  DefineCase(
+    'anon role only nested, not top-level',
+    _define(
+      key: fakeJwt({
+        'claims': {'role': 'anon'},
+      }),
+    ),
+    [_notAllowedKey],
+  ),
+  DefineCase(
+    'anon JWT whose payload holds NaN',
+    _define(key: shapedJwt(payload: '{"role":"anon","x":NaN,"ref":"$canary"}')),
+    [_notAllowedKey],
+  ),
+  DefineCase(
+    'unprefixed secret under OTHER_SECRET',
+    _define(extra: {'OTHER_SECRET': 'rawServiceKey$canary'}),
+    ['define key #4 $_notAllowed'],
+  ),
+  DefineCase(
+    'unprefixed value under SUPABASE_SERVICE_ROLE_KEY',
+    _define(extra: {'SUPABASE_SERVICE_ROLE_KEY': 'rawServiceKey$canary'}),
+    ['SUPABASE_SERVICE_ROLE_KEY $_notAllowed'],
+  ),
+  DefineCase(
+    'canary as an extra top-level key name with a harmless value',
+    _define(extra: {keyCanary: 'x'}),
+    ['define key #4 $_notAllowed'],
+  ),
+  const DefineCase(
+    'the committed example file (config/dart_defines.example.json)',
+    '{\n'
+        '  "API_BASE_URL": "https://api.example.invalid",\n'
+        '  "SUPABASE_URL": "https://your-project-ref.supabase.co",\n'
+        '  "SUPABASE_ANON_KEY": "your-publishable-or-anonymous-key"\n'
+        '}\n',
+    ['API_BASE_URL $_invalidHost', _notAllowedKey],
+  ),
+  DefineCase(
+    '.invalid SUPABASE_URL host',
+    _define(url: 'https://project.example.invalid'),
+    ['SUPABASE_URL $_invalidHost'],
+  ),
+  DefineCase(
+    '.invalid host in upper case with a trailing dot and a port',
+    _define(api: 'https://API.Example.INVALID.:443/v1'),
+    ['API_BASE_URL $_invalidHost'],
+  ),
+  DefineCase(
+    'a host that only contains invalid stays accepted',
+    _define(api: 'https://invalid-api.example.org'),
     [],
   ),
+  // TH-904 (th-security L1): Python json accepts these constants, Dart does
+  // not, and Flutter would print the define content in its error.
+  for (final constant in ['NaN', 'Infinity', '-Infinity'])
+    DefineCase(
+      '$constant as a define value',
+      '{"SUPABASE_URL":"https://example-project.supabase.co",'
+          '"API_BASE_URL":$constant,'
+          '"SUPABASE_ANON_KEY":"sb_publishable_${canary}pub"}',
+      ['cannot read define file as JSON'],
+    ),
 ];
 
 /// A define file whose value is an array nested [depth] deep. The helper must

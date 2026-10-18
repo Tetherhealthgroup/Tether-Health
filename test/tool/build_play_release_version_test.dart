@@ -248,6 +248,29 @@ void main() {
     });
   });
 
+  test('a set CDPATH does not send the script to another tree (L2)', () {
+    writePubspec('1.0.0+2');
+    // Decoy: with CDPATH set, the relative `cd tool/..` would land here, and
+    // this pubspec is below the minimum, so the version check would fail.
+    final decoy = Directory(join([root.path, 'decoy']))..createSync();
+    Directory(join([decoy.path, 'tool'])).createSync();
+    File(join([decoy.path, 'pubspec.yaml']))
+        .writeAsStringSync('name: x\nversion: 1.0.0+1\n');
+    final r = Process.runSync(
+      '/bin/bash',
+      ['tool/build_play_release.sh', '--check-version-only'],
+      environment: {
+        'PATH': '${fakeBin.path}:/usr/bin:/bin',
+        'CDPATH': decoy.path,
+      },
+      includeParentEnvironment: false,
+      workingDirectory: root.path,
+    );
+    expect(r.exitCode, 0, reason: output(r));
+    expect(output(r), contains('(versionCode 2)'));
+    expect(output(r), isNot(contains('decoy')));
+  });
+
   group('--verify-aab (post-build read-back)', () {
     late File aab;
     setUp(() => aab = writeAab('app.aab'));

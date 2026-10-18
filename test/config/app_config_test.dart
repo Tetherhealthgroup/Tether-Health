@@ -17,7 +17,7 @@ void main() {
     const config = AppConfig(
       apiBaseUrl: 'https://api.example.test',
       supabaseUrl: 'https://project.supabase.co',
-      supabaseAnonKey: 'public-placeholder',
+      supabaseAnonKey: 'sb_publishable_synthetic-placeholder',
     );
     expect(() => config.validate(production: true), returnsNormally);
   });
@@ -26,14 +26,14 @@ void main() {
     const insecure = AppConfig(
       apiBaseUrl: 'http://api.example.test',
       supabaseUrl: 'https://project.supabase.co',
-      supabaseAnonKey: 'public-placeholder',
+      supabaseAnonKey: 'sb_publishable_synthetic-placeholder',
     );
     expect(() => insecure.validate(production: true), throwsFormatException);
 
     const placeholder = AppConfig(
       apiBaseUrl: 'https://api.example.invalid',
       supabaseUrl: 'https://project.supabase.co',
-      supabaseAnonKey: 'public-placeholder',
+      supabaseAnonKey: 'sb_publishable_synthetic-placeholder',
     );
     expect(() => placeholder.validate(production: true), throwsFormatException);
   });
@@ -87,7 +87,7 @@ void main() {
       const config = AppConfig(
         apiBaseUrl: 'http://api.example.test',
         supabaseUrl: 'https://p.supabase.co',
-        supabaseAnonKey: 'public-placeholder',
+        supabaseAnonKey: 'sb_publishable_synthetic-placeholder',
       );
       expect(
         () => config.validate(production: true),
@@ -105,7 +105,7 @@ void main() {
       const config = AppConfig(
         apiBaseUrl: 'http://localhost:3000',
         supabaseUrl: 'http://localhost:54321',
-        supabaseAnonKey: 'public-placeholder',
+        supabaseAnonKey: 'sb_publishable_synthetic-placeholder',
       );
       expect(() => config.validate(production: false), returnsNormally);
     });
@@ -118,10 +118,13 @@ void main() {
       return '${enc({'alg': 'none'})}.${enc({'role': role})}.sig';
     }
 
-    test('accepts anon JWT, publishable and placeholder keys', () {
+    test('accepts anon JWT and publishable keys', () {
       expect(AppConfig.anonKeyProblem(jwt('anon')), isNull);
       expect(AppConfig.anonKeyProblem('sb_publishable_abc'), isNull);
-      expect(AppConfig.anonKeyProblem('public-placeholder'), isNull);
+    });
+
+    test('rejects a placeholder key (TH-904 allowlist)', () {
+      expect(AppConfig.anonKeyProblem('public-placeholder'), isNotNull);
     });
 
     test('rejects privileged keys without echoing them', () {

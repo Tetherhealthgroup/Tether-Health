@@ -56,7 +56,15 @@ class AppConfig {
 
   /// Pure check that [key] is safe to embed in a client. Returns a problem
   /// description (never containing the key) or null. Follows the
-  /// SUPABASE_ANON_KEY rules of tool/release_define_check.sh (TH-123, R-055):
+  /// SUPABASE_ANON_KEY rules of tool/release_define_check.sh (TH-123, R-055).
+  ///
+  /// TH-904 (th-security M1): the final verdict is an ALLOWLIST. [key],
+  /// exactly as given (no trimming), must match `^sb_publishable_[A-Za-z0-9_-]+$`
+  /// or be a JWT of exactly three base64url segments (optionally `=`-padded)
+  /// whose payload is strict UTF-8 JSON: an object with a top-level `role` of
+  /// `anon`. Anything else is rejected with `is not a publishable key or an
+  /// anon JWT`. The denylist rules below run first so that the more specific
+  /// problem is reported where one applies:
   /// - a value that is empty after removing whitespace is rejected;
   /// - after removing whitespace, Unicode Cf/Cc characters and the other
   ///   invisible code points of the helper's EXTRA_INVISIBLE list (TH-141, see
@@ -74,8 +82,9 @@ class AppConfig {
   ///   or with a backslash-u escape that could spell one (TH-140 tests this
   ///   for UTF-8, UTF-32BE and a BOM plus UTF-16BE); the problem is then
   ///   `role is not "anon"`.
-  /// Known residuals. Only the last one can let a privileged value through;
-  /// the others never accept a non-anon role:
+  /// Known residuals. None can let a privileged value through any more: the
+  /// allowlist accepts only an ASCII publishable key or a decodable anon JWT,
+  /// so the last item below now only decides which problem is reported:
   /// - deep nesting: a payload nested beyond the Python recursion limit with
   ///   only anon roles is accepted here and rejected by the helper;
   /// - helper-only encodings of an anon payload (for example NaN, UTF-16/32)
@@ -83,9 +92,10 @@ class AppConfig {
   ///   the helper;
   /// - the Cf table is Unicode 16, a superset of the Unicode data of an older
   ///   running Python (3.9 has Unicode 13);
-  /// - look-alike letters, and hex, percent or base64-wrapped encodings can
-  ///   let a privileged value through, here and in the helper alike; so can an
-  ///   invisible character that is in neither Cf/Cc nor the mirrored list.
+  /// - look-alike letters, hex, percent or base64-wrapped encodings, and an
+  ///   invisible character that is in neither Cf/Cc nor the mirrored list
+  ///   escape the denylist, here and in the helper alike, and are then
+  ///   rejected by the allowlist.
   static String? anonKeyProblem(String key) {
     if (_withoutSpace(key).isEmpty) {
       return 'SUPABASE_ANON_KEY is missing or empty.';
@@ -117,7 +127,34 @@ class AppConfig {
     if (shaped && !decoded) {
       return 'SUPABASE_ANON_KEY looks like a JWT but cannot be decoded.';
     }
+    if (!_publishableKey.hasMatch(key) && !_isAnonJwt(key)) {
+      return 'SUPABASE_ANON_KEY is not a publishable key (sb_publishable_...) '
+          'or an anon JWT.';
+    }
     return null;
+  }
+
+  static final _publishableKey = RegExp(r'^sb_publishable_[A-Za-z0-9_-]+$');
+  static final _jwtSegment = RegExp(r'^[A-Za-z0-9_-]+={0,2}$');
+
+  /// True if [key] is exactly three base64url segments whose payload is strict
+  /// UTF-8 JSON: an object with a top-level `role` of `anon` (TH-904, M1).
+  /// Mirrors is_anon_jwt in tool/release_define_check.sh.
+  static bool _isAnonJwt(String key) {
+    final segments = key.split('.');
+    if (segments.length != 3 || !segments.every(_jwtSegment.hasMatch)) {
+      return false;
+    }
+    final body = segments[1].replaceFirst(RegExp(r'=+$'), '');
+    if (body.length % 4 == 1) return false;
+    try {
+      final bytes =
+          base64Url.decode(base64Url.normalize(_clearSpareBits(body)));
+      final payload = jsonDecode(utf8.decode(bytes));
+      return payload is Map && payload['role'] == 'anon';
+    } catch (_) {
+      return false;
+    }
   }
 
   // Whitespace as Python's str.isspace(), which the release helper uses.

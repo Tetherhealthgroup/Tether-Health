@@ -25,6 +25,9 @@ void main() {
   };
 
   const roleNotAnon = 'SUPABASE_ANON_KEY is a JWT whose role is not "anon".';
+  const notAllowlisted =
+      'SUPABASE_ANON_KEY is not a publishable key (sb_publishable_...) '
+      'or an anon JWT.';
   const privilegedKey = 'SUPABASE_ANON_KEY is a privileged key.';
 
   /// TH-141 (R-055): the helper's EXTRA_INVISIBLE code points (a21dd15) that
@@ -309,11 +312,9 @@ void main() {
       expect(() => config.validate(production: false), throwsFormatException);
     });
 
-    test('keeps accepting an anon JWT, publishable and placeholder keys', () {
+    test('keeps accepting an anon JWT and a publishable key', () {
       final anon = token(hs256, '{"role":"anon","iss":"synthetic","exp":1}');
       expect(AppConfig.anonKeyProblem(anon), isNull);
-      expect(AppConfig.anonKeyProblem(' \n$anon\t '), isNull);
-      expect(AppConfig.anonKeyProblem('Bearer $anon'), isNull);
       expect(
         AppConfig.anonKeyProblem(
           '${base64Url.encode(utf8.encode(hs256))}.'
@@ -328,7 +329,6 @@ void main() {
         ),
         isNull,
       );
-      expect(AppConfig.anonKeyProblem('public-placeholder'), isNull);
       final config = AppConfig(
         apiBaseUrl: 'https://api.example.test',
         supabaseUrl: 'https://project.supabase.co',
@@ -377,15 +377,15 @@ void main() {
     });
 
     test(
-        'keeps accepting an ordinary publishable key with an invisible '
-        'character outside a marker (TH-141)', () {
+        'rejects a publishable key with an invisible character outside a '
+        'marker by the allowlist, not as privileged (TH-141, TH-904)', () {
       for (final e in {...mirroredInvisible, ...coveredByCf}.entries) {
         for (final key in [
           'sb_publishable_${e.value}Ab12Cd34Ef56Gh78Ij90Kl12Mn34Op56',
           'sb_publishable_Ab12Cd34Ef56Gh78Ij90Kl12Mn34Op56${e.value}',
           '${e.value}sb_publishable_Ab12Cd34Ef56Gh78Ij90Kl12Mn34Op56',
         ]) {
-          expect(AppConfig.anonKeyProblem(key), isNull, reason: e.key);
+          expect(AppConfig.anonKeyProblem(key), notAllowlisted, reason: e.key);
         }
       }
     });
@@ -405,9 +405,74 @@ void main() {
       }
     });
 
-    test('removes zero-width and control characters inside an anon JWT', () {
+    test('rejects an anon JWT wrapped in zero-width characters (TH-904)', () {
       final anon = token(hs256, '{"role":"anon"}');
-      expect(AppConfig.anonKeyProblem('\u200B$anon\uFEFF'), isNull);
+      expect(AppConfig.anonKeyProblem('\u200B$anon\uFEFF'), notAllowlisted);
+    });
+  });
+
+  // TH-904 (th-security M1): SUPABASE_ANON_KEY is an allowlist, as in
+  // tool/release_define_check.sh. Each value passed the old denylist.
+  group('anonKeyProblem allowlist (TH-904)', () {
+    final canary = newCanary();
+    final anon = token(hs256, '{"role":"anon","ref":"$canary"}');
+    final notAllowed = <String, String>{
+      'raw JWT-signing-secret-shaped string':
+          '${canary}rawSigningSecret0123456789abcdefABCDEF+/=',
+      'hex secret-shaped string': '0f1e2d3c4b5a69788796a5b4c3d2e1f0$canary',
+      'sk_live_ key': 'sk_live_$canary',
+      'placeholder from the old tests': 'public-placeholder-$canary',
+      'example file placeholder': 'your-publishable-or-anonymous-key-$canary',
+      'bare sb_publishable_ prefix plus a dot': 'sb_publishable_.$canary',
+      'publishable key with surrounding whitespace': ' sb_publishable_$canary ',
+      'publishable key with a trailing newline': 'sb_publishable_$canary\n',
+      'anon JWT with surrounding whitespace': ' \n$anon\t ',
+      'anon JWT after a Bearer prefix': 'Bearer $anon',
+      'anon JWT with four segments': '$anon.c2ln',
+      'anon role only nested': token(
+        hs256,
+        '{"claims":{"role":"anon"},"ref":"$canary"}',
+      ),
+      'anon JWT whose payload holds NaN': token(
+        hs256,
+        '{"role":"anon","x":NaN,"ref":"$canary"}',
+      ),
+    };
+
+    for (final MapEntry(key: name, value: key) in notAllowed.entries) {
+      test('rejects $name without echoing it', () {
+        expect(carries(key, canary), isTrue, reason: 'canary placed');
+        final problem = AppConfig.anonKeyProblem(key);
+        expect(problem, isNotNull);
+        expect(leaks(problem!, canary), isFalse);
+        final config = AppConfig(
+          apiBaseUrl: 'https://api.example.test',
+          supabaseUrl: 'https://project.supabase.co',
+          supabaseAnonKey: key,
+        );
+        for (final production in [true, false]) {
+          Object? thrown;
+          try {
+            config.validate(production: production);
+          } catch (e) {
+            thrown = e;
+          }
+          expect(thrown, isA<FormatException>());
+          expect(leaks(thrown.toString(), canary), isFalse);
+        }
+      });
+    }
+
+    test('names the allowlist when no specific problem applies', () {
+      expect(AppConfig.anonKeyProblem('sk_live_$canary'), notAllowlisted);
+      expect(AppConfig.anonKeyProblem('sb_publishable_'), notAllowlisted);
+      expect(AppConfig.anonKeyProblem('$anon.c2ln'), notAllowlisted);
+      expect(AppConfig.anonKeyProblem('Bearer $anon'), notAllowlisted);
+    });
+
+    test('accepts the allowlisted shapes', () {
+      expect(AppConfig.anonKeyProblem('sb_publishable_Ab-12_cd'), isNull);
+      expect(AppConfig.anonKeyProblem(anon), isNull);
     });
   });
 }
