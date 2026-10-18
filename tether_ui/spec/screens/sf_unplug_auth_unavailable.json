@@ -11,7 +11,7 @@
   "state": "unavailable",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+  "desc": "Copy needs clinical/legal review.",
   "header": {
     "t": "header",
     "title": "Unplug",
@@ -47,7 +47,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAuthorizationStatus.unavailable"
   ],
   "over": null,

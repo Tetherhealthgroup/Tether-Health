@@ -11,7 +11,7 @@
   "state": "android",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Android has no permission prompt for usage access; the person turns it on in Settings and the app checks again on return.",
+  "desc": "Copy needs clinical/legal review. Android has no permission prompt for usage access; the person turns it on in Settings and the app checks again on return.",
   "header": {
     "t": "header",
     "title": "Screen Time",
@@ -112,7 +112,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: sf_screentime in this spec; android/.../unplug/UsageReader.kt (usage access, checked on resume)"
   ],
   "over": null,

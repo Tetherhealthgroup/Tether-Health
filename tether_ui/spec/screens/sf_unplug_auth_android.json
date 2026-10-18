@@ -11,7 +11,7 @@
   "state": "android",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Android has no single prompt: usage access and the overlay permission are separate settings pages, checked again when the person returns (authorizationStatus on resume). The foreground service needs a visible notification; its text is generic.",
+  "desc": "Copy needs clinical/legal review. Android has no single prompt: usage access and the overlay permission are separate settings pages, checked again when the person returns (authorizationStatus on resume). The foreground service needs a visible notification; its text is generic.",
   "header": {
     "t": "header",
     "title": "Unplug",
@@ -85,6 +85,13 @@
             }
           },
           {
+            "label": "Notifications off",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_auth_notifications"
+            }
+          },
+          {
             "label": "Missing",
             "action": {
               "type": "toast",
@@ -97,7 +104,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: android/.../unplug/UnplugHost.kt (PACKAGE_USAGE_STATS, SYSTEM_ALERT_WINDOW, foreground service)"
   ],
   "over": null,
@@ -144,6 +151,13 @@
             }
           },
           {
+            "label": "Notifications off",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_auth_notifications"
+            }
+          },
+          {
             "label": "Missing",
             "action": {
               "type": "toast",
@@ -152,7 +166,7 @@
           }
         ]
       },
-      "summary": "branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Missing: toast “Unplug still needs both settings.”"
+      "summary": "branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Notifications off: replace → sf_unplug_auth_notifications | Missing: toast “Unplug still needs both settings.”"
     }
   ]
 }

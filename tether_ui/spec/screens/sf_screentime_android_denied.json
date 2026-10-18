@@ -11,7 +11,7 @@
   "state": "android · not allowed",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+  "desc": "Copy needs clinical/legal review.",
   "header": {
     "t": "header",
     "title": "Screen Time",
@@ -56,7 +56,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: sf_screentime_denied in this spec (same copy, Android wording in the banner)"
   ],
   "over": null,

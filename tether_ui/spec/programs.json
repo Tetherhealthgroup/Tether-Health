@@ -51,6 +51,7 @@
       "sf_unplug_auth",
       "sf_unplug_auth_denied",
       "sf_unplug_auth_unavailable",
+      "sf_unplug_auth_notifications",
       "sf_unplug_auth_android",
       "sf_unplug_apps",
       "sf_unplug_picker_ios",
@@ -70,13 +71,12 @@
       "sf_unplug_gate_commit",
       "sf_unplug_gate_sum",
       "sf_unplug_health",
+      "sf_unplug_health_notifications",
       "sf_unplug_health_stopped",
       "sf_unplug_health_android",
       "sf_unplug_off",
-      "sf_home_unplug_offer",
       "sf_home_unplug",
       "sf_week_unplug",
-      "sf_screentime_report",
       "sf_screentime_android",
       "sf_screentime_android_denied"
     ]

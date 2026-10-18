@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. The shield action hands off to the app because the step needs input the extension has no time or UI for. Clearing it grants the pass length the level allows. Get support opens Rescue without doing the step.",
+  "desc": "Copy needs clinical/legal review. The shield action hands off to the app because the step needs input the extension has no time or UI for. Clearing it grants the pass length the level allows. Get support opens Rescue without doing the step.",
   "header": {
     "t": "header",
     "title": "Small step",
@@ -84,7 +84,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.breath; lib/unplug/screens/unplug_screen_d.dart"
   ],
   "over": null,

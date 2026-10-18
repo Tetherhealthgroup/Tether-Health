@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+  "desc": "Copy needs clinical/legal review.",
   "header": {
     "t": "header",
     "title": "App shortcuts",
@@ -60,11 +60,13 @@
   ],
   "footer": [],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
-    "Source: rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager"
+    "Copy needs clinical/legal review.",
+    "Source: rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager",
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
   ],
   "over": null,
   "api": [],
+  "reference": true,
   "actions": [
     {
       "element": "Close",

@@ -11,7 +11,7 @@
   "state": "typed sentence",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Open it works only after the sentence is typed in full (rule sf.unplug.sentence).",
+  "desc": "Copy needs clinical/legal review. Open it works only after the sentence is typed in full (rule sf.unplug.sentence).",
   "header": {
     "t": "header",
     "title": "Small step",
@@ -102,7 +102,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.commitment"
   ],
   "over": null,

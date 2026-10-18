@@ -11,7 +11,7 @@
   "state": "android",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+  "desc": "Copy needs clinical/legal review.",
   "header": {
     "t": "header",
     "title": "Tracking check",
@@ -21,7 +21,7 @@
     {
       "t": "banner",
       "kind": "success",
-      "text": "Unplug is working. All 3 checks pass."
+      "text": "Unplug is working. All 4 checks pass."
     },
     {
       "t": "checklist",
@@ -39,6 +39,11 @@
         {
           "label": "Unplug running in the background",
           "sub": "Checked 12 s ago",
+          "done": true
+        },
+        {
+          "label": "Notifications",
+          "sub": "On · needed for the “Tether is running” notice",
           "done": true
         }
       ],
@@ -71,7 +76,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: android/.../unplug/UnplugHost.kt trackingHealth() (usage access, foreground service alive, overlay permission)"
   ],
   "over": null,

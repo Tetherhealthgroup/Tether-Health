@@ -1400,6 +1400,13 @@
       "variantOf": "sf_unplug_auth",
       "state": "unavailable"
     },
+    "sf_unplug_auth_notifications": {
+      "route": "/p/sf/unplug/permission?state=notifications",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_auth",
+      "state": "notifications off"
+    },
     "sf_unplug_auth_android": {
       "route": "/p/sf/unplug/permission?state=android",
       "kind": "screen",
@@ -1533,6 +1540,13 @@
       "variantOf": null,
       "state": "default"
     },
+    "sf_unplug_health_notifications": {
+      "route": "/p/sf/unplug/health?state=notifications",
+      "kind": "screen",
+      "flow": "unplug",
+      "variantOf": "sf_unplug_health",
+      "state": "notifications off"
+    },
     "sf_unplug_health_stopped": {
       "route": "/p/sf/unplug/health?state=stopped",
       "kind": "screen",
@@ -1554,40 +1568,26 @@
       "variantOf": null,
       "state": "default"
     },
-    "sf_home_unplug_offer": {
-      "route": "/p/sf/home?state=unplug-offer",
-      "kind": "screen",
-      "flow": "sf",
-      "variantOf": "sf_home",
-      "state": "Unplug not set up (proposal)"
-    },
     "sf_home_unplug": {
       "route": "/p/sf/home?state=unplug",
       "kind": "screen",
       "flow": "sf",
       "variantOf": "sf_home",
-      "state": "Unplug on · iPhone (proposal)"
+      "state": "Unplug on · iPhone"
     },
     "sf_week_unplug": {
       "route": "/p/sf/week?state=unplug",
       "kind": "screen",
       "flow": "sf",
       "variantOf": "sf_week",
-      "state": "Unplug on · iPhone (proposal)"
+      "state": "Unplug on · iPhone"
     },
     "program_settings_sf": {
       "route": "/p/:program/settings?state=sf-unplug",
       "kind": "screen",
       "flow": "plans",
       "variantOf": "program_settings",
-      "state": "ScrollFree with Unplug (proposal)"
-    },
-    "sf_screentime_report": {
-      "route": "/p/sf/screen-time?state=ios-report",
-      "kind": "screen",
-      "flow": "sf",
-      "variantOf": "sf_screentime",
-      "state": "iPhone report wording (proposal)"
+      "state": "ScrollFree"
     },
     "account_delete_apple": {
       "route": "/account/delete?state=apple",

@@ -1,10 +1,14 @@
 """Spec additions proposed for owner review.
 
-Everything here is a *proposal*. Nothing in this file changes an existing
-screen: new screens are added, and changes to an existing screen are shown as
-new state variants of it (``variant_of=``), so the approved screens render
-exactly as before and the owner can compare current and proposed side by side.
-Traceability (which decision each screen serves) is in the review notes in this folder.
+The owner approved these screens in the prototype review. Two approved
+screens changed as a result and are edited in place in screens_prog_a.py
+(``sf_home`` gains the Unplug card, ``sf_screentime`` says "shows"); every
+other existing screen is untouched, and other per-platform or per-state
+differences are state variants (``variant_of=``). Screens marked
+``reference=True`` are native or system surfaces (shield, overlay, widget,
+shortcuts): they keep render tests but are excluded from release-check
+counts, which use device screenshots instead. Traceability is in the review
+notes in this folder.
 
 What is covered:
 
@@ -24,12 +28,14 @@ What is covered:
 
 Safety rules every Unplug surface follows:
 - Every pause surface (iPhone shield, Android overlay, small step) has a
-  route to Rescue, and Rescue reaches Emergency (988 / 911).
+  route to Rescue, and Rescue reaches Emergency (988 / 911). If notifications
+  are off, the shield says "Open Tether for support" and Unplug setup shows
+  a notifications-off state with a way to fix it.
 - Tether itself, the phone dialer and emergency calling can never be chosen
   or paused.
 
-All new copy needs clinical/legal review before it ships; every screen below
-says so in its description and notes.
+All new copy still needs clinical/legal review before it ships; every screen
+below says so in its description and notes.
 """
 import copy
 from dsl import *
@@ -37,11 +43,11 @@ from rules import RULES, SCENARIOS, sc
 
 H = header
 
-REVIEW = 'Proposal for owner review. Copy needs clinical/legal review.'
+REVIEW = 'Copy needs clinical/legal review.'
 NEVER_PAUSED = 'Tether, the phone dialer and emergency calling can never be chosen or paused.'
 NATIVE_NEVER_PAUSED = ('Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, '
                        'the phone dialer or emergency calling, even if they are selected or a session pauses "everything". Needs device validation.')
-SUPPORT_NOTIFICATION = ('A shield button cannot open Tether directly. Proposal: it posts a local notification; tapping it opens Tether. '
+SUPPORT_NOTIFICATION = ('A shield button cannot open Tether directly: it posts a local notification; tapping it opens Tether. If notifications are off, the subtitle tells the person to open Tether for support. '
                         'Needs device validation.')
 
 
@@ -55,10 +61,20 @@ def nativeslot(id, label, caption=None, platform='ios', height=120):
     return N('nativeslot', id=id, label=label, caption=caption, platform=platform, height=height)
 
 
-def P(id, name, route, fl, body, source=None, native=None, desc='', **kw):
-    """S() for a proposed screen: tags the description and notes for review."""
+def P(id, name, route, fl, body, source=None, native=None, desc='', reference=False, **kw):
+    """S() for an added screen: tags the description and notes for copy review.
+
+    reference=True marks a native or system surface (shield, overlay, widget,
+    shortcuts). It is drawn natively, checked by device screenshots and
+    excluded from release-check counts; its render tests stay.
+    """
     notes = [REVIEW] + (['Source: ' + source] if source else []) + ([native] if native else [])
-    return S(id, name, route, fl, body, desc=(REVIEW + ' ' + desc).strip(), notes=notes, **kw)
+    if reference:
+        notes.append('Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.')
+    s = S(id, name, route, fl, body, desc=(REVIEW + ' ' + desc).strip(), notes=notes, **kw)
+    if reference:
+        s['reference'] = True
+    return s
 
 
 def _body_of(sid):
@@ -129,6 +145,9 @@ UNPLUG_SCENARIOS = [
        [('choose', 'Get support'), ('tap', 'Take a breath')], 'rescue_pick'),
     sc('sf_unplug_shield_firm_support', 'sf', 'Unplug', 'Firm iPhone shield reaches Rescue', 'sf_unplug_shield_firm',
        [('tap', 'Get support')], 'rescue_pick'),
+    sc('sf_unplug_notifications_off', 'sf', 'Unplug', 'Notifications off during setup → fix and continue', 'sf_unplug_auth',
+       [('choose', 'Approved · notifications off'), ('tap', 'Continue'), ('expect', 'sf_unplug_auth_notifications'),
+        ('choose', 'On (iPhone)'), ('tap', 'Check again')], 'sf_unplug_apps'),
 ]
 
 
@@ -139,11 +158,11 @@ def rules_and_scenarios():
 
 # ================================================================ UNPLUG
 def unplug():
-    flow('unplug', 'ScrollFree · Unplug (proposal)',
+    flow('unplug', 'ScrollFree · Unplug',
          'Optional app limits for ScrollFree: what Unplug can see, Screen Time / Android permissions, choosing apps, limits and the pause screen, '
-         'focus sessions, the iPhone shield and Android overlay, the small-step gate, tracking check and turning it off. Proposal for owner review. '
-         'Every pause surface reaches Rescue. Related states elsewhere: ScrollFree home (Unplug offer, Unplug on), Weekly reflection (Unplug on), '
-         'Program settings (ScrollFree with Unplug), Connect Screen Time (Android, iPhone report wording).', 'sf')
+         'focus sessions, the iPhone shield and Android overlay, the small-step gate, tracking check and turning it off. '
+         'Every pause surface reaches Rescue. Entry: the Unplug card on ScrollFree home. Related states elsewhere: ScrollFree home (Unplug on), '
+         'Weekly reflection (Unplug on), Program settings (ScrollFree), Connect Screen Time (Android).', 'sf')
     src = 'pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module'
 
     # ---- intro, authorization, app selection, limits
@@ -157,7 +176,7 @@ def unplug():
         button('Set up Unplug', branch('Platform', [('iPhone', go('sf_unplug_auth')), ('Android', go('sf_unplug_auth_android'))])),
         button('Not now', back(), v='secondary'),
     ], source='lib/unplug/screens/unplug_screen_a.dart, lib/unplug/models/platform_ceiling.dart',
-       desc='Shown before anything is switched on, so nobody later reads a number that does not exist. Keeps Pause 60 an intent check and names Unplug as the optional lock.')
+       desc='Shown before anything is switched on, so nobody later reads a number that does not exist. Pause 60 stays an intent check; Unplug is the optional lock.')
 
     P('sf_unplug_auth', 'Allow Screen Time', '/p/sf/unplug/permission', 'unplug', program='sf', phase='plan', hdr=H('Unplug', pill='Step 1 of 3'), body=[
         illus('◷'), title('Allow Screen Time for Unplug', align='center'),
@@ -165,10 +184,11 @@ def unplug():
         kv([('Lets Unplug', 'Pause apps you choose'), ('Never shares', 'App names, content, messages'), ('Turn off', 'Anytime in Account → ScrollFree')]),
     ], footer=[
         button('Continue', branch('Screen Time authorization (iOS Family Controls, individual)',
-                                  [('Approved', rep('sf_unplug_apps')), ('Denied', rep('sf_unplug_auth_denied')), ('Unavailable', rep('sf_unplug_auth_unavailable'))])),
+                                  [('Approved', rep('sf_unplug_apps')), ('Approved · notifications off', rep('sf_unplug_auth_notifications')),
+                                   ('Denied', rep('sf_unplug_auth_denied')), ('Unavailable', rep('sf_unplug_auth_unavailable'))])),
         button('Not now', back(), v='secondary'),
-    ], source=src + ' requestAuthorization(individual), PlatformAuthorizationStatus',
-       desc='iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. approved → choose apps, denied → denied state, unavailable → unavailable state.')
+    ], source=src + ' requestAuthorization(individual), PlatformAuthorizationStatus; notification permission check',
+       desc='iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. Then the app checks notification permission. approved → choose apps, approved with notifications off → notifications-off state, denied → denied state, unavailable → unavailable state.')
     P('sf_unplug_auth_denied', 'Screen Time not allowed', '/p/sf/unplug/permission?state=denied', 'unplug', program='sf', phase='plan',
       variant_of='sf_unplug_auth', state='permission denied', hdr=H('Unplug', pill='Step 1 of 3'), body=[
         banner('info', 'Screen Time access was not allowed.'), title('Unplug needs Screen Time to pause apps.'),
@@ -183,6 +203,17 @@ def unplug():
         banner('info', 'Screen Time isn’t available on this phone.'), title('Unplug can’t run here.'),
         text('This can happen when Screen Time is managed by an organization or limited by a parent. ScrollFree still works without Unplug.', 'muted'),
     ], footer=[button('Back to ScrollFree', back())], source=src + ' PlatformAuthorizationStatus.unavailable')
+    P('sf_unplug_auth_notifications', 'Notifications off', '/p/sf/unplug/permission?state=notifications', 'unplug', program='sf', phase='plan',
+      variant_of='sf_unplug_auth', state='notifications off', hdr=H('Unplug', pill='Step 1 of 3'), body=[
+        banner('info', 'Notifications are off for Tether.'), title('Turn on notifications for Unplug?'),
+        text('When a pause screen sends you to Tether, including Get support, it uses a notification. With notifications off, Unplug still pauses apps, and the pause screen tells you to open Tether yourself for support.', 'muted'),
+    ], footer=[
+        button('Open phone settings', settings()),
+        button('Check again', branch('Notification permission (checked on return)', [('On (iPhone)', rep('sf_unplug_apps')), ('On (Android)', rep('sf_unplug_apps_android')),
+                                                                                   ('Still off', toast('Notifications are still off. You can turn them on later in Settings.'))]), v='secondary'),
+        link('Continue without notifications', branch('Platform', [('iPhone', rep('sf_unplug_apps')), ('Android', rep('sf_unplug_apps_android'))])),
+    ], source='Notification permission check (iOS UNUserNotificationCenter, Android POST_NOTIFICATIONS)',
+       desc='Shown during setup when Screen Time / Android permissions are granted but notifications are off. Open phone settings fixes it; Check again reads the permission on return.')
     P('sf_unplug_auth_android', 'Android permissions for Unplug', '/p/sf/unplug/permission?state=android', 'unplug', program='sf', phase='plan',
       variant_of='sf_unplug_auth', state='android', hdr=H('Unplug', pill='Step 1 of 3'), body=[
         title('Two Android settings for Unplug'),
@@ -193,7 +224,8 @@ def unplug():
     ], footer=[
         button('Turn on display over apps', settings()),
         button('Turn on usage access', settings(), v='secondary'),
-        link('I’ve turned them on', branch('Android permissions (checked on return)', [('All on', rep('sf_unplug_apps_android')), ('Missing', toast('Unplug still needs both settings.'))])),
+        link('I’ve turned them on', branch('Android permissions (checked on return)', [('All on', rep('sf_unplug_apps_android')), ('Notifications off', rep('sf_unplug_auth_notifications')),
+                                                                                          ('Missing', toast('Unplug still needs both settings.'))])),
     ], source='android/.../unplug/UnplugHost.kt (PACKAGE_USAGE_STATS, SYSTEM_ALERT_WINDOW, foreground service)',
        desc='Android has no single prompt: usage access and the overlay permission are separate settings pages, checked again when the person returns (authorizationStatus on resume). The foreground service needs a visible notification; its text is generic.')
 
@@ -229,7 +261,7 @@ def unplug():
         button('Add another group', sheet('sf_unplug_picker_ios'), v='secondary', small=True),
     ], footer=[button('Next: limits', go('sf_unplug_limits'))],
        source=src + ' PlatformAppSelection(groupLabels, groupAppCounts, totalApps)',
-       desc='PlatformAppSelection carries only the person’s group labels and counts. Proposal: group names are device-only (not synced).')
+       desc='PlatformAppSelection carries only the person’s group labels and counts. Group names are device-only (not synced).')
 
     P('sf_unplug_limits', 'Limits & pause screen', '/p/sf/unplug/limits', 'unplug', program='sf', phase='plan', hdr=H('Limits', pill='Step 3 of 3'), body=[
         title('When should Unplug step in?'),
@@ -246,7 +278,7 @@ def unplug():
     ], footer=[button('Save limits', submit('CALL device:unplug/setThresholds+applyShield', toast('Unplug is on', rep('sf_unplug_home'))))],
        source=src + ' PlatformThresholds(minutes, opens), PlatformModuleConfig(tier, overrideAllowance, gate none|breath|commitment|puzzle, strict); lib/unplug/screens/unplug_screen_f.dart (tier, cool-off)',
        native=NATIVE_NEVER_PAUSED,
-       desc='Levels map to PlatformModuleConfig.tier (Notice 1, Pause 2, Pause + step 3, Firm 5 = no overrides). Small step maps to gate breath | commitment | puzzle. Device-only: nothing here is sent to Tether. The loosening delay comes from the feat branch tier model and is a proposal.')
+       desc='Levels map to PlatformModuleConfig.tier (Notice 1, Pause 2, Pause + step 3, Firm 5 = no overrides). Small step maps to gate breath | commitment | puzzle. Device-only: nothing here is sent to Tether. Looser limits take effect the next day.')
 
     # ---- Unplug settings home
     P('sf_unplug_home', 'Unplug', '/p/sf/unplug/home', 'unplug', program='sf', phase='daily', hdr=H('Unplug', pill='On'), body=[
@@ -304,9 +336,9 @@ def unplug():
     # ---- iOS shield (ShieldConfiguration: icon, title, subtitle, primary, secondary only)
     shield_desc = ('iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, '
                    'so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield.')
-    P('sf_unplug_shield', 'Pause screen (iPhone shield)', '/system/unplug/shield', 'unplug', program='sf', phase='rescue', kind='fullscreen', dark=True, body=[
+    P('sf_unplug_shield', 'Pause screen (iPhone shield)', '/system/unplug/shield', 'unplug', reference=True, program='sf', phase='rescue', kind='fullscreen', dark=True, body=[
         spacer(60), illus('T', 'dark'), title('Paused for a moment', 'l', align='center'),
-        text('You asked to slow this one down. Video apps is on your list. 2 of 3 “open anyway” left today.', align='center'),
+        text('You asked to slow this one down. Video apps is on your list. 2 of 3 “open anyway” left today. Open Tether for support.', align='center'),
     ], footer=[
         button('Take a breath', toast('Notification: open Tether to take your breath, or get support',
                                       branch('Notification action', [('Take my breath', go('sf_unplug_gate')), ('Get support', sheet('rescue_pick'))])),
@@ -315,10 +347,10 @@ def unplug():
     ], source='ios/UnplugShield/UnplugShieldConfigurationExtension.swift, ios/UnplugShieldAction/UnplugShieldActionExtension.swift, assets/unplug/intercept_tokens.json',
        native=SUPPORT_NOTIFICATION + ' The notification has two actions: Take my breath (opens the small step) and Get support (opens Rescue directly, without the small step). ' + NATIVE_NEVER_PAUSED,
        desc=shield_desc + ' Take a breath posts a local notification with two actions: Take my breath and Get support (opens Rescue without the small step). Needs device validation.')
-    P('sf_unplug_shield_firm', 'Pause screen (iPhone shield, firm)', '/system/unplug/shield?state=firm', 'unplug', program='sf', phase='rescue', kind='fullscreen', dark=True,
+    P('sf_unplug_shield_firm', 'Pause screen (iPhone shield, firm)', '/system/unplug/shield?state=firm', 'unplug', reference=True, program='sf', phase='rescue', kind='fullscreen', dark=True,
       variant_of='sf_unplug_shield', state='no “open anyway” left', body=[
         spacer(60), illus('T', 'dark'), title('Paused for a moment', 'l', align='center'),
-        text('You asked to slow this one down. Video apps is on your list. No “open anyway” left today.', align='center'),
+        text('You asked to slow this one down. Video apps is on your list. No “open anyway” left today. Open Tether for support.', align='center'),
     ], footer=[
         button('Close the app', toast('The app stays closed.', close()), v='lime', arrow=False),
         link('Get support', toast('Notification: tap to open Rescue in Tether', sheet('rescue_pick'))),
@@ -327,7 +359,7 @@ def unplug():
        desc=shield_desc + ' The second button is Get support: it posts a local notification that opens Rescue. Needs device validation.')
 
     # ---- Android overlay
-    P('sf_unplug_overlay', 'Pause screen (Android overlay)', '/system/unplug/overlay', 'unplug', program='sf', phase='rescue', kind='fullscreen', dark=True, body=[
+    P('sf_unplug_overlay', 'Pause screen (Android overlay)', '/system/unplug/overlay', 'unplug', reference=True, program='sf', phase='rescue', kind='fullscreen', dark=True, body=[
         spacer(24), title('Paused for a moment', 'l', align='center'),
         text('You asked to slow this one down. Video apps is on your list.', align='center'),
         ring('30', palette='teal'), text('Breathe with the circle. 2 of 3 “open anyway” left today.', 'small', align='center'),
@@ -373,10 +405,21 @@ def unplug():
 
     # ---- tracking health
     P('sf_unplug_health', 'Tracking check', '/p/sf/unplug/health', 'unplug', program='sf', phase='daily', hdr=H('Tracking check'), body=[
-        banner('success', 'Unplug is working. All 3 checks pass.'),
-        checklist([ci('Screen Time permission', 'Allowed', True), ci('Daily schedule', 'Running', True), ci('Settings shared with the pause screen', 'Ready', True)], label='iPhone checks'),
+        banner('success', 'Unplug is working. All 4 checks pass.'),
+        checklist([ci('Screen Time permission', 'Allowed', True), ci('Daily schedule', 'Running', True), ci('Settings shared with the pause screen', 'Ready', True),
+                   ci('Notifications', 'On · lets the pause screen open Tether for support', True)], label='iPhone checks'),
         text('If a check fails, Unplug stops counting and pausing. We’ll tell you instead of letting you think it’s still on.', 'small'),
-    ], footer=[button('Done', back())], source=src + ' trackingHealth() (iOS: authorization, schedule, App Group)')
+    ], footer=[button('Done', back())], source=src + ' trackingHealth() (iOS: authorization, schedule, App Group); notification permission')
+    P('sf_unplug_health_notifications', 'Tracking check · notifications off', '/p/sf/unplug/health?state=notifications', 'unplug', program='sf', phase='daily',
+      variant_of='sf_unplug_health', state='notifications off', hdr=H('Tracking check'), body=[
+        banner('info', 'Notifications are off. Unplug still pauses apps, but the pause screen can’t open Tether for you. Open Tether yourself for support.'),
+        checklist([ci('Screen Time permission', 'Allowed', True), ci('Daily schedule', 'Running', True), ci('Settings shared with the pause screen', 'Ready', True),
+                   ci('Notifications', 'Off in Settings')], label='Checks'),
+    ], footer=[
+        button('Open phone settings', settings()),
+        button('Check again', branch('Notification permission (checked on return)', [('On', rep('sf_unplug_health')), ('Still off', toast('Notifications are still off.'))]), v='secondary'),
+    ], source='Notification permission check (iOS UNUserNotificationCenter, Android POST_NOTIFICATIONS)',
+       desc='Same check on both platforms. Unplug keeps working; only the hand-off from the pause screen to Tether needs notifications.')
     P('sf_unplug_health_stopped', 'Tracking stopped', '/p/sf/unplug/health?state=stopped', 'unplug', program='sf', phase='daily',
       variant_of='sf_unplug_health', state='tracking stopped', hdr=H('Tracking check'), body=[
         banner('error', 'Unplug has stopped. Nothing is being counted or paused until this is fixed.'),
@@ -388,8 +431,9 @@ def unplug():
        desc='Also opened from the "Unplug needs attention" notification (generic text, no program name).')
     P('sf_unplug_health_android', 'Tracking check (Android)', '/p/sf/unplug/health?state=android', 'unplug', program='sf', phase='daily',
       variant_of='sf_unplug_health', state='android', hdr=H('Tracking check'), body=[
-        banner('success', 'Unplug is working. All 3 checks pass.'),
-        checklist([ci('Usage access', 'On', True), ci('Display over other apps', 'On', True), ci('Unplug running in the background', 'Checked 12 s ago', True)], label='Android checks'),
+        banner('success', 'Unplug is working. All 4 checks pass.'),
+        checklist([ci('Usage access', 'On', True), ci('Display over other apps', 'On', True), ci('Unplug running in the background', 'Checked 12 s ago', True),
+                   ci('Notifications', 'On · needed for the “Tether is running” notice', True)], label='Android checks'),
         text('Some phones stop background apps to save battery. If Unplug keeps stopping, let Tether run in the background.', 'small'),
     ], footer=[button('Battery settings', settings(), v='secondary'), button('Done', back())],
        source='android/.../unplug/UnplugHost.kt trackingHealth() (usage access, foreground service alive, overlay permission)')
@@ -409,21 +453,15 @@ def unplug():
        desc='Unplug only: liftShield + purgeLocalData(0). With Screen Time: also revokes the ScrollFree screen_time consent (then the same purge).')
 
     # ---- ScrollFree variants: entry points, native minutes slot, Screen Time wording
-    home_offer = _body_of('sf_home')
-    home_offer.insert(2, card(title='Want firmer limits?', text='Unplug can pause apps you choose, after limits you set. Optional.',
-                              cta=button('Set up', go('sf_unplug_intro'), v='secondary', small=True)))
-    P('sf_home_unplug_offer', 'ScrollFree home · Unplug offer', '/p/sf/home?state=unplug-offer', 'sf', program='sf', phase='daily', tabname='plans',
-      variant_of='sf_home', state='Unplug not set up (proposal)', hdr=H(PROGRAMS['sf'][0], avatar='A'), body=home_offer,
-      source='sf_home in this spec (body copied unchanged, one card added)',
-      desc='Identical to ScrollFree home plus one optional card that opens Unplug setup.')
-
-    home_on = _body_of('sf_home')
+    # The Unplug offer card is on the approved sf_home itself (screens_prog_a.py).
+    # With Unplug on, that card is replaced by the Unplug status card.
+    home_on = [n for n in _body_of('sf_home') if n.get('title') != 'Want firmer limits?']
     home_on[0]['eyebrow'] = 'Yesterday · your estimate'
     home_on.insert(0, nativeslot('ios.deviceActivityReport.today', 'Screen Time today',
                                  'Shown by Apple’s Screen Time on this phone. Tether can’t read, store or share these minutes.', 'ios', 132))
     home_on.insert(3, card(v='mint', title='Unplug is on', text='2 groups · pause screen after 60 min', action=go('sf_unplug_home')))
     P('sf_home_unplug', 'ScrollFree home · Unplug on (iPhone)', '/p/sf/home?state=unplug', 'sf', program='sf', phase='daily', tabname='plans',
-      variant_of='sf_home', state='Unplug on · iPhone (proposal)', hdr=H(PROGRAMS['sf'][0], avatar='A'), body=home_on,
+      variant_of='sf_home', state='Unplug on · iPhone', hdr=H(PROGRAMS['sf'][0], avatar='A'), body=home_on,
       source='DeviceActivityReport extension (new); ios/Runner/Unplug/UnplugHost.swift readUsage (iOS returns no minutes)',
       desc='iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.')
 
@@ -434,12 +472,12 @@ def unplug():
     week_on.insert(1, nativeslot('ios.deviceActivityReport.week', 'Screen Time this week',
                                  'Shown by Apple’s Screen Time on this phone. Tether can’t read, store or share these minutes.', 'ios', 200))
     P('sf_week_unplug', 'Weekly reflection · Unplug on (iPhone)', '/p/sf/week?state=unplug', 'sf', program='sf', phase='milestone',
-      variant_of='sf_week', state='Unplug on · iPhone (proposal)', hdr=H('Week 2', pill='ScrollFree'), body=week_on,
+      variant_of='sf_week', state='Unplug on · iPhone', hdr=H('Week 2', pill='ScrollFree'), body=week_on,
       source='DeviceActivityReport extension (new); sf_week in this spec',
       desc='Apple’s weekly report sits above the person’s own estimates, which are what Tether stores and charts.')
 
     P('program_settings_sf', 'Program settings · ScrollFree with Unplug', '/p/:program/settings?state=sf-unplug', 'plans', phase='account',
-      variant_of='program_settings', state='ScrollFree with Unplug (proposal)', hdr=H('ScrollFree settings'), body=[
+      variant_of='program_settings', state='ScrollFree', hdr=H('ScrollFree settings'), body=[
         rows([row('ScrollFree', 'Focus since Aug 14', lead=L_prog('sf'))], flat=True),
         radio([ri('Focus', 'Daily steps and reminders'), ri('Learn only', 'Keep lessons, stop tracking'), ri('Pause', 'Stop reminders; keep everything')], 0, label='Status'),
         card(toggle('Care team sharing', 'Off · ScrollFree isn’t shared', False), toggle('De-identified research', None, False), eyebrow='Sharing'),
@@ -450,17 +488,7 @@ def unplug():
               row('Leave ScrollFree', 'Keep data 30 days or delete now', action=sheet('account_leave'), danger=True)], title='Data'),
     ], footer=[button('Save changes', submit('PATCH /v1/enrolments/:id', toast('Saved', back())))], api=['PATCH /v1/enrolments/:id'],
        source='program_settings in this spec (same layout, ScrollFree data); ' + src + ' purgeLocalData(0)',
-       desc='Program settings shown with ScrollFree data. Leaving ScrollFree or deleting the account also runs purgeLocalData(0).')
-
-    P('sf_screentime_report', 'Connect Screen Time · iPhone report wording', '/p/sf/screen-time?state=ios-report', 'sf', program='sf', phase='plan',
-      variant_of='sf_screentime', state='iPhone report wording (proposal)', hdr=H('Screen Time', pill='Optional'), body=[
-        illus('◷'), title('See your Screen Time here, if you want.', align='center'),
-        text('Apple’s Screen Time shows your daily totals by category inside Tether. Tether can’t read, store or share those minutes.', 'muted', align='center'),
-        kv([('Shows', 'Minutes per category, on this phone'), ('Never reads', 'Content, messages, contacts'), ('Turn off', 'Anytime in Account')]),
-    ], footer=[button('Allow access', branch('iOS Screen Time permission', [('Allowed', toast('Screen Time connected', back())), ('Not allowed', rep('sf_screentime_denied'))])),
-               button('Not now', back(), v='secondary')],
-       source='ios/Runner/Unplug/UnplugHost.swift:239-253 @ origin/feat/unplug-v2.1-module (no API hands the app a number of minutes)',
-       desc='Same layout as Connect Screen Time with "reads" changed to "shows". The owner picks this wording, or legal accepts "reads".')
+       desc='The ScrollFree instance of the parameterized Program settings (the base screen is shown with BreatheFree data). Only ScrollFree has the Screen Time & Unplug section. Leaving ScrollFree or deleting the account also runs purgeLocalData(0).')
 
 
 # ================================================================ MISSING VARIANTS
@@ -523,43 +551,43 @@ def p36_gaps():
 
 # ================================================================ ENTRY SURFACES
 def entry_surfaces():
-    flow('entries', 'Home screen, Siri & shortcuts (proposal)',
+    flow('entries', 'Home screen, Siri & shortcuts',
          'How Tether looks outside the app: the home-screen widget, Siri and App Shortcuts on iPhone, and launcher shortcuts and the widget on Android. '
-         'Labels are generic by default; program names appear only when Show sensitive details is on. These are references for the native '
-         'widget and shortcut work, not app routes.')
-    P('surface_widget_ios', 'Home-screen widget (iPhone)', '/surface/widget/ios', 'entries', phase='rescue', kind='fullscreen', dark=True,
+         'Labels are generic by default; program names appear only when Show sensitive details is on. These are reference surfaces for the native '
+         'widget and shortcut work, not app routes, and are excluded from release-check counts.')
+    P('surface_widget_ios', 'Home-screen widget (iPhone)', '/surface/widget/ios', 'entries', reference=True, phase='rescue', kind='fullscreen', dark=True,
       hdr=H('iPhone widget', left='close', pill='Reference', dark=True), body=[
         eyebrow('Home screen · small widget'),
         card(v='coral', title='Rescue', text='Help for the next few minutes', action=sheet('rescue_pick')),
         kv([('Label', 'Rescue (generic)'), ('Shows', 'No health data, no program names'), ('Tap', 'Opens Rescue, even when signed out'), ('Data', 'None. No App Group needed')]),
     ], source='rescue_pick entry "Home-screen widget / Siri: Rescue" in this spec; WidgetKit, static content',
        desc='WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.')
-    P('surface_widget_android', 'Home-screen widget (Android)', '/surface/widget/android', 'entries', phase='rescue', kind='fullscreen', dark=True,
+    P('surface_widget_android', 'Home-screen widget (Android)', '/surface/widget/android', 'entries', reference=True, phase='rescue', kind='fullscreen', dark=True,
       hdr=H('Android widget', left='close', pill='Reference', dark=True), body=[
         eyebrow('Home screen · 2×1 widget'),
         card(v='coral', title='Rescue', text='Help for the next few minutes', action=sheet('rescue_pick')),
         kv([('Label', 'Rescue (generic)'), ('Shows', 'No health data, no program names'), ('Tap', 'Opens Rescue, even when signed out'), ('Built with', 'RemoteViews, no extra library')]),
     ], source='rescue_pick entry in this spec; Android RemoteViews widget')
-    P('surface_shortcuts_ios', 'Siri & App Shortcuts (iPhone)', '/surface/shortcuts/ios', 'entries', phase='rescue', hdr=H('Siri & Shortcuts', left='close', pill='Reference'), body=[
+    P('surface_shortcuts_ios', 'Siri & App Shortcuts (iPhone)', '/surface/shortcuts/ios', 'entries', reference=True, phase='rescue', hdr=H('Siri & Shortcuts', left='close', pill='Reference'), body=[
         text('What people see in the Shortcuts app and Spotlight, and can say to Siri.', 'muted'),
         rows([row('Rescue', '“Rescue in Tether” · opens Rescue', lead=L_icon('✚'), action=sheet('rescue_pick')),
               row('My plan', '“Show my plan in Tether” · only while ClearAir is a focus program', lead=L_icon('▤'), action=go('ca_red'))], title='Tether Health · App Shortcuts'),
         card(v='mint', text='Labels stay generic so a locked phone doesn’t reveal which programs you use. Turn on Show sensitive details to see program names.'),
     ], source='rescue_pick and ca_red entries in this spec; App Intents (OpenRescueIntent, OpenClearAirRedZoneIntent)',
        desc='App Intents exposed as App Shortcuts. The My plan intent is offered only while enrolled in ClearAir and opens the ClearAir red-zone plan.')
-    P('surface_shortcuts_ios_named', 'Siri & App Shortcuts (sensitive details on)', '/surface/shortcuts/ios?state=named', 'entries', phase='rescue',
+    P('surface_shortcuts_ios_named', 'Siri & App Shortcuts (sensitive details on)', '/surface/shortcuts/ios?state=named', 'entries', reference=True, phase='rescue',
       variant_of='surface_shortcuts_ios', state='Show sensitive details on', hdr=H('Siri & Shortcuts', left='close', pill='Reference'), body=[
         text('With Show sensitive details on (Account → Notifications), shortcuts use program names.', 'muted'),
         rows([row('Rescue', '“Rescue in Tether” · opens Rescue', lead=L_icon('✚'), action=sheet('rescue_pick')),
               row('ClearAir red-zone plan', '“Show my ClearAir plan in Tether”', lead=L_prog('ca'), action=go('ca_red'))], title='Tether Health · App Shortcuts'),
     ], source='surface_shortcuts_ios plus the Show sensitive details toggle on account_notifications in this spec')
-    P('surface_shortcuts_android', 'Launcher shortcuts (Android)', '/surface/shortcuts/android', 'entries', phase='rescue', hdr=H('App shortcuts', left='close', pill='Reference'), body=[
+    P('surface_shortcuts_android', 'Launcher shortcuts (Android)', '/surface/shortcuts/android', 'entries', reference=True, phase='rescue', hdr=H('App shortcuts', left='close', pill='Reference'), body=[
         text('Shown when someone long-presses the Tether icon.', 'muted'),
         rows([row('Rescue', 'Static shortcut · always there', lead=L_icon('✚'), action=sheet('rescue_pick')),
               row('My plan', 'Dynamic shortcut · only while ClearAir is a focus program', lead=L_icon('▤'), action=go('ca_red'))], title='Tether Health'),
         card(v='mint', text='Labels stay generic so the home screen doesn’t reveal which programs you use. Turn on Show sensitive details to see program names.'),
     ], source='rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager')
-    P('surface_shortcuts_android_named', 'Launcher shortcuts (sensitive details on)', '/surface/shortcuts/android?state=named', 'entries', phase='rescue',
+    P('surface_shortcuts_android_named', 'Launcher shortcuts (sensitive details on)', '/surface/shortcuts/android?state=named', 'entries', reference=True, phase='rescue',
       variant_of='surface_shortcuts_android', state='Show sensitive details on', hdr=H('App shortcuts', left='close', pill='Reference'), body=[
         text('With Show sensitive details on (Account → Notifications), shortcuts use program names.', 'muted'),
         rows([row('Rescue', 'Static shortcut · always there', lead=L_icon('✚'), action=sheet('rescue_pick')),

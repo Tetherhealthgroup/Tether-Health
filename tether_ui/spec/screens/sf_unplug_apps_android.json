@@ -11,7 +11,7 @@
   "state": "android",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Android draws its own picker (AppPickerActivity, native layout must match this screen). App names shown here are generic examples; the real list is the phone’s launchable apps.",
+  "desc": "Copy needs clinical/legal review. Android draws its own picker (AppPickerActivity, native layout must match this screen). App names shown here are generic examples; the real list is the phone’s launchable apps.",
   "header": {
     "t": "header",
     "title": "Choose apps",
@@ -83,7 +83,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: android/.../unplug/AppPickerActivity.kt",
     "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation. On Android the picker leaves them out of the list."
   ],

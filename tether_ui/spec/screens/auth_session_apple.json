@@ -11,7 +11,7 @@
   "state": "Apple account",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Apple button.",
+  "desc": "Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Apple button.",
   "header": null,
   "body": [
     {
@@ -84,7 +84,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: auth_session in this spec; Supabase signInWithIdToken"
   ],
   "over": "Today",

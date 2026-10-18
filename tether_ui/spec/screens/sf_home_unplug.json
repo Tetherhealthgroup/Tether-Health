@@ -8,10 +8,10 @@
   "kind": "screen",
   "tab": "plans",
   "variantOf": "sf_home",
-  "state": "Unplug on · iPhone (proposal)",
+  "state": "Unplug on · iPhone",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.",
+  "desc": "Copy needs clinical/legal review. iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.",
   "header": {
     "t": "header",
     "title": "ScrollFree",
@@ -134,7 +134,7 @@
   ],
   "footer": [],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: DeviceActivityReport extension (new); ios/Runner/Unplug/UnplugHost.swift readUsage (iOS returns no minutes)"
   ],
   "over": null,

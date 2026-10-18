@@ -11,7 +11,7 @@
   "state": "no “open anyway” left",
   "dark": true,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield. The second button is Get support: it posts a local notification that opens Rescue. Needs device validation.",
+  "desc": "Copy needs clinical/legal review. iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield. The second button is Get support: it posts a local notification that opens Rescue. Needs device validation.",
   "header": null,
   "body": [
     {
@@ -31,7 +31,7 @@
     },
     {
       "t": "text",
-      "text": "You asked to slow this one down. Video apps is on your list. No “open anyway” left today.",
+      "text": "You asked to slow this one down. Video apps is on your list. No “open anyway” left today. Open Tether for support.",
       "tone": "body",
       "align": "center"
     }
@@ -65,12 +65,14 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift",
-    "A shield button cannot open Tether directly. Proposal: it posts a local notification; tapping it opens Tether. Needs device validation. The second shield button is always Get support when no “open anyway” is left. Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
+    "A shield button cannot open Tether directly: it posts a local notification; tapping it opens Tether. If notifications are off, the subtitle tells the person to open Tether for support. Needs device validation. The second shield button is always Get support when no “open anyway” is left. Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
   ],
   "over": null,
   "api": [],
+  "reference": true,
   "actions": [
     {
       "element": "Close the app",

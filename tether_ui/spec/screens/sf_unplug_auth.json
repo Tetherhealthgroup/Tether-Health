@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. approved → choose apps, denied → denied state, unavailable → unavailable state.",
+  "desc": "Copy needs clinical/legal review. iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. Then the app checks notification permission. approved → choose apps, approved with notifications off → notifications-off state, denied → denied state, unavailable → unavailable state.",
   "header": {
     "t": "header",
     "title": "Unplug",
@@ -72,6 +72,13 @@
             }
           },
           {
+            "label": "Approved · notifications off",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_auth_notifications"
+            }
+          },
+          {
             "label": "Denied",
             "action": {
               "type": "replace",
@@ -101,8 +108,8 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
-    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module requestAuthorization(individual), PlatformAuthorizationStatus"
+    "Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module requestAuthorization(individual), PlatformAuthorizationStatus; notification permission check"
   ],
   "over": null,
   "api": [],
@@ -132,6 +139,13 @@
             }
           },
           {
+            "label": "Approved · notifications off",
+            "action": {
+              "type": "replace",
+              "to": "sf_unplug_auth_notifications"
+            }
+          },
+          {
             "label": "Denied",
             "action": {
               "type": "replace",
@@ -147,7 +161,7 @@
           }
         ]
       },
-      "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
+      "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Approved · notifications off: replace → sf_unplug_auth_notifications | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
     },
     {
       "element": "Not now",

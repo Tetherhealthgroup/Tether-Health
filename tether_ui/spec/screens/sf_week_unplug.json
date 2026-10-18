@@ -8,10 +8,10 @@
   "kind": "screen",
   "tab": null,
   "variantOf": "sf_week",
-  "state": "Unplug on · iPhone (proposal)",
+  "state": "Unplug on · iPhone",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Apple’s weekly report sits above the person’s own estimates, which are what Tether stores and charts.",
+  "desc": "Copy needs clinical/legal review. Apple’s weekly report sits above the person’s own estimates, which are what Tether stores and charts.",
   "header": {
     "t": "header",
     "title": "Week 2",
@@ -128,7 +128,7 @@
   ],
   "footer": [],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: DeviceActivityReport extension (new); sf_week in this spec"
   ],
   "over": null,

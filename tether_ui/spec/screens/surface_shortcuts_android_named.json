@@ -11,7 +11,7 @@
   "state": "Show sensitive details on",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+  "desc": "Copy needs clinical/legal review.",
   "header": {
     "t": "header",
     "title": "App shortcuts",
@@ -55,11 +55,13 @@
   ],
   "footer": [],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
-    "Source: surface_shortcuts_android plus the Show sensitive details toggle on account_notifications in this spec"
+    "Copy needs clinical/legal review.",
+    "Source: surface_shortcuts_android plus the Show sensitive details toggle on account_notifications in this spec",
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
   ],
   "over": null,
   "api": [],
+  "reference": true,
   "actions": [
     {
       "element": "Close",

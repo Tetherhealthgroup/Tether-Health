@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. End session works only after a reason is chosen or typed (rule sf.unplug.reason).",
+  "desc": "Copy needs clinical/legal review. End session works only after a reason is chosen or typed (rule sf.unplug.reason).",
   "header": null,
   "body": [
     {
@@ -89,7 +89,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession(overrideReason)"
   ],
   "over": "Focus session",

@@ -11,7 +11,7 @@
   "state": "tracking stopped",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Also opened from the \"Unplug needs attention\" notification (generic text, no program name).",
+  "desc": "Copy needs clinical/legal review. Also opened from the \"Unplug needs attention\" notification (generic text, no program name).",
   "header": {
     "t": "header",
     "title": "Tracking check",
@@ -84,7 +84,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module UnplugFlutterApi.onTrackingStopped(checkName, detail)"
   ],
   "over": null,

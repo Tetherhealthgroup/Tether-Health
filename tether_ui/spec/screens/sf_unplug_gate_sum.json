@@ -11,7 +11,7 @@
   "state": "quick sum",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Open it works only after the right answer is typed (rule sf.unplug.sum).",
+  "desc": "Copy needs clinical/legal review. Open it works only after the right answer is typed (rule sf.unplug.sum).",
   "header": {
     "t": "header",
     "title": "Small step",
@@ -101,7 +101,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.puzzle"
   ],
   "over": null,

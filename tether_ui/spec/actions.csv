@@ -378,6 +378,7 @@ sf_buddy,Accountability buddy,Skip for now,replace,sf_home ob_setup,replace → 
 sf_home,ScrollFree home,Back,back,,back
 sf_home,ScrollFree home,Avatar · Account,push,account,push → account
 sf_home,ScrollFree home,Pause 60,push,sf_pause,push → sf_pause
+sf_home,ScrollFree home,Set up,push,sf_unplug_intro,push → sf_unplug_intro
 sf_home,ScrollFree home,This week,push,sf_week,push → sf_week
 sf_home,ScrollFree home,Had a long scroll?,push,sf_slip,push → sf_slip
 sf_home,ScrollFree home,Goal & windows,push,sf_goal,push → sf_goal
@@ -775,7 +776,7 @@ sf_unplug_intro,Unplug intro,Back,back,,back
 sf_unplug_intro,Unplug intro,Set up Unplug,branch,sf_unplug_auth sf_unplug_auth_android,branch: Platform → iPhone: push → sf_unplug_auth | Android: push → sf_unplug_auth_android
 sf_unplug_intro,Unplug intro,Not now,back,,back
 sf_unplug_auth,Allow Screen Time,Back,back,,back
-sf_unplug_auth,Allow Screen Time,Continue,branch,sf_unplug_apps sf_unplug_auth_denied sf_unplug_auth_unavailable,"branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
+sf_unplug_auth,Allow Screen Time,Continue,branch,sf_unplug_apps sf_unplug_auth_notifications sf_unplug_auth_denied sf_unplug_auth_unavailable,"branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Approved · notifications off: replace → sf_unplug_auth_notifications | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
 sf_unplug_auth,Allow Screen Time,Not now,back,,back
 sf_unplug_auth_denied,Screen Time not allowed,Back,back,,back
 sf_unplug_auth_denied,Screen Time not allowed,Try again,branch,sf_unplug_apps,"branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: toast “Still not allowed. You can turn it on later in Settings.”"
@@ -783,10 +784,14 @@ sf_unplug_auth_denied,Screen Time not allowed,Open phone settings,os_settings,,o
 sf_unplug_auth_denied,Screen Time not allowed,Not now,back,,back
 sf_unplug_auth_unavailable,Screen Time unavailable,Back,back,,back
 sf_unplug_auth_unavailable,Screen Time unavailable,Back to ScrollFree,back,,back
+sf_unplug_auth_notifications,Notifications off,Back,back,,back
+sf_unplug_auth_notifications,Notifications off,Open phone settings,os_settings,,os_settings
+sf_unplug_auth_notifications,Notifications off,Check again,branch,sf_unplug_apps sf_unplug_apps_android,branch: Notification permission (checked on return) → On (iPhone): replace → sf_unplug_apps | On (Android): replace → sf_unplug_apps_android | Still off: toast “Notifications are still off. You can turn them on later in Settings.”
+sf_unplug_auth_notifications,Notifications off,Continue without notifications,branch,sf_unplug_apps sf_unplug_apps_android,branch: Platform → iPhone: replace → sf_unplug_apps | Android: replace → sf_unplug_apps_android
 sf_unplug_auth_android,Android permissions for Unplug,Back,back,,back
 sf_unplug_auth_android,Android permissions for Unplug,Turn on display over apps,os_settings,,os_settings
 sf_unplug_auth_android,Android permissions for Unplug,Turn on usage access,os_settings,,os_settings
-sf_unplug_auth_android,Android permissions for Unplug,I’ve turned them on,branch,sf_unplug_apps_android,branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Missing: toast “Unplug still needs both settings.”
+sf_unplug_auth_android,Android permissions for Unplug,I’ve turned them on,branch,sf_unplug_apps_android sf_unplug_auth_notifications,branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Notifications off: replace → sf_unplug_auth_notifications | Missing: toast “Unplug still needs both settings.”
 sf_unplug_apps,Choose apps,Back,back,,back
 sf_unplug_apps,Choose apps,Open app picker,sheet,sf_unplug_picker_ios,sheet → sf_unplug_picker_ios
 sf_unplug_apps,Choose apps,Not now,back,,back
@@ -838,6 +843,9 @@ sf_unplug_gate_sum,Small step: quick sum,Keep it closed,toast,sf_home,toast “N
 sf_unplug_gate_sum,Small step: quick sum,Open it for 10 minutes,branch,sf_home,decide sf.unplug.sum: Small step done? → Step done: toast “Open for 10 minutes. The pause screen comes back after.” then reset → sf_home | Step not done: toast “Answer the sum first.”
 sf_unplug_health,Tracking check,Back,back,,back
 sf_unplug_health,Tracking check,Done,back,,back
+sf_unplug_health_notifications,Tracking check · notifications off,Back,back,,back
+sf_unplug_health_notifications,Tracking check · notifications off,Open phone settings,os_settings,,os_settings
+sf_unplug_health_notifications,Tracking check · notifications off,Check again,branch,sf_unplug_health,branch: Notification permission (checked on return) → On: replace → sf_unplug_health | Still off: toast “Notifications are still off.”
 sf_unplug_health_stopped,Tracking stopped,Back,back,,back
 sf_unplug_health_stopped,Tracking stopped,Open phone settings,os_settings,,os_settings
 sf_unplug_health_stopped,Tracking stopped,Check again,branch,sf_unplug_health,branch: Tracking health result → All pass: replace → sf_unplug_health | Still failing: toast “Still not working. Turn Screen Time access on again in Settings.”
@@ -846,19 +854,6 @@ sf_unplug_health_android,Tracking check (Android),Battery settings,os_settings,,
 sf_unplug_health_android,Tracking check (Android),Done,back,,back
 sf_unplug_off,Turn off Unplug,Turn off,branch,sf_home sf_home,decide choice:sf_unplug_off.scope: Chosen option → Unplug only: CALL device:unplug/liftShield+purgeLocalData then toast “Unplug is off” then reset → sf_home | Unplug and Screen Time: PATCH /v1/enrolments/consents then toast “Unplug and Screen Time are off” then reset → sf_home
 sf_unplug_off,Turn off Unplug,Cancel,close,,close
-sf_home_unplug_offer,ScrollFree home · Unplug offer,Back,back,,back
-sf_home_unplug_offer,ScrollFree home · Unplug offer,Avatar · Account,push,account,push → account
-sf_home_unplug_offer,ScrollFree home · Unplug offer,Pause 60,push,sf_pause,push → sf_pause
-sf_home_unplug_offer,ScrollFree home · Unplug offer,Set up,push,sf_unplug_intro,push → sf_unplug_intro
-sf_home_unplug_offer,ScrollFree home · Unplug offer,This week,push,sf_week,push → sf_week
-sf_home_unplug_offer,ScrollFree home · Unplug offer,Had a long scroll?,push,sf_slip,push → sf_slip
-sf_home_unplug_offer,ScrollFree home · Unplug offer,Goal & windows,push,sf_goal,push → sf_goal
-sf_home_unplug_offer,ScrollFree home · Unplug offer,Buddy,push,sf_buddy,push → sf_buddy
-sf_home_unplug_offer,ScrollFree home · Unplug offer,Program settings,push,program_settings,push → program_settings
-sf_home_unplug_offer,ScrollFree home · Unplug offer,Tab · Today,tab,today,tab → today
-sf_home_unplug_offer,ScrollFree home · Unplug offer,Tab · Progress,tab,progress,tab → progress
-sf_home_unplug_offer,ScrollFree home · Unplug offer,Tab · Learn,tab,learn,tab → learn
-sf_home_unplug_offer,ScrollFree home · Unplug offer,Tab · Support,tab,support,tab → support
 sf_home_unplug,ScrollFree home · Unplug on (iPhone),Back,back,,back
 sf_home_unplug,ScrollFree home · Unplug on (iPhone),Avatar · Account,push,account,push → account
 sf_home_unplug,ScrollFree home · Unplug on (iPhone),Pause 60,push,sf_pause,push → sf_pause
@@ -882,9 +877,6 @@ program_settings_sf,Program settings · ScrollFree with Unplug,Turn off Unplug o
 program_settings_sf,Program settings · ScrollFree with Unplug,Export ScrollFree data,toast,,toast “Export is being prepared. We’ll notify you.”
 program_settings_sf,Program settings · ScrollFree with Unplug,Leave ScrollFree,sheet,account_leave,sheet → account_leave
 program_settings_sf,Program settings · ScrollFree with Unplug,Save changes,submit,,PATCH /v1/enrolments/:id then toast “Saved” then back
-sf_screentime_report,Connect Screen Time · iPhone report wording,Back,back,,back
-sf_screentime_report,Connect Screen Time · iPhone report wording,Allow access,branch,sf_screentime_denied,branch: iOS Screen Time permission → Allowed: toast “Screen Time connected” then back | Not allowed: replace → sf_screentime_denied
-sf_screentime_report,Connect Screen Time · iPhone report wording,Not now,back,,back
 account_delete_apple,Delete account · Apple account,Back,back,,back
 account_delete_apple,Delete account · Apple account,Download a copy first,push,account_data,push → account_data
 account_delete_apple,Delete account · Apple account,Delete everything,branch,account_deleted,auth (apple): Sign in with Apple result → Success: DELETE /v1/account/data then replace → account_deleted | Different account: toast “That’s a different Apple account. Use the one you signed in with.” | Cancelled: toast “Nothing was deleted.” | Error: toast “Couldn’t reach Apple. Nothing was deleted.”

@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Reached from ScrollFree home (state \"Unplug on\") and ScrollFree settings. Everything shown is read from this phone.",
+  "desc": "Copy needs clinical/legal review. Reached from ScrollFree home (state \"Unplug on\") and ScrollFree settings. Everything shown is read from this phone.",
   "header": {
     "t": "header",
     "title": "Unplug",
@@ -124,7 +124,7 @@
   ],
   "footer": [],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module"
   ],
   "over": null,

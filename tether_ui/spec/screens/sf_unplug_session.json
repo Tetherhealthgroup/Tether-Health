@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Device-only. Tether (and so Rescue and 988), the phone dialer and emergency calling are never paused.",
+  "desc": "Copy needs clinical/legal review. Device-only. Tether (and so Rescue and 988), the phone dialer and emergency calling are never paused.",
   "header": {
     "t": "header",
     "title": "Focus session",
@@ -85,7 +85,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module startSession(durationSeconds, PlatformShieldScope selectedApps|everythingExceptAllowlist, strict)",
     "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
   ],

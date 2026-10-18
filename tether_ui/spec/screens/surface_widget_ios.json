@@ -11,7 +11,7 @@
   "state": "default",
   "dark": true,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.",
+  "desc": "Copy needs clinical/legal review. WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.",
   "header": {
     "t": "header",
     "title": "iPhone widget",
@@ -58,11 +58,13 @@
   ],
   "footer": [],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
-    "Source: rescue_pick entry \"Home-screen widget / Siri: Rescue\" in this spec; WidgetKit, static content"
+    "Copy needs clinical/legal review.",
+    "Source: rescue_pick entry \"Home-screen widget / Siri: Rescue\" in this spec; WidgetKit, static content",
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
   ],
   "over": null,
   "api": [],
+  "reference": true,
   "actions": [
     {
       "element": "Close",

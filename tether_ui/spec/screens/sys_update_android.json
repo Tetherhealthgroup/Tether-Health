@@ -11,7 +11,7 @@
   "state": "android",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Update required; Update now opens Google Play. The iPhone App Store URL in the base screen still needs the real App Store ID.",
+  "desc": "Copy needs clinical/legal review. Same as Update required; Update now opens Google Play. The iPhone App Store URL in the base screen still needs the real App Store ID.",
   "header": {
     "t": "header",
     "title": "Update needed",
@@ -59,7 +59,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: sys_update in this spec; app ID com.TetherHealthLLC.tetherhealth"
   ],
   "over": null,

@@ -12180,13 +12180,13 @@
       },
       {
         "t": "title",
-        "text": "See real totals, if you want.",
+        "text": "See your Screen Time here, if you want.",
         "size": "m",
         "align": "center"
       },
       {
         "t": "text",
-        "text": "Tether reads daily totals by category only. Never apps’ content, messages or contacts.",
+        "text": "Apple’s Screen Time shows your daily totals by category inside Tether. Tether can’t read, store or share those minutes.",
         "tone": "muted",
         "align": "center"
       },
@@ -12194,8 +12194,8 @@
         "t": "kv",
         "rows": [
           [
-            "Reads",
-            "Minutes per category"
+            "Shows",
+            "Minutes per category, on this phone"
           ],
           [
             "Never reads",
@@ -12586,6 +12586,23 @@
       {
         "t": "card",
         "variant": "plain",
+        "title": "Want firmer limits?",
+        "text": "Unplug can pause apps you choose, after limits you set. Optional.",
+        "cta": {
+          "t": "button",
+          "label": "Set up",
+          "action": {
+            "type": "push",
+            "to": "sf_unplug_intro"
+          },
+          "variant": "secondary",
+          "arrow": false,
+          "small": true
+        }
+      },
+      {
+        "t": "card",
+        "variant": "plain",
         "eyebrow": "Today’s step",
         "children": [
           {
@@ -12677,8 +12694,17 @@
         "summary": "push → sf_pause"
       },
       {
+        "element": "Set up",
+        "path": "body[2].cta[0]",
+        "action": {
+          "type": "push",
+          "to": "sf_unplug_intro"
+        },
+        "summary": "push → sf_unplug_intro"
+      },
+      {
         "element": "This week",
-        "path": "body[3].rows[0]",
+        "path": "body[4].rows[0]",
         "action": {
           "type": "push",
           "to": "sf_week"
@@ -12687,7 +12713,7 @@
       },
       {
         "element": "Had a long scroll?",
-        "path": "body[3].rows[1]",
+        "path": "body[4].rows[1]",
         "action": {
           "type": "push",
           "to": "sf_slip"
@@ -12696,7 +12722,7 @@
       },
       {
         "element": "Goal & windows",
-        "path": "body[3].rows[2]",
+        "path": "body[4].rows[2]",
         "action": {
           "type": "push",
           "to": "sf_goal"
@@ -12705,7 +12731,7 @@
       },
       {
         "element": "Buddy",
-        "path": "body[3].rows[3]",
+        "path": "body[4].rows[3]",
         "action": {
           "type": "push",
           "to": "sf_buddy"
@@ -12714,7 +12740,7 @@
       },
       {
         "element": "Program settings",
-        "path": "body[3].rows[4]",
+        "path": "body[4].rows[4]",
         "action": {
           "type": "push",
           "to": "program_settings"
@@ -26096,7 +26122,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Shown before anything is switched on, so nobody later reads a number that does not exist. Keeps Pause 60 an intent check and names Unplug as the optional lock.",
+    "desc": "Copy needs clinical/legal review. Shown before anything is switched on, so nobody later reads a number that does not exist. Pause 60 stays an intent check; Unplug is the optional lock.",
     "header": {
       "t": "header",
       "title": "Unplug",
@@ -26185,7 +26211,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: lib/unplug/screens/unplug_screen_a.dart, lib/unplug/models/platform_ceiling.dart"
     ],
     "over": null,
@@ -26249,7 +26275,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. approved → choose apps, denied → denied state, unavailable → unavailable state.",
+    "desc": "Copy needs clinical/legal review. iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. Then the app checks notification permission. approved → choose apps, approved with notifications off → notifications-off state, denied → denied state, unavailable → unavailable state.",
     "header": {
       "t": "header",
       "title": "Unplug",
@@ -26310,6 +26336,13 @@
               }
             },
             {
+              "label": "Approved · notifications off",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_auth_notifications"
+              }
+            },
+            {
               "label": "Denied",
               "action": {
                 "type": "replace",
@@ -26339,8 +26372,8 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
-      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module requestAuthorization(individual), PlatformAuthorizationStatus"
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module requestAuthorization(individual), PlatformAuthorizationStatus; notification permission check"
     ],
     "over": null,
     "api": [],
@@ -26370,6 +26403,13 @@
               }
             },
             {
+              "label": "Approved · notifications off",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_auth_notifications"
+              }
+            },
+            {
               "label": "Denied",
               "action": {
                 "type": "replace",
@@ -26385,7 +26425,7 @@
             }
           ]
         },
-        "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
+        "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Approved · notifications off: replace → sf_unplug_auth_notifications | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
       },
       {
         "element": "Not now",
@@ -26410,7 +26450,7 @@
     "state": "permission denied",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+    "desc": "Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Unplug",
@@ -26482,7 +26522,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAuthorizationStatus.denied"
     ],
     "over": null,
@@ -26554,7 +26594,7 @@
     "state": "unavailable",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+    "desc": "Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Unplug",
@@ -26590,7 +26630,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAuthorizationStatus.unavailable"
     ],
     "over": null,
@@ -26614,6 +26654,202 @@
       }
     ]
   },
+  "sf_unplug_auth_notifications": {
+    "id": "sf_unplug_auth_notifications",
+    "name": "Notifications off",
+    "route": "/p/sf/unplug/permission?state=notifications",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "plan",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_unplug_auth",
+    "state": "notifications off",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Shown during setup when Screen Time / Android permissions are granted but notifications are off. Open phone settings fixes it; Check again reads the permission on return.",
+    "header": {
+      "t": "header",
+      "title": "Unplug",
+      "left": "back",
+      "pill": "Step 1 of 3"
+    },
+    "body": [
+      {
+        "t": "banner",
+        "kind": "info",
+        "text": "Notifications are off for Tether."
+      },
+      {
+        "t": "title",
+        "text": "Turn on notifications for Unplug?",
+        "size": "m"
+      },
+      {
+        "t": "text",
+        "text": "When a pause screen sends you to Tether, including Get support, it uses a notification. With notifications off, Unplug still pauses apps, and the pause screen tells you to open Tether yourself for support.",
+        "tone": "muted"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Open phone settings",
+        "action": {
+          "type": "os_settings"
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Check again",
+        "action": {
+          "type": "branch",
+          "question": "Notification permission (checked on return)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "On (iPhone)",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps"
+              }
+            },
+            {
+              "label": "On (Android)",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps_android"
+              }
+            },
+            {
+              "label": "Still off",
+              "action": {
+                "type": "toast",
+                "value": "Notifications are still off. You can turn them on later in Settings."
+              }
+            }
+          ]
+        },
+        "variant": "secondary",
+        "arrow": false
+      },
+      {
+        "t": "link",
+        "label": "Continue without notifications",
+        "action": {
+          "type": "branch",
+          "question": "Platform",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "iPhone",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps"
+              }
+            },
+            {
+              "label": "Android",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps_android"
+              }
+            }
+          ]
+        },
+        "align": "center"
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: Notification permission check (iOS UNUserNotificationCenter, Android POST_NOTIFICATIONS)"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Open phone settings",
+        "path": "footer[0]",
+        "action": {
+          "type": "os_settings"
+        },
+        "summary": "os_settings"
+      },
+      {
+        "element": "Check again",
+        "path": "footer[1]",
+        "action": {
+          "type": "branch",
+          "question": "Notification permission (checked on return)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "On (iPhone)",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps"
+              }
+            },
+            {
+              "label": "On (Android)",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps_android"
+              }
+            },
+            {
+              "label": "Still off",
+              "action": {
+                "type": "toast",
+                "value": "Notifications are still off. You can turn them on later in Settings."
+              }
+            }
+          ]
+        },
+        "summary": "branch: Notification permission (checked on return) → On (iPhone): replace → sf_unplug_apps | On (Android): replace → sf_unplug_apps_android | Still off: toast “Notifications are still off. You can turn them on later in Settings.”"
+      },
+      {
+        "element": "Continue without notifications",
+        "path": "footer[2]",
+        "action": {
+          "type": "branch",
+          "question": "Platform",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "iPhone",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps"
+              }
+            },
+            {
+              "label": "Android",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_apps_android"
+              }
+            }
+          ]
+        },
+        "summary": "branch: Platform → iPhone: replace → sf_unplug_apps | Android: replace → sf_unplug_apps_android"
+      }
+    ]
+  },
   "sf_unplug_auth_android": {
     "id": "sf_unplug_auth_android",
     "name": "Android permissions for Unplug",
@@ -26627,7 +26863,7 @@
     "state": "android",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Android has no single prompt: usage access and the overlay permission are separate settings pages, checked again when the person returns (authorizationStatus on resume). The foreground service needs a visible notification; its text is generic.",
+    "desc": "Copy needs clinical/legal review. Android has no single prompt: usage access and the overlay permission are separate settings pages, checked again when the person returns (authorizationStatus on resume). The foreground service needs a visible notification; its text is generic.",
     "header": {
       "t": "header",
       "title": "Unplug",
@@ -26701,6 +26937,13 @@
               }
             },
             {
+              "label": "Notifications off",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_auth_notifications"
+              }
+            },
+            {
               "label": "Missing",
               "action": {
                 "type": "toast",
@@ -26713,7 +26956,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: android/.../unplug/UnplugHost.kt (PACKAGE_USAGE_STATS, SYSTEM_ALERT_WINDOW, foreground service)"
     ],
     "over": null,
@@ -26760,6 +27003,13 @@
               }
             },
             {
+              "label": "Notifications off",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_auth_notifications"
+              }
+            },
+            {
               "label": "Missing",
               "action": {
                 "type": "toast",
@@ -26768,7 +27018,7 @@
             }
           ]
         },
-        "summary": "branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Missing: toast “Unplug still needs both settings.”"
+        "summary": "branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Notifications off: replace → sf_unplug_auth_notifications | Missing: toast “Unplug still needs both settings.”"
       }
     ]
   },
@@ -26785,7 +27035,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone host screen around Apple’s FamilyActivityPicker. presentAppPicker returns only a count; app identities stay as device-local tokens.",
+    "desc": "Copy needs clinical/legal review. iPhone host screen around Apple’s FamilyActivityPicker. presentAppPicker returns only a count; app identities stay as device-local tokens.",
     "header": {
       "t": "header",
       "title": "Choose apps",
@@ -26837,7 +27087,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()",
       "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
     ],
@@ -26884,7 +27134,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Placeholder for the system picker. In the app this sheet is Apple’s; the buttons stand for the picker’s own Done / Cancel.",
+    "desc": "Copy needs clinical/legal review. Placeholder for the system picker. In the app this sheet is Apple’s; the buttons stand for the picker’s own Done / Cancel.",
     "header": null,
     "body": [
       {
@@ -26935,7 +27185,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()",
       "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
     ],
@@ -26991,7 +27241,7 @@
     "state": "android",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Android draws its own picker (AppPickerActivity, native layout must match this screen). App names shown here are generic examples; the real list is the phone’s launchable apps.",
+    "desc": "Copy needs clinical/legal review. Android draws its own picker (AppPickerActivity, native layout must match this screen). App names shown here are generic examples; the real list is the phone’s launchable apps.",
     "header": {
       "t": "header",
       "title": "Choose apps",
@@ -27063,7 +27313,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: android/.../unplug/AppPickerActivity.kt",
       "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation. On Android the picker leaves them out of the list."
     ],
@@ -27110,7 +27360,7 @@
     "state": "apps chosen",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. PlatformAppSelection carries only the person’s group labels and counts. Proposal: group names are device-only (not synced).",
+    "desc": "Copy needs clinical/legal review. PlatformAppSelection carries only the person’s group labels and counts. Group names are device-only (not synced).",
     "header": {
       "t": "header",
       "title": "Choose apps",
@@ -27174,7 +27424,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAppSelection(groupLabels, groupAppCounts, totalApps)"
     ],
     "over": null,
@@ -27221,7 +27471,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Levels map to PlatformModuleConfig.tier (Notice 1, Pause 2, Pause + step 3, Firm 5 = no overrides). Small step maps to gate breath | commitment | puzzle. Device-only: nothing here is sent to Tether. The loosening delay comes from the feat branch tier model and is a proposal.",
+    "desc": "Copy needs clinical/legal review. Levels map to PlatformModuleConfig.tier (Notice 1, Pause 2, Pause + step 3, Firm 5 = no overrides). Small step maps to gate breath | commitment | puzzle. Device-only: nothing here is sent to Tether. Looser limits take effect the next day.",
     "header": {
       "t": "header",
       "title": "Limits",
@@ -27351,7 +27601,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformThresholds(minutes, opens), PlatformModuleConfig(tier, overrideAllowance, gate none|breath|commitment|puzzle, strict); lib/unplug/screens/unplug_screen_f.dart (tier, cool-off)",
       "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
     ],
@@ -27398,7 +27648,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Reached from ScrollFree home (state \"Unplug on\") and ScrollFree settings. Everything shown is read from this phone.",
+    "desc": "Copy needs clinical/legal review. Reached from ScrollFree home (state \"Unplug on\") and ScrollFree settings. Everything shown is read from this phone.",
     "header": {
       "t": "header",
       "title": "Unplug",
@@ -27511,7 +27761,7 @@
     ],
     "footer": [],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module"
     ],
     "over": null,
@@ -27621,7 +27871,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Device-only. Tether (and so Rescue and 988), the phone dialer and emergency calling are never paused.",
+    "desc": "Copy needs clinical/legal review. Device-only. Tether (and so Rescue and 988), the phone dialer and emergency calling are never paused.",
     "header": {
       "t": "header",
       "title": "Focus session",
@@ -27695,7 +27945,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module startSession(durationSeconds, PlatformShieldScope selectedApps|everythingExceptAllowlist, strict)",
       "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
     ],
@@ -27738,7 +27988,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Close leaves the session running. The session ends by itself at the end time (see Session complete).",
+    "desc": "Copy needs clinical/legal review. Close leaves the session running. The session ends by itself at the end time (see Session complete).",
     "header": {
       "t": "header",
       "title": "Focus session",
@@ -27788,7 +28038,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: lib/unplug/screens/unplug_screen_g.dart"
     ],
     "over": null,
@@ -27835,7 +28085,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. End session works only after a reason is chosen or typed (rule sf.unplug.reason).",
+    "desc": "Copy needs clinical/legal review. End session works only after a reason is chosen or typed (rule sf.unplug.reason).",
     "header": null,
     "body": [
       {
@@ -27913,7 +28163,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession(overrideReason)"
     ],
     "over": "Focus session",
@@ -27973,7 +28223,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Opened from the session-finished notification (generic text) or when the timer ends in the app.",
+    "desc": "Copy needs clinical/legal review. Opened from the session-finished notification (generic text) or when the timer ends in the app.",
     "header": {
       "t": "header",
       "title": "Focus session",
@@ -28011,7 +28261,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession()"
     ],
     "over": null,
@@ -28041,7 +28291,7 @@
     "state": "ended early",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+    "desc": "Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Focus session",
@@ -28086,7 +28336,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession(overrideReason)"
     ],
     "over": null,
@@ -28116,7 +28366,7 @@
     "state": "default",
     "dark": true,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield. Take a breath posts a local notification with two actions: Take my breath and Get support (opens Rescue without the small step). Needs device validation.",
+    "desc": "Copy needs clinical/legal review. iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield. Take a breath posts a local notification with two actions: Take my breath and Get support (opens Rescue without the small step). Needs device validation.",
     "header": null,
     "body": [
       {
@@ -28136,7 +28386,7 @@
       },
       {
         "t": "text",
-        "text": "You asked to slow this one down. Video apps is on your list. 2 of 3 “open anyway” left today.",
+        "text": "You asked to slow this one down. Video apps is on your list. 2 of 3 “open anyway” left today. Open Tether for support.",
         "tone": "body",
         "align": "center"
       }
@@ -28188,12 +28438,14 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift, ios/UnplugShieldAction/UnplugShieldActionExtension.swift, assets/unplug/intercept_tokens.json",
-      "A shield button cannot open Tether directly. Proposal: it posts a local notification; tapping it opens Tether. Needs device validation. The notification has two actions: Take my breath (opens the small step) and Get support (opens Rescue directly, without the small step). Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
+      "A shield button cannot open Tether directly: it posts a local notification; tapping it opens Tether. If notifications are off, the subtitle tells the person to open Tether for support. Needs device validation. The notification has two actions: Take my breath (opens the small step) and Get support (opens Rescue directly, without the small step). Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
     ],
     "over": null,
     "api": [],
+    "reference": true,
     "actions": [
       {
         "element": "Take a breath",
@@ -28253,7 +28505,7 @@
     "state": "no “open anyway” left",
     "dark": true,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield. The second button is Get support: it posts a local notification that opens Rescue. Needs device validation.",
+    "desc": "Copy needs clinical/legal review. iPhone system shield (ShieldConfiguration extension). Apple allows only an icon (here the Tether app icon), a title, a subtitle and two buttons, so this screen uses nothing else. Colors and text come from the shared intercept tokens. Not an app route: reference for the native shield. The second button is Get support: it posts a local notification that opens Rescue. Needs device validation.",
     "header": null,
     "body": [
       {
@@ -28273,7 +28525,7 @@
       },
       {
         "t": "text",
-        "text": "You asked to slow this one down. Video apps is on your list. No “open anyway” left today.",
+        "text": "You asked to slow this one down. Video apps is on your list. No “open anyway” left today. Open Tether for support.",
         "tone": "body",
         "align": "center"
       }
@@ -28307,12 +28559,14 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: ios/UnplugShield/UnplugShieldConfigurationExtension.swift",
-      "A shield button cannot open Tether directly. Proposal: it posts a local notification; tapping it opens Tether. Needs device validation. The second shield button is always Get support when no “open anyway” is left. Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
+      "A shield button cannot open Tether directly: it posts a local notification; tapping it opens Tether. If notifications are off, the subtitle tells the person to open Tether for support. Needs device validation. The second shield button is always Get support when no “open anyway” is left. Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
     ],
     "over": null,
     "api": [],
+    "reference": true,
     "actions": [
       {
         "element": "Close the app",
@@ -28354,7 +28608,7 @@
     "state": "default",
     "dark": true,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Drawn over the opened app by the foreground service (SYSTEM_ALERT_WINDOW), 0.5–1.5 s after it opens. Get support opens Tether at Rescue. The typed-sentence and quick-sum steps use the same layouts as the in-app small-step states. Not an app route: reference for the native overlay.",
+    "desc": "Copy needs clinical/legal review. Drawn over the opened app by the foreground service (SYSTEM_ALERT_WINDOW), 0.5–1.5 s after it opens. Get support opens Tether at Rescue. The typed-sentence and quick-sum steps use the same layouts as the in-app small-step states. Not an app route: reference for the native overlay.",
     "header": null,
     "body": [
       {
@@ -28424,12 +28678,14 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: android/.../unplug/InterceptOverlay.kt, assets/unplug/intercept_tokens.json",
-      "Native requirement: Get support opens Tether at Rescue and is always shown, whatever the level or overrides left. Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
+      "Native requirement: Get support opens Tether at Rescue and is always shown, whatever the level or overrides left. Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
     ],
     "over": null,
     "api": [],
+    "reference": true,
     "actions": [
       {
         "element": "Close the app",
@@ -28479,7 +28735,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. The shield action hands off to the app because the step needs input the extension has no time or UI for. Clearing it grants the pass length the level allows. Get support opens Rescue without doing the step.",
+    "desc": "Copy needs clinical/legal review. The shield action hands off to the app because the step needs input the extension has no time or UI for. Clearing it grants the pass length the level allows. Get support opens Rescue without doing the step.",
     "header": {
       "t": "header",
       "title": "Small step",
@@ -28552,7 +28808,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.breath; lib/unplug/screens/unplug_screen_d.dart"
     ],
     "over": null,
@@ -28616,7 +28872,7 @@
     "state": "typed sentence",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Open it works only after the sentence is typed in full (rule sf.unplug.sentence).",
+    "desc": "Copy needs clinical/legal review. Open it works only after the sentence is typed in full (rule sf.unplug.sentence).",
     "header": {
       "t": "header",
       "title": "Small step",
@@ -28707,7 +28963,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.commitment"
     ],
     "over": null,
@@ -28789,7 +29045,7 @@
     "state": "quick sum",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Open it works only after the right answer is typed (rule sf.unplug.sum).",
+    "desc": "Copy needs clinical/legal review. Open it works only after the right answer is typed (rule sf.unplug.sum).",
     "header": {
       "t": "header",
       "title": "Small step",
@@ -28879,7 +29135,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformEffortGate.puzzle"
     ],
     "over": null,
@@ -28961,7 +29217,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+    "desc": "Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Tracking check",
@@ -28971,7 +29227,7 @@
       {
         "t": "banner",
         "kind": "success",
-        "text": "Unplug is working. All 3 checks pass."
+        "text": "Unplug is working. All 4 checks pass."
       },
       {
         "t": "checklist",
@@ -28989,6 +29245,11 @@
           {
             "label": "Settings shared with the pause screen",
             "sub": "Ready",
+            "done": true
+          },
+          {
+            "label": "Notifications",
+            "sub": "On · lets the pause screen open Tether for support",
             "done": true
           }
         ],
@@ -29012,8 +29273,8 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
-      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module trackingHealth() (iOS: authorization, schedule, App Group)"
+      "Copy needs clinical/legal review.",
+      "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module trackingHealth() (iOS: authorization, schedule, App Group); notification permission"
     ],
     "over": null,
     "api": [],
@@ -29036,6 +29297,148 @@
       }
     ]
   },
+  "sf_unplug_health_notifications": {
+    "id": "sf_unplug_health_notifications",
+    "name": "Tracking check · notifications off",
+    "route": "/p/sf/unplug/health?state=notifications",
+    "flow": "unplug",
+    "program": "sf",
+    "phase": "daily",
+    "kind": "screen",
+    "tab": null,
+    "variantOf": "sf_unplug_health",
+    "state": "notifications off",
+    "dark": false,
+    "bg": null,
+    "desc": "Copy needs clinical/legal review. Same check on both platforms. Unplug keeps working; only the hand-off from the pause screen to Tether needs notifications.",
+    "header": {
+      "t": "header",
+      "title": "Tracking check",
+      "left": "back"
+    },
+    "body": [
+      {
+        "t": "banner",
+        "kind": "info",
+        "text": "Notifications are off. Unplug still pauses apps, but the pause screen can’t open Tether for you. Open Tether yourself for support."
+      },
+      {
+        "t": "checklist",
+        "items": [
+          {
+            "label": "Screen Time permission",
+            "sub": "Allowed",
+            "done": true
+          },
+          {
+            "label": "Daily schedule",
+            "sub": "Running",
+            "done": true
+          },
+          {
+            "label": "Settings shared with the pause screen",
+            "sub": "Ready",
+            "done": true
+          },
+          {
+            "label": "Notifications",
+            "sub": "Off in Settings"
+          }
+        ],
+        "label": "Checks"
+      }
+    ],
+    "footer": [
+      {
+        "t": "button",
+        "label": "Open phone settings",
+        "action": {
+          "type": "os_settings"
+        },
+        "variant": "primary",
+        "arrow": true
+      },
+      {
+        "t": "button",
+        "label": "Check again",
+        "action": {
+          "type": "branch",
+          "question": "Notification permission (checked on return)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "On",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_health"
+              }
+            },
+            {
+              "label": "Still off",
+              "action": {
+                "type": "toast",
+                "value": "Notifications are still off."
+              }
+            }
+          ]
+        },
+        "variant": "secondary",
+        "arrow": false
+      }
+    ],
+    "notes": [
+      "Copy needs clinical/legal review.",
+      "Source: Notification permission check (iOS UNUserNotificationCenter, Android POST_NOTIFICATIONS)"
+    ],
+    "over": null,
+    "api": [],
+    "actions": [
+      {
+        "element": "Back",
+        "path": "header.left",
+        "action": {
+          "type": "back"
+        },
+        "summary": "back"
+      },
+      {
+        "element": "Open phone settings",
+        "path": "footer[0]",
+        "action": {
+          "type": "os_settings"
+        },
+        "summary": "os_settings"
+      },
+      {
+        "element": "Check again",
+        "path": "footer[1]",
+        "action": {
+          "type": "branch",
+          "question": "Notification permission (checked on return)",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "On",
+              "action": {
+                "type": "replace",
+                "to": "sf_unplug_health"
+              }
+            },
+            {
+              "label": "Still off",
+              "action": {
+                "type": "toast",
+                "value": "Notifications are still off."
+              }
+            }
+          ]
+        },
+        "summary": "branch: Notification permission (checked on return) → On: replace → sf_unplug_health | Still off: toast “Notifications are still off.”"
+      }
+    ]
+  },
   "sf_unplug_health_stopped": {
     "id": "sf_unplug_health_stopped",
     "name": "Tracking stopped",
@@ -29049,7 +29452,7 @@
     "state": "tracking stopped",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Also opened from the \"Unplug needs attention\" notification (generic text, no program name).",
+    "desc": "Copy needs clinical/legal review. Also opened from the \"Unplug needs attention\" notification (generic text, no program name).",
     "header": {
       "t": "header",
       "title": "Tracking check",
@@ -29122,7 +29525,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module UnplugFlutterApi.onTrackingStopped(checkName, detail)"
     ],
     "over": null,
@@ -29186,7 +29589,7 @@
     "state": "android",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+    "desc": "Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Tracking check",
@@ -29196,7 +29599,7 @@
       {
         "t": "banner",
         "kind": "success",
-        "text": "Unplug is working. All 3 checks pass."
+        "text": "Unplug is working. All 4 checks pass."
       },
       {
         "t": "checklist",
@@ -29214,6 +29617,11 @@
           {
             "label": "Unplug running in the background",
             "sub": "Checked 12 s ago",
+            "done": true
+          },
+          {
+            "label": "Notifications",
+            "sub": "On · needed for the “Tether is running” notice",
             "done": true
           }
         ],
@@ -29246,7 +29654,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: android/.../unplug/UnplugHost.kt trackingHealth() (usage access, foreground service alive, overlay permission)"
     ],
     "over": null,
@@ -29291,7 +29699,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Unplug only: liftShield + purgeLocalData(0). With Screen Time: also revokes the ScrollFree screen_time consent (then the same purge).",
+    "desc": "Copy needs clinical/legal review. Unplug only: liftShield + purgeLocalData(0). With Screen Time: also revokes the ScrollFree screen_time consent (then the same purge).",
     "header": null,
     "body": [
       {
@@ -29377,7 +29785,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module liftShield(reason), purgeLocalData(0); ScrollFree screen_time consent"
     ],
     "over": "Unplug",
@@ -29436,265 +29844,6 @@
       }
     ]
   },
-  "sf_home_unplug_offer": {
-    "id": "sf_home_unplug_offer",
-    "name": "ScrollFree home · Unplug offer",
-    "route": "/p/sf/home?state=unplug-offer",
-    "flow": "sf",
-    "program": "sf",
-    "phase": "daily",
-    "kind": "screen",
-    "tab": "plans",
-    "variantOf": "sf_home",
-    "state": "Unplug not set up (proposal)",
-    "dark": false,
-    "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Identical to ScrollFree home plus one optional card that opens Unplug setup.",
-    "header": {
-      "t": "header",
-      "title": "ScrollFree",
-      "left": "back",
-      "avatar": "A",
-      "avatarAction": {
-        "type": "push",
-        "to": "account"
-      }
-    },
-    "body": [
-      {
-        "t": "card",
-        "variant": "dark",
-        "eyebrow": "Yesterday",
-        "children": [
-          {
-            "t": "big",
-            "value": "2h 10m",
-            "caption": "Goal 90 min · down from 3h"
-          }
-        ]
-      },
-      {
-        "t": "card",
-        "variant": "coral",
-        "title": "Urge to scroll?",
-        "text": "Take 60 seconds first",
-        "cta": {
-          "t": "button",
-          "label": "Pause 60",
-          "action": {
-            "type": "push",
-            "to": "sf_pause"
-          },
-          "variant": "rescue",
-          "arrow": false,
-          "small": true
-        }
-      },
-      {
-        "t": "card",
-        "variant": "plain",
-        "title": "Want firmer limits?",
-        "text": "Unplug can pause apps you choose, after limits you set. Optional.",
-        "cta": {
-          "t": "button",
-          "label": "Set up",
-          "action": {
-            "type": "push",
-            "to": "sf_unplug_intro"
-          },
-          "variant": "secondary",
-          "arrow": false,
-          "small": true
-        }
-      },
-      {
-        "t": "card",
-        "variant": "plain",
-        "eyebrow": "Today’s step",
-        "children": [
-          {
-            "t": "checklist",
-            "items": [
-              {
-                "label": "Charge your phone outside the bedroom",
-                "sub": "Tonight · bedtime window 10 PM"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "t": "list",
-        "rows": [
-          {
-            "label": "This week",
-            "sub": "5 of 7 phone-free nights",
-            "action": {
-              "type": "push",
-              "to": "sf_week"
-            }
-          },
-          {
-            "label": "Had a long scroll?",
-            "sub": "Reflect, nothing resets",
-            "action": {
-              "type": "push",
-              "to": "sf_slip"
-            }
-          },
-          {
-            "label": "Goal & windows",
-            "sub": "90 min · bedtime",
-            "action": {
-              "type": "push",
-              "to": "sf_goal"
-            }
-          },
-          {
-            "label": "Buddy",
-            "sub": "Sam · weekly message",
-            "action": {
-              "type": "push",
-              "to": "sf_buddy"
-            }
-          },
-          {
-            "label": "Program settings",
-            "sub": "Status, sharing, export, leave",
-            "action": {
-              "type": "push",
-              "to": "program_settings"
-            }
-          }
-        ]
-      }
-    ],
-    "footer": [],
-    "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
-      "Source: sf_home in this spec (body copied unchanged, one card added)"
-    ],
-    "over": null,
-    "api": [],
-    "actions": [
-      {
-        "element": "Back",
-        "path": "header.left",
-        "action": {
-          "type": "back"
-        },
-        "summary": "back"
-      },
-      {
-        "element": "Avatar · Account",
-        "path": "header.avatar",
-        "action": {
-          "type": "push",
-          "to": "account"
-        },
-        "summary": "push → account"
-      },
-      {
-        "element": "Pause 60",
-        "path": "body[1].cta[0]",
-        "action": {
-          "type": "push",
-          "to": "sf_pause"
-        },
-        "summary": "push → sf_pause"
-      },
-      {
-        "element": "Set up",
-        "path": "body[2].cta[0]",
-        "action": {
-          "type": "push",
-          "to": "sf_unplug_intro"
-        },
-        "summary": "push → sf_unplug_intro"
-      },
-      {
-        "element": "This week",
-        "path": "body[4].rows[0]",
-        "action": {
-          "type": "push",
-          "to": "sf_week"
-        },
-        "summary": "push → sf_week"
-      },
-      {
-        "element": "Had a long scroll?",
-        "path": "body[4].rows[1]",
-        "action": {
-          "type": "push",
-          "to": "sf_slip"
-        },
-        "summary": "push → sf_slip"
-      },
-      {
-        "element": "Goal & windows",
-        "path": "body[4].rows[2]",
-        "action": {
-          "type": "push",
-          "to": "sf_goal"
-        },
-        "summary": "push → sf_goal"
-      },
-      {
-        "element": "Buddy",
-        "path": "body[4].rows[3]",
-        "action": {
-          "type": "push",
-          "to": "sf_buddy"
-        },
-        "summary": "push → sf_buddy"
-      },
-      {
-        "element": "Program settings",
-        "path": "body[4].rows[4]",
-        "action": {
-          "type": "push",
-          "to": "program_settings"
-        },
-        "summary": "push → program_settings"
-      },
-      {
-        "element": "Tab · Today",
-        "path": "tabbar.today",
-        "action": {
-          "type": "tab",
-          "to": "today"
-        },
-        "summary": "tab → today"
-      },
-      {
-        "element": "Tab · Progress",
-        "path": "tabbar.progress",
-        "action": {
-          "type": "tab",
-          "to": "progress"
-        },
-        "summary": "tab → progress"
-      },
-      {
-        "element": "Tab · Learn",
-        "path": "tabbar.learn",
-        "action": {
-          "type": "tab",
-          "to": "learn"
-        },
-        "summary": "tab → learn"
-      },
-      {
-        "element": "Tab · Support",
-        "path": "tabbar.support",
-        "action": {
-          "type": "tab",
-          "to": "support"
-        },
-        "summary": "tab → support"
-      }
-    ]
-  },
   "sf_home_unplug": {
     "id": "sf_home_unplug",
     "name": "ScrollFree home · Unplug on (iPhone)",
@@ -29705,10 +29854,10 @@
     "kind": "screen",
     "tab": "plans",
     "variantOf": "sf_home",
-    "state": "Unplug on · iPhone (proposal)",
+    "state": "Unplug on · iPhone",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.",
+    "desc": "Copy needs clinical/legal review. iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.",
     "header": {
       "t": "header",
       "title": "ScrollFree",
@@ -29831,7 +29980,7 @@
     ],
     "footer": [],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: DeviceActivityReport extension (new); ios/Runner/Unplug/UnplugHost.swift readUsage (iOS returns no minutes)"
     ],
     "over": null,
@@ -29965,10 +30114,10 @@
     "kind": "screen",
     "tab": null,
     "variantOf": "sf_week",
-    "state": "Unplug on · iPhone (proposal)",
+    "state": "Unplug on · iPhone",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Apple’s weekly report sits above the person’s own estimates, which are what Tether stores and charts.",
+    "desc": "Copy needs clinical/legal review. Apple’s weekly report sits above the person’s own estimates, which are what Tether stores and charts.",
     "header": {
       "t": "header",
       "title": "Week 2",
@@ -30085,7 +30234,7 @@
     ],
     "footer": [],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: DeviceActivityReport extension (new); sf_week in this spec"
     ],
     "over": null,
@@ -30131,10 +30280,10 @@
     "kind": "screen",
     "tab": null,
     "variantOf": "program_settings",
-    "state": "ScrollFree with Unplug (proposal)",
+    "state": "ScrollFree",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Program settings shown with ScrollFree data. Leaving ScrollFree or deleting the account also runs purgeLocalData(0).",
+    "desc": "Copy needs clinical/legal review. The ScrollFree instance of the parameterized Program settings (the base screen is shown with BreatheFree data). Only ScrollFree has the Screen Time & Unplug section. Leaving ScrollFree or deleting the account also runs purgeLocalData(0).",
     "header": {
       "t": "header",
       "title": "ScrollFree settings",
@@ -30269,7 +30418,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: program_settings in this spec (same layout, ScrollFree data); pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module purgeLocalData(0)"
     ],
     "over": null,
@@ -30348,159 +30497,6 @@
       }
     ]
   },
-  "sf_screentime_report": {
-    "id": "sf_screentime_report",
-    "name": "Connect Screen Time · iPhone report wording",
-    "route": "/p/sf/screen-time?state=ios-report",
-    "flow": "sf",
-    "program": "sf",
-    "phase": "plan",
-    "kind": "screen",
-    "tab": null,
-    "variantOf": "sf_screentime",
-    "state": "iPhone report wording (proposal)",
-    "dark": false,
-    "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Same layout as Connect Screen Time with \"reads\" changed to \"shows\". The owner picks this wording, or legal accepts \"reads\".",
-    "header": {
-      "t": "header",
-      "title": "Screen Time",
-      "left": "back",
-      "pill": "Optional"
-    },
-    "body": [
-      {
-        "t": "illus",
-        "glyph": "◷",
-        "tone": "mint"
-      },
-      {
-        "t": "title",
-        "text": "See your Screen Time here, if you want.",
-        "size": "m",
-        "align": "center"
-      },
-      {
-        "t": "text",
-        "text": "Apple’s Screen Time shows your daily totals by category inside Tether. Tether can’t read, store or share those minutes.",
-        "tone": "muted",
-        "align": "center"
-      },
-      {
-        "t": "kv",
-        "rows": [
-          [
-            "Shows",
-            "Minutes per category, on this phone"
-          ],
-          [
-            "Never reads",
-            "Content, messages, contacts"
-          ],
-          [
-            "Turn off",
-            "Anytime in Account"
-          ]
-        ]
-      }
-    ],
-    "footer": [
-      {
-        "t": "button",
-        "label": "Allow access",
-        "action": {
-          "type": "branch",
-          "question": "iOS Screen Time permission",
-          "on": null,
-          "decide": null,
-          "cases": [
-            {
-              "label": "Allowed",
-              "action": {
-                "type": "toast",
-                "value": "Screen Time connected",
-                "then": {
-                  "type": "back"
-                }
-              }
-            },
-            {
-              "label": "Not allowed",
-              "action": {
-                "type": "replace",
-                "to": "sf_screentime_denied"
-              }
-            }
-          ]
-        },
-        "variant": "primary",
-        "arrow": true
-      },
-      {
-        "t": "button",
-        "label": "Not now",
-        "action": {
-          "type": "back"
-        },
-        "variant": "secondary",
-        "arrow": false
-      }
-    ],
-    "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
-      "Source: ios/Runner/Unplug/UnplugHost.swift:239-253 @ origin/feat/unplug-v2.1-module (no API hands the app a number of minutes)"
-    ],
-    "over": null,
-    "api": [],
-    "actions": [
-      {
-        "element": "Back",
-        "path": "header.left",
-        "action": {
-          "type": "back"
-        },
-        "summary": "back"
-      },
-      {
-        "element": "Allow access",
-        "path": "footer[0]",
-        "action": {
-          "type": "branch",
-          "question": "iOS Screen Time permission",
-          "on": null,
-          "decide": null,
-          "cases": [
-            {
-              "label": "Allowed",
-              "action": {
-                "type": "toast",
-                "value": "Screen Time connected",
-                "then": {
-                  "type": "back"
-                }
-              }
-            },
-            {
-              "label": "Not allowed",
-              "action": {
-                "type": "replace",
-                "to": "sf_screentime_denied"
-              }
-            }
-          ]
-        },
-        "summary": "branch: iOS Screen Time permission → Allowed: toast “Screen Time connected” then back | Not allowed: replace → sf_screentime_denied"
-      },
-      {
-        "element": "Not now",
-        "path": "footer[1]",
-        "action": {
-          "type": "back"
-        },
-        "summary": "back"
-      }
-    ]
-  },
   "account_delete_apple": {
     "id": "account_delete_apple",
     "name": "Delete account · Apple account",
@@ -30514,7 +30510,7 @@
     "state": "Apple account",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Apple re-auth for the same provider; the returned user id must match the signed-in user. Delete runs only after Success.",
+    "desc": "Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Apple re-auth for the same provider; the returned user id must match the signed-in user. Delete runs only after Success.",
     "header": {
       "t": "header",
       "title": "Delete account",
@@ -30627,7 +30623,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: account_delete in this spec; lib/auth/auth_gateway.dart RecentAuthGateway.reauthenticate (password only today)"
     ],
     "over": null,
@@ -30713,7 +30709,7 @@
     "state": "Google account",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Google re-auth for the same provider; the returned user id must match the signed-in user. Delete runs only after Success.",
+    "desc": "Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Google re-auth for the same provider; the returned user id must match the signed-in user. Delete runs only after Success.",
     "header": {
       "t": "header",
       "title": "Delete account",
@@ -30826,7 +30822,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: account_delete in this spec; lib/auth/auth_gateway.dart RecentAuthGateway.reauthenticate (password only today)"
     ],
     "over": null,
@@ -30912,7 +30908,7 @@
     "state": "Apple account",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Apple button.",
+    "desc": "Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Apple button.",
     "header": null,
     "body": [
       {
@@ -30985,7 +30981,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: auth_session in this spec; Supabase signInWithIdToken"
     ],
     "over": "Today",
@@ -31050,7 +31046,7 @@
     "state": "Google account",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Google button.",
+    "desc": "Copy needs clinical/legal review. Same as Session expired, with the password field and Sign in button replaced by the native Google button.",
     "header": null,
     "body": [
       {
@@ -31124,7 +31120,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: auth_session in this spec; Supabase signInWithIdToken"
     ],
     "over": "Today",
@@ -31189,7 +31185,7 @@
     "state": "android",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Android has no permission prompt for usage access; the person turns it on in Settings and the app checks again on return.",
+    "desc": "Copy needs clinical/legal review. Android has no permission prompt for usage access; the person turns it on in Settings and the app checks again on return.",
     "header": {
       "t": "header",
       "title": "Screen Time",
@@ -31290,7 +31286,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: sf_screentime in this spec; android/.../unplug/UsageReader.kt (usage access, checked on resume)"
     ],
     "over": null,
@@ -31357,7 +31353,7 @@
     "state": "android · not allowed",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+    "desc": "Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Screen Time",
@@ -31402,7 +31398,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: sf_screentime_denied in this spec (same copy, Android wording in the banner)"
     ],
     "over": null,
@@ -31447,7 +31443,7 @@
     "state": "android",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Update required; Update now opens Google Play. The iPhone App Store URL in the base screen still needs the real App Store ID.",
+    "desc": "Copy needs clinical/legal review. Same as Update required; Update now opens Google Play. The iPhone App Store URL in the base screen still needs the real App Store ID.",
     "header": {
       "t": "header",
       "title": "Update needed",
@@ -31495,7 +31491,7 @@
       }
     ],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
+      "Copy needs clinical/legal review.",
       "Source: sys_update in this spec; app ID com.TetherHealthLLC.tetherhealth"
     ],
     "over": null,
@@ -31534,7 +31530,7 @@
     "state": "default",
     "dark": true,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.",
+    "desc": "Copy needs clinical/legal review. WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.",
     "header": {
       "t": "header",
       "title": "iPhone widget",
@@ -31581,11 +31577,13 @@
     ],
     "footer": [],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
-      "Source: rescue_pick entry \"Home-screen widget / Siri: Rescue\" in this spec; WidgetKit, static content"
+      "Copy needs clinical/legal review.",
+      "Source: rescue_pick entry \"Home-screen widget / Siri: Rescue\" in this spec; WidgetKit, static content",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
     ],
     "over": null,
     "api": [],
+    "reference": true,
     "actions": [
       {
         "element": "Close",
@@ -31619,7 +31617,7 @@
     "state": "default",
     "dark": true,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+    "desc": "Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Android widget",
@@ -31666,11 +31664,13 @@
     ],
     "footer": [],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
-      "Source: rescue_pick entry in this spec; Android RemoteViews widget"
+      "Copy needs clinical/legal review.",
+      "Source: rescue_pick entry in this spec; Android RemoteViews widget",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
     ],
     "over": null,
     "api": [],
+    "reference": true,
     "actions": [
       {
         "element": "Close",
@@ -31704,7 +31704,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review. App Intents exposed as App Shortcuts. The My plan intent is offered only while enrolled in ClearAir and opens the ClearAir red-zone plan.",
+    "desc": "Copy needs clinical/legal review. App Intents exposed as App Shortcuts. The My plan intent is offered only while enrolled in ClearAir and opens the ClearAir red-zone plan.",
     "header": {
       "t": "header",
       "title": "Siri & Shortcuts",
@@ -31753,11 +31753,13 @@
     ],
     "footer": [],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
-      "Source: rescue_pick and ca_red entries in this spec; App Intents (OpenRescueIntent, OpenClearAirRedZoneIntent)"
+      "Copy needs clinical/legal review.",
+      "Source: rescue_pick and ca_red entries in this spec; App Intents (OpenRescueIntent, OpenClearAirRedZoneIntent)",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
     ],
     "over": null,
     "api": [],
+    "reference": true,
     "actions": [
       {
         "element": "Close",
@@ -31800,7 +31802,7 @@
     "state": "Show sensitive details on",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+    "desc": "Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "Siri & Shortcuts",
@@ -31844,11 +31846,13 @@
     ],
     "footer": [],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
-      "Source: surface_shortcuts_ios plus the Show sensitive details toggle on account_notifications in this spec"
+      "Copy needs clinical/legal review.",
+      "Source: surface_shortcuts_ios plus the Show sensitive details toggle on account_notifications in this spec",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
     ],
     "over": null,
     "api": [],
+    "reference": true,
     "actions": [
       {
         "element": "Close",
@@ -31891,7 +31895,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+    "desc": "Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "App shortcuts",
@@ -31940,11 +31944,13 @@
     ],
     "footer": [],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
-      "Source: rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager"
+      "Copy needs clinical/legal review.",
+      "Source: rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
     ],
     "over": null,
     "api": [],
+    "reference": true,
     "actions": [
       {
         "element": "Close",
@@ -31987,7 +31993,7 @@
     "state": "Show sensitive details on",
     "dark": false,
     "bg": null,
-    "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+    "desc": "Copy needs clinical/legal review.",
     "header": {
       "t": "header",
       "title": "App shortcuts",
@@ -32031,11 +32037,13 @@
     ],
     "footer": [],
     "notes": [
-      "Proposal for owner review. Copy needs clinical/legal review.",
-      "Source: surface_shortcuts_android plus the Show sensitive details toggle on account_notifications in this spec"
+      "Copy needs clinical/legal review.",
+      "Source: surface_shortcuts_android plus the Show sensitive details toggle on account_notifications in this spec",
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
     ],
     "over": null,
     "api": [],
+    "reference": true,
     "actions": [
       {
         "element": "Close",

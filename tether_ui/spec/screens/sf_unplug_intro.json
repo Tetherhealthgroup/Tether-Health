@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Shown before anything is switched on, so nobody later reads a number that does not exist. Keeps Pause 60 an intent check and names Unplug as the optional lock.",
+  "desc": "Copy needs clinical/legal review. Shown before anything is switched on, so nobody later reads a number that does not exist. Pause 60 stays an intent check; Unplug is the optional lock.",
   "header": {
     "t": "header",
     "title": "Unplug",
@@ -100,7 +100,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: lib/unplug/screens/unplug_screen_a.dart, lib/unplug/models/platform_ceiling.dart"
   ],
   "over": null,

@@ -11,7 +11,7 @@
   "state": "Google account",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Google re-auth for the same provider; the returned user id must match the signed-in user. Delete runs only after Success.",
+  "desc": "Copy needs clinical/legal review. Same as Delete account, with the password field replaced by native Google re-auth for the same provider; the returned user id must match the signed-in user. Delete runs only after Success.",
   "header": {
     "t": "header",
     "title": "Delete account",
@@ -124,7 +124,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: account_delete in this spec; lib/auth/auth_gateway.dart RecentAuthGateway.reauthenticate (password only today)"
   ],
   "over": null,

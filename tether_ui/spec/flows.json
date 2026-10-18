@@ -173,10 +173,8 @@
       "sf_pause",
       "sf_slip",
       "sf_week",
-      "sf_home_unplug_offer",
       "sf_home_unplug",
       "sf_week_unplug",
-      "sf_screentime_report",
       "sf_screentime_android",
       "sf_screentime_android_denied"
     ]
@@ -356,14 +354,15 @@
   },
   {
     "id": "unplug",
-    "title": "ScrollFree · Unplug (proposal)",
-    "description": "Optional app limits for ScrollFree: what Unplug can see, Screen Time / Android permissions, choosing apps, limits and the pause screen, focus sessions, the iPhone shield and Android overlay, the small-step gate, tracking check and turning it off. Proposal for owner review. Every pause surface reaches Rescue. Related states elsewhere: ScrollFree home (Unplug offer, Unplug on), Weekly reflection (Unplug on), Program settings (ScrollFree with Unplug), Connect Screen Time (Android, iPhone report wording).",
+    "title": "ScrollFree · Unplug",
+    "description": "Optional app limits for ScrollFree: what Unplug can see, Screen Time / Android permissions, choosing apps, limits and the pause screen, focus sessions, the iPhone shield and Android overlay, the small-step gate, tracking check and turning it off. Every pause surface reaches Rescue. Entry: the Unplug card on ScrollFree home. Related states elsewhere: ScrollFree home (Unplug on), Weekly reflection (Unplug on), Program settings (ScrollFree), Connect Screen Time (Android).",
     "program": "sf",
     "screens": [
       "sf_unplug_intro",
       "sf_unplug_auth",
       "sf_unplug_auth_denied",
       "sf_unplug_auth_unavailable",
+      "sf_unplug_auth_notifications",
       "sf_unplug_auth_android",
       "sf_unplug_apps",
       "sf_unplug_picker_ios",
@@ -383,6 +382,7 @@
       "sf_unplug_gate_commit",
       "sf_unplug_gate_sum",
       "sf_unplug_health",
+      "sf_unplug_health_notifications",
       "sf_unplug_health_stopped",
       "sf_unplug_health_android",
       "sf_unplug_off"
@@ -390,8 +390,8 @@
   },
   {
     "id": "entries",
-    "title": "Home screen, Siri & shortcuts (proposal)",
-    "description": "How Tether looks outside the app: the home-screen widget, Siri and App Shortcuts on iPhone, and launcher shortcuts and the widget on Android. Labels are generic by default; program names appear only when Show sensitive details is on. These are references for the native widget and shortcut work, not app routes.",
+    "title": "Home screen, Siri & shortcuts",
+    "description": "How Tether looks outside the app: the home-screen widget, Siri and App Shortcuts on iPhone, and launcher shortcuts and the widget on Android. Labels are generic by default; program names appear only when Show sensitive details is on. These are reference surfaces for the native widget and shortcut work, not app routes, and are excluded from release-check counts.",
     "program": null,
     "screens": [
       "surface_widget_ios",

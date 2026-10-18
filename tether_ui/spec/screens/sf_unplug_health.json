@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review.",
+  "desc": "Copy needs clinical/legal review.",
   "header": {
     "t": "header",
     "title": "Tracking check",
@@ -21,7 +21,7 @@
     {
       "t": "banner",
       "kind": "success",
-      "text": "Unplug is working. All 3 checks pass."
+      "text": "Unplug is working. All 4 checks pass."
     },
     {
       "t": "checklist",
@@ -39,6 +39,11 @@
         {
           "label": "Settings shared with the pause screen",
           "sub": "Ready",
+          "done": true
+        },
+        {
+          "label": "Notifications",
+          "sub": "On · lets the pause screen open Tether for support",
           "done": true
         }
       ],
@@ -62,8 +67,8 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
-    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module trackingHealth() (iOS: authorization, schedule, App Group)"
+    "Copy needs clinical/legal review.",
+    "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module trackingHealth() (iOS: authorization, schedule, App Group); notification permission"
   ],
   "over": null,
   "api": [],

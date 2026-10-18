@@ -11,7 +11,7 @@
   "state": "default",
   "dark": true,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Drawn over the opened app by the foreground service (SYSTEM_ALERT_WINDOW), 0.5–1.5 s after it opens. Get support opens Tether at Rescue. The typed-sentence and quick-sum steps use the same layouts as the in-app small-step states. Not an app route: reference for the native overlay.",
+  "desc": "Copy needs clinical/legal review. Drawn over the opened app by the foreground service (SYSTEM_ALERT_WINDOW), 0.5–1.5 s after it opens. Get support opens Tether at Rescue. The typed-sentence and quick-sum steps use the same layouts as the in-app small-step states. Not an app route: reference for the native overlay.",
   "header": null,
   "body": [
     {
@@ -81,12 +81,14 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: android/.../unplug/InterceptOverlay.kt, assets/unplug/intercept_tokens.json",
-    "Native requirement: Get support opens Tether at Rescue and is always shown, whatever the level or overrides left. Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation."
+    "Native requirement: Get support opens Tether at Rescue and is always shown, whatever the level or overrides left. Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
   ],
   "over": null,
   "api": [],
+  "reference": true,
   "actions": [
     {
       "element": "Close the app",

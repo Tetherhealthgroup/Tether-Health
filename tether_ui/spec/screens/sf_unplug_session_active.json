@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Close leaves the session running. The session ends by itself at the end time (see Session complete).",
+  "desc": "Copy needs clinical/legal review. Close leaves the session running. The session ends by itself at the end time (see Session complete).",
   "header": {
     "t": "header",
     "title": "Focus session",
@@ -61,7 +61,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: lib/unplug/screens/unplug_screen_g.dart"
   ],
   "over": null,

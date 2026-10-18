@@ -1,7 +1,7 @@
 # Validation
 
 - Screens: 227
-- Actions (edges): 667
+- Actions (edges): 662
 - Errors (loose ends): **0**
 
 Checks: every interactive element has an action; every target exists; every screen can be reached from an entry point; every screen has a way out; routes are unique; branches have ≥2 outcomes.

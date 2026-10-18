@@ -1909,5 +1909,35 @@
       ]
     ],
     "expect": "rescue_pick"
+  },
+  {
+    "id": "sf_unplug_notifications_off",
+    "program": "sf",
+    "function": "Unplug",
+    "title": "Notifications off during setup → fix and continue",
+    "start": "sf_unplug_auth",
+    "steps": [
+      [
+        "choose",
+        "Approved · notifications off"
+      ],
+      [
+        "tap",
+        "Continue"
+      ],
+      [
+        "expect",
+        "sf_unplug_auth_notifications"
+      ],
+      [
+        "choose",
+        "On (iPhone)"
+      ],
+      [
+        "tap",
+        "Check again"
+      ]
+    ],
+    "expect": "sf_unplug_apps"
   }
 ]

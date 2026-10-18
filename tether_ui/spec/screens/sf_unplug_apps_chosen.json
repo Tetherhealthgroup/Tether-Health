@@ -11,7 +11,7 @@
   "state": "apps chosen",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. PlatformAppSelection carries only the person’s group labels and counts. Proposal: group names are device-only (not synced).",
+  "desc": "Copy needs clinical/legal review. PlatformAppSelection carries only the person’s group labels and counts. Group names are device-only (not synced).",
   "header": {
     "t": "header",
     "title": "Choose apps",
@@ -75,7 +75,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module PlatformAppSelection(groupLabels, groupAppCounts, totalApps)"
   ],
   "over": null,

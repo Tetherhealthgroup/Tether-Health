@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Proposal for owner review. Copy needs clinical/legal review. Opened from the session-finished notification (generic text) or when the timer ends in the app.",
+  "desc": "Copy needs clinical/legal review. Opened from the session-finished notification (generic text) or when the timer ends in the app.",
   "header": {
     "t": "header",
     "title": "Focus session",
@@ -49,7 +49,7 @@
     }
   ],
   "notes": [
-    "Proposal for owner review. Copy needs clinical/legal review.",
+    "Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module endSession()"
   ],
   "over": null,
