@@ -9,7 +9,7 @@
 - [Account & data](account.md): 12 screens
 - [System states](system.md): 2 screens
 - [BreatheFree](bf.md): 17 screens
-- [ScrollFree](sf.md): 15 screens
+- [ScrollFree](sf.md): 16 screens
 - [ClearAir](ca.md): 10 screens
 - [Heartwise](hw.md): 13 screens
 - [Steady](st.md): 9 screens

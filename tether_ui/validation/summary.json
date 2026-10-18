@@ -1,18 +1,18 @@
 {
-  "generated": "2026-10-18T07:12:52+00:00",
-  "screens": 227,
+  "generated": "2026-10-18T20:41:36+00:00",
+  "screens": 228,
   "flows": 22,
-  "actions": 911,
+  "actions": 924,
   "flutter": {
-    "total": 1553,
-    "passed": 1553,
+    "total": 1568,
+    "passed": 1568,
     "render_tests": [
-      454,
-      454
+      456,
+      456
     ],
     "action_sweep": [
-      1023,
-      1023
+      1036,
+      1036
     ],
     "scenarios": [
       75,
@@ -25,19 +25,19 @@
       75
     ],
     "action_sweep": [
-      1023,
-      1023
+      1036,
+      1036
     ],
     "js_errors": 0
   },
   "action_coverage": [
-    911,
-    911
+    924,
+    924
   ],
   "release_check": {
     "note": "Release acceptance counts exclude reference surfaces (spec screens with reference: true), which are checked by device screenshots.",
-    "screens": 216,
-    "actions": 883,
+    "screens": 217,
+    "actions": 896,
     "reference_screens": [
       "sf_unplug_apps_android",
       "sf_unplug_overlay",

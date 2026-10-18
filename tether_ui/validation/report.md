@@ -1,14 +1,14 @@
 # Validation report
 
-Generated 2026-10-18T07:12:52+00:00 from the spec, the Flutter package and the HTML prototype.
+Generated 2026-10-18T20:41:36+00:00 from the spec, the Flutter package and the HTML prototype.
 
 | Check | Flutter | Prototype |
 |---|---|---|
 | End-to-end scenarios (all programs) | 75 / 75 | 75 / 75 |
-| Button-flow sweep (every element × every outcome) | 1023 / 1023 | 1023 / 1023 |
-| Render tests (every screen at 100% and 130% text) | 454 / 454 | — |
+| Button-flow sweep (every element × every outcome) | 1036 / 1036 | 1036 / 1036 |
+| Render tests (every screen at 100% and 130% text) | 456 / 456 | — |
 | Static analysis | `flutter analyze`: see analyze.txt | JS errors: 0 |
-| Spec validator (loose ends) | 0 errors · 911 actions, every target exists, every screen reachable | |
+| Spec validator (loose ends) | 0 errors · 924 actions, every target exists, every screen reachable | |
 
 ## Scenarios by program and function
 

@@ -463,7 +463,18 @@ def unplug():
     P('sf_home_unplug', 'ScrollFree home · Unplug on (iPhone)', '/p/sf/home?state=unplug', 'sf', program='sf', phase='daily', tabname='plans',
       variant_of='sf_home', state='Unplug on · iPhone', hdr=H(PROGRAMS['sf'][0], avatar='A'), body=home_on,
       source='DeviceActivityReport extension (new); ios/Runner/Unplug/UnplugHost.swift readUsage (iOS returns no minutes)',
-      desc='iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android keeps the default home with real totals from readUsage.')
+      desc='iPhone: the native slot shows Apple’s minutes; every figure Tether stores stays the person’s own estimate and is labelled so. Android uses the Unplug on · Android state, with figures Tether reads on the phone.')
+
+    # Android: Tether can read usage itself (readUsage), so no native slot; real figures plus the status card.
+    home_android = [n for n in _body_of('sf_home') if n.get('title') != 'Want firmer limits?']
+    home_android[0]['eyebrow'] = 'Yesterday · measured on this phone'
+    home_android.insert(1, stats([st('Today so far', '48 min', 'Video apps and Feeds'), st('Opens today', '14', 'Pause screen after 20')]))
+    home_android.insert(2, text('Measured by Tether on this phone with usage access. Only daily totals by category are saved to your account.', 'small'))
+    home_android.insert(4, card(v='mint', title='Unplug is on', text='2 groups · pause screen after 60 min or 20 opens', action=go('sf_unplug_home')))
+    P('sf_home_unplug_android', 'ScrollFree home · Unplug on (Android)', '/p/sf/home?state=unplug-android', 'sf', program='sf', phase='daily', tabname='plans',
+      variant_of='sf_home', state='Unplug on · Android', hdr=H(PROGRAMS['sf'][0], avatar='A'), body=home_android,
+      source=src + ' readUsage(days) → PlatformUsage(dailyMinutes, opens, opensAreApproximate=false on Android); android/.../unplug/UsageReader.kt',
+      desc='Android: Tether reads usage on the phone (usage access), so ScrollFree home shows measured figures instead of Apple’s native view, and the Unplug status card replaces the offer card. Shown once Unplug setup is finished on Android.')
 
     week_on = _body_of('sf_week')
     for n in week_on:

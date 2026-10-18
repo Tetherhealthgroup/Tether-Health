@@ -424,6 +424,8 @@ abstract final class Routes {
   static const sfUnplugOff = '/p/sf/unplug/off';
   /// ScrollFree home · Unplug on (iPhone) (Unplug on · iPhone)
   static const sfHomeUnplug = '/p/sf/home?state=unplug';
+  /// ScrollFree home · Unplug on (Android) (Unplug on · Android)
+  static const sfHomeUnplugAndroid = '/p/sf/home?state=unplug-android';
   /// Weekly reflection · Unplug on (iPhone) (Unplug on · iPhone)
   static const sfWeekUnplug = '/p/sf/week?state=unplug';
   /// Program settings · ScrollFree with Unplug (ScrollFree)

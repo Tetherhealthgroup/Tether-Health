@@ -1575,6 +1575,13 @@
       "variantOf": "sf_home",
       "state": "Unplug on · iPhone"
     },
+    "sf_home_unplug_android": {
+      "route": "/p/sf/home?state=unplug-android",
+      "kind": "screen",
+      "flow": "sf",
+      "variantOf": "sf_home",
+      "state": "Unplug on · Android"
+    },
     "sf_week_unplug": {
       "route": "/p/sf/week?state=unplug",
       "kind": "screen",

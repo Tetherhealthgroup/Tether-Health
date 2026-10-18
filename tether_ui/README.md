@@ -1,6 +1,6 @@
 # Tether Health · UI for development
 
-Single source of truth for the Tether Health mobile app (iOS + Android, Flutter): **227 screens and states**, **22 flows**, **911 wired actions**, 11 programs, sign-in with **email, Apple and Google**, and **health records** from Epic, Medicare Blue Button and any SMART on FHIR server, or entered by hand.
+Single source of truth for the Tether Health mobile app (iOS + Android, Flutter): **228 screens and states**, **22 flows**, **924 wired actions**, 11 programs, sign-in with **email, Apple and Google**, and **health records** from Epic, Medicare Blue Button and any SMART on FHIR server, or entered by hand.
 Everything here is generated from one spec, so the design, the clickable prototype + simulator, the screenshots and the Flutter code always match.
 
 ## Validation (latest run)
@@ -8,8 +8,8 @@ Everything here is generated from one spec, so the design, the clickable prototy
 | Check | Flutter | Prototype |
 |---|---|---|
 | End-to-end scenarios: setup and functions of every program, sign-in, health records | 75 / 75 | 75 / 75 |
-| Button-flow sweep: every element × every outcome lands where the spec says | 1023 / 1023 | 1023 / 1023 |
-| Render tests: every screen at 100% and 130% text, no overflow | 454 / 454 | — |
+| Button-flow sweep: every element × every outcome lands where the spec says | 1036 / 1036 | 1036 / 1036 |
+| Render tests: every screen at 100% and 130% text, no overflow | 456 / 456 | — |
 | Static analysis | `flutter analyze`: no issues | JS errors: 0 |
 | Spec validator | 0 loose ends: every target exists, every screen reachable, no dead ends | |
 
@@ -47,7 +47,7 @@ tether_ui/
 ```bash
 cd flutter
 flutter pub get
-flutter run                                  # developer gallery of all 227 screens
+flutter run                                  # developer gallery of all 228 screens
 flutter run --dart-define=START=/welcome     # real first-run flow
 flutter analyze && flutter test              # render tests + action sweep + scenarios
 ```
@@ -90,7 +90,7 @@ flutter analyze && flutter test              # render tests + action sweep + sce
 | [Account & data](flows/account.md) | 12 | Settings, programs & sharing, notifications, privacy, export, deletion with receipt, sign out. |
 | [System states](flows/system.md) | 2 | App-wide events: forced update. |
 | [BreatheFree](flows/bf.md) | 17 | Tobacco & nicotine · Quit / Reduce. Four real quit paths, craving rescue, slip recovery, medication education. |
-| [ScrollFree](flows/sf.md) | 15 | Social media use · Quit / Reduce. Self-report first, minute goal + app-free windows, Pause 60, buddy, weekly reflection. |
+| [ScrollFree](flows/sf.md) | 16 | Social media use · Quit / Reduce. Self-report first, minute goal + app-free windows, Pause 60, buddy, weekly reflection. |
 | [ClearAir](flows/ca.md) | 10 | Respiratory · Manage. Clinician action plan, zone check, yellow-zone steps with re-check, red-zone route, progress against own zones. |
 | [Heartwise](flows/hw.md) | 13 | Cardiovascular · Manage. Clinician targets, two-reading BP log, validation, symptom-gated crisis route, trends, lipid panel, previewed visit summary. |
 | [Steady](flows/st.md) | 9 | Diabetes & metabolic · Manage. Clinician range + own low plan, reading log, low route with 15-min timer, meal reset, patterns, A1C. |

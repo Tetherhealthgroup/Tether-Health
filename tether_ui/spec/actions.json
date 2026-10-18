@@ -9022,6 +9022,147 @@
     "summary": "tab → support"
   },
   {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "Pause 60",
+    "path": "body[3].cta[0]",
+    "type": "push",
+    "targets": [
+      "sf_pause"
+    ],
+    "summary": "push → sf_pause"
+  },
+  {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "Unplug is on",
+    "path": "body[4]",
+    "type": "push",
+    "targets": [
+      "sf_unplug_home"
+    ],
+    "summary": "push → sf_unplug_home"
+  },
+  {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "This week",
+    "path": "body[6].rows[0]",
+    "type": "push",
+    "targets": [
+      "sf_week"
+    ],
+    "summary": "push → sf_week"
+  },
+  {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "Had a long scroll?",
+    "path": "body[6].rows[1]",
+    "type": "push",
+    "targets": [
+      "sf_slip"
+    ],
+    "summary": "push → sf_slip"
+  },
+  {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "Goal & windows",
+    "path": "body[6].rows[2]",
+    "type": "push",
+    "targets": [
+      "sf_goal"
+    ],
+    "summary": "push → sf_goal"
+  },
+  {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "Buddy",
+    "path": "body[6].rows[3]",
+    "type": "push",
+    "targets": [
+      "sf_buddy"
+    ],
+    "summary": "push → sf_buddy"
+  },
+  {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "Program settings",
+    "path": "body[6].rows[4]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "sf_home_unplug_android",
+    "screen_name": "ScrollFree home · Unplug on (Android)",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
     "screen": "sf_week_unplug",
     "screen_name": "Weekly reflection · Unplug on (iPhone)",
     "element": "Back",
