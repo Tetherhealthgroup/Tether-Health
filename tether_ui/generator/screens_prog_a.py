@@ -19,7 +19,7 @@ def settings_row(p): return row('Program settings', 'Status, sharing, export, le
 def programs_a():
     # ================================================================ BREATHEFREE
     flow('bf', 'BreatheFree', 'Tobacco & nicotine · Quit / Reduce. Four real quit paths, craving rescue, slip recovery, medication education.', 'bf')
-    intro('bf', [('Help when cravings hit', 'one tap, offline'), ('Plan your way', 'date · today · reduce · explore'), ('Medicines', 'education only')], '~3 min/day',
+    intro('bf', [('Help when cravings hit', 'one tap, no typing'), ('Plan your way', 'date · today · reduce · explore'), ('Medicines', 'education only')], '~3 min/day',
           (go('bf_q1'), 'Plan, practice and get through cravings, with no judgment. A slip never erases your wins.'))
     S('bf_q1', 'Baseline: amount', '/p/bf/onboarding/1', 'bf', program='bf', phase='onboarding', hdr=H('About your smoking', pill='1 of 3'), body=[
         steps(1, 3), eyebrow('Question 1 of 3'), title('On a typical day, how many cigarettes?'),
@@ -66,7 +66,7 @@ def programs_a():
     ], footer=[button('Start my plan', submit('PUT /v1/quit-plan', onboarding_or('bf_home'))), link('Save and finish later', tab('plans'))], api=['PUT /v1/quit-plan'])
     S('bf_home', 'BreatheFree home', '/p/bf/home', 'bf', program='bf', phase='daily', tabname='plans', hdr=home_hdr('bf'), body=[
         card(v='dark', eyebrow='Your quit day', children=[big('7 days', None, 'Friday, August 28 · Pacific Time')]),
-        card(v='coral', title='Craving now?', text='One tap · works offline', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)),
+        card(v='coral', title='Craving now?', text='One tap · no typing', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)),
         card(checklist([ci('Stock gum, water or healthy snacks', 'About 3 minutes')]), eyebrow='Today’s step'),
         card(v='mint', eyebrow='Your top reason', children=[quote('Protect my family.')]),
         rows([row('Daily check-in', 'About 60 seconds', action=sheet('checkin')), row('Medication center', 'Nicotine patch · recorded plan', action=go('bf_meds')),
@@ -75,7 +75,7 @@ def programs_a():
     S('bf_home_quitday', 'BreatheFree · quit day', '/p/bf/home?state=quit-day', 'bf', program='bf', phase='milestone', tabname='plans', variant_of='bf_home', state='quit day', hdr=home_hdr('bf'), body=[
         eyebrow('Quit day · Aug 28'), title('Keep today simple.'),
         card(v='dark', eyebrow='Since your quit time', children=[big('2h 41m', None, 'Started 7:00 AM · Pacific')]),
-        card(v='coral', title='I have a craving', text='One tap · no typing · offline', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)),
+        card(v='coral', title='I have a craving', text='One tap · no typing', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)),
         card(title='I smoked or had a slip', text='Your progress will not be erased', action=go('bf_slip')),
         card(checklist([ci('Water, then a 5-minute walk', 'From your trigger plan')]), eyebrow='Next best step'),
         rows([row('Morning check-in', None, action=sheet('checkin')), row('Medication center', 'Patch · taken 8:07 AM', action=go('bf_meds'))]),
@@ -202,7 +202,7 @@ def programs_a():
     S('ca_home', 'ClearAir home', '/p/ca/home', 'ca', program='ca', phase='daily', tabname='plans', hdr=home_hdr('ca'), body=[
         card(v='dark', eyebrow='Today’s zone', title='Green · 410 L/min', text='Checked 7:40 AM · from your plan'),
         button('Check my zone', go('ca_zone')),
-        card(v='urgent', title='Red-zone plan', text='Open it fast, even offline', action=go('ca_red')),
+        card(v='urgent', title='Red-zone plan', text='Open it fast', action=go('ca_red')),
         rows([row('Log symptoms', None, action=go('ca_symptoms')), row('Progress', '10 green · 2 yellow · 0 red', action=go('ca_progress')),
               row('My action plan', 'Entered Sep 3', action=go('ca_plan')), settings_row('ca')]),
     ])
@@ -222,7 +222,7 @@ def programs_a():
         button('Call 911', call('911'), v='danger', arrow=False),
         card(checklist([ci('Reliever inhaler now, as written'), ci('Call your clinician or 911'), ci('Don’t drive yourself')]), eyebrow='Your red-zone plan'),
         rows([row('Tell Maria', 'Emergency contact · preview first', lead=L_av('M'), action=sheet('support_message'))]),
-        text('Stays open until you close it. Works offline.', 'small'),
+        text('Stays open until you close it.', 'small'),
     ])
     S('ca_symptoms', 'Symptom log', '/p/ca/symptoms', 'ca', program='ca', phase='daily', hdr=H('Log symptoms'), body=[
         title('What are you noticing?'), chips(['Coughing', 'Wheezing', 'Short of breath', 'Chest tightness', 'Woke at night'], ['Wheezing', 'Woke at night']),

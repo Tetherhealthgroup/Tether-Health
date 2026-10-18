@@ -28,7 +28,7 @@ class TodayOfflineScreen extends StatelessWidget {
       children: [
         TBanner(kind: TBannerKind.offline, text: 'Offline · 3 entries will sync when you reconnect.'),
         TTitle('Good morning, Alex.'),
-        TCard(variant: TCardVariant.coral, title: 'Craving or urge?', text: 'Works offline', cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: 'Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
+        TCard(variant: TCardVariant.coral, title: 'Craving or urge?', text: 'One tap · no typing', cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: 'Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
         TCard(eyebrow: 'Today', children: [TChecklist(items: [TCheckItem('Stock gum, water or snacks', sub: 'Saved on this phone', done: true)])]),
         TBody('Lessons not downloaded load when you’re back online.', tone: TTextTone.small),
       ],

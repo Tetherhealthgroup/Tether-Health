@@ -24,7 +24,7 @@ class BfIntroScreen extends StatelessWidget {
       children: [
         TProgramTag(program: 'bf', extra: 'Tobacco & nicotine'),
         TTitle('Your next breath can be different.', size: TTitleSize.l),
-        TKeyValue(rows: [('Help when cravings hit', 'one tap, offline'), ('Plan your way', 'date · today · reduce · explore'), ('Medicines', 'education only')]),
+        TKeyValue(rows: [('Help when cravings hit', 'one tap, no typing'), ('Plan your way', 'date · today · reduce · explore'), ('Medicines', 'education only')]),
         TBody('Plan, practice and get through cravings, with no judgment. A slip never erases your wins.', tone: TTextTone.muted),
       ],
       footer: [

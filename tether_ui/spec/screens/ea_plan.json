@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Stored encrypted on the device only; available offline.",
+  "desc": "Stored encrypted on the device only.",
   "header": {
     "t": "header",
     "title": "Safety plan",

@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Works offline. With one Quit program, the app skips this screen and opens the last helpful tool.",
+  "desc": "With one Quit program, the app skips this screen and opens the last helpful tool.",
   "header": null,
   "body": [
     {

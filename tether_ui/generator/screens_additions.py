@@ -496,7 +496,7 @@ def unplug():
               row('Screen Time access', 'Connected · totals only', action=go('sf_screentime')),
               row('Turn off Unplug or Screen Time', 'Anytime', action=sheet('sf_unplug_off'), danger=True)], title='Screen Time & Unplug'),
         rows([row('Export ScrollFree data', 'PDF + JSON', action=toast('Export is being prepared. We’ll notify you.')),
-              row('Leave ScrollFree', 'Keep data 30 days or delete now', action=sheet('account_leave'), danger=True)], title='Data'),
+              row('Leave ScrollFree', 'Keep your data or delete it now', action=sheet('account_leave'), danger=True)], title='Data'),
     ], footer=[button('Save changes', submit('PATCH /v1/enrolments/:id', toast('Saved', back())))], api=['PATCH /v1/enrolments/:id'],
        source='program_settings in this spec (same layout, ScrollFree data); ' + src + ' purgeLocalData(0)',
        desc='The ScrollFree instance of the parameterized Program settings (the base screen is shown with BreatheFree data). Only ScrollFree has the Screen Time & Unplug section. Leaving ScrollFree or deleting the account also runs purgeLocalData(0).')
@@ -524,7 +524,7 @@ def p36_gaps():
         P(f'auth_session_{prov}', f'Session expired · {name} account', f'/auth/session?state={prov}', 'auth', phase='account', kind='sheet', over='Today',
           variant_of='auth_session', state=f'{name} account', body=[
             title('Please sign in again'),
-            text('For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in.', 'muted'),
+            text('For your security, sessions end after 30 days.', 'muted'),
             text(f'You signed in with {name}, so there’s no password to type.', 'small'),
           ], footer=[authbuttons(**{prov: auth(prov, [('Success', close()), ('Cancelled', toast('Still signed out. Rescue works without signing in.')),
                                                       ('Error', go('auth_social_error'))])}),

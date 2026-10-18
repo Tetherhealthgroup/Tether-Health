@@ -29,7 +29,7 @@ class CrisisScreen extends StatelessWidget {
         TButton(key: const ValueKey('a:body[2]'), label: 'Text 988', onPressed: () => TNav.sms(context, '988'), variant: TButtonVariant.secondary),
         TButton(key: const ValueKey('a:body[3]'), label: 'Call 911', onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.secondary),
         TCard(key: const ValueKey('a:body[4]'), eyebrow: 'Your safety plan', title: 'Things that help: walk the dog, shower, music', text: 'Reach out: Sam · (555) 010-3311', onTap: () => TNav.push(context, Routes.eaPlan)),
-        TBody('Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. Works offline. 988 is US-only; localize per region.', tone: TTextTone.small),
+        TBody('Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. 988 is US-only; localize per region.', tone: TTextTone.small),
       ],
     );
   }

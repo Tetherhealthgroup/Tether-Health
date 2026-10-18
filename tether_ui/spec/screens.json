@@ -56,7 +56,7 @@
           ],
           [
             "Help in one tap",
-            "Works offline"
+            "No typing needed"
           ],
           [
             "Your pace",
@@ -3083,7 +3083,7 @@
       },
       {
         "t": "text",
-        "text": "For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in.",
+        "text": "For your security, sessions end after 30 days.",
         "tone": "muted"
       },
       {
@@ -3199,7 +3199,7 @@
         "t": "card",
         "variant": "coral",
         "title": "Craving or urge to scroll?",
-        "text": "Help for the next few minutes · works offline",
+        "text": "Help for the next few minutes",
         "cta": {
           "t": "button",
           "label": "Rescue",
@@ -3440,7 +3440,7 @@
         "t": "card",
         "variant": "coral",
         "title": "Craving or urge?",
-        "text": "Always available",
+        "text": "One tap · no typing",
         "cta": {
           "t": "button",
           "label": "Rescue",
@@ -3463,7 +3463,7 @@
       },
       {
         "t": "text",
-        "text": "Rescue renders first from the on-device cache, before anything else loads.",
+        "text": "The rest of Today is still loading.",
         "tone": "small"
       }
     ],
@@ -3567,7 +3567,7 @@
         "t": "card",
         "variant": "coral",
         "title": "Craving or urge?",
-        "text": "Works offline",
+        "text": "One tap · no typing",
         "cta": {
           "t": "button",
           "label": "Rescue",
@@ -4098,7 +4098,7 @@
       },
       {
         "t": "text",
-        "text": "Private · works offline · skip anything",
+        "text": "Skip any program question",
         "tone": "small",
         "align": "center"
       }
@@ -4269,7 +4269,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Works offline. With one Quit program, the app skips this screen and opens the last helpful tool.",
+    "desc": "With one Quit program, the app skips this screen and opens the last helpful tool.",
     "header": null,
     "body": [
       {
@@ -5048,7 +5048,7 @@
       },
       {
         "t": "text",
-        "text": "Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. Works offline. 988 is US-only; localize per region.",
+        "text": "Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. 988 is US-only; localize per region.",
         "tone": "small"
       }
     ],
@@ -5817,7 +5817,7 @@
           },
           {
             "label": "Leave BreatheFree",
-            "sub": "Keep data 30 days or delete now",
+            "sub": "Keep your data or delete it now",
             "action": {
               "type": "sheet",
               "to": "account_leave"
@@ -8382,8 +8382,8 @@
         "t": "radio",
         "items": [
           {
-            "label": "Keep my data for 30 days",
-            "sub": "Rejoin anytime and pick up where you left off",
+            "label": "Keep my data",
+            "sub": "Kept until you delete it or delete your account. Rejoin anytime.",
             "badge": "Default"
           },
           {
@@ -9274,7 +9274,7 @@
         "rows": [
           [
             "Help when cravings hit",
-            "one tap, offline"
+            "one tap, no typing"
           ],
           [
             "Plan your way",
@@ -10404,7 +10404,7 @@
         "t": "card",
         "variant": "coral",
         "title": "Craving now?",
-        "text": "One tap · works offline",
+        "text": "One tap · no typing",
         "cta": {
           "t": "button",
           "label": "Rescue",
@@ -10653,7 +10653,7 @@
         "t": "card",
         "variant": "coral",
         "title": "I have a craving",
-        "text": "One tap · no typing · offline",
+        "text": "One tap · no typing",
         "cta": {
           "t": "button",
           "label": "Rescue",
@@ -13779,7 +13779,7 @@
         "t": "card",
         "variant": "urgent",
         "title": "Red-zone plan",
-        "text": "Open it fast, even offline",
+        "text": "Open it fast",
         "action": {
           "type": "push",
           "to": "ca_red"
@@ -14326,7 +14326,7 @@
       },
       {
         "t": "text",
-        "text": "Stays open until you close it. Works offline.",
+        "text": "Stays open until you close it.",
         "tone": "small"
       }
     ],
@@ -20715,7 +20715,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Stored encrypted on the device only; available offline.",
+    "desc": "Stored encrypted on the device only.",
     "header": {
       "t": "header",
       "title": "Safety plan",
@@ -30665,7 +30665,7 @@
           },
           {
             "label": "Leave ScrollFree",
-            "sub": "Keep data 30 days or delete now",
+            "sub": "Keep your data or delete it now",
             "action": {
               "type": "sheet",
               "to": "account_leave"
@@ -31195,7 +31195,7 @@
       },
       {
         "t": "text",
-        "text": "For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in.",
+        "text": "For your security, sessions end after 30 days.",
         "tone": "muted"
       },
       {
@@ -31333,7 +31333,7 @@
       },
       {
         "t": "text",
-        "text": "For your security, sessions end after 30 days. Anything you logged offline is kept and syncs after you sign in.",
+        "text": "For your security, sessions end after 30 days.",
         "tone": "muted"
       },
       {
