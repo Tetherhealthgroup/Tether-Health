@@ -468,13 +468,13 @@ def unplug():
     # Android: Tether can read usage itself (readUsage), so no native slot; real figures plus the status card.
     home_android = [n for n in _body_of('sf_home') if n.get('title') != 'Want firmer limits?']
     home_android[0]['eyebrow'] = 'Yesterday · measured on this phone'
-    home_android.insert(1, stats([st('Today so far', '48 min', 'Video apps and Feeds'), st('Opens today', '14', 'Pause screen after 20')]))
+    home_android.insert(1, stats([st('Today so far', '48 min', 'Short video and Feeds'), st('Opens today', '14', 'On this phone only · pause screen after 20')]))
     home_android.insert(2, text('Measured by Tether on this phone with usage access. Only daily totals by category are saved to your account.', 'small'))
     home_android.insert(4, card(v='mint', title='Unplug is on', text='2 groups · pause screen after 60 min or 20 opens', action=go('sf_unplug_home')))
     P('sf_home_unplug_android', 'ScrollFree home · Unplug on (Android)', '/p/sf/home?state=unplug-android', 'sf', program='sf', phase='daily', tabname='plans',
       variant_of='sf_home', state='Unplug on · Android', hdr=H(PROGRAMS['sf'][0], avatar='A'), body=home_android,
       source=src + ' readUsage(days) → PlatformUsage(dailyMinutes, opens, opensAreApproximate=false on Android); android/.../unplug/UsageReader.kt',
-      desc='Android: Tether reads usage on the phone (usage access), so ScrollFree home shows measured figures instead of Apple’s native view, and the Unplug status card replaces the offer card. Shown once Unplug setup is finished on Android.')
+      desc='Android: Tether reads usage on the phone (usage access), so ScrollFree home shows measured figures instead of Apple’s native view, and the Unplug status card replaces the offer card. Shown once Unplug setup is finished on Android. Figures: yesterday and today are totals of usage categories (the same categories as ScrollFree setup); opens stay on this phone; Unplug group names never leave the phone.')
 
     week_on = _body_of('sf_week')
     for n in week_on:

@@ -7,7 +7,7 @@ import '../../ui/ui.dart';
 
 /// ScrollFree home · Unplug on (Android)  ·  route `/p/sf/home?state=unplug-android`  ·  flow `sf`  ·  kind `screen`
 /// State: Unplug on · Android of sf_home · program sf · phase daily
-/// Copy needs clinical/legal review. Android: Tether reads usage on the phone (usage access), so ScrollFree home shows measured figures instead of Apple’s native view, and the Unplug status card replaces the offer card. Shown once Unplug setup is finished on Android.
+/// Copy needs clinical/legal review. Android: Tether reads usage on the phone (usage access), so ScrollFree home shows measured figures instead of Apple’s native view, and the Unplug status card replaces the offer card. Shown once Unplug setup is finished on Android. Figures: yesterday and today are totals of usage categories (the same categories as ScrollFree setup); opens stay on this phone; Unplug group names never leave the phone.
 ///
 /// Actions (generated from spec/screens/sf_home_unplug_android.json):
 ///   • Back → back
@@ -34,7 +34,7 @@ class SfHomeUnplugAndroidScreen extends StatelessWidget {
       tab: 'plans',
       children: [
         TCard(variant: TCardVariant.dark, eyebrow: 'Yesterday · measured on this phone', children: [TBigNumber(value: '2h 10m', caption: 'Goal 90 min · down from 3h')]),
-        TStatGrid(stats: [TStat(label: 'Today so far', value: '48 min', sub: 'Video apps and Feeds'), TStat(label: 'Opens today', value: '14', sub: 'Pause screen after 20')]),
+        TStatGrid(stats: [TStat(label: 'Today so far', value: '48 min', sub: 'Short video and Feeds'), TStat(label: 'Opens today', value: '14', sub: 'On this phone only · pause screen after 20')]),
         TBody('Measured by Tether on this phone with usage access. Only daily totals by category are saved to your account.', tone: TTextTone.small),
         TCard(variant: TCardVariant.coral, title: 'Urge to scroll?', text: 'Take 60 seconds first', cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: 'Pause 60', onPressed: () => TNav.push(context, Routes.sfPause), variant: TButtonVariant.rescue, small: true)),
         TCard(key: const ValueKey('a:body[4]'), variant: TCardVariant.mint, title: 'Unplug is on', text: '2 groups · pause screen after 60 min or 20 opens', onTap: () => TNav.push(context, Routes.sfUnplugHome)),

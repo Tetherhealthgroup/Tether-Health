@@ -136,6 +136,12 @@ App pickers (coordinator decision under decision 12, owner may override):
 that native surfaces Flutter goldens cannot capture are checked by device
 screenshots. That makes 11 reference screens.
 
+## Notes for implementation tickets
+
+- TH-949: native sync sends only per-category daily totals. It never sends
+  Unplug group names, package names, or per-group figures (P-47 decision 5,
+  and the privacy line on `sf_home_unplug_android`).
+
 ## Safety requirements (th-qa round 1)
 
 - Every pause surface reaches Rescue, and Rescue reaches Emergency:
@@ -175,6 +181,12 @@ All visible text on the 44 added screens, plus the new copy on `sf_home`
   (decisions 1 and 3).
 - The rule specs and the 7 scenarios are registered from
   `screens_additions.py`; `rules.py` is unchanged.
+- TH-971: `dart_static/analysis_options.yaml` now includes the `analyzer:
+  exclude:` block that Flutter 3.47.1 writes on `pub get`, so the generated
+  `tether_ui/flutter/analysis_options.yaml` stays unchanged across gate runs.
+- TH-971: `screens_additions.py` adds `sf_home_unplug_android` (Unplug on,
+  Android). It uses category labels only ("Short video and Feeds"), and opens
+  are marked as on this phone only.
 
 This file is in `generator/` because `build_all.py` rewrites `spec/` on
 every run.

@@ -5,6 +5,16 @@ analyzer:
   errors:
     missing_required_param: error
     missing_return: error
+  # Flutter 3.47.1 adds this block on pub get; keep it in the template so
+  # the generated file is stable across gate runs.
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
 linter:
   rules:
     - always_declare_return_types

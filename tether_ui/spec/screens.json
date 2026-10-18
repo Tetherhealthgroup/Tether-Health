@@ -30121,7 +30121,7 @@
     "state": "Unplug on · Android",
     "dark": false,
     "bg": null,
-    "desc": "Copy needs clinical/legal review. Android: Tether reads usage on the phone (usage access), so ScrollFree home shows measured figures instead of Apple’s native view, and the Unplug status card replaces the offer card. Shown once Unplug setup is finished on Android.",
+    "desc": "Copy needs clinical/legal review. Android: Tether reads usage on the phone (usage access), so ScrollFree home shows measured figures instead of Apple’s native view, and the Unplug status card replaces the offer card. Shown once Unplug setup is finished on Android. Figures: yesterday and today are totals of usage categories (the same categories as ScrollFree setup); opens stay on this phone; Unplug group names never leave the phone.",
     "header": {
       "t": "header",
       "title": "ScrollFree",
@@ -30151,12 +30151,12 @@
           {
             "label": "Today so far",
             "value": "48 min",
-            "sub": "Video apps and Feeds"
+            "sub": "Short video and Feeds"
           },
           {
             "label": "Opens today",
             "value": "14",
-            "sub": "Pause screen after 20"
+            "sub": "On this phone only · pause screen after 20"
           }
         ],
         "cols": 2
