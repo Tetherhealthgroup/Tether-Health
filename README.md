@@ -149,7 +149,7 @@ times out, the tombstone still drives cleanup after restart and the UI reports
 that no server receipt was restored.
 
 Password-reset email and native recovery deep links are implemented with the
-same `io.breathefree.patient://login-callback` contract as signup confirmation.
+same `com.tetherhealthllc.tetherhealth://login-callback` contract as signup confirmation.
 The API enforces recent authentication, bounded request bodies, rate limits,
 security headers, caller-scoped Supabase access, and privacy-safe errors.
 

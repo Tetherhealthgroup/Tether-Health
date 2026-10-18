@@ -22,43 +22,49 @@ const _sessionFields = 'access_token=synthetic-token'
 /// Links that must never be processed as an auth callback.
 const _ignoredLinks = <String, String>{
   'session fields in the fragment':
-      'io.breathefree.patient://login-callback#$_sessionFields',
+      'com.tetherhealthllc.tetherhealth://login-callback#$_sessionFields',
   'session fields in the query':
-      'io.breathefree.patient://login-callback?$_sessionFields',
+      'com.tetherhealthllc.tetherhealth://login-callback?$_sessionFields',
   'recovery type with session fields in the fragment':
-      'io.breathefree.patient://login-callback#$_sessionFields&type=recovery',
+      'com.tetherhealthllc.tetherhealth://login-callback#$_sessionFields&type=recovery',
   'recovery type with session fields in the query':
-      'io.breathefree.patient://login-callback?$_sessionFields&type=recovery',
+      'com.tetherhealthllc.tetherhealth://login-callback?$_sessionFields&type=recovery',
   'recovery type without a code':
-      'io.breathefree.patient://login-callback?type=recovery',
+      'com.tetherhealthllc.tetherhealth://login-callback?type=recovery',
   'code together with session fields in the query':
-      'io.breathefree.patient://login-callback?code=synthetic-code&$_sessionFields',
+      'com.tetherhealthllc.tetherhealth://login-callback?code=synthetic-code&$_sessionFields',
   'code together with session fields in the fragment':
-      'io.breathefree.patient://login-callback?code=synthetic-code#$_sessionFields',
+      'com.tetherhealthllc.tetherhealth://login-callback?code=synthetic-code#$_sessionFields',
   'code only in the fragment':
-      'io.breathefree.patient://login-callback#code=synthetic-code',
+      'com.tetherhealthllc.tetherhealth://login-callback#code=synthetic-code',
   'code with an empty fragment':
-      'io.breathefree.patient://login-callback?code=synthetic-code#',
+      'com.tetherhealthllc.tetherhealth://login-callback?code=synthetic-code#',
   'code with an error':
-      'io.breathefree.patient://login-callback?code=synthetic-code&error=access_denied',
+      'com.tetherhealthllc.tetherhealth://login-callback?code=synthetic-code&error=access_denied',
   'two codes':
-      'io.breathefree.patient://login-callback?code=synthetic-code&code=synthetic-other',
-  'empty code': 'io.breathefree.patient://login-callback?code=',
-  'no parameters': 'io.breathefree.patient://login-callback',
+      'com.tetherhealthllc.tetherhealth://login-callback?code=synthetic-code&code=synthetic-other',
+  'empty code': 'com.tetherhealthllc.tetherhealth://login-callback?code=',
+  'no parameters': 'com.tetherhealthllc.tetherhealth://login-callback',
   'wrong scheme': 'io.example.other://login-callback?code=synthetic-code',
-  'wrong host': 'io.breathefree.patient://other-callback?code=synthetic-code',
+  'wrong host':
+      'com.tetherhealthllc.tetherhealth://other-callback?code=synthetic-code',
   'extra path':
-      'io.breathefree.patient://login-callback/extra?code=synthetic-code',
+      'com.tetherhealthllc.tetherhealth://login-callback/extra?code=synthetic-code',
   'user info':
-      'io.breathefree.patient://someone@login-callback?code=synthetic-code',
-  'port': 'io.breathefree.patient://login-callback:8080?code=synthetic-code',
+      'com.tetherhealthllc.tetherhealth://someone@login-callback?code=synthetic-code',
+  'port':
+      'com.tetherhealthllc.tetherhealth://login-callback:8080?code=synthetic-code',
   'https link': 'https://example.test/login-callback?code=synthetic-code',
+  'previous scheme with a code':
+      'io.breathefree.patient://login-callback?code=synthetic-code',
+  'previous scheme with session fields':
+      'io.breathefree.patient://login-callback#$_sessionFields',
 };
 
 const _acceptedLinks = <String>[
-  'io.breathefree.patient://login-callback?code=synthetic-code',
-  'io.breathefree.patient://login-callback/?code=synthetic-code',
-  'io.breathefree.patient://login-callback?code=synthetic-code&type=recovery',
+  'com.tetherhealthllc.tetherhealth://login-callback?code=synthetic-code',
+  'com.tetherhealthllc.tetherhealth://login-callback/?code=synthetic-code',
+  'com.tetherhealthllc.tetherhealth://login-callback?code=synthetic-code&type=recovery',
 ];
 
 const _verifierKey =
@@ -274,7 +280,7 @@ void main() {
       expect(verifier, isNotNull);
 
       await deliver(
-          'io.breathefree.patient://login-callback?code=synthetic-code');
+          'com.tetherhealthllc.tetherhealth://login-callback?code=synthetic-code');
 
       final exchange = requests
           .singleWhere((request) => request.url.path.endsWith('/token'));
@@ -299,7 +305,7 @@ void main() {
       );
 
       await deliver(
-          'io.breathefree.patient://login-callback?code=synthetic-code');
+          'com.tetherhealthllc.tetherhealth://login-callback?code=synthetic-code');
 
       expect(requests.where((request) => request.url.path.endsWith('/token')),
           hasLength(1));

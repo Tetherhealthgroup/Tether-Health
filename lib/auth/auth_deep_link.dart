@@ -5,7 +5,7 @@ import 'secure_session_storage.dart';
 
 /// The only redirect the app gives Supabase for email links. The native
 /// runners and `supabase/config.toml` register the same scheme and host.
-const authRedirectUrl = 'io.breathefree.patient://login-callback';
+const authRedirectUrl = 'com.tetherhealthllc.tetherhealth://login-callback';
 
 final Uri _authRedirect = Uri.parse(authRedirectUrl);
 

@@ -33,7 +33,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>io.breathefree.patient</string>
+				<string>com.tetherhealthllc.tetherhealth</string>
 			</array>
 		</dict>
 	</array>

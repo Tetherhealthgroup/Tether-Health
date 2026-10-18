@@ -211,11 +211,11 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   confirm from the first TestFlight upload's processing email, ITMS-90683).
   Add them only if Apple flags them; their wording is **needs-counsel**.
 - **G-4 Auth redirect URL scheme.** The only URL scheme is
-  `io.breathefree.patient` (`Info.plist:29-39`), used as the Supabase email
-  redirect `io.breathefree.patient://login-callback`
-  (`lib/auth/auth_gateway.dart:66-67`; Android
-  `android/app/src/main/AndroidManifest.xml:34-35`). It carries the old
-  BreatheFree name. The same redirect is used for sign-up confirmation,
+  `com.tetherhealthllc.tetherhealth` (`Info.plist:29-39`), used as the Supabase email
+  redirect `com.tetherhealthllc.tetherhealth://login-callback`
+  (`authRedirectUrl` in `lib/auth/auth_deep_link.dart`; Android
+  `android/app/src/main/AndroidManifest.xml:34-35`). It replaced the earlier
+  BreatheFree-named scheme. The same redirect is used for sign-up confirmation,
   confirmation resend and password recovery
   (`lib/auth/auth_gateway.dart:66-67,102,117,132-134`). Checklist: confirm the
   auth redirect uses a verified universal link on a Tether Health domain
@@ -331,7 +331,7 @@ None of these were started by any agent. Do them in roughly this order.
   until in-app deletion works against the production backend (D2; BE-047,
   TH-103, G-8). No URL is invented here.
 - **O-9 Supabase Auth redirect allow-list.** Confirm that
-  `io.breathefree.patient://login-callback` (or its G-4 replacement) is in the
+  `com.tetherhealthllc.tetherhealth://login-callback` (G-4) is in the
   production project's redirect URLs. Current setting Unknown.
 - **O-10 Build and upload.** On a Mac signed in to the LLC team, with the same
   release define file as Android (`docs/PLAY_RELEASE.md` section 3). Use
