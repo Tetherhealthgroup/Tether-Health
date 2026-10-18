@@ -10,9 +10,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'account/account_data_api_client.dart';
 import 'account/account_deletion_receipt_store.dart';
 import 'auth/account_controller.dart';
+import 'auth/auth_deep_link.dart';
 import 'auth/auth_gateway.dart';
 import 'auth/password_recovery_screen.dart';
-import 'auth/secure_session_storage.dart';
 import 'config/app_config.dart';
 import 'config/misconfigured_build_app.dart';
 import 'error/privacy_safe_error_reporter.dart';
@@ -85,9 +85,7 @@ Future<void> _bootstrap() async {
     await Supabase.initialize(
       url: config.supabaseUrl,
       publishableKey: config.supabaseAnonKey,
-      authOptions: FlutterAuthClientOptions(
-        localStorage: SecureSessionStorage(),
-      ),
+      authOptions: breatheFreeAuthClientOptions(),
     );
     final auth = SupabaseAuthGateway(Supabase.instance.client);
     account = AccountController(

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'auth_deep_link.dart';
+
 class AuthIdentity {
   const AuthIdentity({
     required this.id,
@@ -105,8 +107,7 @@ class SupabaseAuthGateway
   SupabaseAuthGateway(
     this._client, {
     String? emailRedirectTo,
-  }) : _emailRedirectTo = emailRedirectTo ??
-            (kIsWeb ? null : 'io.breathefree.patient://login-callback');
+  }) : _emailRedirectTo = emailRedirectTo ?? (kIsWeb ? null : authRedirectUrl);
 
   final SupabaseClient _client;
   final String? _emailRedirectTo;

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:breathefree_patient/auth/auth_deep_link.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -12,7 +13,8 @@ void main() {
         File('android/app/src/main/AndroidManifest.xml').readAsStringSync();
     final localConfig = File('supabase/config.toml').readAsStringSync();
 
-    expect(authGateway, contains(callback));
+    expect(authRedirectUrl, callback);
+    expect(authGateway, contains(': authRedirectUrl'));
     expect(authGateway, contains('emailRedirectTo: _emailRedirectTo'));
     expect(iosInfo, contains('<string>io.breathefree.patient</string>'));
     expect(
