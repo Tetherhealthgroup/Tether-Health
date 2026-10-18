@@ -103,3 +103,4 @@ if __name__ == '__main__':
     print(len(SCREENS), 'screens', len(edges), 'edges', len(e), 'errors', len(w), 'warnings')
     for x in e: print('ERR', x)
     for x in w: print('WARN', x)
+    raise SystemExit(1 if e else 0)
