@@ -79,19 +79,30 @@ depends on launch scope:
 - `today_offline` checklist subtitle: "Saved on this phone". **H31.** Depends on
   the TH-927 outbox, which stores the entry on the device until it syncs.
 - `today_offline` note: "Lessons not downloaded load when you’re back online."
-  **H31.** Implies that downloaded lessons are readable offline. Depends on
-  lesson downloads shipping at launch.
-- `learn_error`: "Check your connection. Downloaded lessons still work."
-  **H31.** Depends on lesson downloads shipping at launch.
+  **H31.** Implies that downloaded lessons can be read offline. This becomes
+  true with lesson downloads at launch (owner decision, TH-975). It still goes
+  to H31 for wording.
+- `learn_error` body text: "Check your connection. Downloaded lessons still
+  work." **H31.** Becomes true with TH-975. Still goes to H31 for wording.
+- `learn_error` button: "Open downloads". **H31.** Becomes true with TH-975.
+  Still goes to H31 for wording.
+- `learn` `body[2]` card text: "4 min read · 3:12 audio · downloaded".
+  **H31.** Becomes true with TH-975. Still goes to H31 for wording.
 - `learn_lesson` link "Save for offline" and its toast "Saved for offline".
-  **H31.** Depends on lesson downloads shipping at launch. Changing the label
-  would change `actions.json` and the action sweep, which this ticket must not
-  do. If downloads do not ship, the change is a spec (layout/action) decision.
+  **H31.** Becomes true with TH-975. Still goes to H31 for wording.
 - `today_loading` rows 20 and 21 above: these replace the "always available"
   and "on-device cache" claims. **H31.**
 - Not copy: the `today_offline` screen id, route and state name, and the
   banner style kind `offline` (also used on `records_review`, whose text is
   "2 items need your review.").
+
+Local-storage claims outside P-22's literal scope. These don't claim the
+app works offline, but they do describe on-device storage, so they are
+**flagged for H31**:
+- `progress_error` `body[2]`: "Your data is safe on this phone. Try again in a
+  moment." **H31.**
+- `auth_verify` `body[3]`: "Your plan is saved on this phone while you wait.
+  Nothing is lost if you close the app." **H31.**
 
 Every remaining standalone "30" in the spec, with the reason it stays:
 - `auth_session`, `auth_session_apple`, `auth_session_google`: "sessions end
@@ -111,14 +122,18 @@ Every remaining standalone "30" in the spec, with the reason it stays:
 
 ## Notes for H31 (clinical lead and counsel)
 
-- **No path to delete a program's data after leaving (needs a spec
-  decision).** The new `account_leave` copy says the data is "kept until you
-  delete it or delete your account". Today the only deletion choices are
-  "Delete BreatheFree data now" on `account_leave` itself and full account
-  deletion. Once someone has left a program, no screen lets them delete that
-  program's data later, so "until you delete it" points to a path the spec
-  does not have. A later-delete path, or different wording, needs an owner
-  decision. Tracked to TH-914 and the owner.
+- **Deleting a program's data after leaving (owner decision, TH-976).** The
+  owner decided to add a "Programs you left" screen (Account → Programs) with
+  a per-program "Delete data". It uses the delete-now route from TH-916.
+  The P-08 retention copy (rows 16–19: "Keep your data or delete it now" on
+  `program_settings` and `program_settings_sf`, and "Kept until you delete it
+  or delete your account" on `account_leave`) becomes true once TH-976 and
+  TH-914 ship. Until then, the only per-program deletion is "delete now" on
+  `account_leave`, plus full account deletion.
+- **`account_leave` option 2 label (pre-existing, for TH-976).** The second
+  option always reads "Delete BreatheFree data now", even when the sheet is
+  opened from `program_settings_sf` (ScrollFree). This predates TH-942 and is
+  not changed here.
 - **`account_deleted`: "Backups are purged within 30 days."** Unchanged.
   Counsel must confirm it against the actual backup configuration (retention
   of database backups and point-in-time recovery) before release, or reword it.
