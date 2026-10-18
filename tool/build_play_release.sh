@@ -250,7 +250,7 @@ read_package_with_aapt2() {
 # Fails (exit 1) if neither bundletool nor aapt2 is installed.
 require_manifest_reader() {
   if ! command -v bundletool >/dev/null 2>&1 && ! command -v aapt2 >/dev/null 2>&1; then
-    echo "FAIL: neither bundletool nor aapt2 is installed; cannot read the package and versionCode from the AAB. Install one and re-run with --verify-aab=<path> before uploading." >&2
+    echo "FAIL: neither bundletool nor aapt2 is installed; cannot read versionCode from the AAB. Install one and re-run with --verify-aab=<path> before uploading." >&2
     exit 1
   fi
 }
