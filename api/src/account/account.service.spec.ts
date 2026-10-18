@@ -1,3 +1,4 @@
+import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { createClient } from "@supabase/supabase-js";
 import type { AuthUser } from "../auth/auth-user";
@@ -230,5 +231,174 @@ describe("AccountService", () => {
     expect(rpc).toHaveBeenCalledTimes(4);
     expect(deleteAvatarObjects).toHaveBeenCalledTimes(2);
     expect(deleteAuthIdentity).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("AccountService logging", () => {
+  const SYNTHETIC_EMAIL = "synthetic.patient@example.test";
+  const SYNTHETIC_NOTE = "SYNTHETIC-HEALTH-NOTE-7f3a";
+  const UUID_LINE =
+    /^account_deletion_failed requestId=[0-9a-f-]{36} status=(avatar_cleanup_failed|auth_identity_failed)$/;
+  const methods = [
+    "log",
+    "error",
+    "warn",
+    "debug",
+    "verbose",
+    "fatal",
+  ] as const;
+  let spies: Record<(typeof methods)[number], jest.SpyInstance>;
+
+  const captured = (): string =>
+    JSON.stringify(methods.map((m): unknown[] => spies[m].mock.calls));
+  const totalLogCalls = (): number =>
+    methods.reduce((n, m) => n + spies[m].mock.calls.length, 0);
+  const recentUser = (): AuthUser => user(Math.floor(Date.now() / 1000));
+  const expectNoLeak = (): void => {
+    for (const value of [
+      user(0).id,
+      "caller-token",
+      SYNTHETIC_EMAIL,
+      SYNTHETIC_NOTE,
+    ]) {
+      expect(captured()).not.toContain(value);
+    }
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    deleteAuthIdentity.mockResolvedValue(undefined);
+    deleteAvatarObjects.mockResolvedValue(0);
+    spies = Object.fromEntries(
+      methods.map((m) => [
+        m,
+        jest.spyOn(Logger.prototype, m).mockImplementation(() => undefined),
+      ]),
+    ) as typeof spies;
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it("logs only a request id and status when avatar cleanup fails", async () => {
+    const rpc = jest.fn().mockResolvedValue({ data: true, error: null });
+    mockedCreateClient.mockReturnValue({ rpc } as never);
+    deleteAvatarObjects.mockRejectedValueOnce(
+      new Error(`storage failed ${SYNTHETIC_EMAIL} ${SYNTHETIC_NOTE}`),
+    );
+
+    await expect(
+      new AccountService(config, admin).deleteData(recentUser(), "DELETE"),
+    ).rejects.toMatchObject({ status: 502 });
+
+    expect(spies.error).toHaveBeenCalledTimes(1);
+    expect(spies.error.mock.calls[0]).toHaveLength(1);
+    const [line] = spies.error.mock.calls[0] as [string];
+    expect(line).toMatch(UUID_LINE);
+    expect(line.endsWith("status=avatar_cleanup_failed")).toBe(true);
+    expectNoLeak();
+  });
+
+  it("logs only a request id and status when Auth identity deletion fails", async () => {
+    const rpc = jest
+      .fn()
+      .mockResolvedValueOnce({ data: true, error: null })
+      .mockResolvedValueOnce({
+        data: { profiles: 1, quit_plans: 1, program_data: 0 },
+        error: null,
+      });
+    mockedCreateClient.mockReturnValue({ rpc } as never);
+    deleteAuthIdentity.mockRejectedValueOnce(
+      new Error(`admin failed ${SYNTHETIC_EMAIL} ${SYNTHETIC_NOTE}`),
+    );
+
+    await expect(
+      new AccountService(config, admin).deleteData(recentUser(), "DELETE"),
+    ).rejects.toMatchObject({ status: 502 });
+
+    expect(spies.error).toHaveBeenCalledTimes(1);
+    expect(spies.error.mock.calls[0]).toHaveLength(1);
+    const [line] = spies.error.mock.calls[0] as [string];
+    expect(line).toMatch(UUID_LINE);
+    expect(line.endsWith("status=auth_identity_failed")).toBe(true);
+    expectNoLeak();
+  });
+
+  it("logs a single completion line without user id or token on success", async () => {
+    const rpc = jest.fn((name: string) =>
+      Promise.resolve(
+        name === "begin_account_deletion"
+          ? { data: true, error: null }
+          : {
+              data: { profiles: 1, quit_plans: 1, program_data: 2 },
+              error: null,
+            },
+      ),
+    );
+    mockedCreateClient.mockReturnValue({ rpc } as never);
+
+    const result = await new AccountService(config, admin).deleteData(
+      recentUser(),
+      "DELETE",
+    );
+
+    expect(spies.log.mock.calls).toEqual([
+      [`account_deleted requestId=${result.requestId} status=completed`],
+    ]);
+    expect(totalLogCalls()).toBe(1);
+    expectNoLeak();
+  });
+
+  it("does not log the database error message when app-data deletion fails", async () => {
+    const rpc = jest
+      .fn()
+      .mockResolvedValueOnce({ data: true, error: null })
+      .mockResolvedValueOnce({
+        data: null,
+        error: { message: SYNTHETIC_NOTE },
+      });
+    mockedCreateClient.mockReturnValue({ rpc } as never);
+
+    await expect(
+      new AccountService(config, admin).deleteData(recentUser(), "DELETE"),
+    ).rejects.toMatchObject({ status: 502 });
+
+    expect(totalLogCalls()).toBe(0);
+    expectNoLeak();
+  });
+
+  it("makes no logger calls when exporting data", async () => {
+    const profileSingle = jest.fn().mockResolvedValue({
+      data: { id: user(0).id, display_name: "Synthetic Name" },
+      error: null,
+    });
+    const planSingle = jest.fn().mockResolvedValue({ data: null, error: null });
+    const programReturns = jest.fn().mockResolvedValue({
+      data: [
+        {
+          program_id: "steady",
+          payload: { note: SYNTHETIC_NOTE },
+          revision: 1,
+        },
+      ],
+      error: null,
+    });
+    const from = jest
+      .fn()
+      .mockReturnValueOnce({
+        select: () => ({ eq: () => ({ single: profileSingle }) }),
+      })
+      .mockReturnValueOnce({
+        select: () => ({ eq: () => ({ maybeSingle: planSingle }) }),
+      })
+      .mockReturnValueOnce({
+        select: () => ({ eq: () => ({ returns: programReturns }) }),
+      });
+    mockedCreateClient.mockReturnValue({ from } as never);
+
+    await new AccountService(config, admin).export(recentUser());
+
+    expect(totalLogCalls()).toBe(0);
   });
 });

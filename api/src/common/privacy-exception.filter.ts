@@ -35,7 +35,7 @@ export class PrivacyExceptionFilter implements ExceptionFilter {
     const request = context.getRequest<FastifyRequest>();
     const reply = context.getResponse<FastifyReply>();
     const status = statusOf(exception);
-    const route = request.routeOptions.url ?? request.url.split("?", 1)[0];
+    const route = request.routeOptions.url ?? "unmatched";
     const errorType =
       exception instanceof Error ? exception.constructor.name : "UnknownError";
 
