@@ -2,10 +2,10 @@
 # Canonical Dart format check. Never rewrites files.
 # Checks every .dart file under the repo root, found by walking the filesystem
 # (tracked and untracked alike), except those under top-level third_party/,
-# tether_ui/ (generated package, checked by its own CI job) and build/
-# (anchored to the repo root, so first-party dirs of the same name deeper in
-# the tree are still checked) and hidden directories at any depth,
-# such as .dart_tool/.
+# tether_ui/ and build/ (anchored to the repo root, so first-party dirs of the
+# same name deeper in the tree are still checked) and hidden directories at any
+# depth, such as .dart_tool/. tether_ui/ is generated code, not dart-formatted;
+# the CI regeneration diff check keeps it identical to the generator output.
 # Requires `flutter pub get` to have run: without .dart_tool/package_config.json
 # dart format cannot resolve the language version and reports false changes, so
 # the script exits 2 in that case.

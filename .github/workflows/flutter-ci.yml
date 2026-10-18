@@ -115,7 +115,7 @@ jobs:
       - name: Spec validator (no loose ends)
         working-directory: tether_ui/generator
         run: python3 validate.py
-      - name: Regeneration is diff-clean (out of place)
+      - name: Regeneration is diff-clean (in place, on a scratch copy)
         # Regenerates a scratch copy in place (generator inside the output
         # tree, as in the repo) and compares it with the checkout. Runs
         # before pub get, so neither tree has .dart_tool/ or pubspec.lock.
