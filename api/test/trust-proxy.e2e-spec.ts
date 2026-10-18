@@ -9,8 +9,8 @@ import { configureApp } from "../src/configure-app";
 import { buildFastifyAdapterOptions } from "../src/config/fastify-adapter-options";
 
 const LIMIT = 10; // matches RATE_LIMIT_MAX in ./trust-proxy-env
-const PROXY_ADDRESS = "10.0.0.1"; // socket peer: the single trusted proxy
-const PROXY_CIDRS = "10.0.0.0/24"; // allowlist containing PROXY_ADDRESS
+const PROXY_ADDRESS = "192.0.2.1"; // socket peer: the single trusted proxy
+const PROXY_CIDRS = "192.0.2.0/24"; // allowlist containing PROXY_ADDRESS
 const DIRECT_ADDRESS = "203.0.113.50"; // socket peer outside the allowlist
 
 // Uses the same builder as main.ts, so the e2e wiring cannot drift from it.
