@@ -6,14 +6,12 @@ import {
 } from "@nestjs/platform-fastify";
 import { AppModule } from "./app.module";
 import { configureApp } from "./configure-app";
+import { buildFastifyAdapterOptions } from "./config/fastify-adapter-options";
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({
-      bodyLimit: Number(process.env.REQUEST_BODY_LIMIT_BYTES ?? 65536),
-      trustProxy: false,
-    }),
+    new FastifyAdapter(buildFastifyAdapterOptions()),
   );
   await configureApp(app);
   app.enableShutdownHooks();
