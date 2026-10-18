@@ -3,6 +3,8 @@
 App ID: `com.TetherHealthLLC.tetherhealth`. Agents and CI never sign, upload or
 publish; every step below is performed by the owner.
 
+> **Do not build for Play until TH-941 sets applicationId to com.TetherHealthLLC.tetherhealth; this tree still builds com.breathefree.breathefree_patient.**
+
 ## 1. Create the upload key (once, outside the repo)
 
 > **The first AAB is already uploaded** (1.0.0 (1), 2026-10-12). Play already
@@ -57,10 +59,27 @@ Create a JSON file outside the repo, for example
 }
 ```
 
-Run `chmod 600` on this file. The script rejects a `SUPABASE_ANON_KEY` that
-contains `service_role`, starts with `sb_secret_`, or is a JWT whose role is not
-`anon`; the app applies the same check at startup. A release build refuses to
-start (shows a configuration message) if either URL is missing or not https. Which production API host to use depends on decision
+Run `chmod 600` on this file. Before any build step the script checks it and
+stops if any rule fails:
+
+- The file holds only the three keys above (`SUPABASE_URL`, `API_BASE_URL`,
+  `SUPABASE_ANON_KEY`). Any other top-level key is rejected, whatever its
+  value; keep server-side keys out of this file entirely.
+- `SUPABASE_ANON_KEY` must be a publishable key (`sb_publishable_` followed by
+  letters, digits, `_` or `-`) or an anon JWT (three segments whose payload has
+  role `anon`), with no surrounding spaces or prefix. Anything else, including
+  `sb_secret_` and `service_role` keys, is rejected.
+- Both URLs must be absolute `https` URLs, and a `.invalid` placeholder host
+  (as in `config/dart_defines.example.json`) is rejected.
+- `NaN`, `Infinity` and `-Infinity` are not accepted as JSON.
+- Error messages name the failing key (or its position) and never print a
+  value from the file.
+
+The app applies the same `SUPABASE_ANON_KEY` rule at startup, and a release
+build refuses to start (shows a configuration message) if either URL is
+missing, not https or a `.invalid` host. Debug runs also reject placeholder
+anon keys: use the anon key from a local `supabase start` or an
+`sb_publishable_` key. Which production API host to use depends on decision
 D2 (the app currently calls the NestJS `api/`); confirm before building.
 D2 was decided 2026-10-12 (production is `Tether-Health-Backend`), but the app
 still calls `api/`, so the app has not yet been moved onto the decided backend.
