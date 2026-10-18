@@ -1,0 +1,97 @@
+{
+  "id": "bf_stepdown",
+  "name": "Step-down schedule",
+  "route": "/p/bf/plan/reduce",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Step-down schedule",
+    "left": "back",
+    "pill": "Plan 2 of 3"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Cut back at your pace.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "From your baseline of 15 a day. Adjust any week.",
+      "tone": "muted"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "This week",
+          "15 → 12 a day"
+        ],
+        [
+          "Week 2",
+          "9 a day"
+        ],
+        [
+          "Week 3",
+          "5 a day"
+        ],
+        [
+          "Week 4",
+          "2 a day"
+        ],
+        [
+          "Quit day · Sep 18",
+          "0"
+        ]
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "Reducing works best paired with a quit date. Ask your clinician about nicotine replacement while cutting down."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save schedule",
+      "action": {
+        "type": "push",
+        "to": "bf_support"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save schedule",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_support"
+      },
+      "summary": "push → bf_support"
+    }
+  ]
+}

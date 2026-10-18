@@ -1,0 +1,167 @@
+{
+  "id": "learn_lesson",
+  "name": "Lesson",
+  "route": "/learn/:lesson",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Lesson",
+    "left": "back",
+    "pill": "4 min"
+  },
+  "body": [
+    {
+      "t": "progtag",
+      "program": "bf",
+      "extra": "For quit day"
+    },
+    {
+      "t": "title",
+      "text": "Cravings: what to expect today",
+      "size": "l"
+    },
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Audio · 3:12",
+      "title": "Listen instead",
+      "children": [
+        {
+          "t": "buttons",
+          "items": [
+            {
+              "t": "button",
+              "label": "Play",
+              "action": {
+                "type": "toast",
+                "value": "Playing audio"
+              },
+              "variant": "lime",
+              "arrow": false,
+              "small": true
+            },
+            {
+              "t": "button",
+              "label": "Transcript",
+              "action": {
+                "type": "toast",
+                "value": "Transcript opened"
+              },
+              "variant": "ghostdark",
+              "arrow": false,
+              "small": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Most cravings peak and fade within 3–5 minutes. Knowing that makes them easier to ride out. Today, plan what you’ll do in the first 5 minutes of each craving.",
+      "tone": "body"
+    },
+    {
+      "t": "quote",
+      "text": "This feeling will pass.",
+      "caption": "From your plan"
+    },
+    {
+      "t": "text",
+      "text": "Clinically reviewed · content v3.2 · Aug 2026",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Mark complete",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/lessons",
+        "then": {
+          "type": "toast",
+          "value": "Lesson complete",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Save for offline",
+      "action": {
+        "type": "toast",
+        "value": "Saved for offline"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Play",
+      "path": "body[2].children[0].items[0]",
+      "action": {
+        "type": "toast",
+        "value": "Playing audio"
+      },
+      "summary": "toast “Playing audio”"
+    },
+    {
+      "element": "Transcript",
+      "path": "body[2].children[0].items[1]",
+      "action": {
+        "type": "toast",
+        "value": "Transcript opened"
+      },
+      "summary": "toast “Transcript opened”"
+    },
+    {
+      "element": "Mark complete",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/lessons",
+        "then": {
+          "type": "toast",
+          "value": "Lesson complete",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "summary": "POST /v1/records/lessons then toast “Lesson complete” then back"
+    },
+    {
+      "element": "Save for offline",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "Saved for offline"
+      },
+      "summary": "toast “Saved for offline”"
+    }
+  ]
+}

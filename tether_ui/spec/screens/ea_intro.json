@@ -1,0 +1,111 @@
+{
+  "id": "ea_intro",
+  "name": "Ease intro",
+  "route": "/p/ea",
+  "flow": "ea",
+  "program": "ea",
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Entry from Choose programs, Catalog or a Learn-only row.",
+  "header": {
+    "t": "header",
+    "title": "Ease",
+    "left": "back",
+    "pill": "~2 min/day"
+  },
+  "body": [
+    {
+      "t": "progtag",
+      "program": "ea",
+      "extra": "Mental & behavioral health"
+    },
+    {
+      "t": "title",
+      "text": "Support for how you feel.",
+      "size": "l"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Mood check-in",
+          "30 seconds"
+        ],
+        [
+          "Screening",
+          "optional, private"
+        ],
+        [
+          "Help now",
+          "988 always one tap away"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Set up Ease",
+      "action": {
+        "type": "push",
+        "to": "ea_q1"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Add as Learn only",
+      "action": {
+        "type": "toast",
+        "value": "Ease added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Set up Ease",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "ea_q1"
+      },
+      "summary": "push → ea_q1"
+    },
+    {
+      "element": "Add as Learn only",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "Ease added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "summary": "toast “Ease added as Learn only” then tab → plans"
+    }
+  ]
+}

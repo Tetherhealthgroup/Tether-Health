@@ -1,0 +1,230 @@
+{
+  "id": "sf_home",
+  "name": "ScrollFree home",
+  "route": "/p/sf/home",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "ScrollFree",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Yesterday",
+      "children": [
+        {
+          "t": "big",
+          "value": "2h 10m",
+          "caption": "Goal 90 min · down from 3h"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "Urge to scroll?",
+      "text": "Take 60 seconds first",
+      "cta": {
+        "t": "button",
+        "label": "Pause 60",
+        "action": {
+          "type": "push",
+          "to": "sf_pause"
+        },
+        "variant": "rescue",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Today’s step",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Charge your phone outside the bedroom",
+              "sub": "Tonight · bedtime window 10 PM"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "This week",
+          "sub": "5 of 7 phone-free nights",
+          "action": {
+            "type": "push",
+            "to": "sf_week"
+          }
+        },
+        {
+          "label": "Had a long scroll?",
+          "sub": "Reflect, nothing resets",
+          "action": {
+            "type": "push",
+            "to": "sf_slip"
+          }
+        },
+        {
+          "label": "Goal & windows",
+          "sub": "90 min · bedtime",
+          "action": {
+            "type": "push",
+            "to": "sf_goal"
+          }
+        },
+        {
+          "label": "Buddy",
+          "sub": "Sam · weekly message",
+          "action": {
+            "type": "push",
+            "to": "sf_buddy"
+          }
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Pause 60",
+      "path": "body[1].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_pause"
+      },
+      "summary": "push → sf_pause"
+    },
+    {
+      "element": "This week",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_week"
+      },
+      "summary": "push → sf_week"
+    },
+    {
+      "element": "Had a long scroll?",
+      "path": "body[3].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "sf_slip"
+      },
+      "summary": "push → sf_slip"
+    },
+    {
+      "element": "Goal & windows",
+      "path": "body[3].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "sf_goal"
+      },
+      "summary": "push → sf_goal"
+    },
+    {
+      "element": "Buddy",
+      "path": "body[3].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "sf_buddy"
+      },
+      "summary": "push → sf_buddy"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[3].rows[4]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

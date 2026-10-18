@@ -1,0 +1,135 @@
+{
+  "id": "checkin",
+  "name": "Daily check-in",
+  "route": "/check-in",
+  "flow": "today",
+  "program": null,
+  "phase": "daily",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Each Focus program adds at most 2 questions. Any self-harm signal routes to Crisis.",
+  "header": null,
+  "body": [
+    {
+      "t": "eyebrow",
+      "text": "Shared · asked once"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "Low",
+        "Not great",
+        "Okay",
+        "Good",
+        "Great"
+      ],
+      "selected": "Okay",
+      "label": "How do you feel today?",
+      "key": "how_do_you_feel_today"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "Low",
+        "Some",
+        "High"
+      ],
+      "selected": "High",
+      "label": "Stress today",
+      "key": "stress_today"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "bf",
+      "title": "Since your last check-in, did you smoke?",
+      "text": "Before quit day this is expected, not a setback.",
+      "accent": "bf",
+      "children": [
+        {
+          "t": "chips",
+          "options": [
+            "No",
+            "A puff",
+            "One or more",
+            "Skip"
+          ],
+          "selected": [
+            "One or more"
+          ],
+          "multi": false,
+          "key": "value"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "sf",
+      "title": "How did you feel after scrolling yesterday?",
+      "accent": "sf",
+      "children": [
+        {
+          "t": "chips",
+          "options": [
+            "Better",
+            "Same",
+            "Drained",
+            "Skip"
+          ],
+          "selected": [
+            "Drained"
+          ],
+          "multi": false,
+          "key": "value_2"
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save check-in",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/check-ins",
+        "then": {
+          "type": "replace",
+          "to": "checkin_done"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "text",
+      "text": "Private · works offline · skip anything",
+      "tone": "small",
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": "Today",
+  "api": [
+    "POST /v1/records/check-ins"
+  ],
+  "actions": [
+    {
+      "element": "Save check-in",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/check-ins",
+        "then": {
+          "type": "replace",
+          "to": "checkin_done"
+        }
+      },
+      "summary": "POST /v1/records/check-ins then replace → checkin_done"
+    }
+  ]
+}

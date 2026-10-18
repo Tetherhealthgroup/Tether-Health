@@ -1,0 +1,208 @@
+{
+  "id": "support_empty",
+  "name": "Support · empty",
+  "route": "/support?state=empty",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": "support",
+  "variantOf": "support",
+  "state": "empty",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Support",
+    "left": "none",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Free & confidential",
+      "title": "Quitline counselor",
+      "cta": {
+        "t": "button",
+        "label": "Call",
+        "action": {
+          "type": "call",
+          "value": "1-800-784-8669",
+          "label": "Call 1-800-QUIT-NOW"
+        },
+        "variant": "lime",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Your people",
+      "title": "No one added yet",
+      "text": "A friend or family member gets a short help phrase from you, only when you choose to send it.",
+      "cta": {
+        "t": "button",
+        "label": "Add",
+        "action": {
+          "type": "push",
+          "to": "support_add_person"
+        },
+        "variant": "primary",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Care team",
+      "title": "Not connected",
+      "text": "Connect a clinic to share summaries you approve.",
+      "cta": {
+        "t": "button",
+        "label": "Connect",
+        "action": {
+          "type": "push",
+          "to": "support_connect"
+        },
+        "variant": "secondary",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "emergency",
+      "text": "Thoughts of harming yourself? Call or text 988. Emergency: 911.",
+      "actions": [
+        {
+          "t": "button",
+          "label": "Call or text 988",
+          "action": {
+            "type": "push",
+            "to": "crisis"
+          },
+          "variant": "danger",
+          "arrow": false,
+          "small": true
+        },
+        {
+          "t": "button",
+          "label": "Call 911",
+          "action": {
+            "type": "call",
+            "value": "911",
+            "label": "911"
+          },
+          "variant": "secondary",
+          "arrow": false,
+          "small": true
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Call",
+      "path": "body[0].cta[0]",
+      "action": {
+        "type": "call",
+        "value": "1-800-784-8669",
+        "label": "Call 1-800-QUIT-NOW"
+      },
+      "summary": "call 1-800-784-8669"
+    },
+    {
+      "element": "Add",
+      "path": "body[1].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "support_add_person"
+      },
+      "summary": "push → support_add_person"
+    },
+    {
+      "element": "Connect",
+      "path": "body[2].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "support_connect"
+      },
+      "summary": "push → support_connect"
+    },
+    {
+      "element": "Call or text 988",
+      "path": "body[3].actions[0]",
+      "action": {
+        "type": "push",
+        "to": "crisis"
+      },
+      "summary": "push → crisis"
+    },
+    {
+      "element": "Call 911",
+      "path": "body[3].actions[1]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Plans",
+      "path": "tabbar.plans",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    }
+  ]
+}

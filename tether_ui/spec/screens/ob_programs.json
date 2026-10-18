@@ -1,0 +1,138 @@
+{
+  "id": "ob_programs",
+  "name": "Choose programs",
+  "route": "/onboarding/programs",
+  "flow": "onboarding",
+  "program": null,
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Multi-select. Continue is disabled with 0 selected (\"Choose at least one program\").",
+  "header": {
+    "t": "header",
+    "title": "Choose programs",
+    "left": "back",
+    "pill": "1 of 5"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 1,
+      "total": 5
+    },
+    {
+      "t": "title",
+      "text": "What would you like support with?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Choose any. You can add, pause or leave a program anytime.",
+      "tone": "muted"
+    },
+    {
+      "t": "tiles",
+      "items": [
+        {
+          "label": "BreatheFree",
+          "sub": "Tobacco & nicotine",
+          "program": "bf",
+          "selected": true
+        },
+        {
+          "label": "ScrollFree",
+          "sub": "Social media use",
+          "program": "sf",
+          "selected": true
+        },
+        {
+          "label": "ClearAir",
+          "sub": "Respiratory health",
+          "program": "ca"
+        },
+        {
+          "label": "Heartwise",
+          "sub": "Cardiovascular health",
+          "program": "hw"
+        },
+        {
+          "label": "Steady",
+          "sub": "Diabetes & metabolic health",
+          "program": "st"
+        },
+        {
+          "label": "Ease",
+          "sub": "Mental & behavioral health",
+          "program": "ea"
+        },
+        {
+          "label": "Nourish",
+          "sub": "Obesity & nutrition",
+          "program": "nu"
+        },
+        {
+          "label": "Stride",
+          "sub": "Healthy aging",
+          "program": "sd"
+        }
+      ],
+      "cols": 2
+    },
+    {
+      "t": "link",
+      "label": "See all 11 programs",
+      "action": {
+        "type": "push",
+        "to": "catalog"
+      },
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue with 2 programs",
+      "action": {
+        "type": "push",
+        "to": "ob_focus"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "See all 11 programs",
+      "path": "body[4]",
+      "action": {
+        "type": "push",
+        "to": "catalog"
+      },
+      "summary": "push → catalog"
+    },
+    {
+      "element": "Continue with 2 programs",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "ob_focus"
+      },
+      "summary": "push → ob_focus"
+    }
+  ]
+}

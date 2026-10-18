@@ -1,0 +1,213 @@
+{
+  "id": "plans",
+  "name": "My plans",
+  "route": "/plans",
+  "flow": "plans",
+  "program": null,
+  "phase": "plan",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "My plans",
+    "left": "none",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "list",
+      "title": "Focus · 2 of 2",
+      "rows": [
+        {
+          "label": "BreatheFree",
+          "sub": "Quit date · Fri, Aug 28",
+          "action": {
+            "type": "push",
+            "to": "bf_home"
+          },
+          "lead": {
+            "program": "bf"
+          },
+          "pill": "Focus"
+        },
+        {
+          "label": "ScrollFree",
+          "sub": "90 min/day · bedtime 10 PM–7 AM",
+          "action": {
+            "type": "push",
+            "to": "sf_home"
+          },
+          "lead": {
+            "program": "sf"
+          },
+          "pill": "Focus"
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Learn only",
+      "rows": [
+        {
+          "label": "ClearAir",
+          "sub": "Learn only · no plan yet",
+          "action": {
+            "type": "push",
+            "to": "ca_intro"
+          },
+          "lead": {
+            "program": "ca"
+          },
+          "pill": "Learn"
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Manage",
+      "rows": [
+        {
+          "label": "Medication center",
+          "sub": "BreatheFree · nicotine patch",
+          "action": {
+            "type": "push",
+            "to": "bf_meds"
+          }
+        },
+        {
+          "label": "Programs & sharing",
+          "sub": "Status, consent, data",
+          "action": {
+            "type": "push",
+            "to": "account_programs"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Add a program",
+      "action": {
+        "type": "push",
+        "to": "catalog"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "BreatheFree",
+      "path": "body[0].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_home"
+      },
+      "summary": "push → bf_home"
+    },
+    {
+      "element": "ScrollFree",
+      "path": "body[0].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "sf_home"
+      },
+      "summary": "push → sf_home"
+    },
+    {
+      "element": "ClearAir",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "ca_intro"
+      },
+      "summary": "push → ca_intro"
+    },
+    {
+      "element": "Medication center",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_meds"
+      },
+      "summary": "push → bf_meds"
+    },
+    {
+      "element": "Programs & sharing",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "account_programs"
+      },
+      "summary": "push → account_programs"
+    },
+    {
+      "element": "Add a program",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "catalog"
+      },
+      "summary": "push → catalog"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

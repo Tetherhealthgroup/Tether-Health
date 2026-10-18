@@ -1,0 +1,206 @@
+{
+  "id": "bf_home_quitday",
+  "name": "BreatheFree · quit day",
+  "route": "/p/bf/home?state=quit-day",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "milestone",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": "bf_home",
+  "state": "quit day",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "BreatheFree",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "eyebrow",
+      "text": "Quit day · Aug 28"
+    },
+    {
+      "t": "title",
+      "text": "Keep today simple.",
+      "size": "m"
+    },
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Since your quit time",
+      "children": [
+        {
+          "t": "big",
+          "value": "2h 41m",
+          "caption": "Started 7:00 AM · Pacific"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "I have a craving",
+      "text": "One tap · no typing · offline",
+      "cta": {
+        "t": "button",
+        "label": "Rescue",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "variant": "rescue",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "title": "I smoked or had a slip",
+      "text": "Your progress will not be erased",
+      "action": {
+        "type": "push",
+        "to": "bf_slip"
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Next best step",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Water, then a 5-minute walk",
+              "sub": "From your trigger plan"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Morning check-in",
+          "action": {
+            "type": "sheet",
+            "to": "checkin"
+          }
+        },
+        {
+          "label": "Medication center",
+          "sub": "Patch · taken 8:07 AM",
+          "action": {
+            "type": "push",
+            "to": "bf_meds"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Rescue",
+      "path": "body[3].cta[0]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
+    },
+    {
+      "element": "I smoked or had a slip",
+      "path": "body[4]",
+      "action": {
+        "type": "push",
+        "to": "bf_slip"
+      },
+      "summary": "push → bf_slip"
+    },
+    {
+      "element": "Morning check-in",
+      "path": "body[6].rows[0]",
+      "action": {
+        "type": "sheet",
+        "to": "checkin"
+      },
+      "summary": "sheet → checkin"
+    },
+    {
+      "element": "Medication center",
+      "path": "body[6].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "bf_meds"
+      },
+      "summary": "push → bf_meds"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

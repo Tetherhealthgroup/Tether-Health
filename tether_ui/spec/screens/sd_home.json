@@ -1,0 +1,220 @@
+{
+  "id": "sd_home",
+  "name": "Stride home",
+  "route": "/p/sd/home",
+  "flow": "sd",
+  "program": "sd",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Stride",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Today · Wednesday",
+      "title": "Strength (chair) · 10 min",
+      "cta": {
+        "t": "button",
+        "label": "Start",
+        "action": {
+          "type": "push",
+          "to": "sd_session"
+        },
+        "variant": "lime",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "urgent",
+      "title": "I fell",
+      "text": "Get help or log a fall",
+      "action": {
+        "type": "push",
+        "to": "sd_fell"
+      }
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Home safety checklist",
+          "sub": "2 of 5 done",
+          "action": {
+            "type": "push",
+            "to": "sd_safety"
+          }
+        },
+        {
+          "label": "Caregiver access",
+          "sub": "Rosa · Stride only",
+          "action": {
+            "type": "push",
+            "to": "sd_caregiver"
+          }
+        },
+        {
+          "label": "Movement plan",
+          "sub": "3 sessions a week",
+          "action": {
+            "type": "push",
+            "to": "sd_plan"
+          }
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    },
+    {
+      "t": "stats",
+      "items": [
+        {
+          "label": "This week",
+          "value": "1 of 3",
+          "sub": "sessions"
+        },
+        {
+          "label": "Falls logged",
+          "value": "0",
+          "sub": "last 30 days"
+        }
+      ],
+      "cols": 2
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Start",
+      "path": "body[0].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "sd_session"
+      },
+      "summary": "push → sd_session"
+    },
+    {
+      "element": "I fell",
+      "path": "body[1]",
+      "action": {
+        "type": "push",
+        "to": "sd_fell"
+      },
+      "summary": "push → sd_fell"
+    },
+    {
+      "element": "Home safety checklist",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "sd_safety"
+      },
+      "summary": "push → sd_safety"
+    },
+    {
+      "element": "Caregiver access",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "sd_caregiver"
+      },
+      "summary": "push → sd_caregiver"
+    },
+    {
+      "element": "Movement plan",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "sd_plan"
+      },
+      "summary": "push → sd_plan"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[2].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

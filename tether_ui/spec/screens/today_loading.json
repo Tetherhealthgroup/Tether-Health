@@ -1,0 +1,121 @@
+{
+  "id": "today_loading",
+  "name": "Today · loading",
+  "route": "/today?state=loading",
+  "flow": "today",
+  "program": null,
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "today",
+  "variantOf": "today",
+  "state": "loading",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Today",
+    "left": "logo",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "skeleton",
+      "lines": 1
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "Craving or urge?",
+      "text": "Always available",
+      "cta": {
+        "t": "button",
+        "label": "Rescue",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "variant": "rescue",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "skeleton",
+      "lines": 3
+    },
+    {
+      "t": "skeleton",
+      "lines": 2
+    },
+    {
+      "t": "text",
+      "text": "Rescue renders first from the on-device cache, before anything else loads.",
+      "tone": "small"
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Rescue",
+      "path": "body[1].cta[0]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
+    },
+    {
+      "element": "Tab · Plans",
+      "path": "tabbar.plans",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

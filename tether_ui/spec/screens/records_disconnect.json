@@ -1,0 +1,102 @@
+{
+  "id": "records_disconnect",
+  "name": "Disconnect source",
+  "route": "/records/source/disconnect",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": null,
+  "body": [
+    {
+      "t": "title",
+      "text": "Disconnect Patel Family Medicine?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Tether stops reading new records and revokes its access token.",
+      "tone": "muted"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Keep imported data",
+          "sub": "Marked “from Patel Family Medicine”"
+        },
+        {
+          "label": "Delete data imported from this source",
+          "sub": "21 items removed from your programs"
+        }
+      ],
+      "selected": 0,
+      "key": "keep"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Disconnect source",
+      "action": {
+        "type": "submit",
+        "api": "DELETE /v1/records/fhir/sources/:id",
+        "then": {
+          "type": "toast",
+          "value": "Disconnected",
+          "then": {
+            "type": "popto",
+            "to": "records_hub"
+          }
+        }
+      },
+      "variant": "danger",
+      "arrow": false
+    },
+    {
+      "t": "button",
+      "label": "Cancel",
+      "action": {
+        "type": "close"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": "Patel Family Medicine",
+  "api": [],
+  "actions": [
+    {
+      "element": "Disconnect source",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "DELETE /v1/records/fhir/sources/:id",
+        "then": {
+          "type": "toast",
+          "value": "Disconnected",
+          "then": {
+            "type": "popto",
+            "to": "records_hub"
+          }
+        }
+      },
+      "summary": "DELETE /v1/records/fhir/sources/:id then toast “Disconnected” then popto → records_hub"
+    },
+    {
+      "element": "Cancel",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}

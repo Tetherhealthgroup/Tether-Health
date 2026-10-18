@@ -1,0 +1,103 @@
+{
+  "id": "sf_q2",
+  "name": "Baseline: triggers",
+  "route": "/p/sf/onboarding/2",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your triggers",
+    "left": "back",
+    "pill": "2 of 2"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 2,
+      "total": 2
+    },
+    {
+      "t": "title",
+      "text": "When do you reach for it?",
+      "size": "m"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Bored",
+        "Lonely",
+        "In bed",
+        "Avoiding work",
+        "After conflict",
+        "Waiting",
+        "Can’t sleep",
+        "First thing"
+      ],
+      "selected": [
+        "Bored",
+        "In bed",
+        "Avoiding work"
+      ],
+      "multi": true,
+      "key": "value"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "Better",
+        "Same",
+        "Worse"
+      ],
+      "selected": "Worse",
+      "label": "How do you usually feel after?",
+      "key": "how_do_you_usually_feel_after"
+    },
+    {
+      "t": "text",
+      "text": "Used for your plan only. ScrollFree never reads what you look at.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next",
+      "action": {
+        "type": "push",
+        "to": "sf_goal"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Next",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "sf_goal"
+      },
+      "summary": "push → sf_goal"
+    }
+  ]
+}

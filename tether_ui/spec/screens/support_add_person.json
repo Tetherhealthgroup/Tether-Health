@@ -1,0 +1,114 @@
+{
+  "id": "support_add_person",
+  "name": "Add a supporter",
+  "route": "/support/people/new",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Add a supporter",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Who can you count on?",
+      "size": "m"
+    },
+    {
+      "t": "field",
+      "label": "Name",
+      "value": "Jordan",
+      "kind": "text",
+      "key": "name"
+    },
+    {
+      "t": "field",
+      "label": "Phone",
+      "value": "(555) 010-4421",
+      "kind": "phone",
+      "key": "phone"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "BreatheFree",
+        "ScrollFree"
+      ],
+      "selected": [
+        "BreatheFree"
+      ],
+      "multi": true,
+      "label": "Which programs?",
+      "key": "which_programs"
+    },
+    {
+      "t": "field",
+      "label": "Help phrase",
+      "value": "Can you stay with me for the next 10 minutes?",
+      "kind": "multiline",
+      "key": "help_phrase"
+    },
+    {
+      "t": "text",
+      "text": "Nothing is sent until you preview and tap Send.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save supporter",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/care/supporters",
+        "then": {
+          "type": "toast",
+          "value": "Jordan added",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save supporter",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/care/supporters",
+        "then": {
+          "type": "toast",
+          "value": "Jordan added",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "summary": "POST /v1/care/supporters then toast “Jordan added” then back"
+    }
+  ]
+}

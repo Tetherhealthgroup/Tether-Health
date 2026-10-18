@@ -1,0 +1,103 @@
+{
+  "id": "re_symptoms",
+  "name": "Symptom check",
+  "route": "/p/re/symptoms",
+  "flow": "re",
+  "program": "re",
+  "phase": "rescue",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Check symptoms",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Do you have any of these?",
+      "size": "m"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Very little urine",
+        "Swelling in legs or face",
+        "Yellow skin or eyes",
+        "Confusion",
+        "Vomiting blood",
+        "None"
+      ],
+      "selected": [
+        "Yellow skin or eyes"
+      ],
+      "multi": true,
+      "key": "value"
+    },
+    {
+      "t": "banner",
+      "kind": "urgent",
+      "text": "Yellow skin or eyes needs a clinician today."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Contact my care team",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Vomiting blood or confused? Call 911",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "variant": "danger",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Contact my care team",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "summary": "push → support_message_care"
+    },
+    {
+      "element": "Vomiting blood or confused? Call 911",
+      "path": "footer[1]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    }
+  ]
+}

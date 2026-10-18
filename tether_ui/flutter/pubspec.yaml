@@ -1,0 +1,21 @@
+name: tether_ui
+description: Tether Health mobile UI — generated screens, routes and component kit for every program and flow.
+publish_to: none
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+# Zero third-party runtime packages on purpose (matches the BreatheFree
+# "no SDK leaves the device" rule). Plug url_launcher / your API client in
+# through TPlatform.instance and TApi.instance (lib/ui/nav.dart).
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

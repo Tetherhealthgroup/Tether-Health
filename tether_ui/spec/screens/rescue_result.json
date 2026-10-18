@@ -1,0 +1,136 @@
+{
+  "id": "rescue_result",
+  "name": "Recheck + result",
+  "route": "/rescue/result",
+  "flow": "rescue",
+  "program": null,
+  "phase": "rescue",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Rescue done",
+    "left": "close",
+    "pill": "Saved"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "This craving eased.",
+      "size": "m"
+    },
+    {
+      "t": "slider",
+      "label": "How strong is it now?",
+      "value": 3,
+      "min": 0,
+      "max": 10,
+      "minLabel": "0",
+      "maxLabel": "10",
+      "color": "coral",
+      "key": "how_strong_is_it_now"
+    },
+    {
+      "t": "stats",
+      "items": [
+        {
+          "label": "Before",
+          "value": "8"
+        },
+        {
+          "label": "Now",
+          "value": "3",
+          "sub": "Your rating, not a diagnosis"
+        }
+      ],
+      "cols": 2
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Yes",
+        "A little",
+        "Not this time"
+      ],
+      "selected": [
+        "Yes"
+      ],
+      "multi": false,
+      "label": "Did it help?",
+      "key": "did_it_help"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "eyebrow": "Next 10 minutes",
+      "title": "Stay somewhere smoke-free and sip water."
+    },
+    {
+      "t": "link",
+      "label": "Still strong? Get more help",
+      "action": {
+        "type": "push",
+        "to": "rescue_escalate"
+      },
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Back to Today",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/rescues",
+        "then": {
+          "type": "reset",
+          "to": "today"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [
+    "POST /v1/records/rescues"
+  ],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Still strong? Get more help",
+      "path": "body[5]",
+      "action": {
+        "type": "push",
+        "to": "rescue_escalate"
+      },
+      "summary": "push → rescue_escalate"
+    },
+    {
+      "element": "Back to Today",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/rescues",
+        "then": {
+          "type": "reset",
+          "to": "today"
+        }
+      },
+      "summary": "POST /v1/records/rescues then reset → today"
+    }
+  ]
+}

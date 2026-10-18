@@ -1,0 +1,180 @@
+{
+  "id": "bf_path",
+  "name": "Choose path",
+  "route": "/p/bf/plan/path",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your path",
+    "left": "back",
+    "pill": "Plan 1 of 3"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "What feels possible right now?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "There’s no wrong place to start.",
+      "tone": "muted"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Set a quit date",
+          "sub": "Prepare 7–14 days, then stop",
+          "badge": "Recommended"
+        },
+        {
+          "label": "Quit today",
+          "sub": "Skip the calendar; extra support now"
+        },
+        {
+          "label": "Reduce gradually",
+          "sub": "Step down to zero over 4 weeks"
+        },
+        {
+          "label": "Explore first",
+          "sub": "No date. Lessons and Rescue only"
+        }
+      ],
+      "selected": 0,
+      "key": "path"
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "Talk to a person first?",
+      "text": "Quitline counselor or your care team",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      }
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue with this path",
+      "action": {
+        "type": "branch",
+        "question": "Selected path",
+        "on": "radio",
+        "decide": "choice:bf_path.path",
+        "cases": [
+          {
+            "label": "Set a quit date",
+            "action": {
+              "type": "push",
+              "to": "bf_date"
+            }
+          },
+          {
+            "label": "Quit today",
+            "action": {
+              "type": "push",
+              "to": "bf_support"
+            }
+          },
+          {
+            "label": "Reduce gradually",
+            "action": {
+              "type": "push",
+              "to": "bf_stepdown"
+            }
+          },
+          {
+            "label": "Explore first",
+            "action": {
+              "type": "replace",
+              "to": "bf_home_explore",
+              "context": {
+                "onboarding": "ob_setup"
+              }
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Talk to a person first?",
+      "path": "body[3]",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    },
+    {
+      "element": "Continue with this path",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Selected path",
+        "on": "radio",
+        "decide": "choice:bf_path.path",
+        "cases": [
+          {
+            "label": "Set a quit date",
+            "action": {
+              "type": "push",
+              "to": "bf_date"
+            }
+          },
+          {
+            "label": "Quit today",
+            "action": {
+              "type": "push",
+              "to": "bf_support"
+            }
+          },
+          {
+            "label": "Reduce gradually",
+            "action": {
+              "type": "push",
+              "to": "bf_stepdown"
+            }
+          },
+          {
+            "label": "Explore first",
+            "action": {
+              "type": "replace",
+              "to": "bf_home_explore",
+              "context": {
+                "onboarding": "ob_setup"
+              }
+            }
+          }
+        ]
+      },
+      "summary": "decide choice:bf_path.path: Selected path → Set a quit date: push → bf_date | Quit today: push → bf_support | Reduce gradually: push → bf_stepdown | Explore first: replace → bf_home_explore (onboarding: ob_setup)"
+    }
+  ]
+}

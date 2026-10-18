@@ -1,0 +1,113 @@
+{
+  "id": "records_fhir_url",
+  "name": "Other FHIR server",
+  "route": "/records/fhir-url",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Other FHIR server",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Enter your provider’s FHIR address",
+      "size": "m"
+    },
+    {
+      "t": "field",
+      "label": "FHIR server address",
+      "value": "https://fhir.example-health.org/r4",
+      "hint": "Starts with https:// · your provider gives you this",
+      "kind": "text",
+      "key": "base_url"
+    },
+    {
+      "t": "text",
+      "text": "We check it supports SMART on FHIR R4 (/.well-known/smart-configuration) before you sign in.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Check and continue",
+      "action": {
+        "type": "branch",
+        "question": "Server check",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "SMART on FHIR R4 supported",
+            "action": {
+              "type": "push",
+              "to": "records_consent"
+            }
+          },
+          {
+            "label": "Not a FHIR R4 server",
+            "action": {
+              "type": "push",
+              "to": "records_error"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [
+    "GET {base}/.well-known/smart-configuration",
+    "GET {base}/metadata"
+  ],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Check and continue",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Server check",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "SMART on FHIR R4 supported",
+            "action": {
+              "type": "push",
+              "to": "records_consent"
+            }
+          },
+          {
+            "label": "Not a FHIR R4 server",
+            "action": {
+              "type": "push",
+              "to": "records_error"
+            }
+          }
+        ]
+      },
+      "summary": "branch: Server check → SMART on FHIR R4 supported: push → records_consent | Not a FHIR R4 server: push → records_error"
+    }
+  ]
+}

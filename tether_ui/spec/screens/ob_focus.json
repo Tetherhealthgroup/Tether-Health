@@ -1,0 +1,132 @@
+{
+  "id": "ob_focus",
+  "name": "Focus slots",
+  "route": "/onboarding/focus",
+  "flow": "onboarding",
+  "program": null,
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your focus",
+    "left": "back",
+    "pill": "2 of 5"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 2,
+      "total": 5
+    },
+    {
+      "t": "title",
+      "text": "Two at a time works best.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Focus programs get daily steps and reminders. Learn only gives you lessons, with no tracking.",
+      "tone": "muted"
+    },
+    {
+      "t": "list",
+      "title": "Focus · daily support",
+      "rows": [
+        {
+          "label": "BreatheFree",
+          "sub": "About 3 min a day",
+          "lead": {
+            "program": "bf"
+          },
+          "pill": "Focus 1"
+        },
+        {
+          "label": "ScrollFree",
+          "sub": "About 1 min a day",
+          "lead": {
+            "program": "sf"
+          },
+          "pill": "Focus 2"
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Learn only · no reminders",
+      "rows": [
+        {
+          "label": "ClearAir",
+          "sub": "Lessons about lung recovery",
+          "lead": {
+            "program": "ca"
+          },
+          "pill": "Learn"
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Why two?",
+      "text": "People keep going with fewer daily asks. Swap anytime in Account → Programs."
+    },
+    {
+      "t": "link",
+      "label": "Add a third program",
+      "action": {
+        "type": "sheet",
+        "to": "ob_third"
+      },
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue",
+      "action": {
+        "type": "push",
+        "to": "ob_consent"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Add a third program",
+      "path": "body[6]",
+      "action": {
+        "type": "sheet",
+        "to": "ob_third"
+      },
+      "summary": "sheet → ob_third"
+    },
+    {
+      "element": "Continue",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "ob_consent"
+      },
+      "summary": "push → ob_consent"
+    }
+  ]
+}

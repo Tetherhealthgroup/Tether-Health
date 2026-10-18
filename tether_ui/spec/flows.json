@@ -1,0 +1,345 @@
+[
+  {
+    "id": "onboarding",
+    "title": "First run",
+    "description": "Welcome → choose programs → focus → consent → basics → set up each focus program → reminders → save progress → Today.",
+    "program": null,
+    "screens": [
+      "welcome",
+      "ob_programs",
+      "ob_focus",
+      "ob_third",
+      "ob_consent",
+      "ob_basics",
+      "ob_setup",
+      "ob_reminders",
+      "ob_reminders_denied",
+      "ob_account"
+    ]
+  },
+  {
+    "id": "auth",
+    "title": "Account & sign-in",
+    "description": "Sign up, verify email, sign in (with error), password reset, guest-plan merge, session expiry.",
+    "program": null,
+    "screens": [
+      "auth_verify",
+      "auth_signin",
+      "auth_signin_error",
+      "auth_social_new",
+      "auth_link",
+      "auth_social_error",
+      "auth_forgot",
+      "auth_forgot_sent",
+      "auth_newpass",
+      "auth_merge",
+      "auth_session"
+    ]
+  },
+  {
+    "id": "today",
+    "title": "Today",
+    "description": "The shared home: Rescue first, one step per focus program, combined check-in, milestones and Learn-only lessons. Every state is specified.",
+    "program": null,
+    "screens": [
+      "today",
+      "today_loading",
+      "today_offline",
+      "today_empty",
+      "today_safety",
+      "checkin",
+      "checkin_done"
+    ]
+  },
+  {
+    "id": "rescue",
+    "title": "Universal Rescue",
+    "description": "One entry for every Quit program. Opens the last helpful tool; offers a person when intensity stays high; distress always routes to 988.",
+    "program": null,
+    "screens": [
+      "rescue_pick",
+      "rescue_active",
+      "rescue_tools",
+      "rescue_result",
+      "rescue_escalate",
+      "crisis"
+    ]
+  },
+  {
+    "id": "plans",
+    "title": "Plans & programs",
+    "description": "My plans hub, program catalog (the 11 programs from tetherhealthgroup.com), focus-slot rules and per-program settings.",
+    "program": null,
+    "screens": [
+      "plans",
+      "catalog",
+      "focus_full",
+      "program_settings"
+    ]
+  },
+  {
+    "id": "tabs",
+    "title": "Progress, Learn & Support",
+    "description": "Shared tabs that read every enrolment.",
+    "program": null,
+    "screens": [
+      "progress",
+      "progress_empty",
+      "progress_error",
+      "learn",
+      "learn_error",
+      "learn_lesson",
+      "support",
+      "support_empty",
+      "support_callback",
+      "support_message",
+      "support_message_care",
+      "support_add_person",
+      "support_connect"
+    ]
+  },
+  {
+    "id": "account",
+    "title": "Account & data",
+    "description": "Settings, programs & sharing, notifications, privacy, export, deletion with receipt, sign out.",
+    "program": null,
+    "screens": [
+      "account",
+      "account_signin_methods",
+      "account_programs",
+      "account_leave",
+      "account_notifications",
+      "account_privacy",
+      "account_data",
+      "account_delete",
+      "account_deleted",
+      "account_signout"
+    ]
+  },
+  {
+    "id": "system",
+    "title": "System states",
+    "description": "App-wide events: forced update.",
+    "program": null,
+    "screens": [
+      "sys_update"
+    ]
+  },
+  {
+    "id": "bf",
+    "title": "BreatheFree",
+    "description": "Tobacco & nicotine · Quit / Reduce. Four real quit paths, craving rescue, slip recovery, medication education.",
+    "program": "bf",
+    "screens": [
+      "bf_intro",
+      "bf_q1",
+      "bf_q2",
+      "bf_q3",
+      "bf_path",
+      "bf_date",
+      "bf_stepdown",
+      "bf_support",
+      "bf_review",
+      "bf_home",
+      "bf_home_quitday",
+      "bf_home_explore",
+      "bf_slip",
+      "bf_meds",
+      "bf_meds_edit",
+      "bf_progress",
+      "bf_estimates"
+    ]
+  },
+  {
+    "id": "sf",
+    "title": "ScrollFree",
+    "description": "Social media use · Quit / Reduce. Self-report first, minute goal + app-free windows, Pause 60, buddy, weekly reflection.",
+    "program": "sf",
+    "screens": [
+      "sf_intro",
+      "sf_q1",
+      "sf_q2",
+      "sf_goal",
+      "sf_screentime",
+      "sf_screentime_denied",
+      "sf_buddy",
+      "sf_home",
+      "sf_pause",
+      "sf_slip",
+      "sf_week"
+    ]
+  },
+  {
+    "id": "ca",
+    "title": "ClearAir",
+    "description": "Respiratory · Manage. Clinician action plan, zone check, yellow-zone steps with re-check, red-zone route, progress against own zones.",
+    "program": "ca",
+    "screens": [
+      "ca_intro",
+      "ca_q1",
+      "ca_plan",
+      "ca_noplan",
+      "ca_home",
+      "ca_zone",
+      "ca_yellow",
+      "ca_red",
+      "ca_symptoms",
+      "ca_progress"
+    ]
+  },
+  {
+    "id": "hw",
+    "title": "Heartwise",
+    "description": "Cardiovascular · Manage. Clinician targets, two-reading BP log, validation, symptom-gated crisis route, trends, lipid panel, previewed visit summary.",
+    "program": "hw",
+    "screens": [
+      "hw_intro",
+      "hw_q1",
+      "hw_targets",
+      "hw_home",
+      "hw_log",
+      "hw_log2",
+      "hw_log_error",
+      "hw_result",
+      "hw_crisis",
+      "hw_recheck",
+      "hw_trends",
+      "hw_lipids",
+      "hw_summary"
+    ]
+  },
+  {
+    "id": "st",
+    "title": "Steady",
+    "description": "Diabetes & metabolic · Manage. Clinician range + own low plan, reading log, low route with 15-min timer, meal reset, patterns, A1C.",
+    "program": "st",
+    "screens": [
+      "st_intro",
+      "st_q1",
+      "st_range",
+      "st_home",
+      "st_log",
+      "st_low",
+      "st_reset",
+      "st_patterns",
+      "st_a1c"
+    ]
+  },
+  {
+    "id": "re",
+    "title": "Renew",
+    "description": "Kidney & liver · Manage. Risk check, plain-language result, labs and trends, reminders, warning-symptom route.",
+    "program": "re",
+    "screens": [
+      "re_intro",
+      "re_q1",
+      "re_result",
+      "re_home",
+      "re_labs",
+      "re_history",
+      "re_symptoms"
+    ]
+  },
+  {
+    "id": "nu",
+    "title": "Nourish",
+    "description": "Obesity & nutrition · Build habits. Weight-neutral weekly habits, off-track reset, week-4 milestone, protective mode.",
+    "program": "nu",
+    "screens": [
+      "nu_intro",
+      "nu_q1",
+      "nu_habit",
+      "nu_home",
+      "nu_reset",
+      "nu_week4",
+      "nu_protect"
+    ]
+  },
+  {
+    "id": "sd",
+    "title": "Stride",
+    "description": "Healthy aging · Build habits. Falls check, weekly movement plan, audio-first sessions, I-fell route, home safety, scoped caregiver access.",
+    "program": "sd",
+    "screens": [
+      "sd_intro",
+      "sd_q1",
+      "sd_plan",
+      "sd_home",
+      "sd_session",
+      "sd_fell",
+      "sd_safety",
+      "sd_caregiver"
+    ]
+  },
+  {
+    "id": "ea",
+    "title": "Ease",
+    "description": "Mental & behavioral · Support. Optional PHQ-2/GAD-2, never a diagnosis, safety plan, mood check-in, crisis route, check-back day.",
+    "program": "ea",
+    "screens": [
+      "ea_intro",
+      "ea_q1",
+      "ea_result",
+      "ea_plan",
+      "ea_home",
+      "ea_mood",
+      "ea_checkback"
+    ]
+  },
+  {
+    "id": "ck",
+    "title": "Checkup",
+    "description": "Preventive · Prevent. Personal due list from USPSTF/CDC guidance, item detail with options and cost, mark done, screening-day prep.",
+    "program": "ck",
+    "screens": [
+      "ck_intro",
+      "ck_q1",
+      "ck_list",
+      "ck_uptodate",
+      "ck_item",
+      "ck_done",
+      "ck_day"
+    ]
+  },
+  {
+    "id": "be",
+    "title": "Beacon",
+    "description": "Cancer · Prevent. Four journey paths: lowering risk, in treatment, after treatment, caregiver. Fever rule on the treatment path.",
+    "program": "be",
+    "screens": [
+      "be_intro",
+      "be_q1",
+      "be_q2",
+      "be_home",
+      "be_tx",
+      "be_diary",
+      "be_questions",
+      "be_survivor"
+    ]
+  },
+  {
+    "id": "records",
+    "title": "Health records (FHIR & manual)",
+    "description": "Connect Epic MyChart, Oracle Health, Medicare Blue Button 2.0, Apple Health Records / Health Connect or any SMART on FHIR R4 server, or enter values by hand. Every value is validated (units, plausibility, duplicates, conflicts) and reviewed before it reaches a program.",
+    "program": null,
+    "screens": [
+      "records_hub",
+      "records_hub_empty",
+      "records_add",
+      "records_search",
+      "records_fhir_url",
+      "records_consent",
+      "records_consent_bb",
+      "records_consent_device",
+      "records_importing",
+      "records_review",
+      "records_conflict",
+      "records_error",
+      "records_source",
+      "records_disconnect",
+      "records_manual",
+      "records_manual_error",
+      "records_item"
+    ]
+  }
+]

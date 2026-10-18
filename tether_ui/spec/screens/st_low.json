@@ -1,0 +1,118 @@
+{
+  "id": "st_low",
+  "name": "Low reading",
+  "route": "/p/st/low",
+  "flow": "st",
+  "program": "st",
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Timer survives app close and fires during quiet hours.",
+  "header": {
+    "t": "header",
+    "title": "Low reading",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "urgent",
+      "text": "62 mg/dL is below your low of 70."
+    },
+    {
+      "t": "card",
+      "variant": "warn",
+      "eyebrow": "Your low plan",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Take 15 g of fast sugar",
+              "sub": "4 glucose tablets or ½ cup juice",
+              "done": true
+            },
+            {
+              "label": "Re-check in 15 minutes"
+            },
+            {
+              "label": "Repeat if still below 70"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "timer",
+      "value": "14:52",
+      "label": "until re-check"
+    },
+    {
+      "t": "card",
+      "variant": "urgent",
+      "title": "Confused, can’t swallow or passing out?",
+      "text": "Someone should call 911 now.",
+      "children": [
+        {
+          "t": "button",
+          "label": "Call 911",
+          "action": {
+            "type": "call",
+            "value": "911",
+            "label": "911"
+          },
+          "variant": "danger",
+          "arrow": false
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Re-check now",
+      "action": {
+        "type": "replace",
+        "to": "st_log"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Call 911",
+      "path": "body[3].children[0]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "Re-check now",
+      "path": "footer[0]",
+      "action": {
+        "type": "replace",
+        "to": "st_log"
+      },
+      "summary": "replace → st_log"
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "id": "nu_reset",
+  "name": "Off-track reset",
+  "route": "/p/nu/reset",
+  "flow": "nu",
+  "program": "nu",
+  "phase": "rescue",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Off track?",
+    "left": "back",
+    "pill": "Reset"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Busy week? That’s okay.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Missing days doesn’t undo the ones you did.",
+      "tone": "muted"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Keep this habit, start fresh today"
+        },
+        {
+          "label": "Make it smaller",
+          "sub": "3 nights instead of 5"
+        },
+        {
+          "label": "Pick a different habit"
+        }
+      ],
+      "selected": 0,
+      "key": "option"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue",
+      "action": {
+        "type": "branch",
+        "question": "Selected option",
+        "on": "radio",
+        "decide": "choice:nu_reset.option",
+        "cases": [
+          {
+            "label": "Keep this habit",
+            "action": {
+              "type": "toast",
+              "value": "Fresh start today",
+              "then": {
+                "type": "replace",
+                "to": "nu_home"
+              }
+            }
+          },
+          {
+            "label": "Make it smaller",
+            "action": {
+              "type": "toast",
+              "value": "Goal set to 3 nights",
+              "then": {
+                "type": "replace",
+                "to": "nu_home"
+              }
+            }
+          },
+          {
+            "label": "Pick a different habit",
+            "action": {
+              "type": "replace",
+              "to": "nu_habit"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Continue",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "Selected option",
+        "on": "radio",
+        "decide": "choice:nu_reset.option",
+        "cases": [
+          {
+            "label": "Keep this habit",
+            "action": {
+              "type": "toast",
+              "value": "Fresh start today",
+              "then": {
+                "type": "replace",
+                "to": "nu_home"
+              }
+            }
+          },
+          {
+            "label": "Make it smaller",
+            "action": {
+              "type": "toast",
+              "value": "Goal set to 3 nights",
+              "then": {
+                "type": "replace",
+                "to": "nu_home"
+              }
+            }
+          },
+          {
+            "label": "Pick a different habit",
+            "action": {
+              "type": "replace",
+              "to": "nu_habit"
+            }
+          }
+        ]
+      },
+      "summary": "decide choice:nu_reset.option: Selected option → Keep this habit: toast “Fresh start today” then replace → nu_home | Make it smaller: toast “Goal set to 3 nights” then replace → nu_home | Pick a different habit: replace → nu_habit"
+    }
+  ]
+}

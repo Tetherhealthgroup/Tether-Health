@@ -1,0 +1,109 @@
+{
+  "id": "records_item",
+  "name": "Imported values",
+  "route": "/records/item",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Blood pressure",
+    "left": "back",
+    "pill": "12 + 36"
+  },
+  "body": [
+    {
+      "t": "chart",
+      "kind": "line",
+      "values": [
+        142,
+        140,
+        138,
+        139,
+        135,
+        133,
+        136,
+        131,
+        129,
+        130,
+        128,
+        127
+      ],
+      "color": "hw",
+      "title": "Systolic · all sources",
+      "unit": "mmHg"
+    },
+    {
+      "t": "list",
+      "title": "Latest",
+      "rows": [
+        {
+          "label": "128/82 · Oct 15",
+          "sub": "Patel Family Medicine (Epic) · clinic reading"
+        },
+        {
+          "label": "135/85 · Oct 14",
+          "sub": "Entered by you · home monitor"
+        },
+        {
+          "label": "131/80 · Oct 2",
+          "sub": "Patel Family Medicine (Epic)"
+        }
+      ]
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Coded as",
+          "LOINC 85354-9 (8480-6 / 8462-4)"
+        ],
+        [
+          "Used by",
+          "Heartwise"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Open in Heartwise",
+      "action": {
+        "type": "push",
+        "to": "hw_trends"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Open in Heartwise",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "hw_trends"
+      },
+      "summary": "push → hw_trends"
+    }
+  ]
+}

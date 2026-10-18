@@ -1,0 +1,203 @@
+{
+  "id": "ca_home",
+  "name": "ClearAir home",
+  "route": "/p/ca/home",
+  "flow": "ca",
+  "program": "ca",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "ClearAir",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Today’s zone",
+      "title": "Green · 410 L/min",
+      "text": "Checked 7:40 AM · from your plan"
+    },
+    {
+      "t": "button",
+      "label": "Check my zone",
+      "action": {
+        "type": "push",
+        "to": "ca_zone"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "card",
+      "variant": "urgent",
+      "title": "Red-zone plan",
+      "text": "Open it fast, even offline",
+      "action": {
+        "type": "push",
+        "to": "ca_red"
+      }
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Log symptoms",
+          "action": {
+            "type": "push",
+            "to": "ca_symptoms"
+          }
+        },
+        {
+          "label": "Progress",
+          "sub": "10 green · 2 yellow · 0 red",
+          "action": {
+            "type": "push",
+            "to": "ca_progress"
+          }
+        },
+        {
+          "label": "My action plan",
+          "sub": "Entered Sep 3",
+          "action": {
+            "type": "push",
+            "to": "ca_plan"
+          }
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Check my zone",
+      "path": "body[1]",
+      "action": {
+        "type": "push",
+        "to": "ca_zone"
+      },
+      "summary": "push → ca_zone"
+    },
+    {
+      "element": "Red-zone plan",
+      "path": "body[2]",
+      "action": {
+        "type": "push",
+        "to": "ca_red"
+      },
+      "summary": "push → ca_red"
+    },
+    {
+      "element": "Log symptoms",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "ca_symptoms"
+      },
+      "summary": "push → ca_symptoms"
+    },
+    {
+      "element": "Progress",
+      "path": "body[3].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "ca_progress"
+      },
+      "summary": "push → ca_progress"
+    },
+    {
+      "element": "My action plan",
+      "path": "body[3].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "ca_plan"
+      },
+      "summary": "push → ca_plan"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[3].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

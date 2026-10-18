@@ -1,0 +1,113 @@
+{
+  "id": "ca_red",
+  "name": "Red zone",
+  "route": "/p/ca/zone/red",
+  "flow": "ca",
+  "program": "ca",
+  "phase": "rescue",
+  "kind": "fullscreen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Red zone · act now",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "urgent",
+      "text": "Follow your red-zone plan and seek urgent care now."
+    },
+    {
+      "t": "button",
+      "label": "Call 911",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "variant": "danger",
+      "arrow": false
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Your red-zone plan",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Reliever inhaler now, as written"
+            },
+            {
+              "label": "Call your clinician or 911"
+            },
+            {
+              "label": "Don’t drive yourself"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Tell Maria",
+          "sub": "Emergency contact · preview first",
+          "action": {
+            "type": "sheet",
+            "to": "support_message"
+          },
+          "lead": {
+            "avatar": "M"
+          }
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Stays open until you close it. Works offline.",
+      "tone": "small"
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Call 911",
+      "path": "body[1]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "Tell Maria",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "sheet",
+        "to": "support_message"
+      },
+      "summary": "sheet → support_message"
+    }
+  ]
+}

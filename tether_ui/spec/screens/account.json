@@ -1,0 +1,243 @@
+{
+  "id": "account",
+  "name": "Account",
+  "route": "/account",
+  "flow": "account",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Account",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Alex",
+          "sub": "alex@example.com",
+          "lead": {
+            "avatar": "A"
+          }
+        }
+      ],
+      "flat": true
+    },
+    {
+      "t": "list",
+      "title": "Your health data",
+      "rows": [
+        {
+          "label": "Health records",
+          "sub": "2 sources · Epic, Medicare",
+          "action": {
+            "type": "push",
+            "to": "records_hub"
+          }
+        },
+        {
+          "label": "Sign-in methods",
+          "sub": "Apple · email",
+          "action": {
+            "type": "push",
+            "to": "account_signin_methods"
+          }
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Settings",
+      "rows": [
+        {
+          "label": "Programs & sharing",
+          "sub": "2 focus · 1 learn · 1 paused",
+          "action": {
+            "type": "push",
+            "to": "account_programs"
+          }
+        },
+        {
+          "label": "Notifications",
+          "sub": "On · quiet hours 9 PM–7 AM",
+          "action": {
+            "type": "push",
+            "to": "account_notifications"
+          }
+        },
+        {
+          "label": "Privacy & consent",
+          "sub": "Reviewed Aug 22, 2026",
+          "action": {
+            "type": "push",
+            "to": "account_privacy"
+          }
+        },
+        {
+          "label": "Your data",
+          "sub": "Export or delete",
+          "action": {
+            "type": "push",
+            "to": "account_data"
+          }
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "App",
+      "rows": [
+        {
+          "label": "Text size & contrast",
+          "sub": "Follows your phone",
+          "action": {
+            "type": "os_settings"
+          }
+        },
+        {
+          "label": "Language",
+          "sub": "English",
+          "action": {
+            "type": "toast",
+            "value": "Language set to English"
+          }
+        },
+        {
+          "label": "Help & legal",
+          "action": {
+            "type": "external",
+            "value": "https://www.tetherhealthgroup.com/support/"
+          }
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Tether Health 1.0.0 (100)",
+      "tone": "small",
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Sign out",
+      "action": {
+        "type": "sheet",
+        "to": "account_signout"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Health records",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "records_hub"
+      },
+      "summary": "push → records_hub"
+    },
+    {
+      "element": "Sign-in methods",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "account_signin_methods"
+      },
+      "summary": "push → account_signin_methods"
+    },
+    {
+      "element": "Programs & sharing",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "account_programs"
+      },
+      "summary": "push → account_programs"
+    },
+    {
+      "element": "Notifications",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "account_notifications"
+      },
+      "summary": "push → account_notifications"
+    },
+    {
+      "element": "Privacy & consent",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "account_privacy"
+      },
+      "summary": "push → account_privacy"
+    },
+    {
+      "element": "Your data",
+      "path": "body[2].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "account_data"
+      },
+      "summary": "push → account_data"
+    },
+    {
+      "element": "Text size & contrast",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "os_settings"
+      },
+      "summary": "os_settings"
+    },
+    {
+      "element": "Language",
+      "path": "body[3].rows[1]",
+      "action": {
+        "type": "toast",
+        "value": "Language set to English"
+      },
+      "summary": "toast “Language set to English”"
+    },
+    {
+      "element": "Help & legal",
+      "path": "body[3].rows[2]",
+      "action": {
+        "type": "external",
+        "value": "https://www.tetherhealthgroup.com/support/"
+      },
+      "summary": "external https://www.tetherhealthgroup.com/support/"
+    },
+    {
+      "element": "Sign out",
+      "path": "footer[0]",
+      "action": {
+        "type": "sheet",
+        "to": "account_signout"
+      },
+      "summary": "sheet → account_signout"
+    }
+  ]
+}

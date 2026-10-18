@@ -1,0 +1,172 @@
+{
+  "id": "learn",
+  "name": "Learn",
+  "route": "/learn",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": "learn",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Learn",
+    "left": "none",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "field",
+      "label": "Search",
+      "placeholder": "Search cravings, sleep, blood pressure…",
+      "kind": "search",
+      "key": "search"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "For you",
+        "BreatheFree",
+        "ScrollFree",
+        "ClearAir"
+      ],
+      "selected": [
+        "For you"
+      ],
+      "multi": false,
+      "dots": {
+        "BreatheFree": "bf",
+        "ScrollFree": "sf",
+        "ClearAir": "ca"
+      },
+      "key": "value"
+    },
+    {
+      "t": "card",
+      "variant": "dark",
+      "tag": "bf",
+      "tagExtra": "For quit day",
+      "title": "Cravings: what to expect today",
+      "text": "4 min read · 3:12 audio · downloaded",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "sf",
+      "tagExtra": "2 min",
+      "title": "Why “one more video” never feels like enough",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "ca",
+      "tagExtra": "Learn only",
+      "title": "How your lungs recover after you quit",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      }
+    },
+    {
+      "t": "text",
+      "text": "Clinically reviewed · Library v4.1 · English and Spanish",
+      "tone": "small"
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [
+    "GET /v1/catalogue/lessons?enrolled=true"
+  ],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Cravings: what to expect today",
+      "path": "body[2]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "Why “one more video” never feels like enough",
+      "path": "body[3]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "How your lungs recover after you quit",
+      "path": "body[4]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Plans",
+      "path": "tabbar.plans",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

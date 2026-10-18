@@ -1,0 +1,115 @@
+{
+  "id": "ea_plan",
+  "name": "Safety plan",
+  "route": "/p/ea/plan",
+  "flow": "ea",
+  "program": "ea",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Stored encrypted on the device only; available offline.",
+  "header": {
+    "t": "header",
+    "title": "Safety plan",
+    "left": "back",
+    "pill": "Private"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Make a plan for hard moments",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Based on the Stanley-Brown safety plan. Only you can see this.",
+      "tone": "small"
+    },
+    {
+      "t": "field",
+      "label": "My warning signs",
+      "value": "Not sleeping, pulling away from friends",
+      "kind": "multiline",
+      "key": "my_warning_signs"
+    },
+    {
+      "t": "field",
+      "label": "Things that help me",
+      "value": "Walk the dog, shower, music",
+      "kind": "text",
+      "key": "things_that_help_me"
+    },
+    {
+      "t": "field",
+      "label": "People I can reach",
+      "value": "Sam · (555) 010-3311",
+      "kind": "text",
+      "key": "people_i_can_reach"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Crisis line",
+          "988 · call or text"
+        ],
+        [
+          "Emergency",
+          "911"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save plan",
+      "action": {
+        "type": "submit",
+        "api": "PUT device:encrypted/ea/safety-plan",
+        "then": {
+          "type": "replace",
+          "to": "ea_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save plan",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT device:encrypted/ea/safety-plan",
+        "then": {
+          "type": "replace",
+          "to": "ea_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "summary": "PUT device:encrypted/ea/safety-plan then replace → ea_home (onboarding: ob_setup)"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "id": "records_error",
+  "name": "Connection problem",
+  "route": "/records/error",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "error",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Connect",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "!",
+      "tone": "error"
+    },
+    {
+      "t": "title",
+      "text": "Couldn’t connect",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Sign-in was cancelled, denied, or the server isn’t a SMART on FHIR R4 server. Nothing was imported.",
+      "tone": "muted",
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Try again",
+      "action": {
+        "type": "back"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Choose another source",
+      "action": {
+        "type": "replace",
+        "to": "records_add"
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "link",
+      "label": "Enter manually instead",
+      "action": {
+        "type": "replace",
+        "to": "records_manual"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Try again",
+      "path": "footer[0]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Choose another source",
+      "path": "footer[1]",
+      "action": {
+        "type": "replace",
+        "to": "records_add"
+      },
+      "summary": "replace → records_add"
+    },
+    {
+      "element": "Enter manually instead",
+      "path": "footer[2]",
+      "action": {
+        "type": "replace",
+        "to": "records_manual"
+      },
+      "summary": "replace → records_manual"
+    }
+  ]
+}

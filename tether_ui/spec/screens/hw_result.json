@@ -1,0 +1,97 @@
+{
+  "id": "hw_result",
+  "name": "Reading saved",
+  "route": "/p/hw/log/result",
+  "flow": "hw",
+  "program": "hw",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Saved",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "✓",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "135/85 saved",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "Average of 2 readings. Your clinician’s target is below 130/80.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "One reading is information, not a grade. Trends over weeks matter most."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "See trends",
+      "action": {
+        "type": "replace",
+        "to": "hw_trends"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Back to Heartwise",
+      "action": {
+        "type": "replace",
+        "to": "hw_home"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "See trends",
+      "path": "footer[0]",
+      "action": {
+        "type": "replace",
+        "to": "hw_trends"
+      },
+      "summary": "replace → hw_trends"
+    },
+    {
+      "element": "Back to Heartwise",
+      "path": "footer[1]",
+      "action": {
+        "type": "replace",
+        "to": "hw_home"
+      },
+      "summary": "replace → hw_home"
+    }
+  ]
+}

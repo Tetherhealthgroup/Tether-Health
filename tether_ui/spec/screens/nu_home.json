@@ -1,0 +1,218 @@
+{
+  "id": "nu_home",
+  "name": "Nourish home",
+  "route": "/p/nu/home",
+  "flow": "nu",
+  "program": "nu",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Nourish",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Habit · week 2",
+      "title": "Add a vegetable to dinner",
+      "text": "3 of 5 nights",
+      "children": [
+        {
+          "t": "steps",
+          "n": 3,
+          "total": 5
+        }
+      ],
+      "cta": {
+        "t": "button",
+        "label": "Done today",
+        "action": {
+          "type": "toast",
+          "value": "Nice. 4 of 5 nights."
+        },
+        "variant": "primary",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "eyebrow": "Tip",
+      "title": "Frozen vegetables count, and are often cheaper."
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Quick recipe · 15 min",
+      "title": "Bean and veggie tacos",
+      "text": "Under $2 a serving",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      }
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Busy week?",
+          "sub": "Reset without guilt",
+          "action": {
+            "type": "push",
+            "to": "nu_reset"
+          }
+        },
+        {
+          "label": "Week 4 milestone",
+          "sub": "In 2 weeks",
+          "action": {
+            "type": "push",
+            "to": "nu_week4"
+          }
+        },
+        {
+          "label": "Change habit",
+          "action": {
+            "type": "push",
+            "to": "nu_habit"
+          }
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Done today",
+      "path": "body[0].cta[0]",
+      "action": {
+        "type": "toast",
+        "value": "Nice. 4 of 5 nights."
+      },
+      "summary": "toast “Nice. 4 of 5 nights.”"
+    },
+    {
+      "element": "Bean and veggie tacos",
+      "path": "body[2]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "Busy week?",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "nu_reset"
+      },
+      "summary": "push → nu_reset"
+    },
+    {
+      "element": "Week 4 milestone",
+      "path": "body[3].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "nu_week4"
+      },
+      "summary": "push → nu_week4"
+    },
+    {
+      "element": "Change habit",
+      "path": "body[3].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "nu_habit"
+      },
+      "summary": "push → nu_habit"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[3].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

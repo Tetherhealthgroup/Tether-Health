@@ -1,0 +1,147 @@
+{
+  "id": "nu_protect",
+  "name": "Protective mode",
+  "route": "/p/nu/support",
+  "flow": "nu",
+  "program": "nu",
+  "phase": "rescue",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Support",
+    "left": "back",
+    "pill": "Private"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Thanks for telling us.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Nourish has turned off weight, amount goals and before/after comparisons.",
+      "tone": "muted"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "title": "Talking to someone can help",
+      "text": "A clinician or eating-disorder specialist can support you. We can help you prepare what to say.",
+      "cta": {
+        "t": "button",
+        "label": "Prepare",
+        "action": {
+          "type": "push",
+          "to": "support_message_care"
+        },
+        "variant": "primary",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "emergency",
+      "text": "In crisis? Call or text 988 · Emergency 911",
+      "actions": [
+        {
+          "t": "button",
+          "label": "Call or text 988",
+          "action": {
+            "type": "push",
+            "to": "crisis"
+          },
+          "variant": "danger",
+          "arrow": false,
+          "small": true
+        },
+        {
+          "t": "button",
+          "label": "Call 911",
+          "action": {
+            "type": "call",
+            "value": "911",
+            "label": "911"
+          },
+          "variant": "secondary",
+          "arrow": false,
+          "small": true
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue with gentle habits",
+      "action": {
+        "type": "replace",
+        "to": "nu_habit",
+        "context": {
+          "onboarding": "nu_habit"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Prepare",
+      "path": "body[2].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "summary": "push → support_message_care"
+    },
+    {
+      "element": "Call or text 988",
+      "path": "body[3].actions[0]",
+      "action": {
+        "type": "push",
+        "to": "crisis"
+      },
+      "summary": "push → crisis"
+    },
+    {
+      "element": "Call 911",
+      "path": "body[3].actions[1]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "Continue with gentle habits",
+      "path": "footer[0]",
+      "action": {
+        "type": "replace",
+        "to": "nu_habit",
+        "context": {
+          "onboarding": "nu_habit"
+        }
+      },
+      "summary": "replace → nu_habit (onboarding: nu_habit)"
+    }
+  ]
+}

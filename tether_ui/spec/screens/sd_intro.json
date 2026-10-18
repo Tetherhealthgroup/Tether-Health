@@ -1,0 +1,111 @@
+{
+  "id": "sd_intro",
+  "name": "Stride intro",
+  "route": "/p/sd",
+  "flow": "sd",
+  "program": "sd",
+  "phase": "welcome",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Entry from Choose programs, Catalog or a Learn-only row.",
+  "header": {
+    "t": "header",
+    "title": "Stride",
+    "left": "back",
+    "pill": "~10 min/day"
+  },
+  "body": [
+    {
+      "t": "progtag",
+      "program": "sd",
+      "extra": "Healthy aging"
+    },
+    {
+      "t": "title",
+      "text": "Move well, stay well.",
+      "size": "l"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Sessions",
+          "5–15 min, audio + video"
+        ],
+        [
+          "Falls",
+          "home safety + I fell button"
+        ],
+        [
+          "Caregiver",
+          "optional, Stride only"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Set up Stride",
+      "action": {
+        "type": "push",
+        "to": "sd_q1"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Add as Learn only",
+      "action": {
+        "type": "toast",
+        "value": "Stride added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Set up Stride",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "sd_q1"
+      },
+      "summary": "push → sd_q1"
+    },
+    {
+      "element": "Add as Learn only",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "Stride added as Learn only",
+        "then": {
+          "type": "tab",
+          "to": "plans"
+        }
+      },
+      "summary": "toast “Stride added as Learn only” then tab → plans"
+    }
+  ]
+}

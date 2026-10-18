@@ -1,0 +1,123 @@
+{
+  "id": "auth_link",
+  "name": "Link accounts",
+  "route": "/auth/link",
+  "flow": "auth",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Prevents duplicate accounts for the same email. Supabase manual identity linking after password re-auth.",
+  "header": {
+    "t": "header",
+    "title": "Link accounts",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "⇄",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "You already have a Tether account",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "alex@example.com signed up with email and password. Enter your password once to link Google. After that, either sign-in works.",
+      "tone": "muted",
+      "align": "center"
+    },
+    {
+      "t": "field",
+      "label": "Password",
+      "value": "••••••••••••",
+      "kind": "password",
+      "key": "password"
+    },
+    {
+      "t": "link",
+      "label": "Forgot password?",
+      "action": {
+        "type": "push",
+        "to": "auth_forgot"
+      },
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Link and sign in",
+      "action": {
+        "type": "submit",
+        "api": "POST supabase /auth/v1/user/identities (linkIdentity)",
+        "then": {
+          "type": "reset",
+          "to": "today"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Cancel",
+      "action": {
+        "type": "back"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Forgot password?",
+      "path": "body[4]",
+      "action": {
+        "type": "push",
+        "to": "auth_forgot"
+      },
+      "summary": "push → auth_forgot"
+    },
+    {
+      "element": "Link and sign in",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST supabase /auth/v1/user/identities (linkIdentity)",
+        "then": {
+          "type": "reset",
+          "to": "today"
+        }
+      },
+      "summary": "POST supabase /auth/v1/user/identities (linkIdentity) then reset → today"
+    },
+    {
+      "element": "Cancel",
+      "path": "footer[1]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    }
+  ]
+}

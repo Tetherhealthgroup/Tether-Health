@@ -1,0 +1,171 @@
+{
+  "id": "st_log",
+  "name": "Log reading",
+  "route": "/p/st/log",
+  "flow": "st",
+  "program": "st",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Log a reading",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "field",
+      "label": "Reading",
+      "value": "142",
+      "unit": "mg/dL",
+      "hint": "From your meter or CGM · 20–600 mg/dL",
+      "kind": "number",
+      "key": "reading"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Fasting",
+        "Before meal",
+        "2 h after meal",
+        "Bedtime",
+        "Other"
+      ],
+      "selected": [
+        "2 h after meal"
+      ],
+      "multi": false,
+      "label": "When?",
+      "key": "when"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Fine",
+        "Shaky",
+        "Sweaty",
+        "Tired",
+        "Thirsty"
+      ],
+      "selected": [
+        "Fine"
+      ],
+      "multi": true,
+      "label": "How do you feel?",
+      "key": "how_do_you_feel"
+    },
+    {
+      "t": "field",
+      "label": "Note (optional)",
+      "value": "Pasta lunch",
+      "hint": "Never shared unless you choose",
+      "kind": "text",
+      "key": "note_optional"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save reading",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/st/readings",
+        "then": {
+          "type": "branch",
+          "question": "Reading vs. your range",
+          "on": null,
+          "decide": "st.glucose",
+          "cases": [
+            {
+              "label": "In or above range",
+              "action": {
+                "type": "toast",
+                "value": "Saved",
+                "then": {
+                  "type": "replace",
+                  "to": "st_home"
+                }
+              }
+            },
+            {
+              "label": "Below your low",
+              "action": {
+                "type": "replace",
+                "to": "st_low"
+              }
+            },
+            {
+              "label": "Invalid (outside 20–600)",
+              "action": {
+                "type": "toast",
+                "value": "Check your meter reading"
+              }
+            }
+          ]
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save reading",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/st/readings",
+        "then": {
+          "type": "branch",
+          "question": "Reading vs. your range",
+          "on": null,
+          "decide": "st.glucose",
+          "cases": [
+            {
+              "label": "In or above range",
+              "action": {
+                "type": "toast",
+                "value": "Saved",
+                "then": {
+                  "type": "replace",
+                  "to": "st_home"
+                }
+              }
+            },
+            {
+              "label": "Below your low",
+              "action": {
+                "type": "replace",
+                "to": "st_low"
+              }
+            },
+            {
+              "label": "Invalid (outside 20–600)",
+              "action": {
+                "type": "toast",
+                "value": "Check your meter reading"
+              }
+            }
+          ]
+        }
+      },
+      "summary": "POST /v1/program-data/st/readings then decide st.glucose: Reading vs. your range → In or above range: toast “Saved” then replace → st_home | Below your low: replace → st_low | Invalid (outside 20–600): toast “Check your meter reading”"
+    }
+  ]
+}

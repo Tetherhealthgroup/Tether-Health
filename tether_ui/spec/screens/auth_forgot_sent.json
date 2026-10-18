@@ -1,0 +1,79 @@
+{
+  "id": "auth_forgot_sent",
+  "name": "Reset link sent",
+  "route": "/auth/forgot/sent",
+  "flow": "auth",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Reset password",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "✓",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "Check your email",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "If an account exists for that address, a reset link is on its way. It expires in 1 hour.",
+      "tone": "body",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "We never say whether an email is registered, to protect your privacy.",
+      "tone": "small",
+      "align": "center"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Back to welcome",
+      "action": {
+        "type": "reset",
+        "to": "welcome"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Back to welcome",
+      "path": "footer[0]",
+      "action": {
+        "type": "reset",
+        "to": "welcome"
+      },
+      "summary": "reset → welcome"
+    }
+  ]
+}

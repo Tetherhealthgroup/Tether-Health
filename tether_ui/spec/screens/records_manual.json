@@ -1,0 +1,177 @@
+{
+  "id": "records_manual",
+  "name": "Enter a value",
+  "route": "/records/manual",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Enter a value",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Add a health value",
+      "size": "m"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Blood pressure",
+        "Glucose",
+        "Lab result",
+        "Vaccine",
+        "Medication",
+        "Condition"
+      ],
+      "selected": [
+        "Lab result"
+      ],
+      "multi": false,
+      "label": "Type",
+      "key": "type"
+    },
+    {
+      "t": "field",
+      "label": "Test",
+      "value": "A1C",
+      "kind": "select",
+      "key": "test"
+    },
+    {
+      "t": "field",
+      "label": "Value",
+      "value": "7.4",
+      "unit": "%",
+      "kind": "number",
+      "key": "value"
+    },
+    {
+      "t": "field",
+      "label": "Date",
+      "value": "Oct 1, 2026",
+      "kind": "date",
+      "key": "date"
+    },
+    {
+      "t": "text",
+      "text": "Checked against plausible ranges and your connected records. Manual values are labelled “Entered by you”.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/manual",
+        "then": {
+          "type": "branch",
+          "question": "Validation",
+          "on": null,
+          "decide": "rec.manual",
+          "cases": [
+            {
+              "label": "Valid",
+              "action": {
+                "type": "toast",
+                "value": "Saved · shared with Steady",
+                "then": {
+                  "type": "popto",
+                  "to": "records_hub"
+                }
+              }
+            },
+            {
+              "label": "Outside expected range",
+              "action": {
+                "type": "replace",
+                "to": "records_manual_error"
+              }
+            },
+            {
+              "label": "Matches an imported value",
+              "action": {
+                "type": "toast",
+                "value": "Already in your records from Epic. Not added twice.",
+                "then": {
+                  "type": "back"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/records/manual",
+        "then": {
+          "type": "branch",
+          "question": "Validation",
+          "on": null,
+          "decide": "rec.manual",
+          "cases": [
+            {
+              "label": "Valid",
+              "action": {
+                "type": "toast",
+                "value": "Saved · shared with Steady",
+                "then": {
+                  "type": "popto",
+                  "to": "records_hub"
+                }
+              }
+            },
+            {
+              "label": "Outside expected range",
+              "action": {
+                "type": "replace",
+                "to": "records_manual_error"
+              }
+            },
+            {
+              "label": "Matches an imported value",
+              "action": {
+                "type": "toast",
+                "value": "Already in your records from Epic. Not added twice.",
+                "then": {
+                  "type": "back"
+                }
+              }
+            }
+          ]
+        }
+      },
+      "summary": "POST /v1/records/manual then decide rec.manual: Validation → Valid: toast “Saved · shared with Steady” then popto → records_hub | Outside expected range: replace → records_manual_error | Matches an imported value: toast “Already in your records from Epic. Not added twice.” then back"
+    }
+  ]
+}

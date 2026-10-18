@@ -1,0 +1,98 @@
+{
+  "id": "bf_estimates",
+  "name": "How estimates work",
+  "route": "/p/bf/progress/estimates",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "resources",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": null,
+  "body": [
+    {
+      "t": "title",
+      "text": "How estimates are calculated",
+      "size": "m"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Baseline",
+          "10 cigarettes a day"
+        ],
+        [
+          "Price",
+          "$14.00 per pack"
+        ],
+        [
+          "Time per cigarette",
+          "5 minutes"
+        ],
+        [
+          "Avoided",
+          "baseline − reported"
+        ]
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Estimates, not measurements. Missing days are left out.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Edit numbers",
+      "action": {
+        "type": "toast",
+        "value": "Opened baseline settings",
+        "then": {
+          "type": "close"
+        }
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "button",
+      "label": "Done",
+      "action": {
+        "type": "close"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": "Progress",
+  "api": [],
+  "actions": [
+    {
+      "element": "Edit numbers",
+      "path": "footer[0]",
+      "action": {
+        "type": "toast",
+        "value": "Opened baseline settings",
+        "then": {
+          "type": "close"
+        }
+      },
+      "summary": "toast “Opened baseline settings” then close"
+    },
+    {
+      "element": "Done",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "id": "ck_day",
+  "name": "Screening day",
+  "route": "/p/ck/day",
+  "flow": "ck",
+  "program": "ck",
+  "phase": "milestone",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Screening day",
+    "left": "back",
+    "pill": "Tomorrow"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Mammogram tomorrow at 9:30 AM",
+      "size": "m"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Skip deodorant or powder",
+              "done": true
+            },
+            {
+              "label": "Wear a two-piece outfit"
+            },
+            {
+              "label": "Bring ID and insurance card"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Nervous?",
+      "text": "It’s common. The scan takes about 20 minutes.",
+      "cta": {
+        "t": "button",
+        "label": "2-min breathing",
+        "action": {
+          "type": "push",
+          "to": "rescue_active"
+        },
+        "variant": "primary",
+        "arrow": false,
+        "small": true
+      }
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Add to calendar",
+      "action": {
+        "type": "toast",
+        "value": "Added to your calendar"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Mark as done",
+      "action": {
+        "type": "push",
+        "to": "ck_done"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "2-min breathing",
+      "path": "body[2].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "rescue_active"
+      },
+      "summary": "push → rescue_active"
+    },
+    {
+      "element": "Add to calendar",
+      "path": "footer[0]",
+      "action": {
+        "type": "toast",
+        "value": "Added to your calendar"
+      },
+      "summary": "toast “Added to your calendar”"
+    },
+    {
+      "element": "Mark as done",
+      "path": "footer[1]",
+      "action": {
+        "type": "push",
+        "to": "ck_done"
+      },
+      "summary": "push → ck_done"
+    }
+  ]
+}

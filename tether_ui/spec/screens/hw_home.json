@@ -1,0 +1,253 @@
+{
+  "id": "hw_home",
+  "name": "Heartwise home",
+  "route": "/p/hw/home",
+  "flow": "hw",
+  "program": "hw",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Heartwise",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Last reading · 7:52 AM",
+      "children": [
+        {
+          "t": "big",
+          "value": "128/82",
+          "unit": "mmHg",
+          "caption": "Average of 2 · target below 130/80"
+        }
+      ]
+    },
+    {
+      "t": "button",
+      "label": "Log blood pressure",
+      "action": {
+        "type": "push",
+        "to": "hw_log"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Trends",
+          "sub": "30-day average 132/82",
+          "action": {
+            "type": "push",
+            "to": "hw_trends"
+          }
+        },
+        {
+          "label": "Cholesterol panel",
+          "sub": "LDL 138 · Sep 30",
+          "action": {
+            "type": "push",
+            "to": "hw_lipids"
+          }
+        },
+        {
+          "label": "Visit summary",
+          "sub": "Preview before sharing",
+          "action": {
+            "type": "push",
+            "to": "hw_summary"
+          }
+        },
+        {
+          "label": "From your health record",
+          "sub": "12 readings · Patel Family Medicine (Epic)",
+          "action": {
+            "type": "push",
+            "to": "records_item"
+          }
+        },
+        {
+          "label": "My targets",
+          "sub": "130/80 from Dr. Patel",
+          "action": {
+            "type": "push",
+            "to": "hw_targets"
+          }
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    },
+    {
+      "t": "emergency",
+      "text": "Chest pain, pressure or trouble breathing? Call 911 now.",
+      "actions": [
+        {
+          "t": "button",
+          "label": "Call 911",
+          "action": {
+            "type": "call",
+            "value": "911",
+            "label": "911"
+          },
+          "variant": "danger",
+          "arrow": false,
+          "small": true
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Log blood pressure",
+      "path": "body[1]",
+      "action": {
+        "type": "push",
+        "to": "hw_log"
+      },
+      "summary": "push → hw_log"
+    },
+    {
+      "element": "Trends",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "hw_trends"
+      },
+      "summary": "push → hw_trends"
+    },
+    {
+      "element": "Cholesterol panel",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "hw_lipids"
+      },
+      "summary": "push → hw_lipids"
+    },
+    {
+      "element": "Visit summary",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "hw_summary"
+      },
+      "summary": "push → hw_summary"
+    },
+    {
+      "element": "From your health record",
+      "path": "body[2].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "records_item"
+      },
+      "summary": "push → records_item"
+    },
+    {
+      "element": "My targets",
+      "path": "body[2].rows[4]",
+      "action": {
+        "type": "push",
+        "to": "hw_targets"
+      },
+      "summary": "push → hw_targets"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[2].rows[5]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Call 911",
+      "path": "body[3].actions[0]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

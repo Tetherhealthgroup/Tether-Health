@@ -1,0 +1,87 @@
+{
+  "id": "sf_screentime_denied",
+  "name": "Screen Time denied",
+  "route": "/p/sf/screen-time?state=denied",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": "sf_screentime",
+  "state": "permission denied",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Screen Time",
+    "left": "back",
+    "pill": "Optional"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "info",
+      "text": "Screen Time access was not allowed."
+    },
+    {
+      "t": "title",
+      "text": "Self-report works just as well.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "We’ll ask for a quick estimate in your evening check-in. You can connect later in Account → ScrollFree.",
+      "tone": "muted"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue with self-report",
+      "action": {
+        "type": "back"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Open phone settings",
+      "action": {
+        "type": "os_settings"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Continue with self-report",
+      "path": "footer[0]",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Open phone settings",
+      "path": "footer[1]",
+      "action": {
+        "type": "os_settings"
+      },
+      "summary": "os_settings"
+    }
+  ]
+}

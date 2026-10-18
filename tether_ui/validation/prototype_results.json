@@ -1,0 +1,7239 @@
+{
+ "scenarios": [
+  {
+   "id": "auth-email",
+   "ok": true,
+   "why": "",
+   "end": "today"
+  },
+  {
+   "id": "auth-apple",
+   "ok": true,
+   "why": "",
+   "end": "today"
+  },
+  {
+   "id": "auth-google",
+   "ok": true,
+   "why": "",
+   "end": "today"
+  },
+  {
+   "id": "auth-apple-new",
+   "ok": true,
+   "why": "",
+   "end": "ob_programs"
+  },
+  {
+   "id": "auth-google-link",
+   "ok": true,
+   "why": "",
+   "end": "today"
+  },
+  {
+   "id": "auth-google-error",
+   "ok": true,
+   "why": "",
+   "end": "auth_signin"
+  },
+  {
+   "id": "auth-wrong-password",
+   "ok": true,
+   "why": "",
+   "end": "auth_signin_error"
+  },
+  {
+   "id": "onboarding",
+   "ok": true,
+   "why": "",
+   "end": "today"
+  },
+  {
+   "id": "fhir-epic",
+   "ok": true,
+   "why": "",
+   "end": "records_hub"
+  },
+  {
+   "id": "fhir-bluebutton",
+   "ok": true,
+   "why": "",
+   "end": "records_review"
+  },
+  {
+   "id": "fhir-denied",
+   "ok": true,
+   "why": "",
+   "end": "records_manual"
+  },
+  {
+   "id": "fhir-custom",
+   "ok": true,
+   "why": "",
+   "end": "records_error"
+  },
+  {
+   "id": "fhir-manual-ok",
+   "ok": true,
+   "why": "",
+   "end": "records_hub"
+  },
+  {
+   "id": "fhir-manual-range",
+   "ok": true,
+   "why": "",
+   "end": "records_manual_error"
+  },
+  {
+   "id": "fhir-disconnect",
+   "ok": true,
+   "why": "",
+   "end": "records_hub"
+  },
+  {
+   "id": "bf-date",
+   "ok": true,
+   "why": "",
+   "end": "bf_home"
+  },
+  {
+   "id": "bf-today",
+   "ok": true,
+   "why": "",
+   "end": "bf_support"
+  },
+  {
+   "id": "bf-reduce",
+   "ok": true,
+   "why": "",
+   "end": "bf_support"
+  },
+  {
+   "id": "bf-explore",
+   "ok": true,
+   "why": "",
+   "end": "bf_home_explore"
+  },
+  {
+   "id": "bf-rescue",
+   "ok": true,
+   "why": "",
+   "end": "today"
+  },
+  {
+   "id": "bf-slip",
+   "ok": true,
+   "why": "",
+   "end": "rescue_active"
+  },
+  {
+   "id": "bf-slip-newdate",
+   "ok": true,
+   "why": "",
+   "end": "bf_date"
+  },
+  {
+   "id": "bf-meds",
+   "ok": true,
+   "why": "",
+   "end": "bf_meds"
+  },
+  {
+   "id": "sf-setup",
+   "ok": true,
+   "why": "",
+   "end": "sf_home"
+  },
+  {
+   "id": "sf-denied",
+   "ok": true,
+   "why": "",
+   "end": "sf_screentime_denied"
+  },
+  {
+   "id": "sf-pause",
+   "ok": true,
+   "why": "",
+   "end": "today"
+  },
+  {
+   "id": "sf-slip",
+   "ok": true,
+   "why": "",
+   "end": "sf_home"
+  },
+  {
+   "id": "ca-setup",
+   "ok": true,
+   "why": "",
+   "end": "ca_home"
+  },
+  {
+   "id": "ca-noplan",
+   "ok": true,
+   "why": "",
+   "end": "ca_noplan"
+  },
+  {
+   "id": "ca-green",
+   "ok": true,
+   "why": "",
+   "end": "ca_home"
+  },
+  {
+   "id": "ca-yellow",
+   "ok": true,
+   "why": "",
+   "end": "ca_yellow"
+  },
+  {
+   "id": "ca-red",
+   "ok": true,
+   "why": "",
+   "end": "ca_red"
+  },
+  {
+   "id": "ca-red-symptom",
+   "ok": true,
+   "why": "",
+   "end": "ca_red"
+  },
+  {
+   "id": "ca-invalid",
+   "ok": true,
+   "why": "",
+   "end": "ca_zone"
+  },
+  {
+   "id": "hw-setup",
+   "ok": true,
+   "why": "",
+   "end": "hw_home"
+  },
+  {
+   "id": "hw-learn",
+   "ok": true,
+   "why": "",
+   "end": "plans"
+  },
+  {
+   "id": "hw-normal",
+   "ok": true,
+   "why": "",
+   "end": "hw_result"
+  },
+  {
+   "id": "hw-crisis",
+   "ok": true,
+   "why": "",
+   "end": "hw_recheck"
+  },
+  {
+   "id": "hw-invalid",
+   "ok": true,
+   "why": "",
+   "end": "hw_log_error"
+  },
+  {
+   "id": "hw-summary",
+   "ok": true,
+   "why": "",
+   "end": "hw_home"
+  },
+  {
+   "id": "st-setup",
+   "ok": true,
+   "why": "",
+   "end": "st_home"
+  },
+  {
+   "id": "st-normal",
+   "ok": true,
+   "why": "",
+   "end": "st_home"
+  },
+  {
+   "id": "st-low",
+   "ok": true,
+   "why": "",
+   "end": "st_low"
+  },
+  {
+   "id": "st-low-custom",
+   "ok": true,
+   "why": "",
+   "end": "st_low"
+  },
+  {
+   "id": "st-invalid",
+   "ok": true,
+   "why": "",
+   "end": "st_log"
+  },
+  {
+   "id": "re-setup",
+   "ok": true,
+   "why": "",
+   "end": "re_home"
+  },
+  {
+   "id": "re-labs",
+   "ok": true,
+   "why": "",
+   "end": "re_history"
+  },
+  {
+   "id": "re-import",
+   "ok": true,
+   "why": "",
+   "end": "records_add"
+  },
+  {
+   "id": "re-symptom",
+   "ok": true,
+   "why": "",
+   "end": "support_message_care"
+  },
+  {
+   "id": "nu-setup",
+   "ok": true,
+   "why": "",
+   "end": "nu_home"
+  },
+  {
+   "id": "nu-protect",
+   "ok": true,
+   "why": "",
+   "end": "nu_protect"
+  },
+  {
+   "id": "nu-reset",
+   "ok": true,
+   "why": "",
+   "end": "nu_home"
+  },
+  {
+   "id": "sd-setup",
+   "ok": true,
+   "why": "",
+   "end": "sd_home"
+  },
+  {
+   "id": "sd-session",
+   "ok": true,
+   "why": "",
+   "end": "sd_home"
+  },
+  {
+   "id": "sd-fell",
+   "ok": true,
+   "why": "",
+   "end": "sd_home"
+  },
+  {
+   "id": "ea-setup",
+   "ok": true,
+   "why": "",
+   "end": "ea_result"
+  },
+  {
+   "id": "ea-skip",
+   "ok": true,
+   "why": "",
+   "end": "ea_home"
+  },
+  {
+   "id": "ea-mood",
+   "ok": true,
+   "why": "",
+   "end": "ea_home"
+  },
+  {
+   "id": "ea-crisis",
+   "ok": true,
+   "why": "",
+   "end": "crisis"
+  },
+  {
+   "id": "ck-setup",
+   "ok": true,
+   "why": "",
+   "end": "ck_list"
+  },
+  {
+   "id": "ck-done",
+   "ok": true,
+   "why": "",
+   "end": "ck_list"
+  },
+  {
+   "id": "be-risk",
+   "ok": true,
+   "why": "",
+   "end": "be_home"
+  },
+  {
+   "id": "be-tx",
+   "ok": true,
+   "why": "",
+   "end": "be_tx"
+  },
+  {
+   "id": "be-survivor",
+   "ok": true,
+   "why": "",
+   "end": "be_survivor"
+  },
+  {
+   "id": "be-diary",
+   "ok": true,
+   "why": "",
+   "end": "be_tx"
+  },
+  {
+   "id": "today-tabs",
+   "ok": true,
+   "why": "",
+   "end": "today"
+  },
+  {
+   "id": "checkin",
+   "ok": true,
+   "why": "",
+   "end": "today"
+  },
+  {
+   "id": "delete",
+   "ok": true,
+   "why": "",
+   "end": "welcome"
+  }
+ ],
+ "sweep": [
+  {
+   "screen": "welcome",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_programs"
+  },
+  {
+   "screen": "welcome",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_signin"
+  },
+  {
+   "screen": "welcome",
+   "path": "footer[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "external:https://www.tetherhealthgroup.com/privacy/"
+  },
+  {
+   "screen": "ob_programs",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ob_programs",
+   "path": "body[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "catalog"
+  },
+  {
+   "screen": "ob_programs",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_focus"
+  },
+  {
+   "screen": "ob_focus",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ob_focus",
+   "path": "body[6]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_third"
+  },
+  {
+   "screen": "ob_focus",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_consent"
+  },
+  {
+   "screen": "ob_third",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ob_third",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ob_consent",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ob_consent",
+   "path": "body[7]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "external:https://www.tetherhealthgroup.com/privacy/"
+  },
+  {
+   "screen": "ob_consent",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_basics"
+  },
+  {
+   "screen": "ob_basics",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ob_basics",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "ob_setup",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ob_setup",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_q1"
+  },
+  {
+   "screen": "ob_setup",
+   "path": "body[3].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_q1"
+  },
+  {
+   "screen": "ob_setup",
+   "path": "body[5].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_add"
+  },
+  {
+   "screen": "ob_setup",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_reminders"
+  },
+  {
+   "screen": "ob_setup",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_reminders"
+  },
+  {
+   "screen": "ob_reminders",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ob_reminders",
+   "path": "footer[0]",
+   "force": "Allowed",
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_account"
+  },
+  {
+   "screen": "ob_reminders",
+   "path": "footer[0]",
+   "force": "Not allowed",
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_reminders_denied"
+  },
+  {
+   "screen": "ob_reminders",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_account"
+  },
+  {
+   "screen": "ob_reminders_denied",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ob_reminders_denied",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "os_settings:"
+  },
+  {
+   "screen": "ob_reminders_denied",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_account"
+  },
+  {
+   "screen": "ob_account",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ob_account",
+   "path": "body[2].items[0]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_merge"
+  },
+  {
+   "screen": "ob_account",
+   "path": "body[2].items[0]",
+   "force": "Email already has a Tether account",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_link"
+  },
+  {
+   "screen": "ob_account",
+   "path": "body[2].items[0]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Sign-in cancelled"
+  },
+  {
+   "screen": "ob_account",
+   "path": "body[2].items[0]",
+   "force": "Error",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_error"
+  },
+  {
+   "screen": "ob_account",
+   "path": "body[2].items[1]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_merge"
+  },
+  {
+   "screen": "ob_account",
+   "path": "body[2].items[1]",
+   "force": "Email already has a Tether account",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_link"
+  },
+  {
+   "screen": "ob_account",
+   "path": "body[2].items[1]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Sign-in cancelled"
+  },
+  {
+   "screen": "ob_account",
+   "path": "body[2].items[1]",
+   "force": "Error",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_error"
+  },
+  {
+   "screen": "ob_account",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_verify"
+  },
+  {
+   "screen": "ob_account",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_verify",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_verify",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "external:message://"
+  },
+  {
+   "screen": "auth_verify",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_merge"
+  },
+  {
+   "screen": "auth_verify",
+   "path": "footer[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Link sent again"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "body[1].items[0]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "body[1].items[0]",
+   "force": "Success · guest plan on phone",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_merge"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "body[1].items[0]",
+   "force": "New Apple ID, no Tether account",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_new"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "body[1].items[0]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Sign-in cancelled"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "body[1].items[0]",
+   "force": "Error",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_error"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "body[1].items[1]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "body[1].items[1]",
+   "force": "Success · guest plan on phone",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_merge"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "body[1].items[1]",
+   "force": "New Google account, no Tether account",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_new"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "body[1].items[1]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Sign-in cancelled"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "body[1].items[1]",
+   "force": "Error",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_error"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "body[5]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_forgot"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "footer[0]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "footer[0]",
+   "force": "Success · guest plan on phone",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_merge"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "footer[0]",
+   "force": "Wrong password",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_signin_error"
+  },
+  {
+   "screen": "auth_signin",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "body[2].items[0]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "body[2].items[0]",
+   "force": "Success · guest plan on phone",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_merge"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "body[2].items[0]",
+   "force": "New Apple ID, no Tether account",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_new"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "body[2].items[0]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Sign-in cancelled"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "body[2].items[0]",
+   "force": "Error",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_error"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "body[2].items[1]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "body[2].items[1]",
+   "force": "Success · guest plan on phone",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_merge"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "body[2].items[1]",
+   "force": "New Google account, no Tether account",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_new"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "body[2].items[1]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Sign-in cancelled"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "body[2].items[1]",
+   "force": "Error",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_error"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "body[6]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_forgot"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "footer[0]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "footer[0]",
+   "force": "Wrong password",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_signin_error"
+  },
+  {
+   "screen": "auth_signin_error",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_social_new",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_social_new",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ob_programs"
+  },
+  {
+   "screen": "auth_social_new",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_link",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_link",
+   "path": "body[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_forgot"
+  },
+  {
+   "screen": "auth_link",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_link",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_social_error",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_social_error",
+   "path": "footer[0]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_social_error",
+   "path": "footer[0]",
+   "force": "Error",
+   "onboarding": false,
+   "ok": true,
+   "got": "Still can’t reach Google. Try email."
+  },
+  {
+   "screen": "auth_social_error",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_signin"
+  },
+  {
+   "screen": "auth_forgot",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_forgot",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_forgot_sent"
+  },
+  {
+   "screen": "auth_forgot_sent",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_forgot_sent",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "welcome"
+  },
+  {
+   "screen": "auth_newpass",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_newpass",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_merge",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_session",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "auth_session",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "today",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "today",
+   "path": "body[3].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "today",
+   "path": "body[5].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "checkin"
+  },
+  {
+   "screen": "today",
+   "path": "body[7].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_home"
+  },
+  {
+   "screen": "today",
+   "path": "body[7].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "today",
+   "path": "body[8]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "today",
+   "path": "tabbar.plans",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "today",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "today",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "today",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "today_loading",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "today_loading",
+   "path": "body[1].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "today_loading",
+   "path": "tabbar.plans",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "today_loading",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "today_loading",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "today_loading",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "today_offline",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "today_offline",
+   "path": "body[2].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "today_offline",
+   "path": "tabbar.plans",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "today_offline",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "today_offline",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "today_offline",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "today_empty",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "today_empty",
+   "path": "body[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_programs"
+  },
+  {
+   "screen": "today_empty",
+   "path": "body[5]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "today_empty",
+   "path": "body[6].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "today_empty",
+   "path": "tabbar.plans",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "today_empty",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "today_empty",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "today_empty",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "today_safety",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "today_safety",
+   "path": "body[1].children[0].items[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "today_safety",
+   "path": "body[1].children[0].items[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_recheck"
+  },
+  {
+   "screen": "today_safety",
+   "path": "tabbar.plans",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "today_safety",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "today_safety",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "today_safety",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "checkin",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "checkin_done"
+  },
+  {
+   "screen": "checkin_done",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "checkin_done",
+   "path": "body[3].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_active"
+  },
+  {
+   "screen": "checkin_done",
+   "path": "body[4].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_goal"
+  },
+  {
+   "screen": "checkin_done",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "rescue_pick",
+   "path": "body[3].items[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_active"
+  },
+  {
+   "screen": "rescue_pick",
+   "path": "body[3].items[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_pause"
+  },
+  {
+   "screen": "rescue_pick",
+   "path": "body[3].items[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_active"
+  },
+  {
+   "screen": "rescue_pick",
+   "path": "body[3].items[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_active"
+  },
+  {
+   "screen": "rescue_pick",
+   "path": "body[4].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_active"
+  },
+  {
+   "screen": "rescue_pick",
+   "path": "body[5].items[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "rescue_pick",
+   "path": "body[5].items[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "crisis"
+  },
+  {
+   "screen": "rescue_active",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "rescue_active",
+   "path": "body[4].children[0].items[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_tools"
+  },
+  {
+   "screen": "rescue_active",
+   "path": "body[4].children[0].items[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_escalate"
+  },
+  {
+   "screen": "rescue_active",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_result"
+  },
+  {
+   "screen": "rescue_tools",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_active"
+  },
+  {
+   "screen": "rescue_tools",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "rescue_result",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "rescue_result",
+   "path": "body[5]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_escalate"
+  },
+  {
+   "screen": "rescue_result",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "rescue_escalate",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "rescue_escalate",
+   "path": "body[2].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:1-800-784-8669"
+  },
+  {
+   "screen": "rescue_escalate",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message"
+  },
+  {
+   "screen": "rescue_escalate",
+   "path": "body[4].actions[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "crisis"
+  },
+  {
+   "screen": "rescue_escalate",
+   "path": "body[4].actions[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "rescue_escalate",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_tools"
+  },
+  {
+   "screen": "crisis",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "crisis",
+   "path": "body[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:988"
+  },
+  {
+   "screen": "crisis",
+   "path": "body[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sms:988"
+  },
+  {
+   "screen": "crisis",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "crisis",
+   "path": "body[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_plan"
+  },
+  {
+   "screen": "plans",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "plans",
+   "path": "body[0].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_home"
+  },
+  {
+   "screen": "plans",
+   "path": "body[0].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "plans",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_intro"
+  },
+  {
+   "screen": "plans",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_meds"
+  },
+  {
+   "screen": "plans",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_programs"
+  },
+  {
+   "screen": "plans",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "catalog"
+  },
+  {
+   "screen": "plans",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "plans",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "plans",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "plans",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "catalog",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "catalog",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_intro"
+  },
+  {
+   "screen": "catalog",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_intro"
+  },
+  {
+   "screen": "catalog",
+   "path": "body[2].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_intro"
+  },
+  {
+   "screen": "catalog",
+   "path": "body[2].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_intro"
+  },
+  {
+   "screen": "catalog",
+   "path": "body[2].rows[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "st_intro"
+  },
+  {
+   "screen": "catalog",
+   "path": "body[2].rows[5]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "re_intro"
+  },
+  {
+   "screen": "catalog",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_intro"
+  },
+  {
+   "screen": "catalog",
+   "path": "body[3].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sd_intro"
+  },
+  {
+   "screen": "catalog",
+   "path": "body[3].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_intro"
+  },
+  {
+   "screen": "catalog",
+   "path": "body[3].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ck_intro"
+  },
+  {
+   "screen": "catalog",
+   "path": "body[3].rows[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "be_intro"
+  },
+  {
+   "screen": "focus_full",
+   "path": "footer[0]",
+   "force": "Learn only",
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "focus_full",
+   "path": "footer[0]",
+   "force": "Swap",
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_q1"
+  },
+  {
+   "screen": "focus_full",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "program_settings",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "program_settings",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Export is being prepared. We’ll notify you."
+  },
+  {
+   "screen": "program_settings",
+   "path": "body[3].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_leave"
+  },
+  {
+   "screen": "program_settings",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "progress",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "progress",
+   "path": "body[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_progress"
+  },
+  {
+   "screen": "progress",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_week"
+  },
+  {
+   "screen": "progress",
+   "path": "body[4].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_privacy"
+  },
+  {
+   "screen": "progress",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "progress",
+   "path": "tabbar.plans",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "progress",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "progress",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "progress_empty",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "progress_empty",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "checkin"
+  },
+  {
+   "screen": "progress_empty",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "progress_empty",
+   "path": "tabbar.plans",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "progress_empty",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "progress_empty",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "progress_error",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "progress_error",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "progress_error",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "progress_error",
+   "path": "tabbar.plans",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "progress_error",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "progress_error",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "learn",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "learn",
+   "path": "body[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "learn",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "learn",
+   "path": "body[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "learn",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "learn",
+   "path": "tabbar.plans",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "learn",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "learn",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "learn_error",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "learn_error",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "learn_error",
+   "path": "body[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "learn_error",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "learn_error",
+   "path": "tabbar.plans",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "learn_error",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "learn_error",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "learn_lesson",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "learn_lesson",
+   "path": "body[2].children[0].items[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Playing audio"
+  },
+  {
+   "screen": "learn_lesson",
+   "path": "body[2].children[0].items[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Transcript opened"
+  },
+  {
+   "screen": "learn_lesson",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "learn_lesson",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Saved for offline"
+  },
+  {
+   "screen": "support",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "support",
+   "path": "body[0].children[0].items[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:1-800-784-8669"
+  },
+  {
+   "screen": "support",
+   "path": "body[0].children[0].items[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_callback"
+  },
+  {
+   "screen": "support",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message"
+  },
+  {
+   "screen": "support",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_buddy"
+  },
+  {
+   "screen": "support",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message_care"
+  },
+  {
+   "screen": "support",
+   "path": "body[3].actions[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "crisis"
+  },
+  {
+   "screen": "support",
+   "path": "body[3].actions[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "support",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "support",
+   "path": "tabbar.plans",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "support",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "support",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "support_empty",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "support_empty",
+   "path": "body[0].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:1-800-784-8669"
+  },
+  {
+   "screen": "support_empty",
+   "path": "body[1].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_add_person"
+  },
+  {
+   "screen": "support_empty",
+   "path": "body[2].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_connect"
+  },
+  {
+   "screen": "support_empty",
+   "path": "body[3].actions[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "crisis"
+  },
+  {
+   "screen": "support_empty",
+   "path": "body[3].actions[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "support_empty",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "support_empty",
+   "path": "tabbar.plans",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "support_empty",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "support_empty",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "support_callback",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "support_callback",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "support_message",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sms:Jordan"
+  },
+  {
+   "screen": "support_message",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "support_message_care",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "support_message_care",
+   "path": "body[4].actions[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "crisis"
+  },
+  {
+   "screen": "support_message_care",
+   "path": "body[4].actions[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "support_message_care",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "support_add_person",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "support_add_person",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "support_connect",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "support_connect",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_hub"
+  },
+  {
+   "screen": "account",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_signin_methods"
+  },
+  {
+   "screen": "account",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_programs"
+  },
+  {
+   "screen": "account",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_notifications"
+  },
+  {
+   "screen": "account",
+   "path": "body[2].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_privacy"
+  },
+  {
+   "screen": "account",
+   "path": "body[2].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_data"
+  },
+  {
+   "screen": "account",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "os_settings:"
+  },
+  {
+   "screen": "account",
+   "path": "body[3].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Language set to English"
+  },
+  {
+   "screen": "account",
+   "path": "body[3].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "external:https://www.tetherhealthgroup.com/support/"
+  },
+  {
+   "screen": "account",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_signout"
+  },
+  {
+   "screen": "account_signin_methods",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account_signin_methods",
+   "path": "body[1].rows[1]",
+   "force": "Success",
+   "onboarding": false,
+   "ok": true,
+   "got": "Google connected"
+  },
+  {
+   "screen": "account_signin_methods",
+   "path": "body[1].rows[1]",
+   "force": "Email already has a Tether account",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_link"
+  },
+  {
+   "screen": "account_signin_methods",
+   "path": "body[1].rows[1]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Cancelled"
+  },
+  {
+   "screen": "account_signin_methods",
+   "path": "body[1].rows[1]",
+   "force": "Error",
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_social_error"
+  },
+  {
+   "screen": "account_signin_methods",
+   "path": "body[1].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "auth_newpass"
+  },
+  {
+   "screen": "account_programs",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account_programs",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "account_programs",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "account_programs",
+   "path": "body[1].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "account_programs",
+   "path": "body[1].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "account_programs",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "catalog"
+  },
+  {
+   "screen": "account_leave",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "account_leave",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account_notifications",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account_notifications",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Reminder time saved"
+  },
+  {
+   "screen": "account_notifications",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Reminder time saved"
+  },
+  {
+   "screen": "account_notifications",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account_privacy",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account_privacy",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_programs"
+  },
+  {
+   "screen": "account_privacy",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Consent history opened"
+  },
+  {
+   "screen": "account_privacy",
+   "path": "body[1].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "external:https://www.tetherhealthgroup.com/privacy/"
+  },
+  {
+   "screen": "account_privacy",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account_data",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account_data",
+   "path": "body[0].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "We’re preparing your file. We’ll notify you when it’s ready."
+  },
+  {
+   "screen": "account_data",
+   "path": "body[0].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_summary"
+  },
+  {
+   "screen": "account_data",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_delete"
+  },
+  {
+   "screen": "account_delete",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "account_delete",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_data"
+  },
+  {
+   "screen": "account_delete",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account_deleted"
+  },
+  {
+   "screen": "account_deleted",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "welcome"
+  },
+  {
+   "screen": "account_signout",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "welcome"
+  },
+  {
+   "screen": "account_signout",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sys_update",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "external:https://apps.apple.com/app/tether-health"
+  },
+  {
+   "screen": "sys_update",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "bf_intro",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_intro",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_q1"
+  },
+  {
+   "screen": "bf_intro",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "bf_q1",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_q1",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_q2"
+  },
+  {
+   "screen": "bf_q2",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_q2",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_q3"
+  },
+  {
+   "screen": "bf_q3",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_q3",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_path"
+  },
+  {
+   "screen": "bf_path",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_path",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "bf_path",
+   "path": "footer[0]",
+   "force": "Set a quit date",
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_date"
+  },
+  {
+   "screen": "bf_path",
+   "path": "footer[0]",
+   "force": "Set a quit date",
+   "onboarding": true,
+   "ok": true,
+   "got": "bf_date"
+  },
+  {
+   "screen": "bf_path",
+   "path": "footer[0]",
+   "force": "Quit today",
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_support"
+  },
+  {
+   "screen": "bf_path",
+   "path": "footer[0]",
+   "force": "Quit today",
+   "onboarding": true,
+   "ok": true,
+   "got": "bf_support"
+  },
+  {
+   "screen": "bf_path",
+   "path": "footer[0]",
+   "force": "Reduce gradually",
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_stepdown"
+  },
+  {
+   "screen": "bf_path",
+   "path": "footer[0]",
+   "force": "Reduce gradually",
+   "onboarding": true,
+   "ok": true,
+   "got": "bf_stepdown"
+  },
+  {
+   "screen": "bf_path",
+   "path": "footer[0]",
+   "force": "Explore first",
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_home_explore"
+  },
+  {
+   "screen": "bf_path",
+   "path": "footer[0]",
+   "force": "Explore first",
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "bf_date",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_date",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_support"
+  },
+  {
+   "screen": "bf_stepdown",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_stepdown",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_support"
+  },
+  {
+   "screen": "bf_support",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_support",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_add_person"
+  },
+  {
+   "screen": "bf_support",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_add_person"
+  },
+  {
+   "screen": "bf_support",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_review"
+  },
+  {
+   "screen": "bf_review",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_review",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_path"
+  },
+  {
+   "screen": "bf_review",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_date"
+  },
+  {
+   "screen": "bf_review",
+   "path": "body[2].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_q3"
+  },
+  {
+   "screen": "bf_review",
+   "path": "body[2].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_support"
+  },
+  {
+   "screen": "bf_review",
+   "path": "body[2].rows[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_support"
+  },
+  {
+   "screen": "bf_review",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_home"
+  },
+  {
+   "screen": "bf_review",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "bf_review",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "bf_home",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_home",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "bf_home",
+   "path": "body[1].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "bf_home",
+   "path": "body[4].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "checkin"
+  },
+  {
+   "screen": "bf_home",
+   "path": "body[4].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_meds"
+  },
+  {
+   "screen": "bf_home",
+   "path": "body[4].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_progress"
+  },
+  {
+   "screen": "bf_home",
+   "path": "body[4].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_review"
+  },
+  {
+   "screen": "bf_home",
+   "path": "body[4].rows[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "bf_home",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_home",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "bf_home",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "bf_home",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "bf_home_quitday",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_home_quitday",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "bf_home_quitday",
+   "path": "body[3].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "bf_home_quitday",
+   "path": "body[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_slip"
+  },
+  {
+   "screen": "bf_home_quitday",
+   "path": "body[6].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "checkin"
+  },
+  {
+   "screen": "bf_home_quitday",
+   "path": "body[6].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_meds"
+  },
+  {
+   "screen": "bf_home_quitday",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_home_quitday",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "bf_home_quitday",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "bf_home_quitday",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "bf_home_explore",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_home_explore",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "bf_home_explore",
+   "path": "body[2].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_pick"
+  },
+  {
+   "screen": "bf_home_explore",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "bf_home_explore",
+   "path": "body[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "bf_home_explore",
+   "path": "body[5].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_path"
+  },
+  {
+   "screen": "bf_home_explore",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_home_explore",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "bf_home_explore",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "bf_home_explore",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "bf_slip",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_slip",
+   "path": "footer[0]",
+   "force": "Continue from this moment",
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_active"
+  },
+  {
+   "screen": "bf_slip",
+   "path": "footer[0]",
+   "force": "Choose a new quit time",
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_date"
+  },
+  {
+   "screen": "bf_slip",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_meds",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_meds",
+   "path": "body[1].children[0].items[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Recorded: taken at 8:07 AM"
+  },
+  {
+   "screen": "bf_meds",
+   "path": "body[1].children[0].items[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Recorded: not taken"
+  },
+  {
+   "screen": "bf_meds",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "bf_meds",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "bf_meds",
+   "path": "body[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message_care"
+  },
+  {
+   "screen": "bf_meds",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_meds_edit"
+  },
+  {
+   "screen": "bf_meds_edit",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_meds_edit",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_progress",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_progress",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_estimates"
+  },
+  {
+   "screen": "bf_estimates",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "bf_estimates",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_intro",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_intro",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_q1"
+  },
+  {
+   "screen": "sf_intro",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "sf_q1",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_q1",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_q2"
+  },
+  {
+   "screen": "sf_q2",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_q2",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_goal"
+  },
+  {
+   "screen": "sf_goal",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_goal",
+   "path": "body[4].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_screentime"
+  },
+  {
+   "screen": "sf_goal",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_buddy"
+  },
+  {
+   "screen": "sf_screentime",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_screentime",
+   "path": "footer[0]",
+   "force": "Allowed",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_screentime",
+   "path": "footer[0]",
+   "force": "Not allowed",
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_screentime_denied"
+  },
+  {
+   "screen": "sf_screentime",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_screentime_denied",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_screentime_denied",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_screentime_denied",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "os_settings:"
+  },
+  {
+   "screen": "sf_buddy",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_buddy",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "sf_buddy",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "sf_buddy",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "sf_buddy",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "sf_home",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_home",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "sf_home",
+   "path": "body[1].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_pause"
+  },
+  {
+   "screen": "sf_home",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_week"
+  },
+  {
+   "screen": "sf_home",
+   "path": "body[3].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_slip"
+  },
+  {
+   "screen": "sf_home",
+   "path": "body[3].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_goal"
+  },
+  {
+   "screen": "sf_home",
+   "path": "body[3].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_buddy"
+  },
+  {
+   "screen": "sf_home",
+   "path": "body[3].rows[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "sf_home",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_home",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "sf_home",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "sf_home",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "sf_pause",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_pause",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_pause",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_slip",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_slip",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sf_home"
+  },
+  {
+   "screen": "sf_week",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_week",
+   "path": "body[4].children[0].items[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sf_week",
+   "path": "body[4].children[0].items[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_intro",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_intro",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_q1"
+  },
+  {
+   "screen": "ca_intro",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "ca_q1",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_q1",
+   "path": "footer[0]",
+   "force": "Yes",
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_plan"
+  },
+  {
+   "screen": "ca_q1",
+   "path": "footer[0]",
+   "force": "No / Not sure",
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_noplan"
+  },
+  {
+   "screen": "ca_plan",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_plan",
+   "path": "body[6]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Camera opened"
+  },
+  {
+   "screen": "ca_plan",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_home"
+  },
+  {
+   "screen": "ca_plan",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "ca_noplan",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_noplan",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_symptoms"
+  },
+  {
+   "screen": "ca_noplan",
+   "path": "body[3].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "ca_noplan",
+   "path": "body[3].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message_care"
+  },
+  {
+   "screen": "ca_noplan",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_home"
+  },
+  {
+   "screen": "ca_noplan",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "ca_home",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_home",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "ca_home",
+   "path": "body[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_zone"
+  },
+  {
+   "screen": "ca_home",
+   "path": "body[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_red"
+  },
+  {
+   "screen": "ca_home",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_symptoms"
+  },
+  {
+   "screen": "ca_home",
+   "path": "body[3].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_progress"
+  },
+  {
+   "screen": "ca_home",
+   "path": "body[3].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_plan"
+  },
+  {
+   "screen": "ca_home",
+   "path": "body[3].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "ca_home",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_home",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "ca_home",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "ca_home",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "ca_zone",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_zone",
+   "path": "footer[0]",
+   "force": "Green",
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_home"
+  },
+  {
+   "screen": "ca_zone",
+   "path": "footer[0]",
+   "force": "Yellow",
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_yellow"
+  },
+  {
+   "screen": "ca_zone",
+   "path": "footer[0]",
+   "force": "Red",
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_red"
+  },
+  {
+   "screen": "ca_zone",
+   "path": "footer[0]",
+   "force": "Invalid peak flow",
+   "onboarding": false,
+   "ok": true,
+   "got": "Check your peak flow: 50–900 L/min"
+  },
+  {
+   "screen": "ca_yellow",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_yellow",
+   "path": "body[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_red"
+  },
+  {
+   "screen": "ca_yellow",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ca_home"
+  },
+  {
+   "screen": "ca_yellow",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message_care"
+  },
+  {
+   "screen": "ca_red",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_red",
+   "path": "body[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "ca_red",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message"
+  },
+  {
+   "screen": "ca_symptoms",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_symptoms",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_progress",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ca_progress",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_summary"
+  },
+  {
+   "screen": "hw_intro",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_intro",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "focus_full"
+  },
+  {
+   "screen": "hw_intro",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "hw_q1",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_q1",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_targets"
+  },
+  {
+   "screen": "hw_targets",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_targets",
+   "path": "body[6]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_add"
+  },
+  {
+   "screen": "hw_targets",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_home"
+  },
+  {
+   "screen": "hw_targets",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "hw_home",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_home",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "hw_home",
+   "path": "body[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_log"
+  },
+  {
+   "screen": "hw_home",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_trends"
+  },
+  {
+   "screen": "hw_home",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_lipids"
+  },
+  {
+   "screen": "hw_home",
+   "path": "body[2].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_summary"
+  },
+  {
+   "screen": "hw_home",
+   "path": "body[2].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_item"
+  },
+  {
+   "screen": "hw_home",
+   "path": "body[2].rows[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_targets"
+  },
+  {
+   "screen": "hw_home",
+   "path": "body[2].rows[5]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "hw_home",
+   "path": "body[3].actions[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "hw_home",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_home",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "hw_home",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "hw_home",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "hw_log",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_log",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_log2"
+  },
+  {
+   "screen": "hw_log2",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_log2",
+   "path": "footer[0]",
+   "force": "Valid · below crisis range",
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_result"
+  },
+  {
+   "screen": "hw_log2",
+   "path": "footer[0]",
+   "force": "Invalid value",
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_log_error"
+  },
+  {
+   "screen": "hw_log2",
+   "path": "footer[0]",
+   "force": "≥180 top or ≥120 bottom",
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_crisis"
+  },
+  {
+   "screen": "hw_log_error",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_log_error",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_log2"
+  },
+  {
+   "screen": "hw_result",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_result",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_trends"
+  },
+  {
+   "screen": "hw_result",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_home"
+  },
+  {
+   "screen": "hw_crisis",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_crisis",
+   "path": "body[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "hw_crisis",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_recheck"
+  },
+  {
+   "screen": "hw_recheck",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_recheck",
+   "path": "body[3].actions[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "hw_recheck",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_log"
+  },
+  {
+   "screen": "hw_recheck",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message_care"
+  },
+  {
+   "screen": "hw_trends",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_trends",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_summary"
+  },
+  {
+   "screen": "hw_lipids",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_lipids",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_summary",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_summary",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "hw_summary",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "PDF saved to Files"
+  },
+  {
+   "screen": "st_intro",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "st_intro",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "st_q1"
+  },
+  {
+   "screen": "st_intro",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "st_q1",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "st_q1",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "st_range"
+  },
+  {
+   "screen": "st_range",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "st_range",
+   "path": "body[6]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_add"
+  },
+  {
+   "screen": "st_range",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "st_home"
+  },
+  {
+   "screen": "st_range",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "st_home",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "st_home",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "st_home",
+   "path": "body[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "st_log"
+  },
+  {
+   "screen": "st_home",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "st_reset"
+  },
+  {
+   "screen": "st_home",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "st_patterns"
+  },
+  {
+   "screen": "st_home",
+   "path": "body[2].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "st_a1c"
+  },
+  {
+   "screen": "st_home",
+   "path": "body[2].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "st_range"
+  },
+  {
+   "screen": "st_home",
+   "path": "body[2].rows[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "st_home",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "st_home",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "st_home",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "st_home",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "st_log",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "st_log",
+   "path": "footer[0]",
+   "force": "In or above range",
+   "onboarding": false,
+   "ok": true,
+   "got": "st_home"
+  },
+  {
+   "screen": "st_log",
+   "path": "footer[0]",
+   "force": "Below your low",
+   "onboarding": false,
+   "ok": true,
+   "got": "st_low"
+  },
+  {
+   "screen": "st_log",
+   "path": "footer[0]",
+   "force": "Invalid (outside 20–600)",
+   "onboarding": false,
+   "ok": true,
+   "got": "Check your meter reading"
+  },
+  {
+   "screen": "st_low",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "st_low",
+   "path": "body[3].children[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "st_low",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "st_log"
+  },
+  {
+   "screen": "st_reset",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "st_reset",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "st_patterns",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "st_a1c",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "st_a1c",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "re_intro",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "re_intro",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "re_q1"
+  },
+  {
+   "screen": "re_intro",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "re_q1",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "re_q1",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "re_result"
+  },
+  {
+   "screen": "re_result",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "re_result",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "catalog"
+  },
+  {
+   "screen": "re_result",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "re_home"
+  },
+  {
+   "screen": "re_result",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "re_home",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "re_home",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "re_home",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "re_labs"
+  },
+  {
+   "screen": "re_home",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "re_history"
+  },
+  {
+   "screen": "re_home",
+   "path": "body[2].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "re_symptoms"
+  },
+  {
+   "screen": "re_home",
+   "path": "body[2].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "re_home",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "re_home",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "re_home",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "re_home",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "re_labs",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "re_labs",
+   "path": "body[5]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_add"
+  },
+  {
+   "screen": "re_labs",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "re_history"
+  },
+  {
+   "screen": "re_history",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "re_history",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_summary"
+  },
+  {
+   "screen": "re_symptoms",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "re_symptoms",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message_care"
+  },
+  {
+   "screen": "re_symptoms",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "nu_intro",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "nu_intro",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_q1"
+  },
+  {
+   "screen": "nu_intro",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "nu_q1",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "nu_q1",
+   "path": "footer[0]",
+   "force": "No",
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_habit"
+  },
+  {
+   "screen": "nu_q1",
+   "path": "footer[0]",
+   "force": "Yes / Prefer not to say",
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_protect"
+  },
+  {
+   "screen": "nu_habit",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "nu_habit",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_home"
+  },
+  {
+   "screen": "nu_habit",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "nu_home",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "nu_home",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "nu_home",
+   "path": "body[0].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Nice. 4 of 5 nights."
+  },
+  {
+   "screen": "nu_home",
+   "path": "body[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "nu_home",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_reset"
+  },
+  {
+   "screen": "nu_home",
+   "path": "body[3].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_week4"
+  },
+  {
+   "screen": "nu_home",
+   "path": "body[3].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_habit"
+  },
+  {
+   "screen": "nu_home",
+   "path": "body[3].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "nu_home",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "nu_home",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "nu_home",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "nu_home",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "nu_reset",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "nu_reset",
+   "path": "footer[0]",
+   "force": "Keep this habit",
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_home"
+  },
+  {
+   "screen": "nu_reset",
+   "path": "footer[0]",
+   "force": "Make it smaller",
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_home"
+  },
+  {
+   "screen": "nu_reset",
+   "path": "footer[0]",
+   "force": "Pick a different habit",
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_habit"
+  },
+  {
+   "screen": "nu_week4",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "nu_week4",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_habit"
+  },
+  {
+   "screen": "nu_protect",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "nu_protect",
+   "path": "body[2].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message_care"
+  },
+  {
+   "screen": "nu_protect",
+   "path": "body[3].actions[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "crisis"
+  },
+  {
+   "screen": "nu_protect",
+   "path": "body[3].actions[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "nu_protect",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "nu_habit"
+  },
+  {
+   "screen": "nu_protect",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "nu_habit"
+  },
+  {
+   "screen": "sd_intro",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sd_intro",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sd_q1"
+  },
+  {
+   "screen": "sd_intro",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "sd_q1",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sd_q1",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sd_plan"
+  },
+  {
+   "screen": "sd_plan",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sd_plan",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sd_home"
+  },
+  {
+   "screen": "sd_plan",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "sd_home",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sd_home",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "sd_home",
+   "path": "body[0].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sd_session"
+  },
+  {
+   "screen": "sd_home",
+   "path": "body[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sd_fell"
+  },
+  {
+   "screen": "sd_home",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sd_safety"
+  },
+  {
+   "screen": "sd_home",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sd_caregiver"
+  },
+  {
+   "screen": "sd_home",
+   "path": "body[2].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sd_plan"
+  },
+  {
+   "screen": "sd_home",
+   "path": "body[2].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "sd_home",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sd_home",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "sd_home",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "sd_home",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "sd_session",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sd_session",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Exercise 3 of 6"
+  },
+  {
+   "screen": "sd_session",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sd_home"
+  },
+  {
+   "screen": "sd_fell",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sd_fell",
+   "path": "body[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "sd_fell",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:(555) 010-2244"
+  },
+  {
+   "screen": "sd_fell",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "sd_fell",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "sd_home"
+  },
+  {
+   "screen": "sd_safety",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sd_safety",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sd_caregiver",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "sd_caregiver",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ea_intro",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ea_intro",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_q1"
+  },
+  {
+   "screen": "ea_intro",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "ea_q1",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ea_q1",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_result"
+  },
+  {
+   "screen": "ea_q1",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_plan"
+  },
+  {
+   "screen": "ea_result",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ea_result",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "external:https://findtreatment.gov"
+  },
+  {
+   "screen": "ea_result",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message_care"
+  },
+  {
+   "screen": "ea_result",
+   "path": "body[2].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_plan"
+  },
+  {
+   "screen": "ea_result",
+   "path": "body[3].actions[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "crisis"
+  },
+  {
+   "screen": "ea_result",
+   "path": "body[3].actions[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "ea_plan",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ea_plan",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_home"
+  },
+  {
+   "screen": "ea_plan",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "ea_home",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ea_home",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "ea_home",
+   "path": "body[0].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_mood"
+  },
+  {
+   "screen": "ea_home",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_plan"
+  },
+  {
+   "screen": "ea_home",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_checkback"
+  },
+  {
+   "screen": "ea_home",
+   "path": "body[1].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_result"
+  },
+  {
+   "screen": "ea_home",
+   "path": "body[1].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "ea_home",
+   "path": "body[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "ea_home",
+   "path": "body[3].actions[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "crisis"
+  },
+  {
+   "screen": "ea_home",
+   "path": "body[3].actions[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:911"
+  },
+  {
+   "screen": "ea_home",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ea_home",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "ea_home",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "ea_home",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "ea_mood",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ea_mood",
+   "path": "body[2].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_active"
+  },
+  {
+   "screen": "ea_mood",
+   "path": "footer[0]",
+   "force": "No",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ea_mood",
+   "path": "footer[0]",
+   "force": "Yes",
+   "onboarding": false,
+   "ok": true,
+   "got": "crisis"
+  },
+  {
+   "screen": "ea_checkback",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ea_checkback",
+   "path": "body[3].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "ea_checkback",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ck_intro",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ck_intro",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ck_q1"
+  },
+  {
+   "screen": "ck_intro",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "ck_q1",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ck_q1",
+   "path": "body[6]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_add"
+  },
+  {
+   "screen": "ck_q1",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ck_list"
+  },
+  {
+   "screen": "ck_q1",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "ck_list",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ck_list",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "ck_list",
+   "path": "body[1].children[0].items[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "external:https://www.vaccines.gov"
+  },
+  {
+   "screen": "ck_list",
+   "path": "body[1].children[0].items[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ck_done"
+  },
+  {
+   "screen": "ck_list",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ck_item"
+  },
+  {
+   "screen": "ck_list",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ck_day"
+  },
+  {
+   "screen": "ck_list",
+   "path": "body[2].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ck_item"
+  },
+  {
+   "screen": "ck_list",
+   "path": "body[2].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "ck_list",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ck_list",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "ck_list",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "ck_list",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "ck_uptodate",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ck_uptodate",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "ck_uptodate",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ck_list"
+  },
+  {
+   "screen": "ck_uptodate",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ck_uptodate",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "ck_uptodate",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "ck_uptodate",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "ck_item",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ck_item",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message_care"
+  },
+  {
+   "screen": "ck_item",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ck_done"
+  },
+  {
+   "screen": "ck_done",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ck_done",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ck_list"
+  },
+  {
+   "screen": "ck_day",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "ck_day",
+   "path": "body[2].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "rescue_active"
+  },
+  {
+   "screen": "ck_day",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Added to your calendar"
+  },
+  {
+   "screen": "ck_day",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ck_done"
+  },
+  {
+   "screen": "be_intro",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_intro",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "be_q1"
+  },
+  {
+   "screen": "be_intro",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "plans"
+  },
+  {
+   "screen": "be_q1",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_q1",
+   "path": "footer[0]",
+   "force": "Lowering my risk",
+   "onboarding": false,
+   "ok": true,
+   "got": "be_q2"
+  },
+  {
+   "screen": "be_q1",
+   "path": "footer[0]",
+   "force": "Lowering my risk",
+   "onboarding": true,
+   "ok": true,
+   "got": "be_q2"
+  },
+  {
+   "screen": "be_q1",
+   "path": "footer[0]",
+   "force": "Going through treatment",
+   "onboarding": false,
+   "ok": true,
+   "got": "be_tx"
+  },
+  {
+   "screen": "be_q1",
+   "path": "footer[0]",
+   "force": "Going through treatment",
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "be_q1",
+   "path": "footer[0]",
+   "force": "After treatment",
+   "onboarding": false,
+   "ok": true,
+   "got": "be_survivor"
+  },
+  {
+   "screen": "be_q1",
+   "path": "footer[0]",
+   "force": "After treatment",
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "be_q1",
+   "path": "footer[0]",
+   "force": "Supporting someone",
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "be_q1",
+   "path": "footer[0]",
+   "force": "Supporting someone",
+   "onboarding": true,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "be_q2",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_q2",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "be_home"
+  },
+  {
+   "screen": "be_q2",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": true,
+   "ok": true,
+   "got": "ob_setup"
+  },
+  {
+   "screen": "be_home",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_home",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "be_home",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "bf_home"
+  },
+  {
+   "screen": "be_home",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn_lesson"
+  },
+  {
+   "screen": "be_home",
+   "path": "body[1].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message_care"
+  },
+  {
+   "screen": "be_home",
+   "path": "body[2].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ck_list"
+  },
+  {
+   "screen": "be_home",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "be_q1"
+  },
+  {
+   "screen": "be_home",
+   "path": "body[3].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "be_home",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_home",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "be_home",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "be_home",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "be_tx",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_tx",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "be_tx",
+   "path": "body[0].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "be_questions"
+  },
+  {
+   "screen": "be_tx",
+   "path": "body[1].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:(555) 010-7000"
+  },
+  {
+   "screen": "be_tx",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "be_diary"
+  },
+  {
+   "screen": "be_tx",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_intro"
+  },
+  {
+   "screen": "be_tx",
+   "path": "body[2].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "be_tx",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_tx",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "be_tx",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "be_tx",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "be_diary",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_diary",
+   "path": "body[3].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "call:(555) 010-7000"
+  },
+  {
+   "screen": "be_diary",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_questions",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_questions",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message_care"
+  },
+  {
+   "screen": "be_questions",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_survivor",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_survivor",
+   "path": "header.avatar",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "account"
+  },
+  {
+   "screen": "be_survivor",
+   "path": "body[2].cta[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "ea_intro"
+  },
+  {
+   "screen": "be_survivor",
+   "path": "body[4].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "program_settings"
+  },
+  {
+   "screen": "be_survivor",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Saved"
+  },
+  {
+   "screen": "be_survivor",
+   "path": "tabbar.today",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "be_survivor",
+   "path": "tabbar.progress",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "progress"
+  },
+  {
+   "screen": "be_survivor",
+   "path": "tabbar.learn",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "learn"
+  },
+  {
+   "screen": "be_survivor",
+   "path": "tabbar.support",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support"
+  },
+  {
+   "screen": "records_hub",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_hub",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_source"
+  },
+  {
+   "screen": "records_hub",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_source"
+  },
+  {
+   "screen": "records_hub",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_item"
+  },
+  {
+   "screen": "records_hub",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_item"
+  },
+  {
+   "screen": "records_hub",
+   "path": "body[2].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_item"
+  },
+  {
+   "screen": "records_hub",
+   "path": "body[2].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_item"
+  },
+  {
+   "screen": "records_hub",
+   "path": "body[2].rows[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_item"
+  },
+  {
+   "screen": "records_hub",
+   "path": "body[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_conflict"
+  },
+  {
+   "screen": "records_hub",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_add"
+  },
+  {
+   "screen": "records_hub",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_manual"
+  },
+  {
+   "screen": "records_hub_empty",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_hub_empty",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_add"
+  },
+  {
+   "screen": "records_hub_empty",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_manual"
+  },
+  {
+   "screen": "records_add",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_add",
+   "path": "body[2].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_search"
+  },
+  {
+   "screen": "records_add",
+   "path": "body[2].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_search"
+  },
+  {
+   "screen": "records_add",
+   "path": "body[2].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_consent_bb"
+  },
+  {
+   "screen": "records_add",
+   "path": "body[2].rows[3]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_consent_device"
+  },
+  {
+   "screen": "records_add",
+   "path": "body[2].rows[4]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_consent_device"
+  },
+  {
+   "screen": "records_add",
+   "path": "body[2].rows[5]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_fhir_url"
+  },
+  {
+   "screen": "records_add",
+   "path": "body[3].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_manual"
+  },
+  {
+   "screen": "records_search",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_search",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_consent"
+  },
+  {
+   "screen": "records_search",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_consent"
+  },
+  {
+   "screen": "records_search",
+   "path": "body[1].rows[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_consent"
+  },
+  {
+   "screen": "records_search",
+   "path": "body[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_fhir_url"
+  },
+  {
+   "screen": "records_fhir_url",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_fhir_url",
+   "path": "footer[0]",
+   "force": "SMART on FHIR R4 supported",
+   "onboarding": false,
+   "ok": true,
+   "got": "records_consent"
+  },
+  {
+   "screen": "records_fhir_url",
+   "path": "footer[0]",
+   "force": "Not a FHIR R4 server",
+   "onboarding": false,
+   "ok": true,
+   "got": "records_error"
+  },
+  {
+   "screen": "records_consent",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_consent",
+   "path": "footer[0]",
+   "force": "Approved",
+   "onboarding": false,
+   "ok": true,
+   "got": "records_importing"
+  },
+  {
+   "screen": "records_consent",
+   "path": "footer[0]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Connection cancelled. Nothing was imported."
+  },
+  {
+   "screen": "records_consent",
+   "path": "footer[0]",
+   "force": "Denied or error",
+   "onboarding": false,
+   "ok": true,
+   "got": "records_error"
+  },
+  {
+   "screen": "records_consent",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_consent_bb",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_consent_bb",
+   "path": "footer[0]",
+   "force": "Approved",
+   "onboarding": false,
+   "ok": true,
+   "got": "records_importing"
+  },
+  {
+   "screen": "records_consent_bb",
+   "path": "footer[0]",
+   "force": "Cancelled",
+   "onboarding": false,
+   "ok": true,
+   "got": "Connection cancelled. Nothing was imported."
+  },
+  {
+   "screen": "records_consent_bb",
+   "path": "footer[0]",
+   "force": "Denied or error",
+   "onboarding": false,
+   "ok": true,
+   "got": "records_error"
+  },
+  {
+   "screen": "records_consent_bb",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_consent_device",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_consent_device",
+   "path": "footer[0]",
+   "force": "Allowed",
+   "onboarding": false,
+   "ok": true,
+   "got": "records_importing"
+  },
+  {
+   "screen": "records_consent_device",
+   "path": "footer[0]",
+   "force": "Not allowed",
+   "onboarding": false,
+   "ok": true,
+   "got": "records_error"
+  },
+  {
+   "screen": "records_consent_device",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_importing",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_importing",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_review"
+  },
+  {
+   "screen": "records_importing",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_hub"
+  },
+  {
+   "screen": "records_review",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_review",
+   "path": "body[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_conflict"
+  },
+  {
+   "screen": "records_review",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_hub"
+  },
+  {
+   "screen": "records_review",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_conflict"
+  },
+  {
+   "screen": "records_conflict",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_conflict",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_error",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_error",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_error",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_add"
+  },
+  {
+   "screen": "records_error",
+   "path": "footer[2]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_manual"
+  },
+  {
+   "screen": "records_source",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_source",
+   "path": "body[1].rows[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "Synced · 2 new results"
+  },
+  {
+   "screen": "records_source",
+   "path": "body[1].rows[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_consent"
+  },
+  {
+   "screen": "records_source",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_disconnect"
+  },
+  {
+   "screen": "records_disconnect",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "records_hub"
+  },
+  {
+   "screen": "records_disconnect",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_manual",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_manual",
+   "path": "footer[0]",
+   "force": "Valid",
+   "onboarding": false,
+   "ok": true,
+   "got": "records_hub"
+  },
+  {
+   "screen": "records_manual",
+   "path": "footer[0]",
+   "force": "Outside expected range",
+   "onboarding": false,
+   "ok": true,
+   "got": "records_manual_error"
+  },
+  {
+   "screen": "records_manual",
+   "path": "footer[0]",
+   "force": "Matches an imported value",
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_manual_error",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_manual_error",
+   "path": "footer[0]",
+   "force": "Valid",
+   "onboarding": false,
+   "ok": true,
+   "got": "records_hub"
+  },
+  {
+   "screen": "records_manual_error",
+   "path": "footer[0]",
+   "force": "Outside expected range",
+   "onboarding": false,
+   "ok": true,
+   "got": "Still outside the expected range"
+  },
+  {
+   "screen": "records_manual_error",
+   "path": "footer[1]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "support_message_care"
+  },
+  {
+   "screen": "records_item",
+   "path": "header.left",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "today"
+  },
+  {
+   "screen": "records_item",
+   "path": "footer[0]",
+   "force": null,
+   "onboarding": false,
+   "ok": true,
+   "got": "hw_trends"
+  }
+ ],
+ "errors": []
+}

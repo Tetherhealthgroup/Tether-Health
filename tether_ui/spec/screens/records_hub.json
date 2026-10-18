@@ -1,0 +1,239 @@
+{
+  "id": "records_hub",
+  "name": "Health records",
+  "route": "/records",
+  "flow": "records",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Health records",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "info",
+      "text": "Read-only. Tether never writes to your health record, and each program only gets the data it needs."
+    },
+    {
+      "t": "list",
+      "title": "Connected sources",
+      "rows": [
+        {
+          "label": "Patel Family Medicine",
+          "sub": "Epic MyChart · synced today 7:02 AM",
+          "action": {
+            "type": "push",
+            "to": "records_source"
+          },
+          "lead": {
+            "icon": "E"
+          }
+        },
+        {
+          "label": "Medicare",
+          "sub": "Blue Button 2.0 · synced Oct 12",
+          "action": {
+            "type": "push",
+            "to": "records_source"
+          },
+          "lead": {
+            "icon": "M"
+          }
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Imported data",
+      "rows": [
+        {
+          "label": "Blood pressure",
+          "sub": "12 readings · Heartwise",
+          "action": {
+            "type": "push",
+            "to": "records_item"
+          }
+        },
+        {
+          "label": "Lab results",
+          "sub": "A1C, lipids, eGFR · Steady, Heartwise, Renew",
+          "action": {
+            "type": "push",
+            "to": "records_item"
+          }
+        },
+        {
+          "label": "Immunizations",
+          "sub": "6 · Checkup",
+          "action": {
+            "type": "push",
+            "to": "records_item"
+          }
+        },
+        {
+          "label": "Smoking status",
+          "sub": "Every day smoker (Aug 2026) · BreatheFree",
+          "action": {
+            "type": "push",
+            "to": "records_item"
+          }
+        },
+        {
+          "label": "Medications & conditions",
+          "sub": "Shown for reference only",
+          "action": {
+            "type": "push",
+            "to": "records_item"
+          }
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "warn",
+      "title": "2 items need your review",
+      "text": "A value that differs from what you entered, and one that looks like a typo.",
+      "action": {
+        "type": "push",
+        "to": "records_conflict"
+      }
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Add a source",
+      "action": {
+        "type": "push",
+        "to": "records_add"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Enter a value manually",
+      "action": {
+        "type": "push",
+        "to": "records_manual"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [
+    "GET /v1/records/fhir/sources",
+    "GET /v1/records/fhir/summary"
+  ],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Patel Family Medicine",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "records_source"
+      },
+      "summary": "push → records_source"
+    },
+    {
+      "element": "Medicare",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "records_source"
+      },
+      "summary": "push → records_source"
+    },
+    {
+      "element": "Blood pressure",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "records_item"
+      },
+      "summary": "push → records_item"
+    },
+    {
+      "element": "Lab results",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "records_item"
+      },
+      "summary": "push → records_item"
+    },
+    {
+      "element": "Immunizations",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "records_item"
+      },
+      "summary": "push → records_item"
+    },
+    {
+      "element": "Smoking status",
+      "path": "body[2].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "records_item"
+      },
+      "summary": "push → records_item"
+    },
+    {
+      "element": "Medications & conditions",
+      "path": "body[2].rows[4]",
+      "action": {
+        "type": "push",
+        "to": "records_item"
+      },
+      "summary": "push → records_item"
+    },
+    {
+      "element": "2 items need your review",
+      "path": "body[3]",
+      "action": {
+        "type": "push",
+        "to": "records_conflict"
+      },
+      "summary": "push → records_conflict"
+    },
+    {
+      "element": "Add a source",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "records_add"
+      },
+      "summary": "push → records_add"
+    },
+    {
+      "element": "Enter a value manually",
+      "path": "footer[1]",
+      "action": {
+        "type": "push",
+        "to": "records_manual"
+      },
+      "summary": "push → records_manual"
+    }
+  ]
+}

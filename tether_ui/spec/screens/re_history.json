@@ -1,0 +1,90 @@
+{
+  "id": "re_history",
+  "name": "Lab history",
+  "route": "/p/re/history",
+  "flow": "re",
+  "program": "re",
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Lab history",
+    "left": "back",
+    "pill": "Renew"
+  },
+  "body": [
+    {
+      "t": "chart",
+      "kind": "line",
+      "values": [
+        72,
+        69,
+        66,
+        64,
+        61,
+        58
+      ],
+      "color": "re",
+      "title": "eGFR · 2 years",
+      "unit": "mL/min",
+      "caption": "Lower over time. Bring this to your next visit."
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Latest eGFR",
+          "58 · Oct 3"
+        ],
+        [
+          "Latest ACR",
+          "42 mg/g"
+        ],
+        [
+          "Next check",
+          "Apr 2027 (from your clinician)"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Create visit summary",
+      "action": {
+        "type": "push",
+        "to": "hw_summary"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Create visit summary",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "hw_summary"
+      },
+      "summary": "push → hw_summary"
+    }
+  ]
+}

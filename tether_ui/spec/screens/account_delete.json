@@ -1,0 +1,131 @@
+{
+  "id": "account_delete",
+  "name": "Delete account",
+  "route": "/account/delete",
+  "flow": "account",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Encrypted deletion-intent tombstone is written before the request (develop branch design).",
+  "header": {
+    "t": "header",
+    "title": "Delete account",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Delete your account and all data?",
+      "size": "m"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Programs",
+          "4"
+        ],
+        [
+          "Check-ins",
+          "63"
+        ],
+        [
+          "Readings & logs",
+          "118"
+        ],
+        [
+          "Shared with care team",
+          "3 summaries (their copies stay with them)"
+        ]
+      ]
+    },
+    {
+      "t": "text",
+      "text": "This can’t be undone. Download a copy first if you want one.",
+      "tone": "small"
+    },
+    {
+      "t": "button",
+      "label": "Download a copy first",
+      "action": {
+        "type": "push",
+        "to": "account_data"
+      },
+      "variant": "secondary",
+      "arrow": false
+    },
+    {
+      "t": "field",
+      "label": "Type DELETE to confirm",
+      "value": "DELETE",
+      "kind": "text",
+      "key": "type_delete_to_confirm"
+    },
+    {
+      "t": "field",
+      "label": "Password",
+      "value": "••••••••••••",
+      "hint": "We ask again to protect your account.",
+      "kind": "password",
+      "key": "password"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Delete everything",
+      "action": {
+        "type": "submit",
+        "api": "DELETE /v1/account/data",
+        "then": {
+          "type": "replace",
+          "to": "account_deleted"
+        }
+      },
+      "variant": "danger",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [
+    "DELETE /v1/account/data"
+  ],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Download a copy first",
+      "path": "body[3]",
+      "action": {
+        "type": "push",
+        "to": "account_data"
+      },
+      "summary": "push → account_data"
+    },
+    {
+      "element": "Delete everything",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "DELETE /v1/account/data",
+        "then": {
+          "type": "replace",
+          "to": "account_deleted"
+        }
+      },
+      "summary": "DELETE /v1/account/data then replace → account_deleted"
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "id": "support_message_care",
+  "name": "Message care team",
+  "route": "/support/care-team",
+  "flow": "tabs",
+  "program": null,
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Dr. Patel’s clinic",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "text",
+      "text": "Secure message · usually replies within 1 business day. Not for emergencies.",
+      "tone": "small"
+    },
+    {
+      "t": "field",
+      "label": "Topic",
+      "value": "Question about my plan",
+      "kind": "select",
+      "key": "topic"
+    },
+    {
+      "t": "field",
+      "label": "Message",
+      "value": "I’ve been feeling dizzy in the mornings since starting the patch.",
+      "kind": "multiline",
+      "key": "message"
+    },
+    {
+      "t": "toggle",
+      "label": "Attach a summary",
+      "sub": "You’ll preview it before sending",
+      "on": false,
+      "key": "attach_a_summary"
+    },
+    {
+      "t": "emergency",
+      "text": "Chest pain, trouble breathing or thoughts of harming yourself? Call 911 · call or text 988.",
+      "actions": [
+        {
+          "t": "button",
+          "label": "Call or text 988",
+          "action": {
+            "type": "push",
+            "to": "crisis"
+          },
+          "variant": "danger",
+          "arrow": false,
+          "small": true
+        },
+        {
+          "t": "button",
+          "label": "Call 911",
+          "action": {
+            "type": "call",
+            "value": "911",
+            "label": "911"
+          },
+          "variant": "secondary",
+          "arrow": false,
+          "small": true
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Send message",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/care/messages",
+        "then": {
+          "type": "toast",
+          "value": "Message sent",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Call or text 988",
+      "path": "body[4].actions[0]",
+      "action": {
+        "type": "push",
+        "to": "crisis"
+      },
+      "summary": "push → crisis"
+    },
+    {
+      "element": "Call 911",
+      "path": "body[4].actions[1]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "Send message",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/care/messages",
+        "then": {
+          "type": "toast",
+          "value": "Message sent",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "summary": "POST /v1/care/messages then toast “Message sent” then back"
+    }
+  ]
+}

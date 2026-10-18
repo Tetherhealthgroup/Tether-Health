@@ -1,0 +1,168 @@
+{
+  "id": "rescue_escalate",
+  "name": "Add a person",
+  "route": "/rescue/escalate",
+  "flow": "rescue",
+  "program": null,
+  "phase": "rescue",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Rescue",
+    "left": "close"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Let’s add a person.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Strong cravings are common in the first days. You don’t have to ride this one alone.",
+      "tone": "muted"
+    },
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Free & confidential",
+      "title": "Quitline counselor",
+      "text": "1-800-QUIT-NOW · many states 24/7",
+      "cta": {
+        "t": "button",
+        "label": "Call",
+        "action": {
+          "type": "call",
+          "value": "1-800-784-8669",
+          "label": "Call 1-800-QUIT-NOW"
+        },
+        "variant": "lime",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Text Jordan",
+          "sub": "“Can you stay with me for 10 minutes?”",
+          "action": {
+            "type": "sheet",
+            "to": "support_message"
+          },
+          "lead": {
+            "avatar": "J"
+          }
+        }
+      ]
+    },
+    {
+      "t": "emergency",
+      "text": "Thoughts of harming yourself? Call or text 988. Emergency: 911.",
+      "actions": [
+        {
+          "t": "button",
+          "label": "Call or text 988",
+          "action": {
+            "type": "push",
+            "to": "crisis"
+          },
+          "variant": "danger",
+          "arrow": false,
+          "small": true
+        },
+        {
+          "t": "button",
+          "label": "Call 911",
+          "action": {
+            "type": "call",
+            "value": "911",
+            "label": "911"
+          },
+          "variant": "secondary",
+          "arrow": false,
+          "small": true
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Try another tool",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_tools"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Close",
+      "path": "header.left",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    },
+    {
+      "element": "Call",
+      "path": "body[2].cta[0]",
+      "action": {
+        "type": "call",
+        "value": "1-800-784-8669",
+        "label": "Call 1-800-QUIT-NOW"
+      },
+      "summary": "call 1-800-784-8669"
+    },
+    {
+      "element": "Text Jordan",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "sheet",
+        "to": "support_message"
+      },
+      "summary": "sheet → support_message"
+    },
+    {
+      "element": "Call or text 988",
+      "path": "body[4].actions[0]",
+      "action": {
+        "type": "push",
+        "to": "crisis"
+      },
+      "summary": "push → crisis"
+    },
+    {
+      "element": "Call 911",
+      "path": "body[4].actions[1]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "Try another tool",
+      "path": "footer[0]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_tools"
+      },
+      "summary": "sheet → rescue_tools"
+    }
+  ]
+}

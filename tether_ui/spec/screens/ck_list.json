@@ -1,0 +1,221 @@
+{
+  "id": "ck_list",
+  "name": "Due list",
+  "route": "/p/ck/home",
+  "flow": "ck",
+  "program": "ck",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Checkup",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "3 due, 1 to ask about",
+      "size": "m"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Due now",
+      "title": "Flu vaccine",
+      "text": "Every year · pharmacies offer walk-ins",
+      "children": [
+        {
+          "t": "buttons",
+          "items": [
+            {
+              "t": "button",
+              "label": "Find a pharmacy",
+              "action": {
+                "type": "external",
+                "value": "https://www.vaccines.gov"
+              },
+              "variant": "primary",
+              "arrow": false,
+              "small": true
+            },
+            {
+              "t": "button",
+              "label": "I got it",
+              "action": {
+                "type": "push",
+                "to": "ck_done"
+              },
+              "variant": "secondary",
+              "arrow": false,
+              "small": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Colorectal screening",
+          "sub": "Ages 45–75 · several options",
+          "action": {
+            "type": "push",
+            "to": "ck_item"
+          },
+          "pill": "Due"
+        },
+        {
+          "label": "Mammogram",
+          "sub": "Every 2 years, ages 40–74",
+          "action": {
+            "type": "push",
+            "to": "ck_day"
+          },
+          "pill": "Due"
+        },
+        {
+          "label": "Lung cancer screening",
+          "sub": "Ages 50–80 with smoking history",
+          "action": {
+            "type": "push",
+            "to": "ck_item"
+          },
+          "pill": "Ask"
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Find a pharmacy",
+      "path": "body[1].children[0].items[0]",
+      "action": {
+        "type": "external",
+        "value": "https://www.vaccines.gov"
+      },
+      "summary": "external https://www.vaccines.gov"
+    },
+    {
+      "element": "I got it",
+      "path": "body[1].children[0].items[1]",
+      "action": {
+        "type": "push",
+        "to": "ck_done"
+      },
+      "summary": "push → ck_done"
+    },
+    {
+      "element": "Colorectal screening",
+      "path": "body[2].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "ck_item"
+      },
+      "summary": "push → ck_item"
+    },
+    {
+      "element": "Mammogram",
+      "path": "body[2].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "ck_day"
+      },
+      "summary": "push → ck_day"
+    },
+    {
+      "element": "Lung cancer screening",
+      "path": "body[2].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "ck_item"
+      },
+      "summary": "push → ck_item"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[2].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

@@ -1,0 +1,252 @@
+{
+  "id": "ea_home",
+  "name": "Ease home",
+  "route": "/p/ea/home",
+  "flow": "ea",
+  "program": "ea",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Ease",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "How are you right now?",
+      "title": "30-second mood check-in",
+      "cta": {
+        "t": "button",
+        "label": "Start",
+        "action": {
+          "type": "push",
+          "to": "ea_mood"
+        },
+        "variant": "lime",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "My safety plan",
+          "sub": "Updated Oct 2",
+          "action": {
+            "type": "push",
+            "to": "ea_plan"
+          }
+        },
+        {
+          "label": "Check-back",
+          "sub": "In 6 days",
+          "action": {
+            "type": "push",
+            "to": "ea_checkback"
+          }
+        },
+        {
+          "label": "Find a professional",
+          "action": {
+            "type": "push",
+            "to": "ea_result"
+          }
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "ea",
+      "title": "Sleep and mood: 3 small changes",
+      "text": "5 min",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      }
+    },
+    {
+      "t": "emergency",
+      "text": "Thoughts of harming yourself? Call or text 988. Emergency: 911.",
+      "actions": [
+        {
+          "t": "button",
+          "label": "Call or text 988",
+          "action": {
+            "type": "push",
+            "to": "crisis"
+          },
+          "variant": "danger",
+          "arrow": false,
+          "small": true
+        },
+        {
+          "t": "button",
+          "label": "Call 911",
+          "action": {
+            "type": "call",
+            "value": "911",
+            "label": "911"
+          },
+          "variant": "secondary",
+          "arrow": false,
+          "small": true
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Start",
+      "path": "body[0].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "ea_mood"
+      },
+      "summary": "push → ea_mood"
+    },
+    {
+      "element": "My safety plan",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "ea_plan"
+      },
+      "summary": "push → ea_plan"
+    },
+    {
+      "element": "Check-back",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "ea_checkback"
+      },
+      "summary": "push → ea_checkback"
+    },
+    {
+      "element": "Find a professional",
+      "path": "body[1].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "ea_result"
+      },
+      "summary": "push → ea_result"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[1].rows[3]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Sleep and mood: 3 small changes",
+      "path": "body[2]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "Call or text 988",
+      "path": "body[3].actions[0]",
+      "action": {
+        "type": "push",
+        "to": "crisis"
+      },
+      "summary": "push → crisis"
+    },
+    {
+      "element": "Call 911",
+      "path": "body[3].actions[1]",
+      "action": {
+        "type": "call",
+        "value": "911",
+        "label": "911"
+      },
+      "summary": "call 911"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

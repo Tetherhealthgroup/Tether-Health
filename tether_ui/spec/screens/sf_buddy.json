@@ -1,0 +1,140 @@
+{
+  "id": "sf_buddy",
+  "name": "Accountability buddy",
+  "route": "/p/sf/plan/buddy",
+  "flow": "sf",
+  "program": "sf",
+  "phase": "plan",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Buddy",
+    "left": "back",
+    "pill": "Optional"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Want someone in your corner?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Your buddy only sees what you choose to send.",
+      "tone": "muted"
+    },
+    {
+      "t": "field",
+      "label": "Name",
+      "value": "Sam",
+      "kind": "text",
+      "key": "name"
+    },
+    {
+      "t": "checklist",
+      "items": [
+        {
+          "label": "A weekly “I hit my goal” message",
+          "done": true
+        },
+        {
+          "label": "My minutes per day"
+        },
+        {
+          "label": "Nothing automatic: I send each one",
+          "done": true
+        }
+      ],
+      "label": "They can see"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "eyebrow": "Preview",
+      "children": [
+        {
+          "t": "quote",
+          "text": "Phone-free nights this week: 5. Thanks for cheering me on!"
+        }
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save and finish",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/sf/plan",
+        "then": {
+          "type": "replace",
+          "to": "sf_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Skip for now",
+      "action": {
+        "type": "replace",
+        "to": "sf_home",
+        "context": {
+          "onboarding": "ob_setup"
+        }
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save and finish",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PUT /v1/program-data/sf/plan",
+        "then": {
+          "type": "replace",
+          "to": "sf_home",
+          "context": {
+            "onboarding": "ob_setup"
+          }
+        }
+      },
+      "summary": "PUT /v1/program-data/sf/plan then replace → sf_home (onboarding: ob_setup)"
+    },
+    {
+      "element": "Skip for now",
+      "path": "footer[1]",
+      "action": {
+        "type": "replace",
+        "to": "sf_home",
+        "context": {
+          "onboarding": "ob_setup"
+        }
+      },
+      "summary": "replace → sf_home (onboarding: ob_setup)"
+    }
+  ]
+}

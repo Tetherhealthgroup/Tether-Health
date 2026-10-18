@@ -1,0 +1,167 @@
+{
+  "id": "hw_log2",
+  "name": "Log BP · reading 2",
+  "route": "/p/hw/log/2",
+  "flow": "hw",
+  "program": "hw",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Log blood pressure",
+    "left": "back",
+    "pill": "2 of 2"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Second reading",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Same arm, 1 minute later.",
+      "tone": "muted"
+    },
+    {
+      "t": "fieldrow",
+      "fields": [
+        {
+          "t": "field",
+          "label": "Top (systolic)",
+          "value": "132",
+          "unit": "mmHg",
+          "kind": "number",
+          "key": "systolic"
+        },
+        {
+          "t": "field",
+          "label": "Bottom (diastolic)",
+          "value": "84",
+          "unit": "mmHg",
+          "kind": "number",
+          "key": "diastolic"
+        }
+      ]
+    },
+    {
+      "t": "field",
+      "label": "Pulse (optional)",
+      "value": "70",
+      "unit": "bpm",
+      "kind": "number",
+      "key": "pulse_optional"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Reading 1",
+          "138/86"
+        ],
+        [
+          "Average so far",
+          "135/85"
+        ]
+      ]
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save readings",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/hw/readings",
+        "then": {
+          "type": "branch",
+          "question": "Validated average",
+          "on": null,
+          "decide": "hw.bp",
+          "cases": [
+            {
+              "label": "Valid · below crisis range",
+              "action": {
+                "type": "replace",
+                "to": "hw_result"
+              }
+            },
+            {
+              "label": "Invalid value",
+              "action": {
+                "type": "replace",
+                "to": "hw_log_error"
+              }
+            },
+            {
+              "label": "≥180 top or ≥120 bottom",
+              "action": {
+                "type": "replace",
+                "to": "hw_crisis"
+              }
+            }
+          ]
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Save readings",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/program-data/hw/readings",
+        "then": {
+          "type": "branch",
+          "question": "Validated average",
+          "on": null,
+          "decide": "hw.bp",
+          "cases": [
+            {
+              "label": "Valid · below crisis range",
+              "action": {
+                "type": "replace",
+                "to": "hw_result"
+              }
+            },
+            {
+              "label": "Invalid value",
+              "action": {
+                "type": "replace",
+                "to": "hw_log_error"
+              }
+            },
+            {
+              "label": "≥180 top or ≥120 bottom",
+              "action": {
+                "type": "replace",
+                "to": "hw_crisis"
+              }
+            }
+          ]
+        }
+      },
+      "summary": "POST /v1/program-data/hw/readings then decide hw.bp: Validated average → Valid · below crisis range: replace → hw_result | Invalid value: replace → hw_log_error | ≥180 top or ≥120 bottom: replace → hw_crisis"
+    }
+  ]
+}

@@ -1,0 +1,215 @@
+{
+  "id": "be_home",
+  "name": "Beacon home",
+  "route": "/p/be/home",
+  "flow": "be",
+  "program": "be",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Beacon",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Three steps that lower risk",
+      "size": "m"
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Quitting smoking",
+          "sub": "In progress with BreatheFree",
+          "action": {
+            "type": "push",
+            "to": "bf_home"
+          },
+          "lead": {
+            "program": "bf"
+          },
+          "pill": "Active"
+        },
+        {
+          "label": "Monthly skin self-check",
+          "sub": "Guide with photos",
+          "action": {
+            "type": "push",
+            "to": "learn_lesson"
+          }
+        },
+        {
+          "label": "Ask about genetic counseling",
+          "sub": "Because of family history",
+          "action": {
+            "type": "push",
+            "to": "support_message_care"
+          }
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "title": "Screenings come from Checkup",
+      "text": "Mammogram due · colorectal due",
+      "cta": {
+        "t": "button",
+        "label": "Open Checkup",
+        "action": {
+          "type": "push",
+          "to": "ck_list"
+        },
+        "variant": "secondary",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Change my journey stage",
+          "action": {
+            "type": "push",
+            "to": "be_q1"
+          }
+        },
+        {
+          "label": "Program settings",
+          "sub": "Status, sharing, export, leave",
+          "action": {
+            "type": "push",
+            "to": "program_settings"
+          }
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Quitting smoking",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_home"
+      },
+      "summary": "push → bf_home"
+    },
+    {
+      "element": "Monthly skin self-check",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "Ask about genetic counseling",
+      "path": "body[1].rows[2]",
+      "action": {
+        "type": "push",
+        "to": "support_message_care"
+      },
+      "summary": "push → support_message_care"
+    },
+    {
+      "element": "Open Checkup",
+      "path": "body[2].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "ck_list"
+      },
+      "summary": "push → ck_list"
+    },
+    {
+      "element": "Change my journey stage",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "be_q1"
+      },
+      "summary": "push → be_q1"
+    },
+    {
+      "element": "Program settings",
+      "path": "body[3].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "program_settings"
+      },
+      "summary": "push → program_settings"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

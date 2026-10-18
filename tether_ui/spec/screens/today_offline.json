@@ -1,0 +1,136 @@
+{
+  "id": "today_offline",
+  "name": "Today · offline",
+  "route": "/today?state=offline",
+  "flow": "today",
+  "program": null,
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "today",
+  "variantOf": "today",
+  "state": "offline",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Today",
+    "left": "logo",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "banner",
+      "kind": "offline",
+      "text": "Offline · 3 entries will sync when you reconnect."
+    },
+    {
+      "t": "title",
+      "text": "Good morning, Alex.",
+      "size": "m"
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "Craving or urge?",
+      "text": "Works offline",
+      "cta": {
+        "t": "button",
+        "label": "Rescue",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "variant": "rescue",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Today",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Stock gum, water or snacks",
+              "sub": "Saved on this phone",
+              "done": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Lessons not downloaded load when you’re back online.",
+      "tone": "small"
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Rescue",
+      "path": "body[2].cta[0]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
+    },
+    {
+      "element": "Tab · Plans",
+      "path": "tabbar.plans",
+      "action": {
+        "type": "tab",
+        "to": "plans"
+      },
+      "summary": "tab → plans"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

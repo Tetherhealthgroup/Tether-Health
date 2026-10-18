@@ -1,0 +1,98 @@
+{
+  "id": "st_reset",
+  "name": "Meal energy reset",
+  "route": "/p/st/reset",
+  "flow": "st",
+  "program": "st",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Meal energy reset",
+    "left": "back",
+    "pill": "3 min"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Feeling the post-meal slump?",
+      "size": "m"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "children": [
+        {
+          "t": "checklist",
+          "items": [
+            {
+              "label": "Drink a glass of water",
+              "done": true
+            },
+            {
+              "label": "Take a 10-minute walk if you can",
+              "done": true
+            },
+            {
+              "label": "Take five slow breaths"
+            },
+            {
+              "label": "Feel unwell? Contact your clinician"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "text": "Walking after meals helps some people’s readings. Check with your clinician what’s right for you."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Done",
+      "action": {
+        "type": "toast",
+        "value": "Nice work",
+        "then": {
+          "type": "back"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Done",
+      "path": "footer[0]",
+      "action": {
+        "type": "toast",
+        "value": "Nice work",
+        "then": {
+          "type": "back"
+        }
+      },
+      "summary": "toast “Nice work” then back"
+    }
+  ]
+}

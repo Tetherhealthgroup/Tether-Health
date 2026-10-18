@@ -1,0 +1,81 @@
+{
+  "id": "auth_forgot",
+  "name": "Reset password",
+  "route": "/auth/forgot",
+  "flow": "auth",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Reset password",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Forgot your password?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Enter your email and we’ll send a reset link.",
+      "tone": "muted"
+    },
+    {
+      "t": "field",
+      "label": "Email",
+      "value": "alex@example.com",
+      "kind": "email",
+      "key": "email"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Send reset link",
+      "action": {
+        "type": "submit",
+        "api": "POST supabase /auth/v1/recover",
+        "then": {
+          "type": "replace",
+          "to": "auth_forgot_sent"
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Send reset link",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST supabase /auth/v1/recover",
+        "then": {
+          "type": "replace",
+          "to": "auth_forgot_sent"
+        }
+      },
+      "summary": "POST supabase /auth/v1/recover then replace → auth_forgot_sent"
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "id": "bf_q2",
+  "name": "Baseline: triggers",
+  "route": "/p/bf/onboarding/2",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Your triggers",
+    "left": "back",
+    "pill": "2 of 3"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 2,
+      "total": 3
+    },
+    {
+      "t": "eyebrow",
+      "text": "Choose all that apply"
+    },
+    {
+      "t": "title",
+      "text": "When do you most want a cigarette?",
+      "size": "m"
+    },
+    {
+      "t": "chips",
+      "options": [
+        "Stress",
+        "After meals",
+        "Driving",
+        "With coffee",
+        "Social",
+        "Work breaks",
+        "Alcohol",
+        "Boredom",
+        "Morning",
+        "Scrolling"
+      ],
+      "selected": [
+        "Stress",
+        "After meals",
+        "Driving",
+        "With coffee"
+      ],
+      "multi": true,
+      "key": "value"
+    },
+    {
+      "t": "field",
+      "label": "Add your own",
+      "placeholder": "Type another situation…",
+      "kind": "text",
+      "key": "add_your_own"
+    },
+    {
+      "t": "text",
+      "text": "Used to prepare, never to monitor. No background location.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Next",
+      "action": {
+        "type": "push",
+        "to": "bf_q3"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Next",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_q3"
+      },
+      "summary": "push → bf_q3"
+    }
+  ]
+}

@@ -1,0 +1,8044 @@
+[
+  {
+    "screen": "welcome",
+    "screen_name": "Welcome",
+    "element": "Get started",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "ob_programs"
+    ],
+    "summary": "push → ob_programs"
+  },
+  {
+    "screen": "welcome",
+    "screen_name": "Welcome",
+    "element": "I already have an account",
+    "path": "footer[1]",
+    "type": "sheet",
+    "targets": [
+      "auth_signin"
+    ],
+    "summary": "sheet → auth_signin"
+  },
+  {
+    "screen": "welcome",
+    "screen_name": "Welcome",
+    "element": "Terms and Privacy Notice",
+    "path": "footer[2]",
+    "type": "external",
+    "targets": [],
+    "summary": "external https://www.tetherhealthgroup.com/privacy/"
+  },
+  {
+    "screen": "ob_programs",
+    "screen_name": "Choose programs",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ob_programs",
+    "screen_name": "Choose programs",
+    "element": "See all 11 programs",
+    "path": "body[4]",
+    "type": "push",
+    "targets": [
+      "catalog"
+    ],
+    "summary": "push → catalog"
+  },
+  {
+    "screen": "ob_programs",
+    "screen_name": "Choose programs",
+    "element": "Continue with 2 programs",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "ob_focus"
+    ],
+    "summary": "push → ob_focus"
+  },
+  {
+    "screen": "ob_focus",
+    "screen_name": "Focus slots",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ob_focus",
+    "screen_name": "Focus slots",
+    "element": "Add a third program",
+    "path": "body[6]",
+    "type": "sheet",
+    "targets": [
+      "ob_third"
+    ],
+    "summary": "sheet → ob_third"
+  },
+  {
+    "screen": "ob_focus",
+    "screen_name": "Focus slots",
+    "element": "Continue",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "ob_consent"
+    ],
+    "summary": "push → ob_consent"
+  },
+  {
+    "screen": "ob_third",
+    "screen_name": "Third program sheet",
+    "element": "Continue",
+    "path": "footer[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Heartwise added as Learn only” then close"
+  },
+  {
+    "screen": "ob_third",
+    "screen_name": "Third program sheet",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "ob_consent",
+    "screen_name": "Layered consent",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ob_consent",
+    "screen_name": "Layered consent",
+    "element": "Read the Privacy Notice",
+    "path": "body[7]",
+    "type": "external",
+    "targets": [],
+    "summary": "external https://www.tetherhealthgroup.com/privacy/"
+  },
+  {
+    "screen": "ob_consent",
+    "screen_name": "Layered consent",
+    "element": "Agree and continue",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "ob_basics"
+    ],
+    "summary": "POST /v1/enrolments/consents then push → ob_basics"
+  },
+  {
+    "screen": "ob_basics",
+    "screen_name": "Shared basics",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ob_basics",
+    "screen_name": "Shared basics",
+    "element": "Continue",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "ob_setup"
+    ],
+    "summary": "push → ob_setup"
+  },
+  {
+    "screen": "ob_setup",
+    "screen_name": "Set up focus programs",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ob_setup",
+    "screen_name": "Set up focus programs",
+    "element": "BreatheFree",
+    "path": "body[3].rows[0]",
+    "type": "push",
+    "targets": [
+      "bf_q1"
+    ],
+    "summary": "push → bf_q1"
+  },
+  {
+    "screen": "ob_setup",
+    "screen_name": "Set up focus programs",
+    "element": "ScrollFree",
+    "path": "body[3].rows[1]",
+    "type": "push",
+    "targets": [
+      "sf_q1"
+    ],
+    "summary": "push → sf_q1"
+  },
+  {
+    "screen": "ob_setup",
+    "screen_name": "Set up focus programs",
+    "element": "Health records (optional)",
+    "path": "body[5].rows[0]",
+    "type": "push",
+    "targets": [
+      "records_add"
+    ],
+    "summary": "push → records_add"
+  },
+  {
+    "screen": "ob_setup",
+    "screen_name": "Set up focus programs",
+    "element": "Continue",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "ob_reminders"
+    ],
+    "summary": "push → ob_reminders"
+  },
+  {
+    "screen": "ob_setup",
+    "screen_name": "Set up focus programs",
+    "element": "Set up later",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "ob_reminders"
+    ],
+    "summary": "push → ob_reminders"
+  },
+  {
+    "screen": "ob_reminders",
+    "screen_name": "Reminder prime",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ob_reminders",
+    "screen_name": "Reminder prime",
+    "element": "Turn on reminders",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "ob_account",
+      "ob_reminders_denied"
+    ],
+    "summary": "branch: System permission prompt → Allowed: push → ob_account | Not allowed: push → ob_reminders_denied"
+  },
+  {
+    "screen": "ob_reminders",
+    "screen_name": "Reminder prime",
+    "element": "Not now",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "ob_account"
+    ],
+    "summary": "push → ob_account"
+  },
+  {
+    "screen": "ob_reminders_denied",
+    "screen_name": "Reminders denied",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ob_reminders_denied",
+    "screen_name": "Reminders denied",
+    "element": "Open phone settings",
+    "path": "footer[0]",
+    "type": "os_settings",
+    "targets": [],
+    "summary": "os_settings"
+  },
+  {
+    "screen": "ob_reminders_denied",
+    "screen_name": "Reminders denied",
+    "element": "Continue without reminders",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "ob_account"
+    ],
+    "summary": "push → ob_account"
+  },
+  {
+    "screen": "ob_account",
+    "screen_name": "Save your progress",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "ob_account",
+    "screen_name": "Save your progress",
+    "element": "Continue with Apple",
+    "path": "body[2].items[0]",
+    "type": "branch",
+    "targets": [
+      "auth_merge",
+      "auth_link",
+      "auth_social_error"
+    ],
+    "summary": "auth (apple): Sign in with Apple result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+  },
+  {
+    "screen": "ob_account",
+    "screen_name": "Save your progress",
+    "element": "Continue with Google",
+    "path": "body[2].items[1]",
+    "type": "branch",
+    "targets": [
+      "auth_merge",
+      "auth_link",
+      "auth_social_error"
+    ],
+    "summary": "auth (google): Sign in with Google result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+  },
+  {
+    "screen": "ob_account",
+    "screen_name": "Save your progress",
+    "element": "Create account",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "auth_verify"
+    ],
+    "summary": "POST supabase /auth/v1/signup then push → auth_verify"
+  },
+  {
+    "screen": "ob_account",
+    "screen_name": "Save your progress",
+    "element": "Continue on this phone only",
+    "path": "footer[1]",
+    "type": "reset",
+    "targets": [
+      "today"
+    ],
+    "summary": "reset → today"
+  },
+  {
+    "screen": "auth_verify",
+    "screen_name": "Verify email",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "auth_verify",
+    "screen_name": "Verify email",
+    "element": "Open email app",
+    "path": "footer[0]",
+    "type": "external",
+    "targets": [],
+    "summary": "external message://"
+  },
+  {
+    "screen": "auth_verify",
+    "screen_name": "Verify email",
+    "element": "I’ve confirmed my email",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "auth_merge"
+    ],
+    "summary": "push → auth_merge"
+  },
+  {
+    "screen": "auth_verify",
+    "screen_name": "Verify email",
+    "element": "Resend link (available in 0:42)",
+    "path": "footer[2]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Link sent again”"
+  },
+  {
+    "screen": "auth_signin",
+    "screen_name": "Sign in",
+    "element": "Continue with Apple",
+    "path": "body[1].items[0]",
+    "type": "branch",
+    "targets": [
+      "today",
+      "auth_merge",
+      "auth_social_new",
+      "auth_social_error"
+    ],
+    "summary": "auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+  },
+  {
+    "screen": "auth_signin",
+    "screen_name": "Sign in",
+    "element": "Continue with Google",
+    "path": "body[1].items[1]",
+    "type": "branch",
+    "targets": [
+      "today",
+      "auth_merge",
+      "auth_social_new",
+      "auth_social_error"
+    ],
+    "summary": "auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+  },
+  {
+    "screen": "auth_signin",
+    "screen_name": "Sign in",
+    "element": "Forgot password?",
+    "path": "body[5]",
+    "type": "push",
+    "targets": [
+      "auth_forgot"
+    ],
+    "summary": "push → auth_forgot"
+  },
+  {
+    "screen": "auth_signin",
+    "screen_name": "Sign in",
+    "element": "Sign in",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "today",
+      "auth_merge",
+      "auth_signin_error"
+    ],
+    "summary": "branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error"
+  },
+  {
+    "screen": "auth_signin",
+    "screen_name": "Sign in",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "auth_signin_error",
+    "screen_name": "Sign-in error",
+    "element": "Continue with Apple",
+    "path": "body[2].items[0]",
+    "type": "branch",
+    "targets": [
+      "today",
+      "auth_merge",
+      "auth_social_new",
+      "auth_social_error"
+    ],
+    "summary": "auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+  },
+  {
+    "screen": "auth_signin_error",
+    "screen_name": "Sign-in error",
+    "element": "Continue with Google",
+    "path": "body[2].items[1]",
+    "type": "branch",
+    "targets": [
+      "today",
+      "auth_merge",
+      "auth_social_new",
+      "auth_social_error"
+    ],
+    "summary": "auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+  },
+  {
+    "screen": "auth_signin_error",
+    "screen_name": "Sign-in error",
+    "element": "Forgot password?",
+    "path": "body[6]",
+    "type": "push",
+    "targets": [
+      "auth_forgot"
+    ],
+    "summary": "push → auth_forgot"
+  },
+  {
+    "screen": "auth_signin_error",
+    "screen_name": "Sign-in error",
+    "element": "Try again",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "today",
+      "auth_signin_error"
+    ],
+    "summary": "branch: Sign-in result → Success: reset → today | Wrong password: replace → auth_signin_error"
+  },
+  {
+    "screen": "auth_signin_error",
+    "screen_name": "Sign-in error",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "auth_social_new",
+    "screen_name": "New account from Apple or Google",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "auth_social_new",
+    "screen_name": "New account from Apple or Google",
+    "element": "Create my account",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "ob_programs"
+    ],
+    "summary": "POST supabase /auth/v1/token?grant_type=id_token then push → ob_programs"
+  },
+  {
+    "screen": "auth_social_new",
+    "screen_name": "New account from Apple or Google",
+    "element": "Use a different account",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "auth_link",
+    "screen_name": "Link accounts",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "auth_link",
+    "screen_name": "Link accounts",
+    "element": "Forgot password?",
+    "path": "body[4]",
+    "type": "push",
+    "targets": [
+      "auth_forgot"
+    ],
+    "summary": "push → auth_forgot"
+  },
+  {
+    "screen": "auth_link",
+    "screen_name": "Link accounts",
+    "element": "Link and sign in",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "today"
+    ],
+    "summary": "POST supabase /auth/v1/user/identities (linkIdentity) then reset → today"
+  },
+  {
+    "screen": "auth_link",
+    "screen_name": "Link accounts",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "auth_social_error",
+    "screen_name": "Apple / Google sign-in failed",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "auth_social_error",
+    "screen_name": "Apple / Google sign-in failed",
+    "element": "Try again",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "today"
+    ],
+    "summary": "auth (google): Sign in with Google result → Success: reset → today | Error: toast “Still can’t reach Google. Try email.”"
+  },
+  {
+    "screen": "auth_social_error",
+    "screen_name": "Apple / Google sign-in failed",
+    "element": "Use email instead",
+    "path": "footer[1]",
+    "type": "replace",
+    "targets": [
+      "auth_signin"
+    ],
+    "summary": "replace → auth_signin"
+  },
+  {
+    "screen": "auth_forgot",
+    "screen_name": "Reset password",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "auth_forgot",
+    "screen_name": "Reset password",
+    "element": "Send reset link",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "auth_forgot_sent"
+    ],
+    "summary": "POST supabase /auth/v1/recover then replace → auth_forgot_sent"
+  },
+  {
+    "screen": "auth_forgot_sent",
+    "screen_name": "Reset link sent",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "auth_forgot_sent",
+    "screen_name": "Reset link sent",
+    "element": "Back to welcome",
+    "path": "footer[0]",
+    "type": "reset",
+    "targets": [
+      "welcome"
+    ],
+    "summary": "reset → welcome"
+  },
+  {
+    "screen": "auth_newpass",
+    "screen_name": "Set new password",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "auth_newpass",
+    "screen_name": "Set new password",
+    "element": "Save password",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "today"
+    ],
+    "summary": "PUT supabase /auth/v1/user then reset → today"
+  },
+  {
+    "screen": "auth_merge",
+    "screen_name": "Guest plan merge",
+    "element": "Continue",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "today"
+    ],
+    "summary": "POST /v1/quit-plan/guest-import then reset → today"
+  },
+  {
+    "screen": "auth_session",
+    "screen_name": "Session expired",
+    "element": "Sign in",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST supabase /auth/v1/token then close"
+  },
+  {
+    "screen": "auth_session",
+    "screen_name": "Session expired",
+    "element": "Use Face ID",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "today",
+    "screen_name": "Today",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "today",
+    "screen_name": "Today",
+    "element": "Rescue",
+    "path": "body[3].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "today",
+    "screen_name": "Today",
+    "element": "Start",
+    "path": "body[5].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "checkin"
+    ],
+    "summary": "sheet → checkin"
+  },
+  {
+    "screen": "today",
+    "screen_name": "Today",
+    "element": "BreatheFree home",
+    "path": "body[7].rows[0]",
+    "type": "push",
+    "targets": [
+      "bf_home"
+    ],
+    "summary": "push → bf_home"
+  },
+  {
+    "screen": "today",
+    "screen_name": "Today",
+    "element": "ScrollFree home",
+    "path": "body[7].rows[1]",
+    "type": "push",
+    "targets": [
+      "sf_home"
+    ],
+    "summary": "push → sf_home"
+  },
+  {
+    "screen": "today",
+    "screen_name": "Today",
+    "element": "How your lungs recover after you quit",
+    "path": "body[8]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "today",
+    "screen_name": "Today",
+    "element": "Tab · Plans",
+    "path": "tabbar.plans",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "today",
+    "screen_name": "Today",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "today",
+    "screen_name": "Today",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "today",
+    "screen_name": "Today",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "today_loading",
+    "screen_name": "Today · loading",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "today_loading",
+    "screen_name": "Today · loading",
+    "element": "Rescue",
+    "path": "body[1].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "today_loading",
+    "screen_name": "Today · loading",
+    "element": "Tab · Plans",
+    "path": "tabbar.plans",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "today_loading",
+    "screen_name": "Today · loading",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "today_loading",
+    "screen_name": "Today · loading",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "today_loading",
+    "screen_name": "Today · loading",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "today_offline",
+    "screen_name": "Today · offline",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "today_offline",
+    "screen_name": "Today · offline",
+    "element": "Rescue",
+    "path": "body[2].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "today_offline",
+    "screen_name": "Today · offline",
+    "element": "Tab · Plans",
+    "path": "tabbar.plans",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "today_offline",
+    "screen_name": "Today · offline",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "today_offline",
+    "screen_name": "Today · offline",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "today_offline",
+    "screen_name": "Today · offline",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "today_empty",
+    "screen_name": "Today · nothing in focus",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "today_empty",
+    "screen_name": "Today · nothing in focus",
+    "element": "Choose a focus program",
+    "path": "body[4]",
+    "type": "push",
+    "targets": [
+      "account_programs"
+    ],
+    "summary": "push → account_programs"
+  },
+  {
+    "screen": "today_empty",
+    "screen_name": "Today · nothing in focus",
+    "element": "Browse lessons",
+    "path": "body[5]",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "today_empty",
+    "screen_name": "Today · nothing in focus",
+    "element": "Support",
+    "path": "body[6].cta[0]",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "today_empty",
+    "screen_name": "Today · nothing in focus",
+    "element": "Tab · Plans",
+    "path": "tabbar.plans",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "today_empty",
+    "screen_name": "Today · nothing in focus",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "today_empty",
+    "screen_name": "Today · nothing in focus",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "today_empty",
+    "screen_name": "Today · nothing in focus",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "today_safety",
+    "screen_name": "Today · safety pinned",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "today_safety",
+    "screen_name": "Today · safety pinned",
+    "element": "Yes · call 911",
+    "path": "body[1].children[0].items[0]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "today_safety",
+    "screen_name": "Today · safety pinned",
+    "element": "No symptoms",
+    "path": "body[1].children[0].items[1]",
+    "type": "push",
+    "targets": [
+      "hw_recheck"
+    ],
+    "summary": "push → hw_recheck"
+  },
+  {
+    "screen": "today_safety",
+    "screen_name": "Today · safety pinned",
+    "element": "Tab · Plans",
+    "path": "tabbar.plans",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "today_safety",
+    "screen_name": "Today · safety pinned",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "today_safety",
+    "screen_name": "Today · safety pinned",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "today_safety",
+    "screen_name": "Today · safety pinned",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "checkin",
+    "screen_name": "Daily check-in",
+    "element": "Save check-in",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "checkin_done"
+    ],
+    "summary": "POST /v1/records/check-ins then replace → checkin_done"
+  },
+  {
+    "screen": "checkin_done",
+    "screen_name": "Check-in saved",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "checkin_done",
+    "screen_name": "Check-in saved",
+    "element": "Start",
+    "path": "body[3].cta[0]",
+    "type": "push",
+    "targets": [
+      "rescue_active"
+    ],
+    "summary": "push → rescue_active"
+  },
+  {
+    "screen": "checkin_done",
+    "screen_name": "Check-in saved",
+    "element": "Set it",
+    "path": "body[4].cta[0]",
+    "type": "push",
+    "targets": [
+      "sf_goal"
+    ],
+    "summary": "push → sf_goal"
+  },
+  {
+    "screen": "checkin_done",
+    "screen_name": "Check-in saved",
+    "element": "Back to Today",
+    "path": "footer[0]",
+    "type": "reset",
+    "targets": [
+      "today"
+    ],
+    "summary": "reset → today"
+  },
+  {
+    "screen": "rescue_pick",
+    "screen_name": "Rescue",
+    "element": "A cigarette",
+    "path": "body[3].items[0]",
+    "type": "replace",
+    "targets": [
+      "rescue_active"
+    ],
+    "summary": "replace → rescue_active"
+  },
+  {
+    "screen": "rescue_pick",
+    "screen_name": "Rescue",
+    "element": "Urge to scroll",
+    "path": "body[3].items[1]",
+    "type": "replace",
+    "targets": [
+      "sf_pause"
+    ],
+    "summary": "replace → sf_pause"
+  },
+  {
+    "screen": "rescue_pick",
+    "screen_name": "Rescue",
+    "element": "Stress",
+    "path": "body[3].items[2]",
+    "type": "replace",
+    "targets": [
+      "rescue_active"
+    ],
+    "summary": "replace → rescue_active"
+  },
+  {
+    "screen": "rescue_pick",
+    "screen_name": "Rescue",
+    "element": "Not sure",
+    "path": "body[3].items[3]",
+    "type": "replace",
+    "targets": [
+      "rescue_active"
+    ],
+    "summary": "replace → rescue_active"
+  },
+  {
+    "screen": "rescue_pick",
+    "screen_name": "Rescue",
+    "element": "Start",
+    "path": "body[4].cta[0]",
+    "type": "replace",
+    "targets": [
+      "rescue_active"
+    ],
+    "summary": "replace → rescue_active"
+  },
+  {
+    "screen": "rescue_pick",
+    "screen_name": "Rescue",
+    "element": "Talk to a person",
+    "path": "body[5].items[0]",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "rescue_pick",
+    "screen_name": "Rescue",
+    "element": "Emergency",
+    "path": "body[5].items[1]",
+    "type": "push",
+    "targets": [
+      "crisis"
+    ],
+    "summary": "push → crisis"
+  },
+  {
+    "screen": "rescue_active",
+    "screen_name": "Active tool",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "rescue_active",
+    "screen_name": "Active tool",
+    "element": "Switch tool",
+    "path": "body[4].children[0].items[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_tools"
+    ],
+    "summary": "sheet → rescue_tools"
+  },
+  {
+    "screen": "rescue_active",
+    "screen_name": "Active tool",
+    "element": "Get support",
+    "path": "body[4].children[0].items[1]",
+    "type": "push",
+    "targets": [
+      "rescue_escalate"
+    ],
+    "summary": "push → rescue_escalate"
+  },
+  {
+    "screen": "rescue_active",
+    "screen_name": "Active tool",
+    "element": "I’m done",
+    "path": "footer[0]",
+    "type": "replace",
+    "targets": [
+      "rescue_result"
+    ],
+    "summary": "replace → rescue_result"
+  },
+  {
+    "screen": "rescue_tools",
+    "screen_name": "Switch tool",
+    "element": "Start this tool",
+    "path": "footer[0]",
+    "type": "replace",
+    "targets": [
+      "rescue_active"
+    ],
+    "summary": "replace → rescue_active"
+  },
+  {
+    "screen": "rescue_tools",
+    "screen_name": "Switch tool",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "rescue_result",
+    "screen_name": "Recheck + result",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "rescue_result",
+    "screen_name": "Recheck + result",
+    "element": "Still strong? Get more help",
+    "path": "body[5]",
+    "type": "push",
+    "targets": [
+      "rescue_escalate"
+    ],
+    "summary": "push → rescue_escalate"
+  },
+  {
+    "screen": "rescue_result",
+    "screen_name": "Recheck + result",
+    "element": "Back to Today",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "today"
+    ],
+    "summary": "POST /v1/records/rescues then reset → today"
+  },
+  {
+    "screen": "rescue_escalate",
+    "screen_name": "Add a person",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "rescue_escalate",
+    "screen_name": "Add a person",
+    "element": "Call",
+    "path": "body[2].cta[0]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 1-800-784-8669"
+  },
+  {
+    "screen": "rescue_escalate",
+    "screen_name": "Add a person",
+    "element": "Text Jordan",
+    "path": "body[3].rows[0]",
+    "type": "sheet",
+    "targets": [
+      "support_message"
+    ],
+    "summary": "sheet → support_message"
+  },
+  {
+    "screen": "rescue_escalate",
+    "screen_name": "Add a person",
+    "element": "Call or text 988",
+    "path": "body[4].actions[0]",
+    "type": "push",
+    "targets": [
+      "crisis"
+    ],
+    "summary": "push → crisis"
+  },
+  {
+    "screen": "rescue_escalate",
+    "screen_name": "Add a person",
+    "element": "Call 911",
+    "path": "body[4].actions[1]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "rescue_escalate",
+    "screen_name": "Add a person",
+    "element": "Try another tool",
+    "path": "footer[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_tools"
+    ],
+    "summary": "sheet → rescue_tools"
+  },
+  {
+    "screen": "crisis",
+    "screen_name": "Crisis support",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "crisis",
+    "screen_name": "Crisis support",
+    "element": "Call 988",
+    "path": "body[1]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 988"
+  },
+  {
+    "screen": "crisis",
+    "screen_name": "Crisis support",
+    "element": "Text 988",
+    "path": "body[2]",
+    "type": "sms",
+    "targets": [],
+    "summary": "sms 988"
+  },
+  {
+    "screen": "crisis",
+    "screen_name": "Crisis support",
+    "element": "Call 911",
+    "path": "body[3]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "crisis",
+    "screen_name": "Crisis support",
+    "element": "Things that help: walk the dog, shower, music",
+    "path": "body[4]",
+    "type": "push",
+    "targets": [
+      "ea_plan"
+    ],
+    "summary": "push → ea_plan"
+  },
+  {
+    "screen": "plans",
+    "screen_name": "My plans",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "plans",
+    "screen_name": "My plans",
+    "element": "BreatheFree",
+    "path": "body[0].rows[0]",
+    "type": "push",
+    "targets": [
+      "bf_home"
+    ],
+    "summary": "push → bf_home"
+  },
+  {
+    "screen": "plans",
+    "screen_name": "My plans",
+    "element": "ScrollFree",
+    "path": "body[0].rows[1]",
+    "type": "push",
+    "targets": [
+      "sf_home"
+    ],
+    "summary": "push → sf_home"
+  },
+  {
+    "screen": "plans",
+    "screen_name": "My plans",
+    "element": "ClearAir",
+    "path": "body[1].rows[0]",
+    "type": "push",
+    "targets": [
+      "ca_intro"
+    ],
+    "summary": "push → ca_intro"
+  },
+  {
+    "screen": "plans",
+    "screen_name": "My plans",
+    "element": "Medication center",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "bf_meds"
+    ],
+    "summary": "push → bf_meds"
+  },
+  {
+    "screen": "plans",
+    "screen_name": "My plans",
+    "element": "Programs & sharing",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "account_programs"
+    ],
+    "summary": "push → account_programs"
+  },
+  {
+    "screen": "plans",
+    "screen_name": "My plans",
+    "element": "Add a program",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "catalog"
+    ],
+    "summary": "push → catalog"
+  },
+  {
+    "screen": "plans",
+    "screen_name": "My plans",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "plans",
+    "screen_name": "My plans",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "plans",
+    "screen_name": "My plans",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "plans",
+    "screen_name": "My plans",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "catalog",
+    "screen_name": "Add a program",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "catalog",
+    "screen_name": "Add a program",
+    "element": "BreatheFree",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "bf_intro"
+    ],
+    "summary": "push → bf_intro"
+  },
+  {
+    "screen": "catalog",
+    "screen_name": "Add a program",
+    "element": "ScrollFree",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "sf_intro"
+    ],
+    "summary": "push → sf_intro"
+  },
+  {
+    "screen": "catalog",
+    "screen_name": "Add a program",
+    "element": "ClearAir",
+    "path": "body[2].rows[2]",
+    "type": "push",
+    "targets": [
+      "ca_intro"
+    ],
+    "summary": "push → ca_intro"
+  },
+  {
+    "screen": "catalog",
+    "screen_name": "Add a program",
+    "element": "Heartwise",
+    "path": "body[2].rows[3]",
+    "type": "push",
+    "targets": [
+      "hw_intro"
+    ],
+    "summary": "push → hw_intro"
+  },
+  {
+    "screen": "catalog",
+    "screen_name": "Add a program",
+    "element": "Steady",
+    "path": "body[2].rows[4]",
+    "type": "push",
+    "targets": [
+      "st_intro"
+    ],
+    "summary": "push → st_intro"
+  },
+  {
+    "screen": "catalog",
+    "screen_name": "Add a program",
+    "element": "Renew",
+    "path": "body[2].rows[5]",
+    "type": "push",
+    "targets": [
+      "re_intro"
+    ],
+    "summary": "push → re_intro"
+  },
+  {
+    "screen": "catalog",
+    "screen_name": "Add a program",
+    "element": "Nourish",
+    "path": "body[3].rows[0]",
+    "type": "push",
+    "targets": [
+      "nu_intro"
+    ],
+    "summary": "push → nu_intro"
+  },
+  {
+    "screen": "catalog",
+    "screen_name": "Add a program",
+    "element": "Stride",
+    "path": "body[3].rows[1]",
+    "type": "push",
+    "targets": [
+      "sd_intro"
+    ],
+    "summary": "push → sd_intro"
+  },
+  {
+    "screen": "catalog",
+    "screen_name": "Add a program",
+    "element": "Ease",
+    "path": "body[3].rows[2]",
+    "type": "push",
+    "targets": [
+      "ea_intro"
+    ],
+    "summary": "push → ea_intro"
+  },
+  {
+    "screen": "catalog",
+    "screen_name": "Add a program",
+    "element": "Checkup",
+    "path": "body[3].rows[3]",
+    "type": "push",
+    "targets": [
+      "ck_intro"
+    ],
+    "summary": "push → ck_intro"
+  },
+  {
+    "screen": "catalog",
+    "screen_name": "Add a program",
+    "element": "Beacon",
+    "path": "body[3].rows[4]",
+    "type": "push",
+    "targets": [
+      "be_intro"
+    ],
+    "summary": "push → be_intro"
+  },
+  {
+    "screen": "focus_full",
+    "screen_name": "Focus slots full",
+    "element": "Continue",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "plans",
+      "hw_q1"
+    ],
+    "summary": "decide choice:focus_full.option: Chosen option → Learn only: toast “Heartwise added as Learn only” then tab → plans | Swap: replace → hw_q1"
+  },
+  {
+    "screen": "focus_full",
+    "screen_name": "Focus slots full",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "program_settings",
+    "screen_name": "Program settings",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "program_settings",
+    "screen_name": "Program settings",
+    "element": "Export BreatheFree data",
+    "path": "body[3].rows[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Export is being prepared. We’ll notify you.”"
+  },
+  {
+    "screen": "program_settings",
+    "screen_name": "Program settings",
+    "element": "Leave BreatheFree",
+    "path": "body[3].rows[1]",
+    "type": "sheet",
+    "targets": [
+      "account_leave"
+    ],
+    "summary": "sheet → account_leave"
+  },
+  {
+    "screen": "program_settings",
+    "screen_name": "Program settings",
+    "element": "Save changes",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "PATCH /v1/enrolments/:id then toast “Saved” then back"
+  },
+  {
+    "screen": "progress",
+    "screen_name": "Progress",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "progress",
+    "screen_name": "Progress",
+    "element": "Cigarettes / day",
+    "path": "body[2]",
+    "type": "push",
+    "targets": [
+      "bf_progress"
+    ],
+    "summary": "push → bf_progress"
+  },
+  {
+    "screen": "progress",
+    "screen_name": "Progress",
+    "element": "Social minutes / day",
+    "path": "body[3]",
+    "type": "push",
+    "targets": [
+      "sf_week"
+    ],
+    "summary": "push → sf_week"
+  },
+  {
+    "screen": "progress",
+    "screen_name": "Progress",
+    "element": "Manage",
+    "path": "body[4].cta[0]",
+    "type": "push",
+    "targets": [
+      "account_privacy"
+    ],
+    "summary": "push → account_privacy"
+  },
+  {
+    "screen": "progress",
+    "screen_name": "Progress",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "progress",
+    "screen_name": "Progress",
+    "element": "Tab · Plans",
+    "path": "tabbar.plans",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "progress",
+    "screen_name": "Progress",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "progress",
+    "screen_name": "Progress",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "progress_empty",
+    "screen_name": "Progress · empty",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "progress_empty",
+    "screen_name": "Progress · empty",
+    "element": "Do a check-in",
+    "path": "body[3]",
+    "type": "sheet",
+    "targets": [
+      "checkin"
+    ],
+    "summary": "sheet → checkin"
+  },
+  {
+    "screen": "progress_empty",
+    "screen_name": "Progress · empty",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "progress_empty",
+    "screen_name": "Progress · empty",
+    "element": "Tab · Plans",
+    "path": "tabbar.plans",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "progress_empty",
+    "screen_name": "Progress · empty",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "progress_empty",
+    "screen_name": "Progress · empty",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "progress_error",
+    "screen_name": "Progress · error",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "progress_error",
+    "screen_name": "Progress · error",
+    "element": "Try again",
+    "path": "body[3]",
+    "type": "replace",
+    "targets": [
+      "progress"
+    ],
+    "summary": "replace → progress"
+  },
+  {
+    "screen": "progress_error",
+    "screen_name": "Progress · error",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "progress_error",
+    "screen_name": "Progress · error",
+    "element": "Tab · Plans",
+    "path": "tabbar.plans",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "progress_error",
+    "screen_name": "Progress · error",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "progress_error",
+    "screen_name": "Progress · error",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "learn",
+    "screen_name": "Learn",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "learn",
+    "screen_name": "Learn",
+    "element": "Cravings: what to expect today",
+    "path": "body[2]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "learn",
+    "screen_name": "Learn",
+    "element": "Why “one more video” never feels like enough",
+    "path": "body[3]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "learn",
+    "screen_name": "Learn",
+    "element": "How your lungs recover after you quit",
+    "path": "body[4]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "learn",
+    "screen_name": "Learn",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "learn",
+    "screen_name": "Learn",
+    "element": "Tab · Plans",
+    "path": "tabbar.plans",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "learn",
+    "screen_name": "Learn",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "learn",
+    "screen_name": "Learn",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "learn_error",
+    "screen_name": "Learn · error",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "learn_error",
+    "screen_name": "Learn · error",
+    "element": "Try again",
+    "path": "body[3]",
+    "type": "replace",
+    "targets": [
+      "learn"
+    ],
+    "summary": "replace → learn"
+  },
+  {
+    "screen": "learn_error",
+    "screen_name": "Learn · error",
+    "element": "Open downloads",
+    "path": "body[4]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "learn_error",
+    "screen_name": "Learn · error",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "learn_error",
+    "screen_name": "Learn · error",
+    "element": "Tab · Plans",
+    "path": "tabbar.plans",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "learn_error",
+    "screen_name": "Learn · error",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "learn_error",
+    "screen_name": "Learn · error",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "learn_lesson",
+    "screen_name": "Lesson",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "learn_lesson",
+    "screen_name": "Lesson",
+    "element": "Play",
+    "path": "body[2].children[0].items[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Playing audio”"
+  },
+  {
+    "screen": "learn_lesson",
+    "screen_name": "Lesson",
+    "element": "Transcript",
+    "path": "body[2].children[0].items[1]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Transcript opened”"
+  },
+  {
+    "screen": "learn_lesson",
+    "screen_name": "Lesson",
+    "element": "Mark complete",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/records/lessons then toast “Lesson complete” then back"
+  },
+  {
+    "screen": "learn_lesson",
+    "screen_name": "Lesson",
+    "element": "Save for offline",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Saved for offline”"
+  },
+  {
+    "screen": "support",
+    "screen_name": "Support",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "support",
+    "screen_name": "Support",
+    "element": "Call now",
+    "path": "body[0].children[0].items[0]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 1-800-784-8669"
+  },
+  {
+    "screen": "support",
+    "screen_name": "Support",
+    "element": "Request call-back",
+    "path": "body[0].children[0].items[1]",
+    "type": "sheet",
+    "targets": [
+      "support_callback"
+    ],
+    "summary": "sheet → support_callback"
+  },
+  {
+    "screen": "support",
+    "screen_name": "Support",
+    "element": "Jordan",
+    "path": "body[1].rows[0]",
+    "type": "sheet",
+    "targets": [
+      "support_message"
+    ],
+    "summary": "sheet → support_message"
+  },
+  {
+    "screen": "support",
+    "screen_name": "Support",
+    "element": "Add a ScrollFree buddy",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "sf_buddy"
+    ],
+    "summary": "push → sf_buddy"
+  },
+  {
+    "screen": "support",
+    "screen_name": "Support",
+    "element": "Dr. Patel’s clinic",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "support_message_care"
+    ],
+    "summary": "push → support_message_care"
+  },
+  {
+    "screen": "support",
+    "screen_name": "Support",
+    "element": "Call or text 988",
+    "path": "body[3].actions[0]",
+    "type": "push",
+    "targets": [
+      "crisis"
+    ],
+    "summary": "push → crisis"
+  },
+  {
+    "screen": "support",
+    "screen_name": "Support",
+    "element": "Call 911",
+    "path": "body[3].actions[1]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "support",
+    "screen_name": "Support",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "support",
+    "screen_name": "Support",
+    "element": "Tab · Plans",
+    "path": "tabbar.plans",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "support",
+    "screen_name": "Support",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "support",
+    "screen_name": "Support",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "support_empty",
+    "screen_name": "Support · empty",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "support_empty",
+    "screen_name": "Support · empty",
+    "element": "Call",
+    "path": "body[0].cta[0]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 1-800-784-8669"
+  },
+  {
+    "screen": "support_empty",
+    "screen_name": "Support · empty",
+    "element": "Add",
+    "path": "body[1].cta[0]",
+    "type": "push",
+    "targets": [
+      "support_add_person"
+    ],
+    "summary": "push → support_add_person"
+  },
+  {
+    "screen": "support_empty",
+    "screen_name": "Support · empty",
+    "element": "Connect",
+    "path": "body[2].cta[0]",
+    "type": "push",
+    "targets": [
+      "support_connect"
+    ],
+    "summary": "push → support_connect"
+  },
+  {
+    "screen": "support_empty",
+    "screen_name": "Support · empty",
+    "element": "Call or text 988",
+    "path": "body[3].actions[0]",
+    "type": "push",
+    "targets": [
+      "crisis"
+    ],
+    "summary": "push → crisis"
+  },
+  {
+    "screen": "support_empty",
+    "screen_name": "Support · empty",
+    "element": "Call 911",
+    "path": "body[3].actions[1]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "support_empty",
+    "screen_name": "Support · empty",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "support_empty",
+    "screen_name": "Support · empty",
+    "element": "Tab · Plans",
+    "path": "tabbar.plans",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "support_empty",
+    "screen_name": "Support · empty",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "support_empty",
+    "screen_name": "Support · empty",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "support_callback",
+    "screen_name": "Request call-back",
+    "element": "Send referral",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/care/referrals then toast “Request sent. Expect a call within 2 business days.” then close"
+  },
+  {
+    "screen": "support_callback",
+    "screen_name": "Request call-back",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "support_message",
+    "screen_name": "Preview message",
+    "element": "Open Messages",
+    "path": "footer[0]",
+    "type": "sms",
+    "targets": [],
+    "summary": "sms Jordan"
+  },
+  {
+    "screen": "support_message",
+    "screen_name": "Preview message",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "support_message_care",
+    "screen_name": "Message care team",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "support_message_care",
+    "screen_name": "Message care team",
+    "element": "Call or text 988",
+    "path": "body[4].actions[0]",
+    "type": "push",
+    "targets": [
+      "crisis"
+    ],
+    "summary": "push → crisis"
+  },
+  {
+    "screen": "support_message_care",
+    "screen_name": "Message care team",
+    "element": "Call 911",
+    "path": "body[4].actions[1]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "support_message_care",
+    "screen_name": "Message care team",
+    "element": "Send message",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/care/messages then toast “Message sent” then back"
+  },
+  {
+    "screen": "support_add_person",
+    "screen_name": "Add a supporter",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "support_add_person",
+    "screen_name": "Add a supporter",
+    "element": "Save supporter",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/care/supporters then toast “Jordan added” then back"
+  },
+  {
+    "screen": "support_connect",
+    "screen_name": "Connect a clinic",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "support_connect",
+    "screen_name": "Connect a clinic",
+    "element": "Connect",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/care/connections then toast “Connected to Dr. Patel’s clinic” then back"
+  },
+  {
+    "screen": "account",
+    "screen_name": "Account",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "account",
+    "screen_name": "Account",
+    "element": "Health records",
+    "path": "body[1].rows[0]",
+    "type": "push",
+    "targets": [
+      "records_hub"
+    ],
+    "summary": "push → records_hub"
+  },
+  {
+    "screen": "account",
+    "screen_name": "Account",
+    "element": "Sign-in methods",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "account_signin_methods"
+    ],
+    "summary": "push → account_signin_methods"
+  },
+  {
+    "screen": "account",
+    "screen_name": "Account",
+    "element": "Programs & sharing",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "account_programs"
+    ],
+    "summary": "push → account_programs"
+  },
+  {
+    "screen": "account",
+    "screen_name": "Account",
+    "element": "Notifications",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "account_notifications"
+    ],
+    "summary": "push → account_notifications"
+  },
+  {
+    "screen": "account",
+    "screen_name": "Account",
+    "element": "Privacy & consent",
+    "path": "body[2].rows[2]",
+    "type": "push",
+    "targets": [
+      "account_privacy"
+    ],
+    "summary": "push → account_privacy"
+  },
+  {
+    "screen": "account",
+    "screen_name": "Account",
+    "element": "Your data",
+    "path": "body[2].rows[3]",
+    "type": "push",
+    "targets": [
+      "account_data"
+    ],
+    "summary": "push → account_data"
+  },
+  {
+    "screen": "account",
+    "screen_name": "Account",
+    "element": "Text size & contrast",
+    "path": "body[3].rows[0]",
+    "type": "os_settings",
+    "targets": [],
+    "summary": "os_settings"
+  },
+  {
+    "screen": "account",
+    "screen_name": "Account",
+    "element": "Language",
+    "path": "body[3].rows[1]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Language set to English”"
+  },
+  {
+    "screen": "account",
+    "screen_name": "Account",
+    "element": "Help & legal",
+    "path": "body[3].rows[2]",
+    "type": "external",
+    "targets": [],
+    "summary": "external https://www.tetherhealthgroup.com/support/"
+  },
+  {
+    "screen": "account",
+    "screen_name": "Account",
+    "element": "Sign out",
+    "path": "footer[0]",
+    "type": "sheet",
+    "targets": [
+      "account_signout"
+    ],
+    "summary": "sheet → account_signout"
+  },
+  {
+    "screen": "account_signin_methods",
+    "screen_name": "Sign-in methods",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "account_signin_methods",
+    "screen_name": "Sign-in methods",
+    "element": "Google",
+    "path": "body[1].rows[1]",
+    "type": "branch",
+    "targets": [
+      "auth_link",
+      "auth_social_error"
+    ],
+    "summary": "auth (google): Sign in with Google result → Success: toast “Google connected” | Email already has a Tether account: push → auth_link | Cancelled: toast “Cancelled” | Error: push → auth_social_error"
+  },
+  {
+    "screen": "account_signin_methods",
+    "screen_name": "Sign-in methods",
+    "element": "Email & password",
+    "path": "body[1].rows[2]",
+    "type": "push",
+    "targets": [
+      "auth_newpass"
+    ],
+    "summary": "push → auth_newpass"
+  },
+  {
+    "screen": "account_programs",
+    "screen_name": "Programs & sharing",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "account_programs",
+    "screen_name": "Programs & sharing",
+    "element": "BreatheFree",
+    "path": "body[1].rows[0]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "account_programs",
+    "screen_name": "Programs & sharing",
+    "element": "ScrollFree",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "account_programs",
+    "screen_name": "Programs & sharing",
+    "element": "ClearAir",
+    "path": "body[1].rows[2]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "account_programs",
+    "screen_name": "Programs & sharing",
+    "element": "Heartwise",
+    "path": "body[1].rows[3]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "account_programs",
+    "screen_name": "Programs & sharing",
+    "element": "Add a program",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "catalog"
+    ],
+    "summary": "push → catalog"
+  },
+  {
+    "screen": "account_leave",
+    "screen_name": "Leave a program",
+    "element": "Leave BreatheFree",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "plans"
+    ],
+    "summary": "DELETE /v1/enrolments/:id then toast “You left BreatheFree” then reset → plans"
+  },
+  {
+    "screen": "account_leave",
+    "screen_name": "Leave a program",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "account_notifications",
+    "screen_name": "Notifications",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "account_notifications",
+    "screen_name": "Notifications",
+    "element": "BreatheFree",
+    "path": "body[1].rows[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Reminder time saved”"
+  },
+  {
+    "screen": "account_notifications",
+    "screen_name": "Notifications",
+    "element": "ScrollFree",
+    "path": "body[1].rows[1]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Reminder time saved”"
+  },
+  {
+    "screen": "account_notifications",
+    "screen_name": "Notifications",
+    "element": "Save",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "PATCH /v1/notifications/preferences then toast “Saved” then back"
+  },
+  {
+    "screen": "account_privacy",
+    "screen_name": "Privacy & consent",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "account_privacy",
+    "screen_name": "Privacy & consent",
+    "element": "Care-team sharing",
+    "path": "body[1].rows[0]",
+    "type": "push",
+    "targets": [
+      "account_programs"
+    ],
+    "summary": "push → account_programs"
+  },
+  {
+    "screen": "account_privacy",
+    "screen_name": "Privacy & consent",
+    "element": "Consent history",
+    "path": "body[1].rows[1]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Consent history opened”"
+  },
+  {
+    "screen": "account_privacy",
+    "screen_name": "Privacy & consent",
+    "element": "Privacy Notice",
+    "path": "body[1].rows[2]",
+    "type": "external",
+    "targets": [],
+    "summary": "external https://www.tetherhealthgroup.com/privacy/"
+  },
+  {
+    "screen": "account_privacy",
+    "screen_name": "Privacy & consent",
+    "element": "Save",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "PATCH /v1/enrolments/consents then toast “Saved” then back"
+  },
+  {
+    "screen": "account_data",
+    "screen_name": "Your data",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "account_data",
+    "screen_name": "Your data",
+    "element": "Download everything",
+    "path": "body[0].rows[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/account/export then toast “We’re preparing your file. We’ll notify you when it’s ready.”"
+  },
+  {
+    "screen": "account_data",
+    "screen_name": "Your data",
+    "element": "Export a care summary",
+    "path": "body[0].rows[1]",
+    "type": "push",
+    "targets": [
+      "hw_summary"
+    ],
+    "summary": "push → hw_summary"
+  },
+  {
+    "screen": "account_data",
+    "screen_name": "Your data",
+    "element": "Delete account and all data",
+    "path": "body[1].rows[0]",
+    "type": "push",
+    "targets": [
+      "account_delete"
+    ],
+    "summary": "push → account_delete"
+  },
+  {
+    "screen": "account_delete",
+    "screen_name": "Delete account",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "account_delete",
+    "screen_name": "Delete account",
+    "element": "Download a copy first",
+    "path": "body[3]",
+    "type": "push",
+    "targets": [
+      "account_data"
+    ],
+    "summary": "push → account_data"
+  },
+  {
+    "screen": "account_delete",
+    "screen_name": "Delete account",
+    "element": "Delete everything",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "account_deleted"
+    ],
+    "summary": "DELETE /v1/account/data then replace → account_deleted"
+  },
+  {
+    "screen": "account_deleted",
+    "screen_name": "Deletion receipt",
+    "element": "Done",
+    "path": "footer[0]",
+    "type": "reset",
+    "targets": [
+      "welcome"
+    ],
+    "summary": "reset → welcome"
+  },
+  {
+    "screen": "account_signout",
+    "screen_name": "Sign out",
+    "element": "Sign out",
+    "path": "footer[0]",
+    "type": "reset",
+    "targets": [
+      "welcome"
+    ],
+    "summary": "reset → welcome"
+  },
+  {
+    "screen": "account_signout",
+    "screen_name": "Sign out",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sys_update",
+    "screen_name": "Update required",
+    "element": "Update now",
+    "path": "footer[0]",
+    "type": "external",
+    "targets": [],
+    "summary": "external https://apps.apple.com/app/tether-health"
+  },
+  {
+    "screen": "sys_update",
+    "screen_name": "Update required",
+    "element": "Open Rescue",
+    "path": "footer[1]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "bf_intro",
+    "screen_name": "BreatheFree intro",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_intro",
+    "screen_name": "BreatheFree intro",
+    "element": "Set up BreatheFree",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "bf_q1"
+    ],
+    "summary": "push → bf_q1"
+  },
+  {
+    "screen": "bf_intro",
+    "screen_name": "BreatheFree intro",
+    "element": "Add as Learn only",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "plans"
+    ],
+    "summary": "toast “BreatheFree added as Learn only” then tab → plans"
+  },
+  {
+    "screen": "bf_q1",
+    "screen_name": "Baseline: amount",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_q1",
+    "screen_name": "Baseline: amount",
+    "element": "Next",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "bf_q2"
+    ],
+    "summary": "push → bf_q2"
+  },
+  {
+    "screen": "bf_q2",
+    "screen_name": "Baseline: triggers",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_q2",
+    "screen_name": "Baseline: triggers",
+    "element": "Next",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "bf_q3"
+    ],
+    "summary": "push → bf_q3"
+  },
+  {
+    "screen": "bf_q3",
+    "screen_name": "Baseline: reasons",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_q3",
+    "screen_name": "Baseline: reasons",
+    "element": "Save my reasons",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "bf_path"
+    ],
+    "summary": "push → bf_path"
+  },
+  {
+    "screen": "bf_path",
+    "screen_name": "Choose path",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_path",
+    "screen_name": "Choose path",
+    "element": "Talk to a person first?",
+    "path": "body[3]",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "bf_path",
+    "screen_name": "Choose path",
+    "element": "Continue with this path",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "bf_date",
+      "bf_support",
+      "bf_stepdown",
+      "bf_home_explore",
+      "ob_setup"
+    ],
+    "summary": "decide choice:bf_path.path: Selected path → Set a quit date: push → bf_date | Quit today: push → bf_support | Reduce gradually: push → bf_stepdown | Explore first: replace → bf_home_explore (onboarding: ob_setup)"
+  },
+  {
+    "screen": "bf_date",
+    "screen_name": "Select quit date",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_date",
+    "screen_name": "Select quit date",
+    "element": "Confirm this date",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "bf_support"
+    ],
+    "summary": "push → bf_support"
+  },
+  {
+    "screen": "bf_stepdown",
+    "screen_name": "Step-down schedule",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_stepdown",
+    "screen_name": "Step-down schedule",
+    "element": "Save schedule",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "bf_support"
+    ],
+    "summary": "push → bf_support"
+  },
+  {
+    "screen": "bf_support",
+    "screen_name": "Support & preparation",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_support",
+    "screen_name": "Support & preparation",
+    "element": "Jordan",
+    "path": "body[1].rows[0]",
+    "type": "push",
+    "targets": [
+      "support_add_person"
+    ],
+    "summary": "push → support_add_person"
+  },
+  {
+    "screen": "bf_support",
+    "screen_name": "Support & preparation",
+    "element": "Add a supporter",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "support_add_person"
+    ],
+    "summary": "push → support_add_person"
+  },
+  {
+    "screen": "bf_support",
+    "screen_name": "Support & preparation",
+    "element": "Review my plan",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "bf_review"
+    ],
+    "summary": "push → bf_review"
+  },
+  {
+    "screen": "bf_review",
+    "screen_name": "Review plan",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_review",
+    "screen_name": "Review plan",
+    "element": "Quit approach",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "bf_path"
+    ],
+    "summary": "push → bf_path"
+  },
+  {
+    "screen": "bf_review",
+    "screen_name": "Review plan",
+    "element": "Quit date",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "bf_date"
+    ],
+    "summary": "push → bf_date"
+  },
+  {
+    "screen": "bf_review",
+    "screen_name": "Review plan",
+    "element": "Top reason",
+    "path": "body[2].rows[2]",
+    "type": "push",
+    "targets": [
+      "bf_q3"
+    ],
+    "summary": "push → bf_q3"
+  },
+  {
+    "screen": "bf_review",
+    "screen_name": "Review plan",
+    "element": "Support",
+    "path": "body[2].rows[3]",
+    "type": "push",
+    "targets": [
+      "bf_support"
+    ],
+    "summary": "push → bf_support"
+  },
+  {
+    "screen": "bf_review",
+    "screen_name": "Review plan",
+    "element": "Space",
+    "path": "body[2].rows[4]",
+    "type": "push",
+    "targets": [
+      "bf_support"
+    ],
+    "summary": "push → bf_support"
+  },
+  {
+    "screen": "bf_review",
+    "screen_name": "Review plan",
+    "element": "Start my plan",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "bf_home",
+      "ob_setup"
+    ],
+    "summary": "PUT /v1/quit-plan then replace → bf_home (onboarding: ob_setup)"
+  },
+  {
+    "screen": "bf_review",
+    "screen_name": "Review plan",
+    "element": "Save and finish later",
+    "path": "footer[1]",
+    "type": "tab",
+    "targets": [
+      "plans"
+    ],
+    "summary": "tab → plans"
+  },
+  {
+    "screen": "bf_home",
+    "screen_name": "BreatheFree home",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_home",
+    "screen_name": "BreatheFree home",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "bf_home",
+    "screen_name": "BreatheFree home",
+    "element": "Rescue",
+    "path": "body[1].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "bf_home",
+    "screen_name": "BreatheFree home",
+    "element": "Daily check-in",
+    "path": "body[4].rows[0]",
+    "type": "sheet",
+    "targets": [
+      "checkin"
+    ],
+    "summary": "sheet → checkin"
+  },
+  {
+    "screen": "bf_home",
+    "screen_name": "BreatheFree home",
+    "element": "Medication center",
+    "path": "body[4].rows[1]",
+    "type": "push",
+    "targets": [
+      "bf_meds"
+    ],
+    "summary": "push → bf_meds"
+  },
+  {
+    "screen": "bf_home",
+    "screen_name": "BreatheFree home",
+    "element": "Progress",
+    "path": "body[4].rows[2]",
+    "type": "push",
+    "targets": [
+      "bf_progress"
+    ],
+    "summary": "push → bf_progress"
+  },
+  {
+    "screen": "bf_home",
+    "screen_name": "BreatheFree home",
+    "element": "Edit my plan",
+    "path": "body[4].rows[3]",
+    "type": "push",
+    "targets": [
+      "bf_review"
+    ],
+    "summary": "push → bf_review"
+  },
+  {
+    "screen": "bf_home",
+    "screen_name": "BreatheFree home",
+    "element": "Program settings",
+    "path": "body[4].rows[4]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "bf_home",
+    "screen_name": "BreatheFree home",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "bf_home",
+    "screen_name": "BreatheFree home",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "bf_home",
+    "screen_name": "BreatheFree home",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "bf_home",
+    "screen_name": "BreatheFree home",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "bf_home_quitday",
+    "screen_name": "BreatheFree · quit day",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_home_quitday",
+    "screen_name": "BreatheFree · quit day",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "bf_home_quitday",
+    "screen_name": "BreatheFree · quit day",
+    "element": "Rescue",
+    "path": "body[3].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "bf_home_quitday",
+    "screen_name": "BreatheFree · quit day",
+    "element": "I smoked or had a slip",
+    "path": "body[4]",
+    "type": "push",
+    "targets": [
+      "bf_slip"
+    ],
+    "summary": "push → bf_slip"
+  },
+  {
+    "screen": "bf_home_quitday",
+    "screen_name": "BreatheFree · quit day",
+    "element": "Morning check-in",
+    "path": "body[6].rows[0]",
+    "type": "sheet",
+    "targets": [
+      "checkin"
+    ],
+    "summary": "sheet → checkin"
+  },
+  {
+    "screen": "bf_home_quitday",
+    "screen_name": "BreatheFree · quit day",
+    "element": "Medication center",
+    "path": "body[6].rows[1]",
+    "type": "push",
+    "targets": [
+      "bf_meds"
+    ],
+    "summary": "push → bf_meds"
+  },
+  {
+    "screen": "bf_home_quitday",
+    "screen_name": "BreatheFree · quit day",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "bf_home_quitday",
+    "screen_name": "BreatheFree · quit day",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "bf_home_quitday",
+    "screen_name": "BreatheFree · quit day",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "bf_home_quitday",
+    "screen_name": "BreatheFree · quit day",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "bf_home_explore",
+    "screen_name": "BreatheFree · explore",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_home_explore",
+    "screen_name": "BreatheFree · explore",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "bf_home_explore",
+    "screen_name": "BreatheFree · explore",
+    "element": "Rescue",
+    "path": "body[2].cta[0]",
+    "type": "sheet",
+    "targets": [
+      "rescue_pick"
+    ],
+    "summary": "sheet → rescue_pick"
+  },
+  {
+    "screen": "bf_home_explore",
+    "screen_name": "BreatheFree · explore",
+    "element": "Cravings: what to expect",
+    "path": "body[3]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "bf_home_explore",
+    "screen_name": "BreatheFree · explore",
+    "element": "What quit medicines can do",
+    "path": "body[4]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "bf_home_explore",
+    "screen_name": "BreatheFree · explore",
+    "element": "Choose a path",
+    "path": "body[5].cta[0]",
+    "type": "push",
+    "targets": [
+      "bf_path"
+    ],
+    "summary": "push → bf_path"
+  },
+  {
+    "screen": "bf_home_explore",
+    "screen_name": "BreatheFree · explore",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "bf_home_explore",
+    "screen_name": "BreatheFree · explore",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "bf_home_explore",
+    "screen_name": "BreatheFree · explore",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "bf_home_explore",
+    "screen_name": "BreatheFree · explore",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "bf_slip",
+    "screen_name": "Slip recovery",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "bf_slip",
+    "screen_name": "Slip recovery",
+    "element": "Save and start a 2-min Rescue",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "rescue_active",
+      "bf_date"
+    ],
+    "summary": "POST /v1/records/lapses then decide choice:bf_slip.next: Selected option → Continue from this moment: replace → rescue_active | Choose a new quit time: replace → bf_date"
+  },
+  {
+    "screen": "bf_slip",
+    "screen_name": "Slip recovery",
+    "element": "Skip for now",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_meds",
+    "screen_name": "Medication center",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_meds",
+    "screen_name": "Medication center",
+    "element": "Taken today",
+    "path": "body[1].children[0].items[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Recorded: taken at 8:07 AM”"
+  },
+  {
+    "screen": "bf_meds",
+    "screen_name": "Medication center",
+    "element": "Not today",
+    "path": "body[1].children[0].items[1]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Recorded: not taken”"
+  },
+  {
+    "screen": "bf_meds",
+    "screen_name": "Medication center",
+    "element": "Nicotine replacement",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "bf_meds",
+    "screen_name": "Medication center",
+    "element": "Prescription options",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "bf_meds",
+    "screen_name": "Medication center",
+    "element": "Side effect or worrying symptom?",
+    "path": "body[4]",
+    "type": "push",
+    "targets": [
+      "support_message_care"
+    ],
+    "summary": "push → support_message_care"
+  },
+  {
+    "screen": "bf_meds",
+    "screen_name": "Medication center",
+    "element": "Add or update recorded plan",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "bf_meds_edit"
+    ],
+    "summary": "push → bf_meds_edit"
+  },
+  {
+    "screen": "bf_meds_edit",
+    "screen_name": "Edit recorded plan",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_meds_edit",
+    "screen_name": "Edit recorded plan",
+    "element": "Save plan",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "PUT /v1/program-data/bf/meds then toast “Plan saved” then back"
+  },
+  {
+    "screen": "bf_progress",
+    "screen_name": "BreatheFree progress",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "bf_progress",
+    "screen_name": "BreatheFree progress",
+    "element": "How estimates work",
+    "path": "body[3].rows[0]",
+    "type": "sheet",
+    "targets": [
+      "bf_estimates"
+    ],
+    "summary": "sheet → bf_estimates"
+  },
+  {
+    "screen": "bf_estimates",
+    "screen_name": "How estimates work",
+    "element": "Edit numbers",
+    "path": "footer[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Opened baseline settings” then close"
+  },
+  {
+    "screen": "bf_estimates",
+    "screen_name": "How estimates work",
+    "element": "Done",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sf_intro",
+    "screen_name": "ScrollFree intro",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_intro",
+    "screen_name": "ScrollFree intro",
+    "element": "Set up ScrollFree",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "sf_q1"
+    ],
+    "summary": "push → sf_q1"
+  },
+  {
+    "screen": "sf_intro",
+    "screen_name": "ScrollFree intro",
+    "element": "Add as Learn only",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "plans"
+    ],
+    "summary": "toast “ScrollFree added as Learn only” then tab → plans"
+  },
+  {
+    "screen": "sf_q1",
+    "screen_name": "Baseline: use",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_q1",
+    "screen_name": "Baseline: use",
+    "element": "Next",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "sf_q2"
+    ],
+    "summary": "push → sf_q2"
+  },
+  {
+    "screen": "sf_q2",
+    "screen_name": "Baseline: triggers",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_q2",
+    "screen_name": "Baseline: triggers",
+    "element": "Next",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "sf_goal"
+    ],
+    "summary": "push → sf_goal"
+  },
+  {
+    "screen": "sf_goal",
+    "screen_name": "Goal & windows",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_goal",
+    "screen_name": "Goal & windows",
+    "element": "Connect Screen Time",
+    "path": "body[4].rows[0]",
+    "type": "push",
+    "targets": [
+      "sf_screentime"
+    ],
+    "summary": "push → sf_screentime"
+  },
+  {
+    "screen": "sf_goal",
+    "screen_name": "Goal & windows",
+    "element": "Save my goal",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "sf_buddy"
+    ],
+    "summary": "push → sf_buddy"
+  },
+  {
+    "screen": "sf_screentime",
+    "screen_name": "Connect Screen Time",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_screentime",
+    "screen_name": "Connect Screen Time",
+    "element": "Allow access",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "sf_screentime_denied"
+    ],
+    "summary": "branch: iOS Screen Time permission → Allowed: toast “Screen Time connected” then back | Not allowed: replace → sf_screentime_denied"
+  },
+  {
+    "screen": "sf_screentime",
+    "screen_name": "Connect Screen Time",
+    "element": "Not now",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_screentime_denied",
+    "screen_name": "Screen Time denied",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_screentime_denied",
+    "screen_name": "Screen Time denied",
+    "element": "Continue with self-report",
+    "path": "footer[0]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_screentime_denied",
+    "screen_name": "Screen Time denied",
+    "element": "Open phone settings",
+    "path": "footer[1]",
+    "type": "os_settings",
+    "targets": [],
+    "summary": "os_settings"
+  },
+  {
+    "screen": "sf_buddy",
+    "screen_name": "Accountability buddy",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_buddy",
+    "screen_name": "Accountability buddy",
+    "element": "Save and finish",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "sf_home",
+      "ob_setup"
+    ],
+    "summary": "PUT /v1/program-data/sf/plan then replace → sf_home (onboarding: ob_setup)"
+  },
+  {
+    "screen": "sf_buddy",
+    "screen_name": "Accountability buddy",
+    "element": "Skip for now",
+    "path": "footer[1]",
+    "type": "replace",
+    "targets": [
+      "sf_home",
+      "ob_setup"
+    ],
+    "summary": "replace → sf_home (onboarding: ob_setup)"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
+    "element": "Pause 60",
+    "path": "body[1].cta[0]",
+    "type": "push",
+    "targets": [
+      "sf_pause"
+    ],
+    "summary": "push → sf_pause"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
+    "element": "This week",
+    "path": "body[3].rows[0]",
+    "type": "push",
+    "targets": [
+      "sf_week"
+    ],
+    "summary": "push → sf_week"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
+    "element": "Had a long scroll?",
+    "path": "body[3].rows[1]",
+    "type": "push",
+    "targets": [
+      "sf_slip"
+    ],
+    "summary": "push → sf_slip"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
+    "element": "Goal & windows",
+    "path": "body[3].rows[2]",
+    "type": "push",
+    "targets": [
+      "sf_goal"
+    ],
+    "summary": "push → sf_goal"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
+    "element": "Buddy",
+    "path": "body[3].rows[3]",
+    "type": "push",
+    "targets": [
+      "sf_buddy"
+    ],
+    "summary": "push → sf_buddy"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
+    "element": "Program settings",
+    "path": "body[3].rows[4]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "sf_home",
+    "screen_name": "ScrollFree home",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "sf_pause",
+    "screen_name": "Pause 60",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sf_pause",
+    "screen_name": "Pause 60",
+    "element": "I’m good, put it down",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "today"
+    ],
+    "summary": "POST /v1/program-data/sf/pauses then toast “Nice. Logged as a pause.” then reset → today"
+  },
+  {
+    "screen": "sf_pause",
+    "screen_name": "Pause 60",
+    "element": "Open anyway (logged as information)",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Logged. No judgment.” then close"
+  },
+  {
+    "screen": "sf_slip",
+    "screen_name": "Long-scroll recovery",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_slip",
+    "screen_name": "Long-scroll recovery",
+    "element": "Save",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "sf_home"
+    ],
+    "summary": "POST /v1/records/lapses then toast “Saved” then replace → sf_home"
+  },
+  {
+    "screen": "sf_week",
+    "screen_name": "Weekly reflection",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sf_week",
+    "screen_name": "Weekly reflection",
+    "element": "Yes",
+    "path": "body[4].children[0].items[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Goal set to 75 min” then back"
+  },
+  {
+    "screen": "sf_week",
+    "screen_name": "Weekly reflection",
+    "element": "Stay at 90",
+    "path": "body[4].children[0].items[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ca_intro",
+    "screen_name": "ClearAir intro",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ca_intro",
+    "screen_name": "ClearAir intro",
+    "element": "Set up ClearAir",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "ca_q1"
+    ],
+    "summary": "push → ca_q1"
+  },
+  {
+    "screen": "ca_intro",
+    "screen_name": "ClearAir intro",
+    "element": "Add as Learn only",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "plans"
+    ],
+    "summary": "toast “ClearAir added as Learn only” then tab → plans"
+  },
+  {
+    "screen": "ca_q1",
+    "screen_name": "Diagnosis & plan",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ca_q1",
+    "screen_name": "Diagnosis & plan",
+    "element": "Next",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "ca_plan",
+      "ca_noplan"
+    ],
+    "summary": "decide choice:ca_q1.has_plan: Has a written action plan? → Yes: push → ca_plan | No / Not sure: push → ca_noplan"
+  },
+  {
+    "screen": "ca_plan",
+    "screen_name": "Enter action plan",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ca_plan",
+    "screen_name": "Enter action plan",
+    "element": "Add a photo of my plan",
+    "path": "body[6]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Camera opened”"
+  },
+  {
+    "screen": "ca_plan",
+    "screen_name": "Enter action plan",
+    "element": "Save plan",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "ca_home",
+      "ob_setup"
+    ],
+    "summary": "PUT /v1/program-data/ca/plan then replace → ca_home (onboarding: ob_setup)"
+  },
+  {
+    "screen": "ca_noplan",
+    "screen_name": "No action plan yet",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ca_noplan",
+    "screen_name": "No action plan yet",
+    "element": "Symptom diary",
+    "path": "body[3].rows[0]",
+    "type": "push",
+    "targets": [
+      "ca_symptoms"
+    ],
+    "summary": "push → ca_symptoms"
+  },
+  {
+    "screen": "ca_noplan",
+    "screen_name": "No action plan yet",
+    "element": "Questions for my next visit",
+    "path": "body[3].rows[1]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "ca_noplan",
+    "screen_name": "No action plan yet",
+    "element": "Message my care team",
+    "path": "body[3].rows[2]",
+    "type": "push",
+    "targets": [
+      "support_message_care"
+    ],
+    "summary": "push → support_message_care"
+  },
+  {
+    "screen": "ca_noplan",
+    "screen_name": "No action plan yet",
+    "element": "Continue to ClearAir",
+    "path": "footer[0]",
+    "type": "replace",
+    "targets": [
+      "ca_home",
+      "ob_setup"
+    ],
+    "summary": "replace → ca_home (onboarding: ob_setup)"
+  },
+  {
+    "screen": "ca_home",
+    "screen_name": "ClearAir home",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ca_home",
+    "screen_name": "ClearAir home",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "ca_home",
+    "screen_name": "ClearAir home",
+    "element": "Check my zone",
+    "path": "body[1]",
+    "type": "push",
+    "targets": [
+      "ca_zone"
+    ],
+    "summary": "push → ca_zone"
+  },
+  {
+    "screen": "ca_home",
+    "screen_name": "ClearAir home",
+    "element": "Red-zone plan",
+    "path": "body[2]",
+    "type": "push",
+    "targets": [
+      "ca_red"
+    ],
+    "summary": "push → ca_red"
+  },
+  {
+    "screen": "ca_home",
+    "screen_name": "ClearAir home",
+    "element": "Log symptoms",
+    "path": "body[3].rows[0]",
+    "type": "push",
+    "targets": [
+      "ca_symptoms"
+    ],
+    "summary": "push → ca_symptoms"
+  },
+  {
+    "screen": "ca_home",
+    "screen_name": "ClearAir home",
+    "element": "Progress",
+    "path": "body[3].rows[1]",
+    "type": "push",
+    "targets": [
+      "ca_progress"
+    ],
+    "summary": "push → ca_progress"
+  },
+  {
+    "screen": "ca_home",
+    "screen_name": "ClearAir home",
+    "element": "My action plan",
+    "path": "body[3].rows[2]",
+    "type": "push",
+    "targets": [
+      "ca_plan"
+    ],
+    "summary": "push → ca_plan"
+  },
+  {
+    "screen": "ca_home",
+    "screen_name": "ClearAir home",
+    "element": "Program settings",
+    "path": "body[3].rows[3]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "ca_home",
+    "screen_name": "ClearAir home",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "ca_home",
+    "screen_name": "ClearAir home",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "ca_home",
+    "screen_name": "ClearAir home",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "ca_home",
+    "screen_name": "ClearAir home",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "ca_zone",
+    "screen_name": "Zone check",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ca_zone",
+    "screen_name": "Zone check",
+    "element": "Save and see my steps",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "ca_home",
+      "ca_yellow",
+      "ca_red"
+    ],
+    "summary": "POST /v1/program-data/ca/zone-checks then decide ca.zone: Computed zone → Green: toast “Green zone · follow your daily routine” then replace → ca_home | Yellow: replace → ca_yellow | Red: replace → ca_red | Invalid peak flow: toast “Check your peak flow: 50–900 L/min”"
+  },
+  {
+    "screen": "ca_yellow",
+    "screen_name": "Yellow zone",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ca_yellow",
+    "screen_name": "Yellow zone",
+    "element": "Getting worse or can’t speak in full sentences?",
+    "path": "body[2]",
+    "type": "replace",
+    "targets": [
+      "ca_red"
+    ],
+    "summary": "replace → ca_red"
+  },
+  {
+    "screen": "ca_yellow",
+    "screen_name": "Yellow zone",
+    "element": "Remind me in 20 min",
+    "path": "footer[0]",
+    "type": "toast",
+    "targets": [
+      "ca_home"
+    ],
+    "summary": "toast “Reminder set for 20 minutes” then replace → ca_home"
+  },
+  {
+    "screen": "ca_yellow",
+    "screen_name": "Yellow zone",
+    "element": "Message care team",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "support_message_care"
+    ],
+    "summary": "push → support_message_care"
+  },
+  {
+    "screen": "ca_red",
+    "screen_name": "Red zone",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "ca_red",
+    "screen_name": "Red zone",
+    "element": "Call 911",
+    "path": "body[1]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "ca_red",
+    "screen_name": "Red zone",
+    "element": "Tell Maria",
+    "path": "body[3].rows[0]",
+    "type": "sheet",
+    "targets": [
+      "support_message"
+    ],
+    "summary": "sheet → support_message"
+  },
+  {
+    "screen": "ca_symptoms",
+    "screen_name": "Symptom log",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ca_symptoms",
+    "screen_name": "Symptom log",
+    "element": "Save",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/program-data/ca/symptoms then toast “Saved” then back"
+  },
+  {
+    "screen": "ca_progress",
+    "screen_name": "ClearAir progress",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ca_progress",
+    "screen_name": "ClearAir progress",
+    "element": "Create visit summary",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "hw_summary"
+    ],
+    "summary": "push → hw_summary"
+  },
+  {
+    "screen": "hw_intro",
+    "screen_name": "Heartwise intro",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "hw_intro",
+    "screen_name": "Heartwise intro",
+    "element": "Set up Heartwise",
+    "path": "footer[0]",
+    "type": "sheet",
+    "targets": [
+      "focus_full"
+    ],
+    "summary": "sheet → focus_full"
+  },
+  {
+    "screen": "hw_intro",
+    "screen_name": "Heartwise intro",
+    "element": "Add as Learn only",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "plans"
+    ],
+    "summary": "toast “Heartwise added as Learn only” then tab → plans"
+  },
+  {
+    "screen": "hw_q1",
+    "screen_name": "Baseline",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "hw_q1",
+    "screen_name": "Baseline",
+    "element": "Next",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "hw_targets"
+    ],
+    "summary": "push → hw_targets"
+  },
+  {
+    "screen": "hw_targets",
+    "screen_name": "Clinician targets",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "hw_targets",
+    "screen_name": "Clinician targets",
+    "element": "Import from my health record",
+    "path": "body[6]",
+    "type": "push",
+    "targets": [
+      "records_add"
+    ],
+    "summary": "push → records_add"
+  },
+  {
+    "screen": "hw_targets",
+    "screen_name": "Clinician targets",
+    "element": "Save targets",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "hw_home",
+      "ob_setup"
+    ],
+    "summary": "PUT /v1/program-data/hw/targets then replace → hw_home (onboarding: ob_setup)"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "Log blood pressure",
+    "path": "body[1]",
+    "type": "push",
+    "targets": [
+      "hw_log"
+    ],
+    "summary": "push → hw_log"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "Trends",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "hw_trends"
+    ],
+    "summary": "push → hw_trends"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "Cholesterol panel",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "hw_lipids"
+    ],
+    "summary": "push → hw_lipids"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "Visit summary",
+    "path": "body[2].rows[2]",
+    "type": "push",
+    "targets": [
+      "hw_summary"
+    ],
+    "summary": "push → hw_summary"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "From your health record",
+    "path": "body[2].rows[3]",
+    "type": "push",
+    "targets": [
+      "records_item"
+    ],
+    "summary": "push → records_item"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "My targets",
+    "path": "body[2].rows[4]",
+    "type": "push",
+    "targets": [
+      "hw_targets"
+    ],
+    "summary": "push → hw_targets"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "Program settings",
+    "path": "body[2].rows[5]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "Call 911",
+    "path": "body[3].actions[0]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "hw_home",
+    "screen_name": "Heartwise home",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "hw_log",
+    "screen_name": "Log BP · reading 1",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "hw_log",
+    "screen_name": "Log BP · reading 1",
+    "element": "Next reading",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "hw_log2"
+    ],
+    "summary": "push → hw_log2"
+  },
+  {
+    "screen": "hw_log2",
+    "screen_name": "Log BP · reading 2",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "hw_log2",
+    "screen_name": "Log BP · reading 2",
+    "element": "Save readings",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "hw_result",
+      "hw_log_error",
+      "hw_crisis"
+    ],
+    "summary": "POST /v1/program-data/hw/readings then decide hw.bp: Validated average → Valid · below crisis range: replace → hw_result | Invalid value: replace → hw_log_error | ≥180 top or ≥120 bottom: replace → hw_crisis"
+  },
+  {
+    "screen": "hw_log_error",
+    "screen_name": "Log BP · validation",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "hw_log_error",
+    "screen_name": "Log BP · validation",
+    "element": "Save readings",
+    "path": "footer[0]",
+    "type": "disabled",
+    "targets": [],
+    "summary": "disabled"
+  },
+  {
+    "screen": "hw_log_error",
+    "screen_name": "Log BP · validation",
+    "element": "Edit reading",
+    "path": "footer[1]",
+    "type": "replace",
+    "targets": [
+      "hw_log2"
+    ],
+    "summary": "replace → hw_log2"
+  },
+  {
+    "screen": "hw_result",
+    "screen_name": "Reading saved",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "hw_result",
+    "screen_name": "Reading saved",
+    "element": "See trends",
+    "path": "footer[0]",
+    "type": "replace",
+    "targets": [
+      "hw_trends"
+    ],
+    "summary": "replace → hw_trends"
+  },
+  {
+    "screen": "hw_result",
+    "screen_name": "Reading saved",
+    "element": "Back to Heartwise",
+    "path": "footer[1]",
+    "type": "replace",
+    "targets": [
+      "hw_home"
+    ],
+    "summary": "replace → hw_home"
+  },
+  {
+    "screen": "hw_crisis",
+    "screen_name": "Crisis range",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "hw_crisis",
+    "screen_name": "Crisis range",
+    "element": "Yes · call 911",
+    "path": "body[2]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "hw_crisis",
+    "screen_name": "Crisis range",
+    "element": "No symptoms · re-check in 5 min",
+    "path": "body[3]",
+    "type": "replace",
+    "targets": [
+      "hw_recheck"
+    ],
+    "summary": "replace → hw_recheck"
+  },
+  {
+    "screen": "hw_recheck",
+    "screen_name": "Re-check timer",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "hw_recheck",
+    "screen_name": "Re-check timer",
+    "element": "Call 911",
+    "path": "body[3].actions[0]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "hw_recheck",
+    "screen_name": "Re-check timer",
+    "element": "Re-check now",
+    "path": "footer[0]",
+    "type": "replace",
+    "targets": [
+      "hw_log"
+    ],
+    "summary": "replace → hw_log"
+  },
+  {
+    "screen": "hw_recheck",
+    "screen_name": "Re-check timer",
+    "element": "Contact my clinician",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "support_message_care"
+    ],
+    "summary": "push → support_message_care"
+  },
+  {
+    "screen": "hw_trends",
+    "screen_name": "Trends",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "hw_trends",
+    "screen_name": "Trends",
+    "element": "Create visit summary",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "hw_summary"
+    ],
+    "summary": "push → hw_summary"
+  },
+  {
+    "screen": "hw_lipids",
+    "screen_name": "Cholesterol panel",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "hw_lipids",
+    "screen_name": "Cholesterol panel",
+    "element": "Save panel",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/program-data/hw/lipids then toast “Panel saved” then back"
+  },
+  {
+    "screen": "hw_summary",
+    "screen_name": "Visit summary",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "hw_summary",
+    "screen_name": "Visit summary",
+    "element": "Send summary",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/care/summaries then toast “Summary sent to Dr. Patel’s clinic” then back"
+  },
+  {
+    "screen": "hw_summary",
+    "screen_name": "Visit summary",
+    "element": "Save as PDF",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “PDF saved to Files”"
+  },
+  {
+    "screen": "st_intro",
+    "screen_name": "Steady intro",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "st_intro",
+    "screen_name": "Steady intro",
+    "element": "Set up Steady",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "st_q1"
+    ],
+    "summary": "push → st_q1"
+  },
+  {
+    "screen": "st_intro",
+    "screen_name": "Steady intro",
+    "element": "Add as Learn only",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "plans"
+    ],
+    "summary": "toast “Steady added as Learn only” then tab → plans"
+  },
+  {
+    "screen": "st_q1",
+    "screen_name": "Type & device",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "st_q1",
+    "screen_name": "Type & device",
+    "element": "Next",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "st_range"
+    ],
+    "summary": "push → st_range"
+  },
+  {
+    "screen": "st_range",
+    "screen_name": "Range & low plan",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "st_range",
+    "screen_name": "Range & low plan",
+    "element": "Import from my health record",
+    "path": "body[6]",
+    "type": "push",
+    "targets": [
+      "records_add"
+    ],
+    "summary": "push → records_add"
+  },
+  {
+    "screen": "st_range",
+    "screen_name": "Range & low plan",
+    "element": "Save range",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "st_home",
+      "ob_setup"
+    ],
+    "summary": "PUT /v1/program-data/st/range then replace → st_home (onboarding: ob_setup)"
+  },
+  {
+    "screen": "st_home",
+    "screen_name": "Steady home",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "st_home",
+    "screen_name": "Steady home",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "st_home",
+    "screen_name": "Steady home",
+    "element": "Log a reading",
+    "path": "body[1]",
+    "type": "push",
+    "targets": [
+      "st_log"
+    ],
+    "summary": "push → st_log"
+  },
+  {
+    "screen": "st_home",
+    "screen_name": "Steady home",
+    "element": "Meal energy reset",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "st_reset"
+    ],
+    "summary": "push → st_reset"
+  },
+  {
+    "screen": "st_home",
+    "screen_name": "Steady home",
+    "element": "Patterns",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "st_patterns"
+    ],
+    "summary": "push → st_patterns"
+  },
+  {
+    "screen": "st_home",
+    "screen_name": "Steady home",
+    "element": "A1C history",
+    "path": "body[2].rows[2]",
+    "type": "push",
+    "targets": [
+      "st_a1c"
+    ],
+    "summary": "push → st_a1c"
+  },
+  {
+    "screen": "st_home",
+    "screen_name": "Steady home",
+    "element": "My range & low plan",
+    "path": "body[2].rows[3]",
+    "type": "push",
+    "targets": [
+      "st_range"
+    ],
+    "summary": "push → st_range"
+  },
+  {
+    "screen": "st_home",
+    "screen_name": "Steady home",
+    "element": "Program settings",
+    "path": "body[2].rows[4]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "st_home",
+    "screen_name": "Steady home",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "st_home",
+    "screen_name": "Steady home",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "st_home",
+    "screen_name": "Steady home",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "st_home",
+    "screen_name": "Steady home",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "st_log",
+    "screen_name": "Log reading",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "st_log",
+    "screen_name": "Log reading",
+    "element": "Save reading",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "st_home",
+      "st_low"
+    ],
+    "summary": "POST /v1/program-data/st/readings then decide st.glucose: Reading vs. your range → In or above range: toast “Saved” then replace → st_home | Below your low: replace → st_low | Invalid (outside 20–600): toast “Check your meter reading”"
+  },
+  {
+    "screen": "st_low",
+    "screen_name": "Low reading",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "st_low",
+    "screen_name": "Low reading",
+    "element": "Call 911",
+    "path": "body[3].children[0]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "st_low",
+    "screen_name": "Low reading",
+    "element": "Re-check now",
+    "path": "footer[0]",
+    "type": "replace",
+    "targets": [
+      "st_log"
+    ],
+    "summary": "replace → st_log"
+  },
+  {
+    "screen": "st_reset",
+    "screen_name": "Meal energy reset",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "st_reset",
+    "screen_name": "Meal energy reset",
+    "element": "Done",
+    "path": "footer[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Nice work” then back"
+  },
+  {
+    "screen": "st_patterns",
+    "screen_name": "Patterns",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "st_a1c",
+    "screen_name": "A1C",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "st_a1c",
+    "screen_name": "A1C",
+    "element": "Save",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/program-data/st/a1c then toast “Saved” then back"
+  },
+  {
+    "screen": "re_intro",
+    "screen_name": "Renew intro",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "re_intro",
+    "screen_name": "Renew intro",
+    "element": "Set up Renew",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "re_q1"
+    ],
+    "summary": "push → re_q1"
+  },
+  {
+    "screen": "re_intro",
+    "screen_name": "Renew intro",
+    "element": "Add as Learn only",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "plans"
+    ],
+    "summary": "toast “Renew added as Learn only” then tab → plans"
+  },
+  {
+    "screen": "re_q1",
+    "screen_name": "Risk check",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "re_q1",
+    "screen_name": "Risk check",
+    "element": "See what this means",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "re_result"
+    ],
+    "summary": "push → re_result"
+  },
+  {
+    "screen": "re_result",
+    "screen_name": "Risk result",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "re_result",
+    "screen_name": "Risk result",
+    "element": "Also see Heartwise and Steady",
+    "path": "body[3]",
+    "type": "push",
+    "targets": [
+      "catalog"
+    ],
+    "summary": "push → catalog"
+  },
+  {
+    "screen": "re_result",
+    "screen_name": "Risk result",
+    "element": "Save my plan",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "re_home",
+      "ob_setup"
+    ],
+    "summary": "PUT /v1/program-data/re/plan then replace → re_home (onboarding: ob_setup)"
+  },
+  {
+    "screen": "re_home",
+    "screen_name": "Renew home",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "re_home",
+    "screen_name": "Renew home",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "re_home",
+    "screen_name": "Renew home",
+    "element": "Add lab results",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "re_labs"
+    ],
+    "summary": "push → re_labs"
+  },
+  {
+    "screen": "re_home",
+    "screen_name": "Renew home",
+    "element": "Lab history",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "re_history"
+    ],
+    "summary": "push → re_history"
+  },
+  {
+    "screen": "re_home",
+    "screen_name": "Renew home",
+    "element": "Check symptoms",
+    "path": "body[2].rows[2]",
+    "type": "push",
+    "targets": [
+      "re_symptoms"
+    ],
+    "summary": "push → re_symptoms"
+  },
+  {
+    "screen": "re_home",
+    "screen_name": "Renew home",
+    "element": "Program settings",
+    "path": "body[2].rows[3]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "re_home",
+    "screen_name": "Renew home",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "re_home",
+    "screen_name": "Renew home",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "re_home",
+    "screen_name": "Renew home",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "re_home",
+    "screen_name": "Renew home",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "re_labs",
+    "screen_name": "Add labs",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "re_labs",
+    "screen_name": "Add labs",
+    "element": "Import from my health record",
+    "path": "body[5]",
+    "type": "push",
+    "targets": [
+      "records_add"
+    ],
+    "summary": "push → records_add"
+  },
+  {
+    "screen": "re_labs",
+    "screen_name": "Add labs",
+    "element": "Save results",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "re_history"
+    ],
+    "summary": "POST /v1/program-data/re/labs then toast “Saved” then replace → re_history"
+  },
+  {
+    "screen": "re_history",
+    "screen_name": "Lab history",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "re_history",
+    "screen_name": "Lab history",
+    "element": "Create visit summary",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "hw_summary"
+    ],
+    "summary": "push → hw_summary"
+  },
+  {
+    "screen": "re_symptoms",
+    "screen_name": "Symptom check",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "re_symptoms",
+    "screen_name": "Symptom check",
+    "element": "Contact my care team",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "support_message_care"
+    ],
+    "summary": "push → support_message_care"
+  },
+  {
+    "screen": "re_symptoms",
+    "screen_name": "Symptom check",
+    "element": "Vomiting blood or confused? Call 911",
+    "path": "footer[1]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "nu_intro",
+    "screen_name": "Nourish intro",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "nu_intro",
+    "screen_name": "Nourish intro",
+    "element": "Set up Nourish",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "nu_q1"
+    ],
+    "summary": "push → nu_q1"
+  },
+  {
+    "screen": "nu_intro",
+    "screen_name": "Nourish intro",
+    "element": "Add as Learn only",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "plans"
+    ],
+    "summary": "toast “Nourish added as Learn only” then tab → plans"
+  },
+  {
+    "screen": "nu_q1",
+    "screen_name": "Goals & screen",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "nu_q1",
+    "screen_name": "Goals & screen",
+    "element": "Next",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "nu_habit",
+      "nu_protect"
+    ],
+    "summary": "decide choice:nu_q1.eating: Eating-history answer → No: push → nu_habit | Yes / Prefer not to say: push → nu_protect"
+  },
+  {
+    "screen": "nu_habit",
+    "screen_name": "Weekly habit",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "nu_habit",
+    "screen_name": "Weekly habit",
+    "element": "Start this habit",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "nu_home",
+      "ob_setup"
+    ],
+    "summary": "PUT /v1/program-data/nu/habit then replace → nu_home (onboarding: ob_setup)"
+  },
+  {
+    "screen": "nu_home",
+    "screen_name": "Nourish home",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "nu_home",
+    "screen_name": "Nourish home",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "nu_home",
+    "screen_name": "Nourish home",
+    "element": "Done today",
+    "path": "body[0].cta[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Nice. 4 of 5 nights.”"
+  },
+  {
+    "screen": "nu_home",
+    "screen_name": "Nourish home",
+    "element": "Bean and veggie tacos",
+    "path": "body[2]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "nu_home",
+    "screen_name": "Nourish home",
+    "element": "Busy week?",
+    "path": "body[3].rows[0]",
+    "type": "push",
+    "targets": [
+      "nu_reset"
+    ],
+    "summary": "push → nu_reset"
+  },
+  {
+    "screen": "nu_home",
+    "screen_name": "Nourish home",
+    "element": "Week 4 milestone",
+    "path": "body[3].rows[1]",
+    "type": "push",
+    "targets": [
+      "nu_week4"
+    ],
+    "summary": "push → nu_week4"
+  },
+  {
+    "screen": "nu_home",
+    "screen_name": "Nourish home",
+    "element": "Change habit",
+    "path": "body[3].rows[2]",
+    "type": "push",
+    "targets": [
+      "nu_habit"
+    ],
+    "summary": "push → nu_habit"
+  },
+  {
+    "screen": "nu_home",
+    "screen_name": "Nourish home",
+    "element": "Program settings",
+    "path": "body[3].rows[3]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "nu_home",
+    "screen_name": "Nourish home",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "nu_home",
+    "screen_name": "Nourish home",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "nu_home",
+    "screen_name": "Nourish home",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "nu_home",
+    "screen_name": "Nourish home",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "nu_reset",
+    "screen_name": "Off-track reset",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "nu_reset",
+    "screen_name": "Off-track reset",
+    "element": "Continue",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "nu_home",
+      "nu_home",
+      "nu_habit"
+    ],
+    "summary": "decide choice:nu_reset.option: Selected option → Keep this habit: toast “Fresh start today” then replace → nu_home | Make it smaller: toast “Goal set to 3 nights” then replace → nu_home | Pick a different habit: replace → nu_habit"
+  },
+  {
+    "screen": "nu_week4",
+    "screen_name": "Week 4 milestone",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "nu_week4",
+    "screen_name": "Week 4 milestone",
+    "element": "Choose next habit",
+    "path": "footer[0]",
+    "type": "replace",
+    "targets": [
+      "nu_habit"
+    ],
+    "summary": "replace → nu_habit"
+  },
+  {
+    "screen": "nu_protect",
+    "screen_name": "Protective mode",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "nu_protect",
+    "screen_name": "Protective mode",
+    "element": "Prepare",
+    "path": "body[2].cta[0]",
+    "type": "push",
+    "targets": [
+      "support_message_care"
+    ],
+    "summary": "push → support_message_care"
+  },
+  {
+    "screen": "nu_protect",
+    "screen_name": "Protective mode",
+    "element": "Call or text 988",
+    "path": "body[3].actions[0]",
+    "type": "push",
+    "targets": [
+      "crisis"
+    ],
+    "summary": "push → crisis"
+  },
+  {
+    "screen": "nu_protect",
+    "screen_name": "Protective mode",
+    "element": "Call 911",
+    "path": "body[3].actions[1]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "nu_protect",
+    "screen_name": "Protective mode",
+    "element": "Continue with gentle habits",
+    "path": "footer[0]",
+    "type": "replace",
+    "targets": [
+      "nu_habit",
+      "nu_habit"
+    ],
+    "summary": "replace → nu_habit (onboarding: nu_habit)"
+  },
+  {
+    "screen": "sd_intro",
+    "screen_name": "Stride intro",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sd_intro",
+    "screen_name": "Stride intro",
+    "element": "Set up Stride",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "sd_q1"
+    ],
+    "summary": "push → sd_q1"
+  },
+  {
+    "screen": "sd_intro",
+    "screen_name": "Stride intro",
+    "element": "Add as Learn only",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "plans"
+    ],
+    "summary": "toast “Stride added as Learn only” then tab → plans"
+  },
+  {
+    "screen": "sd_q1",
+    "screen_name": "Falls check",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sd_q1",
+    "screen_name": "Falls check",
+    "element": "Next",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "sd_plan"
+    ],
+    "summary": "push → sd_plan"
+  },
+  {
+    "screen": "sd_plan",
+    "screen_name": "Movement plan",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sd_plan",
+    "screen_name": "Movement plan",
+    "element": "Start plan",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "sd_home",
+      "ob_setup"
+    ],
+    "summary": "PUT /v1/program-data/sd/plan then replace → sd_home (onboarding: ob_setup)"
+  },
+  {
+    "screen": "sd_home",
+    "screen_name": "Stride home",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sd_home",
+    "screen_name": "Stride home",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "sd_home",
+    "screen_name": "Stride home",
+    "element": "Start",
+    "path": "body[0].cta[0]",
+    "type": "push",
+    "targets": [
+      "sd_session"
+    ],
+    "summary": "push → sd_session"
+  },
+  {
+    "screen": "sd_home",
+    "screen_name": "Stride home",
+    "element": "I fell",
+    "path": "body[1]",
+    "type": "push",
+    "targets": [
+      "sd_fell"
+    ],
+    "summary": "push → sd_fell"
+  },
+  {
+    "screen": "sd_home",
+    "screen_name": "Stride home",
+    "element": "Home safety checklist",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "sd_safety"
+    ],
+    "summary": "push → sd_safety"
+  },
+  {
+    "screen": "sd_home",
+    "screen_name": "Stride home",
+    "element": "Caregiver access",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "sd_caregiver"
+    ],
+    "summary": "push → sd_caregiver"
+  },
+  {
+    "screen": "sd_home",
+    "screen_name": "Stride home",
+    "element": "Movement plan",
+    "path": "body[2].rows[2]",
+    "type": "push",
+    "targets": [
+      "sd_plan"
+    ],
+    "summary": "push → sd_plan"
+  },
+  {
+    "screen": "sd_home",
+    "screen_name": "Stride home",
+    "element": "Program settings",
+    "path": "body[2].rows[3]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "sd_home",
+    "screen_name": "Stride home",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "sd_home",
+    "screen_name": "Stride home",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "sd_home",
+    "screen_name": "Stride home",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "sd_home",
+    "screen_name": "Stride home",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "sd_session",
+    "screen_name": "Session player",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sd_session",
+    "screen_name": "Session player",
+    "element": "Next exercise",
+    "path": "footer[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Exercise 3 of 6”"
+  },
+  {
+    "screen": "sd_session",
+    "screen_name": "Session player",
+    "element": "Finish session",
+    "path": "footer[1]",
+    "type": "submit",
+    "targets": [
+      "sd_home"
+    ],
+    "summary": "POST /v1/program-data/sd/sessions then toast “Session saved” then replace → sd_home"
+  },
+  {
+    "screen": "sd_fell",
+    "screen_name": "I fell",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "sd_fell",
+    "screen_name": "I fell",
+    "element": "I hit my head or can’t get up · Call 911",
+    "path": "body[1]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "sd_fell",
+    "screen_name": "I fell",
+    "element": "Call Rosa",
+    "path": "body[2].rows[0]",
+    "type": "call",
+    "targets": [],
+    "summary": "call (555) 010-2244"
+  },
+  {
+    "screen": "sd_fell",
+    "screen_name": "I fell",
+    "element": "How to get up safely",
+    "path": "body[3]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "sd_fell",
+    "screen_name": "I fell",
+    "element": "I’m okay, log this fall",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "sd_home"
+    ],
+    "summary": "POST /v1/program-data/sd/falls then toast “Fall logged. Added to your visit list.” then replace → sd_home"
+  },
+  {
+    "screen": "sd_safety",
+    "screen_name": "Home safety",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sd_safety",
+    "screen_name": "Home safety",
+    "element": "Save",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "PUT /v1/program-data/sd/safety then toast “Saved” then back"
+  },
+  {
+    "screen": "sd_caregiver",
+    "screen_name": "Caregiver access",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "sd_caregiver",
+    "screen_name": "Caregiver access",
+    "element": "Send invite",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/care/caregivers then toast “Invite sent to Rosa” then back"
+  },
+  {
+    "screen": "ea_intro",
+    "screen_name": "Ease intro",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ea_intro",
+    "screen_name": "Ease intro",
+    "element": "Set up Ease",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "ea_q1"
+    ],
+    "summary": "push → ea_q1"
+  },
+  {
+    "screen": "ea_intro",
+    "screen_name": "Ease intro",
+    "element": "Add as Learn only",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "plans"
+    ],
+    "summary": "toast “Ease added as Learn only” then tab → plans"
+  },
+  {
+    "screen": "ea_q1",
+    "screen_name": "Optional screener",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ea_q1",
+    "screen_name": "Optional screener",
+    "element": "Next",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "ea_result"
+    ],
+    "summary": "push → ea_result"
+  },
+  {
+    "screen": "ea_q1",
+    "screen_name": "Optional screener",
+    "element": "Skip the check",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "ea_plan"
+    ],
+    "summary": "push → ea_plan"
+  },
+  {
+    "screen": "ea_result",
+    "screen_name": "Screener result",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ea_result",
+    "screen_name": "Screener result",
+    "element": "Find a therapist near me",
+    "path": "body[2].rows[0]",
+    "type": "external",
+    "targets": [],
+    "summary": "external https://findtreatment.gov"
+  },
+  {
+    "screen": "ea_result",
+    "screen_name": "Screener result",
+    "element": "Talk to my primary care doctor",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "support_message_care"
+    ],
+    "summary": "push → support_message_care"
+  },
+  {
+    "screen": "ea_result",
+    "screen_name": "Screener result",
+    "element": "Not now",
+    "path": "body[2].rows[2]",
+    "type": "push",
+    "targets": [
+      "ea_plan"
+    ],
+    "summary": "push → ea_plan"
+  },
+  {
+    "screen": "ea_result",
+    "screen_name": "Screener result",
+    "element": "Call or text 988",
+    "path": "body[3].actions[0]",
+    "type": "push",
+    "targets": [
+      "crisis"
+    ],
+    "summary": "push → crisis"
+  },
+  {
+    "screen": "ea_result",
+    "screen_name": "Screener result",
+    "element": "Call 911",
+    "path": "body[3].actions[1]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "ea_plan",
+    "screen_name": "Safety plan",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ea_plan",
+    "screen_name": "Safety plan",
+    "element": "Save plan",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "ea_home",
+      "ob_setup"
+    ],
+    "summary": "PUT device:encrypted/ea/safety-plan then replace → ea_home (onboarding: ob_setup)"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Start",
+    "path": "body[0].cta[0]",
+    "type": "push",
+    "targets": [
+      "ea_mood"
+    ],
+    "summary": "push → ea_mood"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "My safety plan",
+    "path": "body[1].rows[0]",
+    "type": "push",
+    "targets": [
+      "ea_plan"
+    ],
+    "summary": "push → ea_plan"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Check-back",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "ea_checkback"
+    ],
+    "summary": "push → ea_checkback"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Find a professional",
+    "path": "body[1].rows[2]",
+    "type": "push",
+    "targets": [
+      "ea_result"
+    ],
+    "summary": "push → ea_result"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Program settings",
+    "path": "body[1].rows[3]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Sleep and mood: 3 small changes",
+    "path": "body[2]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Call or text 988",
+    "path": "body[3].actions[0]",
+    "type": "push",
+    "targets": [
+      "crisis"
+    ],
+    "summary": "push → crisis"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Call 911",
+    "path": "body[3].actions[1]",
+    "type": "call",
+    "targets": [],
+    "summary": "call 911"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "ea_home",
+    "screen_name": "Ease home",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "ea_mood",
+    "screen_name": "Mood check-in",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ea_mood",
+    "screen_name": "Mood check-in",
+    "element": "Start",
+    "path": "body[2].cta[0]",
+    "type": "push",
+    "targets": [
+      "rescue_active"
+    ],
+    "summary": "push → rescue_active"
+  },
+  {
+    "screen": "ea_mood",
+    "screen_name": "Mood check-in",
+    "element": "Save",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "crisis"
+    ],
+    "summary": "POST /v1/program-data/ea/moods then decide ea.selfharm: Self-harm option selected? → No: toast “Saved” then back | Yes: replace → crisis"
+  },
+  {
+    "screen": "ea_checkback",
+    "screen_name": "Check-back day",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ea_checkback",
+    "screen_name": "Check-back day",
+    "element": "Show me",
+    "path": "body[3].cta[0]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "ea_checkback",
+    "screen_name": "Check-back day",
+    "element": "Save",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/program-data/ea/check-backs then toast “Saved” then back"
+  },
+  {
+    "screen": "ck_intro",
+    "screen_name": "Checkup intro",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ck_intro",
+    "screen_name": "Checkup intro",
+    "element": "Set up Checkup",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "ck_q1"
+    ],
+    "summary": "push → ck_q1"
+  },
+  {
+    "screen": "ck_intro",
+    "screen_name": "Checkup intro",
+    "element": "Add as Learn only",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "plans"
+    ],
+    "summary": "toast “Checkup added as Learn only” then tab → plans"
+  },
+  {
+    "screen": "ck_q1",
+    "screen_name": "About you",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ck_q1",
+    "screen_name": "About you",
+    "element": "Import vaccination history",
+    "path": "body[6]",
+    "type": "push",
+    "targets": [
+      "records_add"
+    ],
+    "summary": "push → records_add"
+  },
+  {
+    "screen": "ck_q1",
+    "screen_name": "About you",
+    "element": "Build my list",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "ck_list",
+      "ob_setup"
+    ],
+    "summary": "PUT /v1/program-data/ck/profile then replace → ck_list (onboarding: ob_setup)"
+  },
+  {
+    "screen": "ck_list",
+    "screen_name": "Due list",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ck_list",
+    "screen_name": "Due list",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "ck_list",
+    "screen_name": "Due list",
+    "element": "Find a pharmacy",
+    "path": "body[1].children[0].items[0]",
+    "type": "external",
+    "targets": [],
+    "summary": "external https://www.vaccines.gov"
+  },
+  {
+    "screen": "ck_list",
+    "screen_name": "Due list",
+    "element": "I got it",
+    "path": "body[1].children[0].items[1]",
+    "type": "push",
+    "targets": [
+      "ck_done"
+    ],
+    "summary": "push → ck_done"
+  },
+  {
+    "screen": "ck_list",
+    "screen_name": "Due list",
+    "element": "Colorectal screening",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "ck_item"
+    ],
+    "summary": "push → ck_item"
+  },
+  {
+    "screen": "ck_list",
+    "screen_name": "Due list",
+    "element": "Mammogram",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "ck_day"
+    ],
+    "summary": "push → ck_day"
+  },
+  {
+    "screen": "ck_list",
+    "screen_name": "Due list",
+    "element": "Lung cancer screening",
+    "path": "body[2].rows[2]",
+    "type": "push",
+    "targets": [
+      "ck_item"
+    ],
+    "summary": "push → ck_item"
+  },
+  {
+    "screen": "ck_list",
+    "screen_name": "Due list",
+    "element": "Program settings",
+    "path": "body[2].rows[3]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "ck_list",
+    "screen_name": "Due list",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "ck_list",
+    "screen_name": "Due list",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "ck_list",
+    "screen_name": "Due list",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "ck_list",
+    "screen_name": "Due list",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "ck_uptodate",
+    "screen_name": "Up to date",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ck_uptodate",
+    "screen_name": "Up to date",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "ck_uptodate",
+    "screen_name": "Up to date",
+    "element": "See full schedule",
+    "path": "body[3]",
+    "type": "replace",
+    "targets": [
+      "ck_list"
+    ],
+    "summary": "replace → ck_list"
+  },
+  {
+    "screen": "ck_uptodate",
+    "screen_name": "Up to date",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "ck_uptodate",
+    "screen_name": "Up to date",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "ck_uptodate",
+    "screen_name": "Up to date",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "ck_uptodate",
+    "screen_name": "Up to date",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "ck_item",
+    "screen_name": "Item detail",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ck_item",
+    "screen_name": "Item detail",
+    "element": "Message my care team",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "support_message_care"
+    ],
+    "summary": "push → support_message_care"
+  },
+  {
+    "screen": "ck_item",
+    "screen_name": "Item detail",
+    "element": "Mark as done",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "ck_done"
+    ],
+    "summary": "push → ck_done"
+  },
+  {
+    "screen": "ck_done",
+    "screen_name": "Mark done",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ck_done",
+    "screen_name": "Mark done",
+    "element": "Save",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "ck_list"
+    ],
+    "summary": "POST /v1/program-data/ck/done then toast “Saved · next due Sep 2027” then replace → ck_list"
+  },
+  {
+    "screen": "ck_day",
+    "screen_name": "Screening day",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "ck_day",
+    "screen_name": "Screening day",
+    "element": "2-min breathing",
+    "path": "body[2].cta[0]",
+    "type": "push",
+    "targets": [
+      "rescue_active"
+    ],
+    "summary": "push → rescue_active"
+  },
+  {
+    "screen": "ck_day",
+    "screen_name": "Screening day",
+    "element": "Add to calendar",
+    "path": "footer[0]",
+    "type": "toast",
+    "targets": [],
+    "summary": "toast “Added to your calendar”"
+  },
+  {
+    "screen": "ck_day",
+    "screen_name": "Screening day",
+    "element": "Mark as done",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "ck_done"
+    ],
+    "summary": "push → ck_done"
+  },
+  {
+    "screen": "be_intro",
+    "screen_name": "Beacon intro",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "be_intro",
+    "screen_name": "Beacon intro",
+    "element": "Set up Beacon",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "be_q1"
+    ],
+    "summary": "push → be_q1"
+  },
+  {
+    "screen": "be_intro",
+    "screen_name": "Beacon intro",
+    "element": "Add as Learn only",
+    "path": "footer[1]",
+    "type": "toast",
+    "targets": [
+      "plans"
+    ],
+    "summary": "toast “Beacon added as Learn only” then tab → plans"
+  },
+  {
+    "screen": "be_q1",
+    "screen_name": "Journey stage",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "be_q1",
+    "screen_name": "Journey stage",
+    "element": "Next",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "be_q2",
+      "be_tx",
+      "ob_setup",
+      "be_survivor",
+      "ob_setup",
+      "learn"
+    ],
+    "summary": "decide choice:be_q1.stage: Journey stage → Lowering my risk: push → be_q2 | Going through treatment: replace → be_tx (onboarding: ob_setup) | After treatment: replace → be_survivor (onboarding: ob_setup) | Supporting someone: tab → learn"
+  },
+  {
+    "screen": "be_q2",
+    "screen_name": "Family history",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "be_q2",
+    "screen_name": "Family history",
+    "element": "See my plan",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "be_home",
+      "ob_setup"
+    ],
+    "summary": "PUT /v1/program-data/be/profile then replace → be_home (onboarding: ob_setup)"
+  },
+  {
+    "screen": "be_home",
+    "screen_name": "Beacon home",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "be_home",
+    "screen_name": "Beacon home",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "be_home",
+    "screen_name": "Beacon home",
+    "element": "Quitting smoking",
+    "path": "body[1].rows[0]",
+    "type": "push",
+    "targets": [
+      "bf_home"
+    ],
+    "summary": "push → bf_home"
+  },
+  {
+    "screen": "be_home",
+    "screen_name": "Beacon home",
+    "element": "Monthly skin self-check",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "learn_lesson"
+    ],
+    "summary": "push → learn_lesson"
+  },
+  {
+    "screen": "be_home",
+    "screen_name": "Beacon home",
+    "element": "Ask about genetic counseling",
+    "path": "body[1].rows[2]",
+    "type": "push",
+    "targets": [
+      "support_message_care"
+    ],
+    "summary": "push → support_message_care"
+  },
+  {
+    "screen": "be_home",
+    "screen_name": "Beacon home",
+    "element": "Open Checkup",
+    "path": "body[2].cta[0]",
+    "type": "push",
+    "targets": [
+      "ck_list"
+    ],
+    "summary": "push → ck_list"
+  },
+  {
+    "screen": "be_home",
+    "screen_name": "Beacon home",
+    "element": "Change my journey stage",
+    "path": "body[3].rows[0]",
+    "type": "push",
+    "targets": [
+      "be_q1"
+    ],
+    "summary": "push → be_q1"
+  },
+  {
+    "screen": "be_home",
+    "screen_name": "Beacon home",
+    "element": "Program settings",
+    "path": "body[3].rows[1]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "be_home",
+    "screen_name": "Beacon home",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "be_home",
+    "screen_name": "Beacon home",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "be_home",
+    "screen_name": "Beacon home",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "be_home",
+    "screen_name": "Beacon home",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "be_tx",
+    "screen_name": "Treatment support",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "be_tx",
+    "screen_name": "Treatment support",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "be_tx",
+    "screen_name": "Treatment support",
+    "element": "Questions",
+    "path": "body[0].cta[0]",
+    "type": "push",
+    "targets": [
+      "be_questions"
+    ],
+    "summary": "push → be_questions"
+  },
+  {
+    "screen": "be_tx",
+    "screen_name": "Treatment support",
+    "element": "Call",
+    "path": "body[1].cta[0]",
+    "type": "call",
+    "targets": [],
+    "summary": "call (555) 010-7000"
+  },
+  {
+    "screen": "be_tx",
+    "screen_name": "Treatment support",
+    "element": "Today’s side-effect diary",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "be_diary"
+    ],
+    "summary": "push → be_diary"
+  },
+  {
+    "screen": "be_tx",
+    "screen_name": "Treatment support",
+    "element": "Feeling worried?",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "ea_intro"
+    ],
+    "summary": "push → ea_intro"
+  },
+  {
+    "screen": "be_tx",
+    "screen_name": "Treatment support",
+    "element": "Program settings",
+    "path": "body[2].rows[2]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "be_tx",
+    "screen_name": "Treatment support",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "be_tx",
+    "screen_name": "Treatment support",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "be_tx",
+    "screen_name": "Treatment support",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "be_tx",
+    "screen_name": "Treatment support",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "be_diary",
+    "screen_name": "Treatment diary",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "be_diary",
+    "screen_name": "Treatment diary",
+    "element": "Call",
+    "path": "body[3].cta[0]",
+    "type": "call",
+    "targets": [],
+    "summary": "call (555) 010-7000"
+  },
+  {
+    "screen": "be_diary",
+    "screen_name": "Treatment diary",
+    "element": "Save",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/program-data/be/diary then toast “Saved” then back"
+  },
+  {
+    "screen": "be_questions",
+    "screen_name": "Visit questions",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "be_questions",
+    "screen_name": "Visit questions",
+    "element": "Share with my care team",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "support_message_care"
+    ],
+    "summary": "push → support_message_care"
+  },
+  {
+    "screen": "be_questions",
+    "screen_name": "Visit questions",
+    "element": "Done",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "be_survivor",
+    "screen_name": "Survivorship",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "be_survivor",
+    "screen_name": "Survivorship",
+    "element": "Avatar · Account",
+    "path": "header.avatar",
+    "type": "push",
+    "targets": [
+      "account"
+    ],
+    "summary": "push → account"
+  },
+  {
+    "screen": "be_survivor",
+    "screen_name": "Survivorship",
+    "element": "Open Ease",
+    "path": "body[2].cta[0]",
+    "type": "push",
+    "targets": [
+      "ea_intro"
+    ],
+    "summary": "push → ea_intro"
+  },
+  {
+    "screen": "be_survivor",
+    "screen_name": "Survivorship",
+    "element": "Program settings",
+    "path": "body[4].rows[0]",
+    "type": "push",
+    "targets": [
+      "program_settings"
+    ],
+    "summary": "push → program_settings"
+  },
+  {
+    "screen": "be_survivor",
+    "screen_name": "Survivorship",
+    "element": "Save check-in",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/program-data/be/survivorship then toast “Saved”"
+  },
+  {
+    "screen": "be_survivor",
+    "screen_name": "Survivorship",
+    "element": "Tab · Today",
+    "path": "tabbar.today",
+    "type": "tab",
+    "targets": [
+      "today"
+    ],
+    "summary": "tab → today"
+  },
+  {
+    "screen": "be_survivor",
+    "screen_name": "Survivorship",
+    "element": "Tab · Progress",
+    "path": "tabbar.progress",
+    "type": "tab",
+    "targets": [
+      "progress"
+    ],
+    "summary": "tab → progress"
+  },
+  {
+    "screen": "be_survivor",
+    "screen_name": "Survivorship",
+    "element": "Tab · Learn",
+    "path": "tabbar.learn",
+    "type": "tab",
+    "targets": [
+      "learn"
+    ],
+    "summary": "tab → learn"
+  },
+  {
+    "screen": "be_survivor",
+    "screen_name": "Survivorship",
+    "element": "Tab · Support",
+    "path": "tabbar.support",
+    "type": "tab",
+    "targets": [
+      "support"
+    ],
+    "summary": "tab → support"
+  },
+  {
+    "screen": "records_hub",
+    "screen_name": "Health records",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_hub",
+    "screen_name": "Health records",
+    "element": "Patel Family Medicine",
+    "path": "body[1].rows[0]",
+    "type": "push",
+    "targets": [
+      "records_source"
+    ],
+    "summary": "push → records_source"
+  },
+  {
+    "screen": "records_hub",
+    "screen_name": "Health records",
+    "element": "Medicare",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "records_source"
+    ],
+    "summary": "push → records_source"
+  },
+  {
+    "screen": "records_hub",
+    "screen_name": "Health records",
+    "element": "Blood pressure",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "records_item"
+    ],
+    "summary": "push → records_item"
+  },
+  {
+    "screen": "records_hub",
+    "screen_name": "Health records",
+    "element": "Lab results",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "records_item"
+    ],
+    "summary": "push → records_item"
+  },
+  {
+    "screen": "records_hub",
+    "screen_name": "Health records",
+    "element": "Immunizations",
+    "path": "body[2].rows[2]",
+    "type": "push",
+    "targets": [
+      "records_item"
+    ],
+    "summary": "push → records_item"
+  },
+  {
+    "screen": "records_hub",
+    "screen_name": "Health records",
+    "element": "Smoking status",
+    "path": "body[2].rows[3]",
+    "type": "push",
+    "targets": [
+      "records_item"
+    ],
+    "summary": "push → records_item"
+  },
+  {
+    "screen": "records_hub",
+    "screen_name": "Health records",
+    "element": "Medications & conditions",
+    "path": "body[2].rows[4]",
+    "type": "push",
+    "targets": [
+      "records_item"
+    ],
+    "summary": "push → records_item"
+  },
+  {
+    "screen": "records_hub",
+    "screen_name": "Health records",
+    "element": "2 items need your review",
+    "path": "body[3]",
+    "type": "push",
+    "targets": [
+      "records_conflict"
+    ],
+    "summary": "push → records_conflict"
+  },
+  {
+    "screen": "records_hub",
+    "screen_name": "Health records",
+    "element": "Add a source",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "records_add"
+    ],
+    "summary": "push → records_add"
+  },
+  {
+    "screen": "records_hub",
+    "screen_name": "Health records",
+    "element": "Enter a value manually",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "records_manual"
+    ],
+    "summary": "push → records_manual"
+  },
+  {
+    "screen": "records_hub_empty",
+    "screen_name": "Health records · empty",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_hub_empty",
+    "screen_name": "Health records · empty",
+    "element": "Connect a health system",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "records_add"
+    ],
+    "summary": "push → records_add"
+  },
+  {
+    "screen": "records_hub_empty",
+    "screen_name": "Health records · empty",
+    "element": "Enter a value manually",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "records_manual"
+    ],
+    "summary": "push → records_manual"
+  },
+  {
+    "screen": "records_add",
+    "screen_name": "Add a source",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_add",
+    "screen_name": "Add a source",
+    "element": "Hospital or clinic",
+    "path": "body[2].rows[0]",
+    "type": "push",
+    "targets": [
+      "records_search"
+    ],
+    "summary": "push → records_search"
+  },
+  {
+    "screen": "records_add",
+    "screen_name": "Add a source",
+    "element": "Oracle Health (Cerner)",
+    "path": "body[2].rows[1]",
+    "type": "push",
+    "targets": [
+      "records_search"
+    ],
+    "summary": "push → records_search"
+  },
+  {
+    "screen": "records_add",
+    "screen_name": "Add a source",
+    "element": "Medicare · Blue Button 2.0",
+    "path": "body[2].rows[2]",
+    "type": "push",
+    "targets": [
+      "records_consent_bb"
+    ],
+    "summary": "push → records_consent_bb"
+  },
+  {
+    "screen": "records_add",
+    "screen_name": "Add a source",
+    "element": "Apple Health Records",
+    "path": "body[2].rows[3]",
+    "type": "push",
+    "targets": [
+      "records_consent_device"
+    ],
+    "summary": "push → records_consent_device"
+  },
+  {
+    "screen": "records_add",
+    "screen_name": "Add a source",
+    "element": "Health Connect",
+    "path": "body[2].rows[4]",
+    "type": "push",
+    "targets": [
+      "records_consent_device"
+    ],
+    "summary": "push → records_consent_device"
+  },
+  {
+    "screen": "records_add",
+    "screen_name": "Add a source",
+    "element": "Other FHIR server",
+    "path": "body[2].rows[5]",
+    "type": "push",
+    "targets": [
+      "records_fhir_url"
+    ],
+    "summary": "push → records_fhir_url"
+  },
+  {
+    "screen": "records_add",
+    "screen_name": "Add a source",
+    "element": "Enter manually",
+    "path": "body[3].rows[0]",
+    "type": "push",
+    "targets": [
+      "records_manual"
+    ],
+    "summary": "push → records_manual"
+  },
+  {
+    "screen": "records_search",
+    "screen_name": "Find your provider",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_search",
+    "screen_name": "Find your provider",
+    "element": "Patel Family Medicine",
+    "path": "body[1].rows[0]",
+    "type": "push",
+    "targets": [
+      "records_consent"
+    ],
+    "summary": "push → records_consent"
+  },
+  {
+    "screen": "records_search",
+    "screen_name": "Find your provider",
+    "element": "Patel Heart Institute",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "records_consent"
+    ],
+    "summary": "push → records_consent"
+  },
+  {
+    "screen": "records_search",
+    "screen_name": "Find your provider",
+    "element": "Stanford Health Care",
+    "path": "body[1].rows[2]",
+    "type": "push",
+    "targets": [
+      "records_consent"
+    ],
+    "summary": "push → records_consent"
+  },
+  {
+    "screen": "records_search",
+    "screen_name": "Find your provider",
+    "element": "Can’t find it? Enter a FHIR address",
+    "path": "body[2]",
+    "type": "push",
+    "targets": [
+      "records_fhir_url"
+    ],
+    "summary": "push → records_fhir_url"
+  },
+  {
+    "screen": "records_fhir_url",
+    "screen_name": "Other FHIR server",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_fhir_url",
+    "screen_name": "Other FHIR server",
+    "element": "Check and continue",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "records_consent",
+      "records_error"
+    ],
+    "summary": "branch: Server check → SMART on FHIR R4 supported: push → records_consent | Not a FHIR R4 server: push → records_error"
+  },
+  {
+    "screen": "records_consent",
+    "screen_name": "Consent: Epic",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_consent",
+    "screen_name": "Consent: Epic",
+    "element": "Continue to MyChart",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "records_importing",
+      "records_error"
+    ],
+    "summary": "branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error"
+  },
+  {
+    "screen": "records_consent",
+    "screen_name": "Consent: Epic",
+    "element": "Not now",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_consent_bb",
+    "screen_name": "Consent: Medicare",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_consent_bb",
+    "screen_name": "Consent: Medicare",
+    "element": "Continue to Medicare.gov",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "records_importing",
+      "records_error"
+    ],
+    "summary": "branch: Medicare sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error"
+  },
+  {
+    "screen": "records_consent_bb",
+    "screen_name": "Consent: Medicare",
+    "element": "Not now",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_consent_device",
+    "screen_name": "Consent: phone health data",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_consent_device",
+    "screen_name": "Consent: phone health data",
+    "element": "Continue",
+    "path": "footer[0]",
+    "type": "branch",
+    "targets": [
+      "records_importing",
+      "records_error"
+    ],
+    "summary": "branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error"
+  },
+  {
+    "screen": "records_consent_device",
+    "screen_name": "Consent: phone health data",
+    "element": "Not now",
+    "path": "footer[1]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_importing",
+    "screen_name": "Importing",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "records_importing",
+    "screen_name": "Importing",
+    "element": "Review imported data",
+    "path": "footer[0]",
+    "type": "replace",
+    "targets": [
+      "records_review"
+    ],
+    "summary": "replace → records_review"
+  },
+  {
+    "screen": "records_importing",
+    "screen_name": "Importing",
+    "element": "Cancel import",
+    "path": "footer[1]",
+    "type": "popto",
+    "targets": [
+      "records_hub"
+    ],
+    "summary": "popto → records_hub"
+  },
+  {
+    "screen": "records_review",
+    "screen_name": "Review imported data",
+    "element": "Close",
+    "path": "header.left",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "records_review",
+    "screen_name": "Review imported data",
+    "element": "Review",
+    "path": "body[2]",
+    "type": "push",
+    "targets": [
+      "records_conflict"
+    ],
+    "summary": "push → records_conflict"
+  },
+  {
+    "screen": "records_review",
+    "screen_name": "Review imported data",
+    "element": "Add 21 items to my programs",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "records_hub"
+    ],
+    "summary": "POST /v1/records/fhir/accept then toast “Added to Heartwise, Steady, Checkup, BreatheFree and Renew” then popto → records_hub"
+  },
+  {
+    "screen": "records_review",
+    "screen_name": "Review imported data",
+    "element": "Review conflicts first",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "records_conflict"
+    ],
+    "summary": "push → records_conflict"
+  },
+  {
+    "screen": "records_conflict",
+    "screen_name": "Resolve conflicts",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_conflict",
+    "screen_name": "Resolve conflicts",
+    "element": "Save choices",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/records/fhir/conflicts then toast “Saved” then back"
+  },
+  {
+    "screen": "records_error",
+    "screen_name": "Connection problem",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_error",
+    "screen_name": "Connection problem",
+    "element": "Try again",
+    "path": "footer[0]",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_error",
+    "screen_name": "Connection problem",
+    "element": "Choose another source",
+    "path": "footer[1]",
+    "type": "replace",
+    "targets": [
+      "records_add"
+    ],
+    "summary": "replace → records_add"
+  },
+  {
+    "screen": "records_error",
+    "screen_name": "Connection problem",
+    "element": "Enter manually instead",
+    "path": "footer[2]",
+    "type": "replace",
+    "targets": [
+      "records_manual"
+    ],
+    "summary": "replace → records_manual"
+  },
+  {
+    "screen": "records_source",
+    "screen_name": "Source details",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_source",
+    "screen_name": "Source details",
+    "element": "Sync now",
+    "path": "body[1].rows[0]",
+    "type": "submit",
+    "targets": [],
+    "summary": "POST /v1/records/fhir/sources/:id/sync then toast “Synced · 2 new results”"
+  },
+  {
+    "screen": "records_source",
+    "screen_name": "Source details",
+    "element": "What we read",
+    "path": "body[1].rows[1]",
+    "type": "push",
+    "targets": [
+      "records_consent"
+    ],
+    "summary": "push → records_consent"
+  },
+  {
+    "screen": "records_source",
+    "screen_name": "Source details",
+    "element": "Disconnect",
+    "path": "footer[0]",
+    "type": "sheet",
+    "targets": [
+      "records_disconnect"
+    ],
+    "summary": "sheet → records_disconnect"
+  },
+  {
+    "screen": "records_disconnect",
+    "screen_name": "Disconnect source",
+    "element": "Disconnect source",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "records_hub"
+    ],
+    "summary": "DELETE /v1/records/fhir/sources/:id then toast “Disconnected” then popto → records_hub"
+  },
+  {
+    "screen": "records_disconnect",
+    "screen_name": "Disconnect source",
+    "element": "Cancel",
+    "path": "footer[1]",
+    "type": "close",
+    "targets": [],
+    "summary": "close"
+  },
+  {
+    "screen": "records_manual",
+    "screen_name": "Enter a value",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_manual",
+    "screen_name": "Enter a value",
+    "element": "Save",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "records_hub",
+      "records_manual_error"
+    ],
+    "summary": "POST /v1/records/manual then decide rec.manual: Validation → Valid: toast “Saved · shared with Steady” then popto → records_hub | Outside expected range: replace → records_manual_error | Matches an imported value: toast “Already in your records from Epic. Not added twice.” then back"
+  },
+  {
+    "screen": "records_manual_error",
+    "screen_name": "Enter a value · out of range",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_manual_error",
+    "screen_name": "Enter a value · out of range",
+    "element": "Save",
+    "path": "footer[0]",
+    "type": "submit",
+    "targets": [
+      "records_hub"
+    ],
+    "summary": "POST /v1/records/manual then decide rec.manual: Validation → Valid: toast “Saved · shared with Steady” then popto → records_hub | Outside expected range: toast “Still outside the expected range”"
+  },
+  {
+    "screen": "records_manual_error",
+    "screen_name": "Enter a value · out of range",
+    "element": "Ask my care team instead",
+    "path": "footer[1]",
+    "type": "push",
+    "targets": [
+      "support_message_care"
+    ],
+    "summary": "push → support_message_care"
+  },
+  {
+    "screen": "records_item",
+    "screen_name": "Imported values",
+    "element": "Back",
+    "path": "header.left",
+    "type": "back",
+    "targets": [],
+    "summary": "back"
+  },
+  {
+    "screen": "records_item",
+    "screen_name": "Imported values",
+    "element": "Open in Heartwise",
+    "path": "footer[0]",
+    "type": "push",
+    "targets": [
+      "hw_trends"
+    ],
+    "summary": "push → hw_trends"
+  }
+]

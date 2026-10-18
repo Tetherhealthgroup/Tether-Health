@@ -1,0 +1,90 @@
+{
+  "id": "rescue_tools",
+  "name": "Switch tool",
+  "route": "/rescue/tools",
+  "flow": "rescue",
+  "program": null,
+  "phase": "rescue",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": null,
+  "body": [
+    {
+      "t": "title",
+      "text": "Choose another tool",
+      "size": "m"
+    },
+    {
+      "t": "radio",
+      "items": [
+        {
+          "label": "Slow breathing",
+          "sub": "2 min · voice optional",
+          "badge": "Helped before"
+        },
+        {
+          "label": "Move for 3 minutes",
+          "sub": "Walk or stretch"
+        },
+        {
+          "label": "Change the scene",
+          "sub": "Go somewhere smoke-free"
+        },
+        {
+          "label": "Urge surfing",
+          "sub": "3 min audio"
+        }
+      ],
+      "selected": 1,
+      "key": "value"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Start this tool",
+      "action": {
+        "type": "replace",
+        "to": "rescue_active"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Cancel",
+      "action": {
+        "type": "close"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": "Slow breathing",
+  "api": [],
+  "actions": [
+    {
+      "element": "Start this tool",
+      "path": "footer[0]",
+      "action": {
+        "type": "replace",
+        "to": "rescue_active"
+      },
+      "summary": "replace → rescue_active"
+    },
+    {
+      "element": "Cancel",
+      "path": "footer[1]",
+      "action": {
+        "type": "close"
+      },
+      "summary": "close"
+    }
+  ]
+}

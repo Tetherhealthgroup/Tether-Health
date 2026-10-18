@@ -1,0 +1,127 @@
+{
+  "id": "hw_summary",
+  "name": "Visit summary",
+  "route": "/p/hw/summary",
+  "flow": "hw",
+  "program": "hw",
+  "phase": "resources",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Visit summary",
+    "left": "back",
+    "pill": "Preview"
+  },
+  "body": [
+    {
+      "t": "title",
+      "text": "Share with Dr. Patel’s clinic?",
+      "size": "m"
+    },
+    {
+      "t": "kv",
+      "rows": [
+        [
+          "Dates",
+          "Sep 17 – Oct 17"
+        ],
+        [
+          "BP average",
+          "132/82 (48 readings)"
+        ],
+        [
+          "Highest",
+          "186/122 · Oct 2 · re-checked 144/90"
+        ],
+        [
+          "Latest panel",
+          "LDL 138 · Sep 30"
+        ]
+      ]
+    },
+    {
+      "t": "text",
+      "text": "Only Heartwise data. Nothing from your other programs.",
+      "tone": "small"
+    },
+    {
+      "t": "toggle",
+      "label": "Include notes",
+      "on": false,
+      "key": "include_notes"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Send summary",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/care/summaries",
+        "then": {
+          "type": "toast",
+          "value": "Summary sent to Dr. Patel’s clinic",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Save as PDF",
+      "action": {
+        "type": "toast",
+        "value": "PDF saved to Files"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Send summary",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "POST /v1/care/summaries",
+        "then": {
+          "type": "toast",
+          "value": "Summary sent to Dr. Patel’s clinic",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "summary": "POST /v1/care/summaries then toast “Summary sent to Dr. Patel’s clinic” then back"
+    },
+    {
+      "element": "Save as PDF",
+      "path": "footer[1]",
+      "action": {
+        "type": "toast",
+        "value": "PDF saved to Files"
+      },
+      "summary": "toast “PDF saved to Files”"
+    }
+  ]
+}

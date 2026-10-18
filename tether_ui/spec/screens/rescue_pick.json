@@ -1,0 +1,187 @@
+{
+  "id": "rescue_pick",
+  "name": "Rescue",
+  "route": "/rescue",
+  "flow": "rescue",
+  "program": null,
+  "phase": "rescue",
+  "kind": "sheet",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Works offline. With one Quit program, the app skips this screen and opens the last helpful tool.",
+  "header": null,
+  "body": [
+    {
+      "t": "eyebrow",
+      "text": "Right now"
+    },
+    {
+      "t": "title",
+      "text": "What’s pulling at you?",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "One tap. No typing.",
+      "tone": "muted"
+    },
+    {
+      "t": "tiles",
+      "items": [
+        {
+          "label": "A cigarette",
+          "sub": "BreatheFree",
+          "program": "bf",
+          "action": {
+            "type": "replace",
+            "to": "rescue_active"
+          }
+        },
+        {
+          "label": "Urge to scroll",
+          "sub": "ScrollFree",
+          "program": "sf",
+          "action": {
+            "type": "replace",
+            "to": "sf_pause"
+          }
+        },
+        {
+          "label": "Stress",
+          "sub": "Shared tool",
+          "glyph": "~",
+          "action": {
+            "type": "replace",
+            "to": "rescue_active"
+          }
+        },
+        {
+          "label": "Not sure",
+          "sub": "We’ll suggest one",
+          "glyph": "?",
+          "action": {
+            "type": "replace",
+            "to": "rescue_active"
+          }
+        }
+      ],
+      "cols": 2
+    },
+    {
+      "t": "card",
+      "variant": "dark",
+      "eyebrow": "Helped last time · 6 → 3",
+      "title": "Slow breathing · 2 min",
+      "cta": {
+        "t": "button",
+        "label": "Start",
+        "action": {
+          "type": "replace",
+          "to": "rescue_active"
+        },
+        "variant": "lime",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "buttons",
+      "items": [
+        {
+          "t": "button",
+          "label": "Talk to a person",
+          "action": {
+            "type": "tab",
+            "to": "support"
+          },
+          "variant": "secondary",
+          "arrow": false,
+          "small": true
+        },
+        {
+          "t": "button",
+          "label": "Emergency",
+          "action": {
+            "type": "push",
+            "to": "crisis"
+          },
+          "variant": "danger",
+          "arrow": false,
+          "small": true
+        }
+      ]
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": "Today",
+  "api": [],
+  "actions": [
+    {
+      "element": "A cigarette",
+      "path": "body[3].items[0]",
+      "action": {
+        "type": "replace",
+        "to": "rescue_active"
+      },
+      "summary": "replace → rescue_active"
+    },
+    {
+      "element": "Urge to scroll",
+      "path": "body[3].items[1]",
+      "action": {
+        "type": "replace",
+        "to": "sf_pause"
+      },
+      "summary": "replace → sf_pause"
+    },
+    {
+      "element": "Stress",
+      "path": "body[3].items[2]",
+      "action": {
+        "type": "replace",
+        "to": "rescue_active"
+      },
+      "summary": "replace → rescue_active"
+    },
+    {
+      "element": "Not sure",
+      "path": "body[3].items[3]",
+      "action": {
+        "type": "replace",
+        "to": "rescue_active"
+      },
+      "summary": "replace → rescue_active"
+    },
+    {
+      "element": "Start",
+      "path": "body[4].cta[0]",
+      "action": {
+        "type": "replace",
+        "to": "rescue_active"
+      },
+      "summary": "replace → rescue_active"
+    },
+    {
+      "element": "Talk to a person",
+      "path": "body[5].items[0]",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    },
+    {
+      "element": "Emergency",
+      "path": "body[5].items[1]",
+      "action": {
+        "type": "push",
+        "to": "crisis"
+      },
+      "summary": "push → crisis"
+    }
+  ]
+}

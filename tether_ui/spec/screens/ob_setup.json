@@ -1,0 +1,183 @@
+{
+  "id": "ob_setup",
+  "name": "Set up focus programs",
+  "route": "/onboarding/setup",
+  "flow": "onboarding",
+  "program": null,
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Hub for the onboarding context. Program setups return here (context.onboarding) instead of the program home.",
+  "header": {
+    "t": "header",
+    "title": "Set up",
+    "left": "back",
+    "pill": "5 of 5"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 5,
+      "total": 5
+    },
+    {
+      "t": "title",
+      "text": "Let’s set up your programs.",
+      "size": "m"
+    },
+    {
+      "t": "text",
+      "text": "Each takes about 3 minutes. You can stop and come back.",
+      "tone": "muted"
+    },
+    {
+      "t": "list",
+      "title": "Focus programs",
+      "rows": [
+        {
+          "label": "BreatheFree",
+          "sub": "Quit plan · about 3 min",
+          "action": {
+            "type": "push",
+            "to": "bf_q1"
+          },
+          "lead": {
+            "program": "bf"
+          },
+          "pill": "Start"
+        },
+        {
+          "label": "ScrollFree",
+          "sub": "Usage goal · about 2 min",
+          "action": {
+            "type": "push",
+            "to": "sf_q1"
+          },
+          "lead": {
+            "program": "sf"
+          },
+          "pill": "Start"
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Learn only",
+      "rows": [
+        {
+          "label": "ClearAir",
+          "sub": "Learn only · nothing to set up",
+          "lead": {
+            "program": "ca"
+          }
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "Your data",
+      "rows": [
+        {
+          "label": "Health records (optional)",
+          "sub": "Import from Epic MyChart, Medicare or another FHIR source",
+          "action": {
+            "type": "push",
+            "to": "records_add"
+          },
+          "lead": {
+            "icon": "+"
+          }
+        }
+      ]
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Tip",
+      "text": "Finishing a program setup brings you back here."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue",
+      "action": {
+        "type": "push",
+        "to": "ob_reminders"
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "link",
+      "label": "Set up later",
+      "action": {
+        "type": "push",
+        "to": "ob_reminders"
+      },
+      "align": "center"
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "BreatheFree",
+      "path": "body[3].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_q1"
+      },
+      "summary": "push → bf_q1"
+    },
+    {
+      "element": "ScrollFree",
+      "path": "body[3].rows[1]",
+      "action": {
+        "type": "push",
+        "to": "sf_q1"
+      },
+      "summary": "push → sf_q1"
+    },
+    {
+      "element": "Health records (optional)",
+      "path": "body[5].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "records_add"
+      },
+      "summary": "push → records_add"
+    },
+    {
+      "element": "Continue",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "ob_reminders"
+      },
+      "summary": "push → ob_reminders"
+    },
+    {
+      "element": "Set up later",
+      "path": "footer[1]",
+      "action": {
+        "type": "push",
+        "to": "ob_reminders"
+      },
+      "summary": "push → ob_reminders"
+    }
+  ]
+}

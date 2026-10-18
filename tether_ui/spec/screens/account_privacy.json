@@ -1,0 +1,158 @@
+{
+  "id": "account_privacy",
+  "name": "Privacy & consent",
+  "route": "/account/privacy",
+  "flow": "account",
+  "program": null,
+  "phase": "account",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "Privacy & consent",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Choices",
+      "children": [
+        {
+          "t": "toggle",
+          "label": "Cross-program insights",
+          "sub": "Show connections between your programs",
+          "on": true,
+          "key": "cross_program_insights"
+        },
+        {
+          "t": "toggle",
+          "label": "De-identified research",
+          "sub": "Per program, off by default",
+          "on": false,
+          "key": "de_identified_research"
+        },
+        {
+          "t": "toggle",
+          "label": "Anonymous app diagnostics",
+          "sub": "No health entries",
+          "on": false,
+          "key": "anonymous_app_diagnostics"
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "rows": [
+        {
+          "label": "Care-team sharing",
+          "sub": "Manual only · preview every share",
+          "action": {
+            "type": "push",
+            "to": "account_programs"
+          }
+        },
+        {
+          "label": "Consent history",
+          "sub": "v3 · Aug 22, 2026",
+          "action": {
+            "type": "toast",
+            "value": "Consent history opened"
+          }
+        },
+        {
+          "label": "Privacy Notice",
+          "action": {
+            "type": "external",
+            "value": "https://www.tetherhealthgroup.com/privacy/"
+          }
+        }
+      ]
+    },
+    {
+      "t": "text",
+      "text": "No ads. We never sell your health data.",
+      "tone": "small"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Save",
+      "action": {
+        "type": "submit",
+        "api": "PATCH /v1/enrolments/consents",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Care-team sharing",
+      "path": "body[1].rows[0]",
+      "action": {
+        "type": "push",
+        "to": "account_programs"
+      },
+      "summary": "push → account_programs"
+    },
+    {
+      "element": "Consent history",
+      "path": "body[1].rows[1]",
+      "action": {
+        "type": "toast",
+        "value": "Consent history opened"
+      },
+      "summary": "toast “Consent history opened”"
+    },
+    {
+      "element": "Privacy Notice",
+      "path": "body[1].rows[2]",
+      "action": {
+        "type": "external",
+        "value": "https://www.tetherhealthgroup.com/privacy/"
+      },
+      "summary": "external https://www.tetherhealthgroup.com/privacy/"
+    },
+    {
+      "element": "Save",
+      "path": "footer[0]",
+      "action": {
+        "type": "submit",
+        "api": "PATCH /v1/enrolments/consents",
+        "then": {
+          "type": "toast",
+          "value": "Saved",
+          "then": {
+            "type": "back"
+          }
+        }
+      },
+      "summary": "PATCH /v1/enrolments/consents then toast “Saved” then back"
+    }
+  ]
+}

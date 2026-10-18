@@ -1,0 +1,114 @@
+{
+  "id": "ob_basics",
+  "name": "Shared basics",
+  "route": "/onboarding/basics",
+  "flow": "onboarding",
+  "program": null,
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "About you",
+    "left": "back",
+    "pill": "4 of 5"
+  },
+  "body": [
+    {
+      "t": "steps",
+      "n": 4,
+      "total": 5
+    },
+    {
+      "t": "eyebrow",
+      "text": "Shared · asked once for all programs"
+    },
+    {
+      "t": "title",
+      "text": "A few basics",
+      "size": "m"
+    },
+    {
+      "t": "field",
+      "label": "What should we call you?",
+      "value": "Alex",
+      "kind": "text",
+      "key": "what_should_we_call_you"
+    },
+    {
+      "t": "field",
+      "label": "Age range",
+      "value": "35–44",
+      "kind": "select",
+      "key": "age_range"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "< 5 h",
+        "5–6 h",
+        "7–8 h",
+        "9+ h"
+      ],
+      "selected": "5–6 h",
+      "label": "Sleep on a typical night",
+      "key": "sleep_on_a_typical_night"
+    },
+    {
+      "t": "segmented",
+      "options": [
+        "Low",
+        "Some",
+        "High"
+      ],
+      "selected": "High",
+      "label": "Usual stress",
+      "key": "usual_stress"
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Why we ask",
+      "text": "These answers are shared by your programs, so you’re never asked twice. Age range sets which lessons and screenings apply."
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Continue",
+      "action": {
+        "type": "push",
+        "to": "ob_setup"
+      },
+      "variant": "primary",
+      "arrow": true
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Continue",
+      "path": "footer[0]",
+      "action": {
+        "type": "push",
+        "to": "ob_setup"
+      },
+      "summary": "push → ob_setup"
+    }
+  ]
+}

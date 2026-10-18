@@ -1,0 +1,187 @@
+{
+  "id": "bf_home_explore",
+  "name": "BreatheFree · explore",
+  "route": "/p/bf/home?state=explore",
+  "flow": "bf",
+  "program": "bf",
+  "phase": "daily",
+  "kind": "screen",
+  "tab": "plans",
+  "variantOf": "bf_home",
+  "state": "explore",
+  "dark": false,
+  "bg": null,
+  "desc": "",
+  "header": {
+    "t": "header",
+    "title": "BreatheFree",
+    "left": "back",
+    "avatar": "A",
+    "avatarAction": {
+      "type": "push",
+      "to": "account"
+    }
+  },
+  "body": [
+    {
+      "t": "eyebrow",
+      "text": "Exploring · no date set"
+    },
+    {
+      "t": "title",
+      "text": "Learn at your own pace.",
+      "size": "m"
+    },
+    {
+      "t": "card",
+      "variant": "coral",
+      "title": "Craving now?",
+      "text": "Rescue works without a plan",
+      "cta": {
+        "t": "button",
+        "label": "Rescue",
+        "action": {
+          "type": "sheet",
+          "to": "rescue_pick"
+        },
+        "variant": "rescue",
+        "arrow": false,
+        "small": true
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "bf",
+      "title": "Cravings: what to expect",
+      "text": "4 min read",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      }
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "tag": "bf",
+      "title": "What quit medicines can do",
+      "text": "Education only · 5 min",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      }
+    },
+    {
+      "t": "card",
+      "variant": "mint",
+      "title": "Ready when you are",
+      "text": "Setting a date takes 2 minutes.",
+      "cta": {
+        "t": "button",
+        "label": "Choose a path",
+        "action": {
+          "type": "push",
+          "to": "bf_path"
+        },
+        "variant": "primary",
+        "arrow": false,
+        "small": true
+      }
+    }
+  ],
+  "footer": [],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Avatar · Account",
+      "path": "header.avatar",
+      "action": {
+        "type": "push",
+        "to": "account"
+      },
+      "summary": "push → account"
+    },
+    {
+      "element": "Rescue",
+      "path": "body[2].cta[0]",
+      "action": {
+        "type": "sheet",
+        "to": "rescue_pick"
+      },
+      "summary": "sheet → rescue_pick"
+    },
+    {
+      "element": "Cravings: what to expect",
+      "path": "body[3]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "What quit medicines can do",
+      "path": "body[4]",
+      "action": {
+        "type": "push",
+        "to": "learn_lesson"
+      },
+      "summary": "push → learn_lesson"
+    },
+    {
+      "element": "Choose a path",
+      "path": "body[5].cta[0]",
+      "action": {
+        "type": "push",
+        "to": "bf_path"
+      },
+      "summary": "push → bf_path"
+    },
+    {
+      "element": "Tab · Today",
+      "path": "tabbar.today",
+      "action": {
+        "type": "tab",
+        "to": "today"
+      },
+      "summary": "tab → today"
+    },
+    {
+      "element": "Tab · Progress",
+      "path": "tabbar.progress",
+      "action": {
+        "type": "tab",
+        "to": "progress"
+      },
+      "summary": "tab → progress"
+    },
+    {
+      "element": "Tab · Learn",
+      "path": "tabbar.learn",
+      "action": {
+        "type": "tab",
+        "to": "learn"
+      },
+      "summary": "tab → learn"
+    },
+    {
+      "element": "Tab · Support",
+      "path": "tabbar.support",
+      "action": {
+        "type": "tab",
+        "to": "support"
+      },
+      "summary": "tab → support"
+    }
+  ]
+}

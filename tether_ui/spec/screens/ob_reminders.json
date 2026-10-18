@@ -1,0 +1,149 @@
+{
+  "id": "ob_reminders",
+  "name": "Reminder prime",
+  "route": "/onboarding/reminders",
+  "flow": "onboarding",
+  "program": null,
+  "phase": "onboarding",
+  "kind": "screen",
+  "tab": null,
+  "variantOf": null,
+  "state": "default",
+  "dark": false,
+  "bg": null,
+  "desc": "Shown before the OS prompt so the system dialog is expected.",
+  "header": {
+    "t": "header",
+    "title": "Reminders",
+    "left": "back"
+  },
+  "body": [
+    {
+      "t": "illus",
+      "glyph": "◔",
+      "tone": "mint"
+    },
+    {
+      "t": "title",
+      "text": "Quiet, private reminders",
+      "size": "l",
+      "align": "center"
+    },
+    {
+      "t": "text",
+      "text": "At most 2 a day, only for your focus programs.",
+      "tone": "body",
+      "align": "center"
+    },
+    {
+      "t": "card",
+      "variant": "plain",
+      "eyebrow": "Lock screen preview",
+      "text": "Program names and health details stay hidden unless you turn them on.",
+      "children": [
+        {
+          "t": "card",
+          "variant": "flat",
+          "title": "Tether Health",
+          "text": "You have a Tether reminder."
+        }
+      ]
+    },
+    {
+      "t": "toggle",
+      "label": "Quiet hours",
+      "sub": "9:00 PM – 7:00 AM · safety alerts still come through",
+      "on": true,
+      "key": "quiet_hours"
+    }
+  ],
+  "footer": [
+    {
+      "t": "button",
+      "label": "Turn on reminders",
+      "action": {
+        "type": "branch",
+        "question": "System permission prompt",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Allowed",
+            "action": {
+              "type": "push",
+              "to": "ob_account"
+            }
+          },
+          {
+            "label": "Not allowed",
+            "action": {
+              "type": "push",
+              "to": "ob_reminders_denied"
+            }
+          }
+        ]
+      },
+      "variant": "primary",
+      "arrow": true
+    },
+    {
+      "t": "button",
+      "label": "Not now",
+      "action": {
+        "type": "push",
+        "to": "ob_account"
+      },
+      "variant": "secondary",
+      "arrow": false
+    }
+  ],
+  "notes": [],
+  "over": null,
+  "api": [],
+  "actions": [
+    {
+      "element": "Back",
+      "path": "header.left",
+      "action": {
+        "type": "back"
+      },
+      "summary": "back"
+    },
+    {
+      "element": "Turn on reminders",
+      "path": "footer[0]",
+      "action": {
+        "type": "branch",
+        "question": "System permission prompt",
+        "on": null,
+        "decide": null,
+        "cases": [
+          {
+            "label": "Allowed",
+            "action": {
+              "type": "push",
+              "to": "ob_account"
+            }
+          },
+          {
+            "label": "Not allowed",
+            "action": {
+              "type": "push",
+              "to": "ob_reminders_denied"
+            }
+          }
+        ]
+      },
+      "summary": "branch: System permission prompt → Allowed: push → ob_account | Not allowed: push → ob_reminders_denied"
+    },
+    {
+      "element": "Not now",
+      "path": "footer[1]",
+      "action": {
+        "type": "push",
+        "to": "ob_account"
+      },
+      "summary": "push → ob_account"
+    }
+  ]
+}
