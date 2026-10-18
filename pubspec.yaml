@@ -1,7 +1,7 @@
 name: breathefree_patient
 description: BreatheFree smoking-cessation patient application — complete approved 28-screen experience.
 publish_to: none
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: '>=3.4.0 <4.0.0'

@@ -22,6 +22,21 @@ supabase/.temp/
 android/key.properties
 android/app/*.jks
 android/app/*.keystore
+*.jks
+*.keystore
+*.p12
+key.properties
+# Environment files, Apple keys and profiles, PEM keys and release define
+# files. Example files stay trackable.
+.env
+.env.*
+!.env*.example
+*.p8
+*.mobileprovision
+*.pem
+config/dart_defines.*.json
+!config/dart_defines.example.json
+*.hprof
 ios/Flutter/ephemeral/
 macos/Flutter/ephemeral/
 

@@ -14,6 +14,7 @@ import 'auth/auth_gateway.dart';
 import 'auth/password_recovery_screen.dart';
 import 'auth/secure_session_storage.dart';
 import 'config/app_config.dart';
+import 'config/misconfigured_build_app.dart';
 import 'error/privacy_safe_error_reporter.dart';
 import 'models/screen_spec.dart';
 import 'models/tap_target.dart';
@@ -69,7 +70,17 @@ Future<void> _bootstrap() async {
   QuitPlanController? quitPlan;
   late final SecureProgramStore programStore;
   final guestStore = SecureGuestQuitPlanStore();
-  if (kReleaseMode || config.hasAnyConfiguration) config.validate();
+  if (kReleaseMode || config.hasAnyConfiguration) {
+    try {
+      config.validate();
+    } on FormatException catch (error) {
+      // A release build cannot show a console, so surface the problem on
+      // screen instead of leaving a blank app. Debug behaviour is unchanged.
+      if (!kReleaseMode) rethrow;
+      runApp(MisconfiguredBuildApp(message: error.message));
+      return;
+    }
+  }
   if (config.isConfigured) {
     await Supabase.initialize(
       url: config.supabaseUrl,
