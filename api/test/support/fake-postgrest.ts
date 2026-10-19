@@ -72,6 +72,8 @@ export interface RecordedRequest {
   method: string;
   path: string;
   token: string | null;
+  /** The query string as sent (filters, select), e.g. "?id=eq.…". */
+  search: string;
   /** The parsed JSON body as sent, if any. */
   body: unknown;
 }
@@ -97,6 +99,7 @@ const PURPOSES = [
 const SHARE = ["share_care_team", "share_caregiver"];
 const VERSION = /^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$/;
 const LOCALES = ["en", "es"];
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** The fake's clock starts here (see `now()`). */
 const START = "2026-10-18T09:00:00.000Z";
@@ -119,9 +122,11 @@ const document = (
 /**
  * The seeded consent documents, relative to START: `v1-draft` for every
  * programme purpose in en and es (as the migration seeds), a later core
- * `v2-synthetic` in both locales (so the current core version is
- * v2-synthetic), a retired core `v0-retired` and a not-yet-effective core
- * `v9-future` (both en; neither is grantable or current).
+ * `v2-synthetic` in both locales, a still later core `v3-synthetic` in es
+ * only (so the current core version is v2-synthetic in en and v3-synthetic
+ * in es, and a locale mix-up shows), a retired core `v0-retired` and a
+ * not-yet-effective core `v9-future` (both en; neither is grantable or
+ * current).
  */
 export const CONSENT_DOCUMENTS: readonly ConsentDocument[] = [
   ...PURPOSES.flatMap((purpose) =>
@@ -131,6 +136,7 @@ export const CONSENT_DOCUMENTS: readonly ConsentDocument[] = [
   ),
   document("core", "v2-synthetic", "en", "2026-10-18T06:00:00.000Z"),
   document("core", "v2-synthetic", "es", "2026-10-18T06:00:00.000Z"),
+  document("core", "v3-synthetic", "es", "2026-10-18T07:00:00.000Z"),
   document(
     "core",
     "v0-retired",
@@ -395,6 +401,7 @@ export class FakePostgrest {
       method,
       path: url.pathname,
       token,
+      search: url.search,
       body:
         typeof init?.body === "string"
           ? (JSON.parse(init.body) as unknown)
@@ -472,9 +479,13 @@ export class FakePostgrest {
       return this.rpc(uid, method, path.slice(4), url, body);
     }
     if (
-      !["profiles", "programmes", "enrolments", "programme_consents"].includes(
-        path,
-      )
+      ![
+        "profiles",
+        "programmes",
+        "enrolments",
+        "programme_consents",
+        "consent_documents",
+      ].includes(path)
     ) {
       return fail(404, "PGRST205", "Table not found");
     }
@@ -536,7 +547,16 @@ export class FakePostgrest {
     url: URL,
     body: unknown,
   ): { status: number; body: unknown } {
-    const args = (body ?? {}) as Row;
+    // Arguments typed uuid compare case-insensitively in Postgres and come
+    // back in lower case; the fake stores ids in lower case.
+    const args = Object.fromEntries(
+      Object.entries((body ?? {}) as Row).map(([name, value]) => [
+        name,
+        typeof value === "string" && UUID.test(value)
+          ? value.toLowerCase()
+          : value,
+      ]),
+    );
     const answer = (rows: Row[]) => ({
       status: 200,
       body: rows.map((row) => this.project(row, url)),
@@ -686,6 +706,12 @@ export class FakePostgrest {
 
   private visible(uid: string, table: keyof State): Row[] {
     if (table === "programmes") return this.state.programmes;
+    // Documents already in effect (consent_documents_select); no writes.
+    if (table === "consent_documents") {
+      return this.state.consent_documents.filter(
+        (doc) => Date.parse(doc.effective_from as string) <= this.clock,
+      );
+    }
     // Own row only; the API reads it, never writes it (no grants here).
     if (table === "profiles") {
       return this.state.profiles.filter((row) => row.id === uid);
@@ -731,19 +757,11 @@ export class FakePostgrest {
         created_at: this.now(),
         updated_at: this.now(),
       };
-      this.checkEnrolment(row);
-      if (
-        !this.state.programmes.some(
-          (programme) => programme.code === row.programme_code,
-        )
-      ) {
-        fail(
-          409,
-          "23503",
-          'insert or update on table "enrolments" violates foreign key constraint',
-        );
-      }
+      // Postgres executor order: RLS WITH CHECK, then CHECK constraints,
+      // then unique indexes (on insertion), then foreign keys (an after
+      // trigger at the end of the statement).
       if (row.user_id !== uid || !this.barrierOpen(uid)) rlsViolation(table);
+      this.checkEnrolment(row);
       if (
         this.state.enrolments.some(
           (other) =>
@@ -755,6 +773,17 @@ export class FakePostgrest {
           409,
           "23505",
           'duplicate key value violates unique constraint "enrolments_user_programme_key"',
+        );
+      }
+      if (
+        !this.state.programmes.some(
+          (programme) => programme.code === row.programme_code,
+        )
+      ) {
+        fail(
+          409,
+          "23503",
+          'insert or update on table "enrolments" violates foreign key constraint',
         );
       }
       this.state.enrolments.push(row);
@@ -781,6 +810,21 @@ export class FakePostgrest {
     };
     const purpose = row.purpose as string;
     const recipient = row.recipient_ref as string | null;
+    // After the before-insert trigger: RLS WITH CHECK, then CHECK
+    // constraints, then the unique keys, as Postgres runs them.
+    const enrolment = this.state.enrolments.find(
+      (other) => other.id === row.enrolment_id,
+    );
+    if (
+      !enrolment ||
+      enrolment.user_id !== uid ||
+      enrolment.status === "left" ||
+      !this.barrierOpen(uid) ||
+      (purpose !== "core" &&
+        !this.hasConsent(uid, enrolment.id as string, "core"))
+    ) {
+      rlsViolation(table);
+    }
     if (!PURPOSES.includes(purpose))
       checkViolation("programme_consents_purpose_check");
     if (SHARE.includes(purpose) !== (recipient !== null)) {
@@ -800,19 +844,6 @@ export class FakePostgrest {
     }
     if (row.locale !== null && !LOCALES.includes(row.locale as string)) {
       checkViolation("programme_consents_locale_check");
-    }
-    const enrolment = this.state.enrolments.find(
-      (other) => other.id === row.enrolment_id,
-    );
-    if (
-      !enrolment ||
-      enrolment.user_id !== uid ||
-      enrolment.status === "left" ||
-      !this.barrierOpen(uid) ||
-      (purpose !== "core" &&
-        !this.hasConsent(uid, enrolment.id as string, "core"))
-    ) {
-      rlsViolation(table);
     }
     if (
       !(deferLiveCore && purpose === "core") &&
@@ -860,8 +891,9 @@ export class FakePostgrest {
         else if (row.status !== "left") row.left_at = null;
         else row.left_at = old.left_at;
         row.updated_at = this.now();
-        this.checkEnrolment(row);
+        // RLS WITH CHECK before CHECK constraints, as Postgres runs them.
         if (row.user_id !== uid) rlsViolation(table);
+        this.checkEnrolment(row);
         // enrolments_revoke_on_leave
         if (row.status === "left" && old.status !== "left") {
           const at = this.now();

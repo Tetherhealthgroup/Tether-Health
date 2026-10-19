@@ -252,15 +252,26 @@ export class EnrolmentsService {
    * Moves one enrolment out of focus (to paused, its data kept) and another
    * into focus in one database transaction (public.swap_focus). The focus
    * cap is checked inside the call, so TH001 arrives as the call's error.
+   *
+   * Everything the response needs besides the two rows is read before the
+   * call, so once the swap has committed nothing can turn it into an error.
+   * The consents read beforehand are still the consents afterwards: the swap
+   * changes status between states that are not `left`, and no trigger
+   * touches consents on such a change (only leaving revokes them).
    */
   async swapFocus(
     user: AuthUser,
     dto: SwapFocusDto,
   ): Promise<FocusSwapResponse> {
     const client = this.clients.forUser(user);
+    // Postgres returns UUIDs in lower case; compare in the same form.
+    const demoteId = dto.demoteId.toLowerCase();
+    const promoteId = dto.promoteId.toLowerCase();
     const versions = await this.currentCoreVersions(client);
+    const consents = await this.consentsFor(client, [demoteId, promoteId]);
+    const context = await this.versionContext(client, user, versions, consents);
     const { data, error } = (await client
-      .rpc("swap_focus", { p_demote: dto.demoteId, p_promote: dto.promoteId })
+      .rpc("swap_focus", { p_demote: demoteId, p_promote: promoteId })
       .select(ENROLMENT_COLUMNS)) as RpcResult<EnrolmentRow[]>;
     if (error || data === null) {
       throw (
@@ -268,13 +279,13 @@ export class EnrolmentsService {
         new BadGatewayException("Focus could not be swapped")
       );
     }
-    const demoted = data.find((row) => row.id === dto.demoteId);
-    const promoted = data.find((row) => row.id === dto.promoteId);
+    // Only a result that contradicts the function's contract (both rows,
+    // demoted first) can fail here; no read follows the commit.
+    const demoted = data.find((row) => row.id.toLowerCase() === demoteId);
+    const promoted = data.find((row) => row.id.toLowerCase() === promoteId);
     if (data.length !== 2 || !demoted || !promoted) {
       throw new BadGatewayException("Focus could not be swapped");
     }
-    const consents = await this.consentsFor(client, [demoted.id, promoted.id]);
-    const context = await this.versionContext(client, user, versions, consents);
     const of = (row: EnrolmentRow) =>
       this.toEnrolment(
         row,
@@ -431,7 +442,9 @@ export class EnrolmentsService {
    * live core is read again: if it is already the requested version and
    * locale, the request succeeded and is answered as such; if no core is
    * live, core consent is required; if another version became live, the
-   * supersession is tried once more and the database decides.
+   * supersession is tried once more (at most two calls in all). If that
+   * also loses a race, the answer comes from what is live then; see
+   * answerFromLive.
    */
   private async supersedeCore(
     client: UserSupabaseClient,
@@ -455,14 +468,9 @@ export class EnrolmentsService {
       }
       const live = await this.liveCore(client, enrolmentId);
       if (live === null) throw conflict("core_consent_required");
-      if (this.isFor(live, dto)) {
-        return {
-          ...this.toConsent(live),
-          supersededId: await this.supersededId(client, live.id),
-        };
-      }
+      if (this.isFor(live, dto)) return this.answerAsDone(client, live);
       if (mayRetry) return this.supersedeCore(client, enrolmentId, dto, false);
-      throw conflict("core_consent_required");
+      return this.answerFromLive(client, live, dto);
     }
     if (data === null) {
       throw new BadGatewayException("Consent could not be recorded");
@@ -478,6 +486,54 @@ export class EnrolmentsService {
       throw new BadGatewayException("Consent could not be recorded");
     }
     return { ...this.toConsent(replacement), supersededId: superseded.id };
+  }
+
+  /** A live core that is already what was asked for: the request is done. */
+  private async answerAsDone(
+    client: UserSupabaseClient,
+    live: ConsentRow,
+  ): Promise<GrantConsentResponse> {
+    return {
+      ...this.toConsent(live),
+      supersededId: await this.supersededId(client, live.id),
+    };
+  }
+
+  /**
+   * After the retry also lost a race, from the live core read once more
+   * (not the requested one; done and gone are answered by the caller): on
+   * the requested version or a later one, consent_version_unchanged, as the
+   * database would answer; older, core_consent_required. A core stored
+   * before documents existed counts as older than every document, as in the
+   * database.
+   */
+  private async answerFromLive(
+    client: UserSupabaseClient,
+    live: ConsentRow,
+    dto: GrantConsentDto,
+  ): Promise<never> {
+    if (live.locale !== null) {
+      const { data, error } = await client
+        .from("consent_documents")
+        .select("version,effective_from")
+        .eq("purpose", "core")
+        .in("version", [live.consent_version, dto.consentVersion])
+        .returns<{ version: string; effective_from: string }[]>();
+      if (error) throw new BadGatewayException("Consents are unavailable");
+      const effective = (version: string) =>
+        data.find((document) => document.version === version)?.effective_from;
+      const liveFrom = effective(live.consent_version);
+      const requestedFrom = effective(dto.consentVersion);
+      if (
+        live.consent_version === dto.consentVersion ||
+        (liveFrom !== undefined &&
+          requestedFrom !== undefined &&
+          Date.parse(liveFrom) >= Date.parse(requestedFrom))
+      ) {
+        throw conflict("consent_version_unchanged");
+      }
+    }
+    throw conflict("core_consent_required");
   }
 
   /** The core consent that `id` replaced, if any. */

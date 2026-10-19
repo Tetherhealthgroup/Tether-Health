@@ -164,15 +164,18 @@ export interface EnrolmentResponse {
   consents: ConsentResponse[];
   /**
    * The current core document version (current_consent_documents()) for the
-   * locale of the live core consent. Null without a live core consent, for
-   * a consent stored before documents existed (no locale), or when no core
-   * document is current for that locale.
+   * locale re-consent would use: the live core consent's locale, or for a
+   * consent stored before documents existed (no locale) the member's profile
+   * locale. Null without a live core consent, without a profile for a
+   * consent with no locale, or when no core document is current for that
+   * locale.
    */
   currentCoreConsentVersion: string | null;
   /**
-   * True when the enrolment is not left, has a live core consent, and that
-   * consent's version differs from currentCoreConsentVersion (always true
-   * for a consent stored before documents existed).
+   * True only when re-consent can be completed: the enrolment is not left,
+   * has a live core consent, currentCoreConsentVersion is not null, and the
+   * live consent is not on it (a consent stored before documents existed is
+   * never on a document).
    */
   reconsentRequired: boolean;
 }

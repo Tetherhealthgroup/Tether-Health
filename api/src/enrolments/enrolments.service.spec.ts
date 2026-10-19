@@ -198,6 +198,19 @@ describe("EnrolmentsService", () => {
     });
   });
 
+  it("revokes only a live row (the update filters on revoked_at is null)", async () => {
+    const { service, calls } = setup({ data: consentRow(), error: null });
+    await service.revokeConsent(user, CORE_ID);
+    const updateAt = calls.findIndex((call) => call[0] === "update");
+    expect(updateAt).toBeGreaterThanOrEqual(0);
+    expect(calls.slice(updateAt)).toEqual(
+      expect.arrayContaining([
+        ["eq", '"id"', JSON.stringify(CORE_ID)],
+        ["is", '"revoked_at"', "null"],
+      ]),
+    );
+  });
+
   // TH003 leaves the consent live: it must never be reported as revoked.
   it("does not report revoke error TH003 as revoked", async () => {
     const { service } = setup({
@@ -699,26 +712,87 @@ describe("EnrolmentsService", () => {
         });
       });
 
-      it("tries once more when another version became live, then gives up", async () => {
-        const other = consentRow({ id: NEW_CORE_ID, locale: "es" });
-        const retried = setup(
-          { data: enrolmentRow(), error: null },
-          { data: consentRow(), error: null },
-          th004,
-          { data: other, error: null },
-          th004,
-          { data: other, error: null },
-        );
-        expect(
-          await codeOf(retried.service.grantConsent(user, grantDto())),
-        ).toEqual({
-          status: HttpStatus.CONFLICT,
-          code: "core_consent_required",
-        });
-        expect(
-          retried.calls.filter((call) => call[1] === "supersede_core_consent"),
-        ).toHaveLength(2);
+      // After the retry also hits TH004, the live core is read once more and
+      // decides; the function is never called a third time.
+      const docs = (rows: [string, string][]) => ({
+        data: rows.map(([version, effective_from]) => ({
+          version,
+          effective_from,
+        })),
+        error: null,
       });
+      it.each([
+        [
+          "the requested one",
+          consentRow({ id: NEW_CORE_ID, consent_version: "v2" }),
+          [] as Result[],
+          "done",
+        ],
+        [
+          "a later version",
+          consentRow({ id: NEW_CORE_ID, consent_version: "v3", locale: "es" }),
+          [
+            docs([
+              ["v3", "2026-10-18T07:00:00Z"],
+              ["v2", "2026-10-18T06:00:00Z"],
+            ]),
+          ],
+          "consent_version_unchanged",
+        ],
+        [
+          "the same version in another locale",
+          consentRow({ id: NEW_CORE_ID, consent_version: "v2", locale: "es" }),
+          [docs([["v2", "2026-10-18T06:00:00Z"]])],
+          "consent_version_unchanged",
+        ],
+        [
+          "an earlier version",
+          consentRow({ id: NEW_CORE_ID, consent_version: "v1", locale: "es" }),
+          [
+            docs([
+              ["v1", "2026-10-18T00:00:00Z"],
+              ["v2", "2026-10-18T06:00:00Z"],
+            ]),
+          ],
+          "core_consent_required",
+        ],
+        [
+          "a row stored before documents existed",
+          consentRow({ id: NEW_CORE_ID, consent_version: "v9", locale: null }),
+          [],
+          "core_consent_required",
+        ],
+        ["nothing", null, [], "core_consent_required"],
+      ])(
+        "after the retry loses too, answers from a live core that is %s",
+        async (_label, finalLive, more, expected) => {
+          const other = consentRow({ id: OTHER_ID, locale: "es" });
+          const { service, calls } = setup(
+            { data: enrolmentRow(), error: null },
+            { data: consentRow(), error: null },
+            th004,
+            { data: other, error: null },
+            th004,
+            { data: finalLive, error: null },
+            ...more,
+            ...(expected === "done"
+              ? [{ data: { id: OTHER_ID }, error: null }]
+              : []),
+          );
+          const result = await codeOf(service.grantConsent(user, grantDto()));
+          if (expected === "done") {
+            expect(result).toBeUndefined();
+          } else {
+            expect(result).toEqual({
+              status: HttpStatus.CONFLICT,
+              code: expected,
+            });
+          }
+          expect(
+            calls.filter((call) => call[1] === "supersede_core_consent"),
+          ).toHaveLength(2);
+        },
+      );
     });
   });
 
@@ -732,11 +806,15 @@ describe("EnrolmentsService", () => {
     };
 
     it("calls swap_focus once and returns both enrolments with consents", async () => {
-      const { service, calls } = setup(currentDocs(), swapped, {
-        data: [consentRow({ enrolment_id: OTHER_ID, consent_version: "v2" })],
-        error: null,
-        count: 1,
-      });
+      const { service, calls } = setup(
+        currentDocs(),
+        {
+          data: [consentRow({ enrolment_id: OTHER_ID, consent_version: "v2" })],
+          error: null,
+          count: 1,
+        },
+        swapped,
+      );
       const result = await service.swapFocus(user, {
         demoteId: ENROLMENT_ID,
         promoteId: OTHER_ID,
@@ -760,6 +838,49 @@ describe("EnrolmentsService", () => {
       for (const method of ["update", "insert", "upsert"]) {
         expect(calls.some((call) => call[0] === method)).toBe(false);
       }
+      // Nothing is read after the swap: no failure can follow its commit.
+      const rpcAt = calls.findIndex((call) => call[1] === "swap_focus");
+      expect(calls.slice(rpcAt + 1).some((call) => call[0] === "from")).toBe(
+        false,
+      );
+      expect(calls.filter((call) => call[0] === "from")).toHaveLength(1);
+    });
+
+    it("compares ids in lower case (Postgres returns them so)", async () => {
+      const { service, calls } = setup(
+        currentDocs(),
+        { data: [], error: null, count: 0 },
+        swapped,
+      );
+      const result = await service.swapFocus(user, {
+        demoteId: ENROLMENT_ID.toUpperCase(),
+        promoteId: OTHER_ID.toUpperCase(),
+      });
+      expect(calls).toContainEqual([
+        "rpc",
+        "swap_focus",
+        JSON.stringify({ p_demote: ENROLMENT_ID, p_promote: OTHER_ID }),
+      ]);
+      expect([result.demoted.id, result.promoted.id]).toEqual([
+        ENROLMENT_ID,
+        OTHER_ID,
+      ]);
+    });
+
+    it("a failed read before the swap is a 502 and the swap is not called", async () => {
+      const { service, calls } = setup(currentDocs(), {
+        data: null,
+        error: { code: "XX000", message: "synthetic" },
+      });
+      expect(
+        await codeOf(
+          service.swapFocus(user, {
+            demoteId: ENROLMENT_ID,
+            promoteId: OTHER_ID,
+          }),
+        ),
+      ).toBeInstanceOf(BadGatewayException);
+      expect(calls.some((call) => call[1] === "swap_focus")).toBe(false);
     });
 
     it.each([
@@ -772,10 +893,14 @@ describe("EnrolmentsService", () => {
       ["TH013", HttpStatus.CONFLICT, "focus_swap_invalid"],
       ["TH014", HttpStatus.CONFLICT, "consent_version_unchanged"],
     ])("maps %s to %d %s", async (code, status, token) => {
-      const { service } = setup(currentDocs(), {
-        data: null,
-        error: { code, message: "synthetic", hint: "synthetic" },
-      });
+      const { service } = setup(
+        currentDocs(),
+        { data: [], error: null, count: 0 },
+        {
+          data: null,
+          error: { code, message: "synthetic", hint: "synthetic" },
+        },
+      );
       expect(
         await codeOf(
           service.swapFocus(user, {
@@ -789,10 +914,11 @@ describe("EnrolmentsService", () => {
     it.each(["TH010", "TH015", "TH002", "TH003", "TH999", "42501", "XX000"])(
       "fails closed on %s",
       async (code) => {
-        const { service } = setup(currentDocs(), {
-          data: null,
-          error: { code, message: "synthetic detail" },
-        });
+        const { service } = setup(
+          currentDocs(),
+          { data: [], error: null, count: 0 },
+          { data: null, error: { code, message: "synthetic detail" } },
+        );
         const error = await codeOf(
           service.swapFocus(user, {
             demoteId: ENROLMENT_ID,
@@ -807,10 +933,11 @@ describe("EnrolmentsService", () => {
     );
 
     it("fails closed when the function does not return both rows", async () => {
-      const { service } = setup(currentDocs(), {
-        data: [swapped.data[0]],
-        error: null,
-      });
+      const { service } = setup(
+        currentDocs(),
+        { data: [], error: null, count: 0 },
+        { data: [swapped.data[0]], error: null },
+      );
       expect(
         await codeOf(
           service.swapFocus(user, {

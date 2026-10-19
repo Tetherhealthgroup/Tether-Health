@@ -360,7 +360,9 @@ paths:
         focus in one database transaction (`swap_focus`): the demoted
         enrolment becomes `paused` (its data is kept) and the promoted one
         becomes `focus`. Either both change or neither does. The focus cap
-        of two is checked inside the call. Single status changes stay on
+        of two is checked inside the call. Everything else in the response
+        is read before the swap and nothing is read after it, so a failed
+        read cannot report a committed swap as failed. Single status changes stay on
         `PATCH /v1/enrolments/{enrolmentId}`.
       security: [{supabaseJwt: []}]
       requestBody:
@@ -429,7 +431,12 @@ paths:
         is a grant of the live version and locale and gets
         `consent_already_granted` (409); if the repeat raced the first and
         lost, it is answered as the first's success (201) with the live row
-        and its `supersededId`.
+        and its `supersededId`. If a different core consent became live
+        meanwhile, the supersession is tried once more; if that also loses
+        a race, the answer follows what is then live: 201 if it is the
+        requested version and locale, `consent_version_unchanged` if it is
+        on the requested version or a later one, otherwise
+        `core_consent_required`.
 
         The share purposes (share_care_team, share_caregiver) are refused
         with `sharing_not_available` (409) until care connections exist.
@@ -801,9 +808,8 @@ components:
         locale:
           $ref: '#/components/schemas/ConsentLocale'
           description: The locale of the consent document the app showed.
-    ProgrammeConsent:
+    ProgrammeConsentFields:
       type: object
-      additionalProperties: false
       required: [id, enrolmentId, purpose, recipientRef, consentVersion, locale, consentText, grantedAt, revokedAt]
       properties:
         id: {type: string, format: uuid}
@@ -820,9 +826,13 @@ components:
           description: The text of the consent document, as the database stored it with the consent.
         grantedAt: {type: string, format: date-time}
         revokedAt: {type: [string, 'null'], format: date-time}
+    ProgrammeConsent:
+      allOf:
+        - {$ref: '#/components/schemas/ProgrammeConsentFields'}
+      unevaluatedProperties: false
     GrantedProgrammeConsent:
       allOf:
-        - {$ref: '#/components/schemas/ProgrammeConsent'}
+        - {$ref: '#/components/schemas/ProgrammeConsentFields'}
         - type: object
           required: [supersededId]
           properties:
