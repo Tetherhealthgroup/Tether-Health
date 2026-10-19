@@ -12,6 +12,12 @@ Flutter, source control, logs, or client configuration.
 Commands: `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:e2e`,
 and `npm run build`.
 
+The `overrides` entry for `fastify` in `package.json` exists because
+`@nestjs/platform-fastify` declares an exact `fastify` version, so a newer
+`fastify` 5.x release can only be used through an override. When upgrading
+`@nestjs/platform-fastify`, re-check the `fastify` version it declares and bump
+the override to match or exceed it, staying on `fastify` 5.x.
+
 Export and deletion require a timestamped Supabase JWT authentication-method
 reference (`amr`) no older than
 `RECENT_AUTH_MAX_AGE_SECONDS` (10 minutes by default). The Flutter client obtains

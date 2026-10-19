@@ -565,12 +565,12 @@ export class EnrolmentsService {
     consents: ConsentRow[],
     { versions, memberLocale }: VersionContext,
   ): EnrolmentResponse {
-    const liveCore = consents.find(
+    const liveCoreRow = consents.find(
       (consent) => consent.purpose === "core" && consent.revoked_at === null,
     );
     // The locale re-consent would be in: the consent's own, or for a
     // consent stored before documents existed, the member's profile locale.
-    const locale = liveCore ? (liveCore.locale ?? memberLocale) : null;
+    const locale = liveCoreRow ? (liveCoreRow.locale ?? memberLocale) : null;
     const current = locale !== null ? versions[locale] : null;
     return {
       id: row.id,
@@ -588,9 +588,10 @@ export class EnrolmentsService {
       // before documents existed is never on a document).
       reconsentRequired:
         row.status !== "left" &&
-        liveCore !== undefined &&
+        liveCoreRow !== undefined &&
         current !== null &&
-        (liveCore.locale === null || liveCore.consent_version !== current),
+        (liveCoreRow.locale === null ||
+          liveCoreRow.consent_version !== current),
     };
   }
 }

@@ -1,42 +1,21 @@
 import { readFileSync } from "node:fs";
-import { createRequire } from "node:module";
 import { join } from "node:path";
+import Ajv2020, { type ErrorObject } from "ajv8/dist/2020";
+import addFormats from "ajv-formats";
 
 /**
  * Validates API responses against the schemas in docs/contracts/openapi.yaml
  * (OpenAPI 3.1, JSON Schema 2020-12), so the contract and the real responses
  * cannot drift apart.
  *
- * No new dependency: Ajv 8 (with its 2020-12 build and ajv-formats) comes
- * with Fastify's own schema compiler, @fastify/ajv-compiler, so it is
- * resolved from there; js-yaml is already in the tree (eslint).
+ * Test-only devDependencies: Ajv 8 is installed under the alias "ajv8",
+ * because the top-level "ajv" package is Ajv 6 (eslint); ajv-formats and
+ * js-yaml are declared directly.
  */
-const fromAjvCompiler = createRequire(require.resolve("@fastify/ajv-compiler"));
-const Ajv2020 = (fromAjvCompiler("ajv/dist/2020") as { default: AjvClass })
-  .default;
-const addFormats = (
-  fromAjvCompiler("ajv-formats") as { default: (ajv: AjvInstance) => void }
-).default;
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const yaml = require("js-yaml") as { load: (text: string) => unknown };
 
-// Local shapes: the top-level "ajv" package in the tree is Ajv 6 (eslint),
-// whose types do not describe Ajv 8.
-export interface ErrorObject {
-  instancePath: string;
-  keyword: string;
-  message?: string;
-  params: Record<string, unknown>;
-}
-interface ValidateFunction {
-  (data: unknown): boolean;
-  errors?: ErrorObject[] | null;
-}
-interface AjvInstance {
-  addSchema(schema: object, key: string): AjvInstance;
-  getSchema(ref: string): ValidateFunction | undefined;
-}
-type AjvClass = new (options: object) => AjvInstance;
+export type { ErrorObject };
 
 interface OpenApiDocument {
   info: { version: string };

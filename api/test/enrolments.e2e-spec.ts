@@ -38,16 +38,16 @@ import {
  * request's bearer token and applies the TH-913 RLS policies, grants,
  * constraints and triggers.
  *
- * Stand-in fidelity (th-qa D1, D2, D4):
- * - D1: the fake evaluates writes in Postgres executor order: before-row
- *   triggers, RLS WITH CHECK, CHECK constraints, unique keys, then foreign
- *   keys.
- * - D2: the fake's clock advances by 1 ms on every timestamp, so rows
+ * Where the fake stands in for Postgres and PostgREST:
+ * - Write order: the fake evaluates writes in Postgres executor order:
+ *   before-row triggers, RLS WITH CHECK, CHECK constraints, unique keys,
+ *   then foreign keys.
+ * - Clock: the fake's clock advances by 1 ms on every timestamp, so rows
  *   written in one request get distinct, strictly increasing times where
  *   Postgres's now() would give them the same value. Ordering by
  *   granted_at/created_at is therefore never tied in the fake. No test
  *   relies on it.
- * - D4: the database's own errors (focus cap, consent revoke-only rules)
+ * - Errors: the database's own errors (focus cap, consent revoke-only rules)
  *   carry the registry's TH codes, messages and hints
  *   (test/support/database-errors.ts, checked against
  *   docs/contracts/database.md by test/database-errors.e2e-spec.ts). The
@@ -56,11 +56,11 @@ import {
  *   same way is unverified until a local database run. The API matches the
  *   code only, so the status and message do not affect the mapping.
  * - Consent documents are the fake's seeded CONSENT_DOCUMENTS: the current
- *   core version is v2-synthetic in both locales; v1-draft is grantable for
- *   every purpose. One test retires the es core documents and restores
- *   the seed in a finally block. A race that Postgres resolves after a
- *   lock wait is emulated with interleave (the other transaction commits)
- *   plus failNext (the error this request then gets).
+ *   core version is v2-synthetic in en and v3-synthetic in es; v1-draft is
+ *   grantable for every purpose. One test retires the es core documents and
+ *   restores the seed in a finally block. A race that Postgres resolves
+ *   after a lock wait is emulated with interleave (the other transaction
+ *   commits) plus failNext (the error this request then gets).
  */
 
 type Method = "DELETE" | "GET" | "PATCH" | "POST";
