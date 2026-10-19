@@ -171,6 +171,11 @@ select th944_test.ok(
                 '00000000-0000-4000-8000-000000944002')) = 2,
   'setup: the signup trigger created both synthetic profiles');
 
+-- Synthetic consent documents: consent rows take their text from these.
+insert into public.consent_documents (purpose, version, locale, body, effective_from) values
+  ('core', 'v1', 'en', 'Synthetic core wording', now()),
+  ('core', 'v2', 'en', 'Synthetic core wording v2', now());
+
 -- The thsync role -------------------------------------------------------------
 select th944_test.ok(
   (select not rolcanlogin and not rolinherit and not rolsuper and not rolbypassrls
@@ -230,8 +235,8 @@ select th944_test.ok(
   th944_test.column_acl(array['public.profiles', 'public.quit_plans',
     'public.program_data', 'public.programmes', 'public.enrolments',
     'public.programme_consents', 'public.account_consents']::regclass[]) =
-  'account_consents.consent_text:authenticated:INSERT,'
   'account_consents.consent_version:authenticated:INSERT,'
+  'account_consents.locale:authenticated:INSERT,'
   'account_consents.purpose:authenticated:INSERT,'
   'account_consents.revoked_at:authenticated:UPDATE,'
   'account_consents.user_id:authenticated:INSERT,'
@@ -242,12 +247,13 @@ select th944_test.ok(
   'profiles.avatar_path:authenticated:UPDATE,profiles.display_name:authenticated:UPDATE,'
   'profiles.locale:authenticated:UPDATE,profiles.onboarding_completed:authenticated:UPDATE,'
   'profiles.time_zone:authenticated:UPDATE,'
-  'programme_consents.consent_text:authenticated:INSERT,'
   'programme_consents.consent_version:authenticated:INSERT,'
   'programme_consents.enrolment_id:authenticated:INSERT,'
+  'programme_consents.locale:authenticated:INSERT,'
   'programme_consents.purpose:authenticated:INSERT,'
   'programme_consents.recipient_ref:authenticated:INSERT,'
   'programme_consents.revoked_at:authenticated:UPDATE,'
+  'programme_consents.superseded_by:authenticated:UPDATE,'
   'quit_plans.care_team_reminder:authenticated:INSERT,quit_plans.care_team_reminder:authenticated:UPDATE,'
   'quit_plans.custom_quit_reason:authenticated:INSERT,quit_plans.custom_quit_reason:authenticated:UPDATE,'
   'quit_plans.custom_smoking_trigger:authenticated:INSERT,quit_plans.custom_smoking_trigger:authenticated:UPDATE,'
@@ -368,10 +374,10 @@ with i as (
   insert into public.enrolments (user_id, programme_code, status, mode)
   values ('00000000-0000-4000-8000-000000944001', 'sf', 'learn_only', 'reduce') returning id
 ) select set_config('th944.a_sf', id::text, true) from i;
-insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
+insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
 values
-  (current_setting('th944.a_bf')::uuid, 'core', 'v1', 'Synthetic core wording'),
-  (current_setting('th944.a_hw')::uuid, 'core', 'v1', 'Synthetic core wording');
+  (current_setting('th944.a_bf')::uuid, 'core', 'v1', 'en'),
+  (current_setting('th944.a_hw')::uuid, 'core', 'v1', 'en');
 
 -- The API cannot write sync data, even for its own caller.
 select th944_test.refused(
@@ -517,8 +523,8 @@ select th944_test.affects(
    (''00000000-0000-4000-8000-000000944001'', ''hw'', 0, now())',
   1, 'A sync: Heartwise lapse appended');
 select th944_test.become('authenticator', '00000000-0000-4000-8000-000000944001');
-insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-values (current_setting('th944.a_bf')::uuid, 'core', 'v2', 'Synthetic core wording v2');
+insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+values (current_setting('th944.a_bf')::uuid, 'core', 'v2', 'en');
 select th944_test.become('thsync', '00000000-0000-4000-8000-000000944001');
 select th944_test.affects(
   'insert into public.sync_lapse (user_id, programme_code, ordinal, at) values

@@ -13,44 +13,97 @@ export interface DatabaseErrorEntry {
   readonly messages: readonly string[];
 }
 
+// Messages are typed as plain string lists, so code that asks whether an
+// entry has no message (a reserved code) still type-checks when none is
+// reserved.
 export const DATABASE_ERRORS = [
   {
     code: "TH001",
     hint: "focus_cap_reached",
-    messages: ["At most two programmes can be in focus"],
+    messages: ["At most two programmes can be in focus"] as readonly string[],
   },
   {
     code: "TH002",
     hint: "consent_already_revoked",
-    messages: ["Consent is already revoked"],
+    messages: ["Consent is already revoked"] as readonly string[],
   },
   {
     code: "TH003",
     hint: "consent_immutable",
-    messages: ["Consent can only be revoked", "Consent records are immutable"],
+    messages: [
+      "Consent can only be revoked",
+      "Consent records are immutable",
+    ] as readonly string[],
   },
-  { code: "TH004", hint: "consent_requires_core", messages: [] },
-  { code: "TH005", hint: "enrolment_left", messages: [] },
-  { code: "TH006", hint: "deletion_in_progress", messages: [] },
+  {
+    code: "TH004",
+    hint: "consent_requires_core",
+    messages: ["A live core consent is required"] as readonly string[],
+  },
+  {
+    code: "TH005",
+    hint: "enrolment_left",
+    messages: ["The programme has been left"] as readonly string[],
+  },
+  {
+    code: "TH006",
+    hint: "deletion_in_progress",
+    messages: ["Account deletion has started"] as readonly string[],
+  },
   {
     code: "TH007",
     hint: "sync_area_mismatch",
-    messages: ["Sync area must match its enrolment"],
+    messages: ["Sync area must match its enrolment"] as readonly string[],
   },
   {
     code: "TH008",
     hint: "lapses_append_only",
-    messages: ["Lapses are append-only"],
+    messages: ["Lapses are append-only"] as readonly string[],
   },
   {
     code: "TH009",
     hint: "deletion_via_api_only",
-    messages: ["Account deletion goes through the API"],
+    messages: ["Account deletion goes through the API"] as readonly string[],
   },
   {
     code: "TH010",
     hint: "sync_session_refused",
-    messages: ["The sync service writes only sync tables"],
+    messages: ["The sync service writes only sync tables"] as readonly string[],
+  },
+  {
+    code: "TH011",
+    hint: "consent_document_unavailable",
+    messages: [
+      "No consent document is available for this purpose, version and locale",
+    ] as readonly string[],
+  },
+  {
+    code: "TH012",
+    hint: "enrolment_not_found",
+    messages: ["Enrolment not found"] as readonly string[],
+  },
+  {
+    code: "TH013",
+    hint: "focus_swap_invalid",
+    messages: [
+      "A swap needs one programme in focus and another not in focus",
+    ] as readonly string[],
+  },
+  {
+    code: "TH014",
+    hint: "consent_version_unchanged",
+    messages: [
+      "The core consent is already on this version or a later one",
+    ] as readonly string[],
+  },
+  {
+    code: "TH015",
+    hint: "consent_document_immutable",
+    messages: [
+      "Consent documents are immutable, publish a new version",
+      "A consent document version takes effect at the same time in every locale",
+      "Consent documents are changed only by a role that bypasses row-level security",
+    ] as readonly string[],
   },
 ] as const satisfies readonly DatabaseErrorEntry[];
 

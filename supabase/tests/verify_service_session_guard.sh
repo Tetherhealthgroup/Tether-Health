@@ -259,23 +259,32 @@ select th972_test.ok(
 
 -- Every function authenticated can execute in public is listed here, so a new
 -- one has to be reviewed for the sync-session refusal before this passes.
+-- Writers that refuse a sync session: begin_account_deletion and
+-- delete_my_app_data (TH009); save_program_data, swap_focus and
+-- supersede_core_consent (TH010). current_consent_documents only reads.
 select th972_test.ok(
   (select string_agg(p.oid::regprocedure::text, ',' order by p.oid::regprocedure::text)
    from pg_catalog.pg_proc as p
    where p.pronamespace = 'public'::regnamespace
      and has_function_privilege('authenticated', p.oid, 'EXECUTE')) =
-  'avatar_write_allowed(text),begin_account_deletion(text),delete_my_app_data(text),'
+  'avatar_write_allowed(text),begin_account_deletion(text),current_consent_documents(),'
+  'delete_my_app_data(text),'
   'deletion_barrier_open(),has_consent(uuid,text,text),is_unique_text_array(text[]),'
-  'is_valid_support_people(jsonb),save_program_data(text,jsonb,integer),sync_writer_session()',
+  'is_valid_support_people(jsonb),save_program_data(text,jsonb,integer),'
+  'supersede_core_consent(uuid,text,text),swap_focus(uuid,uuid),sync_writer_session()',
   'functions authenticated can execute are exactly the reviewed set');
 select th972_test.ok(
-  (select bool_and(prosecdef = (proname <> 'save_program_data')
-                   and proconfig = array['search_path=""'])
+  (select count(*) = 6
+     and bool_and(prosecdef = (proname in ('begin_account_deletion', 'delete_my_app_data'))
+                  and proconfig = array['search_path=""'])
    from pg_catalog.pg_proc
    where oid in ('public.begin_account_deletion(text)'::regprocedure,
                  'public.delete_my_app_data(text)'::regprocedure,
-                 'public.save_program_data(text,jsonb,integer)'::regprocedure)),
-  'deletion functions stay security definer, save_program_data invoker; search_path empty');
+                 'public.save_program_data(text,jsonb,integer)'::regprocedure,
+                 'public.swap_focus(uuid,uuid)'::regprocedure,
+                 'public.supersede_core_consent(uuid,text,text)'::regprocedure,
+                 'public.current_consent_documents()'::regprocedure)),
+  'deletion functions stay security definer; save_program_data, swap_focus, supersede_core_consent and current_consent_documents invoker; search_path empty');
 select th972_test.ok(
   not exists (
     select 1 from pg_catalog.pg_proc as p
@@ -287,7 +296,14 @@ select th972_test.ok(
                     'public.enrolments_focus_cap()'::regprocedure,
                     'public.consent_revoke_only()'::regprocedure,
                     'public.sync_area_match_enrolment()'::regprocedure,
-                    'public.sync_lapse_append_only()'::regprocedure)
+                    'public.sync_lapse_append_only()'::regprocedure,
+                    'public.swap_focus(uuid,uuid)'::regprocedure,
+                    'public.supersede_core_consent(uuid,text,text)'::regprocedure,
+                    'public.current_consent_documents()'::regprocedure,
+                    'public.consent_fill_text()'::regprocedure,
+                    'public.consent_documents_guard()'::regprocedure,
+                    'public.programme_consents_check_supersede()'::regprocedure,
+                    'public.programme_consents_supersede_cascade()'::regprocedure)
       and (a.grantee = 0 or a.grantee in ('anon'::regrole, 'thsync'::regrole))),
   'changed functions: no execute for anon, thsync or PUBLIC');
 
@@ -300,6 +316,14 @@ select th972_test.ok(
    where id = '00000000-0000-4000-8000-000000972002') = 1,
   'setup: the signup trigger created the synthetic profile');
 
+-- Synthetic consent documents: consent rows take their text from these.
+insert into public.consent_documents (purpose, version, locale, body, effective_from) values
+  ('core', 'v1', 'en', 'Synthetic core wording', now()),
+  ('research', 'v1', 'en', 'Synthetic research wording', now()),
+  ('reminders', 'v1', 'en', 'Synthetic reminder wording', now()),
+  ('essential', 'v1', 'en', 'Synthetic essential wording', now()),
+  ('diagnostics', 'v1', 'en', 'Synthetic', now());
+
 -- B through the API (PostgREST stand-in): set up rows -------------------------
 select th972_test.become('authenticator', '00000000-0000-4000-8000-000000972002');
 with i as (
@@ -311,16 +335,16 @@ with i as (
   values ('00000000-0000-4000-8000-000000972002', 'bf', 'quit') returning id
 ) select set_config('th972.b_bf', id::text, true) from i;
 select th972_test.affects(format(
-  'insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-   values (%L, ''core'', ''v1'', ''Synthetic core wording'')',
+  'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+   values (%L, ''core'', ''v1'', ''en'')',
   current_setting('th972.b_hw')), 1, 'B API: grants core consent on Heartwise');
 select th972_test.affects(format(
-  'insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-   values (%L, ''research'', ''v1'', ''Synthetic research wording'')',
+  'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+   values (%L, ''research'', ''v1'', ''en'')',
   current_setting('th972.b_hw')), 1, 'B API: grants research consent on Heartwise');
 select th972_test.affects(
-  'insert into public.account_consents (user_id, purpose, consent_version, consent_text)
-   values (''00000000-0000-4000-8000-000000972002'', ''essential'', ''v1'', ''Synthetic essential wording'')',
+  'insert into public.account_consents (user_id, purpose, consent_version, locale)
+   values (''00000000-0000-4000-8000-000000972002'', ''essential'', ''v1'', ''en'')',
   1, 'B API: grants an account consent');
 select th972_test.affects(
   'update public.profiles set display_name = ''Synthetic Member''',
@@ -386,8 +410,8 @@ select th972_test.affects(format(
   'delete from public.enrolments where id = %L', current_setting('th972.b_bf')),
   0, 'B sync: cannot delete an enrolment (no row qualifies)');
 select th972_test.refused(format(
-  'insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-   values (%L, ''reminders'', ''v1'', ''Synthetic reminder wording'')',
+  'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+   values (%L, ''reminders'', ''v1'', ''en'')',
   current_setting('th972.b_hw')),
   array['42501'], '%row-level security%', 'B sync: cannot grant a programme consent');
 select th972_test.affects(format(
@@ -395,8 +419,8 @@ select th972_test.affects(format(
    where enrolment_id = %L and purpose = ''research''',
   current_setting('th972.b_hw')), 0, 'B sync: cannot revoke a programme consent (no row qualifies)');
 select th972_test.refused(
-  'insert into public.account_consents (user_id, purpose, consent_version, consent_text)
-   values (''00000000-0000-4000-8000-000000972002'', ''diagnostics'', ''v1'', ''Synthetic'')',
+  'insert into public.account_consents (user_id, purpose, consent_version, locale)
+   values (''00000000-0000-4000-8000-000000972002'', ''diagnostics'', ''v1'', ''en'')',
   array['42501'], '%row-level security%', 'B sync: cannot grant an account consent');
 select th972_test.affects(
   'update public.account_consents set revoked_at = now() where purpose = ''essential''',
@@ -555,16 +579,16 @@ select th972_test.affects(format(
   'delete from public.enrolments where id = %L', current_setting('th972.b_ca')),
   1, 'B API: inserts and deletes an enrolment');
 select th972_test.affects(format(
-  'insert into public.programme_consents (enrolment_id, purpose, consent_version, consent_text)
-   values (%L, ''reminders'', ''v1'', ''Synthetic reminder wording'')',
+  'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+   values (%L, ''reminders'', ''v1'', ''en'')',
   current_setting('th972.b_hw')), 1, 'B API: grants a programme consent');
 select th972_test.affects(format(
   'update public.programme_consents set revoked_at = now()
    where enrolment_id = %L and purpose = ''reminders''',
   current_setting('th972.b_hw')), 1, 'B API: revokes a programme consent');
 select th972_test.affects(
-  'insert into public.account_consents (user_id, purpose, consent_version, consent_text)
-   values (''00000000-0000-4000-8000-000000972002'', ''diagnostics'', ''v1'', ''Synthetic'')',
+  'insert into public.account_consents (user_id, purpose, consent_version, locale)
+   values (''00000000-0000-4000-8000-000000972002'', ''diagnostics'', ''v1'', ''en'')',
   1, 'B API: grants an account consent');
 select th972_test.affects(
   'update public.account_consents set revoked_at = now() where purpose = ''diagnostics''',
@@ -865,6 +889,8 @@ sync_refusal() {
 sync_refusal begin_account_deletion TH009
 sync_refusal delete_my_app_data TH009
 sync_refusal save_program_data TH010
+sync_refusal swap_focus TH010
+sync_refusal supersede_core_consent TH010
 
 for pair in enrolments_focus_cap:TH001 consent_revoke_only:TH002 consent_revoke_only:TH003 \
   sync_area_match_enrolment:TH007 sync_lapse_append_only:TH008; do
@@ -885,7 +911,8 @@ registry=$(sed -nE 's/^\| `(TH[0-9]{3})` \| `([a-z_]+)` \|.*/\1 \2/p' "$contract
 [[ -n "$registry" ]] || fail "no SQLSTATE registry rows in $contract"
 [[ "$(cut -d' ' -f1 <<<"$registry" | sort | uniq -d)" == '' ]] || fail 'registry codes must be unique'
 [[ "$(cut -d' ' -f2 <<<"$registry" | sort | uniq -d)" == '' ]] || fail 'registry names must be unique'
-for code in TH001 TH002 TH003 TH004 TH005 TH006 TH007 TH008 TH009 TH010; do
+for code in TH001 TH002 TH003 TH004 TH005 TH006 TH007 TH008 TH009 TH010 \
+  TH011 TH012 TH013 TH014 TH015; do
   grep -Eq "^$code " <<<"$registry" || fail "registry is missing $code"
 done
 
