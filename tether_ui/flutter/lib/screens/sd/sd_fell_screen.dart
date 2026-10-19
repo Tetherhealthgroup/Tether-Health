@@ -30,7 +30,7 @@ class SdFellScreen extends StatelessWidget {
         TCard(key: const ValueKey('a:body[3]'), variant: TCardVariant.mint, title: 'How to get up safely', text: 'Roll to your side, crawl to a sturdy chair, kneel, then rise slowly.', onTap: () => TNav.push(context, Routes.learnLesson)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'I’m okay, log this fall', onPressed: () => TNav.submit(context, 'POST /v1/program-data/sd/falls', then: () => TNav.toast(context, 'Fall logged. Added to your visit list.', then: () => TNav.replace(context, Routes.sdHome))), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'I’m okay, log this fall', onPressed: () => TNav.submit(context, 'POST /v1/program-data/sd/falls', screenId: 'sd_fell', then: () => TNav.toast(context, 'Fall logged. Added to your visit list.', then: () => TNav.replace(context, Routes.sdHome))), variant: TButtonVariant.secondary),
       ],
     );
   }

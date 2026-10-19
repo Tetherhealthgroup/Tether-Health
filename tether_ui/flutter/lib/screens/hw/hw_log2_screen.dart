@@ -28,7 +28,7 @@ class HwLog2Screen extends StatelessWidget {
         TKeyValue(rows: [('Reading 1', '138/86'), ('Average so far', '135/85')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save readings', onPressed: () => TNav.submit(context, 'POST /v1/program-data/hw/readings', then: () => TNav.branch(context, 'Validated average', <String, VoidCallback>{'Valid · below crisis range': () => TNav.replace(context, Routes.hwResult), 'Invalid value': () => TNav.replace(context, Routes.hwLogError), '≥180 top or ≥120 bottom': () => TNav.replace(context, Routes.hwCrisis)}, decide: 'hw.bp')), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save readings', onPressed: () => TNav.submit(context, 'POST /v1/program-data/hw/readings', screenId: 'hw_log2', then: () => TNav.branch(context, 'Validated average', <String, VoidCallback>{'Valid · below crisis range': () => TNav.replace(context, Routes.hwResult), 'Invalid value': () => TNav.replace(context, Routes.hwLogError), '≥180 top or ≥120 bottom': () => TNav.replace(context, Routes.hwCrisis)}, decide: 'hw.bp'), safety: TSafetyRoutes('hw.bp', <String, VoidCallback>{'≥180 top or ≥120 bottom': () => TNav.replace(context, Routes.hwCrisis)})), arrow: true),
       ],
     );
   }

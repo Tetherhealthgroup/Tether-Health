@@ -23,7 +23,7 @@ class AccountDataScreen extends StatelessWidget {
     return TScreen(
       header: THeader(title: 'Your data'),
       children: [
-        TListGroup(title: 'Export', rows: [TListRow(key: const ValueKey('a:body[0].rows[0]'), label: 'Download everything', sub: 'Every program · PDF + JSON', onTap: () => TNav.submit(context, 'POST /v1/account/export', then: () => TNav.toast(context, 'We’re preparing your file. We’ll notify you when it’s ready.'))), TListRow(key: const ValueKey('a:body[0].rows[1]'), label: 'Export a care summary', sub: 'Choose dates and preview every detail', onTap: () => TNav.push(context, Routes.hwSummary))]),
+        TListGroup(title: 'Export', rows: [TListRow(key: const ValueKey('a:body[0].rows[0]'), label: 'Download everything', sub: 'Every program · PDF + JSON', onTap: () => TNav.submit(context, 'POST /v1/account/export', screenId: 'account_data', then: () => TNav.toast(context, 'We’re preparing your file. We’ll notify you when it’s ready.'))), TListRow(key: const ValueKey('a:body[0].rows[1]'), label: 'Export a care summary', sub: 'Choose dates and preview every detail', onTap: () => TNav.push(context, Routes.hwSummary))]),
         TListGroup(title: 'Delete', rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'Delete account and all data', sub: 'Permanent · requires confirmation', danger: true, onTap: () => TNav.push(context, Routes.accountDelete))]),
       ],
     );

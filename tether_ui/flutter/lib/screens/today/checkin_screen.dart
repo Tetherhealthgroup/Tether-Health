@@ -26,7 +26,7 @@ class CheckinScreen extends StatelessWidget {
         TCard(tag: 'sf', title: 'How did you feel after scrolling yesterday?', accent: 'sf', children: [TChips(fieldKey: 'checkin.value_2', options: ['Better', 'Same', 'Drained', 'Skip'], selected: ['Drained'], multi: false)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save check-in', onPressed: () => TNav.submit(context, 'POST /v1/records/check-ins', then: () => TNav.replace(context, Routes.checkinDone)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save check-in', onPressed: () => TNav.submit(context, 'POST /v1/records/check-ins', screenId: 'checkin', then: () => TNav.replace(context, Routes.checkinDone)), arrow: true),
         TBody('Skip any program question', tone: TTextTone.small, center: true),
       ],
     );

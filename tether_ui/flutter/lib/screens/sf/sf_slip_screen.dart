@@ -27,7 +27,7 @@ class SfSlipScreen extends StatelessWidget {
         TRadioList(fieldKey: 'sf_slip.value_2', items: [TRadioItem('Keep my goal, try again tonight', badge: 'Recommended'), TRadioItem('Make tomorrow’s goal easier'), TRadioItem('Move bedtime window 30 min earlier')], selected: 0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/records/lapses', then: () => TNav.toast(context, 'Saved', then: () => TNav.replace(context, Routes.sfHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/records/lapses', screenId: 'sf_slip', then: () => TNav.toast(context, 'Saved', then: () => TNav.replace(context, Routes.sfHome))), arrow: true),
       ],
     );
   }

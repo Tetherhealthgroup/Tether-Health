@@ -29,7 +29,7 @@ class AccountPrivacyScreen extends StatelessWidget {
         TBody('No ads. We never sell your health data.', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'PATCH /v1/enrolments/consents', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'PATCH /v1/enrolments/consents', screenId: 'account_privacy', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

@@ -27,7 +27,7 @@ class SfUnplugSessionScreen extends StatelessWidget {
         TCard(children: [TToggleRow(fieldKey: 'sf_unplug_session.strict', label: 'Strict', sub: 'Ending early asks for a reason, kept on this phone')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Start session', onPressed: () => TNav.submit(context, 'CALL device:unplug/startSession', then: () => TNav.replace(context, Routes.sfUnplugSessionActive)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Start session', onPressed: () => TNav.submit(context, 'CALL device:unplug/startSession', screenId: 'sf_unplug_session', then: () => TNav.replace(context, Routes.sfUnplugSessionActive)), arrow: true),
       ],
     );
   }

@@ -26,7 +26,7 @@ class NuHabitScreen extends StatelessWidget {
         TCard(children: [TToggleRow(fieldKey: 'nu_habit.track_weight', label: 'Track weight', sub: 'Off by default · can stay off forever')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Start this habit', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/nu/habit', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.nuHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Start this habit', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/nu/habit', screenId: 'nu_habit', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.nuHome))), arrow: true),
       ],
     );
   }

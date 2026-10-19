@@ -27,7 +27,7 @@ class CaSymptomsScreen extends StatelessWidget {
         TField(fieldKey: 'ca_symptoms.note_optional', label: 'Note (optional)', placeholder: 'Anything else to tell your clinician', kind: TFieldKind.multiline),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/ca/symptoms', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/ca/symptoms', screenId: 'ca_symptoms', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

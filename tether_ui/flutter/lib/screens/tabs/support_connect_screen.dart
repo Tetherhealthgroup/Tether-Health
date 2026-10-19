@@ -25,7 +25,7 @@ class SupportConnectScreen extends StatelessWidget {
         TBody('Your clinic gave you this code. Connecting shares nothing until you approve a summary.', tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Connect', onPressed: () => TNav.submit(context, 'POST /v1/care/connections', then: () => TNav.toast(context, 'Connected to Dr. Patel’s clinic', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Connect', onPressed: () => TNav.submit(context, 'POST /v1/care/connections', screenId: 'support_connect', then: () => TNav.toast(context, 'Connected to Dr. Patel’s clinic', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

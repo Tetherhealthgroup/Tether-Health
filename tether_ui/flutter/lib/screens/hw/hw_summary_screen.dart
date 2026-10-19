@@ -27,7 +27,7 @@ class HwSummaryScreen extends StatelessWidget {
         TToggleRow(fieldKey: 'hw_summary.include_notes', label: 'Include notes'),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Send summary', onPressed: () => TNav.submit(context, 'POST /v1/care/summaries', then: () => TNav.toast(context, 'Summary sent to Dr. Patel’s clinic', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Send summary', onPressed: () => TNav.submit(context, 'POST /v1/care/summaries', screenId: 'hw_summary', then: () => TNav.toast(context, 'Summary sent to Dr. Patel’s clinic', then: () => TNav.back(context))), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Save as PDF', onPressed: () => TNav.toast(context, 'PDF saved to Files'), variant: TButtonVariant.secondary),
       ],
     );

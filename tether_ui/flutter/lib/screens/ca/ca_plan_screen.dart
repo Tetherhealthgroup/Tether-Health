@@ -31,7 +31,7 @@ class CaPlanScreen extends StatelessWidget {
         TButton(key: const ValueKey('a:body[6]'), label: 'Add a photo of my plan', onPressed: () => TNav.toast(context, 'Camera opened'), variant: TButtonVariant.secondary),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/ca/plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.caHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/ca/plan', screenId: 'ca_plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.caHome))), arrow: true),
       ],
     );
   }

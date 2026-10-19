@@ -32,7 +32,7 @@ class ObConsentScreen extends StatelessWidget {
         TLink(key: const ValueKey('a:body[7]'), label: 'Read the Privacy Notice', onTap: () => TNav.external(context, 'https://www.tetherhealthgroup.com/privacy/'), alignLeft: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Agree and continue', onPressed: () => TNav.submit(context, 'POST /v1/enrolments/consents', then: () => TNav.push(context, Routes.obBasics)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Agree and continue', onPressed: () => TNav.submit(context, 'POST /v1/enrolments/consents', screenId: 'ob_consent', then: () => TNav.push(context, Routes.obBasics)), arrow: true),
       ],
     );
   }

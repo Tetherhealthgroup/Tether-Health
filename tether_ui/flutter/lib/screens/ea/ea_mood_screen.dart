@@ -27,7 +27,7 @@ class EaMoodScreen extends StatelessWidget {
         TCard(variant: TCardVariant.dark, eyebrow: 'Try now · 2 min', title: 'Grounding: 5 things you can see', cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: 'Start', onPressed: () => TNav.push(context, Routes.rescueActive), variant: TButtonVariant.lime, small: true)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/ea/moods', then: () => TNav.branch(context, 'Self-harm option selected?', <String, VoidCallback>{'No': () => TNav.toast(context, 'Saved', then: () => TNav.back(context)), 'Yes': () => TNav.replace(context, Routes.crisis)}, decide: 'ea.selfharm')), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/ea/moods', screenId: 'ea_mood', then: () => TNav.branch(context, 'Self-harm option selected?', <String, VoidCallback>{'No': () => TNav.toast(context, 'Saved', then: () => TNav.back(context)), 'Yes': () => TNav.replace(context, Routes.crisis)}, decide: 'ea.selfharm'), safety: TSafetyRoutes('ea.selfharm', <String, VoidCallback>{'Yes': () => TNav.replace(context, Routes.crisis)})), arrow: true),
       ],
     );
   }

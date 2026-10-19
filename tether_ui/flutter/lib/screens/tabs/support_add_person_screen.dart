@@ -28,7 +28,7 @@ class SupportAddPersonScreen extends StatelessWidget {
         TBody('Nothing is sent until you preview and tap Send.', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save supporter', onPressed: () => TNav.submit(context, 'POST /v1/care/supporters', then: () => TNav.toast(context, 'Jordan added', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save supporter', onPressed: () => TNav.submit(context, 'POST /v1/care/supporters', screenId: 'support_add_person', then: () => TNav.toast(context, 'Jordan added', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

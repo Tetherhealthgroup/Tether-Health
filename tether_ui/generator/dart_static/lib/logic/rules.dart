@@ -19,6 +19,30 @@ abstract final class TSession {
     changes.value++;
   }
 
+  /// Removes [keys] from the session. Call right after a submit for values
+  /// that must not stay in memory (see [scrubPasswords]).
+  static void scrub(Iterable<String> keys) {
+    var removed = false;
+    for (final key in keys.toList()) {
+      if (values.containsKey(key)) {
+        values.remove(key);
+        removed = true;
+      }
+    }
+    if (removed) changes.value++;
+  }
+
+  /// Password keys: `*.password` and every `auth_newpass.*` key.
+  static bool isPasswordKey(String key) => key.endsWith('.password') || key.startsWith('auth_newpass.');
+
+  /// Removes every password key. The app's API adapter calls this right
+  /// after it has submitted them.
+  static void scrubPasswords() => scrub(values.keys.where(isPasswordKey));
+
+  /// Empties the whole session (and the simulation hooks). The app calls this
+  /// on sign-out, account switch and account deletion, so no other account's
+  /// data or password stays in memory. It does not reset `TData`: an
+  /// app-owned TData that caches values must drop them at the same points.
   static void clear() {
     values.clear();
     TSim.reset();

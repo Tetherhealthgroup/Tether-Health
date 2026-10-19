@@ -33,7 +33,7 @@ class ProgramSettingsSfScreen extends StatelessWidget {
         TListGroup(title: 'Data', rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: 'Export ScrollFree data', sub: 'PDF + JSON', onTap: () => TNav.toast(context, 'Export is being prepared. We’ll notify you.')), TListRow(key: const ValueKey('a:body[4].rows[1]'), label: 'Leave ScrollFree', sub: 'Keep your data or delete it now', danger: true, onTap: () => TNav.sheet(context, Routes.accountLeave))]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save changes', onPressed: () => TNav.submit(context, 'PATCH /v1/enrolments/:id', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save changes', onPressed: () => TNav.submit(context, 'PATCH /v1/enrolments/:id', screenId: 'program_settings_sf', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

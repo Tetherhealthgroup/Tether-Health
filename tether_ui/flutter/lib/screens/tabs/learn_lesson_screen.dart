@@ -31,7 +31,7 @@ class LearnLessonScreen extends StatelessWidget {
         TBody('Clinically reviewed · content v3.2 · Aug 2026', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Mark complete', onPressed: () => TNav.submit(context, 'POST /v1/records/lessons', then: () => TNav.toast(context, 'Lesson complete', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Mark complete', onPressed: () => TNav.submit(context, 'POST /v1/records/lessons', screenId: 'learn_lesson', then: () => TNav.toast(context, 'Lesson complete', then: () => TNav.back(context))), arrow: true),
         TLink(key: const ValueKey('a:footer[1]'), label: 'Save for offline', onTap: () => TNav.toast(context, 'Saved for offline')),
       ],
     );

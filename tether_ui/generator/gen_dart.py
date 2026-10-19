@@ -1,5 +1,6 @@
 import os, shutil, json
 from dsl import *
+from rules import RULES
 
 def dstr(s):
     if s is None: return 'null'
@@ -33,8 +34,9 @@ def act(a):
         return f"TNav.toast(context, {dstr(a['value'])}{then})"
     if t == 'submit':
         then = f", then: () => {act(a['then'])}" if a.get('then') else ''
-        return f"TNav.submit(context, {dstr(a['api'])}{then})"
+        return f"TNav.submit(context, {dstr(a['api'])}, screenId: {dstr(CUR['sid'])}{then}{safety_routes(a.get('then'))})"
     if t == 'branch':
+        safety_cases(a)  # raises if a safety outcome has no case
         cases = ', '.join(f"{dstr(c['label'])}: () => {act(c['action'])}" for c in a['cases'])
         extra = ''
         if a.get('decide'): extra += f", decide: {dstr(a['decide'])}"
@@ -43,6 +45,38 @@ def act(a):
     raise ValueError(t)
 
 def cb(a): return f'() => {act(a)}' if a else 'null'
+
+def safety_labels(rule_id):
+    """Outcome labels that rules.py marks as safety for `rule_id` (none if unmarked)."""
+    rule = RULES.get(rule_id) or {}
+    ids = rule.get('safety', [])
+    unknown = [i for i in ids if i not in rule.get('outcomes', {})]
+    if unknown: raise ValueError(f'{rule_id}: safety ids {unknown} are not outcomes')
+    return [rule['outcomes'][i] for i in ids]
+
+def safety_cases(a):
+    """The cases of branch `a` for its rule's safety outcomes, in safety order.
+    Raises when the rule marks a safety outcome that has no case with exactly
+    that label: a safety outcome must never be dropped silently."""
+    if not a.get('decide') or a['decide'].startswith('choice:'): return []
+    by_label = {c['label']: c for c in a['cases']}
+    labels = safety_labels(a['decide'])
+    missing = [l for l in labels if l not in by_label]
+    if missing:
+        raise ValueError(f"{CUR['sid']}: branch {a['question']!r} is decided by {a['decide']}, whose safety outcomes {missing} have no case with that exact label")
+    return [by_label[l] for l in labels]
+
+def safety_routes(then):
+    """`, safety: TSafetyRoutes(...)` for a submit whose `then` (through toasts)
+    is a branch decided by an on-device rule with safety outcomes; '' when the
+    branch's rule has no safety outcome (or `then` has no rule-decided branch)."""
+    a = then
+    while a and a['type'] == 'toast': a = a.get('then')
+    if not a or a['type'] != 'branch': return ''
+    cases = safety_cases(a)
+    if not cases: return ''
+    routes = ', '.join(f"{dstr(c['label'])}: () => {act(c['action'])}" for c in cases)
+    return f", safety: TSafetyRoutes({dstr(a['decide'])}, <String, VoidCallback>{{{routes}}})"
 
 def args(**kw):
     parts = []
@@ -205,7 +239,7 @@ def generate(out_dir, describe, static_dir):
     if os.path.exists(out_dir): shutil.rmtree(out_dir)
     shutil.copytree(static_dir, out_dir)
     # barrel
-    open(os.path.join(lib, 'ui', 'ui.dart'), 'w').write("export '../logic/rules.dart';\nexport 'components.dart';\nexport 'nav.dart';\nexport 'tokens.dart';\n")
+    open(os.path.join(lib, 'ui', 'ui.dart'), 'w').write("export '../logic/rules.dart';\nexport 'components.dart';\nexport 'data.dart';\nexport 'nav.dart';\nexport 'tokens.dart';\n")
     # routes
     lines = ['// GENERATED — route names for every screen and state in spec/screens.json.', 'abstract final class Routes {']
     for sid, s in SCREENS.items():
@@ -331,3 +365,35 @@ void main() {{
 }}
 """
     open(os.path.join(out_dir, 'test', 'journeys_test.dart'), 'w').write(code)
+
+
+def _self_test():
+    """python3 gen_dart.py: the safety checks raise on a missing safety case."""
+    rule = {'outcomes': {'ok': 'Fine', 'bad': 'Danger'}, 'safety': ['bad']}
+    RULES['selftest.rule'] = rule
+    CUR['sid'] = 'selftest'
+    try:
+        good = {'type': 'branch', 'question': 'Q', 'decide': 'selftest.rule', 'cases': [{'label': 'Fine', 'action': {'type': 'back'}}, {'label': 'Danger', 'action': {'type': 'close'}}]}
+        assert 'TSafetyRoutes' in safety_routes(good)
+        bad = dict(good, cases=[{'label': 'Fine', 'action': {'type': 'back'}}, {'label': 'Danger zone', 'action': {'type': 'close'}}])
+        for f in (safety_routes, act):
+            try:
+                f(bad)
+            except ValueError as e:
+                assert 'Danger' in str(e)
+            else:
+                raise AssertionError(f'{f.__name__} did not raise for a missing safety case')
+        rule['safety'] = ['nope']
+        try:
+            safety_routes(good)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError('an unknown safety id did not raise')
+    finally:
+        del RULES['selftest.rule']
+    print('gen_dart self-test: ok')
+
+
+if __name__ == '__main__':
+    _self_test()

@@ -29,7 +29,7 @@ class SfBuddyScreen extends StatelessWidget {
         TCard(variant: TCardVariant.mint, eyebrow: 'Preview', children: [TQuote('Phone-free nights this week: 5. Thanks for cheering me on!')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save and finish', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sf/plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.sfHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save and finish', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sf/plan', screenId: 'sf_buddy', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.sfHome))), arrow: true),
         TLink(key: const ValueKey('a:footer[1]'), label: 'Skip for now', onTap: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.sfHome))),
       ],
     );

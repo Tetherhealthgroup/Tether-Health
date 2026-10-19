@@ -29,7 +29,7 @@ class EaPlanScreen extends StatelessWidget {
         TKeyValue(rows: [('Crisis line', '988 · call or text'), ('Emergency', '911')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save plan', onPressed: () => TNav.submit(context, 'PUT device:encrypted/ea/safety-plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.eaHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save plan', onPressed: () => TNav.submit(context, 'PUT device:encrypted/ea/safety-plan', screenId: 'ea_plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.eaHome))), arrow: true),
       ],
     );
   }

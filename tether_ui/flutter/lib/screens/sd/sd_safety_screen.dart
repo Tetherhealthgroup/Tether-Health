@@ -25,7 +25,7 @@ class SdSafetyScreen extends StatelessWidget {
         TBody('2 of 5 done', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sd/safety', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sd/safety', screenId: 'sd_safety', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

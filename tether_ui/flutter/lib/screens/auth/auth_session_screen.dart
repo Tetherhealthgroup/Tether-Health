@@ -24,7 +24,7 @@ class AuthSessionScreen extends StatelessWidget {
         TField(fieldKey: 'auth_session.password', label: 'Password', placeholder: 'Password', kind: TFieldKind.password),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Sign in', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/token', then: () => TNav.close(context)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Sign in', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/token', screenId: 'auth_session', then: () => TNav.close(context)), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Use Face ID', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );

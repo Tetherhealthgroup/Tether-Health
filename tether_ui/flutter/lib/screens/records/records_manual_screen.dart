@@ -29,7 +29,7 @@ class RecordsManualScreen extends StatelessWidget {
         TBody('Checked against plausible ranges and your connected records. Manual values are labelled “Entered by you”.', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/records/manual', then: () => TNav.branch(context, 'Validation', <String, VoidCallback>{'Valid': () => TNav.toast(context, 'Saved · shared with Steady', then: () => TNav.popTo(context, Routes.recordsHub)), 'Outside expected range': () => TNav.replace(context, Routes.recordsManualError), 'Matches an imported value': () => TNav.toast(context, 'Already in your records from Epic. Not added twice.', then: () => TNav.back(context))}, decide: 'rec.manual')), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/records/manual', screenId: 'records_manual', then: () => TNav.branch(context, 'Validation', <String, VoidCallback>{'Valid': () => TNav.toast(context, 'Saved · shared with Steady', then: () => TNav.popTo(context, Routes.recordsHub)), 'Outside expected range': () => TNav.replace(context, Routes.recordsManualError), 'Matches an imported value': () => TNav.toast(context, 'Already in your records from Epic. Not added twice.', then: () => TNav.back(context))}, decide: 'rec.manual')), arrow: true),
       ],
     );
   }

@@ -26,7 +26,7 @@ class AuthMergeScreen extends StatelessWidget {
         TRadioList(fieldKey: 'auth_merge.value', items: [TRadioItem('Keep both, choose later', sub: 'Nothing is overwritten', badge: 'Safest'), TRadioItem('Use this phone’s plan'), TRadioItem('Use the account’s plan')], selected: 0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.submit(context, 'POST /v1/quit-plan/guest-import', then: () => TNav.reset(context, Routes.today)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.submit(context, 'POST /v1/quit-plan/guest-import', screenId: 'auth_merge', then: () => TNav.reset(context, Routes.today)), arrow: true),
       ],
     );
   }

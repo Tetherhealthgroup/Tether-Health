@@ -27,7 +27,7 @@ class HwLipidsScreen extends StatelessWidget {
         TField(fieldKey: 'hw_lipids.lab_date', label: 'Lab date', placeholder: 'Sep 30, 2026', kind: TFieldKind.date),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save panel', onPressed: () => TNav.submit(context, 'POST /v1/program-data/hw/lipids', then: () => TNav.toast(context, 'Panel saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save panel', onPressed: () => TNav.submit(context, 'POST /v1/program-data/hw/lipids', screenId: 'hw_lipids', then: () => TNav.toast(context, 'Panel saved', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

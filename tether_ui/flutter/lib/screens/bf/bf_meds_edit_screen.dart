@@ -28,7 +28,7 @@ class BfMedsEditScreen extends StatelessWidget {
         TBody('You’re recording, not changing, your plan. Ask your clinician about any change.', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/bf/meds', then: () => TNav.toast(context, 'Plan saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/bf/meds', screenId: 'bf_meds_edit', then: () => TNav.toast(context, 'Plan saved', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }
