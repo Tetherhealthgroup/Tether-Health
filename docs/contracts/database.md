@@ -6,8 +6,9 @@ Migration sources of truth include `supabase/migrations/202609110001_profiles.sq
 `supabase/migrations/202610180001_sync_tables.sql`,
 `supabase/migrations/202610180002_service_session_guard.sql`,
 `supabase/migrations/202610180003_enrolment_consent_followups.sql`,
-`supabase/migrations/202610180004_consent_documents_hardening.sql` and
-`supabase/migrations/202610180005_consent_truncate_guards.sql`.
+`supabase/migrations/202610180004_consent_documents_hardening.sql`,
+`supabase/migrations/202610180005_consent_truncate_guards.sql` and
+`supabase/migrations/202610180006_service_role_least_privilege.sql`.
 
 Every migration file is named `YYYYMMDDNNNN_name.sql`: a 12-digit version (date
 plus a four-digit sequence), then lowercase letters, digits and underscores.
@@ -286,11 +287,12 @@ that says it is a draft. They are not consent wording.
 
 ### Consent release gate
 
-A release must not ship while the query below returns any row. Run it as a
-role that bypasses row-level security, such as `postgres` or `service_role`;
-under any other role it returns a `role_without_rls_bypass` row, and with no
-documents visible it returns `no_documents`, so it cannot pass by seeing
-nothing. The other rows name the failing document or consent:
+A release must not ship while the query below returns any row. Run it as
+`postgres`. Under a role that does not bypass row-level security it returns a
+`role_without_rls_bypass` row, and with no documents visible it returns
+`no_documents`, so it cannot pass by seeing nothing; `service_role` cannot read
+the consent tables, so under it the query fails (`42501`). The other rows name
+the failing document or consent:
 
 - `unapproved`: a document that is not retired (grantable now or in future)
   has no `approved_ref`;
@@ -368,6 +370,27 @@ where c.revoked_at is null and c.locale is null
 
 `supabase/tests/verify_enrolment_consent_followups.sh` runs this exact block
 (taken from this file) against each failing condition.
+
+## service_role
+
+Migration source of truth:
+`supabase/migrations/202610180006_service_role_least_privilege.sql`.
+The API holds the service key only for Auth admin (deleting an account's
+identity) and Storage (removing avatar objects); its table and function calls
+in `public` run as `authenticated` with the member's token. In schema `public`
+`service_role` holds `select` on `consent_documents` and nothing else: no other
+table or column privilege, no `execute` on any function, and `usage` but not
+`create` on the schema. Default privileges for tables, functions and sequences
+that `postgres` creates in `public` grant it nothing. On `storage.objects` and
+`storage.buckets` it keeps `select`, `insert`, `update` and `delete` and holds
+no `trigger`, `truncate` or `references`. `auth` is not changed by app
+migrations. Account deletion removes rows in `public` through
+`delete_my_app_data` and foreign-key cascades, which run as the table owner.
+`supabase/tests/verify_service_role_privileges.sh` has two parts. Its static
+check catches literal grants to `service_role` in migrations, other than
+`select` on `consent_documents`. Its SQL test, run against a migrated local
+database, is the control: it checks the privileges `service_role` actually
+holds, including those it gets through `PUBLIC` and through ownership.
 
 ## Sync tables
 
