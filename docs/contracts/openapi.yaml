@@ -6,9 +6,10 @@ info:
     Development contract for authenticated profiles and bounded program data.
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
-    Changed in 1.6.0: a consent grant refused because account deletion has
-    started answers `account_deletion_in_progress` (was
-    `consent_not_permitted`) on every grant path; a core re-consent that
+    Changed in 1.6.0: once account deletion has started, a consent grant
+    that reaches the database (it passed the API's own earlier checks) is
+    refused with `account_deletion_in_progress` (a first grant or optional
+    consent used to get `consent_not_permitted`); a core re-consent that
     loses two races to a different live consent answers the new code
     `consent_conflict_retry`. Changed in 1.5.0 (breaking for the list response): `GET /v1/enrolments`
     returns `currentCoreConsentVersions` (one version per locale) instead of
@@ -443,8 +444,11 @@ paths:
         was written): read the enrolment again and decide whether to ask
         for re-consent.
 
-        Once account deletion has started, every grant is refused with
-        `account_deletion_in_progress`.
+        Once account deletion has started, a grant that would otherwise be
+        recorded (one that reaches the database) is refused with
+        `account_deletion_in_progress`. The API's earlier checks still answer
+        first: `sharing_not_available`, `enrolment_left`,
+        `consent_already_granted` and `core_consent_required`.
 
         The share purposes (share_care_team, share_caregiver) are refused
         with `sharing_not_available` (409) until care connections exist.

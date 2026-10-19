@@ -9,6 +9,7 @@ import { Test } from "@nestjs/testing";
 import { AppModule } from "../src/app.module";
 import { TokenVerifier } from "../src/auth/token-verifier";
 import { configureApp } from "../src/configure-app";
+import { enrolmentErrorCodes } from "../src/enrolments/enrolment-errors";
 import { UserSupabaseClientFactory } from "../src/enrolments/user-supabase-client";
 import {
   DATABASE_ERRORS,
@@ -22,7 +23,11 @@ import {
   registryError,
   type PgError,
 } from "./support/fake-postgrest";
-import { openApiErrors, openApiSchemaNames } from "./support/openapi";
+import {
+  openApiErrors,
+  openApiSchema,
+  openApiSchemaNames,
+} from "./support/openapi";
 
 /**
  * Enrolments and consents, end to end through the real Nest app, the real
@@ -128,10 +133,13 @@ describe("Enrolments and consents API (e2e)", () => {
   });
 
   // A failure injected but never consumed would break an unrelated later
-  // test: clear it first, then fail the test that left it.
+  // test: clear it first, then fail the test that left it. Retired consent
+  // documents are restored too, even when a test timed out before its own
+  // finally block ran.
   afterEach(() => {
     const pending = fake.pendingFailures;
     fake.clearFailures();
+    fake.resetConsentDocuments();
     expect(pending).toBe(0);
   });
 
@@ -1869,6 +1877,15 @@ describe("Enrolments and consents API (e2e)", () => {
       for (const name of openApiSchemaNames) {
         expect(() => openApiErrors(name, null)).not.toThrow();
       }
+    });
+
+    // Every code the API can send is in the contract, in the same order,
+    // including codes no test here provokes.
+    it("the CodedRequestRejected code enum is enrolmentErrorCodes", () => {
+      const schema = openApiSchema("CodedRequestRejected") as {
+        properties: { code: { enum: unknown } };
+      };
+      expect(schema.properties.code.enum).toEqual([...enrolmentErrorCodes]);
     });
 
     it("create, list, update, grant, supersede, swap and revoke", async () => {

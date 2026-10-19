@@ -74,6 +74,15 @@ ajv.addSchema({ $defs: asDefs(document.components.schemas) }, "openapi");
 /** The names of every schema in components.schemas. */
 export const openApiSchemaNames = Object.keys(document.components.schemas);
 
+/** components.schemas[`name`] as written in openapi.yaml (read-only). */
+export function openApiSchema(name: string): Readonly<Record<string, unknown>> {
+  const schema = document.components.schemas[name];
+  if (schema === undefined) {
+    throw new Error(`openapi.yaml has no schema ${name}`);
+  }
+  return structuredClone(schema) as Record<string, unknown>;
+}
+
 /**
  * Validation errors of `body` against components.schemas[`name`]; an empty
  * list means it matches.
