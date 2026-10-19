@@ -9,7 +9,7 @@ import { databaseError, type DatabaseErrorHint } from "./database-errors";
  *
  * What it emulates, per request (one request = one transaction):
  * - identity from the request's own bearer token only (like auth.uid());
- * - the RLS policies of programmes, enrolments and programme_consents
+ * - the RLS policies of profiles (read own row), programmes, enrolments and programme_consents
  *   (select/insert/update/delete), including the insert checks
  *   (deletion barrier, enrolment not left, live core consent);
  * - the column grants (insert/update column lists; no delete on consents;
@@ -275,7 +275,17 @@ export class FakePostgrest {
   /** Registers a synthetic user whose JWT is `token`, with a profile row. */
   addUser(token: string, userId: string): void {
     this.tokens.set(token, userId);
-    this.state.profiles.push({ id: userId, account_deletion_started_at: null });
+    this.state.profiles.push({
+      id: userId,
+      locale: "en",
+      account_deletion_started_at: null,
+    });
+  }
+
+  /** Superuser write of a profile's locale (profiles.locale, en or es). */
+  setProfileLocale(userId: string, locale: "en" | "es"): void {
+    const profile = this.state.profiles.find((row) => row.id === userId);
+    if (profile) profile.locale = locale;
   }
 
   startAccountDeletion(userId: string): void {
@@ -461,7 +471,11 @@ export class FakePostgrest {
     if (path.startsWith("rpc/")) {
       return this.rpc(uid, method, path.slice(4), url, body);
     }
-    if (!["programmes", "enrolments", "programme_consents"].includes(path)) {
+    if (
+      !["profiles", "programmes", "enrolments", "programme_consents"].includes(
+        path,
+      )
+    ) {
       return fail(404, "PGRST205", "Table not found");
     }
     const table = path as keyof State;
@@ -672,6 +686,10 @@ export class FakePostgrest {
 
   private visible(uid: string, table: keyof State): Row[] {
     if (table === "programmes") return this.state.programmes;
+    // Own row only; the API reads it, never writes it (no grants here).
+    if (table === "profiles") {
+      return this.state.profiles.filter((row) => row.id === uid);
+    }
     if (table === "enrolments") {
       return this.state.enrolments.filter((row) => row.user_id === uid);
     }

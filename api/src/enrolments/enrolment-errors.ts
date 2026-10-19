@@ -22,7 +22,6 @@ export const enrolmentErrorCodes = [
   "enrolment_conflict",
   "enrolment_left",
   "account_deletion_in_progress",
-  "deletion_in_progress",
   "core_consent_required",
   "consent_already_granted",
   "consent_not_found",
@@ -68,7 +67,7 @@ const registryResponses: Readonly<Record<string, () => CodedHttpException>> = {
     conflict("core_consent_required"),
   [DatabaseErrorCode.enrolmentLeft]: () => conflict("enrolment_left"),
   [DatabaseErrorCode.deletionInProgress]: () =>
-    conflict("deletion_in_progress"),
+    conflict("account_deletion_in_progress"),
   [DatabaseErrorCode.consentDocumentUnavailable]: () =>
     conflict("consent_document_unavailable"),
   [DatabaseErrorCode.enrolmentNotFound]: () => notFound("enrolment_not_found"),

@@ -6,6 +6,10 @@ info:
     Development contract for authenticated profiles and bounded program data.
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
+    Changed in 1.5.0 (breaking for the list response): `GET /v1/enrolments`
+    returns `currentCoreConsentVersions` (one version per locale) instead of
+    the single `currentCoreConsentVersion` string, which moved onto each
+    enrolment. The API is pre-release and nothing consumed the old field.
 servers:
   - url: https://api.example.invalid
 paths:
@@ -405,7 +409,10 @@ paths:
         A second grant of the same purpose and recipient while one is live
         is refused with `consent_already_granted` (409) and the existing row
         is unchanged; for core this applies when the live core consent is
-        for the same version and locale.
+        for the same version and locale. Clients can treat it as already
+        done. Two first grants of core racing each other (no core live
+        before either) also answer the loser with `consent_already_granted`,
+        whichever version it asked for; the winner's row is the live one.
 
         Core re-consent: a core grant on an enrolment whose live core
         consent is for another version or locale supersedes it in one
@@ -414,10 +421,15 @@ paths:
         history. Optional consents stay live (unless the database's
         documents mark the versions passed over as revoking them). The new
         version must be later than the live one, or the same version in
-        another locale; otherwise `consent_version_unchanged` (409). If an
-        identical re-consent is already complete when this request runs
-        (for example a double tap), the request is answered as a success
-        with the live row and its `supersededId`.
+        another locale; otherwise `consent_version_unchanged` (409).
+
+        Repeating a core re-consent (for example a double tap) has two
+        possible answers, both meaning the consent is in place: if the
+        first request finished before the repeat was received, the repeat
+        is a grant of the live version and locale and gets
+        `consent_already_granted` (409); if the repeat raced the first and
+        lost, it is answered as the first's success (201) with the live row
+        and its `supersededId`.
 
         The share purposes (share_care_team, share_caregiver) are refused
         with `sharing_not_available` (409) until care connections exist.
@@ -453,8 +465,8 @@ paths:
             after account deletion started), `consent_document_unavailable`
             (no grantable document for that purpose, version and locale), and
             for core re-consent `consent_version_unchanged` (not later than
-            the live version) or `deletion_in_progress` (account deletion has
-            started)
+            the live version) or `account_deletion_in_progress` (account
+            deletion has started)
           content:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
@@ -710,7 +722,6 @@ components:
             - enrolment_conflict
             - enrolment_left
             - account_deletion_in_progress
-            - deletion_in_progress
             - core_consent_required
             - consent_already_granted
             - consent_not_found
@@ -859,16 +870,19 @@ components:
           type: [string, 'null']
           description: >-
             The current core consent document version for the locale of the
-            live core consent. Null when there is no live core consent, when
-            that consent was stored before consent documents existed (no
-            locale), or when no core document is current for its locale.
+            live core consent; for a live core consent stored before consent
+            documents existed (no locale), for the member's profile locale.
+            Null when there is no live core consent, or when no core document
+            is current for that locale.
         reconsentRequired:
           type: boolean
           description: >-
-            True when the enrolment is not left, has a live core consent, and
-            that consent's version differs from `currentCoreConsentVersion`.
-            Always true for a live core consent stored before consent
-            documents existed (no locale).
+            True only when re-consent can be completed: the enrolment is not
+            left, has a live core consent, `currentCoreConsentVersion` is not
+            null, and the live consent is not on it. A live core consent
+            stored before consent documents existed (no locale) is never on a
+            document, so it is true whenever a core document is current for
+            the member's profile locale.
     CoreConsentVersions:
       type: object
       additionalProperties: false

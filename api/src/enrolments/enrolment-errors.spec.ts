@@ -59,7 +59,7 @@ describe("registryErrorFor", () => {
     ["TH001", 409, "focus_cap_reached"],
     ["TH004", 409, "core_consent_required"],
     ["TH005", 409, "enrolment_left"],
-    ["TH006", 409, "deletion_in_progress"],
+    ["TH006", 409, "account_deletion_in_progress"],
     ["TH011", 409, "consent_document_unavailable"],
     ["TH012", 404, "enrolment_not_found"],
     ["TH013", 409, "focus_swap_invalid"],

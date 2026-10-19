@@ -624,7 +624,7 @@ describe("EnrolmentsService", () => {
     it.each([
       ["TH001", HttpStatus.CONFLICT, "focus_cap_reached"],
       ["TH005", HttpStatus.CONFLICT, "enrolment_left"],
-      ["TH006", HttpStatus.CONFLICT, "deletion_in_progress"],
+      ["TH006", HttpStatus.CONFLICT, "account_deletion_in_progress"],
       ["TH011", HttpStatus.CONFLICT, "consent_document_unavailable"],
       ["TH012", HttpStatus.NOT_FOUND, "enrolment_not_found"],
       ["TH013", HttpStatus.CONFLICT, "focus_swap_invalid"],
@@ -766,7 +766,7 @@ describe("EnrolmentsService", () => {
       ["TH001", HttpStatus.CONFLICT, "focus_cap_reached"],
       ["TH004", HttpStatus.CONFLICT, "core_consent_required"],
       ["TH005", HttpStatus.CONFLICT, "enrolment_left"],
-      ["TH006", HttpStatus.CONFLICT, "deletion_in_progress"],
+      ["TH006", HttpStatus.CONFLICT, "account_deletion_in_progress"],
       ["TH011", HttpStatus.CONFLICT, "consent_document_unavailable"],
       ["TH012", HttpStatus.NOT_FOUND, "enrolment_not_found"],
       ["TH013", HttpStatus.CONFLICT, "focus_swap_invalid"],
@@ -827,11 +827,13 @@ describe("EnrolmentsService", () => {
       status: string,
       consents: Record<string, unknown>[],
       docs: Result = currentDocs("v2", "v3"),
+      profile?: Result,
     ) => {
       const { service, calls } = setup(
         docs,
         { data: [enrolmentRow(status)], error: null, count: 1 },
         { data: consents, error: null, count: consents.length },
+        ...(profile ? [profile] : []),
       );
       const result = await service.list(user);
       return { result, calls, enrolment: result.enrolments[0] };
@@ -873,13 +875,6 @@ describe("EnrolmentsService", () => {
         true,
       ],
       [
-        "a stored row without locale",
-        "focus",
-        { consent_version: "v2", locale: null },
-        null,
-        true,
-      ],
-      [
         "an older version, left",
         "left",
         { consent_version: "v1" },
@@ -889,15 +884,81 @@ describe("EnrolmentsService", () => {
     ])(
       "a live core on %s",
       async (_label, status, live, current, reconsent) => {
-        const { enrolment } = await listWith(status, [consentRow(live)]);
+        const { enrolment, calls } = await listWith(status, [consentRow(live)]);
         expect(enrolment).toMatchObject({
           currentCoreConsentVersion: current,
           reconsentRequired: reconsent,
         });
+        // The profile is read only for a consent stored without locale.
+        expect(calls).not.toContainEqual(["from", "profiles"]);
       },
     );
 
-    it("needs re-consent when no core document is current for the locale", async () => {
+    describe("a live core stored before documents existed (no locale)", () => {
+      const legacy = [consentRow({ consent_version: "v2", locale: null })];
+
+      it.each([
+        ["en", "v2"],
+        ["es", "v3"],
+      ])(
+        "uses the profile locale %s and needs re-consent to %s",
+        async (locale, current) => {
+          const { enrolment, calls } = await listWith(
+            "focus",
+            legacy,
+            undefined,
+            { data: { locale }, error: null },
+          );
+          expect(enrolment).toMatchObject({
+            currentCoreConsentVersion: current,
+            reconsentRequired: true,
+          });
+          expect(calls).toContainEqual(["from", "profiles"]);
+          expect(calls).toContainEqual(["eq", '"id"', JSON.stringify(user.id)]);
+        },
+      );
+
+      it("no re-consent when the profile locale has no current core document", async () => {
+        const { enrolment } = await listWith(
+          "focus",
+          legacy,
+          {
+            data: [{ purpose: "core", version: "v2", locale: "en" }],
+            error: null,
+          },
+          { data: { locale: "es" }, error: null },
+        );
+        expect(enrolment).toMatchObject({
+          currentCoreConsentVersion: null,
+          reconsentRequired: false,
+        });
+      });
+
+      it("no re-consent without a profile (no locale to offer it in)", async () => {
+        const { enrolment } = await listWith("focus", legacy, undefined, {
+          data: null,
+          error: null,
+        });
+        expect(enrolment).toMatchObject({
+          currentCoreConsentVersion: null,
+          reconsentRequired: false,
+        });
+      });
+
+      it("fails closed when the profile cannot be read", async () => {
+        const { service } = setup(
+          currentDocs(),
+          { data: [enrolmentRow()], error: null, count: 1 },
+          { data: legacy, error: null, count: 1 },
+          { data: null, error: { code: "XX000", message: "synthetic" } },
+        );
+        expect(await codeOf(service.list(user))).toBeInstanceOf(
+          BadGatewayException,
+        );
+      });
+    });
+
+    it("no re-consent when no core document is current for the locale", async () => {
       const { enrolment, result } = await listWith(
         "focus",
         [consentRow({ consent_version: "v1", locale: "es" })],
@@ -909,7 +970,7 @@ describe("EnrolmentsService", () => {
       expect(result.currentCoreConsentVersions).toEqual({ en: "v2", es: null });
       expect(enrolment).toMatchObject({
         currentCoreConsentVersion: null,
-        reconsentRequired: true,
+        reconsentRequired: false,
       });
     });
 

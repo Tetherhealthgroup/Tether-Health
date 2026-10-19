@@ -954,8 +954,24 @@ describe("Enrolments and consents API (e2e)", () => {
       expect(byId.get(current)).toEqual([CURRENT_CORE, false]);
       expect(byId.get(currentEs)).toEqual([CURRENT_CORE, false]);
       expect(byId.get(none)).toEqual([null, false]);
-      // Stored before consent documents existed: no locale, always re-consent.
-      expect(byId.get(legacy)).toEqual([null, true]);
+      // Stored before consent documents existed (no locale): re-consent is
+      // offered in the member's profile locale, which has a current document.
+      expect(byId.get(legacy)).toEqual([CURRENT_CORE, true]);
+      fake.setProfileLocale(a.id, "es");
+      const since = fake.requests.length;
+      const relisted = await call(a, "GET", "/v1/enrolments");
+      expect(
+        relisted
+          .json<{
+            enrolments: { id: string; currentCoreConsentVersion: unknown }[];
+          }>()
+          .enrolments.find((e) => e.id === legacy)?.currentCoreConsentVersion,
+      ).toBe(CURRENT_CORE);
+      expect(
+        fake.requests
+          .slice(since)
+          .some((r) => r.method === "GET" && r.path.endsWith("/profiles")),
+      ).toBe(true);
       expect(byId.get(left)).toEqual([CURRENT_CORE, false]);
     });
   });
@@ -1064,7 +1080,7 @@ describe("Enrolments and consents API (e2e)", () => {
       expectCoded(
         await reconsent(a, id, CURRENT_CORE),
         409,
-        "deletion_in_progress",
+        "account_deletion_in_progress",
       );
       expect(rows(id).find((r) => r.id === core)?.revoked_at).toBeNull();
     });
@@ -1424,7 +1440,7 @@ describe("Enrolments and consents API (e2e)", () => {
       ["TH001", 409, "focus_cap_reached"],
       ["TH004", 409, "core_consent_required"],
       ["TH005", 409, "enrolment_left"],
-      ["TH006", 409, "deletion_in_progress"],
+      ["TH006", 409, "account_deletion_in_progress"],
       ["TH011", 409, "consent_document_unavailable"],
       ["TH012", 404, "enrolment_not_found"],
       ["TH013", 409, "focus_swap_invalid"],

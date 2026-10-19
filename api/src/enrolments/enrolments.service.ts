@@ -84,6 +84,16 @@ const CONSENT_COLUMNS =
 /** For an enrolment answered without consents (no version is needed). */
 const NO_CURRENT_VERSIONS: CoreConsentVersions = { en: null, es: null };
 
+/** What deciding the current core version of an enrolment needs. */
+interface VersionContext {
+  versions: CoreConsentVersions;
+  /**
+   * The member's profile locale, read only when a live core consent has no
+   * locale (stored before consent documents existed); otherwise null.
+   */
+  memberLocale: ConsentLocale | null;
+}
+
 // Database errors are told apart by SQLSTATE code only, never by message.
 const {
   uniqueViolation: UNIQUE_VIOLATION,
@@ -137,13 +147,14 @@ export class EnrolmentsService {
       client,
       data.map((row) => row.id),
     );
+    const context = await this.versionContext(client, user, versions, consents);
     return {
       currentCoreConsentVersions: versions,
       enrolments: data.map((row) =>
         this.toEnrolment(
           row,
           consents.filter((consent) => consent.enrolment_id === row.id),
-          versions,
+          context,
         ),
       ),
     };
@@ -180,7 +191,10 @@ export class EnrolmentsService {
       }
       throw new BadGatewayException("Enrolment could not be created");
     }
-    return this.toEnrolment(data, [], NO_CURRENT_VERSIONS);
+    return this.toEnrolment(data, [], {
+      versions: NO_CURRENT_VERSIONS,
+      memberLocale: null,
+    });
   }
 
   async update(
@@ -226,10 +240,11 @@ export class EnrolmentsService {
       throw new BadGatewayException("Enrolment could not be updated");
     }
     if (!data) throw notFound("enrolment_not_found");
+    const consents = await this.consentsFor(client, [data.id]);
     return this.toEnrolment(
       data,
-      await this.consentsFor(client, [data.id]),
-      versions,
+      consents,
+      await this.versionContext(client, user, versions, consents),
     );
   }
 
@@ -259,11 +274,12 @@ export class EnrolmentsService {
       throw new BadGatewayException("Focus could not be swapped");
     }
     const consents = await this.consentsFor(client, [demoted.id, promoted.id]);
+    const context = await this.versionContext(client, user, versions, consents);
     const of = (row: EnrolmentRow) =>
       this.toEnrolment(
         row,
         consents.filter((consent) => consent.enrolment_id === row.id),
-        versions,
+        context,
       );
     return { demoted: of(demoted), promoted: of(promoted) };
   }
@@ -621,15 +637,47 @@ export class EnrolmentsService {
     }
   }
 
+  /**
+   * The member's locale matters only for a live core consent stored before
+   * consent documents existed (no locale): re-consent is offered in the
+   * profile's locale. The profile is read only then.
+   */
+  private async versionContext(
+    client: UserSupabaseClient,
+    user: AuthUser,
+    versions: CoreConsentVersions,
+    consents: ConsentRow[],
+  ): Promise<VersionContext> {
+    const legacy = consents.some(
+      (consent) =>
+        consent.purpose === "core" &&
+        consent.revoked_at === null &&
+        consent.locale === null,
+    );
+    if (!legacy) return { versions, memberLocale: null };
+    const { data, error } = await client
+      .from("profiles")
+      .select("locale")
+      .eq("id", user.id)
+      .maybeSingle<{ locale: string }>();
+    if (error) throw new BadGatewayException("Profile data is unavailable");
+    const memberLocale =
+      consentLocales.find((known) => known === data?.locale) ?? null;
+    return { versions, memberLocale };
+  }
+
   private toEnrolment(
     row: EnrolmentRow,
     consents: ConsentRow[],
-    versions: CoreConsentVersions,
+    { versions, memberLocale }: VersionContext,
   ): EnrolmentResponse {
     const liveCore = consents.find(
       (consent) => consent.purpose === "core" && consent.revoked_at === null,
     );
-    const current = liveCore?.locale != null ? versions[liveCore.locale] : null;
+    // The locale re-consent would be in: the consent's own, or for a
+    // consent stored before documents existed, the member's profile locale.
+    const locale = liveCore ? (liveCore.locale ?? memberLocale) : null;
+    const current = locale !== null ? versions[locale] : null;
     return {
       id: row.id,
       programmeCode: row.programme_code,
@@ -641,11 +689,13 @@ export class EnrolmentsService {
       updatedAt: row.updated_at,
       consents: consents.map((consent) => this.toConsent(consent)),
       currentCoreConsentVersion: current,
-      // A consent stored before documents existed (no locale) always needs
-      // re-consent; so does one whose locale has no current core document.
+      // Only when the member can complete it: a current core document exists
+      // for that locale, and the consent is not on it (a consent stored
+      // before documents existed is never on a document).
       reconsentRequired:
         row.status !== "left" &&
         liveCore !== undefined &&
+        current !== null &&
         (liveCore.locale === null || liveCore.consent_version !== current),
     };
   }
