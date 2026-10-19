@@ -304,7 +304,8 @@ select th972_test.ok(
                     'public.consent_documents_guard()'::regprocedure,
                     'public.consent_documents_check_effective_from()'::regprocedure,
                     'public.programme_consents_check_supersede()'::regprocedure,
-                    'public.programme_consents_supersede_cascade()'::regprocedure)
+                    'public.programme_consents_supersede_cascade()'::regprocedure,
+                    'public.consent_truncate_guard()'::regprocedure)
       and (a.grantee = 0 or a.grantee in ('anon'::regrole, 'thsync'::regrole))),
   'changed functions: no execute for anon, thsync or PUBLIC');
 

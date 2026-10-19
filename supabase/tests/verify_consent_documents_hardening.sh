@@ -90,6 +90,7 @@ grant usage on schema th981_test to public;
 grant execute on all functions in schema th981_test to public;
 
 -- Catalogue -------------------------------------------------------------------
+-- The truncate guard is enabled always (A) by 202610180005_consent_truncate_guards.sql.
 select th981_test.ok(
   (select string_agg(t.tgname || ':' || t.tgtype || ':' || p.proname || ':'
             || coalesce(t.tgnewtable::text, '-') || ':' || t.tgenabled::text, ',' order by t.tgname)
@@ -97,10 +98,10 @@ select th981_test.ok(
    join pg_catalog.pg_proc as p on p.oid = t.tgfoid
    where t.tgrelid = 'public.consent_documents'::regclass and not t.tgisinternal) =
   'consent_documents_guard:31:consent_documents_guard:-:O,'
-  'consent_documents_guard_truncate:34:consent_documents_guard:-:O,'
+  'consent_documents_guard_truncate:34:consent_documents_guard:-:A,'
   'consent_documents_same_effective_from_insert:4:consent_documents_check_effective_from:written_documents:O,'
   'consent_documents_same_effective_from_update:16:consent_documents_check_effective_from:written_documents:O',
-  'consent_documents triggers: guard before insert, update and delete (row) and truncate; effective_from check after each insert and update statement');
+  'consent_documents triggers: guard before insert, update and delete (row) and truncate (in every session mode); effective_from check after each insert and update statement');
 -- Tripwire: the table privileges anyone but the owner holds on consent_documents.
 select th981_test.ok(
   (select string_agg(a.grantee::regrole::text || ':' || a.privilege_type, ','
