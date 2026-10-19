@@ -66,6 +66,25 @@ def safety_cases(a):
         raise ValueError(f"{CUR['sid']}: branch {a['question']!r} is decided by {a['decide']}, whose safety outcomes {missing} have no case with that exact label")
     return [by_label[l] for l in labels]
 
+SAFETY_ACTION_TYPES = ('replace', 'push')
+
+def check_safety_action(rule_id, case):
+    """Raises unless the safety outcome `case` of `rule_id` leaves the screen:
+    its action must be a replace or a push to a different screen (with any
+    onboarding target also different). Other actions (back, close, toast,
+    tab, reset, popto, ...) either stay on the screen or can dismiss a screen
+    the member opened."""
+    a = case['action']
+    sid = CUR['sid']
+    where = f"{sid}: safety outcome {case['label']!r} of {rule_id}"
+    if a['type'] not in SAFETY_ACTION_TYPES:
+        raise ValueError(f"{where} must leave the screen with {' or '.join(SAFETY_ACTION_TYPES)} to a different screen, not {a['type']!r}")
+    targets = [a['to']] + ([a['context']['onboarding']] if a.get('context') else [])
+    here = SCREENS[sid]['route'] if sid in SCREENS else None
+    for t in targets:
+        if t == sid or (here is not None and t in SCREENS and SCREENS[t]['route'] == here):
+            raise ValueError(f"{where} must leave the screen: its {a['type']} target {t!r} is the screen itself")
+
 def safety_routes(then):
     """`, safety: TSafetyRoutes(...)` for a submit whose `then` (through toasts)
     is a branch decided by an on-device rule with safety outcomes; '' when the
@@ -75,6 +94,7 @@ def safety_routes(then):
     if not a or a['type'] != 'branch': return ''
     cases = safety_cases(a)
     if not cases: return ''
+    for c in cases: check_safety_action(a['decide'], c)
     routes = ', '.join(f"{dstr(c['label'])}: () => {act(c['action'])}" for c in cases)
     return f", safety: TSafetyRoutes({dstr(a['decide'])}, <String, VoidCallback>{{{routes}}})"
 
@@ -368,13 +388,37 @@ void main() {{
 
 
 def _self_test():
-    """python3 gen_dart.py: the safety checks raise on a missing safety case."""
+    """python3 gen_dart.py: the safety checks raise on a missing safety case
+    and on a safety action that does not leave the screen."""
     rule = {'outcomes': {'ok': 'Fine', 'bad': 'Danger'}, 'safety': ['bad']}
     RULES['selftest.rule'] = rule
     CUR['sid'] = 'selftest'
     try:
-        good = {'type': 'branch', 'question': 'Q', 'decide': 'selftest.rule', 'cases': [{'label': 'Fine', 'action': {'type': 'back'}}, {'label': 'Danger', 'action': {'type': 'close'}}]}
+        def branch(danger):
+            return {'type': 'branch', 'question': 'Q', 'decide': 'selftest.rule', 'cases': [{'label': 'Fine', 'action': {'type': 'back'}}, {'label': 'Danger', 'action': danger}]}
+        good = branch({'type': 'replace', 'to': 'crisis'})
         assert 'TSafetyRoutes' in safety_routes(good)
+        assert 'TNav.push(context, Routes.crisis)' in safety_routes(branch({'type': 'push', 'to': 'crisis'}))
+        stays = [
+            ({'type': 'back'}, "not 'back'"),
+            ({'type': 'close'}, "not 'close'"),
+            ({'type': 'toast', 'value': 'Saved'}, "not 'toast'"),
+            ({'type': 'tab', 'to': 'crisis'}, "not 'tab'"),
+            ({'type': 'reset', 'to': 'crisis'}, "not 'reset'"),
+            ({'type': 'popto', 'to': 'crisis'}, "not 'popto'"),
+            ({'type': 'replace', 'to': 'selftest'}, "target 'selftest' is the screen itself"),
+            ({'type': 'push', 'to': 'selftest'}, "target 'selftest' is the screen itself"),
+            ({'type': 'replace', 'to': 'crisis', 'context': {'onboarding': 'selftest'}}, "target 'selftest' is the screen itself"),
+        ]
+        for danger, why in stays:
+            submit = {'type': 'submit', 'api': 'POST /x', 'then': {'type': 'toast', 'value': 'Saved', 'then': branch(danger)}}
+            for f, a in ((safety_routes, branch(danger)), (act, submit)):
+                try:
+                    f(a)
+                except ValueError as e:
+                    assert "safety outcome 'Danger' of selftest.rule must leave the screen" in str(e) and why in str(e), str(e)
+                else:
+                    raise AssertionError(f'{f.__name__} did not raise for the safety action {danger}')
         bad = dict(good, cases=[{'label': 'Fine', 'action': {'type': 'back'}}, {'label': 'Danger zone', 'action': {'type': 'close'}}])
         for f in (safety_routes, act):
             try:

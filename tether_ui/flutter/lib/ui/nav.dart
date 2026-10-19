@@ -205,7 +205,9 @@ class TSafetyRoutes {
   /// Rule id in [TRules.decide] (for example `hw.bp`).
   final String rule;
 
-  /// Safety outcome label → its action.
+  /// Safety outcome label → its action. In generated screens every action
+  /// opens a different screen with a replace or a push (the generator fails
+  /// otherwise), so a safety action always leaves the submitting screen.
   final Map<String, VoidCallback> routes;
 
   /// The action for the rule's current result, or null when the result is
@@ -309,7 +311,43 @@ abstract final class TNav {
 
   static Future<void> push(BuildContext context, String route) => Navigator.of(context).pushNamed(route);
 
-  static Future<void> replace(BuildContext context, String route) => Navigator.of(context).pushReplacementNamed(route);
+  /// Replaces the calling screen (the route [context] belongs to) with
+  /// [route]. When the calling screen is not the top route, for example a
+  /// safety action that runs after the member has opened another screen,
+  /// [route] opens on top instead and every screen stays in place: a replace
+  /// never removes a screen other than the caller. If the top route already
+  /// is [route], nothing opens.
+  static Future<void> replace(BuildContext context, String route) {
+    final nav = Navigator.of(context);
+    if (_isTop(context, ModalRoute.of(context))) return nav.pushReplacementNamed(route);
+    if (_topRoute(nav)?.settings.name == route) return Future<void>.value();
+    return nav.pushNamed(route);
+  }
+
+  /// Whether [route], the route of [context], is still in the navigator and
+  /// is its top route. False when [context] is unmounted or has no route.
+  static bool _isTop(BuildContext context, ModalRoute<dynamic>? route) => context.mounted && route != null && route.isCurrent;
+
+  /// [nav]'s top route (reads only; nothing is popped).
+  static Route<dynamic>? _topRoute(NavigatorState nav) {
+    Route<dynamic>? top;
+    nav.popUntil((r) {
+      top = r;
+      return true;
+    });
+    return top;
+  }
+
+  /// Runs the safety [action] for the screen of [context] and returns the
+  /// route it opened (the navigator's new top route), or null when the top
+  /// route did not change.
+  static Route<dynamic>? _runSafety(BuildContext context, VoidCallback action) {
+    final nav = Navigator.maybeOf(context);
+    final before = nav == null ? null : _topRoute(nav);
+    action();
+    final after = nav == null ? null : _topRoute(nav);
+    return identical(after, before) ? null : after;
+  }
 
   /// Switch tab: clears the stack and shows the tab root.
   static Future<void> tab(BuildContext context, String route) => Navigator.of(context).pushNamedAndRemoveUntil(route, (_) => false);
@@ -413,21 +451,39 @@ abstract final class TNav {
   /// Saves through [TApi.instance] and returns the save's result, or null
   /// when this activation was ignored (see "In flight" below).
   ///
+  /// The submitting screen is the route of [context] ([ModalRoute.of]),
+  /// taken at the tap. A result acts only on that screen: it is "on top"
+  /// when that route is still in the navigator and is the top route.
+  ///
   /// When [safety]'s rule decides a safety outcome at the moment of the tap,
   /// that outcome's action runs at once, before the save is awaited; the save
   /// continues in the background. [then] does not run in this case, whatever
   /// the save's result: the safety action replaces it, so the safety screen
   /// opens exactly once and no confirmation toast from [then] is shown over
-  /// it. If the save then fails, the save error is shown while the submitting
-  /// screen is still mounted, and nothing navigates again.
+  /// it. If the save then fails, nothing navigates again, and the save error
+  /// is shown while the submitting screen is mounted and either it or the
+  /// safety screen this submit opened is on top.
   ///
   /// Otherwise, after the save:
-  /// - ok / queued: runs [then];
-  /// - outcome: runs [then], and the branch inside it may take the label;
+  /// - ok / queued: runs [then] when the submitting screen is on top;
+  /// - outcome: runs [then] when the submitting screen is on top, and the
+  ///   branch inside it may take the label;
   /// - failed (including `not_configured`, `adapter_error` and `timeout`):
-  ///   shows the save error and, when [safety]'s rule now decides a safety
-  ///   outcome, runs that outcome's action. Otherwise the member stays on
-  ///   the screen.
+  ///   when [safety]'s rule now decides a safety outcome, runs that outcome's
+  ///   action whether or not the submitting screen is on top. Shows the save
+  ///   error when the submitting screen is on top or when that action opened
+  ///   a safety screen. Otherwise the member stays where they are.
+  ///
+  /// When the submitting screen is mounted but not on top (the member opened
+  /// another screen, such as a crisis or breathing screen, while the save was
+  /// in flight), [then] does not run, so nothing is popped or replaced and
+  /// no confirmation toast appears over the other screen. The save error is
+  /// shown only with a safety screen this submit opened; over any other
+  /// screen it would read as that screen's result. The save's result is
+  /// still returned. Safety actions still run in this case: a replace opens
+  /// the safety screen on top of the current one ([replace]), so it never
+  /// dismisses the screen the member opened. When the submitting screen is
+  /// no longer mounted, nothing runs after the save.
   ///
   /// In flight: from the tap until the submit completes (any result,
   /// including `timeout` and `adapter_error`, and after [then] has run),
@@ -457,38 +513,43 @@ abstract final class TNav {
         final safetyNow = safety?.pick();
         if (safetyNow != null) {
           pending.safetyRan = true;
-          safetyNow();
+          pending.safetyRoute = _runSafety(context, safetyNow);
         }
       }
       return null;
     }
     final flight = _Flight();
     _inFlight[key] = flight;
+    final submitting = ModalRoute.of(context);
     try {
       final safetyNow = safety?.pick();
       if (safetyNow != null) {
         flight.safetyRan = true;
-        safetyNow();
+        flight.safetyRoute = _runSafety(context, safetyNow);
       }
       final result = await safeSubmit(endpoint, screenId: screenId);
+      final onTop = _isTop(context, submitting);
       if (flight.safetyRan) {
-        if (result is TFailed && context.mounted) toast(context, _saveError);
+        if (result is TFailed && context.mounted && (onTop || (flight.safetyRoute?.isCurrent ?? false))) toast(context, _saveError);
         return result;
       }
       if (!context.mounted) return result;
       switch (result) {
         case TOk() || TQueued():
-          then?.call();
+          if (onTop) then?.call();
         case TOutcome(:final label):
-          _serverOutcome = label;
-          try {
-            then?.call();
-          } finally {
-            _serverOutcome = null;
+          if (onTop) {
+            _serverOutcome = label;
+            try {
+              then?.call();
+            } finally {
+              _serverOutcome = null;
+            }
           }
         case TFailed():
-          toast(context, _saveError);
-          safety?.pick()?.call();
+          final safetyNow = safety?.pick();
+          final opened = safetyNow == null ? null : _runSafety(context, safetyNow);
+          if (onTop || opened != null) toast(context, _saveError);
       }
       return result;
     } finally {
@@ -578,4 +639,7 @@ class _Flight {
   /// A safety action has run for this submit, so [TNav.submit] does not run
   /// `then` or another safety action when the save completes.
   bool safetyRan = false;
+
+  /// The route that safety action opened, or null when it opened none.
+  Route<dynamic>? safetyRoute;
 }
