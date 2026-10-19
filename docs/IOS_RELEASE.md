@@ -287,8 +287,8 @@ None of these were started by any agent. Do them in roughly this order.
   agreements (Assumed, confirm on Apple's enrolment page).
 - **O-2 Confirm the team ID.** In the Apple Developer account, compare the
   Tether Health LLC Team ID with `GJH79955Q7` in `project.pbxproj:389,572,596`.
-  If it differs, tell the release owner; a one-line ticket changes it. Do not sign
-  store builds with a personal team.
+  If it differs, file a one-line ticket to change it. Do not sign store builds
+  with a personal team.
 - **O-3 Register the App ID** `com.TetherHealthLLC.tetherhealth` (explicit, not
   wildcard) under the LLC team. Capabilities needed today: none beyond the
   default; Keychain Sharing comes from the entitlements file (Assumed, confirm
