@@ -64,13 +64,19 @@ flutter run -d linux
 
 ## Manual setup
 
-The Android, iOS, web and Windows runner folders are tracked in the repo and already use the app ID `com.TetherHealthLLC.tetherhealth`. Flutter creates only the untracked macOS and Linux runners. `--org` plus `--project-name` form their app ID, so `--project-name tetherhealth` gives `com.TetherHealthLLC.tetherhealth`; `flutter create .` does not rename the Dart package in `pubspec.yaml`:
+The Android, iOS, web and Windows runner folders are tracked in the repo. Android and iOS already use the app ID `com.TetherHealthLLC.tetherhealth`. Web has no app ID. The Windows runner uses the company name `com.TetherHealthLLC` and the binary name `tetherhealth`. Flutter creates only the untracked macOS and Linux runners. `--org` plus `--project-name` form their app ID, so `--project-name tetherhealth` gives `com.TetherHealthLLC.tetherhealth`; `flutter create .` does not rename the Dart package in `pubspec.yaml`.
+
+`flutter create .` also rewrites `.metadata` and moves `pubspec.lock` to newer package versions. Back up both files first and put them back before `flutter pub get`, as below, so analysis and tests use the locked versions. In a git checkout you can instead run `git checkout -- pubspec.lock .metadata` after `flutter create`.
 
 ```bash
+backup="$(mktemp -d)"
+cp pubspec.lock .metadata "$backup/"
 flutter create . \
   --project-name tetherhealth \
   --org com.TetherHealthLLC \
   --platforms macos,linux
+cp "$backup/pubspec.lock" "$backup/.metadata" .
+rm -rf "$backup"
 flutter pub get
 flutter analyze
 flutter test

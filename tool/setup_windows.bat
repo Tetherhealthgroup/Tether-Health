@@ -10,8 +10,10 @@ if errorlevel 1 (
 
 cd /d "%~dp0\.."
 
-rem The Android, web and Windows runners are tracked in the repo with the app ID
-rem com.TetherHealthLLC.tetherhealth, so this script does not regenerate any runner.
+rem The Android, web and Windows runners are tracked in the repo, so this script
+rem does not regenerate any runner. Android uses the app ID
+rem com.TetherHealthLLC.tetherhealth. Web has no app ID. The Windows runner uses
+rem the company name com.TetherHealthLLC and the binary name tetherhealth.
 
 echo Downloading packages...
 flutter pub get
