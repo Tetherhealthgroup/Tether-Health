@@ -758,10 +758,46 @@ class _TFieldState extends State<TField> {
   // P-31: generated fields have no value; an example is only placeholder
   // (hint) text and is never written to the session. The field writes null
   // until the user types, and null again if they clear it.
+  //
+  // When the field's session key is removed (TSession.scrub, scrubPasswords,
+  // clear), the field empties its text too, so a scrubbed value (a password)
+  // does not stay on screen or in the text controller. The editable is also
+  // rebuilt ([_generation]), which drops its undo history: an undo
+  // (Ctrl/Cmd+Z, shake to undo) cannot bring the scrubbed value back. This
+  // also holds when the text was typed and erased before the scrub: the
+  // field is then already empty, but its undo history still has the typed
+  // text. The rebuilt field does not keep the keyboard focus. Other session
+  // changes do not rebuild the field.
+  late final TextEditingController _controller = TextEditingController(text: widget.value);
+  int _generation = 0;
+
+  // The user has edited the field (it wrote its key) since the editable was
+  // last built, so its undo history may hold typed text.
+  bool _hadKey = false;
+
   @override
   void initState() {
     super.initState();
     TSession.set(widget.fieldKey, widget.value);
+    TSession.changes.addListener(_onSessionChange);
+  }
+
+  @override
+  void dispose() {
+    TSession.changes.removeListener(_onSessionChange);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onSessionChange() {
+    final key = widget.fieldKey;
+    if (key == null || TSession.values.containsKey(key) || (_controller.text.isEmpty && !_hadKey)) return;
+    _controller.clear();
+    _hadKey = false;
+    setState(() {
+      _empty = true;
+      _generation++;
+    });
   }
 
   /// Largest text scale for the unit (mmHg, mg/dL...). The value keeps the
@@ -780,6 +816,7 @@ class _TFieldState extends State<TField> {
   TFieldKind get kind => widget.kind;
 
   void onChanged(String v) {
+    _hadKey = widget.fieldKey != null;
     TSession.set(widget.fieldKey, v.isEmpty ? null : v);
     if (v.isEmpty != _empty) setState(() => _empty = v.isEmpty);
     widget.onChanged?.call(v);
@@ -803,40 +840,70 @@ class _TFieldState extends State<TField> {
     // there is text the unit is the usual suffix, laid out as in the approved
     // design.
     final unitIcon = !readOnly && unit != null && _empty;
+    final maxLines = kind == TFieldKind.multiline ? 4 : 1;
+    // At large text sizes a hint beside the unit may need a second line
+    // rather than being cut. One line at 100% and once there is text.
+    final hintMaxLines = unitIcon ? 2 : null;
+    final hintStyle = TText.input.copyWith(color: const Color(0xFF6B7F79), fontWeight: FontWeight.w400);
+    // Screen readers: the field's label is the visible label above it, and
+    // the example (placeholder) is its hint, never its label. The visible
+    // label is announced once, as the field's label; the value is the typed
+    // text. The example is drawn exactly as Flutter draws `hintText` (same
+    // style, lines and overflow), but kept out of the semantics tree, where
+    // `hintText` would become the field's label.
+    final example = placeholder == null
+        ? null
+        : ExcludeSemantics(
+            child: Text(
+              placeholder!,
+              style: Theme.of(context).textTheme.bodyLarge!.merge(hintStyle),
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.start,
+              maxLines: hintMaxLines ?? maxLines,
+            ),
+          );
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      if (kind != TFieldKind.search) Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(label, style: TText.fieldLabel)),
-      TextFormField(
-        key: widget.fieldKey == null ? null : ValueKey('field:${widget.fieldKey}'),
-        initialValue: value,
-        obscureText: kind == TFieldKind.password,
-        keyboardType: keyboard,
-        readOnly: readOnly,
-        minLines: kind == TFieldKind.multiline ? 2 : 1,
-        maxLines: kind == TFieldKind.multiline ? 4 : 1,
-        style: TText.input,
-        onChanged: onChanged,
-        decoration: InputDecoration(
-          isDense: true,
-          filled: true,
-          fillColor: error != null ? const Color(0xFFFFFBFA) : TColors.paper,
-          hintText: placeholder,
-          // At large text sizes a hint beside the unit may need a second line
-          // rather than being cut. One line at 100% and once there is text.
-          hintMaxLines: unitIcon ? 2 : null,
-          hintStyle: TText.input.copyWith(color: const Color(0xFF6B7F79), fontWeight: FontWeight.w400),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
-          prefixIcon: kind == TFieldKind.search ? const Icon(Icons.search_rounded, color: TColors.muted) : null,
-          suffixIcon: readOnly
-              ? const Icon(Icons.expand_more_rounded, color: TColors.muted)
-              : unitIcon
-                  ? Padding(padding: const EdgeInsets.only(left: 8, right: 18, top: 2.67), child: Text(unit!, style: unitStyle, textScaler: unitScaler))
-                  : null,
-          suffixIconConstraints: unitIcon ? const BoxConstraints(minWidth: 0, minHeight: 0) : null,
-          suffix: unit == null || unitIcon ? null : Text(unit!, style: unitStyle, textScaler: unitScaler),
-          suffixStyle: unitStyle,
-          enabledBorder: border,
-          focusedBorder: border.copyWith(borderSide: const BorderSide(color: TColors.teal, width: 2)),
-          semanticCounterText: label,
+      if (kind != TFieldKind.search) Padding(padding: const EdgeInsets.only(bottom: 6), child: ExcludeSemantics(child: Text(label, style: TText.fieldLabel))),
+      Semantics(
+        label: label,
+        // A password's example is bullets: nothing useful to speak.
+        hint: kind == TFieldKind.password ? null : placeholder,
+        // A new generation (after a scrub) is a new editable, with no undo
+        // history.
+        child: KeyedSubtree(
+          key: ValueKey<int>(_generation),
+          child: TextFormField(
+            key: widget.fieldKey == null ? null : ValueKey('field:${widget.fieldKey}'),
+            controller: _controller,
+            obscureText: kind == TFieldKind.password,
+            keyboardType: keyboard,
+            readOnly: readOnly,
+            minLines: kind == TFieldKind.multiline ? 2 : 1,
+            maxLines: maxLines,
+            style: TText.input,
+            onChanged: onChanged,
+            decoration: InputDecoration(
+              isDense: true,
+              filled: true,
+              fillColor: error != null ? const Color(0xFFFFFBFA) : TColors.paper,
+              hint: example,
+              hintMaxLines: hintMaxLines,
+              hintStyle: hintStyle,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+              prefixIcon: kind == TFieldKind.search ? const Icon(Icons.search_rounded, color: TColors.muted) : null,
+              suffixIcon: readOnly
+                  ? const Icon(Icons.expand_more_rounded, color: TColors.muted)
+                  : unitIcon
+                      ? Padding(padding: const EdgeInsets.only(left: 8, right: 18, top: 2.67), child: Text(unit!, style: unitStyle, textScaler: unitScaler))
+                      : null,
+              suffixIconConstraints: unitIcon ? const BoxConstraints(minWidth: 0, minHeight: 0) : null,
+              suffix: unit == null || unitIcon ? null : Text(unit!, style: unitStyle, textScaler: unitScaler),
+              suffixStyle: unitStyle,
+              enabledBorder: border,
+              focusedBorder: border.copyWith(borderSide: const BorderSide(color: TColors.teal, width: 2)),
+              semanticCounterText: label,
+            ),
+          ),
         ),
       ),
       if (error != null)

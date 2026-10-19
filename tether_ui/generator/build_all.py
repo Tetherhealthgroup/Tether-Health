@@ -14,7 +14,7 @@ OUT = os.path.dirname(HERE) if os.path.basename(HERE) == 'generator' else os.pat
 
 def w(path, content):
     p = os.path.join(OUT, path); os.makedirs(os.path.dirname(p), exist_ok=True)
-    open(p, 'w').write(content)
+    open(p, 'w', newline='\n').write(content)
 
 def wj(path, obj): w(path, json.dumps(obj, indent=2, ensure_ascii=False) + '\n')
 
@@ -215,7 +215,7 @@ Clinical thresholds (BP crisis 180/120, low glucose 70 mg/dL, red-zone symptom r
 async def shoot(describe):
     from playwright.async_api import async_playwright
     gal = B.build_gallery()
-    open('/tmp/tg/gallery.html', 'w').write(gal)
+    open('/tmp/tg/gallery.html', 'w', newline='\n').write(gal)
     async with async_playwright() as p:
         b = await p.chromium.launch()
         pg = await b.new_page(viewport={'width': 1800, 'height': 1000}, device_scale_factor=1.5)
@@ -236,14 +236,14 @@ async def shoot(describe):
         for fid, f in FLOWS.items():
             imgs = ''.join(f'<figure><img src="file://{OUT}/screens/png/{fid}/{sid}.png"><figcaption><b>{SCREENS[sid]["name"]}</b><span>{SCREENS[sid]["route"]}</span></figcaption></figure>' for sid in f['screens'])
             html = f'<html><head><meta charset="utf-8"><style>body{{margin:0;padding:28px;background:#F4F1E8;font-family:Helvetica,Arial,sans-serif;color:#123C37}}h1{{margin:0 0 4px}}p{{margin:0 0 20px;color:#5A726C}}main{{display:grid;grid-template-columns:repeat(6,1fr);gap:22px;align-items:start}}figure{{margin:0}}img{{width:100%;border-radius:22px;box-shadow:0 10px 24px -12px rgba(18,60,55,.4)}}figcaption{{font-size:13px;margin-top:6px}}figcaption span{{display:block;color:#5A726C;font-size:11px}}</style></head><body><h1>{f["title"]}</h1><p>{f["desc"]}</p><main>{imgs}</main></body></html>'
-            open('/tmp/tg/_cs.html', 'w').write(html)
+            open('/tmp/tg/_cs.html', 'w', newline='\n').write(html)
             await pg2.goto('file:///tmp/tg/_cs.html'); await pg2.wait_for_timeout(500)
             os.makedirs(os.path.join(OUT, 'screens', 'sheets'), exist_ok=True)
             await pg2.screenshot(path=os.path.join(OUT, 'screens', 'sheets', f'{fid}.png'), full_page=True)
         # flow boards
         pg3 = await b.new_page(viewport={'width': 1600, 'height': 900}, device_scale_factor=1)
         for fid in FLOWS:
-            open(f'/tmp/tg/flow_{fid}.html', 'w').write(B.build_flowboard(fid))
+            open(f'/tmp/tg/flow_{fid}.html', 'w', newline='\n').write(B.build_flowboard(fid))
             await pg3.goto(f'file:///tmp/tg/flow_{fid}.html'); await pg3.wait_for_timeout(500)
             dims = await pg3.evaluate('[document.querySelector(".wrap").scrollWidth, document.querySelector(".wrap").scrollHeight]')
             await pg3.set_viewport_size({'width': max(1200, dims[0] + 40), 'height': min(4000, dims[1] + 40)})

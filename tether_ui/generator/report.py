@@ -52,9 +52,9 @@ def main():
         'action_coverage': [len(covered_actions & all_actions), len(all_actions)],
         'release_check': {'note': 'Release acceptance counts exclude reference surfaces (spec screens with reference: true), which are checked by device screenshots.', 'screens': sum(1 for s in SCREENS.values() if not s.get('reference')), 'actions': sum(1 for sid, p in all_actions if not SCREENS[sid].get('reference')), 'reference_screens': sorted(sid for sid, s in SCREENS.items() if s.get('reference'))},
     }
-    json.dump(summary, open(os.path.join(vdir, 'summary.json'), 'w'), indent=2)
-    json.dump(fr, open(os.path.join(vdir, 'flutter_results.json'), 'w'), indent=1, ensure_ascii=False)
-    json.dump(pr, open(os.path.join(vdir, 'prototype_results.json'), 'w'), indent=1, ensure_ascii=False)
+    json.dump(summary, open(os.path.join(vdir, 'summary.json'), 'w', newline='\n'), indent=2)
+    json.dump(fr, open(os.path.join(vdir, 'flutter_results.json'), 'w', newline='\n'), indent=1, ensure_ascii=False)
+    json.dump(pr, open(os.path.join(vdir, 'prototype_results.json'), 'w', newline='\n'), indent=1, ensure_ascii=False)
 
     # program × function matrix
     funcs = ['Setup', 'Sign-in', 'Daily', 'Rescue', 'Safety', 'Milestone', 'Resources', 'Validation', 'Health records', 'Navigation', 'Account']
@@ -91,7 +91,7 @@ def main():
         md.append(f"- **{k}** · {r['title']}: {r['logic']} _{r['source']}_")
     fails = [n for n, r in fr.items() if r != 'success'] + [f"prototype sweep {r['screen']} {r['path']}" for r in pr['sweep'] if not r['ok']] + [f"prototype scenario {r['id']}: {r['why']}" for r in pr['scenarios'] if not r['ok']]
     md += ['', '## Failures', '', '\n'.join(f'- {x}' for x in fails) if fails else 'None.']
-    open(os.path.join(vdir, 'report.md'), 'w').write('\n'.join(md) + '\n')
+    open(os.path.join(vdir, 'report.md'), 'w', newline='\n').write('\n'.join(md) + '\n')
     print(json.dumps(summary, indent=1))
 
 if __name__ == '__main__':

@@ -239,7 +239,7 @@ def generate(out_dir, describe, static_dir):
     if os.path.exists(out_dir): shutil.rmtree(out_dir)
     shutil.copytree(static_dir, out_dir)
     # barrel
-    open(os.path.join(lib, 'ui', 'ui.dart'), 'w').write("export '../logic/rules.dart';\nexport 'components.dart';\nexport 'data.dart';\nexport 'nav.dart';\nexport 'tokens.dart';\n")
+    open(os.path.join(lib, 'ui', 'ui.dart'), 'w', newline='\n').write("export '../logic/rules.dart';\nexport 'components.dart';\nexport 'data.dart';\nexport 'nav.dart';\nexport 'tokens.dart';\n")
     # routes
     lines = ['// GENERATED — route names for every screen and state in spec/screens.json.', 'abstract final class Routes {']
     for sid, s in SCREENS.items():
@@ -247,13 +247,13 @@ def generate(out_dir, describe, static_dir):
         lines.append(f"  static const {camel(sid)} = {dstr(s['route'])};")
     lines.append('}')
     os.makedirs(os.path.join(lib, 'router'), exist_ok=True)
-    open(os.path.join(lib, 'router', 'routes.dart'), 'w').write('\n'.join(lines) + '\n')
+    open(os.path.join(lib, 'router', 'routes.dart'), 'w', newline='\n').write('\n'.join(lines) + '\n')
     # screens
     imports = []
     for sid, s in SCREENS.items():
         d = os.path.join(lib, 'screens', s['flow'])
         os.makedirs(d, exist_ok=True)
-        open(os.path.join(d, f'{sid}_screen.dart'), 'w').write(screen_file(s, describe))
+        open(os.path.join(d, f'{sid}_screen.dart'), 'w', newline='\n').write(screen_file(s, describe))
         imports.append(f"import '../screens/{s['flow']}/{sid}_screen.dart';")
     builders = '\n'.join(f"    Routes.{camel(sid)}: (_) => const {pascal(sid)}Screen()," for sid in SCREENS)
     sheets = ', '.join(f'Routes.{camel(sid)}' for sid, s in SCREENS.items() if s['kind'] == 'sheet')
@@ -296,7 +296,7 @@ abstract final class AppRouter {{
   }}
 }}
 """
-    open(os.path.join(lib, 'router', 'app_router.dart'), 'w').write(router)
+    open(os.path.join(lib, 'router', 'app_router.dart'), 'w', newline='\n').write(router)
     return len(SCREENS)
 
 
@@ -364,7 +364,7 @@ void main() {{
 {chr(10).join(cases)}
 }}
 """
-    open(os.path.join(out_dir, 'test', 'journeys_test.dart'), 'w').write(code)
+    open(os.path.join(out_dir, 'test', 'journeys_test.dart'), 'w', newline='\n').write(code)
 
 
 def _self_test():
@@ -397,3 +397,5 @@ def _self_test():
 
 if __name__ == '__main__':
     _self_test()
+    import dsl
+    dsl._self_test()

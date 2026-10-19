@@ -138,7 +138,9 @@ def timer(value, label): return N('timer', value=value, label=label)
 
 # ---------------------------------------------------------------- screens
 def S(id, name, route, fl, body, footer=None, program=None, phase=None, kind='screen', tabname=None, variant_of=None, state=None, dark=False, bg=None, desc='', notes=None, over=None, hdr=None, api=None):
-    assert id not in SCREENS, f'duplicate screen {id}'
+    if id in SCREENS:
+        # An explicit error, not an assert: `python -O` must not skip it.
+        raise ValueError(f'duplicate screen {id}')
     s = {'id': id, 'name': name, 'route': route, 'flow': fl, 'program': program, 'phase': phase, 'kind': kind, 'tab': tabname,
          'variantOf': variant_of, 'state': state or ('default' if not variant_of else None), 'dark': dark, 'bg': bg, 'desc': desc,
          'header': hdr, 'body': body, 'footer': footer or [], 'notes': notes or [], 'over': over, 'api': api or []}
@@ -159,7 +161,9 @@ def _assign_keys(s):
     for part in ('body', 'footer'):
         for n, p in walk(s[part], part):
             if (n['t'] in INPUTS or n['t'] in KEYED) and n.get('key'):
-                assert n['key'] not in used, f"{s['id']}: duplicate key {n['key']!r} at {p}"
+                if n['key'] in used:
+                    # An explicit error, not an assert: `python -O` must not skip it.
+                    raise ValueError(f"{s['id']}: duplicate key {n['key']!r} at {p}")
                 used.add(n['key'])
     for part in ('body', 'footer'):
         for n, p in walk(s[part], part):
@@ -267,3 +271,44 @@ def camel(s):
 
 def pascal(s):
     c = camel(s); return c[:1].upper() + c[1:]
+
+
+def _self_test():
+    """python3 dsl.py (also run by gen_dart.py): a duplicate screen id and a
+    duplicate explicit key on a screen raise ValueError, also under
+    `python -O`. Uses no assert, so the check itself survives -O."""
+    def keys(*ks):
+        s = {'id': 'selftest', 'header': None, 'body': [field(f'Field {k}', key=k) for k in ks], 'footer': []}
+        _assign_keys(s)
+        return [n['key'] for n, _ in walk(s['body'])]
+    if keys('a', 'b') != ['a', 'b']:
+        raise AssertionError('distinct keys were not kept')
+    try:
+        keys('a', 'a')
+    except ValueError as e:
+        if "duplicate key 'a'" not in str(e):
+            raise AssertionError(f'unexpected message: {e}')
+    else:
+        raise AssertionError('a duplicate key did not raise ValueError')
+    if 'selftest_flow' in FLOWS or 'selftest_screen' in SCREENS:
+        raise AssertionError('self-test ids already in use')
+    flow('selftest_flow', 'Self-test', 'Self-test')
+    try:
+        S('selftest_screen', 'Self-test', '/selftest', 'selftest_flow', [])
+        try:
+            S('selftest_screen', 'Self-test again', '/selftest2', 'selftest_flow', [])
+        except ValueError as e:
+            if 'duplicate screen selftest_screen' not in str(e):
+                raise AssertionError(f'unexpected message: {e}')
+        else:
+            raise AssertionError('a duplicate screen id did not raise ValueError')
+        if FLOWS['selftest_flow']['screens'] != ['selftest_screen']:
+            raise AssertionError('the duplicate screen was registered')
+    finally:
+        SCREENS.pop('selftest_screen', None)
+        FLOWS.pop('selftest_flow', None)
+    print('dsl self-test: ok')
+
+
+if __name__ == '__main__':
+    _self_test()
