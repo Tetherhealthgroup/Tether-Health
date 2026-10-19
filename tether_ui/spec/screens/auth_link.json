@@ -38,7 +38,7 @@
     {
       "t": "field",
       "label": "Password",
-      "value": "••••••••••••",
+      "placeholder": "••••••••••••",
       "kind": "password",
       "key": "password"
     },

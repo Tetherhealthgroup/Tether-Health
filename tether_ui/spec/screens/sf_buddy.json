@@ -32,7 +32,7 @@
     {
       "t": "field",
       "label": "Name",
-      "value": "Sam",
+      "placeholder": "Sam",
       "kind": "text",
       "key": "name"
     },
@@ -51,7 +51,8 @@
           "done": true
         }
       ],
-      "label": "They can see"
+      "label": "They can see",
+      "key": "buddy_can_see"
     },
     {
       "t": "card",

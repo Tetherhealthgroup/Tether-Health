@@ -21,8 +21,8 @@ class StA1cScreen extends StatelessWidget {
       header: THeader(title: 'A1C lab', pill: 'Lab day'),
       children: [
         TTitle('Add your A1C'),
-        TField(fieldKey: 'st_a1c.a1c', label: 'A1C', value: '7.4', unit: '%', kind: TFieldKind.number),
-        TField(fieldKey: 'st_a1c.lab_date', label: 'Lab date', value: 'Oct 1, 2026', kind: TFieldKind.date),
+        TField(fieldKey: 'st_a1c.a1c', label: 'A1C', unit: '%', placeholder: '7.4', kind: TFieldKind.number),
+        TField(fieldKey: 'st_a1c.lab_date', label: 'Lab date', placeholder: 'Oct 1, 2026', kind: TFieldKind.date),
         TKeyValue(rows: [('Previous', '7.9% · Jul 2'), ('Change', '−0.5 points')]),
         TBody('Your clinician sets your A1C goal. Steady shows history only.', tone: TTextTone.small),
       ],

@@ -22,8 +22,8 @@ class HwLogScreen extends StatelessWidget {
       header: THeader(title: 'Log blood pressure', pill: '1 of 2'),
       children: [
         TTitle('Sit quietly for 5 minutes first.'),
-        TFieldRow(children: [TField(fieldKey: 'hw_log.systolic', label: 'Top (systolic)', value: '138', unit: 'mmHg', kind: TFieldKind.number), TField(fieldKey: 'hw_log.diastolic', label: 'Bottom (diastolic)', value: '86', unit: 'mmHg', kind: TFieldKind.number)]),
-        TField(fieldKey: 'hw_log.pulse_optional', label: 'Pulse (optional)', value: '72', unit: 'bpm', kind: TFieldKind.number),
+        TFieldRow(children: [TField(fieldKey: 'hw_log.systolic', label: 'Top (systolic)', unit: 'mmHg', placeholder: '138', kind: TFieldKind.number), TField(fieldKey: 'hw_log.diastolic', label: 'Bottom (diastolic)', unit: 'mmHg', placeholder: '86', kind: TFieldKind.number)]),
+        TField(fieldKey: 'hw_log.pulse_optional', label: 'Pulse (optional)', unit: 'bpm', placeholder: '72', kind: TFieldKind.number),
         TChips(fieldKey: 'hw_log.value', options: ['Left arm', 'Right arm'], selected: ['Left arm'], multi: false),
         TCard(variant: TCardVariant.mint, title: 'Tip', text: 'Take a second reading after 1 minute. We’ll average them.'),
       ],

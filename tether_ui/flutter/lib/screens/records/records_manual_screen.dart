@@ -23,9 +23,9 @@ class RecordsManualScreen extends StatelessWidget {
       children: [
         TTitle('Add a health value'),
         TChips(fieldKey: 'records_manual.type', options: ['Blood pressure', 'Glucose', 'Lab result', 'Vaccine', 'Medication', 'Condition'], selected: ['Lab result'], multi: false, label: 'Type'),
-        TField(fieldKey: 'records_manual.test', label: 'Test', value: 'A1C', kind: TFieldKind.select),
-        TField(fieldKey: 'records_manual.value', label: 'Value', value: '7.4', unit: '%', kind: TFieldKind.number),
-        TField(fieldKey: 'records_manual.date', label: 'Date', value: 'Oct 1, 2026', kind: TFieldKind.date),
+        TField(fieldKey: 'records_manual.test', label: 'Test', placeholder: 'A1C', kind: TFieldKind.select),
+        TField(fieldKey: 'records_manual.value', label: 'Value', unit: '%', placeholder: '7.4', kind: TFieldKind.number),
+        TField(fieldKey: 'records_manual.date', label: 'Date', placeholder: 'Oct 1, 2026', kind: TFieldKind.date),
         TBody('Checked against plausible ranges and your connected records. Manual values are labelled “Entered by you”.', tone: TTextTone.small),
       ],
       footer: [

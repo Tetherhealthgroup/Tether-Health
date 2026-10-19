@@ -7,6 +7,17 @@ def load():
         screens_shared.shared(); screens_prog_a.programs_a(); screens_prog_b.programs_b(); screens_records.records(); screens_additions.additions()
     return SCREENS
 
+# Consent checklists and their session keys (TH-907). Each screen has exactly
+# one checklist, and it must carry this key.
+CONSENT_CHECKLISTS = {
+    'ob_account': 'age_18_or_older',
+    'records_consent': 'resources',
+    'records_consent_bb': 'resources',
+    'records_consent_device': 'data_types',
+    'sd_caregiver': 'caregiver_can_see',
+    'sf_buddy': 'buddy_can_see',
+}
+
 def validate():
     load()
     errors, warns = [], []
@@ -58,6 +69,22 @@ def validate():
     for r, spec in RULES.items():
         for k in spec['inputs']:
             if k not in allkeys: errors.append(f'rule {r}: input {k} not on any screen')
+    # Production inputs (TH-907). Session keys the API adapters map must be
+    # explicit and stable, and no field may start with a value that would be
+    # submitted if the member never types (P-31).
+    for sid, p, k in AUTO_KEYS:
+        errors.append(f'{sid}: input at {p} has no explicit key= (label slug {k!r}). Give it a stable key in the generator.')
+    for sid, s in SCREENS.items():
+        for part in ('body', 'footer'):
+            for n, p in walk(s[part], part):
+                if n['t'] == 'field' and n.get('value') is not None:
+                    errors.append(f'{sid}: field {n.get("key")} at {p} starts with a value. P-31: an example is placeholder text only.')
+                if n['t'] == 'tiles' and not n.get('key') and any(not it.get('action') for it in n['items']):
+                    errors.append(f'{sid}: selection tiles at {p} have no key=, so the choice never reaches the session.')
+    for sid, key in CONSENT_CHECKLISTS.items():
+        found = [n for part in ('body', 'footer') for n, p in walk(SCREENS[sid][part], part) if n['t'] == 'checklist'] if sid in SCREENS else []
+        if [n.get('key') for n in found] != [key]:
+            errors.append(f'{sid}: consent checklist must have key={key!r} (found {[n.get("key") for n in found]}).')
     for scn in SCENARIOS:
         for x in [scn['start'], scn['expect']] + [st[1] for st in scn['steps'] if st[0] == 'expect']:
             if x not in SCREENS: errors.append(f'scenario {scn["id"]}: unknown screen {x}')

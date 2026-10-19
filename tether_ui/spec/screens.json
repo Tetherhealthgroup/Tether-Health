@@ -210,7 +210,8 @@
             "program": "sd"
           }
         ],
-        "cols": 2
+        "cols": 2,
+        "key": "programs"
       },
       {
         "t": "link",
@@ -694,14 +695,14 @@
       {
         "t": "field",
         "label": "What should we call you?",
-        "value": "Alex",
+        "placeholder": "Alex",
         "kind": "text",
         "key": "what_should_we_call_you"
       },
       {
         "t": "field",
         "label": "Age range",
-        "value": "35–44",
+        "placeholder": "35–44",
         "kind": "select",
         "key": "age_range"
       },
@@ -1328,15 +1329,15 @@
       {
         "t": "field",
         "label": "Email",
-        "value": "alex@example.com",
+        "placeholder": "alex@example.com",
         "kind": "email",
         "key": "email"
       },
       {
         "t": "field",
         "label": "Password",
-        "value": "••••••••••••",
         "hint": "At least 12 characters. A passphrase works well.",
+        "placeholder": "••••••••••••",
         "kind": "password",
         "key": "password"
       },
@@ -1347,7 +1348,8 @@
             "label": "I’m 18 or older",
             "done": true
           }
-        ]
+        ],
+        "key": "age_18_or_older"
       },
       {
         "t": "text",
@@ -1756,14 +1758,14 @@
       {
         "t": "field",
         "label": "Email",
-        "value": "alex@example.com",
+        "placeholder": "alex@example.com",
         "kind": "email",
         "key": "email"
       },
       {
         "t": "field",
         "label": "Password",
-        "value": "••••••••",
+        "placeholder": "••••••••",
         "kind": "password",
         "key": "password"
       },
@@ -2123,15 +2125,15 @@
       {
         "t": "field",
         "label": "Email",
-        "value": "alex@example.com",
+        "placeholder": "alex@example.com",
         "kind": "email",
         "key": "email"
       },
       {
         "t": "field",
         "label": "Password",
-        "value": "••••••••",
         "error": "Password is incorrect.",
+        "placeholder": "••••••••",
         "kind": "password",
         "key": "password"
       },
@@ -2499,7 +2501,7 @@
       {
         "t": "field",
         "label": "Password",
-        "value": "••••••••••••",
+        "placeholder": "••••••••••••",
         "kind": "password",
         "key": "password"
       },
@@ -2751,7 +2753,7 @@
       {
         "t": "field",
         "label": "Email",
-        "value": "alex@example.com",
+        "placeholder": "alex@example.com",
         "kind": "email",
         "key": "email"
       }
@@ -2906,15 +2908,15 @@
       {
         "t": "field",
         "label": "New password",
-        "value": "••••••••••••",
         "hint": "At least 12 characters.",
+        "placeholder": "••••••••••••",
         "kind": "password",
         "key": "new_password"
       },
       {
         "t": "field",
         "label": "Confirm password",
-        "value": "••••••••••••",
+        "placeholder": "••••••••••••",
         "kind": "password",
         "key": "confirm_password"
       }
@@ -5793,7 +5795,7 @@
             "label": "Care team · Dr. Patel’s clinic",
             "sub": "Manual: you approve each summary",
             "on": true,
-            "key": "care_team_dr_patel_s_clinic"
+            "key": "care_team_sharing"
           },
           {
             "t": "toggle",
@@ -7317,7 +7319,7 @@
       {
         "t": "field",
         "label": "Best time to call",
-        "value": "Weekdays after 5 PM",
+        "placeholder": "Weekdays after 5 PM",
         "kind": "select",
         "key": "best_time_to_call"
       }
@@ -7481,14 +7483,14 @@
       {
         "t": "field",
         "label": "Topic",
-        "value": "Question about my plan",
+        "placeholder": "Question about my plan",
         "kind": "select",
         "key": "topic"
       },
       {
         "t": "field",
         "label": "Message",
-        "value": "I’ve been feeling dizzy in the mornings since starting the patch.",
+        "placeholder": "I’ve been feeling dizzy in the mornings since starting the patch.",
         "kind": "multiline",
         "key": "message"
       },
@@ -7625,14 +7627,14 @@
       {
         "t": "field",
         "label": "Name",
-        "value": "Jordan",
+        "placeholder": "Jordan",
         "kind": "text",
         "key": "name"
       },
       {
         "t": "field",
         "label": "Phone",
-        "value": "(555) 010-4421",
+        "placeholder": "(555) 010-4421",
         "kind": "phone",
         "key": "phone"
       },
@@ -7652,7 +7654,7 @@
       {
         "t": "field",
         "label": "Help phrase",
-        "value": "Can you stay with me for the next 10 minutes?",
+        "placeholder": "Can you stay with me for the next 10 minutes?",
         "kind": "multiline",
         "key": "help_phrase"
       },
@@ -7739,7 +7741,7 @@
       {
         "t": "field",
         "label": "Invite code",
-        "value": "PATEL-4821",
+        "placeholder": "PATEL-4821",
         "kind": "text",
         "key": "invite_code"
       },
@@ -8935,15 +8937,15 @@
       {
         "t": "field",
         "label": "Type DELETE to confirm",
-        "value": "DELETE",
+        "placeholder": "DELETE",
         "kind": "text",
         "key": "type_delete_to_confirm"
       },
       {
         "t": "field",
         "label": "Password",
-        "value": "••••••••••••",
         "hint": "We ask again to protect your account.",
+        "placeholder": "••••••••••••",
         "kind": "password",
         "key": "password"
       }
@@ -11386,21 +11388,21 @@
       {
         "t": "field",
         "label": "Medicine",
-        "value": "Nicotine patch",
+        "placeholder": "Nicotine patch",
         "kind": "select",
         "key": "medicine"
       },
       {
         "t": "field",
         "label": "Strength",
-        "value": "21 mg / 24 h",
+        "placeholder": "21 mg / 24 h",
         "kind": "text",
         "key": "strength"
       },
       {
         "t": "field",
         "label": "When",
-        "value": "Every morning",
+        "placeholder": "Every morning",
         "kind": "select",
         "key": "when"
       },
@@ -12423,7 +12425,7 @@
       {
         "t": "field",
         "label": "Name",
-        "value": "Sam",
+        "placeholder": "Sam",
         "kind": "text",
         "key": "name"
       },
@@ -12442,7 +12444,8 @@
             "done": true
           }
         ],
-        "label": "They can see"
+        "label": "They can see",
+        "key": "buddy_can_see"
       },
       {
         "t": "card",
@@ -13486,15 +13489,15 @@
           {
             "t": "field",
             "label": "Peak flow from",
-            "value": "400",
             "unit": "L/min",
+            "placeholder": "400",
             "kind": "number",
             "key": "green_from"
           },
           {
             "t": "field",
             "label": "Daily medicine",
-            "value": "Controller inhaler · 2 puffs AM/PM",
+            "placeholder": "Controller inhaler · 2 puffs AM/PM",
             "kind": "text",
             "key": "daily_medicine"
           }
@@ -13508,8 +13511,8 @@
           {
             "t": "field",
             "label": "Peak flow",
-            "value": "200–399",
             "unit": "L/min",
+            "placeholder": "200–399",
             "kind": "text",
             "key": "peak_flow"
           }
@@ -13523,8 +13526,8 @@
           {
             "t": "field",
             "label": "Below",
-            "value": "200",
             "unit": "L/min",
+            "placeholder": "200",
             "kind": "number",
             "key": "red_below"
           }
@@ -13965,9 +13968,9 @@
       {
         "t": "field",
         "label": "Peak flow (optional)",
-        "value": "310",
         "unit": "L/min",
         "hint": "50–900 L/min",
+        "placeholder": "310",
         "kind": "number",
         "key": "peak_flow"
       },
@@ -14848,16 +14851,16 @@
           {
             "t": "field",
             "label": "Top below",
-            "value": "130",
             "unit": "mmHg",
+            "placeholder": "130",
             "kind": "number",
             "key": "top_below"
           },
           {
             "t": "field",
             "label": "Bottom below",
-            "value": "80",
             "unit": "mmHg",
+            "placeholder": "80",
             "kind": "number",
             "key": "bottom_below"
           }
@@ -15246,16 +15249,16 @@
           {
             "t": "field",
             "label": "Top (systolic)",
-            "value": "138",
             "unit": "mmHg",
+            "placeholder": "138",
             "kind": "number",
             "key": "systolic"
           },
           {
             "t": "field",
             "label": "Bottom (diastolic)",
-            "value": "86",
             "unit": "mmHg",
+            "placeholder": "86",
             "kind": "number",
             "key": "diastolic"
           }
@@ -15264,8 +15267,8 @@
       {
         "t": "field",
         "label": "Pulse (optional)",
-        "value": "72",
         "unit": "bpm",
+        "placeholder": "72",
         "kind": "number",
         "key": "pulse_optional"
       },
@@ -15360,16 +15363,16 @@
           {
             "t": "field",
             "label": "Top (systolic)",
-            "value": "132",
             "unit": "mmHg",
+            "placeholder": "132",
             "kind": "number",
             "key": "systolic"
           },
           {
             "t": "field",
             "label": "Bottom (diastolic)",
-            "value": "84",
             "unit": "mmHg",
+            "placeholder": "84",
             "kind": "number",
             "key": "diastolic"
           }
@@ -15378,8 +15381,8 @@
       {
         "t": "field",
         "label": "Pulse (optional)",
-        "value": "70",
         "unit": "bpm",
+        "placeholder": "70",
         "kind": "number",
         "key": "pulse_optional"
       },
@@ -15522,17 +15525,17 @@
           {
             "t": "field",
             "label": "Top (systolic)",
-            "value": "128",
             "unit": "mmHg",
+            "placeholder": "128",
             "kind": "number",
             "key": "top_systolic"
           },
           {
             "t": "field",
             "label": "Bottom (diastolic)",
-            "value": "310",
             "unit": "mmHg",
             "error": "Too high for the bottom number. Did you mean 81?",
+            "placeholder": "310",
             "kind": "number",
             "key": "bottom_diastolic"
           }
@@ -16059,16 +16062,16 @@
           {
             "t": "field",
             "label": "Total",
-            "value": "212",
             "unit": "mg/dL",
+            "placeholder": "212",
             "kind": "number",
             "key": "total"
           },
           {
             "t": "field",
             "label": "LDL",
-            "value": "138",
             "unit": "mg/dL",
+            "placeholder": "138",
             "kind": "number",
             "key": "ldl"
           }
@@ -16080,8 +16083,8 @@
           {
             "t": "field",
             "label": "HDL",
-            "value": "46",
             "unit": "mg/dL",
+            "placeholder": "46",
             "kind": "number",
             "key": "hdl"
           },
@@ -16098,7 +16101,7 @@
       {
         "t": "field",
         "label": "Lab date",
-        "value": "Sep 30, 2026",
+        "placeholder": "Sep 30, 2026",
         "kind": "date",
         "key": "lab_date"
       }
@@ -16548,16 +16551,16 @@
           {
             "t": "field",
             "label": "Before meals from",
-            "value": "80",
             "unit": "mg/dL",
+            "placeholder": "80",
             "kind": "number",
             "key": "before_meals_from"
           },
           {
             "t": "field",
             "label": "to",
-            "value": "130",
             "unit": "mg/dL",
+            "placeholder": "130",
             "kind": "number",
             "key": "to"
           }
@@ -16566,8 +16569,8 @@
       {
         "t": "field",
         "label": "2 h after meals below",
-        "value": "180",
         "unit": "mg/dL",
+        "placeholder": "180",
         "kind": "number",
         "key": "2_h_after_meals_below"
       },
@@ -16579,15 +16582,15 @@
           {
             "t": "field",
             "label": "Low below",
-            "value": "70",
             "unit": "mg/dL",
+            "placeholder": "70",
             "kind": "number",
             "key": "low"
           },
           {
             "t": "field",
             "label": "My low steps",
-            "value": "15 g fast sugar, re-check in 15 min",
+            "placeholder": "15 g fast sugar, re-check in 15 min",
             "kind": "multiline",
             "key": "my_low_steps"
           }
@@ -16896,9 +16899,9 @@
       {
         "t": "field",
         "label": "Reading",
-        "value": "142",
         "unit": "mg/dL",
         "hint": "From your meter or CGM · 20–600 mg/dL",
+        "placeholder": "142",
         "kind": "number",
         "key": "reading"
       },
@@ -16937,8 +16940,8 @@
       {
         "t": "field",
         "label": "Note (optional)",
-        "value": "Pasta lunch",
         "hint": "Never shared unless you choose",
+        "placeholder": "Pasta lunch",
         "kind": "text",
         "key": "note_optional"
       }
@@ -17383,15 +17386,15 @@
       {
         "t": "field",
         "label": "A1C",
-        "value": "7.4",
         "unit": "%",
+        "placeholder": "7.4",
         "kind": "number",
         "key": "a1c"
       },
       {
         "t": "field",
         "label": "Lab date",
-        "value": "Oct 1, 2026",
+        "placeholder": "Oct 1, 2026",
         "kind": "date",
         "key": "lab_date"
       },
@@ -18015,16 +18018,16 @@
       {
         "t": "field",
         "label": "eGFR",
-        "value": "58",
         "unit": "mL/min/1.73m²",
+        "placeholder": "58",
         "kind": "number",
         "key": "egfr"
       },
       {
         "t": "field",
         "label": "Urine ACR",
-        "value": "42",
         "unit": "mg/g",
+        "placeholder": "42",
         "kind": "number",
         "key": "urine_acr"
       },
@@ -18039,7 +18042,7 @@
       {
         "t": "field",
         "label": "Lab date",
-        "value": "Oct 3, 2026",
+        "placeholder": "Oct 3, 2026",
         "kind": "date",
         "key": "lab_date"
       },
@@ -20246,14 +20249,14 @@
       {
         "t": "field",
         "label": "Name",
-        "value": "Rosa",
+        "placeholder": "Rosa",
         "kind": "text",
         "key": "name"
       },
       {
         "t": "field",
         "label": "Phone",
-        "value": "(555) 010-2244",
+        "placeholder": "(555) 010-2244",
         "kind": "phone",
         "key": "phone"
       },
@@ -20273,7 +20276,8 @@
             "sub": "Never available to caregivers"
           }
         ],
-        "label": "Rosa can see"
+        "label": "Rosa can see",
+        "key": "caregiver_can_see"
       }
     ],
     "footer": [
@@ -20736,21 +20740,21 @@
       {
         "t": "field",
         "label": "My warning signs",
-        "value": "Not sleeping, pulling away from friends",
+        "placeholder": "Not sleeping, pulling away from friends",
         "kind": "multiline",
         "key": "my_warning_signs"
       },
       {
         "t": "field",
         "label": "Things that help me",
-        "value": "Walk the dog, shower, music",
+        "placeholder": "Walk the dog, shower, music",
         "kind": "text",
         "key": "things_that_help_me"
       },
       {
         "t": "field",
         "label": "People I can reach",
-        "value": "Sam · (555) 010-3311",
+        "placeholder": "Sam · (555) 010-3311",
         "kind": "text",
         "key": "people_i_can_reach"
       },
@@ -21505,7 +21509,7 @@
       {
         "t": "field",
         "label": "Age",
-        "value": "52",
+        "placeholder": "52",
         "kind": "number",
         "key": "age"
       },
@@ -22089,21 +22093,21 @@
       {
         "t": "field",
         "label": "What",
-        "value": "Flu vaccine",
+        "placeholder": "Flu vaccine",
         "kind": "select",
         "key": "what"
       },
       {
         "t": "field",
         "label": "Date",
-        "value": "Oct 12, 2026",
+        "placeholder": "Oct 12, 2026",
         "kind": "date",
         "key": "date"
       },
       {
         "t": "field",
         "label": "Where (optional)",
-        "value": "Main St Pharmacy",
+        "placeholder": "Main St Pharmacy",
         "kind": "text",
         "key": "where_optional"
       },
@@ -22625,7 +22629,7 @@
       {
         "t": "field",
         "label": "Relative’s age at diagnosis (if known)",
-        "value": "44",
+        "placeholder": "44",
         "kind": "number",
         "key": "relative_s_age_at_diagnosis_if_k"
       },
@@ -24087,7 +24091,6 @@
       {
         "t": "field",
         "label": "Search",
-        "value": "Patel",
         "placeholder": "Search hospital, clinic or doctor",
         "kind": "search",
         "key": "query"
@@ -24222,8 +24225,8 @@
       {
         "t": "field",
         "label": "FHIR server address",
-        "value": "https://fhir.example-health.org/r4",
         "hint": "Starts with https:// · your provider gives you this",
+        "placeholder": "https://fhir.example-health.org/r4",
         "kind": "text",
         "key": "base_url"
       },
@@ -24392,7 +24395,8 @@
             "sub": "Not requested"
           }
         ],
-        "label": "What Tether will read"
+        "label": "What Tether will read",
+        "key": "resources"
       },
       {
         "t": "card",
@@ -24591,7 +24595,8 @@
             "sub": "Not requested"
           }
         ],
-        "label": "What Tether will read"
+        "label": "What Tether will read",
+        "key": "resources"
       },
       {
         "t": "card",
@@ -24754,7 +24759,8 @@
             "sub": "Not requested"
           }
         ],
-        "label": "What Tether will ask for"
+        "label": "What Tether will ask for",
+        "key": "data_types"
       }
     ],
     "footer": [
@@ -25714,22 +25720,22 @@
       {
         "t": "field",
         "label": "Test",
-        "value": "A1C",
+        "placeholder": "A1C",
         "kind": "select",
         "key": "test"
       },
       {
         "t": "field",
         "label": "Value",
-        "value": "7.4",
         "unit": "%",
+        "placeholder": "7.4",
         "kind": "number",
         "key": "value"
       },
       {
         "t": "field",
         "label": "Date",
-        "value": "Oct 1, 2026",
+        "placeholder": "Oct 1, 2026",
         "kind": "date",
         "key": "date"
       },
@@ -25874,23 +25880,23 @@
       {
         "t": "field",
         "label": "Test",
-        "value": "A1C",
+        "placeholder": "A1C",
         "kind": "select",
         "key": "test"
       },
       {
         "t": "field",
         "label": "Value",
-        "value": "74",
         "unit": "%",
         "error": "A1C is usually between 4% and 15%. Did you mean 7.4?",
+        "placeholder": "74",
         "kind": "number",
         "key": "value"
       },
       {
         "t": "field",
         "label": "Date",
-        "value": "Oct 1, 2026",
+        "placeholder": "Oct 1, 2026",
         "kind": "date",
         "key": "date"
       }
@@ -30838,7 +30844,7 @@
       {
         "t": "field",
         "label": "Type DELETE to confirm",
-        "value": "DELETE",
+        "placeholder": "DELETE",
         "kind": "text",
         "key": "type_delete_to_confirm"
       },
@@ -31037,7 +31043,7 @@
       {
         "t": "field",
         "label": "Type DELETE to confirm",
-        "value": "DELETE",
+        "placeholder": "DELETE",
         "kind": "text",
         "key": "type_delete_to_confirm"
       },

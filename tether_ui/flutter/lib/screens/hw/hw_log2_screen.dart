@@ -23,8 +23,8 @@ class HwLog2Screen extends StatelessWidget {
       children: [
         TTitle('Second reading'),
         TBody('Same arm, 1 minute later.', tone: TTextTone.muted),
-        TFieldRow(children: [TField(fieldKey: 'hw_log2.systolic', label: 'Top (systolic)', value: '132', unit: 'mmHg', kind: TFieldKind.number), TField(fieldKey: 'hw_log2.diastolic', label: 'Bottom (diastolic)', value: '84', unit: 'mmHg', kind: TFieldKind.number)]),
-        TField(fieldKey: 'hw_log2.pulse_optional', label: 'Pulse (optional)', value: '70', unit: 'bpm', kind: TFieldKind.number),
+        TFieldRow(children: [TField(fieldKey: 'hw_log2.systolic', label: 'Top (systolic)', unit: 'mmHg', placeholder: '132', kind: TFieldKind.number), TField(fieldKey: 'hw_log2.diastolic', label: 'Bottom (diastolic)', unit: 'mmHg', placeholder: '84', kind: TFieldKind.number)]),
+        TField(fieldKey: 'hw_log2.pulse_optional', label: 'Pulse (optional)', unit: 'bpm', placeholder: '70', kind: TFieldKind.number),
         TKeyValue(rows: [('Reading 1', '138/86'), ('Average so far', '135/85')]),
       ],
       footer: [

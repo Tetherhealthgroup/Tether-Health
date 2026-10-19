@@ -23,7 +23,7 @@ class HwLogErrorScreen extends StatelessWidget {
       header: THeader(title: 'Log blood pressure', pill: 'Check'),
       children: [
         TTitle('Let’s double-check that.'),
-        TFieldRow(children: [TField(fieldKey: 'hw_log_error.top_systolic', label: 'Top (systolic)', value: '128', unit: 'mmHg', kind: TFieldKind.number), TField(fieldKey: 'hw_log_error.bottom_diastolic', label: 'Bottom (diastolic)', value: '310', unit: 'mmHg', error: 'Too high for the bottom number. Did you mean 81?', kind: TFieldKind.number)]),
+        TFieldRow(children: [TField(fieldKey: 'hw_log_error.top_systolic', label: 'Top (systolic)', unit: 'mmHg', placeholder: '128', kind: TFieldKind.number), TField(fieldKey: 'hw_log_error.bottom_diastolic', label: 'Bottom (diastolic)', unit: 'mmHg', error: 'Too high for the bottom number. Did you mean 81?', placeholder: '310', kind: TFieldKind.number)]),
         TBody('Valid range: top 70–250, bottom 40–150, bottom lower than top.', tone: TTextTone.small),
       ],
       footer: [

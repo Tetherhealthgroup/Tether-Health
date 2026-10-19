@@ -27,14 +27,14 @@
     {
       "t": "field",
       "label": "Name",
-      "value": "Rosa",
+      "placeholder": "Rosa",
       "kind": "text",
       "key": "name"
     },
     {
       "t": "field",
       "label": "Phone",
-      "value": "(555) 010-2244",
+      "placeholder": "(555) 010-2244",
       "kind": "phone",
       "key": "phone"
     },
@@ -54,7 +54,8 @@
           "sub": "Never available to caregivers"
         }
       ],
-      "label": "Rosa can see"
+      "label": "Rosa can see",
+      "key": "caregiver_can_see"
     }
   ],
   "footer": [

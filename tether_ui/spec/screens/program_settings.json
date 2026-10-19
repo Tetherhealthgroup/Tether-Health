@@ -61,7 +61,7 @@
           "label": "Care team · Dr. Patel’s clinic",
           "sub": "Manual: you approve each summary",
           "on": true,
-          "key": "care_team_dr_patel_s_clinic"
+          "key": "care_team_sharing"
         },
         {
           "t": "toggle",

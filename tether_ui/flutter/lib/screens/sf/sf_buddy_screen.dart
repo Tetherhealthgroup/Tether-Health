@@ -24,8 +24,8 @@ class SfBuddyScreen extends StatelessWidget {
       children: [
         TTitle('Want someone in your corner?'),
         TBody('Your buddy only sees what you choose to send.', tone: TTextTone.muted),
-        TField(fieldKey: 'sf_buddy.name', label: 'Name', value: 'Sam'),
-        TChecklist(items: [TCheckItem('A weekly “I hit my goal” message', done: true), TCheckItem('My minutes per day'), TCheckItem('Nothing automatic: I send each one', done: true)], label: 'They can see'),
+        TField(fieldKey: 'sf_buddy.name', label: 'Name', placeholder: 'Sam'),
+        TChecklist(fieldKey: 'sf_buddy.buddy_can_see', items: [TCheckItem('A weekly “I hit my goal” message', done: true), TCheckItem('My minutes per day'), TCheckItem('Nothing automatic: I send each one', done: true)], label: 'They can see'),
         TCard(variant: TCardVariant.mint, eyebrow: 'Preview', children: [TQuote('Phone-free nights this week: 5. Thanks for cheering me on!')]),
       ],
       footer: [

@@ -22,16 +22,16 @@
     {
       "t": "field",
       "label": "eGFR",
-      "value": "58",
       "unit": "mL/min/1.73m²",
+      "placeholder": "58",
       "kind": "number",
       "key": "egfr"
     },
     {
       "t": "field",
       "label": "Urine ACR",
-      "value": "42",
       "unit": "mg/g",
+      "placeholder": "42",
       "kind": "number",
       "key": "urine_acr"
     },
@@ -46,7 +46,7 @@
     {
       "t": "field",
       "label": "Lab date",
-      "value": "Oct 3, 2026",
+      "placeholder": "Oct 3, 2026",
       "kind": "date",
       "key": "lab_date"
     },

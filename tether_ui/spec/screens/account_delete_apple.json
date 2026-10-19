@@ -62,7 +62,7 @@
     {
       "t": "field",
       "label": "Type DELETE to confirm",
-      "value": "DELETE",
+      "placeholder": "DELETE",
       "kind": "text",
       "key": "type_delete_to_confirm"
     },

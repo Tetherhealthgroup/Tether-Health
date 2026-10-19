@@ -30,17 +30,17 @@
         {
           "t": "field",
           "label": "Top (systolic)",
-          "value": "128",
           "unit": "mmHg",
+          "placeholder": "128",
           "kind": "number",
           "key": "top_systolic"
         },
         {
           "t": "field",
           "label": "Bottom (diastolic)",
-          "value": "310",
           "unit": "mmHg",
           "error": "Too high for the bottom number. Did you mean 81?",
+          "placeholder": "310",
           "kind": "number",
           "key": "bottom_diastolic"
         }

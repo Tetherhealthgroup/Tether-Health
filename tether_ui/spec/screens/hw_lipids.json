@@ -35,16 +35,16 @@
         {
           "t": "field",
           "label": "Total",
-          "value": "212",
           "unit": "mg/dL",
+          "placeholder": "212",
           "kind": "number",
           "key": "total"
         },
         {
           "t": "field",
           "label": "LDL",
-          "value": "138",
           "unit": "mg/dL",
+          "placeholder": "138",
           "kind": "number",
           "key": "ldl"
         }
@@ -56,8 +56,8 @@
         {
           "t": "field",
           "label": "HDL",
-          "value": "46",
           "unit": "mg/dL",
+          "placeholder": "46",
           "kind": "number",
           "key": "hdl"
         },
@@ -74,7 +74,7 @@
     {
       "t": "field",
       "label": "Lab date",
-      "value": "Sep 30, 2026",
+      "placeholder": "Sep 30, 2026",
       "kind": "date",
       "key": "lab_date"
     }

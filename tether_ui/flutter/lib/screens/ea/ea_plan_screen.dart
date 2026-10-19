@@ -23,9 +23,9 @@ class EaPlanScreen extends StatelessWidget {
       children: [
         TTitle('Make a plan for hard moments'),
         TBody('Based on the Stanley-Brown safety plan. Only you can see this.', tone: TTextTone.small),
-        TField(fieldKey: 'ea_plan.my_warning_signs', label: 'My warning signs', value: 'Not sleeping, pulling away from friends', kind: TFieldKind.multiline),
-        TField(fieldKey: 'ea_plan.things_that_help_me', label: 'Things that help me', value: 'Walk the dog, shower, music'),
-        TField(fieldKey: 'ea_plan.people_i_can_reach', label: 'People I can reach', value: 'Sam · (555) 010-3311'),
+        TField(fieldKey: 'ea_plan.my_warning_signs', label: 'My warning signs', placeholder: 'Not sleeping, pulling away from friends', kind: TFieldKind.multiline),
+        TField(fieldKey: 'ea_plan.things_that_help_me', label: 'Things that help me', placeholder: 'Walk the dog, shower, music'),
+        TField(fieldKey: 'ea_plan.people_i_can_reach', label: 'People I can reach', placeholder: 'Sam · (555) 010-3311'),
         TKeyValue(rows: [('Crisis line', '988 · call or text'), ('Emergency', '911')]),
       ],
       footer: [

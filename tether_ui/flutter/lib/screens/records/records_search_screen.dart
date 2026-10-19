@@ -24,7 +24,7 @@ class RecordsSearchScreen extends StatelessWidget {
     return TScreen(
       header: THeader(title: 'Find your provider'),
       children: [
-        TField(fieldKey: 'records_search.query', label: 'Search', value: 'Patel', placeholder: 'Search hospital, clinic or doctor', kind: TFieldKind.search),
+        TField(fieldKey: 'records_search.query', label: 'Search', placeholder: 'Search hospital, clinic or doctor', kind: TFieldKind.search),
         TListGroup(title: 'Results', rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'Patel Family Medicine', sub: 'Epic · San Jose, CA', lead: TLead.icon('E'), onTap: () => TNav.push(context, Routes.recordsConsent)), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: 'Patel Heart Institute', sub: 'Epic · Fremont, CA', lead: TLead.icon('E'), onTap: () => TNav.push(context, Routes.recordsConsent)), TListRow(key: const ValueKey('a:body[1].rows[2]'), label: 'Stanford Health Care', sub: 'Epic · Palo Alto, CA', lead: TLead.icon('E'), onTap: () => TNav.push(context, Routes.recordsConsent))]),
         TLink(key: const ValueKey('a:body[2]'), label: 'Can’t find it? Enter a FHIR address', onTap: () => TNav.push(context, Routes.recordsFhirUrl)),
       ],

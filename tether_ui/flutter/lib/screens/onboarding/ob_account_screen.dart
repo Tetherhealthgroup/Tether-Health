@@ -29,9 +29,9 @@ class ObAccountScreen extends StatelessWidget {
         TAuthButtons(children: [TAuthButton(key: const ValueKey('a:body[2].items[0]'), provider: 'apple', label: 'Continue with Apple', onPressed: () => TNav.branch(context, 'Sign in with Apple result', <String, VoidCallback>{'Success': () => TNav.push(context, Routes.authMerge), 'Email already has a Tether account': () => TNav.push(context, Routes.authLink), 'Cancelled': () => TNav.toast(context, 'Sign-in cancelled'), 'Error': () => TNav.push(context, Routes.authSocialError)}, provider: 'apple'), platforms: ['ios']), TAuthButton(key: const ValueKey('a:body[2].items[1]'), provider: 'google', label: 'Continue with Google', onPressed: () => TNav.branch(context, 'Sign in with Google result', <String, VoidCallback>{'Success': () => TNav.push(context, Routes.authMerge), 'Email already has a Tether account': () => TNav.push(context, Routes.authLink), 'Cancelled': () => TNav.toast(context, 'Sign-in cancelled'), 'Error': () => TNav.push(context, Routes.authSocialError)}, provider: 'google'), platforms: ['ios', 'android'])]),
         TBody('Sign in with Apple can hide your email: we use Apple’s private relay address.', tone: TTextTone.small),
         TEyebrow('Or with email'),
-        TField(fieldKey: 'ob_account.email', label: 'Email', value: 'alex@example.com', kind: TFieldKind.email),
-        TField(fieldKey: 'ob_account.password', label: 'Password', value: '••••••••••••', hint: 'At least 12 characters. A passphrase works well.', kind: TFieldKind.password),
-        TChecklist(items: [TCheckItem('I’m 18 or older', done: true)]),
+        TField(fieldKey: 'ob_account.email', label: 'Email', placeholder: 'alex@example.com', kind: TFieldKind.email),
+        TField(fieldKey: 'ob_account.password', label: 'Password', hint: 'At least 12 characters. A passphrase works well.', placeholder: '••••••••••••', kind: TFieldKind.password),
+        TChecklist(fieldKey: 'ob_account.age_18_or_older', items: [TCheckItem('I’m 18 or older', done: true)]),
         TBody('Guest plans are encrypted on this phone. If you sign up later, we ask before uploading them.', tone: TTextTone.small),
       ],
       footer: [

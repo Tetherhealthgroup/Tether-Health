@@ -15,7 +15,8 @@ The test fails when an approved screen is missing, when it differs from the
 manifest without a deviation entry, when a deviated screen differs from its
 pinned sha256, when a screen is neither approved nor a listed addition, or
 when an entry has no decision or ticket. Decisions must be decision IDs
-(`P-22`, `P-30b`, `N3`, `P-47 decision 3`) and tickets ticket IDs (`TH-942`,
+(`P-22`, `P-28b`, `N3`, `P-47 decision 3`, or exactly `TH-902`, the owner's
+approval of the ARCH-TH-902 design) and tickets ticket IDs (`TH-942`,
 `TH-972a`). Missing or malformed registry files, or a missing
 `spec/screens`, also fail, with a message saying what to restore.
 

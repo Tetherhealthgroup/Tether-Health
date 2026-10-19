@@ -43,22 +43,22 @@
     {
       "t": "field",
       "label": "Test",
-      "value": "A1C",
+      "placeholder": "A1C",
       "kind": "select",
       "key": "test"
     },
     {
       "t": "field",
       "label": "Value",
-      "value": "7.4",
       "unit": "%",
+      "placeholder": "7.4",
       "kind": "number",
       "key": "value"
     },
     {
       "t": "field",
       "label": "Date",
-      "value": "Oct 1, 2026",
+      "placeholder": "Oct 1, 2026",
       "kind": "date",
       "key": "date"
     },

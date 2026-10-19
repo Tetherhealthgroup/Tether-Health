@@ -44,16 +44,16 @@
         {
           "t": "field",
           "label": "Before meals from",
-          "value": "80",
           "unit": "mg/dL",
+          "placeholder": "80",
           "kind": "number",
           "key": "before_meals_from"
         },
         {
           "t": "field",
           "label": "to",
-          "value": "130",
           "unit": "mg/dL",
+          "placeholder": "130",
           "kind": "number",
           "key": "to"
         }
@@ -62,8 +62,8 @@
     {
       "t": "field",
       "label": "2 h after meals below",
-      "value": "180",
       "unit": "mg/dL",
+      "placeholder": "180",
       "kind": "number",
       "key": "2_h_after_meals_below"
     },
@@ -75,15 +75,15 @@
         {
           "t": "field",
           "label": "Low below",
-          "value": "70",
           "unit": "mg/dL",
+          "placeholder": "70",
           "kind": "number",
           "key": "low"
         },
         {
           "t": "field",
           "label": "My low steps",
-          "value": "15 g fast sugar, re-check in 15 min",
+          "placeholder": "15 g fast sugar, re-check in 15 min",
           "kind": "multiline",
           "key": "my_low_steps"
         }

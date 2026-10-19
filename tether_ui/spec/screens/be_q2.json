@@ -50,7 +50,7 @@
     {
       "t": "field",
       "label": "Relative’s age at diagnosis (if known)",
-      "value": "44",
+      "placeholder": "44",
       "kind": "number",
       "key": "relative_s_age_at_diagnosis_if_k"
     },

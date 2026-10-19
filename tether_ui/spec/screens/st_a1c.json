@@ -27,15 +27,15 @@
     {
       "t": "field",
       "label": "A1C",
-      "value": "7.4",
       "unit": "%",
+      "placeholder": "7.4",
       "kind": "number",
       "key": "a1c"
     },
     {
       "t": "field",
       "label": "Lab date",
-      "value": "Oct 1, 2026",
+      "placeholder": "Oct 1, 2026",
       "kind": "date",
       "key": "lab_date"
     },

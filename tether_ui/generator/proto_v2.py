@@ -43,7 +43,9 @@ function match(sel, labels){ if(sel==null) return null; const s=String(sel).toLo
   let i=L.indexOf(s); if(i<0) i=L.findIndex(l=>s.startsWith(l)||l.startsWith(s)); if(i<0) i=L.findIndex(l=>l.includes(s)||s.includes(l.split(' ')[0])); return i>=0?labels[i]:null }
 /* ---------------- inputs → session */
 function valueOf(el){
-  if(el.tagName==='INPUT') return el.value;
+  if(el.tagName==='INPUT') return el.value===''?null:el.value; /* P-31: empty until the user types; the example is only the placeholder */
+  if(el.classList.contains('cklist')) return [...el.querySelectorAll('.ckr')].filter(r=>r.querySelector('.ck.on')).map(r=>r.querySelector('.ol b').textContent.trim());
+  if(el.classList.contains('tiles')) return [...el.querySelectorAll('.tile.on:not(.hot)')].map(t=>t.querySelector('b').textContent.trim());
   if(el.classList.contains('chips')) return [...el.querySelectorAll('.chip.on')].map(c=>c.textContent.trim());
   if(el.classList.contains('seg')) { const o=el.querySelector('span.on'); return o?o.textContent.trim():null }
   if(el.classList.contains('opts')) { const o=el.querySelector('.opt.on'); return o?o.dataset.label:null }
@@ -82,8 +84,8 @@ async function branch(a){
   if(!pick && a.decide) pick=match(decide(a.decide), labels);
   if(!pick && QUEUE.length) pick=match(QUEUE.shift(), labels);
   if(!pick){
-    if(a.provider==='apple') pick=labels[await chooser('Sign in with Apple','Use your Apple ID “alex@icloud.com” with Tether Health? · Share My Email / Hide My Email', labels, 'apple')];
-    else if(a.provider==='google') pick=labels[await chooser('Choose an account','to continue to Tether Health · Alex · alex@gmail.com', labels, 'google')];
+    if(a.provider==='apple') pick=labels[await chooser('Sign in with Apple','Use your Apple ID “alex@example.com” with Tether Health? · Share My Email / Hide My Email', labels, 'apple')];
+    else if(a.provider==='google') pick=labels[await chooser('Choose an account','to continue to Tether Health · Alex · alex@example.com', labels, 'google')];
     else pick=labels[await chooser('Simulate: '+a.question,'Real logic decides this in the app. Pick an outcome to follow that path.', labels)];
   }
   const c=a.cases.find(c=>c.label===pick); if(c) await run(c.action);
@@ -117,8 +119,8 @@ document.addEventListener('click',ev=>{
     const z=ev.target.closest('.zone span'); if(z && !z.parentNode.dataset.rule){z.parentNode.querySelectorAll('span').forEach(c=>c.classList.remove('on')); z.classList.add('on'); return}
     const o=ev.target.closest('.opt'); if(o){o.parentNode.querySelectorAll('.opt').forEach(c=>c.classList.remove('on')); o.classList.add('on'); const k=o.parentNode.dataset.key; if(k) setV(k,valueOf(o.parentNode)); return}
     const t=ev.target.closest('.tg'); if(t){t.classList.toggle('on'); if(t.dataset.key) setV(t.dataset.key,valueOf(t)); return}
-    const ck=ev.target.closest('.ckr'); if(ck){ck.querySelector('.ck').classList.toggle('on'); return}
-    const tl=ev.target.closest('.tile'); if(tl){tl.classList.toggle('on'); return}
+    const ck=ev.target.closest('.ckr'); if(ck){ck.querySelector('.ck').classList.toggle('on'); const k=ck.parentNode.dataset.key; if(k) setV(k,valueOf(ck.parentNode)); return}
+    const tl=ev.target.closest('.tile'); if(tl){tl.classList.toggle('on'); const k=tl.parentNode.dataset.key; if(k) setV(k,valueOf(tl.parentNode)); return}
     return;
   }
   const li=ev.target.closest('.fl li'); if(li){stack=[li.dataset.id]; onboarding=false; render(); return}

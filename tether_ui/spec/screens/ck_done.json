@@ -21,21 +21,21 @@
     {
       "t": "field",
       "label": "What",
-      "value": "Flu vaccine",
+      "placeholder": "Flu vaccine",
       "kind": "select",
       "key": "what"
     },
     {
       "t": "field",
       "label": "Date",
-      "value": "Oct 12, 2026",
+      "placeholder": "Oct 12, 2026",
       "kind": "date",
       "key": "date"
     },
     {
       "t": "field",
       "label": "Where (optional)",
-      "value": "Main St Pharmacy",
+      "placeholder": "Main St Pharmacy",
       "kind": "text",
       "key": "where_optional"
     },

@@ -26,8 +26,8 @@ class AuthSigninScreen extends StatelessWidget {
         TTitle('Welcome back'),
         TAuthButtons(children: [TAuthButton(key: const ValueKey('a:body[1].items[0]'), provider: 'apple', label: 'Continue with Apple', onPressed: () => TNav.branch(context, 'Sign in with Apple result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Success · guest plan on phone': () => TNav.push(context, Routes.authMerge), 'New Apple ID, no Tether account': () => TNav.push(context, Routes.authSocialNew), 'Cancelled': () => TNav.toast(context, 'Sign-in cancelled'), 'Error': () => TNav.push(context, Routes.authSocialError)}, provider: 'apple'), platforms: ['ios']), TAuthButton(key: const ValueKey('a:body[1].items[1]'), provider: 'google', label: 'Continue with Google', onPressed: () => TNav.branch(context, 'Sign in with Google result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Success · guest plan on phone': () => TNav.push(context, Routes.authMerge), 'New Google account, no Tether account': () => TNav.push(context, Routes.authSocialNew), 'Cancelled': () => TNav.toast(context, 'Sign-in cancelled'), 'Error': () => TNav.push(context, Routes.authSocialError)}, provider: 'google'), platforms: ['ios', 'android'])]),
         TEyebrow('Or with email'),
-        TField(fieldKey: 'auth_signin.email', label: 'Email', value: 'alex@example.com', kind: TFieldKind.email),
-        TField(fieldKey: 'auth_signin.password', label: 'Password', value: '••••••••', kind: TFieldKind.password),
+        TField(fieldKey: 'auth_signin.email', label: 'Email', placeholder: 'alex@example.com', kind: TFieldKind.email),
+        TField(fieldKey: 'auth_signin.password', label: 'Password', placeholder: '••••••••', kind: TFieldKind.password),
         TLink(key: const ValueKey('a:body[5]'), label: 'Forgot password?', onTap: () => TNav.push(context, Routes.authForgot), alignLeft: true),
       ],
       footer: [

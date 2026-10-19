@@ -21,9 +21,9 @@ class CkDoneScreen extends StatelessWidget {
     return TScreen(
       header: THeader(title: 'Mark as done'),
       children: [
-        TField(fieldKey: 'ck_done.what', label: 'What', value: 'Flu vaccine', kind: TFieldKind.select),
-        TField(fieldKey: 'ck_done.date', label: 'Date', value: 'Oct 12, 2026', kind: TFieldKind.date),
-        TField(fieldKey: 'ck_done.where_optional', label: 'Where (optional)', value: 'Main St Pharmacy'),
+        TField(fieldKey: 'ck_done.what', label: 'What', placeholder: 'Flu vaccine', kind: TFieldKind.select),
+        TField(fieldKey: 'ck_done.date', label: 'Date', placeholder: 'Oct 12, 2026', kind: TFieldKind.date),
+        TField(fieldKey: 'ck_done.where_optional', label: 'Where (optional)', placeholder: 'Main St Pharmacy'),
         TChecklist(items: [TCheckItem('Remind me next year', done: true)]),
       ],
       footer: [

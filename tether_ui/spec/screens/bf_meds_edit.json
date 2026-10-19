@@ -26,21 +26,21 @@
     {
       "t": "field",
       "label": "Medicine",
-      "value": "Nicotine patch",
+      "placeholder": "Nicotine patch",
       "kind": "select",
       "key": "medicine"
     },
     {
       "t": "field",
       "label": "Strength",
-      "value": "21 mg / 24 h",
+      "placeholder": "21 mg / 24 h",
       "kind": "text",
       "key": "strength"
     },
     {
       "t": "field",
       "label": "When",
-      "value": "Every morning",
+      "placeholder": "Every morning",
       "kind": "select",
       "key": "when"
     },

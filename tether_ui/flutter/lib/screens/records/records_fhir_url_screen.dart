@@ -22,7 +22,7 @@ class RecordsFhirUrlScreen extends StatelessWidget {
       header: THeader(title: 'Other FHIR server'),
       children: [
         TTitle('Enter your provider’s FHIR address'),
-        TField(fieldKey: 'records_fhir_url.base_url', label: 'FHIR server address', value: 'https://fhir.example-health.org/r4', hint: 'Starts with https:// · your provider gives you this'),
+        TField(fieldKey: 'records_fhir_url.base_url', label: 'FHIR server address', hint: 'Starts with https:// · your provider gives you this', placeholder: 'https://fhir.example-health.org/r4'),
         TBody('We check it supports SMART on FHIR R4 (/.well-known/smart-configuration) before you sign in.', tone: TTextTone.small),
       ],
       footer: [

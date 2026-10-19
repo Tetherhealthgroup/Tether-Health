@@ -26,8 +26,8 @@
     {
       "t": "field",
       "label": "FHIR server address",
-      "value": "https://fhir.example-health.org/r4",
       "hint": "Starts with https:// · your provider gives you this",
+      "placeholder": "https://fhir.example-health.org/r4",
       "kind": "text",
       "key": "base_url"
     },

@@ -25,9 +25,9 @@ class StRangeScreen extends StatelessWidget {
         TSteps(n: 2, total: 2),
         TTitle('Enter the range your clinician gave you.'),
         TSegmented(fieldKey: 'st_range.value', options: ['mg/dL', 'mmol/L'], selected: 'mg/dL'),
-        TFieldRow(children: [TField(fieldKey: 'st_range.before_meals_from', label: 'Before meals from', value: '80', unit: 'mg/dL', kind: TFieldKind.number), TField(fieldKey: 'st_range.to', label: 'to', value: '130', unit: 'mg/dL', kind: TFieldKind.number)]),
-        TField(fieldKey: 'st_range.2_h_after_meals_below', label: '2 h after meals below', value: '180', unit: 'mg/dL', kind: TFieldKind.number),
-        TCard(eyebrow: 'Your low plan', children: [TField(fieldKey: 'st_range.low', label: 'Low below', value: '70', unit: 'mg/dL', kind: TFieldKind.number), TField(fieldKey: 'st_range.my_low_steps', label: 'My low steps', value: '15 g fast sugar, re-check in 15 min', kind: TFieldKind.multiline)]),
+        TFieldRow(children: [TField(fieldKey: 'st_range.before_meals_from', label: 'Before meals from', unit: 'mg/dL', placeholder: '80', kind: TFieldKind.number), TField(fieldKey: 'st_range.to', label: 'to', unit: 'mg/dL', placeholder: '130', kind: TFieldKind.number)]),
+        TField(fieldKey: 'st_range.2_h_after_meals_below', label: '2 h after meals below', unit: 'mg/dL', placeholder: '180', kind: TFieldKind.number),
+        TCard(eyebrow: 'Your low plan', children: [TField(fieldKey: 'st_range.low', label: 'Low below', unit: 'mg/dL', placeholder: '70', kind: TFieldKind.number), TField(fieldKey: 'st_range.my_low_steps', label: 'My low steps', placeholder: '15 g fast sugar, re-check in 15 min', kind: TFieldKind.multiline)]),
         TLink(key: const ValueKey('a:body[6]'), label: 'Import from my health record', onTap: () => TNav.push(context, Routes.recordsAdd)),
       ],
       footer: [

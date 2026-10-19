@@ -36,6 +36,43 @@ def resolve(a, force, onboarding):
     if t == 'os_settings': return {'kind': 'platform', 'value': 'os_settings:'}
     raise ValueError(t)
 
+def submits_under(a, force):
+    """True if action `a` reaches a submit when branches take `force` (or their first outcome)."""
+    if not a: return False
+    t = a['type']
+    if t == 'submit': return True
+    if t == 'toast': return submits_under(a.get('then'), force)
+    if t == 'branch':
+        case = next((c for c in a['cases'] if c['label'] == force), a['cases'][0])
+        return submits_under(case['action'], force)
+    return False
+
+def placeholder_cases():
+    """P-31 cases: every screen with text fields, tapped without typing.
+
+    Each element whose action can reach a submit is tapped once per branch
+    outcome that submits. Screens without a submit tap their forward footer
+    buttons ("Next", "Continue"). Returns (screen, path, element, force,
+    must submit, [(session key, placeholder)])."""
+    out = []
+    for sid, s in SCREENS.items():
+        fields = [(f"{sid}.{n['key']}", n.get('placeholder')) for part in ('body', 'footer') for n, p in walk(s[part], part) if n['t'] == 'field']
+        if not fields: continue
+        acts = [(l, p, a) for l, p, a in actions_of(s) if a and not p.startswith(('tabbar', 'header'))]
+        picked = []
+        for l, p, a in acts:
+            br = first_branch(a)
+            forces = [c['label'] for c in br['cases']] if br else [None]
+            for f in forces:
+                if submits_under(a, f): picked.append((l, p, f, True))
+        if not picked:
+            picked = [(l, p, None, False) for l, p, a in acts if p.startswith('footer') and leaves(a) and a['type'] not in ('back', 'close')]
+        if not picked:  # search fields: nothing to save, check the empty start only
+            picked = [('opened, nothing tapped', '', None, False)]
+        for l, p, f, must in picked:
+            out.append((sid, p, l, f, must, fields))
+    return out
+
 def expectations():
     out = []
     for sid, s in SCREENS.items():
@@ -232,4 +269,208 @@ void main() {{
 }}
 """
     open(os.path.join(out_dir, 'test', 'scenarios_test.dart'), 'w').write(code)
+    placeholders_test(out_dir)
+    large_text_test(out_dir)
     return len(exps), len(SCENARIOS)
+
+def large_text_cases():
+    """Screens with unit fields (blood pressure, labs, ranges): (screen, [(session key, unit, example)])."""
+    out = []
+    for sid, s in SCREENS.items():
+        fields = [(f"{sid}.{n['key']}", n['unit'], n.get('placeholder') or '') for part in ('body', 'footer') for n, p in walk(s[part], part)
+                  if n['t'] == 'field' and n.get('unit') and n.get('kind') not in ('select', 'date')]
+        if fields: out.append((sid, fields))
+    return out
+
+def large_text_test(out_dir):
+    rows = [f"  ({dstr(sid)}, Routes.{camel(sid)}, {lst_d([f'({dstr(k)}, {dstr(u)}, {dstr(x)})' for k, u, x in fields])})," for sid, fields in large_text_cases()]
+    code = f"""// GENERATED — unit fields at 200% text. On every screen with a unit field
+// (mmHg, mg/dL, %...) the unit must be visible while the field is empty, the
+// example hint must not be cut, and a typed value of the example's length
+// must fit in full next to its unit. Text is measured with Roboto from the
+// Flutter SDK (the test font draws every glyph 1 em wide).
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tether_ui/router/app_router.dart';
+import 'package:tether_ui/router/routes.dart';
+import 'package:tether_ui/ui/ui.dart';
+
+const _cases = <(String, String, List<(String, String, String)>)>[
+{chr(10).join(rows)}
+];
+
+/// The unit's text exists inside [field] and no ancestor fades it out.
+void _expectUnitVisible(WidgetTester tester, Finder field, String unit, String state) {{
+  final f = find.descendant(of: field, matching: find.text(unit));
+  expect(f, findsOneWidget, reason: 'unit "$unit" missing ($state)');
+  RenderObject? r = tester.renderObject(f);
+  final stop = tester.renderObject(field);
+  while (r != null && r != stop) {{
+    if (r is RenderOpacity) expect(r.opacity, greaterThan(0), reason: 'unit "$unit" hidden ($state)');
+    if (r is RenderAnimatedOpacity) expect(r.opacity.value, greaterThan(0), reason: 'unit "$unit" hidden ($state)');
+    r = r.parent;
+  }}
+}}
+
+Future<void> _loadRoboto() async {{
+  final root = Platform.environment['FLUTTER_ROOT'];
+  expect(root, isNotNull, reason: 'FLUTTER_ROOT is not set; run with flutter test');
+  final loader = FontLoader('Roboto');
+  for (final w in ['Regular', 'Medium', 'Bold', 'Black']) {{
+    final file = File('$root/bin/cache/artifacts/material_fonts/Roboto-$w.ttf');
+    expect(file.existsSync(), isTrue, reason: '${{file.path}} is missing (flutter precache)');
+    loader.addFont(Future.value(ByteData.view(Uint8List.fromList(file.readAsBytesSync()).buffer)));
+  }}
+  await loader.load();
+}}
+
+void main() {{
+  setUpAll(_loadRoboto);
+  for (final c in _cases) {{
+    testWidgets('200% text · ${{c.$1}}', (tester) async {{
+      tester.view.physicalSize = const Size(1170, 2532);
+      tester.view.devicePixelRatio = 3;
+      tester.platformDispatcher.textScaleFactorTestValue = 2.0;
+      addTearDown(tester.view.reset);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      TSession.clear();
+      await tester.pumpWidget(MaterialApp(
+        theme: tetherTheme(),
+        onGenerateRoute: AppRouter.onGenerateRoute,
+        onGenerateInitialRoutes: (_) => [AppRouter.onGenerateRoute(RouteSettings(name: c.$2))!],
+      ));
+      await tester.pump(const Duration(milliseconds: 400));
+      for (final (key, unit, example) in c.$3) {{
+        final field = find.byKey(ValueKey('field:$key'));
+        expect(field, findsOneWidget, reason: 'field $key');
+        await tester.ensureVisible(field);
+        await tester.pump();
+        _expectUnitVisible(tester, field, unit, '$key empty');
+        if (example.isNotEmpty) {{
+          final hint = tester.renderObject<RenderParagraph>(find.descendant(of: field, matching: find.text(example)));
+          expect(hint.didExceedMaxLines, isFalse, reason: '$key: hint "$example" is cut at 200% text');
+        }}
+        final value = example.contains(RegExp(r'\\d')) ? example : '123';
+        await tester.enterText(field, value);
+        await tester.pump(const Duration(milliseconds: 300));
+        _expectUnitVisible(tester, field, unit, '$key with "$value"');
+        final editable = tester.state<EditableTextState>(find.descendant(of: field, matching: find.byType(EditableText))).renderEditable;
+        expect(editable.getMaxIntrinsicWidth(double.infinity), lessThanOrEqualTo(editable.size.width + 0.5),
+            reason: '$key: "$value" does not fit at 200% text (needs ${{editable.getMaxIntrinsicWidth(double.infinity).toStringAsFixed(1)}}, has ${{editable.size.width.toStringAsFixed(1)}})');
+      }}
+      expect(tester.takeException(), isNull);
+    }});
+  }}
+}}
+"""
+    open(os.path.join(out_dir, 'test', 'large_text_test.dart'), 'w').write(code)
+    return len(rows)
+
+
+def placeholders_test(out_dir):
+    rows = []
+    for sid, path, label, force, must, fields in placeholder_cases():
+        keys = lst_d([dstr(k) for k, _ in fields])
+        hints = lst_d([f"({dstr(k)}, {dstr(ph)})" for k, ph in fields if ph])
+        rows.append(f"  ({dstr(sid)}, Routes.{camel(sid)}, {dstr(path)}, {dstr(label)}, {dstr(force)}, {'true' if must else 'false'}, {keys}, {hints}),")
+    code = f"""// GENERATED — P-31: example values are placeholder (hint) text. Every
+// screen with text fields is opened and its Save / Continue elements are
+// tapped without typing. Each field must start empty, show its example only
+// as hint text and hold null in the session. Whatever is submitted must hold
+// null for these fields and never an example value.
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tether_ui/router/app_router.dart';
+import 'package:tether_ui/router/routes.dart';
+import 'package:tether_ui/ui/ui.dart';
+
+class _RecordingApi implements TApi {{
+  final List<(String, Map<String, Object?>)> calls = [];
+  @override
+  Future<bool> submit(String endpoint) async {{
+    calls.add((endpoint, Map<String, Object?>.of(TSession.values)));
+    return true;
+  }}
+}}
+
+bool _holds(Object? value, String example) => value == example || (value is List && value.contains(example));
+
+const _cases = <(String, String, String, String, String?, bool, List<String>, List<(String, String)>)>[
+{chr(10).join(rows)}
+];
+
+void main() {{
+  for (final c in _cases) {{
+    final name = 'no example submitted · ${{c.$1}} · ${{c.$4}}${{c.$5 != null ? ' → ${{c.$5}}' : ''}}';
+    testWidgets(name, (tester) async {{
+      tester.view.physicalSize = const Size(1170, 2532);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      TSession.clear();
+      TFlow.onboarding = false;
+      TSim.force = c.$5;
+      TNav.branchResolver = (context, question, outcomes) async => outcomes.first;
+      final api = _RecordingApi();
+      TApi.instance = api;
+      try {{
+        await tester.pumpWidget(MaterialApp(
+          theme: tetherTheme(),
+          onGenerateRoute: (s) => s.name == '{HOST}' ? MaterialPageRoute<void>(builder: (_) => const Scaffold(), settings: s) : AppRouter.onGenerateRoute(s),
+          onGenerateInitialRoutes: (_) => [
+            MaterialPageRoute<void>(builder: (_) => const Scaffold(), settings: const RouteSettings(name: '{HOST}')),
+            AppRouter.onGenerateRoute(RouteSettings(name: c.$2))!,
+          ],
+        ));
+        await tester.pump(const Duration(milliseconds: 400));
+        for (final key in c.$7) {{
+          final field = find.byKey(ValueKey('field:$key'));
+          expect(field, findsOneWidget, reason: 'field $key');
+          final editable = tester.widget<EditableText>(find.descendant(of: field, matching: find.byType(EditableText)));
+          expect(editable.controller.text, isEmpty, reason: '$key must start empty');
+          expect(TSession.values.containsKey(key), isTrue, reason: '$key writes to the session');
+          expect(TSession.values[key], isNull, reason: '$key must be null until the member types');
+        }}
+        for (final (key, hint) in c.$8) {{
+          expect(find.descendant(of: find.byKey(ValueKey('field:$key')), matching: find.text(hint)), findsOneWidget, reason: '$key shows "$hint" as hint text');
+        }}
+        if (c.$3.isNotEmpty) {{
+          final finder = find.byKey(ValueKey('a:${{c.$3}}'));
+          expect(finder, findsOneWidget, reason: 'element ${{c.$3}} on ${{c.$1}}');
+          await tester.ensureVisible(finder);
+          await tester.pump(const Duration(milliseconds: 100));
+          await tester.tap(finder, warnIfMissed: false);
+          for (var i = 0; i < 6; i++) {{
+            await tester.pump(const Duration(milliseconds: 120));
+          }}
+        }}
+        if (c.$6) expect(api.calls, isNotEmpty, reason: '${{c.$4}} submits');
+        final sent = api.calls.isEmpty ? [Map<String, Object?>.of(TSession.values)] : [for (final call in api.calls) call.$2];
+        for (final values in sent) {{
+          for (final key in c.$7) {{
+            expect(values[key], isNull, reason: '$key was not typed, so nothing may be sent for it');
+          }}
+          for (final (_, hint) in c.$8) {{
+            for (final e in values.entries) {{
+              expect(_holds(e.value, hint), isFalse, reason: 'example "$hint" reached the session as ${{e.key}}');
+            }}
+          }}
+        }}
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+      }} finally {{
+        TSim.reset();
+        TApi.instance = PreviewApi();
+      }}
+    }});
+  }}
+}}
+"""
+    open(os.path.join(out_dir, 'test', 'placeholders_test.dart'), 'w').write(code)
+    return len(rows)
+
+def lst_d(items): return '[' + ', '.join(items) + ']'
+

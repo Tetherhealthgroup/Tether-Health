@@ -26,23 +26,23 @@
     {
       "t": "field",
       "label": "Test",
-      "value": "A1C",
+      "placeholder": "A1C",
       "kind": "select",
       "key": "test"
     },
     {
       "t": "field",
       "label": "Value",
-      "value": "74",
       "unit": "%",
       "error": "A1C is usually between 4% and 15%. Did you mean 7.4?",
+      "placeholder": "74",
       "kind": "number",
       "key": "value"
     },
     {
       "t": "field",
       "label": "Date",
-      "value": "Oct 1, 2026",
+      "placeholder": "Oct 1, 2026",
       "kind": "date",
       "key": "date"
     }

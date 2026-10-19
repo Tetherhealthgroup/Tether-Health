@@ -21,7 +21,7 @@ class SupportConnectScreen extends StatelessWidget {
       header: THeader(title: 'Connect a clinic'),
       children: [
         TTitle('Enter your clinic’s invite code'),
-        TField(fieldKey: 'support_connect.invite_code', label: 'Invite code', value: 'PATEL-4821'),
+        TField(fieldKey: 'support_connect.invite_code', label: 'Invite code', placeholder: 'PATEL-4821'),
         TBody('Your clinic gave you this code. Connecting shares nothing until you approve a summary.', tone: TTextTone.muted),
       ],
       footer: [

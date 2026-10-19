@@ -126,10 +126,14 @@ SCENARIOS = [
     # ---------------- Heartwise
     sc('hw-setup', 'hw', 'Setup', 'Add Heartwise by swapping a focus slot', 'hw_intro', [('tap', 'Set up Heartwise'), ('tap', 'Swap with ScrollFree'), ('tap', 'Continue'), ('expect', 'hw_q1'), ('tap', 'Next'), ('tap', 'Save targets')], 'hw_home'),
     sc('hw-learn', 'hw', 'Setup', 'Add Heartwise as Learn only', 'hw_intro', [('tap', 'Set up Heartwise'), ('tap', 'Continue')], 'plans'),
-    sc('hw-normal', 'hw', 'Daily', 'Two readings 138/86 + 132/84 → saved', 'hw_home', [('tap', 'Log blood pressure'), ('tap', 'Next reading'), ('tap', 'Save readings')], 'hw_result'),
+    sc('hw-normal', 'hw', 'Daily', 'Two readings 138/86 + 132/84 → saved', 'hw_home',
+       [('tap', 'Log blood pressure'), ('enter', 'hw_log.systolic', '138'), ('enter', 'hw_log.diastolic', '86'), ('tap', 'Next reading'),
+        ('enter', 'hw_log2.systolic', '132'), ('enter', 'hw_log2.diastolic', '84'), ('tap', 'Save readings')], 'hw_result'),
     sc('hw-crisis', 'hw', 'Safety', 'Reading 186/122 → symptom check → re-check', 'hw_home',
        [('tap', 'Log blood pressure'), ('enter', 'hw_log.systolic', '186'), ('enter', 'hw_log.diastolic', '122'), ('tap', 'Next reading'), ('tap', 'Save readings'), ('expect', 'hw_crisis'), ('tap', 'No symptoms · re-check in 5 min')], 'hw_recheck'),
-    sc('hw-invalid', 'hw', 'Validation', 'Diastolic 310 → fix-it message', 'hw_log', [('tap', 'Next reading'), ('enter', 'hw_log2.diastolic', '310'), ('tap', 'Save readings')], 'hw_log_error'),
+    sc('hw-invalid', 'hw', 'Validation', 'Diastolic 310 → fix-it message', 'hw_log',
+       [('enter', 'hw_log.systolic', '138'), ('enter', 'hw_log.diastolic', '86'), ('tap', 'Next reading'),
+        ('enter', 'hw_log2.systolic', '132'), ('enter', 'hw_log2.diastolic', '310'), ('tap', 'Save readings')], 'hw_log_error'),
     sc('hw-summary', 'hw', 'Resources', 'Visit summary sent to care team', 'hw_home', [('tap', 'Visit summary'), ('tap', 'Send summary')], 'hw_home'),
     # ---------------- Steady
     sc('st-setup', 'st', 'Setup', 'Steady setup with range and low plan', 'st_intro', [('tap', 'Set up Steady'), ('tap', 'Next'), ('tap', 'Save range')], 'st_home'),

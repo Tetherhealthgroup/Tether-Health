@@ -21,10 +21,10 @@ class StLogScreen extends StatelessWidget {
     return TScreen(
       header: THeader(title: 'Log a reading'),
       children: [
-        TField(fieldKey: 'st_log.reading', label: 'Reading', value: '142', unit: 'mg/dL', hint: 'From your meter or CGM · 20–600 mg/dL', kind: TFieldKind.number),
+        TField(fieldKey: 'st_log.reading', label: 'Reading', unit: 'mg/dL', hint: 'From your meter or CGM · 20–600 mg/dL', placeholder: '142', kind: TFieldKind.number),
         TChips(fieldKey: 'st_log.when', options: ['Fasting', 'Before meal', '2 h after meal', 'Bedtime', 'Other'], selected: ['2 h after meal'], multi: false, label: 'When?'),
         TChips(fieldKey: 'st_log.how_do_you_feel', options: ['Fine', 'Shaky', 'Sweaty', 'Tired', 'Thirsty'], selected: ['Fine'], label: 'How do you feel?'),
-        TField(fieldKey: 'st_log.note_optional', label: 'Note (optional)', value: 'Pasta lunch', hint: 'Never shared unless you choose'),
+        TField(fieldKey: 'st_log.note_optional', label: 'Note (optional)', hint: 'Never shared unless you choose', placeholder: 'Pasta lunch'),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Save reading', onPressed: () => TNav.submit(context, 'POST /v1/program-data/st/readings', then: () => TNav.branch(context, 'Reading vs. your range', <String, VoidCallback>{'In or above range': () => TNav.toast(context, 'Saved', then: () => TNav.replace(context, Routes.stHome)), 'Below your low': () => TNav.replace(context, Routes.stLow), 'Invalid (outside 20–600)': () => TNav.toast(context, 'Check your meter reading')}, decide: 'st.glucose')), arrow: true),

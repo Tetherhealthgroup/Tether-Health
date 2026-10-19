@@ -10,14 +10,14 @@ def programs_b():
           (go('st_q1'), 'Log readings, see patterns around meals and sleep, and follow the low plan your clinician gave you. Steady never counts calories.'))
     S('st_q1', 'Type & device', '/p/st/onboarding/1', 'st', program='st', phase='onboarding', hdr=H('About you', pill='1 of 2'), body=[
         steps(1, 2), title('Which describes you?'), text('As told by a clinician.', 'muted'),
-        radio([ri('Type 2 diabetes'), ri('Prediabetes'), ri('Type 1 diabetes', 'Logging only; follow your care team for insulin'), ri('Gestational diabetes', 'Education only; talk with your care team'), ri('Not diagnosed: learn')], 0),
-        seg(['Meter', 'CGM', 'Lab only'], 'Meter', label='How do you check?'),
+        radio([ri('Type 2 diabetes'), ri('Prediabetes'), ri('Type 1 diabetes', 'Logging only; follow your care team for insulin'), ri('Gestational diabetes', 'Education only; talk with your care team'), ri('Not diagnosed: learn')], 0, key='value'),
+        seg(['Meter', 'CGM', 'Lab only'], 'Meter', label='How do you check?', key='how_do_you_check'),
     ], footer=[button('Next', go('st_range'))])
     S('st_range', 'Range & low plan', '/p/st/plan/range', 'st', program='st', phase='plan', hdr=H('Your range', pill='2 of 2'), body=[
-        steps(2, 2), title('Enter the range your clinician gave you.'), seg(['mg/dL', 'mmol/L'], 'mg/dL'),
-        fieldrow(field('Before meals from', '80', unit='mg/dL', kind='number'), field('to', '130', unit='mg/dL', kind='number')),
-        field('2 h after meals below', '180', unit='mg/dL', kind='number'),
-        card(field('Low below', '70', unit='mg/dL', kind='number', key='low'), field('My low steps', '15 g fast sugar, re-check in 15 min', kind='multiline'), eyebrow='Your low plan'),
+        steps(2, 2), title('Enter the range your clinician gave you.'), seg(['mg/dL', 'mmol/L'], 'mg/dL', key='value'),
+        fieldrow(field('Before meals from', '80', unit='mg/dL', kind='number', key='before_meals_from'), field('to', '130', unit='mg/dL', kind='number', key='to')),
+        field('2 h after meals below', '180', unit='mg/dL', kind='number', key='2_h_after_meals_below'),
+        card(field('Low below', '70', unit='mg/dL', kind='number', key='low'), field('My low steps', '15 g fast sugar, re-check in 15 min', kind='multiline', key='my_low_steps'), eyebrow='Your low plan'),
         link('Import from my health record', go('records_add')),
     ], footer=[button('Save range', submit('PUT /v1/program-data/st/range', onboarding_or('st_home')))])
     S('st_home', 'Steady home', '/p/st/home', 'st', program='st', phase='daily', tabname='plans', hdr=home_hdr('st'), body=[
@@ -28,9 +28,9 @@ def programs_b():
         card(v='mint', text='Steady never counts calories. A high reading is information, not failure.'),
     ])
     S('st_log', 'Log reading', '/p/st/log', 'st', program='st', phase='daily', hdr=H('Log a reading'), body=[
-        field('Reading', '142', unit='mg/dL', kind='number', key='reading', hint='From your meter or CGM · 20–600 mg/dL'), chips(['Fasting', 'Before meal', '2 h after meal', 'Bedtime', 'Other'], ['2 h after meal'], multi=False, label='When?'),
-        chips(['Fine', 'Shaky', 'Sweaty', 'Tired', 'Thirsty'], ['Fine'], label='How do you feel?'),
-        field('Note (optional)', 'Pasta lunch', hint='Never shared unless you choose'),
+        field('Reading', '142', unit='mg/dL', kind='number', key='reading', hint='From your meter or CGM · 20–600 mg/dL'), chips(['Fasting', 'Before meal', '2 h after meal', 'Bedtime', 'Other'], ['2 h after meal'], multi=False, label='When?', key='when'),
+        chips(['Fine', 'Shaky', 'Sweaty', 'Tired', 'Thirsty'], ['Fine'], label='How do you feel?', key='how_do_you_feel'),
+        field('Note (optional)', 'Pasta lunch', hint='Never shared unless you choose', key='note_optional'),
     ], footer=[button('Save reading', submit('POST /v1/program-data/st/readings', branch('Reading vs. your range', [('In or above range', toast('Saved', rep('st_home'))), ('Below your low', rep('st_low')), ('Invalid (outside 20–600)', toast('Check your meter reading'))], decide='st.glucose')))])
     S('st_low', 'Low reading', '/p/st/low', 'st', program='st', phase='rescue', kind='fullscreen', hdr=H('Low reading', left='close'), body=[
         banner('urgent', '62 mg/dL is below your low of 70.'),
@@ -44,13 +44,13 @@ def programs_b():
         card(v='mint', text='Walking after meals helps some people’s readings. Check with your clinician what’s right for you.'),
     ], footer=[button('Done', toast('Nice work', back()))])
     S('st_patterns', 'Patterns', '/p/st/patterns', 'st', program='st', phase='resources', hdr=H('Patterns', pill='Steady'), body=[
-        seg(['7 days', '14 days', '30 days'], '14 days'),
+        seg(['7 days', '14 days', '30 days'], '14 days', key='value'),
         line([196, 182, 175, 190, 168, 160, 172, 158, 165, 150, 162, 149], 'st', title='After meals', unit='mg/dL · range ≤ 180', band=[80, 180]),
         stats([st('In your range', '71%', 'of 38 readings'), st('Lows', '1', 'Oct 9 · treated')]),
         card(v='mint', eyebrow='Pattern', title='Readings were higher on nights with less than 6 h sleep.'),
     ])
     S('st_a1c', 'A1C', '/p/st/a1c', 'st', program='st', phase='milestone', hdr=H('A1C lab', pill='Lab day'), body=[
-        title('Add your A1C'), field('A1C', '7.4', unit='%', kind='number'), field('Lab date', 'Oct 1, 2026', kind='date'),
+        title('Add your A1C'), field('A1C', '7.4', unit='%', kind='number', key='a1c'), field('Lab date', 'Oct 1, 2026', kind='date', key='lab_date'),
         kv([('Previous', '7.9% · Jul 2'), ('Change', '−0.5 points')]), text('Your clinician sets your A1C goal. Steady shows history only.', 'small'),
     ], footer=[button('Save', submit('POST /v1/program-data/st/a1c', toast('Saved', back())))])
 
@@ -59,8 +59,8 @@ def programs_b():
     intro('re', [('Risk check', 'diabetes, BP, alcohol, family'), ('Labs', 'eGFR, ACR, ALT tracking'), ('Reminders', 'checks from your clinician')], '~1 min/day')
     S('re_q1', 'Risk check', '/p/re/onboarding/1', 're', program='re', phase='onboarding', hdr=H('Risk check', pill='1 of 1'), body=[
         steps(1, 1), title('Do any of these apply?'), text('These raise the chance of kidney or liver problems.', 'muted'),
-        chips(['Diabetes', 'High blood pressure', 'Heart disease', 'Family history of kidney disease', 'Regular alcohol', 'Hepatitis B or C', 'None'], ['Diabetes', 'High blood pressure']),
-        seg(['Kidney', 'Liver', 'Both', 'No'], 'No', label='Known condition?'),
+        chips(['Diabetes', 'High blood pressure', 'Heart disease', 'Family history of kidney disease', 'Regular alcohol', 'Hepatitis B or C', 'None'], ['Diabetes', 'High blood pressure'], key='value'),
+        seg(['Kidney', 'Liver', 'Both', 'No'], 'No', label='Known condition?', key='known_condition'),
     ], footer=[button('See what this means', go('re_result'))])
     S('re_result', 'Risk result', '/p/re/plan', 're', program='re', phase='plan', hdr=H('Your result', pill='Not a diagnosis'), body=[
         title('Worth asking about a kidney check.'),
@@ -75,8 +75,8 @@ def programs_b():
         card(v='mint', title='Over-the-counter pain relief?', text='Some (like ibuprofen) can affect kidneys. Ask your pharmacist.'),
     ])
     S('re_labs', 'Add labs', '/p/re/labs', 're', program='re', phase='milestone', hdr=H('Add lab results', pill='Lab'), body=[
-        field('eGFR', '58', unit='mL/min/1.73m²', kind='number'), field('Urine ACR', '42', unit='mg/g', kind='number'),
-        field('ALT (liver)', None, unit='U/L', placeholder='Optional', kind='number'), field('Lab date', 'Oct 3, 2026', kind='date'),
+        field('eGFR', '58', unit='mL/min/1.73m²', kind='number', key='egfr'), field('Urine ACR', '42', unit='mg/g', kind='number', key='urine_acr'),
+        field('ALT (liver)', None, unit='U/L', placeholder='Optional', kind='number', key='alt_liver'), field('Lab date', 'Oct 3, 2026', kind='date', key='lab_date'),
         text('Copy numbers exactly from your report. Renew shows trends; your clinician explains them.', 'small'),
         link('Import from my health record', go('records_add')),
     ], footer=[button('Save results', submit('POST /v1/program-data/re/labs', toast('Saved', rep('re_history'))))])
@@ -85,7 +85,7 @@ def programs_b():
         kv([('Latest eGFR', '58 · Oct 3'), ('Latest ACR', '42 mg/g'), ('Next check', 'Apr 2027 (from your clinician)')]),
     ], footer=[button('Create visit summary', go('hw_summary'), v='secondary')])
     S('re_symptoms', 'Symptom check', '/p/re/symptoms', 're', program='re', phase='rescue', hdr=H('Check symptoms', left='close'), body=[
-        title('Do you have any of these?'), chips(['Very little urine', 'Swelling in legs or face', 'Yellow skin or eyes', 'Confusion', 'Vomiting blood', 'None'], ['Yellow skin or eyes']),
+        title('Do you have any of these?'), chips(['Very little urine', 'Swelling in legs or face', 'Yellow skin or eyes', 'Confusion', 'Vomiting blood', 'None'], ['Yellow skin or eyes'], key='value'),
         banner('urgent', 'Yellow skin or eyes needs a clinician today.'),
     ], footer=[button('Contact my care team', go('support_message_care')), button('Vomiting blood or confused? Call 911', call('911'), v='danger', arrow=False)])
 
@@ -94,13 +94,13 @@ def programs_b():
     intro('nu', [('Weekly habit', 'one at a time'), ('Weight', 'off by default'), ('Approach', 'add, don’t restrict')], '~1 min/day')
     S('nu_q1', 'Goals & screen', '/p/nu/onboarding/1', 'nu', program='nu', phase='onboarding', hdr=H('What matters', pill='1 of 1'), body=[
         steps(1, 1), title('What would you like more of?'),
-        chips(['Energy', 'Easy meals', 'More plants', 'More water', 'Move more', 'Save on food', 'Feel better about food'], ['Energy', 'Easy meals', 'More water']),
+        chips(['Energy', 'Easy meals', 'More plants', 'More water', 'Move more', 'Save on food', 'Feel better about food'], ['Energy', 'Easy meals', 'More water'], key='value'),
         card(seg(['No', 'Yes', 'Prefer not to say'], 'No', key='eating'), title='Have you struggled with eating, like restricting, bingeing or purging?', text='If yes, we adjust Nourish and share support options.'),
     ], footer=[button('Next', branch('Eating-history answer', [('No', go('nu_habit')), ('Yes / Prefer not to say', go('nu_protect'))], on='segmented', key='eating'))])
     S('nu_habit', 'Weekly habit', '/p/nu/plan', 'nu', program='nu', phase='plan', hdr=H('This week’s habit', pill='Plan'), body=[
         title('Pick one habit for this week.'),
-        radio([ri('Add a vegetable to dinner', '5 nights this week', 'Suggested'), ri('Water before each meal', 'Every day'), ri('Cook at home', '3 times this week'), ri('10-minute walk after a meal', '4 times')]),
-        card(toggle('Track weight', 'Off by default · can stay off forever', False)),
+        radio([ri('Add a vegetable to dinner', '5 nights this week', 'Suggested'), ri('Water before each meal', 'Every day'), ri('Cook at home', '3 times this week'), ri('10-minute walk after a meal', '4 times')], key='value'),
+        card(toggle('Track weight', 'Off by default · can stay off forever', False, key='track_weight')),
     ], footer=[button('Start this habit', submit('PUT /v1/program-data/nu/habit', onboarding_or('nu_home')))])
     S('nu_home', 'Nourish home', '/p/nu/home', 'nu', program='nu', phase='daily', tabname='plans', hdr=home_hdr('nu'), body=[
         card(eyebrow='Habit · week 2', title='Add a vegetable to dinner', text='3 of 5 nights', children=[steps(3, 5)], cta=button('Done today', toast('Nice. 4 of 5 nights.'), small=True)),
@@ -115,7 +115,7 @@ def programs_b():
     S('nu_week4', 'Week 4 milestone', '/p/nu/milestone', 'nu', program='nu', phase='milestone', hdr=H('Week 4', pill='Milestone'), body=[
         illus('4'), title('Four weeks of small habits.', 'l', align='center'),
         kv([('Habits tried', '4'), ('Days done', '19'), ('Favorite', 'Water before meals')]),
-        seg(['Worse', 'Same', 'Better'], 'Better', label='How do you feel about food lately?'),
+        seg(['Worse', 'Same', 'Better'], 'Better', label='How do you feel about food lately?', key='how_do_you_feel_about_food_latel'),
     ], footer=[button('Choose next habit', rep('nu_habit'))])
     S('nu_protect', 'Protective mode', '/p/nu/support', 'nu', program='nu', phase='rescue', hdr=H('Support', pill='Private'), body=[
         title('Thanks for telling us.'), text('Nourish has turned off weight, amount goals and before/after comparisons.', 'muted'),
@@ -127,9 +127,9 @@ def programs_b():
     flow('sd', 'Stride', 'Healthy aging · Build habits. Falls check, weekly movement plan, audio-first sessions, I-fell route, home safety, scoped caregiver access.', 'sd')
     intro('sd', [('Sessions', '5–15 min, audio + video'), ('Falls', 'home safety + I fell button'), ('Caregiver', 'optional, Stride only')], '~10 min/day')
     S('sd_q1', 'Falls check', '/p/sd/onboarding/1', 'sd', program='sd', phase='onboarding', hdr=H('How you move', pill='1 of 1'), body=[
-        steps(1, 1), seg(['No', 'Once', '2+ times'], 'Once', label='In the last year, have you fallen?'),
-        seg(['No', 'Sometimes', 'Often'], 'Sometimes', label='Do you feel unsteady standing or walking?'),
-        seg(['No', 'A little', 'A lot'], 'A little', label='Do you worry about falling?'),
+        steps(1, 1), seg(['No', 'Once', '2+ times'], 'Once', label='In the last year, have you fallen?', key='in_the_last_year_have_you_fallen'),
+        seg(['No', 'Sometimes', 'Often'], 'Sometimes', label='Do you feel unsteady standing or walking?', key='do_you_feel_unsteady_standing_or'),
+        seg(['No', 'A little', 'A lot'], 'A little', label='Do you worry about falling?', key='do_you_worry_about_falling'),
         card(v='mint', text='A fall plus feeling unsteady is worth mentioning to your clinician. We’ll add it to your visit list.'),
     ], footer=[button('Next', go('sd_plan'))])
     S('sd_plan', 'Movement plan', '/p/sd/plan', 'sd', program='sd', phase='plan', hdr=H('Your movement plan', pill='Plan'), body=[
@@ -145,7 +145,7 @@ def programs_b():
     ])
     S('sd_session', 'Session player', '/p/sd/session', 'sd', program='sd', phase='daily', kind='fullscreen', dark=True, hdr=H('Balance · 8 min', left='close', pill='2 of 6', dark=True), body=[
         illus('⇅', 'dark'), title('Heel-to-toe stand', 'xl', align='center'), text('Hold the chair. Place one foot in front of the other. Hold 10 seconds.', align='center'),
-        ring('7', palette='teal'), chips(['Audio on', 'Large text', 'Captions'], ['Audio on', 'Large text', 'Captions']),
+        ring('7', palette='teal'), chips(['Audio on', 'Large text', 'Captions'], ['Audio on', 'Large text', 'Captions'], key='value'),
     ], footer=[button('Next exercise', toast('Exercise 3 of 6')), button('Finish session', submit('POST /v1/program-data/sd/sessions', toast('Session saved', rep('sd_home'))), v='white')])
     S('sd_fell', 'I fell', '/p/sd/fell', 'sd', program='sd', phase='rescue', kind='fullscreen', hdr=H('I fell', left='close'), body=[
         title('Are you hurt?'), button('I hit my head or can’t get up · Call 911', call('911'), v='danger', arrow=False),
@@ -158,8 +158,8 @@ def programs_b():
         text('2 of 5 done', 'small'),
     ], footer=[button('Save', submit('PUT /v1/program-data/sd/safety', toast('Saved', back())))])
     S('sd_caregiver', 'Caregiver access', '/p/sd/caregiver', 'sd', program='sd', phase='account', hdr=H('Caregiver access', pill='Optional'), body=[
-        title('Let someone help'), field('Name', 'Rosa'), field('Phone', '(555) 010-2244', kind='phone'),
-        checklist([ci('When I finish a session', done=True), ci('If I log a fall', done=True), ci('My other programs', 'Never available to caregivers')], label='Rosa can see'),
+        title('Let someone help'), field('Name', 'Rosa', key='name'), field('Phone', '(555) 010-2244', kind='phone', key='phone'),
+        checklist([ci('When I finish a session', done=True), ci('If I log a fall', done=True), ci('My other programs', 'Never available to caregivers')], label='Rosa can see', key='caregiver_can_see'),
     ], footer=[button('Send invite', submit('POST /v1/care/caregivers', toast('Invite sent to Rosa', back())))])
 
     # ================================================================ EASE
@@ -167,7 +167,7 @@ def programs_b():
     intro('ea', [('Mood check-in', '30 seconds'), ('Screening', 'optional, private'), ('Help now', '988 always one tap away')], '~2 min/day')
     S('ea_q1', 'Optional screener', '/p/ea/onboarding/1', 'ea', program='ea', phase='onboarding', hdr=H('Optional check', pill='1 of 4'), body=[
         steps(1, 4), text('Over the last 2 weeks, how often have you been bothered by…', 'small'), title('Little interest or pleasure in doing things?'),
-        radio(['Not at all', 'Several days', 'More than half the days', 'Nearly every day'], 1), text('PHQ-2 / GAD-2 · validated questions · skippable', 'small'),
+        radio(['Not at all', 'Several days', 'More than half the days', 'Nearly every day'], 1, key='value'), text('PHQ-2 / GAD-2 · validated questions · skippable', 'small'),
     ], footer=[button('Next', go('ea_result')), button('Skip the check', go('ea_plan'), v='secondary')], desc='4 questions in production (PHQ-2 + GAD-2); one shown.')
     S('ea_result', 'Screener result', '/p/ea/result', 'ea', program='ea', phase='onboarding', hdr=H('Your answers', pill='Not a diagnosis'), body=[
         title('Talking to someone could help.'),
@@ -177,7 +177,7 @@ def programs_b():
     ])
     S('ea_plan', 'Safety plan', '/p/ea/plan', 'ea', program='ea', phase='plan', hdr=H('Safety plan', pill='Private'), body=[
         title('Make a plan for hard moments'), text('Based on the Stanley-Brown safety plan. Only you can see this.', 'small'),
-        field('My warning signs', 'Not sleeping, pulling away from friends', kind='multiline'), field('Things that help me', 'Walk the dog, shower, music'), field('People I can reach', 'Sam · (555) 010-3311'),
+        field('My warning signs', 'Not sleeping, pulling away from friends', kind='multiline', key='my_warning_signs'), field('Things that help me', 'Walk the dog, shower, music', key='things_that_help_me'), field('People I can reach', 'Sam · (555) 010-3311', key='people_i_can_reach'),
         kv([('Crisis line', '988 · call or text'), ('Emergency', '911')]),
     ], footer=[button('Save plan', submit('PUT device:encrypted/ea/safety-plan', onboarding_or('ea_home')))], desc='Stored encrypted on the device only.')
     S('ea_home', 'Ease home', '/p/ea/home', 'ea', program='ea', phase='daily', tabname='plans', hdr=home_hdr('ea'), body=[
@@ -187,13 +187,13 @@ def programs_b():
         emergency(),
     ])
     S('ea_mood', 'Mood check-in', '/p/ea/mood', 'ea', program='ea', phase='daily', hdr=H('Mood check-in', pill='Ease'), body=[
-        seg(['Very low', 'Low', 'Okay', 'Good', 'Great'], 'Low', label='How are you right now?'),
+        seg(['Very low', 'Low', 'Okay', 'Good', 'Great'], 'Low', label='How are you right now?', key='how_are_you_right_now'),
         chips(['Work', 'Money', 'Family', 'Health', 'Lonely', 'Sleep', 'Thoughts of harming myself', 'Not sure'], ['Work', 'Sleep'], label='What’s going on?', key='going_on'),
         card(v='dark', eyebrow='Try now · 2 min', title='Grounding: 5 things you can see', cta=button('Start', go('rescue_active'), v='lime', small=True)),
     ], footer=[button('Save', submit('POST /v1/program-data/ea/moods', branch('Self-harm option selected?', [('No', toast('Saved', back())), ('Yes', rep('crisis'))], decide='ea.selfharm')))])
     S('ea_checkback', 'Check-back day', '/p/ea/check-back', 'ea', program='ea', phase='milestone', hdr=H('Check-back', pill='2 weeks'), body=[
-        title('It’s been two weeks. How are things?'), seg(['Worse', 'Same', 'Better'], 'Same'),
-        chips(['Yes, I have an appointment', 'Not yet', 'I don’t want to'], ['Not yet'], multi=False, label='Did you reach out to someone?'),
+        title('It’s been two weeks. How are things?'), seg(['Worse', 'Same', 'Better'], 'Same', key='value'),
+        chips(['Yes, I have an appointment', 'Not yet', 'I don’t want to'], ['Not yet'], multi=False, label='Did you reach out to someone?', key='did_you_reach_out_to_someone'),
         card(v='mint', text='That’s okay. Would a short list of what to say help?', cta=button('Show me', go('learn_lesson'), small=True)),
     ], footer=[button('Save', submit('POST /v1/program-data/ea/check-backs', toast('Saved', back())))])
 
@@ -201,9 +201,9 @@ def programs_b():
     flow('ck', 'Checkup', 'Preventive · Prevent. Personal due list from USPSTF/CDC guidance, item detail with options and cost, mark done, screening-day prep.', 'ck')
     intro('ck', [('Personal list', 'USPSTF / CDC guidance'), ('Reminders', 'weekly, quiet'), ('Records', 'mark done, add dates')], '~1 min/week')
     S('ck_q1', 'About you', '/p/ck/onboarding/1', 'ck', program='ck', phase='onboarding', hdr=H('About you', pill='1 of 1'), body=[
-        steps(1, 1), title('A few details to personalize'), field('Age', '52', kind='number'),
-        seg(['Female', 'Male', 'Intersex', 'Skip'], 'Female', label='Sex assigned at birth'),
-        chips(['Smoke or used to', 'Diabetes', 'Family history of cancer', 'Pregnant', 'None'], ['Smoke or used to'], label='Any of these?'),
+        steps(1, 1), title('A few details to personalize'), field('Age', '52', kind='number', key='age'),
+        seg(['Female', 'Male', 'Intersex', 'Skip'], 'Female', label='Sex assigned at birth', key='sex_assigned_at_birth'),
+        chips(['Smoke or used to', 'Diabetes', 'Family history of cancer', 'Pregnant', 'None'], ['Smoke or used to'], label='Any of these?', key='any_of_these'),
         text('Used only to build your list. Change anytime.', 'small'), link('Import vaccination history', go('records_add')),
     ], footer=[button('Build my list', submit('PUT /v1/program-data/ck/profile', onboarding_or('ck_list')))])
     S('ck_list', 'Due list', '/p/ck/home', 'ck', program='ck', phase='daily', tabname='plans', hdr=home_hdr('ck'), body=[
@@ -222,7 +222,7 @@ def programs_b():
         text('Source: USPSTF 2021 · reviewed Aug 2026', 'small'),
     ], footer=[button('Message my care team', go('support_message_care')), button('Mark as done', go('ck_done'), v='secondary')])
     S('ck_done', 'Mark done', '/p/ck/done', 'ck', program='ck', phase='milestone', hdr=H('Mark as done'), body=[
-        field('What', 'Flu vaccine', kind='select'), field('Date', 'Oct 12, 2026', kind='date'), field('Where (optional)', 'Main St Pharmacy'),
+        field('What', 'Flu vaccine', kind='select', key='what'), field('Date', 'Oct 12, 2026', kind='date', key='date'), field('Where (optional)', 'Main St Pharmacy', key='where_optional'),
         checklist([ci('Remind me next year', done=True)]),
     ], footer=[button('Save', submit('POST /v1/program-data/ck/done', toast('Saved · next due Sep 2027', rep('ck_list'))))])
     S('ck_day', 'Screening day', '/p/ck/day', 'ck', program='ck', phase='milestone', hdr=H('Screening day', pill='Tomorrow'), body=[
@@ -240,7 +240,7 @@ def programs_b():
     ], footer=[button('Next', branch('Journey stage', [('Lowering my risk', go('be_q2')), ('Going through treatment', onboarding_or('be_tx')), ('After treatment', onboarding_or('be_survivor')), ('Supporting someone', tab('learn'))], on='radio', key='stage'))])
     S('be_q2', 'Family history', '/p/be/onboarding/2', 'be', program='be', phase='onboarding', hdr=H('Family history', pill='2 of 2'), body=[
         steps(2, 2), title('Has a close relative had cancer?'),
-        chips(['Breast', 'Ovarian', 'Colorectal', 'Prostate', 'Pancreatic', 'Melanoma', 'None', 'Not sure'], ['Breast']), field('Relative’s age at diagnosis (if known)', '44', kind='number'),
+        chips(['Breast', 'Ovarian', 'Colorectal', 'Prostate', 'Pancreatic', 'Melanoma', 'None', 'Not sure'], ['Breast'], key='value'), field('Relative’s age at diagnosis (if known)', '44', kind='number', key='relative_s_age_at_diagnosis_if_k'),
         card(v='mint', text='A relative diagnosed before 50 may mean earlier screening or genetic counseling. We’ll add this to your visit list.'),
     ], footer=[button('See my plan', submit('PUT /v1/program-data/be/profile', onboarding_or('be_home')))])
     S('be_home', 'Beacon home', '/p/be/home', 'be', program='be', phase='daily', tabname='plans', hdr=home_hdr('be'), body=[
@@ -255,16 +255,16 @@ def programs_b():
         rows([row('Today’s side-effect diary', 'About 1 minute', action=go('be_diary')), row('Feeling worried?', 'Tools in Ease', action=go('ea_intro')), settings_row('be')]),
     ])
     S('be_diary', 'Treatment diary', '/p/be/diary', 'be', program='be', phase='daily', hdr=H('Treatment diary', pill='Treatment'), body=[
-        title('How are you feeling today?'), slider('Fatigue', 6, color='be'),
-        chips(['Nausea', 'Pain', 'Mouth sores', 'Numbness', 'Low mood'], ['Nausea'], label='Anything else?'),
+        title('How are you feeling today?'), slider('Fatigue', 6, color='be', key='fatigue'),
+        chips(['Nausea', 'Pain', 'Mouth sores', 'Numbness', 'Low mood'], ['Nausea'], label='Anything else?', key='anything_else'),
         card(v='urgent', title='Fever of 100.4°F (38°C) or higher?', text='Call your oncology team now.', cta=button('Call', call('(555) 010-7000', 'Call oncology team'), v='danger', small=True)),
     ], footer=[button('Save', submit('POST /v1/program-data/be/diary', toast('Saved', back())))])
     S('be_questions', 'Visit questions', '/p/be/questions', 'be', program='be', phase='milestone', hdr=H('Questions for my visit', pill='Oct 22'), body=[
         card(checklist([ci('What side effects should I call about?', done=True), ci('Can I keep working during treatment?'), ci('Who do I call after hours?')])),
-        field('Add a question', None, placeholder='Type a question…'),
+        field('Add a question', None, placeholder='Type a question…', key='add_a_question'),
     ], footer=[button('Share with my care team', go('support_message_care'), v='secondary'), button('Done', back())])
     S('be_survivor', 'Survivorship', '/p/be/survivorship', 'be', program='be', phase='milestone', tabname='plans', hdr=home_hdr('be'), body=[
-        title('How have the last 3 months been?'), seg(['Hard', 'Mixed', 'Good'], 'Mixed'),
+        title('How have the last 3 months been?'), seg(['Hard', 'Mixed', 'Good'], 'Mixed', key='value'),
         card(title='Worried about it coming back?', text='Very common. Ease has tools for this, and your team can help.', cta=button('Open Ease', go('ea_intro'), v='secondary', small=True)),
         kv([('Next follow-up', 'Jan 14, 2027')]), rows([row('Program settings', None, action=go('program_settings'))]),
     ], footer=[button('Save check-in', submit('POST /v1/program-data/be/survivorship', toast('Saved')))])

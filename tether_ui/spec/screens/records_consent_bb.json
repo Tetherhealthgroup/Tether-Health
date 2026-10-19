@@ -83,7 +83,8 @@
           "sub": "Not requested"
         }
       ],
-      "label": "What Tether will read"
+      "label": "What Tether will read",
+      "key": "resources"
     },
     {
       "t": "card",

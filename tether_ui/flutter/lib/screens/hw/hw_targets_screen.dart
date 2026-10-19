@@ -24,7 +24,7 @@ class HwTargetsScreen extends StatelessWidget {
       children: [
         TSteps(n: 2, total: 2),
         TTitle('What target did your clinician give you?'),
-        TFieldRow(children: [TField(fieldKey: 'hw_targets.top_below', label: 'Top below', value: '130', unit: 'mmHg', kind: TFieldKind.number), TField(fieldKey: 'hw_targets.bottom_below', label: 'Bottom below', value: '80', unit: 'mmHg', kind: TFieldKind.number)]),
+        TFieldRow(children: [TField(fieldKey: 'hw_targets.top_below', label: 'Top below', unit: 'mmHg', placeholder: '130', kind: TFieldKind.number), TField(fieldKey: 'hw_targets.bottom_below', label: 'Bottom below', unit: 'mmHg', placeholder: '80', kind: TFieldKind.number)]),
         TRadioList(fieldKey: 'hw_targets.value', items: [TRadioItem('I don’t have a target yet', sub: 'Readings show without a target line')], selected: -1),
         TChips(fieldKey: 'hw_targets.when_should_we_remind_you', options: ['Morning', 'Evening', 'Both'], selected: ['Both'], multi: false, label: 'When should we remind you?'),
         TBody('Heartwise never sets or grades targets.', tone: TTextTone.small),

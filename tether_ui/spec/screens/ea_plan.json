@@ -32,21 +32,21 @@
     {
       "t": "field",
       "label": "My warning signs",
-      "value": "Not sleeping, pulling away from friends",
+      "placeholder": "Not sleeping, pulling away from friends",
       "kind": "multiline",
       "key": "my_warning_signs"
     },
     {
       "t": "field",
       "label": "Things that help me",
-      "value": "Walk the dog, shower, music",
+      "placeholder": "Walk the dog, shower, music",
       "kind": "text",
       "key": "things_that_help_me"
     },
     {
       "t": "field",
       "label": "People I can reach",
-      "value": "Sam · (555) 010-3311",
+      "placeholder": "Sam · (555) 010-3311",
       "kind": "text",
       "key": "people_i_can_reach"
     },

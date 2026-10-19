@@ -239,11 +239,37 @@ void main() {
       expect(run(), hasLength(2));
     });
 
-    test('the decision and ticket ID forms in use are accepted', () {
+    test('the decision and ticket ID forms are accepted', () {
       ((deviations['deviations']! as List).first as Map)
-        ..['decisions'] = ['P-22', 'P-30b', 'N3', 'P-47 decision 13']
+        ..['decisions'] = ['P-22', 'P-28b', 'N3', 'P-47 decision 13', 'TH-902']
         ..['tickets'] = ['TH-942', 'TH-972a'];
       expect(run(), isEmpty);
+    });
+
+    test('TH-902 is the only ticket-style decision accepted', () {
+      // TH-902 is the owner's approval of the ARCH-TH-902 design.
+      expect(decisionId.hasMatch('TH-902'), isTrue);
+      for (final bad in [
+        'TH-903',
+        'TH-90',
+        'TH-9020',
+        'TH-902a',
+        'th-902',
+        'TH-902 ',
+        ' TH-902',
+        'TH-907',
+        'TH-942',
+      ]) {
+        expect(decisionId.hasMatch(bad), isFalse, reason: '"$bad"');
+      }
+      ((deviations['deviations']! as List).first as Map)['decisions'] = [
+        'TH-902',
+        'TH-903'
+      ];
+      expectOne(run(), [
+        'Deviation "two" has decisions that are not owner decision IDs: '
+            '[TH-903]'
+      ]);
     });
 
     test('a deviation left behind after a screen is reverted', () {

@@ -42,15 +42,15 @@
         {
           "t": "field",
           "label": "Peak flow from",
-          "value": "400",
           "unit": "L/min",
+          "placeholder": "400",
           "kind": "number",
           "key": "green_from"
         },
         {
           "t": "field",
           "label": "Daily medicine",
-          "value": "Controller inhaler · 2 puffs AM/PM",
+          "placeholder": "Controller inhaler · 2 puffs AM/PM",
           "kind": "text",
           "key": "daily_medicine"
         }
@@ -64,8 +64,8 @@
         {
           "t": "field",
           "label": "Peak flow",
-          "value": "200–399",
           "unit": "L/min",
+          "placeholder": "200–399",
           "kind": "text",
           "key": "peak_flow"
         }
@@ -79,8 +79,8 @@
         {
           "t": "field",
           "label": "Below",
-          "value": "200",
           "unit": "L/min",
+          "placeholder": "200",
           "kind": "number",
           "key": "red_below"
         }

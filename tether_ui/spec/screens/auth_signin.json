@@ -136,14 +136,14 @@
     {
       "t": "field",
       "label": "Email",
-      "value": "alex@example.com",
+      "placeholder": "alex@example.com",
       "kind": "email",
       "key": "email"
     },
     {
       "t": "field",
       "label": "Password",
-      "value": "••••••••",
+      "placeholder": "••••••••",
       "kind": "password",
       "key": "password"
     },
