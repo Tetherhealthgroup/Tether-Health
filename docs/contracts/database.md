@@ -467,9 +467,12 @@ refuses to run in a `thsync` session (`TH009`), as does
 Sync rows are removed only by `DELETE`, together with their programme or account:
 `delete_my_app_data`, and the foreign-key cascades when an enrolment or an
 account is deleted. A trigger refuses `TRUNCATE` on every sync table for every role,
-including a `TRUNCATE ... CASCADE` that reaches them (`TH019`). These guards
-fire in every session mode. `PUBLIC`, `anon`, `authenticated` and `thsync`
-hold no `TRUNCATE` privilege on the sync tables.
+in every session mode; the guard's code is `TH019`. A `TRUNCATE ... CASCADE`
+of another table that would cascade into the sync tables is refused as well,
+and their rows stay; it reports the code of the first guard that fires, which
+may be another table's (`TH003` when it reaches a consent table first).
+`PUBLIC`, `anon`, `authenticated` and `thsync` hold no `TRUNCATE` privilege on
+the sync tables.
 `supabase/tests/verify_sync_truncate_guards.sh` checks this.
 
 The migration starts by dropping the earlier `sync_*` tables (keyed by
@@ -617,7 +620,7 @@ function": every later function that writes and refuses a sync session raises
 | `TH013` | `focus_swap_invalid` | `swap_focus`: the programme to demote is not in focus, the one to promote is already in focus, or both are the same | A swap needs one programme in focus and another not in focus |
 | `TH014` | `consent_version_unchanged` | `programme_consents_check_supersede` (update trigger on `programme_consents`, so also `supersede_core_consent`): the replacement core version is not later than the one it replaces, or is the same version and locale | The core consent is already on this version or a later one |
 | `TH015` | `consent_document_immutable` | `consent_documents_guard` (insert, update, delete and truncate trigger on `consent_documents`): purpose, version, locale or body changed; approved_ref changed after it was set; cascades_optional or effective_from changed on a referenced document; a writer that does not bypass row-level security; a truncate, whatever the role. `consent_documents_check_effective_from` (after each insert or update statement on `consent_documents`): locales of a version with different effective_from | Consent documents are immutable, publish a new version; A consent document version takes effect at the same time in every locale; Consent documents are changed only by a role that bypasses row-level security |
-| `TH019` | `sync_rows_delete_only` | `sync_truncate_guard` (truncate trigger on `sync_account`, `sync_area`, `sync_answer` and `sync_lapse`: a truncate, whatever the role) | Sync rows are removed only with their enrolment or account |
+| `TH019` | `sync_rows_delete_only` | `sync_truncate_guard` (truncate trigger on `sync_account`, `sync_area`, `sync_answer` and `sync_lapse`: a truncate, whatever the role, including a cascade into them when no other table's guard fires first) | Sync rows are removed only with their enrolment or account |
 
 Standard SQLSTATEs are kept where PostgreSQL defines the condition:
 `42501` for row-level security and privilege refusals and for

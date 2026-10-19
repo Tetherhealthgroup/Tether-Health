@@ -108,8 +108,55 @@ begin
 end;
 $f$;
 
+-- TRUNCATE ... CASCADE of tables that would cascade into the sync tables.
+-- programmes reaches sync_area before any other guarded table, so its guard
+-- refuses with TH019. enrolments and auth.users may reach a consent table
+-- first; either guard's refusal (TH003 or TH019) keeps every row.
+create function th989_test.cascades_refused(p_who text)
+returns void language plpgsql set search_path = '' as $f$
+declare
+  stmt text;
+  got_hint text;
+begin
+  perform th989_test.refused('truncate public.programmes cascade', 'TH019',
+    'Sync rows are removed only with their enrolment or account',
+    p_who || ': truncate public.programmes cascade is refused', 'sync_rows_delete_only');
+  foreach stmt in array array[
+    'truncate public.enrolments cascade',
+    'truncate auth.users cascade'
+  ] loop
+    begin
+      execute stmt;
+    exception when others then
+      get stacked diagnostics got_hint = pg_exception_hint;
+      if (sqlstate = 'TH003' and got_hint = 'consent_immutable')
+         or (sqlstate = 'TH019' and got_hint = 'sync_rows_delete_only') then
+        raise notice 'PASS %: % is refused (% %) hint %', p_who, stmt, sqlstate, sqlerrm, got_hint;
+        continue;
+      end if;
+      raise exception 'FAIL %: % (got % % hint %)', p_who, stmt, sqlstate, sqlerrm, got_hint;
+    end;
+    raise exception 'FAIL %: % (statement succeeded)', p_who, stmt;
+  end loop;
+end;
+$f$;
+
+-- Lets p_role truncate every table a cascade above can reach.
+create function th989_test.grant_cascade_truncate(p_role text)
+returns void language plpgsql set search_path = '' as $f$
+declare
+  nsp text;
+begin
+  foreach nsp in array array['public', 'auth', 'storage'] loop
+    execute pg_catalog.format('grant usage on schema %I to %I', nsp, p_role);
+    execute pg_catalog.format('grant truncate on all tables in schema %I to %I', nsp, p_role);
+  end loop;
+end;
+$f$;
+
 grant usage on schema th989_test to public;
 grant execute on all functions in schema th989_test to public;
+revoke all on function th989_test.grant_cascade_truncate(text) from public;
 
 -- Catalogue -------------------------------------------------------------------
 -- The sync tables, read from the catalogue.
@@ -147,6 +194,7 @@ select th989_test.ok(
   'sync tables: exactly one truncate trigger each, before truncate, for each statement, enabled in every session mode');
 select th989_test.ok(
   (select not p.prosecdef and p.proconfig = array['search_path=""']
+     and pg_catalog.strpos(p.prosrc, 'TH019') > 0
    from pg_catalog.pg_proc as p
    where p.oid = 'public.sync_truncate_guard()'::regprocedure)
   and not exists (
@@ -156,7 +204,7 @@ select th989_test.ok(
     where p.oid = 'public.sync_truncate_guard()'::regprocedure
       and (a.grantee = 0 or a.grantee in ('anon'::regrole, 'authenticated'::regrole,
                                           'thsync'::regrole, 'service_role'::regrole))),
-  'sync_truncate_guard: security invoker, empty search_path; no execute for anon, authenticated, thsync, service_role or PUBLIC');
+  'sync_truncate_guard: raises TH019, security invoker, empty search_path; no execute for anon, authenticated, thsync, service_role or PUBLIC');
 select th989_test.ok(
   not exists (
     select 1
@@ -186,6 +234,11 @@ insert into public.enrolments (id, user_id, programme_code, status) values
   ('00000000-0000-4000-8000-00000989e0a1', '00000000-0000-4000-8000-0000009890a1', 'hw', 'focus'),
   ('00000000-0000-4000-8000-00000989e0a2', '00000000-0000-4000-8000-0000009890a1', 'st', 'learn_only'),
   ('00000000-0000-4000-8000-00000989e0b1', '00000000-0000-4000-8000-0000009890b1', 'hw', 'focus');
+-- The focus-cap check on these enrolments is deferred to commit; run it now,
+-- so no trigger event is pending when a truncate cascades to enrolments, and
+-- defer it again.
+set constraints public.enrolments_focus_cap immediate;
+set constraints public.enrolments_focus_cap deferred;
 insert into public.sync_account (user_id) values
   ('00000000-0000-4000-8000-0000009890a1'),
   ('00000000-0000-4000-8000-0000009890b1');
@@ -220,6 +273,29 @@ returns text language sql stable set search_path = '' as $f$
 $f$;
 grant execute on function th989_test.fingerprint() to public;
 select set_config('th989.sync', th989_test.fingerprint(), true);
+
+-- A fingerprint of the sync rows and of every other table the cascades above
+-- reach, to show a refused cascade changes nothing.
+create function th989_test.wide_fingerprint()
+returns text language sql stable set search_path = '' as $f$
+  select pg_catalog.md5(
+    th989_test.fingerprint() || '#' ||
+    coalesce((select string_agg(pg_catalog.to_jsonb(t)::text, '|' order by t.code)
+              from public.programmes as t), '') || '#' ||
+    coalesce((select string_agg(pg_catalog.to_jsonb(t)::text, '|' order by t.id)
+              from public.enrolments as t), '') || '#' ||
+    coalesce((select string_agg(pg_catalog.to_jsonb(t)::text, '|' order by t.id)
+              from public.programme_consents as t), '') || '#' ||
+    coalesce((select string_agg(pg_catalog.to_jsonb(t)::text, '|' order by t.id)
+              from public.account_consents as t), '') || '#' ||
+    coalesce((select string_agg(pg_catalog.to_jsonb(t)::text, '|' order by t.id)
+              from public.profiles as t), '') || '#' ||
+    (select count(*)::text from public.quit_plans) || '/' ||
+    (select count(*)::text from public.program_data) || '/' ||
+    (select count(*)::text from public.consent_documents) || '/' ||
+    (select count(*)::text from auth.users))
+$f$;
+select set_config('th989.wide', th989_test.wide_fingerprint(), true);
 select th989_test.ok(
   (select count(*) from public.sync_account) = 2
   and (select count(*) from public.sync_area) = 3
@@ -237,33 +313,38 @@ select th989_test.refused('truncate public.sync_account',
 select th989_test.refused('truncate public.sync_area',
   '0A000', 'cannot truncate a table referenced in a foreign key constraint',
   'superuser: truncate sync_area without cascade is refused');
-select th989_test.ok(th989_test.fingerprint() = current_setting('th989.sync'),
-  'superuser: the refused truncates left every sync row untouched');
+select th989_test.cascades_refused('superuser');
+select th989_test.ok(th989_test.wide_fingerprint() = current_setting('th989.wide'),
+  'superuser: the refused truncates left every sync row and every row the cascades reach untouched');
 
 -- A role that bypasses row-level security --------------------------------------------
 create role th989_bypass nologin bypassrls;
 grant usage on schema public to th989_bypass;
 grant select, truncate on public.sync_account, public.sync_area, public.sync_answer,
   public.sync_lapse to th989_bypass;
+select th989_test.grant_cascade_truncate('th989_bypass');
 set local role th989_bypass;
 select th989_test.ok(
   (select count(*) from public.sync_lapse) = 4,
   'bypass role: sees every lapse (it holds truncate and select)');
 select th989_test.truncates_refused('bypass role', 'TH019');
+select th989_test.cascades_refused('bypass role');
 reset role;
-select th989_test.ok(th989_test.fingerprint() = current_setting('th989.sync'),
-  'bypass role: the refused truncates left every sync row untouched');
+select th989_test.ok(th989_test.wide_fingerprint() = current_setting('th989.wide'),
+  'bypass role: the refused truncates left every sync row and every row the cascades reach untouched');
 
 -- A role subject to row-level security, holding the truncate privilege ---------------
 create role th989_plain nologin;
 grant usage on schema public to th989_plain;
 grant select, truncate on public.sync_account, public.sync_area, public.sync_answer,
   public.sync_lapse to th989_plain;
+select th989_test.grant_cascade_truncate('th989_plain');
 set local role th989_plain;
 select th989_test.truncates_refused('non-bypass role', 'TH019');
+select th989_test.cascades_refused('non-bypass role');
 reset role;
-select th989_test.ok(th989_test.fingerprint() = current_setting('th989.sync'),
-  'non-bypass role: the refused truncates left every sync row untouched');
+select th989_test.ok(th989_test.wide_fingerprint() = current_setting('th989.wide'),
+  'non-bypass role: the refused truncates left every sync row and every row the cascades reach untouched');
 
 -- thsync, if it were granted truncate ------------------------------------------------
 grant truncate on public.sync_account, public.sync_area, public.sync_answer,
@@ -292,8 +373,10 @@ alter table public.sync_account owner to th989_owner;
 alter table public.sync_area owner to th989_owner;
 alter table public.sync_answer owner to th989_owner;
 alter table public.sync_lapse owner to th989_owner;
+select th989_test.grant_cascade_truncate('th989_owner');
 set local role th989_owner;
 select th989_test.truncates_refused('table owner', 'TH019');
+select th989_test.cascades_refused('table owner');
 reset role;
 do $restore$
 declare
@@ -304,8 +387,8 @@ begin
   end loop;
 end;
 $restore$;
-select th989_test.ok(th989_test.fingerprint() = current_setting('th989.sync'),
-  'table owner: the refused truncates left every sync row untouched');
+select th989_test.ok(th989_test.wide_fingerprint() = current_setting('th989.wide'),
+  'table owner: the refused truncates left every sync row and every row the cascades reach untouched');
 
 -- service_role, authenticated and anon ------------------------------------------------
 -- None holds the truncate privilege, so the privilege check refuses first.
@@ -324,9 +407,10 @@ select th989_test.ok(th989_test.fingerprint() = current_setting('th989.sync'),
 -- The guards fire in every session mode ----------------------------------------------
 set local session_replication_role = replica;
 select th989_test.truncates_refused('superuser, replica session', 'TH019');
+select th989_test.cascades_refused('superuser, replica session');
 reset session_replication_role;
-select th989_test.ok(th989_test.fingerprint() = current_setting('th989.sync'),
-  'replica session: the refused truncates left every sync row untouched');
+select th989_test.ok(th989_test.wide_fingerprint() = current_setting('th989.wide'),
+  'replica session: the refused truncates left every sync row and every row the cascades reach untouched');
 
 -- Row deletes still remove sync rows ---------------------------------------------------
 -- "Delete now": A deletes one enrolment; its area, answers and lapses go with
@@ -563,41 +647,59 @@ if grep -Eiq 'secret|password[[:space:]]*=' <<<"$sql"; then
   fail 'migration must not contain credentials'
 fi
 
-# No migration truncates a table, sets the session replication role, or
-# redefines, drops or changes when a sync truncate guard fires; the only
-# allowed change is enabling a sync guard always. Prints the first problem in
-# the SQL on stdin, or nothing. Comments are removed and the text is joined
-# into one lower-case line, so a statement split over lines is matched as one.
-# Trigger events ("truncate on") and "execute function" in create trigger are
-# not statements and are set aside.
+# Scans each migration for statements that would let a sync truncate run or
+# weaken a sync truncate guard. Prints the first problem in the SQL on stdin,
+# or nothing:
+#   * a truncate statement, or a dynamic execute whose text has "truncate";
+#   * setting session_replication_role;
+#   * create or replace, alter or drop of the function sync_truncate_guard
+#     (with or without the public. schema);
+#   * drop trigger or alter trigger (rename) of a sync guard;
+#   * disable or enable of a sync guard by name, except enable always;
+#   * disable or enable of trigger all or trigger user on a sync table.
+# Comments and double quotes are removed and the text is joined into one
+# lower-case line, so a statement split over lines is matched as one. Trigger
+# events ("truncate on") and "execute function" in create trigger are not
+# statements and are set aside.
 guards='sync_account_truncate_guard|sync_area_truncate_guard|sync_answer_truncate_guard|sync_lapse_truncate_guard'
 migration_problem() {
-  local text change
-  text=$(sed 's/--.*$//' | tr '\n\t' '  ' | tr '[:upper:]' '[:lower:]' |
+  local text change stmt
+  text=$(sed 's/--.*$//' | tr '\n\t' '  ' | tr -d '"' | tr '[:upper:]' '[:lower:]' |
     sed -E 's/ +/ /g; s/(^|[^a-z_])truncate on /\1trigger_event_on /g; s/(^|[^a-z_])execute (function|procedure) /\1runs_\2 /g')
   if grep -Eq "(^|[^a-z_])execute[^;]*[^a-z_]truncate([^a-z_]|\$)" <<<"$text"; then
     echo 'dynamic execute of a truncate'; return
   fi
-  if grep -Eq "(^|[^a-z_'])truncate( table)? (only )?[a-z_\".]" <<<"$text"; then
+  if grep -Eq "(^|[^a-z_'])truncate( table)? (only )?[a-z_.]" <<<"$text"; then
     echo 'truncate statement'; return
   fi
   if grep -Fq 'session_replication_role' <<<"$text"; then
     echo 'sets session_replication_role'; return
   fi
-  if grep -Fq 'create or replace function public.sync_truncate_guard' <<<"$text"; then
+  if grep -Eq "create or replace function (public\.)?sync_truncate_guard([^a-z_]|\$)" <<<"$text"; then
     echo 'redefines sync_truncate_guard'; return
   fi
-  if grep -Eq "drop trigger (if exists )?($guards)([^a-z_]|\$)|drop function (if exists )?public\.sync_truncate_guard" <<<"$text"; then
+  if grep -Eq "(alter|drop) function (if exists )?(public\.)?sync_truncate_guard([^a-z_]|\$)" <<<"$text"; then
+    echo 'alters or drops sync_truncate_guard'; return
+  fi
+  if grep -Eq "drop trigger (if exists )?($guards)([^a-z_]|\$)" <<<"$text"; then
     echo 'drops a sync truncate guard'; return
+  fi
+  if grep -Eq "alter trigger (if exists )?($guards)([^a-z_]|\$)" <<<"$text"; then
+    echo 'alters or renames a sync truncate guard'; return
   fi
   while read -r change; do
     [[ -n "$change" ]] || continue
-    if [[ "$change" =~ ($guards)$ || "$change" =~ trigger\ all$ ]]; then
+    if [[ "$change" =~ ($guards)$ ]]; then
       [[ "$change" =~ ^enable\ always\ trigger\ ($guards)$ ]] || {
         echo "changes when a sync truncate guard fires ($change)"; return
       }
     fi
-  done < <(grep -Eo '(disable|enable)( always| replica)? trigger [a-z_"]+' <<<"$text" || true)
+  done < <(grep -Eo '(disable|enable)( always| replica)? trigger [a-z_]+' <<<"$text" || true)
+  while read -r stmt; do
+    if [[ "$stmt" =~ ^alter\ table\ (if\ exists\ )?(only\ )?(public\.)?(sync_[a-z_]+)[\ ,].*((disable|enable)(\ always|\ replica)?\ trigger\ (all|user))([^a-z_]|$) ]]; then
+      echo "changes when the sync truncate guards fire (${BASH_REMATCH[5]} on ${BASH_REMATCH[4]})"; return
+    fi
+  done < <(tr ';' '\n' <<<"$text" | sed -E 's/^ +//')
 }
 
 # Self-test of the scan; runs every time.
@@ -609,23 +711,42 @@ check_scan() {
 }
 check_scan 'truncate statement' 'begin;' 'TRUNCATE' '  public.sync_lapse;' 'commit;'
 check_scan 'truncate statement' 'truncate table only public.sync_account cascade;'
+check_scan 'truncate statement' 'truncate "public"."sync_lapse";'
 check_scan 'dynamic execute of a truncate' "execute format('truncate %I', t);"
 check_scan 'dynamic execute of a truncate' 'perform 1;' "EXECUTE 'TRUNCATE ' ||" "  'public.sync_answer';"
 check_scan 'sets session_replication_role' 'set local session_replication_role = replica;'
 check_scan 'redefines sync_truncate_guard' 'create or replace function public.sync_truncate_guard()'
+check_scan 'redefines sync_truncate_guard' 'create or replace function "public"."sync_truncate_guard"()'
+check_scan 'redefines sync_truncate_guard' 'CREATE OR REPLACE FUNCTION sync_truncate_guard()'
+check_scan 'redefines sync_truncate_guard' 'create or replace function "sync_truncate_guard" ()'
+check_scan 'alters or drops sync_truncate_guard' 'drop function public.sync_truncate_guard();'
+check_scan 'alters or drops sync_truncate_guard' 'drop function if exists "sync_truncate_guard";'
+check_scan 'alters or drops sync_truncate_guard' 'alter function sync_truncate_guard() security definer;'
 check_scan 'drops a sync truncate guard' 'drop trigger if exists sync_lapse_truncate_guard' '  on public.sync_lapse;'
-check_scan 'drops a sync truncate guard' 'drop function public.sync_truncate_guard();'
+check_scan 'drops a sync truncate guard' 'drop trigger "sync_area_truncate_guard" on "public"."sync_area";'
+check_scan 'alters or renames a sync truncate guard' \
+  'alter trigger sync_answer_truncate_guard on public.sync_answer' '  rename to old_guard;'
+check_scan 'alters or renames a sync truncate guard' \
+  'ALTER TRIGGER "sync_lapse_truncate_guard" ON "public"."sync_lapse" RENAME TO x;'
 check_scan 'changes when a sync truncate guard fires (disable trigger sync_area_truncate_guard)' \
   'alter table public.sync_area disable trigger sync_area_truncate_guard;'
 check_scan 'changes when a sync truncate guard fires (enable trigger sync_lapse_truncate_guard)' \
   'alter table public.sync_lapse' 'enable trigger sync_lapse_truncate_guard;'
 check_scan 'changes when a sync truncate guard fires (enable replica trigger sync_account_truncate_guard)' \
-  'alter table public.sync_account enable replica trigger sync_account_truncate_guard;'
-check_scan 'changes when a sync truncate guard fires (disable trigger all)' 'alter table public.sync_lapse disable trigger all;'
+  'alter table public.sync_account enable replica trigger "sync_account_truncate_guard";'
+check_scan 'changes when the sync truncate guards fire (disable trigger all on sync_lapse)' \
+  'alter table public.sync_lapse disable trigger all;'
+check_scan 'changes when the sync truncate guards fire (disable trigger user on sync_answer)' \
+  'alter table only "public"."sync_answer"' '  DISABLE TRIGGER USER;'
+check_scan 'changes when the sync truncate guards fire (enable trigger all on sync_area)' \
+  'alter table if exists sync_area enable trigger all;'
 check_scan '' 'alter table public.sync_lapse' 'enable always trigger sync_lapse_truncate_guard;' \
   'alter table public.consent_documents enable always trigger consent_documents_guard_truncate;' \
+  'alter table public.enrolments disable trigger user;' \
+  'alter table public.sync_area disable trigger sync_area_set_updated_at;' \
   'create trigger t before insert or truncate on public.t' \
   'for each statement execute function public.sync_truncate_guard();' \
+  'create or replace function public.sync_truncate_guard_note() returns int language sql as $$ select 1 $$;' \
   "  if tg_op = 'TRUNCATE' then" "execute 'select 1';"
 
 for f in "${migration_files[@]}"; do
