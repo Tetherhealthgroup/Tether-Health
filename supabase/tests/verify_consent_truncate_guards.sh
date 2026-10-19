@@ -415,7 +415,7 @@ fi
 # removed and the text is joined into one lower-case line, so a statement
 # split over lines is matched as one. Trigger events ("truncate on") and
 # "execute function" in create trigger are not statements and are set aside.
-guards='programme_consents_truncate_guard|account_consents_truncate_guard|consent_documents_guard_truncate'
+guards='programme_consents_truncate_guard|account_consents_truncate_guard|consent_documents_guard_truncate|sync_account_truncate_guard|sync_area_truncate_guard|sync_answer_truncate_guard|sync_lapse_truncate_guard'
 migration_problem() {
   local text change
   text=$(sed 's/--.*$//' | tr '\n\t' '  ' | tr '[:upper:]' '[:lower:]' |
