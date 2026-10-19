@@ -7,9 +7,12 @@ info:
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
     Changed in 1.6.0: once account deletion has started, a consent grant
-    that reaches the database (it passed the API's own earlier checks) is
-    refused with `account_deletion_in_progress` (a first grant or optional
-    consent used to get `consent_not_permitted`); a core re-consent that
+    that the database would otherwise record is refused with
+    `account_deletion_in_progress` (a first grant or optional consent used
+    to get `consent_not_permitted`). The API's own earlier checks still
+    answer first, and for a first grant or optional consent so does
+    `consent_document_unavailable`, because the database checks the
+    document before the deletion barrier; a core re-consent that
     loses two races to a different live consent answers the new code
     `consent_conflict_retry`. Changed in 1.5.0 (breaking for the list response): `GET /v1/enrolments`
     returns `currentCoreConsentVersions` (one version per locale) instead of

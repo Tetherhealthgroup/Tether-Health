@@ -56,11 +56,11 @@ import {
  *   same way is unverified until a local database run. The API matches the
  *   code only, so the status and message do not affect the mapping.
  * - Consent documents are the fake's seeded CONSENT_DOCUMENTS: the current
- *   core version is v2-synthetic in both locales; v1-draft is grantable for
- *   every purpose. One test retires the es core documents and restores
- *   the seed in a finally block. A race that Postgres resolves after a
- *   lock wait is emulated with interleave (the other transaction commits)
- *   plus failNext (the error this request then gets).
+ *   core version is v2-synthetic in en and v3-synthetic in es; v1-draft is
+ *   grantable for every purpose. One test retires the es core documents and
+ *   restores the seed in a finally block. A race that Postgres resolves
+ *   after a lock wait is emulated with interleave (the other transaction
+ *   commits) plus failNext (the error this request then gets).
  */
 
 type Method = "DELETE" | "GET" | "PATCH" | "POST";
