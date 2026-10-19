@@ -237,16 +237,23 @@ version. `approved_ref` can be set once and never changed afterwards.
 `cascades_optional` and `effective_from` cannot change once any consent row
 references the document. `retired_at` can always be set. Every locale of a
 version has the same `effective_from`. This is checked at the end of every
-insert or update statement (statement triggers), so the rule holds after each
-statement and therefore at commit: a statement that leaves the locales of a
-version with different `effective_from` values is refused, whichever locale is
-earlier. Any insert, update, delete or truncate by a role that does not bypass
-row-level security is refused, because these checks must see every document
-and consent row. Each refusal raises `TH015`. Publishing a replacement version
-means setting `retired_at` on the version it replaces. Consent rows reference
-their document with a foreign key on `(purpose, consent_version, locale)`, so a
-referenced document cannot be removed (`23503`), even by a role that bypasses
-row-level security; a document no consent references can be.
+insert or update statement (statement triggers): a statement that leaves the
+locales of a version with different `effective_from` values is refused,
+whichever locale is earlier. Each insert or update first takes a
+transaction-level advisory lock on its `(purpose, version)`, so concurrent
+writers of one version run one after the other; under `READ COMMITTED` (the
+default) the later writer's check sees the earlier writer's committed rows.
+The release gate's `effective_from_differs` row (below) is the backstop for
+anything written otherwise. Any insert, update or delete by a role that does
+not bypass row-level security is refused, because these checks must see every
+document and consent row. `TRUNCATE` is refused for every role, superuser
+included: it skips the row triggers, and with `CASCADE` it would also empty the
+consent tables. Each refusal raises `TH015`. Publishing a replacement version
+means setting `retired_at` on the version it replaces. Documents are removed
+only by `DELETE`. Consent rows reference their document with a foreign key on
+`(purpose, consent_version, locale)`, so `DELETE` cannot remove a referenced
+document (`23503`), even for a role that bypasses row-level security; a
+document no consent references can be deleted.
 
 To reschedule a version no consent references, move every locale in one
 statement, for example
@@ -568,7 +575,7 @@ function": every later function that writes and refuses a sync session raises
 | `TH012` | `enrolment_not_found` | `swap_focus` and `supersede_core_consent`: no such enrolment for the caller | Enrolment not found |
 | `TH013` | `focus_swap_invalid` | `swap_focus`: the programme to demote is not in focus, the one to promote is already in focus, or both are the same | A swap needs one programme in focus and another not in focus |
 | `TH014` | `consent_version_unchanged` | `programme_consents_check_supersede` (update trigger on `programme_consents`, so also `supersede_core_consent`): the replacement core version is not later than the one it replaces, or is the same version and locale | The core consent is already on this version or a later one |
-| `TH015` | `consent_document_immutable` | `consent_documents_guard` (insert, update, delete and truncate trigger on `consent_documents`): purpose, version, locale or body changed; approved_ref changed after it was set; cascades_optional or effective_from changed on a referenced document; a writer that does not bypass row-level security. `consent_documents_check_effective_from` (after each insert or update statement on `consent_documents`): locales of a version with different effective_from | Consent documents are immutable, publish a new version; A consent document version takes effect at the same time in every locale; Consent documents are changed only by a role that bypasses row-level security |
+| `TH015` | `consent_document_immutable` | `consent_documents_guard` (insert, update, delete and truncate trigger on `consent_documents`): purpose, version, locale or body changed; approved_ref changed after it was set; cascades_optional or effective_from changed on a referenced document; a writer that does not bypass row-level security; any truncate, by any role. `consent_documents_check_effective_from` (after each insert or update statement on `consent_documents`): locales of a version with different effective_from | Consent documents are immutable, publish a new version; A consent document version takes effect at the same time in every locale; Consent documents are changed only by a role that bypasses row-level security |
 
 Standard SQLSTATEs are kept where PostgreSQL defines the condition:
 `42501` for row-level security and privilege refusals and for

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Checks that consent documents are published only by migrations: the guard
-# also covers delete and truncate, service_role may only read, and every
-# locale of a version keeps one effective_from while one statement may move
-# an unreferenced version.
+# also covers delete, nobody truncates documents, service_role may only read,
+# and every locale of a version keeps one effective_from while one statement
+# may move an unreferenced version.
 #
 #   bash supabase/tests/verify_consent_documents_hardening.sh   static checks
 #   VERIFY_DB_URL=postgresql://...@127.0.0.1:54322/... bash <this script>
@@ -135,8 +135,8 @@ select th981_test.ok(
     where p.oid in ('public.consent_documents_guard()'::regprocedure,
                     'public.consent_documents_check_effective_from()'::regprocedure)
       and (a.grantee = 0 or a.grantee in ('anon'::regrole, 'authenticated'::regrole,
-                                          'thsync'::regrole))),
-  'guard functions: security invoker, empty search_path; no execute for anon, authenticated, thsync or PUBLIC');
+                                          'thsync'::regrole, 'service_role'::regrole))),
+  'guard functions: security invoker, empty search_path; no execute for anon, authenticated, thsync, service_role or PUBLIC');
 
 -- Synthetic identity and documents -----------------------------------------------
 insert into auth.users (id, email, aud, role) values
@@ -153,9 +153,18 @@ insert into public.consent_documents
 select set_config('th981.documents', (select count(*)::text from public.consent_documents), true);
 
 -- service_role reads but never writes documents ------------------------------------
+-- On Supabase service_role bypasses row-level security and reads every
+-- document. A service_role without that attribute (as in a plain Postgres
+-- stand-in) reads none: consent_documents forces row-level security and has
+-- no policy for service_role. Either way the select itself is permitted.
+select set_config('th981.service_role_bypass',
+  (select rolbypassrls::text from pg_catalog.pg_roles where rolname = 'service_role'), true);
 set local role service_role;
-select th981_test.ok((select count(*) >= 0 from public.consent_documents),
-  'service_role: select on consent documents is granted');
+select th981_test.ok(
+  (select count(*)::text from public.consent_documents) =
+  case when current_setting('th981.service_role_bypass')::boolean
+       then current_setting('th981.documents') else '0' end,
+  'service_role: reads every document when it bypasses row-level security, none otherwise');
 select th981_test.refused(
   'insert into public.consent_documents (purpose, version, locale, body, effective_from)
    values (''research'', ''v6-svc'', ''en'', ''Synthetic'', now())',
@@ -203,7 +212,7 @@ select th981_test.refused(
   'non-bypass role: cannot delete every document', 'consent_document_immutable');
 select th981_test.refused(
   'truncate public.consent_documents, public.programme_consents, public.account_consents',
-  'TH015', 'Consent documents are changed only by a role that bypasses row-level security',
+  'TH015', 'Consent documents are immutable, publish a new version',
   'non-bypass role: cannot truncate consent documents', 'consent_document_immutable');
 reset role;
 select th981_test.ok(
@@ -214,9 +223,13 @@ select th981_test.ok(
 -- A role that bypasses row-level security removes only unreferenced documents.
 create role th981_doc_publisher nologin bypassrls;
 grant usage on schema public to th981_doc_publisher;
-grant select, delete on public.consent_documents to th981_doc_publisher;
-grant select on public.programme_consents, public.account_consents to th981_doc_publisher;
+grant select, delete, truncate on public.consent_documents to th981_doc_publisher;
+grant select, truncate on public.programme_consents, public.account_consents to th981_doc_publisher;
 set local role th981_doc_publisher;
+select th981_test.refused(
+  'truncate public.consent_documents, public.programme_consents, public.account_consents',
+  'TH015', 'Consent documents are immutable, publish a new version',
+  'bypass role: cannot truncate consent documents', 'consent_document_immutable');
 select th981_test.affects(
   'delete from public.consent_documents where purpose = ''research'' and version = ''v6-unref''',
   1, 'bypass role: deletes an unreferenced document');
@@ -227,6 +240,30 @@ reset role;
 select th981_test.affects(
   'delete from public.consent_documents where purpose = ''core'' and version = ''v6-flag''',
   2, 'superuser: deletes an unreferenced version, every locale');
+
+-- Nobody truncates documents, not even a superuser ----------------------------------
+select set_config('th981.documents', (select count(*)::text from public.consent_documents), true);
+insert into public.enrolments (id, user_id, programme_code)
+values ('00000000-0000-4000-8000-00000981e0a1', '00000000-0000-4000-8000-0000009810a1', 'hw');
+insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+values ('00000000-0000-4000-8000-00000981e0a1', 'core', 'v1-draft', 'en');
+-- Without CASCADE the foreign keys refuse first (0A000); with CASCADE, or
+-- naming the consent tables, the guard refuses.
+select th981_test.refused('truncate public.consent_documents',
+  '0A000', 'cannot truncate a table referenced in a foreign key constraint',
+  'superuser: truncate without cascade is refused');
+select th981_test.refused('truncate public.consent_documents cascade',
+  'TH015', 'Consent documents are immutable, publish a new version',
+  'superuser: truncate cascade is refused', 'consent_document_immutable');
+select th981_test.refused(
+  'truncate public.consent_documents, public.programme_consents, public.account_consents',
+  'TH015', 'Consent documents are immutable, publish a new version',
+  'superuser: truncating documents with the consent tables is refused', 'consent_document_immutable');
+select th981_test.ok(
+  (select count(*)::text from public.consent_documents) = current_setting('th981.documents')
+  and (select count(*) from public.programme_consents) = 1
+  and (select count(*) from public.account_consents) = 1,
+  'superuser: the refused truncates left documents, programme consents and account consents untouched');
 
 -- One statement reschedules an unreferenced version -------------------------------
 insert into public.consent_documents (purpose, version, locale, body, effective_from) values
@@ -275,6 +312,20 @@ select th981_test.affects(
   'insert into public.consent_documents (purpose, version, locale, body, effective_from)
    values (''diagnostics'', ''v7-one'', ''es'', ''Synthetic diagnostics text v7 (es)'', now() + interval ''1 day'')',
   1, 'superuser: adds its es locale at the same time in a later statement');
+select th981_test.refused(
+  'insert into public.consent_documents (purpose, version, locale, body, effective_from) values
+     (''research'', ''v8-multi'', ''en'', ''Synthetic research text v8'', now() + interval ''1 day''),
+     (''research'', ''v8-multi'', ''es'', ''Synthetic research text v8 (es)'', now() + interval ''1 day''),
+     (''screen_time'', ''v8-multi'', ''en'', ''Synthetic screen text v8'', now() + interval ''1 day''),
+     (''screen_time'', ''v8-multi'', ''es'', ''Synthetic screen text v8 (es)'', now() + interval ''2 days'')',
+  'TH015', 'A consent document version takes effect at the same time in every locale',
+  'superuser: one insert of two versions, the second with different times, is refused', 'consent_document_immutable');
+select th981_test.refused(
+  'insert into public.consent_documents (purpose, version, locale, body, effective_from, retired_at) values
+     (''research'', ''v8-ret'', ''en'', ''Synthetic research text v8r'', now() - interval ''3 days'', now() - interval ''1 day''),
+     (''research'', ''v8-ret'', ''es'', ''Synthetic research text v8r (es)'', now() - interval ''2 days'', now() - interval ''1 day'')',
+  'TH015', 'A consent document version takes effect at the same time in every locale',
+  'superuser: retired locales of one version with different times are refused', 'consent_document_immutable');
 
 select 'TH981_SQL_TESTS_COMPLETE' as result;
 rollback;
@@ -330,8 +381,17 @@ grep -A2 '^create trigger consent_documents_guard_truncate$' <<<"$sql" |
   grep -Fq 'before truncate on public.consent_documents' ||
   fail 'consent_documents_guard must also run before truncate'
 guard=$(body_of consent_documents_guard)
-role_line=$(grep -n 'r.rolname = current_user and (r.rolsuper or r.rolbypassrls)' <<<"$guard" | cut -d: -f1)
-delete_line=$(grep -n "^  if tg_op = 'DELETE' then$" <<<"$guard" | cut -d: -f1)
+role_line=$(grep -n 'r.rolname = current_user and (r.rolsuper or r.rolbypassrls)' <<<"$guard" | cut -d: -f1 || true)
+truncate_line=$(grep -n "^  if tg_op = 'TRUNCATE' then$" <<<"$guard" | cut -d: -f1 || true)
+if ! { [[ -n "$role_line" && -n "$truncate_line" ]] && ((truncate_line < role_line)) &&
+  grep -A1 "^  if tg_op = 'TRUNCATE' then$" <<<"$guard" | grep -Fq "raise exception using errcode = 'TH015',"; }; then
+  fail 'consent_documents_guard must refuse every truncate, before the role check'
+fi
+lock_line=$(grep -nF "  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('consent_documents:' || new.purpose || ':' || new.version, 0));" <<<"$guard" | cut -d: -f1 || true)
+if ! { [[ -n "$lock_line" && -n "$role_line" ]] && ((role_line < lock_line)); }; then
+  fail 'consent_documents_guard must take the per-version advisory lock after the role check'
+fi
+delete_line=$(grep -n "^  if tg_op = 'DELETE' then$" <<<"$guard" | cut -d: -f1 || true)
 if ! { [[ -n "$role_line" && -n "$delete_line" ]] && ((role_line < delete_line)) &&
   grep -A1 "^  if tg_op = 'DELETE' then$" <<<"$guard" | grep -Fxq '    return old;'; }; then
   fail 'consent_documents_guard must refuse a non-bypass role before it lets a delete through'
@@ -357,8 +417,10 @@ grep -Fxq 'grant select on table public.consent_documents to service_role;' <<<"
   fail 'consent_documents: service_role keeps select'
 [[ "$(grep -Ec '^grant ' <<<"$sql")" -eq 1 ]] ||
   fail 'the only grant in this migration is select on consent_documents to service_role'
-[[ "$(grep -Eic 'service[_-]?role' <<<"$sql")" -eq 2 ]] ||
-  fail 'service_role appears only in the revoke and the select grant'
+[[ "$(grep -Eic 'service[_-]?role' <<<"$sql")" -eq 4 ]] ||
+  fail 'service_role appears only in the table revoke, the select grant and the two function revokes'
+grep -A1 -Fx 'revoke all on function public.consent_documents_guard()' <<<"$sql" |
+  grep -Fxq 'from service_role;' || fail 'consent_documents_guard: revoke from service_role'
 if grep -Eiq '^(create|drop|alter) policy ' <<<"$sql"; then
   fail 'this migration does not change policies'
 fi
@@ -380,8 +442,8 @@ fi
 grep -Fxq 'revoke all on function public.consent_documents_check_effective_from()' <<<"$sql" ||
   fail 'consent_documents_check_effective_from: revoke all'
 grep -A1 -Fx 'revoke all on function public.consent_documents_check_effective_from()' <<<"$sql" |
-  grep -Fxq 'from public, anon, authenticated;' ||
-  fail 'consent_documents_check_effective_from: revoke from public, anon and authenticated'
+  grep -Fxq 'from public, anon, authenticated, service_role;' ||
+  fail 'consent_documents_check_effective_from: revoke from public, anon, authenticated and service_role'
 if grep -Eq '^grant execute ' <<<"$sql"; then
   fail 'trigger functions are executed by nobody directly'
 fi
@@ -393,7 +455,7 @@ fi
 registry_row() { grep -E "^\| \`$1\` \|" "$contract" || true; }
 fn_re='^create (or replace )?function public\.([a-z_]+)\('
 raise_re="errcode = '(TH[0-9]{3})', message = '([^']+)', hint = '([a-z_]+)';"
-expected_raises=5
+expected_raises=6
 checked=0
 current_fn=''
 while IFS= read -r line; do

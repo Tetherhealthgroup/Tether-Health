@@ -2,10 +2,14 @@ begin;
 
 -- Consent documents are published only by reviewed migrations.
 --
--- * consent_documents_guard now also runs before delete and before truncate:
---   only a role that bypasses row-level security removes a document (TH015),
---   and the foreign keys from programme_consents and account_consents still
---   refuse to remove a document that a consent references (23503).
+-- * consent_documents_guard now also runs before delete: only a role that
+--   bypasses row-level security deletes a document (TH015), and the foreign
+--   keys from programme_consents and account_consents refuse to delete a
+--   document that a consent references (23503).
+-- * TRUNCATE of consent_documents is refused for every role, superuser
+--   included (TH015). Documents are removed only by DELETE, which honours the
+--   foreign keys; TRUNCATE skips the row triggers, and with CASCADE it also
+--   empties the consent tables that reference documents.
 -- * service_role keeps select on public.consent_documents and loses every
 --   other table privilege, so documents are added, changed and removed only
 --   by migrations.
@@ -14,7 +18,11 @@ begin;
 --   update statement, so one update can move every locale of a version no
 --   consent references to a new effective_from, while any statement that
 --   leaves the locales of a version with different effective_from values is
---   refused (TH015). The rest of the guard is unchanged.
+--   refused (TH015). Each insert or update first takes a transaction-level
+--   advisory lock on its (purpose, version), so writers of the same version
+--   in concurrent transactions run one after the other; under READ COMMITTED
+--   the later writer's check sees the earlier writer's committed rows. The
+--   rest of the guard is unchanged.
 
 create or replace function public.consent_documents_guard()
 returns trigger
@@ -22,6 +30,14 @@ language plpgsql
 set search_path = ''
 as $$
 begin
+  -- TRUNCATE skips row triggers, and with CASCADE it also empties the
+  -- consent tables that reference documents, so no role may truncate them.
+  if tg_op = 'TRUNCATE' then
+    raise exception using errcode = 'TH015',
+      message = 'Consent documents are immutable, publish a new version',
+      hint = 'consent_document_immutable';
+  end if;
+
   -- The checks below read consent_documents, programme_consents and
   -- account_consents, which have forced row-level security. A role subject to
   -- it might not see every row, so it is refused outright, for every write.
@@ -39,9 +55,11 @@ begin
   if tg_op = 'DELETE' then
     return old;
   end if;
-  if tg_op = 'TRUNCATE' then
-    return null;
-  end if;
+
+  -- Writers of the same version wait for each other, so the statement check
+  -- below (consent_documents_check_effective_from) sees every committed
+  -- locale of the version under READ COMMITTED.
+  perform pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('consent_documents:' || new.purpose || ':' || new.version, 0));
 
   if tg_op = 'UPDATE' then
     if new.purpose is distinct from old.purpose or
@@ -136,7 +154,9 @@ for each statement execute function public.consent_documents_check_effective_fro
 revoke all on table public.consent_documents from service_role;
 grant select on table public.consent_documents to service_role;
 
+revoke all on function public.consent_documents_guard()
+from service_role;
 revoke all on function public.consent_documents_check_effective_from()
-from public, anon, authenticated;
+from public, anon, authenticated, service_role;
 
 commit;
