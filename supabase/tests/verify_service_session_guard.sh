@@ -302,6 +302,7 @@ select th972_test.ok(
                     'public.current_consent_documents()'::regprocedure,
                     'public.consent_fill_text()'::regprocedure,
                     'public.consent_documents_guard()'::regprocedure,
+                    'public.consent_documents_check_effective_from()'::regprocedure,
                     'public.programme_consents_check_supersede()'::regprocedure,
                     'public.programme_consents_supersede_cascade()'::regprocedure)
       and (a.grantee = 0 or a.grantee in ('anon'::regrole, 'thsync'::regrole))),

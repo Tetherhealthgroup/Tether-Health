@@ -194,8 +194,13 @@ select th972b_test.ok(
   and not has_table_privilege('authenticated', 'public.consent_documents', 'DELETE')
   and not has_table_privilege('authenticated', 'public.consent_documents', 'TRUNCATE')
   and not has_any_column_privilege('anon', 'public.consent_documents', 'SELECT')
-  and not has_any_column_privilege('anon', 'public.consent_documents', 'INSERT'),
-  'consent_documents: authenticated may only read; anon has no access');
+  and not has_any_column_privilege('anon', 'public.consent_documents', 'INSERT')
+  and has_table_privilege('service_role', 'public.consent_documents', 'SELECT')
+  and not has_any_column_privilege('service_role', 'public.consent_documents', 'INSERT')
+  and not has_any_column_privilege('service_role', 'public.consent_documents', 'UPDATE')
+  and not has_table_privilege('service_role', 'public.consent_documents', 'DELETE')
+  and not has_table_privilege('service_role', 'public.consent_documents', 'TRUNCATE'),
+  'consent_documents: authenticated and service_role may only read; anon has no access');
 select th972b_test.ok(
   (select count(*) = 20
      and count(distinct purpose) = 10
@@ -351,12 +356,29 @@ select th972b_test.ok(
   th972b_test.after(array[
     current_setting('th972b.approve_all'),
     'alter table public.consent_documents disable trigger consent_documents_guard',
+    'alter table public.consent_documents disable trigger consent_documents_same_effective_from_insert',
     'insert into public.consent_documents (purpose, version, locale, body, body_sha256, effective_from, approved_ref) values
       (''core'', ''v8'', ''en'', ''Synthetic core text'', repeat(''0'', 64), now() - interval ''2 minutes'', ''synthetic-approval-08''),
       (''core'', ''v8'', ''es'', ''Synthetic core text (es)'', repeat(''0'', 64), now() - interval ''1 minute'', ''synthetic-approval-08'')',
+    'alter table public.consent_documents enable trigger consent_documents_same_effective_from_insert',
     'alter table public.consent_documents enable trigger consent_documents_guard'],
     'select th972b_test.gate_reasons()') = 'effective_from_differs',
   'gate: locales of one version with different effective_from fail (rows written past the guard)');
+select th972b_test.ok(
+  th972b_test.after(array[
+    current_setting('th972b.approve_all'),
+    'alter table public.consent_documents disable trigger consent_documents_guard',
+    'alter table public.consent_documents disable trigger consent_documents_same_effective_from_insert',
+    'insert into public.consent_documents
+       (purpose, version, locale, body, body_sha256, effective_from, retired_at, approved_ref) values
+      (''core'', ''v8r'', ''en'', ''Synthetic core text'', repeat(''0'', 64),
+       now() - interval ''3 days'', now() - interval ''1 day'', ''synthetic-approval-08r''),
+      (''core'', ''v8r'', ''es'', ''Synthetic core text (es)'', repeat(''0'', 64),
+       now() - interval ''2 days'', now() - interval ''1 day'', ''synthetic-approval-08r'')',
+    'alter table public.consent_documents enable trigger consent_documents_same_effective_from_insert',
+    'alter table public.consent_documents enable trigger consent_documents_guard'],
+    'select th972b_test.gate_reasons()') = 'effective_from_differs',
+  'gate: retired locales of one version with different effective_from still fail');
 select th972b_test.ok(
   th972b_test.after(array[
     'update public.consent_documents set approved_ref = ''synthetic-approval-all''
@@ -619,6 +641,19 @@ select th972b_test.refused(
     (''core'', ''v1c'', ''es'', ''Synthetic core text v1c (es)'', now() - interval ''5 minutes'')',
   'TH015', 'A consent document version takes effect at the same time in every locale',
   'superuser: a version cannot take effect later in one locale than another', 'consent_document_immutable');
+insert into public.consent_documents (purpose, version, locale, body, effective_from)
+values ('core', 'v1d', 'en', 'Synthetic core text v1d', now() - interval '43 minutes');
+select th972b_test.refused(
+  'insert into public.consent_documents (purpose, version, locale, body, effective_from)
+   values (''core'', ''v1d'', ''es'', ''Synthetic core text v1d (es)'', now() - interval ''44 minutes'')',
+  'TH015', 'A consent document version takes effect at the same time in every locale',
+  'superuser: a new locale cannot take effect earlier than the existing one', 'consent_document_immutable');
+select th972b_test.refused(
+  'insert into public.consent_documents (purpose, version, locale, body, effective_from)
+   values (''core'', ''v1d'', ''es'', ''Synthetic core text v1d (es)'', now() - interval ''42 minutes'')',
+  'TH015', 'A consent document version takes effect at the same time in every locale',
+  'superuser: a new locale cannot take effect later than the existing one', 'consent_document_immutable');
+delete from public.consent_documents where purpose = 'core' and version = 'v1d';
 select th972b_test.refused(
   'update public.consent_documents set effective_from = now() - interval ''41 minutes''
    where purpose = ''core'' and version = ''v1b'' and locale = ''es''',
