@@ -1,6 +1,8 @@
 // Production hook contract: TApi.submit → TResult (with the submitting
 // screen), how TNav.submit handles each result, and the replaceable branch
 // resolver with its fail-closed production implementation.
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -55,6 +57,26 @@ Future<void> _hostPage(WidgetTester tester) async {
 /// Every text on screen, including toasts in the overlay.
 Iterable<String> _texts(WidgetTester tester) => tester.widgetList<Text>(find.byType(Text, skipOffstage: false)).map((t) => t.data ?? t.textSpan?.toPlainText() ?? '');
 
+/// A save that completes only when the test says so (or never).
+class _GatedApi implements TApi {
+  final Completer<TResult> gate = Completer<TResult>();
+  int calls = 0;
+  @override
+  Future<TResult> submit(String endpoint, {required String screenId}) {
+    calls++;
+    return gate.future;
+  }
+}
+
+/// Every route name pushed or put in place by a replace, in order.
+class _Arrivals extends NavigatorObserver {
+  final List<String?> names = [];
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) => names.add(route.settings.name);
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) => names.add(newRoute?.settings.name);
+}
+
 class _ScriptedApi implements TApi {
   _ScriptedApi(this.result);
   final TResult result;
@@ -74,13 +96,14 @@ Future<void> _settle(WidgetTester tester) async {
   }
 }
 
-Future<void> _open(WidgetTester tester, String route) async {
+Future<void> _open(WidgetTester tester, String route, {List<NavigatorObserver> observers = const []}) async {
   tester.view.physicalSize = const Size(1170, 2532);
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
   await tester.pumpWidget(MaterialApp(
     key: UniqueKey(), // a fresh navigator each time
     theme: tetherTheme(),
+    navigatorObservers: observers,
     onGenerateRoute: (s) => s.name == _host ? MaterialPageRoute<void>(builder: (_) => const Scaffold(), settings: s) : AppRouter.onGenerateRoute(s),
     onGenerateInitialRoutes: (_) => [
       MaterialPageRoute<void>(builder: (_) => const Scaffold(), settings: const RouteSettings(name: _host)),
@@ -107,6 +130,7 @@ void main() {
   tearDown(() {
     TDefaults.forPreview();
     TAuth.instance = null;
+    TNav.submitTimeout = const Duration(seconds: 30);
     TSession.clear();
   });
 
@@ -465,9 +489,14 @@ void main() {
       final platform = TPlatform.instance as TInertPlatform;
       await _open(tester, Routes.crisis);
       expect(find.byType(CrisisScreen), findsOneWidget);
+      await tester.ensureVisible(find.byKey(const ValueKey('a:body[1]')));
+      await _settle(tester);
+      final before = _texts(tester).toList();
       await _tapKey(tester, 'body[1]'); // Call 988
       expect(find.textContaining('Would call'), findsNothing);
       expect(find.textContaining('Would '), findsNothing);
+      expect(find.byType(SnackBar), findsNothing);
+      expect(_texts(tester).toList(), before, reason: 'no new text (toast, snackbar or dialog) after the tap');
       expect(platform.recorded, [TInertPlatform.code]);
       expect(platform.recorded.single.contains('988'), isFalse);
       await tester.pump(const Duration(seconds: 3));
@@ -575,6 +604,153 @@ void main() {
       await _tapKey(tester, 'footer[0]');
       expect(find.byType(StLogScreen), findsNothing);
       expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsNothing);
+      await tester.pump(const Duration(seconds: 3));
+    });
+  });
+
+  group('safety outcome before the save', () {
+    Future<void> selfHarm(WidgetTester tester) async {
+      await tester.ensureVisible(find.text('Thoughts of harming myself'));
+      await tester.tap(find.text('Thoughts of harming myself'), warnIfMissed: false);
+      await _settle(tester);
+    }
+
+    testWidgets('a save that never completes: the crisis screen opens at once', (tester) async {
+      final api = _GatedApi();
+      TApi.instance = api;
+      await _open(tester, Routes.eaMood);
+      await selfHarm(tester);
+      await tester.tap(find.byKey(const ValueKey('a:footer[0]')), warnIfMissed: false);
+      await tester.pump(); // one frame: no waiting for the save
+      await tester.pump(const Duration(milliseconds: 400)); // route transition
+      expect(api.calls, 1);
+      expect(api.gate.isCompleted, isFalse);
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      // The save times out in the background; nothing navigates again.
+      await tester.pump(const Duration(seconds: 31));
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      expect(find.byType(EaMoodScreen), findsNothing);
+      expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    testWidgets('leaving while the save is pending: the crisis screen was already shown, and a later failure navigates nowhere', (tester) async {
+      final api = _GatedApi();
+      final arrivals = _Arrivals();
+      TApi.instance = api;
+      await _open(tester, Routes.eaMood, observers: [arrivals]);
+      await selfHarm(tester);
+      await tester.tap(find.byKey(const ValueKey('a:footer[0]')), warnIfMissed: false);
+      await tester.pump();
+      expect(arrivals.names.last, Routes.crisis, reason: 'crisis opened on the tap, before any back');
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      await tester.binding.handlePopRoute(); // the member presses back
+      await _settle(tester);
+      final seen = arrivals.names.length;
+      api.gate.complete(const TResult.failed('synthetic_code'));
+      await _settle(tester);
+      expect(arrivals.names.length, seen, reason: 'no navigation after the save finished');
+      expect(arrivals.names.where((n) => n == Routes.crisis), hasLength(1));
+      expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    for (final (how, result) in <(String, TResult)>[('ok', const TResult.ok()), ('queued', const TResult.queued()), ('outcome', const TResult.outcome('Yes'))]) {
+      testWidgets('a save that succeeds ($how): exactly one navigation to the crisis screen', (tester) async {
+        final arrivals = _Arrivals();
+        TApi.instance = _ScriptedApi(result);
+        await _open(tester, Routes.eaMood, observers: [arrivals]);
+        await selfHarm(tester);
+        await _tapKey(tester, 'footer[0]');
+        await tester.pump(const Duration(seconds: 1));
+        expect(find.byType(CrisisScreen), findsOneWidget);
+        expect(arrivals.names.where((n) => n == Routes.crisis), hasLength(1));
+        expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsNothing);
+        await tester.pump(const Duration(seconds: 3));
+      });
+    }
+
+    testWidgets('hw_log2 crisis reading with a successful save: one navigation to hw_crisis', (tester) async {
+      final arrivals = _Arrivals();
+      TApi.instance = _ScriptedApi(const TResult.ok());
+      await _open(tester, Routes.hwLog2, observers: [arrivals]);
+      await tester.enterText(find.byKey(const ValueKey('field:hw_log2.systolic')), '186');
+      await tester.enterText(find.byKey(const ValueKey('field:hw_log2.diastolic')), '122');
+      await _settle(tester);
+      await _tapKey(tester, 'footer[0]');
+      expect(find.byType(HwCrisisScreen), findsOneWidget);
+      expect(arrivals.names.where((n) => n == Routes.hwCrisis), hasLength(1));
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    testWidgets('a non-safety value waits for the save, then follows the branch', (tester) async {
+      final api = _GatedApi();
+      final arrivals = _Arrivals();
+      TApi.instance = api;
+      await _open(tester, Routes.eaMood, observers: [arrivals]);
+      final seen = arrivals.names.length;
+      await tester.tap(find.byKey(const ValueKey('a:footer[0]')), warnIfMissed: false);
+      await _settle(tester);
+      expect(arrivals.names.length, seen, reason: 'nothing happens before the save finishes');
+      expect(find.byType(EaMoodScreen), findsOneWidget);
+      api.gate.complete(const TResult.ok());
+      await _settle(tester);
+      expect(find.text('Saved'), findsOneWidget); // the "No" outcome: toast, then back
+      expect(find.byType(EaMoodScreen), findsNothing);
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    test('pick() reads only the session: TSim.force and TSim.queue do not affect it', () {
+      var ran = '';
+      final routes = TSafetyRoutes('ea.selfharm', {'Yes': () => ran = 'crisis'});
+      TSession.set('ea_mood.going_on', ['Work']);
+      TSim.force = 'Yes';
+      TSim.queue.add('Yes');
+      expect(routes.pick(), isNull);
+      TSession.set('ea_mood.going_on', ['Thoughts of harming myself']);
+      TSim.force = 'No';
+      TSim.queue
+        ..clear()
+        ..add('No');
+      routes.pick()!();
+      expect(ran, 'crisis');
+      TSim.reset();
+    });
+  });
+
+  group('save timeout', () {
+    testWidgets('a save that never completes gives failed(timeout) after submitTimeout', (tester) async {
+      final api = _GatedApi();
+      TApi.instance = api;
+      TResult? result;
+      unawaited(TNav.safeSubmit('POST /v1/example', screenId: 'example').then((r) => result = r));
+      await tester.pump(const Duration(seconds: 29));
+      expect(result, isNull);
+      await tester.pump(const Duration(seconds: 2));
+      expect(result, const TResult.failed(TNav.timeoutCode));
+    });
+
+    testWidgets('the timeout is configurable', (tester) async {
+      TNav.submitTimeout = const Duration(seconds: 5);
+      TApi.instance = _GatedApi();
+      TResult? result;
+      unawaited(TNav.safeSubmit('POST /v1/example', screenId: 'example').then((r) => result = r));
+      await tester.pump(const Duration(seconds: 4));
+      expect(result, isNull);
+      await tester.pump(const Duration(seconds: 2));
+      expect(result, const TResult.failed(TNav.timeoutCode));
+    });
+
+    testWidgets('a save that times out keeps the screen and shows the save error', (tester) async {
+      TApi.instance = _GatedApi();
+      await _open(tester, Routes.hwLipids);
+      await _tapKey(tester, 'footer[0]');
+      expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsNothing);
+      await tester.pump(const Duration(seconds: 30));
+      await tester.pump();
+      expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsOneWidget);
+      expect(find.byType(HwLipidsScreen), findsOneWidget);
       await tester.pump(const Duration(seconds: 3));
     });
   });

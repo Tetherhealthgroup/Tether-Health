@@ -7,6 +7,8 @@
 // with real ones at startup, from app code. This package never imports app
 // code, network or storage. In release builds the defaults fail closed
 // ([TDefaults]); debug builds and tests get the preview defaults.
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -183,9 +185,11 @@ abstract class TApi {
 
 /// The safety outcomes of the on-device rule that decides the branch after a
 /// submit, with the action for each. Generated from spec/rules.json
-/// (`safety`). When the submit fails, [TNav.submit] runs [rule] and, if the
-/// result is one of [routes], runs that action, so a safety screen opens
-/// whether or not the save went through.
+/// (`safety`). [TNav.submit] runs [rule] when the member taps, before the
+/// save is awaited, and again if the save fails; when the result is one of
+/// [routes] it runs that action, so a safety screen opens at once, whether
+/// or not the save goes through. [pick] reads only the session values: the
+/// simulation hooks ([TSim]) never affect it.
 class TSafetyRoutes {
   const TSafetyRoutes(this.rule, this.routes);
 
@@ -366,23 +370,54 @@ abstract final class TNav {
     if (then != null) then();
   }
 
+  /// Longest wait for a save. A save that takes longer gives
+  /// `TResult.failed(timeoutCode)`.
+  static Duration submitTimeout = const Duration(seconds: 30);
+
+  /// Code of the [TFailed] result given for a save that exceeds
+  /// [submitTimeout].
+  static const String timeoutCode = 'timeout';
+
   /// Calls [TApi.instance]. An adapter that throws gives
-  /// `TResult.failed(adapterErrorCode)`; the exception is not kept.
+  /// `TResult.failed(adapterErrorCode)` (the exception is not kept); a save
+  /// that takes longer than [submitTimeout] gives `TResult.failed(timeoutCode)`.
   static Future<TResult> safeSubmit(String endpoint, {required String screenId}) async {
     try {
-      return await TApi.instance.submit(endpoint, screenId: screenId);
+      return await TApi.instance.submit(endpoint, screenId: screenId).timeout(submitTimeout);
+    } on TimeoutException {
+      return const TResult.failed(timeoutCode);
     } catch (_) {
       return const TResult.failed(adapterErrorCode);
     }
   }
 
-  /// Saves through [TApi.instance], then:
+  static const String _saveError = 'Couldn’t save. Your entry is kept on this phone.';
+
+  /// Saves through [TApi.instance].
+  ///
+  /// When [safety]'s rule decides a safety outcome at the moment of the tap,
+  /// that outcome's action runs at once, before the save is awaited; the save
+  /// continues in the background. [then] does not run in this case, whatever
+  /// the save's result: the safety action replaces it, so the safety screen
+  /// opens exactly once and no confirmation toast from [then] is shown over
+  /// it. If the save then fails, the save error is shown while the submitting
+  /// screen is still mounted, and nothing navigates again.
+  ///
+  /// Otherwise, after the save:
   /// - ok / queued: runs [then];
   /// - outcome: runs [then], and the branch inside it may take the label;
-  /// - failed (including `not_configured` and `adapter_error`): shows the
-  ///   save error and, when [safety]'s rule decides a safety outcome, runs
-  ///   that outcome's action. Otherwise the member stays on the screen.
+  /// - failed (including `not_configured`, `adapter_error` and `timeout`):
+  ///   shows the save error and, when [safety]'s rule now decides a safety
+  ///   outcome, runs that outcome's action. Otherwise the member stays on
+  ///   the screen.
   static Future<void> submit(BuildContext context, String endpoint, {required String screenId, VoidCallback? then, TSafetyRoutes? safety}) async {
+    final safetyNow = safety?.pick();
+    if (safetyNow != null) {
+      safetyNow();
+      final result = await safeSubmit(endpoint, screenId: screenId);
+      if (result is TFailed && context.mounted) toast(context, _saveError);
+      return;
+    }
     final result = await safeSubmit(endpoint, screenId: screenId);
     if (!context.mounted) return;
     switch (result) {
@@ -396,7 +431,7 @@ abstract final class TNav {
           _serverOutcome = null;
         }
       case TFailed():
-        toast(context, 'Couldn’t save. Your entry is kept on this phone.');
+        toast(context, _saveError);
         safety?.pick()?.call();
     }
   }
