@@ -186,7 +186,7 @@ void main() {{
   }}
 }}
 """
-    open(os.path.join(out_dir, 'test', 'action_sweep_test.dart'), 'w').write(sweep)
+    open(os.path.join(out_dir, 'test', 'action_sweep_test.dart'), 'w', newline='\n').write(sweep)
 
     # scenarios
     cases = []
@@ -268,7 +268,7 @@ void main() {{
 {chr(10).join(cases)}
 }}
 """
-    open(os.path.join(out_dir, 'test', 'scenarios_test.dart'), 'w').write(code)
+    open(os.path.join(out_dir, 'test', 'scenarios_test.dart'), 'w', newline='\n').write(code)
     placeholders_test(out_dir)
     large_text_test(out_dir)
     return len(exps), len(SCENARIOS)
@@ -367,7 +367,7 @@ void main() {{
   }}
 }}
 """
-    open(os.path.join(out_dir, 'test', 'large_text_test.dart'), 'w').write(code)
+    open(os.path.join(out_dir, 'test', 'large_text_test.dart'), 'w', newline='\n').write(code)
     return len(rows)
 
 
@@ -469,7 +469,7 @@ void main() {{
   }}
 }}
 """
-    open(os.path.join(out_dir, 'test', 'placeholders_test.dart'), 'w').write(code)
+    open(os.path.join(out_dir, 'test', 'placeholders_test.dart'), 'w', newline='\n').write(code)
     return len(rows)
 
 def lst_d(items): return '[' + ', '.join(items) + ']'

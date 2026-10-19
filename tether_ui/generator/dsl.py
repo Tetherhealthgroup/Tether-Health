@@ -159,7 +159,9 @@ def _assign_keys(s):
     for part in ('body', 'footer'):
         for n, p in walk(s[part], part):
             if (n['t'] in INPUTS or n['t'] in KEYED) and n.get('key'):
-                assert n['key'] not in used, f"{s['id']}: duplicate key {n['key']!r} at {p}"
+                if n['key'] in used:
+                    # An explicit error, not an assert: `python -O` must not skip it.
+                    raise ValueError(f"{s['id']}: duplicate key {n['key']!r} at {p}")
                 used.add(n['key'])
     for part in ('body', 'footer'):
         for n, p in walk(s[part], part):
@@ -267,3 +269,27 @@ def camel(s):
 
 def pascal(s):
     c = camel(s); return c[:1].upper() + c[1:]
+
+
+def _self_test():
+    """python3 dsl.py (also run by gen_dart.py): a duplicate explicit key on
+    a screen raises ValueError, also under `python -O`. Uses no assert, so
+    the check itself survives -O."""
+    def keys(*ks):
+        s = {'id': 'selftest', 'header': None, 'body': [field(f'Field {k}', key=k) for k in ks], 'footer': []}
+        _assign_keys(s)
+        return [n['key'] for n, _ in walk(s['body'])]
+    if keys('a', 'b') != ['a', 'b']:
+        raise AssertionError('distinct keys were not kept')
+    try:
+        keys('a', 'a')
+    except ValueError as e:
+        if "duplicate key 'a'" not in str(e):
+            raise AssertionError(f'unexpected message: {e}')
+    else:
+        raise AssertionError('a duplicate key did not raise ValueError')
+    print('dsl self-test: ok')
+
+
+if __name__ == '__main__':
+    _self_test()
