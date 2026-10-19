@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Checks that consent records are removed only by row deletes: a statement
 # trigger on programme_consents and on account_consents refuses TRUNCATE for
-# every role, and the deletion paths (delete_my_app_data, deleting an
+# every role, in every session mode, and the deletion paths (delete_my_app_data, deleting an
 # enrolment) still remove consent rows with DELETE.
 #
 #   bash supabase/tests/verify_consent_truncate_guards.sh   static checks
@@ -73,19 +73,14 @@ begin
 end;
 $f$;
 
--- Every TRUNCATE form that reaches a consent table. The current role must hold
--- the truncate privilege on both consent tables, and each form is refused
--- with TH003 (or hold it on neither, and each is refused with 42501).
-create function th987_test.truncates_refused(p_who text)
+-- Every TRUNCATE form that reaches a consent table, each refused with
+-- p_state: TH003 from the guard, or 42501 for a role without the truncate
+-- privilege.
+create function th987_test.truncates_refused(p_who text, p_state text)
 returns void language plpgsql set search_path = '' as $f$
 declare
   stmt text;
-  on_programme boolean := has_table_privilege('public.programme_consents', 'TRUNCATE');
-  on_account boolean := has_table_privilege('public.account_consents', 'TRUNCATE');
 begin
-  if on_programme is distinct from on_account then
-    raise exception 'FAIL % holds truncate on one consent table only', p_who;
-  end if;
   foreach stmt in array array[
     'truncate public.programme_consents',
     'truncate public.programme_consents cascade',
@@ -93,11 +88,11 @@ begin
     'truncate public.account_consents cascade',
     'truncate public.programme_consents, public.account_consents'
   ] loop
-    if on_programme then
+    if p_state = 'TH003' then
       perform th987_test.refused(stmt, 'TH003', 'Consent records are immutable',
         p_who || ': ' || stmt || ' is refused', 'consent_immutable');
     else
-      perform th987_test.refused(stmt, '42501', 'permission denied%',
+      perform th987_test.refused(stmt, p_state, 'permission denied%',
         p_who || ': ' || stmt || ' is refused (no truncate privilege)');
     end if;
   end loop;
@@ -116,9 +111,15 @@ select th987_test.ok(
    join pg_catalog.pg_proc as p on p.oid = t.tgfoid
    where t.tgrelid in ('public.programme_consents'::regclass, 'public.account_consents'::regclass)
      and not t.tgisinternal and (t.tgtype::integer & 32) <> 0) =
-  'account_consents:account_consents_truncate_guard:34:consent_truncate_guard:O,'
-  'programme_consents:programme_consents_truncate_guard:34:consent_truncate_guard:O',
-  'consent tables: one enabled truncate trigger each, before truncate, for each statement, consent_truncate_guard');
+  'account_consents:account_consents_truncate_guard:34:consent_truncate_guard:A,'
+  'programme_consents:programme_consents_truncate_guard:34:consent_truncate_guard:A',
+  'consent tables: one truncate trigger each, before truncate, for each statement, consent_truncate_guard, enabled in every session mode');
+select th987_test.ok(
+  (select t.tgtype::integer = 34 and t.tgenabled = 'A'
+   from pg_catalog.pg_trigger as t
+   where t.tgrelid = 'public.consent_documents'::regclass
+     and t.tgname = 'consent_documents_guard_truncate'),
+  'consent_documents: its truncate guard is enabled in every session mode');
 select th987_test.ok(
   (select not prosecdef and proconfig = array['search_path=""']
    from pg_catalog.pg_proc where oid = 'public.consent_truncate_guard()'::regprocedure)
@@ -136,6 +137,14 @@ select th987_test.ok(
   and not has_table_privilege('anon', 'public.programme_consents', 'TRUNCATE')
   and not has_table_privilege('anon', 'public.account_consents', 'TRUNCATE'),
   'authenticated and anon hold no truncate privilege on the consent tables');
+select th987_test.ok(
+  not has_table_privilege('service_role', 'public.programme_consents', 'TRUNCATE')
+  and not has_table_privilege('service_role', 'public.account_consents', 'TRUNCATE')
+  and not has_table_privilege('service_role', 'public.programme_consents', 'TRIGGER')
+  and not has_table_privilege('service_role', 'public.account_consents', 'TRIGGER')
+  and not has_table_privilege('service_role', 'public.programme_consents', 'REFERENCES')
+  and not has_table_privilege('service_role', 'public.account_consents', 'REFERENCES'),
+  'service_role holds no truncate, trigger or references privilege on the consent tables');
 
 -- Synthetic identities and consents -----------------------------------------------
 insert into auth.users (id, email, aud, role) values
@@ -178,7 +187,7 @@ select th987_test.ok(
   'setup: 4 programme consents (1 revoked) and 2 account consents');
 
 -- Superuser (as a migration runs) --------------------------------------------------
-select th987_test.truncates_refused('superuser');
+select th987_test.truncates_refused('superuser', 'TH003');
 -- Truncating a table the consent tables reference: without CASCADE the
 -- foreign keys refuse first (0A000); with CASCADE it reaches a consent table
 -- and the guard refuses. The focus-cap check on the enrolments inserted above
@@ -203,7 +212,7 @@ set local role th987_bypass;
 select th987_test.ok(
   (select count(*) from public.programme_consents) = 4,
   'bypass role: sees every consent row (it holds truncate and select)');
-select th987_test.truncates_refused('bypass role');
+select th987_test.truncates_refused('bypass role', 'TH003');
 reset role;
 select th987_test.ok(th987_test.fingerprint() = current_setting('th987.consents'),
   'bypass role: the refused truncates left every consent row untouched');
@@ -213,7 +222,7 @@ create role th987_plain nologin;
 grant usage on schema public to th987_plain;
 grant select, truncate on public.programme_consents, public.account_consents to th987_plain;
 set local role th987_plain;
-select th987_test.truncates_refused('non-bypass role');
+select th987_test.truncates_refused('non-bypass role', 'TH003');
 reset role;
 select th987_test.ok(th987_test.fingerprint() = current_setting('th987.consents'),
   'non-bypass role: the refused truncates left every consent row untouched');
@@ -227,7 +236,7 @@ select set_config('th987.owner',
 alter table public.programme_consents owner to th987_owner;
 alter table public.account_consents owner to th987_owner;
 set local role th987_owner;
-select th987_test.truncates_refused('table owner');
+select th987_test.truncates_refused('table owner', 'TH003');
 reset role;
 do $restore$
 begin
@@ -239,16 +248,28 @@ select th987_test.ok(th987_test.fingerprint() = current_setting('th987.consents'
   'table owner: the refused truncates left every consent row untouched');
 
 -- service_role and authenticated -----------------------------------------------------
--- service_role is refused by the trigger when it holds the truncate privilege
--- (as Supabase's default grants give it), by the missing privilege otherwise.
+-- Neither holds the truncate privilege, so the privilege check refuses first.
 set local role service_role;
-select th987_test.truncates_refused('service_role');
+select th987_test.truncates_refused('service_role', '42501');
 reset role;
 set local role authenticated;
-select th987_test.truncates_refused('authenticated');
+select th987_test.truncates_refused('authenticated', '42501');
 reset role;
 select th987_test.ok(th987_test.fingerprint() = current_setting('th987.consents'),
   'every refused truncate left every consent row untouched');
+
+-- The guards fire in every session mode ----------------------------------------------
+select set_config('th987.documents', (select count(*)::text from public.consent_documents), true);
+set local session_replication_role = replica;
+select th987_test.truncates_refused('superuser, replica session', 'TH003');
+select th987_test.refused('truncate public.consent_documents cascade',
+  'TH015', 'Consent documents are immutable, publish a new version',
+  'superuser, replica session: truncate consent_documents cascade is refused', 'consent_document_immutable');
+reset session_replication_role;
+select th987_test.ok(
+  th987_test.fingerprint() = current_setting('th987.consents')
+  and (select count(*)::text from public.consent_documents) = current_setting('th987.documents'),
+  'replica session: the refused truncates left every consent row and document untouched');
 
 -- Row deletes still remove consents ---------------------------------------------------
 -- "Delete now": A deletes one enrolment; its consent goes with it (cascade).
@@ -345,6 +366,14 @@ for table in programme_consents account_consents; do
 done
 [[ "$(grep -Ec '^create trigger ' <<<"$sql")" -eq 2 ]] ||
   fail 'this migration creates exactly the two truncate triggers'
+# The guards, and the consent_documents truncate guard, fire in every session mode.
+for pair in programme_consents:programme_consents_truncate_guard \
+  account_consents:account_consents_truncate_guard \
+  consent_documents:consent_documents_guard_truncate; do
+  grep -A1 -Fx "alter table public.${pair%%:*}" <<<"$sql" |
+    grep -Fxq "enable always trigger ${pair##*:};" ||
+    fail "${pair##*:} must be enabled always"
+done
 
 # The guard refuses unconditionally, with TH003 and its registered hint.
 body=$(sed -n '/^create function public\.consent_truncate_guard()$/,/^\$\$;$/p' <<<"$sql")
@@ -359,6 +388,9 @@ grep -Fxq "set search_path = ''" <<<"$body" || fail "consent_truncate_guard must
 grep -A1 -Fx 'revoke all on function public.consent_truncate_guard()' <<<"$sql" |
   grep -Fxq 'from public, anon, authenticated, service_role;' ||
   fail 'consent_truncate_guard: revoke from public, anon, authenticated and service_role'
+grep -A1 -Fx 'revoke truncate, trigger, references on public.programme_consents, public.account_consents' <<<"$sql" |
+  grep -Fxq 'from service_role;' ||
+  fail 'service_role: revoke truncate, trigger and references on the consent tables'
 [[ "$(grep -Ec '^create (or replace )?function ' <<<"$sql")" -eq 1 ]] ||
   fail 'this migration creates one function'
 if grep -Eq '^security definer$' <<<"$sql"; then
@@ -377,16 +409,72 @@ if grep -Eiq 'secret|password[[:space:]]*=' <<<"$sql"; then
   fail 'migration must not contain credentials'
 fi
 
-# No migration truncates a table, and none removes or disables these triggers.
+# No migration truncates a table, redefines or drops a guard, or changes when
+# a guard fires; the only allowed change is enabling a guard always.
+# Prints the first problem in the SQL on stdin, or nothing. Comments are
+# removed and the text is joined into one lower-case line, so a statement
+# split over lines is matched as one. Trigger events ("truncate on") and
+# "execute function" in create trigger are not statements and are set aside.
+guards='programme_consents_truncate_guard|account_consents_truncate_guard|consent_documents_guard_truncate'
+migration_problem() {
+  local text change
+  text=$(sed 's/--.*$//' | tr '\n\t' '  ' | tr '[:upper:]' '[:lower:]' |
+    sed -E 's/ +/ /g; s/(^|[^a-z_])truncate on /\1trigger_event_on /g; s/(^|[^a-z_])execute (function|procedure) /\1runs_\2 /g')
+  if grep -Eq "(^|[^a-z_])execute[^;]*[^a-z_]truncate([^a-z_]|\$)" <<<"$text"; then
+    echo 'dynamic execute of a truncate'; return
+  fi
+  if grep -Eq "(^|[^a-z_'])truncate( table)? (only )?[a-z_\".]" <<<"$text"; then
+    echo 'truncate statement'; return
+  fi
+  if grep -Fq 'session_replication_role' <<<"$text"; then
+    echo 'sets session_replication_role'; return
+  fi
+  if grep -Fq 'create or replace function public.consent_truncate_guard' <<<"$text"; then
+    echo 'redefines consent_truncate_guard'; return
+  fi
+  if grep -Eq "drop trigger (if exists )?($guards)([^a-z_]|\$)|drop function (if exists )?public\.consent_truncate_guard" <<<"$text"; then
+    echo 'drops a truncate guard'; return
+  fi
+  while read -r change; do
+    [[ -n "$change" ]] || continue
+    [[ "$change" =~ ^enable\ always\ trigger\ ($guards)$ ]] || {
+      echo "changes when a trigger fires ($change)"; return
+    }
+  done < <(grep -Eo '(disable|enable)( always| replica)? trigger [a-z_"]+' <<<"$text" || true)
+}
+
+# Self-test of the scan; runs every time.
+check_scan() {
+  local want="$1" got
+  shift
+  got=$(printf '%s\n' "$@" | migration_problem)
+  [[ "$got" == "$want" ]] || fail "migration scan self-test: expected '$want', got '$got' for: $*"
+}
+check_scan 'truncate statement' 'begin;' 'TRUNCATE' '  public.programme_consents;' 'commit;'
+check_scan 'truncate statement' 'truncate table only public.sync_lapse;'
+check_scan 'dynamic execute of a truncate' "execute format('truncate %I', t);"
+check_scan 'dynamic execute of a truncate' 'perform 1;' "EXECUTE 'TRUNCATE ' ||" "  'public.account_consents';"
+check_scan 'sets session_replication_role' 'set local session_replication_role = replica;'
+check_scan 'redefines consent_truncate_guard' 'create or replace function public.consent_truncate_guard()'
+check_scan 'drops a truncate guard' 'drop trigger if exists programme_consents_truncate_guard' '  on public.programme_consents;'
+check_scan 'drops a truncate guard' 'drop function public.consent_truncate_guard();'
+check_scan 'changes when a trigger fires (disable trigger account_consents_truncate_guard)' \
+  'alter table public.account_consents disable trigger account_consents_truncate_guard;'
+check_scan 'changes when a trigger fires (enable trigger account_consents_truncate_guard)' \
+  'alter table public.account_consents' 'enable trigger account_consents_truncate_guard;'
+check_scan 'changes when a trigger fires (enable replica trigger programme_consents_truncate_guard)' \
+  'alter table public.programme_consents enable replica trigger programme_consents_truncate_guard;'
+check_scan 'changes when a trigger fires (enable always trigger other_trigger)' \
+  'alter table public.enrolments enable always trigger other_trigger;'
+check_scan 'changes when a trigger fires (disable trigger all)' 'alter table public.enrolments disable trigger all;'
+check_scan '' 'alter table public.account_consents' 'enable always trigger account_consents_truncate_guard;' \
+  'create trigger t before insert or truncate on public.t' \
+  'for each statement execute function public.consent_truncate_guard();' \
+  "  if tg_op = 'TRUNCATE' then" "execute 'select 1';"
+
 for f in "${migration_files[@]}"; do
-  stripped=$(sed 's/--.*$//' "$f")
-  if grep -Eiv '(before|after) truncate on ' <<<"$stripped" |
-    grep -Eiq '(^|[;[:space:]])truncate([[:space:]]+table)?[[:space:]]+(only[[:space:]]+)?[a-z_."]+'; then
-    fail "$f issues a TRUNCATE; remove rows with DELETE"
-  fi
-  if grep -Eiq 'drop trigger (if exists )?(programme|account)_consents_truncate_guard|drop function (if exists )?public\.consent_truncate_guard|(disable|enable)[a-z ]* trigger' <<<"$stripped"; then
-    fail "$f removes or changes a trigger; consent truncate guards stay enabled"
-  fi
+  problem=$(migration_problem <"$f")
+  [[ -z "$problem" ]] || fail "$f: $problem; consent rows are removed with DELETE and the truncate guards stay in place"
 done
 
 # The latest delete_my_app_data removes consents with DELETE.

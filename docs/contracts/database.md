@@ -145,7 +145,9 @@ cannot delete consent rows; they go when the enrolment or the account is
 deleted.
 A trigger refuses `TRUNCATE` on `programme_consents` and `account_consents` for every role,
 including a `TRUNCATE ... CASCADE` that reaches them (`TH003`); consent rows
-are removed only by `DELETE`.
+are removed only by `DELETE`. This guard and the `consent_documents` truncate
+guard fire in every session mode. `service_role` holds no `TRUNCATE`,
+`TRIGGER` or `REFERENCES` privilege on the consent tables.
 A caller may add a consent only to their own enrolment that is not
 `left`, and any purpose other than `core` requires that enrolment's `core`
 consent to be live.
