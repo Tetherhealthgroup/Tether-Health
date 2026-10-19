@@ -472,6 +472,60 @@ describe("EnrolmentsService", () => {
     expect(calls.some((call) => call[0] === "upsert")).toBe(false);
   });
 
+  describe("a consent insert refused by the insert policy (42501)", () => {
+    // The deletion barrier is told apart by asking it, never by the text:
+    // each case carries the barrier's own wording.
+    const refused = {
+      data: null,
+      error: { code: "42501", message: "Account deletion has started" },
+    };
+
+    it.each([
+      [false, HttpStatus.CONFLICT, "account_deletion_in_progress"],
+      [true, HttpStatus.CONFLICT, "consent_not_permitted"],
+      [null, HttpStatus.CONFLICT, "account_deletion_in_progress"],
+    ])(
+      "barrier open = %j answers %d %s",
+      async (barrierOpen, status, token) => {
+        const { service, calls } = setup(
+          { data: enrolmentRow(), error: null },
+          { data: null, error: null },
+          refused,
+          { data: barrierOpen, error: null },
+        );
+        expect(await codeOf(service.grantConsent(user, grantDto()))).toEqual({
+          status,
+          code: token,
+        });
+        expect(calls).toContainEqual(["rpc", "deletion_barrier_open"]);
+      },
+    );
+
+    it("fails closed when the barrier cannot be read", async () => {
+      const { service } = setup(
+        { data: enrolmentRow(), error: null },
+        { data: null, error: null },
+        refused,
+        { data: null, error: { code: "XX000", message: "synthetic" } },
+      );
+      expect(
+        await codeOf(service.grantConsent(user, grantDto())),
+      ).toBeInstanceOf(BadGatewayException);
+    });
+
+    it("asks the barrier only after a 42501", async () => {
+      const { service, calls } = setup(
+        { data: enrolmentRow(), error: null },
+        { data: null, error: null },
+        { data: null, error: { code: "23505", message: "duplicate key" } },
+      );
+      await codeOf(service.grantConsent(user, grantDto()));
+      expect(calls.some((call) => call[1] === "deletion_barrier_open")).toBe(
+        false,
+      );
+    });
+  });
+
   it("reports a missing consent as not found and a revoked one as conflict", async () => {
     const missing = setup(
       { data: null, error: null },
@@ -713,59 +767,40 @@ describe("EnrolmentsService", () => {
       });
 
       // After the retry also hits TH004, the live core is read once more and
-      // decides; the function is never called a third time.
-      const docs = (rows: [string, string][]) => ({
-        data: rows.map(([version, effective_from]) => ({
-          version,
-          effective_from,
-        })),
-        error: null,
-      });
+      // decides; the function is never called a third time. Anything but the
+      // requested row or no row is one fail-closed conflict: the database
+      // allows a locale-only move to the same version (R-29), so
+      // consent_version_unchanged would be wrong for it.
       it.each([
         [
           "the requested one",
           consentRow({ id: NEW_CORE_ID, consent_version: "v2" }),
-          [] as Result[],
           "done",
         ],
         [
           "a later version",
           consentRow({ id: NEW_CORE_ID, consent_version: "v3", locale: "es" }),
-          [
-            docs([
-              ["v3", "2026-10-18T07:00:00Z"],
-              ["v2", "2026-10-18T06:00:00Z"],
-            ]),
-          ],
-          "consent_version_unchanged",
+          "consent_conflict_retry",
         ],
         [
           "the same version in another locale",
           consentRow({ id: NEW_CORE_ID, consent_version: "v2", locale: "es" }),
-          [docs([["v2", "2026-10-18T06:00:00Z"]])],
-          "consent_version_unchanged",
+          "consent_conflict_retry",
         ],
         [
           "an earlier version",
           consentRow({ id: NEW_CORE_ID, consent_version: "v1", locale: "es" }),
-          [
-            docs([
-              ["v1", "2026-10-18T00:00:00Z"],
-              ["v2", "2026-10-18T06:00:00Z"],
-            ]),
-          ],
-          "core_consent_required",
+          "consent_conflict_retry",
         ],
         [
           "a row stored before documents existed",
           consentRow({ id: NEW_CORE_ID, consent_version: "v9", locale: null }),
-          [],
-          "core_consent_required",
+          "consent_conflict_retry",
         ],
-        ["nothing", null, [], "core_consent_required"],
+        ["nothing", null, "core_consent_required"],
       ])(
         "after the retry loses too, answers from a live core that is %s",
-        async (_label, finalLive, more, expected) => {
+        async (_label, finalLive, expected) => {
           const other = consentRow({ id: OTHER_ID, locale: "es" });
           const { service, calls } = setup(
             { data: enrolmentRow(), error: null },
@@ -774,7 +809,6 @@ describe("EnrolmentsService", () => {
             { data: other, error: null },
             th004,
             { data: finalLive, error: null },
-            ...more,
             ...(expected === "done"
               ? [{ data: { id: OTHER_ID }, error: null }]
               : []),
@@ -791,6 +825,8 @@ describe("EnrolmentsService", () => {
           expect(
             calls.filter((call) => call[1] === "supersede_core_consent"),
           ).toHaveLength(2);
+          // Decided from the live row alone: no document is read.
+          expect(calls).not.toContainEqual(["from", "consent_documents"]);
         },
       );
     });

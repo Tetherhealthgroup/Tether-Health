@@ -1,12 +1,17 @@
 openapi: 3.1.0
 info:
   title: Tether Health API
-  version: 1.5.0
+  version: 1.6.0
   description: >-
     Development contract for authenticated profiles and bounded program data.
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
-    Changed in 1.5.0 (breaking for the list response): `GET /v1/enrolments`
+    Changed in 1.6.0: once account deletion has started, a consent grant
+    that reaches the database (it passed the API's own earlier checks) is
+    refused with `account_deletion_in_progress` (a first grant or optional
+    consent used to get `consent_not_permitted`); a core re-consent that
+    loses two races to a different live consent answers the new code
+    `consent_conflict_retry`. Changed in 1.5.0 (breaking for the list response): `GET /v1/enrolments`
     returns `currentCoreConsentVersions` (one version per locale) instead of
     the single `currentCoreConsentVersion` string, which moved onto each
     enrolment. The API is pre-release and nothing consumed the old field.
@@ -434,9 +439,16 @@ paths:
         and its `supersededId`. If a different core consent became live
         meanwhile, the supersession is tried once more; if that also loses
         a race, the answer follows what is then live: 201 if it is the
-        requested version and locale, `consent_version_unchanged` if it is
-        on the requested version or a later one, otherwise
-        `core_consent_required`.
+        requested version and locale, `core_consent_required` if no core
+        consent is live, otherwise `consent_conflict_retry` (409, nothing
+        was written): read the enrolment again and decide whether to ask
+        for re-consent.
+
+        Once account deletion has started, a grant that would otherwise be
+        recorded (one that reaches the database) is refused with
+        `account_deletion_in_progress`. The API's earlier checks still answer
+        first: `sharing_not_available`, `enrolment_left`,
+        `consent_already_granted` and `core_consent_required`.
 
         The share purposes (share_care_team, share_caregiver) are refused
         with `sharing_not_available` (409) until care connections exist.
@@ -468,12 +480,15 @@ paths:
         '409':
           description: >-
             `sharing_not_available`, `enrolment_left`, `core_consent_required`,
-            `consent_already_granted`, `consent_not_permitted` (for example
-            after account deletion started), `consent_document_unavailable`
-            (no grantable document for that purpose, version and locale), and
-            for core re-consent `consent_version_unchanged` (not later than
-            the live version) or `account_deletion_in_progress` (account
-            deletion has started)
+            `consent_already_granted`, `account_deletion_in_progress` (account
+            deletion has started), `consent_not_permitted` (the database
+            refused the row for another reason, for example the enrolment was
+            left or the core consent revoked meanwhile),
+            `consent_document_unavailable` (no grantable document for that
+            purpose, version and locale), and for core re-consent
+            `consent_version_unchanged` (not later than the live version) or
+            `consent_conflict_retry` (lost two races to a different live core
+            consent; read the enrolment again)
           content:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
@@ -737,6 +752,7 @@ components:
             - consent_not_permitted
             - consent_document_unavailable
             - consent_version_unchanged
+            - consent_conflict_retry
             - focus_swap_invalid
             - sharing_not_available
             - confirmation_required

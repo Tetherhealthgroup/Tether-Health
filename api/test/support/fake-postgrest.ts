@@ -14,7 +14,9 @@ import { databaseError, type DatabaseErrorHint } from "./database-errors";
  *   (deletion barrier, enrolment not left, live core consent);
  * - the column grants (insert/update column lists; no delete on consents;
  *   consent_text is not insertable, so sending it is refused with 42501);
- * - consent documents: a seeded, read-only table (CONSENT_DOCUMENTS); a
+ * - consent documents: a seeded table, read-only to members
+ *   (CONSENT_DOCUMENTS; a test may retire documents with
+ *   retireConsentDocuments and restore the seed afterwards); a
  *   consent insert takes its text from the grantable document for its
  *   purpose, version and locale, or fails with TH011 (consent_fill_text);
  * - check, foreign-key and unique constraints, including the live-row unique
@@ -297,6 +299,30 @@ export class FakePostgrest {
   startAccountDeletion(userId: string): void {
     const profile = this.state.profiles.find((row) => row.id === userId);
     if (profile) profile.account_deletion_started_at = this.now();
+  }
+
+  /**
+   * Superuser write: retires every live `purpose` document in `locale` now,
+   * so none is current or grantable there (a publishing state the seed does
+   * not have, for the test that needs it). resetConsentDocuments() restores
+   * the seed.
+   */
+  retireConsentDocuments(purpose: string, locale: "en" | "es"): void {
+    const at = this.now();
+    for (const doc of this.state.consent_documents) {
+      if (
+        doc.purpose === purpose &&
+        doc.locale === locale &&
+        doc.retired_at === null
+      ) {
+        doc.retired_at = at;
+      }
+    }
+  }
+
+  /** Restores the seeded consent documents (CONSENT_DOCUMENTS). */
+  resetConsentDocuments(): void {
+    this.state.consent_documents = CONSENT_DOCUMENTS.map((row) => ({ ...row }));
   }
 
   /**
