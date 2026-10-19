@@ -4,8 +4,9 @@ Migration sources of truth include `supabase/migrations/202609110001_profiles.sq
 `supabase/migrations/202609260001_program_data.sql`,
 `supabase/migrations/202610170002_enrolments.sql`,
 `supabase/migrations/202610180001_sync_tables.sql`,
-`supabase/migrations/202610180002_service_session_guard.sql` and
-`supabase/migrations/202610180003_enrolment_consent_followups.sql`.
+`supabase/migrations/202610180002_service_session_guard.sql`,
+`supabase/migrations/202610180003_enrolment_consent_followups.sql` and
+`supabase/migrations/202610180004_consent_documents_hardening.sql`.
 
 Every migration file is named `YYYYMMDDNNNN_name.sql`: a 12-digit version (date
 plus a four-digit sequence), then lowercase letters, digits and underscores.
@@ -208,14 +209,17 @@ belongs to a programme.
 
 ## Consent documents
 
-Migration source of truth:
-`supabase/migrations/202610180003_enrolment_consent_followups.sql`.
+Migration sources of truth:
+`supabase/migrations/202610180003_enrolment_consent_followups.sql` and
+`supabase/migrations/202610180004_consent_documents_hardening.sql`.
 `public.consent_documents` holds every consent text the app may show. It is
 reference data with row-level security enabled and forced: authenticated
 callers can read the documents already in effect (`effective_from <= now()`),
-`anon` has no access, and there are no client writes. Only a role that
-bypasses row-level security (a migration, `postgres` or `service_role`) adds
-or changes documents.
+`anon` has no access, and there are no client writes. Documents are published
+only by reviewed migrations: `service_role` holds `select` on the table and no
+other privilege, `authenticated` holds `select` only, and only a role that
+bypasses row-level security (a migration run as `postgres`) adds, changes or
+removes documents.
 
 | Column | Contract |
 |---|---|
@@ -231,14 +235,34 @@ or changes documents.
 `purpose`, `version`, `locale` and `body` never change; a new text is a new
 version. `approved_ref` can be set once and never changed afterwards.
 `cascades_optional` and `effective_from` cannot change once any consent row
-references the document. `retired_at` can always be set. Every locale of a
-version has the same `effective_from`: an insert, or a change of
-`effective_from`, that would make them differ is refused. Any insert or update
-by a role that does not bypass row-level security is refused, because these
-checks must see every document and consent row. Each refusal raises `TH015`. Publishing a replacement version means setting `retired_at` on the
-version it replaces. Consent rows reference their document with a foreign key on
-`(purpose, consent_version, locale)`, so a referenced document cannot be
-removed. A consent can be granted for a document that is effective
+references the document. `retired_at` can be set at any time, unless the
+version's locales already disagree on `effective_from`. Every locale of a
+version has the same `effective_from`. This is checked at the end of every
+insert or update statement (statement triggers): a statement that leaves the
+locales of a version with different `effective_from` values is refused,
+whichever locale is earlier. Each insert or update first takes a
+transaction-level advisory lock on its `(purpose, version)`, so concurrent
+writers of one version run one after the other; under `READ COMMITTED` (the
+default) the later writer's check sees the earlier writer's committed rows.
+The release gate's `effective_from_differs` row (below) is the backstop for
+anything written otherwise. Any insert, update or delete by a role that does
+not bypass row-level security is refused, because these checks must see every
+document and consent row. A trigger refuses `TRUNCATE` for every role: it
+skips the row triggers, and with `CASCADE` it would also empty the consent
+tables. Each refusal raises `TH015`. Publishing a replacement version means
+setting `retired_at` on the version it replaces. Documents are removed with
+`DELETE`. Consent rows reference their document with a foreign key on
+`(purpose, consent_version, locale)`, so deletes of referenced documents are
+refused by the foreign keys (`23503`), also for a role that bypasses row-level
+security; a document no consent references can be deleted.
+
+To reschedule a version no consent references, move every locale in one
+statement, for example
+`update public.consent_documents set effective_from = <new time> where purpose = <purpose> and version = <version>`.
+Moving one locale at a time is refused at the first statement. A version that
+a consent references cannot be rescheduled; publish a new version instead.
+
+A consent can be granted for a document that is effective
 (`effective_from <= now()`) and not retired; anything else raises `TH011`.
 Rows stored before consent documents existed have a null `locale` and keep the
 text they were stored with.
@@ -538,7 +562,7 @@ function": every later function that writes and refuses a sync session raises
 
 | Code | Name | Raised by | Message |
 |---|---|---|---|
-| `TH001` | `focus_cap_reached` | `enrolments_focus_cap` (deferred trigger on `enrolments`, at commit) | At most two programmes can be in focus |
+| `TH001` | `focus_cap_reached` | `enrolments_focus_cap` (deferred trigger on `enrolments`, at commit); `swap_focus` checks the cap before it returns, so a swap raises it inside the call and changes nothing | At most two programmes can be in focus |
 | `TH002` | `consent_already_revoked` | `consent_revoke_only` (update trigger on `programme_consents` and `account_consents`) | Consent is already revoked |
 | `TH003` | `consent_immutable` | `consent_revoke_only`; `programme_consents_check_supersede` (update trigger on `programme_consents`: `superseded_by` must name the live core consent that replaces the row) | Consent can only be revoked; Consent records are immutable |
 | `TH004` | `consent_requires_core` | `supersede_core_consent` when the enrolment has no live core consent. A direct insert of an optional consent without a live core consent is still refused by row-level security (`42501`) | A live core consent is required |
@@ -552,7 +576,7 @@ function": every later function that writes and refuses a sync session raises
 | `TH012` | `enrolment_not_found` | `swap_focus` and `supersede_core_consent`: no such enrolment for the caller | Enrolment not found |
 | `TH013` | `focus_swap_invalid` | `swap_focus`: the programme to demote is not in focus, the one to promote is already in focus, or both are the same | A swap needs one programme in focus and another not in focus |
 | `TH014` | `consent_version_unchanged` | `programme_consents_check_supersede` (update trigger on `programme_consents`, so also `supersede_core_consent`): the replacement core version is not later than the one it replaces, or is the same version and locale | The core consent is already on this version or a later one |
-| `TH015` | `consent_document_immutable` | `consent_documents_guard` (insert and update trigger on `consent_documents`): purpose, version, locale or body changed; approved_ref changed after it was set; cascades_optional or effective_from changed on a referenced document; locales of a version with different effective_from; a writer that does not bypass row-level security | Consent documents are immutable, publish a new version; A consent document version takes effect at the same time in every locale; Consent documents are changed only by a role that bypasses row-level security |
+| `TH015` | `consent_document_immutable` | `consent_documents_guard` (insert, update, delete and truncate trigger on `consent_documents`): purpose, version, locale or body changed; approved_ref changed after it was set; cascades_optional or effective_from changed on a referenced document; a writer that does not bypass row-level security; a truncate, whatever the role. `consent_documents_check_effective_from` (after each insert or update statement on `consent_documents`): locales of a version with different effective_from | Consent documents are immutable, publish a new version; A consent document version takes effect at the same time in every locale; Consent documents are changed only by a role that bypasses row-level security |
 
 Standard SQLSTATEs are kept where PostgreSQL defines the condition:
 `42501` for row-level security and privilege refusals and for
