@@ -249,7 +249,7 @@ void main() {
       };
 
   /// The exact problem text for the cases whose message is pinned: the three
-  /// escape cases (TH-140, nit 2) and the invisible-character cases (TH-141).
+  /// escape cases (TH-140) and the invisible-character cases (TH-141).
   String? pinnedProblem(String name) {
     if (name.startsWith('anon payload then escaped role key')) {
       return roleNotAnon;

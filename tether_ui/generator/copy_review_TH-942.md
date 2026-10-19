@@ -13,8 +13,8 @@ clinician and counsel approve it.
 
 Source: `screens_shared.py`, `screens_prog_a.py`, `screens_prog_b.py`,
 `screens_additions.py`. `review_TH-953.md` was also touched: it adds
-`sf_home_unplug_android` to its clinical/legal review list (th-reviewer
-TH-971 N1). Only string contents changed. Components, keys,
+`sf_home_unplug_android` to its clinical/legal review list (a reviewer
+note on TH-971). Only string contents changed. Components, keys,
 actions, routes and screen order are unchanged, and `spec/actions.json` is
 byte-identical.
 
