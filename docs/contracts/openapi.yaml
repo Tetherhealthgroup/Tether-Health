@@ -7,10 +7,13 @@ info:
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
     Changed in 1.6.0: once account deletion has started, a consent grant
-    that the database would otherwise record is refused with
+    that reaches the database's deletion check is refused with
     `account_deletion_in_progress` (a first grant or optional consent used
     to get `consent_not_permitted`). The API's own earlier checks still
-    answer first, and for a first grant or optional consent so does
+    answer first (`consent_already_granted` only for a core grant; a
+    repeated optional grant that is already live gets
+    `account_deletion_in_progress`), and for a first grant or optional
+    consent so does
     `consent_document_unavailable`, because the database checks the
     document before the deletion barrier; a core re-consent that
     loses two races to a different live consent answers the new code
@@ -447,11 +450,14 @@ paths:
         was written): read the enrolment again and decide whether to ask
         for re-consent.
 
-        Once account deletion has started, a grant that would otherwise be
-        recorded (one that reaches the database) is refused with
+        Once account deletion has started, a grant that reaches the
+        database's deletion check is refused with
         `account_deletion_in_progress`. The API's earlier checks still answer
         first: `sharing_not_available`, `enrolment_left`,
-        `consent_already_granted` and `core_consent_required`. For a first
+        `consent_already_granted` for a core grant, and
+        `core_consent_required`. A repeated optional grant that is already
+        live gets `account_deletion_in_progress`, not
+        `consent_already_granted`. For a first
         grant or optional consent, `consent_document_unavailable` (no
         grantable document) also answers before
         `account_deletion_in_progress`.
