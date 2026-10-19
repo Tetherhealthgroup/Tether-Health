@@ -1,6 +1,6 @@
 # Validation report
 
-Generated 2026-10-18T21:49:45+00:00 from the spec, the Flutter package and the HTML prototype.
+Generated 2026-10-19T01:00:19+00:00 from the spec, the Flutter package and the HTML prototype.
 
 | Check | Flutter | Prototype |
 |---|---|---|
@@ -67,9 +67,9 @@ Generated 2026-10-18T21:49:45+00:00 from the spec, the Flutter package and the H
 | ca-invalid: Peak flow 2000 is rejected | ClearAir | enter ca_zone.peak_flow=2000 → tap “Save and see my steps” | `ca_zone` | ✅ | ✅ |
 | hw-setup: Add Heartwise by swapping a focus slot | Heartwise | tap “Set up Heartwise” → tap “Swap with ScrollFree” → tap “Continue” → at hw_q1 → tap “Next” → tap “Save targets” | `hw_home` | ✅ | ✅ |
 | hw-learn: Add Heartwise as Learn only | Heartwise | tap “Set up Heartwise” → tap “Continue” | `plans` | ✅ | ✅ |
-| hw-normal: Two readings 138/86 + 132/84 → saved | Heartwise | tap “Log blood pressure” → tap “Next reading” → tap “Save readings” | `hw_result` | ✅ | ✅ |
+| hw-normal: Two readings 138/86 + 132/84 → saved | Heartwise | tap “Log blood pressure” → enter hw_log.systolic=138 → enter hw_log.diastolic=86 → tap “Next reading” → enter hw_log2.systolic=132 → enter hw_log2.diastolic=84 → tap “Save readings” | `hw_result` | ✅ | ✅ |
 | hw-crisis: Reading 186/122 → symptom check → re-check | Heartwise | tap “Log blood pressure” → enter hw_log.systolic=186 → enter hw_log.diastolic=122 → tap “Next reading” → tap “Save readings” → at hw_crisis → tap “No symptoms · re-check in 5 min” | `hw_recheck` | ✅ | ✅ |
-| hw-invalid: Diastolic 310 → fix-it message | Heartwise | tap “Next reading” → enter hw_log2.diastolic=310 → tap “Save readings” | `hw_log_error` | ✅ | ✅ |
+| hw-invalid: Diastolic 310 → fix-it message | Heartwise | enter hw_log.systolic=138 → enter hw_log.diastolic=86 → tap “Next reading” → enter hw_log2.systolic=132 → enter hw_log2.diastolic=310 → tap “Save readings” | `hw_log_error` | ✅ | ✅ |
 | hw-summary: Visit summary sent to care team | Heartwise | tap “Visit summary” → tap “Send summary” | `hw_home` | ✅ | ✅ |
 | st-setup: Steady setup with range and low plan | Steady | tap “Set up Steady” → tap “Next” → tap “Save range” | `st_home` | ✅ | ✅ |
 | st-normal: Reading 142 → saved | Steady | tap “Log a reading” → enter st_log.reading=142 → tap “Save reading” | `st_home` | ✅ | ✅ |

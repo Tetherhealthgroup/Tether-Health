@@ -764,6 +764,13 @@ class _TFieldState extends State<TField> {
     TSession.set(widget.fieldKey, widget.value);
   }
 
+  /// Largest text scale for the unit (mmHg, mg/dL...). The value keeps the
+  /// full text scale; capping the shorter unit leaves the value room at large
+  /// text sizes. No effect at 100%.
+  static const unitMaxScale = 1.5;
+
+  late bool _empty = (widget.value ?? '').isEmpty;
+
   String get label => widget.label;
   String? get value => widget.value;
   String? get unit => widget.unit;
@@ -774,6 +781,7 @@ class _TFieldState extends State<TField> {
 
   void onChanged(String v) {
     TSession.set(widget.fieldKey, v.isEmpty ? null : v);
+    if (v.isEmpty != _empty) setState(() => _empty = v.isEmpty);
     widget.onChanged?.call(v);
   }
 
@@ -788,6 +796,13 @@ class _TFieldState extends State<TField> {
       _ => TextInputType.text,
     };
     final readOnly = kind == TFieldKind.select || kind == TFieldKind.date;
+    final unitStyle = TText.sub.copyWith(fontWeight: FontWeight.w700);
+    final unitScaler = MediaQuery.textScalerOf(context).clamp(maxScaleFactor: unitMaxScale);
+    // Flutter shows a suffix only while the field has text, so an empty field
+    // (P-31: every field starts empty) shows its unit as a suffix icon. Once
+    // there is text the unit is the usual suffix, laid out as in the approved
+    // design.
+    final unitIcon = !readOnly && unit != null && _empty;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       if (kind != TFieldKind.search) Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(label, style: TText.fieldLabel)),
       TextFormField(
@@ -805,17 +820,20 @@ class _TFieldState extends State<TField> {
           filled: true,
           fillColor: error != null ? const Color(0xFFFFFBFA) : TColors.paper,
           hintText: placeholder,
+          // At large text sizes a hint beside the unit may need a second line
+          // rather than being cut. One line at 100% and once there is text.
+          hintMaxLines: unitIcon ? 2 : null,
           hintStyle: TText.input.copyWith(color: const Color(0xFF6B7F79), fontWeight: FontWeight.w400),
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
           prefixIcon: kind == TFieldKind.search ? const Icon(Icons.search_rounded, color: TColors.muted) : null,
-          // The unit is a suffix icon, not suffixText: Flutter hides
-          // suffixText while the field is empty, and P-31 fields start empty.
           suffixIcon: readOnly
               ? const Icon(Icons.expand_more_rounded, color: TColors.muted)
-              : unit == null
-                  ? null
-                  : Padding(padding: const EdgeInsets.only(left: 8, right: 18, top: 2.67), child: Text(unit!, style: TText.sub.copyWith(fontWeight: FontWeight.w700))),
-          suffixIconConstraints: readOnly || unit == null ? null : const BoxConstraints(minWidth: 0, minHeight: 0),
+              : unitIcon
+                  ? Padding(padding: const EdgeInsets.only(left: 8, right: 18, top: 2.67), child: Text(unit!, style: unitStyle, textScaler: unitScaler))
+                  : null,
+          suffixIconConstraints: unitIcon ? const BoxConstraints(minWidth: 0, minHeight: 0) : null,
+          suffix: unit == null || unitIcon ? null : Text(unit!, style: unitStyle, textScaler: unitScaler),
+          suffixStyle: unitStyle,
           enabledBorder: border,
           focusedBorder: border.copyWith(borderSide: const BorderSide(color: TColors.teal, width: 2)),
           semanticCounterText: label,

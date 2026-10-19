@@ -121,3 +121,22 @@ including the ticked "I’m 18 or older" on `ob_account`.
 | `records_consent_device` | `body[2]` (checklist) | gets key `data_types`. |
 | `sd_caregiver` | `body[3]` (checklist) | gets key `caregiver_can_see`. Also P-31 (above). |
 | `sf_buddy` | `body[3]` (checklist) | gets key `buddy_can_see`. Also P-31 (above). |
+
+## Rendering changes with no spec change (TH-907)
+
+These come from the shared field component, not from `spec/screens`, so the
+sha256 guard cannot see them. They follow from P-31 (fields start empty).
+
+- **Units on empty fields.** A field's unit (mmHg, mg/dL, L/min, %) stays
+  visible while the field is empty. Before, Flutter showed the unit only next
+  to a value. This shows new units on two optional fields that the approved
+  design left empty: `hw_lipids` Triglycerides "mg/dL" and `re_labs` ALT
+  (liver) "U/L". Rendering change, no spec change; it matches the base
+  prototype, which always shows units.
+- **Large text.** With text enlarged, the unit grows at most to 150%, and a
+  hint beside a unit may use a second line, so a typed value or a hint is
+  never cut. At 100% text, a field with a typed value renders exactly as in
+  the approved design.
+- **Validation report.** For this change, `validation/` was regenerated from
+  the Flutter test run only. The prototype column still comes from the
+  earlier browser run, before TH-907, and was not re-run in a browser.
