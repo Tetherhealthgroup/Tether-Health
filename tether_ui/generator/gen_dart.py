@@ -387,18 +387,25 @@ void main() {{
     open(os.path.join(out_dir, 'test', 'journeys_test.dart'), 'w', newline='\n').write(code)
 
 
+def _expect(ok, message):
+    """An explicit error, not an assert: `python -O` must not skip the check."""
+    if not ok: raise AssertionError(message)
+
+
 def _self_test():
     """python3 gen_dart.py: the safety checks raise on a missing safety case
     and on a safety action that does not leave the screen."""
     rule = {'outcomes': {'ok': 'Fine', 'bad': 'Danger'}, 'safety': ['bad']}
     RULES['selftest.rule'] = rule
     CUR['sid'] = 'selftest'
+    added = [k for k in ('selftest', 'selftest_alias') if k not in SCREENS]
+    for k in added: SCREENS[k] = {'route': '/selftest'}  # two screen ids, one route
     try:
         def branch(danger):
             return {'type': 'branch', 'question': 'Q', 'decide': 'selftest.rule', 'cases': [{'label': 'Fine', 'action': {'type': 'back'}}, {'label': 'Danger', 'action': danger}]}
         good = branch({'type': 'replace', 'to': 'crisis'})
-        assert 'TSafetyRoutes' in safety_routes(good)
-        assert 'TNav.push(context, Routes.crisis)' in safety_routes(branch({'type': 'push', 'to': 'crisis'}))
+        _expect('TSafetyRoutes' in safety_routes(good), 'a replace to another screen was not generated')
+        _expect('TNav.push(context, Routes.crisis)' in safety_routes(branch({'type': 'push', 'to': 'crisis'})), 'a push to another screen was not generated')
         stays = [
             ({'type': 'back'}, "not 'back'"),
             ({'type': 'close'}, "not 'close'"),
@@ -409,6 +416,8 @@ def _self_test():
             ({'type': 'replace', 'to': 'selftest'}, "target 'selftest' is the screen itself"),
             ({'type': 'push', 'to': 'selftest'}, "target 'selftest' is the screen itself"),
             ({'type': 'replace', 'to': 'crisis', 'context': {'onboarding': 'selftest'}}, "target 'selftest' is the screen itself"),
+            ({'type': 'replace', 'to': 'selftest_alias'}, "target 'selftest_alias' is the screen itself"),
+            ({'type': 'push', 'to': 'selftest_alias'}, "target 'selftest_alias' is the screen itself"),
         ]
         for danger, why in stays:
             submit = {'type': 'submit', 'api': 'POST /x', 'then': {'type': 'toast', 'value': 'Saved', 'then': branch(danger)}}
@@ -416,7 +425,7 @@ def _self_test():
                 try:
                     f(a)
                 except ValueError as e:
-                    assert "safety outcome 'Danger' of selftest.rule must leave the screen" in str(e) and why in str(e), str(e)
+                    _expect("safety outcome 'Danger' of selftest.rule must leave the screen" in str(e) and why in str(e), str(e))
                 else:
                     raise AssertionError(f'{f.__name__} did not raise for the safety action {danger}')
         bad = dict(good, cases=[{'label': 'Fine', 'action': {'type': 'back'}}, {'label': 'Danger zone', 'action': {'type': 'close'}}])
@@ -424,7 +433,7 @@ def _self_test():
             try:
                 f(bad)
             except ValueError as e:
-                assert 'Danger' in str(e)
+                _expect('Danger' in str(e), str(e))
             else:
                 raise AssertionError(f'{f.__name__} did not raise for a missing safety case')
         rule['safety'] = ['nope']
@@ -436,6 +445,7 @@ def _self_test():
             raise AssertionError('an unknown safety id did not raise')
     finally:
         del RULES['selftest.rule']
+        for k in added: del SCREENS[k]
     print('gen_dart self-test: ok')
 
 

@@ -309,7 +309,14 @@ abstract final class TNav {
   /// branch inside `then` can take it. Set only while `then` runs.
   static String? _serverOutcome;
 
-  static Future<void> push(BuildContext context, String route) => Navigator.of(context).pushNamed(route);
+  /// Opens [route] on top. While a safety action runs ([submit]), a push
+  /// opens nothing when the top route already is [route], so a safety screen
+  /// is not stacked on itself; every other push always opens [route].
+  static Future<void> push(BuildContext context, String route) {
+    final nav = Navigator.of(context);
+    if (_runningSafety && _topRoute(nav)?.settings.name == route) return Future<void>.value();
+    return nav.pushNamed(route);
+  }
 
   /// Replaces the calling screen (the route [context] belongs to) with
   /// [route]. When the calling screen is not the top route, for example a
@@ -344,10 +351,18 @@ abstract final class TNav {
   static Route<dynamic>? _runSafety(BuildContext context, VoidCallback action) {
     final nav = Navigator.maybeOf(context);
     final before = nav == null ? null : _topRoute(nav);
-    action();
+    _runningSafety = true;
+    try {
+      action();
+    } finally {
+      _runningSafety = false;
+    }
     final after = nav == null ? null : _topRoute(nav);
     return identical(after, before) ? null : after;
   }
+
+  /// True only while [_runSafety] runs a safety action ([push]).
+  static bool _runningSafety = false;
 
   /// Switch tab: clears the stack and shows the tab root.
   static Future<void> tab(BuildContext context, String route) => Navigator.of(context).pushNamedAndRemoveUntil(route, (_) => false);
@@ -468,6 +483,9 @@ abstract final class TNav {
   /// - ok / queued: runs [then] when the submitting screen is on top;
   /// - outcome: runs [then] when the submitting screen is on top, and the
   ///   branch inside it may take the label;
+  /// - ok / queued / outcome while the submitting screen is mounted but not
+  ///   on top: [then] does not run; when [safety]'s rule now decides a
+  ///   safety outcome, that outcome's action runs (on top, see below);
   /// - failed (including `not_configured`, `adapter_error` and `timeout`):
   ///   when [safety]'s rule now decides a safety outcome, runs that outcome's
   ///   action whether or not the submitting screen is on top. Shows the save
@@ -477,13 +495,16 @@ abstract final class TNav {
   /// When the submitting screen is mounted but not on top (the member opened
   /// another screen, such as a crisis or breathing screen, while the save was
   /// in flight), [then] does not run, so nothing is popped or replaced and
-  /// no confirmation toast appears over the other screen. The save error is
-  /// shown only with a safety screen this submit opened; over any other
-  /// screen it would read as that screen's result. The save's result is
-  /// still returned. Safety actions still run in this case: a replace opens
-  /// the safety screen on top of the current one ([replace]), so it never
-  /// dismisses the screen the member opened. When the submitting screen is
-  /// no longer mounted, nothing runs after the save.
+  /// no confirmation toast appears over the other screen. Unless this
+  /// submit already ran a safety action, [safety]'s rule is checked again
+  /// whatever the save's result, and a safety outcome's action runs: a
+  /// replace or push opens the safety screen on top of the current one
+  /// ([replace], [push]), so it never dismisses the screen the member
+  /// opened, and nothing opens when the top route already is that safety
+  /// screen. The save error is shown only with a safety screen this submit
+  /// opened; over any other screen it would read as that screen's result.
+  /// The save's result is still returned. When the submitting screen is no
+  /// longer mounted, nothing runs after the save.
   ///
   /// In flight: from the tap until the submit completes (any result,
   /// including `timeout` and `adapter_error`, and after [then] has run),
@@ -534,17 +555,20 @@ abstract final class TNav {
         return result;
       }
       if (!context.mounted) return result;
+      if (!onTop && result is! TFailed) {
+        final safetyNow = safety?.pick();
+        if (safetyNow != null) _runSafety(context, safetyNow);
+        return result;
+      }
       switch (result) {
         case TOk() || TQueued():
-          if (onTop) then?.call();
+          then?.call();
         case TOutcome(:final label):
-          if (onTop) {
-            _serverOutcome = label;
-            try {
-              then?.call();
-            } finally {
-              _serverOutcome = null;
-            }
+          _serverOutcome = label;
+          try {
+            then?.call();
+          } finally {
+            _serverOutcome = null;
           }
         case TFailed():
           final safetyNow = safety?.pick();
