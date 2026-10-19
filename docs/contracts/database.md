@@ -5,8 +5,9 @@ Migration sources of truth include `supabase/migrations/202609110001_profiles.sq
 `supabase/migrations/202610170002_enrolments.sql`,
 `supabase/migrations/202610180001_sync_tables.sql`,
 `supabase/migrations/202610180002_service_session_guard.sql`,
-`supabase/migrations/202610180003_enrolment_consent_followups.sql` and
-`supabase/migrations/202610180004_consent_documents_hardening.sql`.
+`supabase/migrations/202610180003_enrolment_consent_followups.sql`,
+`supabase/migrations/202610180004_consent_documents_hardening.sql` and
+`supabase/migrations/202610180005_consent_truncate_guards.sql`.
 
 Every migration file is named `YYYYMMDDNNNN_name.sql`: a 12-digit version (date
 plus a four-digit sequence), then lowercase letters, digits and underscores.
@@ -53,8 +54,9 @@ sync after offline saves. Program payloads are prohibited from logs.
 
 ## Programmes, enrolments and consents
 
-Migration sources of truth: `supabase/migrations/202610170002_enrolments.sql`
-and `supabase/migrations/202610180003_enrolment_consent_followups.sql`.
+Migration sources of truth: `supabase/migrations/202610170002_enrolments.sql`,
+`supabase/migrations/202610180003_enrolment_consent_followups.sql` and
+`supabase/migrations/202610180005_consent_truncate_guards.sql`.
 Programme health data hangs off an enrolment, never off the account, and
 consent is recorded per enrolment, purpose and recipient. Every table below
 has row-level security enabled and forced; `anon` has no access.
@@ -140,7 +142,11 @@ except to revoke it: the only update allowed is setting `revoked_at` (with
 `superseded_by` during a supersession), which the database stamps with the
 current time; a revoked row cannot be revived, and a new grant is a new row. Callers
 cannot delete consent rows; they go when the enrolment or the account is
-deleted. A caller may add a consent only to their own enrolment that is not
+deleted.
+A trigger refuses `TRUNCATE` on `programme_consents` and `account_consents` for every role,
+including a `TRUNCATE ... CASCADE` that reaches them (`TH003`); consent rows
+are removed only by `DELETE`.
+A caller may add a consent only to their own enrolment that is not
 `left`, and any purpose other than `core` requires that enrolment's `core`
 consent to be live.
 
@@ -564,7 +570,7 @@ function": every later function that writes and refuses a sync session raises
 |---|---|---|---|
 | `TH001` | `focus_cap_reached` | `enrolments_focus_cap` (deferred trigger on `enrolments`, at commit); `swap_focus` checks the cap before it returns, so a swap raises it inside the call and changes nothing | At most two programmes can be in focus |
 | `TH002` | `consent_already_revoked` | `consent_revoke_only` (update trigger on `programme_consents` and `account_consents`) | Consent is already revoked |
-| `TH003` | `consent_immutable` | `consent_revoke_only`; `programme_consents_check_supersede` (update trigger on `programme_consents`: `superseded_by` must name the live core consent that replaces the row) | Consent can only be revoked; Consent records are immutable |
+| `TH003` | `consent_immutable` | `consent_revoke_only`; `programme_consents_check_supersede` (update trigger on `programme_consents`: `superseded_by` must name the live core consent that replaces the row); `consent_truncate_guard` (truncate trigger on `programme_consents` and `account_consents`: a truncate, whatever the role) | Consent can only be revoked; Consent records are immutable |
 | `TH004` | `consent_requires_core` | `supersede_core_consent` when the enrolment has no live core consent. A direct insert of an optional consent without a live core consent is still refused by row-level security (`42501`) | A live core consent is required |
 | `TH005` | `enrolment_left` | `swap_focus` (programme to promote is left) and `supersede_core_consent`. A direct write to a left enrolment is still refused by row-level security (`42501`) | The programme has been left |
 | `TH006` | `deletion_in_progress` | `supersede_core_consent` after `begin_account_deletion`. Direct writes after it are still refused by row-level security (`42501`) | Account deletion has started |
