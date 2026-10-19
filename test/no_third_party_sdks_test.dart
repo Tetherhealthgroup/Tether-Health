@@ -167,9 +167,9 @@ const allowedRuntimePackages = <String, String>{
           'hands a URI to the platform and has no network access of its own.',
   // Pre-approved; not yet a dependency.
   'sign_in_with_apple':
-      'Owner decision P-09 (2026-10-17); th-security review pending (TH-935)',
+      'Owner decision P-09 (2026-10-17); security review pending (TH-935)',
   'google_sign_in':
-      'Owner decision P-09 (2026-10-17); th-security review pending (TH-935)',
+      'Owner decision P-09 (2026-10-17); security review pending (TH-935)',
 };
 
 /// Android (Maven) dependencies the build may declare, as `group:artifact`,
@@ -1559,11 +1559,11 @@ void main() {
         'com.google.gms:play-services-ads',
         'https://github.com/firebase/firebase-ios-sdk',
         'https://cdn.example/analytics.js',
-        // Added in TH-992 round 1.
+        // Added in TH-992.
         'com.google.android.gms:play-services-measurement-api',
         'com.google.android.datatransport:transport-runtime',
         'GoogleDataTransport',
-        // Narrowed in TH-992 round 2.
+        // Narrowed later in TH-992.
         'com.google.android.gms:play-services-measurement-base',
         'com.google.android.gms:play-services-measurement-sdk-api',
         'com.google.firebase:firebase-measurement-connector',
@@ -1614,10 +1614,10 @@ void main() {
 
     test('a present dependency still "review pending" is caught', () {
       const allowlist = {
-        'present_pending': 'Owner decision; th-security review pending (TH-1)',
-        'present_reviewed': 'Reviewed by th-security on 2026-10-18 (TH-1).',
+        'present_pending': 'Owner decision; security review pending (TH-1)',
+        'present_reviewed': 'Security review completed on 2026-10-18 (TH-1).',
         'absent_pending': 'Owner decision; review pending (TH-2)',
-        'present_pending_other_wording': 'Pending Review by th-security.',
+        'present_pending_other_wording': 'Pending Review by security.',
       };
       expect(
         presentButPendingReview(allowlist, [

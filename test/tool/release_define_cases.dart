@@ -94,12 +94,12 @@ List<int> utf16Bytes(String text, {required bool bigEndian}) => [
         ...bigEndian ? [unit >> 8, unit & 0xFF] : [unit & 0xFF, unit >> 8],
     ];
 
-// TH-137 send-back R1: payloads that are not valid JSON (a raw control
+// TH-137: payloads that are not valid JSON (a raw control
 // character) and reach the role check only through one branch of the helper's
 // role-object fallback each. Escaped key, so no literal "role" in the text.
 const _escapedKeyPayload = '{"\\u0072ole":"admin","n":"\u0001"}';
 
-/// Raw later segments for the send-back cases: name -> bytes.
+/// Raw later segments for the TH-137 cases: name -> bytes.
 final opaqueSegments = <String, List<int>>{
   'an escaped role key and a control character (no literal role)':
       utf8.encode(_escapedKeyPayload),
@@ -409,7 +409,7 @@ final defineCases = <DefineCase>[
     ],
     absent: ['role is not "anon"', 'privileged'],
   ),
-  // TH-123 send-back: key names never leak, nested key names are scanned,
+  // TH-123: key names never leak, nested key names are scanned,
   // duplicate keys are rejected.
   DefineCase(
     'privileged value under a key named like a secret',
@@ -576,7 +576,7 @@ final defineCases = <DefineCase>[
     ['define key #4 $_notAllowed'],
     absent: ['role is not "anon"'],
   ),
-  // TH-137 send-back R1: each branch of the role-object fallback (backslash-u
+  // TH-137: each branch of the role-object fallback (backslash-u
   // escape, NUL removal, BOM removal) is needed by one of these. An anon
   // segment comes first, so the file is accepted without the fallback.
   for (final MapEntry(key: name, value: bytes) in opaqueSegments.entries) ...[

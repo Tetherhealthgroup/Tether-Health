@@ -2,11 +2,11 @@
 
 These are internal traceability notes for reviewers. The file sits in
 `generator/` and is not part of the shipped app. The generated spec,
-prototype and Flutter code contain no office IDs. Their notes say only
+prototype and Flutter code contain no internal review IDs. Their notes say only
 "Copy needs clinical/legal review."
 
-Status: the owner **approved the prototype as proposed** (DECISIONS.md, row
-"P-47 (H32)", decisions 1–14). All new copy still needs clinical/legal review.
+Status: the owner **approved the prototype as proposed** (the owner's decision
+record, "P-47 (H32)", decisions 1–14). All new copy still needs clinical/legal review.
 
 Source: `screens_additions.py`. The two approved screens that the decisions
 change are edited in place in `screens_prog_a.py`.
@@ -142,7 +142,7 @@ screenshots. That makes 11 reference screens.
   Unplug group names, package names, or per-group figures (P-47 decision 5,
   and the privacy line on `sf_home_unplug_android`).
 
-## Safety requirements (th-qa round 1)
+## Safety requirements (from review)
 
 - Every pause surface reaches Rescue, and Rescue reaches Emergency:
   - overlay: Get support

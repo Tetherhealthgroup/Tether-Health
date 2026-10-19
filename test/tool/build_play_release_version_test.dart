@@ -428,7 +428,7 @@ void main() {
     });
 
     test('never echoes a non-ASCII package value, even in a UTF-8 locale', () {
-      // th-security L1: in a UTF-8 locale, bash matches e-acute against
+      // From security review: in a UTF-8 locale, bash matches e-acute against
       // [A-Za-z]; the script's character check must run in the C locale.
       writeFake('bundletool', bundletoolBody);
       const canary = 'TH941CANARY';

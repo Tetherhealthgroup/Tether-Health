@@ -7,8 +7,8 @@
 > - Gap G-5 and the build step in O-10 are superseded by
 >   `tool/build_ios_release.sh` (TH-904). Use that script, not a raw
 >   `flutter build ipa`.
-> - `BASELINE.md`, cited below, is not in this repository; it is part of the
->   private office notes.
+> - Owner decisions (D2, D3) and baseline facts cited below come from the
+>   maintainers' records, which are not in this repository.
 
 Bundle ID: `com.TetherHealthLLC.tetherhealth` (see section 1). This is the
 iOS counterpart to
@@ -178,15 +178,15 @@ is recorded as gap G-10 in section 2.
   Sign-In): an app that supports account creation must let users start
   account deletion inside the app. The code path exists in this repo.
 - **This server path is the NestJS `api/` at `f06b7c7`, not production.**
-  Under owner decision D2 (BASELINE.md:78), production is
+  Under owner decision D2 (maintainers' records), production is
   Tether-Health-Backend and the app must be moved onto it. There, Auth-user
   deletion is BE-047 and the client move is TH-103; both are Blocked. Whether
   5.1.1(v) is met against production is therefore **Unknown** (gap G-8, owner
-  item O-8). For what deletion leaves behind, see the private office notes.
+  item O-8). For what deletion leaves behind, see the maintainers' records.
 
 ## 2. Gaps an engineer can fix later (proposed tickets, not done in TH-099)
 
-Each is a proposed ticket for th-lead to file. None was changed here.
+Each is a proposed ticket for the maintainers to file. None was changed here.
 
 - **G-1 App-level privacy manifest.** No `ios/Runner/PrivacyInfo.xcprivacy`
   exists (absent from `git ls-tree -r f06b7c7 ios`). Add one that declares
@@ -222,7 +222,7 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   Checklist: confirm the auth redirect uses a verified universal link on a
   Tether Health domain
   (associated-domains entitlement plus an `apple-app-site-association` file on
-  the website); see the private office notes. Needs th-security review;
+  the website); see the maintainers' records. Needs security review;
   touches auth.
 - **G-5 iOS release build script — superseded by `tool/build_ios_release.sh`
   (TH-904).** The script is the iOS counterpart of
@@ -265,7 +265,7 @@ Each is a proposed ticket for th-lead to file. None was changed here.
 - **G-9 Release checklist.** `PRODUCTION_RELEASE_CHECKLIST.md:75-79` has two
   iOS-related bullets under the distribution heading (`:77`, `:78-79`); link
   them to this runbook once TH-099 merges. The `:77` bullet (choose final
-  identifiers) is already decided by D3 (BASELINE.md:79).
+  identifiers) is already decided by D3 (maintainers' records).
 - **G-10 Keychain storage for session, program documents and receipts (not yet
   confirmed).** The Supabase session (`lib/auth/secure_session_storage.dart`),
   program documents, which hold health data
@@ -273,8 +273,8 @@ Each is a proposed ticket for th-lead to file. None was changed here.
   (`lib/account/account_deletion_receipt_store.dart`) are stored with
   `flutter_secure_storage`. Checklist: before the store build, confirm the
   Keychain storage design for these items has been reviewed and shipped; see
-  the private office notes. Any storage policy is **needs-counsel** before it
-  is stated in a disclosure. Touches health-data storage; needs th-security
+  the maintainers' records. Any storage policy is **needs-counsel** before it
+  is stated in a disclosure. Touches health-data storage; needs security
   review. This bullet does not claim the iOS store build is safe on this point.
 
 ## 3. Owner-only items
@@ -287,7 +287,7 @@ None of these were started by any agent. Do them in roughly this order.
   agreements (Assumed, confirm on Apple's enrolment page).
 - **O-2 Confirm the team ID.** In the Apple Developer account, compare the
   Tether Health LLC Team ID with `GJH79955Q7` in `project.pbxproj:389,572,596`.
-  If it differs, tell th-release; a one-line ticket changes it. Do not sign
+  If it differs, tell the release owner; a one-line ticket changes it. Do not sign
   store builds with a personal team.
 - **O-3 Register the App ID** `com.TetherHealthLLC.tetherhealth` (explicit, not
   wildcard) under the LLC team. Capabilities needed today: none beyond the
@@ -297,8 +297,8 @@ None of these were started by any agent. Do them in roughly this order.
   Domains only if G-4 chooses Universal Links, and Push Notifications only if
   O-4 applies.
 - **O-4 Firebase iOS app (conditional).** `tether-health-llc` has only the
-  Android app (BASELINE.md:104). The Flutter app has no Firebase SDK
-  (BASELINE.md:106). Register an iOS app with bundle ID
+  Android app (maintainers' records). The Flutter app has no Firebase SDK
+  (`pubspec.yaml`). Register an iOS app with bundle ID
   `com.TetherHealthLLC.tetherhealth` only if you will send FCM push to iOS
   (that also needs an APNs key uploaded to Firebase and an `aps-environment`
   entitlement, which the app does not have) or use Firebase App Distribution
@@ -313,15 +313,15 @@ None of these were started by any agent. Do them in roughly this order.
   Unknown), primary language, bundle ID `com.TetherHealthLLC.tetherhealth`,
   SKU. Then category, age rating questionnaire, support URL, and the export
   compliance answer that feeds G-2. The export-compliance answer is
-  **needs-counsel**; it is on the counsel question list in the private office
-  notes. Do not answer it,
+  **needs-counsel**; it is on the counsel question list in the maintainers'
+  records. Do not answer it,
   and do not set the G-2 key, on an agent's say-so.
 - **O-7 App Privacy answers, with counsel.** Base them on code evidence:
   email and name for the account, photo (avatar), health-program entries,
   processors Supabase and the API host. Tracking: none found in code (no ad or
   analytics SDK in `pubspec.yaml:9-19`). Every answer is **needs-counsel**.
   Checklist: before answering, review the open privacy-copy items in the
-  private office notes, and confirm the answers match what the code actually
+  maintainers' records, and confirm the answers match what the code actually
   collects and sends rather than what in-app copy says. Also review the claims rules for a health app (Assumed,
   confirm against Guidelines **1.4.1** and **5.1.3**): no medical-device or
   clinical-validation claims (**needs-clinician** for any clinical wording).
@@ -354,5 +354,5 @@ None of these were started by any agent. Do them in roughly this order.
   give a demo account in the review notes (Assumed, Guideline **2.1**): use a
   synthetic test account, enter its password only in App Store Connect, never
   in a file or repo.
-- **O-12 Submit for review.** Owner-only action; see the private office notes
+- **O-12 Submit for review.** Owner-only action; see the maintainers' records
   for the approval gate. Not before O-7 and O-8 are signed off by counsel.
