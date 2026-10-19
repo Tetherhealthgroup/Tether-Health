@@ -7,7 +7,10 @@ begin;
 --   can read the documents already in effect, nobody can write it through
 --   the API. A document's purpose, version, locale and body never change;
 --   approved_ref is set once; cascades_optional and effective_from are fixed
---   once a consent row references the document (TH015). The database
+--   once a consent row references the document; every locale of a version
+--   takes effect at the same time; only a role that bypasses row-level
+--   security writes documents, because these checks must see every row
+--   (all TH015). The database
 --   computes body_sha256. approved_ref stays null until the text is approved,
 --   so a release check can refuse unapproved documents. The seeded v1-draft
 --   rows are placeholders, not consent wording.
@@ -91,20 +94,32 @@ language plpgsql
 set search_path = ''
 as $$
 begin
+  -- The checks below read consent_documents, programme_consents and
+  -- account_consents, which have forced row-level security. A role subject to
+  -- it might not see every row, so it is refused outright.
+  if not exists (
+    select 1 from pg_catalog.pg_roles as r
+    where r.rolname = current_user and (r.rolsuper or r.rolbypassrls)
+  ) then
+    raise exception using errcode = 'TH015',
+      message = 'Consent documents are changed only by a role that bypasses row-level security',
+      hint = 'consent_document_immutable';
+  end if;
+
   if tg_op = 'UPDATE' then
     if new.purpose is distinct from old.purpose or
        new.version is distinct from old.version or
        new.locale is distinct from old.locale or
        new.body is distinct from old.body then
       raise exception using errcode = 'TH015',
-        message = 'Consent documents are immutable; publish a new version',
+        message = 'Consent documents are immutable, publish a new version',
         hint = 'consent_document_immutable';
     end if;
     -- An approval is recorded once.
     if old.approved_ref is not null and
        new.approved_ref is distinct from old.approved_ref then
       raise exception using errcode = 'TH015',
-        message = 'Consent documents are immutable; publish a new version',
+        message = 'Consent documents are immutable, publish a new version',
         hint = 'consent_document_immutable';
     end if;
     -- What a granted consent relied on stays fixed. retired_at may change.
@@ -121,10 +136,22 @@ begin
       )
     ) then
       raise exception using errcode = 'TH015',
-        message = 'Consent documents are immutable; publish a new version',
+        message = 'Consent documents are immutable, publish a new version',
         hint = 'consent_document_immutable';
     end if;
   end if;
+
+  -- Every locale of a version takes effect at the same time.
+  if (tg_op = 'INSERT' or new.effective_from is distinct from old.effective_from) and exists (
+    select 1 from public.consent_documents as d
+    where d.purpose = new.purpose and d.version = new.version
+      and d.locale <> new.locale and d.effective_from <> new.effective_from
+  ) then
+    raise exception using errcode = 'TH015',
+      message = 'A consent document version takes effect at the same time in every locale',
+      hint = 'consent_document_immutable';
+  end if;
+
   new.body_sha256 = pg_catalog.encode(
     pg_catalog.sha256(pg_catalog.convert_to(new.body, 'UTF8')), 'hex'
   );

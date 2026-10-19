@@ -339,6 +339,52 @@ select th972b_test.ok(
   th972b_test.after(array['delete from public.consent_documents'],
     'select th972b_test.gate_reasons()') = 'no_documents',
   'gate: an empty document set fails instead of passing vacuously');
+select th972b_test.ok(
+  th972b_test.after(array[
+    current_setting('th972b.approve_all'),
+    'insert into public.consent_documents (purpose, version, locale, body, effective_from) values
+      (''core'', ''v7'', ''en'', ''Synthetic core text'', now() + interval ''1 day''),
+      (''core'', ''v7'', ''es'', ''Synthetic core text (es)'', now() + interval ''1 day'')'],
+    'select th972b_test.gate_reasons()') = 'unapproved',
+  'gate: an unapproved document dated in the future fails');
+select th972b_test.ok(
+  th972b_test.after(array[
+    current_setting('th972b.approve_all'),
+    'alter table public.consent_documents disable trigger consent_documents_guard',
+    'insert into public.consent_documents (purpose, version, locale, body, body_sha256, effective_from, approved_ref) values
+      (''core'', ''v8'', ''en'', ''Synthetic core text'', repeat(''0'', 64), now() - interval ''2 minutes'', ''synthetic-approval-08''),
+      (''core'', ''v8'', ''es'', ''Synthetic core text (es)'', repeat(''0'', 64), now() - interval ''1 minute'', ''synthetic-approval-08'')',
+    'alter table public.consent_documents enable trigger consent_documents_guard'],
+    'select th972b_test.gate_reasons()') = 'effective_from_differs',
+  'gate: locales of one version with different effective_from fail (rows written past the guard)');
+select th972b_test.ok(
+  th972b_test.after(array[
+    'update public.consent_documents set approved_ref = ''synthetic-approval-all''
+     where not (purpose = ''core'' and version = ''v1-draft'' and locale = ''en'')',
+    'insert into auth.users (id, email, aud, role) values
+      (''00000000-0000-4000-8000-0000009720b9'', ''synthetic-user-b9@example.test'', ''authenticated'', ''authenticated'')',
+    'insert into public.enrolments (id, user_id, programme_code)
+     values (''00000000-0000-4000-8000-00000972e0b9'', ''00000000-0000-4000-8000-0000009720b9'', ''hw'')',
+    'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
+     values (''00000000-0000-4000-8000-00000972e0b9'', ''core'', ''v1-draft'', ''en'')',
+    'update public.consent_documents set retired_at = now() where purpose = ''core'' and version = ''v1-draft'''],
+    'select th972b_test.gate_reasons()') = 'consent_on_unapproved_document',
+  'gate: a live programme consent on an unapproved (since retired) document fails');
+select th972b_test.ok(
+  th972b_test.after(array[
+    'update public.consent_documents set approved_ref = ''synthetic-approval-all''
+     where not (purpose = ''essential'' and version = ''v1-draft'' and locale = ''es'')',
+    'insert into auth.users (id, email, aud, role) values
+      (''00000000-0000-4000-8000-0000009720b9'', ''synthetic-user-b9@example.test'', ''authenticated'', ''authenticated'')',
+    'insert into public.account_consents (user_id, purpose, consent_version, locale)
+     values (''00000000-0000-4000-8000-0000009720b9'', ''essential'', ''v1-draft'', ''es'')',
+    'update public.consent_documents set retired_at = now() where purpose = ''essential'' and version = ''v1-draft'''],
+    'select th972b_test.gate_reasons()') = 'consent_on_unapproved_document',
+  'gate: a live account consent on an unapproved (since retired) document fails');
+set local role authenticated;
+select th972b_test.ok(th972b_test.gate_reasons() like '%role_without_rls_bypass%',
+  'gate: a superuser session after set role authenticated fails (the check uses current_user)');
+reset role;
 
 -- Synthetic identities and documents --------------------------------------------
 insert into auth.users (id, email, aud, role) values
@@ -348,15 +394,17 @@ insert into auth.users (id, email, aud, role) values
    'authenticated', 'authenticated'),
   ('00000000-0000-4000-8000-0000009720b3', 'synthetic-user-b3@example.test',
    'authenticated', 'authenticated');
--- Core versions in order: v1-draft (seed) < v2-test < v3-cascade (marked
--- cascades_optional) < v4-after.
+-- Core versions in order: v1-draft (seed) < v1b < v2-test < v3-cascade
+-- (marked cascades_optional) < v4-after = v4-same (same time).
 insert into public.consent_documents
   (purpose, version, locale, body, effective_from, retired_at, cascades_optional) values
+  ('core', 'v1b', 'en', 'Synthetic core text v1b', now() - interval '45 minutes', null, false),
+  ('core', 'v1b', 'es', 'Synthetic core text v1b (es)', now() - interval '45 minutes', null, false),
+  ('core', 'v4-same', 'en', 'Synthetic core text v4 same time', now() - interval '20 minutes', null, false),
   ('core', 'v2-test', 'en', 'Synthetic core text v2', now() - interval '40 minutes', null, false),
   ('core', 'v2-test', 'es', 'Synthetic core text v2 (es)', now() - interval '40 minutes', null, false),
   ('core', 'v3-cascade', 'en', 'Synthetic core text v3', now() - interval '30 minutes', null, true),
-  -- es takes effect later than en, so a locale move from en to es spans it.
-  ('core', 'v3-cascade', 'es', 'Synthetic core text v3 (es)', now() - interval '25 minutes', null, true),
+  ('core', 'v3-cascade', 'es', 'Synthetic core text v3 (es)', now() - interval '30 minutes', null, true),
   ('core', 'v4-after', 'en', 'Synthetic core text v4', now() - interval '20 minutes', null, false),
   ('core', 'v0-retired', 'en', 'Synthetic retired core text', now() - interval '2 days',
    now() - interval '1 day', false),
@@ -365,8 +413,8 @@ insert into public.consent_documents
 select th972b_test.ok(
   (select string_agg(purpose || ':' || version, ',' order by purpose)
    from public.current_consent_documents() where locale = 'en'
-     and purpose in ('core', 'research')) = 'core:v4-after,research:v5-research',
-  'current_consent_documents: the latest effective, unretired version per purpose and locale');
+     and purpose in ('core', 'research')) = 'core:v4-same,research:v5-research',
+  'current_consent_documents: the latest effective, unretired version per purpose and locale (ties by version)');
 select th972b_test.refused(
   'insert into public.consent_documents (purpose, version, locale, body, effective_from, cascades_optional)
    values (''research'', ''v6'', ''en'', ''Synthetic'', now(), true)',
@@ -499,7 +547,7 @@ select th972b_test.refused(
 select th972b_test.become(current_setting('th972b.superuser'), '');
 select th972b_test.refused(
   'update public.consent_documents set body = ''Changed'' where purpose = ''core'' and version = ''v2-test''',
-  'TH015', 'Consent documents are immutable; publish a new version',
+  'TH015', 'Consent documents are immutable, publish a new version',
   'superuser: a document body cannot change', 'consent_document_immutable');
 select th972b_test.refused(
   'update public.consent_documents set version = ''v2-other'' where purpose = ''core'' and version = ''v2-test''',
@@ -541,9 +589,14 @@ select th972b_test.refused(
    where purpose = ''core'' and version = ''v1-draft'' and locale = ''es''',
   'TH015', 'Consent documents are immutable%',
   'superuser: effective_from is fixed once a programme consent references the document', 'consent_document_immutable');
+-- A single-locale document referenced only by an account consent.
+insert into public.consent_documents (purpose, version, locale, body, effective_from)
+values ('diagnostics', 'v2-acct', 'en', 'Synthetic diagnostics text v2', now() - interval '10 minutes');
+insert into public.account_consents (user_id, purpose, consent_version, locale)
+values ('00000000-0000-4000-8000-0000009720b1', 'diagnostics', 'v2-acct', 'en');
 select th972b_test.refused(
   'update public.consent_documents set effective_from = effective_from - interval ''1 day''
-   where purpose = ''essential'' and version = ''v1-draft'' and locale = ''en''',
+   where purpose = ''diagnostics'' and version = ''v2-acct''',
   'TH015', 'Consent documents are immutable%',
   'superuser: effective_from is fixed once an account consent references the document', 'consent_document_immutable');
 select th972b_test.ok(
@@ -560,6 +613,38 @@ select th972b_test.ok(
     'select cascades_optional::text from public.consent_documents
      where purpose = ''core'' and version = ''v9-future''') = 'true',
   'superuser: an unreferenced document''s effective_from and cascades_optional can still change');
+select th972b_test.refused(
+  'insert into public.consent_documents (purpose, version, locale, body, effective_from) values
+    (''core'', ''v1c'', ''en'', ''Synthetic core text v1c'', now() - interval ''44 minutes''),
+    (''core'', ''v1c'', ''es'', ''Synthetic core text v1c (es)'', now() - interval ''5 minutes'')',
+  'TH015', 'A consent document version takes effect at the same time in every locale',
+  'superuser: a version cannot take effect later in one locale than another', 'consent_document_immutable');
+select th972b_test.refused(
+  'update public.consent_documents set effective_from = now() - interval ''41 minutes''
+   where purpose = ''core'' and version = ''v1b'' and locale = ''es''',
+  'TH015', 'A consent document version takes effect at the same time in every locale',
+  'superuser: one locale''s effective_from cannot move away from the others', 'consent_document_immutable');
+-- A role that is subject to row-level security cannot write documents, even
+-- with table privileges and a policy: the guard cannot trust what it sees.
+create role th972b_doc_editor nologin;
+grant usage on schema public to th972b_doc_editor;
+grant select, insert, update on public.consent_documents to th972b_doc_editor;
+-- It may read the consent tables, but no policy shows it any row there.
+grant select on public.programme_consents, public.account_consents to th972b_doc_editor;
+create policy th972b_doc_editor_all on public.consent_documents
+  for all to th972b_doc_editor using (true) with check (true);
+set local role th972b_doc_editor;
+select th972b_test.refused(
+  'update public.consent_documents set cascades_optional = true
+   where purpose = ''core'' and version = ''v1-draft'' and locale = ''es''',
+  'TH015', 'Consent documents are changed only by a role that bypasses row-level security',
+  'non-bypass role: cannot change a referenced document (fails closed)', 'consent_document_immutable');
+select th972b_test.refused(
+  'insert into public.consent_documents (purpose, version, locale, body, effective_from)
+   values (''research'', ''v6'', ''en'', ''Synthetic'', now())',
+  'TH015', 'Consent documents are changed only by a role that bypasses row-level security',
+  'non-bypass role: cannot add a document', 'consent_document_immutable');
+reset role;
 select th972b_test.refused(
   'delete from public.consent_documents where purpose = ''core'' and version = ''v1-draft'' and locale = ''es''',
   '23503', '%programme_consents_document_fkey%', 'superuser: a referenced document cannot be deleted');
@@ -708,6 +793,13 @@ select th972b_test.ok(
 select th972b_test.ok(
   public.has_consent(current_setting('th972b.a_bf')::uuid, 'reminders'),
   'A: a locale-only move never cascades, even to a cascades_optional document');
+select th972b_test.ok(
+  (select count(*) = 2 from public.supersede_core_consent(
+     current_setting('th972b.a_bf')::uuid, 'v4-after', 'en')),
+  'A: supersedes BreatheFree core from v3-cascade to the later v4-after');
+select th972b_test.ok(
+  public.has_consent(current_setting('th972b.a_bf')::uuid, 'reminders'),
+  'A: leaving a cascades_optional version for a later unflagged one does not cascade');
 
 -- A plain revocation cannot skip the cascade by naming a superseded_by.
 insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
@@ -824,12 +916,14 @@ with i as (
     ('00000000-0000-4000-8000-0000009720b3', 'sd', 'learn_only'),
     ('00000000-0000-4000-8000-0000009720b3', 'ea', 'learn_only'),
     ('00000000-0000-4000-8000-0000009720b3', 'ck', 'learn_only'),
-    ('00000000-0000-4000-8000-0000009720b3', 're', 'learn_only')
+    ('00000000-0000-4000-8000-0000009720b3', 're', 'learn_only'),
+    ('00000000-0000-4000-8000-0000009720b3', 'st', 'learn_only')
   returning id, programme_code
 ) select set_config('th972b.d_' || programme_code, id::text, true) from i;
 insert into public.programme_consents (enrolment_id, purpose, consent_version, locale) values
   (current_setting('th972b.d_sd')::uuid, 'core', 'v2-test', 'en'),
-  (current_setting('th972b.d_re')::uuid, 'core', 'v2-test', 'en');
+  (current_setting('th972b.d_re')::uuid, 'core', 'v2-test', 'en'),
+  (current_setting('th972b.d_st')::uuid, 'core', 'v4-after', 'en');
 -- Rows stored before consent documents existed: no locale, own text.
 select th972b_test.become(current_setting('th972b.superuser'), '');
 alter table public.programme_consents disable trigger programme_consents_fill_text;
@@ -851,6 +945,16 @@ select th972b_test.ok(
   not public.has_consent(current_setting('th972b.d_sd')::uuid, 'research')
   and public.has_consent(current_setting('th972b.d_sd')::uuid, 'core'),
   'D: superseding from v2 straight to v4 passes the cascades_optional v3, so optional consents are revoked');
+select th972b_test.refused(format(
+  'select * from public.supersede_core_consent(%L, ''v4-same'', ''en'')',
+  current_setting('th972b.d_sd')),
+  'TH014', 'The core consent is already on this version or a later one',
+  'D: a different version with the same effective_from is not later', 'consent_version_unchanged');
+select th972b_test.refused(format(
+  'select * from public.supersede_core_consent(%L, ''v1b'', ''es'')',
+  current_setting('th972b.d_st')),
+  'TH014', 'The core consent is already on this version or a later one',
+  'D: moving to an older version in another locale is refused', 'consent_version_unchanged');
 select th972b_test.ok(
   (select count(*) = 2 from public.supersede_core_consent(
      current_setting('th972b.d_ea')::uuid, 'v2-test', 'en')),
@@ -963,7 +1067,7 @@ select th972b_test.affects(format(
    where enrolment_id = %L and revoked_at is null', current_setting('th972b.a_hw')),
   0, 'A sync: cannot revoke or supersede a consent (no row qualifies)');
 select th972b_test.ok(
-  (select count(*) from public.consent_documents) = 27
+  (select count(*) from public.consent_documents) = 31
   and (select count(*) from public.current_consent_documents()) = 20,
   'A sync: reads consent documents');
 
@@ -1000,7 +1104,7 @@ select set_config('th972b.a_receipt', public.delete_my_app_data('DELETE')::text,
 select th972b_test.ok(
   (current_setting('th972b.a_receipt')::jsonb ->> 'enrolments')::int = 4
   and (current_setting('th972b.a_receipt')::jsonb ->> 'programme_consents')::int = 8
-  and (current_setting('th972b.a_receipt')::jsonb ->> 'account_consents')::int = 1,
+  and (current_setting('th972b.a_receipt')::jsonb ->> 'account_consents')::int = 2,
   'A: delete_my_app_data removes the remaining enrolments and consents, superseded history included');
 select th972b_test.become(current_setting('th972b.superuser'), '');
 select th972b_test.ok(
@@ -1008,7 +1112,7 @@ select th972b_test.ok(
    where c.enrolment_id in (current_setting('th972b.a_hw')::uuid, current_setting('th972b.a_bf')::uuid,
      current_setting('th972b.a_st')::uuid, current_setting('th972b.a_ca')::uuid,
      current_setting('th972b.a_be')::uuid)) = 0
-  and (select count(*) from public.consent_documents) = 28,
+  and (select count(*) from public.consent_documents) = 32,
   'A''s consents are gone; the consent documents remain');
 
 select 'TH972B_SQL_TESTS_COMPLETE' as result;
@@ -1135,7 +1239,8 @@ grep -A3 '^create trigger programme_consents_supersede_cascade$' <<<"$sql" |
 # The documented release gate is the block the SQL test runs.
 gate=$(release_gate_sql)
 for reason in role_without_rls_bypass no_documents unapproved missing_locale \
-  cascades_optional_differs consent_without_document; do
+  cascades_optional_differs effective_from_differs consent_without_document \
+  consent_on_unapproved_document; do
   grep -Fq "'$reason'" <<<"$gate" || fail "the release gate in $contract must report $reason"
 done
 if ! { grep -Fq 'set constraints public.programme_consents_live_core_key deferred;' <<<"$supersede" &&
@@ -1181,7 +1286,7 @@ done
 if grep -Eiq 'grant .* to (.*[^a-z_])?(anon|thsync|public)([^a-z_]|$)' <<<"$sql"; then
   fail 'nothing is granted to anon, thsync or PUBLIC'
 fi
-if grep -Eiq 'disable row level security|no force row level security|bypassrls|(create|alter|drop) role|owner to' <<<"$sql"; then
+if grep -Eiq 'disable row level security|no force row level security|(^|[^a-z_])bypassrls|(create|alter|drop) role|owner to' <<<"$sql"; then
   fail 'migration must not weaken RLS or change roles'
 fi
 if grep -Eiq 'service[_-]?role|secret|password[[:space:]]*=' <<<"$sql"; then
@@ -1195,7 +1300,7 @@ fi
 registry_row() { grep -E "^\| \`$1\` \|" "$contract" || true; }
 fn_re='^create (or replace )?function public\.([a-z_]+)\('
 raise_re="errcode = '(TH[0-9]{3})', message = '([^']+)', hint = '([a-z_]+)';"
-expected_raises=21
+expected_raises=23
 checked=0
 current_fn=''
 while IFS= read -r line; do
