@@ -8,12 +8,15 @@
 // from the clinical lead, plus the specialty that the rule's `source` in
 // spec/rules.json names (for example pulmonology for ca.zone, psychiatry for
 // ea.selfharm). The commit that changes a value must cite that sign-off.
+// The current values are unsigned placeholders: they need written clinical
+// sign-off before release, and this test passing does not approve them.
 // The sf.unplug.* params are product rules, not clinical; they are checked
 // for parity only.
 //
 // If this test fails, do not edit either file to make it pass. A mismatch is
-// a clinical item for human review. Until it is resolved, record it in
-// [_excluded] below with the reason, so the gap stays visible.
+// a clinical item for human review. Adding an entry to [_excluded] needs the
+// same written clinical approval as a value change, and the commit must cite
+// it; agents never add an exclusion to turn a failure green.
 import 'dart:convert';
 import 'dart:io';
 
@@ -25,7 +28,10 @@ import 'package:tether_ui/logic/rules.dart';
 /// ('bp.sysMin', 'redSymptoms'); the value says why it is excluded.
 /// An excluded key skips both the value comparison and the coverage checks.
 ///
-/// Mark a known clinical mismatch like this, and never change the value:
+/// Adding an entry needs the same written clinical approval as changing a
+/// value, cited in the commit. Agents never add one to turn a failure green.
+/// With that approval, record a known clinical mismatch like this, and never
+/// change the value:
 ///   '<rule>/<param>': 'CLINICAL MISMATCH: TRules <value>, rules.json '
 ///       '<value>; awaiting clinical-lead sign-off',
 ///
@@ -103,32 +109,67 @@ Map<String, Object?> _specParams(Map<String, Object?> spec) {
   return out;
 }
 
-/// Every constant declared in TRules, read from the source, as members:
-/// '<name>.<field>' for a record with named fields, '<name>' otherwise.
-Set<String> _declaredMembers() {
+/// Every member declared in the TRules class body, read from the source.
+///
+/// Scope: every declaration in the class body that starts on a line
+/// matching `static const`, `static final` or `static late final`, with or
+/// without a type (for example `static const double x = 6.0;`). Trailing
+/// `//` comments are dropped, and the following lines are joined until one
+/// ends with `;`, so multi-line declarations are read whole. A record
+/// literal whose fields are all named yields '<name>.<field>' per field;
+/// any other value yields '<name>'.
+///
+/// Fails closed: a declaration that does not parse as exactly one
+/// `name = value;` (two declarations on one line, no initializer, no `;`
+/// before the class ends) or a record that mixes named and positional
+/// fields is returned in `unparsed`, and the coverage test fails on it.
+/// Not covered: static getters, static methods, and static fields that are
+/// neither const nor final.
+({Set<String> members, List<String> unparsed}) _declaredMembers() {
   final file = File('lib/logic/rules.dart');
   expect(file.existsSync(), isTrue, reason: '${file.absolute.path} not found');
   final lines = file.readAsLinesSync();
   final start = lines.indexWhere((l) => l.startsWith('abstract final class TRules'));
   expect(start, isNonNegative, reason: 'class TRules not found in ${file.path}');
-  final decl = RegExp(r'^\s*static const (\w+)\s*=\s*(.+);\s*$');
+  final end = lines.indexWhere((l) => l.startsWith('}'), start + 1);
+  expect(end, greaterThan(start), reason: 'end of class TRules not found in ${file.path}');
+  final opener = RegExp(r'^\s*static\s+(late\s+)?(const|final)\b');
+  final comment = RegExp(r'(^|\s)//.*$');
+  final decl = RegExp(r'^\s*static\s+(?:late\s+)?(?:const|final)\s+(?:.*\s)?(\w+)\s*$');
   final record = RegExp(r'^\((.*)\)$');
   final field = RegExp(r'^\s*(\w+)\s*:');
-  final out = <String>{};
-  for (final line in lines.skip(start + 1)) {
-    if (line.startsWith('}')) break;
-    final m = decl.firstMatch(line);
-    if (m == null) continue;
+  final members = <String>{};
+  final unparsed = <String>[];
+  for (var i = start + 1; i < end; i++) {
+    if (!opener.hasMatch(lines[i])) continue;
+    final first = i;
+    final parts = <String>[lines[i].replaceFirst(comment, '').trim()];
+    while (!parts.last.endsWith(';') && i + 1 < end) {
+      i++;
+      parts.add(lines[i].replaceFirst(comment, '').trim());
+    }
+    final text = parts.join(' ');
+    final eq = text.indexOf('=');
+    final m = eq < 0 ? null : decl.firstMatch(text.substring(0, eq));
+    if (!text.endsWith(';') || m == null || text.indexOf(';') != text.length - 1) {
+      unparsed.add('line ${first + 1}: $text');
+      continue;
+    }
     final name = m.group(1)!;
-    final body = record.firstMatch(m.group(2)!.trim());
-    final fields = body == null ? const <String>[] : body.group(1)!.split(',').map((f) => field.firstMatch(f)?.group(1)).whereType<String>().toList();
+    final body = record.firstMatch(text.substring(eq + 1, text.length - 1).trim());
+    final items = body == null ? const <String>[] : body.group(1)!.split(',').map((f) => f.trim()).where((f) => f.isNotEmpty).toList();
+    final fields = items.map((f) => field.firstMatch(f)?.group(1)).whereType<String>().toList();
+    if (fields.isNotEmpty && fields.length != items.length) {
+      unparsed.add('line ${first + 1}: $text');
+      continue;
+    }
     if (fields.isEmpty) {
-      out.add(name);
+      members.add(name);
     } else {
-      out.addAll(fields.map((f) => '$name.$f'));
+      members.addAll(fields.map((f) => '$name.$f'));
     }
   }
-  return out;
+  return (members: members, unparsed: unparsed);
 }
 
 /// Numbers compare by value (JSON 3 equals Dart 3.0); lists element-wise.
@@ -151,11 +192,14 @@ void main() {
   late Map<String, Object?> params;
   late List<_Pair> pairs;
   late Set<String> members;
+  late List<String> unparsed;
 
   setUpAll(() {
     params = _specParams(_loadSpec());
     pairs = _pairs();
-    members = _declaredMembers();
+    final declared = _declaredMembers();
+    members = declared.members;
+    unparsed = declared.unparsed;
   });
 
   test('rules.json and rules.dart are both non-empty', () {
@@ -191,6 +235,7 @@ void main() {
     final mapped = pairs.map((p) => p.dart).toSet();
     final unmapped = members.where((m) => !mapped.contains(m) && !_excluded.containsKey(m)).toList();
     final unknown = mapped.where((m) => !members.contains(m)).toList();
+    expect(unparsed, isEmpty, reason: 'TRules declarations the source scan could not read (fail closed): $unparsed');
     expect(unmapped, isEmpty, reason: 'TRules constants with no rules.json param: $unmapped');
     expect(unknown, isEmpty, reason: 'Parity table names TRules members not declared in rules.dart: $unknown');
   });
