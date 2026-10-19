@@ -4,7 +4,6 @@ import {
   IsOptional,
   IsString,
   IsUUID,
-  Length,
   Matches,
   ValidateIf,
 } from "class-validator";
@@ -43,6 +42,9 @@ export const sharePurposes: readonly ConsentPurpose[] = [
   "share_caregiver",
 ];
 export const consentVersionPattern = /^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$/;
+/** Locales of the consent documents (consent_documents.locale). */
+export const consentLocales = ["en", "es"] as const;
+export type ConsentLocale = (typeof consentLocales)[number];
 
 export class CreateEnrolmentDto {
   @IsString()
@@ -86,14 +88,28 @@ export class GrantConsentDto {
   @IsUUID()
   recipientRef?: string;
 
+  /**
+   * The version of the consent document the app showed. The database copies
+   * that document's text into the consent; the API never substitutes a
+   * version of its own.
+   */
   @IsString()
   @Matches(consentVersionPattern)
   consentVersion!: string;
 
-  /** Stored exactly as supplied: the wording the member was shown. */
-  @IsString()
-  @Length(1, 8000)
-  consentText!: string;
+  /** The locale of the document the app showed. */
+  @IsIn(consentLocales)
+  locale!: ConsentLocale;
+}
+
+export class SwapFocusDto {
+  /** The enrolment leaving focus; it becomes paused (its data is kept). */
+  @IsUUID()
+  demoteId!: string;
+
+  /** The enrolment entering focus. */
+  @IsUUID()
+  promoteId!: string;
 }
 
 /**
@@ -116,9 +132,20 @@ export interface ConsentResponse {
   purpose: ConsentPurpose;
   recipientRef: string | null;
   consentVersion: string;
+  /** Null only on consents stored before consent documents existed. */
+  locale: ConsentLocale | null;
+  /** The document text the database stored with the consent. */
   consentText: string;
   grantedAt: string;
   revokedAt: string | null;
+}
+
+export interface GrantConsentResponse extends ConsentResponse {
+  /**
+   * The id of the core consent this grant superseded (a core re-consent to a
+   * later version or another locale), otherwise null.
+   */
+  supersededId: string | null;
 }
 
 export interface EnrolmentResponse {
@@ -136,13 +163,34 @@ export interface EnrolmentResponse {
    */
   consents: ConsentResponse[];
   /**
-   * True when the enrolment is not left and its live core consent was given
-   * to a version other than the current core consent version.
+   * The current core document version (current_consent_documents()) for the
+   * locale re-consent would use: the live core consent's locale, or for a
+   * consent stored before documents existed (no locale) the member's profile
+   * locale. Null without a live core consent, without a profile for a
+   * consent with no locale, or when no core document is current for that
+   * locale.
+   */
+  currentCoreConsentVersion: string | null;
+  /**
+   * True only when re-consent can be completed: the enrolment is not left,
+   * has a live core consent, currentCoreConsentVersion is not null, and the
+   * live consent is not on it (a consent stored before documents existed is
+   * never on a document).
    */
   reconsentRequired: boolean;
 }
 
+/** The current core document version per locale; null when there is none. */
+export type CoreConsentVersions = Record<ConsentLocale, string | null>;
+
 export interface EnrolmentListResponse {
-  currentCoreConsentVersion: string;
+  currentCoreConsentVersions: CoreConsentVersions;
   enrolments: EnrolmentResponse[];
+}
+
+export interface FocusSwapResponse {
+  /** The enrolment that left focus, now paused. */
+  demoted: EnrolmentResponse;
+  /** The enrolment now in focus. */
+  promoted: EnrolmentResponse;
 }

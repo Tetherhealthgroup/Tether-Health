@@ -9,7 +9,6 @@ import { Test } from "@nestjs/testing";
 import { AppModule } from "../src/app.module";
 import { TokenVerifier } from "../src/auth/token-verifier";
 import { configureApp } from "../src/configure-app";
-import { CURRENT_CORE_CONSENT_VERSION } from "../src/enrolments/consent-versions";
 import { UserSupabaseClientFactory } from "../src/enrolments/user-supabase-client";
 import {
   DATABASE_ERRORS,
@@ -17,11 +16,13 @@ import {
   type DatabaseErrorHint,
 } from "./support/database-errors";
 import {
+  CONSENT_DOCUMENTS,
   DB_CANARY,
   FakePostgrest,
   registryError,
   type PgError,
 } from "./support/fake-postgrest";
+import { openApiErrors, openApiSchemaNames } from "./support/openapi";
 
 /**
  * Enrolments and consents, end to end through the real Nest app, the real
@@ -33,9 +34,9 @@ import {
  * constraints and triggers.
  *
  * Stand-in fidelity (th-qa D1, D2, D4):
- * - D1: the fake evaluates check, foreign-key and RLS insert checks in a
- *   fixed order of its own (Postgres runs RLS WITH CHECK before
- *   constraints, and unique/foreign-key checks later). No test relies on it.
+ * - D1: the fake evaluates writes in Postgres executor order: before-row
+ *   triggers, RLS WITH CHECK, CHECK constraints, unique keys, then foreign
+ *   keys.
  * - D2: the fake's clock advances by 1 ms on every timestamp, so rows
  *   written in one request get distinct, strictly increasing times where
  *   Postgres's now() would give them the same value. Ordering by
@@ -49,6 +50,11 @@ import {
  *   not know; that the real deferred focus-cap error at COMMIT arrives the
  *   same way is unverified until a local database run. The API matches the
  *   code only, so the status and message do not affect the mapping.
+ * - Consent documents are the fake's seeded CONSENT_DOCUMENTS: the current
+ *   core version is v2-synthetic in both locales; v1-draft is grantable for
+ *   every purpose. A race that Postgres resolves after a lock wait is
+ *   emulated with interleave (the other transaction commits) plus failNext
+ *   (the error this request then gets).
  */
 
 type Method = "DELETE" | "GET" | "PATCH" | "POST";
@@ -63,8 +69,22 @@ interface Caller {
 const CANARY = "synthetic-canary-7c1e";
 const TOKEN_CANARY = "synthetic-bearer-canary";
 const DELETE_BODY = { confirmation: "DELETE" };
-const CORE_TEXT =
-  "  Synthetic core wording, línea dos —\n kept exactly (tabs\tand trailing space) ";
+/** Every seeded version is synthetic; v1-draft exists for every purpose. */
+const SHOWN = { consentVersion: "v1-draft", locale: "en" };
+/** The current core version in en; es has a later one of its own. */
+const CURRENT_CORE = "v2-synthetic";
+const CURRENT_CORE_ES = "v3-synthetic";
+const CURRENT_VERSIONS = { en: CURRENT_CORE, es: CURRENT_CORE_ES };
+const documentBody = (purpose: string, version: string, locale: string) => {
+  const found = CONSENT_DOCUMENTS.find(
+    (doc) =>
+      doc.purpose === purpose &&
+      doc.version === version &&
+      doc.locale === locale,
+  );
+  if (!found) throw new Error(`no document ${purpose}/${version}/${locale}`);
+  return found.body;
+};
 
 describe("Enrolments and consents API (e2e)", () => {
   let app: NestFastifyApplication;
@@ -183,8 +203,7 @@ describe("Enrolments and consents API (e2e)", () => {
     const response = await call(caller, "POST", "/v1/enrolments/consents", {
       enrolmentId,
       purpose,
-      consentVersion: CURRENT_CORE_CONSENT_VERSION,
-      consentText: `Synthetic ${purpose} wording`,
+      ...SHOWN,
       ...extra,
     });
     expect(response.statusCode).toBe(201);
@@ -206,6 +225,12 @@ describe("Enrolments and consents API (e2e)", () => {
       error: "Request rejected",
       code,
     });
+    expect(openApiErrors("CodedRequestRejected", body)).toEqual([]);
+  };
+
+  /** The response body matches components.schemas[name] in openapi.yaml. */
+  const expectSchema = (response: { json: () => unknown }, name: string) => {
+    expect(openApiErrors(name, response.json())).toEqual([]);
   };
 
   const expectUncoded = (
@@ -221,6 +246,7 @@ describe("Enrolments and consents API (e2e)", () => {
     expect(body.error).toBe(
       status >= 500 ? "Service unavailable" : "Request rejected",
     );
+    expect(openApiErrors("RequestRejected", body)).toEqual([]);
   };
 
   describe("authentication", () => {
@@ -231,6 +257,11 @@ describe("Enrolments and consents API (e2e)", () => {
       ["PATCH", `/v1/enrolments/${id}`, { status: "paused" }],
       ["DELETE", `/v1/enrolments/${id}`, DELETE_BODY],
       ["POST", "/v1/enrolments/consents", {}],
+      [
+        "POST",
+        "/v1/enrolments/focus-swap",
+        { demoteId: id, promoteId: randomUUID() },
+      ],
       ["PATCH", `/v1/enrolments/consents/${id}`, { revoked: true }],
       ["GET", "/v1/catalogue/programmes", undefined],
     ])("%s %s requires a token", async (method, url, payload) => {
@@ -289,9 +320,10 @@ describe("Enrolments and consents API (e2e)", () => {
       const listed = await call(a, "GET", "/v1/enrolments");
       expect(listed.statusCode).toBe(200);
       expect(listed.json()).toEqual({
-        currentCoreConsentVersion: CURRENT_CORE_CONSENT_VERSION,
+        currentCoreConsentVersions: CURRENT_VERSIONS,
         enrolments: [created.json()],
       });
+      expect(created.json()).toMatchObject({ currentCoreConsentVersion: null });
     });
 
     it.each([
@@ -408,8 +440,7 @@ describe("Enrolments and consents API (e2e)", () => {
         await call(a, "POST", "/v1/enrolments/consents", {
           enrolmentId: id,
           purpose: "research",
-          consentVersion: "v1",
-          consentText: "Synthetic research wording",
+          ...SHOWN,
         }),
         409,
         "enrolment_left",
@@ -571,47 +602,103 @@ describe("Enrolments and consents API (e2e)", () => {
   });
 
   describe("consents", () => {
-    it("stores and returns version and text exactly as supplied", async () => {
+    it("records the version and locale shown; the database fills the text", async () => {
       const a = newCaller();
       const id = await enrol(a, "ca");
+      const since = fake.requests.length;
+      // v1-draft is not the current core version: the API records what the
+      // app showed and never substitutes the current one.
       const response = await call(a, "POST", "/v1/enrolments/consents", {
         enrolmentId: id,
         purpose: "core",
-        consentVersion: "2026-10.core_v1",
-        consentText: CORE_TEXT,
+        consentVersion: "v1-draft",
+        locale: "es",
       });
       expect(response.statusCode).toBe(201);
       expect(response.json()).toMatchObject({
         enrolmentId: id,
         purpose: "core",
         recipientRef: null,
-        consentVersion: "2026-10.core_v1",
-        consentText: CORE_TEXT,
+        consentVersion: "v1-draft",
+        locale: "es",
+        consentText: documentBody("core", "v1-draft", "es"),
         revokedAt: null,
+        supersededId: null,
       });
+      // The outgoing insert carries the version and locale, never the text.
+      const inserts = fake.requests
+        .slice(since)
+        .filter(
+          (r) =>
+            r.method === "POST" &&
+            r.path.endsWith("/rest/v1/programme_consents"),
+        );
+      expect(inserts.map((r) => r.body)).toEqual([
+        {
+          enrolment_id: id,
+          purpose: "core",
+          recipient_ref: null,
+          consent_version: "v1-draft",
+          locale: "es",
+        },
+      ]);
       const stored = fake
         .table("programme_consents")
         .find((r) => r.enrolment_id === id);
-      expect(stored?.consent_version).toBe("2026-10.core_v1");
-      expect(stored?.consent_text).toBe(CORE_TEXT);
+      expect(stored).toMatchObject({
+        consent_version: "v1-draft",
+        locale: "es",
+        consent_text: documentBody("core", "v1-draft", "es"),
+      });
     });
 
-    it("treats a second live grant as already granted (409), keeping the first", async () => {
+    it.each([
+      ["an unknown version", "core", "v1", "en"],
+      ["a retired version", "core", "v0-retired", "en"],
+      ["a version not yet in effect", "core", "v9-future", "en"],
+      ["a version that lacks this locale", "core", "v9-future", "es"],
+      ["a version of another purpose", "reminders", "v2-synthetic", "en"],
+    ])(
+      "maps %s to consent_document_unavailable (TH011)",
+      async (_label, purpose, consentVersion, locale) => {
+        const a = newCaller();
+        const id = await enrol(a, "sd", "learn_only");
+        if (purpose !== "core") await grant(a, id, "core");
+        expectCoded(
+          await call(a, "POST", "/v1/enrolments/consents", {
+            enrolmentId: id,
+            purpose,
+            consentVersion,
+            locale,
+          }),
+          409,
+          "consent_document_unavailable",
+        );
+        expect(
+          fake
+            .table("programme_consents")
+            .filter((r) => r.enrolment_id === id && r.purpose === purpose),
+        ).toHaveLength(0);
+      },
+    );
+
+    it("treats a second live grant of the same document as already granted (409), keeping the first", async () => {
       const a = newCaller();
       const id = await enrol(a, "st");
       const first = await grant(a, id, "core");
-      const second = await call(a, "POST", "/v1/enrolments/consents", {
-        enrolmentId: id,
-        purpose: "core",
-        consentVersion: "v2",
-        consentText: `Different wording ${CANARY}`,
-      });
-      expectCoded(second, 409, "consent_already_granted");
-      expect(second.body).not.toContain(CANARY);
+      const reminders = await grant(a, id, "reminders");
+      for (const purpose of ["core", "reminders"]) {
+        const second = await call(a, "POST", "/v1/enrolments/consents", {
+          enrolmentId: id,
+          purpose,
+          ...SHOWN,
+        });
+        expectCoded(second, 409, "consent_already_granted");
+      }
       const live = fake
         .table("programme_consents")
         .filter((r) => r.enrolment_id === id && r.revoked_at === null);
-      expect(live.map((r) => r.id)).toEqual([first]);
+      expect(live.map((r) => r.id)).toEqual([first, reminders]);
     });
 
     it("requires a live core consent before optional consents", async () => {
@@ -621,8 +708,7 @@ describe("Enrolments and consents API (e2e)", () => {
         await call(a, "POST", "/v1/enrolments/consents", {
           enrolmentId: id,
           purpose: "records_import",
-          consentVersion: "v1",
-          consentText: "Synthetic records wording",
+          ...SHOWN,
         }),
         409,
         "core_consent_required",
@@ -642,21 +728,32 @@ describe("Enrolments and consents API (e2e)", () => {
       ],
       ["a null recipient", { purpose: "core", recipientRef: null }],
       ["a bad version", { purpose: "core", consentVersion: "v 1" }],
-      ["empty text", { purpose: "core", consentText: "" }],
-      ["text over 8000", { purpose: "core", consentText: "x".repeat(8001) }],
+      ["a missing version", { purpose: "core", consentVersion: undefined }],
+      // The database fills the text; a client-supplied text is refused.
+      [
+        "consentText",
+        {
+          purpose: "core",
+          consentText: "Synthetic wording the API must not send",
+        },
+      ],
+      ["a missing locale", { purpose: "core", locale: undefined }],
+      ["a null locale", { purpose: "core", locale: null }],
+      ["an unknown locale", { purpose: "core", locale: "fr" }],
       ["an unknown purpose", { purpose: "marketing" }],
       ["an unknown field", { purpose: "core", grantedAt: "2020-01-01" }],
       ["a revoked_at", { purpose: "core", revokedAt: "2020-01-01" }],
     ])("POST refuses %s", async (_label, overrides) => {
       const a = newCaller();
       const id = await enrol(a, "nu");
+      const since = fake.requests.length;
       const response = await call(a, "POST", "/v1/enrolments/consents", {
         enrolmentId: id,
-        consentVersion: "v1",
-        consentText: "Synthetic wording",
+        ...SHOWN,
         ...overrides,
       });
       expectUncoded(response, 400);
+      expect(fake.requests.length).toBe(since);
       expect(
         fake.table("programme_consents").some((r) => r.enrolment_id === id),
       ).toBe(false);
@@ -677,8 +774,7 @@ describe("Enrolments and consents API (e2e)", () => {
           await call(a, "POST", "/v1/enrolments/consents", {
             enrolmentId: id,
             purpose,
-            consentVersion: "v1",
-            consentText: "Synthetic sharing wording",
+            ...SHOWN,
             ...extra,
           }),
           409,
@@ -707,8 +803,7 @@ describe("Enrolments and consents API (e2e)", () => {
           await call(a, "POST", "/v1/enrolments/consents", {
             enrolmentId,
             purpose,
-            consentVersion: "v1",
-            consentText: `Synthetic wording ${CANARY}`,
+            ...SHOWN,
           }),
           409,
           "consent_not_permitted",
@@ -799,6 +894,13 @@ describe("Enrolments and consents API (e2e)", () => {
       );
       expect(revoked.statusCode).toBe(200);
       expect(revoked.json()).toMatchObject({ id: core, purpose: "core" });
+      // Only a live row may match the revoking update.
+      const patch = fake.requests.findLast(
+        (r) => r.method === "PATCH" && r.path.endsWith("/programme_consents"),
+      );
+      const filters = new URLSearchParams(patch?.search);
+      expect(filters.get("id")).toBe(`eq.${core}`);
+      expect(filters.get("revoked_at")).toBe("is.null");
       expect(
         revoked.json<{ revokedAt: string | null }>().revokedAt,
       ).not.toBeNull();
@@ -828,24 +930,487 @@ describe("Enrolments and consents API (e2e)", () => {
       ).toHaveLength(3);
     });
 
-    it("reports reconsentRequired when the live core version is not current", async () => {
+    it("reports the current core version per locale and reconsentRequired", async () => {
       const a = newCaller();
       const old = await enrol(a, "sf", "learn_only");
       const current = await enrol(a, "be", "learn_only");
+      const currentEs = await enrol(a, "ck", "learn_only");
       const none = await enrol(a, "ea", "learn_only");
-      await grant(a, old, "core", { consentVersion: "v0" });
-      await grant(a, current, "core");
+      const legacy = await enrol(a, "nu", "learn_only");
+      const left = await enrol(a, "re", "learn_only");
+      await grant(a, old, "core");
+      await grant(a, current, "core", { consentVersion: CURRENT_CORE });
+      await grant(a, currentEs, "core", {
+        consentVersion: CURRENT_CORE_ES,
+        locale: "es",
+      });
+      // The en current version given in es is not current there.
+      const enVersionInEs = await enrol(a, "hw", "learn_only");
+      await grant(a, enVersionInEs, "core", {
+        consentVersion: CURRENT_CORE,
+        locale: "es",
+      });
+      fake.addLegacyCoreConsent(legacy, CURRENT_CORE);
+      await grant(a, left, "core");
+      expect(
+        (await call(a, "PATCH", `/v1/enrolments/${left}`, { status: "left" }))
+          .statusCode,
+      ).toBe(200);
+
       const listed = await call(a, "GET", "/v1/enrolments");
+      const body = listed.json<{
+        currentCoreConsentVersions: unknown;
+        enrolments: {
+          id: string;
+          currentCoreConsentVersion: string | null;
+          reconsentRequired: boolean;
+        }[];
+      }>();
+      expect(body.currentCoreConsentVersions).toEqual(CURRENT_VERSIONS);
       const byId = new Map(
-        listed
-          .json<{
-            enrolments: { id: string; reconsentRequired: boolean }[];
-          }>()
-          .enrolments.map((e) => [e.id, e.reconsentRequired]),
+        body.enrolments.map((e) => [
+          e.id,
+          [e.currentCoreConsentVersion, e.reconsentRequired],
+        ]),
       );
-      expect(byId.get(old)).toBe(true);
-      expect(byId.get(current)).toBe(false);
-      expect(byId.get(none)).toBe(false);
+      expect(byId.get(old)).toEqual([CURRENT_CORE, true]);
+      expect(byId.get(current)).toEqual([CURRENT_CORE, false]);
+      expect(byId.get(currentEs)).toEqual([CURRENT_CORE_ES, false]);
+      expect(byId.get(enVersionInEs)).toEqual([CURRENT_CORE_ES, true]);
+      expect(byId.get(none)).toEqual([null, false]);
+      // Stored before consent documents existed (no locale): re-consent is
+      // offered in the member's profile locale, which has a current document.
+      expect(byId.get(legacy)).toEqual([CURRENT_CORE, true]);
+      fake.setProfileLocale(a.id, "es");
+      const since = fake.requests.length;
+      const relisted = await call(a, "GET", "/v1/enrolments");
+      expect(
+        relisted
+          .json<{
+            enrolments: { id: string; currentCoreConsentVersion: unknown }[];
+          }>()
+          .enrolments.find((e) => e.id === legacy)?.currentCoreConsentVersion,
+      ).toBe(CURRENT_CORE_ES);
+      expect(
+        fake.requests
+          .slice(since)
+          .some((r) => r.method === "GET" && r.path.endsWith("/profiles")),
+      ).toBe(true);
+      expect(byId.get(left)).toEqual([CURRENT_CORE, false]);
+    });
+  });
+
+  describe("core re-consent (supersession)", () => {
+    /** An enrolment with a live core consent on v1-draft/en and reminders. */
+    const onDraft = async () => {
+      const a = newCaller();
+      const id = await enrol(a, "hw", "learn_only");
+      const core = await grant(a, id, "core");
+      const reminders = await grant(a, id, "reminders");
+      return { a, id, core, reminders };
+    };
+    const reconsent = (a: Caller, id: string, version: string, locale = "en") =>
+      call(a, "POST", "/v1/enrolments/consents", {
+        enrolmentId: id,
+        purpose: "core",
+        consentVersion: version,
+        locale,
+      });
+    const rows = (id: string) =>
+      fake.table("programme_consents").filter((r) => r.enrolment_id === id);
+
+    it("supersedes the live core through supersede_core_consent, keeping optional consents", async () => {
+      const { a, id, core, reminders } = await onDraft();
+      const since = fake.requests.length;
+      const response = await reconsent(a, id, CURRENT_CORE);
+      expect(response.statusCode).toBe(201);
+      const body = response.json<{ id: string }>();
+      expect(body).toMatchObject({
+        enrolmentId: id,
+        purpose: "core",
+        consentVersion: CURRENT_CORE,
+        locale: "en",
+        consentText: documentBody("core", CURRENT_CORE, "en"),
+        revokedAt: null,
+        supersededId: core,
+      });
+      // One function call; no direct revoke (PATCH) or insert (POST) of rows.
+      const writes = fake.requests
+        .slice(since)
+        .filter((r) => r.method !== "GET")
+        .map((r) => `${r.method} ${r.path.replace("/rest/v1/", "")}`);
+      expect(writes).toEqual(["POST rpc/supersede_core_consent"]);
+      expect(fake.requests.slice(since).at(-1)?.body).toEqual({
+        p_enrolment: id,
+        p_version: CURRENT_CORE,
+        p_locale: "en",
+      });
+      const old = rows(id).find((r) => r.id === core);
+      expect(old?.revoked_at).not.toBeNull();
+      expect(old?.superseded_by).toBe(body.id);
+      expect(rows(id).find((r) => r.id === reminders)?.revoked_at).toBeNull();
+
+      const listed = await call(a, "GET", "/v1/enrolments");
+      expect(listed.json()).toMatchObject({
+        enrolments: [
+          {
+            id,
+            currentCoreConsentVersion: CURRENT_CORE,
+            reconsentRequired: false,
+            consents: [{ id: reminders }, { id: body.id }],
+          },
+        ],
+      });
+    });
+
+    it("moves to another locale of the same version", async () => {
+      const { a, id, core } = await onDraft();
+      const response = await reconsent(a, id, "v1-draft", "es");
+      expect(response.statusCode).toBe(201);
+      expect(response.json()).toMatchObject({
+        consentVersion: "v1-draft",
+        locale: "es",
+        consentText: documentBody("core", "v1-draft", "es"),
+        supersededId: core,
+      });
+    });
+
+    it("maps TH014 to consent_version_unchanged (not later than the live one)", async () => {
+      const { a, id } = await onDraft();
+      const current = await reconsent(a, id, CURRENT_CORE);
+      expect(current.statusCode).toBe(201);
+      const before = rows(id);
+      for (const [version, locale] of [
+        ["v1-draft", "en"],
+        ["v1-draft", "es"],
+      ]) {
+        expectCoded(
+          await reconsent(a, id, version as string, locale),
+          409,
+          "consent_version_unchanged",
+        );
+      }
+      expect(rows(id)).toEqual(before);
+    });
+
+    it("maps TH011 and TH006 from the function", async () => {
+      const { a, id, core } = await onDraft();
+      expectCoded(
+        await reconsent(a, id, "v9-future"),
+        409,
+        "consent_document_unavailable",
+      );
+      fake.startAccountDeletion(a.id);
+      expectCoded(
+        await reconsent(a, id, CURRENT_CORE),
+        409,
+        "account_deletion_in_progress",
+      );
+      expect(rows(id).find((r) => r.id === core)?.revoked_at).toBeNull();
+    });
+
+    it("answers a double tap as the success it was, not core_consent_required", async () => {
+      const { a, id, core, reminders } = await onDraft();
+      let firstTap: { id: string } | undefined;
+      // The first tap commits while the second waits for the row lock; the
+      // second then finds no live core row to replace (TH004).
+      fake.interleave("POST", "rpc/supersede_core_consent", () => {
+        const [, created] = fake.supersedeCoreConsent(
+          a.id,
+          id,
+          CURRENT_CORE,
+          "en",
+        );
+        firstTap = created as { id: string };
+      });
+      fake.failNext(
+        "POST",
+        "rpc/supersede_core_consent",
+        registryError("consent_requires_core"),
+      );
+      const response = await call(a, "POST", "/v1/enrolments/consents", {
+        enrolmentId: id,
+        purpose: "core",
+        consentVersion: CURRENT_CORE,
+        locale: "en",
+      });
+      expect(response.statusCode).toBe(201);
+      expect(response.json()).toMatchObject({
+        id: firstTap?.id,
+        consentVersion: CURRENT_CORE,
+        locale: "en",
+        supersededId: core,
+      });
+      // Exactly one supersession happened.
+      const live = rows(id).filter((r) => r.revoked_at === null);
+      expect(live.map((r) => r.id).sort()).toEqual(
+        [firstTap?.id, reminders].sort(),
+      );
+      expect(rows(id).filter((r) => r.purpose === "core")).toHaveLength(2);
+    });
+
+    it("tries once more when another version became live meanwhile", async () => {
+      const { a, id } = await onDraft();
+      let meanwhile: { id: string } | undefined;
+      fake.interleave("POST", "rpc/supersede_core_consent", () => {
+        const [, created] = fake.supersedeCoreConsent(
+          a.id,
+          id,
+          "v1-draft",
+          "es",
+        );
+        meanwhile = created as { id: string };
+      });
+      fake.failNext(
+        "POST",
+        "rpc/supersede_core_consent",
+        registryError("consent_requires_core"),
+      );
+      const response = await reconsent(a, id, CURRENT_CORE);
+      expect(response.statusCode).toBe(201);
+      expect(response.json()).toMatchObject({
+        consentVersion: CURRENT_CORE,
+        locale: "en",
+        supersededId: meanwhile?.id,
+      });
+    });
+
+    it("after the retry also loses a race, answers from what is live (two calls at most)", async () => {
+      const { a, id } = await onDraft();
+      const since = fake.requests.length;
+      // Asked for v2-synthetic/en. Meanwhile the live core moves to
+      // v1-draft/es (first call: TH004), then to v3-synthetic/es, later than
+      // the requested version (retry: TH004).
+      fake.interleave("POST", "rpc/supersede_core_consent", () => {
+        fake.supersedeCoreConsent(a.id, id, "v1-draft", "es");
+      });
+      fake.failNext(
+        "POST",
+        "rpc/supersede_core_consent",
+        registryError("consent_requires_core"),
+      );
+      fake.interleave("POST", "rpc/supersede_core_consent", () => {
+        fake.supersedeCoreConsent(a.id, id, CURRENT_CORE_ES, "es");
+      });
+      fake.failNext(
+        "POST",
+        "rpc/supersede_core_consent",
+        registryError("consent_requires_core"),
+      );
+      expectCoded(
+        await reconsent(a, id, CURRENT_CORE),
+        409,
+        "consent_version_unchanged",
+      );
+      expect(
+        fake.requests
+          .slice(since)
+          .filter((r) => r.path.endsWith("/rpc/supersede_core_consent")),
+      ).toHaveLength(2);
+      const live = rows(id).filter(
+        (r) => r.purpose === "core" && r.revoked_at === null,
+      );
+      expect(live.map((r) => [r.consent_version, r.locale])).toEqual([
+        [CURRENT_CORE_ES, "es"],
+      ]);
+    });
+
+    it("refuses to revoke a superseded core id while a newer core is live", async () => {
+      const { a, id, core, reminders } = await onDraft();
+      const replacement = (await reconsent(a, id, CURRENT_CORE)).json<{
+        id: string;
+      }>().id;
+      const before = rows(id);
+      expectCoded(
+        await call(a, "PATCH", `/v1/enrolments/consents/${core}`, {
+          revoked: true,
+        }),
+        409,
+        "consent_superseded",
+      );
+      // Nothing changed: the newer core and the optional consents stay live.
+      expect(rows(id)).toEqual(before);
+      expect(
+        rows(id)
+          .filter((r) => r.revoked_at === null)
+          .map((r) => r.id)
+          .sort(),
+      ).toEqual([replacement, reminders].sort());
+      // Once the live core is revoked, the old id is simply revoked.
+      expect(
+        (
+          await call(a, "PATCH", `/v1/enrolments/consents/${replacement}`, {
+            revoked: true,
+          })
+        ).statusCode,
+      ).toBe(200);
+      expectCoded(
+        await call(a, "PATCH", `/v1/enrolments/consents/${core}`, {
+          revoked: true,
+        }),
+        409,
+        "consent_already_revoked",
+      );
+    });
+  });
+
+  describe("focus swap", () => {
+    const swap = (a: Caller, demoteId: string, promoteId: string) =>
+      call(a, "POST", "/v1/enrolments/focus-swap", { demoteId, promoteId });
+    const status = (id: string) =>
+      fake.table("enrolments").find((r) => r.id === id)?.status;
+
+    it("pauses the demoted programme and focuses the promoted one in one call", async () => {
+      const a = newCaller();
+      const bf = await enrol(a, "bf", "focus", "quit");
+      const hw = await enrol(a, "hw");
+      const st = await enrol(a, "st", "learn_only");
+      const core = await grant(a, st, "core");
+      const since = fake.requests.length;
+      const response = await swap(a, bf, st);
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toMatchObject({
+        demoted: { id: bf, status: "paused", mode: "quit", consents: [] },
+        promoted: {
+          id: st,
+          status: "focus",
+          consents: [{ id: core, purpose: "core" }],
+          currentCoreConsentVersion: CURRENT_CORE,
+          reconsentRequired: true,
+        },
+      });
+      const writes = fake.requests
+        .slice(since)
+        .filter((r) => r.method !== "GET")
+        .map((r) => `${r.method} ${r.path.replace("/rest/v1/", "")}`);
+      expect(writes).toEqual(["POST rpc/swap_focus"]);
+      expect(
+        fake.requests.slice(since).find((r) => r.method === "POST")?.body,
+      ).toEqual({ p_demote: bf, p_promote: st });
+      expect([status(bf), status(hw), status(st)]).toEqual([
+        "paused",
+        "focus",
+        "focus",
+      ]);
+    });
+
+    it("maps TH013 to focus_swap_invalid and changes nothing", async () => {
+      const a = newCaller();
+      const bf = await enrol(a, "bf");
+      const hw = await enrol(a, "hw");
+      const st = await enrol(a, "st", "paused");
+      for (const [demote, promote] of [
+        [st, bf], // demoted is not in focus
+        [bf, hw], // promoted is already in focus
+        [bf, bf], // the same enrolment
+      ]) {
+        expectCoded(
+          await swap(a, demote as string, promote as string),
+          409,
+          "focus_swap_invalid",
+        );
+      }
+      expect([status(bf), status(hw), status(st)]).toEqual([
+        "focus",
+        "focus",
+        "paused",
+      ]);
+    });
+
+    it("maps TH001, raised inside the call, to focus_cap_reached", async () => {
+      const a = newCaller();
+      const bf = await enrol(a, "bf");
+      await enrol(a, "hw");
+      const st = await enrol(a, "st", "paused");
+      const ca = await enrol(a, "ca", "paused");
+      fake.failNext(
+        "POST",
+        "rpc/swap_focus",
+        registryError("focus_cap_reached"),
+      );
+      expectCoded(await swap(a, bf, st), 409, "focus_cap_reached");
+      // The fake's own swap_focus raising it: a third programme reached focus
+      // concurrently (outside the cap), so the swap's cap check refuses.
+      fake.interleave("POST", "rpc/swap_focus", () =>
+        fake.forceEnrolmentStatus(ca, "focus"),
+      );
+      expectCoded(await swap(a, bf, st), 409, "focus_cap_reached");
+      expect([status(bf), status(st)]).toEqual(["focus", "paused"]);
+      fake.forceEnrolmentStatus(ca, "paused");
+    });
+
+    it("maps TH012 (not the caller's) and TH005 (promoting a left programme)", async () => {
+      const a = newCaller();
+      const b = newCaller();
+      const bf = await enrol(a, "bf");
+      const theirs = await enrol(b, "sf", "paused");
+      expectCoded(await swap(a, bf, theirs), 404, "enrolment_not_found");
+      expectCoded(await swap(a, bf, randomUUID()), 404, "enrolment_not_found");
+      const left = await enrol(a, "ea", "paused");
+      await call(a, "PATCH", `/v1/enrolments/${left}`, { status: "left" });
+      expectCoded(await swap(a, bf, left), 409, "enrolment_left");
+      expect([status(bf), status(theirs), status(left)]).toEqual([
+        "focus",
+        "paused",
+        "left",
+      ]);
+    });
+
+    it("accepts upper-case ids and returns both enrolments", async () => {
+      const a = newCaller();
+      const bf = await enrol(a, "bf");
+      await enrol(a, "hw");
+      const st = await enrol(a, "st", "paused");
+      const response = await swap(a, bf.toUpperCase(), st.toUpperCase());
+      expect(response.statusCode).toBe(200);
+      expectSchema(response, "FocusSwap");
+      expect(response.json()).toMatchObject({
+        demoted: { id: bf, status: "paused" },
+        promoted: { id: st, status: "focus" },
+      });
+      expect([status(bf), status(st)]).toEqual(["paused", "focus"]);
+    });
+
+    it("reads everything before the swap: a failed read changes nothing, and nothing is read after it", async () => {
+      const a = newCaller();
+      const bf = await enrol(a, "bf");
+      await enrol(a, "hw");
+      const st = await enrol(a, "st", "paused");
+      await grant(a, st, "core");
+      // (Not 503: supabase-js retries a GET on 503.)
+      fake.failNext("GET", "programme_consents", {
+        status: 500,
+        code: "XX000",
+        message: "Synthetic internal error",
+        hint: null,
+      });
+      expectUncoded(await swap(a, bf, st), 502);
+      expect([status(bf), status(st)]).toEqual(["focus", "paused"]);
+
+      const since = fake.requests.length;
+      expect((await swap(a, bf, st)).statusCode).toBe(200);
+      const requests = fake.requests.slice(since);
+      expect(requests.at(-1)?.path).toMatch(/\/rpc\/swap_focus$/);
+      expect(
+        requests.filter((r) => r.path.endsWith("/rpc/swap_focus")),
+      ).toHaveLength(1);
+    });
+
+    it.each([
+      ["a missing promoteId", { demoteId: randomUUID() }],
+      ["a non-UUID id", { demoteId: randomUUID(), promoteId: "bf" }],
+      [
+        "an unknown field",
+        { demoteId: randomUUID(), promoteId: randomUUID(), status: "focus" },
+      ],
+    ])("refuses %s (DTO whitelist)", async (_label, payload) => {
+      const a = newCaller();
+      const since = fake.requests.length;
+      expectUncoded(
+        await call(a, "POST", "/v1/enrolments/focus-swap", payload),
+        400,
+      );
+      expect(fake.requests.length).toBe(since);
     });
   });
 
@@ -962,13 +1527,77 @@ describe("Enrolments and consents API (e2e)", () => {
       expectRolledBack(id, core);
     });
 
-    // Every other TH code, raised or reserved, and one not in the registry.
-    const unmapped: PgError[] = [
-      ...DATABASE_ERRORS.filter(
-        (entry) =>
-          !["TH001", "TH002", "TH003"].includes(entry.code) &&
-          entry.messages.length > 0,
-      ).map((entry) => registryError(entry.hint)),
+    // The codes the routes that call database functions (the consent grant,
+    // including supersession, and the focus swap) map; see registryErrorFor.
+    const FUNCTION_CODES = [
+      "TH001",
+      "TH004",
+      "TH005",
+      "TH006",
+      "TH011",
+      "TH012",
+      "TH013",
+      "TH014",
+    ];
+
+    it.each([
+      ["TH001", 409, "focus_cap_reached"],
+      ["TH004", 409, "core_consent_required"],
+      ["TH005", 409, "enrolment_left"],
+      ["TH006", 409, "account_deletion_in_progress"],
+      ["TH011", 409, "consent_document_unavailable"],
+      ["TH012", 404, "enrolment_not_found"],
+      ["TH013", 409, "focus_swap_invalid"],
+      ["TH014", 409, "consent_version_unchanged"],
+    ] as const)(
+      "the consent grant and the focus swap map %s to %d %s",
+      async (code, status, token) => {
+        const { a, id, core } = await prepared();
+        const error = registryError(
+          DATABASE_ERRORS.find((entry) => entry.code === code)
+            ?.hint as DatabaseErrorHint,
+        );
+        const routes: [string, string, unknown][] = [
+          [
+            "programme_consents",
+            "/v1/enrolments/consents",
+            { enrolmentId: id, purpose: "research", ...SHOWN },
+          ],
+          [
+            "rpc/swap_focus",
+            "/v1/enrolments/focus-swap",
+            { demoteId: id, promoteId: randomUUID() },
+          ],
+        ];
+        // TH004 from the supersession is a lost race, handled by its own
+        // tests (core re-consent); the others map like any function error.
+        if (code !== "TH004") {
+          routes.push([
+            "rpc/supersede_core_consent",
+            "/v1/enrolments/consents",
+            {
+              enrolmentId: id,
+              purpose: "core",
+              consentVersion: CURRENT_CORE,
+              locale: "en",
+            },
+          ]);
+        }
+        for (const [path, url, payload] of routes) {
+          fake.failNext("POST", path, error);
+          expectCoded(await call(a, "POST", url, payload), status, token);
+          expect(fake.pendingFailures).toBe(0);
+        }
+        expectRolledBack(id, core);
+      },
+    );
+
+    // Every registry code, raised or reserved, and one not in the registry,
+    // on every route that does not map it.
+    const everyCode: PgError[] = [
+      ...DATABASE_ERRORS.filter((entry) => entry.messages.length > 0).map(
+        (entry) => registryError(entry.hint),
+      ),
       ...DATABASE_ERRORS.filter((entry) => entry.messages.length === 0).map(
         (entry) => ({
           status: 400,
@@ -985,41 +1614,89 @@ describe("Enrolments and consents API (e2e)", () => {
       },
     ];
 
-    it.each(unmapped.map((error) => [error.code, error] as const))(
-      "every route fails closed on %s without echoing it",
-      async (_code, error) => {
+    it.each(everyCode.map((error) => [error.code, error] as const))(
+      "every route that does not map %s fails closed without echoing it",
+      async (code, error) => {
         const { a, id, core } = await prepared();
-        const routes: [Method, string, string, unknown][] = [
+        // [method, path the error is injected on, route, body, codes mapped]
+        const routes: [Method, string, Method, string, unknown, string[]][] = [
+          [
+            "GET",
+            "rpc/current_consent_documents",
+            "GET",
+            "/v1/enrolments",
+            undefined,
+            [],
+          ],
           [
             "POST",
             "enrolments",
+            "POST",
             "/v1/enrolments",
             { programmeCode: "st", status: "focus" },
+            ["TH001"],
           ],
-          ["PATCH", "enrolments", `/v1/enrolments/${id}`, { status: "paused" }],
+          [
+            "PATCH",
+            "enrolments",
+            "PATCH",
+            `/v1/enrolments/${id}`,
+            { status: "paused" },
+            ["TH001", "TH002", "TH003"],
+          ],
           [
             "POST",
             "programme_consents",
+            "POST",
+            "/v1/enrolments/consents",
+            { enrolmentId: id, purpose: "research", ...SHOWN },
+            FUNCTION_CODES,
+          ],
+          [
+            "POST",
+            "rpc/supersede_core_consent",
+            "POST",
             "/v1/enrolments/consents",
             {
               enrolmentId: id,
-              purpose: "research",
-              consentVersion: "v1",
-              consentText: "Synthetic research wording",
+              purpose: "core",
+              consentVersion: CURRENT_CORE,
+              locale: "en",
             },
+            FUNCTION_CODES,
+          ],
+          [
+            "POST",
+            "rpc/swap_focus",
+            "POST",
+            "/v1/enrolments/focus-swap",
+            { demoteId: id, promoteId: randomUUID() },
+            FUNCTION_CODES,
           ],
           [
             "PATCH",
             "programme_consents",
+            "PATCH",
             `/v1/enrolments/consents/${core}`,
             { revoked: true },
+            ["TH002"],
           ],
-          ["DELETE", "enrolments", `/v1/enrolments/${id}`, DELETE_BODY],
+          [
+            "DELETE",
+            "enrolments",
+            "DELETE",
+            `/v1/enrolments/${id}`,
+            DELETE_BODY,
+            [],
+          ],
         ];
+        const failing = routes.filter(
+          ([, , , , , mapped]) => !mapped.includes(code),
+        );
         const since = logged.length;
-        for (const [method, table, url, payload] of routes) {
-          fake.failNext(method, table, error);
-          const response = await call(a, method, url, payload);
+        for (const [method, path, routeMethod, url, payload] of failing) {
+          fake.failNext(method, path, error);
+          const response = await call(a, routeMethod, url, payload);
           expectUncoded(response, 502);
           expect(fake.pendingFailures).toBe(0);
           for (const detail of [error.code, error.message, error.hint]) {
@@ -1027,7 +1704,7 @@ describe("Enrolments and consents API (e2e)", () => {
           }
         }
         expectRolledBack(id, core);
-        expectNotLogged(since, error, routes.length);
+        expectNotLogged(since, error, failing.length);
       },
     );
 
@@ -1089,6 +1766,93 @@ describe("Enrolments and consents API (e2e)", () => {
     });
   });
 
+  describe("responses match docs/contracts/openapi.yaml", () => {
+    it("every schema compiles under strict JSON Schema 2020-12", () => {
+      expect(openApiSchemaNames.length).toBeGreaterThan(10);
+      for (const name of openApiSchemaNames) {
+        expect(() => openApiErrors(name, null)).not.toThrow();
+      }
+    });
+
+    it("create, list, update, grant, supersede, swap and revoke", async () => {
+      const a = newCaller();
+      const created = await call(a, "POST", "/v1/enrolments", {
+        programmeCode: "bf",
+        status: "focus",
+        mode: "quit",
+      });
+      expect(created.statusCode).toBe(201);
+      expectSchema(created, "Enrolment");
+      const bf = created.json<{ id: string }>().id;
+      const st = await enrol(a, "st", "paused");
+
+      const granted = await call(a, "POST", "/v1/enrolments/consents", {
+        enrolmentId: st,
+        purpose: "core",
+        ...SHOWN,
+      });
+      expect(granted.statusCode).toBe(201);
+      expectSchema(granted, "GrantedProgrammeConsent");
+      const reminders = await call(a, "POST", "/v1/enrolments/consents", {
+        enrolmentId: st,
+        purpose: "reminders",
+        ...SHOWN,
+      });
+      expectSchema(reminders, "GrantedProgrammeConsent");
+
+      const superseded = await call(a, "POST", "/v1/enrolments/consents", {
+        enrolmentId: st,
+        purpose: "core",
+        consentVersion: CURRENT_CORE,
+        locale: "en",
+      });
+      expect(superseded.statusCode).toBe(201);
+      expect(superseded.json()).toMatchObject({
+        supersededId: granted.json<{ id: string }>().id,
+      });
+      expectSchema(superseded, "GrantedProgrammeConsent");
+
+      const swapped = await call(a, "POST", "/v1/enrolments/focus-swap", {
+        demoteId: bf,
+        promoteId: st,
+      });
+      expect(swapped.statusCode).toBe(200);
+      expectSchema(swapped, "FocusSwap");
+
+      const updated = await call(a, "PATCH", `/v1/enrolments/${st}`, {
+        mode: null,
+      });
+      expect(updated.statusCode).toBe(200);
+      expectSchema(updated, "Enrolment");
+
+      fake.addLegacyCoreConsent(bf, "v0");
+      const listed = await call(a, "GET", "/v1/enrolments");
+      expect(listed.statusCode).toBe(200);
+      expectSchema(listed, "EnrolmentList");
+
+      const revoked = await call(
+        a,
+        "PATCH",
+        `/v1/enrolments/consents/${reminders.json<{ id: string }>().id}`,
+        { revoked: true },
+      );
+      expect(revoked.statusCode).toBe(200);
+      expectSchema(revoked, "ProgrammeConsent");
+    });
+
+    it("error bodies", async () => {
+      const a = newCaller();
+      const coded = await call(a, "PATCH", `/v1/enrolments/${randomUUID()}`, {
+        status: "paused",
+      });
+      expect(coded.statusCode).toBe(404);
+      expectSchema(coded, "CodedRequestRejected");
+      const invalid = await call(a, "POST", "/v1/enrolments/focus-swap", {});
+      expect(invalid.statusCode).toBe(400);
+      expectSchema(invalid, "RequestRejected");
+    });
+  });
+
   describe("cross-user isolation", () => {
     it("user B cannot read, change or delete user A's enrolment or consents", async () => {
       const a = newCaller();
@@ -1102,7 +1866,7 @@ describe("Enrolments and consents API (e2e)", () => {
       const listed = await call(b, "GET", "/v1/enrolments");
       expect(listed.statusCode).toBe(200);
       expect(listed.json()).toEqual({
-        currentCoreConsentVersion: CURRENT_CORE_CONSENT_VERSION,
+        currentCoreConsentVersions: CURRENT_VERSIONS,
         enrolments: [],
       });
       expect(listed.body).not.toContain(enrolment);
@@ -1127,8 +1891,27 @@ describe("Enrolments and consents API (e2e)", () => {
         await call(b, "POST", "/v1/enrolments/consents", {
           enrolmentId: enrolment,
           purpose: "core",
-          consentVersion: "v1",
-          consentText: "Synthetic core wording",
+          ...SHOWN,
+        }),
+        404,
+        "enrolment_not_found",
+      );
+      // Nor supersede A's core consent, nor swap A's enrolment.
+      expectCoded(
+        await call(b, "POST", "/v1/enrolments/consents", {
+          enrolmentId: enrolment,
+          purpose: "core",
+          consentVersion: CURRENT_CORE,
+          locale: "en",
+        }),
+        404,
+        "enrolment_not_found",
+      );
+      const own = await enrol(b, "bf", "paused");
+      expectCoded(
+        await call(b, "POST", "/v1/enrolments/focus-swap", {
+          demoteId: enrolment,
+          promoteId: own,
         }),
         404,
         "enrolment_not_found",
@@ -1157,8 +1940,8 @@ describe("Enrolments and consents API (e2e)", () => {
       expect(forB.every((request) => request.token === b.token)).toBe(true);
 
       // A still sees everything.
-      const own = await call(a, "GET", "/v1/enrolments");
-      expect(own.json()).toMatchObject({
+      const aList = await call(a, "GET", "/v1/enrolments");
+      expect(aList.json()).toMatchObject({
         enrolments: [{ id: enrolment, consents: [{ id: core }] }],
       });
     });
@@ -1170,7 +1953,7 @@ describe("Enrolments and consents API (e2e)", () => {
     await call(a, "POST", "/v1/enrolments/consents", {
       enrolmentId: id,
       purpose: "core",
-      consentVersion: "v1",
+      ...SHOWN,
       consentText: CANARY,
       note: CANARY,
     });

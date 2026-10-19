@@ -16,6 +16,7 @@ import { EnrolmentsExceptionFilter } from "./enrolment-errors";
 import {
   CreateEnrolmentDto,
   DeleteEnrolmentDto,
+  SwapFocusDto,
   UpdateEnrolmentDto,
 } from "./enrolments.dto";
 import { EnrolmentsService } from "./enrolments.service";
@@ -34,6 +35,16 @@ export class EnrolmentsController {
   @HttpCode(201)
   create(@RequestUser() user: AuthUser, @Body() dto: CreateEnrolmentDto) {
     return this.enrolments.create(user, dto);
+  }
+
+  /**
+   * Focus swap in one transaction: the demoted enrolment becomes paused and
+   * the promoted one enters focus. Single status changes stay on PATCH.
+   */
+  @Post("focus-swap")
+  @HttpCode(200)
+  swapFocus(@RequestUser() user: AuthUser, @Body() dto: SwapFocusDto) {
+    return this.enrolments.swapFocus(user, dto);
   }
 
   @Patch(":id")

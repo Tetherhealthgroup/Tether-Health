@@ -1,11 +1,15 @@
 openapi: 3.1.0
 info:
   title: Tether Health API
-  version: 1.4.0
+  version: 1.5.0
   description: >-
     Development contract for authenticated profiles and bounded program data.
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
+    Changed in 1.5.0 (breaking for the list response): `GET /v1/enrolments`
+    returns `currentCoreConsentVersions` (one version per locale) instead of
+    the single `currentCoreConsentVersion` string, which moved onto each
+    enrolment. The API is pre-release and nothing consumed the old field.
 servers:
   - url: https://api.example.invalid
 paths:
@@ -202,7 +206,9 @@ paths:
         live programme consents (revoked_at is null). Revoked consent history
         is not provided by this endpoint. Only the caller's own rows are
         visible (row-level security). If the full list cannot be returned the
-        request fails with 502 rather than returning part of it.
+        request fails with 502 rather than returning part of it. The current
+        core consent version per locale comes from the database's consent
+        documents (`current_consent_documents()`).
       security: [{supabaseJwt: []}]
       responses:
         '200':
@@ -211,7 +217,7 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/EnrolmentList'}
         '401': {$ref: '#/components/responses/Unauthorized'}
-        '502': {description: Enrolment storage is temporarily unavailable, or the list could not be returned in full}
+        '502': {description: 'Enrolment storage or the consent documents are temporarily unavailable, or the list could not be returned in full'}
     post:
       operationId: enrolInProgramme
       description: >-
@@ -262,9 +268,10 @@ paths:
         Changes status and/or mode. Setting `left` keeps the enrolment and its
         data until "Delete now" or account deletion, and revokes every live
         consent except core. Changing `left` to another status rejoins on the
-        same enrolment; optional consents must be granted again. A focus swap
-        is two requests: first move one enrolment out of focus, then move the
-        other into focus.
+        same enrolment; optional consents must be granted again. This is for
+        single changes; to move one programme out of focus and another in,
+        use `POST /v1/enrolments/focus-swap`, which does both in one
+        transaction.
       security: [{supabaseJwt: []}]
       requestBody:
         required: true
@@ -296,7 +303,7 @@ paths:
           content:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
-        '502': {description: Enrolment storage is temporarily unavailable}
+        '502': {description: Enrolment storage or the consent documents are temporarily unavailable}
     delete:
       operationId: deleteMyEnrolmentNow
       summary: Delete the enrolment row, its consents and its cascaded sync data (not yet for app use)
@@ -345,18 +352,94 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
         '502': {description: Deletion did not complete}
+  /v1/enrolments/focus-swap:
+    post:
+      operationId: swapMyFocus
+      description: >-
+        Moves one of the caller's enrolments out of focus and another into
+        focus in one database transaction (`swap_focus`): the demoted
+        enrolment becomes `paused` (its data is kept) and the promoted one
+        becomes `focus`. Either both change or neither does. The focus cap
+        of two is checked inside the call. Everything else in the response
+        is read before the swap and nothing is read after it, so a failed
+        read cannot report a committed swap as failed. Single status changes stay on
+        `PATCH /v1/enrolments/{enrolmentId}`.
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SwapFocus'}
+      responses:
+        '200':
+          description: Both enrolments after the swap, with their live consents
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/FocusSwap'}
+        '400':
+          description: Invalid body
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RequestRejected'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404':
+          description: '`enrolment_not_found`: either enrolment does not exist or is not the caller''s'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '409':
+          description: >-
+            `focus_swap_invalid` (the enrolment to demote is not in focus, the
+            one to promote is already in focus, or both ids are the same),
+            `enrolment_left` (the enrolment to promote has been left) or
+            `focus_cap_reached`. Nothing was changed.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '502': {description: 'Enrolment storage is temporarily unavailable, or the database refused the swap for a reason the caller cannot fix'}
   /v1/enrolments/consents:
     post:
       operationId: grantProgrammeConsent
       description: >-
-        Records a consent on one of the caller's enrolments, keeping the
-        version and wording exactly as supplied. Any purpose other than core
-        needs the enrolment's live core consent. A second live grant of the
-        same purpose and recipient is refused with `consent_already_granted`
-        (409) and the existing row is unchanged; to record new wording, revoke
-        and grant again. The share purposes (share_care_team,
-        share_caregiver) are refused with `sharing_not_available` (409) until
-        care connections exist.
+        Records a consent on one of the caller's enrolments for the consent
+        document the app showed, named by `consentVersion` and `locale`. The
+        database copies that document's text into the consent; the API never
+        accepts consent text and never substitutes a version of its own. A
+        version that is unknown, not yet in effect or retired for that
+        purpose and locale is refused with `consent_document_unavailable`.
+        Any purpose other than core needs the enrolment's live core consent.
+        A second grant of the same purpose and recipient while one is live
+        is refused with `consent_already_granted` (409) and the existing row
+        is unchanged; for core this applies when the live core consent is
+        for the same version and locale. Clients can treat it as already
+        done. Two first grants of core racing each other (no core live
+        before either) also answer the loser with `consent_already_granted`,
+        whichever version it asked for; the winner's row is the live one.
+
+        Core re-consent: a core grant on an enrolment whose live core
+        consent is for another version or locale supersedes it in one
+        transaction (`supersede_core_consent`). The new row is returned with
+        `supersededId` set to the replaced row, which is kept as revoked
+        history. Optional consents stay live (unless the database's
+        documents mark the versions passed over as revoking them). The new
+        version must be later than the live one, or the same version in
+        another locale; otherwise `consent_version_unchanged` (409).
+
+        Repeating a core re-consent (for example a double tap) has two
+        possible answers, both meaning the consent is in place: if the
+        first request finished before the repeat was received, the repeat
+        is a grant of the live version and locale and gets
+        `consent_already_granted` (409); if the repeat raced the first and
+        lost, it is answered as the first's success (201) with the live row
+        and its `supersededId`. If a different core consent became live
+        meanwhile, the supersession is tried once more; if that also loses
+        a race, the answer follows what is then live: 201 if it is the
+        requested version and locale, `consent_version_unchanged` if it is
+        on the requested version or a later one, otherwise
+        `core_consent_required`.
+
+        The share purposes (share_care_team, share_caregiver) are refused
+        with `sharing_not_available` (409) until care connections exist.
       security: [{supabaseJwt: []}]
       requestBody:
         required: true
@@ -365,12 +448,14 @@ paths:
             schema: {$ref: '#/components/schemas/GrantConsent'}
       responses:
         '201':
-          description: Recorded consent
+          description: >-
+            Recorded consent, with `supersededId` set when it replaced a core
+            consent (null otherwise)
           content:
             application/json:
-              schema: {$ref: '#/components/schemas/ProgrammeConsent'}
+              schema: {$ref: '#/components/schemas/GrantedProgrammeConsent'}
         '400':
-          description: Invalid body
+          description: Invalid body, including any `consentText` field
           content:
             application/json:
               schema: {$ref: '#/components/schemas/RequestRejected'}
@@ -381,11 +466,18 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
         '409':
-          description: '`sharing_not_available`, `enrolment_left`, `core_consent_required`, `consent_already_granted` or `consent_not_permitted` (for example after account deletion started)'
+          description: >-
+            `sharing_not_available`, `enrolment_left`, `core_consent_required`,
+            `consent_already_granted`, `consent_not_permitted` (for example
+            after account deletion started), `consent_document_unavailable`
+            (no grantable document for that purpose, version and locale), and
+            for core re-consent `consent_version_unchanged` (not later than
+            the live version) or `account_deletion_in_progress` (account
+            deletion has started)
           content:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
-        '502': {description: Consent storage is temporarily unavailable}
+        '502': {description: 'Consent storage is temporarily unavailable, or the database refused the consent for a reason the caller cannot fix'}
   /v1/enrolments/consents/{consentId}:
     parameters:
       - name: consentId
@@ -397,7 +489,11 @@ paths:
       description: >-
         Revokes a live consent (the only permitted change). The database sets
         the revocation time. Revoking core revokes every live consent of the
-        enrolment.
+        enrolment. A core consent that was superseded by a newer core
+        consent which is still live is refused with `consent_superseded`
+        (409) and nothing changes: the member's core consent is live under
+        the newer id, so re-read the enrolment and revoke that id. The API
+        never revokes a row other than the one named.
       security: [{supabaseJwt: []}]
       requestBody:
         required: true
@@ -427,7 +523,7 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
         '409':
-          description: '`consent_already_revoked`'
+          description: '`consent_already_revoked`, or `consent_superseded` (a superseded core consent while its replacement is live)'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
@@ -637,7 +733,11 @@ components:
             - consent_already_granted
             - consent_not_found
             - consent_already_revoked
+            - consent_superseded
             - consent_not_permitted
+            - consent_document_unavailable
+            - consent_version_unchanged
+            - focus_swap_invalid
             - sharing_not_available
             - confirmation_required
             - recent_authentication_required
@@ -687,10 +787,11 @@ components:
     ConsentPurpose:
       type: string
       enum: [core, reminders, records_import, share_care_team, share_caregiver, research, screen_time]
+    ConsentLocale: {type: string, enum: [en, es]}
     GrantConsent:
       type: object
       additionalProperties: false
-      required: [enrolmentId, purpose, consentVersion, consentText]
+      required: [enrolmentId, purpose, consentVersion, locale]
       properties:
         enrolmentId: {type: string, format: uuid}
         purpose: {$ref: '#/components/schemas/ConsentPurpose'}
@@ -700,29 +801,66 @@ components:
           description: >-
             Care connection or caregiver id for share purposes only. Share
             purposes are not accepted yet, so any value is currently refused.
-        consentVersion: {type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$'}
-        consentText:
+        consentVersion:
           type: string
-          minLength: 1
-          maxLength: 8000
-          description: The wording shown to the member, stored exactly as supplied.
-    ProgrammeConsent:
+          pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$'
+          description: The version of the consent document the app showed.
+        locale:
+          $ref: '#/components/schemas/ConsentLocale'
+          description: The locale of the consent document the app showed.
+    ProgrammeConsentFields:
       type: object
-      additionalProperties: false
-      required: [id, enrolmentId, purpose, recipientRef, consentVersion, consentText, grantedAt, revokedAt]
+      required: [id, enrolmentId, purpose, recipientRef, consentVersion, locale, consentText, grantedAt, revokedAt]
       properties:
         id: {type: string, format: uuid}
         enrolmentId: {type: string, format: uuid}
         purpose: {$ref: '#/components/schemas/ConsentPurpose'}
         recipientRef: {type: [string, 'null']}
         consentVersion: {type: string}
-        consentText: {type: string}
+        locale:
+          type: [string, 'null']
+          enum: [en, es, null]
+          description: Null only on consents stored before consent documents existed.
+        consentText:
+          type: string
+          description: The text of the consent document, as the database stored it with the consent.
         grantedAt: {type: string, format: date-time}
         revokedAt: {type: [string, 'null'], format: date-time}
+    ProgrammeConsent:
+      allOf:
+        - {$ref: '#/components/schemas/ProgrammeConsentFields'}
+      unevaluatedProperties: false
+    GrantedProgrammeConsent:
+      allOf:
+        - {$ref: '#/components/schemas/ProgrammeConsentFields'}
+        - type: object
+          required: [supersededId]
+          properties:
+            supersededId:
+              type: [string, 'null']
+              format: uuid
+              description: >-
+                The core consent this grant superseded (now revoked history);
+                null when nothing was superseded.
+      unevaluatedProperties: false
+    SwapFocus:
+      type: object
+      additionalProperties: false
+      required: [demoteId, promoteId]
+      properties:
+        demoteId: {type: string, format: uuid, description: The enrolment leaving focus; it becomes paused.}
+        promoteId: {type: string, format: uuid, description: The enrolment entering focus.}
+    FocusSwap:
+      type: object
+      additionalProperties: false
+      required: [demoted, promoted]
+      properties:
+        demoted: {$ref: '#/components/schemas/Enrolment'}
+        promoted: {$ref: '#/components/schemas/Enrolment'}
     Enrolment:
       type: object
       additionalProperties: false
-      required: [id, programmeCode, status, mode, joinedAt, leftAt, createdAt, updatedAt, consents, reconsentRequired]
+      required: [id, programmeCode, status, mode, joinedAt, leftAt, createdAt, updatedAt, consents, currentCoreConsentVersion, reconsentRequired]
       properties:
         id: {type: string, format: uuid}
         programmeCode: {type: string, pattern: '^[a-z]{2}$'}
@@ -738,17 +876,37 @@ components:
             Live consents of this enrolment (revoked_at is null), oldest
             first. Revoked history is not included.
           items: {$ref: '#/components/schemas/ProgrammeConsent'}
+        currentCoreConsentVersion:
+          type: [string, 'null']
+          description: >-
+            The current core consent document version for the locale of the
+            live core consent; for a live core consent stored before consent
+            documents existed (no locale), for the member's profile locale.
+            Null when there is no live core consent, or when no core document
+            is current for that locale.
         reconsentRequired:
           type: boolean
           description: >-
-            True when the enrolment is not left and its live core consent was
-            given to a version other than `currentCoreConsentVersion`.
+            True only when re-consent can be completed: the enrolment is not
+            left, has a live core consent, `currentCoreConsentVersion` is not
+            null, and the live consent is not on it. A live core consent
+            stored before consent documents existed (no locale) is never on a
+            document, so it is true whenever a core document is current for
+            the member's profile locale.
+    CoreConsentVersions:
+      type: object
+      additionalProperties: false
+      required: [en, es]
+      description: The current core consent document version per locale; null when none is current.
+      properties:
+        en: {type: [string, 'null']}
+        es: {type: [string, 'null']}
     EnrolmentList:
       type: object
       additionalProperties: false
-      required: [currentCoreConsentVersion, enrolments]
+      required: [currentCoreConsentVersions, enrolments]
       properties:
-        currentCoreConsentVersion: {type: string}
+        currentCoreConsentVersions: {$ref: '#/components/schemas/CoreConsentVersions'}
         enrolments:
           type: array
           items: {$ref: '#/components/schemas/Enrolment'}

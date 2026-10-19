@@ -3,21 +3,32 @@ import { databaseError, type DatabaseErrorHint } from "./database-errors";
 
 /**
  * In-memory stand-in for PostgREST over the TH-913 schema
- * (supabase/migrations/202610170002_enrolments.sql), used as the `fetch` of
- * the real supabase-js client in e2e tests.
+ * (supabase/migrations/202610170002_enrolments.sql) and its TH-972b
+ * follow-ups (supabase/migrations/202610180003_enrolment_consent_followups.sql),
+ * used as the `fetch` of the real supabase-js client in e2e tests.
  *
  * What it emulates, per request (one request = one transaction):
  * - identity from the request's own bearer token only (like auth.uid());
- * - the RLS policies of programmes, enrolments and programme_consents
+ * - the RLS policies of profiles (read own row), programmes, enrolments and programme_consents
  *   (select/insert/update/delete), including the insert checks
  *   (deletion barrier, enrolment not left, live core consent);
- * - the column grants (insert/update column lists; no delete on consents);
+ * - the column grants (insert/update column lists; no delete on consents;
+ *   consent_text is not insertable, so sending it is refused with 42501);
+ * - consent documents: a seeded, read-only table (CONSENT_DOCUMENTS); a
+ *   consent insert takes its text from the grantable document for its
+ *   purpose, version and locale, or fails with TH011 (consent_fill_text);
  * - check, foreign-key and unique constraints, including the live-row unique
  *   index on consents;
  * - the triggers: left_at management, revoke-only consents, core revocation
  *   cascade, revoke-on-leave, the deferred focus cap of two, and the
  *   delete cascade from enrolments to consents;
- * - the deletion_barrier_open() RPC;
+ * - the RPCs deletion_barrier_open(), current_consent_documents(),
+ *   swap_focus() (focus cap checked inside the call, TH001) and
+ *   supersede_core_consent() (TH004/5/6/11/12/14, superseded_by set, the
+ *   optional consents left live). The supersession's optional-consent
+ *   cascade is not emulated: no seeded document sets cascades_optional;
+ * - a concurrent transaction committing just before a request
+ *   (interleave), e.g. a first tap's supersession;
  * - error bodies: standard SQLSTATEs for constraints and RLS, and the
  *   database's own `TH` codes with the registry's exact message and hint
  *   (test/support/database-errors.ts), answered as HTTP 400 the way
@@ -25,7 +36,9 @@ import { databaseError, type DatabaseErrorHint } from "./database-errors";
  *
  * It is not Postgres: it implements only the filters and headers the API
  * sends (eq, is.null, in, order, limit, select, Prefer return=representation,
- * single-object Accept). The real RLS is tested in SQL by TH-913.
+ * single-object Accept). There are no snapshots or lock waits; a request
+ * that Postgres would refuse after a lock wait is emulated with interleave
+ * plus failNext. The real RLS is tested in SQL by TH-913 and TH-972b.
  */
 
 type Row = Record<string, unknown>;
@@ -35,6 +48,17 @@ interface State {
   programmes: Row[];
   enrolments: Row[];
   programme_consents: Row[];
+  consent_documents: Row[];
+}
+
+export interface ConsentDocument {
+  purpose: string;
+  version: string;
+  locale: "en" | "es";
+  body: string;
+  effective_from: string;
+  retired_at: string | null;
+  cascades_optional: boolean;
 }
 
 export interface PgError {
@@ -48,6 +72,10 @@ export interface RecordedRequest {
   method: string;
   path: string;
   token: string | null;
+  /** The query string as sent (filters, select), e.g. "?id=eq.…". */
+  search: string;
+  /** The parsed JSON body as sent, if any. */
+  body: unknown;
 }
 
 /**
@@ -70,6 +98,54 @@ const PURPOSES = [
 ];
 const SHARE = ["share_care_team", "share_caregiver"];
 const VERSION = /^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$/;
+const LOCALES = ["en", "es"];
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** The fake's clock starts here (see `now()`). */
+const START = "2026-10-18T09:00:00.000Z";
+const document = (
+  purpose: string,
+  version: string,
+  locale: "en" | "es",
+  effectiveFrom: string,
+  retiredAt: string | null = null,
+): ConsentDocument => ({
+  purpose,
+  version,
+  locale,
+  body: `Synthetic ${purpose} ${version} ${locale} document`,
+  effective_from: effectiveFrom,
+  retired_at: retiredAt,
+  cascades_optional: false,
+});
+
+/**
+ * The seeded consent documents, relative to START: `v1-draft` for every
+ * programme purpose in en and es (as the migration seeds), a later core
+ * `v2-synthetic` in both locales, a still later core `v3-synthetic` in es
+ * only (so the current core version is v2-synthetic in en and v3-synthetic
+ * in es, and a locale mix-up shows), a retired core `v0-retired` and a
+ * not-yet-effective core `v9-future` (both en; neither is grantable or
+ * current).
+ */
+export const CONSENT_DOCUMENTS: readonly ConsentDocument[] = [
+  ...PURPOSES.flatMap((purpose) =>
+    (["en", "es"] as const).map((locale) =>
+      document(purpose, "v1-draft", locale, "2026-10-18T00:00:00.000Z"),
+    ),
+  ),
+  document("core", "v2-synthetic", "en", "2026-10-18T06:00:00.000Z"),
+  document("core", "v2-synthetic", "es", "2026-10-18T06:00:00.000Z"),
+  document("core", "v3-synthetic", "es", "2026-10-18T07:00:00.000Z"),
+  document(
+    "core",
+    "v0-retired",
+    "en",
+    "2026-10-17T00:00:00.000Z",
+    "2026-10-18T00:00:00.000Z",
+  ),
+  document("core", "v9-future", "en", "2027-01-01T00:00:00.000Z"),
+];
 
 const INSERT_GRANTS: Record<string, string[]> = {
   enrolments: ["user_id", "programme_code", "status", "mode"],
@@ -78,12 +154,12 @@ const INSERT_GRANTS: Record<string, string[]> = {
     "purpose",
     "recipient_ref",
     "consent_version",
-    "consent_text",
+    "locale",
   ],
 };
 const UPDATE_GRANTS: Record<string, string[]> = {
   enrolments: ["status", "mode"],
-  programme_consents: ["revoked_at"],
+  programme_consents: ["revoked_at", "superseded_by"],
 };
 const DELETE_GRANTS = ["enrolments"];
 
@@ -182,7 +258,9 @@ export class FakePostgrest {
   maxRows: number | null = null;
   private readonly tokens = new Map<string, string>();
   private injected: { method: string; table: string; error: PgError }[] = [];
-  private clock = Date.parse("2026-10-18T09:00:00.000Z");
+  private interleaved: { method: string; path: string; action: () => void }[] =
+    [];
+  private clock = Date.parse(START);
   private state: State = {
     profiles: [],
     programmes: PROGRAMMES.map(
@@ -197,12 +275,23 @@ export class FakePostgrest {
     ),
     enrolments: [],
     programme_consents: [],
+    consent_documents: CONSENT_DOCUMENTS.map((row) => ({ ...row })),
   };
 
   /** Registers a synthetic user whose JWT is `token`, with a profile row. */
   addUser(token: string, userId: string): void {
     this.tokens.set(token, userId);
-    this.state.profiles.push({ id: userId, account_deletion_started_at: null });
+    this.state.profiles.push({
+      id: userId,
+      locale: "en",
+      account_deletion_started_at: null,
+    });
+  }
+
+  /** Superuser write of a profile's locale (profiles.locale, en or es). */
+  setProfileLocale(userId: string, locale: "en" | "es"): void {
+    const profile = this.state.profiles.find((row) => row.id === userId);
+    if (profile) profile.locale = locale;
   }
 
   startAccountDeletion(userId: string): void {
@@ -219,14 +308,70 @@ export class FakePostgrest {
     this.injected.push({ method, table, error });
   }
 
-  /** Injected failures that no request has consumed yet. */
-  get pendingFailures(): number {
-    return this.injected.length;
+  /**
+   * Runs `action` just before the next `method` request on `path` (a table,
+   * or `rpc/<function>`), as a concurrent transaction that has already
+   * committed: its changes stay even if that request fails.
+   */
+  interleave(method: string, path: string, action: () => void): void {
+    this.interleaved.push({ method, path, action });
   }
 
-  /** Drops injected failures that no request consumed. */
+  /** Injected failures and interleaved actions not yet consumed. */
+  get pendingFailures(): number {
+    return this.injected.length + this.interleaved.length;
+  }
+
+  /** Drops injected failures and interleaved actions not consumed. */
   clearFailures(): void {
     this.injected = [];
+    this.interleaved = [];
+  }
+
+  /**
+   * Superuser insert of a live core consent stored before consent documents
+   * existed (null locale, its own text).
+   */
+  addLegacyCoreConsent(enrolmentId: string, version: string): string {
+    const id = randomUUID();
+    this.state.programme_consents.push({
+      id,
+      enrolment_id: enrolmentId,
+      purpose: "core",
+      recipient_ref: null,
+      consent_version: version,
+      locale: null,
+      consent_text: "Synthetic legacy core wording",
+      granted_at: this.now(),
+      revoked_at: null,
+      superseded_by: null,
+    });
+    return id;
+  }
+
+  /** Superuser write of an enrolment's status: no RLS, triggers or cap. */
+  forceEnrolmentStatus(enrolmentId: string, status: string): void {
+    const row = this.state.enrolments.find((r) => r.id === enrolmentId);
+    if (row) row.status = status;
+  }
+
+  /**
+   * public.supersede_core_consent() as `userId`, outside any request (for
+   * a concurrent transaction in interleave). Throws on refusal.
+   */
+  supersedeCoreConsent(
+    userId: string,
+    enrolmentId: string,
+    version: string,
+    locale: string,
+  ): Row[] {
+    return structuredClone(
+      this.supersede(userId, {
+        p_enrolment: enrolmentId,
+        p_version: version,
+        p_locale: locale,
+      }),
+    );
   }
 
   /** Superuser view for assertions (bypasses RLS). */
@@ -252,12 +397,33 @@ export class FakePostgrest {
     const method = (init?.method ?? "GET").toUpperCase();
     const auth = headers.get("authorization");
     const token = auth?.startsWith("Bearer ") ? auth.slice(7) : null;
-    this.requests.push({ method, path: url.pathname, token });
+    this.requests.push({
+      method,
+      path: url.pathname,
+      token,
+      search: url.search,
+      body:
+        typeof init?.body === "string"
+          ? (JSON.parse(init.body) as unknown)
+          : undefined,
+    });
 
     const uid = token ? this.tokens.get(token) : undefined;
     const countExact = (headers.get("prefer") ?? "").includes("count=exact");
     if (!uid)
       return this.respond(401, { code: "PGRST301", message: "JWT invalid" });
+
+    // A concurrent transaction commits first, outside this request's.
+    const path = url.pathname.replace(/^\/rest\/v1\//, "");
+    const concurrent = this.interleaved.find(
+      (entry) => entry.method === method && entry.path === path,
+    );
+    if (concurrent) {
+      this.interleaved = this.interleaved.filter(
+        (entry) => entry !== concurrent,
+      );
+      concurrent.action();
+    }
 
     const snapshot = structuredClone(this.state);
     try {
@@ -302,20 +468,28 @@ export class FakePostgrest {
     body: unknown,
   ): { status: number; body: unknown; total?: number } {
     const path = url.pathname.replace(/^\/rest\/v1\//, "");
-    if (path === "rpc/deletion_barrier_open" && method === "POST") {
-      return { status: 200, body: this.barrierOpen(uid) };
-    }
-    if (!["programmes", "enrolments", "programme_consents"].includes(path)) {
-      return fail(404, "PGRST205", "Table not found");
-    }
-    const table = path as keyof State;
     const injected = this.injected.find(
-      (entry) => entry.method === method && entry.table === table,
+      (entry) => entry.method === method && entry.table === path,
     );
     if (injected) {
       this.injected = this.injected.filter((entry) => entry !== injected);
       throw new PgFailure(injected.error);
     }
+    if (path.startsWith("rpc/")) {
+      return this.rpc(uid, method, path.slice(4), url, body);
+    }
+    if (
+      ![
+        "profiles",
+        "programmes",
+        "enrolments",
+        "programme_consents",
+        "consent_documents",
+      ].includes(path)
+    ) {
+      return fail(404, "PGRST205", "Table not found");
+    }
+    const table = path as keyof State;
     let rows: Row[];
     let status = 200;
     if (method === "GET") {
@@ -331,7 +505,7 @@ export class FakePostgrest {
     } else {
       return fail(405, "PGRST117", "Unsupported method");
     }
-    if (method !== "GET") this.deferredChecks();
+    if (method !== "GET") this.deferredChecks(uid);
 
     const representation =
       method === "GET" ||
@@ -364,10 +538,184 @@ export class FakePostgrest {
     return { status, body: projected, total };
   }
 
+  // ---- RPCs ---------------------------------------------------------------
+
+  private rpc(
+    uid: string,
+    method: string,
+    name: string,
+    url: URL,
+    body: unknown,
+  ): { status: number; body: unknown } {
+    // Arguments typed uuid compare case-insensitively in Postgres and come
+    // back in lower case; the fake stores ids in lower case.
+    const args = Object.fromEntries(
+      Object.entries((body ?? {}) as Row).map(([name, value]) => [
+        name,
+        typeof value === "string" && UUID.test(value)
+          ? value.toLowerCase()
+          : value,
+      ]),
+    );
+    const answer = (rows: Row[]) => ({
+      status: 200,
+      body: rows.map((row) => this.project(row, url)),
+    });
+    if (name === "deletion_barrier_open" && method === "POST") {
+      return { status: 200, body: this.barrierOpen(uid) };
+    }
+    // stable: callable with GET (filters in the query string) or POST.
+    if (name === "current_consent_documents" && method !== "DELETE") {
+      return answer(this.filter(this.currentDocuments(), url));
+    }
+    if (name === "swap_focus" && method === "POST") {
+      const rows = this.swap(uid, args);
+      this.deferredChecks(uid);
+      return answer(rows);
+    }
+    if (name === "supersede_core_consent" && method === "POST") {
+      const rows = this.supersede(uid, args);
+      this.deferredChecks(uid);
+      return answer(rows);
+    }
+    return fail(404, "PGRST202", "Could not find the function");
+  }
+
+  /** The grantable document: effective and not retired. */
+  private grantable(purpose: unknown, version: unknown, locale: unknown) {
+    const at = this.clock;
+    return this.state.consent_documents.find(
+      (doc) =>
+        doc.purpose === purpose &&
+        doc.version === version &&
+        doc.locale === locale &&
+        Date.parse(doc.effective_from as string) <= at &&
+        (doc.retired_at === null || Date.parse(doc.retired_at as string) > at),
+    );
+  }
+
+  /** current_consent_documents(): latest grantable per purpose and locale. */
+  private currentDocuments(): Row[] {
+    const current = new Map<string, Row>();
+    for (const doc of this.state.consent_documents) {
+      if (!this.grantable(doc.purpose, doc.version, doc.locale)) continue;
+      const key = `${text(doc.purpose)}/${text(doc.locale)}`;
+      const best = current.get(key);
+      const later =
+        !best ||
+        Date.parse(doc.effective_from as string) >
+          Date.parse(best.effective_from as string) ||
+        (doc.effective_from === best.effective_from &&
+          text(doc.version) > text(best.version));
+      if (later) current.set(key, doc);
+    }
+    return [...current.values()];
+  }
+
+  /** public.swap_focus(p_demote, p_promote). */
+  private swap(uid: string, args: Row): Row[] {
+    const { p_demote: demoteId, p_promote: promoteId } = args;
+    if (!demoteId || !promoteId || demoteId === promoteId) {
+      raise("focus_swap_invalid");
+    }
+    const own = (id: unknown) =>
+      this.state.enrolments.find((row) => row.id === id && row.user_id === uid);
+    const demote = own(demoteId);
+    const promote = own(promoteId);
+    if (!demote || !promote) return raise("enrolment_not_found");
+    if (promote.status === "left") raise("enrolment_left");
+    if (demote.status !== "focus" || promote.status === "focus") {
+      raise("focus_swap_invalid");
+    }
+    demote.status = "paused";
+    demote.updated_at = this.now();
+    promote.status = "focus";
+    promote.updated_at = this.now();
+    // The function checks the focus cap before it returns.
+    this.deferredChecks(uid);
+    return [demote, promote];
+  }
+
+  /** public.supersede_core_consent(p_enrolment, p_version, p_locale). */
+  private supersede(uid: string, args: Row): Row[] {
+    const { p_enrolment: enrolmentId, p_version, p_locale } = args;
+    const enrolment = this.state.enrolments.find(
+      (row) => row.id === enrolmentId && row.user_id === uid,
+    );
+    if (!enrolment) return raise("enrolment_not_found");
+    if (enrolment.status === "left") raise("enrolment_left");
+    if (!this.barrierOpen(uid)) raise("deletion_in_progress");
+    const old = this.state.programme_consents.find(
+      (row) =>
+        row.enrolment_id === enrolmentId &&
+        row.purpose === "core" &&
+        row.revoked_at === null,
+    );
+    if (!old) return raise("consent_requires_core");
+    if (!this.grantable("core", p_version, p_locale)) {
+      raise("consent_document_unavailable");
+    }
+    // The one-live-core key is deferred inside the function.
+    const replacement = this.insert(
+      uid,
+      "programme_consents",
+      {
+        enrolment_id: enrolmentId,
+        purpose: "core",
+        consent_version: p_version,
+        locale: p_locale,
+      },
+      { deferLiveCore: true },
+    );
+    this.checkSupersede(old, replacement);
+    old.revoked_at = this.now();
+    old.superseded_by = replacement.id;
+    return [old, replacement];
+  }
+
+  /** programme_consents_check_supersede: later version, or other locale. */
+  private checkSupersede(old: Row, replacement: Row): void {
+    const unchanged = () => raise("consent_version_unchanged");
+    if (
+      old.locale !== null &&
+      replacement.consent_version === old.consent_version
+    ) {
+      if (replacement.locale === old.locale) unchanged();
+      return;
+    }
+    const effective = (row: Row) =>
+      this.state.consent_documents.find(
+        (doc) =>
+          doc.purpose === "core" &&
+          doc.version === row.consent_version &&
+          doc.locale === row.locale,
+      )?.effective_from as string | undefined;
+    const oldEffective =
+      old.locale === null ? -Infinity : Date.parse(effective(old) ?? "");
+    const newEffective = Date.parse(effective(replacement) ?? "");
+    if (
+      Number.isNaN(oldEffective) ||
+      Number.isNaN(newEffective) ||
+      newEffective <= oldEffective
+    ) {
+      unchanged();
+    }
+  }
+
   // ---- RLS: USING clauses -------------------------------------------------
 
   private visible(uid: string, table: keyof State): Row[] {
     if (table === "programmes") return this.state.programmes;
+    // Documents already in effect (consent_documents_select); no writes.
+    if (table === "consent_documents") {
+      return this.state.consent_documents.filter(
+        (doc) => Date.parse(doc.effective_from as string) <= this.clock,
+      );
+    }
+    // Own row only; the API reads it, never writes it (no grants here).
+    if (table === "profiles") {
+      return this.state.profiles.filter((row) => row.id === uid);
+    }
     if (table === "enrolments") {
       return this.state.enrolments.filter((row) => row.user_id === uid);
     }
@@ -384,7 +732,12 @@ export class FakePostgrest {
 
   // ---- writes -------------------------------------------------------------
 
-  private insert(uid: string, table: keyof State, value: Row): Row {
+  private insert(
+    uid: string,
+    table: keyof State,
+    value: Row,
+    { deferLiveCore = false } = {},
+  ): Row {
     const granted = INSERT_GRANTS[table];
     if (
       !granted ||
@@ -404,19 +757,11 @@ export class FakePostgrest {
         created_at: this.now(),
         updated_at: this.now(),
       };
-      this.checkEnrolment(row);
-      if (
-        !this.state.programmes.some(
-          (programme) => programme.code === row.programme_code,
-        )
-      ) {
-        fail(
-          409,
-          "23503",
-          'insert or update on table "enrolments" violates foreign key constraint',
-        );
-      }
+      // Postgres executor order: RLS WITH CHECK, then CHECK constraints,
+      // then unique indexes (on insertion), then foreign keys (an after
+      // trigger at the end of the statement).
       if (row.user_id !== uid || !this.barrierOpen(uid)) rlsViolation(table);
+      this.checkEnrolment(row);
       if (
         this.state.enrolments.some(
           (other) =>
@@ -430,21 +775,56 @@ export class FakePostgrest {
           'duplicate key value violates unique constraint "enrolments_user_programme_key"',
         );
       }
+      if (
+        !this.state.programmes.some(
+          (programme) => programme.code === row.programme_code,
+        )
+      ) {
+        fail(
+          409,
+          "23503",
+          'insert or update on table "enrolments" violates foreign key constraint',
+        );
+      }
       this.state.enrolments.push(row);
       return row;
     }
+    // consent_fill_text (before insert): the text comes from the document.
+    const doc = this.grantable(
+      value.purpose,
+      value.consent_version,
+      value.locale ?? null,
+    );
+    if (!doc) raise("consent_document_unavailable");
     const row: Row = {
       id: randomUUID(),
       enrolment_id: value.enrolment_id,
       purpose: value.purpose,
       recipient_ref: value.recipient_ref ?? null,
       consent_version: value.consent_version,
-      consent_text: value.consent_text,
+      locale: value.locale ?? null,
+      consent_text: doc?.body,
       granted_at: this.now(),
       revoked_at: null,
+      superseded_by: null,
     };
     const purpose = row.purpose as string;
     const recipient = row.recipient_ref as string | null;
+    // After the before-insert trigger: RLS WITH CHECK, then CHECK
+    // constraints, then the unique keys, as Postgres runs them.
+    const enrolment = this.state.enrolments.find(
+      (other) => other.id === row.enrolment_id,
+    );
+    if (
+      !enrolment ||
+      enrolment.user_id !== uid ||
+      enrolment.status === "left" ||
+      !this.barrierOpen(uid) ||
+      (purpose !== "core" &&
+        !this.hasConsent(uid, enrolment.id as string, "core"))
+    ) {
+      rlsViolation(table);
+    }
     if (!PURPOSES.includes(purpose))
       checkViolation("programme_consents_purpose_check");
     if (SHARE.includes(purpose) !== (recipient !== null)) {
@@ -462,24 +842,11 @@ export class FakePostgrest {
     ) {
       checkViolation("programme_consents_version_check");
     }
-    const text = row.consent_text;
-    if (typeof text !== "string" || text.length < 1 || text.length > 8000) {
-      checkViolation("programme_consents_text_check");
-    }
-    const enrolment = this.state.enrolments.find(
-      (other) => other.id === row.enrolment_id,
-    );
-    if (
-      !enrolment ||
-      enrolment.user_id !== uid ||
-      enrolment.status === "left" ||
-      !this.barrierOpen(uid) ||
-      (purpose !== "core" &&
-        !this.hasConsent(uid, enrolment.id as string, "core"))
-    ) {
-      rlsViolation(table);
+    if (row.locale !== null && !LOCALES.includes(row.locale as string)) {
+      checkViolation("programme_consents_locale_check");
     }
     if (
+      !(deferLiveCore && purpose === "core") &&
       this.state.programme_consents.some(
         (other) =>
           other.revoked_at === null &&
@@ -491,7 +858,9 @@ export class FakePostgrest {
       fail(
         409,
         "23505",
-        'duplicate key value violates unique constraint "programme_consents_live_key"',
+        purpose === "core"
+          ? 'duplicate key value violates unique constraint "programme_consents_live_core_key"'
+          : 'duplicate key value violates unique constraint "programme_consents_live_key"',
       );
     }
     this.state.programme_consents.push(row);
@@ -522,8 +891,9 @@ export class FakePostgrest {
         else if (row.status !== "left") row.left_at = null;
         else row.left_at = old.left_at;
         row.updated_at = this.now();
-        this.checkEnrolment(row);
+        // RLS WITH CHECK before CHECK constraints, as Postgres runs them.
         if (row.user_id !== uid) rlsViolation(table);
+        this.checkEnrolment(row);
         // enrolments_revoke_on_leave
         if (row.status === "left" && old.status !== "left") {
           const at = this.now();
@@ -538,6 +908,11 @@ export class FakePostgrest {
           }
         }
       } else {
+        // Only supersede_core_consent sets superseded_by here (the API never
+        // writes it directly); a direct write is refused as the
+        // programme_consents_check_supersede trigger refuses a row that does
+        // not name its live replacement.
+        if (change.superseded_by !== undefined) raise("consent_immutable", 1);
         // consent_revoke_only
         if (row.revoked_at !== null) raise("consent_already_revoked");
         if (change.revoked_at === null || change.revoked_at === undefined) {
@@ -593,15 +968,15 @@ export class FakePostgrest {
     }
   }
 
-  /** enrolments_focus_cap: deferred, so checked when the request commits. */
-  private deferredChecks(): void {
-    const focus = new Map<unknown, number>();
-    for (const row of this.state.enrolments) {
-      if (row.status === "focus")
-        focus.set(row.user_id, (focus.get(row.user_id) ?? 0) + 1);
-    }
-    if ([...focus.values()].some((count) => count > 2))
-      raise("focus_cap_reached");
+  /**
+   * enrolments_focus_cap: deferred, so checked when the request commits, for
+   * the user whose rows the request wrote (the trigger counts that user's).
+   */
+  private deferredChecks(uid: string): void {
+    const focus = this.state.enrolments.filter(
+      (row) => row.user_id === uid && row.status === "focus",
+    );
+    if (focus.length > 2) raise("focus_cap_reached");
   }
 
   private barrierOpen(uid: string): boolean {

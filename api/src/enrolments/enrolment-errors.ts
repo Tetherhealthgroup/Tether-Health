@@ -6,6 +6,7 @@ import {
   HttpStatus,
 } from "@nestjs/common";
 import type { FastifyReply, FastifyRequest } from "fastify";
+import { DatabaseErrorCode } from "../common/database-errors";
 import { PrivacyExceptionFilter } from "../common/privacy-exception.filter";
 
 /**
@@ -25,7 +26,11 @@ export const enrolmentErrorCodes = [
   "consent_already_granted",
   "consent_not_found",
   "consent_already_revoked",
+  "consent_superseded",
   "consent_not_permitted",
+  "consent_document_unavailable",
+  "consent_version_unchanged",
+  "focus_swap_invalid",
   "sharing_not_available",
   "confirmation_required",
   "recent_authentication_required",
@@ -49,6 +54,35 @@ export const badRequest = (code: EnrolmentErrorCode) =>
   new CodedHttpException(code, HttpStatus.BAD_REQUEST);
 export const unauthorized = (code: EnrolmentErrorCode) =>
   new CodedHttpException(code, HttpStatus.UNAUTHORIZED);
+
+/**
+ * The database's own rules (registry codes) as they reach the focus swap and
+ * the consent grant, including core supersession. Matched by `code` only.
+ * A code not listed here (TH010 sync session, TH015 document guard, any
+ * unknown code) is not the caller's to fix: it fails closed as a 502.
+ */
+const registryResponses: Readonly<Record<string, () => CodedHttpException>> = {
+  [DatabaseErrorCode.focusCapReached]: () => conflict("focus_cap_reached"),
+  [DatabaseErrorCode.consentRequiresCore]: () =>
+    conflict("core_consent_required"),
+  [DatabaseErrorCode.enrolmentLeft]: () => conflict("enrolment_left"),
+  [DatabaseErrorCode.deletionInProgress]: () =>
+    conflict("account_deletion_in_progress"),
+  [DatabaseErrorCode.consentDocumentUnavailable]: () =>
+    conflict("consent_document_unavailable"),
+  [DatabaseErrorCode.enrolmentNotFound]: () => notFound("enrolment_not_found"),
+  [DatabaseErrorCode.focusSwapInvalid]: () => conflict("focus_swap_invalid"),
+  [DatabaseErrorCode.consentVersionUnchanged]: () =>
+    conflict("consent_version_unchanged"),
+};
+
+/** The client error for a registry code, or undefined when it has none. */
+export const registryErrorFor = (
+  code: string | undefined,
+): CodedHttpException | undefined =>
+  code !== undefined && Object.hasOwn(registryResponses, code)
+    ? registryResponses[code]?.()
+    : undefined;
 
 /**
  * Adds the stable `code` to coded errors; every other error is answered by
