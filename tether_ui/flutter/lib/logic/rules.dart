@@ -12,6 +12,12 @@ abstract final class TSession {
   static final Map<String, Object?> values = <String, Object?>{};
   static final ValueNotifier<int> changes = ValueNotifier<int>(0);
 
+  /// Incremented by every [clear]. State that belongs to the previous
+  /// session (for example submits still in flight in `TNav`) compares it
+  /// and drops itself.
+  static int get epoch => _epoch;
+  static int _epoch = 0;
+
   static void set(String? key, Object? value) {
     if (key == null) return;
     values.remove(key); // keep insertion order = recency
@@ -41,11 +47,13 @@ abstract final class TSession {
 
   /// Empties the whole session (and the simulation hooks). The app calls this
   /// on sign-out, account switch and account deletion, so no other account's
-  /// data or password stays in memory. It does not reset `TData`: an
+  /// data or password stays in memory. Submits still in flight no longer
+  /// block a new tap (see `TNav.submit`). It does not reset `TData`: an
   /// app-owned TData that caches values must drop them at the same points.
   static void clear() {
     values.clear();
     TSim.reset();
+    _epoch++;
     changes.value++;
   }
 }

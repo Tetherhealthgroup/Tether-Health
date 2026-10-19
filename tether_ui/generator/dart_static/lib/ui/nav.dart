@@ -402,8 +402,13 @@ abstract final class TNav {
 
   static const String _saveError = 'Couldn’t save. Your entry is kept on this phone.';
 
-  /// Submits in flight, by (screen id, endpoint). See [submit].
-  static final Map<(String, String), _Flight> _inFlight = <(String, String), _Flight>{};
+  /// Submits in flight, by (submitting screen's context, screen id,
+  /// endpoint). See [submit]. Emptied when [TSession.clear] has run since
+  /// the last submit ([_inFlightEpoch]).
+  static final Map<(BuildContext, String, String), _Flight> _inFlight = <(BuildContext, String, String), _Flight>{};
+
+  /// [TSession.epoch] when [_inFlight] was last checked.
+  static int _inFlightEpoch = TSession.epoch;
 
   /// Saves through [TApi.instance] and returns the save's result, or null
   /// when this activation was ignored (see "In flight" below).
@@ -426,16 +431,26 @@ abstract final class TNav {
   ///
   /// In flight: from the tap until the submit completes (any result,
   /// including `timeout` and `adapter_error`, and after [then] has run),
-  /// further activations of the same submit ([endpoint] from [screenId]) are
-  /// ignored: pointer taps and assistive-technology activations alike. The
-  /// save is sent once. An ignored activation still checks [safety]: when the
+  /// further activations of the same submit ([endpoint] from [screenId]) on
+  /// the same mounted screen ([context]) are ignored: pointer taps and
+  /// assistive-technology activations alike. The save is sent once. The
+  /// guard belongs to that screen instance only: a screen opened again, a
+  /// second instance of the screen, or any screen after [TSession.clear]
+  /// (sign-out, account switch) starts its own submit, sends its own save
+  /// and runs its own safety action, even while an earlier save is still in
+  /// flight. An ignored activation still checks [safety]: when the
   /// rule now decides a safety outcome and this submit has not run a safety
   /// action yet, that action runs at once and then replaces [then], as
   /// above. A safety screen therefore opens at most once per submit. Once the
   /// submit completes, a new tap submits again (a retry after "Couldn’t
   /// save"); adapters keep retries idempotent ([TApi]).
   static Future<TResult?> submit(BuildContext context, String endpoint, {required String screenId, VoidCallback? then, TSafetyRoutes? safety}) async {
-    final key = (screenId, endpoint);
+    if (_inFlightEpoch != TSession.epoch) {
+      _inFlight.clear();
+      _inFlightEpoch = TSession.epoch;
+    }
+    _inFlight.removeWhere((k, _) => !k.$1.mounted);
+    final key = (context, screenId, endpoint);
     final pending = _inFlight[key];
     if (pending != null) {
       if (!pending.safetyRan) {

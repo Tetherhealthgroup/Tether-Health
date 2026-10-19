@@ -1,7 +1,9 @@
 // Session hygiene: TSession.scrub / scrubPasswords / clear, and every
 // password field in the generated screens writes to a key that
 // scrubPasswords removes. Synthetic values only.
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tether_ui/router/app_router.dart';
 import 'package:tether_ui/ui/ui.dart';
@@ -124,6 +126,26 @@ void main() {
     await tester.enterText(find.byKey(const ValueKey('field:auth_signin.password')), 'synthetic-pass-10');
     await tester.pump();
     expect(TSession.values['auth_signin.password'], 'synthetic-pass-10');
+  });
+
+  testWidgets('undo after scrubPasswords does not bring the password back', (tester) async {
+    await openSignIn(tester);
+    await tester.pump(const Duration(seconds: 1)); // the undo history records the typing
+    TSession.scrubPasswords();
+    await tester.pump();
+    expect(fieldText(tester, 'auth_signin.password'), isEmpty);
+    // Focus the field again and press the platform undo shortcut.
+    await tester.tap(find.byKey(const ValueKey('field:auth_signin.password')));
+    await tester.pump();
+    final apple = defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS;
+    final modifier = apple ? LogicalKeyboardKey.meta : LogicalKeyboardKey.control;
+    await tester.sendKeyDownEvent(modifier);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyZ);
+    await tester.sendKeyUpEvent(modifier);
+    await tester.pump();
+    expect(fieldText(tester, 'auth_signin.password'), isEmpty);
+    expect(TSession.values['auth_signin.password'], isNull);
+    expect(find.text('synthetic-pass-9', skipOffstage: false), findsNothing);
   });
 
   testWidgets('scrub of a field key empties that field', (tester) async {

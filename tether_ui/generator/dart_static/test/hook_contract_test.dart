@@ -828,7 +828,11 @@ void main() {
       expect(await otherSubmit, const TResult.ok());
     });
 
-    testWidgets('safety path: two taps open the crisis screen exactly once, with one submit', (tester) async {
+    // Protects the safety path, not the guard: the first tap replaces the
+    // screen with the crisis screen, and the Navigator absorbs the second
+    // pointer, so this passes with or without the guard. The semantics test
+    // below is the guard test for the safety path.
+    testWidgets('safety path: a second pointer tap during the transition opens nothing more (one crisis screen, one submit)', (tester) async {
       final api = _GatedApi();
       final arrivals = _Arrivals();
       TApi.instance = api;
@@ -891,6 +895,155 @@ void main() {
       expect(find.text('Saved'), findsNothing);
       expect(tester.takeException(), isNull);
       await tester.pump(const Duration(seconds: 3));
+    });
+  });
+
+  group('in-flight guard belongs to the screen instance', () {
+    late BuildContext host;
+
+    Future<void> openHost(WidgetTester tester, _Arrivals arrivals) async {
+      tester.view.physicalSize = const Size(1170, 2532);
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      Widget hostPage(BuildContext c) {
+        host = c;
+        return const Scaffold();
+      }
+
+      await tester.pumpWidget(MaterialApp(
+        key: UniqueKey(),
+        theme: tetherTheme(),
+        navigatorObservers: [arrivals],
+        onGenerateRoute: (s) => s.name == _host ? MaterialPageRoute<void>(builder: hostPage, settings: s) : AppRouter.onGenerateRoute(s),
+        onGenerateInitialRoutes: (_) => [MaterialPageRoute<void>(builder: hostPage, settings: const RouteSettings(name: _host))],
+      ));
+      await _settle(tester);
+    }
+
+    Future<void> openMood(WidgetTester tester, {int expected = 1}) async {
+      unawaited(Navigator.of(host).pushNamed(Routes.eaMood));
+      await _settle(tester);
+      expect(find.byType(EaMoodScreen, skipOffstage: false), findsNWidgets(expected));
+    }
+
+    Future<void> selfHarm(WidgetTester tester) async {
+      await tester.ensureVisible(find.text('Thoughts of harming myself'));
+      await tester.tap(find.text('Thoughts of harming myself'), warnIfMissed: false);
+      await _settle(tester);
+    }
+
+    Future<void> save(WidgetTester tester) async {
+      final button = find.byKey(const ValueKey('a:footer[0]'));
+      await tester.ensureVisible(button);
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.tap(button, warnIfMissed: false);
+      await _settle(tester);
+    }
+
+    void leave() => Navigator.of(host).popUntil((r) => r.settings.name == _host);
+
+    int crisisArrivals(_Arrivals a) => a.names.where((n) => n == Routes.crisis).length;
+
+    Future<void> finish(WidgetTester tester, List<Completer<TResult>> gates) async {
+      for (final g in gates) {
+        if (!g.isCompleted) g.complete(const TResult.ok());
+      }
+      await _settle(tester);
+      await tester.pump(const Duration(seconds: 3));
+    }
+
+    testWidgets('P1: re-opened during a slow safety save, a safety value opens the crisis screen again and is saved', (tester) async {
+      final gates = <Completer<TResult>>[];
+      TApi.instance = _EachCallApi(gates);
+      final arrivals = _Arrivals();
+      await openHost(tester, arrivals);
+      await openMood(tester);
+      await selfHarm(tester);
+      await save(tester);
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      leave(); // the member leaves the crisis screen; the first save is still in flight
+      await _settle(tester);
+      await openMood(tester);
+      await selfHarm(tester);
+      await save(tester);
+      expect(crisisArrivals(arrivals), 2);
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      expect(gates, hasLength(2), reason: 'the second entry is sent');
+      await finish(tester, gates);
+      expect(crisisArrivals(arrivals), 2, reason: 'nothing navigates when the saves finish');
+    });
+
+    testWidgets('P2: re-opened during a slow non-safety save, a safety value opens the crisis screen and is saved', (tester) async {
+      final gates = <Completer<TResult>>[];
+      TApi.instance = _EachCallApi(gates);
+      final arrivals = _Arrivals();
+      await openHost(tester, arrivals);
+      await openMood(tester);
+      await save(tester); // "No": waits for the save
+      expect(find.byType(EaMoodScreen), findsOneWidget);
+      leave(); // the screen is disposed while its save is in flight
+      await _settle(tester);
+      await openMood(tester);
+      await selfHarm(tester);
+      await save(tester);
+      expect(crisisArrivals(arrivals), 1);
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      expect(gates, hasLength(2), reason: 'the safety entry is sent');
+      await finish(tester, gates);
+      expect(crisisArrivals(arrivals), 1);
+    });
+
+    testWidgets('P3: after TSession.clear (sign-out) during a slow safety save, the next safety value opens the crisis screen and is saved', (tester) async {
+      final gates = <Completer<TResult>>[];
+      TApi.instance = _EachCallApi(gates);
+      final arrivals = _Arrivals();
+      await openHost(tester, arrivals);
+      await openMood(tester);
+      await selfHarm(tester);
+      await save(tester);
+      leave();
+      await _settle(tester);
+      TSession.clear(); // sign-out or account switch
+      await openMood(tester);
+      await selfHarm(tester);
+      await save(tester);
+      expect(crisisArrivals(arrivals), 2);
+      expect(gates, hasLength(2));
+      await finish(tester, gates);
+    });
+
+    testWidgets('P3b: TSession.clear ends the guard on a screen that stays open: the next tap sends its own save', (tester) async {
+      final gates = <Completer<TResult>>[];
+      TApi.instance = _EachCallApi(gates);
+      final arrivals = _Arrivals();
+      await openHost(tester, arrivals);
+      await openMood(tester);
+      await save(tester); // "No": waits for the save
+      expect(gates, hasLength(1));
+      TSession.clear();
+      await tester.pump();
+      await selfHarm(tester);
+      await save(tester);
+      expect(gates, hasLength(2), reason: 'the next session’s tap is not blocked by the earlier save');
+      expect(crisisArrivals(arrivals), 1);
+      await finish(tester, gates);
+    });
+
+    testWidgets('a second instance pushed on top of one with a save in flight sends its own save and opens its own crisis screen', (tester) async {
+      final gates = <Completer<TResult>>[];
+      TApi.instance = _EachCallApi(gates);
+      final arrivals = _Arrivals();
+      await openHost(tester, arrivals);
+      await openMood(tester);
+      await save(tester); // "No": waits for the save
+      expect(gates, hasLength(1));
+      await openMood(tester, expected: 2); // the same screen again, on top
+      await selfHarm(tester);
+      await save(tester);
+      expect(gates, hasLength(2));
+      expect(crisisArrivals(arrivals), 1);
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      await finish(tester, gates);
     });
   });
 

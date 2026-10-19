@@ -761,8 +761,12 @@ class _TFieldState extends State<TField> {
   //
   // When the field's session key is removed (TSession.scrub, scrubPasswords,
   // clear), the field empties its text too, so a scrubbed value (a password)
-  // does not stay on screen or in the text controller.
+  // does not stay on screen or in the text controller. The editable is also
+  // rebuilt ([_generation]), which drops its undo history: an undo
+  // (Ctrl/Cmd+Z, shake to undo) cannot bring the scrubbed value back. The
+  // rebuilt field does not keep the keyboard focus.
   late final TextEditingController _controller = TextEditingController(text: widget.value);
+  int _generation = 0;
 
   @override
   void initState() {
@@ -782,7 +786,10 @@ class _TFieldState extends State<TField> {
     final key = widget.fieldKey;
     if (key == null || TSession.values.containsKey(key) || _controller.text.isEmpty) return;
     _controller.clear();
-    if (!_empty) setState(() => _empty = true);
+    setState(() {
+      _empty = true;
+      _generation++;
+    });
   }
 
   /// Largest text scale for the unit (mmHg, mg/dL...). The value keeps the
@@ -850,37 +857,43 @@ class _TFieldState extends State<TField> {
       if (kind != TFieldKind.search) Padding(padding: const EdgeInsets.only(bottom: 6), child: ExcludeSemantics(child: Text(label, style: TText.fieldLabel))),
       Semantics(
         label: label,
-        hint: placeholder,
-        child: TextFormField(
-          key: widget.fieldKey == null ? null : ValueKey('field:${widget.fieldKey}'),
-          controller: _controller,
-          obscureText: kind == TFieldKind.password,
-          keyboardType: keyboard,
-          readOnly: readOnly,
-          minLines: kind == TFieldKind.multiline ? 2 : 1,
-          maxLines: maxLines,
-          style: TText.input,
-          onChanged: onChanged,
-          decoration: InputDecoration(
-            isDense: true,
-            filled: true,
-            fillColor: error != null ? const Color(0xFFFFFBFA) : TColors.paper,
-            hint: example,
-            hintMaxLines: hintMaxLines,
-            hintStyle: hintStyle,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
-            prefixIcon: kind == TFieldKind.search ? const Icon(Icons.search_rounded, color: TColors.muted) : null,
-            suffixIcon: readOnly
-                ? const Icon(Icons.expand_more_rounded, color: TColors.muted)
-                : unitIcon
-                    ? Padding(padding: const EdgeInsets.only(left: 8, right: 18, top: 2.67), child: Text(unit!, style: unitStyle, textScaler: unitScaler))
-                    : null,
-            suffixIconConstraints: unitIcon ? const BoxConstraints(minWidth: 0, minHeight: 0) : null,
-            suffix: unit == null || unitIcon ? null : Text(unit!, style: unitStyle, textScaler: unitScaler),
-            suffixStyle: unitStyle,
-            enabledBorder: border,
-            focusedBorder: border.copyWith(borderSide: const BorderSide(color: TColors.teal, width: 2)),
-            semanticCounterText: label,
+        // A password's example is bullets: nothing useful to speak.
+        hint: kind == TFieldKind.password ? null : placeholder,
+        // A new generation (after a scrub) is a new editable, with no undo
+        // history.
+        child: KeyedSubtree(
+          key: ValueKey<int>(_generation),
+          child: TextFormField(
+            key: widget.fieldKey == null ? null : ValueKey('field:${widget.fieldKey}'),
+            controller: _controller,
+            obscureText: kind == TFieldKind.password,
+            keyboardType: keyboard,
+            readOnly: readOnly,
+            minLines: kind == TFieldKind.multiline ? 2 : 1,
+            maxLines: maxLines,
+            style: TText.input,
+            onChanged: onChanged,
+            decoration: InputDecoration(
+              isDense: true,
+              filled: true,
+              fillColor: error != null ? const Color(0xFFFFFBFA) : TColors.paper,
+              hint: example,
+              hintMaxLines: hintMaxLines,
+              hintStyle: hintStyle,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+              prefixIcon: kind == TFieldKind.search ? const Icon(Icons.search_rounded, color: TColors.muted) : null,
+              suffixIcon: readOnly
+                  ? const Icon(Icons.expand_more_rounded, color: TColors.muted)
+                  : unitIcon
+                      ? Padding(padding: const EdgeInsets.only(left: 8, right: 18, top: 2.67), child: Text(unit!, style: unitStyle, textScaler: unitScaler))
+                      : null,
+              suffixIconConstraints: unitIcon ? const BoxConstraints(minWidth: 0, minHeight: 0) : null,
+              suffix: unit == null || unitIcon ? null : Text(unit!, style: unitStyle, textScaler: unitScaler),
+              suffixStyle: unitStyle,
+              enabledBorder: border,
+              focusedBorder: border.copyWith(borderSide: const BorderSide(color: TColors.teal, width: 2)),
+              semanticCounterText: label,
+            ),
           ),
         ),
       ),

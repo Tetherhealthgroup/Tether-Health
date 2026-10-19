@@ -43,15 +43,17 @@ void main() {
   ];
 
   for (final (id, key, typed) in cases) {
-    testWidgets('$id · $key: label is the field label, hint is the example${typed == null ? '' : ', value is the typed text'}', (tester) async {
+    testWidgets('$id · $key: label is the field label, hint is the example (none for a password)${typed == null ? '' : ', value is the typed text'}', (tester) async {
       final semantics = tester.ensureSemantics();
       await _open(tester, id);
       final field = _widget(tester, key);
       expect(field.placeholder, isNotNull, reason: 'the case needs an example');
+      // A password's example is bullets: it is not spoken.
+      final hint = field.kind == TFieldKind.password ? '' : field.placeholder;
       var data = _data(tester, key);
       expect(data.flagsCollection.isTextField, isTrue);
       expect(data.label, field.label);
-      expect(data.hint, field.placeholder);
+      expect(data.hint, hint);
       expect(data.value, isEmpty);
       // The visible label is announced once: as the field's label.
       expect(find.semantics.byLabel(field.label), findsOne);
@@ -62,7 +64,7 @@ void main() {
         await tester.pump();
         data = _data(tester, key);
         expect(data.label, field.label);
-        expect(data.hint, field.placeholder);
+        expect(data.hint, hint);
         if (field.kind == TFieldKind.password) {
           expect(data.value, isNot(contains(typed)), reason: 'a password is never exposed');
           expect(data.value.length, typed.length);
