@@ -4,6 +4,12 @@ The same table is exported to spec/rules.json, compiled into the Flutter kit
 (lib/logic/rules.dart) and the prototype (JS), and exercised by the
 simulation scenarios, so the app, the prototype and the tests all decide
 the same way. Thresholds are clinical placeholders until signed off.
+
+`safety` lists the outcome ids that open a safety screen. When a save fails,
+the app still routes to these outcomes (the on-device rule decides), and
+stays on the screen for every other outcome. A rule without `safety` has no
+safety outcome. The list is clinical content: interim, pending confirmation
+by the clinical lead.
 """
 
 RULES = {
@@ -13,6 +19,7 @@ RULES = {
         'inputs': ['hw_log.systolic', 'hw_log.diastolic', 'hw_log2.systolic', 'hw_log2.diastolic'],
         'params': {'sys_min': 70, 'sys_max': 250, 'dia_min': 40, 'dia_max': 150, 'crisis_sys': 180, 'crisis_dia': 120},
         'outcomes': {'ok': 'Valid · below crisis range', 'invalid': 'Invalid value', 'crisis': '≥180 top or ≥120 bottom'},
+        'safety': ['crisis'],
         'logic': 'Each reading must be sys 70–250, dia 40–150, dia < sys, else Invalid. If either reading has sys ≥ 180 or dia ≥ 120 → Crisis (symptom check). Otherwise the average is saved.',
         'source': 'ACC/AHA hypertensive crisis threshold (≥180/≥120). Needs clinical sign-off.',
     },
@@ -22,6 +29,7 @@ RULES = {
         'inputs': ['st_log.reading', 'st_range.low'],
         'params': {'min': 20, 'max': 600, 'default_low': 70},
         'outcomes': {'ok': 'In or above range', 'low': 'Below your low', 'invalid': 'Invalid (outside 20–600)'},
+        'safety': ['low'],
         'logic': 'Outside 20–600 mg/dL → Invalid. Below the member’s low (from their clinician, default 70) → Low plan with 15-min timer. Otherwise saved neutrally.',
         'source': 'ADA level 1 hypoglycemia < 70 mg/dL. Needs clinical sign-off.',
     },
@@ -31,6 +39,7 @@ RULES = {
         'inputs': ['ca_zone.peak_flow', 'ca_zone.symptoms', 'ca_plan.green_from', 'ca_plan.red_below'],
         'params': {'pef_min': 50, 'pef_max': 900, 'default_green_from': 400, 'default_red_below': 200, 'red_symptoms': ['Can’t speak in full sentences']},
         'outcomes': {'green': 'Green', 'yellow': 'Yellow', 'red': 'Red', 'invalid': 'Invalid peak flow'},
+        'safety': ['red'],
         'logic': 'Peak flow outside 50–900 → Invalid. A red symptom or peak flow below the plan’s red threshold → Red. Peak flow below the green threshold or any symptom → Yellow. Otherwise Green. Thresholds come only from the member’s plan.',
         'source': 'NAEPP asthma action plan zones. Needs pulmonology sign-off.',
     },
@@ -40,6 +49,7 @@ RULES = {
         'inputs': ['ea_mood.going_on'],
         'params': {'triggers': ['Thoughts of harming myself']},
         'outcomes': {'yes': 'Yes', 'no': 'No'},
+        'safety': ['yes'],
         'logic': 'If the member selects a self-harm option the crisis screen opens immediately (988/911).',
         'source': 'Safe messaging guidance. Needs psychiatry sign-off.',
     },

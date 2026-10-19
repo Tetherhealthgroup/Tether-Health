@@ -1,5 +1,6 @@
 import os, shutil, json
 from dsl import *
+from rules import RULES
 
 def dstr(s):
     if s is None: return 'null'
@@ -33,7 +34,7 @@ def act(a):
         return f"TNav.toast(context, {dstr(a['value'])}{then})"
     if t == 'submit':
         then = f", then: () => {act(a['then'])}" if a.get('then') else ''
-        return f"TNav.submit(context, {dstr(a['api'])}, screenId: {dstr(CUR['sid'])}{then})"
+        return f"TNav.submit(context, {dstr(a['api'])}, screenId: {dstr(CUR['sid'])}{then}{safety_routes(a.get('then'))})"
     if t == 'branch':
         cases = ', '.join(f"{dstr(c['label'])}: () => {act(c['action'])}" for c in a['cases'])
         extra = ''
@@ -43,6 +44,26 @@ def act(a):
     raise ValueError(t)
 
 def cb(a): return f'() => {act(a)}' if a else 'null'
+
+def safety_labels(rule_id):
+    """Outcome labels that rules.py marks as safety for `rule_id` (none if unmarked)."""
+    rule = RULES.get(rule_id) or {}
+    ids = rule.get('safety', [])
+    unknown = [i for i in ids if i not in rule.get('outcomes', {})]
+    if unknown: raise ValueError(f'{rule_id}: safety ids {unknown} are not outcomes')
+    return [rule['outcomes'][i] for i in ids]
+
+def safety_routes(then):
+    """`, safety: TSafetyRoutes(...)` for a submit whose `then` (through toasts)
+    is a branch decided by an on-device rule with safety outcomes; '' otherwise."""
+    a = then
+    while a and a['type'] == 'toast': a = a.get('then')
+    if not a or a['type'] != 'branch' or not a.get('decide') or a['decide'].startswith('choice:'): return ''
+    labels = safety_labels(a['decide'])
+    cases = [c for c in a['cases'] if c['label'] in labels]
+    if not cases: return ''
+    routes = ', '.join(f"{dstr(c['label'])}: () => {act(c['action'])}" for c in cases)
+    return f", safety: TSafetyRoutes({dstr(a['decide'])}, <String, VoidCallback>{{{routes}}})"
 
 def args(**kw):
     parts = []

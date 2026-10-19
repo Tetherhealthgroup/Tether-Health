@@ -181,6 +181,28 @@ abstract class TApi {
   Future<TResult> submit(String endpoint, {required String screenId});
 }
 
+/// The safety outcomes of the on-device rule that decides the branch after a
+/// submit, with the action for each. Generated from spec/rules.json
+/// (`safety`). When the submit fails, [TNav.submit] runs [rule] and, if the
+/// result is one of [routes], runs that action, so a safety screen opens
+/// whether or not the save went through.
+class TSafetyRoutes {
+  const TSafetyRoutes(this.rule, this.routes);
+
+  /// Rule id in [TRules.decide] (for example `hw.bp`).
+  final String rule;
+
+  /// Safety outcome label → its action.
+  final Map<String, VoidCallback> routes;
+
+  /// The action for the rule's current result, or null when the result is
+  /// not a safety outcome (or the rule cannot decide yet).
+  VoidCallback? pick() {
+    final decided = TRules.decide(rule, TSession.values);
+    return decided == null ? null : routes[decided];
+  }
+}
+
 /// Release default for [TApi]: every submit fails with [code].
 class TUnconfiguredApi implements TApi {
   const TUnconfiguredApi();
@@ -354,7 +376,13 @@ abstract final class TNav {
     }
   }
 
-  static Future<void> submit(BuildContext context, String endpoint, {required String screenId, VoidCallback? then}) async {
+  /// Saves through [TApi.instance], then:
+  /// - ok / queued: runs [then];
+  /// - outcome: runs [then], and the branch inside it may take the label;
+  /// - failed (including `not_configured` and `adapter_error`): shows the
+  ///   save error and, when [safety]'s rule decides a safety outcome, runs
+  ///   that outcome's action. Otherwise the member stays on the screen.
+  static Future<void> submit(BuildContext context, String endpoint, {required String screenId, VoidCallback? then, TSafetyRoutes? safety}) async {
     final result = await safeSubmit(endpoint, screenId: screenId);
     if (!context.mounted) return;
     switch (result) {
@@ -369,6 +397,7 @@ abstract final class TNav {
         }
       case TFailed():
         toast(context, 'Couldn’t save. Your entry is kept on this phone.');
+        safety?.pick()?.call();
     }
   }
 

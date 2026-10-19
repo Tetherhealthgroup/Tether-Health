@@ -6,7 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tether_ui/router/app_router.dart';
 import 'package:tether_ui/router/routes.dart';
+import 'package:tether_ui/screens/ca/ca_red_screen.dart';
+import 'package:tether_ui/screens/ca/ca_zone_screen.dart';
+import 'package:tether_ui/screens/ea/ea_mood_screen.dart';
+import 'package:tether_ui/screens/hw/hw_crisis_screen.dart';
 import 'package:tether_ui/screens/hw/hw_lipids_screen.dart';
+import 'package:tether_ui/screens/hw/hw_log2_screen.dart';
+import 'package:tether_ui/screens/st/st_log_screen.dart';
+import 'package:tether_ui/screens/st/st_low_screen.dart';
 import 'package:tether_ui/screens/rescue/crisis_screen.dart';
 import 'package:tether_ui/screens/records/records_consent_device_screen.dart';
 import 'package:tether_ui/screens/records/records_hub_screen.dart';
@@ -488,6 +495,87 @@ void main() {
       expect(TData.instance, isA<PreviewData>());
       expect(TPlatform.instance, isA<PreviewPlatform>());
       expect(TNav.branchResolver, same(TNav.previewResolver));
+    });
+  });
+
+  group('failed save and safety outcomes', () {
+    // (name, screen, the screen's type, entry, the rule's result, the safety
+    // screen's type or null when the result is not a safety outcome).
+    Future<void> enter(WidgetTester tester, String key, String value) async {
+      await tester.enterText(find.byKey(ValueKey('field:$key')), value);
+      await _settle(tester);
+    }
+
+    Future<void> tapText(WidgetTester tester, String text) async {
+      await tester.ensureVisible(find.text(text));
+      await tester.tap(find.text(text), warnIfMissed: false);
+      await _settle(tester);
+    }
+
+    final cases = <(String, String, Type, Future<void> Function(WidgetTester), String, Type?)>[
+      ('ca_zone', Routes.caZone, CaZoneScreen, (t) => enter(t, 'ca_zone.peak_flow', '150'), 'Red', CaRedScreen),
+      ('ca_zone', Routes.caZone, CaZoneScreen, (t) => enter(t, 'ca_zone.peak_flow', '310'), 'Yellow', null),
+      ('ca_zone', Routes.caZone, CaZoneScreen, (t) => enter(t, 'ca_zone.peak_flow', '2000'), 'Invalid peak flow', null),
+      ('ea_mood', Routes.eaMood, EaMoodScreen, (t) => tapText(t, 'Thoughts of harming myself'), 'Yes', CrisisScreen),
+      ('ea_mood', Routes.eaMood, EaMoodScreen, (t) async {}, 'No', null),
+      ('hw_log2', Routes.hwLog2, HwLog2Screen, (t) async {
+        await enter(t, 'hw_log2.systolic', '186');
+        await enter(t, 'hw_log2.diastolic', '122');
+      }, '≥180 top or ≥120 bottom', HwCrisisScreen),
+      ('hw_log2', Routes.hwLog2, HwLog2Screen, (t) async {
+        await enter(t, 'hw_log2.systolic', '132');
+        await enter(t, 'hw_log2.diastolic', '84');
+      }, 'Valid · below crisis range', null),
+      ('hw_log2', Routes.hwLog2, HwLog2Screen, (t) async {
+        await enter(t, 'hw_log2.systolic', '132');
+        await enter(t, 'hw_log2.diastolic', '310');
+      }, 'Invalid value', null),
+      ('st_log', Routes.stLog, StLogScreen, (t) => enter(t, 'st_log.reading', '62'), 'Below your low', StLowScreen),
+      ('st_log', Routes.stLog, StLogScreen, (t) => enter(t, 'st_log.reading', '142'), 'In or above range', null),
+      ('records_manual', Routes.recordsManual, RecordsManualScreen, (t) => enter(t, 'records_manual.value', '99'), 'Outside expected range', null),
+      ('records_manual', Routes.recordsManual, RecordsManualScreen, (t) => enter(t, 'records_manual.value', '6'), 'Valid', null),
+    ];
+
+    final failures = <(String, void Function())>[
+      ('failed', () => TApi.instance = _ScriptedApi(const TResult.failed('synthetic_code'))),
+      ('adapter error', () => TApi.instance = _ThrowingApi(Exception(_canary))),
+      ('release defaults', TDefaults.forRelease),
+    ];
+
+    for (final (sid, route, screenType, entry, result, safetyType) in cases) {
+      for (final (how, install) in failures) {
+        final expectation = safetyType == null ? 'stays on $sid' : 'opens ${safetyType.toString()}';
+        testWidgets('$how save · $sid · $result → $expectation', (tester) async {
+          install();
+          await _open(tester, route);
+          await entry(tester);
+          expect(TRules.decide({'ca_zone': 'ca.zone', 'ea_mood': 'ea.selfharm', 'hw_log2': 'hw.bp', 'st_log': 'st.glucose', 'records_manual': 'rec.manual'}[sid]!, TSession.values), result);
+          await _tapKey(tester, 'footer[0]');
+          expect(tester.takeException(), isNull);
+          expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsOneWidget);
+          if (safetyType == null) {
+            expect(find.byType(screenType), findsOneWidget);
+            expect(find.text('Saved'), findsNothing);
+          } else {
+            expect(find.byType(safetyType), findsOneWidget);
+            expect(find.byType(screenType), findsNothing);
+          }
+          for (final t in _texts(tester)) {
+            expect(t.contains('canary'), isFalse, reason: t);
+          }
+          await tester.pump(const Duration(seconds: 3));
+        });
+      }
+    }
+
+    testWidgets('a successful save still follows the branch (safety routes are only for failed saves)', (tester) async {
+      TApi.instance = _ScriptedApi(const TResult.ok());
+      await _open(tester, Routes.stLog);
+      await enter(tester, 'st_log.reading', '142');
+      await _tapKey(tester, 'footer[0]');
+      expect(find.byType(StLogScreen), findsNothing);
+      expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsNothing);
+      await tester.pump(const Duration(seconds: 3));
     });
   });
 }

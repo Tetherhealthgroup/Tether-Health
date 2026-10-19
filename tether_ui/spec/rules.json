@@ -21,6 +21,9 @@
       "invalid": "Invalid value",
       "crisis": "≥180 top or ≥120 bottom"
     },
+    "safety": [
+      "crisis"
+    ],
     "logic": "Each reading must be sys 70–250, dia 40–150, dia < sys, else Invalid. If either reading has sys ≥ 180 or dia ≥ 120 → Crisis (symptom check). Otherwise the average is saved.",
     "source": "ACC/AHA hypertensive crisis threshold (≥180/≥120). Needs clinical sign-off."
   },
@@ -41,6 +44,9 @@
       "low": "Below your low",
       "invalid": "Invalid (outside 20–600)"
     },
+    "safety": [
+      "low"
+    ],
     "logic": "Outside 20–600 mg/dL → Invalid. Below the member’s low (from their clinician, default 70) → Low plan with 15-min timer. Otherwise saved neutrally.",
     "source": "ADA level 1 hypoglycemia < 70 mg/dL. Needs clinical sign-off."
   },
@@ -68,6 +74,9 @@
       "red": "Red",
       "invalid": "Invalid peak flow"
     },
+    "safety": [
+      "red"
+    ],
     "logic": "Peak flow outside 50–900 → Invalid. A red symptom or peak flow below the plan’s red threshold → Red. Peak flow below the green threshold or any symptom → Yellow. Otherwise Green. Thresholds come only from the member’s plan.",
     "source": "NAEPP asthma action plan zones. Needs pulmonology sign-off."
   },
@@ -86,6 +95,9 @@
       "yes": "Yes",
       "no": "No"
     },
+    "safety": [
+      "yes"
+    ],
     "logic": "If the member selects a self-harm option the crisis screen opens immediately (988/911).",
     "source": "Safe messaging guidance. Needs psychiatry sign-off."
   },
