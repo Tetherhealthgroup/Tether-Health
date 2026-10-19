@@ -105,6 +105,13 @@ export const DATABASE_ERRORS = [
       "Consent documents are changed only by a role that bypasses row-level security",
     ] as readonly string[],
   },
+  {
+    code: "TH019",
+    hint: "sync_rows_delete_only",
+    messages: [
+      "Sync rows are removed only with their enrolment or account",
+    ] as readonly string[],
+  },
 ] as const satisfies readonly DatabaseErrorEntry[];
 
 export type DatabaseErrorHint = (typeof DATABASE_ERRORS)[number]["hint"];

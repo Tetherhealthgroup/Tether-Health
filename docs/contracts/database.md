@@ -7,8 +7,9 @@ Migration sources of truth include `supabase/migrations/202609110001_profiles.sq
 `supabase/migrations/202610180002_service_session_guard.sql`,
 `supabase/migrations/202610180003_enrolment_consent_followups.sql`,
 `supabase/migrations/202610180004_consent_documents_hardening.sql`,
-`supabase/migrations/202610180005_consent_truncate_guards.sql` and
-`supabase/migrations/202610180006_service_role_least_privilege.sql`.
+`supabase/migrations/202610180005_consent_truncate_guards.sql`,
+`supabase/migrations/202610180006_service_role_least_privilege.sql` and
+`supabase/migrations/202610180007_sync_truncate_guards.sql`.
 
 Every migration file is named `YYYYMMDDNNNN_name.sql`: a 12-digit version (date
 plus a four-digit sequence), then lowercase letters, digits and underscores.
@@ -394,7 +395,8 @@ holds, including those it gets through `PUBLIC` and through ownership.
 
 ## Sync tables
 
-Migration source of truth: `supabase/migrations/202610180001_sync_tables.sql`.
+Migration sources of truth: `supabase/migrations/202610180001_sync_tables.sql`
+and `supabase/migrations/202610180007_sync_truncate_guards.sql`.
 The `sync/` service stores plan and questionnaire answers and lapses here, per
 programme. Enrolment and consent are not stored here: they stay in
 `enrolments` and `programme_consents`, so sync is never a second consent store.
@@ -462,6 +464,16 @@ and lapses. Account deletion goes through the API only: `delete_my_app_data`
 deletes the caller's sync rows, returns a count for each sync table, and
 refuses to run in a `thsync` session (`TH009`), as does
 `begin_account_deletion`.
+Sync rows are removed only by `DELETE`, together with their programme or account:
+`delete_my_app_data`, and the foreign-key cascades when an enrolment or an
+account is deleted. A trigger refuses `TRUNCATE` on every sync table for every role,
+in every session mode; the guard's code is `TH019`. A `TRUNCATE ... CASCADE`
+of another table that would cascade into the sync tables is refused as well,
+and their rows stay; it reports the code of the first guard that fires, which
+may be another table's (`TH003` when it reaches a consent table first).
+`PUBLIC`, `anon`, `authenticated` and `thsync` hold no `TRUNCATE` privilege on
+the sync tables.
+`supabase/tests/verify_sync_truncate_guards.sh` checks this.
 
 The migration starts by dropping the earlier `sync_*` tables (keyed by
 `account_id`) if they exist and are empty. It stops instead if a table with
@@ -608,6 +620,7 @@ function": every later function that writes and refuses a sync session raises
 | `TH013` | `focus_swap_invalid` | `swap_focus`: the programme to demote is not in focus, the one to promote is already in focus, or both are the same | A swap needs one programme in focus and another not in focus |
 | `TH014` | `consent_version_unchanged` | `programme_consents_check_supersede` (update trigger on `programme_consents`, so also `supersede_core_consent`): the replacement core version is not later than the one it replaces, or is the same version and locale | The core consent is already on this version or a later one |
 | `TH015` | `consent_document_immutable` | `consent_documents_guard` (insert, update, delete and truncate trigger on `consent_documents`): purpose, version, locale or body changed; approved_ref changed after it was set; cascades_optional or effective_from changed on a referenced document; a writer that does not bypass row-level security; a truncate, whatever the role. `consent_documents_check_effective_from` (after each insert or update statement on `consent_documents`): locales of a version with different effective_from | Consent documents are immutable, publish a new version; A consent document version takes effect at the same time in every locale; Consent documents are changed only by a role that bypasses row-level security |
+| `TH019` | `sync_rows_delete_only` | `sync_truncate_guard` (truncate trigger on `sync_account`, `sync_area`, `sync_answer` and `sync_lapse`: a truncate, whatever the role, including a cascade into them when no other table's guard fires first) | Sync rows are removed only with their enrolment or account |
 
 Standard SQLSTATEs are kept where PostgreSQL defines the condition:
 `42501` for row-level security and privilege refusals and for
