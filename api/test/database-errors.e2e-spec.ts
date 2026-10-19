@@ -165,8 +165,8 @@ describe("database error registry", () => {
         enrolment_id: enrolment[0].id,
         purpose: "core",
         recipient_ref: null,
-        consent_version: "v1",
-        consent_text: "Synthetic core wording",
+        consent_version: "v1-draft",
+        locale: "en",
       });
       const [{ id }] = granted.body as unknown as [{ id: string }];
       expect(
@@ -183,6 +183,128 @@ describe("database error registry", () => {
       expect(
         raised(await send("PATCH", `programme_consents?id=eq.${id}`, revoke)),
       ).toEqual(expected("TH002"));
+    });
+
+    const enrolmentId = async (programme: string, status = "focus") => {
+      const response = await send("POST", "enrolments", {
+        user_id: userId,
+        programme_code: programme,
+        status,
+      });
+      return (response.body as unknown as [{ id: string }])[0].id;
+    };
+    const core = (enrolment: string, version = "v1-draft", locale = "en") =>
+      send("POST", "programme_consents", {
+        enrolment_id: enrolment,
+        purpose: "core",
+        consent_version: version,
+        locale,
+      });
+    const supersede = (enrolment: string, version: string, locale = "en") =>
+      send("POST", "rpc/supersede_core_consent", {
+        p_enrolment: enrolment,
+        p_version: version,
+        p_locale: locale,
+      });
+    const swap = (demote: string, promote: string) =>
+      send("POST", "rpc/swap_focus", { p_demote: demote, p_promote: promote });
+
+    it("TH001 from swap_focus, inside the call", async () => {
+      const bf = await enrolmentId("bf");
+      await enrolmentId("hw");
+      const st = await enrolmentId("st", "paused");
+      const ca = await enrolmentId("ca", "paused");
+      // A third programme reaches focus outside the cap (a superuser write),
+      // so the swap's own cap check refuses it and changes nothing.
+      fake.interleave("POST", "rpc/swap_focus", () =>
+        fake.forceEnrolmentStatus(ca, "focus"),
+      );
+      expect(raised(await swap(bf, st))).toEqual(expected("TH001"));
+      const status = (id: string) =>
+        fake.table("enrolments").find((r) => r.id === id)?.status;
+      expect([status(bf), status(st)]).toEqual(["focus", "paused"]);
+    });
+
+    it("TH004, TH011 and TH014 from supersede_core_consent", async () => {
+      const id = await enrolmentId("ca");
+      expect(raised(await supersede(id, "v2-synthetic"))).toEqual(
+        expected("TH004"),
+      );
+      expect((await core(id)).status).toBe(201);
+      expect(raised(await supersede(id, "v9-future"))).toEqual(
+        expected("TH011"),
+      );
+      expect(raised(await supersede(id, "v1-draft"))).toEqual(
+        expected("TH014"),
+      );
+      expect((await supersede(id, "v2-synthetic")).status).toBe(200);
+      expect(raised(await supersede(id, "v1-draft", "es"))).toEqual(
+        expected("TH014"),
+      );
+    });
+
+    it("TH011 from a consent insert without a grantable document", async () => {
+      const id = await enrolmentId("re");
+      for (const [version, locale] of [
+        ["v0-retired", "en"],
+        ["v9-future", "en"],
+        ["v1-draft", "fr"],
+        ["v1", "en"],
+      ]) {
+        expect(raised(await core(id, version, locale))).toEqual(
+          expected("TH011"),
+        );
+      }
+    });
+
+    it("TH005, TH012 and TH013 from swap_focus", async () => {
+      const focus = await enrolmentId("bf");
+      const paused = await enrolmentId("sf", "paused");
+      const left = await enrolmentId("ea", "paused");
+      await send("PATCH", `enrolments?id=eq.${left}`, { status: "left" });
+      expect(raised(await swap(focus, left))).toEqual(expected("TH005"));
+      expect(
+        raised(await swap(focus, "00000000-0000-4000-8000-00000000ffff")),
+      ).toEqual(expected("TH012"));
+      expect(raised(await swap(focus, focus))).toEqual(expected("TH013"));
+      expect(raised(await swap(paused, focus))).toEqual(expected("TH013"));
+    });
+
+    it("TH005, TH006 and TH012 from supersede_core_consent", async () => {
+      const left = await enrolmentId("nu", "paused");
+      expect((await core(left)).status).toBe(201);
+      await send("PATCH", `enrolments?id=eq.${left}`, { status: "left" });
+      expect(raised(await supersede(left, "v2-synthetic"))).toEqual(
+        expected("TH005"),
+      );
+      expect(
+        raised(
+          await supersede(
+            "00000000-0000-4000-8000-00000000ffff",
+            "v2-synthetic",
+          ),
+        ),
+      ).toEqual(expected("TH012"));
+      const live = await enrolmentId("sd", "paused");
+      expect((await core(live)).status).toBe(201);
+      fake.startAccountDeletion(userId);
+      expect(raised(await supersede(live, "v2-synthetic"))).toEqual(
+        expected("TH006"),
+      );
+    });
+
+    it("refuses consent_text on insert with 42501", async () => {
+      const id = await enrolmentId("ck", "paused");
+      const response = await send("POST", "programme_consents", {
+        enrolment_id: id,
+        purpose: "core",
+        consent_version: "v1-draft",
+        locale: "en",
+        consent_text: "Synthetic wording the caller may not write",
+      });
+      expect(response.status).toBe(403);
+      expect(response.body.code).toBe("42501");
+      expect(fake.table("programme_consents")).toEqual([]);
     });
   });
 });

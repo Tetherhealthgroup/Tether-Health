@@ -17,4 +17,13 @@ export const DatabaseErrorCode = {
   focusCapReached: "TH001",
   consentAlreadyRevoked: "TH002",
   consentImmutable: "TH003",
+  consentRequiresCore: "TH004",
+  enrolmentLeft: "TH005",
+  deletionInProgress: "TH006",
+  syncSessionRefused: "TH010",
+  consentDocumentUnavailable: "TH011",
+  enrolmentNotFound: "TH012",
+  focusSwapInvalid: "TH013",
+  consentVersionUnchanged: "TH014",
+  consentDocumentImmutable: "TH015",
 } as const;
