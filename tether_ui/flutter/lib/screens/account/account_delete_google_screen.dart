@@ -30,7 +30,7 @@ class AccountDeleteGoogleScreen extends StatelessWidget {
         TCard(variant: TCardVariant.mint, eyebrow: 'Confirm it’s you', title: 'Signed in with Google', text: 'When you tap Delete everything, Google asks you to confirm. Use the same Google account you signed in with.'),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Delete everything', onPressed: () => TNav.branch(context, 'Sign in with Google result', <String, VoidCallback>{'Success': () => TNav.submit(context, 'DELETE /v1/account/data', then: () => TNav.replace(context, Routes.accountDeleted)), 'Different account': () => TNav.toast(context, 'That’s a different Google account. Use the one you signed in with.'), 'Cancelled': () => TNav.toast(context, 'Nothing was deleted.'), 'Error': () => TNav.toast(context, 'Couldn’t reach Google. Nothing was deleted.')}, provider: 'google'), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Delete everything', onPressed: () => TNav.branch(context, 'Sign in with Google result', <String, VoidCallback>{'Success': () => TNav.submit(context, 'DELETE /v1/account/data', screenId: 'account_delete_google', then: () => TNav.replace(context, Routes.accountDeleted)), 'Different account': () => TNav.toast(context, 'That’s a different Google account. Use the one you signed in with.'), 'Cancelled': () => TNav.toast(context, 'Nothing was deleted.'), 'Error': () => TNav.toast(context, 'Couldn’t reach Google. Nothing was deleted.')}, provider: 'google'), variant: TButtonVariant.danger),
       ],
     );
   }

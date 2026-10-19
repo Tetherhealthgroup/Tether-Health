@@ -27,7 +27,7 @@ class BeDiaryScreen extends StatelessWidget {
         TCard(variant: TCardVariant.urgent, title: 'Fever of 100.4°F (38°C) or higher?', text: 'Call your oncology team now.', cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: 'Call', onPressed: () => TNav.call(context, '(555) 010-7000', label: 'Call oncology team'), variant: TButtonVariant.danger, small: true)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/be/diary', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/be/diary', screenId: 'be_diary', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

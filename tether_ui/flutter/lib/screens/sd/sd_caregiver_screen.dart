@@ -26,7 +26,7 @@ class SdCaregiverScreen extends StatelessWidget {
         TChecklist(fieldKey: 'sd_caregiver.caregiver_can_see', items: [TCheckItem('When I finish a session', done: true), TCheckItem('If I log a fall', done: true), TCheckItem('My other programs', sub: 'Never available to caregivers')], label: 'Rosa can see'),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Send invite', onPressed: () => TNav.submit(context, 'POST /v1/care/caregivers', then: () => TNav.toast(context, 'Invite sent to Rosa', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Send invite', onPressed: () => TNav.submit(context, 'POST /v1/care/caregivers', screenId: 'sd_caregiver', then: () => TNav.toast(context, 'Invite sent to Rosa', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

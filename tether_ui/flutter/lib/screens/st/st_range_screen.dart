@@ -31,7 +31,7 @@ class StRangeScreen extends StatelessWidget {
         TLink(key: const ValueKey('a:body[6]'), label: 'Import from my health record', onTap: () => TNav.push(context, Routes.recordsAdd)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save range', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/st/range', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.stHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save range', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/st/range', screenId: 'st_range', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.stHome))), arrow: true),
       ],
     );
   }

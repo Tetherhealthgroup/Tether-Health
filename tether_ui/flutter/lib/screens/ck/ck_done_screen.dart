@@ -27,7 +27,7 @@ class CkDoneScreen extends StatelessWidget {
         TChecklist(items: [TCheckItem('Remind me next year', done: true)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/ck/done', then: () => TNav.toast(context, 'Saved · next due Sep 2027', then: () => TNav.replace(context, Routes.ckList))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/ck/done', screenId: 'ck_done', then: () => TNav.toast(context, 'Saved · next due Sep 2027', then: () => TNav.replace(context, Routes.ckList))), arrow: true),
       ],
     );
   }

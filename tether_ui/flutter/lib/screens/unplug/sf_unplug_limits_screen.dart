@@ -30,7 +30,7 @@ class SfUnplugLimitsScreen extends StatelessWidget {
         TBody('Every pause screen has a Get support button. Tether, the phone dialer and emergency calling can never be chosen or paused.', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save limits', onPressed: () => TNav.submit(context, 'CALL device:unplug/setThresholds+applyShield', then: () => TNav.toast(context, 'Unplug is on', then: () => TNav.replace(context, Routes.sfUnplugHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save limits', onPressed: () => TNav.submit(context, 'CALL device:unplug/setThresholds+applyShield', screenId: 'sf_unplug_limits', then: () => TNav.toast(context, 'Unplug is on', then: () => TNav.replace(context, Routes.sfUnplugHome))), arrow: true),
       ],
     );
   }

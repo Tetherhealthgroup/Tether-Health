@@ -30,7 +30,7 @@ class SupportMessageCareScreen extends StatelessWidget {
         TEmergencyCard(text: 'Chest pain, trouble breathing or thoughts of harming yourself? Call 911 · call or text 988.', actions: [TButton(key: const ValueKey('a:body[4].actions[0]'), label: 'Call or text 988', onPressed: () => TNav.push(context, Routes.crisis), variant: TButtonVariant.danger, small: true), TButton(key: const ValueKey('a:body[4].actions[1]'), label: 'Call 911', onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.secondary, small: true)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Send message', onPressed: () => TNav.submit(context, 'POST /v1/care/messages', then: () => TNav.toast(context, 'Message sent', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Send message', onPressed: () => TNav.submit(context, 'POST /v1/care/messages', screenId: 'support_message_care', then: () => TNav.toast(context, 'Message sent', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

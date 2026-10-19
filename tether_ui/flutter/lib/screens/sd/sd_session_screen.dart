@@ -31,7 +31,7 @@ class SdSessionScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Next exercise', onPressed: () => TNav.toast(context, 'Exercise 3 of 6'), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Finish session', onPressed: () => TNav.submit(context, 'POST /v1/program-data/sd/sessions', then: () => TNav.toast(context, 'Session saved', then: () => TNav.replace(context, Routes.sdHome))), variant: TButtonVariant.white, arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: 'Finish session', onPressed: () => TNav.submit(context, 'POST /v1/program-data/sd/sessions', screenId: 'sd_session', then: () => TNav.toast(context, 'Session saved', then: () => TNav.replace(context, Routes.sdHome))), variant: TButtonVariant.white, arrow: true),
       ],
     );
   }

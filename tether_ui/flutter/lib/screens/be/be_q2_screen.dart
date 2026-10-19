@@ -28,7 +28,7 @@ class BeQ2Screen extends StatelessWidget {
         TCard(variant: TCardVariant.mint, text: 'A relative diagnosed before 50 may mean earlier screening or genetic counseling. We’ll add this to your visit list.'),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'See my plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/be/profile', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.beHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'See my plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/be/profile', screenId: 'be_q2', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.beHome))), arrow: true),
       ],
     );
   }

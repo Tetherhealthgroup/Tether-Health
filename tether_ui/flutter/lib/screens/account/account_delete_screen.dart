@@ -30,7 +30,7 @@ class AccountDeleteScreen extends StatelessWidget {
         TField(fieldKey: 'account_delete.password', label: 'Password', hint: 'We ask again to protect your account.', placeholder: '••••••••••••', kind: TFieldKind.password),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Delete everything', onPressed: () => TNav.submit(context, 'DELETE /v1/account/data', then: () => TNav.replace(context, Routes.accountDeleted)), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Delete everything', onPressed: () => TNav.submit(context, 'DELETE /v1/account/data', screenId: 'account_delete', then: () => TNav.replace(context, Routes.accountDeleted)), variant: TButtonVariant.danger),
       ],
     );
   }

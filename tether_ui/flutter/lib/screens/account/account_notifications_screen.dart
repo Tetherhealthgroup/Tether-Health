@@ -27,7 +27,7 @@ class AccountNotificationsScreen extends StatelessWidget {
         TCard(eyebrow: 'Lock screen preview', title: 'Tether Health', text: 'You have a Tether reminder.'),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'PATCH /v1/notifications/preferences', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'PATCH /v1/notifications/preferences', screenId: 'account_notifications', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

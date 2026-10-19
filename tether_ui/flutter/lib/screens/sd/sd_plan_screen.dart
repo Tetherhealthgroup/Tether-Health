@@ -27,7 +27,7 @@ class SdPlanScreen extends StatelessWidget {
         TBody('Check with your clinician before starting a new exercise program.', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Start plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sd/plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.sdHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Start plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sd/plan', screenId: 'sd_plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.sdHome))), arrow: true),
       ],
     );
   }

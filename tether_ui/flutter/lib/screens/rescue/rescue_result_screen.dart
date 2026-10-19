@@ -30,7 +30,7 @@ class RescueResultScreen extends StatelessWidget {
         TLink(key: const ValueKey('a:body[5]'), label: 'Still strong? Get more help', onTap: () => TNav.push(context, Routes.rescueEscalate)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Back to Today', onPressed: () => TNav.submit(context, 'POST /v1/records/rescues', then: () => TNav.reset(context, Routes.today)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Back to Today', onPressed: () => TNav.submit(context, 'POST /v1/records/rescues', screenId: 'rescue_result', then: () => TNav.reset(context, Routes.today)), arrow: true),
       ],
     );
   }

@@ -31,7 +31,7 @@ class CkQ1Screen extends StatelessWidget {
         TLink(key: const ValueKey('a:body[6]'), label: 'Import vaccination history', onTap: () => TNav.push(context, Routes.recordsAdd)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Build my list', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/ck/profile', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.ckList))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Build my list', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/ck/profile', screenId: 'ck_q1', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.ckList))), arrow: true),
       ],
     );
   }

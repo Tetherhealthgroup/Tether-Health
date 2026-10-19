@@ -31,7 +31,7 @@ class HwTargetsScreen extends StatelessWidget {
         TLink(key: const ValueKey('a:body[6]'), label: 'Import from my health record', onTap: () => TNav.push(context, Routes.recordsAdd)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save targets', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/hw/targets', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.hwHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save targets', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/hw/targets', screenId: 'hw_targets', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.hwHome))), arrow: true),
       ],
     );
   }

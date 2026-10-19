@@ -30,7 +30,7 @@ class AccountDeleteAppleScreen extends StatelessWidget {
         TCard(variant: TCardVariant.mint, eyebrow: 'Confirm it’s you', title: 'Signed in with Apple', text: 'When you tap Delete everything, Apple asks you to confirm. Use the same Apple account you signed in with.'),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Delete everything', onPressed: () => TNav.branch(context, 'Sign in with Apple result', <String, VoidCallback>{'Success': () => TNav.submit(context, 'DELETE /v1/account/data', then: () => TNav.replace(context, Routes.accountDeleted)), 'Different account': () => TNav.toast(context, 'That’s a different Apple account. Use the one you signed in with.'), 'Cancelled': () => TNav.toast(context, 'Nothing was deleted.'), 'Error': () => TNav.toast(context, 'Couldn’t reach Apple. Nothing was deleted.')}, provider: 'apple'), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Delete everything', onPressed: () => TNav.branch(context, 'Sign in with Apple result', <String, VoidCallback>{'Success': () => TNav.submit(context, 'DELETE /v1/account/data', screenId: 'account_delete_apple', then: () => TNav.replace(context, Routes.accountDeleted)), 'Different account': () => TNav.toast(context, 'That’s a different Apple account. Use the one you signed in with.'), 'Cancelled': () => TNav.toast(context, 'Nothing was deleted.'), 'Error': () => TNav.toast(context, 'Couldn’t reach Apple. Nothing was deleted.')}, provider: 'apple'), variant: TButtonVariant.danger),
       ],
     );
   }

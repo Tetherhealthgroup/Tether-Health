@@ -28,7 +28,7 @@ class EaCheckbackScreen extends StatelessWidget {
         TCard(variant: TCardVariant.mint, text: 'That’s okay. Would a short list of what to say help?', cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: 'Show me', onPressed: () => TNav.push(context, Routes.learnLesson), small: true)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/ea/check-backs', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/ea/check-backs', screenId: 'ea_checkback', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

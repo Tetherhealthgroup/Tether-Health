@@ -33,7 +33,7 @@ class BfReviewScreen extends StatelessWidget {
         TBody('Starting turns on your preparation tasks and reminders. Support messages always need your approval.', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Start my plan', onPressed: () => TNav.submit(context, 'PUT /v1/quit-plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.bfHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Start my plan', onPressed: () => TNav.submit(context, 'PUT /v1/quit-plan', screenId: 'bf_review', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.bfHome))), arrow: true),
         TLink(key: const ValueKey('a:footer[1]'), label: 'Save and finish later', onTap: () => TNav.tab(context, Routes.plans)),
       ],
     );

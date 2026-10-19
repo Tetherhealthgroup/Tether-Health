@@ -28,7 +28,7 @@ class ReResultScreen extends StatelessWidget {
         TCard(key: const ValueKey('a:body[3]'), title: 'Also see Heartwise and Steady', text: 'Managing BP and glucose protects your kidneys.', onTap: () => TNav.push(context, Routes.catalog)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save my plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/re/plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.reHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save my plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/re/plan', screenId: 're_result', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.reHome))), arrow: true),
       ],
     );
   }

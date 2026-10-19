@@ -25,7 +25,7 @@ class RecordsDisconnectScreen extends StatelessWidget {
         TRadioList(fieldKey: 'records_disconnect.keep', items: [TRadioItem('Keep imported data', sub: 'Marked “from Patel Family Medicine”'), TRadioItem('Delete data imported from this source', sub: '21 items removed from your programs')], selected: 0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Disconnect source', onPressed: () => TNav.submit(context, 'DELETE /v1/records/fhir/sources/:id', then: () => TNav.toast(context, 'Disconnected', then: () => TNav.popTo(context, Routes.recordsHub))), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Disconnect source', onPressed: () => TNav.submit(context, 'DELETE /v1/records/fhir/sources/:id', screenId: 'records_disconnect', then: () => TNav.toast(context, 'Disconnected', then: () => TNav.popTo(context, Routes.recordsHub))), variant: TButtonVariant.danger),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );

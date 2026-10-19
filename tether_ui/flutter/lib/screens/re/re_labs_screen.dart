@@ -30,7 +30,7 @@ class ReLabsScreen extends StatelessWidget {
         TLink(key: const ValueKey('a:body[5]'), label: 'Import from my health record', onTap: () => TNav.push(context, Routes.recordsAdd)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save results', onPressed: () => TNav.submit(context, 'POST /v1/program-data/re/labs', then: () => TNav.toast(context, 'Saved', then: () => TNav.replace(context, Routes.reHistory))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save results', onPressed: () => TNav.submit(context, 'POST /v1/program-data/re/labs', screenId: 're_labs', then: () => TNav.toast(context, 'Saved', then: () => TNav.replace(context, Routes.reHistory))), arrow: true),
       ],
     );
   }

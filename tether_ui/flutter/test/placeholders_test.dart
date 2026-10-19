@@ -12,9 +12,9 @@ import 'package:tether_ui/ui/ui.dart';
 class _RecordingApi implements TApi {
   final List<(String, Map<String, Object?>)> calls = [];
   @override
-  Future<bool> submit(String endpoint) async {
+  Future<TResult> submit(String endpoint, {required String screenId}) async {
     calls.add((endpoint, Map<String, Object?>.of(TSession.values)));
-    return true;
+    return const TResult.ok();
   }
 }
 

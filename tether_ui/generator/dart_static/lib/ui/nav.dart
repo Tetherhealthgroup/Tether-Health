@@ -2,8 +2,10 @@
 //
 // Every button in the generated screens calls one of these helpers, so the
 // behaviour of an action type (push, sheet, call, submit, branch, auth...)
-// is defined in exactly one place. Replace the default [TPlatform], [TApi]
-// and [TAuth] implementations with real ones at startup.
+// is defined in exactly one place. Replace the default [TPlatform], [TApi],
+// [TAuth], [TData] (data.dart) and [TNav.branchResolver] implementations
+// with real ones at startup, from app code. This package never imports app
+// code, network or storage.
 import 'package:flutter/material.dart';
 
 import '../logic/rules.dart';
@@ -45,19 +47,78 @@ class PreviewPlatform implements TPlatform {
   Future<void> openOsSettings(BuildContext context) async => _rec(context, 'os_settings', '', 'Would open phone Settings');
 }
 
+/// Result of a backend call.
+///
+/// - [TOk]: saved; the flow continues.
+/// - [TQueued]: kept on the phone and sent later (outbox); the flow continues.
+/// - [TFailed]: not saved. [TFailed.code] is an error code, never content.
+/// - [TOutcome]: saved, and the server decided [TOutcome.label]. The branch
+///   that runs next takes that label when no on-device rule decides it.
+sealed class TResult {
+  const TResult();
+  const factory TResult.ok() = TOk;
+  const factory TResult.failed(String code) = TFailed;
+  const factory TResult.outcome(String label) = TOutcome;
+  const factory TResult.queued() = TQueued;
+}
+
+final class TOk extends TResult {
+  const TOk();
+  @override
+  bool operator ==(Object other) => other is TOk;
+  @override
+  int get hashCode => (TOk).hashCode;
+  @override
+  String toString() => 'TResult.ok()';
+}
+
+final class TFailed extends TResult {
+  const TFailed(this.code);
+  final String code;
+  @override
+  bool operator ==(Object other) => other is TFailed && other.code == code;
+  @override
+  int get hashCode => Object.hash(TFailed, code);
+  @override
+  String toString() => 'TResult.failed($code)';
+}
+
+final class TOutcome extends TResult {
+  const TOutcome(this.label);
+  final String label;
+  @override
+  bool operator ==(Object other) => other is TOutcome && other.label == label;
+  @override
+  int get hashCode => Object.hash(TOutcome, label);
+  @override
+  String toString() => 'TResult.outcome($label)';
+}
+
+final class TQueued extends TResult {
+  const TQueued();
+  @override
+  bool operator ==(Object other) => other is TQueued;
+  @override
+  int get hashCode => (TQueued).hashCode;
+  @override
+  String toString() => 'TResult.queued()';
+}
+
 /// Backend calls named in the spec (e.g. `POST /v1/records/check-ins`).
+/// [screenId] is the screen that submits; the adapter reads the payload from
+/// the [TSession] keys prefixed "<screenId>." (and any declared extra keys).
 /// Default: succeeds immediately and records the endpoint.
 abstract class TApi {
   static TApi instance = PreviewApi();
-  Future<bool> submit(String endpoint);
+  Future<TResult> submit(String endpoint, {required String screenId});
 }
 
 class PreviewApi implements TApi {
   static final List<String> calls = <String>[];
   @override
-  Future<bool> submit(String endpoint) async {
+  Future<TResult> submit(String endpoint, {required String screenId}) async {
     calls.add(endpoint);
-    return true;
+    return const TResult.ok();
   }
 }
 
@@ -70,12 +131,64 @@ abstract class TAuth {
   Future<String?> signIn(String provider, List<String> outcomes);
 }
 
-/// Decides external outcomes when no rule, queue or force applies. The
-/// default asks the developer/tester to pick, like the HTML prototype.
+/// Decides external outcomes when no rule, server outcome, queue or force
+/// applies. Returns the picked outcome label, or null to take no outcome.
+/// The preview default ([TNav.previewResolver]) asks the developer/tester to
+/// pick, like the HTML prototype. Production installs a fail-closed resolver
+/// ([TFailClosedResolver]).
 typedef TBranchResolver = Future<String?> Function(BuildContext context, String question, List<String> outcomes);
 
+/// Production resolver: a branch that no rule or adapter decided takes no
+/// outcome. It shows a generic error and records [code], and never shows the
+/// preview chooser. Install it at startup, from app code:
+///
+///     TNav.branchResolver = TFailClosedResolver(onCode: log).resolve;
+///
+/// [onCode] receives only [code]: never the question or the outcome labels,
+/// which can reveal what the member was doing.
+class TFailClosedResolver {
+  TFailClosedResolver({this.onCode, this.showError});
+
+  /// Error code recorded for an undecided branch.
+  static const String code = 'ui_branch_undecided';
+
+  /// Generic message shown by default. Draft copy, for owner review.
+  static const String message = 'Something went wrong. Please try again.';
+
+  /// Receives [code] each time a branch is left undecided.
+  final void Function(String code)? onCode;
+
+  /// Shows the error. Default: [TNav.toast] with [message].
+  final void Function(BuildContext context)? showError;
+
+  /// Codes recorded by this resolver, oldest first (at most 20).
+  final List<String> recorded = <String>[];
+
+  Future<String?> resolve(BuildContext context, String question, List<String> outcomes) async {
+    if (recorded.length == 20) recorded.removeAt(0);
+    recorded.add(code);
+    onCode?.call(code);
+    if (context.mounted) {
+      final show = showError;
+      if (show != null) {
+        show(context);
+      } else {
+        TNav.toast(context, message);
+      }
+    }
+    return null;
+  }
+}
+
 abstract final class TNav {
-  static TBranchResolver branchResolver = _askOutcome;
+  /// The preview chooser ("Preview: …" sheet). Never install it in release.
+  static const TBranchResolver previewResolver = _askOutcome;
+
+  static TBranchResolver branchResolver = previewResolver;
+
+  /// Outcome label returned by the submit whose `then` is running, so the
+  /// branch inside `then` can take it. Set only while `then` runs.
+  static String? _serverOutcome;
 
   static Future<void> push(BuildContext context, String route) => Navigator.of(context).pushNamed(route);
 
@@ -149,13 +262,21 @@ abstract final class TNav {
     if (then != null) then();
   }
 
-  static Future<void> submit(BuildContext context, String endpoint, {VoidCallback? then}) async {
-    final ok = await TApi.instance.submit(endpoint);
+  static Future<void> submit(BuildContext context, String endpoint, {required String screenId, VoidCallback? then}) async {
+    final result = await TApi.instance.submit(endpoint, screenId: screenId);
     if (!context.mounted) return;
-    if (ok) {
-      then?.call();
-    } else {
-      toast(context, 'Couldn’t save. Your entry is kept on this phone.');
+    switch (result) {
+      case TOk() || TQueued():
+        then?.call();
+      case TOutcome(:final label):
+        _serverOutcome = label;
+        try {
+          then?.call();
+        } finally {
+          _serverOutcome = null;
+        }
+      case TFailed():
+        toast(context, 'Couldn’t save. Your entry is kept on this phone.');
     }
   }
 
@@ -168,14 +289,20 @@ abstract final class TNav {
   static Future<void> osSettings(BuildContext context) => TPlatform.instance.openOsSettings(context);
 
   /// Run the outcome of a decision. Order: forced (tests) → rule / visible
-  /// choice (`decide`) → queued simulation outcome → native auth → resolver.
+  /// choice (`decide`) → server outcome of the submit that led here →
+  /// queued simulation outcome → native auth → resolver.
   static Future<void> branch(BuildContext context, String question, Map<String, VoidCallback> outcomes, {String? decide, String? provider}) async {
     final labels = outcomes.keys.toList();
+    final server = _serverOutcome;
+    _serverOutcome = null; // one branch only
     String? picked;
     if (TSim.force != null && outcomes.containsKey(TSim.force)) {
       picked = TSim.force;
     } else if (decide != null) {
       picked = TRules.match(TRules.decide(decide, TSession.values), labels);
+    }
+    if (picked == null && server != null && outcomes.containsKey(server)) {
+      picked = server;
     }
     if (picked == null && TSim.queue.isNotEmpty) {
       picked = TRules.match(TSim.queue.removeAt(0), labels);

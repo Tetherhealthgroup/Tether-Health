@@ -24,7 +24,7 @@ class RecordsConflictScreen extends StatelessWidget {
         TCard(eyebrow: 'Blood pressure · Aug 4, 2026', title: '1290/80 is outside the possible range', children: [TRadioList(fieldKey: 'records_conflict.bp', items: [TRadioItem('Discard', sub: 'Likely a typo in the source'), TRadioItem('Keep as 129/80', sub: 'Corrected by you, marked as edited'), TRadioItem('Ask my care team', sub: 'Sends a question with the original value')], selected: 1)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save choices', onPressed: () => TNav.submit(context, 'POST /v1/records/fhir/conflicts', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save choices', onPressed: () => TNav.submit(context, 'POST /v1/records/fhir/conflicts', screenId: 'records_conflict', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

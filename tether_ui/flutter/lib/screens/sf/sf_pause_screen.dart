@@ -30,7 +30,7 @@ class SfPauseScreen extends StatelessWidget {
         TCard(variant: TCardVariant.dark2, title: 'Bored? Try instead:', text: '2-min walk · text one real person · a short lesson'),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'I’m good, put it down', onPressed: () => TNav.submit(context, 'POST /v1/program-data/sf/pauses', then: () => TNav.toast(context, 'Nice. Logged as a pause.', then: () => TNav.reset(context, Routes.today))), variant: TButtonVariant.white, arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'I’m good, put it down', onPressed: () => TNav.submit(context, 'POST /v1/program-data/sf/pauses', screenId: 'sf_pause', then: () => TNav.toast(context, 'Nice. Logged as a pause.', then: () => TNav.reset(context, Routes.today))), variant: TButtonVariant.white, arrow: true),
         TLink(key: const ValueKey('a:footer[1]'), label: 'Open anyway (logged as information)', onTap: () => TNav.toast(context, 'Logged. No judgment.', then: () => TNav.close(context))),
       ],
     );

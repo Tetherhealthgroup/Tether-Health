@@ -33,7 +33,7 @@ def act(a):
         return f"TNav.toast(context, {dstr(a['value'])}{then})"
     if t == 'submit':
         then = f", then: () => {act(a['then'])}" if a.get('then') else ''
-        return f"TNav.submit(context, {dstr(a['api'])}{then})"
+        return f"TNav.submit(context, {dstr(a['api'])}, screenId: {dstr(CUR['sid'])}{then})"
     if t == 'branch':
         cases = ', '.join(f"{dstr(c['label'])}: () => {act(c['action'])}" for c in a['cases'])
         extra = ''
@@ -205,7 +205,7 @@ def generate(out_dir, describe, static_dir):
     if os.path.exists(out_dir): shutil.rmtree(out_dir)
     shutil.copytree(static_dir, out_dir)
     # barrel
-    open(os.path.join(lib, 'ui', 'ui.dart'), 'w').write("export '../logic/rules.dart';\nexport 'components.dart';\nexport 'nav.dart';\nexport 'tokens.dart';\n")
+    open(os.path.join(lib, 'ui', 'ui.dart'), 'w').write("export '../logic/rules.dart';\nexport 'components.dart';\nexport 'data.dart';\nexport 'nav.dart';\nexport 'tokens.dart';\n")
     # routes
     lines = ['// GENERATED — route names for every screen and state in spec/screens.json.', 'abstract final class Routes {']
     for sid, s in SCREENS.items():

@@ -29,7 +29,7 @@ class CaZoneScreen extends StatelessWidget {
         TBody('Worked out only from the plan you entered (green from 400, red below 200).', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save and see my steps', onPressed: () => TNav.submit(context, 'POST /v1/program-data/ca/zone-checks', then: () => TNav.branch(context, 'Computed zone', <String, VoidCallback>{'Green': () => TNav.toast(context, 'Green zone · follow your daily routine', then: () => TNav.replace(context, Routes.caHome)), 'Yellow': () => TNav.replace(context, Routes.caYellow), 'Red': () => TNav.replace(context, Routes.caRed), 'Invalid peak flow': () => TNav.toast(context, 'Check your peak flow: 50–900 L/min')}, decide: 'ca.zone')), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save and see my steps', onPressed: () => TNav.submit(context, 'POST /v1/program-data/ca/zone-checks', screenId: 'ca_zone', then: () => TNav.branch(context, 'Computed zone', <String, VoidCallback>{'Green': () => TNav.toast(context, 'Green zone · follow your daily routine', then: () => TNav.replace(context, Routes.caHome)), 'Yellow': () => TNav.replace(context, Routes.caYellow), 'Red': () => TNav.replace(context, Routes.caRed), 'Invalid peak flow': () => TNav.toast(context, 'Check your peak flow: 50–900 L/min')}, decide: 'ca.zone')), arrow: true),
       ],
     );
   }

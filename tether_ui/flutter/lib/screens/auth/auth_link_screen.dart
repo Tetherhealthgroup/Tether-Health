@@ -30,7 +30,7 @@ class AuthLinkScreen extends StatelessWidget {
         TLink(key: const ValueKey('a:body[4]'), label: 'Forgot password?', onTap: () => TNav.push(context, Routes.authForgot)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Link and sign in', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/user/identities (linkIdentity)', then: () => TNav.reset(context, Routes.today)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Link and sign in', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/user/identities (linkIdentity)', screenId: 'auth_link', then: () => TNav.reset(context, Routes.today)), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );

@@ -30,7 +30,7 @@ class BfSlipScreen extends StatelessWidget {
         TRadioList(fieldKey: 'bf_slip.next', items: [TRadioItem('Continue from this moment', sub: 'Keep your plan', badge: 'Recommended'), TRadioItem('Choose a new quit time')], selected: 0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save and start a 2-min Rescue', onPressed: () => TNav.submit(context, 'POST /v1/records/lapses', then: () => TNav.branch(context, 'Selected option', <String, VoidCallback>{'Continue from this moment': () => TNav.replace(context, Routes.rescueActive), 'Choose a new quit time': () => TNav.replace(context, Routes.bfDate)}, decide: 'choice:bf_slip.next')), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save and start a 2-min Rescue', onPressed: () => TNav.submit(context, 'POST /v1/records/lapses', screenId: 'bf_slip', then: () => TNav.branch(context, 'Selected option', <String, VoidCallback>{'Continue from this moment': () => TNav.replace(context, Routes.rescueActive), 'Choose a new quit time': () => TNav.replace(context, Routes.bfDate)}, decide: 'choice:bf_slip.next')), arrow: true),
         TLink(key: const ValueKey('a:footer[1]'), label: 'Skip for now', onTap: () => TNav.back(context)),
       ],
     );

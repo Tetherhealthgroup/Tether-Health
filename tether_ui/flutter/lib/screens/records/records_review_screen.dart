@@ -35,7 +35,7 @@ class RecordsReviewScreen extends StatelessWidget {
         TKeyValue(rows: [('Units converted', '2 glucose results · mmol/L → mg/dL'), ('Duplicates skipped', '3 readings you already entered'), ('Held as likely typo', '1 · BP 1290/80'), ('Future dates rejected', '0')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Add 21 items to my programs', onPressed: () => TNav.submit(context, 'POST /v1/records/fhir/accept', then: () => TNav.toast(context, 'Added to Heartwise, Steady, Checkup, BreatheFree and Renew', then: () => TNav.popTo(context, Routes.recordsHub))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Add 21 items to my programs', onPressed: () => TNav.submit(context, 'POST /v1/records/fhir/accept', screenId: 'records_review', then: () => TNav.toast(context, 'Added to Heartwise, Steady, Checkup, BreatheFree and Renew', then: () => TNav.popTo(context, Routes.recordsHub))), arrow: true),
         TLink(key: const ValueKey('a:footer[1]'), label: 'Review conflicts first', onTap: () => TNav.push(context, Routes.recordsConflict)),
       ],
     );

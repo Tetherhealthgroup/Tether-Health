@@ -36,7 +36,7 @@ class BeSurvivorScreen extends StatelessWidget {
         TListGroup(rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: 'Program settings', onTap: () => TNav.push(context, Routes.programSettings))]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save check-in', onPressed: () => TNav.submit(context, 'POST /v1/program-data/be/survivorship', then: () => TNav.toast(context, 'Saved')), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save check-in', onPressed: () => TNav.submit(context, 'POST /v1/program-data/be/survivorship', screenId: 'be_survivor', then: () => TNav.toast(context, 'Saved')), arrow: true),
       ],
     );
   }

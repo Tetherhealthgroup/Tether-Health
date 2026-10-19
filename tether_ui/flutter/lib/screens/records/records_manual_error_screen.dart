@@ -28,7 +28,7 @@ class RecordsManualErrorScreen extends StatelessWidget {
         TField(fieldKey: 'records_manual_error.date', label: 'Date', placeholder: 'Oct 1, 2026', kind: TFieldKind.date),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/records/manual', then: () => TNav.branch(context, 'Validation', <String, VoidCallback>{'Valid': () => TNav.toast(context, 'Saved · shared with Steady', then: () => TNav.popTo(context, Routes.recordsHub)), 'Outside expected range': () => TNav.toast(context, 'Still outside the expected range')}, decide: 'rec.manual')), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/records/manual', screenId: 'records_manual_error', then: () => TNav.branch(context, 'Validation', <String, VoidCallback>{'Valid': () => TNav.toast(context, 'Saved · shared with Steady', then: () => TNav.popTo(context, Routes.recordsHub)), 'Outside expected range': () => TNav.toast(context, 'Still outside the expected range')}, decide: 'rec.manual')), arrow: true),
         TLink(key: const ValueKey('a:footer[1]'), label: 'Ask my care team instead', onTap: () => TNav.push(context, Routes.supportMessageCare)),
       ],
     );

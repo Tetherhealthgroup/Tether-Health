@@ -27,7 +27,7 @@ class StLogScreen extends StatelessWidget {
         TField(fieldKey: 'st_log.note_optional', label: 'Note (optional)', hint: 'Never shared unless you choose', placeholder: 'Pasta lunch'),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save reading', onPressed: () => TNav.submit(context, 'POST /v1/program-data/st/readings', then: () => TNav.branch(context, 'Reading vs. your range', <String, VoidCallback>{'In or above range': () => TNav.toast(context, 'Saved', then: () => TNav.replace(context, Routes.stHome)), 'Below your low': () => TNav.replace(context, Routes.stLow), 'Invalid (outside 20–600)': () => TNav.toast(context, 'Check your meter reading')}, decide: 'st.glucose')), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save reading', onPressed: () => TNav.submit(context, 'POST /v1/program-data/st/readings', screenId: 'st_log', then: () => TNav.branch(context, 'Reading vs. your range', <String, VoidCallback>{'In or above range': () => TNav.toast(context, 'Saved', then: () => TNav.replace(context, Routes.stHome)), 'Below your low': () => TNav.replace(context, Routes.stLow), 'Invalid (outside 20–600)': () => TNav.toast(context, 'Check your meter reading')}, decide: 'st.glucose')), arrow: true),
       ],
     );
   }
