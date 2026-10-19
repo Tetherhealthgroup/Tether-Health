@@ -68,6 +68,18 @@ class _GatedApi implements TApi {
   }
 }
 
+/// A save per call, each completing only when the test says so.
+class _EachCallApi implements TApi {
+  _EachCallApi(this.gates);
+  final List<Completer<TResult>> gates;
+  @override
+  Future<TResult> submit(String endpoint, {required String screenId}) {
+    final gate = Completer<TResult>();
+    gates.add(gate);
+    return gate.future;
+  }
+}
+
 /// Every route name pushed or put in place by a replace, in order.
 class _Arrivals extends NavigatorObserver {
   final List<String?> names = [];
@@ -375,14 +387,17 @@ void main() {
       expect(asked, ['Q2']);
     });
 
-    testWidgets('a then that throws still clears the outcome', (tester) async {
+    testWidgets('a then that throws still clears the outcome and ends the submit', (tester) async {
       await _hostPage(tester);
-      TApi.instance = _ScriptedApi(const TResult.outcome('A'));
+      final api = _ScriptedApi(const TResult.outcome('A'));
+      TApi.instance = api;
       await expectLater(TNav.submit(_hostContext, 'POST /x', screenId: 's', then: () => throw StateError('synthetic')), throwsStateError);
       final took = <String>[];
       await TNav.branch(_hostContext, 'Later', {'A': () => took.add('A')});
       expect(took, isEmpty);
       expect(asked, ['Later']);
+      expect(await TNav.submit(_hostContext, 'POST /x', screenId: 's'), const TResult.outcome('A'));
+      expect(api.calls, hasLength(2), reason: 'the submit is no longer in flight');
     });
   });
 
@@ -597,7 +612,7 @@ void main() {
       }
     }
 
-    testWidgets('a successful save still follows the branch (safety routes are only for failed saves)', (tester) async {
+    testWidgets('a successful save with a non-safety value follows the branch', (tester) async {
       TApi.instance = _ScriptedApi(const TResult.ok());
       await _open(tester, Routes.stLog);
       await enter(tester, 'st_log.reading', '142');
@@ -719,7 +734,208 @@ void main() {
     });
   });
 
+  group('in-flight guard', () {
+    const saveError = 'Couldn’t save. Your entry is kept on this phone.';
+
+    Future<void> selfHarm(WidgetTester tester) async {
+      await tester.ensureVisible(find.text('Thoughts of harming myself'));
+      await tester.tap(find.text('Thoughts of harming myself'), warnIfMissed: false);
+      await _settle(tester);
+    }
+
+    testWidgets('two pointer taps 150 ms apart during a slow save: one submit, then runs once', (tester) async {
+      final api = _GatedApi();
+      TApi.instance = api;
+      await _open(tester, Routes.hwLipids);
+      final button = find.byKey(const ValueKey('a:footer[0]'));
+      await tester.ensureVisible(button);
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.tap(button, warnIfMissed: false);
+      await tester.pump(const Duration(milliseconds: 150));
+      await tester.tap(button, warnIfMissed: false);
+      await tester.pump(const Duration(milliseconds: 150));
+      expect(api.calls, 1);
+      api.gate.complete(const TResult.ok());
+      await tester.pump();
+      expect(find.text('Panel saved'), findsOneWidget);
+      await _settle(tester);
+      expect(find.byType(HwLipidsScreen), findsNothing);
+      expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    testWidgets('assistive-technology double activation (semantics tap twice): one submit', (tester) async {
+      final semantics = tester.ensureSemantics();
+      final api = _GatedApi();
+      TApi.instance = api;
+      await _open(tester, Routes.hwLipids);
+      await tester.ensureVisible(find.byKey(const ValueKey('a:footer[0]')));
+      await _settle(tester);
+      final node = find.semantics.byLabel('Save panel');
+      tester.semantics.tap(node);
+      tester.semantics.tap(node);
+      await tester.pump();
+      expect(api.calls, 1);
+      api.gate.complete(const TResult.ok());
+      await _settle(tester);
+      expect(find.byType(HwLipidsScreen), findsNothing);
+      await tester.pump(const Duration(seconds: 3));
+      semantics.dispose();
+    });
+
+    for (final (how, finish) in <(String, Future<void> Function(WidgetTester, Completer<TResult>))>[
+      ('failed', (t, gate) async => gate.complete(const TResult.failed('synthetic_code'))),
+      ('adapter_error', (t, gate) async => gate.completeError(Exception(_canary))),
+      ('timeout', (t, gate) => t.pump(const Duration(seconds: 30))), // submitTimeout passes during this pump
+    ]) {
+      testWidgets('after a $how save, a new tap submits again', (tester) async {
+        final gates = <Completer<TResult>>[];
+        TApi.instance = _EachCallApi(gates);
+        await _open(tester, Routes.hwLipids);
+        await _tapKey(tester, 'footer[0]');
+        await tester.tap(find.byKey(const ValueKey('a:footer[0]')), warnIfMissed: false); // in flight: ignored
+        await tester.pump(const Duration(milliseconds: 150));
+        expect(gates, hasLength(1));
+        await finish(tester, gates.single);
+        await tester.pump();
+        expect(find.text(saveError), findsOneWidget);
+        expect(find.byType(HwLipidsScreen), findsOneWidget);
+        await tester.pump(const Duration(seconds: 3));
+        await _tapKey(tester, 'footer[0]'); // the retry
+        expect(gates, hasLength(2));
+        gates.last.complete(const TResult.ok());
+        await _settle(tester);
+        expect(find.text('Panel saved'), findsOneWidget);
+        await tester.pump(const Duration(seconds: 3));
+      });
+    }
+
+    testWidgets('the guard is per screen and submit', (tester) async {
+      await _hostPage(tester);
+      final gates = <Completer<TResult>>[];
+      TApi.instance = _EachCallApi(gates);
+      final first = TNav.submit(_hostContext, 'POST /x', screenId: 'a');
+      final again = TNav.submit(_hostContext, 'POST /x', screenId: 'a');
+      final otherScreen = TNav.submit(_hostContext, 'POST /x', screenId: 'b');
+      final otherSubmit = TNav.submit(_hostContext, 'POST /y', screenId: 'a');
+      expect(gates, hasLength(3), reason: 'same screen and submit: ignored; another screen or submit: sent');
+      for (final g in gates) {
+        g.complete(const TResult.ok());
+      }
+      expect(await again, isNull);
+      expect(await first, const TResult.ok());
+      expect(await otherScreen, const TResult.ok());
+      expect(await otherSubmit, const TResult.ok());
+    });
+
+    testWidgets('safety path: two taps open the crisis screen exactly once, with one submit', (tester) async {
+      final api = _GatedApi();
+      final arrivals = _Arrivals();
+      TApi.instance = api;
+      await _open(tester, Routes.eaMood, observers: [arrivals]);
+      await selfHarm(tester);
+      final button = find.byKey(const ValueKey('a:footer[0]'));
+      await tester.tap(button, warnIfMissed: false);
+      await tester.pump(const Duration(milliseconds: 150));
+      await tester.tap(button, warnIfMissed: false);
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(api.calls, 1);
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      api.gate.complete(const TResult.ok());
+      await _settle(tester);
+      expect(arrivals.names.where((n) => n == Routes.crisis), hasLength(1));
+      expect(find.text('Saved'), findsNothing);
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    testWidgets('safety path: semantics double activation opens the crisis screen exactly once, with one submit', (tester) async {
+      final semantics = tester.ensureSemantics();
+      final api = _GatedApi();
+      final arrivals = _Arrivals();
+      TApi.instance = api;
+      await _open(tester, Routes.eaMood, observers: [arrivals]);
+      await selfHarm(tester);
+      await tester.ensureVisible(find.byKey(const ValueKey('a:footer[0]')));
+      await _settle(tester);
+      final node = find.semantics.byLabel('Save');
+      tester.semantics.tap(node);
+      tester.semantics.tap(node);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(api.calls, 1);
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      expect(arrivals.names.where((n) => n == Routes.crisis), hasLength(1));
+      api.gate.complete(const TResult.ok());
+      await _settle(tester);
+      expect(arrivals.names.where((n) => n == Routes.crisis), hasLength(1));
+      await tester.pump(const Duration(seconds: 3));
+      semantics.dispose();
+    });
+
+    testWidgets('a safety value chosen during a slow save opens the crisis screen at once, once, with one submit', (tester) async {
+      final api = _GatedApi();
+      final arrivals = _Arrivals();
+      TApi.instance = api;
+      await _open(tester, Routes.eaMood, observers: [arrivals]);
+      await _tapKey(tester, 'footer[0]'); // "No": waits for the save
+      expect(find.byType(EaMoodScreen), findsOneWidget);
+      await selfHarm(tester);
+      await tester.tap(find.byKey(const ValueKey('a:footer[0]')), warnIfMissed: false);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(api.calls, 1, reason: 'the second tap sends no second save');
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      api.gate.complete(const TResult.ok());
+      await _settle(tester);
+      expect(arrivals.names.where((n) => n == Routes.crisis), hasLength(1));
+      expect(find.text('Saved'), findsNothing);
+      expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(seconds: 3));
+    });
+  });
+
   group('save timeout', () {
+    testWidgets('safety path: the background save gives failed(timeout) after submitTimeout, and nothing navigates again', (tester) async {
+      TNav.submitTimeout = const Duration(seconds: 5);
+      final api = _GatedApi();
+      final arrivals = _Arrivals();
+      TApi.instance = api;
+      await _open(tester, Routes.eaMood, observers: [arrivals]);
+      await tester.ensureVisible(find.text('Thoughts of harming myself'));
+      await tester.tap(find.text('Thoughts of harming myself'), warnIfMissed: false);
+      await _settle(tester);
+      final context = tester.element(find.byType(EaMoodScreen));
+      var ran = 0;
+      TResult? result;
+      var done = false;
+      unawaited(TNav.submit(context, 'POST /v1/program-data/ea/moods', screenId: 'ea_mood', then: () => fail('then must not run on the safety path'), safety: TSafetyRoutes('ea.selfharm', {
+        'Yes': () {
+          ran++;
+          TNav.push(context, Routes.crisis);
+        },
+      })).then((r) {
+        result = r;
+        done = true;
+      }));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(ran, 1);
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      final seen = arrivals.names.length;
+      await tester.pump(const Duration(seconds: 4));
+      expect(done, isFalse, reason: 'still waiting for the save before submitTimeout');
+      await tester.pump(const Duration(seconds: 2));
+      expect(done, isTrue);
+      expect(result, const TResult.failed(TNav.timeoutCode));
+      expect(api.calls, 1);
+      await _settle(tester);
+      expect(ran, 1);
+      expect(arrivals.names.length, seen, reason: 'no navigation after the timeout');
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pump(const Duration(seconds: 3));
+    });
+
     testWidgets('a save that never completes gives failed(timeout) after submitTimeout', (tester) async {
       final api = _GatedApi();
       TApi.instance = api;

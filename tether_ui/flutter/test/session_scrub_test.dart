@@ -96,6 +96,53 @@ void main() {
     expect(TSession.values.containsKey('auth_signin.password'), isFalse);
   });
 
+  // The text in the field's controller (what the field shows and holds).
+  String fieldText(WidgetTester tester, String key) => tester.widget<EditableText>(find.descendant(of: find.byKey(ValueKey('field:$key')), matching: find.byType(EditableText))).controller.text;
+
+  Future<void> openSignIn(WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(MaterialApp(theme: tetherTheme(), onGenerateRoute: AppRouter.onGenerateRoute, initialRoute: '/auth/signin'));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.enterText(find.byKey(const ValueKey('field:auth_signin.email')), 'synthetic-user-01@example.test');
+    await tester.enterText(find.byKey(const ValueKey('field:auth_signin.password')), 'synthetic-pass-9');
+    await tester.pump();
+    expect(fieldText(tester, 'auth_signin.password'), 'synthetic-pass-9');
+  }
+
+  testWidgets('scrubPasswords empties the password field on screen and keeps the other fields', (tester) async {
+    await openSignIn(tester);
+    TSession.scrubPasswords();
+    await tester.pump();
+    expect(TSession.values['auth_signin.password'], isNull);
+    expect(fieldText(tester, 'auth_signin.password'), isEmpty);
+    expect(fieldText(tester, 'auth_signin.email'), 'synthetic-user-01@example.test');
+    expect(TSession.values['auth_signin.email'], 'synthetic-user-01@example.test');
+    expect(find.text('synthetic-pass-9', skipOffstage: false), findsNothing);
+    // Typing again works as before.
+    await tester.enterText(find.byKey(const ValueKey('field:auth_signin.password')), 'synthetic-pass-10');
+    await tester.pump();
+    expect(TSession.values['auth_signin.password'], 'synthetic-pass-10');
+  });
+
+  testWidgets('scrub of a field key empties that field', (tester) async {
+    await openSignIn(tester);
+    TSession.scrub(['auth_signin.email']);
+    await tester.pump();
+    expect(fieldText(tester, 'auth_signin.email'), isEmpty);
+    expect(fieldText(tester, 'auth_signin.password'), 'synthetic-pass-9');
+  });
+
+  testWidgets('clear empties every field on screen', (tester) async {
+    await openSignIn(tester);
+    TSession.clear();
+    await tester.pump();
+    expect(fieldText(tester, 'auth_signin.email'), isEmpty);
+    expect(fieldText(tester, 'auth_signin.password'), isEmpty);
+    expect(TSession.values, isEmpty);
+  });
+
   testWidgets('every password field in every screen writes to a password key', (tester) async {
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3;

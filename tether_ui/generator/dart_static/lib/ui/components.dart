@@ -758,10 +758,31 @@ class _TFieldState extends State<TField> {
   // P-31: generated fields have no value; an example is only placeholder
   // (hint) text and is never written to the session. The field writes null
   // until the user types, and null again if they clear it.
+  //
+  // When the field's session key is removed (TSession.scrub, scrubPasswords,
+  // clear), the field empties its text too, so a scrubbed value (a password)
+  // does not stay on screen or in the text controller.
+  late final TextEditingController _controller = TextEditingController(text: widget.value);
+
   @override
   void initState() {
     super.initState();
     TSession.set(widget.fieldKey, widget.value);
+    TSession.changes.addListener(_onSessionChange);
+  }
+
+  @override
+  void dispose() {
+    TSession.changes.removeListener(_onSessionChange);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onSessionChange() {
+    final key = widget.fieldKey;
+    if (key == null || TSession.values.containsKey(key) || _controller.text.isEmpty) return;
+    _controller.clear();
+    if (!_empty) setState(() => _empty = true);
   }
 
   /// Largest text scale for the unit (mmHg, mg/dL...). The value keeps the
@@ -807,7 +828,7 @@ class _TFieldState extends State<TField> {
       if (kind != TFieldKind.search) Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(label, style: TText.fieldLabel)),
       TextFormField(
         key: widget.fieldKey == null ? null : ValueKey('field:${widget.fieldKey}'),
-        initialValue: value,
+        controller: _controller,
         obscureText: kind == TFieldKind.password,
         keyboardType: keyboard,
         readOnly: readOnly,

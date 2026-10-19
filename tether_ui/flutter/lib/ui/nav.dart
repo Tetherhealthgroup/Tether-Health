@@ -178,18 +178,27 @@ final class TQueued extends TResult {
 /// the [TSession] keys prefixed "<screenId>." (and any declared extra keys).
 /// Preview default: succeeds immediately and records the endpoint. Release
 /// default: [TUnconfiguredApi].
+///
+/// Adapters must make every submit idempotent, for example with an
+/// idempotency key that the server uses to keep one record per entry.
+/// [TNav.safeSubmit] stops waiting after [TNav.submitTimeout] and reports
+/// `failed('timeout')`, but the adapter's request can still complete after
+/// that; the member can then tap again after "Couldn’t save", and the retry
+/// must not create a second record. [TNav.submit] ignores further taps of a
+/// submit only while it is in flight.
 abstract class TApi {
   static TApi instance = TDefaults.api();
   Future<TResult> submit(String endpoint, {required String screenId});
 }
 
 /// The safety outcomes of the on-device rule that decides the branch after a
-/// submit, with the action for each. Generated from spec/rules.json
-/// (`safety`). [TNav.submit] runs [rule] when the member taps, before the
-/// save is awaited, and again if the save fails; when the result is one of
-/// [routes] it runs that action, so a safety screen opens at once, whether
-/// or not the save goes through. [pick] reads only the session values: the
-/// simulation hooks ([TSim]) never affect it.
+/// submit, with the action for each. Generated from the rule's `safety` list
+/// in the generator's rules.RULES (generator/rules.py), which is also
+/// exported to spec/rules.json. [TNav.submit] runs [rule] when the member
+/// taps, before the save is awaited, and again if the save fails; when the
+/// result is one of [routes] it runs that action, so a safety screen opens at
+/// once, whether or not the save goes through. [pick] reads only the session
+/// values: the simulation hooks ([TSim]) never affect it.
 class TSafetyRoutes {
   const TSafetyRoutes(this.rule, this.routes);
 
@@ -393,7 +402,11 @@ abstract final class TNav {
 
   static const String _saveError = 'Couldn’t save. Your entry is kept on this phone.';
 
-  /// Saves through [TApi.instance].
+  /// Submits in flight, by (screen id, endpoint). See [submit].
+  static final Map<(String, String), _Flight> _inFlight = <(String, String), _Flight>{};
+
+  /// Saves through [TApi.instance] and returns the save's result, or null
+  /// when this activation was ignored (see "In flight" below).
   ///
   /// When [safety]'s rule decides a safety outcome at the moment of the tap,
   /// that outcome's action runs at once, before the save is awaited; the save
@@ -410,29 +423,61 @@ abstract final class TNav {
   ///   shows the save error and, when [safety]'s rule now decides a safety
   ///   outcome, runs that outcome's action. Otherwise the member stays on
   ///   the screen.
-  static Future<void> submit(BuildContext context, String endpoint, {required String screenId, VoidCallback? then, TSafetyRoutes? safety}) async {
-    final safetyNow = safety?.pick();
-    if (safetyNow != null) {
-      safetyNow();
-      final result = await safeSubmit(endpoint, screenId: screenId);
-      if (result is TFailed && context.mounted) toast(context, _saveError);
-      return;
-    }
-    final result = await safeSubmit(endpoint, screenId: screenId);
-    if (!context.mounted) return;
-    switch (result) {
-      case TOk() || TQueued():
-        then?.call();
-      case TOutcome(:final label):
-        _serverOutcome = label;
-        try {
-          then?.call();
-        } finally {
-          _serverOutcome = null;
+  ///
+  /// In flight: from the tap until the submit completes (any result,
+  /// including `timeout` and `adapter_error`, and after [then] has run),
+  /// further activations of the same submit ([endpoint] from [screenId]) are
+  /// ignored: pointer taps and assistive-technology activations alike. The
+  /// save is sent once. An ignored activation still checks [safety]: when the
+  /// rule now decides a safety outcome and this submit has not run a safety
+  /// action yet, that action runs at once and then replaces [then], as
+  /// above. A safety screen therefore opens at most once per submit. Once the
+  /// submit completes, a new tap submits again (a retry after "Couldn’t
+  /// save"); adapters keep retries idempotent ([TApi]).
+  static Future<TResult?> submit(BuildContext context, String endpoint, {required String screenId, VoidCallback? then, TSafetyRoutes? safety}) async {
+    final key = (screenId, endpoint);
+    final pending = _inFlight[key];
+    if (pending != null) {
+      if (!pending.safetyRan) {
+        final safetyNow = safety?.pick();
+        if (safetyNow != null) {
+          pending.safetyRan = true;
+          safetyNow();
         }
-      case TFailed():
-        toast(context, _saveError);
-        safety?.pick()?.call();
+      }
+      return null;
+    }
+    final flight = _Flight();
+    _inFlight[key] = flight;
+    try {
+      final safetyNow = safety?.pick();
+      if (safetyNow != null) {
+        flight.safetyRan = true;
+        safetyNow();
+      }
+      final result = await safeSubmit(endpoint, screenId: screenId);
+      if (flight.safetyRan) {
+        if (result is TFailed && context.mounted) toast(context, _saveError);
+        return result;
+      }
+      if (!context.mounted) return result;
+      switch (result) {
+        case TOk() || TQueued():
+          then?.call();
+        case TOutcome(:final label):
+          _serverOutcome = label;
+          try {
+            then?.call();
+          } finally {
+            _serverOutcome = null;
+          }
+        case TFailed():
+          toast(context, _saveError);
+          safety?.pick()?.call();
+      }
+      return result;
+    } finally {
+      if (identical(_inFlight[key], flight)) _inFlight.remove(key);
     }
   }
 
@@ -511,4 +556,11 @@ abstract final class TNav {
 
   /// Route for a tab name (used by the tab bar).
   static String tabRoute(String tab) => AppRouter.tabRoutes[tab]!;
+}
+
+/// One submit in flight ([TNav.submit]).
+class _Flight {
+  /// A safety action has run for this submit, so [TNav.submit] does not run
+  /// `then` or another safety action when the save completes.
+  bool safetyRan = false;
 }
