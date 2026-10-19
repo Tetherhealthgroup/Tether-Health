@@ -451,7 +451,10 @@ paths:
         recorded (one that reaches the database) is refused with
         `account_deletion_in_progress`. The API's earlier checks still answer
         first: `sharing_not_available`, `enrolment_left`,
-        `consent_already_granted` and `core_consent_required`.
+        `consent_already_granted` and `core_consent_required`. For a first
+        grant or optional consent, `consent_document_unavailable` (no
+        grantable document) also answers before
+        `account_deletion_in_progress`.
 
         The share purposes (share_care_team, share_caregiver) are refused
         with `sharing_not_available` (409) until care connections exist.
