@@ -5,12 +5,47 @@
 // is defined in exactly one place. Replace the default [TPlatform], [TApi],
 // [TAuth], [TData] (data.dart) and [TNav.branchResolver] implementations
 // with real ones at startup, from app code. This package never imports app
-// code, network or storage.
+// code, network or storage. In release builds the defaults fail closed
+// ([TDefaults]); debug builds and tests get the preview defaults.
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../logic/rules.dart';
 import '../router/app_router.dart';
+import 'data.dart';
 import 'tokens.dart';
+
+/// Default hook implementations. Release builds ([kReleaseMode]) start with
+/// fail-closed defaults; debug builds and tests start with the preview ones.
+/// The app must install its real [TPlatform], [TApi], [TData], [TAuth] and
+/// [TNav.branchResolver] at startup; the release defaults only make a
+/// missing install fail safely.
+///
+/// | Hook | Preview default | Release default |
+/// |---|---|---|
+/// | [TNav.branchResolver] | [TNav.previewResolver] | [TFailClosedResolver] |
+/// | [TApi.instance] | [PreviewApi] | [TUnconfiguredApi]: `failed('not_configured')` |
+/// | [TData.instance] | [PreviewData] | [TEmptyData]: null for every key |
+/// | [TPlatform.instance] | [PreviewPlatform] | [TInertPlatform]: does nothing, records a code |
+abstract final class TDefaults {
+  static TBranchResolver branchResolver({bool release = kReleaseMode}) => release ? TFailClosedResolver().resolve : TNav.previewResolver;
+  static TApi api({bool release = kReleaseMode}) => release ? const TUnconfiguredApi() : PreviewApi();
+  static TData data({bool release = kReleaseMode}) => release ? const TEmptyData() : PreviewData();
+  static TPlatform platform({bool release = kReleaseMode}) => release ? TInertPlatform() : PreviewPlatform();
+
+  /// Installs the release defaults (what a release build starts with).
+  static void forRelease() => _install(release: true);
+
+  /// Installs the preview defaults (what debug builds and tests start with).
+  static void forPreview() => _install(release: false);
+
+  static void _install({required bool release}) {
+    TNav.branchResolver = branchResolver(release: release);
+    TApi.instance = api(release: release);
+    TData.instance = data(release: release);
+    TPlatform.instance = platform(release: release);
+  }
+}
 
 /// Flow context. While the member is in first-run setup, finishing a
 /// program's plan returns to the onboarding setup hub instead of the
@@ -20,10 +55,12 @@ class TFlow {
   static bool onboarding = false;
 }
 
-/// Side effects that leave the app. Default: snackbar + record (tests read
-/// [last]). Production: url_launcher / app_settings.
+/// Side effects that leave the app. Preview default: snackbar + record (tests
+/// read [PreviewPlatform.last]). Release default: [TInertPlatform]. The app
+/// must install its real implementation (url_launcher / app_settings), so
+/// crisis-call buttons place the call.
 abstract class TPlatform {
-  static TPlatform instance = PreviewPlatform();
+  static TPlatform instance = TDefaults.platform();
   Future<void> call(BuildContext context, String number, String label);
   Future<void> sms(BuildContext context, String recipient);
   Future<void> openUrl(BuildContext context, String url);
@@ -45,6 +82,36 @@ class PreviewPlatform implements TPlatform {
   Future<void> openUrl(BuildContext context, String url) async => _rec(context, 'external', url, 'Would open $url');
   @override
   Future<void> openOsSettings(BuildContext context) async => _rec(context, 'os_settings', '', 'Would open phone Settings');
+}
+
+/// Release default for [TPlatform]: does nothing and shows nothing, and
+/// records [code] (never the number, recipient or URL). It exists only so a
+/// missing install fails safely; the app must install a real [TPlatform].
+class TInertPlatform implements TPlatform {
+  TInertPlatform({this.onCode});
+
+  static const String code = 'platform_not_configured';
+
+  /// Receives [code] for every attempted side effect.
+  final void Function(String code)? onCode;
+
+  /// Codes recorded by this platform, oldest first (at most 20).
+  final List<String> recorded = <String>[];
+
+  void _rec() {
+    if (recorded.length == 20) recorded.removeAt(0);
+    recorded.add(code);
+    onCode?.call(code);
+  }
+
+  @override
+  Future<void> call(BuildContext context, String number, String label) async => _rec();
+  @override
+  Future<void> sms(BuildContext context, String recipient) async => _rec();
+  @override
+  Future<void> openUrl(BuildContext context, String url) async => _rec();
+  @override
+  Future<void> openOsSettings(BuildContext context) async => _rec();
 }
 
 /// Result of a backend call.
@@ -91,7 +158,7 @@ final class TOutcome extends TResult {
   @override
   int get hashCode => Object.hash(TOutcome, label);
   @override
-  String toString() => 'TResult.outcome($label)';
+  String toString() => 'TResult.outcome(<redacted>)'; // the label can be health content
 }
 
 final class TQueued extends TResult {
@@ -107,10 +174,21 @@ final class TQueued extends TResult {
 /// Backend calls named in the spec (e.g. `POST /v1/records/check-ins`).
 /// [screenId] is the screen that submits; the adapter reads the payload from
 /// the [TSession] keys prefixed "<screenId>." (and any declared extra keys).
-/// Default: succeeds immediately and records the endpoint.
+/// Preview default: succeeds immediately and records the endpoint. Release
+/// default: [TUnconfiguredApi].
 abstract class TApi {
-  static TApi instance = PreviewApi();
+  static TApi instance = TDefaults.api();
   Future<TResult> submit(String endpoint, {required String screenId});
+}
+
+/// Release default for [TApi]: every submit fails with [code].
+class TUnconfiguredApi implements TApi {
+  const TUnconfiguredApi();
+
+  static const String code = 'not_configured';
+
+  @override
+  Future<TResult> submit(String endpoint, {required String screenId}) async => const TResult.failed(code);
 }
 
 class PreviewApi implements TApi {
@@ -184,7 +262,11 @@ abstract final class TNav {
   /// The preview chooser ("Preview: …" sheet). Never install it in release.
   static const TBranchResolver previewResolver = _askOutcome;
 
-  static TBranchResolver branchResolver = previewResolver;
+  static TBranchResolver branchResolver = TDefaults.branchResolver();
+
+  /// Code of the [TFailed] result given for an adapter ([TApi]) that throws.
+  /// The exception and its message are dropped: they can carry payload.
+  static const String adapterErrorCode = 'adapter_error';
 
   /// Outcome label returned by the submit whose `then` is running, so the
   /// branch inside `then` can take it. Set only while `then` runs.
@@ -262,8 +344,18 @@ abstract final class TNav {
     if (then != null) then();
   }
 
+  /// Calls [TApi.instance]. An adapter that throws gives
+  /// `TResult.failed(adapterErrorCode)`; the exception is not kept.
+  static Future<TResult> safeSubmit(String endpoint, {required String screenId}) async {
+    try {
+      return await TApi.instance.submit(endpoint, screenId: screenId);
+    } catch (_) {
+      return const TResult.failed(adapterErrorCode);
+    }
+  }
+
   static Future<void> submit(BuildContext context, String endpoint, {required String screenId, VoidCallback? then}) async {
-    final result = await TApi.instance.submit(endpoint, screenId: screenId);
+    final result = await safeSubmit(endpoint, screenId: screenId);
     if (!context.mounted) return;
     switch (result) {
       case TOk() || TQueued():
@@ -308,7 +400,14 @@ abstract final class TNav {
       picked = TRules.match(TSim.queue.removeAt(0), labels);
     }
     if (picked == null && provider != null && TAuth.instance != null) {
-      picked = await TAuth.instance!.signIn(provider, labels);
+      // A sign-in adapter that throws, or answers a label that is not one of
+      // this branch's outcomes, decides nothing: the resolver runs.
+      try {
+        picked = await TAuth.instance!.signIn(provider, labels);
+      } catch (_) {
+        picked = null;
+      }
+      if (picked != null && !outcomes.containsKey(picked)) picked = null;
     }
     if (picked == null) {
       if (!context.mounted) return;

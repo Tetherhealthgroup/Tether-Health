@@ -41,7 +41,8 @@ abstract final class TSession {
 
   /// Empties the whole session (and the simulation hooks). The app calls this
   /// on sign-out, account switch and account deletion, so no other account's
-  /// data or password stays in memory.
+  /// data or password stays in memory. It does not reset `TData`: an
+  /// app-owned TData that caches values must drop them at the same points.
   static void clear() {
     values.clear();
     TSim.reset();

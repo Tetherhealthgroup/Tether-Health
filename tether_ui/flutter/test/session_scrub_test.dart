@@ -65,9 +65,11 @@ void main() {
     }
   });
 
-  test('clear empties the session and the simulation hooks', () {
+  test('clear empties the session, password keys included, and the simulation hooks', () {
     TSession.set('auth_signin.email', 'synthetic-user-01@example.test');
     TSession.set('hw_log.systolic', '120');
+    TSession.set('auth_signin.password', 'synthetic-pass-1');
+    TSession.set('auth_newpass.new_password', 'synthetic-pass-2');
     TSim.queue.add('Allowed');
     TSim.force = 'Allowed';
     var notified = 0;

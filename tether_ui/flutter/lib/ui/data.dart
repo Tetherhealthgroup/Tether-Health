@@ -1,12 +1,17 @@
 // Tether Health UI kit — live values for display.
 //
 // A bound slot shows a value from [TData.instance] in place of a spec
-// literal. [PreviewData] (the default) answers [TData.example] for every
+// literal. [PreviewData] (the debug and test default) answers [TData.example] for every
 // key, so the slot shows its fallback, which is the spec's example value:
 // the preview, scenarios and screenshots stay as they are. The app installs
 // its own [TData] at startup, from app code. A real [TData] never returns
 // [TData.example]; when it has no value it returns null and the slot shows
-// its empty state, never the fallback.
+// its empty state, never the fallback. Release builds start with
+// [TEmptyData] (see TDefaults in nav.dart).
+//
+// TSession.clear() does not reset TData. An app-owned TData that caches
+// values must drop them itself on sign-out, account switch and account
+// deletion.
 //
 // Binding changes data, never layout or visuals: a slot builds exactly the
 // widget the static component would build with the same value, and adds no
@@ -15,10 +20,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'components.dart';
+import 'nav.dart';
 
 /// Live values for display, keyed by bind key (for example `hw.last_bp`).
+///
+/// `TSession.clear()` does not reset this. An app-owned implementation that
+/// caches values must drop them on sign-out, account switch and account
+/// deletion.
 abstract class TData {
-  static TData instance = PreviewData();
+  static TData instance = TDefaults.data();
 
   /// Marker value meaning "show the spec's example value" (the slot's
   /// fallback). Only [PreviewData] returns it.
@@ -49,6 +59,17 @@ class PreviewData implements TData {
     if (!_values.containsKey(bindKey)) return _example;
     return _cache.putIfAbsent(bindKey, () => _Constant(_values[bindKey]));
   }
+}
+
+/// Release default for [TData]: null (no value) for every key, so slots show
+/// their empty state and never a fallback.
+class TEmptyData implements TData {
+  const TEmptyData();
+
+  static const ValueListenable<Object?> _none = _Constant(null);
+
+  @override
+  ValueListenable<Object?> watch(String bindKey) => _none;
 }
 
 class _Constant implements ValueListenable<Object?> {
