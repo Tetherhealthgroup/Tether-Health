@@ -52,9 +52,10 @@ import { openApiErrors, openApiSchemaNames } from "./support/openapi";
  *   code only, so the status and message do not affect the mapping.
  * - Consent documents are the fake's seeded CONSENT_DOCUMENTS: the current
  *   core version is v2-synthetic in both locales; v1-draft is grantable for
- *   every purpose. A race that Postgres resolves after a lock wait is
- *   emulated with interleave (the other transaction commits) plus failNext
- *   (the error this request then gets).
+ *   every purpose. One test retires the es core documents and restores
+ *   the seed in a finally block. A race that Postgres resolves after a
+ *   lock wait is emulated with interleave (the other transaction commits)
+ *   plus failNext (the error this request then gets).
  */
 
 type Method = "DELETE" | "GET" | "PATCH" | "POST";
@@ -789,7 +790,7 @@ describe("Enrolments and consents API (e2e)", () => {
       },
     );
 
-    it("refuses grants once account deletion started (consent_not_permitted)", async () => {
+    it("refuses grants once account deletion started (account_deletion_in_progress)", async () => {
       const a = newCaller();
       const withCore = await enrol(a, "re", "learn_only");
       const withoutCore = await enrol(a, "nu", "learn_only");
@@ -806,7 +807,7 @@ describe("Enrolments and consents API (e2e)", () => {
             ...SHOWN,
           }),
           409,
-          "consent_not_permitted",
+          "account_deletion_in_progress",
         );
       }
       expect(
@@ -815,6 +816,38 @@ describe("Enrolments and consents API (e2e)", () => {
           .filter((r) =>
             [withCore, withoutCore].includes(r.enrolment_id as string),
           )
+          .map((r) => r.purpose),
+      ).toEqual(["core"]);
+    });
+
+    // The same 42501 for another of the insert policy's checks (here the
+    // enrolment was left by a concurrent request) is not the barrier.
+    it("answers consent_not_permitted when the insert policy refuses for another reason", async () => {
+      const a = newCaller();
+      const id = await enrol(a, "sd", "learn_only");
+      await grant(a, id, "core");
+      fake.interleave("POST", "programme_consents", () => {
+        fake.forceEnrolmentStatus(id, "left");
+      });
+      const since = fake.requests.length;
+      expectCoded(
+        await call(a, "POST", "/v1/enrolments/consents", {
+          enrolmentId: id,
+          purpose: "research",
+          ...SHOWN,
+        }),
+        409,
+        "consent_not_permitted",
+      );
+      expect(
+        fake.requests
+          .slice(since)
+          .some((r) => r.path.endsWith("/rpc/deletion_barrier_open")),
+      ).toBe(true);
+      expect(
+        fake
+          .table("programme_consents")
+          .filter((r) => r.enrolment_id === id)
           .map((r) => r.purpose),
       ).toEqual(["core"]);
     });
@@ -998,6 +1031,54 @@ describe("Enrolments and consents API (e2e)", () => {
       ).toBe(true);
       expect(byId.get(left)).toEqual([CURRENT_CORE, false]);
     });
+    // Seeded for this case only: every core document in es is retired, so
+    // es has no current core version (en keeps its own).
+    it("offers no re-consent when no current core document exists for the member's locale", async () => {
+      const a = newCaller();
+      const inEs = await enrol(a, "ea", "learn_only");
+      const inEn = await enrol(a, "sd", "learn_only");
+      const core = await grant(a, inEs, "core", { locale: "es" });
+      await grant(a, inEn, "core");
+      fake.retireConsentDocuments("core", "es");
+      try {
+        const listed = await call(a, "GET", "/v1/enrolments");
+        expect(listed.statusCode).toBe(200);
+        expectSchema(listed, "EnrolmentList");
+        const body = listed.json<{
+          currentCoreConsentVersions: unknown;
+          enrolments: { id: string }[];
+        }>();
+        expect(body.currentCoreConsentVersions).toEqual({
+          en: CURRENT_CORE,
+          es: null,
+        });
+        expect(body.enrolments.find((e) => e.id === inEs)).toMatchObject({
+          currentCoreConsentVersion: null,
+          reconsentRequired: false,
+        });
+        // The en enrolment still has a current document to re-consent to.
+        expect(body.enrolments.find((e) => e.id === inEn)).toMatchObject({
+          currentCoreConsentVersion: CURRENT_CORE,
+          reconsentRequired: true,
+        });
+        expectCoded(
+          await call(a, "POST", "/v1/enrolments/consents", {
+            enrolmentId: inEs,
+            purpose: "core",
+            consentVersion: CURRENT_CORE_ES,
+            locale: "es",
+          }),
+          409,
+          "consent_document_unavailable",
+        );
+        const live = fake
+          .table("programme_consents")
+          .filter((r) => r.enrolment_id === inEs && r.revoked_at === null);
+        expect(live.map((r) => r.id)).toEqual([core]);
+      } finally {
+        fake.resetConsentDocuments();
+      }
+    });
   });
 
   describe("core re-consent (supersession)", () => {
@@ -1175,45 +1256,61 @@ describe("Enrolments and consents API (e2e)", () => {
       });
     });
 
-    it("after the retry also loses a race, answers from what is live (two calls at most)", async () => {
-      const { a, id } = await onDraft();
-      const since = fake.requests.length;
-      // Asked for v2-synthetic/en. Meanwhile the live core moves to
-      // v1-draft/es (first call: TH004), then to v3-synthetic/es, later than
-      // the requested version (retry: TH004).
-      fake.interleave("POST", "rpc/supersede_core_consent", () => {
-        fake.supersedeCoreConsent(a.id, id, "v1-draft", "es");
-      });
-      fake.failNext(
-        "POST",
-        "rpc/supersede_core_consent",
-        registryError("consent_requires_core"),
-      );
-      fake.interleave("POST", "rpc/supersede_core_consent", () => {
-        fake.supersedeCoreConsent(a.id, id, CURRENT_CORE_ES, "es");
-      });
-      fake.failNext(
-        "POST",
-        "rpc/supersede_core_consent",
-        registryError("consent_requires_core"),
-      );
-      expectCoded(
-        await reconsent(a, id, CURRENT_CORE),
-        409,
-        "consent_version_unchanged",
-      );
-      expect(
-        fake.requests
-          .slice(since)
-          .filter((r) => r.path.endsWith("/rpc/supersede_core_consent")),
-      ).toHaveLength(2);
-      const live = rows(id).filter(
-        (r) => r.purpose === "core" && r.revoked_at === null,
-      );
-      expect(live.map((r) => [r.consent_version, r.locale])).toEqual([
-        [CURRENT_CORE_ES, "es"],
-      ]);
-    });
+    // Not what was asked for after two lost races: one fail-closed conflict,
+    // whatever is live. consent_version_unchanged would be wrong for a
+    // locale-only move to the same version, which the database allows (R-29).
+    it.each([
+      ["a later version", [CURRENT_CORE, "en"], [CURRENT_CORE_ES, "es"]],
+      [
+        "the same version in another locale",
+        [CURRENT_CORE, "en"],
+        [CURRENT_CORE, "es"],
+      ],
+      ["an earlier version", [CURRENT_CORE_ES, "es"], [CURRENT_CORE, "en"]],
+    ] as const)(
+      "after the retry also loses a race to %s, answers consent_conflict_retry (two calls at most)",
+      async (_label, [version, locale], [liveVersion, liveLocale]) => {
+        const { a, id } = await onDraft();
+        const since = fake.requests.length;
+        // Meanwhile the live core moves to v1-draft/es (first call: TH004),
+        // then to the final live version and locale (retry: TH004).
+        fake.interleave("POST", "rpc/supersede_core_consent", () => {
+          fake.supersedeCoreConsent(a.id, id, "v1-draft", "es");
+        });
+        fake.failNext(
+          "POST",
+          "rpc/supersede_core_consent",
+          registryError("consent_requires_core"),
+        );
+        fake.interleave("POST", "rpc/supersede_core_consent", () => {
+          fake.supersedeCoreConsent(a.id, id, liveVersion, liveLocale);
+        });
+        fake.failNext(
+          "POST",
+          "rpc/supersede_core_consent",
+          registryError("consent_requires_core"),
+        );
+        expectCoded(
+          await reconsent(a, id, version, locale),
+          409,
+          "consent_conflict_retry",
+        );
+        const sent = fake.requests.slice(since);
+        expect(
+          sent.filter((r) => r.path.endsWith("/rpc/supersede_core_consent")),
+        ).toHaveLength(2);
+        // Decided from the live row alone: no document is read.
+        expect(sent.some((r) => r.path.endsWith("/consent_documents"))).toBe(
+          false,
+        );
+        const live = rows(id).filter(
+          (r) => r.purpose === "core" && r.revoked_at === null,
+        );
+        expect(live.map((r) => [r.consent_version, r.locale])).toEqual([
+          [liveVersion, liveLocale],
+        ]);
+      },
+    );
 
     it("refuses to revoke a superseded core id while a newer core is live", async () => {
       const { a, id, core, reminders } = await onDraft();

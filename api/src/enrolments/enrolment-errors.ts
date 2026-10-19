@@ -30,6 +30,7 @@ export const enrolmentErrorCodes = [
   "consent_not_permitted",
   "consent_document_unavailable",
   "consent_version_unchanged",
+  "consent_conflict_retry",
   "focus_swap_invalid",
   "sharing_not_available",
   "confirmation_required",

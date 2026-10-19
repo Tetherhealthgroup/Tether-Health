@@ -8,6 +8,14 @@ import type { PostgrestError } from "@supabase/supabase-js";
 import type { AuthUser } from "../auth/auth-user";
 import { DatabaseErrorCode } from "../common/database-errors";
 import {
+  CONSENT_COLUMNS,
+  liveCore,
+  toConsent,
+  type ConsentRow,
+  type RpcResult,
+} from "./consent-rows";
+import { explainNotLive, isFor, supersedeCore } from "./consent-supersession";
+import {
   badRequest,
   conflict,
   notFound,
@@ -19,7 +27,6 @@ import {
   modeProgrammeCodes,
   sharePurposes,
   type ConsentLocale,
-  type ConsentPurpose,
   type ConsentResponse,
   type CoreConsentVersions,
   type CreateEnrolmentDto,
@@ -50,37 +57,14 @@ interface EnrolmentRow {
   updated_at: string;
 }
 
-interface ConsentRow {
-  id: string;
-  enrolment_id: string;
-  purpose: ConsentPurpose;
-  recipient_ref: string | null;
-  consent_version: string;
-  /** Null only on rows stored before consent documents existed. */
-  locale: ConsentLocale | null;
-  consent_text: string;
-  granted_at: string;
-  revoked_at: string | null;
-  /** Set on a core consent replaced through supersede_core_consent. */
-  superseded_by: string | null;
-}
-
 interface ConsentDocumentRow {
   purpose: string;
   version: string;
   locale: string;
 }
 
-/** The untyped client's result of a set-returning function call. */
-interface RpcResult<T> {
-  data: T | null;
-  error: PostgrestError | null;
-}
-
 const ENROLMENT_COLUMNS =
   "id,user_id,programme_code,status,mode,joined_at,left_at,created_at,updated_at";
-const CONSENT_COLUMNS =
-  "id,enrolment_id,purpose,recipient_ref,consent_version,locale,consent_text,granted_at,revoked_at,superseded_by";
 /** For an enrolment answered without consents (no version is needed). */
 const NO_CURRENT_VERSIONS: CoreConsentVersions = { en: null, es: null };
 
@@ -106,10 +90,6 @@ const {
   // including the revocations that leaving an enrolment cascades into.
   consentAlreadyRevoked: CONSENT_ALREADY_REVOKED,
   consentImmutable: CONSENT_IMMUTABLE,
-  // Raised by public.supersede_core_consent() when the enrolment has no live
-  // core consent, including when a concurrent supersession or revocation
-  // replaced it while this call waited for its row lock.
-  consentRequiresCore: CONSENT_REQUIRES_CORE,
 } = DatabaseErrorCode;
 
 /**
@@ -337,12 +317,12 @@ export class EnrolmentsService {
     const enrolment = await this.ownEnrolment(client, user, dto.enrolmentId);
     if (enrolment.status === "left") throw conflict("enrolment_left");
     if (dto.purpose === "core") {
-      const live = await this.liveCore(client, enrolment.id);
+      const live = await liveCore(client, enrolment.id);
       if (live !== null) {
-        if (this.isFor(live, dto)) throw conflict("consent_already_granted");
-        return this.supersedeCore(client, enrolment.id, dto, true);
+        if (isFor(live, dto)) throw conflict("consent_already_granted");
+        return supersedeCore(client, enrolment.id, dto);
       }
-    } else if ((await this.liveCore(client, enrolment.id)) === null) {
+    } else if ((await liveCore(client, enrolment.id)) === null) {
       throw conflict("core_consent_required");
     }
     // A plain insert, never an upsert: the one-live-row keys make a second
@@ -364,8 +344,18 @@ export class EnrolmentsService {
       if (error.code === UNIQUE_VIOLATION) {
         throw conflict("consent_already_granted");
       }
+      // The insert policy refused the row. One of its checks is the deletion
+      // barrier; it is told apart from the others (enrolment left, no live
+      // core) by asking the barrier itself, never by the message. The
+      // barrier only ever closes, so a barrier refusal always reads as
+      // closed here.
       if (error.code === INSUFFICIENT_PRIVILEGE) {
-        throw conflict("consent_not_permitted");
+        throw (await this.deletionBarrierOpen(
+          client,
+          "Consent could not be recorded",
+        ))
+          ? conflict("consent_not_permitted")
+          : conflict("account_deletion_in_progress");
       }
       if (error.code === CHECK_VIOLATION) {
         throw new BadRequestException("Consent rejected");
@@ -375,7 +365,7 @@ export class EnrolmentsService {
         new BadGatewayException("Consent could not be recorded")
       );
     }
-    return { ...this.toConsent(data), supersededId: null };
+    return { ...toConsent(data), supersededId: null };
   }
 
   async revokeConsent(user: AuthUser, id: string): Promise<ConsentResponse> {
@@ -394,167 +384,12 @@ export class EnrolmentsService {
       // first. TH003 (not a pure revocation) leaves the consent live, so it
       // is never reported as revoked; it fails closed like any other error.
       if (error.code === CONSENT_ALREADY_REVOKED) {
-        return this.explainNotLive(client, id);
+        return explainNotLive(client, id);
       }
       throw new BadGatewayException("Consent could not be revoked");
     }
-    if (data) return this.toConsent(data);
-    return this.explainNotLive(client, id);
-  }
-
-  /**
-   * Why a consent could not be revoked: it is not visible (not found), it
-   * was superseded by a core consent that is still live (consent_superseded:
-   * the member's consent is live under the newer row, so "already revoked"
-   * would be wrong), or it is revoked.
-   */
-  private async explainNotLive(
-    client: UserSupabaseClient,
-    id: string,
-  ): Promise<never> {
-    const existing = await client
-      .from("programme_consents")
-      .select("id,enrolment_id,revoked_at,superseded_by")
-      .eq("id", id)
-      .maybeSingle<
-        Pick<ConsentRow, "id" | "enrolment_id" | "revoked_at" | "superseded_by">
-      >();
-    if (existing.error) {
-      throw new BadGatewayException("Consent could not be revoked");
-    }
-    if (!existing.data) throw notFound("consent_not_found");
-    if (
-      existing.data.superseded_by !== null &&
-      (await this.liveCore(client, existing.data.enrolment_id)) !== null
-    ) {
-      throw conflict("consent_superseded");
-    }
-    throw conflict("consent_already_revoked");
-  }
-
-  /**
-   * Core re-consent: one call that inserts the new core row (text from the
-   * document) and revokes the old one with superseded_by set, leaving the
-   * optional consents live unless the document says otherwise.
-   *
-   * A second identical request racing the first (a double tap) waits for the
-   * first's row lock and then finds no live core row to replace (TH004). The
-   * live core is read again: if it is already the requested version and
-   * locale, the request succeeded and is answered as such; if no core is
-   * live, core consent is required; if another version became live, the
-   * supersession is tried once more (at most two calls in all). If that
-   * also loses a race, the answer comes from what is live then; see
-   * answerFromLive.
-   */
-  private async supersedeCore(
-    client: UserSupabaseClient,
-    enrolmentId: string,
-    dto: GrantConsentDto,
-    mayRetry: boolean,
-  ): Promise<GrantConsentResponse> {
-    const { data, error } = (await client
-      .rpc("supersede_core_consent", {
-        p_enrolment: enrolmentId,
-        p_version: dto.consentVersion,
-        p_locale: dto.locale,
-      })
-      .select(CONSENT_COLUMNS)) as RpcResult<ConsentRow[]>;
-    if (error) {
-      if (error.code !== CONSENT_REQUIRES_CORE) {
-        throw (
-          registryErrorFor(error.code) ??
-          new BadGatewayException("Consent could not be recorded")
-        );
-      }
-      const live = await this.liveCore(client, enrolmentId);
-      if (live === null) throw conflict("core_consent_required");
-      if (this.isFor(live, dto)) return this.answerAsDone(client, live);
-      if (mayRetry) return this.supersedeCore(client, enrolmentId, dto, false);
-      return this.answerFromLive(client, live, dto);
-    }
-    if (data === null) {
-      throw new BadGatewayException("Consent could not be recorded");
-    }
-    // The function returns the old row, then the new one; identify them by
-    // content rather than position.
-    const replacement = data.find((row) => row.revoked_at === null);
-    const superseded = data.find(
-      (row) =>
-        replacement !== undefined && row.superseded_by === replacement.id,
-    );
-    if (data.length !== 2 || !replacement || !superseded) {
-      throw new BadGatewayException("Consent could not be recorded");
-    }
-    return { ...this.toConsent(replacement), supersededId: superseded.id };
-  }
-
-  /** A live core that is already what was asked for: the request is done. */
-  private async answerAsDone(
-    client: UserSupabaseClient,
-    live: ConsentRow,
-  ): Promise<GrantConsentResponse> {
-    return {
-      ...this.toConsent(live),
-      supersededId: await this.supersededId(client, live.id),
-    };
-  }
-
-  /**
-   * After the retry also lost a race, from the live core read once more
-   * (not the requested one; done and gone are answered by the caller): on
-   * the requested version or a later one, consent_version_unchanged, as the
-   * database would answer; older, core_consent_required. A core stored
-   * before documents existed counts as older than every document, as in the
-   * database.
-   */
-  private async answerFromLive(
-    client: UserSupabaseClient,
-    live: ConsentRow,
-    dto: GrantConsentDto,
-  ): Promise<never> {
-    if (live.locale !== null) {
-      const { data, error } = await client
-        .from("consent_documents")
-        .select("version,effective_from")
-        .eq("purpose", "core")
-        .in("version", [live.consent_version, dto.consentVersion])
-        .returns<{ version: string; effective_from: string }[]>();
-      if (error) throw new BadGatewayException("Consents are unavailable");
-      const effective = (version: string) =>
-        data.find((document) => document.version === version)?.effective_from;
-      const liveFrom = effective(live.consent_version);
-      const requestedFrom = effective(dto.consentVersion);
-      if (
-        live.consent_version === dto.consentVersion ||
-        (liveFrom !== undefined &&
-          requestedFrom !== undefined &&
-          Date.parse(liveFrom) >= Date.parse(requestedFrom))
-      ) {
-        throw conflict("consent_version_unchanged");
-      }
-    }
-    throw conflict("core_consent_required");
-  }
-
-  /** The core consent that `id` replaced, if any. */
-  private async supersededId(
-    client: UserSupabaseClient,
-    id: string,
-  ): Promise<string | null> {
-    const { data, error } = await client
-      .from("programme_consents")
-      .select("id")
-      .eq("superseded_by", id)
-      .maybeSingle<Pick<ConsentRow, "id">>();
-    if (error) throw new BadGatewayException("Consents are unavailable");
-    return data?.id ?? null;
-  }
-
-  private isFor(consent: ConsentRow, dto: GrantConsentDto): boolean {
-    return (
-      consent.consent_version === dto.consentVersion &&
-      consent.locale === dto.locale
-    );
+    if (data) return toConsent(data);
+    return explainNotLive(client, id);
   }
 
   /**
@@ -619,22 +454,6 @@ export class EnrolmentsService {
     return data;
   }
 
-  /** The enrolment's live core consent (at most one exists), or null. */
-  private async liveCore(
-    client: UserSupabaseClient,
-    enrolmentId: string,
-  ): Promise<ConsentRow | null> {
-    const { data, error } = await client
-      .from("programme_consents")
-      .select(CONSENT_COLUMNS)
-      .eq("enrolment_id", enrolmentId)
-      .eq("purpose", "core")
-      .is("revoked_at", null)
-      .maybeSingle<ConsentRow>();
-    if (error) throw new BadGatewayException("Consents are unavailable");
-    return data;
-  }
-
   private async consentsFor(
     client: UserSupabaseClient,
     enrolmentIds: string[],
@@ -676,12 +495,31 @@ export class EnrolmentsService {
   private async requireDeletionBarrierOpen(
     client: UserSupabaseClient,
   ): Promise<void> {
+    if (
+      !(await this.deletionBarrierOpen(
+        client,
+        "Enrolment could not be updated",
+      ))
+    ) {
+      throw conflict("account_deletion_in_progress");
+    }
+  }
+
+  /**
+   * public.deletion_barrier_open() as the caller: false once account
+   * deletion has started or the profile is gone. A failed call is a 502
+   * with `failure` as its (never sent) message.
+   */
+  private async deletionBarrierOpen(
+    client: UserSupabaseClient,
+    failure: string,
+  ): Promise<boolean> {
     const { data, error } = (await client.rpc("deletion_barrier_open")) as {
       data: unknown;
       error: PostgrestError | null;
     };
-    if (error) throw new BadGatewayException("Enrolment could not be updated");
-    if (data !== true) throw conflict("account_deletion_in_progress");
+    if (error) throw new BadGatewayException(failure);
+    return data === true;
   }
 
   private checkMode(programmeCode: string, mode: EnrolmentMode | null) {
@@ -743,7 +581,7 @@ export class EnrolmentsService {
       leftAt: row.left_at,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
-      consents: consents.map((consent) => this.toConsent(consent)),
+      consents: consents.map((consent) => toConsent(consent)),
       currentCoreConsentVersion: current,
       // Only when the member can complete it: a current core document exists
       // for that locale, and the consent is not on it (a consent stored
@@ -753,20 +591,6 @@ export class EnrolmentsService {
         liveCore !== undefined &&
         current !== null &&
         (liveCore.locale === null || liveCore.consent_version !== current),
-    };
-  }
-
-  private toConsent(row: ConsentRow): ConsentResponse {
-    return {
-      id: row.id,
-      enrolmentId: row.enrolment_id,
-      purpose: row.purpose,
-      recipientRef: row.recipient_ref,
-      consentVersion: row.consent_version,
-      locale: row.locale,
-      consentText: row.consent_text,
-      grantedAt: row.granted_at,
-      revokedAt: row.revoked_at,
     };
   }
 }
