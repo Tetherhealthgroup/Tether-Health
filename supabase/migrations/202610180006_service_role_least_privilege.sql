@@ -21,7 +21,7 @@ revoke all on all tables in schema public from service_role;
 revoke all on all sequences in schema public from service_role;
 grant select on table public.consent_documents to service_role;
 
-revoke all on all functions in schema public from service_role;
+revoke all on all routines in schema public from service_role;
 
 revoke create on schema public from service_role;
 

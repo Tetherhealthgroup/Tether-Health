@@ -386,9 +386,11 @@ that `postgres` creates in `public` grant it nothing. On `storage.objects` and
 no `trigger`, `truncate` or `references`. `auth` is not changed by app
 migrations. Account deletion removes rows in `public` through
 `delete_my_app_data` and foreign-key cascades, which run as the table owner.
-`supabase/tests/verify_service_role_privileges.sh` fails on any migration that
-grants `service_role` anything (including through default privileges) beyond
-`select` on `consent_documents`.
+`supabase/tests/verify_service_role_privileges.sh` has two parts. Its static
+check catches literal grants to `service_role` in migrations, other than
+`select` on `consent_documents`. Its SQL test, run against a migrated local
+database, is the control: it checks the privileges `service_role` actually
+holds, including those it gets through `PUBLIC` and through ownership.
 
 ## Sync tables
 

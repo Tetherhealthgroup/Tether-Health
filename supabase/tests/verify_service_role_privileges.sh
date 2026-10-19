@@ -286,6 +286,23 @@ select th988_test.ok(
 select th988_test.ok(
   th988_test.public_privileges('service_role') not like '%th988_scratch%',
   'default privileges: service_role holds no privilege on the new table, its columns, the sequence or the view');
+-- Known residual: a function postgres creates in public keeps the built-in
+-- execute for PUBLIC (default privileges for a schema only add to it), so
+-- service_role may execute it until the creating migration revokes all on
+-- the function from public. The catalogue check above is the control.
+select th988_test.ok(
+  pg_catalog.has_function_privilege('service_role', 'public.th988_scratch_fn()', 'EXECUTE')
+  and exists (select 1 from pg_catalog.pg_proc as p
+              cross join lateral pg_catalog.aclexplode(
+                coalesce(p.proacl, pg_catalog.acldefault('f', p.proowner))) as a
+              where p.oid = 'public.th988_scratch_fn()'::regprocedure
+                and a.grantee = 0 and a.privilege_type = 'EXECUTE'),
+  'known residual: service_role may execute a new function in public through PUBLIC until its migration revokes all from public');
+revoke all on function public.th988_scratch_fn() from public;
+select th988_test.ok(
+  not pg_catalog.has_function_privilege('service_role', 'public.th988_scratch_fn()', 'EXECUTE')
+  and position('th988_scratch_fn' in th988_test.public_executable('service_role')) = 0,
+  'known residual: once revoked from public, service_role may not execute the new function');
 drop function public.th988_scratch_fn();
 drop view public.th988_scratch_view;
 drop sequence public.th988_scratch_seq;
@@ -710,7 +727,7 @@ expected_statements='begin
 revoke all on all tables in schema public from service_role
 revoke all on all sequences in schema public from service_role
 grant select on table public.consent_documents to service_role
-revoke all on all functions in schema public from service_role
+revoke all on all routines in schema public from service_role
 revoke create on schema public from service_role
 alter default privileges for role postgres in schema public revoke all on tables from service_role
 alter default privileges for role postgres in schema public revoke all on functions from service_role
