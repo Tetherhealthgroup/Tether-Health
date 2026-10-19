@@ -148,6 +148,90 @@ void main() {
     expect(find.text('synthetic-pass-9', skipOffstage: false), findsNothing);
   });
 
+  // Focuses the field and presses the platform undo shortcut (Cmd+Z on
+  // Apple platforms, Ctrl+Z elsewhere).
+  Future<void> undoIn(WidgetTester tester, String key) async {
+    await tester.tap(find.byKey(ValueKey('field:$key')));
+    await tester.pump();
+    final apple = defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS;
+    final modifier = apple ? LogicalKeyboardKey.meta : LogicalKeyboardKey.control;
+    await tester.sendKeyDownEvent(modifier);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyZ);
+    await tester.sendKeyUpEvent(modifier);
+    await tester.pump();
+  }
+
+  // Types a password and erases it again, so the field is empty but its undo
+  // history holds the typed text.
+  Future<void> typeAndErasePassword(WidgetTester tester) async {
+    await openSignIn(tester);
+    await tester.pump(const Duration(seconds: 1)); // the undo history records the typing
+    await tester.enterText(find.byKey(const ValueKey('field:auth_signin.password')), '');
+    await tester.pump(const Duration(seconds: 1));
+    expect(fieldText(tester, 'auth_signin.password'), isEmpty);
+    expect(TSession.values.containsKey('auth_signin.password'), isTrue);
+    expect(TSession.values['auth_signin.password'], isNull);
+  }
+
+  final undoPlatforms = TargetPlatformVariant(<TargetPlatform>{TargetPlatform.android, TargetPlatform.macOS});
+
+  testWidgets('undo after a password was typed, erased and then scrubbed does not bring it back', (tester) async {
+    await typeAndErasePassword(tester);
+    TSession.scrubPasswords();
+    await tester.pump();
+    await undoIn(tester, 'auth_signin.password');
+    expect(fieldText(tester, 'auth_signin.password'), isEmpty);
+    expect(TSession.values['auth_signin.password'], isNull);
+    expect(find.text('synthetic-pass-9', skipOffstage: false), findsNothing);
+  }, variant: undoPlatforms);
+
+  testWidgets('undo after a password was typed, erased and then cleared with the session does not bring it back', (tester) async {
+    await typeAndErasePassword(tester);
+    TSession.clear();
+    await tester.pump();
+    await undoIn(tester, 'auth_signin.password');
+    expect(fieldText(tester, 'auth_signin.password'), isEmpty);
+    expect(TSession.values['auth_signin.password'], isNull);
+    expect(find.text('synthetic-pass-9', skipOffstage: false), findsNothing);
+  }, variant: undoPlatforms);
+
+  testWidgets('other session changes do not rebuild a field or take its focus', (tester) async {
+    EditableTextState editable(String key) => tester.state<EditableTextState>(find.descendant(of: find.byKey(ValueKey('field:$key')), matching: find.byType(EditableText)));
+    Future<void> otherChanges() async {
+      TSession.set('hw_log.systolic', '120');
+      TSession.scrub(['hw_log.systolic']);
+      TSession.scrub(['auth_signin.email']);
+      await tester.pump();
+    }
+
+    // A field with typed text.
+    await openSignIn(tester);
+    await tester.tap(find.byKey(const ValueKey('field:auth_signin.password')));
+    await tester.pump();
+    var before = editable('auth_signin.password');
+    expect(before.widget.focusNode.hasFocus, isTrue);
+    await otherChanges();
+    expect(identical(editable('auth_signin.password'), before), isTrue);
+    expect(before.widget.focusNode.hasFocus, isTrue);
+    expect(fieldText(tester, 'auth_signin.password'), 'synthetic-pass-9');
+
+    // A field that was typed in, erased and scrubbed, then focused again
+    // without typing.
+    await tester.pump(const Duration(seconds: 1));
+    await tester.enterText(find.byKey(const ValueKey('field:auth_signin.password')), '');
+    await tester.pump(const Duration(seconds: 1));
+    TSession.scrubPasswords();
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey('field:auth_signin.password')));
+    await tester.pump();
+    before = editable('auth_signin.password');
+    expect(before.widget.focusNode.hasFocus, isTrue);
+    await otherChanges();
+    expect(identical(editable('auth_signin.password'), before), isTrue);
+    expect(before.widget.focusNode.hasFocus, isTrue);
+    expect(fieldText(tester, 'auth_signin.password'), isEmpty);
+  });
+
   testWidgets('scrub of a field key empties that field', (tester) async {
     await openSignIn(tester);
     TSession.scrub(['auth_signin.email']);

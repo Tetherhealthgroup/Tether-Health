@@ -763,10 +763,17 @@ class _TFieldState extends State<TField> {
   // clear), the field empties its text too, so a scrubbed value (a password)
   // does not stay on screen or in the text controller. The editable is also
   // rebuilt ([_generation]), which drops its undo history: an undo
-  // (Ctrl/Cmd+Z, shake to undo) cannot bring the scrubbed value back. The
-  // rebuilt field does not keep the keyboard focus.
+  // (Ctrl/Cmd+Z, shake to undo) cannot bring the scrubbed value back. This
+  // also holds when the text was typed and erased before the scrub: the
+  // field is then already empty, but its undo history still has the typed
+  // text. The rebuilt field does not keep the keyboard focus. Other session
+  // changes do not rebuild the field.
   late final TextEditingController _controller = TextEditingController(text: widget.value);
   int _generation = 0;
+
+  // The user has edited the field (it wrote its key) since the editable was
+  // last built, so its undo history may hold typed text.
+  bool _hadKey = false;
 
   @override
   void initState() {
@@ -784,8 +791,9 @@ class _TFieldState extends State<TField> {
 
   void _onSessionChange() {
     final key = widget.fieldKey;
-    if (key == null || TSession.values.containsKey(key) || _controller.text.isEmpty) return;
+    if (key == null || TSession.values.containsKey(key) || (_controller.text.isEmpty && !_hadKey)) return;
     _controller.clear();
+    _hadKey = false;
     setState(() {
       _empty = true;
       _generation++;
@@ -808,6 +816,7 @@ class _TFieldState extends State<TField> {
   TFieldKind get kind => widget.kind;
 
   void onChanged(String v) {
+    _hadKey = widget.fieldKey != null;
     TSession.set(widget.fieldKey, v.isEmpty ? null : v);
     if (v.isEmpty != _empty) setState(() => _empty = v.isEmpty);
     widget.onChanged?.call(v);

@@ -952,7 +952,7 @@ void main() {
       await tester.pump(const Duration(seconds: 3));
     }
 
-    testWidgets('P1: re-opened during a slow safety save, a safety value opens the crisis screen again and is saved', (tester) async {
+    testWidgets('re-opened during a slow safety save, a safety value opens the crisis screen again and is saved', (tester) async {
       final gates = <Completer<TResult>>[];
       TApi.instance = _EachCallApi(gates);
       final arrivals = _Arrivals();
@@ -973,7 +973,7 @@ void main() {
       expect(crisisArrivals(arrivals), 2, reason: 'nothing navigates when the saves finish');
     });
 
-    testWidgets('P2: re-opened during a slow non-safety save, a safety value opens the crisis screen and is saved', (tester) async {
+    testWidgets('re-opened during a slow non-safety save, a safety value opens the crisis screen and is saved', (tester) async {
       final gates = <Completer<TResult>>[];
       TApi.instance = _EachCallApi(gates);
       final arrivals = _Arrivals();
@@ -993,7 +993,7 @@ void main() {
       expect(crisisArrivals(arrivals), 1);
     });
 
-    testWidgets('P3: after TSession.clear (sign-out) during a slow safety save, the next safety value opens the crisis screen and is saved', (tester) async {
+    testWidgets('after TSession.clear (sign-out) during a slow safety save, the next safety value opens the crisis screen and is saved', (tester) async {
       final gates = <Completer<TResult>>[];
       TApi.instance = _EachCallApi(gates);
       final arrivals = _Arrivals();
@@ -1012,7 +1012,7 @@ void main() {
       await finish(tester, gates);
     });
 
-    testWidgets('P3b: TSession.clear ends the guard on a screen that stays open: the next tap sends its own save', (tester) async {
+    testWidgets('TSession.clear ends the guard on a screen that stays open: the next tap sends its own save', (tester) async {
       final gates = <Completer<TResult>>[];
       TApi.instance = _EachCallApi(gates);
       final arrivals = _Arrivals();
