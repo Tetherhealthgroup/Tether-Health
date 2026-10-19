@@ -624,16 +624,31 @@ class TCheckItem {
 }
 
 class TChecklist extends StatefulWidget {
-  const TChecklist({super.key, required this.items, this.label, this.onChanged});
+  const TChecklist({super.key, required this.items, this.label, this.onChanged, this.fieldKey});
   final List<TCheckItem> items;
   final String? label;
   final void Function(int index, bool done)? onChanged;
+
+  /// Session key. When set, the labels of the ticked items are written to
+  /// [TSession] (consent checklists).
+  final String? fieldKey;
   @override
   State<TChecklist> createState() => _TChecklistState();
 }
 
 class _TChecklistState extends State<TChecklist> {
   late final List<bool> _done = [for (final i in widget.items) i.done];
+  void _store() => TSession.set(widget.fieldKey, [
+        for (var i = 0; i < widget.items.length; i++)
+          if (_done[i]) widget.items[i].label
+      ]);
+
+  @override
+  void initState() {
+    super.initState();
+    _store();
+  }
+
   @override
   Widget build(BuildContext context) => _labelled(
         widget.label,
@@ -645,6 +660,7 @@ class _TChecklistState extends State<TChecklist> {
               child: InkWell(
                 onTap: () {
                   setState(() => _done[i] = !_done[i]);
+                  _store();
                   widget.onChanged?.call(i, _done[i]);
                 },
                 child: Container(
@@ -739,6 +755,9 @@ class TField extends StatefulWidget {
 }
 
 class _TFieldState extends State<TField> {
+  // P-31: generated fields have no value; an example is only placeholder
+  // (hint) text and is never written to the session. The field writes null
+  // until the user types, and null again if they clear it.
   @override
   void initState() {
     super.initState();
@@ -754,7 +773,7 @@ class _TFieldState extends State<TField> {
   TFieldKind get kind => widget.kind;
 
   void onChanged(String v) {
-    TSession.set(widget.fieldKey, v);
+    TSession.set(widget.fieldKey, v.isEmpty ? null : v);
     widget.onChanged?.call(v);
   }
 
@@ -789,9 +808,14 @@ class _TFieldState extends State<TField> {
           hintStyle: TText.input.copyWith(color: const Color(0xFF6B7F79), fontWeight: FontWeight.w400),
           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
           prefixIcon: kind == TFieldKind.search ? const Icon(Icons.search_rounded, color: TColors.muted) : null,
-          suffixIcon: readOnly ? const Icon(Icons.expand_more_rounded, color: TColors.muted) : null,
-          suffixText: unit,
-          suffixStyle: TText.sub.copyWith(fontWeight: FontWeight.w700),
+          // The unit is a suffix icon, not suffixText: Flutter hides
+          // suffixText while the field is empty, and P-31 fields start empty.
+          suffixIcon: readOnly
+              ? const Icon(Icons.expand_more_rounded, color: TColors.muted)
+              : unit == null
+                  ? null
+                  : Padding(padding: const EdgeInsets.only(left: 8, right: 18, top: 2.67), child: Text(unit!, style: TText.sub.copyWith(fontWeight: FontWeight.w700))),
+          suffixIconConstraints: readOnly || unit == null ? null : const BoxConstraints(minWidth: 0, minHeight: 0),
           enabledBorder: border,
           focusedBorder: border.copyWith(borderSide: const BorderSide(color: TColors.teal, width: 2)),
           semanticCounterText: label,
@@ -1142,15 +1166,30 @@ class TTile {
 }
 
 class TTileGrid extends StatefulWidget {
-  const TTileGrid({super.key, required this.tiles, this.columns = 2});
+  const TTileGrid({super.key, required this.tiles, this.columns = 2, this.fieldKey});
   final List<TTile> tiles;
   final int columns;
+
+  /// Session key. When set, the labels of the selected tiles (tiles without
+  /// [TTile.onTap]) are written to [TSession] (the program picker).
+  final String? fieldKey;
   @override
   State<TTileGrid> createState() => _TTileGridState();
 }
 
 class _TTileGridState extends State<TTileGrid> {
   late final List<bool> _sel = [for (final t in widget.tiles) t.selected];
+  void _store() => TSession.set(widget.fieldKey, [
+        for (var i = 0; i < widget.tiles.length; i++)
+          if (_sel[i] && widget.tiles[i].onTap == null) widget.tiles[i].label
+      ]);
+
+  @override
+  void initState() {
+    super.initState();
+    _store();
+  }
+
   @override
   Widget build(BuildContext context) {
     final rows = <Widget>[];
@@ -1176,7 +1215,11 @@ class _TTileGridState extends State<TTileGrid> {
       child: InkWell(
         key: t.key,
         borderRadius: BorderRadius.circular(TRadius.tile),
-        onTap: t.onTap ?? () => setState(() => _sel[i] = !_sel[i]),
+        onTap: t.onTap ??
+            () {
+              setState(() => _sel[i] = !_sel[i]);
+              _store();
+            },
         child: Container(
           constraints: const BoxConstraints(minHeight: 104),
           padding: const EdgeInsets.all(13),

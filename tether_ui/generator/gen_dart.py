@@ -80,7 +80,7 @@ def node(n, top=False, path=''):
         return f"TRadioList({args(fieldKey=FK(n), items=lst(items), selected=str(n['selected']), label=S_(n['label']) if n.get('label') else None)})"
     if t == 'checklist':
         items = [f"TCheckItem({args(_=S_(i['label']), sub=S_(i['sub']) if i.get('sub') else None, done='true' if i.get('done') else None)})" for i in n['items']]
-        return f"TChecklist({args(items=lst(items), label=S_(n['label']) if n.get('label') else None)})"
+        return f"TChecklist({args(fieldKey=FK(n), items=lst(items), label=S_(n['label']) if n.get('label') else None)})"
     if t == 'toggle': return f"TToggleRow({args(fieldKey=FK(n), label=S_(n['label']), sub=S_(n['sub']) if n.get('sub') else None, value='true' if n.get('on') else None)})"
     if t == 'field':
         kind = n.get('kind', 'text')
@@ -106,7 +106,7 @@ def node(n, top=False, path=''):
         return f"TListGroup({args(title=S_(n['title']) if n.get('title') else None, flat='true' if n.get('flat') else None, rows=lst(rows))})"
     if t == 'tiles':
         tiles = [f"TTile({args(key=K(f'{path}.items[{j}]') if i.get('action') else None, label=S_(i['label']), sub=S_(i['sub']) if i.get('sub') else None, program=S_(i['program']) if i.get('program') else None, glyph=S_(i['glyph']) if i.get('glyph') else None, selected='true' if i.get('selected') else None, onTap=cb(i['action']) if i.get('action') else None)})" for j, i in enumerate(n['items'])]
-        return f"TTileGrid({args(columns=str(n.get('cols', 2)) if n.get('cols', 2) != 2 else None, tiles=lst(tiles))})"
+        return f"TTileGrid({args(fieldKey=FK(n), columns=str(n.get('cols', 2)) if n.get('cols', 2) != 2 else None, tiles=lst(tiles))})"
     if t == 'stats':
         st_ = [f"TStat({args(label=S_(i['label']), value=S_(i['value']), sub=S_(i['sub']) if i.get('sub') else None, program=S_(i['program']) if i.get('program') else None)})" for i in n['items']]
         return f"TStatGrid({args(columns=str(n.get('cols', 2)) if n.get('cols', 2) != 2 else None, stats=lst(st_))})"

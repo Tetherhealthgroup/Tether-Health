@@ -22,10 +22,10 @@ class ReLabsScreen extends StatelessWidget {
     return TScreen(
       header: THeader(title: 'Add lab results', pill: 'Lab'),
       children: [
-        TField(fieldKey: 're_labs.egfr', label: 'eGFR', value: '58', unit: 'mL/min/1.73m²', kind: TFieldKind.number),
-        TField(fieldKey: 're_labs.urine_acr', label: 'Urine ACR', value: '42', unit: 'mg/g', kind: TFieldKind.number),
+        TField(fieldKey: 're_labs.egfr', label: 'eGFR', unit: 'mL/min/1.73m²', placeholder: '58', kind: TFieldKind.number),
+        TField(fieldKey: 're_labs.urine_acr', label: 'Urine ACR', unit: 'mg/g', placeholder: '42', kind: TFieldKind.number),
         TField(fieldKey: 're_labs.alt_liver', label: 'ALT (liver)', unit: 'U/L', placeholder: 'Optional', kind: TFieldKind.number),
-        TField(fieldKey: 're_labs.lab_date', label: 'Lab date', value: 'Oct 3, 2026', kind: TFieldKind.date),
+        TField(fieldKey: 're_labs.lab_date', label: 'Lab date', placeholder: 'Oct 3, 2026', kind: TFieldKind.date),
         TBody('Copy numbers exactly from your report. Renew shows trends; your clinician explains them.', tone: TTextTone.small),
         TLink(key: const ValueKey('a:body[5]'), label: 'Import from my health record', onTap: () => TNav.push(context, Routes.recordsAdd)),
       ],

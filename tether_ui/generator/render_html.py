@@ -53,7 +53,7 @@ def render(n, p=''):
         return f'{lab(n.get("label"))}<div class="opts"{DK(n)}>{out}</div>'
     if t == 'checklist':
         out = ''.join(f'<div class="ckr" role="checkbox"><span class="ck{" on" if it.get("done") else ""}"></span><span class="ol"><b>{e(it["label"])}</b>{("<span class=sub>" + e(it["sub"]) + "</span>") if it.get("sub") else ""}</span></div>' for it in n['items'])
-        return f'{lab(n.get("label"))}<div class="cklist">{out}</div>'
+        return f'{lab(n.get("label"))}<div class="cklist"{DK(n)}>{out}</div>'
     if t == 'toggle':
         sub = f'<span class="sub">{e(n["sub"])}</span>' if n.get('sub') else ''
         return f'<div class="tgr"><span class="ol"><b>{e(n["label"])}</b>{sub}</span><span class="tg{" on" if n.get("on") else ""}" role="switch"{DK(n)}></span></div>'
@@ -119,7 +119,7 @@ def render(n, p=''):
             lead = badge(it['program'], 'm') if it.get('program') else f'<span class="pb m" style="--c:{color(it.get("color") or "#536F69")}">{e(it.get("glyph") or "•")}</span>'
             sub = f'<span class="sub">{e(it["sub"])}</span>' if it.get('sub') else ''
             out += f'<div class="tile{" on" if it.get("selected") else ""}{" hot" if it.get("action") else ""}"{A(it.get("action"), f"{p}.items[{j}]")} role="{"button" if it.get("action") else "checkbox"}">{lead}<b>{e(it["label"])}</b>{sub}</div>'
-        return f'<div class="tiles c{n.get("cols",2)}">{out}</div>'
+        return f'<div class="tiles c{n.get("cols",2)}"{DK(n)}>{out}</div>'
     if t == 'stats':
         out = ''.join(f'<div class="stat">{tagh(it["program"], it["label"]) if it.get("program") else "<p class=ey>" + e(it["label"]) + "</p>"}<b>{e(it["value"])}</b>{("<span>" + e(it["sub"]) + "</span>") if it.get("sub") else ""}</div>' for it in n['items'])
         return f'<div class="stats c{n.get("cols",2)}">{out}</div>'

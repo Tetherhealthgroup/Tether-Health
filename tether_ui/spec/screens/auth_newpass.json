@@ -26,15 +26,15 @@
     {
       "t": "field",
       "label": "New password",
-      "value": "••••••••••••",
       "hint": "At least 12 characters.",
+      "placeholder": "••••••••••••",
       "kind": "password",
       "key": "new_password"
     },
     {
       "t": "field",
       "label": "Confirm password",
-      "value": "••••••••••••",
+      "placeholder": "••••••••••••",
       "kind": "password",
       "key": "confirm_password"
     }

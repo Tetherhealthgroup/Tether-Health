@@ -25,7 +25,7 @@ class ObProgramsScreen extends StatelessWidget {
         TSteps(n: 1, total: 5),
         TTitle('What would you like support with?'),
         TBody('Choose any. You can add, pause or leave a program anytime.', tone: TTextTone.muted),
-        TTileGrid(tiles: [TTile(label: 'BreatheFree', sub: 'Tobacco & nicotine', program: 'bf', selected: true), TTile(label: 'ScrollFree', sub: 'Social media use', program: 'sf', selected: true), TTile(label: 'ClearAir', sub: 'Respiratory health', program: 'ca'), TTile(label: 'Heartwise', sub: 'Cardiovascular health', program: 'hw'), TTile(label: 'Steady', sub: 'Diabetes & metabolic health', program: 'st'), TTile(label: 'Ease', sub: 'Mental & behavioral health', program: 'ea'), TTile(label: 'Nourish', sub: 'Obesity & nutrition', program: 'nu'), TTile(label: 'Stride', sub: 'Healthy aging', program: 'sd')]),
+        TTileGrid(fieldKey: 'ob_programs.programs', tiles: [TTile(label: 'BreatheFree', sub: 'Tobacco & nicotine', program: 'bf', selected: true), TTile(label: 'ScrollFree', sub: 'Social media use', program: 'sf', selected: true), TTile(label: 'ClearAir', sub: 'Respiratory health', program: 'ca'), TTile(label: 'Heartwise', sub: 'Cardiovascular health', program: 'hw'), TTile(label: 'Steady', sub: 'Diabetes & metabolic health', program: 'st'), TTile(label: 'Ease', sub: 'Mental & behavioral health', program: 'ea'), TTile(label: 'Nourish', sub: 'Obesity & nutrition', program: 'nu'), TTile(label: 'Stride', sub: 'Healthy aging', program: 'sd')]),
         TLink(key: const ValueKey('a:body[4]'), label: 'See all 11 programs', onTap: () => TNav.push(context, Routes.catalog)),
       ],
       footer: [

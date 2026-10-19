@@ -21,9 +21,9 @@
     {
       "t": "field",
       "label": "Reading",
-      "value": "142",
       "unit": "mg/dL",
       "hint": "From your meter or CGM · 20–600 mg/dL",
+      "placeholder": "142",
       "kind": "number",
       "key": "reading"
     },
@@ -62,8 +62,8 @@
     {
       "t": "field",
       "label": "Note (optional)",
-      "value": "Pasta lunch",
       "hint": "Never shared unless you choose",
+      "placeholder": "Pasta lunch",
       "kind": "text",
       "key": "note_optional"
     }

@@ -26,14 +26,14 @@
     {
       "t": "field",
       "label": "Topic",
-      "value": "Question about my plan",
+      "placeholder": "Question about my plan",
       "kind": "select",
       "key": "topic"
     },
     {
       "t": "field",
       "label": "Message",
-      "value": "I’ve been feeling dizzy in the mornings since starting the patch.",
+      "placeholder": "I’ve been feeling dizzy in the mornings since starting the patch.",
       "kind": "multiline",
       "key": "message"
     },

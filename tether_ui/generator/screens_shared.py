@@ -6,7 +6,7 @@ def shared():
     # ================================================================ ONBOARDING
     flow('onboarding', 'First run', 'Welcome → choose programs → focus → consent → basics → set up each focus program → reminders → save progress → Today.')
     S('welcome', 'Welcome', '/welcome', 'onboarding', phase='welcome', hdr=H('', left='logo', pill=None), body=[
-        seg(['English', 'Español'], 'English'),
+        seg(['English', 'Español'], 'English', key='value'),
         illus('✿'),
         eyebrow('Welcome to Tether Health'), title('Care that meets you where you are.', 'xl'),
         text('Small steps, practical support and no judgment, for the parts of your health you choose.'),
@@ -19,7 +19,7 @@ def shared():
 
     S('ob_programs', 'Choose programs', '/onboarding/programs', 'onboarding', phase='welcome', hdr=H('Choose programs', pill='1 of 5'), body=[
         steps(1, 5), title('What would you like support with?'), text('Choose any. You can add, pause or leave a program anytime.', 'muted'),
-        tiles([tl(PROGRAMS[p][0], PROGRAMS[p][1], program=p, selected=p in ('bf', 'sf')) for p in ['bf', 'sf', 'ca', 'hw', 'st', 'ea', 'nu', 'sd']]),
+        tiles([tl(PROGRAMS[p][0], PROGRAMS[p][1], program=p, selected=p in ('bf', 'sf')) for p in ['bf', 'sf', 'ca', 'hw', 'st', 'ea', 'nu', 'sd']], key='programs'),
         link('See all 11 programs', go('catalog')),
     ], footer=[button('Continue with 2 programs', go('ob_focus'))], desc='Multi-select. Continue is disabled with 0 selected ("Choose at least one program").')
 
@@ -33,23 +33,23 @@ def shared():
 
     S('ob_third', 'Third program sheet', '/onboarding/focus/third', 'onboarding', phase='welcome', kind='sheet', over='Your focus', body=[
         eyebrow('Both focus slots are in use'), title('Add Heartwise as…'),
-        radio([ri('Learn only for now', 'Lessons, no reminders. Upgrade anytime.', 'Suggested'), ri('Swap with ScrollFree', 'ScrollFree pauses. Its data and progress are kept.'), ri('Swap with BreatheFree', 'Not suggested during your quit week.')]),
+        radio([ri('Learn only for now', 'Lessons, no reminders. Upgrade anytime.', 'Suggested'), ri('Swap with ScrollFree', 'ScrollFree pauses. Its data and progress are kept.'), ri('Swap with BreatheFree', 'Not suggested during your quit week.')], key='value'),
     ], footer=[button('Continue', toast('Heartwise added as Learn only', close())), button('Cancel', close(), v='secondary')])
 
     S('ob_consent', 'Layered consent', '/onboarding/consent', 'onboarding', phase='onboarding', hdr=H('Your privacy', pill='3 of 5'), body=[
         steps(3, 5), title('Your story stays yours.'), text('Each program keeps its own data. Optional choices start off.', 'muted'),
-        card(toggle('Essential app data', 'Account, plans and progress, encrypted. Required.', True), eyebrow='Account · required'),
-        card(toggle('Private reminders', 'Lock screen: “You have a Tether reminder.”', True), toggle('Share summaries with my care team', 'You preview every share', False), tag='bf', accent='bf'),
-        card(toggle('Connect Screen Time', 'Optional · totals only, never content', False), toggle('De-identified research', None, False), tag='sf', accent='sf'),
+        card(toggle('Essential app data', 'Account, plans and progress, encrypted. Required.', True, key='essential_app_data'), eyebrow='Account · required'),
+        card(toggle('Private reminders', 'Lock screen: “You have a Tether reminder.”', True, key='private_reminders'), toggle('Share summaries with my care team', 'You preview every share', False, key='share_summaries_with_my_care_tea'), tag='bf', accent='bf'),
+        card(toggle('Connect Screen Time', 'Optional · totals only, never content', False, key='connect_screen_time'), toggle('De-identified research', None, False, key='de_identified_research'), tag='sf', accent='sf'),
         text('No ads. No tobacco-industry funding. We never sell health information.', 'small'),
         link('Read the Privacy Notice', ext('https://www.tetherhealthgroup.com/privacy/'), align='left'),
     ], footer=[button('Agree and continue', submit('POST /v1/enrolments/consents', go('ob_basics')))], api=['POST /v1/enrolments/consents'])
 
     S('ob_basics', 'Shared basics', '/onboarding/basics', 'onboarding', phase='onboarding', hdr=H('About you', pill='4 of 5'), body=[
         steps(4, 5), eyebrow('Shared · asked once for all programs'), title('A few basics'),
-        field('What should we call you?', 'Alex'), field('Age range', '35–44', kind='select'),
-        seg(['< 5 h', '5–6 h', '7–8 h', '9+ h'], '5–6 h', label='Sleep on a typical night'),
-        seg(['Low', 'Some', 'High'], 'High', label='Usual stress'),
+        field('What should we call you?', 'Alex', key='what_should_we_call_you'), field('Age range', '35–44', kind='select', key='age_range'),
+        seg(['< 5 h', '5–6 h', '7–8 h', '9+ h'], '5–6 h', label='Sleep on a typical night', key='sleep_on_a_typical_night'),
+        seg(['Low', 'Some', 'High'], 'High', label='Usual stress', key='usual_stress'),
         card(v='mint', text='These answers are shared by your programs, so you’re never asked twice. Age range sets which lessons and screenings apply.', title='Why we ask'),
     ], footer=[button('Continue', go('ob_setup'))])
 
@@ -66,7 +66,7 @@ def shared():
     S('ob_reminders', 'Reminder prime', '/onboarding/reminders', 'onboarding', phase='onboarding', hdr=H('Reminders'), body=[
         illus('◔'), title('Quiet, private reminders', 'l', align='center'), text('At most 2 a day, only for your focus programs.', align='center'),
         card(card(title='Tether Health', text='You have a Tether reminder.', v='flat'), eyebrow='Lock screen preview', text='Program names and health details stay hidden unless you turn them on.'),
-        toggle('Quiet hours', '9:00 PM – 7:00 AM · safety alerts still come through', True),
+        toggle('Quiet hours', '9:00 PM – 7:00 AM · safety alerts still come through', True, key='quiet_hours'),
     ], footer=[button('Turn on reminders', branch('System permission prompt', [('Allowed', go('ob_account')), ('Not allowed', go('ob_reminders_denied'))])), button('Not now', go('ob_account'), v='secondary')],
        desc='Shown before the OS prompt so the system dialog is expected.')
     S('ob_reminders_denied', 'Reminders denied', '/onboarding/reminders?state=denied', 'onboarding', phase='onboarding', variant_of='ob_reminders', state='permission denied', hdr=H('Reminders'), body=[
@@ -79,8 +79,8 @@ def shared():
         authbuttons(apple=auth('apple', [('Success', go('auth_merge')), ('Email already has a Tether account', go('auth_link')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]), google=auth('google', [('Success', go('auth_merge')), ('Email already has a Tether account', go('auth_link')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])),
         text('Sign in with Apple can hide your email: we use Apple’s private relay address.', 'small'),
         eyebrow('Or with email'),
-        field('Email', 'alex@example.com', kind='email'), field('Password', '••••••••••••', hint='At least 12 characters. A passphrase works well.', kind='password'),
-        checklist([ci('I’m 18 or older', done=True)]),
+        field('Email', 'alex@example.com', kind='email', key='email'), field('Password', '••••••••••••', hint='At least 12 characters. A passphrase works well.', kind='password', key='password'),
+        checklist([ci('I’m 18 or older', done=True)], key='age_18_or_older'),
         text('Guest plans are encrypted on this phone. If you sign up later, we ask before uploading them.', 'small'),
     ], footer=[button('Create account', submit('POST supabase /auth/v1/signup', go('auth_verify'))), button('Continue on this phone only', reset('today'), v='secondary')], api=['POST supabase /auth/v1/signup'])
 
@@ -92,12 +92,12 @@ def shared():
     ], footer=[button('Open email app', ext('message://')), button('I’ve confirmed my email', go('auth_merge')), link('Resend link (available in 0:42)', toast('Link sent again'))])
 
     S('auth_signin', 'Sign in', '/auth/signin', 'auth', phase='account', kind='sheet', over='Welcome', body=[
-        title('Welcome back'), authbuttons(apple=auth('apple', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Apple ID, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]), google=auth('google', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Google account, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])), eyebrow('Or with email'), field('Email', 'alex@example.com', kind='email'), field('Password', '••••••••', kind='password'),
+        title('Welcome back'), authbuttons(apple=auth('apple', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Apple ID, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]), google=auth('google', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Google account, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])), eyebrow('Or with email'), field('Email', 'alex@example.com', kind='email', key='email'), field('Password', '••••••••', kind='password', key='password'),
         link('Forgot password?', go('auth_forgot'), align='left'),
     ], footer=[button('Sign in', branch('Sign-in result', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('Wrong password', go('auth_signin_error'))])), button('Cancel', close(), v='secondary')], api=['POST supabase /auth/v1/token'])
     S('auth_signin_error', 'Sign-in error', '/auth/signin?state=error', 'auth', phase='account', kind='sheet', over='Welcome', variant_of='auth_signin', state='error', body=[
         title('Welcome back'), banner('error', 'That email and password don’t match. Check both and try again.'), authbuttons(apple=auth('apple', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Apple ID, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]), google=auth('google', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Google account, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])), eyebrow('Or with email'),
-        field('Email', 'alex@example.com', kind='email'), field('Password', '••••••••', error='Password is incorrect.', kind='password'),
+        field('Email', 'alex@example.com', kind='email', key='email'), field('Password', '••••••••', error='Password is incorrect.', kind='password', key='password'),
         link('Forgot password?', go('auth_forgot'), align='left'), text('After 5 tries we pause sign-in for 15 minutes to protect your account.', 'small'),
     ], footer=[button('Try again', branch('Sign-in result', [('Success', reset('today')), ('Wrong password', rep('auth_signin_error'))])), button('Cancel', close(), v='secondary')])
 
@@ -119,27 +119,27 @@ def shared():
     ], footer=[button('Try again', auth('google', [('Success', reset('today')), ('Error', toast('Still can’t reach Google. Try email.'))])), button('Use email instead', rep('auth_signin'), v='secondary')])
 
     S('auth_forgot', 'Reset password', '/auth/forgot', 'auth', phase='account', hdr=H('Reset password'), body=[
-        title('Forgot your password?'), text('Enter your email and we’ll send a reset link.', 'muted'), field('Email', 'alex@example.com', kind='email'),
+        title('Forgot your password?'), text('Enter your email and we’ll send a reset link.', 'muted'), field('Email', 'alex@example.com', kind='email', key='email'),
     ], footer=[button('Send reset link', submit('POST supabase /auth/v1/recover', rep('auth_forgot_sent')))])
     S('auth_forgot_sent', 'Reset link sent', '/auth/forgot/sent', 'auth', phase='account', hdr=H('Reset password'), body=[
         illus('✓'), title('Check your email', 'l', align='center'), text('If an account exists for that address, a reset link is on its way. It expires in 1 hour.', align='center'),
         text('We never say whether an email is registered, to protect your privacy.', 'small', align='center'),
     ], footer=[button('Back to welcome', reset('welcome'), v='secondary')])
     S('auth_newpass', 'Set new password', '/auth/reset', 'auth', phase='account', hdr=H('New password', left='close'), body=[
-        title('Choose a new password'), field('New password', '••••••••••••', hint='At least 12 characters.', kind='password'), field('Confirm password', '••••••••••••', kind='password'),
+        title('Choose a new password'), field('New password', '••••••••••••', hint='At least 12 characters.', kind='password', key='new_password'), field('Confirm password', '••••••••••••', kind='password', key='confirm_password'),
     ], footer=[button('Save password', submit('PUT supabase /auth/v1/user', reset('today')))], desc='Opened from the reset email deep link.')
 
     S('auth_merge', 'Guest plan merge', '/auth/merge', 'auth', phase='account', kind='sheet', over='Today', body=[
         eyebrow('You’re signed in'), title('Upload the plan on this phone?'),
         rows([row('BreatheFree plan · this phone', 'Quit date Aug 28 · 3 reasons', lead=L_prog('bf'))]),
         text('Your account already has a BreatheFree plan from Aug 12.', 'small'),
-        radio([ri('Keep both, choose later', 'Nothing is overwritten', 'Safest'), ri('Use this phone’s plan'), ri('Use the account’s plan')]),
+        radio([ri('Keep both, choose later', 'Nothing is overwritten', 'Safest'), ri('Use this phone’s plan'), ri('Use the account’s plan')], key='value'),
     ], footer=[button('Continue', submit('POST /v1/quit-plan/guest-import', reset('today')))], api=['POST /v1/quit-plan/guest-import'],
        desc='Create-only import: a concurrent cloud plan returns 409 and both plans are kept.')
 
     S('auth_session', 'Session expired', '/auth/session', 'auth', phase='account', kind='sheet', over='Today', body=[
         title('Please sign in again'), text('For your security, sessions end after 30 days.', 'muted'),
-        field('Password', None, placeholder='Password', kind='password'),
+        field('Password', None, placeholder='Password', kind='password', key='password'),
     ], footer=[button('Sign in', submit('POST supabase /auth/v1/token', close())), button('Use Face ID', close(), v='secondary')])
 
     # ================================================================ TODAY
@@ -147,7 +147,7 @@ def shared():
     today_hdr = H('Today', left='logo', avatar='A')
     S('today', 'Today', '/today', 'today', phase='daily', tabname='today', hdr=today_hdr, body=[
         eyebrow('Friday, August 21'), title('Good morning, Alex.'),
-        chips(['All', 'BreatheFree', 'ScrollFree'], ['All'], multi=False, dots={'BreatheFree': 'bf', 'ScrollFree': 'sf'}),
+        chips(['All', 'BreatheFree', 'ScrollFree'], ['All'], multi=False, dots={'BreatheFree': 'bf', 'ScrollFree': 'sf'}, key='value'),
         card(v='coral', title='Craving or urge to scroll?', text='Help for the next few minutes', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)),
         card(checklist([ci('Stock gum, water or snacks', 'BreatheFree · 3 min', True), ci('Charge your phone outside the bedroom', 'ScrollFree · tonight')]), eyebrow='Today · 2 small steps'),
         card(v='dark', eyebrow='Check-in · about 90 sec', title='Covers both programs', cta=button('Start', sheet('checkin'), v='lime', small=True)),
@@ -176,10 +176,10 @@ def shared():
         card(checklist([ci('Stock gum, water or snacks'), ci('Charge phone outside the bedroom')]), eyebrow='Today · paused')])
 
     S('checkin', 'Daily check-in', '/check-in', 'today', phase='daily', kind='sheet', over='Today', body=[
-        eyebrow('Shared · asked once'), seg(['Low', 'Not great', 'Okay', 'Good', 'Great'], 'Okay', label='How do you feel today?'),
-        seg(['Low', 'Some', 'High'], 'High', label='Stress today'),
-        card(chips(['No', 'A puff', 'One or more', 'Skip'], ['One or more'], multi=False), tag='bf', accent='bf', title='Since your last check-in, did you smoke?', text='Before quit day this is expected, not a setback.'),
-        card(chips(['Better', 'Same', 'Drained', 'Skip'], ['Drained'], multi=False), tag='sf', accent='sf', title='How did you feel after scrolling yesterday?'),
+        eyebrow('Shared · asked once'), seg(['Low', 'Not great', 'Okay', 'Good', 'Great'], 'Okay', label='How do you feel today?', key='how_do_you_feel_today'),
+        seg(['Low', 'Some', 'High'], 'High', label='Stress today', key='stress_today'),
+        card(chips(['No', 'A puff', 'One or more', 'Skip'], ['One or more'], multi=False, key='value'), tag='bf', accent='bf', title='Since your last check-in, did you smoke?', text='Before quit day this is expected, not a setback.'),
+        card(chips(['Better', 'Same', 'Drained', 'Skip'], ['Drained'], multi=False, key='value_2'), tag='sf', accent='sf', title='How did you feel after scrolling yesterday?'),
     ], footer=[button('Save check-in', submit('POST /v1/records/check-ins', rep('checkin_done'))), text('Skip any program question', 'small', align='center')], api=['POST /v1/records/check-ins'],
        desc='Each Focus program adds at most 2 questions. Any self-harm signal routes to Crisis.')
     S('checkin_done', 'Check-in saved', '/check-in/done', 'today', phase='daily', hdr=H('Check-in saved', left='close'), body=[
@@ -200,15 +200,15 @@ def shared():
     ], desc='With one Quit program, the app skips this screen and opens the last helpful tool.')
     S('rescue_active', 'Active tool', '/rescue/breathing', 'rescue', phase='rescue', kind='fullscreen', dark=True, hdr=H('Slow breathing', left='close', pill='1:32 left', dark=True), body=[
         eyebrow('Breathe out · slowly'), ring('5'), text('The urge is a wave. Let it rise and pass.', align='center'),
-        chips(['Voice on', 'Haptics on', 'Reduced motion'], ['Voice on', 'Haptics on']),
+        chips(['Voice on', 'Haptics on', 'Reduced motion'], ['Voice on', 'Haptics on'], key='value'),
         card(v='dark2', title='Still strong?', text='Switch tool or reach a person. This check-in is kept.', children=[buttons(button('Switch tool', sheet('rescue_tools'), v='lime', small=True), button('Get support', go('rescue_escalate'), v='ghostdark', small=True))]),
     ], footer=[button('I’m done', rep('rescue_result'), v='white')], desc='Timer pauses when the app is backgrounded. Reduce Motion → no scaling, countdown only.')
     S('rescue_tools', 'Switch tool', '/rescue/tools', 'rescue', phase='rescue', kind='sheet', over='Slow breathing', body=[
-        title('Choose another tool'), radio([ri('Slow breathing', '2 min · voice optional', 'Helped before'), ri('Move for 3 minutes', 'Walk or stretch'), ri('Change the scene', 'Go somewhere smoke-free'), ri('Urge surfing', '3 min audio')], 1),
+        title('Choose another tool'), radio([ri('Slow breathing', '2 min · voice optional', 'Helped before'), ri('Move for 3 minutes', 'Walk or stretch'), ri('Change the scene', 'Go somewhere smoke-free'), ri('Urge surfing', '3 min audio')], 1, key='value'),
     ], footer=[button('Start this tool', rep('rescue_active')), button('Cancel', close(), v='secondary')])
     S('rescue_result', 'Recheck + result', '/rescue/result', 'rescue', phase='rescue', hdr=H('Rescue done', left='close', pill='Saved'), body=[
-        title('This craving eased.'), slider('How strong is it now?', 3), stats([st('Before', '8'), st('Now', '3', 'Your rating, not a diagnosis')]),
-        chips(['Yes', 'A little', 'Not this time'], ['Yes'], multi=False, label='Did it help?'),
+        title('This craving eased.'), slider('How strong is it now?', 3, key='how_strong_is_it_now'), stats([st('Before', '8'), st('Now', '3', 'Your rating, not a diagnosis')]),
+        chips(['Yes', 'A little', 'Not this time'], ['Yes'], multi=False, label='Did it help?', key='did_it_help'),
         card(v='mint', eyebrow='Next 10 minutes', title='Stay somewhere smoke-free and sip water.'),
         link('Still strong? Get more help', go('rescue_escalate')),
     ], footer=[button('Back to Today', submit('POST /v1/records/rescues', reset('today')))], api=['POST /v1/records/rescues'])
@@ -244,8 +244,8 @@ def shared():
     ], footer=[button('Continue', branch('Chosen option', [('Learn only', toast('Heartwise added as Learn only', tab('plans'))), ('Swap', rep('hw_q1'))], on='radio', key='option')), button('Cancel', close(), v='secondary')])
     S('program_settings', 'Program settings', '/p/:program/settings', 'plans', phase='account', hdr=H('BreatheFree settings'), body=[
         rows([row('BreatheFree', 'Focus since Aug 14', lead=L_prog('bf'))], flat=True),
-        radio([ri('Focus', 'Daily steps and reminders'), ri('Learn only', 'Keep lessons, stop tracking'), ri('Pause', 'Stop reminders; keep everything')], 0, label='Status'),
-        card(toggle('Care team · Dr. Patel’s clinic', 'Manual: you approve each summary', True), toggle('De-identified research', None, False), eyebrow='Sharing'),
+        radio([ri('Focus', 'Daily steps and reminders'), ri('Learn only', 'Keep lessons, stop tracking'), ri('Pause', 'Stop reminders; keep everything')], 0, label='Status', key='status'),
+        card(toggle('Care team · Dr. Patel’s clinic', 'Manual: you approve each summary', True, key='care_team_sharing'), toggle('De-identified research', None, False, key='de_identified_research'), eyebrow='Sharing'),
         rows([row('Export BreatheFree data', 'PDF + JSON', action=toast('Export is being prepared. We’ll notify you.')), row('Leave BreatheFree', 'Keep your data or delete it now', action=sheet('account_leave'), danger=True)], title='Data'),
     ], footer=[button('Save changes', submit('PATCH /v1/enrolments/:id', toast('Saved', back())))], api=['PATCH /v1/enrolments/:id'],
        desc='Parameterized by program. Shown here with BreatheFree data.')
@@ -253,7 +253,7 @@ def shared():
     # ================================================================ PROGRESS / LEARN / SUPPORT
     flow('tabs', 'Progress, Learn & Support', 'Shared tabs that read every enrolment.')
     S('progress', 'Progress', '/progress', 'tabs', phase='resources', tabname='progress', hdr=H('Progress', left='none', avatar='A'), body=[
-        seg(['7 days', '30 days', 'All'], '7 days'), text('Patterns, not grades. Missing check-ins are never counted as zero.', 'small'),
+        seg(['7 days', '30 days', 'All'], '7 days', key='value'), text('Patterns, not grades. Missing check-ins are never counted as zero.', 'small'),
         bars([10, 7, 4, 3, 1, 1, 0], 'bf', title='Cigarettes / day', tag='bf', missing=[3], labels=list('MTWTFSS'), caption='Saved $42.70 · avoided 61', action=go('bf_progress')),
         bars([190, 160, 150, 115, 130, 95, 85], 'sf', title='Social minutes / day', tag='sf', target=90, labels=list('MTWTFSS'), caption='Goal 90 min · reclaimed 5h 40m', action=go('sf_week')),
         card(v='mint', eyebrow='Connection we noticed', title='Late scrolling came before 3 of your 4 strongest cravings.', text='Shown because both programs are yours.', cta=button('Manage', go('account_privacy'), v='secondary', small=True)),
@@ -265,8 +265,8 @@ def shared():
         illus('!', 'error'), title('Something went wrong on our side', align='center'), text('Your data is safe on this phone. Try again in a moment.', 'muted', align='center'),
         button('Try again', rep('progress')), text('Reference 5xx-2F91 · reports never include health data', 'small', align='center')])
     S('learn', 'Learn', '/learn', 'tabs', phase='resources', tabname='learn', hdr=H('Learn', left='none', avatar='A'), body=[
-        field('Search', None, placeholder='Search cravings, sleep, blood pressure…', kind='search'),
-        chips(['For you', 'BreatheFree', 'ScrollFree', 'ClearAir'], ['For you'], multi=False, dots={'BreatheFree': 'bf', 'ScrollFree': 'sf', 'ClearAir': 'ca'}),
+        field('Search', None, placeholder='Search cravings, sleep, blood pressure…', kind='search', key='search'),
+        chips(['For you', 'BreatheFree', 'ScrollFree', 'ClearAir'], ['For you'], multi=False, dots={'BreatheFree': 'bf', 'ScrollFree': 'sf', 'ClearAir': 'ca'}, key='value'),
         card(v='dark', tag='bf', tagx='For quit day', title='Cravings: what to expect today', text='4 min read · 3:12 audio · downloaded', action=go('learn_lesson')),
         card(tag='sf', tagx='2 min', title='Why “one more video” never feels like enough', action=go('learn_lesson')),
         card(tag='ca', tagx='Learn only', title='How your lungs recover after you quit', action=go('learn_lesson')),
@@ -297,23 +297,23 @@ def shared():
     S('support_callback', 'Request call-back', '/support/callback', 'tabs', phase='resources', kind='sheet', over='Support', body=[
         title('Request a counselor call-back?'), text('Review exactly what will be sent before you agree.', 'muted'),
         kv([('Sent to', 'California Smokers’ Helpline'), ('Shared', 'First name, phone, preferred time'), ('Not shared', 'Your plan, check-ins, health details'), ('Consent expires', '30 days')]),
-        field('Best time to call', 'Weekdays after 5 PM', kind='select'),
+        field('Best time to call', 'Weekdays after 5 PM', kind='select', key='best_time_to_call'),
     ], footer=[button('Send referral', submit('POST /v1/care/referrals', toast('Request sent. Expect a call within 2 business days.', close()))), button('Cancel', close(), v='secondary')])
     S('support_message', 'Preview message', '/support/message', 'tabs', phase='resources', kind='sheet', over='Support', body=[
         title('Send to Jordan?'), card(v='mint', eyebrow='Preview', title='“Can you stay with me for the next 10 minutes?”', text='Sent from your phone’s Messages app. Tether never sends on its own.'),
     ], footer=[button('Open Messages', sms('Jordan')), button('Cancel', close(), v='secondary')])
     S('support_message_care', 'Message care team', '/support/care-team', 'tabs', phase='resources', hdr=H('Dr. Patel’s clinic'), body=[
         text('Secure message · usually replies within 1 business day. Not for emergencies.', 'small'),
-        field('Topic', 'Question about my plan', kind='select'), field('Message', 'I’ve been feeling dizzy in the mornings since starting the patch.', kind='multiline'),
-        toggle('Attach a summary', 'You’ll preview it before sending', False), emergency('Chest pain, trouble breathing or thoughts of harming yourself? Call 911 · call or text 988.'),
+        field('Topic', 'Question about my plan', kind='select', key='topic'), field('Message', 'I’ve been feeling dizzy in the mornings since starting the patch.', kind='multiline', key='message'),
+        toggle('Attach a summary', 'You’ll preview it before sending', False, key='attach_a_summary'), emergency('Chest pain, trouble breathing or thoughts of harming yourself? Call 911 · call or text 988.'),
     ], footer=[button('Send message', submit('POST /v1/care/messages', toast('Message sent', back())))])
     S('support_add_person', 'Add a supporter', '/support/people/new', 'tabs', phase='resources', hdr=H('Add a supporter'), body=[
-        title('Who can you count on?'), field('Name', 'Jordan'), field('Phone', '(555) 010-4421', kind='phone'),
-        chips(['BreatheFree', 'ScrollFree'], ['BreatheFree'], label='Which programs?'),
-        field('Help phrase', 'Can you stay with me for the next 10 minutes?', kind='multiline'), text('Nothing is sent until you preview and tap Send.', 'small'),
+        title('Who can you count on?'), field('Name', 'Jordan', key='name'), field('Phone', '(555) 010-4421', kind='phone', key='phone'),
+        chips(['BreatheFree', 'ScrollFree'], ['BreatheFree'], label='Which programs?', key='which_programs'),
+        field('Help phrase', 'Can you stay with me for the next 10 minutes?', kind='multiline', key='help_phrase'), text('Nothing is sent until you preview and tap Send.', 'small'),
     ], footer=[button('Save supporter', submit('POST /v1/care/supporters', toast('Jordan added', back())))])
     S('support_connect', 'Connect a clinic', '/support/connect', 'tabs', phase='resources', hdr=H('Connect a clinic'), body=[
-        title('Enter your clinic’s invite code'), field('Invite code', 'PATEL-4821'), text('Your clinic gave you this code. Connecting shares nothing until you approve a summary.', 'muted'),
+        title('Enter your clinic’s invite code'), field('Invite code', 'PATEL-4821', key='invite_code'), text('Your clinic gave you this code. Connecting shares nothing until you approve a summary.', 'muted'),
     ], footer=[button('Connect', submit('POST /v1/care/connections', toast('Connected to Dr. Patel’s clinic', back())))])
 
     # ================================================================ ACCOUNT
@@ -340,15 +340,15 @@ def shared():
     ], footer=[button('Add a program', go('catalog'), v='secondary')])
     S('account_leave', 'Leave a program', '/account/programs/leave', 'account', phase='account', kind='sheet', over='Programs & sharing', body=[
         title('Leave BreatheFree?'), text('Reminders stop right away. Your other programs are not affected.', 'muted'),
-        radio([ri('Keep my data', 'Kept until you delete it or delete your account. Rejoin anytime.', 'Default'), ri('Delete BreatheFree data now', '63 check-ins, 14 rescues, 1 plan')]),
+        radio([ri('Keep my data', 'Kept until you delete it or delete your account. Rejoin anytime.', 'Default'), ri('Delete BreatheFree data now', '63 check-ins, 14 rescues, 1 plan')], key='value'),
     ], footer=[button('Leave BreatheFree', submit('DELETE /v1/enrolments/:id', toast('You left BreatheFree', reset('plans'))), v='danger'), button('Cancel', close(), v='secondary')])
     S('account_notifications', 'Notifications', '/account/notifications', 'account', phase='account', hdr=H('Notifications'), body=[
-        card(toggle('Check-ins and plan reminders', 'At most 2 a day', True), toggle('Show sensitive details', 'Off: program names and health data hidden', False), toggle('Quiet hours', '9:00 PM – 7:00 AM · safety alerts still come through', True)),
+        card(toggle('Check-ins and plan reminders', 'At most 2 a day', True, key='check_ins_and_plan_reminders'), toggle('Show sensitive details', 'Off: program names and health data hidden', False, key='show_sensitive_details'), toggle('Quiet hours', '9:00 PM – 7:00 AM · safety alerts still come through', True, key='quiet_hours')),
         rows([row('BreatheFree', '8:00 AM check-in', lead=L_prog('bf'), action=toast('Reminder time saved')), row('ScrollFree', '9:30 PM wind-down', lead=L_prog('sf'), action=toast('Reminder time saved'))], title='Per program'),
         card(eyebrow='Lock screen preview', title='Tether Health', text='You have a Tether reminder.'),
     ], footer=[button('Save', submit('PATCH /v1/notifications/preferences', toast('Saved', back())))])
     S('account_privacy', 'Privacy & consent', '/account/privacy', 'account', phase='account', hdr=H('Privacy & consent'), body=[
-        card(toggle('Cross-program insights', 'Show connections between your programs', True), toggle('De-identified research', 'Per program, off by default', False), toggle('Anonymous app diagnostics', 'No health entries', False), eyebrow='Choices'),
+        card(toggle('Cross-program insights', 'Show connections between your programs', True, key='cross_program_insights'), toggle('De-identified research', 'Per program, off by default', False, key='de_identified_research'), toggle('Anonymous app diagnostics', 'No health entries', False, key='anonymous_app_diagnostics'), eyebrow='Choices'),
         rows([row('Care-team sharing', 'Manual only · preview every share', action=go('account_programs')), row('Consent history', 'v3 · Aug 22, 2026', action=toast('Consent history opened')), row('Privacy Notice', None, action=ext('https://www.tetherhealthgroup.com/privacy/'))]),
         text('No ads. We never sell your health data.', 'small'),
     ], footer=[button('Save', submit('PATCH /v1/enrolments/consents', toast('Saved', back())))])
@@ -361,7 +361,7 @@ def shared():
         title('Delete your account and all data?'),
         kv([('Programs', '4'), ('Check-ins', '63'), ('Readings & logs', '118'), ('Shared with care team', '3 summaries (their copies stay with them)')]),
         text('This can’t be undone. Download a copy first if you want one.', 'small'), button('Download a copy first', go('account_data'), v='secondary'),
-        field('Type DELETE to confirm', 'DELETE'), field('Password', '••••••••••••', hint='We ask again to protect your account.', kind='password'),
+        field('Type DELETE to confirm', 'DELETE', key='type_delete_to_confirm'), field('Password', '••••••••••••', hint='We ask again to protect your account.', kind='password', key='password'),
     ], footer=[button('Delete everything', submit('DELETE /v1/account/data', rep('account_deleted')), v='danger')], api=['DELETE /v1/account/data'],
        desc='Encrypted deletion-intent tombstone is written before the request (develop branch design).')
     S('account_deleted', 'Deletion receipt', '/account/deleted', 'account', phase='account', hdr=H('Deleted', left='none'), body=[

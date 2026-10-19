@@ -30,16 +30,16 @@
         {
           "t": "field",
           "label": "Top (systolic)",
-          "value": "138",
           "unit": "mmHg",
+          "placeholder": "138",
           "kind": "number",
           "key": "systolic"
         },
         {
           "t": "field",
           "label": "Bottom (diastolic)",
-          "value": "86",
           "unit": "mmHg",
+          "placeholder": "86",
           "kind": "number",
           "key": "diastolic"
         }
@@ -48,8 +48,8 @@
     {
       "t": "field",
       "label": "Pulse (optional)",
-      "value": "72",
       "unit": "bpm",
+      "placeholder": "72",
       "kind": "number",
       "key": "pulse_optional"
     },

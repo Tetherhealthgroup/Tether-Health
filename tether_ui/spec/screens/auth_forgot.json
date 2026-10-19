@@ -31,7 +31,7 @@
     {
       "t": "field",
       "label": "Email",
-      "value": "alex@example.com",
+      "placeholder": "alex@example.com",
       "kind": "email",
       "key": "email"
     }

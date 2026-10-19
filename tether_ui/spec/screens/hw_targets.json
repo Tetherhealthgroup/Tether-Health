@@ -35,16 +35,16 @@
         {
           "t": "field",
           "label": "Top below",
-          "value": "130",
           "unit": "mmHg",
+          "placeholder": "130",
           "kind": "number",
           "key": "top_below"
         },
         {
           "t": "field",
           "label": "Bottom below",
-          "value": "80",
           "unit": "mmHg",
+          "placeholder": "80",
           "kind": "number",
           "key": "bottom_below"
         }

@@ -26,7 +26,7 @@ class AccountDeleteAppleScreen extends StatelessWidget {
         TKeyValue(rows: [('Programs', '4'), ('Check-ins', '63'), ('Readings & logs', '118'), ('Shared with care team', '3 summaries (their copies stay with them)')]),
         TBody('This can’t be undone. Download a copy first if you want one.', tone: TTextTone.small),
         TButton(key: const ValueKey('a:body[3]'), label: 'Download a copy first', onPressed: () => TNav.push(context, Routes.accountData), variant: TButtonVariant.secondary),
-        TField(fieldKey: 'account_delete_apple.type_delete_to_confirm', label: 'Type DELETE to confirm', value: 'DELETE'),
+        TField(fieldKey: 'account_delete_apple.type_delete_to_confirm', label: 'Type DELETE to confirm', placeholder: 'DELETE'),
         TCard(variant: TCardVariant.mint, eyebrow: 'Confirm it’s you', title: 'Signed in with Apple', text: 'When you tap Delete everything, Apple asks you to confirm. Use the same Apple account you signed in with.'),
       ],
       footer: [

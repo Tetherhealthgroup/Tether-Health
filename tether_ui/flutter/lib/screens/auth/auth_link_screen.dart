@@ -26,7 +26,7 @@ class AuthLinkScreen extends StatelessWidget {
         TIllustration(glyph: '⇄'),
         TTitle('You already have a Tether account', size: TTitleSize.l, center: true),
         TBody('alex@example.com signed up with email and password. Enter your password once to link Google. After that, either sign-in works.', tone: TTextTone.muted, center: true),
-        TField(fieldKey: 'auth_link.password', label: 'Password', value: '••••••••••••', kind: TFieldKind.password),
+        TField(fieldKey: 'auth_link.password', label: 'Password', placeholder: '••••••••••••', kind: TFieldKind.password),
         TLink(key: const ValueKey('a:body[4]'), label: 'Forgot password?', onTap: () => TNav.push(context, Routes.authForgot)),
       ],
       footer: [

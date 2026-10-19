@@ -50,7 +50,8 @@
           "sub": "Not requested"
         }
       ],
-      "label": "What Tether will ask for"
+      "label": "What Tether will ask for",
+      "key": "data_types"
     }
   ],
   "footer": [

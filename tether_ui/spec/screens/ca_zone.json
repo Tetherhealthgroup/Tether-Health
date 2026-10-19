@@ -27,9 +27,9 @@
     {
       "t": "field",
       "label": "Peak flow (optional)",
-      "value": "310",
       "unit": "L/min",
       "hint": "50–900 L/min",
+      "placeholder": "310",
       "kind": "number",
       "key": "peak_flow"
     },

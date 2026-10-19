@@ -24,7 +24,7 @@ class CkQ1Screen extends StatelessWidget {
       children: [
         TSteps(n: 1, total: 1),
         TTitle('A few details to personalize'),
-        TField(fieldKey: 'ck_q1.age', label: 'Age', value: '52', kind: TFieldKind.number),
+        TField(fieldKey: 'ck_q1.age', label: 'Age', placeholder: '52', kind: TFieldKind.number),
         TSegmented(fieldKey: 'ck_q1.sex_assigned_at_birth', options: ['Female', 'Male', 'Intersex', 'Skip'], selected: 'Female', label: 'Sex assigned at birth'),
         TChips(fieldKey: 'ck_q1.any_of_these', options: ['Smoke or used to', 'Diabetes', 'Family history of cancer', 'Pregnant', 'None'], selected: ['Smoke or used to'], label: 'Any of these?'),
         TBody('Used only to build your list. Change anytime.', tone: TTextTone.small),

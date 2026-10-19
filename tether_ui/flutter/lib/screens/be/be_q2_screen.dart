@@ -24,7 +24,7 @@ class BeQ2Screen extends StatelessWidget {
         TSteps(n: 2, total: 2),
         TTitle('Has a close relative had cancer?'),
         TChips(fieldKey: 'be_q2.value', options: ['Breast', 'Ovarian', 'Colorectal', 'Prostate', 'Pancreatic', 'Melanoma', 'None', 'Not sure'], selected: ['Breast']),
-        TField(fieldKey: 'be_q2.relative_s_age_at_diagnosis_if_k', label: 'Relative’s age at diagnosis (if known)', value: '44', kind: TFieldKind.number),
+        TField(fieldKey: 'be_q2.relative_s_age_at_diagnosis_if_k', label: 'Relative’s age at diagnosis (if known)', placeholder: '44', kind: TFieldKind.number),
         TCard(variant: TCardVariant.mint, text: 'A relative diagnosed before 50 may mean earlier screening or genetic counseling. We’ll add this to your visit list.'),
       ],
       footer: [

@@ -85,11 +85,15 @@ def radio(items, selected=0, label=None, key=None):
     its = [i if isinstance(i, dict) else {'label': i} for i in items]
     return N('radio', items=its, selected=selected, label=label, key=key)
 def ri(label, sub=None, badge=None): return {k: v for k, v in {'label': label, 'sub': sub, 'badge': badge}.items() if v}
-def checklist(items, label=None): return N('checklist', items=[i if isinstance(i, dict) else {'label': i} for i in items], label=label)
+def checklist(items, label=None, key=None): return N('checklist', items=[i if isinstance(i, dict) else {'label': i} for i in items], label=label, key=key)
 def ci(label, sub=None, done=False): return {k: v for k, v in {'label': label, 'sub': sub, 'done': done or None}.items() if v}
 def toggle(label, sub=None, on=False, key=None): return N('toggle', label=label, sub=sub, on=on, key=key)
-def field(label, value=None, unit=None, hint=None, error=None, placeholder=None, kind='text', key=None):
-    return N('field', label=label, value=value, unit=unit, hint=hint, error=error, placeholder=placeholder, kind=kind, key=key)
+def field(label, example=None, unit=None, hint=None, error=None, placeholder=None, kind='text', key=None):
+    """A text input. P-31: a field never starts with a value. The example
+    renders as placeholder (hint) text, and the field writes null until the
+    user types. If the field already has its own placeholder, the example is
+    dropped."""
+    return N('field', label=label, unit=unit, hint=hint, error=error, placeholder=placeholder if placeholder is not None else example, kind=kind, key=key)
 def fieldrow(*fields): return N('fieldrow', fields=list(fields))
 def slider(label, value, mn=0, mx=10, lo=None, hi=None, color='coral', suffix='', key=None):
     return N('slider', label=label, value=value, min=mn, max=mx, minLabel=lo or str(mn), maxLabel=hi or str(mx), color=color, suffix=suffix or None, key=key)
@@ -104,7 +108,7 @@ def L_prog(pid): return {'program': pid}
 def L_av(ch): return {'avatar': ch}
 def L_icon(ch): return {'icon': ch}
 def rows(items, title=None, flat=False): return N('list', title=title, rows=items, flat=flat or None)
-def tiles(items, cols=2): return N('tiles', items=items, cols=cols)
+def tiles(items, cols=2, key=None): return N('tiles', items=items, cols=cols, key=key)
 def tl(label, sub=None, program=None, glyph=None, selected=False, action=None, color=None):
     return {k: v for k, v in {'label': label, 'sub': sub, 'program': program, 'glyph': glyph, 'selected': selected or None, 'action': action, 'color': color}.items() if v is not None}
 def stats(items, cols=2): return N('stats', items=items, cols=cols)
@@ -147,15 +151,25 @@ def slug(t):
     return re.sub(r'[^a-z0-9]+', '_', (t or '').lower()).strip('_')[:32] or 'value'
 
 def _assign_keys(s):
+    # Explicit keys (key=) are the stable session keys the API adapters map,
+    # so a copy edit to a label cannot change a payload. They must be unique
+    # on a screen. Inputs without one still get a label slug, but validate.py
+    # rejects them (AUTO_KEYS).
     used = set()
     for part in ('body', 'footer'):
         for n, p in walk(s[part], part):
-            if n['t'] in INPUTS:
-                k = n.get('key') or slug(n.get('label')) or n['t']
+            if (n['t'] in INPUTS or n['t'] in KEYED) and n.get('key'):
+                assert n['key'] not in used, f"{s['id']}: duplicate key {n['key']!r} at {p}"
+                used.add(n['key'])
+    for part in ('body', 'footer'):
+        for n, p in walk(s[part], part):
+            if n['t'] in INPUTS and not n.get('key'):
+                k = slug(n.get('label')) or n['t']
                 base, i = k, 2
                 while k in used:
                     k = f'{base}_{i}'; i += 1
                 used.add(k); n['key'] = k
+                AUTO_KEYS.append((s['id'], p, k))
     def q(a):
         if not a: return
         if a.get('decide', '') and a['decide'].startswith('choice:') and '.' not in a['decide']:
@@ -172,6 +186,11 @@ def entry(screen, trigger): ENTRIES.append({'screen': screen, 'trigger': trigger
 # ---------------------------------------------------------------- graph helpers
 INTERACTIVE = ('button', 'link', 'authbtn')
 INPUTS = ('field', 'chips', 'segmented', 'radio', 'toggle', 'slider')
+# Checklists and selection tiles write to the session only when they have an
+# explicit key (consent checklists, the program picker). They are never
+# auto-keyed.
+KEYED = ('checklist', 'tiles')
+AUTO_KEYS = []  # (screen id, path, key) of inputs without an explicit key
 
 def walk(nodes, path='body'):
     for i, n in enumerate(nodes or []):

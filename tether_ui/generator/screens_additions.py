@@ -490,8 +490,8 @@ def unplug():
     P('program_settings_sf', 'Program settings · ScrollFree with Unplug', '/p/:program/settings?state=sf-unplug', 'plans', phase='account',
       variant_of='program_settings', state='ScrollFree', hdr=H('ScrollFree settings'), body=[
         rows([row('ScrollFree', 'Focus since Aug 14', lead=L_prog('sf'))], flat=True),
-        radio([ri('Focus', 'Daily steps and reminders'), ri('Learn only', 'Keep lessons, stop tracking'), ri('Pause', 'Stop reminders; keep everything')], 0, label='Status'),
-        card(toggle('Care team sharing', 'Off · ScrollFree isn’t shared', False), toggle('De-identified research', None, False), eyebrow='Sharing'),
+        radio([ri('Focus', 'Daily steps and reminders'), ri('Learn only', 'Keep lessons, stop tracking'), ri('Pause', 'Stop reminders; keep everything')], 0, label='Status', key='status'),
+        card(toggle('Care team sharing', 'Off · ScrollFree isn’t shared', False, key='care_team_sharing'), toggle('De-identified research', None, False, key='de_identified_research'), eyebrow='Sharing'),
         rows([row('Unplug', 'On · 2 groups · 60 min limit', action=go('sf_unplug_home')),
               row('Screen Time access', 'Connected · totals only', action=go('sf_screentime')),
               row('Turn off Unplug or Screen Time', 'Anytime', action=sheet('sf_unplug_off'), danger=True)], title='Screen Time & Unplug'),

@@ -2,6 +2,17 @@
   "about": "Approved screens allowed to differ from manifest.json. sha256 is the reviewed current content of tether_ui/spec/screens/<screen>.json. See deviations.md.",
   "deviations": [
     {
+      "screen": "account_delete",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "72639a4af84a4fd5426bd33ab89558e5dac99d31a833549a02e0eb5a9f2fb205",
+      "change": "P-31 placeholders, fields start empty: body[4] \"Type DELETE to confirm\" example \"DELETE\" -> placeholder; body[5] \"Password\" example \"••••••••••••\" -> placeholder"
+    },
+    {
       "screen": "account_leave",
       "decisions": [
         "P-08"
@@ -13,6 +24,39 @@
       "change": "Leave sheet, option 1: \"Keep my data for 30 days\" / \"Rejoin anytime and pick up where you left off\" -> \"Keep my data\" / \"Kept until you delete it or delete your account. Rejoin anytime.\""
     },
     {
+      "screen": "auth_forgot",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "d7f877a0d1f1c4fe2060775451900c9578750edf84429cedb158f5e768342a79",
+      "change": "P-31 placeholders, fields start empty: body[2] \"Email\" example \"alex@example.com\" -> placeholder"
+    },
+    {
+      "screen": "auth_link",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "2e66b3f57d5956ab210f322f041be1f4f83cd60ba43af4d4df32ee1a72f8f3ea",
+      "change": "P-31 placeholders, fields start empty: body[3] \"Password\" example \"••••••••••••\" -> placeholder"
+    },
+    {
+      "screen": "auth_newpass",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "fc0345462689f93e854d618fb225a8e09463d43d74a60fbba10e58a4b5af2d3e",
+      "change": "P-31 placeholders, fields start empty: body[1] \"New password\" example \"••••••••••••\" -> placeholder; body[2] \"Confirm password\" example \"••••••••••••\" -> placeholder"
+    },
+    {
       "screen": "auth_session",
       "decisions": [
         "P-22"
@@ -22,6 +66,39 @@
       ],
       "sha256": "64be737afb4e9f55b09bf6bcd1345e3bcb4e6f9e3e68d2e4f12ab54addb5e0af",
       "change": "body text: drops \"Anything you logged offline is kept and syncs after you sign in.\""
+    },
+    {
+      "screen": "auth_signin",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "cd437b6a4b2d3191601ec423a6b557d1c1ee73a5f34252363f44ae07feb8b16b",
+      "change": "P-31 placeholders, fields start empty: body[3] \"Email\" example \"alex@example.com\" -> placeholder; body[4] \"Password\" example \"••••••••\" -> placeholder"
+    },
+    {
+      "screen": "auth_signin_error",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "870b1a6748b6ffb6fa1f4492eeff8c34f2974348e20ba6e1ddffdb37a8674a24",
+      "change": "P-31 placeholders, fields start empty: body[4] \"Email\" example \"alex@example.com\" -> placeholder; body[5] \"Password\" example \"••••••••\" -> placeholder"
+    },
+    {
+      "screen": "be_q2",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "0e18956f32109465739fbe7e3eaa4ff4ca1986e3fd934a49977ba2b20643ffe7",
+      "change": "P-31 placeholders, fields start empty: body[3] \"Relative’s age at diagnosis (if known)\" example \"44\" -> placeholder"
     },
     {
       "screen": "bf_home",
@@ -57,6 +134,17 @@
       "change": "Row value: \"one tap, offline\" -> \"one tap, no typing\""
     },
     {
+      "screen": "bf_meds_edit",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "c9fb5619e371872043d0d2b23c6b282ec985491e9527fdd3fe92da81048a4258",
+      "change": "P-31 placeholders, fields start empty: body[1] \"Medicine\" example \"Nicotine patch\" -> placeholder; body[2] \"Strength\" example \"21 mg / 24 h\" -> placeholder; body[3] \"When\" example \"Every morning\" -> placeholder"
+    },
+    {
       "screen": "ca_home",
       "decisions": [
         "P-22"
@@ -66,6 +154,17 @@
       ],
       "sha256": "88a0761af33bdc92c918a82dbbab61847f090306b0839704d54c6a4cf796d1bc",
       "change": "Red-zone plan card: \"Open it fast, even offline\" -> \"Open it fast\""
+    },
+    {
+      "screen": "ca_plan",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "b286b32dc9c5391758d8da5e2bdc78b890f99da6798d426e58d9dc07e6b5b302",
+      "change": "P-31 placeholders, fields start empty: body[3].children[0] \"Peak flow from\" example \"400\" -> placeholder; body[3].children[1] \"Daily medicine\" example \"Controller inhaler · 2 puffs AM/PM\" -> placeholder; body[4].children[0] \"Peak flow\" example \"200–399\" -> placeholder; body[5].children[0] \"Below\" example \"200\" -> placeholder"
     },
     {
       "screen": "ca_red",
@@ -79,6 +178,17 @@
       "change": "Note: drops \"Works offline.\""
     },
     {
+      "screen": "ca_zone",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "c72c14b1d09ee1989c3499d5659b5ea5eeb5eb5278e9b14caa4b6e2dc707ed09",
+      "change": "P-31 placeholders, fields start empty: body[1] \"Peak flow (optional)\" example \"310\" -> placeholder"
+    },
+    {
       "screen": "checkin",
       "decisions": [
         "P-22"
@@ -88,6 +198,28 @@
       ],
       "sha256": "e7ccebb4c836902b41f548a4e98b95ce36e624e4923a2d298862e1e8beaf9f63",
       "change": "Footer: \"Private · works offline · skip anything\" -> \"Skip any program question\""
+    },
+    {
+      "screen": "ck_done",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "6f7423c98c39597f472bdabbdebf4b1584b3a4d09a5b9923dfaee03a5efcfd12",
+      "change": "P-31 placeholders, fields start empty: body[0] \"What\" example \"Flu vaccine\" -> placeholder; body[1] \"Date\" example \"Oct 12, 2026\" -> placeholder; body[2] \"Where (optional)\" example \"Main St Pharmacy\" -> placeholder"
+    },
+    {
+      "screen": "ck_q1",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "ef8f8c789be17fa365878c8af15a72e2799df75a91fa6c99d8d5baad6306a75e",
+      "change": "P-31 placeholders, fields start empty: body[2] \"Age\" example \"52\" -> placeholder"
     },
     {
       "screen": "crisis",
@@ -103,24 +235,205 @@
     {
       "screen": "ea_plan",
       "decisions": [
-        "P-22"
+        "P-22",
+        "P-31"
       ],
       "tickets": [
-        "TH-942"
+        "TH-942",
+        "TH-907"
       ],
-      "sha256": "b3d01b1750aea752b783f0726ce34c3845ea0d1a6c12e6ad315a0ed06424fa7c",
-      "change": "Developer description: drops \"; available offline\""
+      "sha256": "7fc3cdc725a27363d673b5e0695718e2e1bcd55b8c122e94dc5026b4accf57d9",
+      "change": "Developer description: drops \"; available offline\" | TH-907: P-31 placeholders, fields start empty: body[2] \"My warning signs\" example \"Not sleeping, pulling away from friends\" -> placeholder; body[3] \"Things that help me\" example \"Walk the dog, shower, music\" -> placeholder; body[4] \"People I can reach\" example \"Sam · (555) 010-3311\" -> placeholder"
+    },
+    {
+      "screen": "hw_lipids",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "7e4bc01b359e2c1553e6e3d1469eb0c76ca4661745774f98bef838c75667483a",
+      "change": "P-31 placeholders, fields start empty: body[2].fields[0] \"Total\" example \"212\" -> placeholder; body[2].fields[1] \"LDL\" example \"138\" -> placeholder; body[3].fields[0] \"HDL\" example \"46\" -> placeholder; body[4] \"Lab date\" example \"Sep 30, 2026\" -> placeholder"
+    },
+    {
+      "screen": "hw_log",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "ca66c2afbe47dad14f0290c29791c03ceb6f62414c87fd33726876fa388250a5",
+      "change": "P-31 placeholders, fields start empty: body[1].fields[0] \"Top (systolic)\" example \"138\" -> placeholder; body[1].fields[1] \"Bottom (diastolic)\" example \"86\" -> placeholder; body[2] \"Pulse (optional)\" example \"72\" -> placeholder"
+    },
+    {
+      "screen": "hw_log2",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "83ea0eca6050806fc7ff1799f3bdf975a33580d04d7bc3afa9d54d0ef429be0e",
+      "change": "P-31 placeholders, fields start empty: body[2].fields[0] \"Top (systolic)\" example \"132\" -> placeholder; body[2].fields[1] \"Bottom (diastolic)\" example \"84\" -> placeholder; body[3] \"Pulse (optional)\" example \"70\" -> placeholder"
+    },
+    {
+      "screen": "hw_log_error",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "50c093c6ee762011e3ad8cd15c62f880f77721a62e0c685062f5f7831bbc8ccb",
+      "change": "P-31 placeholders, fields start empty: body[1].fields[0] \"Top (systolic)\" example \"128\" -> placeholder; body[1].fields[1] \"Bottom (diastolic)\" example \"310\" -> placeholder"
+    },
+    {
+      "screen": "hw_targets",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "95683e0b15ab0cddbf2850f5fcf67fd8e16d3c33fff2672ac9b0f732c4e4a0ab",
+      "change": "P-31 placeholders, fields start empty: body[2].fields[0] \"Top below\" example \"130\" -> placeholder; body[2].fields[1] \"Bottom below\" example \"80\" -> placeholder"
+    },
+    {
+      "screen": "ob_account",
+      "decisions": [
+        "P-31",
+        "TH-902"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "b2373beec58ccd05175e400a848513e740b352eb64b32fdf27be2cc49511b17c",
+      "change": "P-31 placeholders, fields start empty: body[5] \"Email\" example \"alex@example.com\" -> placeholder; body[6] \"Password\" example \"••••••••••••\" -> placeholder | Session key only, no visual change: body[7] checklist gets key \"age_18_or_older\""
+    },
+    {
+      "screen": "ob_basics",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "845a86c8fd7e19c06307a15718049945565a0c2ca99c544a8e4cbfc1e9cfb7a6",
+      "change": "P-31 placeholders, fields start empty: body[3] \"What should we call you?\" example \"Alex\" -> placeholder; body[4] \"Age range\" example \"35–44\" -> placeholder"
+    },
+    {
+      "screen": "ob_programs",
+      "decisions": [
+        "TH-902"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "1d94cbd65da4011d19abe8f2606b15b28b40a733138d7ed25ad6359cfc6fd05f",
+      "change": "Session key only, no visual change: body[3] tiles gets key \"programs\""
     },
     {
       "screen": "program_settings",
       "decisions": [
-        "P-08"
+        "P-08",
+        "TH-902"
       ],
       "tickets": [
-        "TH-942"
+        "TH-942",
+        "TH-907"
       ],
-      "sha256": "866d29061b7c6592f5ff7c5d91c13b1752fe9579595718499f29bc177f93835f",
-      "change": "Leave row subtitle: \"Keep data 30 days or delete now\" -> \"Keep your data or delete it now\""
+      "sha256": "4bedc41b8a8a0f6bf7d48de7b98738df2f50fd8c9334a5abfb921a0fa15c2935",
+      "change": "Leave row subtitle: \"Keep data 30 days or delete now\" -> \"Keep your data or delete it now\" | TH-907: Session key only, no visual change: body[2].children[0] toggle key \"care_team_dr_patel_s_clinic\" -> \"care_team_sharing\""
+    },
+    {
+      "screen": "re_labs",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "80e90ac92b910820a991beda0cedda79c98c77289848d69cbf689477d494b5d1",
+      "change": "P-31 placeholders, fields start empty: body[0] \"eGFR\" example \"58\" -> placeholder; body[1] \"Urine ACR\" example \"42\" -> placeholder; body[3] \"Lab date\" example \"Oct 3, 2026\" -> placeholder"
+    },
+    {
+      "screen": "records_consent",
+      "decisions": [
+        "TH-902"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "2f855fc79c0650c056bb11aed87fcb7ca2bb2537bdb4646ddc19b9254067064a",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\""
+    },
+    {
+      "screen": "records_consent_bb",
+      "decisions": [
+        "TH-902"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "ab16fbdff3e1816078b0868aac0e543a3100179668320235debd63b2c09704d4",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\""
+    },
+    {
+      "screen": "records_consent_device",
+      "decisions": [
+        "TH-902"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "3d4ffd373d6964add7ad77256c52b4eb91320f4e849189858ef8602d3f7fa8c3",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"data_types\""
+    },
+    {
+      "screen": "records_fhir_url",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "8daebea44805c2998a2e5c14212a380dfc165b68c753062220fbfe38dc450c93",
+      "change": "P-31 placeholders, fields start empty: body[1] \"FHIR server address\" example \"https://fhir.example-health.org/r4\" -> placeholder"
+    },
+    {
+      "screen": "records_manual",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "0a90614620aa88de8530a80e388213071c6bf227ef89603ca119833aae7388b9",
+      "change": "P-31 placeholders, fields start empty: body[2] \"Test\" example \"A1C\" -> placeholder; body[3] \"Value\" example \"7.4\" -> placeholder; body[4] \"Date\" example \"Oct 1, 2026\" -> placeholder"
+    },
+    {
+      "screen": "records_manual_error",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "47331cf31f6af4e6e5ab298b5eab285c5bd85c344fffd8f28ae220b7874ec870",
+      "change": "P-31 placeholders, fields start empty: body[1] \"Test\" example \"A1C\" -> placeholder; body[2] \"Value\" example \"74\" -> placeholder; body[3] \"Date\" example \"Oct 1, 2026\" -> placeholder"
+    },
+    {
+      "screen": "records_search",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "09e19b1942db1bf9c13f919b9af4899fa5dfac9314f9bfa175a080319e97df5c",
+      "change": "P-31 placeholders, fields start empty: body[0] \"Search\" example \"Patel\" -> dropped; keeps its own placeholder \"Search hospital, clinic or doctor\""
     },
     {
       "screen": "rescue_pick",
@@ -132,6 +445,30 @@
       ],
       "sha256": "7e895e9ef5adc34d917ae3be46bcff35bed5808fb7159ab3a441ee8af18782be",
       "change": "Developer description: drops \"Works offline.\""
+    },
+    {
+      "screen": "sd_caregiver",
+      "decisions": [
+        "P-31",
+        "TH-902"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "a7804abf3434b10235a979d2cb50d5eafbd8c1a9839d657c57304c7046554d5a",
+      "change": "P-31 placeholders, fields start empty: body[1] \"Name\" example \"Rosa\" -> placeholder; body[2] \"Phone\" example \"(555) 010-2244\" -> placeholder | Session key only, no visual change: body[3] checklist gets key \"caregiver_can_see\""
+    },
+    {
+      "screen": "sf_buddy",
+      "decisions": [
+        "P-31",
+        "TH-902"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "55b41fe8a2782698daa756e2d5099ea4384e43cbfa945a4710e6e99fa815a214",
+      "change": "P-31 placeholders, fields start empty: body[2] \"Name\" example \"Sam\" -> placeholder | Session key only, no visual change: body[3] checklist gets key \"buddy_can_see\""
     },
     {
       "screen": "sf_home",
@@ -154,6 +491,83 @@
       ],
       "sha256": "59d6b66a1dd3b8c4df7721d8267309281508fdf065003fc0161bd3324b7ec568",
       "change": "iPhone copy says Screen Time \"shows\" totals, not that Tether \"reads\" them (4 strings)"
+    },
+    {
+      "screen": "st_a1c",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "e9a1237ce7cb8c399e3bec485c5f6536a5118b3f02b1e5ea1bc23388f48ed099",
+      "change": "P-31 placeholders, fields start empty: body[1] \"A1C\" example \"7.4\" -> placeholder; body[2] \"Lab date\" example \"Oct 1, 2026\" -> placeholder"
+    },
+    {
+      "screen": "st_log",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "10cf7ae4463eb432aaa65e548e57f116d48789528a886fb9965e575be538bce1",
+      "change": "P-31 placeholders, fields start empty: body[0] \"Reading\" example \"142\" -> placeholder; body[3] \"Note (optional)\" example \"Pasta lunch\" -> placeholder"
+    },
+    {
+      "screen": "st_range",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "e371503b640ea50b34b8593e9afcfbbd07f0ce4d8bca6e9fb64cc23fd37a1596",
+      "change": "P-31 placeholders, fields start empty: body[3].fields[0] \"Before meals from\" example \"80\" -> placeholder; body[3].fields[1] \"to\" example \"130\" -> placeholder; body[4] \"2 h after meals below\" example \"180\" -> placeholder; body[5].children[0] \"Low below\" example \"70\" -> placeholder; body[5].children[1] \"My low steps\" example \"15 g fast sugar, re-check in 15 min\" -> placeholder"
+    },
+    {
+      "screen": "support_add_person",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "e7611768071e24a4024175b20cfba75d370c46561a38ce669708406664eeb9cd",
+      "change": "P-31 placeholders, fields start empty: body[1] \"Name\" example \"Jordan\" -> placeholder; body[2] \"Phone\" example \"(555) 010-4421\" -> placeholder; body[4] \"Help phrase\" example \"Can you stay with me for the next 10 minutes?\" -> placeholder"
+    },
+    {
+      "screen": "support_callback",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "1751167a596e5ac6e4f8f5dbd65f8181a53cea8ffc3601511b863a6aa209220f",
+      "change": "P-31 placeholders, fields start empty: body[3] \"Best time to call\" example \"Weekdays after 5 PM\" -> placeholder"
+    },
+    {
+      "screen": "support_connect",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "47593df3f4a59e28d23ace7a54aea0d5a75f9d00273587779e1d48190a5db4be",
+      "change": "P-31 placeholders, fields start empty: body[1] \"Invite code\" example \"PATEL-4821\" -> placeholder"
+    },
+    {
+      "screen": "support_message_care",
+      "decisions": [
+        "P-31"
+      ],
+      "tickets": [
+        "TH-907"
+      ],
+      "sha256": "110939a740b2b442fad4e098fe2c6e66a415d11843b22614f4465a1532280b25",
+      "change": "P-31 placeholders, fields start empty: body[1] \"Topic\" example \"Question about my plan\" -> placeholder; body[2] \"Message\" example \"I’ve been feeling dizzy in the mornings since starting the patch.\" -> placeholder"
     },
     {
       "screen": "today",

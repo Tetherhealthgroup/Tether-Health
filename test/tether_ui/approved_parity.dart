@@ -28,9 +28,11 @@ bool _nonBlankStrings(Object? v) =>
     v.isNotEmpty &&
     v.every((e) => e is String && e.trim().isNotEmpty);
 
-/// Decision IDs as used in the registry: `P-22`, `P-30b`,
-/// `N3`, `P-47 decision 3`.
-final decisionId = RegExp(r'^(P-\d+[a-z]?|N\d+|P-47 decision \d+)$');
+/// Owner decision IDs, in these forms: `P-22`, `P-28b`, `N3`,
+/// `P-47 decision 3`. `TH-902` is accepted as exactly that literal: it is the
+/// owner approval of the ARCH-TH-902 design. No other ticket ID is a
+/// decision.
+final decisionId = RegExp(r'^(P-\d+[a-z]?|N\d+|P-47 decision \d+|TH-902)$');
 
 /// Ticket IDs: `TH-942`, `TH-972a`.
 final ticketId = RegExp(r'^TH-\d+[a-z]?$');
@@ -47,7 +49,8 @@ void _checkIds(
     final bad = _badIds(decisions, decisionId);
     if (bad.isNotEmpty) {
       failures.add('$what has decisions that are not owner decision IDs: '
-          '$bad. Use the decision ID (e.g. "P-22", "N3", "P-47 decision 3"); '
+          '$bad. Use the decision ID (e.g. "P-22", "N3", "P-47 decision 3", '
+          '"TH-902"); '
           'without an owner decision there is no entry: get an owner decision, '
           'then record it in a reviewed change (see $approvedDir/README.md).');
     }
@@ -198,7 +201,7 @@ List<String> checkApprovedParity({
       failures.add('Approved screen "$id" is missing: $screensDir/$id.json '
           'does not exist. Restore it in the generator and regenerate. '
           'Removing an approved screen needs an owner decision and a reviewed '
-          'change to $approvedDir/ (see README.md).');
+          'change to $approvedDir/ (see $approvedDir/README.md).');
     } else if (now == approved[id]) {
       if (dev != null) {
         failures.add('Approved screen "$id" matches the owner\'s snapshot '

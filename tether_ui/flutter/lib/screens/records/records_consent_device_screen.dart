@@ -24,7 +24,7 @@ class RecordsConsentDeviceScreen extends StatelessWidget {
       children: [
         TTitle('Use health data on this phone?'),
         TBody('iPhone: Apple Health Records (FHIR) and readings. Android: Health Connect readings. You choose each type in the system screen next.', tone: TTextTone.muted),
-        TChecklist(items: [TCheckItem('Blood pressure', done: true), TCheckItem('Blood glucose', done: true), TCheckItem('Clinical records (iPhone)', sub: 'Labs, immunizations, conditions', done: true), TCheckItem('Steps and sleep', sub: 'Not requested')], label: 'What Tether will ask for'),
+        TChecklist(fieldKey: 'records_consent_device.data_types', items: [TCheckItem('Blood pressure', done: true), TCheckItem('Blood glucose', done: true), TCheckItem('Clinical records (iPhone)', sub: 'Labs, immunizations, conditions', done: true), TCheckItem('Steps and sleep', sub: 'Not requested')], label: 'What Tether will ask for'),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.branch(context, 'System permission result', <String, VoidCallback>{'Allowed': () => TNav.push(context, Routes.recordsImporting), 'Not allowed': () => TNav.push(context, Routes.recordsError)}), arrow: true),

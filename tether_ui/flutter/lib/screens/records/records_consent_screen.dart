@@ -24,7 +24,7 @@ class RecordsConsentScreen extends StatelessWidget {
       children: [
         TTitle('Connect Patel Family Medicine?'),
         TKeyValue(rows: [('Source', 'Epic MyChart · SMART on FHIR R4'), ('Access', 'Read-only'), ('Refresh', 'Daily while connected'), ('Stop', 'Disconnect anytime')]),
-        TChecklist(items: [TCheckItem('Conditions', sub: 'Condition', done: true), TCheckItem('Vital signs', sub: 'Observation · blood pressure, weight', done: true), TCheckItem('Lab results', sub: 'Observation · A1C, lipids, eGFR', done: true), TCheckItem('Medications', sub: 'MedicationRequest', done: true), TCheckItem('Immunizations', sub: 'Immunization', done: true), TCheckItem('Smoking status', sub: 'Observation · LOINC 72166-2', done: true), TCheckItem('Clinical notes', sub: 'Not requested')], label: 'What Tether will read'),
+        TChecklist(fieldKey: 'records_consent.resources', items: [TCheckItem('Conditions', sub: 'Condition', done: true), TCheckItem('Vital signs', sub: 'Observation · blood pressure, weight', done: true), TCheckItem('Lab results', sub: 'Observation · A1C, lipids, eGFR', done: true), TCheckItem('Medications', sub: 'MedicationRequest', done: true), TCheckItem('Immunizations', sub: 'Immunization', done: true), TCheckItem('Smoking status', sub: 'Observation · LOINC 72166-2', done: true), TCheckItem('Clinical notes', sub: 'Not requested')], label: 'What Tether will read'),
         TCard(variant: TCardVariant.mint, title: 'Only the programs you joined get data', text: 'Heartwise ← blood pressure, lipids · Steady ← A1C, glucose · Renew ← eGFR · Checkup ← immunizations · BreatheFree ← smoking status. Ease and ScrollFree get nothing.'),
       ],
       footer: [

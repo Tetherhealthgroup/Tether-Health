@@ -26,14 +26,14 @@
     {
       "t": "field",
       "label": "Name",
-      "value": "Jordan",
+      "placeholder": "Jordan",
       "kind": "text",
       "key": "name"
     },
     {
       "t": "field",
       "label": "Phone",
-      "value": "(555) 010-4421",
+      "placeholder": "(555) 010-4421",
       "kind": "phone",
       "key": "phone"
     },
@@ -53,7 +53,7 @@
     {
       "t": "field",
       "label": "Help phrase",
-      "value": "Can you stay with me for the next 10 minutes?",
+      "placeholder": "Can you stay with me for the next 10 minutes?",
       "kind": "multiline",
       "key": "help_phrase"
     },

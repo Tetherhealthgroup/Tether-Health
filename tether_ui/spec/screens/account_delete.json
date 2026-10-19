@@ -62,15 +62,15 @@
     {
       "t": "field",
       "label": "Type DELETE to confirm",
-      "value": "DELETE",
+      "placeholder": "DELETE",
       "kind": "text",
       "key": "type_delete_to_confirm"
     },
     {
       "t": "field",
       "label": "Password",
-      "value": "••••••••••••",
       "hint": "We ask again to protect your account.",
+      "placeholder": "••••••••••••",
       "kind": "password",
       "key": "password"
     }

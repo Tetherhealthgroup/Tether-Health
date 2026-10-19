@@ -1034,8 +1034,28 @@
         "Log blood pressure"
       ],
       [
+        "enter",
+        "hw_log.systolic",
+        "138"
+      ],
+      [
+        "enter",
+        "hw_log.diastolic",
+        "86"
+      ],
+      [
         "tap",
         "Next reading"
+      ],
+      [
+        "enter",
+        "hw_log2.systolic",
+        "132"
+      ],
+      [
+        "enter",
+        "hw_log2.diastolic",
+        "84"
       ],
       [
         "tap",
@@ -1092,8 +1112,23 @@
     "start": "hw_log",
     "steps": [
       [
+        "enter",
+        "hw_log.systolic",
+        "138"
+      ],
+      [
+        "enter",
+        "hw_log.diastolic",
+        "86"
+      ],
+      [
         "tap",
         "Next reading"
+      ],
+      [
+        "enter",
+        "hw_log2.systolic",
+        "132"
       ],
       [
         "enter",

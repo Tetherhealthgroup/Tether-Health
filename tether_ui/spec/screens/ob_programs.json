@@ -80,7 +80,8 @@
           "program": "sd"
         }
       ],
-      "cols": 2
+      "cols": 2,
+      "key": "programs"
     },
     {
       "t": "link",

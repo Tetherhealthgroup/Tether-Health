@@ -23,17 +23,17 @@ def programs_a():
           (go('bf_q1'), 'Plan, practice and get through cravings, with no judgment. A slip never erases your wins.'))
     S('bf_q1', 'Baseline: amount', '/p/bf/onboarding/1', 'bf', program='bf', phase='onboarding', hdr=H('About your smoking', pill='1 of 3'), body=[
         steps(1, 3), eyebrow('Question 1 of 3'), title('On a typical day, how many cigarettes?'),
-        radio(['I don’t smoke every day', '10 or fewer', '11–20', '21–30', '31 or more'], 2),
+        radio(['I don’t smoke every day', '10 or fewer', '11–20', '21–30', '31 or more'], 2, key='value'),
         card(v='mint', title='Why we ask', text='Tailors your plan and estimates money saved. Not a diagnosis.'),
     ], footer=[button('Next', go('bf_q2'))])
     S('bf_q2', 'Baseline: triggers', '/p/bf/onboarding/2', 'bf', program='bf', phase='onboarding', hdr=H('Your triggers', pill='2 of 3'), body=[
         steps(2, 3), eyebrow('Choose all that apply'), title('When do you most want a cigarette?'),
-        chips(['Stress', 'After meals', 'Driving', 'With coffee', 'Social', 'Work breaks', 'Alcohol', 'Boredom', 'Morning', 'Scrolling'], ['Stress', 'After meals', 'Driving', 'With coffee']),
-        field('Add your own', None, placeholder='Type another situation…'), text('Used to prepare, never to monitor. No background location.', 'small'),
+        chips(['Stress', 'After meals', 'Driving', 'With coffee', 'Social', 'Work breaks', 'Alcohol', 'Boredom', 'Morning', 'Scrolling'], ['Stress', 'After meals', 'Driving', 'With coffee'], key='value'),
+        field('Add your own', None, placeholder='Type another situation…', key='add_your_own'), text('Used to prepare, never to monitor. No background location.', 'small'),
     ], footer=[button('Next', go('bf_q3'))])
     S('bf_q3', 'Baseline: reasons', '/p/bf/onboarding/3', 'bf', program='bf', phase='onboarding', hdr=H('Your reasons', pill='3 of 3'), body=[
         steps(3, 3), title('What are you quitting for?'), text('Choose all that matter. Your top reason appears when a craving hits.', 'muted'),
-        chips(['Protect my family', 'Breathe easier', 'Save money', 'Feel in control', 'My health', 'Be there for my future'], ['Protect my family', 'Breathe easier', 'Save money']),
+        chips(['Protect my family', 'Breathe easier', 'Save money', 'Feel in control', 'My health', 'Be there for my future'], ['Protect my family', 'Breathe easier', 'Save money'], key='value'),
         card(v='mint', eyebrow='When a craving hits', children=[quote('You chose this for your family. This feeling will pass.')]),
     ], footer=[button('Save my reasons', go('bf_path'))])
     S('bf_path', 'Choose path', '/p/bf/plan/path', 'bf', program='bf', phase='plan', hdr=H('Your path', pill='Plan 1 of 3'), body=[
@@ -45,7 +45,7 @@ def programs_a():
         title('Choose a day to begin.'), text('7–14 days away gives you time to prepare without losing momentum.', 'muted'),
         calendar('August 2026', 28, [28, 29, 30, 31], today=21),
         card(v='dark', eyebrow='Your quit date', title='Friday, August 28, 2026', text='7 days to prepare · Pacific Time'),
-        toggle('Quit-day check-in at 7:00 AM', 'Lock screen: “You have a Tether reminder.”', True),
+        toggle('Quit-day check-in at 7:00 AM', 'Lock screen: “You have a Tether reminder.”', True, key='quit_day_check_in_at_7_00_am'),
     ], footer=[button('Confirm this date', go('bf_support'))])
     S('bf_stepdown', 'Step-down schedule', '/p/bf/plan/reduce', 'bf', program='bf', phase='plan', hdr=H('Step-down schedule', pill='Plan 2 of 3'), body=[
         title('Cut back at your pace.'), text('From your baseline of 15 a day. Adjust any week.', 'muted'),
@@ -56,7 +56,7 @@ def programs_a():
         title('You don’t have to do this alone.'),
         rows([row('Jordan', 'Friend · text message · evening before', lead=L_av('J'), action=go('support_add_person')), row('Add a supporter', None, lead=L_icon('+'), action=go('support_add_person'))], title='Your support circle'),
         card(checklist([ci('Remove cigarettes, lighters, ashtrays', done=True), ci('Make home and car smoke-free', done=True), ci('Stock gum, water or snacks')]), eyebrow='Prepare your space · 2 of 3'),
-        toggle('Remind me to discuss quit medicines with my care team', 'Education only. The app never prescribes.', True),
+        toggle('Remind me to discuss quit medicines with my care team', 'Education only. The app never prescribes.', True, key='remind_me_to_discuss_quit_medici'),
     ], footer=[button('Review my plan', go('bf_review'))])
     S('bf_review', 'Review plan', '/p/bf/plan/review', 'bf', program='bf', phase='plan', hdr=H('Review your plan', pill='Ready'), body=[
         title('Your plan is ready.'), text('Tap any item to edit.', 'muted'),
@@ -90,8 +90,8 @@ def programs_a():
     S('bf_slip', 'Slip recovery', '/p/bf/slip', 'bf', program='bf', phase='milestone', hdr=H('Slip recovery', left='close', pill='Private'), body=[
         eyebrow('Your progress is still here'), title('A slip is information, not the end.'),
         kv([('Smoke-free days so far', '6 of 7 · kept')]),
-        chips(['A puff or two', 'One cigarette', 'More', 'Prefer not to say'], ['A puff or two'], multi=False, label='What happened?'),
-        chips(['Stress', 'Around smokers', 'Alcohol', 'Scrolling late'], ['Stress'], label='What was going on? (optional)'),
+        chips(['A puff or two', 'One cigarette', 'More', 'Prefer not to say'], ['A puff or two'], multi=False, label='What happened?', key='what_happened'),
+        chips(['Stress', 'Around smokers', 'Alcohol', 'Scrolling late'], ['Stress'], label='What was going on? (optional)', key='what_was_going_on_optional'),
         radio([ri('Continue from this moment', 'Keep your plan', 'Recommended'), ri('Choose a new quit time')], key='next'),
     ], footer=[button('Save and start a 2-min Rescue', submit('POST /v1/records/lapses', branch('Selected option', [('Continue from this moment', rep('rescue_active')), ('Choose a new quit time', rep('bf_date'))], on='radio', key='next'))), link('Skip for now', back())],
        api=['POST /v1/records/lapses'], desc='Append-only lapse event. No counter decreases.')
@@ -104,11 +104,11 @@ def programs_a():
         card(v='urgent', title='Side effect or worrying symptom?', text='Contact your care team or pharmacist. Emergency: 911.', action=go('support_message_care')),
     ], footer=[button('Add or update recorded plan', go('bf_meds_edit'), v='secondary')])
     S('bf_meds_edit', 'Edit recorded plan', '/p/bf/meds/edit', 'bf', program='bf', phase='resources', hdr=H('Recorded plan'), body=[
-        title('Record the plan from your clinician'), field('Medicine', 'Nicotine patch', kind='select'), field('Strength', '21 mg / 24 h'), field('When', 'Every morning', kind='select'),
-        toggle('Private reminder', 'Lock screen hides the medicine name', True), text('You’re recording, not changing, your plan. Ask your clinician about any change.', 'small'),
+        title('Record the plan from your clinician'), field('Medicine', 'Nicotine patch', kind='select', key='medicine'), field('Strength', '21 mg / 24 h', key='strength'), field('When', 'Every morning', kind='select', key='when'),
+        toggle('Private reminder', 'Lock screen hides the medicine name', True, key='private_reminder'), text('You’re recording, not changing, your plan. Ask your clinician about any change.', 'small'),
     ], footer=[button('Save plan', submit('PUT /v1/program-data/bf/meds', toast('Plan saved', back())))])
     S('bf_progress', 'BreatheFree progress', '/p/bf/progress', 'bf', program='bf', phase='resources', hdr=H('Progress', pill='BreatheFree'), body=[
-        seg(['7 days', '30 days', 'All'], '7 days'),
+        seg(['7 days', '30 days', 'All'], '7 days', key='value'),
         bars([10, 7, 4, 3, 1, 1, 0], 'bf', title='Cigarettes / day', missing=[3], labels=list('MTWTFSS'), caption='Thursday: no check-in · not counted as zero'),
         stats([st('Est. avoided', '61', 'cigarettes'), st('Est. saved', '$42.70', '$14 per pack'), st('Cravings eased', '4 of 6', 'after a tool'), st('Most helpful', 'Breathing', '3 of 4 times')]),
         rows([row('How estimates work', '10/day · $14/pack · 5 min each', action=sheet('bf_estimates'))]),
@@ -124,18 +124,18 @@ def programs_a():
           (go('sf_q1'), 'Notice what pulls you in, set a goal that feels doable, and pause for 60 seconds when the urge hits. Never called “addiction”.'))
     S('sf_q1', 'Baseline: use', '/p/sf/onboarding/1', 'sf', program='sf', phase='onboarding', hdr=H('About your use', pill='1 of 2'), body=[
         steps(1, 2), title('On a typical day, how long on social apps?'), text('A rough guess is fine.', 'muted'),
-        radio(['Less than 1 hour', '1–2 hours', '3–4 hours', '5+ hours'], 2),
-        chips(['Short video', 'Feeds', 'Messaging', 'Games', 'News'], ['Short video', 'Feeds'], label='Which pull hardest? (categories only)'),
+        radio(['Less than 1 hour', '1–2 hours', '3–4 hours', '5+ hours'], 2, key='value'),
+        chips(['Short video', 'Feeds', 'Messaging', 'Games', 'News'], ['Short video', 'Feeds'], label='Which pull hardest? (categories only)', key='which_pull_hardest_categories_on'),
     ], footer=[button('Next', go('sf_q2'))])
     S('sf_q2', 'Baseline: triggers', '/p/sf/onboarding/2', 'sf', program='sf', phase='onboarding', hdr=H('Your triggers', pill='2 of 2'), body=[
         steps(2, 2), title('When do you reach for it?'),
-        chips(['Bored', 'Lonely', 'In bed', 'Avoiding work', 'After conflict', 'Waiting', 'Can’t sleep', 'First thing'], ['Bored', 'In bed', 'Avoiding work']),
-        seg(['Better', 'Same', 'Worse'], 'Worse', label='How do you usually feel after?'),
+        chips(['Bored', 'Lonely', 'In bed', 'Avoiding work', 'After conflict', 'Waiting', 'Can’t sleep', 'First thing'], ['Bored', 'In bed', 'Avoiding work'], key='value'),
+        seg(['Better', 'Same', 'Worse'], 'Worse', label='How do you usually feel after?', key='how_do_you_usually_feel_after'),
         text('Used for your plan only. ScrollFree never reads what you look at.', 'small'),
     ], footer=[button('Next', go('sf_goal'))])
     S('sf_goal', 'Goal & windows', '/p/sf/plan/goal', 'sf', program='sf', phase='plan', hdr=H('Your goal', pill='Plan'), body=[
         title('Set a goal that feels doable.'), text('From about 3 hours a day.', 'muted'),
-        card(slider('Daily social time', 90, 30, 240, '30 min', '4 h', 'sf', ' min'), toggle('Step down 15 min each week', None, True)),
+        card(slider('Daily social time', 90, 30, 240, '30 min', '4 h', 'sf', ' min', key='daily_social_time'), toggle('Step down 15 min each week', None, True, key='step_down_15_min_each_week')),
         card(checklist([ci('Bedtime', '10:00 PM – 7:00 AM', True), ci('Meals', 'When you mark a meal', True), ci('First hour awake')]), eyebrow='App-free times'),
         rows([row('Connect Screen Time', 'Optional · totals only', action=go('sf_screentime'))]),
     ], footer=[button('Save my goal', go('sf_buddy'))])
@@ -148,8 +148,8 @@ def programs_a():
         text('We’ll ask for a quick estimate in your evening check-in. You can connect later in Account → ScrollFree.', 'muted'),
     ], footer=[button('Continue with self-report', back()), button('Open phone settings', settings(), v='secondary')])
     S('sf_buddy', 'Accountability buddy', '/p/sf/plan/buddy', 'sf', program='sf', phase='plan', hdr=H('Buddy', pill='Optional'), body=[
-        title('Want someone in your corner?'), text('Your buddy only sees what you choose to send.', 'muted'), field('Name', 'Sam'),
-        checklist([ci('A weekly “I hit my goal” message', done=True), ci('My minutes per day'), ci('Nothing automatic: I send each one', done=True)], label='They can see'),
+        title('Want someone in your corner?'), text('Your buddy only sees what you choose to send.', 'muted'), field('Name', 'Sam', key='name'),
+        checklist([ci('A weekly “I hit my goal” message', done=True), ci('My minutes per day'), ci('Nothing automatic: I send each one', done=True)], label='They can see', key='buddy_can_see'),
         card(v='mint', eyebrow='Preview', children=[quote('Phone-free nights this week: 5. Thanks for cheering me on!')]),
     ], footer=[button('Save and finish', submit('PUT /v1/program-data/sf/plan', onboarding_or('sf_home'))), link('Skip for now', onboarding_or('sf_home'))])
     S('sf_home', 'ScrollFree home', '/p/sf/home', 'sf', program='sf', phase='daily', tabname='plans', hdr=home_hdr('sf'), body=[
@@ -162,13 +162,13 @@ def programs_a():
     ])
     S('sf_pause', 'Pause 60', '/p/sf/pause', 'sf', program='sf', phase='rescue', kind='fullscreen', dark=True, bg='indigo', hdr=H('Pause 60', left='close', pill='Urge rescue', dark=True), body=[
         title('Before you open it, one breath.', 'l'), text('What did you pick up your phone for?'), ring('42', palette='indigo'),
-        chips(['Message someone', 'Bored', 'Avoiding something', 'Can’t sleep'], ['Bored'], multi=False),
+        chips(['Message someone', 'Bored', 'Avoiding something', 'Can’t sleep'], ['Bored'], multi=False, key='value'),
         card(v='dark2', title='Bored? Try instead:', text='2-min walk · text one real person · a short lesson'),
     ], footer=[button('I’m good, put it down', submit('POST /v1/program-data/sf/pauses', toast('Nice. Logged as a pause.', reset('today'))), v='white'), link('Open anyway (logged as information)', toast('Logged. No judgment.', close()))])
     S('sf_slip', 'Long-scroll recovery', '/p/sf/slip', 'sf', program='sf', phase='milestone', hdr=H('Long scroll', pill='Private'), body=[
         title('That happens. What pulled you in?'), text('Nothing resets. Your phone-free nights still count.', 'muted'),
-        chips(['Couldn’t sleep', 'Bored', 'Stressed', 'Didn’t notice time'], ['Couldn’t sleep']),
-        radio([ri('Keep my goal, try again tonight', None, 'Recommended'), ri('Make tomorrow’s goal easier'), ri('Move bedtime window 30 min earlier')]),
+        chips(['Couldn’t sleep', 'Bored', 'Stressed', 'Didn’t notice time'], ['Couldn’t sleep'], key='value'),
+        radio([ri('Keep my goal, try again tonight', None, 'Recommended'), ri('Make tomorrow’s goal easier'), ri('Move bedtime window 30 min earlier')], key='value_2'),
     ], footer=[button('Save', submit('POST /v1/records/lapses', toast('Saved', rep('sf_home'))))])
     S('sf_week', 'Weekly reflection', '/p/sf/week', 'sf', program='sf', phase='milestone', hdr=H('Week 2', pill='ScrollFree'), body=[
         title('Your week, honestly.'),
@@ -184,13 +184,13 @@ def programs_a():
           (go('ca_q1'), 'Check your zone, log symptoms and know exactly what to do, using the plan your clinician gave you.'))
     S('ca_q1', 'Diagnosis & plan', '/p/ca/onboarding/1', 'ca', program='ca', phase='onboarding', hdr=H('About your breathing', pill='1 of 2'), body=[
         steps(1, 2), title('Which applies to you?'), text('As told by a clinician.', 'muted'),
-        radio(['Asthma', 'COPD', 'Other lung condition', 'Not diagnosed: I want to learn'], 0),
+        radio(['Asthma', 'COPD', 'Other lung condition', 'Not diagnosed: I want to learn'], 0, key='value'),
         seg(['Yes', 'No', 'Not sure'], 'Yes', label='Do you have a written action plan?', key='has_plan'),
     ], footer=[button('Next', branch('Has a written action plan?', [('Yes', go('ca_plan')), ('No / Not sure', go('ca_noplan'))], on='segmented', key='has_plan'))])
     S('ca_plan', 'Enter action plan', '/p/ca/plan', 'ca', program='ca', phase='plan', hdr=H('Your action plan', pill='2 of 2'), body=[
         steps(2, 2), title('Copy your plan from your clinician.'), text('ClearAir never creates or changes zones.', 'muted'),
-        card(field('Peak flow from', '400', unit='L/min', kind='number', key='green_from'), field('Daily medicine', 'Controller inhaler · 2 puffs AM/PM'), eyebrow='Green zone'),
-        card(field('Peak flow', '200–399', unit='L/min'), eyebrow='Yellow zone'),
+        card(field('Peak flow from', '400', unit='L/min', kind='number', key='green_from'), field('Daily medicine', 'Controller inhaler · 2 puffs AM/PM', key='daily_medicine'), eyebrow='Green zone'),
+        card(field('Peak flow', '200–399', unit='L/min', key='peak_flow'), eyebrow='Yellow zone'),
         card(field('Below', '200', unit='L/min', kind='number', key='red_below'), eyebrow='Red zone'),
         button('Add a photo of my plan', toast('Camera opened'), v='secondary'),
     ], footer=[button('Save plan', submit('PUT /v1/program-data/ca/plan', onboarding_or('ca_home')))])
@@ -225,9 +225,9 @@ def programs_a():
         text('Stays open until you close it.', 'small'),
     ])
     S('ca_symptoms', 'Symptom log', '/p/ca/symptoms', 'ca', program='ca', phase='daily', hdr=H('Log symptoms'), body=[
-        title('What are you noticing?'), chips(['Coughing', 'Wheezing', 'Short of breath', 'Chest tightness', 'Woke at night'], ['Wheezing', 'Woke at night']),
-        seg(['Mild', 'Moderate', 'Severe'], 'Mild', label='How bad?'), chips(['Cold air', 'Smoke', 'Pollen', 'Exercise', 'Not sure'], ['Cold air'], label='Possible trigger'),
-        field('Note (optional)', None, placeholder='Anything else to tell your clinician', kind='multiline'),
+        title('What are you noticing?'), chips(['Coughing', 'Wheezing', 'Short of breath', 'Chest tightness', 'Woke at night'], ['Wheezing', 'Woke at night'], key='value'),
+        seg(['Mild', 'Moderate', 'Severe'], 'Mild', label='How bad?', key='how_bad'), chips(['Cold air', 'Smoke', 'Pollen', 'Exercise', 'Not sure'], ['Cold air'], label='Possible trigger', key='possible_trigger'),
+        field('Note (optional)', None, placeholder='Anything else to tell your clinician', kind='multiline', key='note_optional'),
     ], footer=[button('Save', submit('POST /v1/program-data/ca/symptoms', toast('Saved', back())))])
     S('ca_progress', 'ClearAir progress', '/p/ca/progress', 'ca', program='ca', phase='resources', hdr=H('Progress', pill='ClearAir'), body=[
         line([410, 405, 398, 380, 360, 310, 330, 350, 372, 390, 401, 404], 'ca', title='Peak flow · 12 days', unit='L/min', band=[400, 450], caption='Shaded: your green zone, from your plan'),
@@ -241,15 +241,15 @@ def programs_a():
           (sheet('focus_full'), 'Log blood pressure and cholesterol, see trends and prepare for visits. Both focus slots are in use, so you’ll choose how to add it.'))
     S('hw_q1', 'Baseline', '/p/hw/onboarding/1', 'hw', program='hw', phase='onboarding', hdr=H('About you', pill='1 of 2'), body=[
         steps(1, 2), title('Has a clinician talked with you about…'),
-        chips(['High blood pressure', 'High cholesterol', 'Heart disease', 'Stroke', 'None of these'], ['High blood pressure']),
-        seg(['Yes', 'No', 'Not sure'], 'Yes', label='Do you have a home BP monitor?'),
+        chips(['High blood pressure', 'High cholesterol', 'Heart disease', 'Stroke', 'None of these'], ['High blood pressure'], key='value'),
+        seg(['Yes', 'No', 'Not sure'], 'Yes', label='Do you have a home BP monitor?', key='do_you_have_a_home_bp_monitor'),
         card(v='mint', text='No monitor? Many pharmacies have free kiosks. We’ll show how to measure correctly.'),
     ], footer=[button('Next', go('hw_targets'))])
     S('hw_targets', 'Clinician targets', '/p/hw/plan/targets', 'hw', program='hw', phase='plan', hdr=H('Your targets', pill='2 of 2'), body=[
         steps(2, 2), title('What target did your clinician give you?'),
-        fieldrow(field('Top below', '130', unit='mmHg', kind='number'), field('Bottom below', '80', unit='mmHg', kind='number')),
-        radio([ri('I don’t have a target yet', 'Readings show without a target line')], -1),
-        chips(['Morning', 'Evening', 'Both'], ['Both'], multi=False, label='When should we remind you?'),
+        fieldrow(field('Top below', '130', unit='mmHg', kind='number', key='top_below'), field('Bottom below', '80', unit='mmHg', kind='number', key='bottom_below')),
+        radio([ri('I don’t have a target yet', 'Readings show without a target line')], -1, key='value'),
+        chips(['Morning', 'Evening', 'Both'], ['Both'], multi=False, label='When should we remind you?', key='when_should_we_remind_you'),
         text('Heartwise never sets or grades targets.', 'small'), link('Import from my health record', go('records_add')),
     ], footer=[button('Save targets', submit('PUT /v1/program-data/hw/targets', onboarding_or('hw_home')))])
     S('hw_home', 'Heartwise home', '/p/hw/home', 'hw', program='hw', phase='daily', tabname='plans', hdr=home_hdr('hw'), body=[
@@ -262,17 +262,17 @@ def programs_a():
     S('hw_log', 'Log BP · reading 1', '/p/hw/log', 'hw', program='hw', phase='daily', hdr=H('Log blood pressure', pill='1 of 2'), body=[
         title('Sit quietly for 5 minutes first.'),
         fieldrow(field('Top (systolic)', '138', unit='mmHg', kind='number', key='systolic'), field('Bottom (diastolic)', '86', unit='mmHg', kind='number', key='diastolic')),
-        field('Pulse (optional)', '72', unit='bpm', kind='number'), chips(['Left arm', 'Right arm'], ['Left arm'], multi=False),
+        field('Pulse (optional)', '72', unit='bpm', kind='number', key='pulse_optional'), chips(['Left arm', 'Right arm'], ['Left arm'], multi=False, key='value'),
         card(v='mint', title='Tip', text='Take a second reading after 1 minute. We’ll average them.'),
     ], footer=[button('Next reading', go('hw_log2'))])
     S('hw_log2', 'Log BP · reading 2', '/p/hw/log/2', 'hw', program='hw', phase='daily', hdr=H('Log blood pressure', pill='2 of 2'), body=[
         title('Second reading'), text('Same arm, 1 minute later.', 'muted'),
         fieldrow(field('Top (systolic)', '132', unit='mmHg', kind='number', key='systolic'), field('Bottom (diastolic)', '84', unit='mmHg', kind='number', key='diastolic')),
-        field('Pulse (optional)', '70', unit='bpm', kind='number'), kv([('Reading 1', '138/86'), ('Average so far', '135/85')]),
+        field('Pulse (optional)', '70', unit='bpm', kind='number', key='pulse_optional'), kv([('Reading 1', '138/86'), ('Average so far', '135/85')]),
     ], footer=[button('Save readings', submit('POST /v1/program-data/hw/readings', branch('Validated average', [('Valid · below crisis range', rep('hw_result')), ('Invalid value', rep('hw_log_error')), ('≥180 top or ≥120 bottom', rep('hw_crisis'))], decide='hw.bp')))])
     S('hw_log_error', 'Log BP · validation', '/p/hw/log/2?state=error', 'hw', program='hw', phase='daily', variant_of='hw_log2', state='error', hdr=H('Log blood pressure', pill='Check'), body=[
         title('Let’s double-check that.'),
-        fieldrow(field('Top (systolic)', '128', unit='mmHg', kind='number'), field('Bottom (diastolic)', '310', unit='mmHg', error='Too high for the bottom number. Did you mean 81?', kind='number')),
+        fieldrow(field('Top (systolic)', '128', unit='mmHg', kind='number', key='top_systolic'), field('Bottom (diastolic)', '310', unit='mmHg', error='Too high for the bottom number. Did you mean 81?', kind='number', key='bottom_diastolic')),
         text('Valid range: top 70–250, bottom 40–150, bottom lower than top.', 'small'),
     ], footer=[button('Save readings', None, state='disabled'), link('Edit reading', rep('hw_log2'))])
     S('hw_result', 'Reading saved', '/p/hw/log/result', 'hw', program='hw', phase='daily', hdr=H('Saved', left='close'), body=[
@@ -291,20 +291,20 @@ def programs_a():
         emergency('New chest pain, weakness or trouble speaking? Call 911 now.', [button('Call 911', call('911'), v='danger', small=True)]),
     ], footer=[button('Re-check now', rep('hw_log')), button('Contact my clinician', go('support_message_care'), v='secondary')])
     S('hw_trends', 'Trends', '/p/hw/trends', 'hw', program='hw', phase='resources', hdr=H('Trends', pill='Heartwise'), body=[
-        seg(['7 days', '30 days', '90 days'], '30 days'),
+        seg(['7 days', '30 days', '90 days'], '30 days', key='value'),
         line([142, 140, 138, 139, 135, 133, 136, 131, 129, 130, 128, 127], 'hw', title='Systolic · morning avg', unit='target < 130', band=[110, 130], caption='Shaded: your clinician’s target'),
         stats([st('30-day avg', '132/82'), st('Readings', '48', '4 days missed')]),
     ], footer=[button('Create visit summary', go('hw_summary'), v='secondary')])
     S('hw_lipids', 'Cholesterol panel', '/p/hw/lipids', 'hw', program='hw', phase='milestone', hdr=H('Cholesterol panel', pill='Lab'), body=[
         title('Add your lab results'), text('Copy from your lab report. Units: mg/dL.', 'muted'),
-        fieldrow(field('Total', '212', unit='mg/dL', kind='number'), field('LDL', '138', unit='mg/dL', kind='number')),
-        fieldrow(field('HDL', '46', unit='mg/dL', kind='number'), field('Triglycerides', None, unit='mg/dL', placeholder='Optional', kind='number')),
-        field('Lab date', 'Sep 30, 2026', kind='date'),
+        fieldrow(field('Total', '212', unit='mg/dL', kind='number', key='total'), field('LDL', '138', unit='mg/dL', kind='number', key='ldl')),
+        fieldrow(field('HDL', '46', unit='mg/dL', kind='number', key='hdl'), field('Triglycerides', None, unit='mg/dL', placeholder='Optional', kind='number', key='triglycerides')),
+        field('Lab date', 'Sep 30, 2026', kind='date', key='lab_date'),
     ], footer=[button('Save panel', submit('POST /v1/program-data/hw/lipids', toast('Panel saved', back())))])
     S('hw_summary', 'Visit summary', '/p/hw/summary', 'hw', program='hw', phase='resources', hdr=H('Visit summary', pill='Preview'), body=[
         title('Share with Dr. Patel’s clinic?'),
         kv([('Dates', 'Sep 17 – Oct 17'), ('BP average', '132/82 (48 readings)'), ('Highest', '186/122 · Oct 2 · re-checked 144/90'), ('Latest panel', 'LDL 138 · Sep 30')]),
-        text('Only Heartwise data. Nothing from your other programs.', 'small'), toggle('Include notes', None, False),
+        text('Only Heartwise data. Nothing from your other programs.', 'small'), toggle('Include notes', None, False, key='include_notes'),
     ], footer=[button('Send summary', submit('POST /v1/care/summaries', toast('Summary sent to Dr. Patel’s clinic', back()))), button('Save as PDF', toast('PDF saved to Files'), v='secondary')])
 
     entry('ca_red', 'Shortcut: ClearAir red-zone plan')

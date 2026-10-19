@@ -22,9 +22,9 @@ class HwLipidsScreen extends StatelessWidget {
       children: [
         TTitle('Add your lab results'),
         TBody('Copy from your lab report. Units: mg/dL.', tone: TTextTone.muted),
-        TFieldRow(children: [TField(fieldKey: 'hw_lipids.total', label: 'Total', value: '212', unit: 'mg/dL', kind: TFieldKind.number), TField(fieldKey: 'hw_lipids.ldl', label: 'LDL', value: '138', unit: 'mg/dL', kind: TFieldKind.number)]),
-        TFieldRow(children: [TField(fieldKey: 'hw_lipids.hdl', label: 'HDL', value: '46', unit: 'mg/dL', kind: TFieldKind.number), TField(fieldKey: 'hw_lipids.triglycerides', label: 'Triglycerides', unit: 'mg/dL', placeholder: 'Optional', kind: TFieldKind.number)]),
-        TField(fieldKey: 'hw_lipids.lab_date', label: 'Lab date', value: 'Sep 30, 2026', kind: TFieldKind.date),
+        TFieldRow(children: [TField(fieldKey: 'hw_lipids.total', label: 'Total', unit: 'mg/dL', placeholder: '212', kind: TFieldKind.number), TField(fieldKey: 'hw_lipids.ldl', label: 'LDL', unit: 'mg/dL', placeholder: '138', kind: TFieldKind.number)]),
+        TFieldRow(children: [TField(fieldKey: 'hw_lipids.hdl', label: 'HDL', unit: 'mg/dL', placeholder: '46', kind: TFieldKind.number), TField(fieldKey: 'hw_lipids.triglycerides', label: 'Triglycerides', unit: 'mg/dL', placeholder: 'Optional', kind: TFieldKind.number)]),
+        TField(fieldKey: 'hw_lipids.lab_date', label: 'Lab date', placeholder: 'Sep 30, 2026', kind: TFieldKind.date),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Save panel', onPressed: () => TNav.submit(context, 'POST /v1/program-data/hw/lipids', then: () => TNav.toast(context, 'Panel saved', then: () => TNav.back(context))), arrow: true),

@@ -25,9 +25,9 @@ class CaPlanScreen extends StatelessWidget {
         TSteps(n: 2, total: 2),
         TTitle('Copy your plan from your clinician.'),
         TBody('ClearAir never creates or changes zones.', tone: TTextTone.muted),
-        TCard(eyebrow: 'Green zone', children: [TField(fieldKey: 'ca_plan.green_from', label: 'Peak flow from', value: '400', unit: 'L/min', kind: TFieldKind.number), TField(fieldKey: 'ca_plan.daily_medicine', label: 'Daily medicine', value: 'Controller inhaler · 2 puffs AM/PM')]),
-        TCard(eyebrow: 'Yellow zone', children: [TField(fieldKey: 'ca_plan.peak_flow', label: 'Peak flow', value: '200–399', unit: 'L/min')]),
-        TCard(eyebrow: 'Red zone', children: [TField(fieldKey: 'ca_plan.red_below', label: 'Below', value: '200', unit: 'L/min', kind: TFieldKind.number)]),
+        TCard(eyebrow: 'Green zone', children: [TField(fieldKey: 'ca_plan.green_from', label: 'Peak flow from', unit: 'L/min', placeholder: '400', kind: TFieldKind.number), TField(fieldKey: 'ca_plan.daily_medicine', label: 'Daily medicine', placeholder: 'Controller inhaler · 2 puffs AM/PM')]),
+        TCard(eyebrow: 'Yellow zone', children: [TField(fieldKey: 'ca_plan.peak_flow', label: 'Peak flow', unit: 'L/min', placeholder: '200–399')]),
+        TCard(eyebrow: 'Red zone', children: [TField(fieldKey: 'ca_plan.red_below', label: 'Below', unit: 'L/min', placeholder: '200', kind: TFieldKind.number)]),
         TButton(key: const ValueKey('a:body[6]'), label: 'Add a photo of my plan', onPressed: () => TNav.toast(context, 'Camera opened'), variant: TButtonVariant.secondary),
       ],
       footer: [

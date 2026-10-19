@@ -48,7 +48,7 @@
     {
       "t": "field",
       "label": "Best time to call",
-      "value": "Weekdays after 5 PM",
+      "placeholder": "Weekdays after 5 PM",
       "kind": "select",
       "key": "best_time_to_call"
     }

@@ -32,7 +32,7 @@
     {
       "t": "field",
       "label": "Age",
-      "value": "52",
+      "placeholder": "52",
       "kind": "number",
       "key": "age"
     },

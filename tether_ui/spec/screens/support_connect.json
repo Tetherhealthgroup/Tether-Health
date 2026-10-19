@@ -26,7 +26,7 @@
     {
       "t": "field",
       "label": "Invite code",
-      "value": "PATEL-4821",
+      "placeholder": "PATEL-4821",
       "kind": "text",
       "key": "invite_code"
     },

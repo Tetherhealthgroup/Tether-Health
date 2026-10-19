@@ -49,7 +49,7 @@ def records():
         title(f'Connect {name}?'),
         kv([('Source', src), ('Access', 'Read-only'), ('Refresh', 'Daily while connected'), ('Stop', 'Disconnect anytime')]),
         checklist([ci('Conditions', 'Condition', True), ci('Vital signs', 'Observation · blood pressure, weight', True), ci('Lab results', 'Observation · A1C, lipids, eGFR', True),
-                   ci('Medications', 'MedicationRequest', True), ci('Immunizations', 'Immunization', True), ci('Smoking status', 'Observation · LOINC 72166-2', True), ci('Clinical notes', 'Not requested')], label='What Tether will read'),
+                   ci('Medications', 'MedicationRequest', True), ci('Immunizations', 'Immunization', True), ci('Smoking status', 'Observation · LOINC 72166-2', True), ci('Clinical notes', 'Not requested')], label='What Tether will read', key='resources'),
         card(v='mint', title='Only the programs you joined get data', text='Heartwise ← blood pressure, lipids · Steady ← A1C, glucose · Renew ← eGFR · Checkup ← immunizations · BreatheFree ← smoking status. Ease and ScrollFree get nothing.'),
     ]
     S('records_consent', 'Consent: Epic', '/records/consent', 'records', phase='resources', hdr=H('Connect', pill='Read-only'), body=consent_body('Patel Family Medicine', 'Epic MyChart · SMART on FHIR R4'),
@@ -63,7 +63,7 @@ def records():
               button('Not now', back(), v='secondary')])
     S('records_consent_device', 'Consent: phone health data', '/records/consent?source=device', 'records', phase='resources', variant_of='records_consent', state='Apple Health / Health Connect', hdr=H('Connect', pill='Read-only'),
       body=[title('Use health data on this phone?'), text('iPhone: Apple Health Records (FHIR) and readings. Android: Health Connect readings. You choose each type in the system screen next.', 'muted'),
-            checklist([ci('Blood pressure', None, True), ci('Blood glucose', None, True), ci('Clinical records (iPhone)', 'Labs, immunizations, conditions', True), ci('Steps and sleep', 'Not requested')], label='What Tether will ask for')],
+            checklist([ci('Blood pressure', None, True), ci('Blood glucose', None, True), ci('Clinical records (iPhone)', 'Labs, immunizations, conditions', True), ci('Steps and sleep', 'Not requested')], label='What Tether will ask for', key='data_types')],
       footer=[button('Continue', branch('System permission result', [('Allowed', go('records_importing')), ('Not allowed', go('records_error'))])), button('Not now', back(), v='secondary')],
       desc='HealthKit clinical records (HKClinicalType) on iOS; Health Connect permissions on Android. Data stays on the device until you review it.')
 

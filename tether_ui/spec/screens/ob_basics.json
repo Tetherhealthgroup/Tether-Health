@@ -36,14 +36,14 @@
     {
       "t": "field",
       "label": "What should we call you?",
-      "value": "Alex",
+      "placeholder": "Alex",
       "kind": "text",
       "key": "what_should_we_call_you"
     },
     {
       "t": "field",
       "label": "Age range",
-      "value": "35–44",
+      "placeholder": "35–44",
       "kind": "select",
       "key": "age_range"
     },

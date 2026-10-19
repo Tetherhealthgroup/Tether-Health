@@ -23,9 +23,9 @@ class RecordsManualErrorScreen extends StatelessWidget {
       header: THeader(title: 'Enter a value'),
       children: [
         TTitle('Add a health value'),
-        TField(fieldKey: 'records_manual_error.test', label: 'Test', value: 'A1C', kind: TFieldKind.select),
-        TField(fieldKey: 'records_manual_error.value', label: 'Value', value: '74', unit: '%', error: 'A1C is usually between 4% and 15%. Did you mean 7.4?', kind: TFieldKind.number),
-        TField(fieldKey: 'records_manual_error.date', label: 'Date', value: 'Oct 1, 2026', kind: TFieldKind.date),
+        TField(fieldKey: 'records_manual_error.test', label: 'Test', placeholder: 'A1C', kind: TFieldKind.select),
+        TField(fieldKey: 'records_manual_error.value', label: 'Value', unit: '%', error: 'A1C is usually between 4% and 15%. Did you mean 7.4?', placeholder: '74', kind: TFieldKind.number),
+        TField(fieldKey: 'records_manual_error.date', label: 'Date', placeholder: 'Oct 1, 2026', kind: TFieldKind.date),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/records/manual', then: () => TNav.branch(context, 'Validation', <String, VoidCallback>{'Valid': () => TNav.toast(context, 'Saved · shared with Steady', then: () => TNav.popTo(context, Routes.recordsHub)), 'Outside expected range': () => TNav.toast(context, 'Still outside the expected range')}, decide: 'rec.manual')), arrow: true),

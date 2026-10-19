@@ -22,7 +22,7 @@ class CaZoneScreen extends StatelessWidget {
       header: THeader(title: 'Zone check', pill: 'Today'),
       children: [
         TTitle('How is your breathing?'),
-        TField(fieldKey: 'ca_zone.peak_flow', label: 'Peak flow (optional)', value: '310', unit: 'L/min', hint: '50–900 L/min', kind: TFieldKind.number),
+        TField(fieldKey: 'ca_zone.peak_flow', label: 'Peak flow (optional)', unit: 'L/min', hint: '50–900 L/min', placeholder: '310', kind: TFieldKind.number),
         TChips(fieldKey: 'ca_zone.symptoms', options: ['Coughing', 'Wheezing', 'Short of breath', 'Chest tightness', 'Woke at night', 'Can’t speak in full sentences'], selected: ['Wheezing'], label: 'Symptoms now'),
         TEyebrow('Your zone · updates as you type'),
         TZoneSelector(selected: 'yellow', rule: 'ca.zone'),

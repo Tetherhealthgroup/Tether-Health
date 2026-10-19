@@ -21,10 +21,10 @@ class SupportAddPersonScreen extends StatelessWidget {
       header: THeader(title: 'Add a supporter'),
       children: [
         TTitle('Who can you count on?'),
-        TField(fieldKey: 'support_add_person.name', label: 'Name', value: 'Jordan'),
-        TField(fieldKey: 'support_add_person.phone', label: 'Phone', value: '(555) 010-4421', kind: TFieldKind.phone),
+        TField(fieldKey: 'support_add_person.name', label: 'Name', placeholder: 'Jordan'),
+        TField(fieldKey: 'support_add_person.phone', label: 'Phone', placeholder: '(555) 010-4421', kind: TFieldKind.phone),
         TChips(fieldKey: 'support_add_person.which_programs', options: ['BreatheFree', 'ScrollFree'], selected: ['BreatheFree'], label: 'Which programs?'),
-        TField(fieldKey: 'support_add_person.help_phrase', label: 'Help phrase', value: 'Can you stay with me for the next 10 minutes?', kind: TFieldKind.multiline),
+        TField(fieldKey: 'support_add_person.help_phrase', label: 'Help phrase', placeholder: 'Can you stay with me for the next 10 minutes?', kind: TFieldKind.multiline),
         TBody('Nothing is sent until you preview and tap Send.', tone: TTextTone.small),
       ],
       footer: [

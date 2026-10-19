@@ -648,7 +648,11 @@ void main() {
     await _start(tester, Routes.hwHome, ios: false);
     try {
         await _tap(tester, 'Log blood pressure');
+        await _enter(tester, 'hw_log.systolic', '138');
+        await _enter(tester, 'hw_log.diastolic', '86');
         await _tap(tester, 'Next reading');
+        await _enter(tester, 'hw_log2.systolic', '132');
+        await _enter(tester, 'hw_log2.diastolic', '84');
         await _tap(tester, 'Save readings');
         expect(find.byType(HwResultScreen), findsOneWidget, reason: 'expected hw_result');
         expect(tester.takeException(), isNull);
@@ -677,7 +681,10 @@ void main() {
   testWidgets('scenario hw-invalid · Diastolic 310 → fix-it message', (tester) async {
     await _start(tester, Routes.hwLog, ios: false);
     try {
+        await _enter(tester, 'hw_log.systolic', '138');
+        await _enter(tester, 'hw_log.diastolic', '86');
         await _tap(tester, 'Next reading');
+        await _enter(tester, 'hw_log2.systolic', '132');
         await _enter(tester, 'hw_log2.diastolic', '310');
         await _tap(tester, 'Save readings');
         expect(find.byType(HwLogErrorScreen), findsOneWidget, reason: 'expected hw_log_error');

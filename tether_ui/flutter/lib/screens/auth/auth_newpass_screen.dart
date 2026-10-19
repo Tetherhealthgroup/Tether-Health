@@ -22,8 +22,8 @@ class AuthNewpassScreen extends StatelessWidget {
       header: THeader(title: 'New password', left: THeaderLeft.close),
       children: [
         TTitle('Choose a new password'),
-        TField(fieldKey: 'auth_newpass.new_password', label: 'New password', value: '••••••••••••', hint: 'At least 12 characters.', kind: TFieldKind.password),
-        TField(fieldKey: 'auth_newpass.confirm_password', label: 'Confirm password', value: '••••••••••••', kind: TFieldKind.password),
+        TField(fieldKey: 'auth_newpass.new_password', label: 'New password', hint: 'At least 12 characters.', placeholder: '••••••••••••', kind: TFieldKind.password),
+        TField(fieldKey: 'auth_newpass.confirm_password', label: 'Confirm password', placeholder: '••••••••••••', kind: TFieldKind.password),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Save password', onPressed: () => TNav.submit(context, 'PUT supabase /auth/v1/user', then: () => TNav.reset(context, Routes.today)), arrow: true),
