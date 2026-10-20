@@ -808,6 +808,22 @@ void main() {
       await tester.pump(const Duration(seconds: 3));
     });
 
+    testWidgets('a branch started on a covered screen does not ask the resolver over the screen on top', (tester) async {
+      await _hostPage(tester);
+      final asked = <String>[];
+      TNav.branchResolver = (c, q, o) async {
+        asked.add(q);
+        return o.first;
+      };
+      await openCrisis(tester);
+      final took = <String>[];
+      await TNav.branch(_hostContext, 'Q', {'Back': () => took.add('Back'), 'Other': () => took.add('Other')});
+      await _settle(tester);
+      expect(asked, isEmpty);
+      expect(took, isEmpty);
+      expect(find.byType(CrisisScreen), findsOneWidget);
+    });
+
     testWidgets('a late resolver answer does not act over the crisis screen', (tester) async {
       await _hostPage(tester);
       final gate = Completer<String?>();
