@@ -9,12 +9,14 @@
 # Every other track, promotion and rollout stays manual in Play Console.
 # Uploads are refused under CI.
 
+# Set before any action runs, so even a failure in the first action sends no
+# usage metrics and no error text to a GitHub issue search.
+ENV["FASTLANE_OPT_OUT_USAGE"] = "YES"
+ENV["FASTLANE_HIDE_GITHUB_ISSUES"] = "1"
+
 require "json"
 
-# Turns off fastlane's anonymous usage metrics.
 opt_out_usage
-# Error messages are never sent to a GitHub issue search.
-ENV["FASTLANE_HIDE_GITHUB_ISSUES"] = "1"
 
 default_platform(:android)
 

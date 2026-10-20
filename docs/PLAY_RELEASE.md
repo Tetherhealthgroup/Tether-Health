@@ -275,9 +275,11 @@ private-key content; do not rely on either.
 
 ### Each upload
 
-From the repository root:
+From the repository root, in a shell with both variables set:
 
 ```sh
+export TETHER_PLAY_JSON_KEY=$HOME/secure/tether-health/play-service-account.json
+export FASTLANE_SKIP_UPDATE_CHECK=1
 bash tool/build_play_release.sh --dart-define-from-file=$HOME/secure/tether-health/release.json
 cd android
 bundle exec fastlane android validate aab:build/app/outputs/bundle/release/app-release.aab
@@ -309,13 +311,14 @@ versionCode (section 5).
 - During `internal` and `validate`: calls to the Google Play Developer API
   (Google's OAuth token endpoint and the Android Publisher API), carrying the
   AAB.
-- fastlane's update check to rubygems.org, only if `FASTLANE_SKIP_UPDATE_CHECK`
-  is not set.
+- fastlane's update check to rubygems.org and, when a newer fastlane exists,
+  its changelog from api.github.com. Neither happens when
+  `FASTLANE_SKIP_UPDATE_CHECK=1` is set.
 - `bundle install` fetches the pinned gems from rubygems.org.
 
-fastlane's other outbound calls are turned off in the Fastfile: usage metrics
-(`opt_out_usage`) and the GitHub issue search it runs on errors
-(`FASTLANE_HIDE_GITHUB_ISSUES`).
+fastlane's other outbound calls are turned off at the top of the Fastfile,
+before any action runs: usage metrics (`FASTLANE_OPT_OUT_USAGE`) and the
+GitHub issue search it runs on errors (`FASTLANE_HIDE_GITHUB_ISSUES`).
 
 ### What the lanes never do
 
@@ -327,8 +330,10 @@ fastlane's other outbound calls are turned off in the Fastfile: usage metrics
   options.
 - Run under CI: they stop when `CI` or `GITHUB_ACTIONS` is set. They also stop
   when any `SUPPLY_*` variable is set (those would change the upload
-  settings), when a fastlane environment is selected with `--env` (its file
-  could override these checks), and under `--verbose` or `--troubleshoot`
-  (verbose output can expose credential details).
+  settings), and when an env file was loaded with `--env` (it could
+  override these checks).
+- Support verbose-style flags (`--verbose`, `--troubleshoot`,
+  `--capture_output`): verbose output can expose credential details. Do not
+  use them with these lanes.
 - Print the key path or its contents (fastlane's settings table, which
   would show the path, is turned off).

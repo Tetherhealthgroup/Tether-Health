@@ -226,29 +226,29 @@ void main() {
       'TETHER_PLAY_JSON_KEY',
       'FASTLANE_SKIP_ALL_LANE_SUMMARIES',
       'FASTLANE_HIDE_GITHUB_ISSUES',
+      'FASTLANE_OPT_OUT_USAGE',
     });
   });
 
-  test('top-level settings: no usage metrics, no issue search, two options',
+  test('top-level lines are pinned; metrics and issue search are off first',
       () {
+    // Everything before the platform block, in order. The two ENV lines come
+    // before any action call, so even a failure in the first action sends no
+    // usage metrics and no GitHub issue search.
     final lines = fastfile.split('\n');
-    for (final line in [
-      'require "json"',
-      'opt_out_usage',
-      'ENV["FASTLANE_HIDE_GITHUB_ISSUES"] = "1"',
-      'default_platform(:android)',
-      'REPO_ROOT = File.realpath(File.join(Dir.pwd, "..", ".."))',
-      'LANE_OPTIONS = [:aab, :min_version_code].freeze',
-    ]) {
-      expect(lines, contains(line));
-    }
-    // Both settings come before the platform block, so they apply to every
-    // lane.
     final platformAt = lines.indexOf('platform :android do');
-    expect(lines.indexOf('opt_out_usage'), lessThan(platformAt));
+    expect(platformAt, isNot(-1), reason: 'platform block not found');
     expect(
-      lines.indexOf('ENV["FASTLANE_HIDE_GITHUB_ISSUES"] = "1"'),
-      lessThan(platformAt),
+      lines.sublist(0, platformAt).where((l) => l.trim().isNotEmpty).toList(),
+      [
+        'ENV["FASTLANE_OPT_OUT_USAGE"] = "YES"',
+        'ENV["FASTLANE_HIDE_GITHUB_ISSUES"] = "1"',
+        'require "json"',
+        'opt_out_usage',
+        'default_platform(:android)',
+        'REPO_ROOT = File.realpath(File.join(Dir.pwd, "..", ".."))',
+        'LANE_OPTIONS = [:aab, :min_version_code].freeze',
+      ],
     );
   });
 
