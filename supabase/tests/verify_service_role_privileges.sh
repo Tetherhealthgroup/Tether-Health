@@ -290,14 +290,109 @@ select th988_test.ok(
 -- execute for PUBLIC (default privileges for a schema only add to it), so
 -- service_role may execute it until the creating migration revokes all on
 -- the function from public. The catalogue check above is the control.
-select th988_test.ok(
-  pg_catalog.has_function_privilege('service_role', 'public.th988_scratch_fn()', 'EXECUTE')
-  and exists (select 1 from pg_catalog.pg_proc as p
-              cross join lateral pg_catalog.aclexplode(
-                coalesce(p.proacl, pg_catalog.acldefault('f', p.proowner))) as a
-              where p.oid = 'public.th988_scratch_fn()'::regprocedure
-                and a.grantee = 0 and a.privilege_type = 'EXECUTE'),
-  'known residual: service_role may execute a new function in public through PUBLIC until its migration revokes all from public');
+-- public_residual passes when service_role may execute the function only
+-- through PUBLIC ('public'), or may not execute it and the function grants
+-- PUBLIC nothing ('absent': an image whose defaults already withhold it). It
+-- fails when service_role may execute it in any other way.
+create function th988_test.public_residual(p_fn text)
+returns text language plpgsql set search_path = '' as $f$
+declare
+  fn regprocedure := pg_catalog.to_regprocedure(p_fn);
+  can_execute boolean;
+  public_entry boolean;
+  other_path boolean;
+begin
+  if fn is null then
+    raise exception 'FAIL residual: function % is missing', p_fn;
+  end if;
+  can_execute := pg_catalog.has_function_privilege('service_role', fn, 'EXECUTE');
+  select
+    coalesce(bool_or(a.grantee = 0), false),
+    coalesce(bool_or(a.grantee <> 0 and pg_catalog.pg_has_role('service_role', a.grantee, 'MEMBER')), false)
+  into public_entry, other_path
+  from pg_catalog.pg_proc as p
+  cross join lateral pg_catalog.aclexplode(
+    coalesce(p.proacl, pg_catalog.acldefault('f', p.proowner))) as a
+  where p.oid = fn and a.privilege_type = 'EXECUTE';
+  other_path := other_path or pg_catalog.pg_has_role('service_role',
+    (select p.proowner from pg_catalog.pg_proc as p where p.oid = fn), 'MEMBER');
+  -- With PUBLIC's execute revoked, service_role must not be able to execute
+  -- it. The revoke is undone with the block.
+  begin
+    execute pg_catalog.format('revoke execute on function %s from public', fn);
+    other_path := other_path or pg_catalog.has_function_privilege('service_role', fn, 'EXECUTE');
+    raise exception 'th988 residual probe undone';
+  exception when raise_exception then
+    if sqlerrm <> 'th988 residual probe undone' then
+      raise;
+    end if;
+  end;
+  if other_path then
+    raise exception 'FAIL residual: service_role may execute % other than through PUBLIC', fn;
+  elsif can_execute and public_entry then
+    raise notice 'PASS known residual: service_role may execute % only through PUBLIC until its migration revokes all from public', fn;
+    return 'public';
+  elsif not can_execute and not public_entry then
+    raise notice 'PASS residual absent: the image grants PUBLIC no EXECUTE on new functions; service_role may not execute %', fn;
+    return 'absent';
+  end if;
+  raise exception 'FAIL residual: % (execute %, PUBLIC entry %)', fn, can_execute, public_entry;
+end;
+$f$;
+
+-- Runs p_sql, then undoes everything it did.
+create function th988_test.undone(p_sql text)
+returns void language plpgsql set search_path = '' as $f$
+begin
+  begin
+    execute p_sql;
+    raise exception 'th988 case undone';
+  exception when raise_exception then
+    if sqlerrm <> 'th988 case undone' then
+      raise;
+    end if;
+  end;
+end;
+$f$;
+
+select th988_test.public_residual('public.th988_scratch_fn()');
+
+-- The residual check itself, each case undone afterwards: an image whose
+-- defaults withhold PUBLIC's execute gives 'absent'; a direct grant, a role
+-- service_role belongs to, or default privileges for service_role fail.
+select th988_test.undone($c$
+  alter default privileges for role postgres revoke execute on functions from public;
+  set local role postgres;
+  create function public.th988_scratch_strict_fn() returns integer language sql as $x$ select 1 $x$;
+  reset role;
+  select th988_test.ok(
+    th988_test.public_residual('public.th988_scratch_strict_fn()') = 'absent',
+    'residual check: with PUBLIC execute withheld by default, a new function is reported as residual absent');
+$c$);
+select th988_test.undone($c$
+  grant execute on function public.th988_scratch_fn() to service_role;
+  select th988_test.refused('select th988_test.public_residual(''public.th988_scratch_fn()'')',
+    'P0001', 'FAIL residual: service_role may execute % other than through PUBLIC',
+    'residual check: execute granted to service_role directly fails');
+$c$);
+select th988_test.undone($c$
+  create role th988_executor nologin;
+  grant execute on function public.th988_scratch_fn() to th988_executor;
+  grant th988_executor to service_role;
+  select th988_test.refused('select th988_test.public_residual(''public.th988_scratch_fn()'')',
+    'P0001', 'FAIL residual: service_role may execute % other than through PUBLIC',
+    'residual check: execute through a role service_role belongs to fails');
+$c$);
+select th988_test.undone($c$
+  alter default privileges for role postgres in schema public grant execute on functions to service_role;
+  set local role postgres;
+  create function public.th988_scratch_default_fn() returns integer language sql as $x$ select 1 $x$;
+  reset role;
+  select th988_test.refused('select th988_test.public_residual(''public.th988_scratch_default_fn()'')',
+    'P0001', 'FAIL residual: service_role may execute % other than through PUBLIC',
+    'residual check: execute from default privileges for service_role fails');
+$c$);
+
 revoke all on function public.th988_scratch_fn() from public;
 select th988_test.ok(
   not pg_catalog.has_function_privilege('service_role', 'public.th988_scratch_fn()', 'EXECUTE')

@@ -382,16 +382,25 @@ as `authenticated` with the member's token. In schema `public`
 `service_role` holds `select` on `consent_documents` and nothing else: no other
 table or column privilege, no `execute` on any function, and `usage` but not
 `create` on the schema. Default privileges for tables, functions and sequences
-that `postgres` creates in `public` grant it nothing. On `storage.objects` and
+that `postgres` creates in `public` grant it nothing. A new function still
+gets the built-in `execute` for `PUBLIC`, so every new function is revoked
+from `public` in the migration that first creates it. On `storage.objects` and
 `storage.buckets` it keeps `select`, `insert`, `update` and `delete` and holds
 no `trigger`, `truncate` or `references`. `auth` is not changed by app
-migrations. Account deletion removes rows in `public` through
-`delete_my_app_data` and foreign-key cascades, which run as the table owner.
+migrations. App migrations do not change its `maintain` privilege on
+`storage.objects` and `storage.buckets` or any privilege it holds on
+`auth.users`; those are checked on a live Supabase database. Account deletion
+removes rows in `public` through `delete_my_app_data` and foreign-key
+cascades, which run as the table owner.
 `supabase/tests/verify_service_role_privileges.sh` has two parts. Its static
 check catches literal grants to `service_role` in migrations, other than
 `select` on `consent_documents`. Its SQL test, run against a migrated local
 database, is the control: it checks the privileges `service_role` actually
-holds, including those it gets through `PUBLIC` and through ownership.
+holds, including those it gets through `PUBLIC` and through ownership. For a
+function `postgres` newly creates in `public`, it accepts `execute` held only
+through `PUBLIC`, or none at all on an image whose defaults withhold it from
+`PUBLIC`, and fails on any other way to execute it; once the function is
+revoked from `public`, `service_role` must not be able to execute it.
 
 ## Sync tables
 
