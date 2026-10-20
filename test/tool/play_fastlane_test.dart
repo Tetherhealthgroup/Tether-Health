@@ -15,32 +15,41 @@ const String appfilePath = 'android/fastlane/Appfile';
 const String gemfilePath = 'android/Gemfile';
 const String gemfileLockPath = 'android/Gemfile.lock';
 
+/// A comment-only line: optional spaces or tabs, then `#`.
+final RegExp commentLine = RegExp(r'^[ \t]*#');
+
+/// A blank line: nothing but spaces or tabs.
+final RegExp blankLine = RegExp(r'^[ \t]*$');
+
 /// Ruby source with comment lines removed, so prose cannot satisfy or trip a
 /// check. The files keep comments on their own lines.
-String code(String source) => source
-    .split('\n')
-    .where((line) => !line.trimLeft().startsWith('#'))
-    .join('\n');
+String code(String source) =>
+    source.split('\n').where((line) => !commentLine.hasMatch(line)).join('\n');
 
-/// The body of `lane :<name> do ... end`, two-space indented inside
-/// `platform :android do`.
-String laneBody(String fastfile, String name) {
+/// [lines] without the blank ones, in order.
+List<String> nonBlank(Iterable<String> lines) =>
+    lines.where((line) => !blankLine.hasMatch(line)).toList();
+
+/// The non-blank lines of `lane :<name> do ... end`, two-space indented
+/// inside `platform :android do`.
+List<String> laneBody(String fastfile, String name) {
   final lines = fastfile.split('\n');
   final start = lines.indexWhere((l) => l.startsWith('  lane :$name do'));
   expect(start, isNot(-1), reason: 'lane :$name not found');
   final end = lines.indexWhere((l) => l == '  end', start + 1);
   expect(end, isNot(-1), reason: 'end of lane :$name not found');
-  return lines.sublist(start + 1, end).join('\n');
+  return nonBlank(lines.sublist(start + 1, end));
 }
 
-/// The body of the top-level `def <signature>` up to its closing `end`.
-String defBody(String fastfile, String signature) {
+/// The non-blank lines of the top-level `def <signature>` up to its closing
+/// `end`.
+List<String> defBody(String fastfile, String signature) {
   final lines = fastfile.split('\n');
   final start = lines.indexOf('def $signature');
   expect(start, isNot(-1), reason: 'def $signature not found');
   final end = lines.indexWhere((l) => l == 'end', start + 1);
   expect(end, isNot(-1), reason: 'end of def $signature not found');
-  return lines.sublist(start + 1, end).join('\n');
+  return nonBlank(lines.sublist(start + 1, end));
 }
 
 /// True when the working directory is inside a git work tree.
@@ -129,6 +138,18 @@ const List<String> pinnedTopLevel = [
   'LANE_OPTIONS = [:aab, :min_version_code].freeze',
 ];
 
+/// The body of `lane :internal do |options| ... end`.
+const List<String> pinnedInternalLane = [
+  '    aab, key = checked_inputs(options)',
+  '    play_upload(aab, key, validate_only: false)',
+];
+
+/// The body of `lane :validate do |options| ... end`.
+const List<String> pinnedValidateLane = [
+  '    aab, key = checked_inputs(options)',
+  '    play_upload(aab, key, validate_only: true)',
+];
+
 /// Every non-blank line of `platform :android do ... end`, in order, so no
 /// callback (error, after_all, before_each, ...) or other line can be added
 /// to the block without changing this list.
@@ -139,13 +160,11 @@ final List<String> pinnedPlatformBlock = [
   '  end',
   '  desc "Upload an existing, verified AAB to the internal track as a draft"',
   '  lane :internal do |options|',
-  '    aab, key = checked_inputs(options)',
-  '    play_upload(aab, key, validate_only: false)',
+  ...pinnedInternalLane,
   '  end',
   '  desc "Check an existing, verified AAB with Play without creating a release"',
   '  lane :validate do |options|',
-  '    aab, key = checked_inputs(options)',
-  '    play_upload(aab, key, validate_only: true)',
+  ...pinnedValidateLane,
   '  end',
   'end',
 ];
@@ -213,7 +232,7 @@ const String pinnedPlayUpload = r'''
 /// above. fastlane also runs callbacks such as `error do` or `after_all do`
 /// written outside the platform block, so nothing may be added at the top
 /// level either.
-final List<String> pinnedFastfile = [
+final List<String> pinnedFastfile = nonBlank([
   ...pinnedTopLevel,
   ...pinnedPlatformBlock,
   'def checked_inputs(options)',
@@ -225,7 +244,7 @@ final List<String> pinnedFastfile = [
   'def play_upload(aab, key, validate_only:)',
   ...pinnedPlayUpload.split('\n'),
   'end',
-].where((l) => l.trim().isNotEmpty).toList();
+]);
 
 void main() {
   late String fastfile;
@@ -243,7 +262,7 @@ void main() {
         RegExp(r'applicationId\s*=\s*"([^"]+)"').firstMatch(gradle)?.group(1);
     expect(appId, isNotNull, reason: 'applicationId not found');
 
-    expect(appfile.trim(), 'package_name("$appId")');
+    expect(nonBlank(appfile.split('\n')), ['package_name("$appId")']);
 
     final script = File('tool/build_play_release.sh').readAsStringSync();
     expect(script, contains('expected_package="$appId"'));
@@ -289,7 +308,7 @@ void main() {
     final platformAt = lines.indexOf('platform :android do');
     expect(platformAt, isNot(-1), reason: 'platform block not found');
     expect(
-      lines.sublist(0, platformAt).where((l) => l.trim().isNotEmpty).toList(),
+      nonBlank(lines.sublist(0, platformAt)),
       pinnedTopLevel,
     );
   });
@@ -313,16 +332,8 @@ void main() {
   });
 
   test('each lane checks its inputs before the upload, nothing else', () {
-    expect(
-      laneBody(fastfile, 'internal'),
-      '    aab, key = checked_inputs(options)\n'
-      '    play_upload(aab, key, validate_only: false)',
-    );
-    expect(
-      laneBody(fastfile, 'validate'),
-      '    aab, key = checked_inputs(options)\n'
-      '    play_upload(aab, key, validate_only: true)',
-    );
+    expect(laneBody(fastfile, 'internal'), pinnedInternalLane);
+    expect(laneBody(fastfile, 'validate'), pinnedValidateLane);
   });
 
   test('before_all refuses CI, --env, --verbose and SUPPLY_* variables', () {
@@ -330,7 +341,10 @@ void main() {
     final start = lines.indexOf('  before_all do');
     expect(start, isNot(-1), reason: 'before_all not found');
     final end = lines.indexOf('  end', start + 1);
-    expect(lines.sublist(start + 1, end).join('\n'), pinnedBeforeAll);
+    expect(
+      nonBlank(lines.sublist(start + 1, end)),
+      nonBlank(pinnedBeforeAll.split('\n')),
+    );
     expect(start, lessThan(lines.indexWhere((l) => l.startsWith('  lane :'))));
   });
 
@@ -344,7 +358,7 @@ void main() {
     final end = lines.indexOf('end', start + 1);
     expect(end, isNot(-1), reason: 'end of the platform block not found');
     expect(
-      lines.sublist(start, end + 1).where((l) => l.trim().isNotEmpty).toList(),
+      nonBlank(lines.sublist(start, end + 1)),
       pinnedPlatformBlock,
     );
   });
@@ -353,7 +367,7 @@ void main() {
     // Comment and blank lines are dropped; every other line must match, in
     // order, so no line or block can be added anywhere in the file.
     expect(
-      fastfile.split('\n').where((l) => l.trim().isNotEmpty).toList(),
+      nonBlank(fastfile.split('\n')),
       pinnedFastfile,
     );
   });
@@ -361,19 +375,25 @@ void main() {
   test(
       'inputs are checked as pinned: options, key, service account, AAB, '
       'then a fatal --verify-aab', () {
-    expect(defBody(fastfile, 'checked_inputs(options)'), pinnedCheckedInputs);
+    expect(
+      defBody(fastfile, 'checked_inputs(options)'),
+      nonBlank(pinnedCheckedInputs.split('\n')),
+    );
   });
 
   test(
       'the key must resolve outside the repository, compared '
       'case-insensitively', () {
-    expect(defBody(fastfile, 'inside_repo?(path)'), pinnedInsideRepo);
+    expect(
+      defBody(fastfile, 'inside_repo?(path)'),
+      nonBlank(pinnedInsideRepo.split('\n')),
+    );
   });
 
   test('the single upload call is pinned: internal track, draft, skips', () {
     expect(
       defBody(fastfile, 'play_upload(aab, key, validate_only:)'),
-      pinnedPlayUpload,
+      nonBlank(pinnedPlayUpload.split('\n')),
     );
     expect(RegExp(r'\bupload_to_play_store\b').allMatches(fastfile).length, 1);
     expect(RegExp(r'\bsupply\b').hasMatch(fastfile), isFalse);
