@@ -46,7 +46,9 @@ class TScreen extends StatelessWidget {
       TBackground.dark => const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [TColors.teal, Color(0xFF1C5149)])),
       TBackground.indigo => const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1F2A6B), Color(0xFF3B4CC0)])),
     };
-    return TDark(
+    // Lays out above the call fallback while it shows (TCallFallback); the
+    // footer then scrolls with the body so nothing overflows.
+    return TFallbackInset(builder: (context, covered) => TDark(
       dark: dark,
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -60,10 +62,10 @@ class TScreen extends StatelessWidget {
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.fromLTRB(TSpace.screen, 6, TSpace.screen, 20),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: _gap(children)),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (covered && footer.isNotEmpty) ...[const SizedBox(height: 16), ..._gap(footer, 8)]]),
                   ),
                 ),
-                if (footer.isNotEmpty)
+                if (!covered && footer.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(TSpace.screen, 10, TSpace.screen, 12),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: _gap(footer, 8)),
@@ -74,7 +76,7 @@ class TScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -87,7 +89,9 @@ class TSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final maxH = MediaQuery.sizeOf(context).height * 0.86;
-    return ConstrainedBox(
+    // Lays out above the call fallback while it shows (TCallFallback); the
+    // footer then scrolls with the body so nothing overflows.
+    return TFallbackInset(sheet: true, builder: (context, covered) => ConstrainedBox(
       constraints: BoxConstraints(maxHeight: maxH),
       child: Material(
         color: TColors.paper,
@@ -102,10 +106,10 @@ class TSheet extends StatelessWidget {
               Flexible(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(TSpace.screen, 6, TSpace.screen, 12),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: _gap(children)),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (covered && footer.isNotEmpty) ...[const SizedBox(height: 16), ..._gap(footer, 8)]]),
                 ),
               ),
-              if (footer.isNotEmpty)
+              if (!covered && footer.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(TSpace.screen, 8, TSpace.screen, 12),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: _gap(footer, 8)),
@@ -114,7 +118,7 @@ class TSheet extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 
