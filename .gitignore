@@ -39,8 +39,10 @@ config/dart_defines.*.json
 *.hprof
 # Google Play service-account keys, in case one is copied into the tree by
 # mistake. The key belongs outside the repository (docs/PLAY_RELEASE.md).
-*play*key*.json
-*play*credentials*.json
+play-key*.json
+*[-_.]play-key*.json
+play-store-key*.json
+*[-_.]play-store-key*.json
 *service-account*.json
 *service_account*.json
 ios/Flutter/ephemeral/

@@ -13,6 +13,8 @@ require "json"
 
 # Turns off fastlane's anonymous usage metrics.
 opt_out_usage
+# Error messages are never sent to a GitHub issue search.
+ENV["FASTLANE_HIDE_GITHUB_ISSUES"] = "1"
 
 default_platform(:android)
 
@@ -24,6 +26,13 @@ platform :android do
   before_all do
     if !ENV["CI"].to_s.empty? || !ENV["GITHUB_ACTIONS"].to_s.empty?
       UI.user_error!("Refusing to run: CI or GITHUB_ACTIONS is set. Play uploads are run by the owner only, never by CI.")
+    end
+    # fastlane loads an --env file and records its name before this block runs.
+    if !Fastlane::Actions.lane_context[Fastlane::Actions::SharedValues::ENVIRONMENT].to_s.empty?
+      UI.user_error!("Refusing to run: a fastlane environment (--env) was selected. Its .env file can override the checks.")
+    end
+    if FastlaneCore::Globals.verbose? || $troubleshoot
+      UI.user_error!("Refusing to run with --verbose or --troubleshoot: verbose output can expose credential details.")
     end
     supply_env = ENV.keys.grep(/\ASUPPLY_/).sort
     unless supply_env.empty?
@@ -61,10 +70,16 @@ def checked_inputs(options)
   if inside_repo?(key)
     UI.user_error!("TETHER_PLAY_JSON_KEY points inside the repository. Keep the key outside it.")
   end
-  begin
-    JSON.parse(File.read(key))
-  rescue JSON::ParserError, SystemCallError, IOError
-    UI.user_error!("TETHER_PLAY_JSON_KEY does not point to a readable JSON file.")
+  # Decided inside begin/rescue, raised outside it, so the error carries no
+  # parser or file-system message (those can quote file bytes or the path).
+  service_account =
+    begin
+      JSON.parse(File.read(key))["type"] == "service_account"
+    rescue StandardError
+      false
+    end
+  unless service_account
+    UI.user_error!("TETHER_PLAY_JSON_KEY does not point to a readable service-account JSON key.")
   end
 
   aab = options[:aab].to_s
