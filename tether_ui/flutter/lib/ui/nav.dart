@@ -424,15 +424,27 @@ abstract final class TNav {
   static Duration platformTimeout = const Duration(seconds: 8);
 
   /// Receives every code the UI kit reports through [report]: the error
-  /// codes above, [TCallFallback.shownCode] and [TCallFallback.clipboardErrorCode].
-  /// It receives only the code (and a stack trace for errors), never content.
-  /// Default: [reportToFlutterError]. The app can install its own, for
-  /// example to send the codes to its telemetry.
+  /// codes in [errorCodes] and the informational [TCallFallback.shownCode].
+  /// It receives only the code, never content, and the stack trace exactly
+  /// as the caller passed it (the stack of a caught error, or null).
+  ///
+  /// Default: [reportToFlutterError], which forwards only [errorCodes] to
+  /// [FlutterError.reportError] and drops informational codes, so a shown
+  /// fallback is not counted as an error. To receive informational codes
+  /// (for example to count fallbacks in telemetry), install a reporter.
   static void Function(String code, StackTrace? stack) reporter = reportToFlutterError;
 
-  /// Reports [code] through [FlutterError.reportError] as a [TUiError], so
-  /// the app's error reporting ([FlutterError.onError]) receives it.
-  static void reportToFlutterError(String code, StackTrace? stack) => FlutterError.reportError(FlutterErrorDetails(exception: TUiError(code), stack: stack, library: 'tether_ui'));
+  /// Codes that report a failure. [reportToFlutterError] forwards only these.
+  static const Set<String> errorCodes = {platformErrorCode, platformTimeoutCode, safetyActionErrorCode, fallbackUnavailableCode, TCallFallback.clipboardErrorCode};
+
+  /// Reports [code] through [FlutterError.reportError] as a [TUiError] with
+  /// [stack] unchanged, so the app's error reporting ([FlutterError.onError])
+  /// receives it, when [code] is one of [errorCodes]. Any other code is
+  /// dropped, without printing anything.
+  static void reportToFlutterError(String code, StackTrace? stack) {
+    if (!errorCodes.contains(code)) return;
+    FlutterError.reportError(FlutterErrorDetails(exception: TUiError(code), stack: stack, library: 'tether_ui'));
+  }
 
   /// Reports [code] to [reporter]. Callers pass only a code: the original
   /// exception and its message are dropped, because they can carry payload
@@ -906,6 +918,19 @@ abstract final class TCallFallback {
   static void _setInset(OverlayEntry entry, double value) {
     if (identical(_entry, entry)) inset.value = value;
   }
+
+  /// The card of [entry] has left the tree without [dismiss], for example
+  /// because the app or its overlay was rebuilt: the fallback no longer
+  /// shows, so nothing stays laid out around it.
+  static void _cardGone(OverlayEntry entry) {
+    if (!identical(_entry, entry)) return;
+    final listener = _sessionListener;
+    _sessionListener = null;
+    if (listener != null) TSession.changes.removeListener(listener);
+    _entry = null;
+    _overlay = null;
+    inset.value = 0;
+  }
 }
 
 /// Lays out [TScreen] and [TSheet] content above [TCallFallback] while it
@@ -952,13 +977,30 @@ class _TCallFallbackCard extends StatefulWidget {
 
 class _TCallFallbackCardState extends State<_TCallFallbackCard> {
   final FocusNode _focus = FocusNode(debugLabel: 'call fallback');
+  final ScrollController _messageScroll = ScrollController();
   Timer? _copiedTimer;
+
+  /// The message is cut at the top or bottom edge of its scrolling area.
+  bool _moreAbove = false, _moreBelow = false;
+
+  void _updateEdges(ScrollMetrics m) {
+    final above = m.pixels > m.minScrollExtent + 0.5;
+    final below = m.pixels < m.maxScrollExtent - 0.5;
+    if (above == _moreAbove && below == _moreBelow) return;
+    setState(() {
+      _moreAbove = above;
+      _moreBelow = below;
+    });
+  }
 
   String get _message => TCallFallbackCopy.message(widget.kind, widget.value);
 
   @override
   void initState() {
     super.initState();
+    _messageScroll.addListener(() {
+      if (_messageScroll.hasClients) _updateEdges(_messageScroll.position);
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _focus.requestFocus();
@@ -968,7 +1010,11 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
 
   @override
   void dispose() {
+    final entry = widget.entry;
+    // After this frame: the inset cannot change while the tree is locked.
+    WidgetsBinding.instance.addPostFrameCallback((_) => TCallFallback._cardGone(entry));
     _copiedTimer?.cancel();
+    _messageScroll.dispose();
     _focus.dispose();
     super.dispose();
   }
@@ -1003,7 +1049,8 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
       right: TSpace.screen,
       bottom: bottom,
       child: _ReportHeight(
-        onHeight: (h) => TCallFallback._setInset(widget.entry, h + bottom + 8),
+        extra: bottom + 8,
+        onInset: (v) => TCallFallback._setInset(widget.entry, v),
         child: ConstrainedBox(
           constraints: BoxConstraints(maxHeight: math.max(0, safeHeight * TCallFallback.maxHeightFraction)),
           child: Focus(
@@ -1021,7 +1068,28 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
                 // The number and the buttons always show; at large text on
                 // small screens only the message scrolls.
                 child: TCard(variant: TCardVariant.urgent, children: [
-                  Flexible(child: SingleChildScrollView(child: ExcludeSemantics(child: Text(_message, style: TText.cardTitle.copyWith(color: TColors.errorText))))),
+                  Flexible(
+                    // When the message is cut, a fade at the cut edge and a
+                    // scrollbar that stays visible show that it scrolls.
+                    child: NotificationListener<ScrollMetricsNotification>(
+                      onNotification: (n) {
+                        _updateEdges(n.metrics);
+                        return false;
+                      },
+                      child: Stack(children: [
+                        Scrollbar(
+                          controller: _messageScroll,
+                          thumbVisibility: true,
+                          child: SingleChildScrollView(
+                            controller: _messageScroll,
+                            child: ExcludeSemantics(child: Text(_message, style: TText.cardTitle.copyWith(color: TColors.errorText))),
+                          ),
+                        ),
+                        if (_moreAbove) const Positioned(top: 0, left: 0, right: 0, child: _Fade(key: ValueKey('call_fallback.fade_top'), down: false)),
+                        if (_moreBelow) const Positioned(bottom: 0, left: 0, right: 0, child: _Fade(key: ValueKey('call_fallback.fade_bottom'), down: true)),
+                      ]),
+                    ),
+                  ),
                   SelectionArea(
                     // Read on its own, after the message.
                     child: Semantics(
@@ -1058,29 +1126,66 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
   }
 }
 
-/// Calls [onHeight] after layout whenever its child's height changes.
+/// Calls [onInset] after layout with its child's height plus [extra] (the
+/// space below the card, which grows with the keyboard) whenever that sum
+/// changes.
 class _ReportHeight extends SingleChildRenderObjectWidget {
-  const _ReportHeight({required this.onHeight, super.child});
-  final ValueChanged<double> onHeight;
+  const _ReportHeight({required this.extra, required this.onInset, super.child});
+  final double extra;
+  final ValueChanged<double> onInset;
 
   @override
-  RenderObject createRenderObject(BuildContext context) => _RenderReportHeight(onHeight);
+  RenderObject createRenderObject(BuildContext context) => _RenderReportHeight(extra, onInset);
 
   @override
-  void updateRenderObject(BuildContext context, _RenderReportHeight renderObject) => renderObject.onHeight = onHeight;
+  void updateRenderObject(BuildContext context, _RenderReportHeight renderObject) {
+    renderObject
+      ..onInset = onInset
+      ..extra = extra;
+  }
 }
 
 class _RenderReportHeight extends RenderProxyBox {
-  _RenderReportHeight(this.onHeight);
-  ValueChanged<double> onHeight;
+  _RenderReportHeight(this._extra, this.onInset);
+  ValueChanged<double> onInset;
   double? _last;
+
+  double get extra => _extra;
+  double _extra;
+  set extra(double value) {
+    if (value == _extra) return;
+    _extra = value;
+    markNeedsLayout();
+  }
 
   @override
   void performLayout() {
     super.performLayout();
-    final h = size.height;
-    if (h == _last) return;
-    _last = h;
-    WidgetsBinding.instance.addPostFrameCallback((_) => onHeight(h));
+    final v = size.height + _extra;
+    if (v == _last) return;
+    _last = v;
+    WidgetsBinding.instance.addPostFrameCallback((_) => onInset(v));
   }
+}
+
+/// Fade from the card's colour to transparent at a cut edge of the message.
+class _Fade extends StatelessWidget {
+  const _Fade({super.key, required this.down});
+
+  /// True at the bottom edge (fades in towards the bottom).
+  final bool down;
+
+  @override
+  Widget build(BuildContext context) => IgnorePointer(
+        child: Container(
+          height: 24,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: down ? Alignment.topCenter : Alignment.bottomCenter,
+              end: down ? Alignment.bottomCenter : Alignment.topCenter,
+              colors: [TColors.errorFill.withValues(alpha: 0), TColors.errorFill],
+            ),
+          ),
+        ),
+      );
 }

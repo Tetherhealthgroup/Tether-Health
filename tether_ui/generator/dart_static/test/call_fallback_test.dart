@@ -724,6 +724,45 @@ void main() {
       await _drain(tester);
     });
 
+    testWidgets('the default reporter drops the informational shown code: a fallback raises no error', (tester) async {
+      TNav.reporter = TNav.reportToFlutterError;
+      TDefaults.forRelease();
+      await _open(tester, route: Routes.crisis);
+      await _tapKey(tester, 'body[1]');
+      _expectFallback(TFallbackKind.call, '988');
+      expect(tester.takeException(), isNull);
+      expect(TNav.errorCodes, isNot(contains(TCallFallback.shownCode)));
+      await _drain(tester);
+    });
+
+    testWidgets('the default reporter forwards a failure once: a throwing platform raises only platform_error', (tester) async {
+      TNav.reporter = TNav.reportToFlutterError;
+      TPlatform.instance = _ScriptedPlatform(() => throw StateError(_canary));
+      await _open(tester, route: Routes.crisis);
+      await _tapKey(tester, 'body[1]');
+      _expectFallback(TFallbackKind.call, '988');
+      final error = tester.takeException();
+      expect(error, isA<TUiError>());
+      expect((error as TUiError).code, TNav.platformErrorCode);
+      expect(error.toString(), isNot(contains(_canary)));
+      await _drain(tester);
+    });
+
+    test('every error code is forwarded by the default reporter', () {
+      expect(TNav.errorCodes, {TNav.platformErrorCode, TNav.platformTimeoutCode, TCallFallback.clipboardErrorCode, TNav.safetyActionErrorCode, TNav.fallbackUnavailableCode});
+    });
+
+    test('an installed reporter gets the stack trace unchanged', () {
+      final stacks = <StackTrace?>[];
+      TNav.reporter = (_, stack) => stacks.add(stack);
+      final stack = StackTrace.current;
+      TNav.report(TNav.platformErrorCode, stack);
+      TNav.report(TCallFallback.shownCode);
+      expect(stacks, hasLength(2));
+      expect(identical(stacks.first, stack), isTrue);
+      expect(stacks.last, isNull);
+    });
+
     testWidgets('the default reporter sends a TUiError with the code only to FlutterError', (tester) async {
       TNav.reporter = TNav.reportToFlutterError;
       TNav.report(TNav.platformErrorCode, StackTrace.current);
@@ -739,6 +778,193 @@ void main() {
       await _open(tester, route: Routes.crisis);
       await _tapKey(tester, 'body[1]');
       _expectFallback(TFallbackKind.call, '988');
+      await _drain(tester);
+    });
+  });
+
+  group('the keyboard and rebuilds', () {
+    testWidgets('hw_log2: a keyboard that opens while the card shows moves the card and the screen above it; Save stays reachable above the card', (tester) async {
+      TDefaults.forRelease();
+      await _open(tester, route: Routes.hwLog2);
+      final field = find.byKey(const ValueKey('field:hw_log2.systolic'));
+      await TNav.call(tester.element(field), '988');
+      await _settle(tester);
+      _expectFallback(TFallbackKind.call, '988');
+      final before = TCallFallback.inset.value;
+      tester.view.viewInsets = const FakeViewPadding(bottom: 300 * 3);
+      addTearDown(tester.view.resetViewInsets);
+      await _settle(tester);
+      final card = tester.getRect(find.byKey(_fallback));
+      expect(card.bottom, lessThanOrEqualTo(844 - 300), reason: 'the card sits above the keyboard');
+      expect(TCallFallback.inset.value, greaterThanOrEqualTo(844 - card.top), reason: 'inset $before → ${TCallFallback.inset.value}');
+      final save = find.byKey(const ValueKey('a:footer[0]'));
+      await tester.ensureVisible(save);
+      await _settle(tester);
+      expect(save.hitTestable(), findsOneWidget);
+      expect(tester.getRect(save).bottom, lessThanOrEqualTo(card.top), reason: 'Save is above the card');
+      tester.view.resetViewInsets();
+      await _settle(tester);
+      expect(TCallFallback.inset.value, before, reason: 'the inset follows the keyboard back down');
+      await _drain(tester);
+    });
+
+    testWidgets('a rebuilt app (new MaterialApp) leaves no inset, listener or fallback behind', (tester) async {
+      TDefaults.forRelease();
+      await _open(tester, route: Routes.crisis);
+      await _tapKey(tester, 'body[1]');
+      _expectFallback(TFallbackKind.call, '988');
+      expect(TCallFallback.inset.value, greaterThan(0));
+      await _open(tester, route: Routes.crisis); // a new MaterialApp key
+      _expectNoFallback();
+      expect(TCallFallback.inset.value, 0);
+      expect(TCallFallback.debugListensToSession, isFalse);
+      final scaffold = find.descendant(of: find.byType(CrisisScreen), matching: find.byType(Scaffold));
+      expect(MediaQuery.viewInsetsOf(tester.element(scaffold)).bottom, 0, reason: 'the screen is laid out full height');
+      await _drain(tester);
+    });
+  });
+
+  group('fields and focus', () {
+    // (name, route, field key, size, text scale)
+    final cases = <(String, String, String, Size, double)>[
+      ('screen 390×844 at 1.0', Routes.supportMessageCare, 'support_message_care.message', const Size(390, 844), 1),
+      ('screen 320×568 at 2.0 (footer moves into the body)', Routes.supportMessageCare, 'support_message_care.message', const Size(320, 568), 2),
+      ('sheet 390×844 at 1.0', Routes.sfUnplugSessionEnd, 'sf_unplug_session_end.note', const Size(390, 844), 1),
+      ('sheet 320×568 at 2.0', Routes.sfUnplugSessionEnd, 'sf_unplug_session_end.note', const Size(320, 568), 2),
+    ];
+    for (final (name, route, key, size, scale) in cases) {
+      testWidgets('$name: a focused field keeps its state and text while the card shows, and gets focus back on Close', (tester) async {
+        TDefaults.forRelease();
+        await _open(tester, route: route, size: size, textScale: scale);
+        final field = find.byKey(ValueKey('field:$key'));
+        await tester.ensureVisible(field);
+        await _settle(tester);
+        await tester.enterText(field, 'synthetic note 01');
+        await _settle(tester);
+        EditableTextState editable() => tester.state<EditableTextState>(find.descendant(of: field, matching: find.byType(EditableText)));
+        State tfield() => tester.state(find.ancestor(of: find.byType(EditableText), matching: find.byType(TField)).first);
+        final editState = editable();
+        final fieldState = tfield();
+        expect(editState.widget.focusNode.hasFocus, isTrue);
+        await TNav.call(tester.element(field), '988');
+        await _settle(tester);
+        _expectFallback(TFallbackKind.call, '988');
+        expect(identical(editable(), editState) && identical(tfield(), fieldState), isTrue, reason: 'no state recreated when the card shows');
+        expect(editable().textEditingValue.text, 'synthetic note 01');
+        expect(editState.widget.focusNode.hasFocus, isFalse, reason: 'the card took focus');
+        await tester.tap(find.byKey(_close));
+        await _settle(tester);
+        _expectNoFallback();
+        expect(identical(editable(), editState) && identical(tfield(), fieldState), isTrue, reason: 'no state recreated when it closes');
+        expect(editable().textEditingValue.text, 'synthetic note 01');
+        expect(TSession.values[key], 'synthetic note 01');
+        expect(editState.widget.focusNode.hasFocus, isTrue, reason: 'focus is back in the field');
+        await _drain(tester);
+      });
+    }
+
+    final closes = <String, Future<void> Function(WidgetTester)>{
+      'the keyboard (Tab to Close, Enter)': (tester) async {
+        for (var i = 0; i < 8; i++) {
+          await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+          await tester.pump();
+          final p = FocusManager.instance.primaryFocus?.context;
+          if (p != null && find.ancestor(of: find.byElementPredicate((e) => identical(e, p)), matching: find.byKey(_close)).evaluate().isNotEmpty) break;
+        }
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      },
+      'a screen-reader activation': (tester) async {
+        final node = tester.getSemantics(find.descendant(of: find.byKey(_fallback), matching: find.bySemanticsLabel(TCallFallbackCopy.close)));
+        node.owner!.performAction(node.id, SemanticsAction.tap);
+      },
+      'Copy, then Close': (tester) async {
+        await tester.tap(find.byKey(_copy));
+        await _settle(tester);
+        await tester.tap(find.byKey(_close));
+      },
+    };
+    for (final MapEntry(key: how, value: close) in closes.entries) {
+      testWidgets('closed with $how: focus is back in the field', (tester) async {
+        final semantics = tester.ensureSemantics();
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (_) async => null);
+        addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+        TDefaults.forRelease();
+        await _open(tester, route: Routes.supportMessageCare);
+        final field = find.byKey(const ValueKey('field:support_message_care.message'));
+        await tester.enterText(field, 'synthetic note 01');
+        await _settle(tester);
+        final node = tester.state<EditableTextState>(find.descendant(of: field, matching: find.byType(EditableText))).widget.focusNode;
+        await TNav.call(tester.element(field), '988');
+        await _settle(tester);
+        await close(tester);
+        await _settle(tester);
+        _expectNoFallback();
+        expect(node.hasFocus, isTrue);
+        await _drain(tester);
+        semantics.dispose();
+      });
+    }
+  });
+
+  group('a sheet stays usable', () {
+    setUpAll(_loadRoboto);
+    for (final (id, route) in [('rescue_pick', Routes.rescuePick), ('auth_signin', Routes.authSignin), ('auth_signin_error', Routes.authSigninError), ('support_callback', Routes.supportCallback), ('sf_unplug_session_end', Routes.sfUnplugSessionEnd)]) {
+      for (final scale in [1.0, 2.0]) {
+        testWidgets('$id at ${scale == 1 ? 100 : 200}% on 320×568: every action can be scrolled to and tapped above the card', (tester) async {
+          TDefaults.forRelease();
+          await _open(tester, size: const Size(320, 568), textScale: scale);
+          unawaited(TNav.sheet(_hostContext, route));
+          await _settle(tester);
+          final keys = find.byWidgetPredicate((w) => w.key is ValueKey<String> && (w.key! as ValueKey<String>).value.startsWith('a:')).evaluate().map((e) => (e.widget.key! as ValueKey<String>).value).toSet().toList();
+          expect(keys, isNotEmpty);
+          await TNav.call(tester.element(find.byKey(ValueKey(keys.first))), '988');
+          await _settle(tester);
+          _expectFallback(TFallbackKind.call, '988');
+          final card = tester.getRect(find.byKey(_fallback));
+          for (final k in keys) {
+            final f = find.byKey(ValueKey(k));
+            await tester.ensureVisible(f);
+            await _settle(tester);
+            expect(f.hitTestable(), findsOneWidget, reason: '$k is reachable');
+            expect(tester.getRect(f).top, lessThan(card.top), reason: '$k is above the card');
+          }
+          await _drain(tester);
+        });
+      }
+    }
+  });
+
+  group('a cut message', () {
+    setUpAll(_loadRoboto);
+    const top = ValueKey('call_fallback.fade_top'), bottom = ValueKey('call_fallback.fade_bottom');
+    Finder scrollbar() => find.descendant(of: find.byKey(_fallback), matching: find.byWidgetPredicate((w) => w is Scrollbar && w.thumbVisibility == true));
+
+    testWidgets('at 200% on 320×568 it fades at the cut edge and keeps its scrollbar visible; scrolled to the end, the fade moves to the top', (tester) async {
+      TDefaults.forRelease();
+      await _open(tester, route: Routes.crisis, size: const Size(320, 568), textScale: 2);
+      await _tapKey(tester, 'body[1]');
+      expect(find.byKey(bottom), findsOneWidget);
+      expect(find.byKey(top), findsNothing);
+      expect(scrollbar(), findsOneWidget);
+      final scrollable = find.descendant(of: find.byKey(_fallback), matching: find.byType(Scrollable));
+      final position = tester.state<ScrollableState>(scrollable).position;
+      expect(position.maxScrollExtent, greaterThan(0), reason: 'the message is cut');
+      position.jumpTo(position.maxScrollExtent);
+      await _settle(tester);
+      expect(find.byKey(top), findsOneWidget);
+      expect(find.byKey(bottom), findsNothing);
+      _expectFallback(TFallbackKind.call, '988');
+      await _drain(tester);
+    });
+
+    testWidgets('when the whole message fits there is no fade', (tester) async {
+      TDefaults.forRelease();
+      await _open(tester, route: Routes.crisis);
+      await _tapKey(tester, 'body[1]');
+      expect(find.byKey(top), findsNothing);
+      expect(find.byKey(bottom), findsNothing);
+      final position = tester.state<ScrollableState>(find.descendant(of: find.byKey(_fallback), matching: find.byType(Scrollable))).position;
+      expect(position.maxScrollExtent, 0);
       await _drain(tester);
     });
   });

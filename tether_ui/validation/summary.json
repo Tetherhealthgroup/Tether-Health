@@ -1,11 +1,11 @@
 {
-  "generated": "2026-10-20T09:09:22+00:00",
+  "generated": "2026-10-20T09:49:46+00:00",
   "screens": 228,
   "flows": 22,
   "actions": 924,
   "flutter": {
-    "total": 1937,
-    "passed": 1937,
+    "total": 1962,
+    "passed": 1962,
     "render_tests": [
       456,
       456
