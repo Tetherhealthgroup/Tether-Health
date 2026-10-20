@@ -855,8 +855,10 @@ abstract final class TCallFallbackCopy {
 /// it), or [TSession.clear] (sign-out, account switch, deletion), so it never
 /// shows one member's number to the next.
 ///
-/// It takes at most [maxHeightFraction] of the safe area and scrolls inside
-/// beyond that. While it shows, [inset] is the height it covers from the
+/// It takes at most [maxHeightFraction] of the safe area above the keyboard
+/// and scrolls inside beyond that, but never less than the number and the
+/// Copy and Close buttons need: when the keyboard leaves less room, only the
+/// message shrinks (down to no visible line) and scrolls. While it shows, [inset] is the height it covers from the
 /// bottom of the screen; [TScreen] and [TSheet] lay out above it, so every
 /// button on the screen beneath can still be scrolled into view and tapped.
 abstract final class TCallFallback {
@@ -866,7 +868,8 @@ abstract final class TCallFallback {
   /// Code reported when copying to the clipboard fails.
   static const String clipboardErrorCode = 'clipboard_error';
 
-  /// Largest share of the safe area the fallback covers.
+  /// Largest share of the safe area above the keyboard the fallback covers,
+  /// unless the number and the buttons alone need more.
   static const double maxHeightFraction = 0.4;
 
   /// Height the fallback covers from the bottom of the screen, 0 when none
@@ -882,9 +885,11 @@ abstract final class TCallFallback {
   static bool get debugListensToSession => _sessionListener != null;
 
   /// Shows the fallback for [kind] with [value] in [overlay], replacing a
-  /// fallback already shown.
+  /// fallback already shown. A replaced fallback's [inset] stays until the
+  /// new card reports its own height, so the screen beneath does not lay out
+  /// uncovered for a frame in between.
   static void show(OverlayState overlay, TFallbackKind kind, String value) {
-    dismiss();
+    _remove();
     late final OverlayEntry entry;
     entry = OverlayEntry(builder: (_) => _TCallFallbackCard(entry: entry, kind: kind, value: value));
     _entry = entry;
@@ -902,6 +907,12 @@ abstract final class TCallFallback {
 
   /// Removes the fallback, if one is shown.
   static void dismiss() {
+    _remove();
+    inset.value = 0;
+  }
+
+  /// Removes the shown entry and its session listener; leaves [inset].
+  static void _remove() {
     final listener = _sessionListener;
     _sessionListener = null;
     if (listener != null) TSession.changes.removeListener(listener);
@@ -909,7 +920,6 @@ abstract final class TCallFallback {
     _entry = null;
     _overlay = null;
     entry?.remove();
-    inset.value = 0;
   }
 
   /// The fallback's entry when it is shown in [overlay], else null.
@@ -1051,8 +1061,8 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
       child: _ReportHeight(
         extra: bottom + 8,
         onInset: (v) => TCallFallback._setInset(widget.entry, v),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: math.max(0, safeHeight * TCallFallback.maxHeightFraction)),
+        child: _FlooredMaxHeight(
+          maxHeight: math.max(0, safeHeight * TCallFallback.maxHeightFraction),
           child: Focus(
             focusNode: _focus,
             child: Semantics(
@@ -1070,8 +1080,11 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
                 child: TCard(variant: TCardVariant.urgent, children: [
                   Flexible(
                     // When the message is cut, a fade at the cut edge and a
-                    // scrollbar that stays visible show that it scrolls.
-                    child: NotificationListener<ScrollMetricsNotification>(
+                    // scrollbar that stays visible show that it scrolls. It
+                    // adds nothing to the card's least height, so the number
+                    // and the buttons set the floor of the height cap.
+                    child: _NoMinHeight(
+                      child: NotificationListener<ScrollMetricsNotification>(
                       onNotification: (n) {
                         _updateEdges(n.metrics);
                         return false;
@@ -1088,6 +1101,7 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
                         if (_moreAbove) const Positioned(top: 0, left: 0, right: 0, child: _Fade(key: ValueKey('call_fallback.fade_top'), down: false)),
                         if (_moreBelow) const Positioned(bottom: 0, left: 0, right: 0, child: _Fade(key: ValueKey('call_fallback.fade_bottom'), down: true)),
                       ]),
+                    ),
                     ),
                   ),
                   SelectionArea(
@@ -1124,6 +1138,63 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
       ),
     );
   }
+}
+
+/// Lays its child out at most [maxHeight] tall, or as tall as the child's
+/// least height when that is more, so the child is never squeezed below what
+/// it needs (a RenderFlex overflow that would cut off the buttons).
+class _FlooredMaxHeight extends SingleChildRenderObjectWidget {
+  const _FlooredMaxHeight({required this.maxHeight, super.child});
+  final double maxHeight;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => _RenderFlooredMaxHeight(maxHeight);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderFlooredMaxHeight renderObject) => renderObject.maxHeight = maxHeight;
+}
+
+class _RenderFlooredMaxHeight extends RenderProxyBox {
+  _RenderFlooredMaxHeight(this._maxHeight);
+
+  double get maxHeight => _maxHeight;
+  double _maxHeight;
+  set maxHeight(double value) {
+    if (value == _maxHeight) return;
+    _maxHeight = value;
+    markNeedsLayout();
+  }
+
+  // As a ConstrainedBox with this maximum height would constrain the child.
+  BoxConstraints _childConstraints(BoxConstraints constraints) =>
+      BoxConstraints(maxHeight: math.max(_maxHeight, child!.getMinIntrinsicHeight(constraints.maxWidth))).enforce(constraints);
+
+  @override
+  Size computeDryLayout(BoxConstraints constraints) => child == null ? constraints.smallest : child!.getDryLayout(_childConstraints(constraints));
+
+  @override
+  void performLayout() {
+    if (child == null) {
+      size = constraints.smallest;
+      return;
+    }
+    child!.layout(_childConstraints(constraints), parentUsesSize: true);
+    size = constraints.constrain(child!.size);
+  }
+}
+
+/// Reports a least height of 0, so a [Flexible] around it does not raise
+/// its [Flex]'s least height; layout and paint are its child's.
+class _NoMinHeight extends SingleChildRenderObjectWidget {
+  const _NoMinHeight({super.child});
+
+  @override
+  RenderObject createRenderObject(BuildContext context) => _RenderNoMinHeight();
+}
+
+class _RenderNoMinHeight extends RenderProxyBox {
+  @override
+  double computeMinIntrinsicHeight(double width) => 0;
 }
 
 /// Calls [onInset] after layout with its child's height plus [extra] (the

@@ -29,7 +29,7 @@ class THeader {
 
 /// A full screen: status-bar safe area, header, scrollable body, pinned
 /// footer (primary actions) and optional tab bar.
-class TScreen extends StatelessWidget {
+class TScreen extends StatefulWidget {
   const TScreen({super.key, this.header, this.children = const [], this.footer = const [], this.tab, this.background = TBackground.paper});
   final THeader? header;
   final List<Widget> children;
@@ -40,7 +40,17 @@ class TScreen extends StatelessWidget {
   bool get dark => background != TBackground.paper;
 
   @override
+  State<TScreen> createState() => _TScreenState();
+}
+
+class _TScreenState extends State<TScreen> {
+  /// Keeps the footer's elements, state and focus nodes when it moves
+  /// between the pinned area and the scrolling body.
+  final GlobalKey _footerKey = GlobalKey(debugLabel: 'TScreen footer');
+
+  @override
   Widget build(BuildContext context) {
+    final TScreen(:header, :children, :footer, :tab, :background, :dark) = widget;
     final decoration = switch (background) {
       TBackground.paper => const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFBF8F0), Color(0xFFF3F0E6)])),
       TBackground.dark => const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [TColors.teal, Color(0xFF1C5149)])),
@@ -58,19 +68,19 @@ class TScreen extends StatelessWidget {
             bottom: tab == null,
             child: Column(
               children: [
-                if (header != null) _Header(spec: header!, dark: dark),
+                if (header != null) _Header(spec: header, dark: dark),
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.fromLTRB(TSpace.screen, 6, TSpace.screen, 20),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (covered && footer.isNotEmpty) ...[const SizedBox(height: 16), ..._gap(footer, 8)]]),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (covered && footer.isNotEmpty) ...[const SizedBox(height: 16), _footerColumn(_footerKey, footer)]]),
                   ),
                 ),
                 if (!covered && footer.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(TSpace.screen, 10, TSpace.screen, 12),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: _gap(footer, 8)),
+                    child: _footerColumn(_footerKey, footer),
                   ),
-                if (tab != null) TTabBar(active: tab!),
+                if (tab != null) TTabBar(active: tab),
               ],
             ),
           ),
@@ -81,13 +91,23 @@ class TScreen extends StatelessWidget {
 }
 
 /// Bottom-sheet content. Shown by TNav.sheet through a ModalBottomSheetRoute.
-class TSheet extends StatelessWidget {
+class TSheet extends StatefulWidget {
   const TSheet({super.key, this.children = const [], this.footer = const []});
   final List<Widget> children;
   final List<Widget> footer;
 
   @override
+  State<TSheet> createState() => _TSheetState();
+}
+
+class _TSheetState extends State<TSheet> {
+  /// Keeps the footer's elements, state and focus nodes when it moves
+  /// between the pinned area and the scrolling body.
+  final GlobalKey _footerKey = GlobalKey(debugLabel: 'TSheet footer');
+
+  @override
   Widget build(BuildContext context) {
+    final TSheet(:children, :footer) = widget;
     final maxH = MediaQuery.sizeOf(context).height * 0.86;
     // Lays out above the call fallback while it shows (TCallFallback); the
     // footer then scrolls with the body so nothing overflows.
@@ -106,13 +126,13 @@ class TSheet extends StatelessWidget {
               Flexible(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.fromLTRB(TSpace.screen, 6, TSpace.screen, 12),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (covered && footer.isNotEmpty) ...[const SizedBox(height: 16), ..._gap(footer, 8)]]),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (covered && footer.isNotEmpty) ...[const SizedBox(height: 16), _footerColumn(_footerKey, footer)]]),
                 ),
               ),
               if (!covered && footer.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(TSpace.screen, 8, TSpace.screen, 12),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: _gap(footer, 8)),
+                  child: _footerColumn(_footerKey, footer),
                 ),
             ],
           ),
@@ -132,6 +152,11 @@ class TSheetPreview extends StatelessWidget {
         body: Align(alignment: Alignment.bottomCenter, child: child),
       );
 }
+
+/// The footer of a [TScreen] or [TSheet], pinned or in the scrolling body.
+/// [key] moves the same subtree between the two, so a focused footer button
+/// keeps its focus node and gets focus back when the call fallback closes.
+Widget _footerColumn(GlobalKey key, List<Widget> footer) => Column(key: key, crossAxisAlignment: CrossAxisAlignment.stretch, children: _gap(footer, 8));
 
 List<Widget> _gap(List<Widget> items, [double gap = TSpace.gap]) {
   final out = <Widget>[];
