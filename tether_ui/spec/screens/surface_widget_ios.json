@@ -16,14 +16,9 @@
     "t": "header",
     "title": "iPhone widget",
     "left": "close",
-    "pill": "Reference",
     "dark": true
   },
   "body": [
-    {
-      "t": "eyebrow",
-      "text": "Home screen · small widget"
-    },
     {
       "t": "card",
       "variant": "coral",
@@ -33,34 +28,19 @@
         "type": "sheet",
         "to": "rescue_pick"
       }
-    },
-    {
-      "t": "kv",
-      "rows": [
-        [
-          "Label",
-          "Rescue (generic)"
-        ],
-        [
-          "Shows",
-          "No health data, no program names"
-        ],
-        [
-          "Tap",
-          "Opens Rescue, even when signed out"
-        ],
-        [
-          "Data",
-          "None. No App Group needed"
-        ]
-      ]
     }
   ],
   "footer": [],
   "notes": [
     "Copy needs clinical/legal review.",
     "Source: rescue_pick entry \"Home-screen widget / Siri: Rescue\" in this spec; WidgetKit, static content",
-    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
+    "Header pill: Reference",
+    "Home screen · small widget",
+    "Label: Rescue (generic)",
+    "Shows: No health data, no program names",
+    "Tap: Opens Rescue, even when signed out",
+    "Data: None. No App Group needed"
   ],
   "over": null,
   "api": [],
@@ -76,7 +56,7 @@
     },
     {
       "element": "Rescue",
-      "path": "body[1]",
+      "path": "body[0]",
       "action": {
         "type": "sheet",
         "to": "rescue_pick"

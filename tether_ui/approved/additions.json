@@ -325,10 +325,12 @@
       "name": "Apple app picker",
       "decisions": [
         "P-47",
-        "P-30"
+        "P-30",
+        "P-62"
       ],
       "tickets": [
-        "TH-953"
+        "TH-953",
+        "TH-1001"
       ]
     },
     {
@@ -425,10 +427,13 @@
       "decisions": [
         "P-47",
         "P-32",
-        "P-48"
+        "P-48",
+        "P-58",
+        "P-62"
       ],
       "tickets": [
-        "TH-953"
+        "TH-953",
+        "TH-1001"
       ]
     },
     {
@@ -436,10 +441,12 @@
       "name": "Launcher shortcuts (sensitive details on)",
       "decisions": [
         "P-47",
-        "P-48"
+        "P-48",
+        "P-62"
       ],
       "tickets": [
-        "TH-953"
+        "TH-953",
+        "TH-1001"
       ]
     },
     {
@@ -448,10 +455,12 @@
       "decisions": [
         "P-47",
         "P-32",
-        "P-48"
+        "P-48",
+        "P-62"
       ],
       "tickets": [
-        "TH-953"
+        "TH-953",
+        "TH-1001"
       ]
     },
     {
@@ -459,10 +468,12 @@
       "name": "Siri & App Shortcuts (sensitive details on)",
       "decisions": [
         "P-47",
-        "P-48"
+        "P-48",
+        "P-62"
       ],
       "tickets": [
-        "TH-953"
+        "TH-953",
+        "TH-1001"
       ]
     },
     {
@@ -471,10 +482,12 @@
       "decisions": [
         "P-47",
         "P-32",
-        "P-48"
+        "P-48",
+        "P-62"
       ],
       "tickets": [
-        "TH-953"
+        "TH-953",
+        "TH-1001"
       ]
     },
     {
@@ -483,10 +496,12 @@
       "decisions": [
         "P-47",
         "P-32",
-        "P-48"
+        "P-48",
+        "P-62"
       ],
       "tickets": [
-        "TH-953"
+        "TH-953",
+        "TH-1001"
       ]
     },
     {

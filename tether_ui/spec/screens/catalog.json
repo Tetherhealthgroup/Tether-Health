@@ -24,11 +24,6 @@
       "size": "m"
     },
     {
-      "t": "text",
-      "text": "Mirrors tetherhealthgroup.com. Status shows what’s available today.",
-      "tone": "muted"
-    },
-    {
       "t": "list",
       "title": "Quit · Manage",
       "rows": [
@@ -163,7 +158,9 @@
     }
   ],
   "footer": [],
-  "notes": [],
+  "notes": [
+    "Mirrors tetherhealthgroup.com. Status shows what’s available today."
+  ],
   "over": null,
   "api": [],
   "actions": [
@@ -177,7 +174,7 @@
     },
     {
       "element": "BreatheFree",
-      "path": "body[2].rows[0]",
+      "path": "body[1].rows[0]",
       "action": {
         "type": "push",
         "to": "bf_intro"
@@ -186,7 +183,7 @@
     },
     {
       "element": "ScrollFree",
-      "path": "body[2].rows[1]",
+      "path": "body[1].rows[1]",
       "action": {
         "type": "push",
         "to": "sf_intro"
@@ -195,7 +192,7 @@
     },
     {
       "element": "ClearAir",
-      "path": "body[2].rows[2]",
+      "path": "body[1].rows[2]",
       "action": {
         "type": "push",
         "to": "ca_intro"
@@ -204,7 +201,7 @@
     },
     {
       "element": "Heartwise",
-      "path": "body[2].rows[3]",
+      "path": "body[1].rows[3]",
       "action": {
         "type": "push",
         "to": "hw_intro"
@@ -213,7 +210,7 @@
     },
     {
       "element": "Steady",
-      "path": "body[2].rows[4]",
+      "path": "body[1].rows[4]",
       "action": {
         "type": "push",
         "to": "st_intro"
@@ -222,7 +219,7 @@
     },
     {
       "element": "Renew",
-      "path": "body[2].rows[5]",
+      "path": "body[1].rows[5]",
       "action": {
         "type": "push",
         "to": "re_intro"
@@ -231,7 +228,7 @@
     },
     {
       "element": "Nourish",
-      "path": "body[3].rows[0]",
+      "path": "body[2].rows[0]",
       "action": {
         "type": "push",
         "to": "nu_intro"
@@ -240,7 +237,7 @@
     },
     {
       "element": "Stride",
-      "path": "body[3].rows[1]",
+      "path": "body[2].rows[1]",
       "action": {
         "type": "push",
         "to": "sd_intro"
@@ -249,7 +246,7 @@
     },
     {
       "element": "Ease",
-      "path": "body[3].rows[2]",
+      "path": "body[2].rows[2]",
       "action": {
         "type": "push",
         "to": "ea_intro"
@@ -258,7 +255,7 @@
     },
     {
       "element": "Checkup",
-      "path": "body[3].rows[3]",
+      "path": "body[2].rows[3]",
       "action": {
         "type": "push",
         "to": "ck_intro"
@@ -267,7 +264,7 @@
     },
     {
       "element": "Beacon",
-      "path": "body[3].rows[4]",
+      "path": "body[2].rows[4]",
       "action": {
         "type": "push",
         "to": "be_intro"

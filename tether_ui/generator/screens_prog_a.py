@@ -2,7 +2,7 @@ from dsl import *
 
 H = header
 
-def intro(p, bullets, time, setup=None):
+def intro(p, bullets, time, setup=None, notes=None):
     name, area = PROGRAMS[p][0], PROGRAMS[p][1]
     S(f'{p}_intro', f'{name} intro', f'/p/{p}', p, program=p, phase='welcome', hdr=H(name, pill=time), body=[
         progtag(p, area), title(PROGRAMS[p][6], 'l'),
@@ -10,7 +10,7 @@ def intro(p, bullets, time, setup=None):
     ] + ([text(setup[1], 'muted')] if setup and len(setup) > 1 else []), footer=[
         button(f'Set up {name}', setup[0] if setup else go(f'{p}_q1')),
         button('Add as Learn only', toast(f'{name} added as Learn only', tab('plans')), v='secondary'),
-    ], desc='Entry from Choose programs, Catalog or a Learn-only row.')
+    ], desc='Entry from Choose programs, Catalog or a Learn-only row.', notes=notes)
 
 def home_hdr(p): return H(PROGRAMS[p][0], avatar='A')
 
@@ -121,7 +121,8 @@ def programs_a():
     # ================================================================ SCROLLFREE
     flow('sf', 'ScrollFree', 'Social media use · Quit / Reduce. Self-report first, minute goal + app-free windows, Pause 60, buddy, weekly reflection.', 'sf')
     intro('sf', [('Goal', 'minutes a day + app-free times'), ('Pause 60', 'intent check, not a lock'), ('Never', 'reads messages or feeds')], '~1 min/day',
-          (go('sf_q1'), 'Notice what pulls you in, set a goal that feels doable, and pause for 60 seconds when the urge hits. Never called “addiction”.'))
+          (go('sf_q1'), 'Notice what pulls you in, set a goal that feels doable, and pause for 60 seconds when the urge hits.'),
+          notes=['Never called “addiction”.'])  # P-62: design rule, not rendered
     S('sf_q1', 'Baseline: use', '/p/sf/onboarding/1', 'sf', program='sf', phase='onboarding', hdr=H('About your use', pill='1 of 2'), body=[
         steps(1, 2), title('On a typical day, how long on social apps?'), text('A rough guess is fine.', 'muted'),
         radio(['Less than 1 hour', '1–2 hours', '3–4 hours', '5+ hours'], 2, key='value'),

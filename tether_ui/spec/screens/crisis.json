@@ -65,15 +65,12 @@
         "type": "push",
         "to": "ea_plan"
       }
-    },
-    {
-      "t": "text",
-      "text": "Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. 988 is US-only; localize per region.",
-      "tone": "small"
     }
   ],
   "footer": [],
-  "notes": [],
+  "notes": [
+    "Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. 988 is US-only; localize per region."
+  ],
   "over": null,
   "api": [],
   "actions": [

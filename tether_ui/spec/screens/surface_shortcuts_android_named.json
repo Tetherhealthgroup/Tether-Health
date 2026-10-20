@@ -15,22 +15,15 @@
   "header": {
     "t": "header",
     "title": "App shortcuts",
-    "left": "close",
-    "pill": "Reference"
+    "left": "close"
   },
   "body": [
-    {
-      "t": "text",
-      "text": "With Show sensitive details on (Account → Notifications), shortcuts use program names.",
-      "tone": "muted"
-    },
     {
       "t": "list",
       "title": "Tether Health",
       "rows": [
         {
           "label": "Rescue",
-          "sub": "Static shortcut · always there",
           "action": {
             "type": "sheet",
             "to": "rescue_pick"
@@ -41,7 +34,6 @@
         },
         {
           "label": "ClearAir red-zone plan",
-          "sub": "Dynamic shortcut",
           "action": {
             "type": "push",
             "to": "ca_red"
@@ -57,7 +49,11 @@
   "notes": [
     "Copy needs clinical/legal review.",
     "Source: surface_shortcuts_android plus the Show sensitive details toggle on account_notifications in this spec",
-    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
+    "Header pill: Reference",
+    "With Show sensitive details on (Account → Notifications), shortcuts use program names.",
+    "Rescue: Static shortcut · always there",
+    "ClearAir red-zone plan: Dynamic shortcut"
   ],
   "over": null,
   "api": [],
@@ -73,7 +69,7 @@
     },
     {
       "element": "Rescue",
-      "path": "body[1].rows[0]",
+      "path": "body[0].rows[0]",
       "action": {
         "type": "sheet",
         "to": "rescue_pick"
@@ -82,7 +78,7 @@
     },
     {
       "element": "ClearAir red-zone plan",
-      "path": "body[1].rows[1]",
+      "path": "body[0].rows[1]",
       "action": {
         "type": "push",
         "to": "ca_red"

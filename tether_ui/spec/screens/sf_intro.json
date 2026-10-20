@@ -48,7 +48,7 @@
     },
     {
       "t": "text",
-      "text": "Notice what pulls you in, set a goal that feels doable, and pause for 60 seconds when the urge hits. Never called “addiction”.",
+      "text": "Notice what pulls you in, set a goal that feels doable, and pause for 60 seconds when the urge hits.",
       "tone": "muted"
     }
   ],
@@ -78,7 +78,9 @@
       "arrow": false
     }
   ],
-  "notes": [],
+  "notes": [
+    "Never called “addiction”."
+  ],
   "over": null,
   "api": [],
   "actions": [

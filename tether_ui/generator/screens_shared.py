@@ -222,8 +222,9 @@ def shared():
         banner('urgent', 'If you might act on thoughts of harming yourself, get help now.'),
         button('Call 988', call('988'), v='danger', arrow=False), button('Text 988', sms('988'), v='secondary'), button('Call 911', call('911'), v='secondary'),
         card(eyebrow='Your safety plan', title='Things that help: walk the dog, shower, music', text='Reach out: Sam · (555) 010-3311', action=go('ea_plan')),
-        text('Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. 988 is US-only; localize per region.', 'small'),
-    ], desc='Global crisis screen used by every program.')
+    ], desc='Global crisis screen used by every program.',
+       # P-58: designer note, kept in the spec and not rendered.
+       notes=['Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. 988 is US-only; localize per region.'])
 
     # ================================================================ PLANS
     flow('plans', 'Plans & programs', 'My plans hub, program catalog (the 11 programs from tetherhealthgroup.com), focus-slot rules and per-program settings.')
@@ -234,10 +235,12 @@ def shared():
         rows([row('Medication center', 'BreatheFree · nicotine patch', action=go('bf_meds')), row('Programs & sharing', 'Status, consent, data', action=go('account_programs'))], title='Manage'),
     ], footer=[button('Add a program', go('catalog'), v='secondary')])
     S('catalog', 'Add a program', '/programs', 'plans', phase='welcome', hdr=H('All programs'), body=[
-        title('Choose what you want support with.'), text('Mirrors tetherhealthgroup.com. Status shows what’s available today.', 'muted'),
+        title('Choose what you want support with.'),
         rows([row(PROGRAMS[p][0], f'{PROGRAMS[p][1]} · {PROGRAMS[p][2]}', lead=L_prog(p), action=go(f'{p}_intro')) for p in ORDER[:6]], title='Quit · Manage'),
         rows([row(PROGRAMS[p][0], f'{PROGRAMS[p][1]} · {PROGRAMS[p][2]}', lead=L_prog(p), action=go(f'{p}_intro')) for p in ORDER[6:]], title='Habits · Support · Prevent'),
-    ], desc='Catalog is served by the catalogue service so a program can launch without an app release.')
+    ], desc='Catalog is served by the catalogue service so a program can launch without an app release.',
+       # P-62: designer note, kept in the spec and not rendered.
+       notes=['Mirrors tetherhealthgroup.com. Status shows what’s available today.'])
     S('focus_full', 'Focus slots full', '/programs/focus-full', 'plans', phase='plan', kind='sheet', over='Heartwise', body=[
         eyebrow('Both focus slots are in use'), title('Add Heartwise as…'),
         radio([ri('Learn only for now', 'Lessons, no reminders. Upgrade anytime.', 'Suggested'), ri('Swap with ScrollFree', 'ScrollFree pauses. Its data is kept.'), ri('Swap with BreatheFree', 'Not suggested during your quit week.')], key='option'),
