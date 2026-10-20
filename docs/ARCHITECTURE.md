@@ -7,8 +7,7 @@ iPhone / Android Flutter app
           | HTTPS + Supabase access token
           v
 NestJS API (TypeScript / Node.js)
-          | caller-scoped client (normal data)
-          | server-only admin client (Auth deletion)
+          | caller-scoped client (all data, account deletion included)
           v
 Supabase (PostgreSQL + Auth + Storage)
 ```
@@ -21,10 +20,11 @@ boundary that is replaceable in tests. Flutter uses the publishable/anonymous
 key only and sends its short-lived access token to the API.
 NestJS validates signature, issuer, audience, expiry, and subject against
 Supabase JWKS, then accesses normal data with that caller token. PostgreSQL RLS
-is the final authorization boundary for app-owned data. Only complete account
-deletion uses a separate server-only service-role client. It recursively cleans
-the exact avatar prefix and deletes only the identity selected from the verified
-JWT subject. Service-role credentials must never ship in Flutter.
+is the final authorization boundary for app-owned data. The API holds no
+service-role credential: complete account deletion also runs with the caller's
+token, through Storage for the avatar prefix and a database function that
+deletes only the caller's own identity. Service-role credentials must never ship
+in Flutter or the API.
 
 ## Trust boundaries
 
@@ -85,13 +85,14 @@ unsigned/no-codesign release builds.
 Deletion crosses the trust boundary only inside the API. A caller-scoped RPC
 first sets a durable profile-row barrier. Storage insert/update authorization
 locks that same row, so deletion drains uploads already in flight and blocks new
-ones before cleanup starts. The server-only client then flat-lists every nested
-object under the verified subject's exact prefix with cursor pagination and
-removes bounded batches. Only then does `delete_my_app_data` remove database
-rows and the administrator delete the Auth identity. The ordered cleanup is
-idempotent; failures return 502 and retries repeat cleanup safely. An
-already-absent identity is success. No health payload or user identifier is
-written to application logs.
+ones before cleanup starts. With the caller's token, the API then flat-lists
+every nested object under the verified subject's exact prefix with cursor
+pagination and removes bounded batches. Only then does `delete_my_account`
+remove the database rows and the caller's Auth identity in one transaction; it
+re-checks the recent sign-in and refuses while any avatar object remains. The
+ordered cleanup is idempotent; failures return 502 and retries repeat cleanup
+safely. An already-absent identity is success. No health payload or user
+identifier is written to application logs.
 
 Before the destructive request, Flutter persists an encrypted deletion-intent
 tombstone; failure or timeout aborts before the API call. After a 2xx confirms
@@ -107,6 +108,7 @@ deletion bodies are retried once with the same recent token, then fall back to
 the tombstone and local cleanup. Only explicit acknowledgement clears both keys.
 
 External release dependencies remain: production infrastructure and redirect
-allowlisting, service-role provisioning and identity-retention policy, final
+allowlisting, removing the retired service-role variable from the API host,
+identity-retention policy, final
 identifiers and signing, clinical/legal/privacy approval, professional localization,
 vendor penetration testing, store review, and physical-device validation.

@@ -54,7 +54,8 @@ Do not place API secrets, service credentials or production signing certificates
 See `docs/ARCHITECTURE.md` and `docs/contracts/` for versioned boundaries.
 
 The account-data API exports only those two bounded database records. Deletion
-uses a caller-scoped Supabase RPC, removes a caller avatar through Storage, and
-returns counts plus a request ID without logging payloads. It does not delete
-the Supabase Auth identity; that requires an externally provisioned privileged
-Auth administration path.
+runs entirely with the caller's token: it removes the caller's avatar objects
+through Storage, then `delete_my_account` deletes the app data and the Supabase
+Auth identity together. It returns counts plus a request ID without logging
+payloads. The API holds no Supabase service key and refuses to start if
+`SUPABASE_SERVICE_ROLE_KEY` is set.

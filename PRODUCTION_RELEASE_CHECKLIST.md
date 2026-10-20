@@ -55,9 +55,13 @@ not be described as production-ready while any release requirement remains open.
   HTTPS, and exact CORS origins.
 - [ ] Allowlist `com.tetherhealthllc.tetherhealth://login-callback` for confirmation and
   password recovery in production Supabase Auth.
-- [ ] Provision, protect, rotate, and operationally approve the API's Supabase
-  service-role credential for Auth identity deletion. The implementation is
-  complete, but no production credential has been configured or exercised.
+- [x] No Supabase service key in the API: account deletion, Auth identity
+  included, runs with the member's own token, and the API refuses to start
+  while `SUPABASE_SERVICE_ROLE_KEY` is set.
+- [ ] Deploy the API without the service key (human, manual deploy): apply the
+  migration that adds `delete_my_account` first; in the same manual deploy,
+  remove the `SUPABASE_SERVICE_ROLE_KEY` variable from the Render service.
+  Whether to rotate or revoke the key the API held is decided at deploy time.
 - [ ] Commission independent mobile/API/cloud penetration testing and remediate
   findings.
 - [ ] Approve production telemetry/crash service and verify by policy/test that

@@ -377,9 +377,8 @@ where c.revoked_at is null and c.locale is null
 
 Migration source of truth:
 `supabase/migrations/202610180006_service_role_least_privilege.sql`.
-The API holds the service key only for Auth admin (deleting an account's
-identity) and Storage (removing avatar objects); its table and function calls
-in `public` run as `authenticated` with the member's token. In schema `public`
+The API holds no service key; all its table, function and Storage calls run
+as `authenticated` with the member's token. In schema `public`
 `service_role` holds `select` on `consent_documents` and nothing else: no other
 table or column privilege, no `execute` on any function, and `usage` but not
 `create` on the schema. Default privileges for tables, functions and sequences
@@ -568,12 +567,14 @@ session (`TH009`).
 The NestJS API first invokes `begin_account_deletion` with exact confirmation.
 That function updates the caller's profile row, waiting for any upload holding a
 conflicting `FOR SHARE` lock and durably blocking subsequent avatar
-inserts/updates. The
-API's server-only client then uses flat cursor pagination to enumerate every
-object under the exact `<verified-subject>/` prefix and removes those objects in
-bounded batches. It never accepts a user ID in the request body. Only after
-Storage succeeds does `delete_my_app_data` remove database rows, followed by
-deletion of that verified subject's Auth identity. Failed attempts are safe to
+inserts/updates. With the member's token, the API then uses flat cursor
+pagination to enumerate every object under the exact `<verified-subject>/`
+prefix and removes those objects in bounded batches through the Storage API. It
+never accepts a user ID in the request body. Only after Storage succeeds does it
+call `delete_my_account`, which deletes the database rows and the Auth identity
+together; the API no longer calls `delete_my_app_data` directly. The API maps
+`TH017` from either function to 401 and every other error to 502, and logs only
+the request ID, a status and the error code. Failed attempts are safe to
 retry: the write barrier remains set until the profile is removed, cleanup is
 idempotent, and a missing Auth identity is success. API receipts contain only
 request/completion identifiers and deleted counts, never user payloads.

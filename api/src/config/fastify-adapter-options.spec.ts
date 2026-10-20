@@ -5,7 +5,6 @@ const baseEnv = {
   NODE_ENV: "production",
   SUPABASE_URL: "https://project.supabase.co",
   SUPABASE_ANON_KEY: "publishable-placeholder-key",
-  SUPABASE_SERVICE_ROLE_KEY: "sb_secret_synthetic-server-key",
 };
 
 type TrustProxy = ReturnType<typeof buildFastifyAdapterOptions>["trustProxy"];
