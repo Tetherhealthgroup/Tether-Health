@@ -658,6 +658,10 @@ select th944_test.ok(
   'A has 2 enrolments, 2 programme consents, 2 sync answers, 3 lapses, 1 area and 1 sync account before deletion');
 
 select th944_test.become('authenticator', '00000000-0000-4000-8000-000000944001');
+-- A recent sign-in, which begin_account_deletion requires.
+select set_config('request.jwt.claims', (current_setting('request.jwt.claims')::jsonb
+  || jsonb_build_object('amr', jsonb_build_array(jsonb_build_object(
+    'method', 'password', 'timestamp', extract(epoch from now()) - 30))))::text, true);
 select th944_test.ok(public.begin_account_deletion('DELETE'), 'A API: deletion barrier set');
 select th944_test.become('thsync', '00000000-0000-4000-8000-000000944001');
 select th944_test.refused(

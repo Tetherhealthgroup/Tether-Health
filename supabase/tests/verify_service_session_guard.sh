@@ -665,6 +665,10 @@ select th972_test.ok(
     "sync_answers": 1, "sync_lapses": 1, "sync_areas": 1, "sync_accounts": 1}'::jsonb,
   'B has the expected rows before deletion');
 select th972_test.become('authenticator', '00000000-0000-4000-8000-000000972002');
+-- A recent sign-in, which begin_account_deletion requires.
+select set_config('request.jwt.claims', (current_setting('request.jwt.claims')::jsonb
+  || jsonb_build_object('amr', jsonb_build_array(jsonb_build_object(
+    'method', 'password', 'timestamp', extract(epoch from now()) - 30))))::text, true);
 select th972_test.ok(public.begin_account_deletion('DELETE'),
   'B API: begin_account_deletion still sets the barrier');
 select th972_test.become('thsync', '00000000-0000-4000-8000-000000972002');

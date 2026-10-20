@@ -645,7 +645,10 @@ select th988b_test.ok(
     (select relowner from pg_catalog.pg_class where oid = 'auth.users'::regclass), 'MEMBER')
   and coalesce((select not rolsuper and rolbypassrls from pg_catalog.pg_roles
                 where rolname = 'th988b_owner_bypass'), true),
-  'owners: th988b_owner_norls neither is a superuser nor bypasses row-level security nor belongs to postgres or the auth.users owner; th988b_owner_bypass bypasses it without being a superuser');
+  'owners: th988b_owner_norls neither is a superuser nor bypasses row-level security nor belongs to postgres or the auth.users owner'
+  || case when exists (select 1 from pg_catalog.pg_roles where rolname = 'th988b_owner_bypass')
+          then '; th988b_owner_bypass bypasses it without being a superuser'
+          else ' (th988b_owner_bypass could not be created on this image and was not checked)' end);
 
 -- Member M: an identity, a session, a row in every member table, deletion
 -- started; delete_my_app_data's counts for M are taken in a rolled-back block.
@@ -1169,7 +1172,7 @@ if [[ -n "${VERIFY_DB_URL:-}" ]]; then
     echo "$out" >&2
     fail 'SQL test failed'
   }
-  echo "$out" | grep -E 'PASS|FAIL' || true
+  echo "$out" | grep -E 'PASS|FAIL|not runnable' || true
   echo "$out" | grep -q 'TH988B_SQL_TESTS_COMPLETE' || fail 'SQL test did not complete'
   out=$(print_control_sql | run_psql) || {
     echo "$out" >&2

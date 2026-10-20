@@ -456,8 +456,10 @@ select th988_test.ok(
 
 -- A: delete_my_app_data through the API path (authenticated, A's token).
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-0000009880a1', true);
-select set_config('request.jwt.claims',
-  '{"sub":"00000000-0000-4000-8000-0000009880a1","role":"authenticated"}', true);
+select set_config('request.jwt.claims', json_build_object(
+  'sub', '00000000-0000-4000-8000-0000009880a1', 'role', 'authenticated',
+  'amr', json_build_array(json_build_object(
+    'method', 'password', 'timestamp', extract(epoch from now()) - 30)))::text, true);
 select set_config('th988.a_before', th988_test.counts('00000000-0000-4000-8000-0000009880a1')::text, true);
 set local role authenticated;
 select th988_test.ok(public.begin_account_deletion('DELETE'), 'A: begin_account_deletion sets the barrier');
@@ -553,8 +555,10 @@ reset role;
 
 -- A: delete_my_app_data through the API path.
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-0000009881a1', true);
-select set_config('request.jwt.claims',
-  '{"sub":"00000000-0000-4000-8000-0000009881a1","role":"authenticated"}', true);
+select set_config('request.jwt.claims', json_build_object(
+  'sub', '00000000-0000-4000-8000-0000009881a1', 'role', 'authenticated',
+  'amr', json_build_array(json_build_object(
+    'method', 'password', 'timestamp', extract(epoch from now()) - 30)))::text, true);
 set local role authenticated;
 do $delete$
 begin
