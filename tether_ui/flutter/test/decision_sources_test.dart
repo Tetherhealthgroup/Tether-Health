@@ -790,6 +790,24 @@ void main() {
       expect(find.textContaining('Preview:'), findsNothing);
     });
 
+    testWidgets('a late empty device answer never asks the resolver over the crisis screen (no error toast there)', (tester) async {
+      TDefaults.forRelease();
+      final resolver = TFailClosedResolver();
+      TNav.branchResolver = resolver.resolve;
+      final gate = Completer<TAnswer?>();
+      TDevice.instance = _ScriptedDevice((_) => gate.future);
+      await _open(tester, Routes.recordsConsentDevice);
+      await _tapKey(tester, 'footer[0]');
+      unawaited(Navigator.of(tester.element(find.byType(RecordsConsentDeviceScreen))).pushNamed(Routes.crisis));
+      await _settle(tester);
+      gate.complete(null);
+      await _settle(tester);
+      expect(resolver.recorded, isEmpty);
+      expect(find.text(TFailClosedResolver.message), findsNothing);
+      expect(find.byType(CrisisScreen), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3));
+    });
+
     testWidgets('a late resolver answer does not act over the crisis screen', (tester) async {
       await _hostPage(tester);
       final gate = Completer<String?>();
