@@ -1098,4 +1098,157 @@ void main() {
       await _drain(tester);
     });
   });
+
+  group('a keyboard that leaves little room', () {
+    setUpAll(_loadRoboto);
+    // (size, text scale, keyboard height)
+    final cases = <(Size, double, double)>[
+      (const Size(320, 568), 1, 260),
+      (const Size(320, 568), 2, 260),
+      (const Size(390, 844), 2, 300),
+    ];
+    for (final (size, scale, keyboard) in cases) {
+      testWidgets('crisis · Call 988 on ${size.width.toInt()}×${size.height.toInt()} at ${(scale * 100).round()}% with a ${keyboard.toInt()} pt keyboard: nothing overflows, the number shows whole, Copy and Close are fully tappable', (tester) async {
+        TDefaults.forRelease();
+        await _open(tester, route: Routes.crisis, size: size, textScale: scale);
+        tester.view.viewInsets = FakeViewPadding(bottom: keyboard * 3);
+        addTearDown(tester.view.resetViewInsets);
+        await _settle(tester);
+        await _tapKey(tester, 'body[1]');
+        expect(tester.takeException(), isNull, reason: 'no RenderFlex overflow in the card');
+        _expectFallback(TFallbackKind.call, '988');
+        final above = Offset.zero & Size(size.width, size.height - keyboard);
+        final card = tester.getRect(find.byKey(_fallback));
+        expect(above.contains(card.topLeft) && above.contains(card.bottomRight - const Offset(0.01, 0.01)), isTrue, reason: 'the card $card is on screen above the keyboard');
+        for (final key in [_number, _copy, _close]) {
+          final r = tester.getRect(find.byKey(key));
+          expect(r.height, greaterThan(0), reason: '$key');
+          expect(card.contains(r.topLeft) && card.contains(r.bottomRight - const Offset(0.01, 0.01)), isTrue, reason: '$key at $r is inside the card $card');
+        }
+        for (final key in [_copy, _close]) {
+          _expectFullyHitTestable(tester, find.byKey(key));
+        }
+        expect(tester.getSemantics(find.byKey(_fallback)).label, contains(TCallFallbackCopy.message(TFallbackKind.call, '988')), reason: 'the message is still read');
+        await tester.tap(find.byKey(_close));
+        await _settle(tester);
+        _expectNoFallback();
+        await _drain(tester); // an overflow would be a reported exception
+      });
+    }
+  });
+
+  group('focus after Close', () {
+    setUpAll(_loadRoboto); // as in the other 200% groups
+    // (screen, route, action path, where the button is, kind, value)
+    final cases = <(String, String, String, String, TFallbackKind, String)>[
+      ('re_symptoms', Routes.reSymptoms, 'footer[1]', 'screen footer', TFallbackKind.call, '911'),
+      ('support_message', Routes.supportMessage, 'footer[0]', 'sheet footer', TFallbackKind.sms, 'Jordan'),
+      ('crisis', Routes.crisis, 'body[1]', 'body', TFallbackKind.call, '988'),
+    ];
+    final sizes = <(Size, double)>[(const Size(390, 844), 1), (const Size(320, 568), 2)];
+    final closes = <String, Future<void> Function(WidgetTester)>{
+      'Tab to Close, Enter': (tester) async {
+        expect(await _tabTo(tester, find.byKey(_close), 8), isTrue, reason: 'Tab reaches Close');
+        await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      },
+      'a tap on Close': (tester) => tester.tap(find.byKey(_close)),
+    };
+    for (final (sid, route, path, where, kind, value) in cases) {
+      for (final (size, scale) in sizes) {
+        for (final MapEntry(key: how, value: close) in closes.entries) {
+          testWidgets('$sid · $path ($where) on ${size.width.toInt()}×${size.height.toInt()} at ${(scale * 100).round()}%: Tab to it, Enter, $how: focus is back on it', (tester) async {
+            TDefaults.forRelease();
+            await _open(tester, route: route, size: size, textScale: scale);
+            final button = find.byKey(ValueKey('a:$path'));
+            expect(await _tabTo(tester, button, 60), isTrue, reason: 'Tab reaches $path');
+            await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+            await _settle(tester);
+            _expectFallback(kind, value);
+            final focused = FocusManager.instance.primaryFocus?.context;
+            expect(focused != null && find.descendant(of: find.byElementPredicate((e) => identical(e, focused)), matching: find.byKey(_fallback)).evaluate().isNotEmpty, isTrue, reason: 'the card took focus');
+            if (where.endsWith('footer')) {
+              expect(find.ancestor(of: button, matching: find.byType(SingleChildScrollView)), findsOneWidget, reason: 'the footer moved into the scrolling body');
+            }
+            await close(tester);
+            await _settle(tester);
+            _expectNoFallback();
+            expect(_hasFocus(button), isTrue, reason: 'focus is back on $path');
+            await _drain(tester);
+          });
+        }
+      }
+    }
+  });
+
+  group('a fallback that replaces another', () {
+    testWidgets('support_message: the screen stays laid out above a card the whole time (the inset never drops to 0), and the footer keeps its element', (tester) async {
+      TDefaults.forRelease();
+      await _open(tester, route: Routes.supportMessage);
+      await _tapKey(tester, 'footer[0]');
+      _expectFallback(TFallbackKind.sms, 'Jordan');
+      final footer = find.byKey(const ValueKey('a:footer[0]'));
+      final element = footer.evaluate().single;
+      final insets = <double>[];
+      void record() => insets.add(TCallFallback.inset.value);
+      TCallFallback.inset.addListener(record);
+      addTearDown(() => TCallFallback.inset.removeListener(record));
+      await TNav.call(tester.element(footer), '988');
+      for (var i = 0; i < 8; i++) {
+        await tester.pump(const Duration(milliseconds: 16));
+        expect(TCallFallback.inset.value, greaterThan(0), reason: 'frame $i');
+      }
+      _expectFallback(TFallbackKind.call, '988');
+      expect(insets, isNot(contains(0)), reason: 'insets $insets');
+      expect(identical(footer.evaluate().single, element), isTrue, reason: 'the footer kept its element');
+      TCallFallback.dismiss();
+      expect(TCallFallback.inset.value, 0);
+      await _drain(tester);
+    });
+  });
+}
+
+/// Presses Tab up to [max] times until the primary focus is inside [target].
+Future<bool> _tabTo(WidgetTester tester, Finder target, int max) async {
+  for (var i = 0; i < max; i++) {
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    if (_hasFocus(target)) {
+      await _settle(tester); // let a scroll into view finish
+      return true;
+    }
+  }
+  return false;
+}
+
+/// The primary focus is [target] or inside it.
+bool _hasFocus(Finder target) {
+  final focused = FocusManager.instance.primaryFocus?.context;
+  if (focused == null) return false;
+  final targets = target.evaluate().toSet();
+  var found = false;
+  if (targets.contains(focused)) return true;
+  focused.visitAncestorElements((e) {
+    found = targets.contains(e);
+    return !found;
+  });
+  return found;
+}
+
+/// The topmost hit at the middle of every edge (1 px in), at every corner
+/// (inside the rounded corner) and at the centre of [finder] is [finder] or
+/// inside it, so no part of it is covered or cut off.
+void _expectFullyHitTestable(WidgetTester tester, Finder finder) {
+  final edges = tester.getRect(finder).deflate(1);
+  final corners = tester.getRect(finder).deflate(12);
+  final target = tester.renderObject(finder);
+  for (final p in [edges.topCenter, edges.bottomCenter, edges.centerLeft, edges.centerRight, corners.topLeft, corners.topRight, corners.bottomLeft, corners.bottomRight, edges.center]) {
+    final result = HitTestResult();
+    tester.binding.hitTestInView(result, p, tester.view.viewId);
+    final first = result.path.map((e) => e.target).whereType<RenderObject>().firstOrNull; // a TextSpan is not a RenderObject
+    var inside = false;
+    for (RenderObject? o = first; o != null && !inside; o = o.parent) {
+      inside = identical(o, target);
+    }
+    expect(inside, isTrue, reason: '$finder is hit at $p (topmost: $first)');
+  }
 }
