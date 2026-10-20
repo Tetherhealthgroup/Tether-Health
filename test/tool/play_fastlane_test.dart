@@ -118,6 +118,27 @@ const String pinnedBeforeAll = r'''
     end
     ENV["FASTLANE_SKIP_ALL_LANE_SUMMARIES"] = "1"''';
 
+/// Every non-blank line of `platform :android do ... end`, in order, so no
+/// callback (error, after_all, before_each, ...) or other line can be added
+/// to the block without changing this list.
+final List<String> pinnedPlatformBlock = [
+  'platform :android do',
+  '  before_all do',
+  ...pinnedBeforeAll.split('\n'),
+  '  end',
+  '  desc "Upload an existing, verified AAB to the internal track as a draft"',
+  '  lane :internal do |options|',
+  '    aab, key = checked_inputs(options)',
+  '    play_upload(aab, key, validate_only: false)',
+  '  end',
+  '  desc "Check an existing, verified AAB with Play without creating a release"',
+  '  lane :validate do |options|',
+  '    aab, key = checked_inputs(options)',
+  '    play_upload(aab, key, validate_only: true)',
+  '  end',
+  'end',
+];
+
 const String pinnedCheckedInputs = r'''
   unless (options.keys - LANE_OPTIONS).empty?
     UI.user_error!("Unknown lane option (not shown). Only aab: and min_version_code: are accepted.")
@@ -290,6 +311,21 @@ void main() {
     final end = lines.indexOf('  end', start + 1);
     expect(lines.sublist(start + 1, end).join('\n'), pinnedBeforeAll);
     expect(start, lessThan(lines.indexWhere((l) => l.startsWith('  lane :'))));
+  });
+
+  test('the whole platform block is pinned, line by line', () {
+    // From `platform :android do` to its `end`, the first unindented `end`
+    // after it (everything inside the block is indented). Comment and blank
+    // lines are dropped; every other line must match, in order.
+    final lines = fastfile.split('\n');
+    final start = lines.indexOf('platform :android do');
+    expect(start, isNot(-1), reason: 'platform block not found');
+    final end = lines.indexOf('end', start + 1);
+    expect(end, isNot(-1), reason: 'end of the platform block not found');
+    expect(
+      lines.sublist(start, end + 1).where((l) => l.trim().isNotEmpty).toList(),
+      pinnedPlatformBlock,
+    );
   });
 
   test(
