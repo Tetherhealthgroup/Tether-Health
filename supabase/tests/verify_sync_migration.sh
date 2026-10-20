@@ -293,7 +293,7 @@ select th944_test.ok(
     'public.deletion_barrier_open()', 'public.delete_my_app_data(text)',
     'public.begin_account_deletion(text)', 'public.sync_writer_session()',
     'public.sync_area_match_enrolment()', 'public.sync_lapse_append_only()']::regprocedure[]) =
-  'begin_account_deletion:authenticated:EXECUTE,delete_my_app_data:authenticated:EXECUTE,'
+  'begin_account_deletion:authenticated:EXECUTE,'
   'deletion_barrier_open:authenticated:EXECUTE,has_consent:authenticated:EXECUTE,'
   'sync_writer_session:authenticated:EXECUTE',
   'functions: execute only for authenticated where intended; never anon, thsync or PUBLIC');
@@ -491,7 +491,7 @@ select th944_test.refused('update public.sync_lapse set severity = ''changed''',
 select th944_test.refused('delete from public.sync_lapse',
   array['42501'], 'permission denied%', 'A sync: cannot delete a lapse');
 select th944_test.refused('select public.delete_my_app_data(''DELETE'')',
-  array['TH009'], '%through the API%', 'A sync: the sync service cannot delete the account');
+  array['42501'], 'permission denied for function delete_my_app_data', 'A sync: the sync service cannot delete the account');
 
 -- Revoking one programme's core consent stops its writes, and only its writes.
 select th944_test.become('authenticator', '00000000-0000-4000-8000-000000944001');
@@ -678,11 +678,12 @@ select th944_test.refused(
 select th944_test.refused('update public.sync_account set change_seq = 10',
   array['42501'], '%row-level security%', 'A sync: no cursor bump once deletion has started');
 
-select th944_test.become('authenticator', '00000000-0000-4000-8000-000000944001');
+-- Owner context, as delete_my_account runs it: the superuser with A's claims.
+select th944_test.become(current_setting('th944.superuser'), '00000000-0000-4000-8000-000000944001');
 select set_config('th944.a_receipt', public.delete_my_app_data('DELETE')::text, true);
 select th944_test.ok(
   current_setting('th944.a_receipt')::jsonb = current_setting('th944.a_counts')::jsonb,
-  'A API: delete_my_app_data returns counts only, one per deleted table, including all four sync tables');
+  'A owner: delete_my_app_data returns counts only, one per deleted table, including all four sync tables');
 select th944_test.become('thsync', '00000000-0000-4000-8000-000000944001');
 select th944_test.refused(
   'insert into public.sync_account (user_id) values (''00000000-0000-4000-8000-000000944001'')',
@@ -928,7 +929,7 @@ require '^revoke all on function public\.delete_my_app_data\(text\)$' 'deletion 
 require '^grant execute on function public\.delete_my_app_data\(text\) to authenticated;$' 'deletion granted to authenticated'
 
 # Whatever migration defines delete_my_app_data last must still cover sync_*.
-latest_delete=$(grep -El 'function public\.delete_my_app_data\(' "$migrations_dir"/*.sql | LC_ALL=C sort | tail -n 1)
+latest_delete=$(grep -El '^[[:space:]]*create (or replace )?function +("?public"?\.)?"?delete_my_app_data"? *\(' "$migrations_dir"/*.sql | LC_ALL=C sort | tail -n 1)
 latest_body=$(sed -n '/function public\.delete_my_app_data(p_confirmation text)/,/^\$\$;/p' "$latest_delete")
 check_delete_body "$latest_body" "$latest_delete (latest delete_my_app_data)"
 

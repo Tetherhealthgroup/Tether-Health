@@ -259,17 +259,18 @@ select th972_test.ok(
 
 -- Every function authenticated can execute in public is listed here, so a new
 -- one has to be reviewed for the sync-session refusal before this passes.
--- Writers that refuse a sync session: begin_account_deletion and
--- delete_my_app_data (TH009); save_program_data, swap_focus,
--- supersede_core_consent and delete_my_account (TH010).
--- current_consent_documents only reads.
+-- Writers that refuse a sync session: begin_account_deletion (TH009);
+-- save_program_data, swap_focus, supersede_core_consent and delete_my_account
+-- (TH010). current_consent_documents only reads. delete_my_app_data is not
+-- listed: only its owner may execute it; its TH009 guard stays and is
+-- checked statically below.
 select th972_test.ok(
   (select string_agg(p.oid::regprocedure::text, ',' order by p.oid::regprocedure::text)
    from pg_catalog.pg_proc as p
    where p.pronamespace = 'public'::regnamespace
      and has_function_privilege('authenticated', p.oid, 'EXECUTE')) =
   'avatar_write_allowed(text),begin_account_deletion(text),current_consent_documents(),'
-  'delete_my_account(text),delete_my_app_data(text),'
+  'delete_my_account(text),'
   'deletion_barrier_open(),has_consent(uuid,text,text),is_unique_text_array(text[]),'
   'is_valid_support_people(jsonb),save_program_data(text,jsonb,integer),'
   'supersede_core_consent(uuid,text,text),swap_focus(uuid,uuid),sync_writer_session()',
@@ -480,8 +481,8 @@ select th972_test.refused('select public.begin_account_deletion(''DELETE'')',
   array['TH009'], 'Account deletion goes through the API',
   'B sync: begin_account_deletion refuses the sync session', 'deletion_via_api_only');
 select th972_test.refused('select public.delete_my_app_data(''DELETE'')',
-  array['TH009'], 'Account deletion goes through the API',
-  'B sync: delete_my_app_data refuses the sync session', 'deletion_via_api_only');
+  array['42501'], 'permission denied for function delete_my_app_data',
+  'B sync: delete_my_app_data refuses the sync session');
 select th972_test.refused(format(
   'insert into public.sync_area (user_id, enrolment_id, programme_code, revision, change_seq)
    values (''00000000-0000-4000-8000-000000972002'', %L, ''st'', 1, 3)',
@@ -673,13 +674,14 @@ select th972_test.ok(public.begin_account_deletion('DELETE'),
   'B API: begin_account_deletion still sets the barrier');
 select th972_test.become('thsync', '00000000-0000-4000-8000-000000972002');
 select th972_test.refused('select public.delete_my_app_data(''DELETE'')',
-  array['TH009'], 'Account deletion goes through the API',
-  'B sync: delete_my_app_data still refuses the sync session after the barrier', 'deletion_via_api_only');
-select th972_test.become('authenticator', '00000000-0000-4000-8000-000000972002');
+  array['42501'], 'permission denied for function delete_my_app_data',
+  'B sync: delete_my_app_data still refuses the sync session after the barrier');
+-- Owner context, as delete_my_account runs it: the superuser with B's claims.
+select th972_test.become(current_setting('th972.superuser'), '00000000-0000-4000-8000-000000972002');
 select set_config('th972.b_receipt', public.delete_my_app_data('DELETE')::text, true);
 select th972_test.ok(
   current_setting('th972.b_receipt')::jsonb = current_setting('th972.b_counts')::jsonb,
-  'B API: delete_my_app_data still deletes everything and returns the counts');
+  'B owner: delete_my_app_data still deletes everything and returns the counts');
 select th972_test.become(current_setting('th972.superuser'), '');
 select th972_test.ok(
   (select count(*) from public.profiles

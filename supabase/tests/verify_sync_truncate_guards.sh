@@ -437,8 +437,9 @@ select set_config('request.jwt.claims', (current_setting('request.jwt.claims')::
     'method', 'password', 'timestamp', extract(epoch from now()) - 30))))::text, true);
 set local role authenticated;
 select th989_test.ok(public.begin_account_deletion('DELETE'), 'A: begin_account_deletion sets the barrier');
-select set_config('th989.a_receipt', public.delete_my_app_data('DELETE')::text, true);
+-- Owner context, as delete_my_account runs it: the superuser with A's claims.
 reset role;
+select set_config('th989.a_receipt', public.delete_my_app_data('DELETE')::text, true);
 select set_config('request.jwt.claim.sub', '', true);
 select set_config('request.jwt.claims', '', true);
 select th989_test.ok(
