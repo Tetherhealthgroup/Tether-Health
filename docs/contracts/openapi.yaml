@@ -6,7 +6,9 @@ info:
     Development contract for authenticated profiles and bounded program data.
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
-    Changed in 1.6.0: once account deletion has started, a consent grant
+    Changed in 1.6.1 (description only): account deletion runs with the
+    member's own token, and `DELETE /v1/account/data` answers 401 when the
+    sign-in is older than the deletion window. Changed in 1.6.0: once account deletion has started, a consent grant
     that reaches the database's deletion check is refused with
     `account_deletion_in_progress` (a first grant or optional consent used
     to get `consent_not_permitted`). The API's own earlier checks still
@@ -178,8 +180,10 @@ paths:
         the caller's own token: avatar objects are removed through Storage, then one
         database call deletes the data and the identity together. Safe to retry; a
         retry after a completed deletion returns a receipt with zero counts. The
-        database also requires a sign-in at most 600 seconds old, so a retry made
-        later than that gets 401. If the earlier attempt completed, the account no
+        API refuses deletion once the sign-in is older than
+        RECENT_AUTH_MAX_AGE_SECONDS minus 30 seconds (570 seconds at the default
+        of 600), so a retry made later than that gets 401. If the earlier attempt
+        completed, the account no
         longer exists and a new sign-in is not possible; if it did not complete,
         sign in again and retry.
       security: [{supabaseJwt: []}]
