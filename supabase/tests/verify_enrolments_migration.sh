@@ -657,8 +657,10 @@ select th913_test.ok(
   'A has 3 enrolments, 10 programme consents (8 revoked), 7 account consents before deletion');
 
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000913001', true);
-select set_config('request.jwt.claims',
-  '{"sub":"00000000-0000-4000-8000-000000913001","role":"authenticated"}', true);
+select set_config('request.jwt.claims', json_build_object(
+  'sub', '00000000-0000-4000-8000-000000913001', 'role', 'authenticated',
+  'amr', json_build_array(json_build_object(
+    'method', 'password', 'timestamp', extract(epoch from now()) - 30)))::text, true);
 set local role authenticated;
 
 select th913_test.refused('select public.delete_my_app_data(''DELETE'')',

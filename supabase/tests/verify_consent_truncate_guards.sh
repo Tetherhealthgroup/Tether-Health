@@ -287,6 +287,10 @@ select th987_test.ok(
   'A: deleting an enrolment still removes its consents (row delete cascade)');
 
 -- delete_my_app_data, end to end.
+-- A recent sign-in, which begin_account_deletion requires.
+select set_config('request.jwt.claims', (current_setting('request.jwt.claims')::jsonb
+  || jsonb_build_object('amr', jsonb_build_array(jsonb_build_object(
+    'method', 'password', 'timestamp', extract(epoch from now()) - 30))))::text, true);
 set local role authenticated;
 select th987_test.ok(public.begin_account_deletion('DELETE'), 'A: begin_account_deletion sets the barrier');
 select set_config('th987.a_receipt', public.delete_my_app_data('DELETE')::text, true);

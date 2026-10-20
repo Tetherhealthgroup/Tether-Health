@@ -551,8 +551,9 @@ Migration sources of truth:
 `supabase/migrations/202610030001_avatar_deletion_barrier.sql`,
 `supabase/migrations/202610170002_enrolments.sql`,
 `supabase/migrations/202610180001_sync_tables.sql`,
-`supabase/migrations/202610180002_service_session_guard.sql` and
-`supabase/migrations/202610180008_delete_my_account.sql`.
+`supabase/migrations/202610180002_service_session_guard.sql`,
+`supabase/migrations/202610180008_delete_my_account.sql` and
+`supabase/migrations/202610180009_begin_deletion_recent_sign_in.sql`.
 
 `delete_my_app_data` deletes the caller's sync lapses, answers, areas and sync
 account, programme consents, enrolments (and everything that cascades from
@@ -563,6 +564,15 @@ only, one for each table it deletes from: `profiles`, `quit_plans`,
 Consent history is deleted with the account; nothing records what was deleted.
 It and `begin_account_deletion` refuse to run in a sync service (`thsync`)
 session (`TH009`).
+
+`begin_account_deletion('DELETE')` sets the caller's
+`profiles.account_deletion_started_at` (a repeat keeps the first time). It
+refuses, in this order: no caller (`42501`); a sync service session (`TH009`);
+a confirmation other than `DELETE` (`23514`); and a sign-in that is not recent
+(`TH017`), by the same rule as `delete_my_account` below. A refusal sets
+nothing. So for a member with a profile, `delete_my_app_data` cannot run
+until `begin_account_deletion` has accepted a recent sign-in.
+`supabase/tests/verify_begin_deletion_recent_sign_in.sh` checks this.
 
 The NestJS API first invokes `begin_account_deletion` with exact confirmation.
 That function updates the caller's profile row, waiting for any upload holding a
@@ -646,7 +656,7 @@ function": every later function that writes and refuses a sync session raises
 | `TH014` | `consent_version_unchanged` | `programme_consents_check_supersede` (update trigger on `programme_consents`, so also `supersede_core_consent`): the replacement core version is not later than the one it replaces, or is the same version and locale | The core consent is already on this version or a later one |
 | `TH015` | `consent_document_immutable` | `consent_documents_guard` (insert, update, delete and truncate trigger on `consent_documents`): purpose, version, locale or body changed; approved_ref changed after it was set; cascades_optional or effective_from changed on a referenced document; a writer that does not bypass row-level security; a truncate, whatever the role. `consent_documents_check_effective_from` (after each insert or update statement on `consent_documents`): locales of a version with different effective_from | Consent documents are immutable, publish a new version; A consent document version takes effect at the same time in every locale; Consent documents are changed only by a role that bypasses row-level security |
 | `TH016` | `avatar_objects_remain` | `delete_my_account`: an object is still stored in the `avatars` bucket under the caller's folder | Avatar objects must be removed before the account is deleted |
-| `TH017` | `recent_authentication_required` | `delete_my_account`: the token has no `amr` sign-in timestamp within the last 600 seconds (or one more than 60 seconds in the future) | Recent authentication is required |
+| `TH017` | `recent_authentication_required` | `begin_account_deletion` and `delete_my_account`: the token has no `amr` sign-in timestamp within the last 600 seconds (or one more than 60 seconds in the future) | Recent authentication is required |
 | `TH018` | `auth_identity_not_deleted` | `delete_my_account`: the caller's `auth.users` row still exists after its delete | The account identity was not deleted |
 | `TH019` | `sync_rows_delete_only` | `sync_truncate_guard` (truncate trigger on `sync_account`, `sync_area`, `sync_answer` and `sync_lapse`: a truncate, whatever the role, including a cascade into them when no other table's guard fires first) | Sync rows are removed only with their enrolment or account |
 | `TH020` | `rls_bypass_required` | `delete_my_account`: the function owner is neither a superuser nor bypasses row-level security | Account deletion requires a function owner that bypasses row-level security |

@@ -1126,6 +1126,10 @@ select th972b_test.ok(
 
 -- Deletion keeps working with supersession history -------------------------------------
 select th972b_test.become('authenticator', '00000000-0000-4000-8000-0000009720b1');
+-- A recent sign-in, which begin_account_deletion requires.
+select set_config('request.jwt.claims', (current_setting('request.jwt.claims')::jsonb
+  || jsonb_build_object('amr', jsonb_build_array(jsonb_build_object(
+    'method', 'password', 'timestamp', extract(epoch from now()) - 30))))::text, true);
 select th972b_test.ok(public.begin_account_deletion('DELETE'), 'A: deletion barrier set');
 select th972b_test.refused(format(
   'select * from public.supersede_core_consent(%L, ''v3-cascade'', ''en'')',
