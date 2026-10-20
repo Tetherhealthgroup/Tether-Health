@@ -8,7 +8,7 @@ Everything here is generated from one spec, so the design, the clickable prototy
 | Check | Flutter | Prototype |
 |---|---|---|
 | End-to-end scenarios: setup and functions of every program, sign-in, health records | 75 / 75 | 75 / 75 |
-| Button-flow sweep: every element × every outcome lands where the spec says | 1036 / 1036 | 1036 / 1036 |
+| Button-flow sweep: every element × every outcome lands where the spec says | 1037 / 1037 | 1036 / 1036 |
 | Render tests: every screen at 100% and 130% text, no overflow | 456 / 456 | — |
 | Static analysis | `flutter analyze`: no issues | JS errors: 0 |
 | Spec validator | 0 loose ends: every target exists, every screen reachable, no dead ends | |
