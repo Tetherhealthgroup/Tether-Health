@@ -1139,6 +1139,8 @@ select th972b_test.refused(format(
 select th972b_test.affects(format(
   'delete from public.enrolments where id = %L', current_setting('th972b.a_bf')),
   1, 'A: delete-now on an enrolment with a superseded core row');
+-- Owner context, as delete_my_account runs it: the superuser with A's claims.
+select th972b_test.become(current_setting('th972b.superuser'), '00000000-0000-4000-8000-0000009720b1');
 select set_config('th972b.a_receipt', public.delete_my_app_data('DELETE')::text, true);
 select th972b_test.ok(
   (current_setting('th972b.a_receipt')::jsonb ->> 'enrolments')::int = 4

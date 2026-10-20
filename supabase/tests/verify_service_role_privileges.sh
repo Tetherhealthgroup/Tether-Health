@@ -581,7 +581,9 @@ select th988_test.ok(
       th988_test.counts('00000000-0000-4000-8000-0000009880a1'),
   'setup: synthetic A and B each hold a row in every member table');
 
--- A: delete_my_app_data through the API path (authenticated, A's token).
+-- A: begin_account_deletion as authenticated with A's token, then
+-- delete_my_app_data in owner context (the superuser with A's claims), as
+-- delete_my_account runs it.
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-0000009880a1', true);
 select set_config('request.jwt.claims', json_build_object(
   'sub', '00000000-0000-4000-8000-0000009880a1', 'role', 'authenticated',
@@ -590,8 +592,8 @@ select set_config('request.jwt.claims', json_build_object(
 select set_config('th988.a_before', th988_test.counts('00000000-0000-4000-8000-0000009880a1')::text, true);
 set local role authenticated;
 select th988_test.ok(public.begin_account_deletion('DELETE'), 'A: begin_account_deletion sets the barrier');
-select set_config('th988.a_receipt', public.delete_my_app_data('DELETE')::text, true);
 reset role;
+select set_config('th988.a_receipt', public.delete_my_app_data('DELETE')::text, true);
 select set_config('request.jwt.claim.sub', '', true);
 select set_config('request.jwt.claims', '', true);
 select th988_test.ok(
@@ -680,7 +682,8 @@ end;
 $plant$;
 reset role;
 
--- A: delete_my_app_data through the API path.
+-- A: begin_account_deletion as authenticated, then delete_my_app_data in
+-- owner context (the superuser with A's claims), as delete_my_account runs it.
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-0000009881a1', true);
 select set_config('request.jwt.claims', json_build_object(
   'sub', '00000000-0000-4000-8000-0000009881a1', 'role', 'authenticated',
@@ -690,6 +693,7 @@ set local role authenticated;
 do $delete$
 begin
   perform public.begin_account_deletion('DELETE');
+  reset role;
   begin
     perform public.delete_my_app_data('DELETE');
     perform pg_catalog.set_config('th988c.delete_my_app_data', 'completed', true);

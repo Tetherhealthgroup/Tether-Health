@@ -661,10 +661,12 @@ select set_config('request.jwt.claims', json_build_object(
   'sub', '00000000-0000-4000-8000-000000913001', 'role', 'authenticated',
   'amr', json_build_array(json_build_object(
     'method', 'password', 'timestamp', extract(epoch from now()) - 30)))::text, true);
-set local role authenticated;
 
+-- delete_my_app_data runs in owner context, as delete_my_account runs it: the
+-- superuser with A's claims. begin_account_deletion runs as authenticated.
 select th913_test.refused('select public.delete_my_app_data(''DELETE'')',
-  '23514', '%not started%', 'A: deletion refused before the barrier is set');
+  '23514', '%not started%', 'A owner: deletion refused before the barrier is set');
+set local role authenticated;
 select th913_test.ok(public.begin_account_deletion('DELETE'), 'A: deletion barrier set');
 select th913_test.refused(
   'insert into public.enrolments (user_id, programme_code)
@@ -682,10 +684,12 @@ select th913_test.refused(format(
   current_setting('th913.a_bf')),
   '42501', '%row-level security%', 'A: no new programme data once deletion has started');
 
+reset role;
 select set_config('th913.a_receipt', public.delete_my_app_data('DELETE')::text, true);
+set local role authenticated;
 select th913_test.ok(
   current_setting('th913.a_receipt')::jsonb = current_setting('th913.a_counts')::jsonb,
-  'A: delete_my_app_data returns counts only, matching the rows removed');
+  'A owner: delete_my_app_data returns counts only, matching the rows removed');
 select th913_test.refused(
   'insert into public.enrolments (user_id, programme_code)
    values (''00000000-0000-4000-8000-000000913001'', ''nu'')',

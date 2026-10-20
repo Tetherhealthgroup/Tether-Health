@@ -565,8 +565,9 @@ Migration sources of truth:
 `supabase/migrations/202610170002_enrolments.sql`,
 `supabase/migrations/202610180001_sync_tables.sql`,
 `supabase/migrations/202610180002_service_session_guard.sql`,
-`supabase/migrations/202610180008_delete_my_account.sql` and
-`supabase/migrations/202610180009_begin_deletion_recent_sign_in.sql`.
+`supabase/migrations/202610180008_delete_my_account.sql`,
+`supabase/migrations/202610180009_begin_deletion_recent_sign_in.sql` and
+`supabase/migrations/202610180010_app_data_deletion_owner_only.sql`.
 
 `delete_my_app_data` deletes the caller's sync lapses, answers, areas and sync
 account, programme consents, enrolments (and everything that cascades from
@@ -576,7 +577,9 @@ only, one for each table it deletes from: `profiles`, `quit_plans`,
 `sync_answers`, `sync_lapses`, `sync_areas` and `sync_accounts`.
 Consent history is deleted with the account; nothing records what was deleted.
 It and `begin_account_deletion` refuse to run in a sync service (`thsync`)
-session (`TH009`).
+session (`TH009`). Only its owner may execute it; members reach it only
+through `delete_my_account` below.
+`supabase/tests/verify_app_data_deletion_owner_only.sh` checks this.
 
 `begin_account_deletion('DELETE')` sets the caller's
 `profiles.account_deletion_started_at` (a repeat keeps the first time). It
@@ -595,7 +598,7 @@ pagination to enumerate every object under the exact `<verified-subject>/`
 prefix and removes those objects in bounded batches through the Storage API. It
 never accepts a user ID in the request body. Only after Storage succeeds does it
 call `delete_my_account`, which deletes the database rows and the Auth identity
-together; the API no longer calls `delete_my_app_data` directly. The API maps
+together; members cannot call `delete_my_app_data` directly. The API maps
 `TH017` from either function to 401 and every other error to 502, and logs only
 the request ID, a status and the error code. Failed attempts are safe to
 retry: the write barrier remains set until the profile is removed, cleanup is
@@ -620,8 +623,10 @@ raises `TH018` if that row still exists. It returns the same counts as
 deletion returns zero counts. The avatar check and the identity re-check read
 the same tables as the deletes, as the function owner, so they rely on an owner
 that bypasses row-level security; the function refuses (`TH020`) otherwise.
-The re-check catches a delete that removes no row, for example because of a
-trigger, a rule or a concurrent delete.
+The re-check catches a delete that leaves the row in place, for example
+because of a trigger or a rule. Two deletions of the same account at the same
+time are not an error: the second deletes no rows, finds no identity left and
+returns zero counts, as a repeat does.
 `supabase/tests/verify_account_identity_deletion.sh` checks this.
 
 The Flutter client persists an encrypted deletion-intent tombstone before it

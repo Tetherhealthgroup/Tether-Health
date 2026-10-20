@@ -330,7 +330,9 @@ select th988b_test.refused('select public.delete_my_account('''')',
   '23514', 'Explicit confirmation required',
   'A API: the confirmation check comes before the sign-in check');
 
--- delete_my_app_data's counts for A, taken in a block that is rolled back.
+-- delete_my_app_data's counts for A, taken in a block that is rolled back:
+-- begin_account_deletion as authenticated, then delete_my_app_data in owner
+-- context (the superuser with A's claims), as delete_my_account runs it.
 select th988b_test.act_as('authenticator',
   th988b_test.claims('00000000-0000-4000-8000-00000988b0a1', th988b_test.amr_at(30)));
 do $reference$
@@ -339,6 +341,8 @@ declare
 begin
   begin
     perform public.begin_account_deletion('DELETE');
+    perform th988b_test.act_as(pg_catalog.current_setting('th988b.superuser'),
+      pg_catalog.current_setting('request.jwt.claims'));
     receipt := public.delete_my_app_data('DELETE');
     raise exception 'th988b reference rollback';
   exception when raise_exception then
@@ -657,13 +661,18 @@ set constraints public.enrolments_focus_cap immediate;
 set constraints public.enrolments_focus_cap deferred;
 select th988b_test.act_as('authenticator',
   th988b_test.claims('00000000-0000-4000-8000-00000988b0d1', th988b_test.amr_at(30)));
+-- begin_account_deletion as authenticated, delete_my_app_data in owner
+-- context (the superuser with M's claims), then back to M's API session.
 do $m_reference$
 declare
   receipt jsonb;
+  member_claims text := pg_catalog.current_setting('request.jwt.claims');
 begin
   begin
     perform public.begin_account_deletion('DELETE');
+    perform th988b_test.act_as(pg_catalog.current_setting('th988b.superuser'), member_claims);
     receipt := public.delete_my_app_data('DELETE');
+    perform th988b_test.act_as('authenticator', member_claims);
     raise exception 'th988b reference rollback';
   exception when raise_exception then
     if sqlerrm <> 'th988b reference rollback' then
