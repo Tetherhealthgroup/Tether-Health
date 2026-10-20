@@ -1,0 +1,5 @@
+# Owner-run Google Play upload tooling (docs/PLAY_RELEASE.md). Development
+# tooling only: nothing here is part of the app or its build.
+source "https://rubygems.org"
+
+gem "fastlane", "2.241.1"

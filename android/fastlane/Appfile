@@ -1,0 +1,4 @@
+# Play app for the owner-run upload lanes in Fastfile. The service-account key
+# is not configured here: the lanes pass it explicitly from
+# TETHER_PLAY_JSON_KEY, so fastlane never prints it as an Appfile value.
+package_name("com.TetherHealthLLC.tetherhealth")

@@ -215,3 +215,125 @@ firebase appdistribution:distribute build/app/outputs/bundle/release/app-release
 Distributing an AAB requires the Firebase project to be linked to Google Play.
 If it is not, distribute an APK build instead. This command has not been run
 by any agent.
+
+## Uploading with fastlane (owner)
+
+`android/fastlane/Fastfile` sends an AAB that `tool/build_play_release.sh`
+already built to the Internal testing track as a draft. The owner runs it on
+their own Mac with their own Play service-account key. CI never uploads.
+
+### Prerequisites (once)
+
+- Ruby 3.3 or newer (some gems in `android/Gemfile.lock` need it), for example
+  through rbenv: `rbenv install 3.3.9 && rbenv shell 3.3.9`.
+- Install the pinned gems into `android/vendor/bundle` (gitignored), with the
+  lockfile frozen. `android/Gemfile.lock` pins every gem with its checksum,
+  and Bundler checks them on install. All three `bundle` commands are
+  required:
+
+  ```sh
+  cd android
+  bundle config set --local path vendor/bundle
+  bundle config set --local frozen true
+  bundle install
+  ```
+
+- The tools that `tool/build_play_release.sh --verify-aab` needs: `keytool`,
+  and `bundletool` or `aapt2` on `PATH` (see section 4).
+- Turn off fastlane's update check in the shell you upload from. It runs
+  before the Fastfile is read, so the Fastfile cannot turn it off:
+
+  ```sh
+  export FASTLANE_SKIP_UPDATE_CHECK=1
+  ```
+
+### Play service account (once)
+
+1. In Google Cloud, in a project you control, enable the Google Play Android
+   Developer API and create a service account. Give it no IAM roles in the
+   project. Create a JSON key for it.
+2. In Play Console, Users and permissions, invite the service account's email.
+   Under App permissions add only `com.TetherHealthLLC.tetherhealth`, and grant
+   only "Release apps to testing tracks". Grant no account permissions, no
+   production release, no store presence and no admin rights.
+3. Keep the JSON outside the repository and readable only by you:
+
+   ```sh
+   mkdir -p -m 700 ~/secure/tether-health
+   mv ~/Downloads/<downloaded key>.json ~/secure/tether-health/play-service-account.json
+   chmod 600 ~/secure/tether-health/play-service-account.json
+   export TETHER_PLAY_JSON_KEY=$HOME/secure/tether-health/play-service-account.json
+   ```
+
+The lanes read the key path only from `TETHER_PLAY_JSON_KEY` and pass it to
+the upload explicitly; the Appfile does not name a key. They refuse to run if
+the variable is unset, does not point to a readable service-account JSON key,
+or resolves inside the repository. Common key file names (`play-key*.json`,
+`*-play-store-key*.json`, `*service-account*.json`, ...) are gitignored as a
+backstop, and a test fails if a tracked file contains service-account or
+private-key content; do not rely on either.
+
+### Each upload
+
+From the repository root, in a shell with both variables set:
+
+```sh
+export TETHER_PLAY_JSON_KEY=$HOME/secure/tether-health/play-service-account.json
+export FASTLANE_SKIP_UPDATE_CHECK=1
+bash tool/build_play_release.sh --dart-define-from-file=$HOME/secure/tether-health/release.json
+cd android
+bundle exec fastlane android validate aab:build/app/outputs/bundle/release/app-release.aab
+bundle exec fastlane android internal aab:build/app/outputs/bundle/release/app-release.aab
+```
+
+A relative `aab:` path is read from the repository root. Both lanes first run
+`bash tool/build_play_release.sh --verify-aab=<aab>` (signing certificate,
+package and versionCode) and stop if it fails. Pass `min_version_code:N` to
+either lane to forward `--min-version-code N`.
+
+- `validate` uploads the whole AAB into a Play edit, asks Play to validate it,
+  and never commits the edit, so no release is created.
+- `internal` uploads the AAB and commits a draft release on the Internal
+  testing track. It replaces any existing draft on that track; check the track
+  in Play Console first.
+
+The release lands as a **draft** in Internal testing. Review it in Play
+Console (Test and release > Testing > Internal testing), then roll it out
+there. Promotion to any other track also stays in Play Console.
+
+After each upload, raise the `min_version_code` default in
+`tool/build_play_release.sh` to the uploaded versionCode plus one, in the same
+commit as the next `pubspec.yaml` bump (section 4), and record the uploaded
+versionCode (section 5).
+
+### What leaves the machine
+
+- During `internal` and `validate`: calls to the Google Play Developer API
+  (Google's OAuth token endpoint and the Android Publisher API), carrying the
+  AAB.
+- fastlane's update check to rubygems.org and, when a newer fastlane exists,
+  its changelog from api.github.com. Neither happens when
+  `FASTLANE_SKIP_UPDATE_CHECK=1` is set.
+- `bundle install` fetches the pinned gems from rubygems.org.
+
+fastlane's other outbound calls are turned off at the top of the Fastfile,
+before any action runs: usage metrics (`FASTLANE_OPT_OUT_USAGE`) and the
+GitHub issue search it runs on errors (`FASTLANE_HIDE_GITHUB_ISSUES`).
+
+### What the lanes never do
+
+- Build, sign or change a version number.
+- Upload or change the store listing, metadata, images, screenshots or
+  changelogs, or upload APKs.
+- Use any track other than Internal testing, any status other than draft, or
+  promote or roll out a release. These are fixed in the Fastfile, not lane
+  options.
+- Run under CI: they stop when `CI` or `GITHUB_ACTIONS` is set. They also stop
+  when any `SUPPLY_*` variable is set (those would change the upload
+  settings), and when an env file was loaded with `--env` (it could
+  override these checks).
+- Support verbose-style flags (`--verbose`, `--troubleshoot`,
+  `--capture_output`): verbose output can expose credential details. Do not
+  use them with these lanes.
+- Print the key path or its contents (fastlane's settings table, which
+  would show the path, is turned off).
