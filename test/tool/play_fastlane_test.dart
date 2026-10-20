@@ -118,6 +118,17 @@ const String pinnedBeforeAll = r'''
     end
     ENV["FASTLANE_SKIP_ALL_LANE_SUMMARIES"] = "1"''';
 
+/// The lines before the platform block, in order (blank lines removed).
+const List<String> pinnedTopLevel = [
+  'ENV["FASTLANE_OPT_OUT_USAGE"] = "YES"',
+  'ENV["FASTLANE_HIDE_GITHUB_ISSUES"] = "1"',
+  'require "json"',
+  'opt_out_usage',
+  'default_platform(:android)',
+  'REPO_ROOT = File.realpath(File.join(Dir.pwd, "..", ".."))',
+  'LANE_OPTIONS = [:aab, :min_version_code].freeze',
+];
+
 /// Every non-blank line of `platform :android do ... end`, in order, so no
 /// callback (error, after_all, before_each, ...) or other line can be added
 /// to the block without changing this list.
@@ -198,6 +209,24 @@ const String pinnedPlayUpload = r'''
     validate_only: validate_only
   )''';
 
+/// Every non-blank line of the whole Fastfile, in order, built from the pins
+/// above. fastlane also runs callbacks such as `error do` or `after_all do`
+/// written outside the platform block, so nothing may be added at the top
+/// level either.
+final List<String> pinnedFastfile = [
+  ...pinnedTopLevel,
+  ...pinnedPlatformBlock,
+  'def checked_inputs(options)',
+  ...pinnedCheckedInputs.split('\n'),
+  'end',
+  'def inside_repo?(path)',
+  ...pinnedInsideRepo.split('\n'),
+  'end',
+  'def play_upload(aab, key, validate_only:)',
+  ...pinnedPlayUpload.split('\n'),
+  'end',
+].where((l) => l.trim().isNotEmpty).toList();
+
 void main() {
   late String fastfile;
   late String appfile;
@@ -261,15 +290,7 @@ void main() {
     expect(platformAt, isNot(-1), reason: 'platform block not found');
     expect(
       lines.sublist(0, platformAt).where((l) => l.trim().isNotEmpty).toList(),
-      [
-        'ENV["FASTLANE_OPT_OUT_USAGE"] = "YES"',
-        'ENV["FASTLANE_HIDE_GITHUB_ISSUES"] = "1"',
-        'require "json"',
-        'opt_out_usage',
-        'default_platform(:android)',
-        'REPO_ROOT = File.realpath(File.join(Dir.pwd, "..", ".."))',
-        'LANE_OPTIONS = [:aab, :min_version_code].freeze',
-      ],
+      pinnedTopLevel,
     );
   });
 
@@ -325,6 +346,15 @@ void main() {
     expect(
       lines.sublist(start, end + 1).where((l) => l.trim().isNotEmpty).toList(),
       pinnedPlatformBlock,
+    );
+  });
+
+  test('the whole Fastfile is pinned, line by line', () {
+    // Comment and blank lines are dropped; every other line must match, in
+    // order, so no line or block can be added anywhere in the file.
+    expect(
+      fastfile.split('\n').where((l) => l.trim().isNotEmpty).toList(),
+      pinnedFastfile,
     );
   });
 
