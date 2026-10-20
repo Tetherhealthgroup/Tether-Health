@@ -8,13 +8,19 @@ begin;
 --   session (TH010); a confirmation other than 'DELETE' (23514); a sign-in
 --   older than 600 seconds, or more than 60 seconds in the future, by the
 --   newest timestamp in the token's amr claim, or no such timestamp (TH017);
---   any avatar object still stored under the caller's folder (TH016). Avatar
---   objects are removed through the Storage API before this call; this
---   function never deletes storage rows.
+--   a function owner that is neither a superuser nor bypasses row-level
+--   security (TH020); any avatar object still stored under the caller's
+--   folder (TH016). Avatar objects are removed through the Storage API before
+--   this call; this function never deletes storage rows.
 -- * It then calls delete_my_app_data, unchanged, which still requires
 --   begin_account_deletion first (23514) and deletes every member table, and
 --   deletes the caller's auth.users row. If that row still exists afterwards
 --   it raises TH018. It returns the counts delete_my_app_data returned.
+-- * The avatar check and the identity re-check read the same tables as the
+--   deletes, as the function owner, and rely on that owner bypassing
+--   row-level security, which the TH020 check enforces. The re-check catches
+--   a delete that removes no row, for example because of a trigger, a rule
+--   or a concurrent delete.
 -- * Everything runs in the caller's transaction: data and identity are
 --   deleted together or not at all. A repeat after a completed deletion
 --   returns zero counts.
@@ -62,6 +68,17 @@ begin
     raise exception using errcode = 'TH017',
       message = 'Recent authentication is required',
       hint = 'recent_authentication_required';
+  end if;
+
+  -- The checks and deletes below run as the function owner and must see
+  -- every row: the owner has to bypass row-level security.
+  if not exists (
+    select 1 from pg_catalog.pg_roles as r
+    where r.rolname = current_user and (r.rolsuper or r.rolbypassrls)
+  ) then
+    raise exception using errcode = 'TH020',
+      message = 'Account deletion requires a function owner that bypasses row-level security',
+      hint = 'rls_bypass_required';
   end if;
 
   -- Avatar objects must already be gone.

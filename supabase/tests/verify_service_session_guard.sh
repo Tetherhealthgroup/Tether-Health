@@ -918,7 +918,7 @@ registry=$(sed -nE 's/^\| `(TH[0-9]{3})` \| `([a-z_]+)` \|.*/\1 \2/p' "$contract
 [[ "$(cut -d' ' -f1 <<<"$registry" | sort | uniq -d)" == '' ]] || fail 'registry codes must be unique'
 [[ "$(cut -d' ' -f2 <<<"$registry" | sort | uniq -d)" == '' ]] || fail 'registry names must be unique'
 for code in TH001 TH002 TH003 TH004 TH005 TH006 TH007 TH008 TH009 TH010 \
-  TH011 TH012 TH013 TH014 TH015 TH016 TH017 TH018; do
+  TH011 TH012 TH013 TH014 TH015 TH016 TH017 TH018 TH020; do
   grep -Eq "^$code " <<<"$registry" || fail "registry is missing $code"
 done
 

@@ -4,8 +4,9 @@
 # id, is security definer with an empty search_path, may be executed by
 # authenticated only, and refuses in this order: no caller (42501), a sync
 # service session (TH010), a confirmation other than DELETE (23514), a sign-in
-# that is not recent by the token's amr claim (TH017), avatar objects left
-# under the caller's folder (TH016). It then calls delete_my_app_data
+# that is not recent by the token's amr claim (TH017), a function owner that
+# does not bypass row-level security (TH020), avatar objects left under the
+# caller's folder (TH016). It then calls delete_my_app_data
 # unchanged, deletes the caller's auth.users row, raises TH018 if that row is
 # still there, and returns delete_my_app_data's counts. It never deletes
 # storage rows.
@@ -21,10 +22,13 @@
 #   bash <this script> --print-control-sql    print the control: for one
 #       synthetic account it calls delete_my_account with an avatar object
 #       left, then with a delete of the auth.users row that silently removes
-#       nothing (a before-delete trigger that skips the row), and reports
-#       each outcome:
-#         TH988B_CONTROL_REFUSED_TH016_TH018   (expected with the migration)
+#       nothing (a before-delete trigger that skips the row); for a second
+#       account it switches the function owner to a role that does not bypass
+#       row-level security. It reports each outcome:
+#         TH988B_CONTROL_REFUSED_TH016_TH018   (expected with the migration;
+#             the owner case is refused with TH020)
 #         TH988B_CONTROL_FUNCTION_ABSENT       (a tree without the migration)
+#         TH988B_CONTROL_RLS_GUARD_MISSING     (the owner check was removed)
 #         TH988B_CONTROL_STORAGE_CHECK_MISSING / TH988B_CONTROL_RECHECK_MISSING
 #             (the avatar check or the post-delete check was removed)
 #
@@ -484,6 +488,28 @@ select th988b_test.ok(
   th988b_test.state('00000000-0000-4000-8000-00000988b0a1') = current_setting('th988b.a_ready')::jsonb,
   'A: the identity refusal rolled back the app data deletion too (one transaction)');
 
+-- Objects outside A's avatar folder do not block A's deletion: a lookalike
+-- folder, an object under A's folder in another bucket and, where
+-- storage.foldername() treats a bare name as a file, a root object named
+-- after A. They are seeded as fixtures, not with A's token.
+insert into storage.buckets (id, name) values ('th988b-other', 'th988b-other');
+insert into storage.objects (bucket_id, name) values
+  ('avatars', '00000000-0000-4000-8000-00000988b0a1x/avatar.png'),
+  ('th988b-other', '00000000-0000-4000-8000-00000988b0a1/avatar.png');
+do $root$
+begin
+  if (storage.foldername('00000000-0000-4000-8000-00000988b0a1'))[1] is not distinct from '00000000-0000-4000-8000-00000988b0a1' then
+    raise notice 'NOTICE root object fixture: not runnable with this storage.foldername(), which counts a bare name as a folder';
+  else
+    insert into storage.objects (bucket_id, name) values ('avatars', '00000000-0000-4000-8000-00000988b0a1');
+  end if;
+end;
+$root$;
+select set_config('th988b.fixtures', (
+  select string_agg(bucket_id || ':' || name, ',' order by bucket_id, name) from storage.objects
+  where name like '00000000-0000-4000-8000-00000988b0a1%'
+    and not (bucket_id = 'avatars' and name like '00000000-0000-4000-8000-00000988b0a1/%')), true);
+
 -- Deletion ----------------------------------------------------------------------
 select th988b_test.act_as('authenticator',
   th988b_test.claims('00000000-0000-4000-8000-00000988b0a1', th988b_test.amr_at(30)));
@@ -501,6 +527,12 @@ select th988b_test.ok(
 select th988b_test.ok(
   th988b_test.state('00000000-0000-4000-8000-00000988b0b1') = current_setting('th988b.b_seeded')::jsonb,
   'B: deleting A left every row of B untouched, its identity, session and avatar object included');
+select th988b_test.ok(
+  current_setting('th988b.fixtures') like 'avatars:00000000-0000-4000-8000-00000988b0a1x/avatar.png%'
+  and current_setting('th988b.fixtures') like '%th988b-other:00000000-0000-4000-8000-00000988b0a1/avatar.png'
+  and (select string_agg(bucket_id || ':' || name, ',' order by bucket_id, name) from storage.objects
+       where name like '00000000-0000-4000-8000-00000988b0a1%') = current_setting('th988b.fixtures'),
+  'A: objects outside its avatar folder (a lookalike folder, another bucket) did not block the deletion and are left in place');
 
 -- A repeat with the same token (a retry after a lost response).
 select th988b_test.act_as('authenticator',
@@ -515,6 +547,245 @@ select th988b_test.ok(
 select th988b_test.ok(
   th988b_test.state('00000000-0000-4000-8000-00000988b0b1') = current_setting('th988b.b_seeded')::jsonb,
   'B: the repeat left every row of B untouched');
+
+-- The function owner must bypass row-level security -----------------------------
+-- Two owners hold only what the function needs to run to its end:
+-- th988b_owner_norls (no superuser, no bypass, not a member of postgres) and
+-- th988b_owner_bypass (bypasses row-level security, not a superuser). Each
+-- case switches the owner and the row-level security of auth.users and
+-- storage.objects, and restores both afterwards. A case the image does not
+-- allow (altering auth.users or storage.objects, creating a bypassing role)
+-- is reported as a notice, not a pass.
+select set_config('th988b.owner', (select pg_catalog.pg_get_userbyid(proowner) from pg_catalog.pg_proc
+  where oid = 'public.delete_my_account(text)'::regprocedure), true);
+select set_config('th988b.rls_users', (select relrowsecurity::text from pg_catalog.pg_class
+  where oid = 'auth.users'::regclass), true);
+select set_config('th988b.rls_objects', (select relrowsecurity::text from pg_catalog.pg_class
+  where oid = 'storage.objects'::regclass), true);
+
+-- Runs p_sql; false, with a notice, when the image refuses it.
+create function th988b_test.try(p_sql text, p_case text)
+returns boolean language plpgsql as $f$
+begin
+  execute p_sql;
+  return true;
+exception when others then
+  raise notice 'NOTICE %: not runnable on this image (% refused: % %)', p_case, p_sql, sqlstate, sqlerrm;
+  return false;
+end;
+$f$;
+
+create function th988b_test.grant_owner(p_role text)
+returns void language plpgsql as $f$
+begin
+  execute pg_catalog.format('grant usage on schema public, auth, storage to %I', p_role);
+  execute pg_catalog.format('grant execute on function auth.uid(), auth.jwt(), public.sync_writer_session(), '
+    'storage.foldername(text), public.delete_my_app_data(text) to %I', p_role);
+  execute pg_catalog.format('grant select, delete on auth.users to %I', p_role);
+  execute pg_catalog.format('grant select on storage.objects to %I', p_role);
+end;
+$f$;
+
+-- Sets row-level security on p_table to p_on (null leaves it).
+create function th988b_test.set_rls(p_table regclass, p_on boolean, p_case text)
+returns boolean language plpgsql as $f$
+begin
+  if p_on is null
+     or p_on = (select relrowsecurity from pg_catalog.pg_class where oid = p_table) then
+    return true;
+  end if;
+  return th988b_test.try(pg_catalog.format('alter table %s %s row level security', p_table,
+    case when p_on then 'enable' else 'disable' end), p_case);
+end;
+$f$;
+
+create function th988b_test.case_restore()
+returns void language plpgsql as $f$
+begin
+  execute pg_catalog.format('alter function public.delete_my_account(text) owner to %I',
+    pg_catalog.current_setting('th988b.owner'));
+  perform th988b_test.set_rls('auth.users', pg_catalog.current_setting('th988b.rls_users')::boolean, 'restore');
+  perform th988b_test.set_rls('storage.objects', pg_catalog.current_setting('th988b.rls_objects')::boolean, 'restore');
+end;
+$f$;
+
+-- Switches the owner and row-level security for case p_case; 'run', or
+-- 'skip' when the image refuses a step and p_strict is set.
+create function th988b_test.case_setup(
+  p_case text, p_owner text, p_users_rls boolean, p_objects_rls boolean, p_strict boolean
+)
+returns text language plpgsql as $f$
+declare
+  applied boolean;
+begin
+  if not exists (select 1 from pg_catalog.pg_roles where rolname = p_owner) then
+    raise notice 'NOTICE %: not runnable on this image (role % could not be created)', p_case, p_owner;
+    return 'skip';
+  end if;
+  execute pg_catalog.format('alter function public.delete_my_account(text) owner to %I', p_owner);
+  applied := th988b_test.set_rls('auth.users', p_users_rls, p_case);
+  applied := th988b_test.set_rls('storage.objects', p_objects_rls, p_case) and applied;
+  if not applied and p_strict then
+    perform th988b_test.case_restore();
+    return 'skip';
+  end if;
+  return 'run';
+end;
+$f$;
+
+create role th988b_owner_norls nologin;
+select th988b_test.grant_owner('th988b_owner_norls');
+select th988b_test.try('create role th988b_owner_bypass nologin bypassrls', 'owner check, bypassing owner');
+select th988b_test.grant_owner('th988b_owner_bypass')
+where exists (select 1 from pg_catalog.pg_roles where rolname = 'th988b_owner_bypass');
+select th988b_test.ok(
+  (select not rolsuper and not rolbypassrls from pg_catalog.pg_roles where rolname = 'th988b_owner_norls')
+  and not pg_catalog.pg_has_role('th988b_owner_norls', 'postgres', 'MEMBER')
+  and not pg_catalog.pg_has_role('th988b_owner_norls',
+    (select relowner from pg_catalog.pg_class where oid = 'auth.users'::regclass), 'MEMBER')
+  and coalesce((select not rolsuper and rolbypassrls from pg_catalog.pg_roles
+                where rolname = 'th988b_owner_bypass'), true),
+  'owners: th988b_owner_norls neither is a superuser nor bypasses row-level security nor belongs to postgres or the auth.users owner; th988b_owner_bypass bypasses it without being a superuser');
+
+-- Member M: an identity, a session, a row in every member table, deletion
+-- started; delete_my_app_data's counts for M are taken in a rolled-back block.
+select th988b_test.seed('00000000-0000-4000-8000-00000988b0d1');
+set constraints public.enrolments_focus_cap immediate;
+set constraints public.enrolments_focus_cap deferred;
+select th988b_test.act_as('authenticator',
+  th988b_test.claims('00000000-0000-4000-8000-00000988b0d1', th988b_test.amr_at(30)));
+do $m_reference$
+declare
+  receipt jsonb;
+begin
+  begin
+    perform public.begin_account_deletion('DELETE');
+    receipt := public.delete_my_app_data('DELETE');
+    raise exception 'th988b reference rollback';
+  exception when raise_exception then
+    if sqlerrm <> 'th988b reference rollback' then
+      raise;
+    end if;
+  end;
+  perform pg_catalog.set_config('th988b.m_reference', receipt::text, true);
+end;
+$m_reference$;
+select public.begin_account_deletion('DELETE');
+select th988b_test.act_as(current_setting('th988b.superuser'), null);
+select set_config('th988b.m_ready', th988b_test.state('00000000-0000-4000-8000-00000988b0d1')::text, true);
+select th988b_test.ok(
+  current_setting('th988b.m_ready')::jsonb =
+    current_setting('th988b.a_seeded')::jsonb || '{"deletion_started": true}'::jsonb
+  and current_setting('th988b.m_reference')::jsonb = th988b_test.counts('00000000-0000-4000-8000-00000988b0d1'),
+  'setup: member M holds an identity, a session and a row in every member table, deletion started; reference counts taken');
+
+-- Owner check, earlier refusals: the earlier refusals keep their order with an owner that does not bypass.
+select set_config('th988b.case', th988b_test.case_setup('owner check, earlier refusals', 'th988b_owner_norls', null, null, true), true);
+select th988b_test.act_as('authenticator',
+  th988b_test.claims('00000000-0000-4000-8000-00000988b0d1', th988b_test.amr_at(601)));
+select th988b_test.refused('select public.delete_my_account(''DELETE'')',
+  'TH017', 'Recent authentication is required',
+  'owner check, earlier refusals: with an owner that does not bypass row-level security, a stale sign-in is still refused first',
+  'recent_authentication_required')
+where current_setting('th988b.case') = 'run';
+select th988b_test.act_as('thsync', th988b_test.claims('00000000-0000-4000-8000-00000988b0d1', th988b_test.amr_at(30)));
+select th988b_test.refused('select public.delete_my_account(''DELETE'')',
+  'TH010', 'The sync service writes only sync tables',
+  'owner check, earlier refusals: with an owner that does not bypass row-level security, a sync session is still refused first',
+  'sync_session_refused')
+where current_setting('th988b.case') = 'run';
+select th988b_test.act_as(current_setting('th988b.superuser'), null);
+select th988b_test.ok(th988b_test.state('00000000-0000-4000-8000-00000988b0d1') = current_setting('th988b.m_ready')::jsonb,
+  'owner check, earlier refusals: nothing of M changed')
+where current_setting('th988b.case') = 'run';
+select th988b_test.case_restore();
+
+-- Owner check, auth.users row-level security: row-level security on auth.users, owner without bypass.
+select set_config('th988b.case', th988b_test.case_setup('owner check, auth.users row-level security', 'th988b_owner_norls', true, null, true), true);
+select th988b_test.act_as('authenticator',
+  th988b_test.claims('00000000-0000-4000-8000-00000988b0d1', th988b_test.amr_at(30)));
+select th988b_test.refused('select public.delete_my_account(''DELETE'')',
+  'TH020', 'Account deletion requires a function owner that bypasses row-level security',
+  'owner check, auth.users row-level security: row-level security on auth.users and an owner that does not bypass it is refused',
+  'rls_bypass_required')
+where current_setting('th988b.case') = 'run';
+select th988b_test.act_as(current_setting('th988b.superuser'), null);
+select th988b_test.ok(th988b_test.state('00000000-0000-4000-8000-00000988b0d1') = current_setting('th988b.m_ready')::jsonb,
+  'owner check, auth.users row-level security: nothing of M changed: identity, identities, sessions and every member table')
+where current_setting('th988b.case') = 'run';
+select th988b_test.case_restore();
+
+-- Owner check, storage.objects row-level security: row-level security on storage.objects (its select policy is for
+-- authenticated only) with an avatar of M present, owner without bypass.
+insert into storage.objects (bucket_id, name) values ('avatars', '00000000-0000-4000-8000-00000988b0d1/avatar.png');
+select set_config('th988b.m_avatar', th988b_test.state('00000000-0000-4000-8000-00000988b0d1')::text, true);
+select set_config('th988b.case', th988b_test.case_setup('owner check, storage.objects row-level security', 'th988b_owner_norls', false, true, true), true);
+select th988b_test.act_as('authenticator',
+  th988b_test.claims('00000000-0000-4000-8000-00000988b0d1', th988b_test.amr_at(30)));
+select th988b_test.refused('select public.delete_my_account(''DELETE'')',
+  'TH020', 'Account deletion requires a function owner that bypasses row-level security',
+  'owner check, storage.objects row-level security: row-level security on storage.objects, an avatar present and an owner that does not bypass it is refused',
+  'rls_bypass_required')
+where current_setting('th988b.case') = 'run';
+select th988b_test.act_as(current_setting('th988b.superuser'), null);
+select th988b_test.ok(
+  th988b_test.state('00000000-0000-4000-8000-00000988b0d1') = current_setting('th988b.m_avatar')::jsonb
+  and (current_setting('th988b.m_avatar')::jsonb ->> 'avatars') = '1',
+  'owner check, storage.objects row-level security: nothing of M changed: the avatar object, identity and member rows')
+where current_setting('th988b.case') = 'run';
+select th988b_test.case_restore();
+delete from storage.objects where bucket_id = 'avatars' and name = '00000000-0000-4000-8000-00000988b0d1/avatar.png';
+
+-- Owner check, any row-level security: row-level security off on both (where the image allows it), owner
+-- without bypass: refused all the same.
+select set_config('th988b.case', th988b_test.case_setup('owner check, any row-level security', 'th988b_owner_norls', false, false, false), true);
+select th988b_test.act_as('authenticator',
+  th988b_test.claims('00000000-0000-4000-8000-00000988b0d1', th988b_test.amr_at(30)));
+select th988b_test.refused('select public.delete_my_account(''DELETE'')',
+  'TH020', 'Account deletion requires a function owner that bypasses row-level security',
+  'owner check, any row-level security: an owner that does not bypass row-level security is refused whatever the tables'' row-level security',
+  'rls_bypass_required')
+where current_setting('th988b.case') = 'run';
+select th988b_test.act_as(current_setting('th988b.superuser'), null);
+select th988b_test.ok(th988b_test.state('00000000-0000-4000-8000-00000988b0d1') = current_setting('th988b.m_ready')::jsonb,
+  'owner check, any row-level security: nothing of M changed')
+where current_setting('th988b.case') = 'run';
+select th988b_test.case_restore();
+
+-- Owner check, bypassing owner: row-level security on both, an owner that bypasses it without being a
+-- superuser: the deletion completes.
+select set_config('th988b.case', th988b_test.case_setup('owner check, bypassing owner', 'th988b_owner_bypass', true, true, true), true);
+select th988b_test.act_as('authenticator',
+  th988b_test.claims('00000000-0000-4000-8000-00000988b0d1', th988b_test.amr_at(30)));
+select set_config('th988b.m_receipt', public.delete_my_account('DELETE')::text, true)
+where current_setting('th988b.case') = 'run';
+select th988b_test.act_as(current_setting('th988b.superuser'), null);
+select th988b_test.ok(
+  current_setting('th988b.m_receipt')::jsonb = current_setting('th988b.m_reference')::jsonb,
+  'owner check, bypassing owner: an owner that bypasses row-level security (not a superuser) deletes M with the same counts as delete_my_app_data')
+where current_setting('th988b.case') = 'run';
+select th988b_test.ok(
+  th988b_test.state('00000000-0000-4000-8000-00000988b0d1') = '{"profiles": 0, "quit_plans": 0,
+    "program_data": 0, "enrolments": 0, "programme_consents": 0, "account_consents": 0,
+    "sync_answers": 0, "sync_lapses": 0, "sync_areas": 0, "sync_accounts": 0,
+    "users": 0, "identities": 0, "sessions": 0, "avatars": 0, "deletion_started": null}'::jsonb
+  and not exists (select 1 from storage.objects where name like '00000000-0000-4000-8000-00000988b0d1%')
+  and th988b_test.state('00000000-0000-4000-8000-00000988b0b1') = current_setting('th988b.b_seeded')::jsonb,
+  'owner check, bypassing owner: no row of M is left in any member table, auth.users, auth.identities, auth.sessions or storage.objects; B untouched')
+where current_setting('th988b.case') = 'run';
+select th988b_test.case_restore();
+
+select th988b_test.ok(
+  (select proowner from pg_catalog.pg_proc where oid = 'public.delete_my_account(text)'::regprocedure)
+    = (select proowner from pg_catalog.pg_proc where oid = 'public.delete_my_app_data(text)'::regprocedure)
+  and pg_catalog.current_setting('th988b.owner') =
+      (select pg_catalog.pg_get_userbyid(proowner) from pg_catalog.pg_proc
+       where oid = 'public.delete_my_account(text)'::regprocedure)
+  and (select relrowsecurity::text from pg_catalog.pg_class where oid = 'auth.users'::regclass)
+      = current_setting('th988b.rls_users')
+  and (select relrowsecurity::text from pg_catalog.pg_class where oid = 'storage.objects'::regclass)
+      = current_setting('th988b.rls_objects'),
+  'restored: delete_my_account has the owner of delete_my_app_data again; row-level security of auth.users and storage.objects as before');
 
 select 'TH988B_SQL_TESTS_COMPLETE' as result;
 rollback;
@@ -598,6 +869,61 @@ begin
 end;
 $silent$;
 reset role;
+
+-- 3. Synthetic D, deletion started, no avatar object. The function owner is
+-- switched to a role that does not bypass row-level security, and row-level
+-- security is enabled on auth.users where the image allows it.
+drop trigger th988b_control_skip_delete on auth.users;
+insert into auth.users (id, email, aud, role) values
+  ('00000000-0000-4000-8000-00000988b0e1', 'synthetic-control-d1@example.test', 'authenticated', 'authenticated');
+update public.profiles set account_deletion_started_at = now() where id = '00000000-0000-4000-8000-00000988b0e1';
+create role th988b_control_norls nologin;
+grant usage on schema public, auth, storage to th988b_control_norls;
+grant execute on function auth.uid(), auth.jwt(), public.sync_writer_session(),
+  storage.foldername(text), public.delete_my_app_data(text) to th988b_control_norls;
+grant select, delete on auth.users to th988b_control_norls;
+grant select on storage.objects to th988b_control_norls;
+do $owner$
+begin
+  begin
+    alter function public.delete_my_account(text) owner to th988b_control_norls;
+  exception when undefined_function then
+    null;
+  end;
+  begin
+    alter table auth.users enable row level security;
+  exception when others then
+    raise notice 'CONTROL row-level security on auth.users could not be enabled (%); probing with it as it is', sqlstate;
+  end;
+end;
+$owner$;
+select set_config('request.jwt.claims', jsonb_build_object(
+  'sub', '00000000-0000-4000-8000-00000988b0e1', 'role', 'authenticated',
+  'amr', jsonb_build_array(jsonb_build_object(
+    'method', 'password', 'timestamp', extract(epoch from now()) - 30)))::text, true);
+set local role authenticated;
+do $rls$
+declare
+  outcome text;
+begin
+  begin
+    perform public.delete_my_account('DELETE');
+    outcome := 'completed';
+  exception when others then
+    outcome := sqlstate;
+  end;
+  perform pg_catalog.set_config('th988bc.rls_owner', outcome, true);
+  raise notice 'CONTROL delete_my_account with an owner that does not bypass row-level security: %', outcome;
+end;
+$rls$;
+reset role;
+select set_config('th988bc.identity_d',
+  (select count(*) from auth.users where id = '00000000-0000-4000-8000-00000988b0e1')::text, true);
+do $report_d$
+begin
+  raise notice 'CONTROL auth.users rows of D left: %', pg_catalog.current_setting('th988bc.identity_d');
+end;
+$report_d$;
 select set_config('th988bc.identity',
   (select count(*) from auth.users where id = '00000000-0000-4000-8000-00000988b0c1')::text, true);
 do $report$
@@ -610,10 +936,15 @@ select case
   when current_setting('th988bc.avatar_left') = 'TH016'
    and current_setting('th988bc.silent_delete') = 'TH018'
    and current_setting('th988bc.identity') = '1'
+   and current_setting('th988bc.rls_owner') = 'TH020'
+   and current_setting('th988bc.identity_d') = '1'
     then 'TH988B_CONTROL_REFUSED_TH016_TH018'
   when current_setting('th988bc.avatar_left') = '42883'
    and current_setting('th988bc.silent_delete') = '42883'
+   and current_setting('th988bc.rls_owner') = '42883'
     then 'TH988B_CONTROL_FUNCTION_ABSENT'
+  when current_setting('th988bc.rls_owner') = 'completed'
+    then 'TH988B_CONTROL_RLS_GUARD_MISSING'
   when current_setting('th988bc.avatar_left') = 'completed'
     then 'TH988B_CONTROL_STORAGE_CHECK_MISSING'
   when current_setting('th988bc.silent_delete') = 'completed'
@@ -741,6 +1072,20 @@ next_line_matches "$l_confirm" "^    raise check_violation using message = 'Expl
 l_amr=$(line_of "auth\\.jwt\\(\\) -> 'amr'\\) = 'array'$")
 l_age=$(line_of "^  if sign_in_age is null or sign_in_age > 600 or sign_in_age < -60 then$")
 next_line_matches "$l_age" "^    raise exception using errcode = 'TH017',$" 'a sign-in that is not recent must raise TH017'
+l_guard=$(line_of "^    select 1 from pg_catalog\\.pg_roles as r$")
+l_guard_cond=$(line_of "^    where r\\.rolname = current_user and \\(r\\.rolsuper or r\\.rolbypassrls\\)$")
+l_guard_raise=$(line_of "^    raise exception using errcode = 'TH020',$")
+next_line_matches "$l_guard_raise" \
+  "^      message = 'Account deletion requires a function owner that bypasses row-level security',$" \
+  'TH020 must carry its registered message'
+next_line_matches "$((l_guard_raise + 1))" "^      hint = 'rls_bypass_required';$" 'TH020 must carry its registered hint'
+sed -n "$((l_guard - 1))p" <<<"$code" | grep -Eq '^  if not exists \($' ||
+  fail 'the owner check must be "if not exists (select 1 from pg_catalog.pg_roles ...)"'
+sed -n "$((l_guard_cond + 1))p" <<<"$code" | grep -Eq '^  \) then$' ||
+  fail 'the owner check must refuse when no such role row exists'
+[[ $((l_guard_raise - l_guard_cond)) -eq 2 ]] || fail 'the owner check must raise TH020 directly'
+[[ "$(grep -c 'pg_roles' <<<"$code")" -eq 1 && "$(grep -c "TH020" <<<"$code")" -eq 1 ]] ||
+  fail 'the owner check appears exactly once'
 l_storage=$(line_of "^    from storage\\.objects$")
 line_of "^    where bucket_id = 'avatars'$" >/dev/null
 line_of "^      and \\(storage\\.foldername\\(name\\)\\)\\[1\\] = caller_id::text$" >/dev/null
@@ -751,11 +1096,12 @@ l_recheck=$(line_of "^  if exists \\(select 1 from auth\\.users where id = calle
 next_line_matches "$l_recheck" "^    raise exception using errcode = 'TH018',$" \
   'the auth.users row still present after the delete must raise TH018'
 l_return=$(line_of "^  return counts;$")
-order=("$l_caller" "$l_null" "$l_sync" "$l_confirm" "$l_amr" "$l_age" "$l_storage" "$l_th016" \
+order=("$l_caller" "$l_null" "$l_sync" "$l_confirm" "$l_amr" "$l_age" "$l_guard" "$l_guard_cond" \
+  "$l_guard_raise" "$l_storage" "$l_th016" \
   "$l_app" "$l_delete" "$l_recheck" "$l_return")
 for ((i = 1; i < ${#order[@]}; i++)); do
   ((order[i - 1] < order[i])) ||
-    fail 'delete_my_account must run: caller, sync refusal (TH010), confirmation, recent sign-in (TH017), avatar check (TH016), delete_my_app_data, delete from auth.users, re-check (TH018), return'
+    fail 'delete_my_account must run: caller, sync refusal (TH010), confirmation, recent sign-in (TH017), owner bypasses row-level security (TH020), avatar check (TH016), delete_my_app_data, delete from auth.users, re-check (TH018), return'
 done
 # Nothing is deleted, and delete_my_app_data is not called, before the sync
 # refusal and the other checks; the only delete is the auth.users row.
@@ -789,7 +1135,8 @@ $auth_deletes"
 # shellcheck disable=SC2016
 for row in 'TH016|avatar_objects_remain|Avatar objects must be removed before the account is deleted' \
   'TH017|recent_authentication_required|Recent authentication is required' \
-  'TH018|auth_identity_not_deleted|The account identity was not deleted'; do
+  'TH018|auth_identity_not_deleted|The account identity was not deleted' \
+  'TH020|rls_bypass_required|Account deletion requires a function owner that bypasses row-level security'; do
   IFS='|' read -r c name message <<<"$row"
   line=$(grep -E "^\\| \`$c\` \\| \`$name\` \\|" "$contract" || true)
   [[ -n "$line" ]] || fail "$c $name is not in the registry in $contract"
@@ -806,6 +1153,9 @@ grep -Fq '`delete_my_account('"'"'DELETE'"'"')`' <<<"$deletion_section" ||
   fail 'the account-data deletion section must describe delete_my_account'
 grep -Fq 'never deletes storage rows' <<<"$deletion_section" ||
   fail 'the account-data deletion section must say the function never deletes storage rows'
+# shellcheck disable=SC2016
+grep -Fq 'that bypasses row-level security; the function refuses (`TH020`) otherwise.' <<<"$deletion_section" ||
+  fail 'the account-data deletion section must say the function refuses (TH020) unless its owner bypasses row-level security'
 
 echo 'Account identity deletion static checks passed.'
 

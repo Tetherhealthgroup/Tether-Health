@@ -129,6 +129,13 @@ export const DATABASE_ERRORS = [
       "Sync rows are removed only with their enrolment or account",
     ] as readonly string[],
   },
+  {
+    code: "TH020",
+    hint: "rls_bypass_required",
+    messages: [
+      "Account deletion requires a function owner that bypasses row-level security",
+    ] as readonly string[],
+  },
 ] as const satisfies readonly DatabaseErrorEntry[];
 
 export type DatabaseErrorHint = (typeof DATABASE_ERRORS)[number]["hint"];

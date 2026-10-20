@@ -585,15 +585,20 @@ this order: no caller (`42501`); a sync service session (`TH010`); a
 confirmation other than `DELETE` (`23514`); a sign-in that is not recent
 (`TH017`): the newest `amr` entry in the token with a string `method` and a
 numeric `timestamp` must be at most 600 seconds old and at most 60 seconds in
-the future, and a token without one is refused; and any object left in the
-`avatars` bucket under the caller's folder (`TH016`). Avatar objects are
+the future, and a token without one is refused; a function owner that is
+neither a superuser nor bypasses row-level security (`TH020`); and any object
+left in the `avatars` bucket under the caller's folder (`TH016`). Avatar objects are
 removed through the Storage API first; the function never deletes storage
 rows. It then calls `delete_my_app_data` unchanged (so `begin_account_deletion`
 must have run, `23514` otherwise), deletes the caller's `auth.users` row, and
 raises `TH018` if that row still exists. It returns the same counts as
 `delete_my_app_data`. Any refusal deletes nothing. A repeat after a completed
-deletion returns zero counts. `supabase/tests/verify_account_identity_deletion.sh`
-checks this.
+deletion returns zero counts. The avatar check and the identity re-check read
+the same tables as the deletes, as the function owner, so they rely on an owner
+that bypasses row-level security; the function refuses (`TH020`) otherwise.
+The re-check catches a delete that removes no row, for example because of a
+trigger, a rule or a concurrent delete.
+`supabase/tests/verify_account_identity_deletion.sh` checks this.
 
 The Flutter client persists an encrypted deletion-intent tombstone before it
 calls the destructive API and aborts if that prerequisite fails or times out.
@@ -643,6 +648,7 @@ function": every later function that writes and refuses a sync session raises
 | `TH017` | `recent_authentication_required` | `delete_my_account`: the token has no `amr` sign-in timestamp within the last 600 seconds (or one more than 60 seconds in the future) | Recent authentication is required |
 | `TH018` | `auth_identity_not_deleted` | `delete_my_account`: the caller's `auth.users` row still exists after its delete | The account identity was not deleted |
 | `TH019` | `sync_rows_delete_only` | `sync_truncate_guard` (truncate trigger on `sync_account`, `sync_area`, `sync_answer` and `sync_lapse`: a truncate, whatever the role, including a cascade into them when no other table's guard fires first) | Sync rows are removed only with their enrolment or account |
+| `TH020` | `rls_bypass_required` | `delete_my_account`: the function owner is neither a superuser nor bypasses row-level security | Account deletion requires a function owner that bypasses row-level security |
 
 Standard SQLSTATEs are kept where PostgreSQL defines the condition:
 `42501` for row-level security and privilege refusals and for
