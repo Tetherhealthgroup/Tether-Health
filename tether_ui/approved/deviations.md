@@ -17,8 +17,11 @@ the current file:
   `value` and gains `placeholder` with the same text (P-31), or a node gains
   or changes only its `key` (TH-902). With those attributes removed, the old
   and new files are equal.
-- The TH-1001 row removes one text node from `body` and adds the same text
-  to the screen's `notes`, which are not rendered. Nothing else changes.
+- TH-1001 rows move designer-only text to the screen's `notes`, which are
+  not rendered: `crisis` and `catalog` lose one text node from `body`, and
+  `sf_intro` loses one sentence from one text value. Each removed text is
+  added to `notes` unchanged. Nothing else changes, apart from the later
+  action paths that move up by one on `catalog`.
 
 All replacement copy still needs clinical/legal review before release.
 
@@ -78,6 +81,40 @@ That screen is an addition (`additions.json`, TH-953), not one of the
 approved screens in `manifest.json`, so it has no entry in
 `deviations.json`; the parity test accepts deviation entries for approved
 screens only.
+
+## P-62: other designer notes are not shown to members (TH-1001)
+
+The same treatment as P-58: designer-only text no longer renders, and each
+removed text is kept unchanged in the screen's `notes` in the spec.
+
+| Screen | Field | Change |
+|---|---|---|
+| `catalog` | `body[1]` (text, muted) | "Mirrors tetherhealthgroup.com. Status shows what’s available today." is removed from `body` and kept in `notes`. The program lists move from `body[2]`, `body[3]` to `body[1]`, `body[2]`, so their action paths move up by one. |
+| `sf_intro` | `body[3].text` | Drops the last sentence, "Never called “addiction”.", which is kept in `notes`. The rest of the text is unchanged: "Notice what pulls you in, set a goal that feels doable, and pause for 60 seconds when the urge hits." |
+
+P-62 also changes these additions (`additions.json` lists P-62 and TH-1001
+on each). They are not approved screens, so they have no entry in
+`deviations.json`. The removed text is kept in each screen's `notes`.
+
+- `surface_widget_ios`, `surface_widget_android`: the header pill
+  "Reference", the eyebrow "Home screen · small widget" / "Home screen ·
+  2×1 widget" and the key-value rows (Label, Shows, Tap, and Data or Built
+  with) are removed. The header and the Rescue card stay; the card moves
+  from `body[1]` to `body[0]`.
+- `surface_shortcuts_ios`, `surface_shortcuts_ios_named`: the header pill
+  "Reference" and the first text ("What people see in the Shortcuts app and
+  Spotlight, and can say to Siri." / "With Show sensitive details on
+  (Account → Notifications), shortcuts use program names.") are removed.
+  The shortcut rows move from `body[1]` to `body[0]`; their subtitles stay.
+- `surface_shortcuts_android`, `surface_shortcuts_android_named`: the header
+  pill "Reference" and the row subtitles ("Static shortcut · always there",
+  "Dynamic shortcut · only while ClearAir is a focus program", "Dynamic
+  shortcut") are removed. On the named variant the first text ("With Show
+  sensitive details on …") is removed too, and its rows move from `body[1]`
+  to `body[0]`.
+- `sf_unplug_picker_ios`: the native-view caption "System sheet drawn by
+  iOS (FamilyActivityPicker). Tether can’t style it or read the app names."
+  is removed. The native view and its label stay.
 
 ## P-31: example values become placeholders (TH-907)
 

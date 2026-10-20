@@ -1558,7 +1558,7 @@
     "screen": "catalog",
     "screen_name": "Add a program",
     "element": "BreatheFree",
-    "path": "body[2].rows[0]",
+    "path": "body[1].rows[0]",
     "type": "push",
     "targets": [
       "bf_intro"
@@ -1569,7 +1569,7 @@
     "screen": "catalog",
     "screen_name": "Add a program",
     "element": "ScrollFree",
-    "path": "body[2].rows[1]",
+    "path": "body[1].rows[1]",
     "type": "push",
     "targets": [
       "sf_intro"
@@ -1580,7 +1580,7 @@
     "screen": "catalog",
     "screen_name": "Add a program",
     "element": "ClearAir",
-    "path": "body[2].rows[2]",
+    "path": "body[1].rows[2]",
     "type": "push",
     "targets": [
       "ca_intro"
@@ -1591,7 +1591,7 @@
     "screen": "catalog",
     "screen_name": "Add a program",
     "element": "Heartwise",
-    "path": "body[2].rows[3]",
+    "path": "body[1].rows[3]",
     "type": "push",
     "targets": [
       "hw_intro"
@@ -1602,7 +1602,7 @@
     "screen": "catalog",
     "screen_name": "Add a program",
     "element": "Steady",
-    "path": "body[2].rows[4]",
+    "path": "body[1].rows[4]",
     "type": "push",
     "targets": [
       "st_intro"
@@ -1613,7 +1613,7 @@
     "screen": "catalog",
     "screen_name": "Add a program",
     "element": "Renew",
-    "path": "body[2].rows[5]",
+    "path": "body[1].rows[5]",
     "type": "push",
     "targets": [
       "re_intro"
@@ -1624,7 +1624,7 @@
     "screen": "catalog",
     "screen_name": "Add a program",
     "element": "Nourish",
-    "path": "body[3].rows[0]",
+    "path": "body[2].rows[0]",
     "type": "push",
     "targets": [
       "nu_intro"
@@ -1635,7 +1635,7 @@
     "screen": "catalog",
     "screen_name": "Add a program",
     "element": "Stride",
-    "path": "body[3].rows[1]",
+    "path": "body[2].rows[1]",
     "type": "push",
     "targets": [
       "sd_intro"
@@ -1646,7 +1646,7 @@
     "screen": "catalog",
     "screen_name": "Add a program",
     "element": "Ease",
-    "path": "body[3].rows[2]",
+    "path": "body[2].rows[2]",
     "type": "push",
     "targets": [
       "ea_intro"
@@ -1657,7 +1657,7 @@
     "screen": "catalog",
     "screen_name": "Add a program",
     "element": "Checkup",
-    "path": "body[3].rows[3]",
+    "path": "body[2].rows[3]",
     "type": "push",
     "targets": [
       "ck_intro"
@@ -1668,7 +1668,7 @@
     "screen": "catalog",
     "screen_name": "Add a program",
     "element": "Beacon",
-    "path": "body[3].rows[4]",
+    "path": "body[2].rows[4]",
     "type": "push",
     "targets": [
       "be_intro"
@@ -9451,7 +9451,7 @@
     "screen": "surface_widget_ios",
     "screen_name": "Home-screen widget (iPhone)",
     "element": "Rescue",
-    "path": "body[1]",
+    "path": "body[0]",
     "type": "sheet",
     "targets": [
       "rescue_pick"
@@ -9471,7 +9471,7 @@
     "screen": "surface_widget_android",
     "screen_name": "Home-screen widget (Android)",
     "element": "Rescue",
-    "path": "body[1]",
+    "path": "body[0]",
     "type": "sheet",
     "targets": [
       "rescue_pick"
@@ -9491,7 +9491,7 @@
     "screen": "surface_shortcuts_ios",
     "screen_name": "Siri & App Shortcuts (iPhone)",
     "element": "Rescue",
-    "path": "body[1].rows[0]",
+    "path": "body[0].rows[0]",
     "type": "sheet",
     "targets": [
       "rescue_pick"
@@ -9502,7 +9502,7 @@
     "screen": "surface_shortcuts_ios",
     "screen_name": "Siri & App Shortcuts (iPhone)",
     "element": "My plan",
-    "path": "body[1].rows[1]",
+    "path": "body[0].rows[1]",
     "type": "push",
     "targets": [
       "ca_red"
@@ -9522,7 +9522,7 @@
     "screen": "surface_shortcuts_ios_named",
     "screen_name": "Siri & App Shortcuts (sensitive details on)",
     "element": "Rescue",
-    "path": "body[1].rows[0]",
+    "path": "body[0].rows[0]",
     "type": "sheet",
     "targets": [
       "rescue_pick"
@@ -9533,7 +9533,7 @@
     "screen": "surface_shortcuts_ios_named",
     "screen_name": "Siri & App Shortcuts (sensitive details on)",
     "element": "ClearAir red-zone plan",
-    "path": "body[1].rows[1]",
+    "path": "body[0].rows[1]",
     "type": "push",
     "targets": [
       "ca_red"
@@ -9584,7 +9584,7 @@
     "screen": "surface_shortcuts_android_named",
     "screen_name": "Launcher shortcuts (sensitive details on)",
     "element": "Rescue",
-    "path": "body[1].rows[0]",
+    "path": "body[0].rows[0]",
     "type": "sheet",
     "targets": [
       "rescue_pick"
@@ -9595,7 +9595,7 @@
     "screen": "surface_shortcuts_android_named",
     "screen_name": "Launcher shortcuts (sensitive details on)",
     "element": "ClearAir red-zone plan",
-    "path": "body[1].rows[1]",
+    "path": "body[0].rows[1]",
     "type": "push",
     "targets": [
       "ca_red"

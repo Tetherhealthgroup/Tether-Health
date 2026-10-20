@@ -19,12 +19,10 @@ class SurfaceWidgetAndroidScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TScreen(
-      header: THeader(title: 'Android widget', left: THeaderLeft.close, pill: 'Reference'),
+      header: THeader(title: 'Android widget', left: THeaderLeft.close),
       background: TBackground.dark,
       children: [
-        TEyebrow('Home screen · 2×1 widget'),
-        TCard(key: const ValueKey('a:body[1]'), variant: TCardVariant.coral, title: 'Rescue', text: 'Help for the next few minutes', onTap: () => TNav.sheet(context, Routes.rescuePick)),
-        TKeyValue(rows: [('Label', 'Rescue (generic)'), ('Shows', 'No health data, no program names'), ('Tap', 'Opens Rescue, even when signed out'), ('Built with', 'RemoteViews, no extra library')]),
+        TCard(key: const ValueKey('a:body[0]'), variant: TCardVariant.coral, title: 'Rescue', text: 'Help for the next few minutes', onTap: () => TNav.sheet(context, Routes.rescuePick)),
       ],
     );
   }

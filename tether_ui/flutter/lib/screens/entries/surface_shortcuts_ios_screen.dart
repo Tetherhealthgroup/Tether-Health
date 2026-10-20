@@ -20,10 +20,9 @@ class SurfaceShortcutsIosScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TScreen(
-      header: THeader(title: 'Siri & Shortcuts', left: THeaderLeft.close, pill: 'Reference'),
+      header: THeader(title: 'Siri & Shortcuts', left: THeaderLeft.close),
       children: [
-        TBody('What people see in the Shortcuts app and Spotlight, and can say to Siri.', tone: TTextTone.muted),
-        TListGroup(title: 'Tether Health · App Shortcuts', rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'Rescue', sub: '“Rescue in Tether” · opens Rescue', lead: TLead.icon('✚'), onTap: () => TNav.sheet(context, Routes.rescuePick)), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: 'My plan', sub: '“Show my plan in Tether” · only while ClearAir is a focus program', lead: TLead.icon('▤'), onTap: () => TNav.push(context, Routes.caRed))]),
+        TListGroup(title: 'Tether Health · App Shortcuts', rows: [TListRow(key: const ValueKey('a:body[0].rows[0]'), label: 'Rescue', sub: '“Rescue in Tether” · opens Rescue', lead: TLead.icon('✚'), onTap: () => TNav.sheet(context, Routes.rescuePick)), TListRow(key: const ValueKey('a:body[0].rows[1]'), label: 'My plan', sub: '“Show my plan in Tether” · only while ClearAir is a focus program', lead: TLead.icon('▤'), onTap: () => TNav.push(context, Routes.caRed))]),
         TCard(variant: TCardVariant.mint, text: 'Labels stay generic so a locked phone doesn’t reveal which programs you use. Turn on Show sensitive details to see program names.'),
       ],
     );

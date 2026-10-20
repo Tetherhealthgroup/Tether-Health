@@ -18,7 +18,6 @@
       "t": "nativeslot",
       "id": "ios.familyActivityPicker",
       "label": "Apple’s app picker",
-      "caption": "System sheet drawn by iOS (FamilyActivityPicker). Tether can’t style it or read the app names.",
       "platform": "ios",
       "height": 320
     }
@@ -65,7 +64,8 @@
     "Copy needs clinical/legal review.",
     "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()",
     "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
-    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
+    "System sheet drawn by iOS (FamilyActivityPicker). Tether can’t style it or read the app names."
   ],
   "over": "Choose apps",
   "api": [],

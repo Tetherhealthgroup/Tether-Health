@@ -241,12 +241,13 @@ def unplug():
        source=src + ' presentAppPicker()', native=NATIVE_NEVER_PAUSED,
        desc='iPhone host screen around Apple’s FamilyActivityPicker. presentAppPicker returns only a count; app identities stay as device-local tokens.')
     P('sf_unplug_picker_ios', 'Apple app picker', '/p/sf/unplug/apps/picker', 'unplug', reference=True, program='sf', phase='plan', kind='sheet', over='Choose apps', body=[
-        nativeslot('ios.familyActivityPicker', 'Apple’s app picker', 'System sheet drawn by iOS (FamilyActivityPicker). Tether can’t style it or read the app names.', 'ios', 320),
+        nativeslot('ios.familyActivityPicker', 'Apple’s app picker', None, 'ios', 320),
     ], footer=[
         button('Done', branch('System app picker result', [('Apps chosen', rep('sf_unplug_apps_chosen')), ('Cancelled', close())])),
         button('Cancel', close(), v='secondary'),
     ], source=src + ' presentAppPicker()', native=NATIVE_NEVER_PAUSED,
-       desc='Placeholder for the system picker. In the app this sheet is Apple’s; the buttons stand for the picker’s own Done / Cancel.')
+       desc='Placeholder for the system picker. In the app this sheet is Apple’s; the buttons stand for the picker’s own Done / Cancel.',
+       notes=['System sheet drawn by iOS (FamilyActivityPicker). Tether can’t style it or read the app names.'])  # P-62: not rendered
     P('sf_unplug_apps_android', 'Choose apps (Android)', '/p/sf/unplug/apps?state=android', 'unplug', reference=True, program='sf', phase='plan',
       variant_of='sf_unplug_apps', state='android', hdr=H('Choose apps', pill='Step 2 of 3'), body=[
         title('Choose the apps to pause'), text('This choice stays on this phone. Tether never receives it.', 'muted'),
@@ -569,45 +570,48 @@ def entry_surfaces():
          'How Tether looks outside the app: the home-screen widget, Siri and App Shortcuts on iPhone, and launcher shortcuts and the widget on Android. '
          'Labels are generic by default; program names appear only when Show sensitive details is on. These are reference surfaces for the native '
          'widget and shortcut work, not app routes, and are excluded from release-check counts.')
+    # P-62: designer notes and reference labels are kept in notes and not rendered.
     P('surface_widget_ios', 'Home-screen widget (iPhone)', '/surface/widget/ios', 'entries', reference=True, phase='rescue', kind='fullscreen', dark=True,
-      hdr=H('iPhone widget', left='close', pill='Reference', dark=True), body=[
-        eyebrow('Home screen · small widget'),
+      hdr=H('iPhone widget', left='close', dark=True), body=[
         card(v='coral', title='Rescue', text='Help for the next few minutes', action=sheet('rescue_pick')),
-        kv([('Label', 'Rescue (generic)'), ('Shows', 'No health data, no program names'), ('Tap', 'Opens Rescue, even when signed out'), ('Data', 'None. No App Group needed')]),
     ], source='rescue_pick entry "Home-screen widget / Siri: Rescue" in this spec; WidgetKit, static content',
-       desc='WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.')
+       desc='WidgetKit extension, static content. The coral card stands for the widget; tapping it opens Rescue.',
+       notes=['Header pill: Reference', 'Home screen · small widget',
+              'Label: Rescue (generic)', 'Shows: No health data, no program names', 'Tap: Opens Rescue, even when signed out', 'Data: None. No App Group needed'])
     P('surface_widget_android', 'Home-screen widget (Android)', '/surface/widget/android', 'entries', reference=True, phase='rescue', kind='fullscreen', dark=True,
-      hdr=H('Android widget', left='close', pill='Reference', dark=True), body=[
-        eyebrow('Home screen · 2×1 widget'),
+      hdr=H('Android widget', left='close', dark=True), body=[
         card(v='coral', title='Rescue', text='Help for the next few minutes', action=sheet('rescue_pick')),
-        kv([('Label', 'Rescue (generic)'), ('Shows', 'No health data, no program names'), ('Tap', 'Opens Rescue, even when signed out'), ('Built with', 'RemoteViews, no extra library')]),
-    ], source='rescue_pick entry in this spec; Android RemoteViews widget')
-    P('surface_shortcuts_ios', 'Siri & App Shortcuts (iPhone)', '/surface/shortcuts/ios', 'entries', reference=True, phase='rescue', hdr=H('Siri & Shortcuts', left='close', pill='Reference'), body=[
-        text('What people see in the Shortcuts app and Spotlight, and can say to Siri.', 'muted'),
+    ], source='rescue_pick entry in this spec; Android RemoteViews widget',
+       notes=['Header pill: Reference', 'Home screen · 2×1 widget',
+              'Label: Rescue (generic)', 'Shows: No health data, no program names', 'Tap: Opens Rescue, even when signed out', 'Built with: RemoteViews, no extra library'])
+    P('surface_shortcuts_ios', 'Siri & App Shortcuts (iPhone)', '/surface/shortcuts/ios', 'entries', reference=True, phase='rescue', hdr=H('Siri & Shortcuts', left='close'), body=[
         rows([row('Rescue', '“Rescue in Tether” · opens Rescue', lead=L_icon('✚'), action=sheet('rescue_pick')),
               row('My plan', '“Show my plan in Tether” · only while ClearAir is a focus program', lead=L_icon('▤'), action=go('ca_red'))], title='Tether Health · App Shortcuts'),
         card(v='mint', text='Labels stay generic so a locked phone doesn’t reveal which programs you use. Turn on Show sensitive details to see program names.'),
     ], source='rescue_pick and ca_red entries in this spec; App Intents (OpenRescueIntent, OpenClearAirRedZoneIntent)',
-       desc='App Intents exposed as App Shortcuts. The My plan intent is offered only while enrolled in ClearAir and opens the ClearAir red-zone plan.')
+       desc='App Intents exposed as App Shortcuts. The My plan intent is offered only while enrolled in ClearAir and opens the ClearAir red-zone plan.',
+       notes=['Header pill: Reference', 'What people see in the Shortcuts app and Spotlight, and can say to Siri.'])
     P('surface_shortcuts_ios_named', 'Siri & App Shortcuts (sensitive details on)', '/surface/shortcuts/ios?state=named', 'entries', reference=True, phase='rescue',
-      variant_of='surface_shortcuts_ios', state='Show sensitive details on', hdr=H('Siri & Shortcuts', left='close', pill='Reference'), body=[
-        text('With Show sensitive details on (Account → Notifications), shortcuts use program names.', 'muted'),
+      variant_of='surface_shortcuts_ios', state='Show sensitive details on', hdr=H('Siri & Shortcuts', left='close'), body=[
         rows([row('Rescue', '“Rescue in Tether” · opens Rescue', lead=L_icon('✚'), action=sheet('rescue_pick')),
               row('ClearAir red-zone plan', '“Show my ClearAir plan in Tether”', lead=L_prog('ca'), action=go('ca_red'))], title='Tether Health · App Shortcuts'),
-    ], source='surface_shortcuts_ios plus the Show sensitive details toggle on account_notifications in this spec')
-    # P-58: the designer note is kept in notes and not rendered.
-    P('surface_shortcuts_android', 'Launcher shortcuts (Android)', '/surface/shortcuts/android', 'entries', reference=True, phase='rescue', hdr=H('App shortcuts', left='close', pill='Reference'), body=[
-        rows([row('Rescue', 'Static shortcut · always there', lead=L_icon('✚'), action=sheet('rescue_pick')),
-              row('My plan', 'Dynamic shortcut · only while ClearAir is a focus program', lead=L_icon('▤'), action=go('ca_red'))], title='Tether Health'),
+    ], source='surface_shortcuts_ios plus the Show sensitive details toggle on account_notifications in this spec',
+       notes=['Header pill: Reference', 'With Show sensitive details on (Account → Notifications), shortcuts use program names.'])
+    # P-58, P-62: the designer note and reference labels are kept in notes and not rendered.
+    P('surface_shortcuts_android', 'Launcher shortcuts (Android)', '/surface/shortcuts/android', 'entries', reference=True, phase='rescue', hdr=H('App shortcuts', left='close'), body=[
+        rows([row('Rescue', lead=L_icon('✚'), action=sheet('rescue_pick')),
+              row('My plan', lead=L_icon('▤'), action=go('ca_red'))], title='Tether Health'),
         card(v='mint', text='Labels stay generic so the home screen doesn’t reveal which programs you use. Turn on Show sensitive details to see program names.'),
     ], source='rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager',
-       notes=['Shown when someone long-presses the Tether icon.'])
+       notes=['Shown when someone long-presses the Tether icon.', 'Header pill: Reference',
+              'Rescue: Static shortcut · always there', 'My plan: Dynamic shortcut · only while ClearAir is a focus program'])
     P('surface_shortcuts_android_named', 'Launcher shortcuts (sensitive details on)', '/surface/shortcuts/android?state=named', 'entries', reference=True, phase='rescue',
-      variant_of='surface_shortcuts_android', state='Show sensitive details on', hdr=H('App shortcuts', left='close', pill='Reference'), body=[
-        text('With Show sensitive details on (Account → Notifications), shortcuts use program names.', 'muted'),
-        rows([row('Rescue', 'Static shortcut · always there', lead=L_icon('✚'), action=sheet('rescue_pick')),
-              row('ClearAir red-zone plan', 'Dynamic shortcut', lead=L_prog('ca'), action=go('ca_red'))], title='Tether Health'),
-    ], source='surface_shortcuts_android plus the Show sensitive details toggle on account_notifications in this spec')
+      variant_of='surface_shortcuts_android', state='Show sensitive details on', hdr=H('App shortcuts', left='close'), body=[
+        rows([row('Rescue', lead=L_icon('✚'), action=sheet('rescue_pick')),
+              row('ClearAir red-zone plan', lead=L_prog('ca'), action=go('ca_red'))], title='Tether Health'),
+    ], source='surface_shortcuts_android plus the Show sensitive details toggle on account_notifications in this spec',
+       notes=['Header pill: Reference', 'With Show sensitive details on (Account → Notifications), shortcuts use program names.',
+              'Rescue: Static shortcut · always there', 'ClearAir red-zone plan: Dynamic shortcut'])
 
     # entry points: system surfaces and notifications that open the new screens
     entry('sf_unplug_shield', 'System: opening a paused app on iPhone (Unplug shield)')

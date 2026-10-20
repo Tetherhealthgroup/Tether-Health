@@ -15,8 +15,7 @@
   "header": {
     "t": "header",
     "title": "App shortcuts",
-    "left": "close",
-    "pill": "Reference"
+    "left": "close"
   },
   "body": [
     {
@@ -25,7 +24,6 @@
       "rows": [
         {
           "label": "Rescue",
-          "sub": "Static shortcut · always there",
           "action": {
             "type": "sheet",
             "to": "rescue_pick"
@@ -36,7 +34,6 @@
         },
         {
           "label": "My plan",
-          "sub": "Dynamic shortcut · only while ClearAir is a focus program",
           "action": {
             "type": "push",
             "to": "ca_red"
@@ -58,7 +55,10 @@
     "Copy needs clinical/legal review.",
     "Source: rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager",
     "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
-    "Shown when someone long-presses the Tether icon."
+    "Shown when someone long-presses the Tether icon.",
+    "Header pill: Reference",
+    "Rescue: Static shortcut · always there",
+    "My plan: Dynamic shortcut · only while ClearAir is a focus program"
   ],
   "over": null,
   "api": [],

@@ -5343,11 +5343,6 @@
         "size": "m"
       },
       {
-        "t": "text",
-        "text": "Mirrors tetherhealthgroup.com. Status shows what’s available today.",
-        "tone": "muted"
-      },
-      {
         "t": "list",
         "title": "Quit · Manage",
         "rows": [
@@ -5482,7 +5477,9 @@
       }
     ],
     "footer": [],
-    "notes": [],
+    "notes": [
+      "Mirrors tetherhealthgroup.com. Status shows what’s available today."
+    ],
     "over": null,
     "api": [],
     "actions": [
@@ -5496,7 +5493,7 @@
       },
       {
         "element": "BreatheFree",
-        "path": "body[2].rows[0]",
+        "path": "body[1].rows[0]",
         "action": {
           "type": "push",
           "to": "bf_intro"
@@ -5505,7 +5502,7 @@
       },
       {
         "element": "ScrollFree",
-        "path": "body[2].rows[1]",
+        "path": "body[1].rows[1]",
         "action": {
           "type": "push",
           "to": "sf_intro"
@@ -5514,7 +5511,7 @@
       },
       {
         "element": "ClearAir",
-        "path": "body[2].rows[2]",
+        "path": "body[1].rows[2]",
         "action": {
           "type": "push",
           "to": "ca_intro"
@@ -5523,7 +5520,7 @@
       },
       {
         "element": "Heartwise",
-        "path": "body[2].rows[3]",
+        "path": "body[1].rows[3]",
         "action": {
           "type": "push",
           "to": "hw_intro"
@@ -5532,7 +5529,7 @@
       },
       {
         "element": "Steady",
-        "path": "body[2].rows[4]",
+        "path": "body[1].rows[4]",
         "action": {
           "type": "push",
           "to": "st_intro"
@@ -5541,7 +5538,7 @@
       },
       {
         "element": "Renew",
-        "path": "body[2].rows[5]",
+        "path": "body[1].rows[5]",
         "action": {
           "type": "push",
           "to": "re_intro"
@@ -5550,7 +5547,7 @@
       },
       {
         "element": "Nourish",
-        "path": "body[3].rows[0]",
+        "path": "body[2].rows[0]",
         "action": {
           "type": "push",
           "to": "nu_intro"
@@ -5559,7 +5556,7 @@
       },
       {
         "element": "Stride",
-        "path": "body[3].rows[1]",
+        "path": "body[2].rows[1]",
         "action": {
           "type": "push",
           "to": "sd_intro"
@@ -5568,7 +5565,7 @@
       },
       {
         "element": "Ease",
-        "path": "body[3].rows[2]",
+        "path": "body[2].rows[2]",
         "action": {
           "type": "push",
           "to": "ea_intro"
@@ -5577,7 +5574,7 @@
       },
       {
         "element": "Checkup",
-        "path": "body[3].rows[3]",
+        "path": "body[2].rows[3]",
         "action": {
           "type": "push",
           "to": "ck_intro"
@@ -5586,7 +5583,7 @@
       },
       {
         "element": "Beacon",
-        "path": "body[3].rows[4]",
+        "path": "body[2].rows[4]",
         "action": {
           "type": "push",
           "to": "be_intro"
@@ -11736,7 +11733,7 @@
       },
       {
         "t": "text",
-        "text": "Notice what pulls you in, set a goal that feels doable, and pause for 60 seconds when the urge hits. Never called “addiction”.",
+        "text": "Notice what pulls you in, set a goal that feels doable, and pause for 60 seconds when the urge hits.",
         "tone": "muted"
       }
     ],
@@ -11766,7 +11763,9 @@
         "arrow": false
       }
     ],
-    "notes": [],
+    "notes": [
+      "Never called “addiction”."
+    ],
     "over": null,
     "api": [],
     "actions": [
@@ -27144,7 +27143,6 @@
         "t": "nativeslot",
         "id": "ios.familyActivityPicker",
         "label": "Apple’s app picker",
-        "caption": "System sheet drawn by iOS (FamilyActivityPicker). Tether can’t style it or read the app names.",
         "platform": "ios",
         "height": 320
       }
@@ -27191,7 +27189,8 @@
       "Copy needs clinical/legal review.",
       "Source: pigeons/unplug_api.dart @ origin/feat/unplug-v2.1-module presentAppPicker()",
       "Native requirement (iOS shield and app selection, Android overlay, picker and service): never shield or pause Tether, the phone dialer or emergency calling, even if they are selected or a session pauses \"everything\". Needs device validation.",
-      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
+      "System sheet drawn by iOS (FamilyActivityPicker). Tether can’t style it or read the app names."
     ],
     "over": "Choose apps",
     "api": [],
@@ -31815,14 +31814,9 @@
       "t": "header",
       "title": "iPhone widget",
       "left": "close",
-      "pill": "Reference",
       "dark": true
     },
     "body": [
-      {
-        "t": "eyebrow",
-        "text": "Home screen · small widget"
-      },
       {
         "t": "card",
         "variant": "coral",
@@ -31832,34 +31826,19 @@
           "type": "sheet",
           "to": "rescue_pick"
         }
-      },
-      {
-        "t": "kv",
-        "rows": [
-          [
-            "Label",
-            "Rescue (generic)"
-          ],
-          [
-            "Shows",
-            "No health data, no program names"
-          ],
-          [
-            "Tap",
-            "Opens Rescue, even when signed out"
-          ],
-          [
-            "Data",
-            "None. No App Group needed"
-          ]
-        ]
       }
     ],
     "footer": [],
     "notes": [
       "Copy needs clinical/legal review.",
       "Source: rescue_pick entry \"Home-screen widget / Siri: Rescue\" in this spec; WidgetKit, static content",
-      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
+      "Header pill: Reference",
+      "Home screen · small widget",
+      "Label: Rescue (generic)",
+      "Shows: No health data, no program names",
+      "Tap: Opens Rescue, even when signed out",
+      "Data: None. No App Group needed"
     ],
     "over": null,
     "api": [],
@@ -31875,7 +31854,7 @@
       },
       {
         "element": "Rescue",
-        "path": "body[1]",
+        "path": "body[0]",
         "action": {
           "type": "sheet",
           "to": "rescue_pick"
@@ -31902,14 +31881,9 @@
       "t": "header",
       "title": "Android widget",
       "left": "close",
-      "pill": "Reference",
       "dark": true
     },
     "body": [
-      {
-        "t": "eyebrow",
-        "text": "Home screen · 2×1 widget"
-      },
       {
         "t": "card",
         "variant": "coral",
@@ -31919,34 +31893,19 @@
           "type": "sheet",
           "to": "rescue_pick"
         }
-      },
-      {
-        "t": "kv",
-        "rows": [
-          [
-            "Label",
-            "Rescue (generic)"
-          ],
-          [
-            "Shows",
-            "No health data, no program names"
-          ],
-          [
-            "Tap",
-            "Opens Rescue, even when signed out"
-          ],
-          [
-            "Built with",
-            "RemoteViews, no extra library"
-          ]
-        ]
       }
     ],
     "footer": [],
     "notes": [
       "Copy needs clinical/legal review.",
       "Source: rescue_pick entry in this spec; Android RemoteViews widget",
-      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
+      "Header pill: Reference",
+      "Home screen · 2×1 widget",
+      "Label: Rescue (generic)",
+      "Shows: No health data, no program names",
+      "Tap: Opens Rescue, even when signed out",
+      "Built with: RemoteViews, no extra library"
     ],
     "over": null,
     "api": [],
@@ -31962,7 +31921,7 @@
       },
       {
         "element": "Rescue",
-        "path": "body[1]",
+        "path": "body[0]",
         "action": {
           "type": "sheet",
           "to": "rescue_pick"
@@ -31988,15 +31947,9 @@
     "header": {
       "t": "header",
       "title": "Siri & Shortcuts",
-      "left": "close",
-      "pill": "Reference"
+      "left": "close"
     },
     "body": [
-      {
-        "t": "text",
-        "text": "What people see in the Shortcuts app and Spotlight, and can say to Siri.",
-        "tone": "muted"
-      },
       {
         "t": "list",
         "title": "Tether Health · App Shortcuts",
@@ -32035,7 +31988,9 @@
     "notes": [
       "Copy needs clinical/legal review.",
       "Source: rescue_pick and ca_red entries in this spec; App Intents (OpenRescueIntent, OpenClearAirRedZoneIntent)",
-      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
+      "Header pill: Reference",
+      "What people see in the Shortcuts app and Spotlight, and can say to Siri."
     ],
     "over": null,
     "api": [],
@@ -32051,7 +32006,7 @@
       },
       {
         "element": "Rescue",
-        "path": "body[1].rows[0]",
+        "path": "body[0].rows[0]",
         "action": {
           "type": "sheet",
           "to": "rescue_pick"
@@ -32060,7 +32015,7 @@
       },
       {
         "element": "My plan",
-        "path": "body[1].rows[1]",
+        "path": "body[0].rows[1]",
         "action": {
           "type": "push",
           "to": "ca_red"
@@ -32086,15 +32041,9 @@
     "header": {
       "t": "header",
       "title": "Siri & Shortcuts",
-      "left": "close",
-      "pill": "Reference"
+      "left": "close"
     },
     "body": [
-      {
-        "t": "text",
-        "text": "With Show sensitive details on (Account → Notifications), shortcuts use program names.",
-        "tone": "muted"
-      },
       {
         "t": "list",
         "title": "Tether Health · App Shortcuts",
@@ -32128,7 +32077,9 @@
     "notes": [
       "Copy needs clinical/legal review.",
       "Source: surface_shortcuts_ios plus the Show sensitive details toggle on account_notifications in this spec",
-      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
+      "Header pill: Reference",
+      "With Show sensitive details on (Account → Notifications), shortcuts use program names."
     ],
     "over": null,
     "api": [],
@@ -32144,7 +32095,7 @@
       },
       {
         "element": "Rescue",
-        "path": "body[1].rows[0]",
+        "path": "body[0].rows[0]",
         "action": {
           "type": "sheet",
           "to": "rescue_pick"
@@ -32153,7 +32104,7 @@
       },
       {
         "element": "ClearAir red-zone plan",
-        "path": "body[1].rows[1]",
+        "path": "body[0].rows[1]",
         "action": {
           "type": "push",
           "to": "ca_red"
@@ -32179,8 +32130,7 @@
     "header": {
       "t": "header",
       "title": "App shortcuts",
-      "left": "close",
-      "pill": "Reference"
+      "left": "close"
     },
     "body": [
       {
@@ -32189,7 +32139,6 @@
         "rows": [
           {
             "label": "Rescue",
-            "sub": "Static shortcut · always there",
             "action": {
               "type": "sheet",
               "to": "rescue_pick"
@@ -32200,7 +32149,6 @@
           },
           {
             "label": "My plan",
-            "sub": "Dynamic shortcut · only while ClearAir is a focus program",
             "action": {
               "type": "push",
               "to": "ca_red"
@@ -32222,7 +32170,10 @@
       "Copy needs clinical/legal review.",
       "Source: rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager",
       "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
-      "Shown when someone long-presses the Tether icon."
+      "Shown when someone long-presses the Tether icon.",
+      "Header pill: Reference",
+      "Rescue: Static shortcut · always there",
+      "My plan: Dynamic shortcut · only while ClearAir is a focus program"
     ],
     "over": null,
     "api": [],
@@ -32273,22 +32224,15 @@
     "header": {
       "t": "header",
       "title": "App shortcuts",
-      "left": "close",
-      "pill": "Reference"
+      "left": "close"
     },
     "body": [
-      {
-        "t": "text",
-        "text": "With Show sensitive details on (Account → Notifications), shortcuts use program names.",
-        "tone": "muted"
-      },
       {
         "t": "list",
         "title": "Tether Health",
         "rows": [
           {
             "label": "Rescue",
-            "sub": "Static shortcut · always there",
             "action": {
               "type": "sheet",
               "to": "rescue_pick"
@@ -32299,7 +32243,6 @@
           },
           {
             "label": "ClearAir red-zone plan",
-            "sub": "Dynamic shortcut",
             "action": {
               "type": "push",
               "to": "ca_red"
@@ -32315,7 +32258,11 @@
     "notes": [
       "Copy needs clinical/legal review.",
       "Source: surface_shortcuts_android plus the Show sensitive details toggle on account_notifications in this spec",
-      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+      "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
+      "Header pill: Reference",
+      "With Show sensitive details on (Account → Notifications), shortcuts use program names.",
+      "Rescue: Static shortcut · always there",
+      "ClearAir red-zone plan: Dynamic shortcut"
     ],
     "over": null,
     "api": [],
@@ -32331,7 +32278,7 @@
       },
       {
         "element": "Rescue",
-        "path": "body[1].rows[0]",
+        "path": "body[0].rows[0]",
         "action": {
           "type": "sheet",
           "to": "rescue_pick"
@@ -32340,7 +32287,7 @@
       },
       {
         "element": "ClearAir red-zone plan",
-        "path": "body[1].rows[1]",
+        "path": "body[0].rows[1]",
         "action": {
           "type": "push",
           "to": "ca_red"

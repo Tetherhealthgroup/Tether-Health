@@ -20,7 +20,7 @@ class SfUnplugPickerIosScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return TSheet(
       children: [
-        TNativeSlot(id: 'ios.familyActivityPicker', label: 'Apple’s app picker', caption: 'System sheet drawn by iOS (FamilyActivityPicker). Tether can’t style it or read the app names.', height: 320.0),
+        TNativeSlot(id: 'ios.familyActivityPicker', label: 'Apple’s app picker', height: 320.0),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Done', onPressed: () => TNav.branch(context, 'System app picker result', <String, VoidCallback>{'Apps chosen': () => TNav.replace(context, Routes.sfUnplugAppsChosen), 'Cancelled': () => TNav.close(context)}), arrow: true),

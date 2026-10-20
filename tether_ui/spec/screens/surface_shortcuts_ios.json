@@ -15,15 +15,9 @@
   "header": {
     "t": "header",
     "title": "Siri & Shortcuts",
-    "left": "close",
-    "pill": "Reference"
+    "left": "close"
   },
   "body": [
-    {
-      "t": "text",
-      "text": "What people see in the Shortcuts app and Spotlight, and can say to Siri.",
-      "tone": "muted"
-    },
     {
       "t": "list",
       "title": "Tether Health · App Shortcuts",
@@ -62,7 +56,9 @@
   "notes": [
     "Copy needs clinical/legal review.",
     "Source: rescue_pick and ca_red entries in this spec; App Intents (OpenRescueIntent, OpenClearAirRedZoneIntent)",
-    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
+    "Header pill: Reference",
+    "What people see in the Shortcuts app and Spotlight, and can say to Siri."
   ],
   "over": null,
   "api": [],
@@ -78,7 +74,7 @@
     },
     {
       "element": "Rescue",
-      "path": "body[1].rows[0]",
+      "path": "body[0].rows[0]",
       "action": {
         "type": "sheet",
         "to": "rescue_pick"
@@ -87,7 +83,7 @@
     },
     {
       "element": "My plan",
-      "path": "body[1].rows[1]",
+      "path": "body[0].rows[1]",
       "action": {
         "type": "push",
         "to": "ca_red"

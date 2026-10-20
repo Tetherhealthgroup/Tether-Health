@@ -235,10 +235,12 @@ def shared():
         rows([row('Medication center', 'BreatheFree · nicotine patch', action=go('bf_meds')), row('Programs & sharing', 'Status, consent, data', action=go('account_programs'))], title='Manage'),
     ], footer=[button('Add a program', go('catalog'), v='secondary')])
     S('catalog', 'Add a program', '/programs', 'plans', phase='welcome', hdr=H('All programs'), body=[
-        title('Choose what you want support with.'), text('Mirrors tetherhealthgroup.com. Status shows what’s available today.', 'muted'),
+        title('Choose what you want support with.'),
         rows([row(PROGRAMS[p][0], f'{PROGRAMS[p][1]} · {PROGRAMS[p][2]}', lead=L_prog(p), action=go(f'{p}_intro')) for p in ORDER[:6]], title='Quit · Manage'),
         rows([row(PROGRAMS[p][0], f'{PROGRAMS[p][1]} · {PROGRAMS[p][2]}', lead=L_prog(p), action=go(f'{p}_intro')) for p in ORDER[6:]], title='Habits · Support · Prevent'),
-    ], desc='Catalog is served by the catalogue service so a program can launch without an app release.')
+    ], desc='Catalog is served by the catalogue service so a program can launch without an app release.',
+       # P-62: designer note, kept in the spec and not rendered.
+       notes=['Mirrors tetherhealthgroup.com. Status shows what’s available today.'])
     S('focus_full', 'Focus slots full', '/programs/focus-full', 'plans', phase='plan', kind='sheet', over='Heartwise', body=[
         eyebrow('Both focus slots are in use'), title('Add Heartwise as…'),
         radio([ri('Learn only for now', 'Lessons, no reminders. Upgrade anytime.', 'Suggested'), ri('Swap with ScrollFree', 'ScrollFree pauses. Its data is kept.'), ri('Swap with BreatheFree', 'Not suggested during your quit week.')], key='option'),
