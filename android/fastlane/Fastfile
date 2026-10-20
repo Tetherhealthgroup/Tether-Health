@@ -36,9 +36,25 @@ platform :android do
     if FastlaneCore::Globals.verbose? || $troubleshoot
       UI.user_error!("Refusing to run with --verbose or --troubleshoot: verbose output can expose credential details.")
     end
+    if !ENV["DEBUG"].to_s.empty? || !ENV["FASTLANE_DISABLE_SECRET_MASKING"].to_s.empty?
+      UI.user_error!("Refusing to run: DEBUG or FASTLANE_DISABLE_SECRET_MASKING is set. Either can expose credential details.")
+    end
     supply_env = ENV.keys.grep(/\ASUPPLY_/).sort
     unless supply_env.empty?
       UI.user_error!("Refusing to run: unset #{supply_env.join(', ')}. The lanes set every upload option themselves.")
+    end
+    # The fastlane folder holds only the two tracked files and the README.md
+    # and report.xml that fastlane writes on each run.
+    fastlane_dir = File.join(REPO_ROOT, "android", "fastlane")
+    unless (Dir.children(fastlane_dir) - ["Appfile", "Fastfile", "README.md", "report.xml"]).empty?
+      UI.user_error!("Refusing to run: the fastlane folder holds an extra file or folder (not shown). Only the two tracked files and fastlane's own output may be there.")
+    end
+    # No env file (*.env*, dot files included) in the android or fastlane folder.
+    env_files = [File.join(REPO_ROOT, "android"), fastlane_dir].flat_map do |dir|
+      Dir.glob("*.env*", File::FNM_DOTMATCH, base: dir)
+    end
+    unless env_files.empty?
+      UI.user_error!("Refusing to run: an environment file (not shown) is in the android or fastlane folder. Remove it before uploading.")
     end
     # The upload action prints a settings table that includes the key path.
     ENV["FASTLANE_SKIP_ALL_LANE_SUMMARIES"] = "1"

@@ -15,6 +15,9 @@ const String appfilePath = 'android/fastlane/Appfile';
 const String gemfilePath = 'android/Gemfile';
 const String gemfileLockPath = 'android/Gemfile.lock';
 
+/// The fastlane version the Gemfile pins and Gemfile.lock resolves.
+const String fastlaneVersion = '2.241.1';
+
 /// A comment-only line: optional spaces or tabs, then `#`.
 final RegExp commentLine = RegExp(r'^[ \t]*#');
 
@@ -121,9 +124,22 @@ const String pinnedBeforeAll = r'''
     if FastlaneCore::Globals.verbose? || $troubleshoot
       UI.user_error!("Refusing to run with --verbose or --troubleshoot: verbose output can expose credential details.")
     end
+    if !ENV["DEBUG"].to_s.empty? || !ENV["FASTLANE_DISABLE_SECRET_MASKING"].to_s.empty?
+      UI.user_error!("Refusing to run: DEBUG or FASTLANE_DISABLE_SECRET_MASKING is set. Either can expose credential details.")
+    end
     supply_env = ENV.keys.grep(/\ASUPPLY_/).sort
     unless supply_env.empty?
       UI.user_error!("Refusing to run: unset #{supply_env.join(', ')}. The lanes set every upload option themselves.")
+    end
+    fastlane_dir = File.join(REPO_ROOT, "android", "fastlane")
+    unless (Dir.children(fastlane_dir) - ["Appfile", "Fastfile", "README.md", "report.xml"]).empty?
+      UI.user_error!("Refusing to run: the fastlane folder holds an extra file or folder (not shown). Only the two tracked files and fastlane's own output may be there.")
+    end
+    env_files = [File.join(REPO_ROOT, "android"), fastlane_dir].flat_map do |dir|
+      Dir.glob("*.env*", File::FNM_DOTMATCH, base: dir)
+    end
+    unless env_files.empty?
+      UI.user_error!("Refusing to run: an environment file (not shown) is in the android or fastlane folder. Remove it before uploading.")
     end
     ENV["FASTLANE_SKIP_ALL_LANE_SUMMARIES"] = "1"''';
 
@@ -293,6 +309,8 @@ void main() {
       'CI',
       'GITHUB_ACTIONS',
       'TETHER_PLAY_JSON_KEY',
+      'DEBUG',
+      'FASTLANE_DISABLE_SECRET_MASKING',
       'FASTLANE_SKIP_ALL_LANE_SUMMARIES',
       'FASTLANE_HIDE_GITHUB_ISSUES',
       'FASTLANE_OPT_OUT_USAGE',
@@ -336,7 +354,9 @@ void main() {
     expect(laneBody(fastfile, 'validate'), pinnedValidateLane);
   });
 
-  test('before_all refuses CI, --env, --verbose and SUPPLY_* variables', () {
+  test(
+      'before_all refuses CI, --env, --verbose, DEBUG, SUPPLY_* variables '
+      'and extra fastlane or env files', () {
     final lines = fastfile.split('\n');
     final start = lines.indexOf('  before_all do');
     expect(start, isNot(-1), reason: 'before_all not found');
@@ -551,21 +571,55 @@ void main() {
         : 'not a git work tree; the ignore files are checked as text above',
   );
 
-  test('the Gemfile pins fastlane exactly, matching Gemfile.lock', () {
+  test(
+    'android/ and android/fastlane/ hold only the expected files',
+    () {
+      // Files git tracks or would add (ignored files such as fastlane's
+      // generated README.md and report.xml are not listed).
+      final files = repoFiles('android');
+      expect(
+        files.where((p) => p.startsWith('android/fastlane/')).toSet(),
+        {'android/fastlane/Appfile', 'android/fastlane/Fastfile'},
+      );
+      expect(files.where((p) => p.startsWith('android/.fastlane/')), isEmpty);
+      expect(
+        files.where((p) => p.split('/').length == 2).toSet(),
+        {
+          'android/.gitignore',
+          'android/Gemfile',
+          'android/Gemfile.lock',
+          'android/build.gradle.kts',
+          'android/gradle.properties',
+          'android/settings.gradle.kts',
+        },
+      );
+    },
+    skip: gitWorkTree
+        ? false
+        : 'not a git work tree; the file set comes from git ls-files',
+  );
+
+  test('the Gemfile is pinned line by line, matching Gemfile.lock', () {
     final gemfile = code(File(gemfilePath).readAsStringSync());
-    expect(gemfile, contains('source "https://rubygems.org"'));
-    final gems = RegExp(r'^gem\s+"([^"]+)"(.*)$', multiLine: true)
-        .allMatches(gemfile)
-        .toList();
-    expect(gems.map((m) => m[1]), ['fastlane']);
-    final pin =
-        RegExp(r'^,\s*"(\d+\.\d+\.\d+)"\s*$').firstMatch(gems.single[2]!);
-    expect(pin, isNotNull, reason: 'fastlane must be pinned to one version');
-    final version = pin![1]!;
+    expect(nonBlank(gemfile.split('\n')), [
+      'source "https://rubygems.org"',
+      'gem "fastlane", "$fastlaneVersion"',
+    ]);
 
     final lock = File(gemfileLockPath).readAsStringSync();
-    expect(lock, contains('\nDEPENDENCIES\n  fastlane (= $version)\n'));
-    expect(lock, contains('\n    fastlane ($version)\n'));
+    expect(lock, contains('\nDEPENDENCIES\n  fastlane (= $fastlaneVersion)\n'));
+    expect(lock, contains('\n    fastlane ($fastlaneVersion)\n'));
+  });
+
+  test('Gemfile.lock has only the expected sections, in order', () {
+    // Every line that does not start with a space is a section header.
+    final headers = RegExp(r'^[^ \n].*$', multiLine: true)
+        .allMatches(File(gemfileLockPath).readAsStringSync())
+        .map((m) => m[0]);
+    expect(
+      headers,
+      ['GEM', 'PLATFORMS', 'DEPENDENCIES', 'CHECKSUMS', 'BUNDLED WITH'],
+    );
   });
 
   test('every locked gem has a sha256 checksum', () {
