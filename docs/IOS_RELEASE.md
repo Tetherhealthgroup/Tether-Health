@@ -169,11 +169,13 @@ is recorded as gap G-10 in section 2.
   (`lib/screens/approved_screen_player.dart:709-732`, `lib/main.dart:393-404`),
   which calls `DELETE /v1/account/data` with `{"confirmation": "DELETE"}`
   (`lib/account/account_data_api_client.dart:106-113`).
-- Server: `api/src/account/account.controller.ts:16-19` →
-  `AccountService.deleteData` (`api/src/account/account.service.ts:78-132`):
-  deletion barrier RPC (`:85`), avatar purge (`:94`), `delete_my_app_data`
-  RPC (`:102`), then `deleteAuthIdentity` (`:110`), which hard-deletes the
-  Supabase Auth user (`api/src/auth/supabase-admin.service.ts:25-32`).
+- Server: `api/src/account/account.controller.ts` →
+  `AccountService.deleteData` (`api/src/account/account.service.ts`), all with
+  the member's own token: the `begin_account_deletion` barrier RPC, avatar
+  removal through Storage (`api/src/account/avatar-objects.ts`), then the
+  `delete_my_account` RPC, which deletes the app data and hard-deletes the
+  Supabase Auth user in one transaction
+  (`supabase/migrations/202610180008_delete_my_account.sql`).
 - Rule (Assumed, confirm against App Review Guideline **5.1.1(v)** Account
   Sign-In): an app that supports account creation must let users start
   account deletion inside the app. The code path exists in this repo.

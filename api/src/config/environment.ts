@@ -211,17 +211,18 @@ export const environmentSchema = Joi.object({
       return value;
     })
     .required(),
-  SUPABASE_SERVICE_ROLE_KEY: Joi.string()
-    .min(20)
-    .custom((value: string, helpers) =>
-      isPrivilegedSupabaseKey(value) ? value : helpers.error("any.invalid"),
-    )
-    .required(),
+  // The API never holds the Supabase service key: account deletion runs with
+  // the member's own token. Startup fails while this variable is set to any
+  // value, including an empty one, so the key cannot linger in the process
+  // environment.
+  SUPABASE_SERVICE_ROLE_KEY: Joi.any().forbidden(),
   SUPABASE_JWT_AUDIENCE: Joi.string().default("authenticated"),
+  // At most the database's own recent sign-in window for account deletion
+  // (600 seconds), so the API is never looser than the database.
   RECENT_AUTH_MAX_AGE_SECONDS: Joi.number()
     .integer()
     .min(60)
-    .max(3600)
+    .max(600)
     .default(600),
   REQUEST_BODY_LIMIT_BYTES: Joi.number()
     .integer()

@@ -1,15 +1,27 @@
+import { randomUUID } from "node:crypto";
+import { Logger } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from "@nestjs/platform-fastify";
 import { Test } from "@nestjs/testing";
 import { AppModule } from "../src/app.module";
-import { AccountService } from "../src/account/account.service";
+import {
+  AccountDeletionErrorCode,
+  AccountService,
+} from "../src/account/account.service";
 import { TokenVerifier } from "../src/auth/token-verifier";
+import { environmentSchema } from "../src/config/environment";
+import { buildFastifyAdapterOptions } from "../src/config/fastify-adapter-options";
 import { configureApp } from "../src/configure-app";
+import { UserSupabaseClientFactory } from "../src/enrolments/user-supabase-client";
 import { ProfileService } from "../src/profile/profile.service";
 import { QuitPlanService } from "../src/quit-plan/quit-plan.service";
 import { ProgramDataService } from "../src/program-data/program-data.service";
+import { DATABASE_ERRORS } from "./support/database-errors";
+import { FakePostgrest, registryError } from "./support/fake-postgrest";
+import { openApiErrors } from "./support/openapi";
 
 describe("API (e2e)", () => {
   let app: NestFastifyApplication;
@@ -303,6 +315,374 @@ describe("API (e2e)", () => {
     expect(response.json()).toEqual(
       expect.objectContaining({ statusCode: 413, error: "Request rejected" }),
     );
+  });
+});
+
+/**
+ * Account deletion end to end through the real Nest app, guard, validation,
+ * filters, AccountService and supabase-js client. Mocked: TokenVerifier and
+ * the network below supabase-js, a fake PostgREST and Storage API
+ * (test/support/fake-postgrest.ts) that takes the caller from each
+ * request's own bearer token and emulates begin_account_deletion,
+ * delete_my_account and the avatar bucket.
+ */
+describe("Account deletion (e2e)", () => {
+  const TOKEN_PREFIX = "synthetic-deletion-token";
+  let app: NestFastifyApplication;
+  let fake: FakePostgrest;
+  const users = new Map<string, { sub: string; authTime: number }>();
+  const logged: string[] = [];
+  let counter = 0;
+
+  interface Member {
+    token: string;
+    id: string;
+    address: string;
+  }
+
+  beforeAll(async () => {
+    fake = new FakePostgrest();
+    const module = await Test.createTestingModule({ imports: [AppModule] })
+      .overrideProvider(TokenVerifier)
+      .useValue({
+        verify: (token: string) => {
+          const user = users.get(token);
+          return user
+            ? Promise.resolve(user)
+            : Promise.reject(new Error("invalid token"));
+        },
+      })
+      .overrideProvider(UserSupabaseClientFactory)
+      .useFactory({
+        factory: (config: ConfigService) =>
+          new UserSupabaseClientFactory(config, fake.fetch),
+        inject: [ConfigService],
+      })
+      .compile();
+    app = module.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter({ bodyLimit: 65536 }),
+    );
+    await configureApp(app);
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+    for (const level of ["log", "warn", "error", "debug", "verbose"] as const) {
+      jest
+        .spyOn(Logger.prototype, level)
+        .mockImplementation((...args: unknown[]) => {
+          logged.push(JSON.stringify(args));
+        });
+    }
+  });
+
+  beforeEach(() => {
+    logged.length = 0;
+    fake.functionOwnerBypassesRls = true;
+  });
+
+  afterEach(() => {
+    const pending = fake.pendingFailures;
+    fake.clearFailures();
+    expect(pending).toBe(0);
+  });
+
+  afterAll(async () => {
+    jest.restoreAllMocks();
+    await app.close();
+  });
+
+  /** A member with a profile, a quit plan, two program snapshots and avatars. */
+  const newMember = (avatars = 2): Member => {
+    counter += 1;
+    const member = {
+      token: `${TOKEN_PREFIX}-${counter}`,
+      id: randomUUID(),
+      address: `198.51.100.${counter}`,
+    };
+    users.set(member.token, {
+      sub: member.id,
+      authTime: Math.floor(Date.now() / 1000),
+    });
+    fake.addUser(member.token, member.id);
+    fake.addQuitPlan(member.id);
+    fake.addProgramData(member.id, "steady");
+    fake.addProgramData(member.id, "heartwise");
+    for (let index = 0; index < avatars; index += 1) {
+      fake.addAvatarObject(`${member.id}/avatar-${index}.webp`);
+    }
+    return member;
+  };
+
+  const requestsOf = (member: Member) =>
+    fake.requests.filter((request) => request.token === member.token);
+
+  const deleteAccount = async (member: Member) => {
+    const before = fake.requests.length;
+    const response = await app.inject({
+      method: "DELETE",
+      url: "/v1/account/data",
+      remoteAddress: member.address,
+      headers: { authorization: `Bearer ${member.token}` },
+      payload: { confirmation: "DELETE" },
+    });
+    const sent = fake.requests.slice(before);
+    // Every call below the API carries the member's own token.
+    expect(sent.map((request) => request.token)).toEqual(
+      sent.map(() => member.token),
+    );
+    expect(response.body).not.toContain(member.token);
+    expect(response.body).not.toContain(member.id);
+    expect(response.body).not.toMatch(/TH0\d\d|Synthetic storage failure/);
+    return { response, sent: sent.map((request) => request.path) };
+  };
+
+  const rowsOf = (member: Member) => ({
+    identity: fake.table("auth_users").filter((row) => row.id === member.id)
+      .length,
+    profiles: fake.table("profiles").filter((row) => row.id === member.id)
+      .length,
+    quitPlans: fake
+      .table("quit_plans")
+      .filter((row) => row.user_id === member.id).length,
+    programData: fake
+      .table("program_data")
+      .filter((row) => row.user_id === member.id).length,
+    avatars: fake
+      .table("storage_objects")
+      .filter((row) => String(row.name).startsWith(`${member.id}/`)).length,
+  });
+  const barrierSet = (member: Member) =>
+    fake.table("profiles").find((row) => row.id === member.id)
+      ?.account_deletion_started_at !== null;
+
+  const BEGIN = "/rest/v1/rpc/begin_account_deletion";
+  const DELETE_ACCOUNT = "/rest/v1/rpc/delete_my_account";
+  const LIST = "/storage/v1/object/list-v2/avatars";
+  const REMOVE = "/storage/v1/object/avatars";
+
+  it("deletes data, avatars and identity with the member's token and returns the contract receipt", async () => {
+    const member = newMember();
+    const bystander = newMember(1);
+
+    const { response, sent } = await deleteAccount(member);
+
+    expect(response.statusCode).toBe(200);
+    const receipt: unknown = response.json();
+    expect(openApiErrors("AccountDeletionReceipt", receipt)).toEqual([]);
+    expect(receipt).toMatchObject({
+      deleted: { profiles: 1, quitPlans: 1, avatarObjects: 2, programData: 2 },
+      authIdentityDeleted: true,
+      authIdentityStatus: "deleted",
+    });
+    expect(sent).toEqual([BEGIN, LIST, REMOVE, DELETE_ACCOUNT]);
+    const listed = requestsOf(member).find((request) => request.path === LIST);
+    expect(listed?.body).toMatchObject({ prefix: `${member.id}/` });
+    expect(rowsOf(member)).toEqual({
+      identity: 0,
+      profiles: 0,
+      quitPlans: 0,
+      programData: 0,
+      avatars: 0,
+    });
+    expect(rowsOf(bystander)).toEqual({
+      identity: 1,
+      profiles: 1,
+      quitPlans: 1,
+      programData: 2,
+      avatars: 1,
+    });
+    expect(logged).toEqual([
+      JSON.stringify([
+        `account_deleted requestId=${(receipt as { requestId: string }).requestId} status=completed`,
+      ]),
+    ]);
+  });
+
+  it("takes the deleted account only from the verified token, never from the body", async () => {
+    const member = newMember();
+    const other = newMember(1);
+    const before = fake.requests.length;
+
+    for (const extra of [
+      { subject: other.id },
+      { userId: other.id },
+      { prefix: `${other.id}/` },
+    ]) {
+      const response = await app.inject({
+        method: "DELETE",
+        url: "/v1/account/data",
+        remoteAddress: member.address,
+        headers: { authorization: `Bearer ${member.token}` },
+        payload: { confirmation: "DELETE", ...extra },
+      });
+      expect(response.statusCode).toBe(400);
+    }
+
+    expect(fake.requests.length).toBe(before);
+    expect(rowsOf(member)).toMatchObject({ identity: 1, avatars: 2 });
+    expect(rowsOf(other)).toMatchObject({ identity: 1, avatars: 1 });
+  });
+
+  it("calls no other deletion function and no Auth admin endpoint", async () => {
+    const member = newMember(0);
+
+    const { response } = await deleteAccount(member);
+
+    expect(response.statusCode).toBe(200);
+    const paths = requestsOf(member).map((request) => request.path);
+    expect(paths.filter((path) => path.startsWith("/rest/v1/rpc/"))).toEqual([
+      BEGIN,
+      DELETE_ACCOUNT,
+    ]);
+    expect(paths.filter((path) => path.startsWith("/auth/"))).toEqual([]);
+    expect(
+      fake.requests.some((request) => request.path.includes("admin")),
+    ).toBe(false);
+  });
+
+  it("answers a retry after a lost response with a zero-count receipt", async () => {
+    const member = newMember();
+    expect((await deleteAccount(member)).response.statusCode).toBe(200);
+
+    const { response, sent } = await deleteAccount(member);
+
+    expect(response.statusCode).toBe(200);
+    const receipt: unknown = response.json();
+    expect(openApiErrors("AccountDeletionReceipt", receipt)).toEqual([]);
+    expect(receipt).toMatchObject({
+      deleted: { profiles: 0, quitPlans: 0, avatarObjects: 0, programData: 0 },
+      authIdentityDeleted: true,
+    });
+    expect(sent).toEqual([BEGIN, LIST, DELETE_ACCOUNT]);
+  });
+
+  it("maps TH017 from delete_my_account to 401 and deletes no data", async () => {
+    const member = newMember();
+    fake.setSignInAge(member.token, 601);
+
+    const { response, sent } = await deleteAccount(member);
+
+    expect(response.statusCode).toBe(401);
+    expect(sent).toEqual([BEGIN, LIST, REMOVE, DELETE_ACCOUNT]);
+    expect(rowsOf(member)).toEqual({
+      identity: 1,
+      profiles: 1,
+      quitPlans: 1,
+      programData: 2,
+      avatars: 0,
+    });
+    expect(logged).toEqual([]);
+  });
+
+  it("maps TH017 from begin_account_deletion to 401 before touching storage", async () => {
+    const member = newMember();
+    fake.failNext(
+      "POST",
+      "rpc/begin_account_deletion",
+      registryError("recent_authentication_required"),
+    );
+
+    const { response, sent } = await deleteAccount(member);
+
+    expect(response.statusCode).toBe(401);
+    expect(sent).toEqual([BEGIN]);
+    expect(barrierSet(member)).toBe(false);
+    expect(rowsOf(member).avatars).toBe(2);
+  });
+
+  it("maps TH016 to 502 and logs only the status and code", async () => {
+    const member = newMember();
+    // An avatar object appears after the cleanup, before the function runs.
+    fake.interleave("POST", "rpc/delete_my_account", () =>
+      fake.addAvatarObject(`${member.id}/late.webp`),
+    );
+
+    const { response, sent } = await deleteAccount(member);
+
+    expect(response.statusCode).toBe(502);
+    expect(sent).toEqual([BEGIN, LIST, REMOVE, DELETE_ACCOUNT]);
+    expect(rowsOf(member)).toMatchObject({ identity: 1, profiles: 1 });
+    const failures = logged.filter((line) =>
+      line.includes("account_deletion_failed"),
+    );
+    expect(failures).toHaveLength(1);
+    expect(failures[0]).toMatch(
+      /^\["account_deletion_failed requestId=[0-9a-f-]{36} status=avatar_objects_remain code=TH016"\]$/,
+    );
+  });
+
+  it("maps TH020 to 502 with only the code in the log", async () => {
+    const member = newMember();
+    fake.functionOwnerBypassesRls = false;
+
+    const { response } = await deleteAccount(member);
+
+    expect(response.statusCode).toBe(502);
+    expect(rowsOf(member)).toMatchObject({ identity: 1, profiles: 1 });
+    const failures = logged.filter((line) =>
+      line.includes("account_deletion_failed"),
+    );
+    expect(failures).toHaveLength(1);
+    expect(failures[0]).toMatch(
+      /^\["account_deletion_failed requestId=[0-9a-f-]{36} status=account_delete_failed code=TH020"\]$/,
+    );
+    const joined = logged.join("\n");
+    expect(joined).not.toContain("rls_bypass_required");
+    expect(joined).not.toContain("row-level security");
+    expect(joined).not.toContain(member.id);
+  });
+
+  it("fails with 502 and never calls delete_my_account when avatar cleanup fails", async () => {
+    const member = newMember();
+    fake.failNextStorage("remove");
+
+    const { response, sent } = await deleteAccount(member);
+
+    expect(response.statusCode).toBe(502);
+    expect(sent).toEqual([BEGIN, LIST, REMOVE]);
+    expect(barrierSet(member)).toBe(true);
+    expect(rowsOf(member)).toMatchObject({ identity: 1, profiles: 1 });
+    expect(
+      logged.filter((line) => line.includes("account_deletion_failed")),
+    ).toEqual([expect.stringMatching(/status=avatar_cleanup_failed"\]$/)]);
+  });
+
+  it("every registry code the deletion maps is in the registry under the same name", () => {
+    const snakeCase = (name: string) =>
+      name.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+    for (const [name, code] of Object.entries(AccountDeletionErrorCode)) {
+      expect(DATABASE_ERRORS.find((entry) => entry.code === code)?.hint).toBe(
+        snakeCase(name),
+      );
+    }
+  });
+});
+
+describe("startup without the Supabase service key", () => {
+  const KEY_NAME = "SUPABASE_SERVICE_ROLE_KEY";
+
+  it.each([
+    ["a secret key", "sb_secret_synthetic-server-key"],
+    ["an empty value", ""],
+  ])("refuses to start while the variable holds %s", async (_, value) => {
+    expect(process.env[KEY_NAME]).toBeUndefined();
+    const env = { ...process.env, [KEY_NAME]: value };
+    expect(() => buildFastifyAdapterOptions(env)).toThrow(KEY_NAME);
+
+    process.env[KEY_NAME] = value;
+    try {
+      await expect(
+        ConfigModule.forRoot({
+          ignoreEnvFile: true,
+          validationSchema: environmentSchema,
+        }),
+      ).rejects.toThrow(`"${KEY_NAME}" is not allowed`);
+    } finally {
+      delete process.env[KEY_NAME];
+    }
+  });
+
+  it("starts without it", () => {
+    expect(() => buildFastifyAdapterOptions(process.env)).not.toThrow();
   });
 });
 

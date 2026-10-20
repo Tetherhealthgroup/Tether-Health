@@ -31,6 +31,23 @@ import { databaseError, type DatabaseErrorHint } from "./database-errors";
  *   cascade is not emulated: no seeded document sets cascades_optional;
  * - a concurrent transaction committing just before a request
  *   (interleave), e.g. a first tap's supersession;
+ * - account deletion (supabase/migrations/202610180008_delete_my_account.sql
+ *   and the functions it calls): begin_account_deletion() sets the deletion
+ *   barrier; delete_my_account() refuses, in the function's order, a
+ *   confirmation other than DELETE (23514), a sign-in that is not recent
+ *   (TH017, see setSignInAge), a function owner that does not bypass
+ *   row-level security (TH020, see functionOwnerBypassesRls) and an avatar
+ *   object left under the caller's folder (TH016); then, as
+ *   delete_my_app_data(), refuses a profile without the barrier (23514) and
+ *   deletes the caller's consents, enrolments, program data, quit plan and
+ *   profile, deletes the caller's identity and returns the ten counts. A
+ *   refusal deletes nothing; a repeat returns zero counts. The sync session
+ *   refusals (TH009, TH010) and the identity re-check (TH018) are not
+ *   emulated: the API sees them only as other errors;
+ * - the Storage API for the avatars bucket (/storage/v1): list-v2 and
+ *   remove, limited to objects in the caller's own folder like the avatar
+ *   select and delete policies; an object outside it is neither listed nor
+ *   removed (a short batch). failNextStorage makes the next call fail;
  * - error bodies: standard SQLSTATEs for constraints and RLS, and the
  *   database's own `TH` codes with the registry's exact message and hint
  *   (test/support/database-errors.ts), answered as HTTP 400 the way
@@ -51,6 +68,13 @@ interface State {
   enrolments: Row[];
   programme_consents: Row[];
   consent_documents: Row[];
+  /** Not exposed through the REST tables; written by account deletion. */
+  quit_plans: Row[];
+  program_data: Row[];
+  /** Stand-in for auth.users (id only). */
+  auth_users: Row[];
+  /** Stand-in for storage.objects (bucket_id, name). */
+  storage_objects: Row[];
 }
 
 export interface ConsentDocument {
@@ -278,16 +302,61 @@ export class FakePostgrest {
     enrolments: [],
     programme_consents: [],
     consent_documents: CONSENT_DOCUMENTS.map((row) => ({ ...row })),
+    quit_plans: [],
+    program_data: [],
+    auth_users: [],
+    storage_objects: [],
   };
+  /**
+   * Seconds since the sign-in recorded in each token's amr claim (0 unless
+   * set); null means the token has no usable amr entry.
+   */
+  private readonly signInAges = new Map<string, number | null>();
+  private storageFailures: { operation: "list" | "remove"; status: number }[] =
+    [];
+  /**
+   * Whether delete_my_account's owner is a superuser or bypasses row-level
+   * security; false makes it refuse with TH020.
+   */
+  functionOwnerBypassesRls = true;
 
-  /** Registers a synthetic user whose JWT is `token`, with a profile row. */
+  /**
+   * Registers a synthetic user whose JWT is `token`, with an identity and a
+   * profile row.
+   */
   addUser(token: string, userId: string): void {
     this.tokens.set(token, userId);
+    this.state.auth_users.push({ id: userId });
     this.state.profiles.push({
       id: userId,
       locale: "en",
       account_deletion_started_at: null,
     });
+  }
+
+  /** Sets how long ago `token`'s sign-in was (null: no usable amr). */
+  setSignInAge(token: string, seconds: number | null): void {
+    this.signInAges.set(token, seconds);
+  }
+
+  /** Superuser insert of a quit plan for `userId`. */
+  addQuitPlan(userId: string): void {
+    this.state.quit_plans.push({ user_id: userId });
+  }
+
+  /** Superuser insert of program data for `userId`. */
+  addProgramData(userId: string, programId: string): void {
+    this.state.program_data.push({ user_id: userId, program_id: programId });
+  }
+
+  /** Superuser insert of an object named `name` in the avatars bucket. */
+  addAvatarObject(name: string): void {
+    this.state.storage_objects.push({ bucket_id: "avatars", name });
+  }
+
+  /** Makes the next Storage `operation` fail with HTTP `status`. */
+  failNextStorage(operation: "list" | "remove", status = 500): void {
+    this.storageFailures.push({ operation, status });
   }
 
   /** Superuser write of a profile's locale (profiles.locale, en or es). */
@@ -345,13 +414,18 @@ export class FakePostgrest {
 
   /** Injected failures and interleaved actions not yet consumed. */
   get pendingFailures(): number {
-    return this.injected.length + this.interleaved.length;
+    return (
+      this.injected.length +
+      this.interleaved.length +
+      this.storageFailures.length
+    );
   }
 
   /** Drops injected failures and interleaved actions not consumed. */
   clearFailures(): void {
     this.injected = [];
     this.interleaved = [];
+    this.storageFailures = [];
   }
 
   /**
@@ -438,6 +512,9 @@ export class FakePostgrest {
     const countExact = (headers.get("prefer") ?? "").includes("count=exact");
     if (!uid)
       return this.respond(401, { code: "PGRST301", message: "JWT invalid" });
+    if (url.pathname.startsWith("/storage/v1/")) {
+      return this.storage(uid, method, url.pathname.slice(12), init?.body);
+    }
 
     // A concurrent transaction commits first, outside this request's.
     const path = url.pathname.replace(/^\/rest\/v1\//, "");
@@ -457,7 +534,7 @@ export class FakePostgrest {
         typeof init?.body === "string"
           ? (JSON.parse(init.body) as unknown)
           : undefined;
-      const result = this.handle(uid, method, url, headers, body);
+      const result = this.handle(uid, token, method, url, headers, body);
       return this.respond(
         result.status,
         result.body,
@@ -488,6 +565,7 @@ export class FakePostgrest {
 
   private handle(
     uid: string,
+    token: string | null,
     method: string,
     url: URL,
     headers: Headers,
@@ -502,7 +580,7 @@ export class FakePostgrest {
       throw new PgFailure(injected.error);
     }
     if (path.startsWith("rpc/")) {
-      return this.rpc(uid, method, path.slice(4), url, body);
+      return this.rpc(uid, token, method, path.slice(4), url, body);
     }
     if (
       ![
@@ -568,6 +646,7 @@ export class FakePostgrest {
 
   private rpc(
     uid: string,
+    token: string | null,
     method: string,
     name: string,
     url: URL,
@@ -604,7 +683,157 @@ export class FakePostgrest {
       this.deferredChecks(uid);
       return answer(rows);
     }
+    if (name === "begin_account_deletion" && method === "POST") {
+      return { status: 200, body: this.beginDeletion(uid, args) };
+    }
+    if (name === "delete_my_account" && method === "POST") {
+      return { status: 200, body: this.deleteAccount(uid, token, args) };
+    }
     return fail(404, "PGRST202", "Could not find the function");
+  }
+
+  /** public.begin_account_deletion(p_confirmation). */
+  private beginDeletion(uid: string, args: Row): boolean {
+    if (args.p_confirmation !== "DELETE") {
+      fail(400, "23514", "Explicit confirmation required");
+    }
+    const profile = this.state.profiles.find((row) => row.id === uid);
+    if (profile && profile.account_deletion_started_at === null) {
+      profile.account_deletion_started_at = this.now();
+    }
+    return true;
+  }
+
+  /** public.delete_my_account(p_confirmation), in the function's order. */
+  private deleteAccount(
+    uid: string,
+    token: string | null,
+    args: Row,
+  ): Record<string, number> {
+    if (args.p_confirmation !== "DELETE") {
+      fail(400, "23514", "Explicit confirmation required");
+    }
+    const age = token === null ? null : (this.signInAges.get(token) ?? 0);
+    if (age === null || age > 600 || age < -60) {
+      raise("recent_authentication_required");
+    }
+    if (!this.functionOwnerBypassesRls) raise("rls_bypass_required");
+    if (
+      this.state.storage_objects.some(
+        (row) =>
+          row.bucket_id === "avatars" && text(row.name).split("/")[0] === uid,
+      )
+    ) {
+      raise("avatar_objects_remain");
+    }
+    // delete_my_app_data(p_confirmation), unchanged.
+    const profile = this.state.profiles.find((row) => row.id === uid);
+    if (profile && profile.account_deletion_started_at === null) {
+      fail(400, "23514", "Account deletion was not started");
+    }
+    const enrolmentIds = new Set(
+      this.state.enrolments
+        .filter((row) => row.user_id === uid)
+        .map((row) => row.id),
+    );
+    const removeWhere = (table: keyof State, match: (row: Row) => boolean) => {
+      const before = this.state[table].length;
+      this.state[table] = this.state[table].filter((row) => !match(row));
+      return before - this.state[table].length;
+    };
+    const counts = {
+      sync_lapses: 0,
+      sync_answers: 0,
+      sync_areas: 0,
+      sync_accounts: 0,
+      programme_consents: removeWhere("programme_consents", (row) =>
+        enrolmentIds.has(row.enrolment_id),
+      ),
+      enrolments: removeWhere("enrolments", (row) => row.user_id === uid),
+      account_consents: 0,
+      program_data: removeWhere("program_data", (row) => row.user_id === uid),
+      quit_plans: removeWhere("quit_plans", (row) => row.user_id === uid),
+      profiles: removeWhere("profiles", (row) => row.id === uid),
+    };
+    removeWhere("auth_users", (row) => row.id === uid);
+    return counts;
+  }
+
+  // ---- Storage ------------------------------------------------------------
+
+  /**
+   * The Storage API for the avatars bucket: POST object/list-v2/avatars and
+   * DELETE object/avatars. Only objects in the caller's own folder are
+   * listed or removed. Answers with the fields the API reads.
+   */
+  private storage(
+    uid: string,
+    method: string,
+    path: string,
+    rawBody: unknown,
+  ): Response {
+    const body = (
+      typeof rawBody === "string" ? JSON.parse(rawBody) : {}
+    ) as Row;
+    const own = (row: Row) =>
+      row.bucket_id === "avatars" && text(row.name).split("/")[0] === uid;
+    const operation =
+      method === "POST" && path === "object/list-v2/avatars"
+        ? "list"
+        : method === "DELETE" && path === "object/avatars"
+          ? "remove"
+          : null;
+    if (operation === null) {
+      return this.respond(400, {
+        statusCode: "400",
+        error: "InvalidRequest",
+        message: "Unsupported storage request",
+      });
+    }
+    const failure = this.storageFailures.find(
+      (entry) => entry.operation === operation,
+    );
+    if (failure) {
+      this.storageFailures = this.storageFailures.filter(
+        (entry) => entry !== failure,
+      );
+      return this.respond(failure.status, {
+        statusCode: String(failure.status),
+        error: "InternalError",
+        message: "Synthetic storage failure",
+      });
+    }
+    if (operation === "list") {
+      const prefix = text(body.prefix ?? "");
+      const cursor = typeof body.cursor === "string" ? body.cursor : null;
+      const limit = typeof body.limit === "number" ? body.limit : 1000;
+      const names = this.state.storage_objects
+        .filter((row) => own(row) && text(row.name).startsWith(prefix))
+        .map((row) => text(row.name))
+        .filter((name) => cursor === null || name > cursor)
+        .sort();
+      const page = names.slice(0, limit);
+      const hasNext = names.length > limit;
+      return this.respond(200, {
+        hasNext,
+        ...(hasNext ? { nextCursor: page[page.length - 1] } : {}),
+        folders: [],
+        objects: page.map((name) => ({ id: randomUUID(), name })),
+      });
+    }
+    const prefixes = Array.isArray(body.prefixes)
+      ? body.prefixes.map(text)
+      : [];
+    const removed = this.state.storage_objects.filter(
+      (row) => own(row) && prefixes.includes(text(row.name)),
+    );
+    this.state.storage_objects = this.state.storage_objects.filter(
+      (row) => !removed.includes(row),
+    );
+    return this.respond(
+      200,
+      removed.map((row) => ({ bucket_id: "avatars", name: row.name })),
+    );
   }
 
   /** The grantable document: effective and not retired. */

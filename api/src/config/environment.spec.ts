@@ -4,51 +4,68 @@ const validEnvironment = {
   NODE_ENV: "production",
   SUPABASE_URL: "https://project.supabase.co",
   SUPABASE_ANON_KEY: "publishable-placeholder-key",
-  SUPABASE_SERVICE_ROLE_KEY: "sb_secret_synthetic-server-key",
 };
 
 describe("environmentSchema", () => {
-  it("requires a server-only credential for privileged Auth deletion", () => {
-    const { error } = environmentSchema.validate({
-      ...validEnvironment,
-      SUPABASE_SERVICE_ROLE_KEY: undefined,
-    });
-
-    expect(error?.message).toContain("SUPABASE_SERVICE_ROLE_KEY");
-  });
-
-  it("rejects a publishable key in the privileged credential slot", () => {
-    const { error } = environmentSchema.validate({
-      ...validEnvironment,
-      SUPABASE_SERVICE_ROLE_KEY: "sb_publishable_not-a-server-secret",
-    });
-
-    expect(error?.message).toContain("SUPABASE_SERVICE_ROLE_KEY");
-  });
-
-  it("rejects an arbitrary value in the privileged credential slot", () => {
-    const { error } = environmentSchema.validate({
-      ...validEnvironment,
-      SUPABASE_SERVICE_ROLE_KEY: "arbitrary-long-value-that-is-not-privileged",
-    });
-
-    expect(error?.message).toContain("SUPABASE_SERVICE_ROLE_KEY");
-  });
-
-  it("accepts separately scoped caller and server credentials", () => {
+  it("accepts the caller-scoped configuration without a server key", () => {
     const { error } = environmentSchema.validate(validEnvironment);
 
     expect(error).toBeUndefined();
   });
 
-  it("accepts a legacy JWT only when its payload has the service_role", () => {
+  it.each([
+    ["a secret key", "sb_secret_synthetic-server-key"],
+    [
+      "a legacy service-role JWT",
+      "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIn0.synthetic-signature",
+    ],
+    ["a publishable key", "sb_publishable_not-a-server-secret"],
+    ["an arbitrary value", "arbitrary-long-value"],
+    ["an empty value", ""],
+  ])("refuses to start while the server key variable holds %s", (_, value) => {
     const { error } = environmentSchema.validate({
       ...validEnvironment,
-      SUPABASE_SERVICE_ROLE_KEY:
-        "eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIn0.synthetic-signature",
+      SUPABASE_SERVICE_ROLE_KEY: value,
     });
 
-    expect(error).toBeUndefined();
+    expect(error?.message).toContain('"SUPABASE_SERVICE_ROLE_KEY"');
+    expect(error?.message).toContain("is not allowed");
+    if (value !== "") expect(error?.message).not.toContain(value);
+  });
+
+  it("refuses the server key variable the way startup validates the environment", () => {
+    // ConfigModule validates process.env with unknown keys allowed and every
+    // error reported; buildFastifyAdapterOptions does the same.
+    const { error } = environmentSchema.validate(
+      { ...validEnvironment, SUPABASE_SERVICE_ROLE_KEY: "" },
+      { allowUnknown: true, abortEarly: false },
+    );
+
+    expect(error?.message).toContain('"SUPABASE_SERVICE_ROLE_KEY"');
+  });
+
+  describe("RECENT_AUTH_MAX_AGE_SECONDS", () => {
+    const maxAge = (value?: unknown) =>
+      environmentSchema.validate({
+        ...validEnvironment,
+        ...(value === undefined ? {} : { RECENT_AUTH_MAX_AGE_SECONDS: value }),
+      }) as { error?: Error; value: { RECENT_AUTH_MAX_AGE_SECONDS: number } };
+
+    it("defaults to 600 seconds", () => {
+      const { error, value } = maxAge();
+      expect(error).toBeUndefined();
+      expect(value.RECENT_AUTH_MAX_AGE_SECONDS).toBe(600);
+    });
+
+    it.each([60, "600", 600])("accepts %p", (raw) => {
+      expect(maxAge(raw).error).toBeUndefined();
+    });
+
+    it.each([601, "601", 3600, 59])("refuses %p", (raw) => {
+      expect(maxAge(raw).error?.message).toContain(
+        '"RECENT_AUTH_MAX_AGE_SECONDS"',
+      );
+    });
   });
 
   it("rejects a legacy service-role JWT in the anonymous credential slot", () => {
