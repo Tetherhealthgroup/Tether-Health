@@ -28,6 +28,22 @@ export const AccountDeletionErrorCode = {
 
 const SQLSTATE = /^[0-9A-Z]{5}$/;
 
+/**
+ * Seconds by which account deletion is stricter than
+ * RECENT_AUTH_MAX_AGE_SECONDS. The database checks the sign-in again when
+ * the deletion completes, after the barrier and the avatar removal, against
+ * its own window of 600 seconds. Refusing at the start once the sign-in is
+ * older than the maximum minus this margin leaves the rest of the request
+ * that much time, so a sign-in the API accepts is not refused by the
+ * database part-way through. A sign-in exactly the maximum minus the margin
+ * old is still accepted.
+ */
+export const DELETION_SIGN_IN_MARGIN_SECONDS = 30;
+
+/** The value logged as `code=`: a SQLSTATE, or "none". */
+const loggedCode = (code: string | undefined): string =>
+  code && SQLSTATE.test(code) ? code : "none";
+
 interface DeleteCounts {
   profiles: number;
   quit_plans: number;
@@ -99,7 +115,7 @@ export class AccountService {
     user: AuthUser,
     confirmation: "DELETE",
   ): Promise<AccountDeletionReceipt> {
-    this.requireRecentAuthentication(user);
+    this.requireRecentAuthentication(user, DELETION_SIGN_IN_MARGIN_SECONDS);
     const requestId = randomUUID();
     const client = this.clients.forUser(user);
     const begun = await client.rpc("begin_account_deletion", {
@@ -112,6 +128,9 @@ export class AccountService {
       throw new UnauthorizedException("Recent authentication is required");
     }
     if (begun.error || begun.data !== true) {
+      this.logger.error(
+        `account_deletion_failed requestId=${requestId} status=begin_failed code=${loggedCode(begun.error?.code)}`,
+      );
       throw new BadGatewayException("Account deletion could not start");
     }
 
@@ -138,9 +157,8 @@ export class AccountService {
         code === AccountDeletionErrorCode.avatarObjectsRemain
           ? "avatar_objects_remain"
           : "account_delete_failed";
-      const sqlstate = code && SQLSTATE.test(code) ? code : "none";
       this.logger.error(
-        `account_deletion_failed requestId=${requestId} status=${status} code=${sqlstate}`,
+        `account_deletion_failed requestId=${requestId} status=${status} code=${loggedCode(code)}`,
       );
       throw new BadGatewayException("Account deletion could not complete");
     }
@@ -162,12 +180,17 @@ export class AccountService {
     return receipt;
   }
 
-  private requireRecentAuthentication(user: AuthUser): void {
+  /**
+   * Refuses a sign-in in the future or older than
+   * RECENT_AUTH_MAX_AGE_SECONDS minus `marginSeconds`. The age keeps its
+   * fraction of a second, as the database's own check does.
+   */
+  private requireRecentAuthentication(user: AuthUser, marginSeconds = 0): void {
     const maxAge = this.config.getOrThrow<number>(
       "RECENT_AUTH_MAX_AGE_SECONDS",
     );
-    const age = Math.floor(Date.now() / 1000) - user.authenticatedAt;
-    if (age < 0 || age > maxAge) {
+    const age = Date.now() / 1000 - user.authenticatedAt;
+    if (age < 0 || age > maxAge - marginSeconds) {
       throw new UnauthorizedException("Recent authentication is required");
     }
   }

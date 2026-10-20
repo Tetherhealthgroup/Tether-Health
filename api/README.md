@@ -20,7 +20,9 @@ the override to match or exceed it, staying on `fastify` 5.x.
 Export and deletion require a timestamped Supabase JWT authentication-method
 reference (`amr`) no older than
 `RECENT_AUTH_MAX_AGE_SECONDS` (10 minutes by default and at most; a larger value
-aborts startup). The Flutter client obtains
+aborts startup). Deletion is 30 seconds stricter, so that the database's own
+check at the end of the request does not refuse a sign-in the API accepted at
+the start. The Flutter client obtains
 a fresh token by re-entering the account password. Deletion returns a request ID
 and counts but never logs user identifiers, profile, quit-plan, or program payloads.
 Deletion first sets a durable database write barrier that drains in-flight avatar
@@ -31,9 +33,10 @@ app rows and the caller's Supabase Auth identity in one database transaction;
 the database checks the recent sign-in again and refuses while any avatar object
 remains. Cleanup is idempotent; a 502, transport failure, or unusable 2xx
 receipt body can be retried once safely with the same recent token, and a retry
-after a completed deletion returns zero counts. A retry more than 10 minutes
-after the sign-in gets 401 and needs a new sign-in. Failure logs carry only the
-request ID, a status, and the database error code.
+after a completed deletion returns zero counts. A retry once the sign-in is too
+old gets 401: if the earlier attempt completed, the account no longer exists and
+a new sign-in is not possible; if it did not complete, sign in again and retry.
+Failure logs carry only the request ID, a status, and the database error code.
 
 Default protections are a 64 KiB body limit, 120 requests/minute/IP, Helmet
 headers, optional explicit CORS allowlisting, DTO whitelisting, and redacted

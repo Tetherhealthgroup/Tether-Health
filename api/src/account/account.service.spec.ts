@@ -3,7 +3,10 @@ import { ConfigService } from "@nestjs/config";
 import { createClient } from "@supabase/supabase-js";
 import type { AuthUser } from "../auth/auth-user";
 import { UserSupabaseClientFactory } from "../enrolments/user-supabase-client";
-import { AccountService } from "./account.service";
+import {
+  AccountService,
+  DELETION_SIGN_IN_MARGIN_SECONDS,
+} from "./account.service";
 
 jest.mock("@supabase/supabase-js", () => ({ createClient: jest.fn() }));
 
@@ -509,4 +512,169 @@ describe("AccountService logging", () => {
 
     expect(totalLogCalls()).toBe(0);
   });
+});
+
+describe("AccountService recent sign-in", () => {
+  // A whole second, so ages below are exact.
+  const NOW_SECONDS = 1_800_000_000;
+  const at = (ageSeconds: number) => {
+    jest
+      .spyOn(Date, "now")
+      .mockReturnValue(Math.round((NOW_SECONDS + ageSeconds) * 1000));
+    return user(NOW_SECONDS);
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(Logger.prototype, "error").mockImplementation(() => undefined);
+    jest.spyOn(Logger.prototype, "log").mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it("deletion uses a 30-second margin below the configured maximum", () => {
+    expect(DELETION_SIGN_IN_MARGIN_SECONDS).toBe(30);
+  });
+
+  it.each([569, 570])(
+    "starts deletion for a sign-in %p seconds old (maximum minus the margin or less)",
+    async (age) => {
+      const { rpc } = memberClient({
+        begin_account_deletion: [begun()],
+        delete_my_account: [deleted()],
+      });
+
+      await expect(
+        newService().deleteData(at(age), "DELETE"),
+      ).resolves.toMatchObject({ authIdentityDeleted: true });
+      expect(rpc).toHaveBeenCalledTimes(2);
+    },
+  );
+
+  it.each([570.9, 571, 600])(
+    "refuses deletion before any call for a sign-in %p seconds old",
+    async (age) => {
+      await expect(
+        newService().deleteData(at(age), "DELETE"),
+      ).rejects.toMatchObject({ status: 401 });
+      expect(mockedCreateClient).not.toHaveBeenCalled();
+    },
+  );
+
+  it.each([-3, -0.5])(
+    "refuses deletion and export for a sign-in %p seconds in the future",
+    async (age) => {
+      await expect(
+        newService().deleteData(at(age), "DELETE"),
+      ).rejects.toMatchObject({ status: 401 });
+      await expect(newService().export(at(age))).rejects.toMatchObject({
+        status: 401,
+      });
+      expect(mockedCreateClient).not.toHaveBeenCalled();
+    },
+  );
+
+  it("export allows the full configured maximum, to the fraction of a second", async () => {
+    await expect(newService().export(at(600.5))).rejects.toMatchObject({
+      status: 401,
+    });
+    expect(mockedCreateClient).not.toHaveBeenCalled();
+
+    const single = jest.fn().mockResolvedValue({ data: {}, error: null });
+    const maybeSingle = jest
+      .fn()
+      .mockResolvedValue({ data: null, error: null });
+    const returns = jest.fn().mockResolvedValue({ data: [], error: null });
+    mockedCreateClient.mockReturnValue({
+      from: jest
+        .fn()
+        .mockReturnValueOnce({ select: () => ({ eq: () => ({ single }) }) })
+        .mockReturnValueOnce({
+          select: () => ({ eq: () => ({ maybeSingle }) }),
+        })
+        .mockReturnValueOnce({ select: () => ({ eq: () => ({ returns }) }) }),
+    } as never);
+    await expect(newService().export(at(600))).resolves.toMatchObject({
+      schemaVersion: "1.0",
+    });
+  });
+});
+
+describe("AccountService begin_account_deletion failures", () => {
+  let errors: jest.SpyInstance;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    errors = jest
+      .spyOn(Logger.prototype, "error")
+      .mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it.each([
+    ["no error and false", { data: false, error: null }],
+    ["no error and null", { data: null, error: null }],
+    ["no error and a non-boolean", { data: "true", error: null }],
+  ])(
+    "fails with 502 when begin returns %s, before storage or any further RPC",
+    async (_, answer) => {
+      const { rpc, storageFrom } = memberClient({
+        begin_account_deletion: [answer],
+        delete_my_account: [deleted()],
+      });
+
+      await expect(
+        newService().deleteData(recentUser(), "DELETE"),
+      ).rejects.toMatchObject({ status: 502 });
+      expect(rpc).toHaveBeenCalledTimes(1);
+      expect(storageFrom).not.toHaveBeenCalled();
+      expect(errors.mock.calls).toEqual([
+        [
+          expect.stringMatching(
+            /^account_deletion_failed requestId=[0-9a-f-]{36} status=begin_failed code=none$/,
+          ),
+        ],
+      ]);
+    },
+  );
+
+  it.each([
+    ["08006", "08006"],
+    ["TH009", "TH009"],
+    ["PGRST202", "none"],
+    ["", "none"],
+  ])(
+    "logs only request id, status and SQLSTATE when begin raises %p",
+    async (code, logged) => {
+      memberClient({
+        begin_account_deletion: [
+          failed(code, `SYNTHETIC-HEALTH-NOTE ${userId} caller-token`),
+        ],
+      });
+
+      await expect(
+        newService().deleteData(recentUser(), "DELETE"),
+      ).rejects.toMatchObject({ status: 502 });
+      expect(errors).toHaveBeenCalledTimes(1);
+      const [line] = errors.mock.calls[0] as [string];
+      expect(line).toMatch(
+        new RegExp(
+          `^account_deletion_failed requestId=[0-9a-f-]{36} status=begin_failed code=${logged}$`,
+        ),
+      );
+      for (const leak of [
+        "SYNTHETIC-HEALTH-NOTE",
+        userId,
+        "caller-token",
+        "synthetic_hint",
+      ]) {
+        expect(JSON.stringify(errors.mock.calls)).not.toContain(leak);
+      }
+    },
+  );
 });

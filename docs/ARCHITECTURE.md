@@ -90,8 +90,8 @@ every nested object under the verified subject's exact prefix with cursor
 pagination and removes bounded batches. Only then does `delete_my_account`
 remove the database rows and the caller's Auth identity in one transaction; it
 re-checks the recent sign-in and refuses while any avatar object remains. The
-ordered cleanup is idempotent; failures return 502 and retries repeat cleanup
-safely. An already-absent identity is success. No health payload or user
+ordered cleanup is idempotent; failures return 502, a missing or stale recent
+sign-in returns 401, and retries repeat cleanup safely. An already-absent identity is success. No health payload or user
 identifier is written to application logs.
 
 Before the destructive request, Flutter persists an encrypted deletion-intent

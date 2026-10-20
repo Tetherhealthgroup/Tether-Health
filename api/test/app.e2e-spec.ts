@@ -474,6 +474,8 @@ describe("Account deletion (e2e)", () => {
       authIdentityStatus: "deleted",
     });
     expect(sent).toEqual([BEGIN, LIST, REMOVE, DELETE_ACCOUNT]);
+    const listed = requestsOf(member).find((request) => request.path === LIST);
+    expect(listed?.body).toMatchObject({ prefix: `${member.id}/` });
     expect(rowsOf(member)).toEqual({
       identity: 0,
       profiles: 0,
@@ -493,6 +495,31 @@ describe("Account deletion (e2e)", () => {
         `account_deleted requestId=${(receipt as { requestId: string }).requestId} status=completed`,
       ]),
     ]);
+  });
+
+  it("takes the deleted account only from the verified token, never from the body", async () => {
+    const member = newMember();
+    const other = newMember(1);
+    const before = fake.requests.length;
+
+    for (const extra of [
+      { subject: other.id },
+      { userId: other.id },
+      { prefix: `${other.id}/` },
+    ]) {
+      const response = await app.inject({
+        method: "DELETE",
+        url: "/v1/account/data",
+        remoteAddress: member.address,
+        headers: { authorization: `Bearer ${member.token}` },
+        payload: { confirmation: "DELETE", ...extra },
+      });
+      expect(response.statusCode).toBe(400);
+    }
+
+    expect(fake.requests.length).toBe(before);
+    expect(rowsOf(member)).toMatchObject({ identity: 1, avatars: 2 });
+    expect(rowsOf(other)).toMatchObject({ identity: 1, avatars: 1 });
   });
 
   it("calls no other deletion function and no Auth admin endpoint", async () => {

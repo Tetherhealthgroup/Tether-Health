@@ -179,7 +179,9 @@ paths:
         database call deletes the data and the identity together. Safe to retry; a
         retry after a completed deletion returns a receipt with zero counts. The
         database also requires a sign-in at most 600 seconds old, so a retry made
-        later than that gets 401 and needs a new sign-in.
+        later than that gets 401. If the earlier attempt completed, the account no
+        longer exists and a new sign-in is not possible; if it did not complete,
+        sign in again and retry.
       security: [{supabaseJwt: []}]
       requestBody:
         required: true
