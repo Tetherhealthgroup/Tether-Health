@@ -106,10 +106,34 @@ export const DATABASE_ERRORS = [
     ] as readonly string[],
   },
   {
+    code: "TH016",
+    hint: "avatar_objects_remain",
+    messages: [
+      "Avatar objects must be removed before the account is deleted",
+    ] as readonly string[],
+  },
+  {
+    code: "TH017",
+    hint: "recent_authentication_required",
+    messages: ["Recent authentication is required"] as readonly string[],
+  },
+  {
+    code: "TH018",
+    hint: "auth_identity_not_deleted",
+    messages: ["The account identity was not deleted"] as readonly string[],
+  },
+  {
     code: "TH019",
     hint: "sync_rows_delete_only",
     messages: [
       "Sync rows are removed only with their enrolment or account",
+    ] as readonly string[],
+  },
+  {
+    code: "TH020",
+    hint: "rls_bypass_required",
+    messages: [
+      "Account deletion requires a function owner that bypasses row-level security",
     ] as readonly string[],
   },
 ] as const satisfies readonly DatabaseErrorEntry[];
