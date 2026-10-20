@@ -293,7 +293,10 @@ select th988_test.ok(
 -- public_residual passes when service_role may execute the function only
 -- through PUBLIC ('public'), or may not execute it and the function grants
 -- PUBLIC nothing ('absent': an image whose defaults already withhold it). It
--- fails when service_role may execute it in any other way.
+-- fails when the function grants execute to service_role or to a role it
+-- belongs to (directly or through default privileges), when service_role
+-- belongs to the function's owner or to a superuser role, or when
+-- service_role may still execute it once PUBLIC's execute is revoked.
 create function th988_test.public_residual(p_fn text)
 returns text language plpgsql set search_path = '' as $f$
 declare
@@ -314,8 +317,12 @@ begin
   cross join lateral pg_catalog.aclexplode(
     coalesce(p.proacl, pg_catalog.acldefault('f', p.proowner))) as a
   where p.oid = fn and a.privilege_type = 'EXECUTE';
-  other_path := other_path or pg_catalog.pg_has_role('service_role',
-    (select p.proowner from pg_catalog.pg_proc as p where p.oid = fn), 'MEMBER');
+  -- Membership in the owner, or in a superuser role.
+  other_path := other_path
+    or pg_catalog.pg_has_role('service_role',
+      (select p.proowner from pg_catalog.pg_proc as p where p.oid = fn), 'MEMBER')
+    or exists (select 1 from pg_catalog.pg_roles as r
+               where r.rolsuper and pg_catalog.pg_has_role('service_role', r.oid, 'MEMBER'));
   -- With PUBLIC's execute revoked, service_role must not be able to execute
   -- it. The revoke is undone with the block.
   begin
@@ -359,7 +366,9 @@ select th988_test.public_residual('public.th988_scratch_fn()');
 
 -- The residual check itself, each case undone afterwards: an image whose
 -- defaults withhold PUBLIC's execute gives 'absent'; a direct grant, a role
--- service_role belongs to, or default privileges for service_role fail.
+-- service_role belongs to, default privileges for service_role, membership
+-- in a superuser role, and ownership by service_role or a role it belongs to
+-- fail.
 select th988_test.undone($c$
   alter default privileges for role postgres revoke execute on functions from public;
   set local role postgres;
@@ -391,6 +400,29 @@ select th988_test.undone($c$
   select th988_test.refused('select th988_test.public_residual(''public.th988_scratch_default_fn()'')',
     'P0001', 'FAIL residual: service_role may execute % other than through PUBLIC',
     'residual check: execute from default privileges for service_role fails');
+$c$);
+select th988_test.undone($c$
+  create role th988_superuser superuser nologin;
+  grant th988_superuser to service_role;
+  select th988_test.refused('select th988_test.public_residual(''public.th988_scratch_fn()'')',
+    'P0001', 'FAIL residual: service_role may execute % other than through PUBLIC',
+    'residual check: membership in a superuser role fails');
+$c$);
+select th988_test.undone($c$
+  create role th988_owner nologin;
+  grant th988_owner to service_role with inherit false;
+  alter function public.th988_scratch_fn() owner to th988_owner;
+  revoke execute on function public.th988_scratch_fn() from th988_owner;
+  select th988_test.refused('select th988_test.public_residual(''public.th988_scratch_fn()'')',
+    'P0001', 'FAIL residual: service_role may execute % other than through PUBLIC',
+    'residual check: an owner service_role belongs to without inheriting fails');
+$c$);
+select th988_test.undone($c$
+  alter function public.th988_scratch_fn() owner to service_role;
+  revoke execute on function public.th988_scratch_fn() from service_role;
+  select th988_test.refused('select th988_test.public_residual(''public.th988_scratch_fn()'')',
+    'P0001', 'FAIL residual: service_role may execute % other than through PUBLIC',
+    'residual check: a function owned by service_role fails');
 $c$);
 
 revoke all on function public.th988_scratch_fn() from public;

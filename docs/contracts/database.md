@@ -399,8 +399,12 @@ database, is the control: it checks the privileges `service_role` actually
 holds, including those it gets through `PUBLIC` and through ownership. For a
 function `postgres` newly creates in `public`, it accepts `execute` held only
 through `PUBLIC`, or none at all on an image whose defaults withhold it from
-`PUBLIC`, and fails on any other way to execute it; once the function is
-revoked from `public`, `service_role` must not be able to execute it.
+`PUBLIC`. It fails when the function grants `execute` to `service_role` or to
+a role it belongs to, directly or through default privileges; when
+`service_role` belongs to the function's owner or to a superuser role; or
+when `service_role` can still execute the function once `PUBLIC`'s `execute`
+is revoked. Once the function is revoked from `public`, `service_role` must
+not be able to execute it.
 
 ## Sync tables
 
