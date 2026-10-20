@@ -61,16 +61,19 @@ def nativeslot(id, label, caption=None, platform='ios', height=120):
     return N('nativeslot', id=id, label=label, caption=caption, platform=platform, height=height)
 
 
-def P(id, name, route, fl, body, source=None, native=None, desc='', reference=False, **kw):
+def P(id, name, route, fl, body, source=None, native=None, desc='', reference=False, notes=None, **kw):
     """S() for an added screen: tags the description and notes for copy review.
 
     reference=True marks a native or system surface (shield, overlay, widget,
     shortcuts). It is drawn natively, checked by device screenshots and
     excluded from release-check counts; its render tests stay.
+    notes: extra design notes, appended after the generated ones (not rendered).
     """
+    extra = list(notes or [])
     notes = [REVIEW] + (['Source: ' + source] if source else []) + ([native] if native else [])
     if reference:
         notes.append('Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.')
+    notes += extra
     s = S(id, name, route, fl, body, desc=(REVIEW + ' ' + desc).strip(), notes=notes, **kw)
     if reference:
         s['reference'] = True
@@ -592,12 +595,13 @@ def entry_surfaces():
         rows([row('Rescue', '“Rescue in Tether” · opens Rescue', lead=L_icon('✚'), action=sheet('rescue_pick')),
               row('ClearAir red-zone plan', '“Show my ClearAir plan in Tether”', lead=L_prog('ca'), action=go('ca_red'))], title='Tether Health · App Shortcuts'),
     ], source='surface_shortcuts_ios plus the Show sensitive details toggle on account_notifications in this spec')
+    # P-58: the designer note is kept in notes and not rendered.
     P('surface_shortcuts_android', 'Launcher shortcuts (Android)', '/surface/shortcuts/android', 'entries', reference=True, phase='rescue', hdr=H('App shortcuts', left='close', pill='Reference'), body=[
-        text('Shown when someone long-presses the Tether icon.', 'muted'),
         rows([row('Rescue', 'Static shortcut · always there', lead=L_icon('✚'), action=sheet('rescue_pick')),
               row('My plan', 'Dynamic shortcut · only while ClearAir is a focus program', lead=L_icon('▤'), action=go('ca_red'))], title='Tether Health'),
         card(v='mint', text='Labels stay generic so the home screen doesn’t reveal which programs you use. Turn on Show sensitive details to see program names.'),
-    ], source='rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager')
+    ], source='rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager',
+       notes=['Shown when someone long-presses the Tether icon.'])
     P('surface_shortcuts_android_named', 'Launcher shortcuts (sensitive details on)', '/surface/shortcuts/android?state=named', 'entries', reference=True, phase='rescue',
       variant_of='surface_shortcuts_android', state='Show sensitive details on', hdr=H('App shortcuts', left='close', pill='Reference'), body=[
         text('With Show sensitive details on (Account → Notifications), shortcuts use program names.', 'muted'),

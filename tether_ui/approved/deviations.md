@@ -17,6 +17,8 @@ the current file:
   `value` and gains `placeholder` with the same text (P-31), or a node gains
   or changes only its `key` (TH-902). With those attributes removed, the old
   and new files are equal.
+- The TH-1001 row removes one text node from `body` and adds the same text
+  to the screen's `notes`, which are not rendered. Nothing else changes.
 
 All replacement copy still needs clinical/legal review before release.
 
@@ -36,7 +38,7 @@ owner has not yet checked it in the prototype.
 | `ca_home` | `body[2].text` | "Open it fast, even offline" → "Open it fast" | 8 |
 | `ca_red` | `body[4].text` | drops "Works offline." | 9 |
 | `checkin` | `footer[1].text` | "Private · works offline · skip anything" → "Skip any program question" | 7 |
-| `crisis` | `body[5].text` | drops "Works offline." | 10 |
+| `crisis` | `body[5].text` | drops "Works offline." (the whole line is no longer shown since P-58, below) | 10 |
 | `ea_plan` | `desc` | drops "; available offline" (developer description) | 12 |
 | `rescue_pick` | `desc` | drops "Works offline." (developer description) | 11 |
 | `today` | `body[3].text` | drops " · works offline" | 5 |
@@ -57,6 +59,25 @@ owner has not yet checked it in the prototype.
 |---|---|---|
 | `sf_home` | P-47 decision 1 | New Unplug entry card between the Urge card and Today's step: "Want firmer limits?" / "Unplug can pause apps you choose, after limits you set. Optional." with **Set up** → `sf_unplug_intro`. One new action; the later action paths move from `body[3]` to `body[4]`. Nothing else changes. |
 | `sf_screentime` | P-47 decision 3 | iPhone copy says Apple's Screen Time "shows" the totals instead of Tether "reading" them: `body[1].text`, `body[2].text`, and the row `body[3].rows[0]` ("Reads: Minutes per category" → "Shows: Minutes per category, on this phone"). Layout and actions are unchanged. |
+
+## P-58: designer notes are not shown to members (TH-1001)
+
+A designer annotation that the approved design rendered as body text no
+longer renders in the app. Its text moves to the screen's `notes` in the
+spec, so the design intent is kept. The other elements and their action
+paths are unchanged.
+
+| Screen | Field | Change |
+|---|---|---|
+| `crisis` | `body[5]` (text, small) | "Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. 988 is US-only; localize per region." is removed from `body` and kept in `notes`. Also P-22 (TH-942). |
+
+The same decision covers `surface_shortcuts_android`: "Shown when someone
+long-presses the Tether icon." (`body[0]`, muted text) is removed from `body`
+and kept in `notes`. The two shortcut rows move from `body[1]` to `body[0]`.
+That screen is an addition (`additions.json`, TH-953), not one of the
+approved screens in `manifest.json`, so it has no entry in
+`deviations.json`; the parity test accepts deviation entries for approved
+screens only.
 
 ## P-31: example values become placeholders (TH-907)
 

@@ -224,13 +224,15 @@
     {
       "screen": "crisis",
       "decisions": [
-        "P-22"
+        "P-22",
+        "P-58"
       ],
       "tickets": [
-        "TH-942"
+        "TH-942",
+        "TH-1001"
       ],
-      "sha256": "f4f781d1dd23ded44fc78d8105f7dbb07e43801031ba8b64d89f49338c704b01",
-      "change": "Note: drops \"Works offline.\""
+      "sha256": "eedbfd00ba32717362c9d0a13dd1c18fd549be07e89eccdc5e742c665bb53bca",
+      "change": "P-22: the note dropped \"Works offline.\" (TH-942). P-58: the designer note body[5] \"Shown whenever someone chooses … localize per region.\" is no longer rendered; its text moves to the screen's notes, which are not rendered (TH-1001)"
     },
     {
       "screen": "ea_plan",

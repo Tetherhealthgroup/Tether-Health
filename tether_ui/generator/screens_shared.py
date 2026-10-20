@@ -222,8 +222,9 @@ def shared():
         banner('urgent', 'If you might act on thoughts of harming yourself, get help now.'),
         button('Call 988', call('988'), v='danger', arrow=False), button('Text 988', sms('988'), v='secondary'), button('Call 911', call('911'), v='secondary'),
         card(eyebrow='Your safety plan', title='Things that help: walk the dog, shower, music', text='Reach out: Sam · (555) 010-3311', action=go('ea_plan')),
-        text('Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. 988 is US-only; localize per region.', 'small'),
-    ], desc='Global crisis screen used by every program.')
+    ], desc='Global crisis screen used by every program.',
+       # P-58: designer note, kept in the spec and not rendered.
+       notes=['Shown whenever someone chooses “thoughts of harming myself” or types similar words anywhere. 988 is US-only; localize per region.'])
 
     # ================================================================ PLANS
     flow('plans', 'Plans & programs', 'My plans hub, program catalog (the 11 programs from tetherhealthgroup.com), focus-slot rules and per-program settings.')

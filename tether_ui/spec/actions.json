@@ -9553,7 +9553,7 @@
     "screen": "surface_shortcuts_android",
     "screen_name": "Launcher shortcuts (Android)",
     "element": "Rescue",
-    "path": "body[1].rows[0]",
+    "path": "body[0].rows[0]",
     "type": "sheet",
     "targets": [
       "rescue_pick"
@@ -9564,7 +9564,7 @@
     "screen": "surface_shortcuts_android",
     "screen_name": "Launcher shortcuts (Android)",
     "element": "My plan",
-    "path": "body[1].rows[1]",
+    "path": "body[0].rows[1]",
     "type": "push",
     "targets": [
       "ca_red"

@@ -20,11 +20,6 @@
   },
   "body": [
     {
-      "t": "text",
-      "text": "Shown when someone long-presses the Tether icon.",
-      "tone": "muted"
-    },
-    {
       "t": "list",
       "title": "Tether Health",
       "rows": [
@@ -62,7 +57,8 @@
   "notes": [
     "Copy needs clinical/legal review.",
     "Source: rescue_pick and ca_red entries in this spec; Android shortcuts.xml + ShortcutManager",
-    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots."
+    "Reference surface: drawn natively or by the system; excluded from release-check counts, checked by device screenshots.",
+    "Shown when someone long-presses the Tether icon."
   ],
   "over": null,
   "api": [],
@@ -78,7 +74,7 @@
     },
     {
       "element": "Rescue",
-      "path": "body[1].rows[0]",
+      "path": "body[0].rows[0]",
       "action": {
         "type": "sheet",
         "to": "rescue_pick"
@@ -87,7 +83,7 @@
     },
     {
       "element": "My plan",
-      "path": "body[1].rows[1]",
+      "path": "body[0].rows[1]",
       "action": {
         "type": "push",
         "to": "ca_red"
