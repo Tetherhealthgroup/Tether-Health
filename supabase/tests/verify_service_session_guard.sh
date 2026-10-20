@@ -260,31 +260,34 @@ select th972_test.ok(
 -- Every function authenticated can execute in public is listed here, so a new
 -- one has to be reviewed for the sync-session refusal before this passes.
 -- Writers that refuse a sync session: begin_account_deletion and
--- delete_my_app_data (TH009); save_program_data, swap_focus and
--- supersede_core_consent (TH010). current_consent_documents only reads.
+-- delete_my_app_data (TH009); save_program_data, swap_focus,
+-- supersede_core_consent and delete_my_account (TH010).
+-- current_consent_documents only reads.
 select th972_test.ok(
   (select string_agg(p.oid::regprocedure::text, ',' order by p.oid::regprocedure::text)
    from pg_catalog.pg_proc as p
    where p.pronamespace = 'public'::regnamespace
      and has_function_privilege('authenticated', p.oid, 'EXECUTE')) =
   'avatar_write_allowed(text),begin_account_deletion(text),current_consent_documents(),'
-  'delete_my_app_data(text),'
+  'delete_my_account(text),delete_my_app_data(text),'
   'deletion_barrier_open(),has_consent(uuid,text,text),is_unique_text_array(text[]),'
   'is_valid_support_people(jsonb),save_program_data(text,jsonb,integer),'
   'supersede_core_consent(uuid,text,text),swap_focus(uuid,uuid),sync_writer_session()',
   'functions authenticated can execute are exactly the reviewed set');
 select th972_test.ok(
-  (select count(*) = 6
-     and bool_and(prosecdef = (proname in ('begin_account_deletion', 'delete_my_app_data'))
+  (select count(*) = 7
+     and bool_and(prosecdef = (proname in ('begin_account_deletion', 'delete_my_app_data',
+                                            'delete_my_account'))
                   and proconfig = array['search_path=""'])
    from pg_catalog.pg_proc
    where oid in ('public.begin_account_deletion(text)'::regprocedure,
                  'public.delete_my_app_data(text)'::regprocedure,
+                 'public.delete_my_account(text)'::regprocedure,
                  'public.save_program_data(text,jsonb,integer)'::regprocedure,
                  'public.swap_focus(uuid,uuid)'::regprocedure,
                  'public.supersede_core_consent(uuid,text,text)'::regprocedure,
                  'public.current_consent_documents()'::regprocedure)),
-  'deletion functions stay security definer; save_program_data, swap_focus, supersede_core_consent and current_consent_documents invoker; search_path empty');
+  'deletion functions (delete_my_account included) stay security definer; save_program_data, swap_focus, supersede_core_consent and current_consent_documents invoker; search_path empty');
 select th972_test.ok(
   not exists (
     select 1 from pg_catalog.pg_proc as p
@@ -893,6 +896,7 @@ sync_refusal delete_my_app_data TH009
 sync_refusal save_program_data TH010
 sync_refusal swap_focus TH010
 sync_refusal supersede_core_consent TH010
+sync_refusal delete_my_account TH010
 
 for pair in enrolments_focus_cap:TH001 consent_revoke_only:TH002 consent_revoke_only:TH003 \
   sync_area_match_enrolment:TH007 sync_lapse_append_only:TH008; do
@@ -914,7 +918,7 @@ registry=$(sed -nE 's/^\| `(TH[0-9]{3})` \| `([a-z_]+)` \|.*/\1 \2/p' "$contract
 [[ "$(cut -d' ' -f1 <<<"$registry" | sort | uniq -d)" == '' ]] || fail 'registry codes must be unique'
 [[ "$(cut -d' ' -f2 <<<"$registry" | sort | uniq -d)" == '' ]] || fail 'registry names must be unique'
 for code in TH001 TH002 TH003 TH004 TH005 TH006 TH007 TH008 TH009 TH010 \
-  TH011 TH012 TH013 TH014 TH015; do
+  TH011 TH012 TH013 TH014 TH015 TH016 TH017 TH018; do
   grep -Eq "^$code " <<<"$registry" || fail "registry is missing $code"
 done
 
