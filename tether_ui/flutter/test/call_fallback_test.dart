@@ -1,8 +1,10 @@
 // When a call or text cannot be placed (TInertPlatform, a TPlatform that
-// returns false or throws), TNav.call / TNav.sms show TCallFallback with the
-// number the action passed. The fallback is an overlay entry, not a route:
-// late submit results, safety actions and branch outcomes do not remove or
-// cover it. A safety action that throws does not stop the save.
+// returns false, throws or does not answer in time), TNav.call / TNav.sms
+// show TCallFallback with the number the action passed. The fallback is an
+// entry in the root overlay, not a route: late submit results, safety
+// actions and branch outcomes do not remove or cover it; TSession.clear
+// does. The screen beneath stays usable. A safety action that throws does
+// not stop the save.
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -140,13 +142,13 @@ int _paintIndex(WidgetTester tester, Finder finder) {
   return i;
 }
 
-/// The error reported by [TNav.report] during the test, which must be a
-/// [TUiError] with [code] and carry no payload.
+/// Codes received by [TNav.reporter] during the test.
+final List<String> _codes = [];
+
+/// [code] was reported through [TNav.report], and no report carried payload.
 void _expectReported(WidgetTester tester, String code) {
-  final error = tester.takeException();
-  expect(error, isA<TUiError>());
-  expect((error as TUiError).code, code);
-  expect(error.toString(), isNot(contains(_canary)));
+  expect(_codes, contains(code));
+  expect(_codes.join(' '), isNot(contains(_canary)));
 }
 
 /// Ends the test after the toasts have gone.
@@ -200,9 +202,13 @@ void main() {
   setUp(() {
     TSession.clear();
     TFlow.onboarding = false;
+    _codes.clear();
+    TNav.reporter = (code, _) => _codes.add(code);
   });
   tearDown(() {
     TCallFallback.dismiss();
+    TNav.reporter = TNav.reportToFlutterError;
+    TNav.platformTimeout = const Duration(seconds: 8);
     TDefaults.forPreview();
     TAuth.instance = null;
     TNav.submitTimeout = const Duration(seconds: 30);
@@ -233,6 +239,7 @@ void main() {
         await _tapKey(tester, path);
         _expectFallback(kind, value);
         expect(platform.recorded, [TInertPlatform.code]);
+        expect(_codes, [TCallFallback.shownCode], reason: 'the fallback is reported, without the number');
         expect(find.textContaining('Would '), findsNothing);
         await _drain(tester);
       });
@@ -370,8 +377,14 @@ void main() {
       await tester.tap(find.byKey(_copy));
       await _settle(tester);
       expect(clipboard, ['988']);
-      expect(find.text(TCallFallbackCopy.copied), findsOneWidget);
+      expect(find.descendant(of: find.byKey(_copy), matching: find.text(TCallFallbackCopy.copied)), findsOneWidget, reason: 'confirmed on the button, inside the card');
+      expect(find.text(TCallFallbackCopy.copied), findsOneWidget, reason: 'no toast under the card');
+      final copied = tester.takeAnnouncements().where((a) => a.message == TCallFallbackCopy.copied).toList();
+      expect(copied, hasLength(1));
+      expect(copied.single.assertiveness, Assertiveness.polite);
       _expectFallback(TFallbackKind.call, '988');
+      await tester.pump(const Duration(seconds: 2));
+      expect(find.descendant(of: find.byKey(_copy), matching: find.text(TCallFallbackCopy.copy)), findsOneWidget, reason: 'reads Copy again');
       await _drain(tester);
       semantics.dispose();
     });
@@ -524,6 +537,212 @@ void main() {
     });
   });
 
+  group('a cleared session removes the fallback', () {
+    testWidgets('TSession.clear (sign-out) removes it and stops listening', (tester) async {
+      TDefaults.forRelease();
+      await _open(tester, route: Routes.beTx);
+      await _tapKey(tester, 'body[1].cta[0]'); // Call oncology team
+      _expectFallback(TFallbackKind.call, '(555) 010-7000');
+      expect(TCallFallback.debugListensToSession, isTrue);
+      TSession.clear();
+      await _settle(tester);
+      _expectNoFallback();
+      expect(find.textContaining('(555) 010-7000'), findsNothing);
+      expect(TCallFallback.debugListensToSession, isFalse, reason: 'no listener left on TSession.changes');
+      expect(TCallFallback.inset.value, 0);
+      await _drain(tester);
+    });
+
+    testWidgets('other session changes and TNav.reset leave it in place', (tester) async {
+      TDefaults.forRelease();
+      await _open(tester, route: Routes.crisis);
+      await _tapKey(tester, 'body[1]');
+      TSession.set('crisis.synthetic', 'x');
+      await _settle(tester);
+      _expectFallback(TFallbackKind.call, '988');
+      unawaited(TNav.reset(tester.element(find.byType(CrisisScreen)), Routes.today));
+      await _settle(tester);
+      _expectFallback(TFallbackKind.call, '988');
+      await _drain(tester);
+    });
+
+    testWidgets('Close also stops listening', (tester) async {
+      TDefaults.forRelease();
+      await _open(tester, route: Routes.crisis);
+      await _tapKey(tester, 'body[1]');
+      await tester.tap(find.byKey(_close));
+      await _settle(tester);
+      expect(TCallFallback.debugListensToSession, isFalse);
+      expect(TCallFallback.inset.value, 0);
+      await _drain(tester);
+    });
+
+    testWidgets('a platform that answers false after a sign-out shows nothing', (tester) async {
+      final answer = Completer<bool>();
+      TPlatform.instance = _ScriptedPlatform(() => answer.future);
+      await _open(tester, route: Routes.crisis);
+      await _tapKey(tester, 'body[1]');
+      TSession.clear();
+      answer.complete(false);
+      await _settle(tester);
+      _expectNoFallback();
+      expect(_codes, isEmpty);
+      await _drain(tester);
+    });
+  });
+
+  group('a platform that does not answer', () {
+    testWidgets('never completes: the fallback shows after platformTimeout and platform_timeout is reported', (tester) async {
+      final answer = Completer<bool>();
+      TPlatform.instance = _ScriptedPlatform(() => answer.future);
+      await _open(tester, route: Routes.crisis);
+      await _tapKey(tester, 'body[1]');
+      await tester.pump(TNav.platformTimeout - const Duration(seconds: 2));
+      _expectNoFallback();
+      await tester.pump(const Duration(seconds: 2));
+      await _settle(tester);
+      _expectFallback(TFallbackKind.call, '988');
+      expect(_codes, [TNav.platformTimeoutCode, TCallFallback.shownCode]);
+      await _drain(tester);
+    });
+
+    for (final late in [true, false]) {
+      testWidgets('a late $late after the timeout changes nothing', (tester) async {
+        final answer = Completer<bool>();
+        TPlatform.instance = _ScriptedPlatform(() => answer.future);
+        await _open(tester, route: Routes.crisis);
+        await _tapKey(tester, 'body[1]');
+        await tester.pump(TNav.platformTimeout);
+        await _settle(tester);
+        _expectFallback(TFallbackKind.call, '988');
+        answer.complete(late);
+        await _settle(tester);
+        _expectFallback(TFallbackKind.call, '988');
+        expect(_codes, [TNav.platformTimeoutCode, TCallFallback.shownCode], reason: 'no second fallback');
+        await _drain(tester);
+      });
+    }
+
+    test('the default wait is 8 seconds', () => expect(TNav.platformTimeout, const Duration(seconds: 8)));
+  });
+
+  group('the screen beneath stays usable at 200% text on 320×568', () {
+    setUpAll(_loadRoboto);
+    final byScreen = <String, List<(String, String, String, TFallbackKind, String)>>{};
+    for (final a in _specActions()) {
+      (byScreen[a.$1] ??= []).add(a);
+    }
+    for (final MapEntry(key: sid, value: actions) in byScreen.entries) {
+      for (final (_, route, path, kind, value) in actions) {
+        final others = actions.where((o) => o.$3 != path).toList();
+        testWidgets('$sid · $path: the card covers at most ${(TCallFallback.maxHeightFraction * 100).round()}% and ${others.isEmpty ? 'nothing overflows' : 'every other call or text button can be scrolled to and tapped'}', (tester) async {
+          TDefaults.forRelease();
+          await _open(tester, route: route, size: const Size(320, 568), textScale: 2);
+          await _tapKey(tester, path);
+          _expectFallback(kind, value);
+          final card = tester.getRect(find.byKey(_fallback));
+          expect(card.height, lessThanOrEqualTo(568 * TCallFallback.maxHeightFraction + 0.5));
+          for (final (_, _, other, _, _) in others) {
+            final button = find.byKey(ValueKey('a:$other'));
+            await tester.ensureVisible(button);
+            await _settle(tester);
+            expect(button.hitTestable(), findsOneWidget, reason: '$other is reachable');
+            expect(tester.getRect(button).top, lessThan(card.top), reason: '$other is above the card');
+          }
+          _expectFallback(kind, value);
+          await _drain(tester); // an overflow would be a reported exception
+        });
+      }
+    }
+  });
+
+  group('the number stays whole', () {
+    setUpAll(_loadRoboto);
+    testWidgets('1-800-784-8669 at 200% on 320×568 is on one line inside the card, and Copy copies it unchanged', (tester) async {
+      final clipboard = <Object?>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+        if (call.method == 'Clipboard.setData') clipboard.add((call.arguments as Map<Object?, Object?>)['text']);
+        return null;
+      });
+      addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+      TDefaults.forRelease();
+      await _open(tester, route: Routes.rescueEscalate, size: const Size(320, 568), textScale: 2);
+      await _tapKey(tester, 'body[2].cta[0]');
+      _expectFallback(TFallbackKind.call, '1-800-784-8669');
+      final paragraph = tester.renderObject<RenderParagraph>(find.descendant(of: find.byKey(_number), matching: find.byType(RichText)));
+      final boxes = paragraph.getBoxesForSelection(const TextSelection(baseOffset: 0, extentOffset: 14));
+      expect(boxes.map((b) => b.top).toSet(), hasLength(1), reason: 'one line');
+      final card = tester.getRect(find.byKey(_fallback));
+      final number = tester.getRect(find.byKey(_number));
+      expect(number.left, greaterThanOrEqualTo(card.left));
+      expect(number.right, lessThanOrEqualTo(card.right));
+      await tester.tap(find.byKey(_copy));
+      await _settle(tester);
+      expect(clipboard, ['1-800-784-8669']);
+      await _drain(tester);
+    });
+  });
+
+  group('root overlay', () {
+    testWidgets('from a screen inside a nested navigator, a route pushed later on the root navigator stays below the fallback', (tester) async {
+      TDefaults.forRelease();
+      late BuildContext rootContext;
+      await tester.pumpWidget(MaterialApp(
+        theme: tetherTheme(),
+        home: Builder(builder: (c) {
+          rootContext = c;
+          return Navigator(onGenerateRoute: (_) => AppRouter.onGenerateRoute(const RouteSettings(name: Routes.crisis)));
+        }),
+      ));
+      await _settle(tester);
+      await _tapKey(tester, 'body[1]');
+      _expectFallback(TFallbackKind.call, '988');
+      unawaited(Navigator.of(rootContext, rootNavigator: true).push(MaterialPageRoute<void>(builder: (_) => const Scaffold(body: SizedBox.expand()))));
+      await _settle(tester);
+      expect(find.byType(CrisisScreen), findsNothing, reason: 'the nested navigator is covered');
+      _expectFallback(TFallbackKind.call, '988');
+      await _drain(tester);
+    });
+  });
+
+  group('reporting', () {
+    testWidgets('a clipboard error reports a code and keeps the card', (tester) async {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+        if (call.method == 'Clipboard.setData') throw PlatformException(code: _canary);
+        return null;
+      });
+      addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+      TDefaults.forRelease();
+      await _open(tester, route: Routes.crisis);
+      await _tapKey(tester, 'body[1]');
+      await tester.tap(find.byKey(_copy));
+      await _settle(tester);
+      expect(_codes, [TCallFallback.shownCode, TCallFallback.clipboardErrorCode]);
+      _expectReported(tester, TCallFallback.clipboardErrorCode);
+      expect(find.text(TCallFallbackCopy.copied), findsNothing);
+      _expectFallback(TFallbackKind.call, '988');
+      await _drain(tester);
+    });
+
+    testWidgets('the default reporter sends a TUiError with the code only to FlutterError', (tester) async {
+      TNav.reporter = TNav.reportToFlutterError;
+      TNav.report(TNav.platformErrorCode, StackTrace.current);
+      final error = tester.takeException();
+      expect(error, isA<TUiError>());
+      expect((error as TUiError).code, TNav.platformErrorCode);
+      expect(error.toString(), 'TUiError(platform_error)');
+    });
+
+    testWidgets('a reporter that throws does not stop the fallback', (tester) async {
+      TNav.reporter = (_, __) => throw StateError('synthetic');
+      TPlatform.instance = _ScriptedPlatform(() => throw StateError(_canary));
+      await _open(tester, route: Routes.crisis);
+      await _tapKey(tester, 'body[1]');
+      _expectFallback(TFallbackKind.call, '988');
+      await _drain(tester);
+    });
+  });
+
   group('a safety action that throws', () {
     late _EachCallApi api;
     setUp(() {
@@ -556,18 +775,74 @@ void main() {
       await _drain(tester);
     });
 
-    testWidgets('before opening anything: the save is still sent and a failure shows the save error', (tester) async {
+    testWidgets('before opening anything, always throwing: the save is still sent, the rule is tried again on failure, and the save error shows', (tester) async {
       await _open(tester);
       selfHarmValue();
       final done = TNav.submit(_hostContext, 'POST /x', screenId: 's', safety: TSafetyRoutes('ea.selfharm', {'Yes': () => throw StateError(_canary)}));
       await _settle(tester);
       expect(api.gates, hasLength(1), reason: 'the save is sent');
-      _expectReported(tester, TNav.safetyActionErrorCode);
+      expect(_codes, [TNav.safetyActionErrorCode]);
       api.gates.single.complete(const TResult.failed('synthetic_code'));
       expect(await done, const TResult.failed('synthetic_code'));
       await tester.pump();
+      expect(_codes, [TNav.safetyActionErrorCode, TNav.safetyActionErrorCode], reason: 'nothing opened, so the completion check ran the action again');
       expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsOneWidget);
       expect(find.textContaining(_canary), findsNothing);
+      await _drain(tester);
+    });
+
+    // An action that throws on its first run, before navigating, and pushes
+    // the crisis screen on later runs. [then] is the generated form: a branch
+    // decided by the same rule, whose case runs the same action.
+    (VoidCallback, int Function()) throwOnceThenPush() {
+      var runs = 0;
+      void action() {
+        runs++;
+        if (runs == 1) throw StateError(_canary);
+        TNav.push(_hostContext, Routes.crisis);
+      }
+
+      return (action, () => runs);
+    }
+
+    for (final (how, result) in <(String, TResult)>[('succeeds', const TResult.ok()), ('fails', const TResult.failed('synthetic_code'))]) {
+      testWidgets('throws before navigating, the save $how while the screen is on top: the safety screen opens once', (tester) async {
+        await _open(tester);
+        selfHarmValue();
+        final (action, runs) = throwOnceThenPush();
+        final then = () => TNav.branch(_hostContext, 'Q', {'Yes': action, 'No': () {}}, decide: 'ea.selfharm');
+        final done = TNav.submit(_hostContext, 'POST /x', screenId: 's', then: then, safety: TSafetyRoutes('ea.selfharm', {'Yes': action}));
+        await _settle(tester);
+        expect(api.gates, hasLength(1));
+        expect(find.byType(CrisisScreen), findsNothing);
+        _expectReported(tester, TNav.safetyActionErrorCode);
+        api.gates.single.complete(result);
+        await done;
+        await _settle(tester);
+        expect(find.byType(CrisisScreen), findsOneWidget);
+        expect(runs(), 2);
+        await _drain(tester);
+      });
+    }
+
+    testWidgets('throws after pushing, the save fails: no second safety screen', (tester) async {
+      await _open(tester);
+      selfHarmValue();
+      var runs = 0;
+      final safety = TSafetyRoutes('ea.selfharm', {
+        'Yes': () {
+          runs++;
+          TNav.push(_hostContext, Routes.crisis);
+          throw StateError(_canary);
+        },
+      });
+      final done = TNav.submit(_hostContext, 'POST /x', screenId: 's', safety: safety);
+      await _settle(tester);
+      api.gates.single.complete(const TResult.failed('synthetic_code'));
+      await done;
+      await _settle(tester);
+      expect(runs, 1);
+      expect(find.byType(CrisisScreen, skipOffstage: false), findsOneWidget);
       await _drain(tester);
     });
 

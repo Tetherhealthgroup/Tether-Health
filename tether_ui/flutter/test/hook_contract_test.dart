@@ -501,6 +501,9 @@ void main() {
 
     testWidgets('release defaults: a crisis call button shows only the call fallback with the number, and records a code without it', (tester) async {
       TDefaults.forRelease();
+      final codes = <String>[];
+      TNav.reporter = (code, _) => codes.add(code);
+      addTearDown(() => TNav.reporter = TNav.reportToFlutterError);
       final platform = TPlatform.instance as TInertPlatform;
       await _open(tester, Routes.crisis);
       expect(find.byType(CrisisScreen), findsOneWidget);
@@ -514,6 +517,7 @@ void main() {
       expect(_texts(tester).toList(), [...before, TCallFallbackCopy.callMessage('988'), '988', TCallFallbackCopy.copy, TCallFallbackCopy.close], reason: 'the only new text is the call fallback');
       expect(platform.recorded, [TInertPlatform.code]);
       expect(platform.recorded.single.contains('988'), isFalse);
+      expect(codes, [TCallFallback.shownCode]);
       TCallFallback.dismiss();
       await tester.pump(const Duration(seconds: 3));
     });
