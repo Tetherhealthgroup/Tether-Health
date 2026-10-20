@@ -12,3 +12,9 @@ GeneratedPluginRegistrant.java
 key.properties
 **/*.keystore
 **/*.jks
+
+# fastlane (owner-run Play upload lanes): generated files and local gems.
+/fastlane/report.xml
+/fastlane/README.md
+/vendor/bundle/
+/.bundle/

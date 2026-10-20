@@ -215,3 +215,88 @@ firebase appdistribution:distribute build/app/outputs/bundle/release/app-release
 Distributing an AAB requires the Firebase project to be linked to Google Play.
 If it is not, distribute an APK build instead. This command has not been run
 by any agent.
+
+## Uploading with fastlane (owner)
+
+`android/fastlane/Fastfile` sends an AAB that `tool/build_play_release.sh`
+already built to the Internal testing track as a draft. The owner runs it on
+their own Mac with their own Play service-account key. CI never uploads.
+
+### Prerequisites (once)
+
+- Ruby 3.2 or newer (fastlane 2.241.1 needs it), for example through rbenv:
+  `rbenv install 3.3.9 && rbenv shell 3.3.9`.
+- Install the pinned gems. `android/Gemfile.lock` pins every gem with its
+  checksum, and Bundler checks them on install:
+
+  ```sh
+  cd android
+  bundle config set --local path vendor/bundle   # optional; gitignored
+  bundle install
+  ```
+
+- The tools that `tool/build_play_release.sh --verify-aab` needs: `keytool`,
+  and `bundletool` or `aapt2` on `PATH` (see section 4).
+
+### Play service account (once)
+
+1. In Google Cloud, in a project you control, enable the Google Play Android
+   Developer API and create a service account. Give it no IAM roles in the
+   project. Create a JSON key for it.
+2. In Play Console, Users and permissions, invite the service account's email.
+   Under App permissions add only `com.TetherHealthLLC.tetherhealth`, and grant
+   only "Release apps to testing tracks". Grant no account permissions, no
+   production release, no store presence and no admin rights.
+3. Keep the JSON outside the repository and readable only by you:
+
+   ```sh
+   mv ~/Downloads/<downloaded key>.json ~/secure/tether-health/play-service-account.json
+   chmod 600 ~/secure/tether-health/play-service-account.json
+   export TETHER_PLAY_JSON_KEY=$HOME/secure/tether-health/play-service-account.json
+   ```
+
+The lanes read the key path only from `TETHER_PLAY_JSON_KEY`. They refuse to
+run if it is unset, is not an existing JSON file, or resolves inside the
+repository. Common key file names (`*play*key*.json`,
+`*service-account*.json`, ...) are gitignored as a backstop; do not rely on it.
+
+### Each upload
+
+From the repository root:
+
+```sh
+bash tool/build_play_release.sh --dart-define-from-file=$HOME/secure/tether-health/release.json
+cd android
+bundle exec fastlane android validate aab:build/app/outputs/bundle/release/app-release.aab
+bundle exec fastlane android internal aab:build/app/outputs/bundle/release/app-release.aab
+```
+
+A relative `aab:` path is read from the repository root. Both lanes first run
+`bash tool/build_play_release.sh --verify-aab=<aab>` (signing certificate,
+package and versionCode) and stop if it fails. Pass `min_version_code:N` to
+either lane to forward `--min-version-code N`. `validate` asks Play to check
+the upload without creating a release. `internal` creates the release.
+
+The release lands as a **draft** in Internal testing. Review it in Play
+Console (Test and release > Testing > Internal testing), then roll it out
+there. Promotion to any other track also stays in Play Console.
+
+After each upload, raise the `min_version_code` default in
+`tool/build_play_release.sh` to the uploaded versionCode plus one, in the same
+commit as the next `pubspec.yaml` bump (section 4), and record the uploaded
+versionCode (section 5).
+
+### What the lanes never do
+
+- Build, sign or change a version number.
+- Upload or change the store listing, metadata, images, screenshots or
+  changelogs, or upload APKs.
+- Use any track other than Internal testing, any status other than draft, or
+  promote or roll out a release. These are fixed in the Fastfile, not lane
+  options.
+- Run under CI: they stop when `CI` or `GITHUB_ACTIONS` is set. They also stop
+  when any `SUPPLY_*` variable is set, because those would change the upload
+  settings.
+- Print the key path or its contents (fastlane's settings table, which
+  would show the path, is turned off), or send fastlane usage metrics
+  (`opt_out_usage`).

@@ -1,0 +1,111 @@
+# Google Play upload lanes, run by the owner on their own machine
+# (docs/PLAY_RELEASE.md, "Uploading with fastlane (owner)").
+#
+# Scope: send an AAB that tool/build_play_release.sh has already built to the
+# internal testing track as a draft, after re-running that script's
+# --verify-aab checks. These lanes never build, sign or change a version, and
+# never touch the store listing, metadata, images, screenshots or changelogs.
+# Track, status and skip flags are fixed below; they are not lane options.
+# Every other track, promotion and rollout stays manual in Play Console.
+# Uploads are refused under CI.
+
+require "json"
+
+# Turns off fastlane's anonymous usage metrics.
+opt_out_usage
+
+default_platform(:android)
+
+# fastlane parses this file with android/fastlane as the working directory.
+REPO_ROOT = File.realpath(File.join(Dir.pwd, "..", ".."))
+LANE_OPTIONS = [:aab, :min_version_code].freeze
+
+platform :android do
+  before_all do
+    if !ENV["CI"].to_s.empty? || !ENV["GITHUB_ACTIONS"].to_s.empty?
+      UI.user_error!("Refusing to run: CI or GITHUB_ACTIONS is set. Play uploads are run by the owner only, never by CI.")
+    end
+    supply_env = ENV.keys.grep(/\ASUPPLY_/).sort
+    unless supply_env.empty?
+      UI.user_error!("Refusing to run: unset #{supply_env.join(', ')}. The lanes set every upload option themselves.")
+    end
+    # The upload action prints a settings table that includes the key path.
+    ENV["FASTLANE_SKIP_ALL_LANE_SUMMARIES"] = "1"
+  end
+
+  desc "Upload an existing, verified AAB to the internal track as a draft"
+  lane :internal do |options|
+    aab, key = checked_inputs(options)
+    play_upload(aab, key, validate_only: false)
+  end
+
+  desc "Check an existing, verified AAB with Play without creating a release"
+  lane :validate do |options|
+    aab, key = checked_inputs(options)
+    play_upload(aab, key, validate_only: true)
+  end
+end
+
+# Checks the lane options, the key file and the AAB, then runs the repo's AAB
+# verification. Returns the AAB and key paths. Messages name the environment
+# variable or the lane option only, never a path or file content.
+def checked_inputs(options)
+  unless (options.keys - LANE_OPTIONS).empty?
+    UI.user_error!("Unknown lane option (not shown). Only aab: and min_version_code: are accepted.")
+  end
+
+  key = ENV["TETHER_PLAY_JSON_KEY"].to_s
+  UI.user_error!("TETHER_PLAY_JSON_KEY is not set.") if key.empty?
+  UI.user_error!("TETHER_PLAY_JSON_KEY does not point to an existing file.") unless File.file?(key)
+  key = File.realpath(key)
+  if inside_repo?(key)
+    UI.user_error!("TETHER_PLAY_JSON_KEY points inside the repository. Keep the key outside it.")
+  end
+  begin
+    JSON.parse(File.read(key))
+  rescue JSON::ParserError, SystemCallError, IOError
+    UI.user_error!("TETHER_PLAY_JSON_KEY does not point to a readable JSON file.")
+  end
+
+  aab = options[:aab].to_s
+  UI.user_error!("aab: is required (the bundle built by tool/build_play_release.sh).") if aab.empty?
+  aab = File.expand_path(aab, REPO_ROOT) # a relative path is read from the repo root
+  unless aab.downcase.end_with?(".aab") && File.file?(aab)
+    UI.user_error!("aab: does not point to an existing .aab file (path not shown).")
+  end
+  aab = File.realpath(aab)
+
+  verify = ["bash", "tool/build_play_release.sh", "--verify-aab=#{aab}"]
+  if options.key?(:min_version_code)
+    verify << "--min-version-code=#{options[:min_version_code]}"
+  end
+  unless system(*verify, chdir: REPO_ROOT)
+    UI.user_error!("tool/build_play_release.sh --verify-aab failed. Nothing was uploaded.")
+  end
+
+  [aab, key]
+end
+
+# True if path is the repository root or inside it. Compared case-insensitively
+# because macOS volumes usually are.
+def inside_repo?(path)
+  path = path.downcase
+  root = REPO_ROOT.downcase
+  path == root || path.start_with?(root + File::SEPARATOR)
+end
+
+# The only upload call.
+def play_upload(aab, key, validate_only:)
+  upload_to_play_store(
+    json_key: key,
+    aab: aab,
+    track: "internal",
+    release_status: "draft",
+    skip_upload_apk: true,
+    skip_upload_metadata: true,
+    skip_upload_changelogs: true,
+    skip_upload_images: true,
+    skip_upload_screenshots: true,
+    validate_only: validate_only
+  )
+end
