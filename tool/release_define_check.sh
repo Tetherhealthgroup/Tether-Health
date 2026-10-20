@@ -86,8 +86,9 @@ JWT_SEGMENT = re.compile(r"[A-Za-z0-9_-]+={0,2}")
 #                                checked below in check() (this file)
 #   SUPABASE_ANON_KEY            lib/config/app_config.dart:14 and ANON above
 #   SUPABASE_SERVICE_ROLE_KEY    not read by the release scripts or app_config.
-#                                It is the server-only key name in render.yaml:20
-#                                and api/src/config/environment.ts:46. Listed
+#                                The Supabase service key name; the API refuses
+#                                to start while it is set
+#                                (api/src/config/environment.ts). Listed
 #                                so that the mistake this check exists to catch
 #                                (an sb_secret_ value pasted under that name)
 #                                is reported by its name (R1). The name is a

@@ -142,10 +142,11 @@ messaging, remote notifications, analytics, and later health domains remain
 consent-aware prototype actions or interfaces. Authenticated users can re-enter
 their password to export the
 bounded app-owned dataset as JSON or permanently delete their profile, plan,
-program snapshots, avatar, and Supabase Auth identity. The API sets a durable
-avatar-upload barrier, then performs recursive Storage and Auth cleanup with a
-server-only privileged client scoped to the verified caller; the privileged
-credential is never included in Flutter. Before calling the destructive
+program snapshots, avatar, and Supabase Auth identity. The API uses only the
+anon key plus the member's own token. It sets a durable avatar-upload barrier,
+removes the caller's avatar objects through Storage, and then deletes the app
+data and the Auth identity through the `delete_my_account` database function.
+Before calling the destructive
 endpoint, Flutter must persist an encrypted deletion-intent tombstone or it
 aborts. Once a 2xx confirms the endpoint ran, Flutter immediately invalidates
 the session and starts bounded account-scoped local cleanup independently of
@@ -170,12 +171,11 @@ For a configured development build, copy `config/dart_defines.example.json` to
 an ignored local file, replace placeholders through an approved secret/config
 channel, and run Flutter with `--dart-define-from-file=<local-file>`. Only the
 Supabase publishable/anonymous key belongs in a client build; never use a
-service-role key in Flutter.
+service-role key in Flutter or the API.
 
 This repository is a technically verifiable MVP, not an approved clinical
 production release. Signing identities, final store configuration, production
-Supabase/API provisioning and redirect allowlisting, server-only service-role
-configuration and operational approval, legal/clinical/privacy approval,
+Supabase/API provisioning and redirect allowlisting, legal/clinical/privacy approval,
 professional translation,
 third-party penetration testing, and physical-device accessibility/integration
 validation remain external release dependencies.
