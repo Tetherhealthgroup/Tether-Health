@@ -570,8 +570,8 @@ session (`TH009`).
 refuses, in this order: no caller (`42501`); a sync service session (`TH009`);
 a confirmation other than `DELETE` (`23514`); and a sign-in that is not recent
 (`TH017`), by the same rule as `delete_my_account` below. A refusal sets
-nothing. Because `delete_my_app_data` refuses until the barrier is set, the
-deletion of a member's data can only start with a recent sign-in.
+nothing. So for a member with a profile, `delete_my_app_data` cannot run
+until `begin_account_deletion` has accepted a recent sign-in.
 `supabase/tests/verify_begin_deletion_recent_sign_in.sh` checks this.
 
 The NestJS API first invokes `begin_account_deletion` with exact confirmation.
