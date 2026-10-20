@@ -28,7 +28,7 @@ class SfUnplugAuthDeniedScreen extends StatelessWidget {
         TBody('Everything else in ScrollFree works without it: your goal, Pause 60 and check-ins.', tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Try again', onPressed: () => TNav.branch(context, 'Screen Time authorization (iOS Family Controls, individual)', <String, VoidCallback>{'Approved': () => TNav.replace(context, Routes.sfUnplugApps), 'Denied': () => TNav.toast(context, 'Still not allowed. You can turn it on later in Settings.')}), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Try again', onPressed: () => TNav.branch(context, 'Screen Time authorization (iOS Family Controls, individual)', <String, VoidCallback>{'Approved': () => TNav.replace(context, Routes.sfUnplugApps), 'Denied': () => TNav.toast(context, 'Still not allowed. You can turn it on later in Settings.')}, device: const TBranchRef('unplug.setup.ios_authorization_retry', TAsk.unplugAuthIos, 'sf_unplug_auth_denied'), when: const <TAnswer, String>{TAnswer.granted: 'Approved', TAnswer.grantedNotificationsOff: 'Approved', TAnswer.denied: 'Denied', TAnswer.unavailable: 'Denied'}), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Open phone settings', onPressed: () => TNav.osSettings(context), variant: TButtonVariant.secondary),
         TLink(key: const ValueKey('a:footer[2]'), label: 'Not now', onTap: () => TNav.back(context)),
       ],

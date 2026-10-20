@@ -78,7 +78,14 @@
               "to": "records_error"
             }
           }
-        ]
+        ],
+        "id": "records.device.health_records_request",
+        "ask": "healthRecordsRequest",
+        "when": {
+          "granted": "Allowed",
+          "denied": "Not allowed",
+          "unavailable": "Not allowed"
+        }
       },
       "variant": "primary",
       "arrow": true
@@ -128,7 +135,14 @@
               "to": "records_error"
             }
           }
-        ]
+        ],
+        "id": "records.device.health_records_request",
+        "ask": "healthRecordsRequest",
+        "when": {
+          "granted": "Allowed",
+          "denied": "Not allowed",
+          "unavailable": "Not allowed"
+        }
       },
       "summary": "branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error"
     },

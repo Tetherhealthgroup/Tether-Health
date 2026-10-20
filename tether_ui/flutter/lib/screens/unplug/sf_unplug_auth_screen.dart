@@ -28,7 +28,7 @@ class SfUnplugAuthScreen extends StatelessWidget {
         TKeyValue(rows: [('Lets Unplug', 'Pause apps you choose'), ('Never shares', 'App names, content, messages'), ('Turn off', 'Anytime in Account → ScrollFree')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.branch(context, 'Screen Time authorization (iOS Family Controls, individual)', <String, VoidCallback>{'Approved': () => TNav.replace(context, Routes.sfUnplugApps), 'Approved · notifications off': () => TNav.replace(context, Routes.sfUnplugAuthNotifications), 'Denied': () => TNav.replace(context, Routes.sfUnplugAuthDenied), 'Unavailable': () => TNav.replace(context, Routes.sfUnplugAuthUnavailable)}), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.branch(context, 'Screen Time authorization (iOS Family Controls, individual)', <String, VoidCallback>{'Approved': () => TNav.replace(context, Routes.sfUnplugApps), 'Approved · notifications off': () => TNav.replace(context, Routes.sfUnplugAuthNotifications), 'Denied': () => TNav.replace(context, Routes.sfUnplugAuthDenied), 'Unavailable': () => TNav.replace(context, Routes.sfUnplugAuthUnavailable)}, device: const TBranchRef('unplug.setup.ios_authorization', TAsk.unplugAuthIos, 'sf_unplug_auth'), when: const <TAnswer, String>{TAnswer.granted: 'Approved', TAnswer.grantedNotificationsOff: 'Approved · notifications off', TAnswer.denied: 'Denied', TAnswer.unavailable: 'Unavailable'}), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );

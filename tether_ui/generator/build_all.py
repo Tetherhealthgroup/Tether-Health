@@ -285,6 +285,9 @@ def main():
         for l, p, a in actions_of(s):
             rows.append({'screen': sid, 'screen_name': s['name'], 'element': l, 'path': p, 'type': a['type'] if a else 'disabled', 'targets': targets(a), 'summary': describe(a)})
     wj('spec/actions.json', rows)
+    from validate import branch_catalogue, endpoint_catalogue, check_emitted
+    wj('spec/branches.json', branch_catalogue(SCREENS))
+    wj('spec/endpoints.json', endpoint_catalogue(SCREENS))
     from rules import RULES as _R, SCENARIOS as _S
     wj('spec/rules.json', _R)
     wj('spec/scenarios.json', _S)
@@ -292,7 +295,10 @@ def main():
     with open(os.path.join(OUT, 'spec', 'actions.csv'), 'w', newline='') as fh:
         wr = csv.writer(fh); wr.writerow(['screen', 'screen_name', 'element', 'type', 'targets', 'summary'])
         for r in rows: wr.writerow([r['screen'], r['screen_name'], r['element'], r['type'], ' '.join(r['targets']), r['summary']])
-    w('spec/validation.md', f'# Validation\n\n- Screens: {len(SCREENS)}\n- Actions (edges): {len(edges)}\n- Errors (loose ends): **{len(errs)}**\n\nChecks: every interactive element has an action; every target exists; every screen can be reached from an entry point; every screen has a way out; routes are unique; branches have ≥2 outcomes.\n\n## Notes\n\n' + '\n'.join(f'- {x}' for x in warns) + '\n')
+    w('spec/validation.md', f'# Validation\n\n- Screens: {len(SCREENS)}\n- Actions (edges): {len(edges)}\n- Errors (loose ends): **{len(errs)}**\n\nChecks: every interactive element has an action; every target exists; every screen can be reached from an entry point; every screen has a way out; routes are unique; branches have ≥2 outcomes; every branch has exactly one production decision source (V1–V6, spec/branches.json).\n\n## Notes\n\n' + '\n'.join(f'- {x}' for x in warns) + '\n')
+    emitted = check_emitted(os.path.join(OUT, 'spec'))
+    if emitted:
+        print('\n'.join(emitted)); sys.exit(1)
     # flows markdown
     for fid in FLOWS: w(f'flows/{fid}.md', flow_markdown(fid, describe))
     w('flows/README.md', '# Flows\n\n' + '\n'.join(f'- [{f["title"]}]({fid}.md): {len(f["screens"])} screens' for fid, f in FLOWS.items()) + '\n')

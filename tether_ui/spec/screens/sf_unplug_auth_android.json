@@ -98,7 +98,14 @@
               "value": "Unplug still needs both settings."
             }
           }
-        ]
+        ],
+        "id": "unplug.setup.android_check",
+        "ask": "unplugAndroidCheck",
+        "when": {
+          "allOn": "All on",
+          "notificationsOff": "Notifications off",
+          "missing": "Missing"
+        }
       },
       "align": "center"
     }
@@ -164,7 +171,14 @@
               "value": "Unplug still needs both settings."
             }
           }
-        ]
+        ],
+        "id": "unplug.setup.android_check",
+        "ask": "unplugAndroidCheck",
+        "when": {
+          "allOn": "All on",
+          "notificationsOff": "Notifications off",
+          "missing": "Missing"
+        }
       },
       "summary": "branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Notifications off: replace → sf_unplug_auth_notifications | Missing: toast “Unplug still needs both settings.”"
     }

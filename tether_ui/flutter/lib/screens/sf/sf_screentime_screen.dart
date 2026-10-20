@@ -28,7 +28,7 @@ class SfScreentimeScreen extends StatelessWidget {
         TKeyValue(rows: [('Shows', 'Minutes per category, on this phone'), ('Never reads', 'Content, messages, contacts'), ('Turn off', 'Anytime in Account')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Allow access', onPressed: () => TNav.branch(context, 'iOS Screen Time permission', <String, VoidCallback>{'Allowed': () => TNav.toast(context, 'Screen Time connected', then: () => TNav.back(context)), 'Not allowed': () => TNav.replace(context, Routes.sfScreentimeDenied)}), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Allow access', onPressed: () => TNav.branch(context, 'iOS Screen Time permission', <String, VoidCallback>{'Allowed': () => TNav.toast(context, 'Screen Time connected', then: () => TNav.back(context)), 'Not allowed': () => TNav.replace(context, Routes.sfScreentimeDenied)}, device: const TBranchRef('sf.screentime.ios_request', TAsk.screenTimeRequest, 'sf_screentime'), when: const <TAnswer, String>{TAnswer.granted: 'Allowed', TAnswer.denied: 'Not allowed', TAnswer.unavailable: 'Not allowed'}), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );

@@ -59,7 +59,15 @@
               "value": "Still not allowed. You can turn it on later in Settings."
             }
           }
-        ]
+        ],
+        "id": "unplug.setup.ios_authorization_retry",
+        "ask": "unplugAuthIos",
+        "when": {
+          "granted": "Approved",
+          "grantedNotificationsOff": "Approved",
+          "denied": "Denied",
+          "unavailable": "Denied"
+        }
       },
       "variant": "primary",
       "arrow": true
@@ -120,7 +128,15 @@
               "value": "Still not allowed. You can turn it on later in Settings."
             }
           }
-        ]
+        ],
+        "id": "unplug.setup.ios_authorization_retry",
+        "ask": "unplugAuthIos",
+        "when": {
+          "granted": "Approved",
+          "grantedNotificationsOff": "Approved",
+          "denied": "Denied",
+          "unavailable": "Denied"
+        }
       },
       "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: toast “Still not allowed. You can turn it on later in Settings.”"
     },

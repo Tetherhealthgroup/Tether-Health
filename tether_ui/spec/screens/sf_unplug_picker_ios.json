@@ -45,7 +45,9 @@
               "type": "close"
             }
           }
-        ]
+        ],
+        "id": "unplug.picker.ios",
+        "ask": "reference"
       },
       "variant": "primary",
       "arrow": true
@@ -93,7 +95,9 @@
               "type": "close"
             }
           }
-        ]
+        ],
+        "id": "unplug.picker.ios",
+        "ask": "reference"
       },
       "summary": "branch: System app picker result → Apps chosen: replace → sf_unplug_apps_chosen | Cancelled: close"
     },

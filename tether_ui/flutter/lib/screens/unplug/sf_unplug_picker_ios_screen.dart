@@ -23,7 +23,7 @@ class SfUnplugPickerIosScreen extends StatelessWidget {
         TNativeSlot(id: 'ios.familyActivityPicker', label: 'Apple’s app picker', height: 320.0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Done', onPressed: () => TNav.branch(context, 'System app picker result', <String, VoidCallback>{'Apps chosen': () => TNav.replace(context, Routes.sfUnplugAppsChosen), 'Cancelled': () => TNav.close(context)}), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Done', onPressed: () => TNav.branch(context, 'System app picker result', <String, VoidCallback>{'Apps chosen': () => TNav.replace(context, Routes.sfUnplugAppsChosen), 'Cancelled': () => TNav.close(context)}, device: const TBranchRef('unplug.picker.ios', TAsk.reference, 'sf_unplug_picker_ios')), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );

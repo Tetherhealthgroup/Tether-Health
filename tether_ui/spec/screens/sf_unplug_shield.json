@@ -63,7 +63,9 @@
                 "to": "rescue_pick"
               }
             }
-          ]
+          ],
+          "id": "unplug.shield.notification_action",
+          "ask": "reference"
         }
       },
       "variant": "lime",
@@ -118,7 +120,9 @@
                 "to": "rescue_pick"
               }
             }
-          ]
+          ],
+          "id": "unplug.shield.notification_action",
+          "ask": "reference"
         }
       },
       "summary": "toast “Notification: open Tether to take your breath, or get support” then branch: Notification action → Take my breath: push → sf_unplug_gate | Get support: sheet → rescue_pick"

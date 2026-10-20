@@ -39,12 +39,12 @@ auth_verify,Verify email,Resend link (available in 0:42),toast,,toast “Link se
 auth_signin,Sign in,Continue with Apple,branch,today auth_merge auth_social_new auth_social_error,"auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
 auth_signin,Sign in,Continue with Google,branch,today auth_merge auth_social_new auth_social_error,"auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
 auth_signin,Sign in,Forgot password?,push,auth_forgot,push → auth_forgot
-auth_signin,Sign in,Sign in,branch,today auth_merge auth_signin_error,branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error
+auth_signin,Sign in,Sign in,submit,today auth_merge auth_signin_error,POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error
 auth_signin,Sign in,Cancel,close,,close
 auth_signin_error,Sign-in error,Continue with Apple,branch,today auth_merge auth_social_new auth_social_error,"auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
 auth_signin_error,Sign-in error,Continue with Google,branch,today auth_merge auth_social_new auth_social_error,"auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
 auth_signin_error,Sign-in error,Forgot password?,push,auth_forgot,push → auth_forgot
-auth_signin_error,Sign-in error,Try again,branch,today auth_signin_error,branch: Sign-in result → Success: reset → today | Wrong password: replace → auth_signin_error
+auth_signin_error,Sign-in error,Try again,submit,today auth_merge auth_signin_error,POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: replace → auth_signin_error
 auth_signin_error,Sign-in error,Cancel,close,,close
 auth_social_new,New account from Apple or Google,Back,back,,back
 auth_social_new,New account from Apple or Google,Create my account,submit,ob_programs,POST supabase /auth/v1/token?grant_type=id_token then push → ob_programs

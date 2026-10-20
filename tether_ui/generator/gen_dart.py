@@ -34,17 +34,43 @@ def act(a):
         return f"TNav.toast(context, {dstr(a['value'])}{then})"
     if t == 'submit':
         then = f", then: () => {act(a['then'])}" if a.get('then') else ''
-        return f"TNav.submit(context, {dstr(a['api'])}, screenId: {dstr(CUR['sid'])}{then}{safety_routes(a.get('then'))})"
+        nq = '' if queueable(a['api']) else ', queueable: false'
+        return f"TNav.submit(context, {dstr(a['api'])}, screenId: {dstr(CUR['sid'])}{nq}{then}{safety_routes(a.get('then'))})"
     if t == 'branch':
         safety_cases(a)  # raises if a safety outcome has no case
         cases = ', '.join(f"{dstr(c['label'])}: () => {act(c['action'])}" for c in a['cases'])
         extra = ''
         if a.get('decide'): extra += f", decide: {dstr(a['decide'])}"
         if a.get('provider'): extra += f", provider: {dstr(a['provider'])}"
+        if a.get('ask') is not None: extra += device_args(a)
         return f"TNav.branch(context, {dstr(a['question'])}, <String, VoidCallback>{{{cases}}}{extra})"
     raise ValueError(t)
 
 def cb(a): return f'() => {act(a)}' if a else 'null'
+
+def device_args(a):
+    """`, device: TBranchRef(...), when: {...}` for a branch decided by the
+    device hook (R-31). Raises on an unknown ask or answer, so a typo never
+    generates a branch that the kit cannot decide."""
+    ask = a['ask']
+    if ask not in ASKS: raise ValueError(f"{CUR['sid']}: unknown ask {ask!r}")
+    if not isinstance(a.get('id'), str) or not BRANCH_ID.match(a['id']):
+        raise ValueError(f"{CUR['sid']}: branch id {a.get('id')!r} must match {BRANCH_ID.pattern}")
+    out = f", device: const TBranchRef({dstr(a['id'])}, TAsk.{ask}, {dstr(CUR['sid'])})"
+    when = a.get('when') or {}
+    plain = {k: v for k, v in when.items() if not isinstance(v, dict)}
+    per = {k: v for k, v in when.items() if isinstance(v, dict)}
+    for k in list(plain) + list(per):
+        if k not in ASKS[ask]: raise ValueError(f"{CUR['sid']}: {ask} never answers {k!r}")
+    for k, m in per.items():
+        for p in m:
+            if p not in ASKS['platform']: raise ValueError(f"{CUR['sid']}: {k!r} per-platform map has {p!r}")
+    if plain:
+        out += ', when: const <TAnswer, String>{' + ', '.join(f'TAnswer.{k}: {dstr(v)}' for k, v in plain.items()) + '}'
+    if per:
+        out += ', whenByPlatform: const <TAnswer, Map<TAnswer, String>>{' + ', '.join(
+            f'TAnswer.{k}: {{' + ', '.join(f'TAnswer.{p}: {dstr(l)}' for p, l in m.items()) + '}' for k, m in per.items()) + '}'
+    return out
 
 def safety_labels(rule_id):
     """Outcome labels that rules.py marks as safety for `rule_id` (none if unmarked)."""
@@ -446,10 +472,45 @@ def _self_test():
     finally:
         del RULES['selftest.rule']
         for k in added: del SCREENS[k]
+    _device_self_test()
     print('gen_dart self-test: ok')
+
+
+def _device_self_test():
+    """Device branches and non-queueable submits generate as R-31 says, and
+    a branch the kit could not decide fails generation."""
+    CUR['sid'] = 'selftest'
+    def dev(**kw):
+        return dict({'type': 'branch', 'question': 'Q', 'cases': [{'label': 'Yes', 'action': {'type': 'back'}}, {'label': 'No', 'action': {'type': 'close'}}],
+                     'id': 'selftest.screen.check', 'ask': 'notificationsCheck', 'when': {'granted': 'Yes', 'denied': 'No'}}, **kw)
+    code = act(dev())
+    _expect("device: const TBranchRef('selftest.screen.check', TAsk.notificationsCheck, 'selftest')" in code, code)
+    _expect("when: const <TAnswer, String>{TAnswer.granted: 'Yes', TAnswer.denied: 'No'}" in code, code)
+    _expect('whenByPlatform' not in code, code)
+    per = act(dev(when={'granted': {'ios': 'Yes', 'android': 'No'}, 'denied': 'No'}))
+    _expect("whenByPlatform: const <TAnswer, Map<TAnswer, String>>{TAnswer.granted: {TAnswer.ios: 'Yes', TAnswer.android: 'No'}}" in per, per)
+    _expect("when: const <TAnswer, String>{TAnswer.denied: 'No'}" in per, per)
+    ref = act(dev(ask='reference', when=None))
+    _expect('TAsk.reference' in ref and 'when:' not in ref, ref)
+    for bad, why in ((dev(ask='nope'), 'unknown ask'), (dev(id='Bad.Id'), 'must match'), (dev(id=None), 'must match'),
+                     (dev(when={'granted': 'Yes', 'maybe': 'No'}), 'never answers'), (dev(when={'granted': {'ios': 'Yes', 'web': 'No'}, 'denied': 'No'}), 'per-platform')):
+        try:
+            act(bad)
+        except ValueError as e:
+            _expect(why in str(e), str(e))
+        else:
+            raise AssertionError(f'a device branch with {why} generated')
+    plain = act(dev(id=None, ask=None, when=None))
+    _expect('device:' not in plain and 'when:' not in plain, plain)
+    auth = act({'type': 'submit', 'api': 'POST supabase /auth/v1/token', 'then': {'type': 'back'}})
+    _expect("screenId: 'selftest', queueable: false, then:" in auth, auth)
+    save = act({'type': 'submit', 'api': 'POST /v1/records/check-ins', 'then': {'type': 'back'}})
+    _expect('queueable' not in save, save)
+    _expect(all(not queueable(e) and is_auth_endpoint(e) for e in NOT_QUEUEABLE), 'NOT_QUEUEABLE holds a non-auth endpoint')
 
 
 if __name__ == '__main__':
     _self_test()
-    import dsl
+    import dsl, validate
     dsl._self_test()
+    validate._self_test()

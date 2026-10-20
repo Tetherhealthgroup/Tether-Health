@@ -81,7 +81,14 @@
               "to": "ob_reminders_denied"
             }
           }
-        ]
+        ],
+        "id": "onboarding.reminders.notifications_request",
+        "ask": "notificationsRequest",
+        "when": {
+          "granted": "Allowed",
+          "denied": "Not allowed",
+          "unavailable": "Not allowed"
+        }
       },
       "variant": "primary",
       "arrow": true
@@ -132,7 +139,14 @@
               "to": "ob_reminders_denied"
             }
           }
-        ]
+        ],
+        "id": "onboarding.reminders.notifications_request",
+        "ask": "notificationsRequest",
+        "when": {
+          "granted": "Allowed",
+          "denied": "Not allowed",
+          "unavailable": "Not allowed"
+        }
       },
       "summary": "branch: System permission prompt → Allowed: push → ob_account | Not allowed: push → ob_reminders_denied"
     },

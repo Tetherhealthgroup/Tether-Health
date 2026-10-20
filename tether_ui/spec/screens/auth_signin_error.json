@@ -173,26 +173,37 @@
       "t": "button",
       "label": "Try again",
       "action": {
-        "type": "branch",
-        "question": "Sign-in result",
-        "on": null,
-        "decide": null,
-        "cases": [
-          {
-            "label": "Success",
-            "action": {
-              "type": "reset",
-              "to": "today"
+        "type": "submit",
+        "api": "POST supabase /auth/v1/token",
+        "then": {
+          "type": "branch",
+          "question": "Sign-in result",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Success",
+              "action": {
+                "type": "reset",
+                "to": "today"
+              }
+            },
+            {
+              "label": "Success · guest plan on phone",
+              "action": {
+                "type": "push",
+                "to": "auth_merge"
+              }
+            },
+            {
+              "label": "Wrong password",
+              "action": {
+                "type": "replace",
+                "to": "auth_signin_error"
+              }
             }
-          },
-          {
-            "label": "Wrong password",
-            "action": {
-              "type": "replace",
-              "to": "auth_signin_error"
-            }
-          }
-        ]
+          ]
+        }
       },
       "variant": "primary",
       "arrow": true
@@ -322,28 +333,39 @@
       "element": "Try again",
       "path": "footer[0]",
       "action": {
-        "type": "branch",
-        "question": "Sign-in result",
-        "on": null,
-        "decide": null,
-        "cases": [
-          {
-            "label": "Success",
-            "action": {
-              "type": "reset",
-              "to": "today"
+        "type": "submit",
+        "api": "POST supabase /auth/v1/token",
+        "then": {
+          "type": "branch",
+          "question": "Sign-in result",
+          "on": null,
+          "decide": null,
+          "cases": [
+            {
+              "label": "Success",
+              "action": {
+                "type": "reset",
+                "to": "today"
+              }
+            },
+            {
+              "label": "Success · guest plan on phone",
+              "action": {
+                "type": "push",
+                "to": "auth_merge"
+              }
+            },
+            {
+              "label": "Wrong password",
+              "action": {
+                "type": "replace",
+                "to": "auth_signin_error"
+              }
             }
-          },
-          {
-            "label": "Wrong password",
-            "action": {
-              "type": "replace",
-              "to": "auth_signin_error"
-            }
-          }
-        ]
+          ]
+        }
       },
-      "summary": "branch: Sign-in result → Success: reset → today | Wrong password: replace → auth_signin_error"
+      "summary": "POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: replace → auth_signin_error"
     },
     {
       "element": "Cancel",

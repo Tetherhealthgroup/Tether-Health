@@ -80,12 +80,12 @@ flowchart LR
 | Sign in | Continue with Apple | `auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
 | Sign in | Continue with Google | `auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
 | Sign in | Forgot password? | `push → auth_forgot` |
-| Sign in | Sign in | `branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error` |
+| Sign in | Sign in | `POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error` |
 | Sign in | Cancel | `close` |
 | Sign-in error | Continue with Apple | `auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
 | Sign-in error | Continue with Google | `auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
 | Sign-in error | Forgot password? | `push → auth_forgot` |
-| Sign-in error | Try again | `branch: Sign-in result → Success: reset → today | Wrong password: replace → auth_signin_error` |
+| Sign-in error | Try again | `POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: replace → auth_signin_error` |
 | Sign-in error | Cancel | `close` |
 | New account from Apple or Google | Back | `back` |
 | New account from Apple or Google | Create my account | `POST supabase /auth/v1/token?grant_type=id_token then push → ob_programs` |

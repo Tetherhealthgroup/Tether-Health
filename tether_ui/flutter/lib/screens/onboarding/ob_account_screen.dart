@@ -35,7 +35,7 @@ class ObAccountScreen extends StatelessWidget {
         TBody('Guest plans are encrypted on this phone. If you sign up later, we ask before uploading them.', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Create account', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/signup', screenId: 'ob_account', then: () => TNav.push(context, Routes.authVerify)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Create account', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/signup', screenId: 'ob_account', queueable: false, then: () => TNav.push(context, Routes.authVerify)), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Continue on this phone only', onPressed: () => TNav.reset(context, Routes.today), variant: TButtonVariant.secondary),
       ],
     );

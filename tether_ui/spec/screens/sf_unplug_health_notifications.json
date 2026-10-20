@@ -82,7 +82,13 @@
               "value": "Notifications are still off."
             }
           }
-        ]
+        ],
+        "id": "unplug.health.notifications_check",
+        "ask": "notificationsCheck",
+        "when": {
+          "granted": "On",
+          "denied": "Still off"
+        }
       },
       "variant": "secondary",
       "arrow": false
@@ -134,7 +140,13 @@
               "value": "Notifications are still off."
             }
           }
-        ]
+        ],
+        "id": "unplug.health.notifications_check",
+        "ask": "notificationsCheck",
+        "when": {
+          "granted": "On",
+          "denied": "Still off"
+        }
       },
       "summary": "branch: Notification permission (checked on return) → On: replace → sf_unplug_health | Still off: toast “Notifications are still off.”"
     }

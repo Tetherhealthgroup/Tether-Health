@@ -92,7 +92,15 @@
               "to": "sf_unplug_auth_unavailable"
             }
           }
-        ]
+        ],
+        "id": "unplug.setup.ios_authorization",
+        "ask": "unplugAuthIos",
+        "when": {
+          "granted": "Approved",
+          "grantedNotificationsOff": "Approved · notifications off",
+          "denied": "Denied",
+          "unavailable": "Unavailable"
+        }
       },
       "variant": "primary",
       "arrow": true
@@ -159,7 +167,15 @@
               "to": "sf_unplug_auth_unavailable"
             }
           }
-        ]
+        ],
+        "id": "unplug.setup.ios_authorization",
+        "ask": "unplugAuthIos",
+        "when": {
+          "granted": "Approved",
+          "grantedNotificationsOff": "Approved · notifications off",
+          "denied": "Denied",
+          "unavailable": "Unavailable"
+        }
       },
       "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Approved · notifications off: replace → sf_unplug_auth_notifications | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
     },

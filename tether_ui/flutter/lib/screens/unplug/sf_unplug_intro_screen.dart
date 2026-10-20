@@ -28,7 +28,7 @@ class SfUnplugIntroScreen extends StatelessWidget {
         TKeyValue(rows: [('Can', 'Pause apps you pick, after your limits'), ('Can’t', 'See what you do inside any app'), ('On iPhone', 'Apple doesn’t share app names or minutes with Tether'), ('Stays', 'On this phone. Your app list never reaches Tether'), ('Never paused', 'Tether, phone calls and emergency calls')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Set up Unplug', onPressed: () => TNav.branch(context, 'Platform', <String, VoidCallback>{'iPhone': () => TNav.push(context, Routes.sfUnplugAuth), 'Android': () => TNav.push(context, Routes.sfUnplugAuthAndroid)}), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Set up Unplug', onPressed: () => TNav.branch(context, 'Platform', <String, VoidCallback>{'iPhone': () => TNav.push(context, Routes.sfUnplugAuth), 'Android': () => TNav.push(context, Routes.sfUnplugAuthAndroid)}, device: const TBranchRef('unplug.intro.platform', TAsk.platform, 'sf_unplug_intro'), when: const <TAnswer, String>{TAnswer.ios: 'iPhone', TAnswer.android: 'Android'}), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );

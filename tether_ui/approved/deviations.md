@@ -22,6 +22,11 @@ the current file:
   `sf_intro` loses one sentence from one text value. Each removed text is
   added to `notes` unchanged. Nothing else changes, apart from the later
   action paths that move up by one on `catalog`.
+- TH-986a rows add decision-source metadata only: a branch gains `id`,
+  `ask` and `when` (TH-902), or the email sign-in branch is wrapped in its
+  `POST supabase /auth/v1/token` submit (TH-902; the action summary then
+  names the endpoint). With those removed, the old and new files are equal,
+  except the one case P-51 adds on `auth_signin_error` (TH-986b).
 
 All replacement copy still needs clinical/legal review before release.
 
@@ -179,6 +184,40 @@ including the ticked "I’m 18 or older" on `ob_account`.
 | `records_consent_device` | `body[2]` (checklist) | gets key `data_types`. |
 | `sd_caregiver` | `body[3]` (checklist) | gets key `caregiver_can_see`. Also P-31 (above). |
 | `sf_buddy` | `body[3]` (checklist) | gets key `buddy_can_see`. Also P-31 (above). |
+
+## TH-902: decision sources, no visual change (TH-986a)
+
+Every branch has exactly one production decision source (`spec/branches.json`).
+The branches that had none get one without any visible change: a device
+answer keyed by a stable id (`id`, `ask`, and `when`, which maps each answer
+to an existing case), or, for email sign-in, the server outcome of the
+`POST supabase /auth/v1/token` submit that the screen's `api` list already
+named. Labels, targets, copy and layout are unchanged.
+
+| Screen | Node | Change |
+|---|---|---|
+| `auth_signin` | `footer[0]` "Sign in" | branch "Sign-in result" is wrapped in submit `POST supabase /auth/v1/token`. Also P-31 (TH-907). |
+| `auth_signin_error` | `footer[0]` "Try again" | branch "Sign-in result" is wrapped in submit `POST supabase /auth/v1/token`. Also P-51 (below) and P-31 (TH-907). |
+| `ob_reminders` | `footer[0]` "Turn on reminders" | id `onboarding.reminders.notifications_request`, ask `notificationsRequest`: granted → Allowed; denied, unavailable → Not allowed. |
+| `records_consent` | `footer[0]` "Continue to MyChart" | id `records.connect.mychart`, ask `smartConnect`: approved → Approved; cancelled → Cancelled; failed → Denied or error. Also TH-902 key (TH-907). |
+| `records_consent_bb` | `footer[0]` "Continue to Medicare.gov" | id `records.connect.medicare`, ask `smartConnect`: as above. Also TH-902 key (TH-907). |
+| `records_consent_device` | `footer[0]` "Continue" | id `records.device.health_records_request`, ask `healthRecordsRequest`: granted → Allowed; denied, unavailable → Not allowed. Also TH-902 key (TH-907). |
+| `records_fhir_url` | `footer[0]` "Check and continue" | id `records.fhir_url.server_check`, ask `fhirServerCheck`: supported → SMART on FHIR R4 supported; unsupported → Not a FHIR R4 server. Also P-31 (TH-907). |
+| `sf_screentime` | `footer[0]` "Allow access" | id `sf.screentime.ios_request`, ask `screenTimeRequest`: granted → Allowed; denied, unavailable → Not allowed. Also P-47 decision 3 (TH-953). |
+
+The same metadata is added to these additions (`additions.json`, not
+hash-pinned, so they have no entry in `deviations.json`): `sf_screentime_android`,
+`sf_unplug_intro`, `sf_unplug_auth`, `sf_unplug_auth_denied`,
+`sf_unplug_auth_notifications` (two branches), `sf_unplug_auth_android`,
+`sf_unplug_home`, `sf_unplug_health_notifications`, `sf_unplug_health_stopped`,
+and, as preview-only reference branches (ask `reference`), `sf_unplug_picker_ios`
+and `sf_unplug_shield`.
+
+## P-51: the sign-in retry offers the guest-plan case (TH-986b)
+
+| Screen | Node | Change |
+|---|---|---|
+| `auth_signin_error` | `footer[0]` "Try again", branch "Sign-in result" | gains the case "Success · guest plan on phone" → push `auth_merge`, the same case and target as "Sign in" on `auth_signin`. No visible element changes. |
 
 ## Rendering changes with no spec change (TH-907)
 

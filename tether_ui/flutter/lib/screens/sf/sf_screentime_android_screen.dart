@@ -29,7 +29,7 @@ class SfScreentimeAndroidScreen extends StatelessWidget {
         TChecklist(items: [TCheckItem('Tap Open settings'), TCheckItem('Find Tether Health'), TCheckItem('Turn on “Permit usage access”')], label: 'Android asks in Settings'),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Open settings', onPressed: () => TNav.branch(context, 'Android usage access (checked on return)', <String, VoidCallback>{'Allowed': () => TNav.toast(context, 'Usage access on', then: () => TNav.back(context)), 'Not allowed': () => TNav.replace(context, Routes.sfScreentimeAndroidDenied)}), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Open settings', onPressed: () => TNav.branch(context, 'Android usage access (checked on return)', <String, VoidCallback>{'Allowed': () => TNav.toast(context, 'Usage access on', then: () => TNav.back(context)), 'Not allowed': () => TNav.replace(context, Routes.sfScreentimeAndroidDenied)}, device: const TBranchRef('sf.screentime.android_usage_access', TAsk.usageAccessSettings, 'sf_screentime_android'), when: const <TAnswer, String>{TAnswer.granted: 'Allowed', TAnswer.denied: 'Not allowed'}), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );

@@ -96,6 +96,7 @@ const _cases = <(String, String, String, String, String?, bool, bool, (String, S
   ('auth_signin_error', Routes.authSigninError, 'body[2].items[1]', 'Continue with Google', 'Error', false, false, ('route', '/auth/social/error')),
   ('auth_signin_error', Routes.authSigninError, 'body[6]', 'Forgot password?', null, false, false, ('route', '/auth/forgot')),
   ('auth_signin_error', Routes.authSigninError, 'footer[0]', 'Try again', 'Success', false, false, ('route', '/today')),
+  ('auth_signin_error', Routes.authSigninError, 'footer[0]', 'Try again', 'Success · guest plan on phone', false, false, ('route', '/auth/merge')),
   ('auth_signin_error', Routes.authSigninError, 'footer[0]', 'Try again', 'Wrong password', false, false, ('route', '/auth/signin?state=error')),
   ('auth_signin_error', Routes.authSigninError, 'footer[1]', 'Cancel', null, false, false, ('pop', null)),
   ('auth_social_new', Routes.authSocialNew, 'header.left', 'Back', null, false, false, ('pop', null)),

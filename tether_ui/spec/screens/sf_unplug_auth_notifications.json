@@ -75,7 +75,16 @@
               "value": "Notifications are still off. You can turn them on later in Settings."
             }
           }
-        ]
+        ],
+        "id": "unplug.setup.notifications_check",
+        "ask": "notificationsCheck",
+        "when": {
+          "granted": {
+            "ios": "On (iPhone)",
+            "android": "On (Android)"
+          },
+          "denied": "Still off"
+        }
       },
       "variant": "secondary",
       "arrow": false
@@ -103,7 +112,13 @@
               "to": "sf_unplug_apps_android"
             }
           }
-        ]
+        ],
+        "id": "unplug.setup.continue_platform",
+        "ask": "platform",
+        "when": {
+          "ios": "iPhone",
+          "android": "Android"
+        }
       },
       "align": "center"
     }
@@ -161,7 +176,16 @@
               "value": "Notifications are still off. You can turn them on later in Settings."
             }
           }
-        ]
+        ],
+        "id": "unplug.setup.notifications_check",
+        "ask": "notificationsCheck",
+        "when": {
+          "granted": {
+            "ios": "On (iPhone)",
+            "android": "On (Android)"
+          },
+          "denied": "Still off"
+        }
       },
       "summary": "branch: Notification permission (checked on return) → On (iPhone): replace → sf_unplug_apps | On (Android): replace → sf_unplug_apps_android | Still off: toast “Notifications are still off. You can turn them on later in Settings.”"
     },
@@ -188,7 +212,13 @@
               "to": "sf_unplug_apps_android"
             }
           }
-        ]
+        ],
+        "id": "unplug.setup.continue_platform",
+        "ask": "platform",
+        "when": {
+          "ios": "iPhone",
+          "android": "Android"
+        }
       },
       "summary": "branch: Platform → iPhone: replace → sf_unplug_apps | Android: replace → sf_unplug_apps_android"
     }

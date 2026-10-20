@@ -1037,7 +1037,14 @@
                 "to": "ob_reminders_denied"
               }
             }
-          ]
+          ],
+          "id": "onboarding.reminders.notifications_request",
+          "ask": "notificationsRequest",
+          "when": {
+            "granted": "Allowed",
+            "denied": "Not allowed",
+            "unavailable": "Not allowed"
+          }
         },
         "variant": "primary",
         "arrow": true
@@ -1088,7 +1095,14 @@
                 "to": "ob_reminders_denied"
               }
             }
-          ]
+          ],
+          "id": "onboarding.reminders.notifications_request",
+          "ask": "notificationsRequest",
+          "when": {
+            "granted": "Allowed",
+            "denied": "Not allowed",
+            "unavailable": "Not allowed"
+          }
         },
         "summary": "branch: System permission prompt → Allowed: push → ob_account | Not allowed: push → ob_reminders_denied"
       },
@@ -1784,33 +1798,37 @@
         "t": "button",
         "label": "Sign in",
         "action": {
-          "type": "branch",
-          "question": "Sign-in result",
-          "on": null,
-          "decide": null,
-          "cases": [
-            {
-              "label": "Success",
-              "action": {
-                "type": "reset",
-                "to": "today"
+          "type": "submit",
+          "api": "POST supabase /auth/v1/token",
+          "then": {
+            "type": "branch",
+            "question": "Sign-in result",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Success",
+                "action": {
+                  "type": "reset",
+                  "to": "today"
+                }
+              },
+              {
+                "label": "Success · guest plan on phone",
+                "action": {
+                  "type": "push",
+                  "to": "auth_merge"
+                }
+              },
+              {
+                "label": "Wrong password",
+                "action": {
+                  "type": "push",
+                  "to": "auth_signin_error"
+                }
               }
-            },
-            {
-              "label": "Success · guest plan on phone",
-              "action": {
-                "type": "push",
-                "to": "auth_merge"
-              }
-            },
-            {
-              "label": "Wrong password",
-              "action": {
-                "type": "push",
-                "to": "auth_signin_error"
-              }
-            }
-          ]
+            ]
+          }
         },
         "variant": "primary",
         "arrow": true
@@ -1942,35 +1960,39 @@
         "element": "Sign in",
         "path": "footer[0]",
         "action": {
-          "type": "branch",
-          "question": "Sign-in result",
-          "on": null,
-          "decide": null,
-          "cases": [
-            {
-              "label": "Success",
-              "action": {
-                "type": "reset",
-                "to": "today"
+          "type": "submit",
+          "api": "POST supabase /auth/v1/token",
+          "then": {
+            "type": "branch",
+            "question": "Sign-in result",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Success",
+                "action": {
+                  "type": "reset",
+                  "to": "today"
+                }
+              },
+              {
+                "label": "Success · guest plan on phone",
+                "action": {
+                  "type": "push",
+                  "to": "auth_merge"
+                }
+              },
+              {
+                "label": "Wrong password",
+                "action": {
+                  "type": "push",
+                  "to": "auth_signin_error"
+                }
               }
-            },
-            {
-              "label": "Success · guest plan on phone",
-              "action": {
-                "type": "push",
-                "to": "auth_merge"
-              }
-            },
-            {
-              "label": "Wrong password",
-              "action": {
-                "type": "push",
-                "to": "auth_signin_error"
-              }
-            }
-          ]
+            ]
+          }
         },
-        "summary": "branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error"
+        "summary": "POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error"
       },
       {
         "element": "Cancel",
@@ -2157,26 +2179,37 @@
         "t": "button",
         "label": "Try again",
         "action": {
-          "type": "branch",
-          "question": "Sign-in result",
-          "on": null,
-          "decide": null,
-          "cases": [
-            {
-              "label": "Success",
-              "action": {
-                "type": "reset",
-                "to": "today"
+          "type": "submit",
+          "api": "POST supabase /auth/v1/token",
+          "then": {
+            "type": "branch",
+            "question": "Sign-in result",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Success",
+                "action": {
+                  "type": "reset",
+                  "to": "today"
+                }
+              },
+              {
+                "label": "Success · guest plan on phone",
+                "action": {
+                  "type": "push",
+                  "to": "auth_merge"
+                }
+              },
+              {
+                "label": "Wrong password",
+                "action": {
+                  "type": "replace",
+                  "to": "auth_signin_error"
+                }
               }
-            },
-            {
-              "label": "Wrong password",
-              "action": {
-                "type": "replace",
-                "to": "auth_signin_error"
-              }
-            }
-          ]
+            ]
+          }
         },
         "variant": "primary",
         "arrow": true
@@ -2306,28 +2339,39 @@
         "element": "Try again",
         "path": "footer[0]",
         "action": {
-          "type": "branch",
-          "question": "Sign-in result",
-          "on": null,
-          "decide": null,
-          "cases": [
-            {
-              "label": "Success",
-              "action": {
-                "type": "reset",
-                "to": "today"
+          "type": "submit",
+          "api": "POST supabase /auth/v1/token",
+          "then": {
+            "type": "branch",
+            "question": "Sign-in result",
+            "on": null,
+            "decide": null,
+            "cases": [
+              {
+                "label": "Success",
+                "action": {
+                  "type": "reset",
+                  "to": "today"
+                }
+              },
+              {
+                "label": "Success · guest plan on phone",
+                "action": {
+                  "type": "push",
+                  "to": "auth_merge"
+                }
+              },
+              {
+                "label": "Wrong password",
+                "action": {
+                  "type": "replace",
+                  "to": "auth_signin_error"
+                }
               }
-            },
-            {
-              "label": "Wrong password",
-              "action": {
-                "type": "replace",
-                "to": "auth_signin_error"
-              }
-            }
-          ]
+            ]
+          }
         },
-        "summary": "branch: Sign-in result → Success: reset → today | Wrong password: replace → auth_signin_error"
+        "summary": "POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: replace → auth_signin_error"
       },
       {
         "element": "Cancel",
@@ -12233,7 +12277,14 @@
                 "to": "sf_screentime_denied"
               }
             }
-          ]
+          ],
+          "id": "sf.screentime.ios_request",
+          "ask": "screenTimeRequest",
+          "when": {
+            "granted": "Allowed",
+            "denied": "Not allowed",
+            "unavailable": "Not allowed"
+          }
         },
         "variant": "primary",
         "arrow": true
@@ -12286,7 +12337,14 @@
                 "to": "sf_screentime_denied"
               }
             }
-          ]
+          ],
+          "id": "sf.screentime.ios_request",
+          "ask": "screenTimeRequest",
+          "when": {
+            "granted": "Allowed",
+            "denied": "Not allowed",
+            "unavailable": "Not allowed"
+          }
         },
         "summary": "branch: iOS Screen Time permission → Allowed: toast “Screen Time connected” then back | Not allowed: replace → sf_screentime_denied"
       },
@@ -24256,7 +24314,13 @@
                 "to": "records_error"
               }
             }
-          ]
+          ],
+          "id": "records.fhir_url.server_check",
+          "ask": "fhirServerCheck",
+          "when": {
+            "supported": "SMART on FHIR R4 supported",
+            "unsupported": "Not a FHIR R4 server"
+          }
         },
         "variant": "primary",
         "arrow": true
@@ -24300,7 +24364,13 @@
                 "to": "records_error"
               }
             }
-          ]
+          ],
+          "id": "records.fhir_url.server_check",
+          "ask": "fhirServerCheck",
+          "when": {
+            "supported": "SMART on FHIR R4 supported",
+            "unsupported": "Not a FHIR R4 server"
+          }
         },
         "summary": "branch: Server check → SMART on FHIR R4 supported: push → records_consent | Not a FHIR R4 server: push → records_error"
       }
@@ -24432,7 +24502,14 @@
                 "to": "records_error"
               }
             }
-          ]
+          ],
+          "id": "records.connect.mychart",
+          "ask": "smartConnect",
+          "when": {
+            "approved": "Approved",
+            "cancelled": "Cancelled",
+            "failed": "Denied or error"
+          }
         },
         "variant": "primary",
         "arrow": true
@@ -24492,7 +24569,14 @@
                 "to": "records_error"
               }
             }
-          ]
+          ],
+          "id": "records.connect.mychart",
+          "ask": "smartConnect",
+          "when": {
+            "approved": "Approved",
+            "cancelled": "Cancelled",
+            "failed": "Denied or error"
+          }
         },
         "summary": "branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error"
       },
@@ -24632,7 +24716,14 @@
                 "to": "records_error"
               }
             }
-          ]
+          ],
+          "id": "records.connect.medicare",
+          "ask": "smartConnect",
+          "when": {
+            "approved": "Approved",
+            "cancelled": "Cancelled",
+            "failed": "Denied or error"
+          }
         },
         "variant": "primary",
         "arrow": true
@@ -24689,7 +24780,14 @@
                 "to": "records_error"
               }
             }
-          ]
+          ],
+          "id": "records.connect.medicare",
+          "ask": "smartConnect",
+          "when": {
+            "approved": "Approved",
+            "cancelled": "Cancelled",
+            "failed": "Denied or error"
+          }
         },
         "summary": "branch: Medicare sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error"
       },
@@ -24783,7 +24881,14 @@
                 "to": "records_error"
               }
             }
-          ]
+          ],
+          "id": "records.device.health_records_request",
+          "ask": "healthRecordsRequest",
+          "when": {
+            "granted": "Allowed",
+            "denied": "Not allowed",
+            "unavailable": "Not allowed"
+          }
         },
         "variant": "primary",
         "arrow": true
@@ -24833,7 +24938,14 @@
                 "to": "records_error"
               }
             }
-          ]
+          ],
+          "id": "records.device.health_records_request",
+          "ask": "healthRecordsRequest",
+          "when": {
+            "granted": "Allowed",
+            "denied": "Not allowed",
+            "unavailable": "Not allowed"
+          }
         },
         "summary": "branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error"
       },
@@ -26197,7 +26309,13 @@
                 "to": "sf_unplug_auth_android"
               }
             }
-          ]
+          ],
+          "id": "unplug.intro.platform",
+          "ask": "platform",
+          "when": {
+            "ios": "iPhone",
+            "android": "Android"
+          }
         },
         "variant": "primary",
         "arrow": true
@@ -26250,7 +26368,13 @@
                 "to": "sf_unplug_auth_android"
               }
             }
-          ]
+          ],
+          "id": "unplug.intro.platform",
+          "ask": "platform",
+          "when": {
+            "ios": "iPhone",
+            "android": "Android"
+          }
         },
         "summary": "branch: Platform → iPhone: push → sf_unplug_auth | Android: push → sf_unplug_auth_android"
       },
@@ -26358,7 +26482,15 @@
                 "to": "sf_unplug_auth_unavailable"
               }
             }
-          ]
+          ],
+          "id": "unplug.setup.ios_authorization",
+          "ask": "unplugAuthIos",
+          "when": {
+            "granted": "Approved",
+            "grantedNotificationsOff": "Approved · notifications off",
+            "denied": "Denied",
+            "unavailable": "Unavailable"
+          }
         },
         "variant": "primary",
         "arrow": true
@@ -26425,7 +26557,15 @@
                 "to": "sf_unplug_auth_unavailable"
               }
             }
-          ]
+          ],
+          "id": "unplug.setup.ios_authorization",
+          "ask": "unplugAuthIos",
+          "when": {
+            "granted": "Approved",
+            "grantedNotificationsOff": "Approved · notifications off",
+            "denied": "Denied",
+            "unavailable": "Unavailable"
+          }
         },
         "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Approved · notifications off: replace → sf_unplug_auth_notifications | Denied: replace → sf_unplug_auth_denied | Unavailable: replace → sf_unplug_auth_unavailable"
       },
@@ -26500,7 +26640,15 @@
                 "value": "Still not allowed. You can turn it on later in Settings."
               }
             }
-          ]
+          ],
+          "id": "unplug.setup.ios_authorization_retry",
+          "ask": "unplugAuthIos",
+          "when": {
+            "granted": "Approved",
+            "grantedNotificationsOff": "Approved",
+            "denied": "Denied",
+            "unavailable": "Denied"
+          }
         },
         "variant": "primary",
         "arrow": true
@@ -26561,7 +26709,15 @@
                 "value": "Still not allowed. You can turn it on later in Settings."
               }
             }
-          ]
+          ],
+          "id": "unplug.setup.ios_authorization_retry",
+          "ask": "unplugAuthIos",
+          "when": {
+            "granted": "Approved",
+            "grantedNotificationsOff": "Approved",
+            "denied": "Denied",
+            "unavailable": "Denied"
+          }
         },
         "summary": "branch: Screen Time authorization (iOS Family Controls, individual) → Approved: replace → sf_unplug_apps | Denied: toast “Still not allowed. You can turn it on later in Settings.”"
       },
@@ -26733,7 +26889,16 @@
                 "value": "Notifications are still off. You can turn them on later in Settings."
               }
             }
-          ]
+          ],
+          "id": "unplug.setup.notifications_check",
+          "ask": "notificationsCheck",
+          "when": {
+            "granted": {
+              "ios": "On (iPhone)",
+              "android": "On (Android)"
+            },
+            "denied": "Still off"
+          }
         },
         "variant": "secondary",
         "arrow": false
@@ -26761,7 +26926,13 @@
                 "to": "sf_unplug_apps_android"
               }
             }
-          ]
+          ],
+          "id": "unplug.setup.continue_platform",
+          "ask": "platform",
+          "when": {
+            "ios": "iPhone",
+            "android": "Android"
+          }
         },
         "align": "center"
       }
@@ -26819,7 +26990,16 @@
                 "value": "Notifications are still off. You can turn them on later in Settings."
               }
             }
-          ]
+          ],
+          "id": "unplug.setup.notifications_check",
+          "ask": "notificationsCheck",
+          "when": {
+            "granted": {
+              "ios": "On (iPhone)",
+              "android": "On (Android)"
+            },
+            "denied": "Still off"
+          }
         },
         "summary": "branch: Notification permission (checked on return) → On (iPhone): replace → sf_unplug_apps | On (Android): replace → sf_unplug_apps_android | Still off: toast “Notifications are still off. You can turn them on later in Settings.”"
       },
@@ -26846,7 +27026,13 @@
                 "to": "sf_unplug_apps_android"
               }
             }
-          ]
+          ],
+          "id": "unplug.setup.continue_platform",
+          "ask": "platform",
+          "when": {
+            "ios": "iPhone",
+            "android": "Android"
+          }
         },
         "summary": "branch: Platform → iPhone: replace → sf_unplug_apps | Android: replace → sf_unplug_apps_android"
       }
@@ -26952,7 +27138,14 @@
                 "value": "Unplug still needs both settings."
               }
             }
-          ]
+          ],
+          "id": "unplug.setup.android_check",
+          "ask": "unplugAndroidCheck",
+          "when": {
+            "allOn": "All on",
+            "notificationsOff": "Notifications off",
+            "missing": "Missing"
+          }
         },
         "align": "center"
       }
@@ -27018,7 +27211,14 @@
                 "value": "Unplug still needs both settings."
               }
             }
-          ]
+          ],
+          "id": "unplug.setup.android_check",
+          "ask": "unplugAndroidCheck",
+          "when": {
+            "allOn": "All on",
+            "notificationsOff": "Notifications off",
+            "missing": "Missing"
+          }
         },
         "summary": "branch: Android permissions (checked on return) → All on: replace → sf_unplug_apps_android | Notifications off: replace → sf_unplug_auth_notifications | Missing: toast “Unplug still needs both settings.”"
       }
@@ -27170,7 +27370,9 @@
                 "type": "close"
               }
             }
-          ]
+          ],
+          "id": "unplug.picker.ios",
+          "ask": "reference"
         },
         "variant": "primary",
         "arrow": true
@@ -27218,7 +27420,9 @@
                 "type": "close"
               }
             }
-          ]
+          ],
+          "id": "unplug.picker.ios",
+          "ask": "reference"
         },
         "summary": "branch: System app picker result → Apps chosen: replace → sf_unplug_apps_chosen | Cancelled: close"
       },
@@ -27729,7 +27933,13 @@
                     "to": "sf_unplug_overlay"
                   }
                 }
-              ]
+              ],
+              "id": "unplug.home.preview_platform",
+              "ask": "platform",
+              "when": {
+                "ios": "iPhone",
+                "android": "Android"
+              }
             }
           },
           {
@@ -27831,7 +28041,13 @@
                 "to": "sf_unplug_overlay"
               }
             }
-          ]
+          ],
+          "id": "unplug.home.preview_platform",
+          "ask": "platform",
+          "when": {
+            "ios": "iPhone",
+            "android": "Android"
+          }
         },
         "summary": "branch: Platform → iPhone: push → sf_unplug_shield | Android: push → sf_unplug_overlay"
       },
@@ -28424,7 +28640,9 @@
                   "to": "rescue_pick"
                 }
               }
-            ]
+            ],
+            "id": "unplug.shield.notification_action",
+            "ask": "reference"
           }
         },
         "variant": "lime",
@@ -28479,7 +28697,9 @@
                   "to": "rescue_pick"
                 }
               }
-            ]
+            ],
+            "id": "unplug.shield.notification_action",
+            "ask": "reference"
           }
         },
         "summary": "toast “Notification: open Tether to take your breath, or get support” then branch: Notification action → Take my breath: push → sf_unplug_gate | Get support: sheet → rescue_pick"
@@ -29387,7 +29607,13 @@
                 "value": "Notifications are still off."
               }
             }
-          ]
+          ],
+          "id": "unplug.health.notifications_check",
+          "ask": "notificationsCheck",
+          "when": {
+            "granted": "On",
+            "denied": "Still off"
+          }
         },
         "variant": "secondary",
         "arrow": false
@@ -29439,7 +29665,13 @@
                 "value": "Notifications are still off."
               }
             }
-          ]
+          ],
+          "id": "unplug.health.notifications_check",
+          "ask": "notificationsCheck",
+          "when": {
+            "granted": "On",
+            "denied": "Still off"
+          }
         },
         "summary": "branch: Notification permission (checked on return) → On: replace → sf_unplug_health | Still off: toast “Notifications are still off.”"
       }
@@ -29524,7 +29756,13 @@
                 "value": "Still not working. Turn Screen Time access on again in Settings."
               }
             }
-          ]
+          ],
+          "id": "unplug.health.tracking_check",
+          "ask": "unplugTrackingCheck",
+          "when": {
+            "healthy": "All pass",
+            "failing": "Still failing"
+          }
         },
         "variant": "secondary",
         "arrow": false
@@ -29576,7 +29814,13 @@
                 "value": "Still not working. Turn Screen Time access on again in Settings."
               }
             }
-          ]
+          ],
+          "id": "unplug.health.tracking_check",
+          "ask": "unplugTrackingCheck",
+          "when": {
+            "healthy": "All pass",
+            "failing": "Still failing"
+          }
         },
         "summary": "branch: Tracking health result → All pass: replace → sf_unplug_health | Still failing: toast “Still not working. Turn Screen Time access on again in Settings.”"
       }
@@ -31549,7 +31793,13 @@
                 "to": "sf_screentime_android_denied"
               }
             }
-          ]
+          ],
+          "id": "sf.screentime.android_usage_access",
+          "ask": "usageAccessSettings",
+          "when": {
+            "granted": "Allowed",
+            "denied": "Not allowed"
+          }
         },
         "variant": "primary",
         "arrow": true
@@ -31605,7 +31855,13 @@
                 "to": "sf_screentime_android_denied"
               }
             }
-          ]
+          ],
+          "id": "sf.screentime.android_usage_access",
+          "ask": "usageAccessSettings",
+          "when": {
+            "granted": "Allowed",
+            "denied": "Not allowed"
+          }
         },
         "summary": "branch: Android usage access (checked on return) → Allowed: toast “Usage access on” then back | Not allowed: replace → sf_screentime_android_denied"
       },

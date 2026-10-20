@@ -47,10 +47,67 @@ def toast(msg, then=None):
     if then: a['then'] = then
     return a
 def submit(api, then, **kw): return dict({'type': 'submit', 'api': api, 'then': then}, **kw)
-def branch(question, cases, on=None, key=None, decide=None):
+def branch(question, cases, on=None, key=None, decide=None, id=None, ask=None, when=None):
+    """cases: list of (label, action). on: 'radio' / 'zone' / 'chips' if the choice is visible in UI.
+
+    A branch that a device or OS answer decides (R-31: permission prompts,
+    SMART sign-in, the FHIR server check, the platform) names a stable `id`
+    (BRANCH_ID), the device question `ask` (a key of ASKS) and `when`, a map
+    from each of that ask's answers to a case label. A `when` value may be a
+    per-platform map ({'ios': label, 'android': label}). Reference surfaces
+    use ask='reference' with no `when`. The question text is for the preview
+    only: production never decides on it."""
     if on and key and not decide: decide = 'choice:' + key
-    """cases: list of (label, action). on: 'radio' / 'zone' / 'chips' if the choice is visible in UI."""
-    return {'type': 'branch', 'question': question, 'on': on, 'decide': decide, 'cases': [{'label': l, 'action': a} for l, a in cases]}
+    b = {'type': 'branch', 'question': question, 'on': on, 'decide': decide, 'cases': [{'label': l, 'action': a} for l, a in cases]}
+    if id is not None: b['id'] = id
+    if ask is not None: b['ask'] = ask
+    if when is not None: b['when'] = dict(when)
+    return b
+
+# Device questions a branch can ask (R-31, R-4), each with its fixed answer
+# set. The Flutter kit mirrors this table as TAsk / TAnswer (lib/ui/nav.dart);
+# validate.py checks that the two match. 'reference' marks a preview-only
+# branch on a reference surface: it has no answers and production never
+# decides it in the app.
+ASKS = {
+    'platform': ('ios', 'android'),
+    'notificationsRequest': ('granted', 'denied', 'unavailable'),
+    'notificationsCheck': ('granted', 'denied'),
+    'healthRecordsRequest': ('granted', 'denied', 'unavailable'),
+    'screenTimeRequest': ('granted', 'denied', 'unavailable'),
+    'unplugAuthIos': ('granted', 'grantedNotificationsOff', 'denied', 'unavailable'),
+    'usageAccessSettings': ('granted', 'denied'),
+    'unplugAndroidCheck': ('allOn', 'notificationsOff', 'missing'),
+    'unplugTrackingCheck': ('healthy', 'failing'),
+    'smartConnect': ('approved', 'cancelled', 'failed'),
+    'fhirServerCheck': ('supported', 'unsupported'),
+    'reference': (),
+}
+
+# Stable branch id: three dot-separated lower-case segments, chosen by hand
+# (never derived from the screen or the element path, which move when the
+# layout changes).
+BRANCH_ID = re.compile(r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*){2}$')
+
+# Submit endpoints that are never queued (R-31, R-6): the sign-in and account
+# endpoints. A queued result counts as failed('not_queueable') and a failure
+# shows the generic message, not the save message. validate.py checks that
+# every submit endpoint on "supabase /auth/" is listed and every entry is used.
+NOT_QUEUEABLE = (
+    'POST supabase /auth/v1/recover',
+    'POST supabase /auth/v1/signup',
+    'POST supabase /auth/v1/token',
+    'POST supabase /auth/v1/token?grant_type=id_token',
+    'POST supabase /auth/v1/user/identities (linkIdentity)',
+    'PUT supabase /auth/v1/user',
+)
+
+def queueable(endpoint): return endpoint not in NOT_QUEUEABLE
+
+def is_auth_endpoint(endpoint):
+    """True for a submit endpoint whose path is on supabase /auth/."""
+    parts = endpoint.split(' ', 1)
+    return len(parts) == 2 and parts[1].startswith('supabase /auth/')
 def settings(): return {'type': 'os_settings'}
 def reset(to): return {'type': 'reset', 'to': to}
 def popto(to): return {'type': 'popto', 'to': to}

@@ -28,7 +28,7 @@ class RecordsConsentBbScreen extends StatelessWidget {
         TCard(variant: TCardVariant.mint, title: 'Only the programs you joined get data', text: 'Heartwise ← blood pressure, lipids · Steady ← A1C, glucose · Renew ← eGFR · Checkup ← immunizations · BreatheFree ← smoking status. Ease and ScrollFree get nothing.'),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue to Medicare.gov', onPressed: () => TNav.branch(context, 'Medicare sign-in result', <String, VoidCallback>{'Approved': () => TNav.push(context, Routes.recordsImporting), 'Cancelled': () => TNav.toast(context, 'Connection cancelled. Nothing was imported.'), 'Denied or error': () => TNav.push(context, Routes.recordsError)}), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue to Medicare.gov', onPressed: () => TNav.branch(context, 'Medicare sign-in result', <String, VoidCallback>{'Approved': () => TNav.push(context, Routes.recordsImporting), 'Cancelled': () => TNav.toast(context, 'Connection cancelled. Nothing was imported.'), 'Denied or error': () => TNav.push(context, Routes.recordsError)}, device: const TBranchRef('records.connect.medicare', TAsk.smartConnect, 'records_consent_bb'), when: const <TAnswer, String>{TAnswer.approved: 'Approved', TAnswer.cancelled: 'Cancelled', TAnswer.failed: 'Denied or error'}), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );

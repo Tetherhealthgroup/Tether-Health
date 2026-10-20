@@ -27,7 +27,7 @@ class SfUnplugShieldScreen extends StatelessWidget {
         TBody('You asked to slow this one down. Video apps is on your list. 2 of 3 “open anyway” left today. Open Tether for support.', center: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Take a breath', onPressed: () => TNav.toast(context, 'Notification: open Tether to take your breath, or get support', then: () => TNav.branch(context, 'Notification action', <String, VoidCallback>{'Take my breath': () => TNav.push(context, Routes.sfUnplugGate), 'Get support': () => TNav.sheet(context, Routes.rescuePick)})), variant: TButtonVariant.lime),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Take a breath', onPressed: () => TNav.toast(context, 'Notification: open Tether to take your breath, or get support', then: () => TNav.branch(context, 'Notification action', <String, VoidCallback>{'Take my breath': () => TNav.push(context, Routes.sfUnplugGate), 'Get support': () => TNav.sheet(context, Routes.rescuePick)}, device: const TBranchRef('unplug.shield.notification_action', TAsk.reference, 'sf_unplug_shield'))), variant: TButtonVariant.lime),
         TLink(key: const ValueKey('a:footer[1]'), label: 'Open anyway', onTap: () => TNav.toast(context, 'Opened · 1 “open anyway” left today', then: () => TNav.close(context))),
       ],
     );
