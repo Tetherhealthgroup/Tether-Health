@@ -8,12 +8,16 @@
 // code, network or storage. In release builds the defaults fail closed
 // ([TDefaults]); debug builds and tests get the preview defaults.
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 
 import '../logic/rules.dart';
 import '../router/app_router.dart';
+import 'components.dart';
 import 'data.dart';
 import 'tokens.dart';
 
@@ -28,7 +32,7 @@ import 'tokens.dart';
 /// | [TNav.branchResolver] | [TNav.previewResolver] | [TFailClosedResolver] |
 /// | [TApi.instance] | [PreviewApi] | [TUnconfiguredApi]: `failed('not_configured')` |
 /// | [TData.instance] | [PreviewData] | [TEmptyData]: null for every key |
-/// | [TPlatform.instance] | [PreviewPlatform] | [TInertPlatform]: does nothing, records a code |
+/// | [TPlatform.instance] | [PreviewPlatform] | [TInertPlatform]: does nothing, records a code; calls and texts show [TCallFallback] |
 abstract final class TDefaults {
   static TBranchResolver branchResolver({bool release = kReleaseMode}) => release ? TFailClosedResolver().resolve : TNav.previewResolver;
   static TApi api({bool release = kReleaseMode}) => release ? const TUnconfiguredApi() : PreviewApi();
@@ -61,10 +65,15 @@ class TFlow {
 /// read [PreviewPlatform.last]). Release default: [TInertPlatform]. The app
 /// must install its real implementation (url_launcher / app_settings), so
 /// crisis-call buttons place the call.
+///
+/// [call] and [sms] return true when the phone app or Messages opened with
+/// the number, and false when they could not (for example url_launcher's
+/// `launchUrl` returning false). When they return false or throw,
+/// [TNav.call] and [TNav.sms] show [TCallFallback] with the number to dial.
 abstract class TPlatform {
   static TPlatform instance = TDefaults.platform();
-  Future<void> call(BuildContext context, String number, String label);
-  Future<void> sms(BuildContext context, String recipient);
+  Future<bool> call(BuildContext context, String number, String label);
+  Future<bool> sms(BuildContext context, String recipient);
   Future<void> openUrl(BuildContext context, String url);
   Future<void> openOsSettings(BuildContext context);
 }
@@ -77,18 +86,28 @@ class PreviewPlatform implements TPlatform {
   }
 
   @override
-  Future<void> call(BuildContext context, String number, String label) async => _rec(context, 'call', number, 'Would call $number');
+  Future<bool> call(BuildContext context, String number, String label) async {
+    _rec(context, 'call', number, 'Would call $number');
+    return true;
+  }
+
   @override
-  Future<void> sms(BuildContext context, String recipient) async => _rec(context, 'sms', recipient, 'Would open Messages: $recipient');
+  Future<bool> sms(BuildContext context, String recipient) async {
+    _rec(context, 'sms', recipient, 'Would open Messages: $recipient');
+    return true;
+  }
+
   @override
   Future<void> openUrl(BuildContext context, String url) async => _rec(context, 'external', url, 'Would open $url');
   @override
   Future<void> openOsSettings(BuildContext context) async => _rec(context, 'os_settings', '', 'Would open phone Settings');
 }
 
-/// Release default for [TPlatform]: does nothing and shows nothing, and
-/// records [code] (never the number, recipient or URL). It exists only so a
-/// missing install fails safely; the app must install a real [TPlatform].
+/// Release default for [TPlatform]: does nothing, and records [code] (never
+/// the number, recipient or URL). [call] and [sms] return false, so
+/// [TNav.call] and [TNav.sms] show [TCallFallback] with the number instead
+/// of doing nothing. It exists only so a missing install fails safely; the
+/// app must install a real [TPlatform].
 class TInertPlatform implements TPlatform {
   TInertPlatform({this.onCode});
 
@@ -107,9 +126,17 @@ class TInertPlatform implements TPlatform {
   }
 
   @override
-  Future<void> call(BuildContext context, String number, String label) async => _rec();
+  Future<bool> call(BuildContext context, String number, String label) async {
+    _rec();
+    return false;
+  }
+
   @override
-  Future<void> sms(BuildContext context, String recipient) async => _rec();
+  Future<bool> sms(BuildContext context, String recipient) async {
+    _rec();
+    return false;
+  }
+
   @override
   Future<void> openUrl(BuildContext context, String url) async => _rec();
   @override
@@ -347,19 +374,40 @@ abstract final class TNav {
 
   /// Runs the safety [action] for the screen of [context] and returns the
   /// route it opened (the navigator's new top route), or null when the top
-  /// route did not change.
+  /// route did not change. An [action] that throws does not stop [submit]:
+  /// the exception is reported as [safetyActionErrorCode] ([report]) and the
+  /// save is still sent; a screen the action opened before it threw still
+  /// counts as opened.
   static Route<dynamic>? _runSafety(BuildContext context, VoidCallback action) {
     final nav = Navigator.maybeOf(context);
     final before = nav == null ? null : _topRoute(nav);
     _runningSafety = true;
     try {
       action();
+    } catch (_, stack) {
+      report(safetyActionErrorCode, stack);
     } finally {
       _runningSafety = false;
     }
-    final after = nav == null ? null : _topRoute(nav);
+    final after = nav == null || !nav.mounted ? null : _topRoute(nav);
     return identical(after, before) ? null : after;
   }
+
+  /// Code reported when a safety action throws ([submit]).
+  static const String safetyActionErrorCode = 'safety_action_error';
+
+  /// Code reported when [TPlatform.call] or [TPlatform.sms] throws.
+  static const String platformErrorCode = 'platform_error';
+
+  /// Code reported when a call or text failed and no [Overlay] was found to
+  /// show [TCallFallback] in.
+  static const String fallbackUnavailableCode = 'call_fallback_unavailable';
+
+  /// Reports [code] through [FlutterError.reportError] as a [TUiError], so
+  /// the app's error reporting ([FlutterError.onError]) receives it. Only
+  /// the code is reported: the original exception and its message are
+  /// dropped, because they can carry payload or a phone number.
+  static void report(String code, [StackTrace? stack]) => FlutterError.reportError(FlutterErrorDetails(exception: TUiError(code), stack: stack, library: 'tether_ui'));
 
   /// True only while [_runSafety] runs a safety action ([push]).
   static bool _runningSafety = false;
@@ -423,7 +471,7 @@ abstract final class TNav {
         ),
       );
       _toast = entry;
-      overlay.insert(entry);
+      overlay.insert(entry, below: TCallFallback._entryIn(overlay)); // never over the call fallback
       Future<void>.delayed(const Duration(milliseconds: 1800), () {
         if (_toast == entry) _toast = null;
         if (entry.mounted) entry.remove();
@@ -521,6 +569,9 @@ abstract final class TNav {
   /// above. A safety screen therefore opens at most once per submit. Once the
   /// submit completes, a new tap submits again (a retry after "Couldn’t
   /// save"); adapters keep retries idempotent ([TApi]).
+  ///
+  /// A safety action that throws is reported as [safetyActionErrorCode] and
+  /// counts as run; the save is still sent and handled as above.
   static Future<TResult?> submit(BuildContext context, String endpoint, {required String screenId, VoidCallback? then, TSafetyRoutes? safety}) async {
     if (_inFlightEpoch != TSession.epoch) {
       _inFlight.clear();
@@ -581,9 +632,33 @@ abstract final class TNav {
     }
   }
 
-  static Future<void> call(BuildContext context, String number, {String? label}) => TPlatform.instance.call(context, number, label ?? number);
+  /// Places a call through [TPlatform.instance]. When the platform returns
+  /// false or throws, [TCallFallback] shows [number] (see there).
+  static Future<void> call(BuildContext context, String number, {String? label}) =>
+      _callOrText(context, TFallbackKind.call, number, () => TPlatform.instance.call(context, number, label ?? number));
 
-  static Future<void> sms(BuildContext context, String recipient) => TPlatform.instance.sms(context, recipient);
+  /// Opens Messages through [TPlatform.instance]. When the platform returns
+  /// false or throws, [TCallFallback] shows [recipient] (see there).
+  static Future<void> sms(BuildContext context, String recipient) =>
+      _callOrText(context, TFallbackKind.sms, recipient, () => TPlatform.instance.sms(context, recipient));
+
+  static Future<void> _callOrText(BuildContext context, TFallbackKind kind, String value, Future<bool> Function() attempt) async {
+    // Taken before the wait, so the fallback still shows when the calling
+    // screen has gone by the time the platform answers.
+    final overlay = Overlay.maybeOf(context, rootOverlay: true);
+    var placed = false;
+    try {
+      placed = await attempt();
+    } catch (_, stack) {
+      report(platformErrorCode, stack);
+    }
+    if (placed) return;
+    if (overlay == null || !overlay.mounted) {
+      report(fallbackUnavailableCode);
+      return;
+    }
+    TCallFallback.show(overlay, kind, value);
+  }
 
   static Future<void> external(BuildContext context, String url) => TPlatform.instance.openUrl(context, url);
 
@@ -666,4 +741,156 @@ class _Flight {
 
   /// The route that safety action opened, or null when it opened none.
   Route<dynamic>? safetyRoute;
+}
+
+/// Error reported by the UI kit ([TNav.report]): a code only, never content.
+final class TUiError implements Exception {
+  const TUiError(this.code);
+  final String code;
+  @override
+  String toString() => 'TUiError($code)';
+}
+
+/// What a [TNav.call] or [TNav.sms] that could not be placed tried to do.
+enum TFallbackKind { call, sms }
+
+/// Every string [TCallFallback] shows. Draft copy, pending owner and
+/// clinical approval: change the wording here only.
+abstract final class TCallFallbackCopy {
+  /// Message for a call that could not be placed; [number] comes from the
+  /// call action.
+  static String callMessage(String number) => 'Calling isn’t available here. Dial $number now.';
+
+  /// Message for a text that could not be opened; [recipient] comes from the
+  /// text action.
+  static String smsMessage(String recipient) => 'Texting isn’t available here. Text $recipient now.';
+
+  /// Button that copies the number or recipient.
+  static const String copy = 'Copy';
+
+  /// Toast after [copy].
+  static const String copied = 'Copied';
+
+  /// Button that removes the fallback.
+  static const String close = 'Close';
+
+  static String message(TFallbackKind kind, String value) => switch (kind) {
+        TFallbackKind.call => callMessage(value),
+        TFallbackKind.sms => smsMessage(value),
+      };
+}
+
+/// Shown when [TNav.call] or [TNav.sms] could not place the call or open
+/// Messages: with [TInertPlatform] (the release default), a [TPlatform] that
+/// returns false, or one that throws. It shows the message from
+/// [TCallFallbackCopy] and the number or recipient that the action itself
+/// passed (never a separate copy of it), selectable, with Copy and Close
+/// buttons. It is announced to screen readers and takes input focus.
+///
+/// It is an entry in the root [Overlay], not a [Navigator] route: popping,
+/// replacing or pushing routes (a late submit result, a safety action, a
+/// branch outcome, the member's own back) does not remove it, routes pushed
+/// later stay below it, and [TNav.toast] inserts toasts below it. Only its
+/// Close button, [dismiss], or a later fallback (which replaces it) removes
+/// it.
+abstract final class TCallFallback {
+  static OverlayEntry? _entry;
+  static OverlayState? _overlay;
+
+  /// Shows the fallback for [kind] with [value] in [overlay], replacing a
+  /// fallback already shown.
+  static void show(OverlayState overlay, TFallbackKind kind, String value) {
+    dismiss();
+    final entry = OverlayEntry(builder: (_) => _TCallFallbackCard(kind: kind, value: value));
+    _entry = entry;
+    _overlay = overlay;
+    overlay.insert(entry);
+  }
+
+  /// Removes the fallback, if one is shown.
+  static void dismiss() {
+    final entry = _entry;
+    _entry = null;
+    _overlay = null;
+    entry?.remove();
+  }
+
+  /// The fallback's entry when it is shown in [overlay], else null.
+  static OverlayEntry? _entryIn(OverlayState overlay) => identical(_overlay, overlay) && overlay.mounted ? _entry : null;
+}
+
+class _TCallFallbackCard extends StatefulWidget {
+  const _TCallFallbackCard({required this.kind, required this.value});
+  final TFallbackKind kind;
+  final String value;
+
+  @override
+  State<_TCallFallbackCard> createState() => _TCallFallbackCardState();
+}
+
+class _TCallFallbackCardState extends State<_TCallFallbackCard> {
+  final FocusNode _focus = FocusNode(debugLabel: 'call fallback');
+
+  String get _message => TCallFallbackCopy.message(widget.kind, widget.value);
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _focus.requestFocus();
+      SemanticsService.sendAnnouncement(View.of(context), _message, Directionality.of(context), assertiveness: Assertiveness.assertive);
+    });
+  }
+
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
+
+  Future<void> _copy() async {
+    await Clipboard.setData(ClipboardData(text: widget.value));
+    if (mounted) TNav.toast(context, TCallFallbackCopy.copied);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final padding = MediaQuery.paddingOf(context);
+    final bottom = padding.bottom + MediaQuery.viewInsetsOf(context).bottom + 12;
+    return Positioned(
+      left: TSpace.screen,
+      right: TSpace.screen,
+      bottom: bottom,
+      child: ConstrainedBox(
+        // Up to the whole screen, so large text fits without scrolling on
+        // small phones; it scrolls only beyond that.
+        constraints: BoxConstraints(maxHeight: math.max(0, MediaQuery.sizeOf(context).height - padding.top - bottom - 12)),
+        child: Focus(
+          focusNode: _focus,
+          child: Semantics(
+            key: const ValueKey('call_fallback'),
+            container: true,
+            liveRegion: true,
+            label: _message, // the visible message below is not read twice
+            child: Material(
+              color: TColors.errorFill,
+              elevation: 6,
+              borderRadius: BorderRadius.circular(TRadius.card),
+              child: SingleChildScrollView(
+                child: TCard(variant: TCardVariant.urgent, children: [
+                  ExcludeSemantics(child: Text(_message, style: TText.cardTitle.copyWith(color: TColors.errorText))),
+                  SelectionArea(child: Text(widget.value, key: const ValueKey('call_fallback.number'), style: TText.stat.copyWith(color: TColors.errorText))),
+                  TButtonRow(children: [
+                    TButton(key: const ValueKey('call_fallback.copy'), label: TCallFallbackCopy.copy, small: true, variant: TButtonVariant.secondary, onPressed: _copy),
+                    TButton(key: const ValueKey('call_fallback.close'), label: TCallFallbackCopy.close, small: true, variant: TButtonVariant.secondary, onPressed: TCallFallback.dismiss),
+                  ]),
+                ]),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
