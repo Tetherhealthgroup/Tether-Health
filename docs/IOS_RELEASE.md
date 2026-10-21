@@ -114,11 +114,13 @@ framework ships its own privacy manifest was not checked (Unknown).
 
 ### Signing settings present in the repo
 
-- `DEVELOPMENT_TEAM = GJH79955Q7` on Runner Profile, Debug and Release
-  (`project.pbxproj:389`, `:572`, `:596`), first added in commit `fcb6307`
-  (2026-08-23, "Configure iOS signing and bundle identifier"). **Which Apple
-  team this is, and whether it belongs to Tether Health LLC, is Unknown.** See
-  owner item O-2.
+- `DEVELOPMENT_TEAM = HDH9WGZQ45` on Runner Profile, Debug and Release
+  (`project.pbxproj:390`, `:575`, `:599`, Observed at TH-1004). This is the
+  Tether Health LLC Team ID, confirmed by the owner (O-2, answered). Commit
+  `fcb6307` (2026-08-23, "Configure iOS signing and bundle identifier") first
+  set a different team; TH-1004 replaced it on all three configurations.
+  `test/tool/ios_development_team_test.dart` fails if any `DEVELOPMENT_TEAM`
+  in `project.pbxproj` is not `HDH9WGZQ45`.
 - The Runner target sets no `CODE_SIGN_STYLE`, so Xcode's default applies
   (Automatic, Assumed). RunnerTests sets `CODE_SIGN_STYLE = Automatic`
   (`project.pbxproj:408`, `:425`, `:440`). Project level sets
@@ -287,10 +289,10 @@ None of these were started by any agent. Do them in roughly this order.
   organization. Status Unknown. Organization enrolment needs a D-U-N-S number
   for the legal entity and someone with legal authority to accept the
   agreements (Assumed, confirm on Apple's enrolment page).
-- **O-2 Confirm the team ID.** In the Apple Developer account, compare the
-  Tether Health LLC Team ID with `GJH79955Q7` in `project.pbxproj:389,572,596`.
-  If it differs, file a one-line ticket to change it. Do not sign store builds
-  with a personal team.
+- **O-2 Confirm the team ID.** Answered: the Tether Health LLC Team ID is
+  `HDH9WGZQ45`, and the repo now uses it on every Runner configuration
+  (`project.pbxproj:390,575,599`; TH-1004). Do not sign store builds with a
+  personal team.
 - **O-3 Register the App ID** `com.TetherHealthLLC.tetherhealth` (explicit, not
   wildcard) under the LLC team. Capabilities needed today: none beyond the
   default; Keychain Sharing comes from the entitlements file (Assumed, confirm
