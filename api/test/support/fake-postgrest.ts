@@ -10,10 +10,13 @@ import { databaseError, type DatabaseErrorHint } from "./database-errors";
  * What it emulates, per request (one request = one transaction):
  * - identity from the request's own bearer token only (like auth.uid());
  * - the RLS policies of profiles (read own row), programmes, enrolments and programme_consents
- *   (select/insert/update/delete), including the insert checks
- *   (deletion barrier, enrolment not left, live core consent);
- * - the column grants (insert/update column lists; no delete on consents;
- *   consent_text is not insertable, so sending it is refused with 42501);
+ *   (select/insert/update), including the insert checks (deletion barrier,
+ *   enrolment not left, live core consent) and the deletion barrier in the
+ *   enrolment update check
+ *   (supabase/migrations/202610180012_enrolment_delete_now.sql);
+ * - the column grants (insert/update column lists; no delete on any table,
+ *   so a member's direct delete is refused with 42501; consent_text is not
+ *   insertable, so sending it is refused with 42501);
  * - consent documents: a seeded table, read-only to members
  *   (CONSENT_DOCUMENTS; a test may retire documents with
  *   retireConsentDocuments and restore the seed afterwards); a
@@ -22,10 +25,10 @@ import { databaseError, type DatabaseErrorHint } from "./database-errors";
  * - check, foreign-key and unique constraints, including the live-row unique
  *   index on consents;
  * - the triggers: left_at management, revoke-only consents, core revocation
- *   cascade, revoke-on-leave, the deferred focus cap of two, and the
- *   delete cascade from enrolments to consents;
+ *   cascade, revoke-on-leave and the deferred focus cap of two;
  * - the RPCs deletion_barrier_open(), current_consent_documents(),
- *   swap_focus() (focus cap checked inside the call, TH001) and
+ *   swap_focus() (focus cap checked inside the call, TH001; its updates
+ *   refused with 42501 once account deletion has started) and
  *   supersede_core_consent() (TH004/5/6/11/12/14, superseded_by set, the
  *   optional consents left live). The supersession's optional-consent
  *   cascade is not emulated: no seeded document sets cascades_optional;
@@ -44,6 +47,17 @@ import { databaseError, type DatabaseErrorHint } from "./database-errors";
  *   refusal deletes nothing; a repeat returns zero counts. The sync session
  *   refusals (TH009, TH010) and the identity re-check (TH018) are not
  *   emulated: the API sees them only as other errors;
+ * - "Delete now" (202610180012): delete_enrolment_now() refuses, in the
+ *   function's order, a confirmation other than DELETE (23514), a sign-in
+ *   that is not recent (TH017, see setSignInAge), a function owner that does
+ *   not bypass row-level security (TH020, see functionOwnerBypassesRls) and
+ *   an enrolment that is missing or not the caller's (TH012); it does not
+ *   check the deletion barrier. It then deletes the enrolment's consents,
+ *   the caller's quit plan (BreatheFree only), the caller's program data
+ *   whose program_id is the programme's slug, and the enrolment, and
+ *   returns the twelve counts (the sync and care tables are not held here,
+ *   so theirs are 0). A refusal deletes nothing. The sync session refusal
+ *   (TH010) is not emulated;
  * - the Storage API for the avatars bucket (/storage/v1): list-v2 and
  *   remove, limited to objects in the caller's own folder like the avatar
  *   select and delete policies; an object outside it is neither listed nor
@@ -187,7 +201,11 @@ const UPDATE_GRANTS: Record<string, string[]> = {
   enrolments: ["status", "mode"],
   programme_consents: ["revoked_at", "superseded_by"],
 };
-const DELETE_GRANTS = ["enrolments"];
+/**
+ * No table: members lost DELETE on enrolments in 202610180012 (consents never
+ * had it); "Delete now" goes through delete_enrolment_now().
+ */
+const DELETE_GRANTS: string[] = [];
 
 const PROGRAMMES: [string, string, string, string, string, string[]][] = [
   [
@@ -315,8 +333,9 @@ export class FakePostgrest {
   private storageFailures: { operation: "list" | "remove"; status: number }[] =
     [];
   /**
-   * Whether delete_my_account's owner is a superuser or bypasses row-level
-   * security; false makes it refuse with TH020.
+   * Whether the owner of delete_my_account and delete_enrolment_now is a
+   * superuser or bypasses row-level security; false makes both refuse with
+   * TH020.
    */
   functionOwnerBypassesRls = true;
 
@@ -689,6 +708,9 @@ export class FakePostgrest {
     if (name === "delete_my_account" && method === "POST") {
       return { status: 200, body: this.deleteAccount(uid, token, args) };
     }
+    if (name === "delete_enrolment_now" && method === "POST") {
+      return { status: 200, body: this.deleteEnrolmentNow(uid, token, args) };
+    }
     return fail(404, "PGRST202", "Could not find the function");
   }
 
@@ -757,6 +779,73 @@ export class FakePostgrest {
     };
     removeWhere("auth_users", (row) => row.id === uid);
     return counts;
+  }
+
+  /**
+   * public.delete_enrolment_now(p_enrolment_id, p_confirmation), in the
+   * function's order. No deletion-barrier check.
+   */
+  private deleteEnrolmentNow(
+    uid: string,
+    token: string | null,
+    args: Row,
+  ): Record<string, number> {
+    if (args.p_confirmation !== "DELETE") {
+      fail(400, "23514", "Explicit confirmation required");
+    }
+    const age = token === null ? null : (this.signInAges.get(token) ?? 0);
+    if (age === null || age > 600 || age < -60) {
+      raise("recent_authentication_required");
+    }
+    if (!this.functionOwnerBypassesRls) raise("rls_bypass_required");
+    // uuid compares case-insensitively in Postgres.
+    const wanted =
+      typeof args.p_enrolment_id === "string"
+        ? args.p_enrolment_id.toLowerCase()
+        : null;
+    const enrolment = this.state.enrolments.find(
+      (row) => text(row.id).toLowerCase() === wanted && row.user_id === uid,
+    );
+    if (!enrolment) return raise("enrolment_not_found");
+    const code = enrolment.programme_code;
+    const slug = this.state.programmes.find((row) => row.code === code)?.slug;
+    const removeWhere = (table: keyof State, match: (row: Row) => boolean) => {
+      const before = this.state[table].length;
+      this.state[table] = this.state[table].filter((row) => !match(row));
+      return before - this.state[table].length;
+    };
+    const counts = {
+      programme_consents: removeWhere(
+        "programme_consents",
+        (row) => row.enrolment_id === enrolment.id,
+      ),
+      quit_plans:
+        code === "bf"
+          ? removeWhere("quit_plans", (row) => row.user_id === uid)
+          : 0,
+      program_data: removeWhere(
+        "program_data",
+        (row) => row.user_id === uid && row.program_id === slug,
+      ),
+      enrolments: removeWhere(
+        "enrolments",
+        (row) => row.id === enrolment.id && row.user_id === uid,
+      ),
+    };
+    return {
+      quit_plans: counts.quit_plans,
+      program_data: counts.program_data,
+      enrolments: counts.enrolments,
+      programme_consents: counts.programme_consents,
+      sync_answers: 0,
+      sync_lapses: 0,
+      sync_areas: 0,
+      care_share_access: 0,
+      care_messages: 0,
+      care_shares: 0,
+      caregiver_events: 0,
+      caregivers: 0,
+    };
   }
 
   // ---- Storage ------------------------------------------------------------
@@ -882,6 +971,9 @@ export class FakePostgrest {
     if (demote.status !== "focus" || promote.status === "focus") {
       raise("focus_swap_invalid");
     }
+    // The function is security invoker: its updates meet the update policy,
+    // whose check includes the deletion barrier.
+    if (!this.barrierOpen(uid)) rlsViolation("enrolments");
     demote.status = "paused";
     demote.updated_at = this.now();
     promote.status = "focus";
@@ -1146,8 +1238,9 @@ export class FakePostgrest {
         else if (row.status !== "left") row.left_at = null;
         else row.left_at = old.left_at;
         row.updated_at = this.now();
-        // RLS WITH CHECK before CHECK constraints, as Postgres runs them.
-        if (row.user_id !== uid) rlsViolation(table);
+        // RLS WITH CHECK (own row, deletion barrier open) before CHECK
+        // constraints, as Postgres runs them.
+        if (row.user_id !== uid || !this.barrierOpen(uid)) rlsViolation(table);
         this.checkEnrolment(row);
         // enrolments_revoke_on_leave
         if (row.status === "left" && old.status !== "left") {
@@ -1191,6 +1284,7 @@ export class FakePostgrest {
     return targets;
   }
 
+  /** A direct delete: refused for every table (DELETE_GRANTS). */
   private remove(uid: string, table: keyof State, url: URL): Row[] {
     if (!DELETE_GRANTS.includes(table)) {
       return fail(403, "42501", `permission denied for table ${table}`);

@@ -1,4 +1,4 @@
-import { BadGatewayException, HttpStatus } from "@nestjs/common";
+import { BadGatewayException, HttpStatus, Logger } from "@nestjs/common";
 import type { ConfigService } from "@nestjs/config";
 import type { AuthUser } from "../auth/auth-user";
 import { CodedHttpException } from "./enrolment-errors";
@@ -64,6 +64,9 @@ const currentDocs = (en = "v2", es = "v2"): Result => ({
   ],
   error: null,
 });
+/** deletion_barrier_open(): account deletion has not started. */
+const barrierOpen: Result = { data: true, error: null };
+const REQUEST_ID = "req-synthetic-1";
 const consentRow = (overrides: Record<string, unknown> = {}) => ({
   id: CORE_ID,
   enrolment_id: ENROLMENT_ID,
@@ -176,6 +179,7 @@ describe("EnrolmentsService", () => {
   ])("maps update error %j", async (error, expected) => {
     const { service } = setup(
       { data: enrolmentRow(), error: null },
+      barrierOpen,
       currentDocs(),
       { data: null, error: { ...error, message: "synthetic" } },
     );
@@ -244,6 +248,7 @@ describe("EnrolmentsService", () => {
     it("update: focus-cap text under 23514 is an ordinary check violation", async () => {
       const { service } = setup(
         { data: enrolmentRow(), error: null },
+        barrierOpen,
         currentDocs(),
         { data: null, error: { code: "23514", ...capText } },
       );
@@ -310,10 +315,17 @@ describe("EnrolmentsService", () => {
     });
 
     it("delete now", async () => {
+      // Its failure log line (the code only) is tested on its own below.
+      const quiet = jest
+        .spyOn(Logger.prototype, "error")
+        .mockImplementation(() => undefined);
       const { service } = setup({ data: null, error });
       expectHidden(
-        await codeOf(service.deleteNow(recent(), ENROLMENT_ID, "DELETE")),
+        await codeOf(
+          service.deleteNow(recent(), ENROLMENT_ID, "DELETE", REQUEST_ID),
+        ),
       );
+      quiet.mockRestore();
     });
 
     if (!["TH001"].includes(code)) {
@@ -331,6 +343,7 @@ describe("EnrolmentsService", () => {
       it("update", async () => {
         const { service } = setup(
           { data: enrolmentRow(), error: null },
+          barrierOpen,
           currentDocs(),
           { data: null, error },
         );
@@ -350,33 +363,111 @@ describe("EnrolmentsService", () => {
     }
   });
 
-  it("checks the deletion barrier only when rejoining", async () => {
-    const rejoin = setup(
-      { data: enrolmentRow("left"), error: null },
-      { data: false, error: null },
-    );
-    expect(
-      await codeOf(
-        rejoin.service.update(user, ENROLMENT_ID, { status: "focus" }),
-      ),
-    ).toEqual({
-      status: HttpStatus.CONFLICT,
-      code: "account_deletion_in_progress",
-    });
-    expect(rejoin.calls).toContainEqual(["rpc", "deletion_barrier_open"]);
+  // The update policy refuses every enrolment change once account deletion
+  // has started; the API asks the barrier first and changes nothing.
+  describe("the deletion barrier before an enrolment change", () => {
+    const changes: [string, string, Record<string, unknown>][] = [
+      ["pause", "focus", { status: "paused" }],
+      ["leave", "focus", { status: "left" }],
+      ["rejoin", "left", { status: "focus" }],
+      ["mode change", "focus", { mode: "reduce" }],
+      ["mode cleared", "focus", { mode: null }],
+    ];
 
-    const pause = setup(
-      { data: enrolmentRow("focus"), error: null },
-      currentDocs(),
-      { data: enrolmentRow("paused"), error: null },
-      { data: [], error: null, count: 0 },
+    it.each(changes)(
+      "%s: refused with account_deletion_in_progress, nothing written",
+      async (_label, status, dto) => {
+        const { service, calls } = setup(
+          { data: enrolmentRow(status), error: null },
+          { data: false, error: null },
+        );
+        expect(await codeOf(service.update(user, ENROLMENT_ID, dto))).toEqual({
+          status: HttpStatus.CONFLICT,
+          code: "account_deletion_in_progress",
+        });
+        expect(calls).toContainEqual(["rpc", "deletion_barrier_open"]);
+        expect(calls.some((call) => call[0] === "update")).toBe(false);
+      },
     );
-    await pause.service.update(user, ENROLMENT_ID, { status: "paused" });
-    expect(
-      pause.calls.some(
-        (call) => call[0] === "rpc" && call[1] === "deletion_barrier_open",
-      ),
-    ).toBe(false);
+
+    it.each(changes)(
+      "%s: asked before the update when the barrier is open",
+      async (_label, status, dto) => {
+        const { service, calls } = setup(
+          { data: enrolmentRow(status), error: null },
+          barrierOpen,
+          currentDocs(),
+          { data: enrolmentRow("paused"), error: null },
+          { data: [], error: null, count: 0 },
+        );
+        await service.update(user, ENROLMENT_ID, dto);
+        const barrierAt = calls.findIndex(
+          (call) => call[0] === "rpc" && call[1] === "deletion_barrier_open",
+        );
+        const updateAt = calls.findIndex((call) => call[0] === "update");
+        expect(barrierAt).toBeGreaterThanOrEqual(0);
+        expect(updateAt).toBeGreaterThan(barrierAt);
+      },
+    );
+
+    it("fails closed when the barrier cannot be read", async () => {
+      // Every later step would succeed, so only the barrier failure can
+      // produce the 502.
+      const { service, calls } = setup(
+        { data: enrolmentRow(), error: null },
+        { data: null, error: { code: "XX000", message: "synthetic detail" } },
+        currentDocs(),
+        { data: enrolmentRow("paused"), error: null },
+        { data: [], error: null, count: 0 },
+      );
+      expect(
+        await codeOf(service.update(user, ENROLMENT_ID, { status: "paused" })),
+      ).toBeInstanceOf(BadGatewayException);
+      expect(calls.at(-1)).toEqual(["rpc", "deletion_barrier_open"]);
+      expect(calls.some((call) => call[0] === "update")).toBe(false);
+    });
+
+    it("focus swap: refused before any read or the swap", async () => {
+      const { service, calls } = setup({ data: false, error: null });
+      expect(
+        await codeOf(
+          service.swapFocus(user, {
+            demoteId: ENROLMENT_ID,
+            promoteId: OTHER_ID,
+          }),
+        ),
+      ).toEqual({
+        status: HttpStatus.CONFLICT,
+        code: "account_deletion_in_progress",
+      });
+      expect(calls).toEqual([["rpc", "deletion_barrier_open"]]);
+    });
+
+    it("focus swap: fails closed when the barrier cannot be read", async () => {
+      // Every later step would succeed, so only the barrier failure can
+      // produce the 502.
+      const { service, calls } = setup(
+        { data: null, error: { code: "XX000", message: "synthetic detail" } },
+        currentDocs(),
+        { data: [], error: null, count: 0 },
+        {
+          data: [
+            { ...enrolmentRow("paused"), id: ENROLMENT_ID },
+            { ...enrolmentRow("focus"), id: OTHER_ID },
+          ],
+          error: null,
+        },
+      );
+      expect(
+        await codeOf(
+          service.swapFocus(user, {
+            demoteId: ENROLMENT_ID,
+            promoteId: OTHER_ID,
+          }),
+        ),
+      ).toBeInstanceOf(BadGatewayException);
+      expect(calls).toEqual([["rpc", "deletion_barrier_open"]]);
+    });
   });
 
   it("refuses a partial list (server row limit) instead of dropping rows", async () => {
@@ -404,14 +495,18 @@ describe("EnrolmentsService", () => {
     const recent = { ...user, authenticatedAt: Math.floor(Date.now() / 1000) };
     const wrong = setup();
     expect(
-      await codeOf(wrong.service.deleteNow(recent, ENROLMENT_ID, "delete")),
+      await codeOf(
+        wrong.service.deleteNow(recent, ENROLMENT_ID, "delete", REQUEST_ID),
+      ),
     ).toEqual({
       status: HttpStatus.BAD_REQUEST,
       code: "confirmation_required",
     });
     const stale = setup();
     expect(
-      await codeOf(stale.service.deleteNow(user, ENROLMENT_ID, "DELETE")),
+      await codeOf(
+        stale.service.deleteNow(user, ENROLMENT_ID, "DELETE", REQUEST_ID),
+      ),
     ).toEqual({
       status: HttpStatus.UNAUTHORIZED,
       code: "recent_authentication_required",
@@ -420,23 +515,127 @@ describe("EnrolmentsService", () => {
     expect(stale.calls).toEqual([]);
   });
 
-  it("deletes now with the caller-scoped client and reports missing rows", async () => {
-    const { service, calls } = setup({ data: [], error: null });
-    const recent = { ...user, authenticatedAt: Math.floor(Date.now() / 1000) };
-    expect(
-      await codeOf(service.deleteNow(recent, ENROLMENT_ID, "DELETE")),
-    ).toEqual({
-      status: HttpStatus.NOT_FOUND,
-      code: "enrolment_not_found",
+  describe("delete now through delete_enrolment_now", () => {
+    const recent = () => ({
+      ...user,
+      authenticatedAt: Math.floor(Date.now() / 1000),
     });
-    expect(calls).toEqual(
-      expect.arrayContaining([
-        ["from", "enrolments"],
-        ["delete"],
-        ["eq", '"id"', JSON.stringify(ENROLMENT_ID)],
-        ["eq", '"user_id"', JSON.stringify(user.id)],
-      ]),
-    );
+    let logged: string[];
+    beforeEach(() => {
+      logged = [];
+      for (const level of ["log", "error", "warn", "debug", "verbose"] as const)
+        jest
+          .spyOn(Logger.prototype, level)
+          .mockImplementation((...args: unknown[]) => {
+            logged.push(JSON.stringify(args));
+          });
+    });
+    afterEach(() => jest.restoreAllMocks());
+
+    /** No user id, enrolment id, token or database text in any log line. */
+    const expectNoIdentifiers = () => {
+      const lines = logged.join("\n");
+      for (const value of [
+        user.id,
+        ENROLMENT_ID,
+        user.accessToken,
+        "synthetic detail",
+        "synthetic_hint",
+        "bf",
+      ]) {
+        expect(lines).not.toContain(value);
+      }
+    };
+
+    it("calls the function once as the caller, after its own checks, with no table write", async () => {
+      const { service, calls, forUser } = setup({
+        data: { enrolments: 1, programme_consents: 2 },
+        error: null,
+      });
+      const caller = recent();
+      await service.deleteNow(caller, ENROLMENT_ID, "DELETE", REQUEST_ID);
+      expect(forUser).toHaveBeenCalledWith(caller);
+      expect(calls).toEqual([
+        [
+          "rpc",
+          "delete_enrolment_now",
+          JSON.stringify({
+            p_enrolment_id: ENROLMENT_ID,
+            p_confirmation: "DELETE",
+          }),
+        ],
+      ]);
+      expect(logged).toEqual([
+        JSON.stringify([
+          `enrolment_deleted requestId=${REQUEST_ID} status=completed`,
+        ]),
+      ]);
+      expectNoIdentifiers();
+    });
+
+    it.each([
+      ["TH012", HttpStatus.NOT_FOUND, "enrolment_not_found"],
+      ["TH017", HttpStatus.UNAUTHORIZED, "recent_authentication_required"],
+    ] as const)("maps %s to %d %s", async (code, status, token) => {
+      const { service } = setup({
+        data: null,
+        error: { code, message: "synthetic detail", hint: "synthetic_hint" },
+      });
+      expect(
+        await codeOf(
+          service.deleteNow(recent(), ENROLMENT_ID, "DELETE", REQUEST_ID),
+        ),
+      ).toEqual({ status, code: token });
+      // A refusal the caller can act on is not a failure: nothing is logged.
+      expect(logged).toEqual([]);
+    });
+
+    it.each([
+      ["TH010", "TH010"],
+      ["TH020", "TH020"],
+      ["TH006", "TH006"],
+      ["TH999", "TH999"],
+      ["42501", "42501"],
+      ["23514", "23514"],
+      ["22P02", "22P02"],
+      ["XX000", "XX000"],
+      ["PGRST202", "none"],
+      ["th012", "none"],
+    ])("fails closed on %s, logging the code only", async (code, loggedAs) => {
+      const { service } = setup({
+        data: null,
+        error: { code, message: "synthetic detail", hint: "synthetic_hint" },
+      });
+      const error = await codeOf(
+        service.deleteNow(recent(), ENROLMENT_ID, "DELETE", REQUEST_ID),
+      );
+      expect(error).toBeInstanceOf(BadGatewayException);
+      expect(
+        JSON.stringify((error as BadGatewayException).getResponse()),
+      ).not.toContain(code);
+      expect(logged).toEqual([
+        JSON.stringify([
+          `enrolment_deletion_failed requestId=${REQUEST_ID} status=enrolment_delete_failed code=${loggedAs}`,
+        ]),
+      ]);
+      expectNoIdentifiers();
+    });
+
+    it("message text and hint never decide: TH012 text under another code is a 502", async () => {
+      const { service } = setup({
+        data: null,
+        error: {
+          code: "P0001",
+          message: "Enrolment not found",
+          hint: "enrolment_not_found",
+        },
+      });
+      expect(
+        await codeOf(
+          service.deleteNow(recent(), ENROLMENT_ID, "DELETE", REQUEST_ID),
+        ),
+      ).toBeInstanceOf(BadGatewayException);
+    });
   });
 
   it.each(["share_care_team", "share_caregiver"] as const)(
@@ -843,6 +1042,7 @@ describe("EnrolmentsService", () => {
 
     it("calls swap_focus once and returns both enrolments with consents", async () => {
       const { service, calls } = setup(
+        barrierOpen,
         currentDocs(),
         {
           data: [consentRow({ enrolment_id: OTHER_ID, consent_version: "v2" })],
@@ -884,6 +1084,7 @@ describe("EnrolmentsService", () => {
 
     it("compares ids in lower case (Postgres returns them so)", async () => {
       const { service, calls } = setup(
+        barrierOpen,
         currentDocs(),
         { data: [], error: null, count: 0 },
         swapped,
@@ -904,7 +1105,7 @@ describe("EnrolmentsService", () => {
     });
 
     it("a failed read before the swap is a 502 and the swap is not called", async () => {
-      const { service, calls } = setup(currentDocs(), {
+      const { service, calls } = setup(barrierOpen, currentDocs(), {
         data: null,
         error: { code: "XX000", message: "synthetic" },
       });
@@ -930,6 +1131,7 @@ describe("EnrolmentsService", () => {
       ["TH014", HttpStatus.CONFLICT, "consent_version_unchanged"],
     ])("maps %s to %d %s", async (code, status, token) => {
       const { service } = setup(
+        barrierOpen,
         currentDocs(),
         { data: [], error: null, count: 0 },
         {
@@ -951,6 +1153,7 @@ describe("EnrolmentsService", () => {
       "fails closed on %s",
       async (code) => {
         const { service } = setup(
+          barrierOpen,
           currentDocs(),
           { data: [], error: null, count: 0 },
           { data: null, error: { code, message: "synthetic detail" } },
@@ -970,6 +1173,7 @@ describe("EnrolmentsService", () => {
 
     it("fails closed when the function does not return both rows", async () => {
       const { service } = setup(
+        barrierOpen,
         currentDocs(),
         { data: [], error: null, count: 0 },
         { data: [swapped.data[0]], error: null },
