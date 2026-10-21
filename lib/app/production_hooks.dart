@@ -10,6 +10,7 @@ import 'package:tether_ui/ui/ui.dart';
 import '../error/privacy_safe_error_reporter.dart';
 import '../integration/data_adapter.dart';
 import '../integration/device_outcomes.dart';
+import '../integration/platform_adapter.dart';
 import '../integration/registry.dart';
 
 /// Receives every code the tether_ui screens report. Codes only: no content,
@@ -81,10 +82,8 @@ ProductionHooks installProductionHooks({
     api: api ?? AppApi(),
     data: data ?? AppData(),
     device: device ?? AppDevice(onCode: codes.code),
-    // Calls, texts, links and settings: the platform adapter replaces this
-    // inert placeholder (TH-924). Until then a call or text shows the number
-    // to dial, and links and settings do nothing.
-    platform: TInertPlatform(onCode: codes.code),
+    // Calls, texts, links and phone settings; reports codes only.
+    platform: AppPlatform(onCode: codes.code),
     resolver: TFailClosedResolver(onCode: codes.code),
     reporter: codes,
   );
