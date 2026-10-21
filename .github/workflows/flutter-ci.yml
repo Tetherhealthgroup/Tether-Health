@@ -29,6 +29,17 @@ jobs:
       - name: Accessibility, offline, and program integration coverage
         run: flutter test test/accessibility test/programs test/profile test/auth
       - run: flutter test
+      # The Unplug channel contract is generated for Dart, Swift and Kotlin and
+      # the output is checked in. If pigeons/unplug_api.dart changes without a
+      # regeneration, Dart and the native sides drift apart silently, so CI
+      # regenerates and fails on any difference.
+      - name: Channel contract is up to date
+        run: |
+          ./tool/generate_pigeon.sh
+          git diff --exit-code -- \
+            lib/unplug/platform/unplug_api.g.dart \
+            ios/Runner/Unplug/UnplugApi.g.swift \
+            android/app/src/main/kotlin/com/TetherHealthLLC/tetherhealth/unplug/UnplugApi.g.kt
       - name: Build unsigned Android release bundle
         env:
           # Explicit opt-in: Gradle otherwise refuses release builds without an
