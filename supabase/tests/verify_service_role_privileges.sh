@@ -588,7 +588,7 @@ select th988_test.ok(
     "caregivers": 0, "care_connections": 0, "supporters": 0}'::jsonb
   and th988_test.counts('00000000-0000-4000-8000-0000009880b1') =
       th988_test.counts('00000000-0000-4000-8000-0000009880a1'),
-  'setup: synthetic A and B each hold a row in every member table');
+  'setup: synthetic A and B each hold a row in every member table except the care tables, which verify_care_migration.sh covers');
 
 -- A: begin_account_deletion as authenticated with A's token, then
 -- delete_my_app_data in owner context (the superuser with A's claims), as

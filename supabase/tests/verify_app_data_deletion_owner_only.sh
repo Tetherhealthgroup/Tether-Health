@@ -230,7 +230,7 @@ select th988f_test.ok(
     "caregivers": 0, "care_connections": 0, "supporters": 0}'::jsonb
   and th988f_test.counts('00000000-0000-4000-8000-00000988f0b1') =
     current_setting('th988f.a_seeded')::jsonb || '{"profiles": 0, "quit_plans": 0}'::jsonb,
-  'setup: synthetic A holds a row in every member table; B the same without a profile or quit plan');
+  'setup: synthetic A holds a row in every member table except the care tables (verify_care_migration.sh covers them); B the same without a profile or quit plan');
 
 select th988f_test.act_as('authenticator', th988f_test.claims('00000000-0000-4000-8000-00000988f0a1'));
 select th988f_test.ok(public.begin_account_deletion('DELETE'),

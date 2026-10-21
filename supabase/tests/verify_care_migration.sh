@@ -32,7 +32,7 @@ migrations_dir="supabase/migrations"
 contract="docs/contracts/database.md"
 
 # The block between the legacy share consent markers in the migration.
-r59_block() {
+legacy_block() {
   if [[ -f "$migration" ]]; then
     sed -n '/^-- TH-955 legacy share consents: begin$/,/^-- TH-955 legacy share consents: end$/p' "$migration" |
       sed '1d;$d'
@@ -276,6 +276,36 @@ grant execute on all functions in schema th955_test to public;
 revoke all on function th955_test.text_hits(text) from public;
 
 -- Catalogue -------------------------------------------------------------------
+-- The reviewed check constraints of the care tables, as pg_get_constraintdef
+-- prints them (schema prefixes removed), ordered by constraint name.
+select set_config('th955.check_constraints', btrim($checks$
+care_connections.care_connections_revoked_check: CHECK (((revoked_at IS NULL) OR (revoked_at >= connected_at)))
+care_invites.care_invites_code_hash_check: CHECK ((octet_length(code_hash) = 32))
+care_invites.care_invites_created_by_check: CHECK (((char_length(created_by) >= 1) AND (char_length(created_by) <= 120)))
+care_invites.care_invites_expires_check: CHECK ((expires_at > created_at))
+care_invites.care_invites_max_uses_check: CHECK (((max_uses >= 1) AND (max_uses <= 10000)))
+care_invites.care_invites_uses_check: CHECK (((uses >= 0) AND (uses <= max_uses)))
+care_messages.care_messages_body_check: CHECK (((char_length(body) >= 1) AND (char_length(body) <= 2000)))
+care_messages.care_messages_share_enrolment_check: CHECK (((share_id IS NULL) OR (enrolment_id IS NOT NULL)))
+care_messages.care_messages_topic_check: CHECK (((char_length(topic) >= 1) AND (char_length(topic) <= 80)))
+care_orgs.care_orgs_contact_email_check: CHECK (((contact_email IS NULL) OR ((char_length(contact_email) <= 254) AND (contact_email ~ '^[^@]+@[^@]+$'::text))))
+care_orgs.care_orgs_name_check: CHECK (((name = btrim(name)) AND ((char_length(name) >= 1) AND (char_length(name) <= 120))))
+care_share_access.care_share_access_channel_check: CHECK ((channel = 'secure_link'::text))
+care_shares.care_shares_expires_check: CHECK (((expires_at > created_at) AND (expires_at <= (created_at + '30 days'::interval))))
+care_shares.care_shares_kind_check: CHECK ((kind = ANY (ARRAY['visit_summary'::text, 'message_attachment'::text])))
+care_shares.care_shares_revoked_check: CHECK (((revoked_at IS NULL) OR (revoked_at >= created_at)))
+care_shares.care_shares_snapshot_check: CHECK (((jsonb_typeof(snapshot) = 'object'::text) AND (octet_length((snapshot)::text) <= 65536)))
+caregiver_events.caregiver_events_kind_check: CHECK ((kind = ANY (ARRAY['sd.session_finished'::text, 'sd.fall_logged'::text])))
+caregivers.caregivers_invite_status_check: CHECK ((invite_status = ANY (ARRAY['pending'::text, 'sent'::text])))
+caregivers.caregivers_name_check: CHECK (((name = btrim(name)) AND ((char_length(name) >= 1) AND (char_length(name) <= 80))))
+caregivers.caregivers_phone_check: CHECK ((phone ~ '^\+[1-9][0-9]{6,14}$'::text))
+caregivers.caregivers_revoked_check: CHECK (((revoked_at IS NULL) OR (revoked_at >= created_at)))
+caregivers.caregivers_scope_check: CHECK (((cardinality(scope) >= 1) AND (array_position(scope, NULL::text) IS NULL) AND is_unique_text_array(scope) AND (scope <@ ARRAY['sd.session_finished'::text, 'sd.fall_logged'::text])))
+supporters.supporters_help_phrase_check: CHECK (((help_phrase IS NULL) OR ((char_length(help_phrase) >= 1) AND (char_length(help_phrase) <= 200))))
+supporters.supporters_name_check: CHECK (((name = btrim(name)) AND ((char_length(name) >= 1) AND (char_length(name) <= 80))))
+supporters.supporters_phone_check: CHECK ((phone ~ '^\+[1-9][0-9]{6,14}$'::text))
+supporters.supporters_programme_codes_check: CHECK (((array_position(programme_codes, NULL::text) IS NULL) AND is_unique_text_array(programme_codes) AND (programme_codes <@ ARRAY['bf'::text, 'sf'::text])))
+$checks$, E'\n'), true);
 select th955_test.ok(
   (select string_agg(relname || ':' || relrowsecurity || ':' || relforcerowsecurity, ','
                      order by relname)
@@ -355,6 +385,18 @@ select th955_test.ok(
   'caregivers.user_id>auth.users:c,supporters.user_id>auth.users:c',
   'catalogue: foreign keys exactly as reviewed; care_shares.consent_id has none; nothing sets null or a default');
 select th955_test.ok(
+  (select string_agg(c.relname || '.' || k.conname || ': '
+                     || replace(pg_catalog.pg_get_constraintdef(k.oid), 'public.', ''), E'\n'
+                     order by k.conname)
+   from pg_catalog.pg_constraint as k
+   join pg_catalog.pg_class as c on c.oid = k.conrelid
+   where k.contype = 'c' and c.relnamespace = 'public'::regnamespace
+     and c.relname in ('care_orgs', 'care_invites', 'care_connections', 'care_shares',
+                       'care_share_access', 'care_messages', 'caregivers', 'caregiver_events',
+                       'supporters')) =
+  current_setting('th955.check_constraints'),
+  'catalogue: every check constraint on the care tables is exactly as reviewed');
+select th955_test.ok(
   not exists (
     select 1 from pg_catalog.pg_constraint as k
     join pg_catalog.pg_class as fc on fc.oid = k.confrelid
@@ -416,7 +458,7 @@ select th955_test.ok(
       and c.relname in ('care_orgs', 'care_invites', 'care_connections', 'care_shares',
                         'care_share_access', 'care_messages', 'caregivers', 'caregiver_events',
                         'supporters')
-      and (a.grantee = 0 or a.grantee in ('anon'::regrole, 'service_role'::regrole, 'thsync'::regrole)))
+      and a.grantee not in (c.relowner, 'authenticated'::regrole))
   and not exists (
     select 1 from pg_catalog.pg_attribute as att
     join pg_catalog.pg_class as c on c.oid = att.attrelid
@@ -425,8 +467,8 @@ select th955_test.ok(
       and c.relname in ('care_orgs', 'care_invites', 'care_connections', 'care_shares',
                         'care_share_access', 'care_messages', 'caregivers', 'caregiver_events',
                         'supporters')
-      and (a.grantee = 0 or a.grantee in ('anon'::regrole, 'service_role'::regrole, 'thsync'::regrole))),
-  'catalogue: anon, service_role, thsync and PUBLIC hold nothing on the care tables');
+      and a.grantee not in (c.relowner, 'authenticated'::regrole)),
+  'catalogue: every privilege on the care tables is held by their owner or authenticated, and no one else');
 select th955_test.ok(
   (select string_agg(tablename || ':' || policyname || ':' || cmd || ':' || permissive || ':'
                      || array_to_string(roles, '+'), ',' order by tablename, policyname)
@@ -454,6 +496,15 @@ select th955_test.ok(
   'supporters:supporters_select_own:SELECT:PERMISSIVE:authenticated,'
   'supporters:supporters_update_own:UPDATE:PERMISSIVE:authenticated',
   'catalogue: the care policies are exactly the reviewed per-command policies for authenticated');
+-- care_connections' own select policy already limits the subquery to the
+-- caller's rows, so no member-level test can tell the ownership clause apart;
+-- the clause is pinned here.
+select th955_test.ok(
+  (select regexp_replace(replace(qual, 'public.', ''), '\s+', ' ', 'g')
+   from pg_catalog.pg_policies
+   where schemaname = 'public' and policyname = 'care_orgs_select_connected') =
+  '(EXISTS ( SELECT 1 FROM care_connections c WHERE ((c.org_id = care_orgs.id) AND (c.user_id = ( SELECT auth.uid() AS uid)))))',
+  'catalogue: a clinic is visible only through one of the caller''s own connections');
 select th955_test.ok(
   not exists (
     select 1 from pg_catalog.pg_policies
@@ -564,6 +615,7 @@ insert into public.care_orgs (name, contact_email, verified_at, disabled_at) val
   ('Synthetic Clinic 955 A', 'clinic-955a@example.test', now(), null),
   ('Synthetic Clinic 955 B', null, now(), null),
   ('Synthetic Clinic 955 M', null, now(), null),
+  ('Synthetic Clinic 955 C', null, now(), null),
   ('Synthetic Clinic 955 E', null, now(), null),
   ('Synthetic Clinic 955 U', null, null, null),
   ('Synthetic Clinic 955 X', null, now(), now());
@@ -578,10 +630,13 @@ from (values
   ('Synthetic Clinic 955 B', 'SYNTH955B0001', now() + interval '1 day', 1, 0, now()),
   ('Synthetic Clinic 955 B', 'SYNTH955B0002', now() + interval '1 day', 1, 0, now()),
   ('Synthetic Clinic 955 M', 'SYNTH955M0001', now() + interval '1 day', 10, 0, now()),
+  ('Synthetic Clinic 955 C', 'SYNTH955C0001', now() + interval '1 day', 1, 0, now()),
   ('Synthetic Clinic 955 E', 'SYNTH955E0001', now() - interval '1 day', 5, 0, now() - interval '2 days'),
   ('Synthetic Clinic 955 E', 'SYNTH955F0001', now() + interval '1 day', 1, 1, now()),
   ('Synthetic Clinic 955 U', 'SYNTH955N0001', now() + interval '1 day', 5, 0, now()),
-  ('Synthetic Clinic 955 X', 'SYNTH955X0001', now() + interval '1 day', 5, 0, now())
+  ('Synthetic Clinic 955 X', 'SYNTH955X0001', now() + interval '1 day', 5, 0, now()),
+  ('Synthetic Clinic 955 E', 'SYNTH955L11', now() + interval '1 day', 5, 0, now()),
+  ('Synthetic Clinic 955 E', 'SYNTH955' || repeat('L', 57), now() + interval '1 day', 5, 0, now())
 ) as v(org, code, expires_at, max_uses, uses, created_at)
 join public.care_orgs as o on o.name = v.org;
 
@@ -613,11 +668,11 @@ values ('00000000-0000-4000-8000-0000009550a1', 'hw', 0, now());
 set constraints public.enrolments_focus_cap immediate;
 set constraints public.enrolments_focus_cap deferred;
 select th955_test.ok(
-  (select count(*) from public.care_orgs where name like 'Synthetic Clinic 955 _') = 6
+  (select count(*) from public.care_orgs where name like 'Synthetic Clinic 955 _') = 7
   and (select count(*) from public.care_invites
-       where org_id in (select id from public.care_orgs where name like 'Synthetic Clinic 955 _')) = 8
+       where org_id in (select id from public.care_orgs where name like 'Synthetic Clinic 955 _')) = 11
   and (select count(*) from public.enrolments where user_id::text like '00000000-0000-4000-8000-0000009550%') = 10,
-  'setup: six synthetic clinics, eight invites and ten enrolments with core consents');
+  'setup: seven synthetic clinics, eleven invites and ten enrolments with core consents');
 
 -- Redemption ------------------------------------------------------------------
 select th955_test.act_as('authenticator', th955_test.claims('00000000-0000-4000-8000-0000009550a1'));
@@ -649,10 +704,14 @@ select th955_test.refused('select public.redeem_care_invite(''SYNTH955F0001'')',
   'TH025', 'Invite code is not valid', 'redeem: a used-up code is refused', 'care_invite_invalid');
 select th955_test.refused('select public.redeem_care_invite(''SYNTH955Z0001'')',
   'TH025', 'Invite code is not valid', 'redeem: an unknown code is refused', 'care_invite_invalid');
-select th955_test.refused('select public.redeem_care_invite(''SYNTH955ABC'')',
-  'TH025', 'Invite code is not valid', 'redeem: an 11-character code is refused', 'care_invite_invalid');
-select th955_test.refused('select public.redeem_care_invite(repeat(''A'', 65))',
-  'TH025', 'Invite code is not valid', 'redeem: a 65-character code is refused', 'care_invite_invalid');
+select th955_test.refused('select public.redeem_care_invite(''SYNTH955L11'')',
+  'TH025', 'Invite code is not valid', 'redeem: an 11-character code is refused by length, though an invite has its hash',
+  'care_invite_invalid');
+select th955_test.refused('select public.redeem_care_invite(''SYNTH955'' || repeat(''L'', 57))',
+  'TH025', 'Invite code is not valid', 'redeem: a 65-character code is refused by length, though an invite has its hash',
+  'care_invite_invalid');
+select th955_test.refused('select public.redeem_care_invite(null)',
+  'TH025', 'Invite code is not valid', 'redeem: a null code is refused', 'care_invite_invalid');
 select th955_test.refused('select public.redeem_care_invite(''SYNTH955N0001'')',
   'TH025', 'Invite code is not valid', 'redeem: a code of an unverified clinic is refused', 'care_invite_invalid');
 select th955_test.refused('select public.redeem_care_invite(''SYNTH955X0001'')',
@@ -674,6 +733,11 @@ select th955_test.refused('select public.redeem_care_invite(''SYNTH955B0001'')',
   'TH025', 'Invite code is not valid',
   'redeem: after revoking, the same member''s used single-use code is refused', 'care_invite_invalid');
 select set_config('th955.bm', (public.redeem_care_invite('SYNTH955M0001')).id::text, true);
+select set_config('th955.bc', (public.redeem_care_invite('SYNTH955C0001')).id::text, true);
+select th955_test.ok(
+  (select string_agg(name, ',' order by name collate "C") from public.care_orgs) =
+  'Synthetic Clinic 955 B,Synthetic Clinic 955 C,Synthetic Clinic 955 M',
+  'B: sees the clinics it is or was connected to, including one A never joins');
 select th955_test.act_as('authenticator', th955_test.claims('00000000-0000-4000-8000-0000009550a1'));
 select set_config('th955.am', (public.redeem_care_invite('SYNTH955M0001')).id::text, true);
 select set_config('th955.ab', (public.redeem_care_invite('SYNTH955B0002')).id::text, true);
@@ -682,12 +746,12 @@ select th955_test.affects(format(
   1, 'A: revokes its connection to clinic B');
 select th955_test.act_as(current_setting('th955.superuser'), null);
 select th955_test.ok(
-  (select count(*) from public.care_connections where user_id = '00000000-0000-4000-8000-0000009550b1') = 2
+  (select count(*) from public.care_connections where user_id = '00000000-0000-4000-8000-0000009550b1') = 3
   and (select count(*) from public.care_connections
-       where user_id = '00000000-0000-4000-8000-0000009550b1' and revoked_at is null) = 1
+       where user_id = '00000000-0000-4000-8000-0000009550b1' and revoked_at is null) = 2
   and (select uses from public.care_invites where org_id = th955_test.v('org_m')::uuid) = 2
   and (select revoked_at >= connected_at from public.care_connections where id = th955_test.v('ab')::uuid),
-  'redeem: B holds one revoked and one live connection; a multi-use code was used twice');
+  'redeem: B holds one revoked and two live connections; a multi-use code was used twice');
 
 select th955_test.act_as('thsync', th955_test.claims('00000000-0000-4000-8000-0000009550a1'));
 select th955_test.refused('select public.redeem_care_invite(''SYNTH955M0001'')',
@@ -708,7 +772,7 @@ select th955_test.act_as('authenticator', th955_test.claims('00000000-0000-4000-
 select th955_test.ok(
   (select string_agg(name, ',' order by name collate "C") from public.care_orgs) =
   'Synthetic Clinic 955 A,Synthetic Clinic 955 B,Synthetic Clinic 955 M',
-  'A: sees the clinics it is or was connected to, and no other');
+  'A: sees the clinics it is or was connected to, and not the clinic only B joined');
 select th955_test.refused('select contact_email from public.care_orgs',
   '42501', 'permission denied%', 'A: cannot read a clinic''s contact email');
 select th955_test.refused('select count(*) from public.care_invites',
@@ -828,7 +892,12 @@ select th955_test.refused(format(
   'insert into public.care_shares (user_id, enrolment_id, connection_id, consent_id, kind, snapshot, expires_at)
    values (auth.uid(), %L, %L, %L, ''visit_summary'', ''{}'', now() + interval ''31 days'')',
   th955_test.v('a_hw'), th955_test.v('a1'), th955_test.v('c_hw_a1')),
-  '23514', '%care_shares_expires_check%', 'share: an expiry more than 30 days away is refused');
+  '23514', '%care_shares_expires_check%', 'share: an expiry 31 days away is refused');
+select th955_test.refused(format(
+  'insert into public.care_shares (user_id, enrolment_id, connection_id, consent_id, kind, snapshot, expires_at)
+   values (auth.uid(), %L, %L, %L, ''visit_summary'', ''{}'', now() + interval ''30 days 1 hour'')',
+  th955_test.v('a_hw'), th955_test.v('a1'), th955_test.v('c_hw_a1')),
+  '23514', '%care_shares_expires_check%', 'share: an expiry 30 days and 1 hour away is refused');
 select th955_test.act_as('thsync', th955_test.claims('00000000-0000-4000-8000-0000009550a1'));
 select th955_test.refused(format(
   'insert into public.care_shares (user_id, enrolment_id, connection_id, consent_id, kind, snapshot)
@@ -845,7 +914,7 @@ select th955_test.act_as('authenticator', th955_test.claims('00000000-0000-4000-
 select th955_test.ok(
   (select count(*) from public.care_shares) = 0
   and (select count(*) from public.care_share_access) = 0
-  and (select count(*) from public.care_connections) = 2
+  and (select count(*) from public.care_connections) = 3
   and (select count(*) from public.programme_consents
        where purpose in ('share_care_team', 'share_caregiver')) = 0,
   'B: sees none of A''s shares, access rows, connections or sharing consents');
@@ -896,6 +965,21 @@ select th955_test.refused(format(
    values (%L, %L, ''Synthetic topic'', ''Synthetic message'', %L)',
   '00000000-0000-4000-8000-0000009550a1', th955_test.v('a1'), th955_test.v('s4')),
   '42501', '%row-level security%', 'message: an attachment without an enrolment is refused');
+select th955_test.act_as(current_setting('th955.superuser'), null);
+with i as (
+  insert into public.care_shares (user_id, enrolment_id, connection_id, consent_id, kind, snapshot,
+                                  created_at, expires_at)
+  values ('00000000-0000-4000-8000-0000009550a1', th955_test.v('a_hw')::uuid, th955_test.v('a1')::uuid,
+          th955_test.v('c_hw_a1')::uuid, 'message_attachment', '{"summary": "synthetic"}',
+          now() - interval '31 days', now() - interval '1 day')
+  returning id
+) select set_config('th955.s_expired', id::text, true) from i;
+select th955_test.act_as('authenticator', th955_test.claims('00000000-0000-4000-8000-0000009550a1'));
+select th955_test.refused(format(
+  'insert into public.care_messages (user_id, connection_id, enrolment_id, topic, body, share_id)
+   values (%L, %L, %L, ''Synthetic topic'', ''Synthetic message'', %L)',
+  '00000000-0000-4000-8000-0000009550a1', th955_test.v('a1'), th955_test.v('a_hw'), th955_test.v('s_expired')),
+  '42501', '%row-level security%', 'message: an expired attachment is refused');
 select th955_test.affects(format(
   'insert into public.care_messages (user_id, connection_id, enrolment_id, topic, body, share_id)
    values (%L, %L, %L, ''Synthetic topic'', ''Synthetic message with attachment'', %L)',
@@ -1185,7 +1269,7 @@ select th955_test.ok(
    where purpose in ('share_care_team', 'share_caregiver') and revoked_at is null) = 3,
   'legacy: one unbound live sharing consent is seeded next to two live bound ones');
 SQL
-  r59_block
+  legacy_block
   cat <<'SQL'
 select th955_test.ok(
   not exists (select 1 from public.programme_consents
@@ -1198,11 +1282,11 @@ select th955_test.no_orphans('after the legacy revocation');
 create role th955_nobypass nologin;
 grant usage on schema th955_test to th955_nobypass;
 set local role th955_nobypass;
-select th955_test.refused($r59$
+select th955_test.refused($legacy$
 SQL
-  r59_block
+  legacy_block
   cat <<'SQL'
-$r59$, 'P0001', 'Revoking stored share consents needs a migration role that bypasses row-level security',
+$legacy$, 'P0001', 'Revoking stored share consents needs a migration role that bypasses row-level security',
   'legacy: the block refuses to run under a role without row-level security bypass');
 reset role;
 
@@ -1438,6 +1522,22 @@ invites=$(sed -n '/^create table public\.care_invites (/,/^);/p' "$migration")
 grep -Fq '  code_hash bytea not null,' <<<"$invites" || fail 'care_invites must hold code_hash bytea not null'
 grep -Fq 'octet_length(code_hash) = 32' <<<"$invites" || fail 'care_invites.code_hash must be 32 bytes'
 if grep -Eq '^  code ' <<<"$invites"; then fail 'care_invites must not hold the code'; fi
+# Shares expire 30 days after creation by default, and at most 30 days after it.
+shares=$(sed -n '/^create table public\.care_shares (/,/^);/p' "$migration")
+grep -Fq "  expires_at timestamptz not null default now() + interval '30 days'," <<<"$shares" ||
+  fail 'care_shares.expires_at must default to 30 days after creation'
+grep -Fq "    expires_at > created_at and expires_at <= created_at + interval '30 days'" <<<"$shares" ||
+  fail 'care_shares.expires_at must be capped at 30 days after creation'
+
+# The recipient check and the insert re-checks lock what they read (FOR SHARE),
+# and redemption locks the invite (FOR UPDATE).
+for pair in care_check_consent_recipient:2:0 care_lock_live_consent:4:0 redeem_care_invite:0:1; do
+  IFS=: read -r fn shares_n updates_n <<<"$pair"
+  body=$(sed -n "/^create function public\\.$fn(/,/^\\\$\\\$;\$/p" "$migration")
+  [[ "$(grep -cE '^ +for share;$' <<<"$body")" -eq "$shares_n" &&
+    "$(grep -cE '^ +for update;$' <<<"$body")" -eq "$updates_n" ]] ||
+    fail "$fn must lock with $shares_n for share and $updates_n for update"
+done
 
 # Truncate appears only in the guards' trigger events and in the revoke.
 while IFS= read -r stmt; do
@@ -1562,7 +1662,7 @@ fi
 [[ "$(grep -Fxc -- '-- TH-955 legacy share consents: begin' "$migration")" -eq 1 &&
   "$(grep -Fxc -- '-- TH-955 legacy share consents: end' "$migration")" -eq 1 ]] ||
   fail 'the legacy share consent markers must each appear once'
-block=$(r59_block)
+block=$(legacy_block)
 block_start=$(grep -nFx -- '-- TH-955 legacy share consents: begin' "$migration" | cut -d: -f1)
 last_object=$(grep -nE '^(create|alter table|grant|revoke|comment on)' "$migration" | tail -n 1 | cut -d: -f1)
 [[ "$block_start" -gt "$last_object" ]] || fail 'the legacy block must come after every object is created'
