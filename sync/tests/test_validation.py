@@ -171,3 +171,22 @@ def test_a_problem_body_is_always_rfc7807(client: TestClient) -> None:
         assert set(body) >= {"type", "title", "status", "detail"}
         assert body["status"] == response.status_code
         assert body["type"].startswith("https://tetherhealthgroup.com/problems/")
+
+
+@pytest.mark.parametrize("number", ["NaN", "Infinity", "-Infinity"])
+def test_a_slider_value_that_is_not_a_finite_number_is_refused(
+    client: TestClient, number: str
+) -> None:
+    """Python's JSON parser accepts NaN and Infinity; the store must never see
+    them."""
+    raw = (
+        '{"areas": [{"area": "bf", "answers": {"bf/S05": {"slider": {"0": '
+        + number
+        + '}}}, "lapses": []}]}'
+    )
+    response = client.post(
+        "/v1/sync/push",
+        content=raw,
+        headers={**auth(), "content-type": "application/json"},
+    )
+    assert response.status_code == 422

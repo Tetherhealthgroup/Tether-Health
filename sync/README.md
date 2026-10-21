@@ -29,7 +29,7 @@ documentation and this file is the map.
 
 ```bash
 python3.12 -m venv .venv && . .venv/bin/activate
-pip install -r requirements.txt -r requirements-postgres.txt
+pip install --require-hashes -r requirements-lock.txt
 
 export THSYNC_SUPABASE_URL='https://<project-ref>.supabase.co'
 export THSYNC_DATABASE_URL='postgresql+psycopg://thsync:<password>@<host>/postgres'
@@ -40,13 +40,19 @@ uvicorn --factory thsync.app:create_app --port 8080
 `create_app` is a factory, not a module-level `app`, so tests can hand it their
 own engine. `--factory` is therefore required.
 
+`requirements-lock.txt` pins every runtime package, transitive ones included,
+with their hashes; a production install uses it with `--require-hashes`. It is
+generated from `requirements.txt` and `requirements-postgres.txt`; regenerate it
+with the command in its header whenever either changes.
+
 **The database login must be the role `thsync`.** It is created `NOLOGIN` by
 `supabase/migrations/202610180001_sync_tables.sql`; giving it a login and a
 password is a manual step on the server, and the password lives only in the
 deployment's secret store. At start-up the service refuses to run if its login
-is a superuser, bypasses row-level security, can act as a privileged role
-(`postgres`, `service_role`, …), is not `thsync`, has a role set at session
-level, or is a member of anything but `authenticated`. Every transaction then
+is a superuser, bypasses row-level security, can create roles or replicate,
+can act as a privileged role (`postgres`, `service_role`, …), is not `thsync`,
+has a role set at session level, or is a member of anything but
+`authenticated`. Every transaction then
 runs `SET LOCAL ROLE authenticated` and sets `request.jwt.claims` to the
 verified subject, so the row-level security policies apply to every statement.
 
@@ -63,7 +69,8 @@ uvicorn --factory thsync.app:create_app --port 8080
 ### Tests
 
 ```bash
-pip install -r requirements-dev.txt
+python3.12 -m venv .venv && . .venv/bin/activate
+pip install -r requirements-dev.txt     # includes requirements-postgres.txt
 pytest          # in-process; only loopback network
 mypy            # strict
 ```
@@ -94,12 +101,12 @@ keys with their cascades — so the two cannot drift silently.
 | Variable | Required | Default | Meaning |
 | --- | --- | --- | --- |
 | `THSYNC_ENVIRONMENT` | no | `production` | `production` or `development`. Production accepts only JWKS (ES256) token verification and a PostgreSQL database, and never echoes SQL. |
-| `THSYNC_SUPABASE_URL` | in production | — | e.g. `https://<ref>.supabase.co`. Derives the issuer and the JWKS URL. |
-| `THSYNC_JWT_JWKS_URL` | no | derived | Overrides the derived key-set URL. |
+| `THSYNC_SUPABASE_URL` | in production (or the two below) | — | e.g. `https://<ref>.supabase.co`. Derives the issuer and the JWKS URL. Must be `https://` in production. |
+| `THSYNC_JWT_JWKS_URL` | no | derived | Overrides the derived key-set URL. Must be `https://` in production. The key set is cached for 10 minutes (a removed key stops verifying at the next refetch) and fetched with a 5-second timeout. |
 | `THSYNC_JWT_SECRET` | development only | — | Legacy symmetric HS256 secret. **Refused in production.** Setting both this and a key set is refused everywhere. |
 | `THSYNC_DATABASE_URL` | in production | `sqlite+pysqlite:///./thsync.db` (development) | SQLAlchemy URL. Production: `postgresql+psycopg://thsync:…@…` |
 | `THSYNC_JWT_AUDIENCE` | no | `authenticated` | Required `aud`. Supabase signs `anon` tokens with the same key, so this check is what keeps the public key out. |
-| `THSYNC_JWT_ISSUER` | no | derived from the project URL | Required `iss` when set. |
+| `THSYNC_JWT_ISSUER` | in production, unless derived | derived from the project URL | Required `iss`. Production refuses to start without an issuer to check. |
 | `THSYNC_JWT_LEEWAY_SECONDS` | no | `10` | Clock skew tolerated on `exp`/`iat`. |
 | `THSYNC_SQL_ECHO` | no | `false` | Echo SQL, development only. **Forced off in production** — statement parameters include answer text. |
 

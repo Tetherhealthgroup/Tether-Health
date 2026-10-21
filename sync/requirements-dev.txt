@@ -1,4 +1,7 @@
 -r requirements.txt
+# The PostgreSQL driver too, so the start-up role tests (which build a
+# PostgreSQL engine without connecting) and tests/test_postgres.py always have it.
+-r requirements-postgres.txt
 
 # Test and type-check tooling. httpx is what starlette's TestClient drives the
 # app through in-process, so no port is ever bound during a test run.

@@ -225,20 +225,28 @@ def test_start_up_refuses_a_superuser_login(
             pass  # pragma: no cover - start-up must not get here
 
 
-def test_start_up_refuses_a_login_holding_a_privileged_role(
-    database: dict[str, Engine], pg_settings: Settings
+@pytest.mark.parametrize(
+    ("attributes", "grants", "reason"),
+    [
+        ("", "service_role, authenticated", "service_role"),
+        ("createrole", "authenticated", "can create roles"),
+        ("replication", "authenticated", "can replicate"),
+    ],
+)
+def test_start_up_refuses_a_login_with_privileges_beyond_its_grants(
+    database: dict[str, Engine], pg_settings: Settings, attributes: str, grants: str, reason: str
 ) -> None:
-    """A login that is not superuser itself but can become service_role."""
+    """Logins that are not superusers but hold a privileged role or attribute."""
     login = f"thsync_test_{secrets.token_hex(4)}"
     password = secrets.token_hex(24)
     admin = database["admin"]
-    _run_script(admin, f"create role {login} login noinherit password '{password}'")
-    _run_script(admin, f"grant service_role, authenticated to {login}")
+    _run_script(admin, f"create role {login} login noinherit {attributes} password '{password}'")
+    _run_script(admin, f"grant {grants} to {login}")
     engine = create_engine(
         database["sync"].url.set(username=login, password=password)
     )
     try:
-        with pytest.raises(StartupRefused, match="service_role"):
+        with pytest.raises(StartupRefused, match=reason):
             with TestClient(create_app(settings=pg_settings, engine=engine)):
                 pass  # pragma: no cover - start-up must not get here
     finally:

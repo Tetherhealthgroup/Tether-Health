@@ -21,6 +21,8 @@ import hmac
 import json
 import threading
 import time
+import types
+import uuid
 from collections.abc import Iterator
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
@@ -30,6 +32,7 @@ import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import ec, rsa
 
+from thsync import auth as auth_module
 from thsync.auth import verify_token
 from thsync.config import ConfigError, Settings, settings_from_env
 from thsync.problems import Problem
@@ -327,3 +330,113 @@ class TestProduction:
     def test_an_unknown_environment_is_refused(self) -> None:
         with pytest.raises(ConfigError):
             settings_from_env({**PRODUCTION, "THSYNC_ENVIRONMENT": "staging"})
+
+
+class TestProductionKeySource:
+    def test_an_http_project_url_is_refused(self) -> None:
+        with pytest.raises(ConfigError, match="https"):
+            settings_from_env({**PRODUCTION, "THSYNC_SUPABASE_URL": "http://example.supabase.co"})
+
+    def test_an_http_key_set_url_is_refused(self) -> None:
+        with pytest.raises(ConfigError, match="https"):
+            settings_from_env(
+                {**PRODUCTION, "THSYNC_JWT_JWKS_URL": "http://example.test/jwks.json"}
+            )
+
+    def test_a_key_set_url_alone_needs_an_issuer(self) -> None:
+        keys_only = {
+            "THSYNC_JWT_JWKS_URL": "https://example.test/auth/v1/.well-known/jwks.json",
+            "THSYNC_DATABASE_URL": PRODUCTION["THSYNC_DATABASE_URL"],
+        }
+        with pytest.raises(ConfigError, match="issuer"):
+            settings_from_env(keys_only)
+        settings = settings_from_env(
+            {**keys_only, "THSYNC_JWT_ISSUER": "https://example.test/auth/v1"}
+        )
+        assert settings.jwt_issuer == "https://example.test/auth/v1"
+
+    def test_development_may_use_a_loopback_http_key_set(self) -> None:
+        settings = settings_from_env(
+            {**DEV, "THSYNC_JWT_JWKS_URL": "http://127.0.0.1:9/jwks.json"}
+        )
+        assert settings.jwt_jwks_url == "http://127.0.0.1:9/jwks.json"
+
+
+def _public_jwk(key: ec.EllipticCurvePrivateKey, kid: str) -> dict[str, Any]:
+    jwk: dict[str, Any] = json.loads(jwt.algorithms.ECAlgorithm.to_jwk(key.public_key()))
+    jwk.update({"kid": kid, "use": "sig", "alg": "ES256"})
+    return jwk
+
+
+def test_a_key_removed_from_the_key_set_is_refused_once_the_cache_expires(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Revocation: a key taken out of the published set stops verifying.
+
+    The key set is cached for `_JWKS_LIFESPAN_SECONDS`. Once that has passed
+    the set is fetched again, and a token signed by the removed key is refused
+    — no per-key cache keeps it alive until restart. Synthetic keys, served
+    from loopback.
+    """
+    old_key = ec.generate_private_key(ec.SECP256R1())
+    new_key = ec.generate_private_key(ec.SECP256R1())
+    published: dict[str, Any] = {"keys": [_public_jwk(old_key, "old")]}
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self) -> None:  # noqa: N802 - name fixed by the base class
+            body = json.dumps(published).encode()
+            self.send_response(200)
+            self.send_header("content-type", "application/json")
+            self.send_header("content-length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args: Any) -> None:
+            """Silent."""
+
+    server = HTTPServer(("127.0.0.1", 0), Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    host, port = server.server_address[:2]
+    settings = Settings(
+        database_url="sqlite+pysqlite:///:memory:",
+        jwt_secret="",
+        # A path of its own, so this test gets its own cached client.
+        jwt_jwks_url=f"http://{host!s}:{port}/{uuid.uuid4()}/jwks.json",
+        jwt_audience=AUDIENCE,
+        jwt_issuer=ISSUER,
+        jwt_leeway_seconds=0,
+        sql_echo=False,
+    )
+    try:
+        old_token = _token(old_key, kid="old")
+        assert str(verify_token(old_token, settings).id) == SUBJECT
+
+        # The key is rotated out of the published set.
+        published["keys"] = [_public_jwk(new_key, "new")]
+
+        # Time passes beyond the cache lifespan.
+        real_clock = time.monotonic
+        later = types.SimpleNamespace(
+            monotonic=lambda: real_clock() + auth_module._JWKS_LIFESPAN_SECONDS + 1
+        )
+        monkeypatch.setattr(jwt.jwk_set_cache, "time", later)
+
+        with pytest.raises(Problem) as raised:
+            verify_token(old_token, settings)
+        assert raised.value.status_code == 401
+        # The key that replaced it verifies.
+        assert str(verify_token(_token(new_key, kid="new"), settings).id) == SUBJECT
+    finally:
+        server.shutdown()
+        server.server_close()
+
+
+def test_the_key_set_client_has_no_per_key_cache_and_a_short_timeout() -> None:
+    client = auth_module._jwk_client(f"https://example.test/{uuid.uuid4()}/jwks.json")
+    assert client.jwk_set_cache is not None
+    assert client.jwk_set_cache.lifespan == auth_module._JWKS_LIFESPAN_SECONDS
+    assert client.timeout == auth_module._JWKS_TIMEOUT_SECONDS == 5
+    # With the per-key cache on, PyJWT wraps get_signing_key in an LRU cache
+    # with no expiry.
+    assert not hasattr(client.get_signing_key, "cache_info")

@@ -221,3 +221,56 @@ def test_a_commit_that_fails_is_never_reported_as_success(
         event.remove(engine, "commit", refuse_commit)
     assert response.status_code == 500
     assert client.post("/v1/sync/pull", json={"cursor": None}, headers=auth()).json()["areas"] == []
+
+
+def test_a_push_committed_mid_pull_is_never_skipped(
+    client: TestClient, engine: Engine, enrol: Callable[..., uuid.UUID]
+) -> None:
+    """Another device's push lands between the pull's reads.
+
+    Simulated by writing a change right after the pull has read the changed
+    areas, as a concurrent commit would appear to its next statement. The
+    returned cursor must not move past that change, so the next pull from it
+    delivers the change.
+    """
+    from sqlalchemy import event, text as sql
+
+    enrol(ALICE, "bf", "nu")
+    client.post("/v1/sync/push", json={"areas": [bundle("bf"), bundle("nu")]}, headers=auth())
+    first = client.post("/v1/sync/pull", json={"cursor": None}, headers=auth()).json()
+    assert first["cursor"] == 2
+
+    fired: list[bool] = []
+
+    def concurrent_push(conn: Any, clause: Any, *_: Any) -> None:
+        if fired or "sync_area.change_seq >" not in str(clause):
+            return
+        fired.append(True)
+        user = uuid.UUID(ALICE).hex
+        conn.execute(
+            sql("update sync_account set change_seq = change_seq + 1 where user_id = :u"),
+            {"u": user},
+        )
+        conn.execute(
+            sql(
+                "update sync_area set change_seq = 3, revision = revision + 1 "
+                "where user_id = :u and programme_code = 'nu'"
+            ),
+            {"u": user},
+        )
+
+    event.listen(engine, "after_execute", concurrent_push)
+    try:
+        racing = client.post(
+            "/v1/sync/pull", json={"cursor": first["cursor"]}, headers=auth()
+        ).json()
+    finally:
+        event.remove(engine, "after_execute", concurrent_push)
+    assert fired
+    assert racing["areas"] == []
+    # The cursor stays below the change the pull did not read...
+    assert racing["cursor"] == 2
+    # ...so the next pull delivers it.
+    after = client.post("/v1/sync/pull", json={"cursor": racing["cursor"]}, headers=auth()).json()
+    assert [area["area"] for area in after["areas"]] == ["nu"]
+    assert after["cursor"] == 3

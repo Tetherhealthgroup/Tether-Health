@@ -314,7 +314,13 @@ def pull_since(
 
     `current_areas` is never filtered: it is how a device learns that a
     programme was deleted, and a filter must not hide that.
+
+    The account's counter is read *before* the changed areas. Each statement
+    sees the data committed when it starts, so a push committed between the
+    two reads can only add bundles above the returned cursor (sent now, and
+    again next time), never move the cursor past a change that was not read.
     """
+    upper = current_cursor(connection, user_id)
     changed = connection.execute(
         select(sync_area.c.programme_code, sync_area.c.change_seq).where(
             sync_area.c.user_id == user_id, sync_area.c.change_seq > cursor
@@ -331,7 +337,7 @@ def pull_since(
         str(row.programme_code) for row in changed if wanted is None or row.programme_code in wanted
     ]
 
-    next_cursor = min(withheld) - 1 if withheld else current_cursor(connection, user_id)
+    next_cursor = min([upper, *(seq - 1 for seq in withheld)])
 
     bundles: list[AreaBundle] = []
     for code in sorted(selected):

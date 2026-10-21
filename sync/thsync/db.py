@@ -175,6 +175,10 @@ class RoleFacts:
     current_user: str
     superuser: bool
     bypass_rls: bool
+    #: Can create, alter or drop roles (`rolcreaterole`).
+    create_role: bool
+    #: Can open replication connections (`rolreplication`).
+    replication: bool
     #: Roles the login is a direct member of.
     member_of: tuple[str, ...]
     #: Privileged roles (from [_PRIVILEGED_ROLES]) the login can act as,
@@ -192,6 +196,8 @@ def read_role_facts(connection: Connection) -> RoleFacts:
               current_user::text as current_user,
               s.rolsuper or c.rolsuper as superuser,
               s.rolbypassrls or c.rolbypassrls as bypass_rls,
+              s.rolcreaterole or c.rolcreaterole as create_role,
+              s.rolreplication or c.rolreplication as replication,
               coalesce(
                 (select array_agg(m.roleid::regrole::text order by m.roleid::regrole::text)
                  from pg_catalog.pg_auth_members as m
@@ -216,6 +222,8 @@ def read_role_facts(connection: Connection) -> RoleFacts:
         current_user=str(row.current_user),
         superuser=bool(row.superuser),
         bypass_rls=bool(row.bypass_rls),
+        create_role=bool(row.create_role),
+        replication=bool(row.replication),
         member_of=tuple(str(name) for name in row.member_of),
         privileged=tuple(str(name) for name in row.privileged),
     )
@@ -225,7 +233,8 @@ def role_refusal(facts: RoleFacts) -> str | None:
     """Why the service must not start with this login, or None if it may.
 
     Each condition alone is enough to refuse. A superuser or a `BYPASSRLS`
-    role would read and write every person's rows regardless of policy; a
+    role would read and write every person's rows regardless of policy; a role
+    that can create roles or replicate holds powers beyond its own grants; a
     login other than `thsync` cannot write sync data at all (the policies check
     `session_user`) and is almost certainly a privileged role pasted into the
     wrong variable; and a role set at session level, or membership in anything
@@ -236,6 +245,10 @@ def role_refusal(facts: RoleFacts) -> str | None:
         return "the database login is a superuser"
     if facts.bypass_rls:
         return "the database login bypasses row-level security"
+    if facts.create_role:
+        return "the database login can create roles"
+    if facts.replication:
+        return "the database login can replicate"
     if facts.privileged:
         return "the database login can act as a privileged role: " + ", ".join(facts.privileged)
     if facts.session_user != LOGIN_ROLE:

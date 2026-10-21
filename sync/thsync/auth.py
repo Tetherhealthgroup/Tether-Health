@@ -48,10 +48,15 @@ _SCHEME: Final = "bearer"
 
 _CHALLENGE: Final = {"WWW-Authenticate": "Bearer"}
 
-#: How long a fetched key set is trusted before it is refetched. Supabase key
-#: rotation is rare and an unknown `kid` forces a refetch anyway, so this only
-#: bounds how long a *revoked* key stays usable.
+#: How long a fetched key set is trusted before it is refetched. An unknown
+#: `kid` forces a refetch sooner, so a new key works at once. A key removed
+#: from the published set stops verifying at the next refetch, at most this
+#: long after its removal: keys are only ever looked up in the cached set,
+#: never in a separate per-key cache.
 _JWKS_LIFESPAN_SECONDS: Final = 600
+
+#: Seconds to wait for the key set before failing closed (401).
+_JWKS_TIMEOUT_SECONDS: Final = 5
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,17 +140,25 @@ def verify_token(token: str, settings: Settings) -> Account:
 def _jwk_client(url: str) -> PyJWKClient:
     """One client per JWKS URL, kept for the life of the process.
 
-    `PyJWKClient` caches the key set and only refetches when a token arrives
-    with an unknown `kid`, which is exactly the behaviour a rotation needs: no
-    network call on the hot path, and no stale-key outage when Supabase rolls
-    a key. Building a fresh client per request would fetch the JWKS per
-    request, turning every sync into two round trips and Supabase's auth
-    endpoint into a hard dependency of ours.
+    `PyJWKClient` caches the key set for [_JWKS_LIFESPAN_SECONDS] and refetches
+    it when that expires or a token names an unknown `kid`: no network call on
+    the hot path, no stale-key outage when Supabase rolls a key, and a removed
+    key stops verifying once the cached set expires. The per-key cache
+    (`cache_keys`) stays off, because it has no expiry and would keep a
+    removed key valid until restart. Building a fresh client per request
+    would fetch the JWKS per request, turning every sync into two round trips
+    and Supabase's auth endpoint into a hard dependency of ours.
 
     Cached on the URL rather than on `Settings` because `Settings` is not
     hashable and the URL is the only part that identifies the key set.
     """
-    return PyJWKClient(url, cache_keys=True, lifespan=_JWKS_LIFESPAN_SECONDS)
+    return PyJWKClient(
+        url,
+        cache_keys=False,
+        cache_jwk_set=True,
+        lifespan=_JWKS_LIFESPAN_SECONDS,
+        timeout=_JWKS_TIMEOUT_SECONDS,
+    )
 
 
 def _key_for(token: str, settings: Settings) -> tuple[Any, list[str]]:

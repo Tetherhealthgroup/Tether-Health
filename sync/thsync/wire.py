@@ -76,7 +76,16 @@ MAX_LAPSES_PER_AREA: Final = 5_000
 
 
 class _Body(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    # `hide_input_in_errors`: a validation error's text never carries the
+    # value that failed, which for this API is answer text or lapse context.
+    # `allow_inf_nan=False`: NaN and infinities are not numbers a person
+    # answered, and `jsonb` cannot store them.
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        hide_input_in_errors=True,
+        allow_inf_nan=False,
+    )
 
 
 def _jsonb_text_bytes(value: object) -> int:

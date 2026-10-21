@@ -18,7 +18,7 @@ from sqlalchemy.engine import Connection
 
 from thsync import repository
 from thsync.schema import sync_answer
-from thsync.wire import PushBundle
+from thsync.wire import PushBundle, ScreenAnswers
 from conftest import ALICE, auth, bundle
 
 SECRET_TEXT = "i smoked three on the way home"
@@ -169,3 +169,56 @@ def test_a_failed_authentication_logs_no_token(
     written = "\n".join(record.getMessage() for record in caplog.records)
     assert "expired-token" in written
     assert "eyJ" not in written  # the leading bytes of every JWT header
+
+
+CANARY = "synthetic-canary-7f3a9c"
+
+
+def test_an_unexpected_error_logs_its_type_and_place_but_not_its_message(
+    client: TestClient, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def explode(*_: object, **__: object) -> None:
+        raise RuntimeError(f"failed while handling {CANARY}")
+
+    monkeypatch.setattr(repository, "pull_since", explode)
+    with caplog.at_level(logging.DEBUG, logger="thsync"):
+        response = client.post("/v1/sync/pull", json={"cursor": None}, headers=auth())
+    assert response.status_code == 500
+    assert "unhandled RuntimeError at" in caplog.text
+    assert "explode" in caplog.text
+    assert CANARY not in caplog.text
+    assert "Traceback" not in caplog.text
+    assert CANARY not in response.text
+
+
+def test_a_validation_error_never_carries_the_value_that_failed(
+    client: TestClient, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Raised inside the service (not from the request body), so it reaches the
+    500 handler; its text must not hold the input."""
+    with pytest.raises(Exception) as raised:
+        ScreenAnswers.model_validate({"text": {"not-an-index": CANARY}})
+    assert CANARY not in str(raised.value)
+
+    def invalid(*_: object, **__: object) -> None:
+        ScreenAnswers.model_validate({"text": {"not-an-index": CANARY}})
+
+    monkeypatch.setattr(repository, "pull_since", invalid)
+    with caplog.at_level(logging.DEBUG, logger="thsync"):
+        response = client.post("/v1/sync/pull", json={"cursor": None}, headers=auth())
+    assert response.status_code == 500
+    assert "ValidationError" in caplog.text
+    assert CANARY not in caplog.text
+    assert CANARY not in response.text
+
+
+def test_a_rejected_body_s_values_stay_out_of_the_log_and_the_response(
+    client: TestClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    sent = bundle("bf", answers={"bf/S05": {"text": {"x": CANARY}, "slider": {"0": "high"}}})
+    with caplog.at_level(logging.DEBUG, logger="thsync"):
+        response = client.post("/v1/sync/push", json={"areas": [sent]}, headers=auth())
+    assert response.status_code == 422
+    assert CANARY not in caplog.text
+    assert CANARY not in response.text
+    assert "high" not in response.text

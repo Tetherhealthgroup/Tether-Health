@@ -145,16 +145,27 @@ def install_problem_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def _unhandled(_: Request, exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
-        # The exception type goes to the log; the body says nothing. A stack
-        # frame or a driver message in a 500 body is how a database URL, a
-        # table name, or a bound parameter ends up on somebody's screen.
-        log.exception("unhandled %s", type(exc).__name__)
+        # The exception type and where it was raised go to the log; its
+        # message and traceback do not, because a validation or driver error's
+        # text can carry the values involved. The body says nothing.
+        log.error("unhandled %s at %s", type(exc).__name__, _origin(exc))
         return problem_response(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             code="internal-error",
             title="Internal server error",
             detail="The request could not be completed. Nothing was changed.",
         )
+
+
+def _origin(exc: BaseException) -> str:
+    """`file:line` of the innermost frame that raised [exc], without values."""
+    trace = exc.__traceback__
+    if trace is None:
+        return "unknown"
+    while trace.tb_next is not None:
+        trace = trace.tb_next
+    code = trace.tb_frame.f_code
+    return f"{code.co_filename.rsplit('/', 1)[-1]}:{trace.tb_lineno} in {code.co_name}"
 
 
 #: Field names this API defines. Anything in a validation `loc` that is not one

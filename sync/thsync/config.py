@@ -138,6 +138,18 @@ def settings_from_env(env: Mapping[str, str] | None = None) -> Settings:
             "and still return 200s, which looks exactly like a working deployment."
         )
 
+    if production:
+        # Keys fetched over plain HTTP could be swapped in transit, and a
+        # swapped key set verifies forged tokens.
+        for name, value in (("SUPABASE_URL", project), ("JWT_JWKS_URL", jwks_url)):
+            if value and not value.startswith("https://"):
+                raise ConfigError(f"{_PREFIX}{name} must be an https:// URL in production.")
+        if not issuer:
+            raise ConfigError(
+                f"production verifies the token issuer: set {_PREFIX}SUPABASE_URL "
+                f"(which derives it) or {_PREFIX}JWT_ISSUER."
+            )
+
     database_url = source.get(f"{_PREFIX}DATABASE_URL", "").strip()
     if production and not database_url.startswith("postgresql"):
         # The start-up role check, row-level security and the per-transaction

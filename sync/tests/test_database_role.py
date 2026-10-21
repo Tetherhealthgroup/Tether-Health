@@ -36,6 +36,8 @@ SYNC_LOGIN = RoleFacts(
     current_user="thsync",
     superuser=False,
     bypass_rls=False,
+    create_role=False,
+    replication=False,
     member_of=("authenticated",),
     privileged=(),
 )
@@ -52,6 +54,8 @@ def test_the_sync_login_may_start() -> None:
          "superuser"),
         (replace(SYNC_LOGIN, superuser=True), "superuser"),
         (replace(SYNC_LOGIN, bypass_rls=True), "bypasses row-level security"),
+        (replace(SYNC_LOGIN, create_role=True), "can create roles"),
+        (replace(SYNC_LOGIN, replication=True), "can replicate"),
         (replace(SYNC_LOGIN, session_user="service_role", current_user="service_role"),
          "must be the role thsync"),
         (replace(SYNC_LOGIN, session_user="authenticator", current_user="authenticator"),
