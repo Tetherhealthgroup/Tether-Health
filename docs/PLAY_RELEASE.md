@@ -275,8 +275,10 @@ private-key content; do not rely on either.
 
 ### Each upload
 
-Start from a fresh terminal and add only the two variables shown below. From
-the repository root, first check the working tree and the fastlane folder:
+Start from a fresh terminal. Apart from selecting Ruby as in Prerequisites
+(`rbenv shell 3.3.9`, which lasts only for that terminal), add only the two
+variables shown below. From the repository root, first check the working tree
+and the fastlane folder:
 
 ```sh
 git status --porcelain
@@ -288,6 +290,7 @@ only `Appfile` and `Fastfile`, plus the `README.md` and `report.xml` that
 fastlane writes on each run. Then, in the same terminal:
 
 ```sh
+rbenv shell 3.3.9
 export TETHER_PLAY_JSON_KEY=$HOME/secure/tether-health/play-service-account.json
 export FASTLANE_SKIP_UPDATE_CHECK=1
 bash tool/build_play_release.sh --dart-define-from-file=$HOME/secure/tether-health/release.json
