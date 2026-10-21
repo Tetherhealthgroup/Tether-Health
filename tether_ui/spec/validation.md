@@ -8,6 +8,7 @@ Checks: every interactive element has an action; every target exists; every scre
 
 ## Notes
 
+- auth_social_new: has Back but no inbound navigation
 - INFO bf: phases without a program-specific screen: rescue (covered by shared screens)
 - INFO sf: phases without a program-specific screen: resources (covered by shared screens)
 - INFO ca: phases without a program-specific screen: milestone (covered by shared screens)

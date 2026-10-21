@@ -13,7 +13,6 @@ import 'package:tether_ui/screens/auth/auth_merge_screen.dart';
 import 'package:tether_ui/screens/auth/auth_signin_screen.dart';
 import 'package:tether_ui/screens/auth/auth_signin_error_screen.dart';
 import 'package:tether_ui/screens/auth/auth_social_error_screen.dart';
-import 'package:tether_ui/screens/auth/auth_social_new_screen.dart';
 import 'package:tether_ui/screens/auth/auth_verify_screen.dart';
 import 'package:tether_ui/screens/be/be_home_screen.dart';
 import 'package:tether_ui/screens/be/be_survivor_screen.dart';
@@ -162,14 +161,12 @@ void main() {
       debugDefaultTargetPlatformOverride = null;
     }
   });
-  testWidgets('scenario auth-apple-new · New Apple ID starts onboarding with an account', (tester) async {
+  testWidgets('scenario auth-apple-new · New Apple ID goes through the normal sign-up', (tester) async {
     await _start(tester, Routes.welcome, ios: true);
     try {
         await _tap(tester, 'I already have an account');
         TSim.queue.add('New Apple ID, no Tether account');
         await _tap(tester, 'Continue with Apple');
-        expect(find.byType(AuthSocialNewScreen), findsOneWidget, reason: 'expected auth_social_new');
-        await _tap(tester, 'Create my account');
         expect(find.byType(ObProgramsScreen), findsOneWidget, reason: 'expected ob_programs');
         expect(tester.takeException(), isNull);
         await tester.pump(const Duration(seconds: 3));

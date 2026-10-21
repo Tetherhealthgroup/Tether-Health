@@ -25,6 +25,10 @@
       "trigger": "Event: session expired"
     },
     {
+      "screen": "auth_social_new",
+      "trigger": "Reference: not routed; new Apple and Google accounts use the normal sign-up (P-73)"
+    },
+    {
       "screen": "sys_update",
       "trigger": "Event: minimum version above installed"
     },

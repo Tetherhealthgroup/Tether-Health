@@ -102,12 +102,17 @@ def shared():
         card(v='mint', text='Your plan is saved on this phone while you wait. Nothing is lost if you close the app.'),
     ], footer=[button('Open email app', ext('message://')), button('I’ve confirmed my email', go('auth_merge')), link('Resend link (available in 0:42)', toast('Link sent again'))])
 
+    # P-73: a new Apple ID or Google account (no Tether account yet) goes
+    # through the normal sign-up from its start, the screen welcome “Get
+    # started” opens (ob_programs). The sheet is replaced, as other sheets do
+    # when they lead into a flow. The account is then created on ob_account,
+    # which asks ob.age first.
     S('auth_signin', 'Sign in', '/auth/signin', 'auth', phase='account', kind='sheet', over='Welcome', body=[
-        title('Welcome back'), authbuttons(apple=auth('apple', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Apple ID, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]), google=auth('google', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Google account, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])), eyebrow('Or with email'), field('Email', 'alex@example.com', kind='email', key='email'), field('Password', '••••••••', kind='password', key='password'),
+        title('Welcome back'), authbuttons(apple=auth('apple', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Apple ID, no Tether account', rep('ob_programs')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]), google=auth('google', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Google account, no Tether account', rep('ob_programs')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])), eyebrow('Or with email'), field('Email', 'alex@example.com', kind='email', key='email'), field('Password', '••••••••', kind='password', key='password'),
         link('Forgot password?', go('auth_forgot'), align='left'),
     ], footer=[button('Sign in', submit('POST supabase /auth/v1/token', branch('Sign-in result', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('Wrong password', go('auth_signin_error'))]))), button('Cancel', close(), v='secondary')], api=['POST supabase /auth/v1/token'])
     S('auth_signin_error', 'Sign-in error', '/auth/signin?state=error', 'auth', phase='account', kind='sheet', over='Welcome', variant_of='auth_signin', state='error', body=[
-        title('Welcome back'), banner('error', 'That email and password don’t match. Check both and try again.'), authbuttons(apple=auth('apple', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Apple ID, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]), google=auth('google', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Google account, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])), eyebrow('Or with email'),
+        title('Welcome back'), banner('error', 'That email and password don’t match. Check both and try again.'), authbuttons(apple=auth('apple', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Apple ID, no Tether account', rep('ob_programs')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]), google=auth('google', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Google account, no Tether account', rep('ob_programs')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])), eyebrow('Or with email'),
         field('Email', 'alex@example.com', kind='email', key='email'), field('Password', '••••••••', error='Password is incorrect.', kind='password', key='password'),
         link('Forgot password?', go('auth_forgot'), align='left'), text('After 5 tries we pause sign-in for 15 minutes to protect your account.', 'small'),
     ], footer=[button('Try again', submit('POST supabase /auth/v1/token', branch('Sign-in result', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('Wrong password', rep('auth_signin_error'))]))), button('Cancel', close(), v='secondary')])
@@ -116,14 +121,17 @@ def shared():
         illus('A'), title('Create your Tether account?', 'l', align='center'), text('No Tether account uses this Apple ID or Google account yet.', 'muted', align='center'),
         kv([('Name', 'Alex (shared by Apple)'), ('Email', 'Private relay · Hide My Email'), ('Password', 'None needed')]),
         text('You can add email & password or another sign-in method later in Account → Sign-in methods.', 'small'),
-    ], footer=[button('Create my account', submit('POST supabase /auth/v1/token?grant_type=id_token', go('ob_programs'))), button('Use a different account', back(), v='secondary')],
-       api=['POST supabase /auth/v1/token?grant_type=id_token'], desc='Supabase signInWithIdToken (provider apple|google). First sign-in creates the identity, then onboarding starts with the account attached.')
+    ], footer=[button('Create my account', go('ob_programs')), button('Use a different account', back(), v='secondary')],
+       desc='Not routed (P-73): a new Apple ID or Google account goes through the normal sign-up from its start (ob_programs). Kept as the approved design; Create my account opens the normal sign-up and creates nothing here.')
     S('auth_link', 'Link accounts', '/auth/link', 'auth', phase='account', hdr=H('Link accounts'), body=[
         illus('⇄'), title('You already have a Tether account', 'l', align='center'),
         text('alex@example.com signed up with email and password. Enter your password once to link Google. After that, either sign-in works.', 'muted', align='center'),
         field('Password', '••••••••••••', kind='password', key='password'), link('Forgot password?', go('auth_forgot')),
     ], footer=[button('Link and sign in', submit('POST supabase /auth/v1/user/identities (linkIdentity)', reset('today'))), button('Cancel', back(), v='secondary')],
        desc='Prevents duplicate accounts for the same email. Supabase manual identity linking after password re-auth.')
+    # Try again only signs in an existing account: it has no outcome that
+    # creates one (a new Apple ID or Google account goes through the normal
+    # sign-up).
     S('auth_social_error', 'Apple / Google sign-in failed', '/auth/social/error', 'auth', phase='account', hdr=H('Sign in', left='close'), body=[
         illus('!', 'error'), title('Couldn’t sign in', 'l', align='center'), text('Google sign-in didn’t finish. Check your connection and try again, or use email.', 'muted', align='center'),
         text('Nothing was saved or shared.', 'small', align='center'),
@@ -399,5 +407,6 @@ def shared():
     entry('rescue_pick', 'Home-screen widget / Siri: Rescue')
     entry('auth_newpass', 'Deep link: password reset email')
     entry('auth_session', 'Event: session expired')
+    entry('auth_social_new', 'Reference: not routed; new Apple and Google accounts use the normal sign-up (P-73)')
     entry('sys_update', 'Event: minimum version above installed')
     entry('today_safety', 'Event: program safety rule fired')

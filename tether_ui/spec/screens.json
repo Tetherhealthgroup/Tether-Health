@@ -1829,8 +1829,8 @@
                 {
                   "label": "New Apple ID, no Tether account",
                   "action": {
-                    "type": "push",
-                    "to": "auth_social_new"
+                    "type": "replace",
+                    "to": "ob_programs"
                   }
                 },
                 {
@@ -1881,8 +1881,8 @@
                 {
                   "label": "New Google account, no Tether account",
                   "action": {
-                    "type": "push",
-                    "to": "auth_social_new"
+                    "type": "replace",
+                    "to": "ob_programs"
                   }
                 },
                 {
@@ -2019,8 +2019,8 @@
             {
               "label": "New Apple ID, no Tether account",
               "action": {
-                "type": "push",
-                "to": "auth_social_new"
+                "type": "replace",
+                "to": "ob_programs"
               }
             },
             {
@@ -2039,7 +2039,7 @@
             }
           ]
         },
-        "summary": "auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+        "summary": "auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: replace → ob_programs | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
       },
       {
         "element": "Continue with Google",
@@ -2068,8 +2068,8 @@
             {
               "label": "New Google account, no Tether account",
               "action": {
-                "type": "push",
-                "to": "auth_social_new"
+                "type": "replace",
+                "to": "ob_programs"
               }
             },
             {
@@ -2088,7 +2088,7 @@
             }
           ]
         },
-        "summary": "auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+        "summary": "auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: replace → ob_programs | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
       },
       {
         "element": "Forgot password?",
@@ -2204,8 +2204,8 @@
                 {
                   "label": "New Apple ID, no Tether account",
                   "action": {
-                    "type": "push",
-                    "to": "auth_social_new"
+                    "type": "replace",
+                    "to": "ob_programs"
                   }
                 },
                 {
@@ -2256,8 +2256,8 @@
                 {
                   "label": "New Google account, no Tether account",
                   "action": {
-                    "type": "push",
-                    "to": "auth_social_new"
+                    "type": "replace",
+                    "to": "ob_programs"
                   }
                 },
                 {
@@ -2398,8 +2398,8 @@
             {
               "label": "New Apple ID, no Tether account",
               "action": {
-                "type": "push",
-                "to": "auth_social_new"
+                "type": "replace",
+                "to": "ob_programs"
               }
             },
             {
@@ -2418,7 +2418,7 @@
             }
           ]
         },
-        "summary": "auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+        "summary": "auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: replace → ob_programs | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
       },
       {
         "element": "Continue with Google",
@@ -2447,8 +2447,8 @@
             {
               "label": "New Google account, no Tether account",
               "action": {
-                "type": "push",
-                "to": "auth_social_new"
+                "type": "replace",
+                "to": "ob_programs"
               }
             },
             {
@@ -2467,7 +2467,7 @@
             }
           ]
         },
-        "summary": "auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+        "summary": "auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: replace → ob_programs | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
       },
       {
         "element": "Forgot password?",
@@ -2539,7 +2539,7 @@
     "state": "default",
     "dark": false,
     "bg": null,
-    "desc": "Supabase signInWithIdToken (provider apple|google). First sign-in creates the identity, then onboarding starts with the account attached.",
+    "desc": "Not routed (P-73): a new Apple ID or Google account goes through the normal sign-up from its start (ob_programs). Kept as the approved design; Create my account opens the normal sign-up and creates nothing here.",
     "header": {
       "t": "header",
       "title": "Create account",
@@ -2591,12 +2591,8 @@
         "t": "button",
         "label": "Create my account",
         "action": {
-          "type": "submit",
-          "api": "POST supabase /auth/v1/token?grant_type=id_token",
-          "then": {
-            "type": "push",
-            "to": "ob_programs"
-          }
+          "type": "push",
+          "to": "ob_programs"
         },
         "variant": "primary",
         "arrow": true
@@ -2613,9 +2609,7 @@
     ],
     "notes": [],
     "over": null,
-    "api": [
-      "POST supabase /auth/v1/token?grant_type=id_token"
-    ],
+    "api": [],
     "actions": [
       {
         "element": "Back",
@@ -2629,14 +2623,10 @@
         "element": "Create my account",
         "path": "footer[0]",
         "action": {
-          "type": "submit",
-          "api": "POST supabase /auth/v1/token?grant_type=id_token",
-          "then": {
-            "type": "push",
-            "to": "ob_programs"
-          }
+          "type": "push",
+          "to": "ob_programs"
         },
-        "summary": "POST supabase /auth/v1/token?grant_type=id_token then push → ob_programs"
+        "summary": "push → ob_programs"
       },
       {
         "element": "Use a different account",
@@ -31651,9 +31641,7 @@
       "Source: auth_session in this spec; Supabase signInWithIdToken"
     ],
     "over": "Today",
-    "api": [
-      "POST supabase /auth/v1/token?grant_type=id_token"
-    ],
+    "api": [],
     "actions": [
       {
         "element": "Continue with Apple",
@@ -31790,9 +31778,7 @@
       "Source: auth_session in this spec; Supabase signInWithIdToken"
     ],
     "over": "Today",
-    "api": [
-      "POST supabase /auth/v1/token?grant_type=id_token"
-    ],
+    "api": [],
     "actions": [
       {
         "element": "Continue with Google",

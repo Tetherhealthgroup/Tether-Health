@@ -388,10 +388,10 @@
     "targets": [
       "today",
       "auth_merge",
-      "auth_social_new",
+      "ob_programs",
       "auth_social_error"
     ],
-    "summary": "auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+    "summary": "auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: replace → ob_programs | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
   },
   {
     "screen": "auth_signin",
@@ -402,10 +402,10 @@
     "targets": [
       "today",
       "auth_merge",
-      "auth_social_new",
+      "ob_programs",
       "auth_social_error"
     ],
-    "summary": "auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+    "summary": "auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: replace → ob_programs | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
   },
   {
     "screen": "auth_signin",
@@ -449,10 +449,10 @@
     "targets": [
       "today",
       "auth_merge",
-      "auth_social_new",
+      "ob_programs",
       "auth_social_error"
     ],
-    "summary": "auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+    "summary": "auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: replace → ob_programs | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
   },
   {
     "screen": "auth_signin_error",
@@ -463,10 +463,10 @@
     "targets": [
       "today",
       "auth_merge",
-      "auth_social_new",
+      "ob_programs",
       "auth_social_error"
     ],
-    "summary": "auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+    "summary": "auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: replace → ob_programs | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
   },
   {
     "screen": "auth_signin_error",
@@ -515,11 +515,11 @@
     "screen_name": "New account from Apple or Google",
     "element": "Create my account",
     "path": "footer[0]",
-    "type": "submit",
+    "type": "push",
     "targets": [
       "ob_programs"
     ],
-    "summary": "POST supabase /auth/v1/token?grant_type=id_token then push → ob_programs"
+    "summary": "push → ob_programs"
   },
   {
     "screen": "auth_social_new",

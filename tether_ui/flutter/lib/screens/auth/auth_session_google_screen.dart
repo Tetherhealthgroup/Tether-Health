@@ -12,7 +12,7 @@ import '../../ui/ui.dart';
 /// Actions (generated from spec/screens/auth_session_google.json):
 ///   • Continue with Google → auth (google): Sign in with Google result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error
 ///   • Use Face ID → close
-/// API: POST supabase /auth/v1/token?grant_type=id_token
+/// API: —
 class AuthSessionGoogleScreen extends StatelessWidget {
   const AuthSessionGoogleScreen({super.key});
 

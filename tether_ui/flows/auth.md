@@ -20,13 +20,13 @@ flowchart LR
   auth_verify -->|"I’ve confirmed my email"| auth_merge
   auth_signin -->|"Continue with Apple"| today
   auth_signin -->|"Continue with Apple"| auth_merge
-  auth_signin -->|"Continue with Apple"| auth_social_new
+  auth_signin -->|"Continue with Apple"| ob_programs
   auth_signin -->|"Continue with Apple"| auth_social_error
   auth_signin -->|"Forgot password?"| auth_forgot
   auth_signin -->|"Sign in"| auth_signin_error
   auth_signin_error -->|"Continue with Apple"| today
   auth_signin_error -->|"Continue with Apple"| auth_merge
-  auth_signin_error -->|"Continue with Apple"| auth_social_new
+  auth_signin_error -->|"Continue with Apple"| ob_programs
   auth_signin_error -->|"Continue with Apple"| auth_social_error
   auth_signin_error -->|"Forgot password?"| auth_forgot
   auth_social_new -->|"Create my account"| ob_programs
@@ -77,18 +77,18 @@ flowchart LR
 | Verify email | Open email app | `external message://` |
 | Verify email | I’ve confirmed my email | `push → auth_merge` |
 | Verify email | Resend link (available in 0:42) | `toast “Link sent again”` |
-| Sign in | Continue with Apple | `auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
-| Sign in | Continue with Google | `auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
+| Sign in | Continue with Apple | `auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: replace → ob_programs | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
+| Sign in | Continue with Google | `auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: replace → ob_programs | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
 | Sign in | Forgot password? | `push → auth_forgot` |
 | Sign in | Sign in | `POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error` |
 | Sign in | Cancel | `close` |
-| Sign-in error | Continue with Apple | `auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
-| Sign-in error | Continue with Google | `auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
+| Sign-in error | Continue with Apple | `auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: replace → ob_programs | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
+| Sign-in error | Continue with Google | `auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: replace → ob_programs | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
 | Sign-in error | Forgot password? | `push → auth_forgot` |
 | Sign-in error | Try again | `POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: replace → auth_signin_error` |
 | Sign-in error | Cancel | `close` |
 | New account from Apple or Google | Back | `back` |
-| New account from Apple or Google | Create my account | `POST supabase /auth/v1/token?grant_type=id_token then push → ob_programs` |
+| New account from Apple or Google | Create my account | `push → ob_programs` |
 | New account from Apple or Google | Use a different account | `back` |
 | Link accounts | Back | `back` |
 | Link accounts | Forgot password? | `push → auth_forgot` |

@@ -11,7 +11,7 @@
   "state": "default",
   "dark": false,
   "bg": null,
-  "desc": "Supabase signInWithIdToken (provider apple|google). First sign-in creates the identity, then onboarding starts with the account attached.",
+  "desc": "Not routed (P-73): a new Apple ID or Google account goes through the normal sign-up from its start (ob_programs). Kept as the approved design; Create my account opens the normal sign-up and creates nothing here.",
   "header": {
     "t": "header",
     "title": "Create account",
@@ -63,12 +63,8 @@
       "t": "button",
       "label": "Create my account",
       "action": {
-        "type": "submit",
-        "api": "POST supabase /auth/v1/token?grant_type=id_token",
-        "then": {
-          "type": "push",
-          "to": "ob_programs"
-        }
+        "type": "push",
+        "to": "ob_programs"
       },
       "variant": "primary",
       "arrow": true
@@ -85,9 +81,7 @@
   ],
   "notes": [],
   "over": null,
-  "api": [
-    "POST supabase /auth/v1/token?grant_type=id_token"
-  ],
+  "api": [],
   "actions": [
     {
       "element": "Back",
@@ -101,14 +95,10 @@
       "element": "Create my account",
       "path": "footer[0]",
       "action": {
-        "type": "submit",
-        "api": "POST supabase /auth/v1/token?grant_type=id_token",
-        "then": {
-          "type": "push",
-          "to": "ob_programs"
-        }
+        "type": "push",
+        "to": "ob_programs"
       },
-      "summary": "POST supabase /auth/v1/token?grant_type=id_token then push → ob_programs"
+      "summary": "push → ob_programs"
     },
     {
       "element": "Use a different account",

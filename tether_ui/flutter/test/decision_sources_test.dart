@@ -392,7 +392,7 @@ void main() {
     test('spec/endpoints.json: sign-in and account endpoints are never queued, every other endpoint may be', () {
       final eps = _endpoints();
       final auth = [for (final e in eps) if ((e['endpoint'] as String).contains(' supabase /auth/')) e['endpoint']];
-      expect(auth, hasLength(6));
+      expect(auth, hasLength(5));
       for (final e in eps) {
         expect(e['queueable'], !(e['endpoint'] as String).contains(' supabase /auth/'), reason: e['endpoint'] as String);
       }
@@ -409,7 +409,7 @@ void main() {
           expect(m.group(2) != null, isAuth, reason: '${f.path}: ${m.group(1)}');
         }
       }
-      expect(auth, 8, reason: 'six endpoints on eight screens: the token endpoint on auth_session, auth_signin and auth_signin_error');
+      expect(auth, 7, reason: 'five endpoints on seven screens: the token endpoint on auth_session, auth_signin and auth_signin_error');
     });
   });
 

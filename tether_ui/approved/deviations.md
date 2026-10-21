@@ -36,6 +36,13 @@ the current file:
   sign-up routes on `ob_account` in a branch decided by rule `ob.age`. With
   each branch replaced by its "Age confirmed" action, the file equals its
   TH-907b state, except the four generated action summaries.
+- TH-907d rows (P-73) change only actions, and one description. On
+  `auth_signin` and `auth_signin_error` the two new-identity outcomes replace
+  the sheet with `ob_programs` instead of pushing `auth_social_new`. On
+  `auth_social_new`, "Create my account" pushes `ob_programs` without
+  submitting first, its `api` list empties
+  and its `desc` says it is not routed. With those values restored, each file
+  equals its earlier state, except the generated action summaries.
 
 All replacement copy still needs clinical/legal review before release.
 
@@ -208,8 +215,8 @@ unchanged.
 
 | Screen | Node | Change |
 |---|---|---|
-| `auth_signin` | `footer[0]` "Sign in" | branch "Sign-in result" is wrapped in submit `POST supabase /auth/v1/token`. Also P-31 (TH-907). |
-| `auth_signin_error` | `footer[0]` "Try again" | branch "Sign-in result" is wrapped in submit `POST supabase /auth/v1/token`. Also P-51 (below) and P-31 (TH-907). |
+| `auth_signin` | `footer[0]` "Sign in" | branch "Sign-in result" is wrapped in submit `POST supabase /auth/v1/token`. Also P-31 (TH-907) and P-73 (TH-907d). |
+| `auth_signin_error` | `footer[0]` "Try again" | branch "Sign-in result" is wrapped in submit `POST supabase /auth/v1/token`. Also P-51 (below), P-31 (TH-907) and P-73 (TH-907d). |
 | `ob_reminders` | `footer[0]` "Turn on reminders" | id `onboarding.reminders.notifications_request`, ask `notificationsRequest`: granted → Allowed; denied, unavailable → Not allowed. |
 | `records_consent` | `footer[0]` "Continue to MyChart" | id `records.connect.mychart`, ask `smartConnect`: approved → Approved; cancelled → Cancelled; failed → Denied or error. Also TH-902 key (TH-907). |
 | `records_consent_bb` | `footer[0]` "Continue to Medicare.gov" | id `records.connect.medicare`, ask `smartConnect`: as above. Also TH-902 key (TH-907). |
@@ -267,6 +274,52 @@ wording follows the checklist label.
 | `ob_account` | `body[2].items[1]` "Continue with Google" | the "Sign in with Google result" branch is wrapped in an `ob.age` branch. |
 | `ob_account` | `footer[0]` "Create account" | the `POST supabase /auth/v1/signup` submit is wrapped in an `ob.age` branch. |
 | `ob_account` | `footer[1]` "Continue on this phone only" | the reset to `today` is wrapped in an `ob.age` branch. |
+
+## P-73: new Apple and Google accounts go through the normal sign-up (TH-907d)
+
+On "I already have an account", an Apple ID or Google account that has no
+Tether account now enters the normal sign-up at its start, `ob_programs`, the
+screen welcome "Get started" opens. The member chooses programmes and gives
+consent as every new member does, and the account is created on `ob_account`,
+which asks for "I’m 18 or older" first (P-72), not on `auth_social_new`. The
+sign-in sheet is replaced by `ob_programs`, as other sheets that lead into a
+flow are (`rescue_pick`, `focus_full`, `checkin`). Outcome labels are
+unchanged. No visible element, label or layout changes.
+
+`auth_social_new` is no longer opened from any screen. Removing an approved
+screen needs an owner snapshot change, so it stays in the spec as the approved
+design and is listed in `spec/app.json` as a reference entry point (the
+validator requires every screen to be reachable from one). Its "Create my
+account" opens `ob_programs` and submits nothing, so the screen cannot create
+an account even if it is opened. `POST supabase /auth/v1/token?grant_type=id_token`
+is no longer a screen submit and leaves `spec/endpoints.json` and the app's
+endpoint registry; native Apple and Google sign-in still use it inside the
+sign-in adapter.
+
+| Screen | Node | Change |
+|---|---|---|
+| `auth_signin` | `body[1].items[0]` "Continue with Apple" | outcome "New Apple ID, no Tether account": push `auth_social_new` → replace with `ob_programs`. Also P-31 (TH-907) and TH-902 (TH-986a). |
+| `auth_signin` | `body[1].items[1]` "Continue with Google" | outcome "New Google account, no Tether account": push `auth_social_new` → replace with `ob_programs`. |
+| `auth_signin_error` | `body[2].items[0]` "Continue with Apple" | outcome "New Apple ID, no Tether account": push `auth_social_new` → replace with `ob_programs`. Also P-31 (TH-907), TH-902 (TH-986a) and P-51 (TH-986b). |
+| `auth_signin_error` | `body[2].items[1]` "Continue with Google" | outcome "New Google account, no Tether account": push `auth_social_new` → replace with `ob_programs`. |
+| `auth_social_new` | `footer[0]` "Create my account" | submit `POST supabase /auth/v1/token?grant_type=id_token` then push `ob_programs` → push `ob_programs` (no submit). `api`: that endpoint → empty. `desc` says the screen is not routed. |
+
+The other sign-in steps were checked for the same route. "Try again" on
+`auth_social_error`, Google on `account_signin_methods`, and Apple or Google on
+`auth_session_apple`, `auth_session_google`, `account_delete_apple` and
+`account_delete_google` only sign in, link or re-confirm an existing account:
+none has an outcome that creates one, and the sign-in adapter contract
+(`TAuth`) says so. `POST supabase /auth/v1/signup` is submitted only from
+`ob_account`, after the age check.
+
+The age-gate checks fail closed. `tether_ui/flutter/test/sign_up_age_route_test.dart`
+and the validator carry the same two tables and walk every route from every
+screen. A submit to `supabase /auth/` counts as creating an account unless it
+is listed as one that does not (recover, the password token, setting a new
+password, linking an identity), and each account-creating submit must sit
+inside "Age confirmed" on its own screen. Every native sign-in branch outside
+"Age confirmed" must match a pinned list of branches and their exact outcome
+labels. A new-identity outcome must enter the normal sign-up at `ob_programs`.
 
 ## Rendering changes with no spec change (TH-907)
 

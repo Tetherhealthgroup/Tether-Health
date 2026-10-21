@@ -97,7 +97,6 @@ NOT_QUEUEABLE = (
     'POST supabase /auth/v1/recover',
     'POST supabase /auth/v1/signup',
     'POST supabase /auth/v1/token',
-    'POST supabase /auth/v1/token?grant_type=id_token',
     'POST supabase /auth/v1/user/identities (linkIdentity)',
     'PUT supabase /auth/v1/user',
 )
