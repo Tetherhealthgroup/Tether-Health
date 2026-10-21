@@ -16,6 +16,9 @@ dependencies:
   http: ^1.6.0
   image_picker: ^1.2.0
   supabase_flutter: ^2.17.2
+  # First-party UI package in this repository (generated screens and kit).
+  tether_ui:
+    path: tether_ui/flutter
   url_launcher: ^6.3.2
 
 dev_dependencies:

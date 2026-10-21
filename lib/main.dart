@@ -9,6 +9,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'account/account_data_api_client.dart';
 import 'account/account_deletion_receipt_store.dart';
+import 'app/tether_ui_shell.dart';
+import 'app/ui_selection.dart';
 import 'auth/account_controller.dart';
 import 'auth/auth_deep_link.dart';
 import 'auth/auth_gateway.dart';
@@ -112,6 +114,16 @@ Future<void> _bootstrap() async {
   } else {
     quitPlan = QuitPlanController.disabled(guestStore: guestStore);
     programStore = SecureProgramStore();
+  }
+
+  // Debug builds started with --dart-define=TETHER_UI=true only; every
+  // profile and release build runs the app below.
+  if (selectAppUi() == AppUi.tetherUi) {
+    await runTetherUi(
+      account: account ?? AccountController.disabled(),
+      guestStore: guestStore,
+    );
+    return;
   }
 
   runApp(BreatheFreeApp(

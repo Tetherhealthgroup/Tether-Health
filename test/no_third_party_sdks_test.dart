@@ -162,6 +162,9 @@ const allowedRuntimePackages = <String, String>{
           'only, the upload goes to our own Supabase storage.',
   'supabase_flutter':
       'Our Supabase project (vendor/processor; BAA/DPA status to confirm).',
+  'tether_ui':
+      'First-party UI package in this repo (tether_ui/flutter); no third-party '
+          'code, Flutter SDK only (owner decision P-01).',
   'url_launcher':
       'Opens the dialer for 988, 911 and the quitlines, and support URLs; it '
           'hands a URI to the platform and has no network access of its own.',
@@ -400,9 +403,11 @@ List<String> directRuntimeDependencies(List<LockedPackage> packages) => [
 
 /// Why [package] comes from a source this app does not accept, or `null`.
 ///
-/// Accepted: `hosted` on https://pub.dev, `sdk`, and a relative `path` under
-/// `third_party/`. Anything else — git, another host, another path — is a
-/// way to ship code the allowlist never saw.
+/// Accepted: `hosted` on https://pub.dev, `sdk`, a relative `path` under
+/// `third_party/`, and exactly the relative path [uiPackagePath] (the
+/// first-party UI package, whose own dependencies [uiPackageViolations]
+/// checks). Anything else — git, another host, another path — is a way to
+/// ship code the allowlist never saw.
 String? sourceViolation(LockedPackage package) {
   switch (package.source) {
     case 'hosted':
@@ -415,6 +420,7 @@ String? sourceViolation(LockedPackage package) {
     case 'path':
       final path = package.descriptionFields['path'] ?? '';
       final relative = package.descriptionFields['relative'] == 'true';
+      if (relative && path == uiPackagePath) return null;
       final segments = path.split('/');
       final underThirdParty = relative &&
           segments.length >= 2 &&
@@ -425,6 +431,39 @@ String? sourceViolation(LockedPackage package) {
     default:
       return 'source "${package.source}" is not hosted, sdk or path';
   }
+}
+
+/// The one path dependency outside `third_party/`: the first-party UI
+/// package. Matched by string equality only.
+const uiPackagePath = 'tether_ui/flutter';
+
+/// Why the UI package's pubspec ([uiPackagePath]`/pubspec.yaml`) may ship
+/// something other than the Flutter SDK, or an empty list. Its `dependencies:`
+/// block must hold exactly `flutter: {sdk: flutter}`, in block or inline
+/// form; any other entry would reach the app through the path exception in
+/// [sourceViolation] without passing the allowlist.
+List<String> uiPackageViolations(List<String> pubspec) {
+  final start = pubspec.indexWhere(
+    (line) => _isTopLevelKey(line, 'dependencies'),
+  );
+  if (start == -1) return const ['it has no dependencies block'];
+  final lines = <String>[];
+  for (final line in pubspec.skip(start + 1)) {
+    if (RegExp(r'^[^\s#]').hasMatch(line)) break;
+    final trimmed = line.trimRight();
+    if (trimmed.trim().isEmpty || trimmed.trimLeft().startsWith('#')) continue;
+    lines.add(trimmed);
+  }
+  final block = lines.join('\n');
+  const accepted = {
+    '  flutter:\n    sdk: flutter',
+    '  flutter: {sdk: flutter}',
+  };
+  if (accepted.contains(block)) return const [];
+  return [
+    'its dependencies block is not exactly flutter: {sdk: flutter} '
+        '(found: ${lines.map((l) => l.trim()).join('; ')})',
+  ];
 }
 
 // --- iOS -------------------------------------------------------------------
@@ -1264,6 +1303,19 @@ void main() {
         reason: 'pubspec.lock: ${package.name} — ${sourceViolation(package)}.',
       );
     }
+  });
+
+  test('the first-party UI package depends only on the Flutter SDK', () {
+    final pubspec = File('$uiPackagePath/pubspec.yaml');
+    expect(pubspec.existsSync(), isTrue,
+        reason: '$uiPackagePath/pubspec.yaml is missing');
+    expect(
+      uiPackageViolations(pubspec.readAsLinesSync()),
+      isEmpty,
+      reason: '$uiPackagePath is accepted as a path dependency only while it '
+          'ships nothing but the Flutter SDK. A package it adds reaches the '
+          'app without this allowlist.',
+    );
   });
 
   test('nothing overrides the resolved dependencies', () {
@@ -2301,6 +2353,67 @@ gms = { id = "com.google.gms.google-services", version = "4.4.2" }
         scripts.where((src) => !allowedWebScripts.containsKey(src)),
         ['https://cdn.example/analytics.js', '<inline script>', 'main.dart.js'],
       );
+    });
+  });
+
+  group('self-check: the UI package exception is exact', () {
+    LockedPackage pathPackage(String path, {bool relative = true}) =>
+        LockedPackage('tether_ui')
+          ..dependency = 'direct main'
+          ..source = 'path'
+          ..descriptionFields['path'] = path
+          ..descriptionFields['relative'] = '$relative';
+
+    test('only the relative path tether_ui/flutter is accepted', () {
+      expect(sourceViolation(pathPackage('tether_ui/flutter')), isNull);
+      for (final path in [
+        'tether_ui/other',
+        '../tether_ui/flutter',
+        'tether_ui/flutter/',
+        './tether_ui/flutter',
+        'tether_ui/flutter/..',
+        'tether_ui',
+        'Tether_ui/flutter',
+        r'tether_ui\flutter',
+      ]) {
+        expect(sourceViolation(pathPackage(path)), isNotNull, reason: path);
+      }
+      expect(
+        sourceViolation(pathPackage('tether_ui/flutter', relative: false)),
+        isNotNull,
+      );
+    });
+
+    test('the package pubspec may hold only the Flutter SDK', () {
+      const sdkOnly = [
+        'name: tether_ui',
+        'dependencies:',
+        '  # comment',
+        '  flutter:',
+        '    sdk: flutter',
+        '',
+        'dev_dependencies:',
+        '  flutter_test:',
+        '    sdk: flutter',
+      ];
+      expect(uiPackageViolations(sdkOnly), isEmpty);
+      expect(
+        uiPackageViolations(
+            ['dependencies:', '  flutter: {sdk: flutter}', 'flutter:']),
+        isEmpty,
+      );
+      final withHttp = [...sdkOnly]..insert(5, '  http: ^1.6.0');
+      expect(uiPackageViolations(withHttp), isNotEmpty);
+      final flutterFromPath = [
+        'dependencies:',
+        '  flutter:',
+        '    path: ../flutter',
+      ];
+      expect(uiPackageViolations(flutterFromPath), isNotEmpty);
+      final withSdkPackage = [...sdkOnly]
+        ..insertAll(5, ['  flutter_localizations:', '    sdk: flutter']);
+      expect(uiPackageViolations(withSdkPackage), isNotEmpty);
+      expect(uiPackageViolations(['name: tether_ui']), isNotEmpty);
     });
   });
 }
