@@ -124,7 +124,14 @@ returns jsonb language sql stable set search_path = '' as $f$
     'sync_answers', (select count(*) from public.sync_answer where user_id = p_user),
     'sync_lapses', (select count(*) from public.sync_lapse where user_id = p_user),
     'sync_areas', (select count(*) from public.sync_area where user_id = p_user),
-    'sync_accounts', (select count(*) from public.sync_account where user_id = p_user))
+    'sync_accounts', (select count(*) from public.sync_account where user_id = p_user),
+    'care_share_access', (select count(*) from public.care_share_access where user_id = p_user),
+    'care_messages', (select count(*) from public.care_messages where user_id = p_user),
+    'care_shares', (select count(*) from public.care_shares where user_id = p_user),
+    'caregiver_events', (select count(*) from public.caregiver_events where user_id = p_user),
+    'caregivers', (select count(*) from public.caregivers where user_id = p_user),
+    'care_connections', (select count(*) from public.care_connections where user_id = p_user),
+    'supporters', (select count(*) from public.supporters where user_id = p_user))
 $f$;
 
 -- Member rows plus the identity and whether account deletion was started.
@@ -218,10 +225,12 @@ select set_config('th988f.a_seeded', th988f_test.counts('00000000-0000-4000-8000
 select th988f_test.ok(
   current_setting('th988f.a_seeded')::jsonb = '{"profiles": 1, "quit_plans": 1,
     "program_data": 1, "enrolments": 2, "programme_consents": 3, "account_consents": 1,
-    "sync_answers": 1, "sync_lapses": 1, "sync_areas": 1, "sync_accounts": 1}'::jsonb
+    "sync_answers": 1, "sync_lapses": 1, "sync_areas": 1, "sync_accounts": 1,
+    "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
+    "caregivers": 0, "care_connections": 0, "supporters": 0}'::jsonb
   and th988f_test.counts('00000000-0000-4000-8000-00000988f0b1') =
     current_setting('th988f.a_seeded')::jsonb || '{"profiles": 0, "quit_plans": 0}'::jsonb,
-  'setup: synthetic A holds a row in every member table; B the same without a profile or quit plan');
+  'setup: synthetic A holds a row in every member table except the care tables (verify_care_migration.sh covers them); B the same without a profile or quit plan');
 
 select th988f_test.act_as('authenticator', th988f_test.claims('00000000-0000-4000-8000-00000988f0a1'));
 select th988f_test.ok(public.begin_account_deletion('DELETE'),
@@ -269,6 +278,8 @@ select th988f_test.ok(
   th988f_test.state('00000000-0000-4000-8000-00000988f0a1') = '{"profiles": 0, "quit_plans": 0,
     "program_data": 0, "enrolments": 0, "programme_consents": 0, "account_consents": 0,
     "sync_answers": 0, "sync_lapses": 0, "sync_areas": 0, "sync_accounts": 0,
+    "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
+    "caregivers": 0, "care_connections": 0, "supporters": 0,
     "users": 0, "deletion_started": null}'::jsonb,
   'A: no member row and no identity of A is left');
 select th988f_test.ok(

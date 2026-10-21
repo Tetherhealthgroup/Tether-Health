@@ -9,8 +9,9 @@ Migration sources of truth include `supabase/migrations/202609110001_profiles.sq
 `supabase/migrations/202610180004_consent_documents_hardening.sql`,
 `supabase/migrations/202610180005_consent_truncate_guards.sql`,
 `supabase/migrations/202610180006_service_role_least_privilege.sql`,
-`supabase/migrations/202610180007_sync_truncate_guards.sql` and
-`supabase/migrations/202610180008_delete_my_account.sql`.
+`supabase/migrations/202610180007_sync_truncate_guards.sql`,
+`supabase/migrations/202610180008_delete_my_account.sql` and
+`supabase/migrations/202610180011_care.sql`.
 
 Every migration file is named `YYYYMMDDNNNN_name.sql`: a 12-digit version (date
 plus a four-digit sequence), then lowercase letters, digits and underscores.
@@ -557,6 +558,73 @@ This table is development-only until privacy, clinical, consent, retention,
 deletion, and compliance review is complete. Only synthetic data may be entered
 in `breathefree-dev`; real patient or support-person information is prohibited.
 
+## Care team
+
+Migration source of truth: `supabase/migrations/202610180011_care.sql`.
+`supabase/tests/verify_care_migration.sh` checks this section.
+
+Nine tables, each with a UUID `id` (no sequences). Row-level security is enabled
+and forced on all of them; `anon`, `service_role` and `PUBLIC` hold nothing on
+them. Every table that holds a member's rows has `user_id` referencing
+`auth.users(id) on delete cascade`.
+
+| Table | Contents | `authenticated` may |
+|---|---|---|
+| `care_orgs` | Clinics: `name` (trimmed, 1–120), `contact_email`, `verified_at`, `disabled_at`. Reference data, no patient data | read `id` and `name` of clinics it is or was connected to |
+| `care_invites` | Clinic invite codes: `org_id`, `code_hash` (SHA-256 of the normalised code, 32 bytes, unique; the code itself is never stored), `expires_at`, `max_uses` (1–10000), `uses`, `created_by` (operator reference) | nothing |
+| `care_connections` | A member's connection to a clinic: `org_id`, `invite_id`, `connected_at`, `revoked_at`; one live connection per member and clinic | read own; revoke own (`revoked_at`). Created only by `redeem_care_invite` |
+| `care_shares` | What a member approved to share: `enrolment_id`, `connection_id`, `consent_id`, `kind` (`visit_summary`, `message_attachment`), `snapshot` (JSON object, at most 64 KiB), `expires_at` (default and maximum 30 days after creation), `revoked_at` | read own; insert own; revoke own |
+| `care_share_access` | When a share was opened (`accessed_at`, `channel` `secure_link`); no content, no viewer identity | read own |
+| `care_messages` | One-way messages to a connected clinic: `connection_id`, `enrolment_id`, `topic` (1–80), `body` (1–2000), `share_id` | read own; insert own |
+| `caregivers` | A caregiver of a Stride enrolment: `enrolment_id`, `name` (trimmed, 1–80), `phone` (E.164), `scope` (non-empty subset of `sd.session_finished`, `sd.fall_logged`), `invite_status` (`pending`, `sent`), `revoked_at` | read own; insert own; set `invite_status`, revoke own |
+| `caregiver_events` | The only records a caregiver can see: `caregiver_id`, `kind` (in the caregiver's scope), `occurred_at` | read own; insert own |
+| `supporters` | People a member contacts themselves: `name`, `phone` (E.164), `programme_codes` (subset of `bf`, `sf`), `help_phrase` (1–200), `updated_at` | read, insert, update and delete own |
+
+Rules:
+
+- Every insert, update and delete policy refuses a sync service session
+  (top-level `and not public.sync_writer_session()`); select policies do not.
+  Every insert policy requires `deletion_barrier_open()`.
+- A member connects only through `redeem_care_invite(code)` (security
+  definer, executable by `authenticated` only). It refuses, in this order: no
+  caller (`42501`); a sync service session (`TH010`); account deletion started
+  (`TH006`); a code shorter than 12 or longer than 64 characters after removing
+  spaces and hyphens and upper-casing (`TH025`); an unknown code, or a clinic
+  that is not verified or is disabled (`TH025`). A member who already has a
+  live connection to that clinic gets it back and no use is consumed. Then an
+  expired or used-up code is refused (`TH025`); otherwise one use is consumed
+  and the connection is created. Every refused code gets the same `TH025`
+  error.
+- A `share_care_team` or `share_caregiver` consent must name, by its
+  lowercase id, a live connection, or a live caregiver of the same enrolment,
+  owned by the enrolment's member (`TH021`). Without a recipient the existing
+  check constraint refuses it (`23514`).
+- A share needs a live `share_care_team` consent on the same enrolment that
+  names its connection, and a live connection; a caregiver event needs a live
+  caregiver, a kind in its scope and a live `share_caregiver` consent that
+  names it. The insert locks and re-checks them (`TH022`). `consent_id` is not
+  a foreign key; shares are deleted with their enrolment.
+- A message on an enrolment needs that enrolment's live `share_care_team`
+  consent for the connection. A message with an attachment must name the
+  enrolment of a live, unexpired `message_attachment` share on the same
+  connection, and is deleted with that share.
+- Revoking a share consent revokes its shares; revoking a connection revokes
+  the consents that name it and its shares; revoking a caregiver revokes the
+  consents that name it. Revoking core, leaving a programme and supersession
+  therefore reach shares too.
+- Connections, shares and caregivers can only be revoked (and a caregiver's
+  `invite_status` moved from `pending` to `sent` while live); access rows,
+  messages and caregiver events never change (`TH023`). A trigger refuses
+  `TRUNCATE` on those six tables for every role (`TH024`). An invite that a
+  connection used cannot be deleted.
+- `supporters.programme_codes` may list only the caller's `bf` and `sf`
+  enrolments that are not left. Leaving or deleting a programme removes its
+  code from the member's supporters.
+- Members may delete only supporters. Connections and caregivers are kept,
+  revoked, until the programme or the account is deleted.
+- When the migration ran, every live sharing consent stored before it was
+  revoked: none could name a connection or caregiver.
+
 ## Account-data deletion
 
 Migration sources of truth:
@@ -566,15 +634,20 @@ Migration sources of truth:
 `supabase/migrations/202610180001_sync_tables.sql`,
 `supabase/migrations/202610180002_service_session_guard.sql`,
 `supabase/migrations/202610180008_delete_my_account.sql`,
-`supabase/migrations/202610180009_begin_deletion_recent_sign_in.sql` and
-`supabase/migrations/202610180010_app_data_deletion_owner_only.sql`.
+`supabase/migrations/202610180009_begin_deletion_recent_sign_in.sql`,
+`supabase/migrations/202610180010_app_data_deletion_owner_only.sql` and
+`supabase/migrations/202610180011_care.sql`.
 
 `delete_my_app_data` deletes the caller's sync lapses, answers, areas and sync
-account, programme consents, enrolments (and everything that cascades from
-them), account consents, program data, quit plan and profile. It returns counts
-only, one for each table it deletes from: `profiles`, `quit_plans`,
-`program_data`, `enrolments`, `programme_consents`, `account_consents`,
-`sync_answers`, `sync_lapses`, `sync_areas` and `sync_accounts`.
+account, care share access rows, care messages, care shares, caregiver events,
+caregivers, care connections, supporters, programme consents, enrolments (and
+everything that cascades from them), account consents, program data, quit plan
+and profile. It returns counts only, one for each table it deletes from:
+`profiles`, `quit_plans`, `program_data`, `enrolments`, `programme_consents`,
+`account_consents`, `sync_answers`, `sync_lapses`, `sync_areas`,
+`sync_accounts`, `care_share_access`, `care_messages`, `care_shares`,
+`caregiver_events`, `caregivers`, `care_connections` and `supporters`.
+Clinics and invite codes are not member data and are not deleted.
 Consent history is deleted with the account; nothing records what was deleted.
 It and `begin_account_deletion` refuse to run in a sync service (`thsync`)
 session (`TH009`). Only its owner may execute it; members reach it only
@@ -663,11 +736,11 @@ function": every later function that writes and refuses a sync session raises
 | `TH003` | `consent_immutable` | `consent_revoke_only`; `programme_consents_check_supersede` (update trigger on `programme_consents`: `superseded_by` must name the live core consent that replaces the row); `consent_truncate_guard` (truncate trigger on `programme_consents` and `account_consents`: a truncate, whatever the role) | Consent can only be revoked; Consent records are immutable |
 | `TH004` | `consent_requires_core` | `supersede_core_consent` when the enrolment has no live core consent. A direct insert of an optional consent without a live core consent is still refused by row-level security (`42501`) | A live core consent is required |
 | `TH005` | `enrolment_left` | `swap_focus` (programme to promote is left) and `supersede_core_consent`. A direct write to a left enrolment is still refused by row-level security (`42501`) | The programme has been left |
-| `TH006` | `deletion_in_progress` | `supersede_core_consent` after `begin_account_deletion`. Direct writes after it are still refused by row-level security (`42501`) | Account deletion has started |
+| `TH006` | `deletion_in_progress` | `supersede_core_consent` and `redeem_care_invite` after `begin_account_deletion`. Direct writes after it are still refused by row-level security (`42501`) | Account deletion has started |
 | `TH007` | `sync_area_mismatch` | `sync_area_match_enrolment` (trigger on `sync_area`) | Sync area must match its enrolment |
 | `TH008` | `lapses_append_only` | `sync_lapse_append_only` (update trigger on `sync_lapse`) | Lapses are append-only |
 | `TH009` | `deletion_via_api_only` | `begin_account_deletion` and `delete_my_app_data` in a sync service session | Account deletion goes through the API |
-| `TH010` | `sync_session_refused` | `save_program_data`, `swap_focus` and `supersede_core_consent` in a sync service session; the shared code for every later writing function that refuses a sync session | The sync service writes only sync tables |
+| `TH010` | `sync_session_refused` | `save_program_data`, `swap_focus`, `supersede_core_consent` and `redeem_care_invite` in a sync service session; the shared code for every later writing function that refuses a sync session | The sync service writes only sync tables |
 | `TH011` | `consent_document_unavailable` | `consent_fill_text` (insert trigger on `programme_consents` and `account_consents`) and `supersede_core_consent`: no effective, unretired document for that purpose, version and locale | No consent document is available for this purpose, version and locale |
 | `TH012` | `enrolment_not_found` | `swap_focus` and `supersede_core_consent`: no such enrolment for the caller | Enrolment not found |
 | `TH013` | `focus_swap_invalid` | `swap_focus`: the programme to demote is not in focus, the one to promote is already in focus, or both are the same | A swap needs one programme in focus and another not in focus |
@@ -678,6 +751,11 @@ function": every later function that writes and refuses a sync session raises
 | `TH018` | `auth_identity_not_deleted` | `delete_my_account`: the caller's `auth.users` row still exists after its delete | The account identity was not deleted |
 | `TH019` | `sync_rows_delete_only` | `sync_truncate_guard` (truncate trigger on `sync_account`, `sync_area`, `sync_answer` and `sync_lapse`: a truncate, whatever the role, including a cascade into them when no other table's guard fires first) | Sync rows are removed only with their enrolment or account |
 | `TH020` | `rls_bypass_required` | `delete_my_account`: the function owner is neither a superuser nor bypasses row-level security | Account deletion requires a function owner that bypasses row-level security |
+| `TH021` | `consent_recipient_invalid` | `care_check_consent_recipient` (insert trigger on `programme_consents`): a sharing consent's `recipient_ref` is not a live connection or caregiver of the enrolment's member (a caregiver of the same enrolment) | A sharing consent must name a live connection or caregiver of the same member |
+| `TH022` | `care_consent_required` | `care_lock_live_consent` (insert trigger on `care_shares` and `caregiver_events`): the named consent, connection or caregiver is not live, or does not match | A live sharing consent for this recipient is required |
+| `TH023` | `care_record_immutable` | `care_revoke_only` (update trigger on `care_connections`, `care_shares` and `caregivers`); `care_append_only` (update trigger on `care_share_access`, `care_messages` and `caregiver_events`) | Care records can only be revoked |
+| `TH024` | `care_rows_delete_only` | `care_truncate_guard` (truncate trigger on `care_connections`, `care_shares`, `care_share_access`, `care_messages`, `caregivers` and `caregiver_events`: a truncate, whatever the role) | Care rows are removed only with their programme or account |
+| `TH025` | `care_invite_invalid` | `redeem_care_invite`: the code is malformed or unknown, its clinic is not verified or is disabled, or it is expired or used up (for a member not already connected to that clinic) | Invite code is not valid |
 
 Standard SQLSTATEs are kept where PostgreSQL defines the condition:
 `42501` for row-level security and privilege refusals and for

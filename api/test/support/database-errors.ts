@@ -136,6 +136,37 @@ export const DATABASE_ERRORS = [
       "Account deletion requires a function owner that bypasses row-level security",
     ] as readonly string[],
   },
+  {
+    code: "TH021",
+    hint: "consent_recipient_invalid",
+    messages: [
+      "A sharing consent must name a live connection or caregiver of the same member",
+    ] as readonly string[],
+  },
+  {
+    code: "TH022",
+    hint: "care_consent_required",
+    messages: [
+      "A live sharing consent for this recipient is required",
+    ] as readonly string[],
+  },
+  {
+    code: "TH023",
+    hint: "care_record_immutable",
+    messages: ["Care records can only be revoked"] as readonly string[],
+  },
+  {
+    code: "TH024",
+    hint: "care_rows_delete_only",
+    messages: [
+      "Care rows are removed only with their programme or account",
+    ] as readonly string[],
+  },
+  {
+    code: "TH025",
+    hint: "care_invite_invalid",
+    messages: ["Invite code is not valid"] as readonly string[],
+  },
 ] as const satisfies readonly DatabaseErrorEntry[];
 
 export type DatabaseErrorHint = (typeof DATABASE_ERRORS)[number]["hint"];

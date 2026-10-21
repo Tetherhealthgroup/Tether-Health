@@ -162,6 +162,20 @@ insert into public.consent_documents (purpose, version, locale, body, effective_
   ('diagnostics', 'v1', 'en', 'Synthetic diagnostics wording', now()),
   ('cross_program_insights', 'v1', 'en', 'Synthetic insights wording', now());
 
+-- A synthetic clinic and one care connection each for A and B: a sharing
+-- consent must name a live connection of the member.
+insert into public.care_orgs (name, verified_at) values ('Synthetic Clinic 913', now());
+with i as (
+  insert into public.care_connections (user_id, org_id)
+  select '00000000-0000-4000-8000-000000913001', id from public.care_orgs
+  where name = 'Synthetic Clinic 913' returning id
+) select set_config('th913.a_connection', id::text, true) from i;
+with i as (
+  insert into public.care_connections (user_id, org_id)
+  select '00000000-0000-4000-8000-000000913002', id from public.care_orgs
+  where name = 'Synthetic Clinic 913' returning id
+) select set_config('th913.b_connection', id::text, true) from i;
+
 -- Privileges and policies -----------------------------------------------------
 -- Pinned so that an accidental grant or policy change fails this test.
 select th913_test.ok(
@@ -322,12 +336,12 @@ select th913_test.refused(format(
 insert into public.programme_consents
   (enrolment_id, purpose, recipient_ref, consent_version, locale)
 values (current_setting('th913.a_hw')::uuid, 'share_care_team',
-  'synthetic-connection-01', 'v1', 'en');
+  current_setting('th913.a_connection'), 'v1', 'en');
 select th913_test.ok(
   public.has_consent(current_setting('th913.a_hw')::uuid, 'share_care_team',
-    'synthetic-connection-01')
+    current_setting('th913.a_connection'))
   and not public.has_consent(current_setting('th913.a_hw')::uuid, 'share_care_team',
-    'synthetic-connection-02')
+    current_setting('th913.b_connection'))
   and not public.has_consent(current_setting('th913.a_hw')::uuid, 'share_care_team'),
   'A: sharing consent is per recipient');
 select th913_test.refused(format(
@@ -370,7 +384,7 @@ where enrolment_id = current_setting('th913.a_hw')::uuid and purpose = 'core'
   and revoked_at is null;
 select th913_test.ok(
   not public.has_consent(current_setting('th913.a_hw')::uuid, 'share_care_team',
-    'synthetic-connection-01'),
+    current_setting('th913.a_connection')),
   'A: sharing consent not honoured while core is revoked');
 select th913_test.refused(format(
   'insert into th913_test.phi_probe (enrolment_id, note) values (%L, ''synthetic'')',
@@ -385,7 +399,7 @@ select th913_test.ok(
   'A: re-grant adds a row and keeps the revoked one as history');
 select th913_test.ok(
   not public.has_consent(current_setting('th913.a_hw')::uuid, 'share_care_team',
-    'synthetic-connection-01'),
+    current_setting('th913.a_connection')),
   'A: sharing stays off after a core re-grant');
 select th913_test.ok(
   (select count(*) from public.programme_consents
@@ -421,7 +435,7 @@ insert into public.programme_consents (enrolment_id, purpose, consent_version, l
 values (current_setting('th913.a_bf')::uuid, 'core', 'v1', 'en');
 select th913_test.ok(
   not public.has_consent(current_setting('th913.a_bf')::uuid, 'share_care_team',
-    'synthetic-connection-01'),
+    current_setting('th913.a_connection')),
   'A: consent on one programme does not carry to another');
 do $loop$
 begin
@@ -553,7 +567,7 @@ values (current_setting('th913.b_hw')::uuid, 'core', 'v1', 'en');
 insert into public.programme_consents
   (enrolment_id, purpose, recipient_ref, consent_version, locale)
 values
-  (current_setting('th913.b_hw')::uuid, 'share_care_team', 'synthetic-connection-02',
+  (current_setting('th913.b_hw')::uuid, 'share_care_team', current_setting('th913.b_connection'),
    'v1', 'en'),
   (current_setting('th913.b_hw')::uuid, 'research', null, 'v1', 'en'),
   (current_setting('th913.b_hw')::uuid, 'records_import', null, 'v1', 'en');
@@ -569,7 +583,7 @@ values (current_setting('th913.b_ca')::uuid, 'core', 'v1', 'en');
 -- Leaving: keep the data (no automatic purge), then rejoin; or delete now.
 select th913_test.ok(
   public.has_consent(current_setting('th913.b_hw')::uuid, 'share_care_team',
-    'synthetic-connection-02')
+    current_setting('th913.b_connection'))
   and public.has_consent(current_setting('th913.b_hw')::uuid, 'research')
   and public.has_consent(current_setting('th913.b_hw')::uuid, 'records_import'),
   'B: sharing, research and records import are live before leaving');
@@ -614,7 +628,7 @@ select th913_test.ok(
   'B: rejoin reuses the row, clears left_at, keeps data and the core consent');
 select th913_test.ok(
   not public.has_consent(current_setting('th913.b_hw')::uuid, 'share_care_team',
-    'synthetic-connection-02')
+    current_setting('th913.b_connection'))
   and not public.has_consent(current_setting('th913.b_hw')::uuid, 'research')
   and not public.has_consent(current_setting('th913.b_hw')::uuid, 'records_import'),
   'B: after rejoin, sharing, research and records import are off until granted again');
@@ -648,7 +662,21 @@ select set_config('th913.a_counts', jsonb_build_object(
                          where e.user_id = '00000000-0000-4000-8000-000000913001'),
   'account_consents', (select count(*) from public.account_consents
                        where user_id = '00000000-0000-4000-8000-000000913001'),
-  'sync_answers', 0, 'sync_lapses', 0, 'sync_areas', 0, 'sync_accounts', 0
+  'sync_answers', 0, 'sync_lapses', 0, 'sync_areas', 0, 'sync_accounts', 0,
+  'care_share_access', (select count(*) from public.care_share_access
+                        where user_id = '00000000-0000-4000-8000-000000913001'),
+  'care_messages', (select count(*) from public.care_messages
+                    where user_id = '00000000-0000-4000-8000-000000913001'),
+  'care_shares', (select count(*) from public.care_shares
+                  where user_id = '00000000-0000-4000-8000-000000913001'),
+  'caregiver_events', (select count(*) from public.caregiver_events
+                       where user_id = '00000000-0000-4000-8000-000000913001'),
+  'caregivers', (select count(*) from public.caregivers
+                 where user_id = '00000000-0000-4000-8000-000000913001'),
+  'care_connections', (select count(*) from public.care_connections
+                       where user_id = '00000000-0000-4000-8000-000000913001'),
+  'supporters', (select count(*) from public.supporters
+                 where user_id = '00000000-0000-4000-8000-000000913001')
 )::text, true);
 select th913_test.ok(
   (current_setting('th913.a_counts')::jsonb ->> 'enrolments')::int = 3
