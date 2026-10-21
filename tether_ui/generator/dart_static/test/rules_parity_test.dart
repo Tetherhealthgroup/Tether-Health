@@ -10,8 +10,8 @@
 // ea.selfharm). The commit that changes a value must cite that sign-off.
 // The current values are unsigned placeholders: they need written clinical
 // sign-off before release, and this test passing does not approve them.
-// The sf.unplug.* params are product rules, not clinical; they are checked
-// for parity only.
+// The sf.unplug.* and ob.age params are product rules, not clinical; they
+// are checked for parity only.
 //
 // If this test fails, do not edit either file to make it pass. A mismatch is
 // a clinical item for human review. Adding an entry to [_excluded] needs the
@@ -75,6 +75,7 @@ List<_Pair> _pairs() => [
       _Pair('sf.unplug.sentence/sentence', 'unplugSentence', TRules.unplugSentence),
       _Pair('sf.unplug.sum/a', 'unplugSum.a', TRules.unplugSum.a),
       _Pair('sf.unplug.sum/b', 'unplugSum.b', TRules.unplugSum.b),
+      _Pair('ob.age/item', 'ageItem', TRules.ageItem),
     ];
 
 /// spec/rules.json, relative to the package root (the flutter test cwd).

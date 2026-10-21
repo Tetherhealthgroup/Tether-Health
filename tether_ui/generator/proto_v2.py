@@ -37,6 +37,7 @@ const RULES = {
  'sf.unplug.reason': ()=> (list(SESSION.get('sf_unplug_session_end.reason')).length || String(SESSION.get('sf_unplug_session_end.note')||'').trim()) ? 'Reason given' : 'No reason yet',
  'sf.unplug.sentence': ()=>{ const n=s=>String(s||'').toLowerCase().trim().replace(/\s+/g,' ').replace(/[.!]+$/,''); return n(SESSION.get('sf_unplug_gate_commit.sentence'))===n(RULESPEC['sf.unplug.sentence'].params.sentence)?'Step done':'Step not done' },
  'sf.unplug.sum': ()=>{ const P=RULESPEC['sf.unplug.sum'].params; return num(SESSION.get('sf_unplug_gate_sum.answer'))===P.a+P.b?'Step done':'Step not done' },
+ 'ob.age': ()=> list(SESSION.get('ob_account.age_18_or_older')).includes(RULESPEC['ob.age'].params.item)?'Age confirmed':'Age not confirmed',
 };
 function decide(d){ if(!d) return null; if(d.startsWith('choice:')) return SESSION.get(d.slice(7)); return RULES[d]?RULES[d]():null }
 function match(sel, labels){ if(sel==null) return null; const s=String(sel).toLowerCase(); const L=labels.map(l=>l.toLowerCase());
@@ -177,7 +178,7 @@ async function runAll(quiet){
 async function sweep(){
   FAST=true; const out=[];
   for(const x of EXP){
-    stack=['today', x.screen]; onboarding=false; SESSION.clear(); QUEUE.length=0; FORCE=x.force; lastToast=null; lastPlatform=null;
+    stack=['today', x.screen]; onboarding=false; SESSION.clear(); QUEUE.length=0; if(x.queue) QUEUE.push(x.queue); FORCE=x.force; lastToast=null; lastPlatform=null;
     document.body.dataset.platform=x.platform; render(); onboarding=x.onboarding;
     const el=document.querySelector(`#phone [data-path="${x.path}"]`);
     let ok=false, got='';

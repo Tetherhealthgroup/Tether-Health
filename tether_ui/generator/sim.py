@@ -21,17 +21,20 @@ def first_branch(a):
     if a['type'] == 'branch': return a
     return first_branch(a.get('then'))
 
-def resolve(a, force, onboarding):
+def resolve(a, force, onboarding, queue=None):
+    """Effect of action `a` when its first branch takes `force` and a branch
+    inside the chosen case takes `queue` (a nested branch is decided by the
+    simulation queue, as TSim.queue / QUEUE do)."""
     t = a['type']
     if t in ('push', 'replace', 'tab', 'sheet', 'reset', 'popto'):
         to = a['context']['onboarding'] if (a.get('context') and onboarding) else a['to']
         return {'kind': 'route', 'route': route_of(to), 'screen': to}
     if t in ('back', 'close'): return {'kind': 'pop'}
-    if t == 'toast': return resolve(a['then'], force, onboarding) if a.get('then') else {'kind': 'toast', 'text': a['value']}
-    if t == 'submit': return resolve(a['then'], force, onboarding)
+    if t == 'toast': return resolve(a['then'], force, onboarding, queue) if a.get('then') else {'kind': 'toast', 'text': a['value']}
+    if t == 'submit': return resolve(a['then'], force, onboarding, queue)
     if t == 'branch':
         case = next(c for c in a['cases'] if c['label'] == force)
-        return resolve(case['action'], None, onboarding)
+        return resolve(case['action'], queue, onboarding)
     if t in ('call', 'sms', 'external'): return {'kind': 'platform', 'value': f"{t}:{a['value']}"}
     if t == 'os_settings': return {'kind': 'platform', 'value': 'os_settings:'}
     raise ValueError(t)
@@ -84,14 +87,21 @@ def expectations():
                     if p == path: node = n
             platform = 'ios' if node and node.get('t') == 'authbtn' and 'android' not in node.get('platforms', []) else 'android'
             br = first_branch(a)
-            forces = [c['label'] for c in br['cases']] if br else [None]
-            for f in forces:
+            # (force, queue): every outcome of the first branch, and for a case
+            # that holds another branch, every outcome of that one too.
+            picks = []
+            for c in (br['cases'] if br else [None]):
+                inner = first_branch(c['action']) if c else None
+                picks += [(c['label'], i['label']) for i in inner['cases']] if inner else [(c['label'] if c else None, None)]
+            for f, q in picks:
                 onbs = [False, True] if has_context(a) else [False]
                 for onb in onbs:
-                    eff = resolve(a, f, onb)
+                    eff = resolve(a, f, onb, q)
                     if eff['kind'] == 'route' and eff['screen'] == sid and a['type'] in ('replace',):
                         pass
-                    out.append({'screen': sid, 'element': label, 'path': path, 'force': f, 'onboarding': onb, 'platform': platform, 'expect': eff})
+                    row = {'screen': sid, 'element': label, 'path': path, 'force': f, 'onboarding': onb, 'platform': platform, 'expect': eff}
+                    if q is not None: row['queue'] = q
+                    out.append(row)
     return out
 
 def dart_tests(out_dir):
@@ -100,10 +110,11 @@ def dart_tests(out_dir):
     for x in exps:
         e = x['expect']
         exp = {'route': f"('route', {dstr(e.get('route'))})", 'pop': "('pop', null)", 'toast': f"('toast', {dstr(e.get('text'))})", 'platform': f"('platform', {dstr(e.get('value'))})"}[e['kind']]
-        rows.append(f"  ({dstr(x['screen'])}, Routes.{camel(x['screen'])}, {dstr(x['path'])}, {dstr(x['element'])}, {dstr(x['force'])}, {'true' if x['onboarding'] else 'false'}, {'true' if x['platform'] == 'ios' else 'false'}, {exp}),")
+        rows.append(f"  ({dstr(x['screen'])}, Routes.{camel(x['screen'])}, {dstr(x['path'])}, {dstr(x['element'])}, {dstr(x['force'])}, {'true' if x['onboarding'] else 'false'}, {'true' if x['platform'] == 'ios' else 'false'}, {exp}, {dstr(x.get('queue'))}),")
     sweep = f"""// GENERATED — button-flow sweep: taps every interactive element on every
 // screen (every branch outcome, with and without the onboarding context)
-// and checks it lands exactly where spec/actions.json says.
+// and checks it lands exactly where spec/actions.json says. A branch inside a
+// case is decided by the simulation queue (the last field).
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -127,13 +138,13 @@ class _Obs extends NavigatorObserver {{
   String? get top => stack.isEmpty ? null : stack.last;
 }}
 
-const _cases = <(String, String, String, String, String?, bool, bool, (String, String?))>[
+const _cases = <(String, String, String, String, String?, bool, bool, (String, String?), String?)>[
 {chr(10).join(rows)}
 ];
 
 void main() {{
   for (final c in _cases) {{
-    final name = 'sweep ${{c.$1}} · ${{c.$4}}${{c.$5 != null ? ' → ${{c.$5}}' : ''}}${{c.$6 ? ' (onboarding)' : ''}}';
+    final name = 'sweep ${{c.$1}} · ${{c.$4}}${{c.$5 != null ? ' → ${{c.$5}}' : ''}}${{c.$9 != null ? ' → ${{c.$9}}' : ''}}${{c.$6 ? ' (onboarding)' : ''}}';
     testWidgets(name, (tester) async {{
       tester.view.physicalSize = const Size(1170, 2532);
       tester.view.devicePixelRatio = 3;
@@ -141,6 +152,7 @@ void main() {{
       TSession.clear();
       TFlow.onboarding = c.$6;
       TSim.force = c.$5;
+      if (c.$9 != null) TSim.queue.add(c.$9!);
       PreviewPlatform.last = null;
       if (c.$7) debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
       try {{

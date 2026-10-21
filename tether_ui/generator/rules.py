@@ -62,6 +62,15 @@ RULES = {
         'logic': 'Value must be within the plausible range for the chosen test, else held for review. Duplicates of an imported FHIR value (same LOINC, date, value) are not added twice.',
         'source': 'Plausibility ranges, not clinical targets.',
     },
+    'ob.age': {
+        'title': 'Sign-up: “I’m 18 or older” ticked',
+        'program': None,
+        'inputs': ['ob_account.age_18_or_older'],
+        'params': {'item': 'I’m 18 or older'},
+        'outcomes': {'confirmed': 'Age confirmed', 'missing': 'Age not confirmed'},
+        'logic': 'Confirmed when the item is ticked. Every sign-up route on ob_account (Apple, Google, Create account, Continue on this phone only) asks this first; unticked, it shows a message and goes nowhere.',
+        'source': 'Owner decisions P-68 and P-72. Product rule, not clinical.',
+    },
 }
 
 # Simulation scenarios: end-to-end setups and functions for every program.
@@ -74,7 +83,7 @@ SETUP_BF = [('tap', 'Set up BreatheFree'), ('tap', 'Next'), ('tap', 'Next'), ('t
 SCENARIOS = [
     # ---------------- account & sign-in
     sc('auth-email', None, 'Sign-in', 'Create account with email, verify, keep both plans', 'ob_account',
-       [('tap', 'Create account'), ('expect', 'auth_verify'), ('tap', 'I’ve confirmed my email'), ('expect', 'auth_merge'), ('tap', 'Continue')], 'today'),
+       [('tap', 'I’m 18 or older'), ('tap', 'Create account'), ('expect', 'auth_verify'), ('tap', 'I’ve confirmed my email'), ('expect', 'auth_merge'), ('tap', 'Continue')], 'today'),
     sc('auth-apple', None, 'Sign-in', 'Sign in with Apple (iPhone)', 'welcome',
        [('tap', 'I already have an account'), ('choose', 'Success'), ('tap', 'Continue with Apple')], 'today'),
     sc('auth-google', None, 'Sign-in', 'Sign in with Google (Android)', 'welcome',
@@ -82,9 +91,9 @@ SCENARIOS = [
     sc('auth-apple-new', None, 'Sign-in', 'New Apple ID starts onboarding with an account', 'welcome',
        [('tap', 'I already have an account'), ('choose', 'New Apple ID, no Tether account'), ('tap', 'Continue with Apple'), ('expect', 'auth_social_new'), ('tap', 'Create my account')], 'ob_programs'),
     sc('auth-google-link', None, 'Sign-in', 'Google email already used → link accounts', 'ob_account',
-       [('choose', 'Email already has a Tether account'), ('tap', 'Continue with Google'), ('expect', 'auth_link'), ('tap', 'Link and sign in')], 'today'),
+       [('tap', 'I’m 18 or older'), ('choose', 'Email already has a Tether account'), ('tap', 'Continue with Google'), ('expect', 'auth_link'), ('tap', 'Link and sign in')], 'today'),
     sc('auth-google-error', None, 'Sign-in', 'Google sign-in fails → error with email fallback', 'ob_account',
-       [('choose', 'Error'), ('tap', 'Continue with Google'), ('expect', 'auth_social_error'), ('tap', 'Use email instead')], 'auth_signin'),
+       [('tap', 'I’m 18 or older'), ('choose', 'Error'), ('tap', 'Continue with Google'), ('expect', 'auth_social_error'), ('tap', 'Use email instead')], 'auth_signin'),
     sc('auth-wrong-password', None, 'Sign-in', 'Wrong password shows inline error', 'welcome',
        [('tap', 'I already have an account'), ('choose', 'Wrong password'), ('tap', 'Sign in')], 'auth_signin_error'),
     # ---------------- first run
@@ -92,7 +101,7 @@ SCENARIOS = [
        [('tap', 'Get started'), ('tap', 'Continue with 2 programs'), ('tap', 'Continue'), ('tap', 'Agree and continue'), ('tap', 'Continue'), ('expect', 'ob_setup'),
         ('tap', 'BreatheFree'), ('tap', 'Next'), ('tap', 'Next'), ('tap', 'Save my reasons'), ('tap', 'Continue with this path'), ('tap', 'Confirm this date'),
         ('tap', 'Review my plan'), ('tap', 'Start my plan'), ('expect', 'ob_setup'), ('tap', 'Continue'), ('choose', 'Allowed'), ('tap', 'Turn on reminders'),
-        ('tap', 'Continue on this phone only')], 'today'),
+        ('tap', 'I’m 18 or older'), ('tap', 'Continue on this phone only')], 'today'),
     # ---------------- health records (FHIR)
     sc('fhir-epic', None, 'Health records', 'Connect Epic MyChart, review, resolve conflict, add to programs', 'records_hub',
        [('tap', 'Add a source'), ('tap', 'Hospital or clinic'), ('tap', 'Patel Family Medicine'), ('choose', 'Approved'), ('tap', 'Continue to MyChart'),

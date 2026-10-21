@@ -1,11 +1,11 @@
 # Validation report
 
-Generated 2026-10-21T07:08:04+00:00 from the spec, the Flutter package and the HTML prototype.
+Generated 2026-10-21T19:12:48+00:00 from the spec, the Flutter package and the HTML prototype.
 
 | Check | Flutter | Prototype |
 |---|---|---|
 | End-to-end scenarios (all programs) | 75 / 75 | 75 / 75 |
-| Button-flow sweep (every element × every outcome) | 1037 / 1037 | 1036 / 1036 |
+| Button-flow sweep (every element × every outcome) | 1041 / 1041 | 1036 / 1036 |
 | Render tests (every screen at 100% and 130% text) | 456 / 456 | — |
 | Static analysis | `flutter analyze`: see analyze.txt | JS errors: 0 |
 | Spec validator (loose ends) | 0 errors · 924 actions, every target exists, every screen reachable | |
@@ -31,14 +31,14 @@ Generated 2026-10-21T07:08:04+00:00 from the spec, the Flutter package and the H
 
 | Scenario | Program | Steps | Ends at | Flutter | Prototype |
 |---|---|---|---|---|---|
-| auth-email: Create account with email, verify, keep both plans | — | tap “Create account” → at auth_verify → tap “I’ve confirmed my email” → at auth_merge → tap “Continue” | `today` | ✅ | ✅ |
+| auth-email: Create account with email, verify, keep both plans | — | tap “I’m 18 or older” → tap “Create account” → at auth_verify → tap “I’ve confirmed my email” → at auth_merge → tap “Continue” | `today` | ✅ | ✅ |
 | auth-apple: Sign in with Apple (iPhone) | — | tap “I already have an account” → outcome “Success” → tap “Continue with Apple” | `today` | ✅ | ✅ |
 | auth-google: Sign in with Google (Android) | — | tap “I already have an account” → outcome “Success” → tap “Continue with Google” | `today` | ✅ | ✅ |
 | auth-apple-new: New Apple ID starts onboarding with an account | — | tap “I already have an account” → outcome “New Apple ID, no Tether account” → tap “Continue with Apple” → at auth_social_new → tap “Create my account” | `ob_programs` | ✅ | ✅ |
-| auth-google-link: Google email already used → link accounts | — | outcome “Email already has a Tether account” → tap “Continue with Google” → at auth_link → tap “Link and sign in” | `today` | ✅ | ✅ |
-| auth-google-error: Google sign-in fails → error with email fallback | — | outcome “Error” → tap “Continue with Google” → at auth_social_error → tap “Use email instead” | `auth_signin` | ✅ | ✅ |
+| auth-google-link: Google email already used → link accounts | — | tap “I’m 18 or older” → outcome “Email already has a Tether account” → tap “Continue with Google” → at auth_link → tap “Link and sign in” | `today` | ✅ | ✅ |
+| auth-google-error: Google sign-in fails → error with email fallback | — | tap “I’m 18 or older” → outcome “Error” → tap “Continue with Google” → at auth_social_error → tap “Use email instead” | `auth_signin` | ✅ | ✅ |
 | auth-wrong-password: Wrong password shows inline error | — | tap “I already have an account” → outcome “Wrong password” → tap “Sign in” | `auth_signin_error` | ✅ | ✅ |
-| onboarding: First run: 2 programs, consent, BreatheFree plan, guest | — | tap “Get started” → tap “Continue with 2 programs” → tap “Continue” → tap “Agree and continue” → tap “Continue” → at ob_setup → tap “BreatheFree” → tap “Next” → tap “Next” → tap “Save my reasons” → tap “Continue with this path” → tap “Confirm this date” → tap “Review my plan” → tap “Start my plan” → at ob_setup → tap “Continue” → outcome “Allowed” → tap “Turn on reminders” → tap “Continue on this phone only” | `today` | ✅ | ✅ |
+| onboarding: First run: 2 programs, consent, BreatheFree plan, guest | — | tap “Get started” → tap “Continue with 2 programs” → tap “Continue” → tap “Agree and continue” → tap “Continue” → at ob_setup → tap “BreatheFree” → tap “Next” → tap “Next” → tap “Save my reasons” → tap “Continue with this path” → tap “Confirm this date” → tap “Review my plan” → tap “Start my plan” → at ob_setup → tap “Continue” → outcome “Allowed” → tap “Turn on reminders” → tap “I’m 18 or older” → tap “Continue on this phone only” | `today` | ✅ | ✅ |
 | fhir-epic: Connect Epic MyChart, review, resolve conflict, add to programs | — | tap “Add a source” → tap “Hospital or clinic” → tap “Patel Family Medicine” → outcome “Approved” → tap “Continue to MyChart” → at records_importing → tap “Review imported data” → at records_review → tap “Review conflicts first” → tap “From Patel Family Medicine (Epic): 7.6%” → tap “Save choices” → at records_review → tap “Add 21 items to my programs” | `records_hub` | ✅ | ✅ |
 | fhir-bluebutton: Connect Medicare Blue Button 2.0 | — | tap “Medicare · Blue Button 2.0” → outcome “Approved” → tap “Continue to Medicare.gov” → tap “Review imported data” | `records_review` | ✅ | ✅ |
 | fhir-denied: Provider sign-in denied → error with options | — | tap “Hospital or clinic” → tap “Patel Family Medicine” → outcome “Denied or error” → tap “Continue to MyChart” → at records_error → tap “Enter manually instead” | `records_manual` | ✅ | ✅ |
@@ -114,6 +114,7 @@ Generated 2026-10-21T07:08:04+00:00 from the spec, the Flutter package and the H
 - **ca.zone** · Asthma/COPD zone from action plan: Peak flow outside 50–900 → Invalid. A red symptom or peak flow below the plan’s red threshold → Red. Peak flow below the green threshold or any symptom → Yellow. Otherwise Green. Thresholds come only from the member’s plan. _NAEPP asthma action plan zones. Needs pulmonology sign-off._
 - **ea.selfharm** · Self-harm signal: If the member selects a self-harm option the crisis screen opens immediately (988/911). _Safe messaging guidance. Needs psychiatry sign-off._
 - **rec.manual** · Manual health value check: Value must be within the plausible range for the chosen test, else held for review. Duplicates of an imported FHIR value (same LOINC, date, value) are not added twice. _Plausibility ranges, not clinical targets._
+- **ob.age** · Sign-up: “I’m 18 or older” ticked: Confirmed when the item is ticked. Every sign-up route on ob_account (Apple, Google, Create account, Continue on this phone only) asks this first; unticked, it shows a message and goes nowhere. _Owner decisions P-68 and P-72. Product rule, not clinical._
 - **sf.unplug.reason** · Strict session: reason before ending early: A strict session ends early only when a reason chip is selected or a note is typed. _endSession(overrideReason) in pigeons/unplug_api.dart. Product rule, not clinical._
 - **sf.unplug.sentence** · Small step: typed sentence: Done when the typed text equals the sentence, ignoring case, extra spaces and a final full stop. _PlatformEffortGate.commitment. Product rule, not clinical._
 - **sf.unplug.sum** · Small step: quick sum: Done when the answer equals a + b. _PlatformEffortGate.puzzle. Product rule, not clinical._

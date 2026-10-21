@@ -30,7 +30,12 @@ the current file:
 - TH-907b rows change only a starting state (P-52): on `ob_consent` the
   "Private reminders" toggle's `on` goes from `true` to `false`; on
   `ob_account` the "I’m 18 or older" checklist item loses `"done": true`.
-  With that attribute restored, the old and new files are equal.
+  With that attribute restored, `ob_consent` then equals the snapshot and
+  `ob_account` its TH-907 state.
+- The TH-907c row (P-68 as amended by P-72) wraps the actions of the four
+  sign-up routes on `ob_account` in a branch decided by rule `ob.age`. With
+  each branch replaced by its "Age confirmed" action, the file equals its
+  TH-907b state, except the four generated action summaries.
 
 All replacement copy still needs clinical/legal review before release.
 
@@ -237,7 +242,31 @@ checklist.
 | Screen | Node | Change |
 |---|---|---|
 | `ob_consent` | `body[4].children[0]` (toggle "Private reminders", key `private_reminders`) | `on`: `true` → `false`. "Agree and continue" still submits and opens `ob_basics` with it off; it is optional. "Essential app data" (required) stays on. |
-| `ob_account` | `body[7]` (checklist "I’m 18 or older", key `age_18_or_older`) | the item no longer starts ticked (`"done": true` removed). "Create account" is unchanged and does not read the checklist. Also P-31 and TH-902 (above). |
+| `ob_account` | `body[7]` (checklist "I’m 18 or older", key `age_18_or_older`) | the item no longer starts ticked (`"done": true` removed). Since P-68 / P-72 (below), no sign-up route proceeds until the member ticks it. Also P-31 and TH-902 (above). |
+
+## P-72: sign-up asks for "I’m 18 or older" first (TH-907c)
+
+P-68 requires the age item before any sign-up route proceeds. P-72 amends how:
+the routes keep their normal look, and tapping one while the item is unticked
+shows a short message and goes nowhere. Each route's action is wrapped in a
+branch decided by the on-device rule `ob.age` (`spec/rules.json`: confirmed
+when "I’m 18 or older" is ticked). "Age confirmed" runs the action exactly as
+before; "Age not confirmed" shows the toast below, which screen readers
+announce. The rule decides before anything else runs, so an unticked
+"Create account" sends no `POST supabase /auth/v1/signup` and an unticked
+Apple or Google button never starts native sign-in. No visible element, label
+or layout changes.
+
+Draft message, needs clinical/legal copy review: "You need to be 18 or
+older to continue." No existing spec copy states the age requirement; the
+wording follows the checklist label.
+
+| Screen | Node | Change |
+|---|---|---|
+| `ob_account` | `body[2].items[0]` "Continue with Apple" | the "Sign in with Apple result" branch is wrapped in an `ob.age` branch. |
+| `ob_account` | `body[2].items[1]` "Continue with Google" | the "Sign in with Google result" branch is wrapped in an `ob.age` branch. |
+| `ob_account` | `footer[0]` "Create account" | the `POST supabase /auth/v1/signup` submit is wrapped in an `ob.age` branch. |
+| `ob_account` | `footer[1]` "Continue on this phone only" | the reset to `today` is wrapped in an `ob.age` branch. |
 
 ## Rendering changes with no spec change (TH-907)
 

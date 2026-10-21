@@ -100,6 +100,7 @@ abstract final class TRules {
   static const manualRanges = <String, (double, double)>{'A1C': (3, 20), 'LDL': (10, 400), 'eGFR': (1, 150), 'Glucose': (20, 600)};
   static const unplugSentence = 'I can come back to this later';
   static const unplugSum = (a: 7, b: 5);
+  static const ageItem = 'I’m 18 or older';
 
   /// Returns the outcome label for [rule], or null when inputs are missing.
   static String? decide(String rule, Map<String, Object?> v) {
@@ -146,6 +147,8 @@ abstract final class TRules {
         return norm(v['sf_unplug_gate_commit.sentence']) == norm(unplugSentence) ? 'Step done' : 'Step not done';
       case 'sf.unplug.sum':
         return _num(v['sf_unplug_gate_sum.answer']) == (unplugSum.a + unplugSum.b) ? 'Step done' : 'Step not done';
+      case 'ob.age':
+        return _list(v['ob_account.age_18_or_older']).contains(ageItem) ? 'Age confirmed' : 'Age not confirmed';
     }
     return null;
   }

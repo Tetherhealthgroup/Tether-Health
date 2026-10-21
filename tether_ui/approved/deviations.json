@@ -324,14 +324,17 @@
       "decisions": [
         "P-31",
         "TH-902",
-        "P-52"
+        "P-52",
+        "P-68",
+        "P-72"
       ],
       "tickets": [
         "TH-907",
-        "TH-907b"
+        "TH-907b",
+        "TH-907c"
       ],
-      "sha256": "d789ba48d163c55b9e8c7593e80d804bd3a6ec3cbafcae0a7d5193d5e257b670",
-      "change": "P-31 placeholders, fields start empty: body[5] \"Email\" example \"alex@example.com\" -> placeholder; body[6] \"Password\" example \"••••••••••••\" -> placeholder | Session key only, no visual change: body[7] checklist gets key \"age_18_or_older\" | P-52, starts unticked: body[7] checklist item \"I’m 18 or older\" no longer starts ticked (\"done\": true removed); the member ticks it"
+      "sha256": "b27d821b403221fe782ff287a6138eef28a25649f9070291b91ae48492c7f974",
+      "change": "P-31 placeholders, fields start empty: body[5] \"Email\" example \"alex@example.com\" -> placeholder; body[6] \"Password\" example \"••••••••••••\" -> placeholder | Session key only, no visual change: body[7] checklist gets key \"age_18_or_older\" | P-52, starts unticked: body[7] checklist item \"I’m 18 or older\" no longer starts ticked (\"done\": true removed); the member ticks it | P-68 as amended by P-72, sign-up asks for the age item first: the actions of body[2].items[0] \"Continue with Apple\", body[2].items[1] \"Continue with Google\", footer[0] \"Create account\" and footer[1] \"Continue on this phone only\" are each wrapped in a branch decided by rule ob.age: \"Age confirmed\" runs the action unchanged; \"Age not confirmed\" shows the toast \"You need to be 18 or older to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow. No visible element changes"
     },
     {
       "screen": "ob_basics",

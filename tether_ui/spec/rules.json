@@ -136,6 +136,22 @@
     "logic": "Value must be within the plausible range for the chosen test, else held for review. Duplicates of an imported FHIR value (same LOINC, date, value) are not added twice.",
     "source": "Plausibility ranges, not clinical targets."
   },
+  "ob.age": {
+    "title": "Sign-up: “I’m 18 or older” ticked",
+    "program": null,
+    "inputs": [
+      "ob_account.age_18_or_older"
+    ],
+    "params": {
+      "item": "I’m 18 or older"
+    },
+    "outcomes": {
+      "confirmed": "Age confirmed",
+      "missing": "Age not confirmed"
+    },
+    "logic": "Confirmed when the item is ticked. Every sign-up route on ob_account (Apple, Google, Create account, Continue on this phone only) asks this first; unticked, it shows a message and goes nowhere.",
+    "source": "Owner decisions P-68 and P-72. Product rule, not clinical."
+  },
   "sf.unplug.reason": {
     "title": "Strict session: reason before ending early",
     "program": "sf",

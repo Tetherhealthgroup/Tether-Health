@@ -2,6 +2,10 @@ from dsl import *
 
 H = header
 
+# Shown when a sign-up route on ob_account is tapped while “I’m 18 or older”
+# is unticked (P-72). Draft wording, pending legal/clinical copy review.
+AGE_GATE_MESSAGE = 'You need to be 18 or older to continue.'
+
 def shared():
     # ================================================================ ONBOARDING
     flow('onboarding', 'First run', 'Welcome → choose programs → focus → consent → basics → set up each focus program → reminders → save progress → Today.')
@@ -78,15 +82,18 @@ def shared():
     ], footer=[button('Open phone settings', settings(), v='secondary'), button('Continue without reminders', go('ob_account'))])
 
     # P-52: “I’m 18 or older” starts unticked; the member ticks it.
+    # P-68 / P-72: every sign-up route asks rule ob.age first. Unticked, it
+    # shows AGE_GATE_MESSAGE and goes nowhere; ticked, it does what it did.
+    def age_gate(action): return branch('“I’m 18 or older” ticked?', [('Age confirmed', action), ('Age not confirmed', toast(AGE_GATE_MESSAGE))], decide='ob.age')
     S('ob_account', 'Save your progress', '/onboarding/account', 'onboarding', phase='account', hdr=H('Save your progress', left='close'), body=[
         title('Create your account'), text('Keeps your plans safe if you change phones. You can also continue on this phone only.', 'muted'),
-        authbuttons(apple=auth('apple', [('Success', go('auth_merge')), ('Email already has a Tether account', go('auth_link')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]), google=auth('google', [('Success', go('auth_merge')), ('Email already has a Tether account', go('auth_link')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])),
+        authbuttons(apple=age_gate(auth('apple', [('Success', go('auth_merge')), ('Email already has a Tether account', go('auth_link')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])), google=age_gate(auth('google', [('Success', go('auth_merge')), ('Email already has a Tether account', go('auth_link')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]))),
         text('Sign in with Apple can hide your email: we use Apple’s private relay address.', 'small'),
         eyebrow('Or with email'),
         field('Email', 'alex@example.com', kind='email', key='email'), field('Password', '••••••••••••', hint='At least 12 characters. A passphrase works well.', kind='password', key='password'),
         checklist([ci('I’m 18 or older')], key='age_18_or_older'),
         text('Guest plans are encrypted on this phone. If you sign up later, we ask before uploading them.', 'small'),
-    ], footer=[button('Create account', submit('POST supabase /auth/v1/signup', go('auth_verify'))), button('Continue on this phone only', reset('today'), v='secondary')], api=['POST supabase /auth/v1/signup'])
+    ], footer=[button('Create account', age_gate(submit('POST supabase /auth/v1/signup', go('auth_verify')))), button('Continue on this phone only', age_gate(reset('today')), v='secondary')], api=['POST supabase /auth/v1/signup'])
 
     # ================================================================ AUTH
     flow('auth', 'Account & sign-in', 'Sign up, verify email, sign in (with error), password reset, guest-plan merge, session expiry.')

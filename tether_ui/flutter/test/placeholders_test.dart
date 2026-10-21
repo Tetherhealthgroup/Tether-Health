@@ -22,7 +22,7 @@ bool _holds(Object? value, String example) => value == example || (value is List
 
 const _cases = <(String, String, String, String, String?, bool, List<String>, List<(String, String)>)>[
   ('ob_basics', Routes.obBasics, 'footer[0]', 'Continue', null, false, ['ob_basics.what_should_we_call_you', 'ob_basics.age_range'], [('ob_basics.what_should_we_call_you', 'Alex'), ('ob_basics.age_range', '35–44')]),
-  ('ob_account', Routes.obAccount, 'footer[0]', 'Create account', null, true, ['ob_account.email', 'ob_account.password'], [('ob_account.email', 'alex@example.com'), ('ob_account.password', '••••••••••••')]),
+  ('ob_account', Routes.obAccount, 'footer[0]', 'Create account', 'Age confirmed', true, ['ob_account.email', 'ob_account.password'], [('ob_account.email', 'alex@example.com'), ('ob_account.password', '••••••••••••')]),
   ('auth_signin', Routes.authSignin, 'footer[0]', 'Sign in', 'Success', true, ['auth_signin.email', 'auth_signin.password'], [('auth_signin.email', 'alex@example.com'), ('auth_signin.password', '••••••••')]),
   ('auth_signin', Routes.authSignin, 'footer[0]', 'Sign in', 'Success · guest plan on phone', true, ['auth_signin.email', 'auth_signin.password'], [('auth_signin.email', 'alex@example.com'), ('auth_signin.password', '••••••••')]),
   ('auth_signin', Routes.authSignin, 'footer[0]', 'Sign in', 'Wrong password', true, ['auth_signin.email', 'auth_signin.password'], [('auth_signin.email', 'alex@example.com'), ('auth_signin.password', '••••••••')]),
