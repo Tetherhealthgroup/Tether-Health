@@ -190,9 +190,11 @@ including the ticked "I’m 18 or older" on `ob_account`.
 Every branch has exactly one production decision source (`spec/branches.json`).
 The branches that had none get one without any visible change: a device
 answer keyed by a stable id (`id`, `ask`, and `when`, which maps each answer
-to an existing case), or, for email sign-in, the server outcome of the
-`POST supabase /auth/v1/token` submit that the screen's `api` list already
-named. Labels, targets, copy and layout are unchanged.
+to an existing case), or, for email sign-in, the server outcome of a
+`POST supabase /auth/v1/token` submit (the endpoint `auth_signin` already
+lists in its `api`; the `api` list of `auth_signin_error` stays empty, so the
+approved JSON keeps its other fields). Labels, targets, copy and layout are
+unchanged.
 
 | Screen | Node | Change |
 |---|---|---|

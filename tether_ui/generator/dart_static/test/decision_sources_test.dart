@@ -45,27 +45,112 @@ Map<String, dynamic> _screens() => jsonDecode(File('../spec/screens.json').readA
 
 final Map<String, String> _routeOf = {for (final s in AppRouter.catalog) s.$1: s.$4};
 
-/// The R-7 mapping: every branch that a device answer decides, or that is a
-/// preview-only reference branch, with its stable id and ask.
-const _r7 = <String, (String, String)>{
-  'ob_reminders footer[0]': ('onboarding.reminders.notifications_request', 'notificationsRequest'),
-  'records_fhir_url footer[0]': ('records.fhir_url.server_check', 'fhirServerCheck'),
-  'records_consent footer[0]': ('records.connect.mychart', 'smartConnect'),
-  'records_consent_bb footer[0]': ('records.connect.medicare', 'smartConnect'),
-  'records_consent_device footer[0]': ('records.device.health_records_request', 'healthRecordsRequest'),
-  'sf_screentime footer[0]': ('sf.screentime.ios_request', 'screenTimeRequest'),
-  'sf_screentime_android footer[0]': ('sf.screentime.android_usage_access', 'usageAccessSettings'),
-  'sf_unplug_intro footer[0]': ('unplug.intro.platform', 'platform'),
-  'sf_unplug_home body[2].rows[2]': ('unplug.home.preview_platform', 'platform'),
-  'sf_unplug_auth_notifications footer[2]': ('unplug.setup.continue_platform', 'platform'),
-  'sf_unplug_auth footer[0]': ('unplug.setup.ios_authorization', 'unplugAuthIos'),
-  'sf_unplug_auth_denied footer[0]': ('unplug.setup.ios_authorization_retry', 'unplugAuthIos'),
-  'sf_unplug_auth_notifications footer[1]': ('unplug.setup.notifications_check', 'notificationsCheck'),
-  'sf_unplug_auth_android footer[2]': ('unplug.setup.android_check', 'unplugAndroidCheck'),
-  'sf_unplug_health_notifications footer[1]': ('unplug.health.notifications_check', 'notificationsCheck'),
-  'sf_unplug_health_stopped footer[1]': ('unplug.health.tracking_check', 'unplugTrackingCheck'),
-  'sf_unplug_picker_ios footer[0]': ('unplug.picker.ios', 'reference'),
-  'sf_unplug_shield footer[0] then': ('unplug.shield.notification_action', 'reference'),
+/// Every branch that a device answer decides, or that is a preview-only
+/// reference branch: its stable id, its ask and its full answer → case map
+/// (a per-platform value maps ios and android). Pinned here, independently of
+/// the spec, because the Unplug and screen-time additions are not hash-pinned
+/// by the approved-design registry. Reference branches have no map.
+const _mapping = <String, (String, String, Map<String, Object>?)>{
+  'ob_reminders footer[0]': ('onboarding.reminders.notifications_request', 'notificationsRequest', {'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'}),
+  'records_fhir_url footer[0]': ('records.fhir_url.server_check', 'fhirServerCheck', {'supported': 'SMART on FHIR R4 supported', 'unsupported': 'Not a FHIR R4 server'}),
+  'records_consent footer[0]': ('records.connect.mychart', 'smartConnect', {'approved': 'Approved', 'cancelled': 'Cancelled', 'failed': 'Denied or error'}),
+  'records_consent_bb footer[0]': ('records.connect.medicare', 'smartConnect', {'approved': 'Approved', 'cancelled': 'Cancelled', 'failed': 'Denied or error'}),
+  'records_consent_device footer[0]': ('records.device.health_records_request', 'healthRecordsRequest', {'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'}),
+  'sf_screentime footer[0]': ('sf.screentime.ios_request', 'screenTimeRequest', {'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'}),
+  'sf_screentime_android footer[0]': ('sf.screentime.android_usage_access', 'usageAccessSettings', {'granted': 'Allowed', 'denied': 'Not allowed'}),
+  'sf_unplug_intro footer[0]': ('unplug.intro.platform', 'platform', {'ios': 'iPhone', 'android': 'Android'}),
+  'sf_unplug_home body[2].rows[2]': ('unplug.home.preview_platform', 'platform', {'ios': 'iPhone', 'android': 'Android'}),
+  'sf_unplug_auth_notifications footer[2]': ('unplug.setup.continue_platform', 'platform', {'ios': 'iPhone', 'android': 'Android'}),
+  'sf_unplug_auth footer[0]': ('unplug.setup.ios_authorization', 'unplugAuthIos', {'granted': 'Approved', 'grantedNotificationsOff': 'Approved · notifications off', 'denied': 'Denied', 'unavailable': 'Unavailable'}),
+  'sf_unplug_auth_denied footer[0]': ('unplug.setup.ios_authorization_retry', 'unplugAuthIos', {'granted': 'Approved', 'grantedNotificationsOff': 'Approved', 'denied': 'Denied', 'unavailable': 'Denied'}),
+  'sf_unplug_auth_notifications footer[1]': ('unplug.setup.notifications_check', 'notificationsCheck', {'granted': {'ios': 'On (iPhone)', 'android': 'On (Android)'}, 'denied': 'Still off'}),
+  'sf_unplug_auth_android footer[2]': ('unplug.setup.android_check', 'unplugAndroidCheck', {'allOn': 'All on', 'notificationsOff': 'Notifications off', 'missing': 'Missing'}),
+  'sf_unplug_health_notifications footer[1]': ('unplug.health.notifications_check', 'notificationsCheck', {'granted': 'On', 'denied': 'Still off'}),
+  'sf_unplug_health_stopped footer[1]': ('unplug.health.tracking_check', 'unplugTrackingCheck', {'healthy': 'All pass', 'failing': 'Still failing'}),
+  'sf_unplug_picker_ios footer[0]': ('unplug.picker.ios', 'reference', null),
+  'sf_unplug_shield footer[0] then': ('unplug.shield.notification_action', 'reference', null),
+};
+
+/// For each device branch and each answer ('answer' or 'answer/platform'):
+/// the case it takes and what that case opens: ('route', route) with the
+/// route on top, ('pop', null) back to the screen below, or ('toast', null)
+/// staying on the screen; plus the toast text it shows, if any.
+const _opens = <String, Map<String, (String, String, String?, String?)>>{
+  'ob_reminders footer[0]': {
+    'granted': ('Allowed', 'route', '/onboarding/account', null),
+    'denied': ('Not allowed', 'route', '/onboarding/reminders?state=denied', null),
+    'unavailable': ('Not allowed', 'route', '/onboarding/reminders?state=denied', null),
+  },
+  'records_fhir_url footer[0]': {
+    'supported': ('SMART on FHIR R4 supported', 'route', '/records/consent', null),
+    'unsupported': ('Not a FHIR R4 server', 'route', '/records/error', null),
+  },
+  'records_consent footer[0]': {
+    'approved': ('Approved', 'route', '/records/importing', null),
+    'cancelled': ('Cancelled', 'toast', null, 'Connection cancelled. Nothing was imported.'),
+    'failed': ('Denied or error', 'route', '/records/error', null),
+  },
+  'records_consent_bb footer[0]': {
+    'approved': ('Approved', 'route', '/records/importing', null),
+    'cancelled': ('Cancelled', 'toast', null, 'Connection cancelled. Nothing was imported.'),
+    'failed': ('Denied or error', 'route', '/records/error', null),
+  },
+  'records_consent_device footer[0]': {
+    'granted': ('Allowed', 'route', '/records/importing', null),
+    'denied': ('Not allowed', 'route', '/records/error', null),
+    'unavailable': ('Not allowed', 'route', '/records/error', null),
+  },
+  'sf_screentime footer[0]': {
+    'granted': ('Allowed', 'pop', null, 'Screen Time connected'),
+    'denied': ('Not allowed', 'route', '/p/sf/screen-time?state=denied', null),
+    'unavailable': ('Not allowed', 'route', '/p/sf/screen-time?state=denied', null),
+  },
+  'sf_screentime_android footer[0]': {
+    'granted': ('Allowed', 'pop', null, 'Usage access on'),
+    'denied': ('Not allowed', 'route', '/p/sf/screen-time?state=android-denied', null),
+  },
+  'sf_unplug_intro footer[0]': {
+    'ios': ('iPhone', 'route', '/p/sf/unplug/permission', null),
+    'android': ('Android', 'route', '/p/sf/unplug/permission?state=android', null),
+  },
+  'sf_unplug_home body[2].rows[2]': {
+    'ios': ('iPhone', 'route', '/system/unplug/shield', null),
+    'android': ('Android', 'route', '/system/unplug/overlay', null),
+  },
+  'sf_unplug_auth_notifications footer[2]': {
+    'ios': ('iPhone', 'route', '/p/sf/unplug/apps', null),
+    'android': ('Android', 'route', '/p/sf/unplug/apps?state=android', null),
+  },
+  'sf_unplug_auth footer[0]': {
+    'granted': ('Approved', 'route', '/p/sf/unplug/apps', null),
+    'grantedNotificationsOff': ('Approved · notifications off', 'route', '/p/sf/unplug/permission?state=notifications', null),
+    'denied': ('Denied', 'route', '/p/sf/unplug/permission?state=denied', null),
+    'unavailable': ('Unavailable', 'route', '/p/sf/unplug/permission?state=unavailable', null),
+  },
+  'sf_unplug_auth_denied footer[0]': {
+    'granted': ('Approved', 'route', '/p/sf/unplug/apps', null),
+    'grantedNotificationsOff': ('Approved', 'route', '/p/sf/unplug/apps', null),
+    'denied': ('Denied', 'toast', null, 'Still not allowed. You can turn it on later in Settings.'),
+    'unavailable': ('Denied', 'toast', null, 'Still not allowed. You can turn it on later in Settings.'),
+  },
+  'sf_unplug_auth_notifications footer[1]': {
+    'granted/ios': ('On (iPhone)', 'route', '/p/sf/unplug/apps', null),
+    'granted/android': ('On (Android)', 'route', '/p/sf/unplug/apps?state=android', null),
+    'denied': ('Still off', 'toast', null, 'Notifications are still off. You can turn them on later in Settings.'),
+  },
+  'sf_unplug_auth_android footer[2]': {
+    'allOn': ('All on', 'route', '/p/sf/unplug/apps?state=android', null),
+    'notificationsOff': ('Notifications off', 'route', '/p/sf/unplug/permission?state=notifications', null),
+    'missing': ('Missing', 'toast', null, 'Unplug still needs both settings.'),
+  },
+  'sf_unplug_health_notifications footer[1]': {
+    'granted': ('On', 'route', '/p/sf/unplug/health', null),
+    'denied': ('Still off', 'toast', null, 'Notifications are still off.'),
+  },
+  'sf_unplug_health_stopped footer[1]': {
+    'healthy': ('All pass', 'route', '/p/sf/unplug/health', null),
+    'failing': ('Still failing', 'toast', null, 'Still not working. Turn Screen Time access on again in Settings.'),
+  },
 };
 
 String _where(Map<String, dynamic> r) => '${r['screen']} ${r['path']}${(r['at'] as String).isEmpty ? '' : ' ${r['at']}'}';
@@ -101,6 +186,31 @@ class _ScriptedApi implements TApi {
     calls.add((endpoint, screenId));
     return result;
   }
+}
+
+/// The navigator's stack of route names (top last).
+class _Stack extends NavigatorObserver {
+  final List<String?> names = [];
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) => names.add(route.settings.name);
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    if (names.isNotEmpty) names.removeLast();
+  }
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) => names.remove(route.settings.name);
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    final i = names.lastIndexOf(oldRoute?.settings.name);
+    if (i >= 0) {
+      names[i] = newRoute?.settings.name;
+    } else {
+      names.add(newRoute?.settings.name);
+    }
+  }
+
+  String? get top => names.isEmpty ? null : names.last;
 }
 
 /// Every route name pushed or put in place, in order.
@@ -251,12 +361,16 @@ void main() {
       }
     });
 
-    test('the device and reference branches are exactly the R-7 mapping', () {
-      final found = {
-        for (final r in _catalogue())
-          if (r['source'] == 'device' || r['source'] == 'reference') _where(r): (r['id'] as String, r['ask'] as String),
-      };
-      expect(found, _r7);
+    test('the device and reference branches are exactly the pinned mapping: id, ask and the full answer map', () {
+      final cat = [for (final r in _catalogue()) if (r['source'] == 'device' || r['source'] == 'reference') r];
+      expect({for (final r in cat) _where(r)}, _mapping.keys.toSet());
+      for (final r in cat) {
+        final (id, ask, map) = _mapping[_where(r)]!;
+        expect(r['id'], id, reason: _where(r));
+        expect(r['ask'], ask, reason: _where(r));
+        expect(r['when'], map == null ? isNull : equals(map), reason: '${_where(r)}: answer map');
+      }
+      expect(_opens.keys.toSet(), {for (final e in _mapping.entries) if (e.value.$3 != null) e.key});
     });
 
     test('the formerly undecided branches now have a source: email sign-in by its submit, the rest by TDevice', () {
@@ -294,28 +408,40 @@ void main() {
 
   group('every generated branch is decided without the resolver (release defaults)', () {
     final cat = _catalogue();
-    for (final r in cat.where((r) => r['source'] == 'device')) {
-      final ask = TAsk.values.byName(r['ask'] as String);
-      final when = (r['when'] as Map).cast<String, Object>();
-      for (final answer in ask.answers) {
-        final platforms = when[answer.name] is Map ? [TAnswer.ios, TAnswer.android] : <TAnswer?>[null];
-        for (final platform in platforms) {
-          testWidgets('device ${_where(r)}: ${answer.name}${platform == null ? '' : ' on ${platform.name}'}', (tester) async {
-            TDefaults.forRelease();
-            final resolver = TFailClosedResolver();
-            TNav.branchResolver = resolver.resolve;
-            final device = _ScriptedDevice((ref) async => ref.ask == TAsk.platform && ask != TAsk.platform ? platform : answer);
-            TDevice.instance = device;
-            await _open(tester, _routeOf[r['screen']]!);
-            await _tapKey(tester, r['path'] as String);
-            expect(resolver.recorded, isEmpty, reason: 'the device answer decides the branch');
-            expect(device.asked.first, TBranchRef(r['id'] as String, ask, r['screen'] as String));
-            expect(device.asked, hasLength(platform == null ? 1 : 2));
-            expect(tester.takeException(), isNull);
-            TCallFallback.dismiss();
-            await tester.pump(const Duration(seconds: 3));
-          });
-        }
+    for (final MapEntry(key: where, value: answers) in _opens.entries) {
+      final (id, askName, _) = _mapping[where]!;
+      final ask = TAsk.values.byName(askName);
+      final parts = where.split(' ');
+      final screen = parts[0];
+      final path = parts[1];
+      for (final MapEntry(key: key, value: (label, kind, route, toast)) in answers.entries) {
+        final answer = TAnswer.values.byName(key.split('/').first);
+        final platform = key.contains('/') ? TAnswer.values.byName(key.split('/').last) : null;
+        testWidgets('device $where: $key takes "$label" and opens ${route ?? kind}', (tester) async {
+          TDefaults.forRelease();
+          final resolver = TFailClosedResolver();
+          TNav.branchResolver = resolver.resolve;
+          final device = _ScriptedDevice((ref) async => ref.ask == TAsk.platform && ask != TAsk.platform ? platform : answer);
+          TDevice.instance = device;
+          final stack = _Stack();
+          await _open(tester, _routeOf[screen]!, observers: [stack]);
+          await _tapKey(tester, path);
+          expect(resolver.recorded, isEmpty, reason: 'the device answer decides the branch');
+          expect(device.asked.first, TBranchRef(id, ask, screen));
+          expect(device.asked, hasLength(platform == null ? 1 : 2));
+          switch (kind) {
+            case 'route':
+              expect(stack.top, route, reason: '"$label" opens $route');
+            case 'pop':
+              expect(stack.top, _host, reason: '"$label" goes back');
+            case 'toast':
+              expect(stack.top, _routeOf[screen], reason: '"$label" stays on the screen');
+          }
+          if (toast != null) expect(find.text(toast), findsWidgets, reason: '"$label" shows "$toast"');
+          expect(tester.takeException(), isNull);
+          TCallFallback.dismiss();
+          await tester.pump(const Duration(seconds: 3));
+        });
       }
     }
     for (final r in cat.where((r) => r['source'] == 'server')) {
@@ -588,7 +714,7 @@ void main() {
     });
   });
 
-  group('question redaction (R-5)', () {
+  group('question redaction', () {
     testWidgets('release defaults pass an empty question to the resolver', (tester) async {
       TDefaults.forRelease();
       final got = <String>[];
@@ -631,7 +757,7 @@ void main() {
     });
   });
 
-  group('email sign-in is a submit (R-1, R-6, P-51)', () {
+  group('email sign-in is a submit, never queued (P-51)', () {
     for (final (screen, route) in [('auth_signin', Routes.authSignin), ('auth_signin_error', Routes.authSigninError)]) {
       for (final (label, expected) in <(String, Type)>[
         ('Success', TodayScreen),

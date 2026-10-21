@@ -24,7 +24,7 @@ only while the screen that asked is still the top route.
 labels and, for device branches, id, ask and when. It never carries question
 text. Counts: rule 9, choice 8, auth 12, device 16, server 2, reference 2.
 
-## R-7 mapping (device and reference branches)
+## Branch id mapping (device and reference branches)
 
 Ids follow `^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*){2}$` and are chosen by hand,
 never derived from the screen or the element path.
@@ -59,7 +59,7 @@ the resolver runs. Release default `TInertDevice` never answers and records
 the preview chooser runs as before. While a device branch is being decided,
 another activation of the same branch on the same screen is ignored.
 
-## Email sign-in (R-1) and non-queueable auth submits (R-6)
+## Email sign-in and non-queueable auth submits
 
 `auth_signin` and `auth_signin_error` footer "Sign in" / "Try again" are
 `submit('POST supabase /auth/v1/token', branch('Sign-in result', …))`

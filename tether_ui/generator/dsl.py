@@ -64,7 +64,7 @@ def branch(question, cases, on=None, key=None, decide=None, id=None, ask=None, w
     if when is not None: b['when'] = dict(when)
     return b
 
-# Device questions a branch can ask (R-31, R-4), each with its fixed answer
+# Device questions a branch can ask (R-31), each with its fixed answer
 # set. The Flutter kit mirrors this table as TAsk / TAnswer (lib/ui/nav.dart);
 # validate.py checks that the two match. 'reference' marks a preview-only
 # branch on a reference surface: it has no answers and production never
@@ -89,7 +89,7 @@ ASKS = {
 # layout changes).
 BRANCH_ID = re.compile(r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*){2}$')
 
-# Submit endpoints that are never queued (R-31, R-6): the sign-in and account
+# Submit endpoints that are never queued (R-31): the sign-in and account
 # endpoints. A queued result counts as failed('not_queueable') and a failure
 # shows the generic message, not the save message. validate.py checks that
 # every submit endpoint on "supabase /auth/" is listed and every entry is used.
