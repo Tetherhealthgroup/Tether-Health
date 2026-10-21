@@ -257,7 +257,7 @@ announce. The rule decides before anything else runs, so an unticked
 Apple or Google button never starts native sign-in. No visible element, label
 or layout changes.
 
-Draft message, pending clinical/legal copy review (H31): "You need to be 18 or
+Draft message, needs clinical/legal copy review: "You need to be 18 or
 older to continue." No existing spec copy states the age requirement; the
 wording follows the checklist label.
 
