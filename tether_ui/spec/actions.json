@@ -423,13 +423,13 @@
     "screen_name": "Sign in",
     "element": "Sign in",
     "path": "footer[0]",
-    "type": "branch",
+    "type": "submit",
     "targets": [
       "today",
       "auth_merge",
       "auth_signin_error"
     ],
-    "summary": "branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error"
+    "summary": "POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error"
   },
   {
     "screen": "auth_signin",
@@ -484,12 +484,13 @@
     "screen_name": "Sign-in error",
     "element": "Try again",
     "path": "footer[0]",
-    "type": "branch",
+    "type": "submit",
     "targets": [
       "today",
+      "auth_merge",
       "auth_signin_error"
     ],
-    "summary": "branch: Sign-in result → Success: reset → today | Wrong password: replace → auth_signin_error"
+    "summary": "POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: replace → auth_signin_error"
   },
   {
     "screen": "auth_signin_error",

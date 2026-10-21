@@ -84,7 +84,13 @@
               "to": "sf_unplug_auth_android"
             }
           }
-        ]
+        ],
+        "id": "unplug.intro.platform",
+        "ask": "platform",
+        "when": {
+          "ios": "iPhone",
+          "android": "Android"
+        }
       },
       "variant": "primary",
       "arrow": true
@@ -137,7 +143,13 @@
               "to": "sf_unplug_auth_android"
             }
           }
-        ]
+        ],
+        "id": "unplug.intro.platform",
+        "ask": "platform",
+        "when": {
+          "ios": "iPhone",
+          "android": "Android"
+        }
       },
       "summary": "branch: Platform → iPhone: push → sf_unplug_auth | Android: push → sf_unplug_auth_android"
     },

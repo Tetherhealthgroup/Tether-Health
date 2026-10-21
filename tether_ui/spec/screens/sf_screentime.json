@@ -81,7 +81,14 @@
               "to": "sf_screentime_denied"
             }
           }
-        ]
+        ],
+        "id": "sf.screentime.ios_request",
+        "ask": "screenTimeRequest",
+        "when": {
+          "granted": "Allowed",
+          "denied": "Not allowed",
+          "unavailable": "Not allowed"
+        }
       },
       "variant": "primary",
       "arrow": true
@@ -134,7 +141,14 @@
               "to": "sf_screentime_denied"
             }
           }
-        ]
+        ],
+        "id": "sf.screentime.ios_request",
+        "ask": "screenTimeRequest",
+        "when": {
+          "granted": "Allowed",
+          "denied": "Not allowed",
+          "unavailable": "Not allowed"
+        }
       },
       "summary": "branch: iOS Screen Time permission → Allowed: toast “Screen Time connected” then back | Not allowed: replace → sf_screentime_denied"
     },

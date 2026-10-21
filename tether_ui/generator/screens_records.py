@@ -42,9 +42,13 @@ def records():
     S('records_fhir_url', 'Other FHIR server', '/records/fhir-url', 'records', phase='resources', hdr=H('Other FHIR server'), body=[
         title('Enter your provider’s FHIR address'), field('FHIR server address', 'https://fhir.example-health.org/r4', kind='text', key='base_url', hint='Starts with https:// · your provider gives you this'),
         text('We check it supports SMART on FHIR R4 (/.well-known/smart-configuration) before you sign in.', 'small'),
-    ], footer=[button('Check and continue', branch('Server check', [('SMART on FHIR R4 supported', go('records_consent')), ('Not a FHIR R4 server', go('records_error'))]))],
+    ], footer=[button('Check and continue', branch('Server check', [('SMART on FHIR R4 supported', go('records_consent')), ('Not a FHIR R4 server', go('records_error'))],
+                                                 id='records.fhir_url.server_check', ask='fhirServerCheck',
+                                                 when={'supported': 'SMART on FHIR R4 supported', 'unsupported': 'Not a FHIR R4 server'}))],
        api=['GET {base}/.well-known/smart-configuration', 'GET {base}/metadata'])
 
+    # SMART sign-in in the system browser (R-31: through the device hook, not a submit).
+    SMART_WHEN = {'approved': 'Approved', 'cancelled': 'Cancelled', 'failed': 'Denied or error'}
     consent_body = lambda name, src: [
         title(f'Connect {name}?'),
         kv([('Source', src), ('Access', 'Read-only'), ('Refresh', 'Daily while connected'), ('Stop', 'Disconnect anytime')]),
@@ -53,18 +57,22 @@ def records():
         card(v='mint', title='Only the programs you joined get data', text='Heartwise ← blood pressure, lipids · Steady ← A1C, glucose · Renew ← eGFR · Checkup ← immunizations · BreatheFree ← smoking status. Ease and ScrollFree get nothing.'),
     ]
     S('records_consent', 'Consent: Epic', '/records/consent', 'records', phase='resources', hdr=H('Connect', pill='Read-only'), body=consent_body('Patel Family Medicine', 'Epic MyChart · SMART on FHIR R4'),
-      footer=[button('Continue to MyChart', branch('MyChart sign-in result', [('Approved', go('records_importing')), ('Cancelled', toast('Connection cancelled. Nothing was imported.')), ('Denied or error', go('records_error'))])),
+      footer=[button('Continue to MyChart', branch('MyChart sign-in result', [('Approved', go('records_importing')), ('Cancelled', toast('Connection cancelled. Nothing was imported.')), ('Denied or error', go('records_error'))],
+                                                   id='records.connect.mychart', ask='smartConnect', when=SMART_WHEN)),
               button('Not now', back(), v='secondary')],
       api=['GET /v1/records/fhir/authorize (PKCE) → system browser', 'POST /v1/records/fhir/callback (code exchange on server)'],
       desc='Authorization code + PKCE in ASWebAuthenticationSession / Custom Tabs. The code is exchanged by records-service; refresh tokens are stored encrypted server-side, never on the phone.')
     S('records_consent_bb', 'Consent: Medicare', '/records/consent?source=medicare', 'records', phase='resources', variant_of='records_consent', state='Medicare', hdr=H('Connect', pill='Read-only'),
       body=consent_body('Medicare', 'CMS Blue Button 2.0 · FHIR R4 (claims)'),
-      footer=[button('Continue to Medicare.gov', branch('Medicare sign-in result', [('Approved', go('records_importing')), ('Cancelled', toast('Connection cancelled. Nothing was imported.')), ('Denied or error', go('records_error'))])),
+      footer=[button('Continue to Medicare.gov', branch('Medicare sign-in result', [('Approved', go('records_importing')), ('Cancelled', toast('Connection cancelled. Nothing was imported.')), ('Denied or error', go('records_error'))],
+                                                       id='records.connect.medicare', ask='smartConnect', when=SMART_WHEN)),
               button('Not now', back(), v='secondary')])
     S('records_consent_device', 'Consent: phone health data', '/records/consent?source=device', 'records', phase='resources', variant_of='records_consent', state='Apple Health / Health Connect', hdr=H('Connect', pill='Read-only'),
       body=[title('Use health data on this phone?'), text('iPhone: Apple Health Records (FHIR) and readings. Android: Health Connect readings. You choose each type in the system screen next.', 'muted'),
             checklist([ci('Blood pressure', None, True), ci('Blood glucose', None, True), ci('Clinical records (iPhone)', 'Labs, immunizations, conditions', True), ci('Steps and sleep', 'Not requested')], label='What Tether will ask for', key='data_types')],
-      footer=[button('Continue', branch('System permission result', [('Allowed', go('records_importing')), ('Not allowed', go('records_error'))])), button('Not now', back(), v='secondary')],
+      footer=[button('Continue', branch('System permission result', [('Allowed', go('records_importing')), ('Not allowed', go('records_error'))],
+                                         id='records.device.health_records_request', ask='healthRecordsRequest',
+                                         when={'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'})), button('Not now', back(), v='secondary')],
       desc='HealthKit clinical records (HKClinicalType) on iOS; Health Connect permissions on Android. Data stays on the device until you review it.')
 
     S('records_importing', 'Importing', '/records/importing', 'records', phase='resources', state='loading', hdr=H('Importing', left='close'), body=[

@@ -13,7 +13,7 @@ import '../../ui/ui.dart';
 ///   • Continue with Apple → auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error
 ///   • Continue with Google → auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error
 ///   • Forgot password? → push → auth_forgot
-///   • Sign in → branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error
+///   • Sign in → POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: push → auth_signin_error
 ///   • Cancel → close
 /// API: POST supabase /auth/v1/token
 class AuthSigninScreen extends StatelessWidget {
@@ -31,7 +31,7 @@ class AuthSigninScreen extends StatelessWidget {
         TLink(key: const ValueKey('a:body[5]'), label: 'Forgot password?', onTap: () => TNav.push(context, Routes.authForgot), alignLeft: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Sign in', onPressed: () => TNav.branch(context, 'Sign-in result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Success · guest plan on phone': () => TNav.push(context, Routes.authMerge), 'Wrong password': () => TNav.push(context, Routes.authSigninError)}), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Sign in', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/token', screenId: 'auth_signin', queueable: false, then: () => TNav.branch(context, 'Sign-in result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Success · guest plan on phone': () => TNav.push(context, Routes.authMerge), 'Wrong password': () => TNav.push(context, Routes.authSigninError)})), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );

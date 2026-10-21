@@ -70,24 +70,30 @@
     {
       "screen": "auth_signin",
       "decisions": [
-        "P-31"
+        "P-31",
+        "TH-902"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-986a"
       ],
-      "sha256": "cd437b6a4b2d3191601ec423a6b557d1c1ee73a5f34252363f44ae07feb8b16b",
-      "change": "P-31 placeholders, fields start empty: body[3] \"Email\" example \"alex@example.com\" -> placeholder; body[4] \"Password\" example \"••••••••\" -> placeholder"
+      "sha256": "c1e04f8e565da38ef5513a603ccb1a89f8f65b3b5169dafea2adf9fdf5690b7d",
+      "change": "P-31 placeholders, fields start empty: body[3] \"Email\" example \"alex@example.com\" -> placeholder; body[4] \"Password\" example \"••••••••\" -> placeholder | TH-986a: Decision source only, no visual change: footer[0] \"Sign in\" branch \"Sign-in result\" is wrapped in submit \"POST supabase /auth/v1/token\", so the server outcome decides it (labels and targets unchanged; the action summary names the endpoint)"
     },
     {
       "screen": "auth_signin_error",
       "decisions": [
-        "P-31"
+        "P-31",
+        "TH-902",
+        "P-51"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-986a",
+        "TH-986b"
       ],
-      "sha256": "870b1a6748b6ffb6fa1f4492eeff8c34f2974348e20ba6e1ddffdb37a8674a24",
-      "change": "P-31 placeholders, fields start empty: body[4] \"Email\" example \"alex@example.com\" -> placeholder; body[5] \"Password\" example \"••••••••\" -> placeholder"
+      "sha256": "f4de80876ac203a17fbf529829062a3684abdec907969f2a51096fce786ff539",
+      "change": "P-31 placeholders, fields start empty: body[4] \"Email\" example \"alex@example.com\" -> placeholder; body[5] \"Password\" example \"••••••••\" -> placeholder | TH-986a, TH-986b: Decision source: footer[0] \"Try again\" branch \"Sign-in result\" is wrapped in submit \"POST supabase /auth/v1/token\" (TH-902, TH-986a), and gains the case \"Success · guest plan on phone\" -> push auth_merge, as on auth_signin (P-51, TH-986b)"
     },
     {
       "screen": "be_q2",
@@ -348,6 +354,17 @@
       "change": "Session key only, no visual change: body[3] tiles gets key \"programs\""
     },
     {
+      "screen": "ob_reminders",
+      "decisions": [
+        "TH-902"
+      ],
+      "tickets": [
+        "TH-986a"
+      ],
+      "sha256": "3ac929b7d784b0f3a19533bd33dc7b6befad0edee7aa01871b78f25a770ec5a4",
+      "change": "Decision source only, no visual change: footer[0] branch gets id \"onboarding.reminders.notifications_request\", ask \"notificationsRequest\" and when {granted: Allowed, denied: Not allowed, unavailable: Not allowed}"
+    },
+    {
       "screen": "program_settings",
       "decisions": [
         "P-08",
@@ -377,10 +394,11 @@
         "TH-902"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-986a"
       ],
-      "sha256": "2f855fc79c0650c056bb11aed87fcb7ca2bb2537bdb4646ddc19b9254067064a",
-      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\""
+      "sha256": "b1fe26df1593d88c28571ca3ab3157c8659fbaea627f8c2d7ff21328c314fcd1",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.connect.mychart\", ask \"smartConnect\" and when {approved: Approved, cancelled: Cancelled, failed: Denied or error}"
     },
     {
       "screen": "records_consent_bb",
@@ -388,10 +406,11 @@
         "TH-902"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-986a"
       ],
-      "sha256": "ab16fbdff3e1816078b0868aac0e543a3100179668320235debd63b2c09704d4",
-      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\""
+      "sha256": "14a7a411640ac2ca2738e746af0b15bd654feec477ddd7c3cc66b8dd11a581cc",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.connect.medicare\", ask \"smartConnect\" and when {approved: Approved, cancelled: Cancelled, failed: Denied or error}"
     },
     {
       "screen": "records_consent_device",
@@ -399,21 +418,24 @@
         "TH-902"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-986a"
       ],
-      "sha256": "3d4ffd373d6964add7ad77256c52b4eb91320f4e849189858ef8602d3f7fa8c3",
-      "change": "Session key only, no visual change: body[2] checklist gets key \"data_types\""
+      "sha256": "5e2416a736e45fa22ca9d8a8427789c0c5a6bd594f04b39b0df26a446a615007",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"data_types\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.device.health_records_request\", ask \"healthRecordsRequest\" and when {granted: Allowed, denied: Not allowed, unavailable: Not allowed}"
     },
     {
       "screen": "records_fhir_url",
       "decisions": [
-        "P-31"
+        "P-31",
+        "TH-902"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-986a"
       ],
-      "sha256": "8daebea44805c2998a2e5c14212a380dfc165b68c753062220fbfe38dc450c93",
-      "change": "P-31 placeholders, fields start empty: body[1] \"FHIR server address\" example \"https://fhir.example-health.org/r4\" -> placeholder"
+      "sha256": "02ab281aa5dcd85887af52e3101963f23cfcbb90837d8fadbfd77c09a87701c1",
+      "change": "P-31 placeholders, fields start empty: body[1] \"FHIR server address\" example \"https://fhir.example-health.org/r4\" -> placeholder | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.fhir_url.server_check\", ask \"fhirServerCheck\" and when {supported: SMART on FHIR R4 supported, unsupported: Not a FHIR R4 server}"
     },
     {
       "screen": "records_manual",
@@ -508,13 +530,15 @@
     {
       "screen": "sf_screentime",
       "decisions": [
-        "P-47 decision 3"
+        "P-47 decision 3",
+        "TH-902"
       ],
       "tickets": [
-        "TH-953"
+        "TH-953",
+        "TH-986a"
       ],
-      "sha256": "59d6b66a1dd3b8c4df7721d8267309281508fdf065003fc0161bd3324b7ec568",
-      "change": "iPhone copy says Screen Time \"shows\" totals, not that Tether \"reads\" them (4 strings)"
+      "sha256": "94ccbb12d25d884505e812f6066d635e3cc30af4c732a6fbb9a80e96f5a685ff",
+      "change": "iPhone copy says Screen Time \"shows\" totals, not that Tether \"reads\" them (4 strings) | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"sf.screentime.ios_request\", ask \"screenTimeRequest\" and when {granted: Allowed, denied: Not allowed, unavailable: Not allowed}"
     },
     {
       "screen": "st_a1c",

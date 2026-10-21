@@ -86,7 +86,13 @@
                   "to": "sf_unplug_overlay"
                 }
               }
-            ]
+            ],
+            "id": "unplug.home.preview_platform",
+            "ask": "platform",
+            "when": {
+              "ios": "iPhone",
+              "android": "Android"
+            }
           }
         },
         {
@@ -188,7 +194,13 @@
               "to": "sf_unplug_overlay"
             }
           }
-        ]
+        ],
+        "id": "unplug.home.preview_platform",
+        "ask": "platform",
+        "when": {
+          "ios": "iPhone",
+          "android": "Android"
+        }
       },
       "summary": "branch: Platform → iPhone: push → sf_unplug_shield | Android: push → sf_unplug_overlay"
     },

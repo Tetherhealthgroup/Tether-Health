@@ -61,7 +61,13 @@
               "to": "records_error"
             }
           }
-        ]
+        ],
+        "id": "records.fhir_url.server_check",
+        "ask": "fhirServerCheck",
+        "when": {
+          "supported": "SMART on FHIR R4 supported",
+          "unsupported": "Not a FHIR R4 server"
+        }
       },
       "variant": "primary",
       "arrow": true
@@ -105,7 +111,13 @@
               "to": "records_error"
             }
           }
-        ]
+        ],
+        "id": "records.fhir_url.server_check",
+        "ask": "fhirServerCheck",
+        "when": {
+          "supported": "SMART on FHIR R4 supported",
+          "unsupported": "Not a FHIR R4 server"
+        }
       },
       "summary": "branch: Server check → SMART on FHIR R4 supported: push → records_consent | Not a FHIR R4 server: push → records_error"
     }

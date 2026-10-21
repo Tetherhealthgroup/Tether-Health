@@ -518,8 +518,10 @@ void main() {
         _expectFallback(TFallbackKind.call, '988');
         auth.gate.complete('Cancelled');
         await _settle(tester);
-        expect(took, ['Cancelled']);
-        // Which route the outcome pops is out of scope here; the fallback stays.
+        // The screen that asked is covered by the crisis screen, so the late
+        // outcome is dropped (TNav.branch route scope) and nothing is popped.
+        expect(took, isEmpty);
+        expect(find.byType(CrisisScreen), findsOneWidget);
         _expectFallback(TFallbackKind.call, '988');
         await _drain(tester);
       });

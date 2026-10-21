@@ -27,7 +27,7 @@ class SfUnplugHealthStoppedScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Open phone settings', onPressed: () => TNav.osSettings(context), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Check again', onPressed: () => TNav.branch(context, 'Tracking health result', <String, VoidCallback>{'All pass': () => TNav.replace(context, Routes.sfUnplugHealth), 'Still failing': () => TNav.toast(context, 'Still not working. Turn Screen Time access on again in Settings.')}), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: 'Check again', onPressed: () => TNav.branch(context, 'Tracking health result', <String, VoidCallback>{'All pass': () => TNav.replace(context, Routes.sfUnplugHealth), 'Still failing': () => TNav.toast(context, 'Still not working. Turn Screen Time access on again in Settings.')}, device: const TBranchRef('unplug.health.tracking_check', TAsk.unplugTrackingCheck, 'sf_unplug_health_stopped'), when: const <TAnswer, String>{TAnswer.healthy: 'All pass', TAnswer.failing: 'Still failing'}), variant: TButtonVariant.secondary),
       ],
     );
   }

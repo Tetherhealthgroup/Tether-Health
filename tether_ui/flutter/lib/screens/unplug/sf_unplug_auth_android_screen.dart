@@ -30,7 +30,7 @@ class SfUnplugAuthAndroidScreen extends StatelessWidget {
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Turn on display over apps', onPressed: () => TNav.osSettings(context), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Turn on usage access', onPressed: () => TNav.osSettings(context), variant: TButtonVariant.secondary),
-        TLink(key: const ValueKey('a:footer[2]'), label: 'I’ve turned them on', onTap: () => TNav.branch(context, 'Android permissions (checked on return)', <String, VoidCallback>{'All on': () => TNav.replace(context, Routes.sfUnplugAppsAndroid), 'Notifications off': () => TNav.replace(context, Routes.sfUnplugAuthNotifications), 'Missing': () => TNav.toast(context, 'Unplug still needs both settings.')})),
+        TLink(key: const ValueKey('a:footer[2]'), label: 'I’ve turned them on', onTap: () => TNav.branch(context, 'Android permissions (checked on return)', <String, VoidCallback>{'All on': () => TNav.replace(context, Routes.sfUnplugAppsAndroid), 'Notifications off': () => TNav.replace(context, Routes.sfUnplugAuthNotifications), 'Missing': () => TNav.toast(context, 'Unplug still needs both settings.')}, device: const TBranchRef('unplug.setup.android_check', TAsk.unplugAndroidCheck, 'sf_unplug_auth_android'), when: const <TAnswer, String>{TAnswer.allOn: 'All on', TAnswer.notificationsOff: 'Notifications off', TAnswer.missing: 'Missing'})),
       ],
     );
   }

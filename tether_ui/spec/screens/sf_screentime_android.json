@@ -96,7 +96,13 @@
               "to": "sf_screentime_android_denied"
             }
           }
-        ]
+        ],
+        "id": "sf.screentime.android_usage_access",
+        "ask": "usageAccessSettings",
+        "when": {
+          "granted": "Allowed",
+          "denied": "Not allowed"
+        }
       },
       "variant": "primary",
       "arrow": true
@@ -152,7 +158,13 @@
               "to": "sf_screentime_android_denied"
             }
           }
-        ]
+        ],
+        "id": "sf.screentime.android_usage_access",
+        "ask": "usageAccessSettings",
+        "when": {
+          "granted": "Allowed",
+          "denied": "Not allowed"
+        }
       },
       "summary": "branch: Android usage access (checked on return) → Allowed: toast “Usage access on” then back | Not allowed: replace → sf_screentime_android_denied"
     },

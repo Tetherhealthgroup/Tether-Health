@@ -3,8 +3,8 @@
 // Every button in the generated screens calls one of these helpers, so the
 // behaviour of an action type (push, sheet, call, submit, branch, auth...)
 // is defined in exactly one place. Replace the default [TPlatform], [TApi],
-// [TAuth], [TData] (data.dart) and [TNav.branchResolver] implementations
-// with real ones at startup, from app code. This package never imports app
+// [TAuth], [TDevice], [TData] (data.dart) and [TNav.branchResolver]
+// implementations with real ones at startup, from app code. This package never imports app
 // code, network or storage. In release builds the defaults fail closed
 // ([TDefaults]); debug builds and tests get the preview defaults.
 import 'dart:async';
@@ -23,9 +23,9 @@ import 'tokens.dart';
 
 /// Default hook implementations. Release builds ([kReleaseMode]) start with
 /// fail-closed defaults; debug builds and tests start with the preview ones.
-/// The app must install its real [TPlatform], [TApi], [TData], [TAuth] and
-/// [TNav.branchResolver] at startup; the release defaults only make a
-/// missing install fail safely.
+/// The app must install its real [TPlatform], [TApi], [TData], [TAuth],
+/// [TDevice] and [TNav.branchResolver] at startup; the release defaults only
+/// make a missing install fail safely.
 ///
 /// | Hook | Preview default | Release default |
 /// |---|---|---|
@@ -33,11 +33,14 @@ import 'tokens.dart';
 /// | [TApi.instance] | [PreviewApi] | [TUnconfiguredApi]: `failed('not_configured')` |
 /// | [TData.instance] | [PreviewData] | [TEmptyData]: null for every key |
 /// | [TPlatform.instance] | [PreviewPlatform] | [TInertPlatform]: does nothing, records a code; calls and texts show [TCallFallback] |
+/// | [TDevice.instance] | [PreviewDevice]: no answer, so the preview chooser runs | [TInertDevice]: no answer, records a code |
+/// | [TNav.redactQuestion] | false | true: the resolver receives `''` as the question |
 abstract final class TDefaults {
   static TBranchResolver branchResolver({bool release = kReleaseMode}) => release ? TFailClosedResolver().resolve : TNav.previewResolver;
   static TApi api({bool release = kReleaseMode}) => release ? const TUnconfiguredApi() : PreviewApi();
   static TData data({bool release = kReleaseMode}) => release ? const TEmptyData() : PreviewData();
   static TPlatform platform({bool release = kReleaseMode}) => release ? TInertPlatform() : PreviewPlatform();
+  static TDevice device({bool release = kReleaseMode}) => release ? TInertDevice() : const PreviewDevice();
 
   /// Installs the release defaults (what a release build starts with).
   static void forRelease() => _install(release: true);
@@ -50,6 +53,8 @@ abstract final class TDefaults {
     TApi.instance = api(release: release);
     TData.instance = data(release: release);
     TPlatform.instance = platform(release: release);
+    TDevice.instance = device(release: release);
+    TNav.redactQuestion = release;
   }
 }
 
@@ -143,6 +148,144 @@ class TInertPlatform implements TPlatform {
   Future<void> openUrl(BuildContext context, String url) async => _rec();
   @override
   Future<void> openOsSettings(BuildContext context) async => _rec();
+}
+
+/// Answers a device or OS question can give ([TAsk.answers]).
+enum TAnswer {
+  granted,
+  grantedNotificationsOff,
+  denied,
+  unavailable,
+  supported,
+  unsupported,
+  approved,
+  cancelled,
+  failed,
+  ios,
+  android,
+  allOn,
+  notificationsOff,
+  missing,
+  healthy,
+  failing,
+}
+
+/// Device and OS questions that decide a branch ([TDevice]), each with its
+/// fixed answer set. Mirrors the generator's `ASKS` table (generator/dsl.py);
+/// the generator's validator fails when the two differ.
+enum TAsk {
+  /// The phone's platform.
+  platform(<TAnswer>{TAnswer.ios, TAnswer.android}),
+
+  /// Asks for notification permission (OS prompt).
+  notificationsRequest(<TAnswer>{TAnswer.granted, TAnswer.denied, TAnswer.unavailable}),
+
+  /// Reads notification permission, for example on return from Settings.
+  notificationsCheck(<TAnswer>{TAnswer.granted, TAnswer.denied}),
+
+  /// Asks for health records access (HealthKit / Health Connect prompt).
+  healthRecordsRequest(<TAnswer>{TAnswer.granted, TAnswer.denied, TAnswer.unavailable}),
+
+  /// Asks for Screen Time access (iPhone).
+  screenTimeRequest(<TAnswer>{TAnswer.granted, TAnswer.denied, TAnswer.unavailable}),
+
+  /// Family Controls authorisation for Unplug, then the notification check (iPhone).
+  unplugAuthIos(<TAnswer>{TAnswer.granted, TAnswer.grantedNotificationsOff, TAnswer.denied, TAnswer.unavailable}),
+
+  /// Reads usage access on return from Settings (Android).
+  usageAccessSettings(<TAnswer>{TAnswer.granted, TAnswer.denied}),
+
+  /// Reads Unplug's Android permissions on return from Settings.
+  unplugAndroidCheck(<TAnswer>{TAnswer.allOn, TAnswer.notificationsOff, TAnswer.missing}),
+
+  /// Reads Unplug's tracking checks.
+  unplugTrackingCheck(<TAnswer>{TAnswer.healthy, TAnswer.failing}),
+
+  /// SMART on FHIR sign-in in the system browser.
+  smartConnect(<TAnswer>{TAnswer.approved, TAnswer.cancelled, TAnswer.failed}),
+
+  /// Checks that an address is a SMART on FHIR R4 server (HTTPS only, with a
+  /// timeout and a size cap). A transport failure is no answer (null), never
+  /// [TAnswer.unsupported].
+  fhirServerCheck(<TAnswer>{TAnswer.supported, TAnswer.unsupported}),
+
+  /// A reference surface's branch: preview only, never asked in the app.
+  reference(<TAnswer>{});
+
+  const TAsk(this.answers);
+
+  /// Every answer this question can give.
+  final Set<TAnswer> answers;
+}
+
+/// The branch a [TDevice] is asked about: its stable [id] (from the spec,
+/// never derived from the screen layout), the question [ask] and the screen
+/// that asks. Carries no question text.
+@immutable
+final class TBranchRef {
+  const TBranchRef(this.id, this.ask, this.screenId);
+
+  /// Stable branch id, for example `onboarding.reminders.notifications_request`.
+  final String id;
+  final TAsk ask;
+
+  /// The screen the branch is on; inputs it needs are the [TSession] keys
+  /// prefixed "<screenId>." (for example the FHIR address).
+  final String screenId;
+
+  @override
+  bool operator ==(Object other) => other is TBranchRef && other.id == id && other.ask == ask && other.screenId == screenId;
+  @override
+  int get hashCode => Object.hash(id, ask, screenId);
+  @override
+  String toString() => 'TBranchRef($id, ${ask.name}, $screenId)';
+}
+
+/// Answers the device and OS questions that decide branches (R-31):
+/// permission prompts, permission checks on return from Settings, SMART
+/// sign-in, the FHIR server check and the platform. [TNav.branch] asks it
+/// after the native sign-in step ([TAuth]) and before the resolver, and maps
+/// the answer to a case through the branch's `when` map.
+///
+/// Return one of `branch.ask.answers`, or null when there is no answer (not
+/// configured, interrupted, a transport failure). Null, an answer outside
+/// the set, an answer the branch does not map, or a throw decides nothing:
+/// the resolver runs, which fails closed in release builds. Preview default:
+/// [PreviewDevice]. Release default: [TInertDevice].
+abstract class TDevice {
+  static TDevice instance = TDefaults.device();
+  Future<TAnswer?> ask(BuildContext context, TBranchRef branch);
+}
+
+/// Preview default for [TDevice]: never answers, so the preview chooser
+/// picks the outcome as before.
+class PreviewDevice implements TDevice {
+  const PreviewDevice();
+  @override
+  Future<TAnswer?> ask(BuildContext context, TBranchRef branch) async => null;
+}
+
+/// Release default for [TDevice]: never answers and records [code] (never
+/// the branch id or anything the member entered). It exists only so a
+/// missing install fails safely; the app must install a real [TDevice].
+class TInertDevice implements TDevice {
+  TInertDevice({this.onCode});
+
+  static const String code = 'device_not_configured';
+
+  /// Receives [code] for every question asked.
+  final void Function(String code)? onCode;
+
+  /// Codes recorded by this device, oldest first (at most 20).
+  final List<String> recorded = <String>[];
+
+  @override
+  Future<TAnswer?> ask(BuildContext context, TBranchRef branch) async {
+    if (recorded.length == 20) recorded.removeAt(0);
+    recorded.add(code);
+    onCode?.call(code);
+    return null;
+  }
 }
 
 /// Result of a backend call.
@@ -275,11 +418,12 @@ abstract class TAuth {
   Future<String?> signIn(String provider, List<String> outcomes);
 }
 
-/// Decides external outcomes when no rule, server outcome, queue or force
-/// applies. Returns the picked outcome label, or null to take no outcome.
-/// The preview default ([TNav.previewResolver]) asks the developer/tester to
-/// pick, like the HTML prototype. Production installs a fail-closed resolver
-/// ([TFailClosedResolver]).
+/// Decides external outcomes when no rule, server outcome, queue, force,
+/// sign-in or device answer applies. Returns the picked outcome label, or
+/// null to take no outcome. The preview default ([TNav.previewResolver])
+/// asks the developer/tester to pick, like the HTML prototype. Production
+/// installs a fail-closed resolver ([TFailClosedResolver]) and never decides
+/// on [question]: release builds pass `''` ([TNav.redactQuestion]).
 typedef TBranchResolver = Future<String?> Function(BuildContext context, String question, List<String> outcomes);
 
 /// Production resolver: a branch that no rule or adapter decided takes no
@@ -329,6 +473,15 @@ abstract final class TNav {
   static const TBranchResolver previewResolver = _askOutcome;
 
   static TBranchResolver branchResolver = TDefaults.branchResolver();
+
+  static bool _redactQuestion = kReleaseMode;
+
+  /// When true, [branch] passes `''` instead of the question text to
+  /// [branchResolver], so no resolver can decide on wording. Always true in
+  /// release builds (setting it to false there has no effect); tests and
+  /// debug builds start with false, and [TDefaults.forRelease] sets it.
+  static bool get redactQuestion => kReleaseMode || _redactQuestion;
+  static set redactQuestion(bool value) => _redactQuestion = value;
 
   /// Code of the [TFailed] result given for an adapter ([TApi]) that throws.
   /// The exception and its message are dropped: they can carry payload.
@@ -550,6 +703,10 @@ abstract final class TNav {
 
   static const String _saveError = 'Couldn’t save. Your entry is kept on this phone.';
 
+  /// Code of the [TFailed] result given for a [TQueued] result of a submit
+  /// that must not be queued ([submit] with `queueable: false`).
+  static const String notQueueableCode = 'not_queueable';
+
   /// Submits in flight, by (submitting screen's context, screen id,
   /// endpoint). See [submit]. Emptied when [TSession.clear] has run since
   /// the last submit ([_inFlightEpoch]).
@@ -621,7 +778,13 @@ abstract final class TNav {
   /// the save is still sent and handled as above. It counts as run only if
   /// it opened a screen before it threw; otherwise the rule is checked again
   /// as if no safety action had run.
-  static Future<TResult?> submit(BuildContext context, String endpoint, {required String screenId, VoidCallback? then, TSafetyRoutes? safety}) async {
+  ///
+  /// Not queueable (`queueable: false`, generated for the sign-in and account
+  /// endpoints in the generator's endpoint table, spec/endpoints.json): a
+  /// [TQueued] result counts as `failed(notQueueableCode)`, and every failure
+  /// shows the generic [TFailClosedResolver.message] instead of the save
+  /// error, which would wrongly say the entry is kept on this phone.
+  static Future<TResult?> submit(BuildContext context, String endpoint, {required String screenId, bool queueable = true, VoidCallback? then, TSafetyRoutes? safety}) async {
     if (_inFlightEpoch != TSession.epoch) {
       _inFlight.clear();
       _inFlightEpoch = TSession.epoch;
@@ -652,10 +815,12 @@ abstract final class TNav {
         flight.safetyRan = run.ran;
         flight.safetyRoute = run.opened;
       }
-      final result = await safeSubmit(endpoint, screenId: screenId);
+      var result = await safeSubmit(endpoint, screenId: screenId);
+      if (!queueable && result is TQueued) result = const TResult.failed(notQueueableCode);
+      final failCopy = queueable ? _saveError : TFailClosedResolver.message;
       final onTop = _isTop(context, submitting);
       if (flight.safetyRan) {
-        if (result is TFailed && context.mounted && (onTop || (flight.safetyRoute?.isCurrent ?? false))) toast(context, _saveError);
+        if (result is TFailed && context.mounted && (onTop || (flight.safetyRoute?.isCurrent ?? false))) toast(context, failCopy);
         return result;
       }
       if (!context.mounted) return result;
@@ -677,7 +842,7 @@ abstract final class TNav {
         case TFailed():
           final safetyNow = safety?.pick();
           final opened = safetyNow == null ? null : _runSafety(context, safetyNow).opened;
-          if (onTop || opened != null) toast(context, _saveError);
+          if (onTop || opened != null) toast(context, failCopy);
       }
       return result;
     } finally {
@@ -722,13 +887,51 @@ abstract final class TNav {
 
   static Future<void> osSettings(BuildContext context) => TPlatform.instance.openOsSettings(context);
 
+  /// Device branches being decided, by (screen's context, branch id). See
+  /// [branch]. Emptied when [TSession.clear] has run since the last check.
+  static final Set<(BuildContext, String)> _deviceInFlight = <(BuildContext, String)>{};
+
+  /// [TSession.epoch] when [_deviceInFlight] was last checked.
+  static int _deviceEpoch = TSession.epoch;
+
   /// Run the outcome of a decision. Order: forced (tests) → rule / visible
   /// choice (`decide`) → server outcome of the submit that led here →
-  /// queued simulation outcome → native auth → resolver.
-  static Future<void> branch(BuildContext context, String question, Map<String, VoidCallback> outcomes, {String? decide, String? provider}) async {
+  /// queued simulation outcome → native sign-in ([TAuth], `provider`) →
+  /// device answer ([TDevice], `device`) → resolver ([branchResolver]).
+  ///
+  /// A device branch names its [TBranchRef] and maps each answer to a case
+  /// label in [when], or per platform in [whenByPlatform] (the platform is a
+  /// second [TDevice] question, [TAsk.platform]). No answer, an answer outside
+  /// `device.ask.answers`, an unmapped answer, or a [TDevice] that throws
+  /// decides nothing, and the resolver runs. While a device branch is being
+  /// decided, further activations of the same branch on the same screen are
+  /// ignored, so a double tap never raises two system prompts; after
+  /// [TSession.clear] a new activation is not blocked by an earlier one.
+  ///
+  /// Route scope: the branch belongs to the route of [context], taken when
+  /// it starts. After waiting for [TAuth], [TDevice] or the resolver, the
+  /// outcome runs (and the resolver is asked) only while that route is still
+  /// the top route; otherwise nothing happens, so a late answer never pops,
+  /// replaces or covers a screen the member opened meanwhile (for example the
+  /// crisis screen). Decisions that need no wait (forced, rule, server
+  /// outcome, simulation) run at once, as before.
+  ///
+  /// The resolver receives `''` instead of [question] when [redactQuestion]
+  /// is true (always in release builds).
+  static Future<void> branch(
+    BuildContext context,
+    String question,
+    Map<String, VoidCallback> outcomes, {
+    String? decide,
+    String? provider,
+    TBranchRef? device,
+    Map<TAnswer, String> when = const <TAnswer, String>{},
+    Map<TAnswer, Map<TAnswer, String>> whenByPlatform = const <TAnswer, Map<TAnswer, String>>{},
+  }) async {
     final labels = outcomes.keys.toList();
     final server = _serverOutcome;
     _serverOutcome = null; // one branch only
+    final route = context.mounted ? ModalRoute.of(context) : null;
     String? picked;
     if (TSim.force != null && outcomes.containsKey(TSim.force)) {
       picked = TSim.force;
@@ -741,22 +944,73 @@ abstract final class TNav {
     if (picked == null && TSim.queue.isNotEmpty) {
       picked = TRules.match(TSim.queue.removeAt(0), labels);
     }
-    if (picked == null && provider != null && TAuth.instance != null) {
-      // A sign-in adapter that throws, or answers a label that is not one of
-      // this branch's outcomes, decides nothing: the resolver runs.
-      try {
-        picked = await TAuth.instance!.signIn(provider, labels);
-      } catch (_) {
-        picked = null;
+    if (picked != null) {
+      if (context.mounted) outcomes[picked]?.call();
+      return;
+    }
+    (BuildContext, String)? guard;
+    if (device != null) {
+      if (_deviceEpoch != TSession.epoch) {
+        _deviceInFlight.clear();
+        _deviceEpoch = TSession.epoch;
       }
-      if (picked != null && !outcomes.containsKey(picked)) picked = null;
+      _deviceInFlight.removeWhere((k) => !k.$1.mounted);
+      guard = (context, device.id);
+      if (!_deviceInFlight.add(guard)) return; // already being decided
     }
-    if (picked == null) {
-      if (!context.mounted) return;
-      picked = await branchResolver(context, question, labels);
+    final epoch = _deviceEpoch;
+    try {
+      if (provider != null && TAuth.instance != null) {
+        // A sign-in adapter that throws, or answers a label that is not one of
+        // this branch's outcomes, decides nothing: the resolver runs.
+        try {
+          picked = await TAuth.instance!.signIn(provider, labels);
+        } catch (_) {
+          picked = null;
+        }
+        if (picked != null && !outcomes.containsKey(picked)) picked = null;
+        if (!_isTop(context, route)) return;
+      }
+      if (picked == null && device != null) {
+        picked = await _deviceOutcome(context, route, device, when, whenByPlatform, labels);
+        if (!_isTop(context, route)) return;
+      }
+      if (picked == null) {
+        if (!_isTop(context, route)) return;
+        picked = await branchResolver(context, redactQuestion ? '' : question, labels);
+        if (picked == null || !_isTop(context, route)) return;
+      }
+      outcomes[picked]?.call();
+    } finally {
+      if (guard != null && _deviceEpoch == epoch) _deviceInFlight.remove(guard);
     }
-    if (picked == null || !context.mounted) return;
-    outcomes[picked]?.call();
+  }
+
+  /// The case label [TDevice] decides for [ref], or null (see [branch]).
+  static Future<String?> _deviceOutcome(BuildContext context, ModalRoute<dynamic>? route, TBranchRef ref, Map<TAnswer, String> when,
+      Map<TAnswer, Map<TAnswer, String>> whenByPlatform, List<String> labels) async {
+    if (ref.ask.answers.isEmpty) return null; // reference surface: preview only
+    final answer = await _askDevice(context, ref);
+    if (answer == null) return null;
+    var label = when[answer];
+    final byPlatform = whenByPlatform[answer];
+    if (label == null && byPlatform != null) {
+      if (!_isTop(context, route)) return null;
+      final platform = await _askDevice(context, TBranchRef(ref.id, TAsk.platform, ref.screenId));
+      label = platform == null ? null : byPlatform[platform];
+    }
+    return label != null && labels.contains(label) ? label : null;
+  }
+
+  /// [TDevice.instance]'s answer to [ref], or null when it gives none, gives
+  /// an answer outside `ref.ask.answers`, or throws.
+  static Future<TAnswer?> _askDevice(BuildContext context, TBranchRef ref) async {
+    try {
+      final answer = await TDevice.instance.ask(context, ref);
+      return answer != null && ref.ask.answers.contains(answer) ? answer : null;
+    } catch (_) {
+      return null;
+    }
   }
 
   static Future<String?> _askOutcome(BuildContext context, String question, List<String> outcomes) {

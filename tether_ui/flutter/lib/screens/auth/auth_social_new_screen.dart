@@ -29,7 +29,7 @@ class AuthSocialNewScreen extends StatelessWidget {
         TBody('You can add email & password or another sign-in method later in Account → Sign-in methods.', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Create my account', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/token?grant_type=id_token', screenId: 'auth_social_new', then: () => TNav.push(context, Routes.obPrograms)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Create my account', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/token?grant_type=id_token', screenId: 'auth_social_new', queueable: false, then: () => TNav.push(context, Routes.obPrograms)), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Use a different account', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );

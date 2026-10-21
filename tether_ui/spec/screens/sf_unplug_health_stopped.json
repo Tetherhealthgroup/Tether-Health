@@ -77,7 +77,13 @@
               "value": "Still not working. Turn Screen Time access on again in Settings."
             }
           }
-        ]
+        ],
+        "id": "unplug.health.tracking_check",
+        "ask": "unplugTrackingCheck",
+        "when": {
+          "healthy": "All pass",
+          "failing": "Still failing"
+        }
       },
       "variant": "secondary",
       "arrow": false
@@ -129,7 +135,13 @@
               "value": "Still not working. Turn Screen Time access on again in Settings."
             }
           }
-        ]
+        ],
+        "id": "unplug.health.tracking_check",
+        "ask": "unplugTrackingCheck",
+        "when": {
+          "healthy": "All pass",
+          "failing": "Still failing"
+        }
       },
       "summary": "branch: Tracking health result → All pass: replace → sf_unplug_health | Still failing: toast “Still not working. Turn Screen Time access on again in Settings.”"
     }

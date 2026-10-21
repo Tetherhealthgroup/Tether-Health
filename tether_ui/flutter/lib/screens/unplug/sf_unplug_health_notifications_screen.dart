@@ -27,7 +27,7 @@ class SfUnplugHealthNotificationsScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Open phone settings', onPressed: () => TNav.osSettings(context), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Check again', onPressed: () => TNav.branch(context, 'Notification permission (checked on return)', <String, VoidCallback>{'On': () => TNav.replace(context, Routes.sfUnplugHealth), 'Still off': () => TNav.toast(context, 'Notifications are still off.')}), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: 'Check again', onPressed: () => TNav.branch(context, 'Notification permission (checked on return)', <String, VoidCallback>{'On': () => TNav.replace(context, Routes.sfUnplugHealth), 'Still off': () => TNav.toast(context, 'Notifications are still off.')}, device: const TBranchRef('unplug.health.notifications_check', TAsk.notificationsCheck, 'sf_unplug_health_notifications'), when: const <TAnswer, String>{TAnswer.granted: 'On', TAnswer.denied: 'Still off'}), variant: TButtonVariant.secondary),
       ],
     );
   }

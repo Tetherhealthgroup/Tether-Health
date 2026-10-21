@@ -1,0 +1,678 @@
+[
+  {
+    "screen": "ob_reminders",
+    "path": "footer[0]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "Allowed",
+      "Not allowed"
+    ],
+    "id": "onboarding.reminders.notifications_request",
+    "ask": "notificationsRequest",
+    "when": {
+      "granted": "Allowed",
+      "denied": "Not allowed",
+      "unavailable": "Not allowed"
+    }
+  },
+  {
+    "screen": "ob_account",
+    "path": "body[2].items[0]",
+    "at": "",
+    "source": "auth",
+    "labels": [
+      "Success",
+      "Email already has a Tether account",
+      "Cancelled",
+      "Error"
+    ],
+    "provider": "apple"
+  },
+  {
+    "screen": "ob_account",
+    "path": "body[2].items[1]",
+    "at": "",
+    "source": "auth",
+    "labels": [
+      "Success",
+      "Email already has a Tether account",
+      "Cancelled",
+      "Error"
+    ],
+    "provider": "google"
+  },
+  {
+    "screen": "auth_signin",
+    "path": "body[1].items[0]",
+    "at": "",
+    "source": "auth",
+    "labels": [
+      "Success",
+      "Success · guest plan on phone",
+      "New Apple ID, no Tether account",
+      "Cancelled",
+      "Error"
+    ],
+    "provider": "apple"
+  },
+  {
+    "screen": "auth_signin",
+    "path": "body[1].items[1]",
+    "at": "",
+    "source": "auth",
+    "labels": [
+      "Success",
+      "Success · guest plan on phone",
+      "New Google account, no Tether account",
+      "Cancelled",
+      "Error"
+    ],
+    "provider": "google"
+  },
+  {
+    "screen": "auth_signin",
+    "path": "footer[0]",
+    "at": "then",
+    "source": "server",
+    "labels": [
+      "Success",
+      "Success · guest plan on phone",
+      "Wrong password"
+    ],
+    "endpoint": "POST supabase /auth/v1/token"
+  },
+  {
+    "screen": "auth_signin_error",
+    "path": "body[2].items[0]",
+    "at": "",
+    "source": "auth",
+    "labels": [
+      "Success",
+      "Success · guest plan on phone",
+      "New Apple ID, no Tether account",
+      "Cancelled",
+      "Error"
+    ],
+    "provider": "apple"
+  },
+  {
+    "screen": "auth_signin_error",
+    "path": "body[2].items[1]",
+    "at": "",
+    "source": "auth",
+    "labels": [
+      "Success",
+      "Success · guest plan on phone",
+      "New Google account, no Tether account",
+      "Cancelled",
+      "Error"
+    ],
+    "provider": "google"
+  },
+  {
+    "screen": "auth_signin_error",
+    "path": "footer[0]",
+    "at": "then",
+    "source": "server",
+    "labels": [
+      "Success",
+      "Success · guest plan on phone",
+      "Wrong password"
+    ],
+    "endpoint": "POST supabase /auth/v1/token"
+  },
+  {
+    "screen": "auth_social_error",
+    "path": "footer[0]",
+    "at": "",
+    "source": "auth",
+    "labels": [
+      "Success",
+      "Error"
+    ],
+    "provider": "google"
+  },
+  {
+    "screen": "focus_full",
+    "path": "footer[0]",
+    "at": "",
+    "source": "choice",
+    "labels": [
+      "Learn only",
+      "Swap"
+    ],
+    "decide": "choice:focus_full.option"
+  },
+  {
+    "screen": "account_signin_methods",
+    "path": "body[1].rows[1]",
+    "at": "",
+    "source": "auth",
+    "labels": [
+      "Success",
+      "Email already has a Tether account",
+      "Cancelled",
+      "Error"
+    ],
+    "provider": "google"
+  },
+  {
+    "screen": "bf_path",
+    "path": "footer[0]",
+    "at": "",
+    "source": "choice",
+    "labels": [
+      "Set a quit date",
+      "Quit today",
+      "Reduce gradually",
+      "Explore first"
+    ],
+    "decide": "choice:bf_path.path"
+  },
+  {
+    "screen": "bf_slip",
+    "path": "footer[0]",
+    "at": "then",
+    "source": "choice",
+    "labels": [
+      "Continue from this moment",
+      "Choose a new quit time"
+    ],
+    "decide": "choice:bf_slip.next"
+  },
+  {
+    "screen": "sf_screentime",
+    "path": "footer[0]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "Allowed",
+      "Not allowed"
+    ],
+    "id": "sf.screentime.ios_request",
+    "ask": "screenTimeRequest",
+    "when": {
+      "granted": "Allowed",
+      "denied": "Not allowed",
+      "unavailable": "Not allowed"
+    }
+  },
+  {
+    "screen": "ca_q1",
+    "path": "footer[0]",
+    "at": "",
+    "source": "choice",
+    "labels": [
+      "Yes",
+      "No / Not sure"
+    ],
+    "decide": "choice:ca_q1.has_plan"
+  },
+  {
+    "screen": "ca_zone",
+    "path": "footer[0]",
+    "at": "then",
+    "source": "rule",
+    "labels": [
+      "Green",
+      "Yellow",
+      "Red",
+      "Invalid peak flow"
+    ],
+    "decide": "ca.zone"
+  },
+  {
+    "screen": "hw_log2",
+    "path": "footer[0]",
+    "at": "then",
+    "source": "rule",
+    "labels": [
+      "Valid · below crisis range",
+      "Invalid value",
+      "≥180 top or ≥120 bottom"
+    ],
+    "decide": "hw.bp"
+  },
+  {
+    "screen": "st_log",
+    "path": "footer[0]",
+    "at": "then",
+    "source": "rule",
+    "labels": [
+      "In or above range",
+      "Below your low",
+      "Invalid (outside 20–600)"
+    ],
+    "decide": "st.glucose"
+  },
+  {
+    "screen": "nu_q1",
+    "path": "footer[0]",
+    "at": "",
+    "source": "choice",
+    "labels": [
+      "No",
+      "Yes / Prefer not to say"
+    ],
+    "decide": "choice:nu_q1.eating"
+  },
+  {
+    "screen": "nu_reset",
+    "path": "footer[0]",
+    "at": "",
+    "source": "choice",
+    "labels": [
+      "Keep this habit",
+      "Make it smaller",
+      "Pick a different habit"
+    ],
+    "decide": "choice:nu_reset.option"
+  },
+  {
+    "screen": "ea_mood",
+    "path": "footer[0]",
+    "at": "then",
+    "source": "rule",
+    "labels": [
+      "No",
+      "Yes"
+    ],
+    "decide": "ea.selfharm"
+  },
+  {
+    "screen": "be_q1",
+    "path": "footer[0]",
+    "at": "",
+    "source": "choice",
+    "labels": [
+      "Lowering my risk",
+      "Going through treatment",
+      "After treatment",
+      "Supporting someone"
+    ],
+    "decide": "choice:be_q1.stage"
+  },
+  {
+    "screen": "records_fhir_url",
+    "path": "footer[0]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "SMART on FHIR R4 supported",
+      "Not a FHIR R4 server"
+    ],
+    "id": "records.fhir_url.server_check",
+    "ask": "fhirServerCheck",
+    "when": {
+      "supported": "SMART on FHIR R4 supported",
+      "unsupported": "Not a FHIR R4 server"
+    }
+  },
+  {
+    "screen": "records_consent",
+    "path": "footer[0]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "Approved",
+      "Cancelled",
+      "Denied or error"
+    ],
+    "id": "records.connect.mychart",
+    "ask": "smartConnect",
+    "when": {
+      "approved": "Approved",
+      "cancelled": "Cancelled",
+      "failed": "Denied or error"
+    }
+  },
+  {
+    "screen": "records_consent_bb",
+    "path": "footer[0]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "Approved",
+      "Cancelled",
+      "Denied or error"
+    ],
+    "id": "records.connect.medicare",
+    "ask": "smartConnect",
+    "when": {
+      "approved": "Approved",
+      "cancelled": "Cancelled",
+      "failed": "Denied or error"
+    }
+  },
+  {
+    "screen": "records_consent_device",
+    "path": "footer[0]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "Allowed",
+      "Not allowed"
+    ],
+    "id": "records.device.health_records_request",
+    "ask": "healthRecordsRequest",
+    "when": {
+      "granted": "Allowed",
+      "denied": "Not allowed",
+      "unavailable": "Not allowed"
+    }
+  },
+  {
+    "screen": "records_manual",
+    "path": "footer[0]",
+    "at": "then",
+    "source": "rule",
+    "labels": [
+      "Valid",
+      "Outside expected range",
+      "Matches an imported value"
+    ],
+    "decide": "rec.manual"
+  },
+  {
+    "screen": "records_manual_error",
+    "path": "footer[0]",
+    "at": "then",
+    "source": "rule",
+    "labels": [
+      "Valid",
+      "Outside expected range"
+    ],
+    "decide": "rec.manual"
+  },
+  {
+    "screen": "sf_unplug_intro",
+    "path": "footer[0]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "iPhone",
+      "Android"
+    ],
+    "id": "unplug.intro.platform",
+    "ask": "platform",
+    "when": {
+      "ios": "iPhone",
+      "android": "Android"
+    }
+  },
+  {
+    "screen": "sf_unplug_auth",
+    "path": "footer[0]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "Approved",
+      "Approved · notifications off",
+      "Denied",
+      "Unavailable"
+    ],
+    "id": "unplug.setup.ios_authorization",
+    "ask": "unplugAuthIos",
+    "when": {
+      "granted": "Approved",
+      "grantedNotificationsOff": "Approved · notifications off",
+      "denied": "Denied",
+      "unavailable": "Unavailable"
+    }
+  },
+  {
+    "screen": "sf_unplug_auth_denied",
+    "path": "footer[0]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "Approved",
+      "Denied"
+    ],
+    "id": "unplug.setup.ios_authorization_retry",
+    "ask": "unplugAuthIos",
+    "when": {
+      "granted": "Approved",
+      "grantedNotificationsOff": "Approved",
+      "denied": "Denied",
+      "unavailable": "Denied"
+    }
+  },
+  {
+    "screen": "sf_unplug_auth_notifications",
+    "path": "footer[1]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "On (iPhone)",
+      "On (Android)",
+      "Still off"
+    ],
+    "id": "unplug.setup.notifications_check",
+    "ask": "notificationsCheck",
+    "when": {
+      "granted": {
+        "ios": "On (iPhone)",
+        "android": "On (Android)"
+      },
+      "denied": "Still off"
+    }
+  },
+  {
+    "screen": "sf_unplug_auth_notifications",
+    "path": "footer[2]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "iPhone",
+      "Android"
+    ],
+    "id": "unplug.setup.continue_platform",
+    "ask": "platform",
+    "when": {
+      "ios": "iPhone",
+      "android": "Android"
+    }
+  },
+  {
+    "screen": "sf_unplug_auth_android",
+    "path": "footer[2]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "All on",
+      "Notifications off",
+      "Missing"
+    ],
+    "id": "unplug.setup.android_check",
+    "ask": "unplugAndroidCheck",
+    "when": {
+      "allOn": "All on",
+      "notificationsOff": "Notifications off",
+      "missing": "Missing"
+    }
+  },
+  {
+    "screen": "sf_unplug_picker_ios",
+    "path": "footer[0]",
+    "at": "",
+    "source": "reference",
+    "labels": [
+      "Apps chosen",
+      "Cancelled"
+    ],
+    "id": "unplug.picker.ios",
+    "ask": "reference"
+  },
+  {
+    "screen": "sf_unplug_home",
+    "path": "body[2].rows[2]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "iPhone",
+      "Android"
+    ],
+    "id": "unplug.home.preview_platform",
+    "ask": "platform",
+    "when": {
+      "ios": "iPhone",
+      "android": "Android"
+    }
+  },
+  {
+    "screen": "sf_unplug_session_end",
+    "path": "footer[0]",
+    "at": "",
+    "source": "rule",
+    "labels": [
+      "Reason given",
+      "No reason yet"
+    ],
+    "decide": "sf.unplug.reason"
+  },
+  {
+    "screen": "sf_unplug_shield",
+    "path": "footer[0]",
+    "at": "then",
+    "source": "reference",
+    "labels": [
+      "Take my breath",
+      "Get support"
+    ],
+    "id": "unplug.shield.notification_action",
+    "ask": "reference"
+  },
+  {
+    "screen": "sf_unplug_gate_commit",
+    "path": "footer[1]",
+    "at": "",
+    "source": "rule",
+    "labels": [
+      "Step done",
+      "Step not done"
+    ],
+    "decide": "sf.unplug.sentence"
+  },
+  {
+    "screen": "sf_unplug_gate_sum",
+    "path": "footer[1]",
+    "at": "",
+    "source": "rule",
+    "labels": [
+      "Step done",
+      "Step not done"
+    ],
+    "decide": "sf.unplug.sum"
+  },
+  {
+    "screen": "sf_unplug_health_notifications",
+    "path": "footer[1]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "On",
+      "Still off"
+    ],
+    "id": "unplug.health.notifications_check",
+    "ask": "notificationsCheck",
+    "when": {
+      "granted": "On",
+      "denied": "Still off"
+    }
+  },
+  {
+    "screen": "sf_unplug_health_stopped",
+    "path": "footer[1]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "All pass",
+      "Still failing"
+    ],
+    "id": "unplug.health.tracking_check",
+    "ask": "unplugTrackingCheck",
+    "when": {
+      "healthy": "All pass",
+      "failing": "Still failing"
+    }
+  },
+  {
+    "screen": "sf_unplug_off",
+    "path": "footer[0]",
+    "at": "",
+    "source": "choice",
+    "labels": [
+      "Unplug only",
+      "Unplug and Screen Time"
+    ],
+    "decide": "choice:sf_unplug_off.scope"
+  },
+  {
+    "screen": "account_delete_apple",
+    "path": "footer[0]",
+    "at": "",
+    "source": "auth",
+    "labels": [
+      "Success",
+      "Different account",
+      "Cancelled",
+      "Error"
+    ],
+    "provider": "apple"
+  },
+  {
+    "screen": "account_delete_google",
+    "path": "footer[0]",
+    "at": "",
+    "source": "auth",
+    "labels": [
+      "Success",
+      "Different account",
+      "Cancelled",
+      "Error"
+    ],
+    "provider": "google"
+  },
+  {
+    "screen": "auth_session_apple",
+    "path": "footer[0].items[0]",
+    "at": "",
+    "source": "auth",
+    "labels": [
+      "Success",
+      "Cancelled",
+      "Error"
+    ],
+    "provider": "apple"
+  },
+  {
+    "screen": "auth_session_google",
+    "path": "footer[0].items[0]",
+    "at": "",
+    "source": "auth",
+    "labels": [
+      "Success",
+      "Cancelled",
+      "Error"
+    ],
+    "provider": "google"
+  },
+  {
+    "screen": "sf_screentime_android",
+    "path": "footer[0]",
+    "at": "",
+    "source": "device",
+    "labels": [
+      "Allowed",
+      "Not allowed"
+    ],
+    "id": "sf.screentime.android_usage_access",
+    "ask": "usageAccessSettings",
+    "when": {
+      "granted": "Allowed",
+      "denied": "Not allowed"
+    }
+  }
+]

@@ -124,7 +124,14 @@
               "to": "records_error"
             }
           }
-        ]
+        ],
+        "id": "records.connect.mychart",
+        "ask": "smartConnect",
+        "when": {
+          "approved": "Approved",
+          "cancelled": "Cancelled",
+          "failed": "Denied or error"
+        }
       },
       "variant": "primary",
       "arrow": true
@@ -184,7 +191,14 @@
               "to": "records_error"
             }
           }
-        ]
+        ],
+        "id": "records.connect.mychart",
+        "ask": "smartConnect",
+        "when": {
+          "approved": "Approved",
+          "cancelled": "Cancelled",
+          "failed": "Denied or error"
+        }
       },
       "summary": "branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error"
     },

@@ -29,7 +29,7 @@ class ObRemindersScreen extends StatelessWidget {
         TToggleRow(fieldKey: 'ob_reminders.quiet_hours', label: 'Quiet hours', sub: '9:00 PM – 7:00 AM · safety alerts still come through', value: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Turn on reminders', onPressed: () => TNav.branch(context, 'System permission prompt', <String, VoidCallback>{'Allowed': () => TNav.push(context, Routes.obAccount), 'Not allowed': () => TNav.push(context, Routes.obRemindersDenied)}), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Turn on reminders', onPressed: () => TNav.branch(context, 'System permission prompt', <String, VoidCallback>{'Allowed': () => TNav.push(context, Routes.obAccount), 'Not allowed': () => TNav.push(context, Routes.obRemindersDenied)}, device: const TBranchRef('onboarding.reminders.notifications_request', TAsk.notificationsRequest, 'ob_reminders'), when: const <TAnswer, String>{TAnswer.granted: 'Allowed', TAnswer.denied: 'Not allowed', TAnswer.unavailable: 'Not allowed'}), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.push(context, Routes.obAccount), variant: TButtonVariant.secondary),
       ],
     );

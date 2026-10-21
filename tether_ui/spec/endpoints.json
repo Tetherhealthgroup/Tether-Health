@@ -1,0 +1,437 @@
+[
+  {
+    "endpoint": "CALL device:unplug/endSession",
+    "queueable": true,
+    "screens": [
+      "sf_unplug_session_end"
+    ]
+  },
+  {
+    "endpoint": "CALL device:unplug/liftShield+purgeLocalData",
+    "queueable": true,
+    "screens": [
+      "sf_unplug_off"
+    ]
+  },
+  {
+    "endpoint": "CALL device:unplug/setThresholds+applyShield",
+    "queueable": true,
+    "screens": [
+      "sf_unplug_limits"
+    ]
+  },
+  {
+    "endpoint": "CALL device:unplug/startSession",
+    "queueable": true,
+    "screens": [
+      "sf_unplug_session"
+    ]
+  },
+  {
+    "endpoint": "DELETE /v1/account/data",
+    "queueable": true,
+    "screens": [
+      "account_delete",
+      "account_delete_apple",
+      "account_delete_google"
+    ]
+  },
+  {
+    "endpoint": "DELETE /v1/enrolments/:id",
+    "queueable": true,
+    "screens": [
+      "account_leave"
+    ]
+  },
+  {
+    "endpoint": "DELETE /v1/records/fhir/sources/:id",
+    "queueable": true,
+    "screens": [
+      "records_disconnect"
+    ]
+  },
+  {
+    "endpoint": "PATCH /v1/enrolments/:id",
+    "queueable": true,
+    "screens": [
+      "program_settings",
+      "program_settings_sf"
+    ]
+  },
+  {
+    "endpoint": "PATCH /v1/enrolments/consents",
+    "queueable": true,
+    "screens": [
+      "account_privacy",
+      "sf_unplug_off"
+    ]
+  },
+  {
+    "endpoint": "PATCH /v1/notifications/preferences",
+    "queueable": true,
+    "screens": [
+      "account_notifications"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/account/export",
+    "queueable": true,
+    "screens": [
+      "account_data"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/care/caregivers",
+    "queueable": true,
+    "screens": [
+      "sd_caregiver"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/care/connections",
+    "queueable": true,
+    "screens": [
+      "support_connect"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/care/messages",
+    "queueable": true,
+    "screens": [
+      "support_message_care"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/care/referrals",
+    "queueable": true,
+    "screens": [
+      "support_callback"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/care/summaries",
+    "queueable": true,
+    "screens": [
+      "hw_summary"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/care/supporters",
+    "queueable": true,
+    "screens": [
+      "support_add_person"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/enrolments/consents",
+    "queueable": true,
+    "screens": [
+      "ob_consent"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/be/diary",
+    "queueable": true,
+    "screens": [
+      "be_diary"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/be/survivorship",
+    "queueable": true,
+    "screens": [
+      "be_survivor"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/ca/symptoms",
+    "queueable": true,
+    "screens": [
+      "ca_symptoms"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/ca/zone-checks",
+    "queueable": true,
+    "screens": [
+      "ca_zone"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/ck/done",
+    "queueable": true,
+    "screens": [
+      "ck_done"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/ea/check-backs",
+    "queueable": true,
+    "screens": [
+      "ea_checkback"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/ea/moods",
+    "queueable": true,
+    "screens": [
+      "ea_mood"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/hw/lipids",
+    "queueable": true,
+    "screens": [
+      "hw_lipids"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/hw/readings",
+    "queueable": true,
+    "screens": [
+      "hw_log2"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/re/labs",
+    "queueable": true,
+    "screens": [
+      "re_labs"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/sd/falls",
+    "queueable": true,
+    "screens": [
+      "sd_fell"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/sd/sessions",
+    "queueable": true,
+    "screens": [
+      "sd_session"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/sf/pauses",
+    "queueable": true,
+    "screens": [
+      "sf_pause"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/st/a1c",
+    "queueable": true,
+    "screens": [
+      "st_a1c"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/program-data/st/readings",
+    "queueable": true,
+    "screens": [
+      "st_log"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/quit-plan/guest-import",
+    "queueable": true,
+    "screens": [
+      "auth_merge"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/records/check-ins",
+    "queueable": true,
+    "screens": [
+      "checkin"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/records/fhir/accept",
+    "queueable": true,
+    "screens": [
+      "records_review"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/records/fhir/conflicts",
+    "queueable": true,
+    "screens": [
+      "records_conflict"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/records/fhir/sources/:id/sync",
+    "queueable": true,
+    "screens": [
+      "records_source"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/records/lapses",
+    "queueable": true,
+    "screens": [
+      "bf_slip",
+      "sf_slip"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/records/lessons",
+    "queueable": true,
+    "screens": [
+      "learn_lesson"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/records/manual",
+    "queueable": true,
+    "screens": [
+      "records_manual",
+      "records_manual_error"
+    ]
+  },
+  {
+    "endpoint": "POST /v1/records/rescues",
+    "queueable": true,
+    "screens": [
+      "rescue_result"
+    ]
+  },
+  {
+    "endpoint": "POST supabase /auth/v1/recover",
+    "queueable": false,
+    "screens": [
+      "auth_forgot"
+    ]
+  },
+  {
+    "endpoint": "POST supabase /auth/v1/signup",
+    "queueable": false,
+    "screens": [
+      "ob_account"
+    ]
+  },
+  {
+    "endpoint": "POST supabase /auth/v1/token",
+    "queueable": false,
+    "screens": [
+      "auth_signin",
+      "auth_signin_error",
+      "auth_session"
+    ]
+  },
+  {
+    "endpoint": "POST supabase /auth/v1/token?grant_type=id_token",
+    "queueable": false,
+    "screens": [
+      "auth_social_new"
+    ]
+  },
+  {
+    "endpoint": "POST supabase /auth/v1/user/identities (linkIdentity)",
+    "queueable": false,
+    "screens": [
+      "auth_link"
+    ]
+  },
+  {
+    "endpoint": "PUT /v1/program-data/be/profile",
+    "queueable": true,
+    "screens": [
+      "be_q2"
+    ]
+  },
+  {
+    "endpoint": "PUT /v1/program-data/bf/meds",
+    "queueable": true,
+    "screens": [
+      "bf_meds_edit"
+    ]
+  },
+  {
+    "endpoint": "PUT /v1/program-data/ca/plan",
+    "queueable": true,
+    "screens": [
+      "ca_plan"
+    ]
+  },
+  {
+    "endpoint": "PUT /v1/program-data/ck/profile",
+    "queueable": true,
+    "screens": [
+      "ck_q1"
+    ]
+  },
+  {
+    "endpoint": "PUT /v1/program-data/hw/targets",
+    "queueable": true,
+    "screens": [
+      "hw_targets"
+    ]
+  },
+  {
+    "endpoint": "PUT /v1/program-data/nu/habit",
+    "queueable": true,
+    "screens": [
+      "nu_habit"
+    ]
+  },
+  {
+    "endpoint": "PUT /v1/program-data/re/plan",
+    "queueable": true,
+    "screens": [
+      "re_result"
+    ]
+  },
+  {
+    "endpoint": "PUT /v1/program-data/sd/plan",
+    "queueable": true,
+    "screens": [
+      "sd_plan"
+    ]
+  },
+  {
+    "endpoint": "PUT /v1/program-data/sd/safety",
+    "queueable": true,
+    "screens": [
+      "sd_safety"
+    ]
+  },
+  {
+    "endpoint": "PUT /v1/program-data/sf/plan",
+    "queueable": true,
+    "screens": [
+      "sf_buddy"
+    ]
+  },
+  {
+    "endpoint": "PUT /v1/program-data/st/range",
+    "queueable": true,
+    "screens": [
+      "st_range"
+    ]
+  },
+  {
+    "endpoint": "PUT /v1/quit-plan",
+    "queueable": true,
+    "screens": [
+      "bf_review"
+    ]
+  },
+  {
+    "endpoint": "PUT device:encrypted/ea/safety-plan",
+    "queueable": true,
+    "screens": [
+      "ea_plan"
+    ]
+  },
+  {
+    "endpoint": "PUT supabase /auth/v1/user",
+    "queueable": false,
+    "screens": [
+      "auth_newpass"
+    ]
+  }
+]

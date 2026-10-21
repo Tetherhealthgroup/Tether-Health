@@ -176,7 +176,7 @@ def unplug():
             ('On iPhone', 'Apple doesn’t share app names or minutes with Tether'), ('Stays', 'On this phone. Your app list never reaches Tether'),
             ('Never paused', 'Tether, phone calls and emergency calls')]),
     ], footer=[
-        button('Set up Unplug', branch('Platform', [('iPhone', go('sf_unplug_auth')), ('Android', go('sf_unplug_auth_android'))])),
+        button('Set up Unplug', branch('Platform', [('iPhone', go('sf_unplug_auth')), ('Android', go('sf_unplug_auth_android'))], id='unplug.intro.platform', ask='platform', when={'ios': 'iPhone', 'android': 'Android'})),
         button('Not now', back(), v='secondary'),
     ], source='lib/unplug/screens/unplug_screen_a.dart, lib/unplug/models/platform_ceiling.dart',
        desc='Shown before anything is switched on, so nobody later reads a number that does not exist. Pause 60 stays an intent check; Unplug is the optional lock.')
@@ -188,7 +188,9 @@ def unplug():
     ], footer=[
         button('Continue', branch('Screen Time authorization (iOS Family Controls, individual)',
                                   [('Approved', rep('sf_unplug_apps')), ('Approved · notifications off', rep('sf_unplug_auth_notifications')),
-                                   ('Denied', rep('sf_unplug_auth_denied')), ('Unavailable', rep('sf_unplug_auth_unavailable'))])),
+                                   ('Denied', rep('sf_unplug_auth_denied')), ('Unavailable', rep('sf_unplug_auth_unavailable'))],
+                                  id='unplug.setup.ios_authorization', ask='unplugAuthIos',
+                                  when={'granted': 'Approved', 'grantedNotificationsOff': 'Approved · notifications off', 'denied': 'Denied', 'unavailable': 'Unavailable'})),
         button('Not now', back(), v='secondary'),
     ], source=src + ' requestAuthorization(individual), PlatformAuthorizationStatus; notification permission check',
        desc='iPhone. Continue calls requestAuthorization(individual); Apple shows its own prompt. Then the app checks notification permission. approved → choose apps, approved with notifications off → notifications-off state, denied → denied state, unavailable → unavailable state.')
@@ -198,7 +200,9 @@ def unplug():
         text('Everything else in ScrollFree works without it: your goal, Pause 60 and check-ins.', 'muted'),
     ], footer=[
         button('Try again', branch('Screen Time authorization (iOS Family Controls, individual)',
-                                   [('Approved', rep('sf_unplug_apps')), ('Denied', toast('Still not allowed. You can turn it on later in Settings.'))])),
+                                   [('Approved', rep('sf_unplug_apps')), ('Denied', toast('Still not allowed. You can turn it on later in Settings.'))],
+                                   id='unplug.setup.ios_authorization_retry', ask='unplugAuthIos',
+                                   when={'granted': 'Approved', 'grantedNotificationsOff': 'Approved', 'denied': 'Denied', 'unavailable': 'Denied'})),
         button('Open phone settings', settings(), v='secondary'), link('Not now', back()),
     ], source=src + ' PlatformAuthorizationStatus.denied')
     P('sf_unplug_auth_unavailable', 'Screen Time unavailable', '/p/sf/unplug/permission?state=unavailable', 'unplug', program='sf', phase='plan',
@@ -213,8 +217,10 @@ def unplug():
     ], footer=[
         button('Open phone settings', settings()),
         button('Check again', branch('Notification permission (checked on return)', [('On (iPhone)', rep('sf_unplug_apps')), ('On (Android)', rep('sf_unplug_apps_android')),
-                                                                                   ('Still off', toast('Notifications are still off. You can turn them on later in Settings.'))]), v='secondary'),
-        link('Continue without notifications', branch('Platform', [('iPhone', rep('sf_unplug_apps')), ('Android', rep('sf_unplug_apps_android'))])),
+                                                                                   ('Still off', toast('Notifications are still off. You can turn them on later in Settings.'))],
+                                     id='unplug.setup.notifications_check', ask='notificationsCheck',
+                                     when={'granted': {'ios': 'On (iPhone)', 'android': 'On (Android)'}, 'denied': 'Still off'}), v='secondary'),
+        link('Continue without notifications', branch('Platform', [('iPhone', rep('sf_unplug_apps')), ('Android', rep('sf_unplug_apps_android'))], id='unplug.setup.continue_platform', ask='platform', when={'ios': 'iPhone', 'android': 'Android'})),
     ], source='Notification permission check (iOS UNUserNotificationCenter, Android POST_NOTIFICATIONS)',
        desc='Shown during setup when Screen Time / Android permissions are granted but notifications are off. Open phone settings fixes it; Check again reads the permission on return.')
     P('sf_unplug_auth_android', 'Android permissions for Unplug', '/p/sf/unplug/permission?state=android', 'unplug', program='sf', phase='plan',
@@ -228,7 +234,9 @@ def unplug():
         button('Turn on display over apps', settings()),
         button('Turn on usage access', settings(), v='secondary'),
         link('I’ve turned them on', branch('Android permissions (checked on return)', [('All on', rep('sf_unplug_apps_android')), ('Notifications off', rep('sf_unplug_auth_notifications')),
-                                                                                          ('Missing', toast('Unplug still needs both settings.'))])),
+                                                                                          ('Missing', toast('Unplug still needs both settings.'))],
+                                                     id='unplug.setup.android_check', ask='unplugAndroidCheck',
+                                                     when={'allOn': 'All on', 'notificationsOff': 'Notifications off', 'missing': 'Missing'})),
     ], source='android/.../unplug/UnplugHost.kt (PACKAGE_USAGE_STATS, SYSTEM_ALERT_WINDOW, foreground service)',
        desc='Android has no single prompt: usage access and the overlay permission are separate settings pages, checked again when the person returns (authorizationStatus on resume). The foreground service needs a visible notification; its text is generic.')
 
@@ -243,7 +251,7 @@ def unplug():
     P('sf_unplug_picker_ios', 'Apple app picker', '/p/sf/unplug/apps/picker', 'unplug', reference=True, program='sf', phase='plan', kind='sheet', over='Choose apps', body=[
         nativeslot('ios.familyActivityPicker', 'Apple’s app picker', None, 'ios', 320),
     ], footer=[
-        button('Done', branch('System app picker result', [('Apps chosen', rep('sf_unplug_apps_chosen')), ('Cancelled', close())])),
+        button('Done', branch('System app picker result', [('Apps chosen', rep('sf_unplug_apps_chosen')), ('Cancelled', close())], id='unplug.picker.ios', ask='reference')),
         button('Cancel', close(), v='secondary'),
     ], source=src + ' presentAppPicker()', native=NATIVE_NEVER_PAUSED,
        desc='Placeholder for the system picker. In the app this sheet is Apple’s; the buttons stand for the picker’s own Done / Cancel.',
@@ -290,7 +298,7 @@ def unplug():
         card(v='dark', eyebrow='Focus session', title='Need to focus?', text='Pause your chosen apps for a set time', cta=button('Start', go('sf_unplug_session'), v='lime', small=True)),
         rows([row('Apps', 'Video apps · 3, Feeds · 2', action=go('sf_unplug_apps_chosen')),
               row('Limits & pause screen', '60 min · 20 opens · one breath first', action=go('sf_unplug_limits')),
-              row('Preview the pause screen', 'iPhone shield or Android overlay', action=branch('Platform', [('iPhone', go('sf_unplug_shield')), ('Android', go('sf_unplug_overlay'))])),
+              row('Preview the pause screen', 'iPhone shield or Android overlay', action=branch('Platform', [('iPhone', go('sf_unplug_shield')), ('Android', go('sf_unplug_overlay'))], id='unplug.home.preview_platform', ask='platform', when={'ios': 'iPhone', 'android': 'Android'})),
               row('Tracking check', 'All checks pass', action=go('sf_unplug_health'))], title='Settings'),
         rows([row('How Unplug works', 'What it can and can’t see', action=go('sf_unplug_intro')),
               row('Turn off Unplug', 'Paused apps open normally again', action=sheet('sf_unplug_off'), danger=True)]),
@@ -345,7 +353,7 @@ def unplug():
         text('You asked to slow this one down. Video apps is on your list. 2 of 3 “open anyway” left today. Open Tether for support.', align='center'),
     ], footer=[
         button('Take a breath', toast('Notification: open Tether to take your breath, or get support',
-                                      branch('Notification action', [('Take my breath', go('sf_unplug_gate')), ('Get support', sheet('rescue_pick'))])),
+                                      branch('Notification action', [('Take my breath', go('sf_unplug_gate')), ('Get support', sheet('rescue_pick'))], id='unplug.shield.notification_action', ask='reference')),
                v='lime', arrow=False),
         link('Open anyway', toast('Opened · 1 “open anyway” left today', close())),
     ], source='ios/UnplugShield/UnplugShieldConfigurationExtension.swift, ios/UnplugShieldAction/UnplugShieldActionExtension.swift, assets/unplug/intercept_tokens.json',
@@ -421,7 +429,8 @@ def unplug():
                    ci('Notifications', 'Off in Settings')], label='Checks'),
     ], footer=[
         button('Open phone settings', settings()),
-        button('Check again', branch('Notification permission (checked on return)', [('On', rep('sf_unplug_health')), ('Still off', toast('Notifications are still off.'))]), v='secondary'),
+        button('Check again', branch('Notification permission (checked on return)', [('On', rep('sf_unplug_health')), ('Still off', toast('Notifications are still off.'))],
+                                     id='unplug.health.notifications_check', ask='notificationsCheck', when={'granted': 'On', 'denied': 'Still off'}), v='secondary'),
     ], source='Notification permission check (iOS UNUserNotificationCenter, Android POST_NOTIFICATIONS)',
        desc='Same check on both platforms. Unplug keeps working; only the hand-off from the pause screen to Tether needs notifications.')
     P('sf_unplug_health_stopped', 'Tracking stopped', '/p/sf/unplug/health?state=stopped', 'unplug', program='sf', phase='daily',
@@ -430,7 +439,8 @@ def unplug():
         checklist([ci('Screen Time permission', 'Turned off in Settings'), ci('Daily schedule', 'Running', True), ci('Settings shared with the pause screen', 'Ready', True)], label='iPhone checks'),
     ], footer=[
         button('Open phone settings', settings()),
-        button('Check again', branch('Tracking health result', [('All pass', rep('sf_unplug_health')), ('Still failing', toast('Still not working. Turn Screen Time access on again in Settings.'))]), v='secondary'),
+        button('Check again', branch('Tracking health result', [('All pass', rep('sf_unplug_health')), ('Still failing', toast('Still not working. Turn Screen Time access on again in Settings.'))],
+                                     id='unplug.health.tracking_check', ask='unplugTrackingCheck', when={'healthy': 'All pass', 'failing': 'Still failing'}), v='secondary'),
     ], source=src + ' UnplugFlutterApi.onTrackingStopped(checkName, detail)',
        desc='Also opened from the "Unplug needs attention" notification (generic text, no program name).')
     P('sf_unplug_health_android', 'Tracking check (Android)', '/p/sf/unplug/health?state=android', 'unplug', program='sf', phase='daily',
@@ -544,7 +554,8 @@ def p36_gaps():
         text('Tether reads daily totals by category only. Never apps’ content, messages or contacts.', 'muted', align='center'),
         kv([('Reads', 'Minutes per category'), ('Never reads', 'Content, messages, contacts'), ('Turn off', 'Anytime in Account')]),
         checklist([ci('Tap Open settings'), ci('Find Tether Health'), ci('Turn on “Permit usage access”')], label='Android asks in Settings'),
-    ], footer=[button('Open settings', branch('Android usage access (checked on return)', [('Allowed', toast('Usage access on', back())), ('Not allowed', rep('sf_screentime_android_denied'))])),
+    ], footer=[button('Open settings', branch('Android usage access (checked on return)', [('Allowed', toast('Usage access on', back())), ('Not allowed', rep('sf_screentime_android_denied'))],
+                                          id='sf.screentime.android_usage_access', ask='usageAccessSettings', when={'granted': 'Allowed', 'denied': 'Not allowed'})),
                button('Not now', back(), v='secondary')],
        source='sf_screentime in this spec; android/.../unplug/UsageReader.kt (usage access, checked on resume)',
        desc='Android has no permission prompt for usage access; the person turns it on in Settings and the app checks again on return.')

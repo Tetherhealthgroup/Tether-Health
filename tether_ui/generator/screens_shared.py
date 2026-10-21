@@ -67,7 +67,9 @@ def shared():
         illus('◔'), title('Quiet, private reminders', 'l', align='center'), text('At most 2 a day, only for your focus programs.', align='center'),
         card(card(title='Tether Health', text='You have a Tether reminder.', v='flat'), eyebrow='Lock screen preview', text='Program names and health details stay hidden unless you turn them on.'),
         toggle('Quiet hours', '9:00 PM – 7:00 AM · safety alerts still come through', True, key='quiet_hours'),
-    ], footer=[button('Turn on reminders', branch('System permission prompt', [('Allowed', go('ob_account')), ('Not allowed', go('ob_reminders_denied'))])), button('Not now', go('ob_account'), v='secondary')],
+    ], footer=[button('Turn on reminders', branch('System permission prompt', [('Allowed', go('ob_account')), ('Not allowed', go('ob_reminders_denied'))],
+                                                               id='onboarding.reminders.notifications_request', ask='notificationsRequest',
+                                                               when={'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'})), button('Not now', go('ob_account'), v='secondary')],
        desc='Shown before the OS prompt so the system dialog is expected.')
     S('ob_reminders_denied', 'Reminders denied', '/onboarding/reminders?state=denied', 'onboarding', phase='onboarding', variant_of='ob_reminders', state='permission denied', hdr=H('Reminders'), body=[
         banner('info', 'Notifications are off in your phone settings.'), title('You can still use everything.'),
@@ -94,12 +96,12 @@ def shared():
     S('auth_signin', 'Sign in', '/auth/signin', 'auth', phase='account', kind='sheet', over='Welcome', body=[
         title('Welcome back'), authbuttons(apple=auth('apple', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Apple ID, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]), google=auth('google', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Google account, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])), eyebrow('Or with email'), field('Email', 'alex@example.com', kind='email', key='email'), field('Password', '••••••••', kind='password', key='password'),
         link('Forgot password?', go('auth_forgot'), align='left'),
-    ], footer=[button('Sign in', branch('Sign-in result', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('Wrong password', go('auth_signin_error'))])), button('Cancel', close(), v='secondary')], api=['POST supabase /auth/v1/token'])
+    ], footer=[button('Sign in', submit('POST supabase /auth/v1/token', branch('Sign-in result', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('Wrong password', go('auth_signin_error'))]))), button('Cancel', close(), v='secondary')], api=['POST supabase /auth/v1/token'])
     S('auth_signin_error', 'Sign-in error', '/auth/signin?state=error', 'auth', phase='account', kind='sheet', over='Welcome', variant_of='auth_signin', state='error', body=[
         title('Welcome back'), banner('error', 'That email and password don’t match. Check both and try again.'), authbuttons(apple=auth('apple', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Apple ID, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]), google=auth('google', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('New Google account, no Tether account', go('auth_social_new')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])), eyebrow('Or with email'),
         field('Email', 'alex@example.com', kind='email', key='email'), field('Password', '••••••••', error='Password is incorrect.', kind='password', key='password'),
         link('Forgot password?', go('auth_forgot'), align='left'), text('After 5 tries we pause sign-in for 15 minutes to protect your account.', 'small'),
-    ], footer=[button('Try again', branch('Sign-in result', [('Success', reset('today')), ('Wrong password', rep('auth_signin_error'))])), button('Cancel', close(), v='secondary')])
+    ], footer=[button('Try again', submit('POST supabase /auth/v1/token', branch('Sign-in result', [('Success', reset('today')), ('Success · guest plan on phone', go('auth_merge')), ('Wrong password', rep('auth_signin_error'))]))), button('Cancel', close(), v='secondary')])
 
     S('auth_social_new', 'New account from Apple or Google', '/auth/social/new', 'auth', phase='account', hdr=H('Create account'), body=[
         illus('A'), title('Create your Tether account?', 'l', align='center'), text('No Tether account uses this Apple ID or Google account yet.', 'muted', align='center'),

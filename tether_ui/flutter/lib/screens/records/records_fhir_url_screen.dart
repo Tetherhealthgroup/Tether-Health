@@ -26,7 +26,7 @@ class RecordsFhirUrlScreen extends StatelessWidget {
         TBody('We check it supports SMART on FHIR R4 (/.well-known/smart-configuration) before you sign in.', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Check and continue', onPressed: () => TNav.branch(context, 'Server check', <String, VoidCallback>{'SMART on FHIR R4 supported': () => TNav.push(context, Routes.recordsConsent), 'Not a FHIR R4 server': () => TNav.push(context, Routes.recordsError)}), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Check and continue', onPressed: () => TNav.branch(context, 'Server check', <String, VoidCallback>{'SMART on FHIR R4 supported': () => TNav.push(context, Routes.recordsConsent), 'Not a FHIR R4 server': () => TNav.push(context, Routes.recordsError)}, device: const TBranchRef('records.fhir_url.server_check', TAsk.fhirServerCheck, 'records_fhir_url'), when: const <TAnswer, String>{TAnswer.supported: 'SMART on FHIR R4 supported', TAnswer.unsupported: 'Not a FHIR R4 server'}), arrow: true),
       ],
     );
   }

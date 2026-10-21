@@ -143,7 +143,9 @@ def programs_a():
     S('sf_screentime', 'Connect Screen Time', '/p/sf/screen-time', 'sf', program='sf', phase='plan', hdr=H('Screen Time', pill='Optional'), body=[
         illus('◷'), title('See your Screen Time here, if you want.', align='center'), text('Apple’s Screen Time shows your daily totals by category inside Tether. Tether can’t read, store or share those minutes.', 'muted', align='center'),
         kv([('Shows', 'Minutes per category, on this phone'), ('Never reads', 'Content, messages, contacts'), ('Turn off', 'Anytime in Account')]),
-    ], footer=[button('Allow access', branch('iOS Screen Time permission', [('Allowed', toast('Screen Time connected', back())), ('Not allowed', rep('sf_screentime_denied'))])), button('Not now', back(), v='secondary')])
+    ], footer=[button('Allow access', branch('iOS Screen Time permission', [('Allowed', toast('Screen Time connected', back())), ('Not allowed', rep('sf_screentime_denied'))],
+                                         id='sf.screentime.ios_request', ask='screenTimeRequest',
+                                         when={'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'})), button('Not now', back(), v='secondary')])
     S('sf_screentime_denied', 'Screen Time denied', '/p/sf/screen-time?state=denied', 'sf', program='sf', phase='plan', variant_of='sf_screentime', state='permission denied', hdr=H('Screen Time', pill='Optional'), body=[
         banner('info', 'Screen Time access was not allowed.'), title('Self-report works just as well.'),
         text('We’ll ask for a quick estimate in your evening check-in. You can connect later in Account → ScrollFree.', 'muted'),

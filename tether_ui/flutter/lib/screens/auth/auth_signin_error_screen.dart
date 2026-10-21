@@ -13,7 +13,7 @@ import '../../ui/ui.dart';
 ///   • Continue with Apple → auth (apple): Sign in with Apple result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Apple ID, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error
 ///   • Continue with Google → auth (google): Sign in with Google result → Success: reset → today | Success · guest plan on phone: push → auth_merge | New Google account, no Tether account: push → auth_social_new | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error
 ///   • Forgot password? → push → auth_forgot
-///   • Try again → branch: Sign-in result → Success: reset → today | Wrong password: replace → auth_signin_error
+///   • Try again → POST supabase /auth/v1/token then branch: Sign-in result → Success: reset → today | Success · guest plan on phone: push → auth_merge | Wrong password: replace → auth_signin_error
 ///   • Cancel → close
 /// API: —
 class AuthSigninErrorScreen extends StatelessWidget {
@@ -33,7 +33,7 @@ class AuthSigninErrorScreen extends StatelessWidget {
         TBody('After 5 tries we pause sign-in for 15 minutes to protect your account.', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Try again', onPressed: () => TNav.branch(context, 'Sign-in result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Wrong password': () => TNav.replace(context, Routes.authSigninError)}), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Try again', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/token', screenId: 'auth_signin_error', queueable: false, then: () => TNav.branch(context, 'Sign-in result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Success · guest plan on phone': () => TNav.push(context, Routes.authMerge), 'Wrong password': () => TNav.replace(context, Routes.authSigninError)})), arrow: true),
         TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );
