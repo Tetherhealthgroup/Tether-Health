@@ -593,6 +593,22 @@ void main() {
           'android/settings.gradle.kts',
         },
       );
+      // Directly under android/: those files plus the app, gradle and
+      // fastlane folders only.
+      expect(
+        files.map((p) => p.split('/').take(2).join('/')).toSet(),
+        {
+          'android/.gitignore',
+          'android/Gemfile',
+          'android/Gemfile.lock',
+          'android/build.gradle.kts',
+          'android/gradle.properties',
+          'android/settings.gradle.kts',
+          'android/app',
+          'android/gradle',
+          'android/fastlane',
+        },
+      );
     },
     skip: gitWorkTree
         ? false
