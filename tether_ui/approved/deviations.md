@@ -27,6 +27,10 @@ the current file:
   `POST supabase /auth/v1/token` submit (TH-902; the action summary then
   names the endpoint). With those removed, the old and new files are equal,
   except the one case P-51 adds on `auth_signin_error` (TH-986b).
+- TH-907b rows change only a starting state (P-52): on `ob_consent` the
+  "Private reminders" toggle's `on` goes from `true` to `false`; on
+  `ob_account` the "I’m 18 or older" checklist item loses `"done": true`.
+  With that attribute restored, the old and new files are equal.
 
 All replacement copy still needs clinical/legal review before release.
 
@@ -148,7 +152,7 @@ copy, keys and actions are unchanged.
 | `hw_log2` | `body[2].fields[0]` Top (systolic): "132"; `body[2].fields[1]` Bottom (diastolic): "84"; `body[3]` Pulse (optional): "70". |
 | `hw_log_error` | `body[1].fields[0]` Top (systolic): "128"; `body[1].fields[1]` Bottom (diastolic): "310". |
 | `hw_targets` | `body[2].fields[0]` Top below: "130"; `body[2].fields[1]` Bottom below: "80". |
-| `ob_account` | `body[5]` Email: "alex@example.com"; `body[6]` Password: "••••••••••••". Also TH-902 (key, below). |
+| `ob_account` | `body[5]` Email: "alex@example.com"; `body[6]` Password: "••••••••••••". Also TH-902 (key, below) and P-52 (starts unticked, below). |
 | `ob_basics` | `body[3]` What should we call you?: "Alex"; `body[4]` Age range: "35–44". |
 | `re_labs` | `body[0]` eGFR: "58"; `body[1]` Urine ACR: "42"; `body[3]` Lab date: "Oct 3, 2026". |
 | `records_fhir_url` | `body[1]` FHIR server address: "https://fhir.example-health.org/r4". |
@@ -171,12 +175,13 @@ Stable keys for inputs the API reads (decision TH-902, the owner's approval of
 the ARCH-TH-902 design). The consent checklists and the program picker get a
 key so their state reaches the session. The `program_settings` care-team
 toggle had a key made from the example clinic name; it now uses the same key
-as `program_settings_sf`. Checklist and tile on/off states are unchanged,
-including the ticked "I’m 18 or older" on `ob_account`.
+as `program_settings_sf`. Checklist and tile on/off states are unchanged by
+this change. The "I’m 18 or older" item on `ob_account`, ticked here, starts
+unticked since P-52 (below).
 
 | Screen | Node | Change |
 |---|---|---|
-| `ob_account` | `body[7]` (checklist) | gets key `age_18_or_older`. Also P-31 (above). |
+| `ob_account` | `body[7]` (checklist) | gets key `age_18_or_older`. Also P-31 (above) and P-52 (below). |
 | `ob_programs` | `body[3]` (tiles) | gets key `programs`. |
 | `program_settings` | `body[2].children[0]` (toggle) | key `care_team_dr_patel_s_clinic` → `care_team_sharing`. Also P-08 (TH-942). |
 | `records_consent` | `body[2]` (checklist) | gets key `resources`. |
@@ -220,6 +225,19 @@ and `sf_unplug_shield`.
 | Screen | Node | Change |
 |---|---|---|
 | `auth_signin_error` | `footer[0]` "Try again", branch "Sign-in result" | gains the case "Success · guest plan on phone" → push `auth_merge`, the same case and target as "Sign in" on `auth_signin`. No visible element changes. |
+
+## P-52: optional consent and age attestation start unticked (TH-907b)
+
+A choice the member makes starts off, so the member makes it: a pre-ticked
+consent is not freely given. The label, copy, keys, layout and actions are
+unchanged; only the starting state differs. Until the member changes it,
+the session holds `false` for the toggle and an empty list for the
+checklist.
+
+| Screen | Node | Change |
+|---|---|---|
+| `ob_consent` | `body[4].children[0]` (toggle "Private reminders", key `private_reminders`) | `on`: `true` → `false`. "Agree and continue" still submits and opens `ob_basics` with it off; it is optional. "Essential app data" (required) stays on. |
+| `ob_account` | `body[7]` (checklist "I’m 18 or older", key `age_18_or_older`) | the item no longer starts ticked (`"done": true` removed). "Create account" is unchanged and does not read the checklist. Also P-31 and TH-902 (above). |
 
 ## Rendering changes with no spec change (TH-907)
 

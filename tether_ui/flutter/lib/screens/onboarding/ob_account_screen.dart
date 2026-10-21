@@ -31,7 +31,7 @@ class ObAccountScreen extends StatelessWidget {
         TEyebrow('Or with email'),
         TField(fieldKey: 'ob_account.email', label: 'Email', placeholder: 'alex@example.com', kind: TFieldKind.email),
         TField(fieldKey: 'ob_account.password', label: 'Password', hint: 'At least 12 characters. A passphrase works well.', placeholder: '••••••••••••', kind: TFieldKind.password),
-        TChecklist(fieldKey: 'ob_account.age_18_or_older', items: [TCheckItem('I’m 18 or older', done: true)]),
+        TChecklist(fieldKey: 'ob_account.age_18_or_older', items: [TCheckItem('I’m 18 or older')]),
         TBody('Guest plans are encrypted on this phone. If you sign up later, we ask before uploading them.', tone: TTextTone.small),
       ],
       footer: [

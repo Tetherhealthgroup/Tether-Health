@@ -152,8 +152,7 @@
       "t": "checklist",
       "items": [
         {
-          "label": "I’m 18 or older",
-          "done": true
+          "label": "I’m 18 or older"
         }
       ],
       "key": "age_18_or_older"

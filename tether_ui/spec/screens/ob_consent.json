@@ -58,7 +58,7 @@
           "t": "toggle",
           "label": "Private reminders",
           "sub": "Lock screen: “You have a Tether reminder.”",
-          "on": true,
+          "on": false,
           "key": "private_reminders"
         },
         {
