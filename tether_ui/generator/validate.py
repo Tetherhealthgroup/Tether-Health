@@ -66,9 +66,12 @@ def validate():
         for part in ('body', 'footer'):
             for n, p in walk(s[part], part):
                 if n['t'] == 'zone' and n.get('rule') and n['rule'] not in RULES: errors.append(f'{sid}: zone rule missing')
+    # A rule may also read a keyed checklist or tile set (ob.age reads the
+    # "I’m 18 or older" checklist).
+    rulekeys = allkeys | {f"{sid}.{n['key']}" for sid, s in SCREENS.items() for part in ('body', 'footer') for n, p in walk(s[part], part) if n.get('key') and n['t'] in KEYED}
     for r, spec in RULES.items():
         for k in spec['inputs']:
-            if k not in allkeys: errors.append(f'rule {r}: input {k} not on any screen')
+            if k not in rulekeys: errors.append(f'rule {r}: input {k} not on any screen')
     # Production inputs (TH-907). Session keys the API adapters map must be
     # explicit and stable, and no field may start with a value that would be
     # submitted if the member never types (P-31).

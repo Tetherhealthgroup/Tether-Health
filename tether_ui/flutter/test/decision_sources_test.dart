@@ -153,6 +153,13 @@ const _opens = <String, Map<String, (String, String, String?, String?)>>{
   },
 };
 
+/// Sign-in branches that sit inside a rule branch (the sign-up age check,
+/// P-72), keyed by where: the item to tick so the rule lets sign-in run.
+const _ticks = <String, String>{
+  'ob_account body[2].items[0] cases[0].action': 'I’m 18 or older',
+  'ob_account body[2].items[1] cases[0].action': 'I’m 18 or older',
+};
+
 String _where(Map<String, dynamic> r) => '${r['screen']} ${r['path']}${(r['at'] as String).isEmpty ? '' : ' ${r['at']}'}';
 
 class _ScriptedDevice implements TDevice {
@@ -461,6 +468,9 @@ void main() {
         });
       }
     }
+    test('a sign-in branch sits inside another branch only where the pinned tick lets it run', () {
+      expect({for (final r in cat) if (r['source'] == 'auth' && (r['at'] as String).isNotEmpty) _where(r)}, _ticks.keys.toSet());
+    });
     for (final r in cat.where((r) => r['source'] == 'auth')) {
       for (final label in (r['labels'] as List).cast<String>()) {
         testWidgets('auth ${_where(r)}: $label', (tester) async {
@@ -472,6 +482,13 @@ void main() {
             final auth = _ScriptedAuth(() async => label);
             TAuth.instance = auth;
             await _open(tester, _routeOf[r['screen']]!);
+            final tick = _ticks[_where(r)];
+            if (tick != null) {
+              final item = find.text(tick);
+              await tester.ensureVisible(item);
+              await tester.tap(item);
+              await _settle(tester);
+            }
             await _tapKey(tester, r['path'] as String);
             expect(auth.calls, 1);
             expect(resolver.recorded, isEmpty, reason: 'native sign-in decides the branch');

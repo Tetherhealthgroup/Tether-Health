@@ -107,7 +107,7 @@ flowchart LR
 | Reminders denied | Open phone settings | `os_settings` |
 | Reminders denied | Continue without reminders | `push → ob_account` |
 | Save your progress | Close | `close` |
-| Save your progress | Continue with Apple | `auth (apple): Sign in with Apple result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
-| Save your progress | Continue with Google | `auth (google): Sign in with Google result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error` |
-| Save your progress | Create account | `POST supabase /auth/v1/signup then push → auth_verify` |
-| Save your progress | Continue on this phone only | `reset → today` |
+| Save your progress | Continue with Apple | `decide ob.age: “I’m 18 or older” ticked? → Age confirmed: auth (apple): Sign in with Apple result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error | Age not confirmed: toast “You need to be 18 or older to continue.”` |
+| Save your progress | Continue with Google | `decide ob.age: “I’m 18 or older” ticked? → Age confirmed: auth (google): Sign in with Google result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error | Age not confirmed: toast “You need to be 18 or older to continue.”` |
+| Save your progress | Create account | `decide ob.age: “I’m 18 or older” ticked? → Age confirmed: POST supabase /auth/v1/signup then push → auth_verify | Age not confirmed: toast “You need to be 18 or older to continue.”` |
+| Save your progress | Continue on this phone only | `decide ob.age: “I’m 18 or older” ticked? → Age confirmed: reset → today | Age not confirmed: toast “You need to be 18 or older to continue.”` |

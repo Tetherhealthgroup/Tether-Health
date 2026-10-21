@@ -123,6 +123,7 @@ void main() {
   testWidgets('scenario auth-email · Create account with email, verify, keep both plans', (tester) async {
     await _start(tester, Routes.obAccount, ios: false);
     try {
+        await _tap(tester, 'I’m 18 or older');
         await _tap(tester, 'Create account');
         expect(find.byType(AuthVerifyScreen), findsOneWidget, reason: 'expected auth_verify');
         await _tap(tester, 'I’ve confirmed my email');
@@ -179,6 +180,7 @@ void main() {
   testWidgets('scenario auth-google-link · Google email already used → link accounts', (tester) async {
     await _start(tester, Routes.obAccount, ios: false);
     try {
+        await _tap(tester, 'I’m 18 or older');
         TSim.queue.add('Email already has a Tether account');
         await _tap(tester, 'Continue with Google');
         expect(find.byType(AuthLinkScreen), findsOneWidget, reason: 'expected auth_link');
@@ -193,6 +195,7 @@ void main() {
   testWidgets('scenario auth-google-error · Google sign-in fails → error with email fallback', (tester) async {
     await _start(tester, Routes.obAccount, ios: false);
     try {
+        await _tap(tester, 'I’m 18 or older');
         TSim.queue.add('Error');
         await _tap(tester, 'Continue with Google');
         expect(find.byType(AuthSocialErrorScreen), findsOneWidget, reason: 'expected auth_social_error');
@@ -238,6 +241,7 @@ void main() {
         await _tap(tester, 'Continue');
         TSim.queue.add('Allowed');
         await _tap(tester, 'Turn on reminders');
+        await _tap(tester, 'I’m 18 or older');
         await _tap(tester, 'Continue on this phone only');
         expect(find.byType(TodayScreen), findsOneWidget, reason: 'expected today');
         expect(tester.takeException(), isNull);

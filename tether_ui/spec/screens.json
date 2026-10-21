@@ -1244,37 +1244,55 @@
             "label": "Continue with Apple",
             "action": {
               "type": "branch",
-              "question": "Sign in with Apple result",
-              "provider": "apple",
+              "question": "“I’m 18 or older” ticked?",
               "on": null,
-              "decide": null,
+              "decide": "ob.age",
               "cases": [
                 {
-                  "label": "Success",
+                  "label": "Age confirmed",
                   "action": {
-                    "type": "push",
-                    "to": "auth_merge"
+                    "type": "branch",
+                    "question": "Sign in with Apple result",
+                    "provider": "apple",
+                    "on": null,
+                    "decide": null,
+                    "cases": [
+                      {
+                        "label": "Success",
+                        "action": {
+                          "type": "push",
+                          "to": "auth_merge"
+                        }
+                      },
+                      {
+                        "label": "Email already has a Tether account",
+                        "action": {
+                          "type": "push",
+                          "to": "auth_link"
+                        }
+                      },
+                      {
+                        "label": "Cancelled",
+                        "action": {
+                          "type": "toast",
+                          "value": "Sign-in cancelled"
+                        }
+                      },
+                      {
+                        "label": "Error",
+                        "action": {
+                          "type": "push",
+                          "to": "auth_social_error"
+                        }
+                      }
+                    ]
                   }
                 },
                 {
-                  "label": "Email already has a Tether account",
-                  "action": {
-                    "type": "push",
-                    "to": "auth_link"
-                  }
-                },
-                {
-                  "label": "Cancelled",
+                  "label": "Age not confirmed",
                   "action": {
                     "type": "toast",
-                    "value": "Sign-in cancelled"
-                  }
-                },
-                {
-                  "label": "Error",
-                  "action": {
-                    "type": "push",
-                    "to": "auth_social_error"
+                    "value": "You need to be 18 or older to continue."
                   }
                 }
               ]
@@ -1289,37 +1307,55 @@
             "label": "Continue with Google",
             "action": {
               "type": "branch",
-              "question": "Sign in with Google result",
-              "provider": "google",
+              "question": "“I’m 18 or older” ticked?",
               "on": null,
-              "decide": null,
+              "decide": "ob.age",
               "cases": [
                 {
-                  "label": "Success",
+                  "label": "Age confirmed",
                   "action": {
-                    "type": "push",
-                    "to": "auth_merge"
+                    "type": "branch",
+                    "question": "Sign in with Google result",
+                    "provider": "google",
+                    "on": null,
+                    "decide": null,
+                    "cases": [
+                      {
+                        "label": "Success",
+                        "action": {
+                          "type": "push",
+                          "to": "auth_merge"
+                        }
+                      },
+                      {
+                        "label": "Email already has a Tether account",
+                        "action": {
+                          "type": "push",
+                          "to": "auth_link"
+                        }
+                      },
+                      {
+                        "label": "Cancelled",
+                        "action": {
+                          "type": "toast",
+                          "value": "Sign-in cancelled"
+                        }
+                      },
+                      {
+                        "label": "Error",
+                        "action": {
+                          "type": "push",
+                          "to": "auth_social_error"
+                        }
+                      }
+                    ]
                   }
                 },
                 {
-                  "label": "Email already has a Tether account",
-                  "action": {
-                    "type": "push",
-                    "to": "auth_link"
-                  }
-                },
-                {
-                  "label": "Cancelled",
+                  "label": "Age not confirmed",
                   "action": {
                     "type": "toast",
-                    "value": "Sign-in cancelled"
-                  }
-                },
-                {
-                  "label": "Error",
-                  "action": {
-                    "type": "push",
-                    "to": "auth_social_error"
+                    "value": "You need to be 18 or older to continue."
                   }
                 }
               ]
@@ -1375,12 +1411,30 @@
         "t": "button",
         "label": "Create account",
         "action": {
-          "type": "submit",
-          "api": "POST supabase /auth/v1/signup",
-          "then": {
-            "type": "push",
-            "to": "auth_verify"
-          }
+          "type": "branch",
+          "question": "“I’m 18 or older” ticked?",
+          "on": null,
+          "decide": "ob.age",
+          "cases": [
+            {
+              "label": "Age confirmed",
+              "action": {
+                "type": "submit",
+                "api": "POST supabase /auth/v1/signup",
+                "then": {
+                  "type": "push",
+                  "to": "auth_verify"
+                }
+              }
+            },
+            {
+              "label": "Age not confirmed",
+              "action": {
+                "type": "toast",
+                "value": "You need to be 18 or older to continue."
+              }
+            }
+          ]
         },
         "variant": "primary",
         "arrow": true
@@ -1389,8 +1443,26 @@
         "t": "button",
         "label": "Continue on this phone only",
         "action": {
-          "type": "reset",
-          "to": "today"
+          "type": "branch",
+          "question": "“I’m 18 or older” ticked?",
+          "on": null,
+          "decide": "ob.age",
+          "cases": [
+            {
+              "label": "Age confirmed",
+              "action": {
+                "type": "reset",
+                "to": "today"
+              }
+            },
+            {
+              "label": "Age not confirmed",
+              "action": {
+                "type": "toast",
+                "value": "You need to be 18 or older to continue."
+              }
+            }
+          ]
         },
         "variant": "secondary",
         "arrow": false
@@ -1415,106 +1487,178 @@
         "path": "body[2].items[0]",
         "action": {
           "type": "branch",
-          "question": "Sign in with Apple result",
-          "provider": "apple",
+          "question": "“I’m 18 or older” ticked?",
           "on": null,
-          "decide": null,
+          "decide": "ob.age",
           "cases": [
             {
-              "label": "Success",
+              "label": "Age confirmed",
               "action": {
-                "type": "push",
-                "to": "auth_merge"
+                "type": "branch",
+                "question": "Sign in with Apple result",
+                "provider": "apple",
+                "on": null,
+                "decide": null,
+                "cases": [
+                  {
+                    "label": "Success",
+                    "action": {
+                      "type": "push",
+                      "to": "auth_merge"
+                    }
+                  },
+                  {
+                    "label": "Email already has a Tether account",
+                    "action": {
+                      "type": "push",
+                      "to": "auth_link"
+                    }
+                  },
+                  {
+                    "label": "Cancelled",
+                    "action": {
+                      "type": "toast",
+                      "value": "Sign-in cancelled"
+                    }
+                  },
+                  {
+                    "label": "Error",
+                    "action": {
+                      "type": "push",
+                      "to": "auth_social_error"
+                    }
+                  }
+                ]
               }
             },
             {
-              "label": "Email already has a Tether account",
-              "action": {
-                "type": "push",
-                "to": "auth_link"
-              }
-            },
-            {
-              "label": "Cancelled",
+              "label": "Age not confirmed",
               "action": {
                 "type": "toast",
-                "value": "Sign-in cancelled"
-              }
-            },
-            {
-              "label": "Error",
-              "action": {
-                "type": "push",
-                "to": "auth_social_error"
+                "value": "You need to be 18 or older to continue."
               }
             }
           ]
         },
-        "summary": "auth (apple): Sign in with Apple result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+        "summary": "decide ob.age: “I’m 18 or older” ticked? → Age confirmed: auth (apple): Sign in with Apple result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error | Age not confirmed: toast “You need to be 18 or older to continue.”"
       },
       {
         "element": "Continue with Google",
         "path": "body[2].items[1]",
         "action": {
           "type": "branch",
-          "question": "Sign in with Google result",
-          "provider": "google",
+          "question": "“I’m 18 or older” ticked?",
           "on": null,
-          "decide": null,
+          "decide": "ob.age",
           "cases": [
             {
-              "label": "Success",
+              "label": "Age confirmed",
               "action": {
-                "type": "push",
-                "to": "auth_merge"
+                "type": "branch",
+                "question": "Sign in with Google result",
+                "provider": "google",
+                "on": null,
+                "decide": null,
+                "cases": [
+                  {
+                    "label": "Success",
+                    "action": {
+                      "type": "push",
+                      "to": "auth_merge"
+                    }
+                  },
+                  {
+                    "label": "Email already has a Tether account",
+                    "action": {
+                      "type": "push",
+                      "to": "auth_link"
+                    }
+                  },
+                  {
+                    "label": "Cancelled",
+                    "action": {
+                      "type": "toast",
+                      "value": "Sign-in cancelled"
+                    }
+                  },
+                  {
+                    "label": "Error",
+                    "action": {
+                      "type": "push",
+                      "to": "auth_social_error"
+                    }
+                  }
+                ]
               }
             },
             {
-              "label": "Email already has a Tether account",
-              "action": {
-                "type": "push",
-                "to": "auth_link"
-              }
-            },
-            {
-              "label": "Cancelled",
+              "label": "Age not confirmed",
               "action": {
                 "type": "toast",
-                "value": "Sign-in cancelled"
-              }
-            },
-            {
-              "label": "Error",
-              "action": {
-                "type": "push",
-                "to": "auth_social_error"
+                "value": "You need to be 18 or older to continue."
               }
             }
           ]
         },
-        "summary": "auth (google): Sign in with Google result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error"
+        "summary": "decide ob.age: “I’m 18 or older” ticked? → Age confirmed: auth (google): Sign in with Google result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error | Age not confirmed: toast “You need to be 18 or older to continue.”"
       },
       {
         "element": "Create account",
         "path": "footer[0]",
         "action": {
-          "type": "submit",
-          "api": "POST supabase /auth/v1/signup",
-          "then": {
-            "type": "push",
-            "to": "auth_verify"
-          }
+          "type": "branch",
+          "question": "“I’m 18 or older” ticked?",
+          "on": null,
+          "decide": "ob.age",
+          "cases": [
+            {
+              "label": "Age confirmed",
+              "action": {
+                "type": "submit",
+                "api": "POST supabase /auth/v1/signup",
+                "then": {
+                  "type": "push",
+                  "to": "auth_verify"
+                }
+              }
+            },
+            {
+              "label": "Age not confirmed",
+              "action": {
+                "type": "toast",
+                "value": "You need to be 18 or older to continue."
+              }
+            }
+          ]
         },
-        "summary": "POST supabase /auth/v1/signup then push → auth_verify"
+        "summary": "decide ob.age: “I’m 18 or older” ticked? → Age confirmed: POST supabase /auth/v1/signup then push → auth_verify | Age not confirmed: toast “You need to be 18 or older to continue.”"
       },
       {
         "element": "Continue on this phone only",
         "path": "footer[1]",
         "action": {
-          "type": "reset",
-          "to": "today"
+          "type": "branch",
+          "question": "“I’m 18 or older” ticked?",
+          "on": null,
+          "decide": "ob.age",
+          "cases": [
+            {
+              "label": "Age confirmed",
+              "action": {
+                "type": "reset",
+                "to": "today"
+              }
+            },
+            {
+              "label": "Age not confirmed",
+              "action": {
+                "type": "toast",
+                "value": "You need to be 18 or older to continue."
+              }
+            }
+          ]
         },
-        "summary": "reset → today"
+        "summary": "decide ob.age: “I’m 18 or older” ticked? → Age confirmed: reset → today | Age not confirmed: toast “You need to be 18 or older to continue.”"
       }
     ]
   },

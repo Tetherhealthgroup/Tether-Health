@@ -20,6 +20,17 @@
     "screen": "ob_account",
     "path": "body[2].items[0]",
     "at": "",
+    "source": "rule",
+    "labels": [
+      "Age confirmed",
+      "Age not confirmed"
+    ],
+    "decide": "ob.age"
+  },
+  {
+    "screen": "ob_account",
+    "path": "body[2].items[0]",
+    "at": "cases[0].action",
     "source": "auth",
     "labels": [
       "Success",
@@ -33,6 +44,17 @@
     "screen": "ob_account",
     "path": "body[2].items[1]",
     "at": "",
+    "source": "rule",
+    "labels": [
+      "Age confirmed",
+      "Age not confirmed"
+    ],
+    "decide": "ob.age"
+  },
+  {
+    "screen": "ob_account",
+    "path": "body[2].items[1]",
+    "at": "cases[0].action",
     "source": "auth",
     "labels": [
       "Success",
@@ -41,6 +63,28 @@
       "Error"
     ],
     "provider": "google"
+  },
+  {
+    "screen": "ob_account",
+    "path": "footer[0]",
+    "at": "",
+    "source": "rule",
+    "labels": [
+      "Age confirmed",
+      "Age not confirmed"
+    ],
+    "decide": "ob.age"
+  },
+  {
+    "screen": "ob_account",
+    "path": "footer[1]",
+    "at": "",
+    "source": "rule",
+    "labels": [
+      "Age confirmed",
+      "Age not confirmed"
+    ],
+    "decide": "ob.age"
   },
   {
     "screen": "auth_signin",

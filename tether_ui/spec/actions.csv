@@ -28,10 +28,10 @@ ob_reminders_denied,Reminders denied,Back,back,,back
 ob_reminders_denied,Reminders denied,Open phone settings,os_settings,,os_settings
 ob_reminders_denied,Reminders denied,Continue without reminders,push,ob_account,push → ob_account
 ob_account,Save your progress,Close,close,,close
-ob_account,Save your progress,Continue with Apple,branch,auth_merge auth_link auth_social_error,auth (apple): Sign in with Apple result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error
-ob_account,Save your progress,Continue with Google,branch,auth_merge auth_link auth_social_error,auth (google): Sign in with Google result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error
-ob_account,Save your progress,Create account,submit,auth_verify,POST supabase /auth/v1/signup then push → auth_verify
-ob_account,Save your progress,Continue on this phone only,reset,today,reset → today
+ob_account,Save your progress,Continue with Apple,branch,auth_merge auth_link auth_social_error,decide ob.age: “I’m 18 or older” ticked? → Age confirmed: auth (apple): Sign in with Apple result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error | Age not confirmed: toast “You need to be 18 or older to continue.”
+ob_account,Save your progress,Continue with Google,branch,auth_merge auth_link auth_social_error,decide ob.age: “I’m 18 or older” ticked? → Age confirmed: auth (google): Sign in with Google result → Success: push → auth_merge | Email already has a Tether account: push → auth_link | Cancelled: toast “Sign-in cancelled” | Error: push → auth_social_error | Age not confirmed: toast “You need to be 18 or older to continue.”
+ob_account,Save your progress,Create account,branch,auth_verify,decide ob.age: “I’m 18 or older” ticked? → Age confirmed: POST supabase /auth/v1/signup then push → auth_verify | Age not confirmed: toast “You need to be 18 or older to continue.”
+ob_account,Save your progress,Continue on this phone only,branch,today,decide ob.age: “I’m 18 or older” ticked? → Age confirmed: reset → today | Age not confirmed: toast “You need to be 18 or older to continue.”
 auth_verify,Verify email,Back,back,,back
 auth_verify,Verify email,Open email app,external,,external message://
 auth_verify,Verify email,I’ve confirmed my email,push,auth_merge,push → auth_merge

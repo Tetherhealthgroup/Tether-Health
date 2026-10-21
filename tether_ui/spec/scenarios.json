@@ -8,6 +8,10 @@
     "steps": [
       [
         "tap",
+        "I’m 18 or older"
+      ],
+      [
+        "tap",
         "Create account"
       ],
       [
@@ -111,6 +115,10 @@
     "start": "ob_account",
     "steps": [
       [
+        "tap",
+        "I’m 18 or older"
+      ],
+      [
         "choose",
         "Email already has a Tether account"
       ],
@@ -136,6 +144,10 @@
     "title": "Google sign-in fails → error with email fallback",
     "start": "ob_account",
     "steps": [
+      [
+        "tap",
+        "I’m 18 or older"
+      ],
       [
         "choose",
         "Error"
@@ -255,6 +267,10 @@
       [
         "tap",
         "Turn on reminders"
+      ],
+      [
+        "tap",
+        "I’m 18 or older"
       ],
       [
         "tap",
