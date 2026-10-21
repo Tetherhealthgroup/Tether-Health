@@ -213,7 +213,7 @@ select th972_test.ok(
   'public.care_shares:care_shares_insert_own,public.care_shares:care_shares_update_own,'
   'public.caregiver_events:caregiver_events_insert_own,'
   'public.caregivers:caregivers_insert_own,public.caregivers:caregivers_update_own,'
-  'public.enrolments:enrolments_delete_own,public.enrolments:enrolments_insert_own,'
+  'public.enrolments:enrolments_insert_own,'
   'public.enrolments:enrolments_update_own,'
   'public.profiles:profiles_update_own,'
   'public.program_data:program_data_delete_own,public.program_data:program_data_insert_own,'
@@ -225,7 +225,7 @@ select th972_test.ok(
   'public.supporters:supporters_update_own,'
   'storage.objects:avatars_delete_own,storage.objects:avatars_insert_own,'
   'storage.objects:avatars_update_own',
-  'the guarded write policies are exactly the 26 expected ones');
+  'the guarded write policies are exactly the 25 expected ones');
 select th972_test.ok(
   not exists (
     select 1 from pg_catalog.pg_policies
@@ -268,8 +268,8 @@ select th972_test.ok(
 -- Every function authenticated can execute in public is listed here, so a new
 -- one has to be reviewed for the sync-session refusal before this passes.
 -- Writers that refuse a sync session: begin_account_deletion (TH009);
--- save_program_data, swap_focus, supersede_core_consent, delete_my_account
--- and redeem_care_invite (TH010). current_consent_documents only reads. delete_my_app_data is not
+-- save_program_data, swap_focus, supersede_core_consent, delete_my_account,
+-- redeem_care_invite and delete_enrolment_now (TH010). current_consent_documents only reads. delete_my_app_data is not
 -- listed: only its owner may execute it; its TH009 guard stays and is
 -- checked statically below.
 select th972_test.ok(
@@ -278,7 +278,7 @@ select th972_test.ok(
    where p.pronamespace = 'public'::regnamespace
      and has_function_privilege('authenticated', p.oid, 'EXECUTE')) =
   'avatar_write_allowed(text),begin_account_deletion(text),current_consent_documents(),'
-  'delete_my_account(text),'
+  'delete_enrolment_now(uuid,text),delete_my_account(text),'
   'deletion_barrier_open(),has_consent(uuid,text,text),is_unique_text_array(text[]),'
   'is_valid_support_people(jsonb),redeem_care_invite(text),save_program_data(text,jsonb,integer),'
   'supersede_core_consent(uuid,text,text),swap_focus(uuid,uuid),sync_writer_session()',
@@ -420,9 +420,9 @@ select th972_test.refused(
 select th972_test.affects(format(
   'update public.enrolments set status = ''paused'' where id = %L',
   current_setting('th972.b_hw')), 0, 'B sync: cannot update an enrolment (no row qualifies)');
-select th972_test.affects(format(
+select th972_test.refused(format(
   'delete from public.enrolments where id = %L', current_setting('th972.b_bf')),
-  0, 'B sync: cannot delete an enrolment (no row qualifies)');
+  array['42501'], '%permission denied%', 'B sync: cannot delete an enrolment (no row qualifies)');
 select th972_test.refused(format(
   'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
    values (%L, ''reminders'', ''v1'', ''en'')',
@@ -589,8 +589,12 @@ with i as (
   insert into public.enrolments (user_id, programme_code, status)
   values ('00000000-0000-4000-8000-000000972002', 'ca', 'learn_only') returning id
 ) select set_config('th972.b_ca', id::text, true) from i;
+-- A recent sign-in, which delete_enrolment_now requires.
+select set_config('request.jwt.claims', (current_setting('request.jwt.claims')::jsonb
+  || jsonb_build_object('amr', jsonb_build_array(jsonb_build_object(
+    'method', 'password', 'timestamp', extract(epoch from now()) - 30))))::text, true);
 select th972_test.affects(format(
-  'delete from public.enrolments where id = %L', current_setting('th972.b_ca')),
+  'select public.delete_enrolment_now(%L, ''DELETE'')', current_setting('th972.b_ca')),
   1, 'B API: inserts and deletes an enrolment');
 select th972_test.affects(format(
   'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)
@@ -895,7 +899,6 @@ for expected in public.profiles:profiles_update_own \
   public.program_data:program_data_insert_own public.program_data:program_data_update_own \
   public.program_data:program_data_delete_own \
   public.enrolments:enrolments_insert_own public.enrolments:enrolments_update_own \
-  public.enrolments:enrolments_delete_own \
   public.programme_consents:programme_consents_insert_own \
   public.programme_consents:programme_consents_update_own \
   public.account_consents:account_consents_insert_own \
@@ -928,6 +931,7 @@ sync_refusal swap_focus TH010
 sync_refusal supersede_core_consent TH010
 sync_refusal delete_my_account TH010
 sync_refusal redeem_care_invite TH010
+sync_refusal delete_enrolment_now TH010
 
 for pair in enrolments_focus_cap:TH001 consent_revoke_only:TH002 consent_revoke_only:TH003 \
   sync_area_match_enrolment:TH007 sync_lapse_append_only:TH008; do

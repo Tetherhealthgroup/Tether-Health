@@ -418,8 +418,11 @@ select th989_test.ok(th989_test.wide_fingerprint() = current_setting('th989.wide
 select set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-0000009890a1', true);
 select set_config('request.jwt.claims',
   '{"sub":"00000000-0000-4000-8000-0000009890a1","role":"authenticated"}', true);
+select set_config('request.jwt.claims', (current_setting('request.jwt.claims')::jsonb
+  || jsonb_build_object('amr', jsonb_build_array(jsonb_build_object(
+    'method', 'password', 'timestamp', extract(epoch from now()) - 30))))::text, true);
 set local role authenticated;
-delete from public.enrolments where id = '00000000-0000-4000-8000-00000989e0a2';
+select public.delete_enrolment_now('00000000-0000-4000-8000-00000989e0a2', 'DELETE');
 reset role;
 select th989_test.ok(
   (select count(*) from public.sync_area where enrolment_id = '00000000-0000-4000-8000-00000989e0a2') = 0
