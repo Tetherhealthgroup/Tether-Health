@@ -314,8 +314,9 @@ None of these were started by any agent. Do them in roughly this order.
   key, downloadable only once) in the macOS Keychain or a password manager,
   never in the repo and not as loose files in a folder. The one exception is
   the App Store Connect API key for the scripted upload in O-10, which must be
-  a file: keep it in a folder of its own such as `~/secure/tether-health/`,
-  readable by your account only (`chmod 600`), outside the repository and
+  a file: keep it in a folder that holds nothing else, such as
+  `~/secure/tether-health/asc/` (`chmod 700` on the folder), readable by your
+  account only (`chmod 600` on the key), outside the repository and
   outside every folder altool searches for keys (`./private_keys`,
   `~/private_keys`, `~/.private_keys`, `~/.appstoreconnect/private_keys`).
   `tool/upload_ios_testflight.sh` refuses a key in any of those places, and
@@ -361,18 +362,20 @@ None of these were started by any agent. Do them in roughly this order.
   higher):
 
   ```sh
-  export TETHER_ASC_KEY_PATH=$HOME/secure/tether-health/AuthKey_<key ID>.p8
+  export TETHER_ASC_KEY_PATH=$HOME/secure/tether-health/asc/AuthKey_<key ID>.p8
   export TETHER_ASC_KEY_ID=<key ID>
   export TETHER_ASC_ISSUER_ID=<issuer ID>
   sh tool/upload_ios_testflight.sh --ipa=build/ios/ipa/<name>.ipa --validate
   sh tool/upload_ios_testflight.sh --ipa=build/ios/ipa/<name>.ipa
   ```
 
-  `--validate` checks the IPA with App Store Connect without uploading it. The
-  script refuses to run under CI or with DEBUG set, checks the three variables,
-  the key file and the IPA's bundle ID before it calls `xcrun altool`, uploads
-  only the IPA, and hides the key's path and file name in altool's output. Fix
-  the cause of a refusal rather than working around it. If the script cannot
+  `--validate` checks the IPA with App Store Connect without uploading it. Run
+  the script in a normal terminal with your default HOME: its checks of the
+  key folders look in that home folder. The script refuses to run under CI or
+  with DEBUG set, checks the three variables, the key file and the IPA's bundle
+  ID before it calls `xcrun altool`, uploads only the IPA, and hides the key's
+  path and file name in altool's output. Fix the cause of a refusal rather
+  than working around it. If the script cannot
   be used, upload the `.ipa` with Xcode Organizer or Transporter instead,
   signed in with the owner's Apple ID.
   **No agent has run this against the real release define file, signed a

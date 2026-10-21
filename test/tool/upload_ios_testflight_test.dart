@@ -83,6 +83,17 @@ const List<String> pinnedEnvironmentRefusals = [
   r'if [ -n "${API_PRIVATE_KEYS_DIR+set}" ]; then',
   r'  fail "refusing to run: API_PRIVATE_KEYS_DIR is set. Unset it; the key is passed to altool by TETHER_ASC_KEY_PATH only."',
   r'fi',
+  r'if [ -n "${CFFIXED_USER_HOME+set}" ]; then',
+  r'  fail "refusing to run: CFFIXED_USER_HOME is set. It changes the home folder altool uses; unset it."',
+  r'fi',
+  r'check_status=0',
+  r"""python3 -I -c 'import os, sys; sys.exit(3 if any(n.startswith("ALTOOL_") for n in os.environ) else 0)' 2>/dev/null ||""",
+  r'  check_status=$?',
+  r'case "$check_status" in',
+  r'  0) ;;',
+  r'  3) fail "refusing to run: an environment variable whose name starts with ALTOOL_ is set (not shown). Unset it; it can change how altool runs." ;;',
+  r'  *) fail "cannot check the environment for ALTOOL_ variables." ;;',
+  r'esac',
   r'[ -n "${HOME:-}" ] || fail "HOME is not set."',
   r'altool_preferences="$HOME/Library/Preferences/com.apple.itunes.altool.plist"',
   r'if [ -e "$altool_preferences" ] || [ -L "$altool_preferences" ]; then',
@@ -145,6 +156,9 @@ const List<String> pinnedFailMessages = [
   r'refusing to run: CI or GITHUB_ACTIONS is set. TestFlight uploads are run by the owner only, never by CI.',
   r'refusing to run: DEBUG is set. Debug output can expose credential details.',
   r'refusing to run: API_PRIVATE_KEYS_DIR is set. Unset it; the key is passed to altool by TETHER_ASC_KEY_PATH only.',
+  r'refusing to run: CFFIXED_USER_HOME is set. It changes the home folder altool uses; unset it.',
+  r'refusing to run: an environment variable whose name starts with ALTOOL_ is set (not shown). Unset it; it can change how altool runs.',
+  r'cannot check the environment for ALTOOL_ variables.',
   r'HOME is not set.',
   r'refusing to run: ~/Library/Preferences/com.apple.itunes.altool.plist exists. It can change how altool runs; move it out of that folder first.',
   r'--ipa given more than once',
@@ -317,6 +331,7 @@ void main() {
         'GITHUB_ACTIONS',
         'DEBUG',
         'API_PRIVATE_KEYS_DIR',
+        'CFFIXED_USER_HOME',
         'HOME',
         'PWD',
         'TETHER_ASC_KEY_ID',
@@ -383,6 +398,8 @@ void main() {
           'TETHER_ASC_KEY_ID',
           'TETHER_ASC_ISSUER_ID',
           '~/.appstoreconnect/private_keys',
+          '~/secure/tether-health/asc/',
+          'with your default HOME',
           'Xcode Organizer or Transporter',
           'internal testers only',
         ]) {
@@ -705,6 +722,21 @@ void main() {
         expect(xcrunCalls(), hasLength(1));
       });
 
+      test('DEVELOPER_DIR, TOOLCHAINS, TMPDIR and near-miss names pass', () {
+        final r = run(
+          null,
+          env: {
+            'DEVELOPER_DIR': inBase('developer'),
+            'TOOLCHAINS': 'com.example.toolchain',
+            'TMPDIR': base.path,
+            'XALTOOL_SETTING': 'x',
+            'altool_setting': 'x',
+          },
+        );
+        expect(r.exitCode, 0, reason: '${r.stdout}${r.stderr}');
+        expect(xcrunCalls(), hasLength(1));
+      });
+
       test('a CI variable set to an empty value is not a refusal', () {
         final r = run(null, env: {'CI': '', 'GITHUB_ACTIONS': '', 'DEBUG': ''});
         expect(r.exitCode, 0, reason: '${r.stdout}${r.stderr}');
@@ -758,6 +790,33 @@ void main() {
             1,
             'refusing to run: API_PRIVATE_KEYS_DIR is set. Unset it; the key '
             'is passed to altool by TETHER_ASC_KEY_PATH only.',
+          );
+        }
+      });
+
+      test('refuses CFFIXED_USER_HOME, even empty', () {
+        for (final value in [home.path, '']) {
+          expectRefused(
+            run(null, env: {'CFFIXED_USER_HOME': value}),
+            1,
+            'refusing to run: CFFIXED_USER_HOME is set. It changes the home '
+            'folder altool uses; unset it.',
+          );
+        }
+      });
+
+      test('refuses any variable named ALTOOL_*, without showing it', () {
+        for (final (name, value) in [
+          ('ALTOOL_$canary', hostile),
+          ('ALTOOL_', ''),
+          ('ALTOOL_DEFAULTS', 'x'),
+        ]) {
+          expectRefused(
+            run(null, env: {name: value}),
+            1,
+            'refusing to run: an environment variable whose name starts with '
+            'ALTOOL_ is set (not shown). Unset it; it can change how '
+            'altool runs.',
           );
         }
       });
@@ -929,12 +988,15 @@ void main() {
       });
 
       test('a path holding a line break is refused', () {
-        final odd = writeKey(join([secure.path, 'line\nbreak.p8']));
-        expectRefused(
-          withKey(odd.path),
-          1,
-          'TETHER_ASC_KEY_PATH contains a line break (path not shown).',
-        );
+        // The second name ends in a newline, which $(...) would strip.
+        for (final name in ['line\nbreak.p8', 'AuthKey_$canary.p8\n']) {
+          final odd = writeKey(join([secure.path, name]));
+          expectRefused(
+            withKey(odd.path),
+            1,
+            'TETHER_ASC_KEY_PATH contains a line break (path not shown).',
+          );
+        }
       });
 
       test('the real path must be outside the repository', () {
@@ -1067,6 +1129,21 @@ void main() {
         );
         expect(r.stdout, versionSection);
         expect(r.stderr, isNot(contains('com.example.other')));
+      });
+
+      test('the bundle identifier must match exactly', () {
+        for (final id in [
+          '$appBundleId.dev',
+          '${appBundleId}x',
+          'x$appBundleId',
+        ]) {
+          final near = writeIpa(inBase('out/Near.ipa'), appId: id);
+          expectRefusedAfterInspect(
+            run(['--ipa=${near.path}']),
+            "the IPA's bundle identifier is not $appBundleId. Nothing was sent "
+            'to App Store Connect.',
+          );
+        }
       });
 
       test('only the app Info.plist counts, not a framework one', () {

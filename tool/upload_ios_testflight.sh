@@ -26,7 +26,8 @@
 #   TETHER_ASC_ISSUER_ID  The issuer ID: a UUID.
 #
 # Before any xcrun call it refuses to run if CI, GITHUB_ACTIONS or DEBUG is
-# set to a non-empty value, if API_PRIVATE_KEYS_DIR is set, if
+# set to a non-empty value, if API_PRIVATE_KEYS_DIR or CFFIXED_USER_HOME is
+# set, if any environment variable whose name starts with ALTOOL_ is set, if
 # ~/Library/Preferences/com.apple.itunes.altool.plist exists, if a file named
 # AuthKey_<key ID>.p8 is in one of the key search folders above, if the key
 # file is not a PEM private key, or if the IPA's bundle identifier is not the
@@ -78,6 +79,17 @@ fi
 if [ -n "${API_PRIVATE_KEYS_DIR+set}" ]; then
   fail "refusing to run: API_PRIVATE_KEYS_DIR is set. Unset it; the key is passed to altool by TETHER_ASC_KEY_PATH only."
 fi
+if [ -n "${CFFIXED_USER_HOME+set}" ]; then
+  fail "refusing to run: CFFIXED_USER_HOME is set. It changes the home folder altool uses; unset it."
+fi
+check_status=0
+python3 -I -c 'import os, sys; sys.exit(3 if any(n.startswith("ALTOOL_") for n in os.environ) else 0)' 2>/dev/null ||
+  check_status=$?
+case "$check_status" in
+  0) ;;
+  3) fail "refusing to run: an environment variable whose name starts with ALTOOL_ is set (not shown). Unset it; it can change how altool runs." ;;
+  *) fail "cannot check the environment for ALTOOL_ variables." ;;
+esac
 [ -n "${HOME:-}" ] || fail "HOME is not set."
 altool_preferences="$HOME/Library/Preferences/com.apple.itunes.altool.plist"
 if [ -e "$altool_preferences" ] || [ -L "$altool_preferences" ]; then
