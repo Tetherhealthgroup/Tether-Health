@@ -6,6 +6,7 @@ import 'package:breathefree_patient/auth/account_controller.dart';
 import 'package:breathefree_patient/error/privacy_safe_error_reporter.dart';
 import 'package:breathefree_patient/integration/data_adapter.dart';
 import 'package:breathefree_patient/integration/device_outcomes.dart';
+import 'package:breathefree_patient/integration/platform_adapter.dart';
 import 'package:breathefree_patient/integration/registry.dart';
 import 'package:breathefree_patient/quit_plan/guest_quit_plan_store.dart';
 import 'package:flutter/material.dart';
@@ -67,9 +68,9 @@ void _expectProductionHooks(ProductionHooks hooks) {
   expect(TDevice.instance, isNot(isA<TInertDevice>()));
 
   expect(TPlatform.instance, same(hooks.platform));
+  expect(TPlatform.instance, isA<AppPlatform>());
+  expect(TPlatform.instance, isNot(isA<TInertPlatform>()));
   expect(TPlatform.instance, isNot(isA<PreviewPlatform>()));
-  // Inert placeholder until the platform adapter is installed (TH-924).
-  expect(TPlatform.instance, isA<TInertPlatform>());
 
   expect(TNav.branchResolver, hooks.resolver.resolve,
       reason: 'the resolver is the installed fail-closed tear-off');
@@ -125,7 +126,7 @@ void main() {
     expect((error as TUiError).code, TNav.platformTimeoutCode);
   });
 
-  testWidgets('the resolver, device and placeholder report through it',
+  testWidgets('the resolver, device and platform report through it',
       (tester) async {
     final errors = _RecordingErrors();
     installProductionHooks(
@@ -140,14 +141,14 @@ void main() {
     await TNav.branchResolver(context, '', const ['A', 'B']);
     await TDevice.instance.ask(context,
         const TBranchRef('x', TAsk.notificationsRequest, 'ob_reminders'));
-    await TPlatform.instance.openOsSettings(context);
+    await TPlatform.instance.openUrl(context, 'http://example.test/');
     await tester.pump(const Duration(seconds: 2));
     expect(
       errors.recorded.map((e) => (e.$1 as TUiError).code),
       [
         TFailClosedResolver.code,
         deviceNotConfiguredCode,
-        TInertPlatform.code,
+        PlatformCodes.urlRefused,
       ],
     );
   });
