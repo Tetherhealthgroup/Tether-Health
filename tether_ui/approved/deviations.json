@@ -323,13 +323,15 @@
       "screen": "ob_account",
       "decisions": [
         "P-31",
-        "TH-902"
+        "TH-902",
+        "P-52"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-907b"
       ],
-      "sha256": "b2373beec58ccd05175e400a848513e740b352eb64b32fdf27be2cc49511b17c",
-      "change": "P-31 placeholders, fields start empty: body[5] \"Email\" example \"alex@example.com\" -> placeholder; body[6] \"Password\" example \"••••••••••••\" -> placeholder | Session key only, no visual change: body[7] checklist gets key \"age_18_or_older\""
+      "sha256": "d789ba48d163c55b9e8c7593e80d804bd3a6ec3cbafcae0a7d5193d5e257b670",
+      "change": "P-31 placeholders, fields start empty: body[5] \"Email\" example \"alex@example.com\" -> placeholder; body[6] \"Password\" example \"••••••••••••\" -> placeholder | Session key only, no visual change: body[7] checklist gets key \"age_18_or_older\" | P-52, starts unticked: body[7] checklist item \"I’m 18 or older\" no longer starts ticked (\"done\": true removed); the member ticks it"
     },
     {
       "screen": "ob_basics",
@@ -341,6 +343,17 @@
       ],
       "sha256": "845a86c8fd7e19c06307a15718049945565a0c2ca99c544a8e4cbfc1e9cfb7a6",
       "change": "P-31 placeholders, fields start empty: body[3] \"What should we call you?\" example \"Alex\" -> placeholder; body[4] \"Age range\" example \"35–44\" -> placeholder"
+    },
+    {
+      "screen": "ob_consent",
+      "decisions": [
+        "P-52"
+      ],
+      "tickets": [
+        "TH-907b"
+      ],
+      "sha256": "4c6bb4ff8663c523fe05b9e3d65894fa58e9c7b8c0aa408513cc548e515f495f",
+      "change": "P-52, optional consent starts off: body[4].children[0] toggle \"Private reminders\" \"on\": true -> false; the member turns it on"
     },
     {
       "screen": "ob_programs",

@@ -36,10 +36,11 @@ def shared():
         radio([ri('Learn only for now', 'Lessons, no reminders. Upgrade anytime.', 'Suggested'), ri('Swap with ScrollFree', 'ScrollFree pauses. Its data and progress are kept.'), ri('Swap with BreatheFree', 'Not suggested during your quit week.')], key='value'),
     ], footer=[button('Continue', toast('Heartwise added as Learn only', close())), button('Cancel', close(), v='secondary')])
 
+    # P-52: optional consents start off; the member turns them on.
     S('ob_consent', 'Layered consent', '/onboarding/consent', 'onboarding', phase='onboarding', hdr=H('Your privacy', pill='3 of 5'), body=[
         steps(3, 5), title('Your story stays yours.'), text('Each program keeps its own data. Optional choices start off.', 'muted'),
         card(toggle('Essential app data', 'Account, plans and progress, encrypted. Required.', True, key='essential_app_data'), eyebrow='Account · required'),
-        card(toggle('Private reminders', 'Lock screen: “You have a Tether reminder.”', True, key='private_reminders'), toggle('Share summaries with my care team', 'You preview every share', False, key='share_summaries_with_my_care_tea'), tag='bf', accent='bf'),
+        card(toggle('Private reminders', 'Lock screen: “You have a Tether reminder.”', False, key='private_reminders'), toggle('Share summaries with my care team', 'You preview every share', False, key='share_summaries_with_my_care_tea'), tag='bf', accent='bf'),
         card(toggle('Connect Screen Time', 'Optional · totals only, never content', False, key='connect_screen_time'), toggle('De-identified research', None, False, key='de_identified_research'), tag='sf', accent='sf'),
         text('No ads. No tobacco-industry funding. We never sell health information.', 'small'),
         link('Read the Privacy Notice', ext('https://www.tetherhealthgroup.com/privacy/'), align='left'),
@@ -76,13 +77,14 @@ def shared():
         text('Today shows your steps when you open the app. To get reminders, allow notifications for Tether in Settings.', 'muted'),
     ], footer=[button('Open phone settings', settings(), v='secondary'), button('Continue without reminders', go('ob_account'))])
 
+    # P-52: “I’m 18 or older” starts unticked; the member ticks it.
     S('ob_account', 'Save your progress', '/onboarding/account', 'onboarding', phase='account', hdr=H('Save your progress', left='close'), body=[
         title('Create your account'), text('Keeps your plans safe if you change phones. You can also continue on this phone only.', 'muted'),
         authbuttons(apple=auth('apple', [('Success', go('auth_merge')), ('Email already has a Tether account', go('auth_link')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))]), google=auth('google', [('Success', go('auth_merge')), ('Email already has a Tether account', go('auth_link')), ('Cancelled', toast('Sign-in cancelled')), ('Error', go('auth_social_error'))])),
         text('Sign in with Apple can hide your email: we use Apple’s private relay address.', 'small'),
         eyebrow('Or with email'),
         field('Email', 'alex@example.com', kind='email', key='email'), field('Password', '••••••••••••', hint='At least 12 characters. A passphrase works well.', kind='password', key='password'),
-        checklist([ci('I’m 18 or older', done=True)], key='age_18_or_older'),
+        checklist([ci('I’m 18 or older')], key='age_18_or_older'),
         text('Guest plans are encrypted on this phone. If you sign up later, we ask before uploading them.', 'small'),
     ], footer=[button('Create account', submit('POST supabase /auth/v1/signup', go('auth_verify'))), button('Continue on this phone only', reset('today'), v='secondary')], api=['POST supabase /auth/v1/signup'])
 

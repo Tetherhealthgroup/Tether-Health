@@ -555,7 +555,7 @@
             "t": "toggle",
             "label": "Private reminders",
             "sub": "Lock screen: “You have a Tether reminder.”",
-            "on": true,
+            "on": false,
             "key": "private_reminders"
           },
           {
@@ -1359,8 +1359,7 @@
         "t": "checklist",
         "items": [
           {
-            "label": "I’m 18 or older",
-            "done": true
+            "label": "I’m 18 or older"
           }
         ],
         "key": "age_18_or_older"
