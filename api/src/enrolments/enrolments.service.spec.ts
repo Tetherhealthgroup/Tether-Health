@@ -411,13 +411,19 @@ describe("EnrolmentsService", () => {
     );
 
     it("fails closed when the barrier cannot be read", async () => {
+      // Every later step would succeed, so only the barrier failure can
+      // produce the 502.
       const { service, calls } = setup(
         { data: enrolmentRow(), error: null },
         { data: null, error: { code: "XX000", message: "synthetic detail" } },
+        currentDocs(),
+        { data: enrolmentRow("paused"), error: null },
+        { data: [], error: null, count: 0 },
       );
       expect(
         await codeOf(service.update(user, ENROLMENT_ID, { status: "paused" })),
       ).toBeInstanceOf(BadGatewayException);
+      expect(calls.at(-1)).toEqual(["rpc", "deletion_barrier_open"]);
       expect(calls.some((call) => call[0] === "update")).toBe(false);
     });
 
@@ -438,10 +444,20 @@ describe("EnrolmentsService", () => {
     });
 
     it("focus swap: fails closed when the barrier cannot be read", async () => {
-      const { service, calls } = setup({
-        data: null,
-        error: { code: "XX000", message: "synthetic detail" },
-      });
+      // Every later step would succeed, so only the barrier failure can
+      // produce the 502.
+      const { service, calls } = setup(
+        { data: null, error: { code: "XX000", message: "synthetic detail" } },
+        currentDocs(),
+        { data: [], error: null, count: 0 },
+        {
+          data: [
+            { ...enrolmentRow("paused"), id: ENROLMENT_ID },
+            { ...enrolmentRow("focus"), id: OTHER_ID },
+          ],
+          error: null,
+        },
+      );
       expect(
         await codeOf(
           service.swapFocus(user, {
@@ -450,7 +466,7 @@ describe("EnrolmentsService", () => {
           }),
         ),
       ).toBeInstanceOf(BadGatewayException);
-      expect(calls.some((call) => call[1] === "swap_focus")).toBe(false);
+      expect(calls).toEqual([["rpc", "deletion_barrier_open"]]);
     });
   });
 

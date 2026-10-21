@@ -605,6 +605,26 @@ describe("Enrolments and consents API (e2e)", () => {
       },
     );
 
+    it("DELETE accepts an upper-case id for the caller's own enrolment", async () => {
+      const a = newCaller();
+      const id = await enrol(a, "ea", "learn_only");
+      await grant(a, id, "core");
+      expect(
+        (
+          await call(
+            a,
+            "DELETE",
+            `/v1/enrolments/${id.toUpperCase()}`,
+            DELETE_BODY,
+          )
+        ).statusCode,
+      ).toBe(204);
+      expect(fake.table("enrolments").some((r) => r.id === id)).toBe(false);
+      expect(
+        fake.table("programme_consents").some((r) => r.enrolment_id === id),
+      ).toBe(false);
+    });
+
     it("DELETE removes only that programme's quit plan or program data", async () => {
       const a = newCaller();
       const b = newCaller();

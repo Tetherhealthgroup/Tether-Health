@@ -798,8 +798,13 @@ export class FakePostgrest {
       raise("recent_authentication_required");
     }
     if (!this.functionOwnerBypassesRls) raise("rls_bypass_required");
+    // uuid compares case-insensitively in Postgres.
+    const wanted =
+      typeof args.p_enrolment_id === "string"
+        ? args.p_enrolment_id.toLowerCase()
+        : null;
     const enrolment = this.state.enrolments.find(
-      (row) => row.id === args.p_enrolment_id && row.user_id === uid,
+      (row) => text(row.id).toLowerCase() === wanted && row.user_id === uid,
     );
     if (!enrolment) return raise("enrolment_not_found");
     const code = enrolment.programme_code;
