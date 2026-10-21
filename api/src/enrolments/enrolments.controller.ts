@@ -8,8 +8,10 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Req,
   UseFilters,
 } from "@nestjs/common";
+import type { FastifyRequest } from "fastify";
 import type { AuthUser } from "../auth/auth-user";
 import { RequestUser } from "../auth/request-user.decorator";
 import { EnrolmentsExceptionFilter } from "./enrolment-errors";
@@ -62,7 +64,8 @@ export class EnrolmentsController {
     @RequestUser() user: AuthUser,
     @Param("id", ParseUUIDPipe) id: string,
     @Body() dto: DeleteEnrolmentDto,
+    @Req() request: FastifyRequest,
   ) {
-    await this.enrolments.deleteNow(user, id, dto.confirmation);
+    await this.enrolments.deleteNow(user, id, dto.confirmation, request.id);
   }
 }

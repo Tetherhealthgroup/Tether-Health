@@ -1,12 +1,18 @@
 openapi: 3.1.0
 info:
   title: Tether Health API
-  version: 1.6.1
+  version: 1.6.2
   description: >-
     Development contract for authenticated profiles and bounded program data.
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
-    Changed in 1.6.1 (description only): account deletion runs with the
+    Changed in 1.6.2: `DELETE /v1/enrolments/{enrolmentId}` ("Delete now")
+    is for app use; it deletes the programme's data in one database call
+    and also answers 401 `recent_authentication_required` when the database
+    finds the sign-in not recent. Once account deletion has started, every
+    `PATCH /v1/enrolments/{enrolmentId}` (not only a rejoin) and
+    `POST /v1/enrolments/focus-swap` answer 409
+    `account_deletion_in_progress`. Changed in 1.6.1 (description only): account deletion runs with the
     member's own token, and `DELETE /v1/account/data` answers 401 when the
     sign-in is older than the deletion window. Changed in 1.6.0: once account deletion has started, a consent grant
     that reaches the database's deletion check is refused with
@@ -320,24 +326,31 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
         '409':
-          description: '`focus_cap_reached`, `enrolment_conflict` or `account_deletion_in_progress` (rejoin after account deletion started)'
+          description: '`focus_cap_reached`, `enrolment_conflict` or `account_deletion_in_progress` (any change once account deletion has started; nothing was changed)'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
         '502': {description: Enrolment storage or the consent documents are temporarily unavailable}
     delete:
       operationId: deleteMyEnrolmentNow
-      summary: Delete the enrolment row, its consents and its cascaded sync data (not yet for app use)
+      summary: Delete now - permanently delete one programme's enrolment and data
       description: >-
-        Not for app use yet. Permanently deletes the enrolment row, all of its
-        programme consents (live and revoked), and rows in tables that
-        reference the enrolment with on delete cascade (sync data tables once
-        they reference enrolments). It does not delete older programme data
-        stored per account (quit_plans, program_data); a later change removes
-        that data too, and only then should the app offer this as "Delete
-        now". Requires the exact confirmation and a recent sign-in, as account
-        deletion does.
-      x-app-use: false
+        "Delete now" for one programme, in one database call
+        (`delete_enrolment_now`) made with the member's own token.
+        Permanently deletes the enrolment, all of its programme consents
+        (live and revoked), its sync data, its care-team data (shares, their
+        access rows and messages, caregivers and their events), the quit plan
+        for BreatheFree, and the stored program data for Heartwise, Steady
+        and ClearAir. Account data is kept: the profile, connections,
+        supporters (who only lose this programme), account consents and
+        messages not tied to the programme. Requires the exact confirmation
+        and a recent sign-in, as account deletion does; both are checked by
+        the API and again by the database. A left enrolment can be deleted,
+        and deletion stays possible after account deletion has started.
+        Not idempotent: a repeat answers 404 `enrolment_not_found`. A
+        replayed request whose sign-in is no longer recent answers 401
+        `recent_authentication_required` and needs a fresh sign-in.
+      x-app-use: true
       security: [{supabaseJwt: []}]
       requestBody:
         required: true
@@ -350,7 +363,7 @@ paths:
               properties:
                 confirmation: {const: DELETE}
       responses:
-        '204': {description: The enrolment row, its consents and its cascaded rows were deleted}
+        '204': {description: The enrolment and that programme's data were deleted}
         '400':
           description: '`confirmation_required` (missing or wrong confirmation), or an invalid enrolment id or body (no code)'
           content:
@@ -360,7 +373,7 @@ paths:
                   - {$ref: '#/components/schemas/RequestRejected'}
                   - {$ref: '#/components/schemas/CodedRequestRejected'}
         '401':
-          description: Missing or invalid token (no code), or `recent_authentication_required`
+          description: Missing or invalid token (no code), or `recent_authentication_required` (the sign-in is not recent, by the API's or the database's check; nothing was deleted)
           content:
             application/json:
               schema:
@@ -368,11 +381,11 @@ paths:
                   - {$ref: '#/components/schemas/RequestRejected'}
                   - {$ref: '#/components/schemas/CodedRequestRejected'}
         '404':
-          description: '`enrolment_not_found` (also for enrolments of other users)'
+          description: '`enrolment_not_found` (no such enrolment for the caller, including enrolments of other users and one already deleted; nothing was deleted)'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
-        '502': {description: Deletion did not complete}
+        '502': {description: 'The database refused the deletion for a reason the caller cannot fix (nothing was deleted), or could not be reached; if only the response was lost, a retry answers 404'}
   /v1/enrolments/focus-swap:
     post:
       operationId: swapMyFocus
@@ -412,8 +425,9 @@ paths:
           description: >-
             `focus_swap_invalid` (the enrolment to demote is not in focus, the
             one to promote is already in focus, or both ids are the same),
-            `enrolment_left` (the enrolment to promote has been left) or
-            `focus_cap_reached`. Nothing was changed.
+            `enrolment_left` (the enrolment to promote has been left),
+            `focus_cap_reached` or `account_deletion_in_progress` (account
+            deletion has started). Nothing was changed.
           content:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}

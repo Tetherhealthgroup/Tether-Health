@@ -518,6 +518,8 @@ describe("Enrolments and consents API (e2e)", () => {
       const a = newCaller();
       const id = await enrol(a, "ea", "learn_only");
       await grant(a, id, "core");
+      const since = fake.requests.length;
+      const loggedSince = logged.length;
       const response = await call(
         a,
         "DELETE",
@@ -526,6 +528,26 @@ describe("Enrolments and consents API (e2e)", () => {
       );
       expect(response.statusCode).toBe(204);
       expect(response.body).toBe("");
+      // One call to delete_enrolment_now with the member's token; no direct
+      // table delete.
+      expect(
+        fake.requests
+          .slice(since)
+          .map((r) => [r.method, r.path.replace("/rest/v1/", ""), r.token]),
+      ).toEqual([["POST", "rpc/delete_enrolment_now", a.token]]);
+      expect(fake.requests.at(-1)?.body).toEqual({
+        p_enrolment_id: id,
+        p_confirmation: "DELETE",
+      });
+      // The success line carries the request id and status only.
+      const lines = logged.slice(loggedSince);
+      expect(lines).toHaveLength(1);
+      expect(lines[0]).toMatch(
+        /^\["enrolment_deleted requestId=\S+ status=completed"\]$/,
+      );
+      for (const value of [a.id, id, a.token, "ea"]) {
+        expect(lines[0]).not.toContain(value);
+      }
       expect(fake.table("enrolments").some((r) => r.id === id)).toBe(false);
       expect(
         fake.table("programme_consents").some((r) => r.enrolment_id === id),
@@ -582,6 +604,187 @@ describe("Enrolments and consents API (e2e)", () => {
         expect(fake.table("enrolments").some((r) => r.id === id)).toBe(true);
       },
     );
+
+    it("DELETE removes only that programme's quit plan or program data", async () => {
+      const a = newCaller();
+      const b = newCaller();
+      const bf = await enrol(a, "bf", "learn_only");
+      const hw = await enrol(a, "hw", "learn_only");
+      const st = await enrol(a, "st", "learn_only");
+      fake.addQuitPlan(a.id);
+      fake.addProgramData(a.id, "heartwise");
+      fake.addProgramData(a.id, "steady");
+      fake.addQuitPlan(b.id);
+      fake.addProgramData(b.id, "heartwise");
+      const own = (table: "quit_plans" | "program_data", id: string) =>
+        fake.table(table).filter((r) => r.user_id === id);
+
+      expect(
+        (await call(a, "DELETE", `/v1/enrolments/${hw}`, DELETE_BODY))
+          .statusCode,
+      ).toBe(204);
+      expect(own("program_data", a.id).map((r) => r.program_id)).toEqual([
+        "steady",
+      ]);
+      expect(own("quit_plans", a.id)).toHaveLength(1);
+
+      expect(
+        (await call(a, "DELETE", `/v1/enrolments/${bf}`, DELETE_BODY))
+          .statusCode,
+      ).toBe(204);
+      expect(own("quit_plans", a.id)).toHaveLength(0);
+      expect(own("program_data", a.id)).toHaveLength(1);
+      expect(fake.table("enrolments").map((r) => r.id)).toContain(st);
+      // The other member's data is untouched.
+      expect(own("quit_plans", b.id)).toHaveLength(1);
+      expect(own("program_data", b.id)).toHaveLength(1);
+    });
+
+    it("DELETE answers 401 when the database finds the sign-in not recent (TH017)", async () => {
+      const a = newCaller();
+      const id = await enrol(a, "ck", "learn_only");
+      // The API's own clock accepts the sign-in; the database's does not.
+      fake.setSignInAge(a.token, 601);
+      const loggedSince = logged.length;
+      try {
+        expectCoded(
+          await call(a, "DELETE", `/v1/enrolments/${id}`, DELETE_BODY),
+          401,
+          "recent_authentication_required",
+        );
+      } finally {
+        fake.setSignInAge(a.token, 0);
+      }
+      expect(fake.table("enrolments").some((r) => r.id === id)).toBe(true);
+      expect(logged.slice(loggedSince)).toEqual([]);
+    });
+
+    it("DELETE of a missing or other member's enrolment is 404 and deletes nothing (TH012)", async () => {
+      const a = newCaller();
+      const b = newCaller();
+      const theirs = await enrol(b, "ck", "learn_only");
+      await grant(b, theirs, "core");
+      for (const id of [theirs, randomUUID()]) {
+        expectCoded(
+          await call(a, "DELETE", `/v1/enrolments/${id}`, DELETE_BODY),
+          404,
+          "enrolment_not_found",
+        );
+      }
+      expect(fake.table("enrolments").some((r) => r.id === theirs)).toBe(true);
+      expect(
+        fake
+          .table("programme_consents")
+          .filter((r) => r.enrolment_id === theirs),
+      ).toHaveLength(1);
+    });
+
+    it("DELETE fails closed on TH020, logging the code and the request id only", async () => {
+      const a = newCaller();
+      const id = await enrol(a, "ck", "learn_only");
+      const error = registryError("rls_bypass_required");
+      fake.functionOwnerBypassesRls = false;
+      const loggedSince = logged.length;
+      let response;
+      try {
+        response = await call(a, "DELETE", `/v1/enrolments/${id}`, DELETE_BODY);
+      } finally {
+        fake.functionOwnerBypassesRls = true;
+      }
+      expectUncoded(response, 502);
+      for (const detail of [error.code, error.message, error.hint]) {
+        expect(response.body).not.toContain(detail);
+      }
+      expect(fake.table("enrolments").some((r) => r.id === id)).toBe(true);
+      const requestId = response.json<{ requestId: string }>().requestId;
+      const lines = logged.slice(loggedSince);
+      expect(lines).toContain(
+        JSON.stringify([
+          `enrolment_deletion_failed requestId=${requestId} status=enrolment_delete_failed code=TH020`,
+        ]),
+      );
+      const all = lines.join("\n");
+      for (const value of [a.id, id, a.token, error.message, error.hint]) {
+        expect(all).not.toContain(value);
+      }
+    });
+
+    it("DELETE still works once account deletion started (the function has no barrier check)", async () => {
+      const a = newCaller();
+      const id = await enrol(a, "sd", "learn_only");
+      fake.startAccountDeletion(a.id);
+      expect(
+        (await call(a, "DELETE", `/v1/enrolments/${id}`, DELETE_BODY))
+          .statusCode,
+      ).toBe(204);
+      expect(fake.table("enrolments").some((r) => r.id === id)).toBe(false);
+    });
+
+    it("the database refuses a member's direct delete of an enrolment (42501)", async () => {
+      const a = newCaller();
+      const id = await enrol(a, "ck", "learn_only");
+      const response = await fake.fetch(
+        `http://fake.invalid/rest/v1/enrolments?id=eq.${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            authorization: `Bearer ${a.token}`,
+            prefer: "return=representation",
+          },
+        },
+      );
+      expect(response.status).toBe(403);
+      expect(await response.json()).toMatchObject({ code: "42501" });
+      expect(fake.table("enrolments").some((r) => r.id === id)).toBe(true);
+    });
+
+    it("refuses every enrolment change once account deletion started, before writing", async () => {
+      const c = newCaller();
+      const bf = await enrol(c, "bf", "focus", "quit");
+      const paused = await enrol(c, "sf", "paused");
+      fake.startAccountDeletion(c.id);
+      const before = fake.table("enrolments");
+      const since = fake.requests.length;
+      for (const [id, change] of [
+        [bf, { status: "paused" }],
+        [bf, { status: "left" }],
+        [bf, { status: "learn_only" }],
+        [bf, { mode: "reduce" }],
+        [bf, { mode: null }],
+        [paused, { status: "focus" }],
+      ] as const) {
+        expectCoded(
+          await call(c, "PATCH", `/v1/enrolments/${id}`, change),
+          409,
+          "account_deletion_in_progress",
+        );
+      }
+      expect(
+        fake.requests
+          .slice(since)
+          .some((r) => r.method === "PATCH" || r.path.endsWith("swap_focus")),
+      ).toBe(false);
+      expect(fake.table("enrolments")).toEqual(before);
+    });
+
+    it("the database refuses an enrolment update once account deletion started (42501)", async () => {
+      const c = newCaller();
+      const id = await enrol(c, "bf", "focus");
+      fake.startAccountDeletion(c.id);
+      const response = await fake.fetch(
+        `http://fake.invalid/rest/v1/enrolments?id=eq.${id}`,
+        {
+          method: "PATCH",
+          headers: { authorization: `Bearer ${c.token}` },
+          body: JSON.stringify({ status: "paused" }),
+        },
+      );
+      expect(response.status).toBe(403);
+      expect(await response.json()).toMatchObject({ code: "42501" });
+      expect(fake.table("enrolments").find((r) => r.id === id)?.status).toBe(
+        "focus",
+      );
+    });
 
     it("refuses new enrolments and rejoining once account deletion started", async () => {
       const c = newCaller();
@@ -1388,15 +1591,46 @@ describe("Enrolments and consents API (e2e)", () => {
         .slice(since)
         .filter((r) => r.method !== "GET")
         .map((r) => `${r.method} ${r.path.replace("/rest/v1/", "")}`);
-      expect(writes).toEqual(["POST rpc/swap_focus"]);
+      // The barrier is read first (a POST, but it writes nothing).
+      expect(writes).toEqual([
+        "POST rpc/deletion_barrier_open",
+        "POST rpc/swap_focus",
+      ]);
       expect(
-        fake.requests.slice(since).find((r) => r.method === "POST")?.body,
+        fake.requests.slice(since).find((r) => r.path.endsWith("swap_focus"))
+          ?.body,
       ).toEqual({ p_demote: bf, p_promote: st });
       expect([status(bf), status(hw), status(st)]).toEqual([
         "paused",
         "focus",
         "focus",
       ]);
+    });
+
+    it("refuses once account deletion started (account_deletion_in_progress), before the swap", async () => {
+      const a = newCaller();
+      const bf = await enrol(a, "bf");
+      const st = await enrol(a, "st", "paused");
+      fake.startAccountDeletion(a.id);
+      const since = fake.requests.length;
+      expectCoded(await swap(a, bf, st), 409, "account_deletion_in_progress");
+      expect(
+        fake.requests.slice(since).map((r) => r.path.replace("/rest/v1/", "")),
+      ).toEqual(["rpc/deletion_barrier_open"]);
+      expect([status(bf), status(st)]).toEqual(["focus", "paused"]);
+      // The database refuses the swap's updates too (42501), so a swap that
+      // got past the check fails closed.
+      const direct = await fake.fetch(
+        "http://fake.invalid/rest/v1/rpc/swap_focus",
+        {
+          method: "POST",
+          headers: { authorization: `Bearer ${a.token}` },
+          body: JSON.stringify({ p_demote: bf, p_promote: st }),
+        },
+      );
+      expect(direct.status).toBe(403);
+      expect(await direct.json()).toMatchObject({ code: "42501" });
+      expect([status(bf), status(st)]).toEqual(["focus", "paused"]);
     });
 
     it("maps TH013 to focus_swap_invalid and changes nothing", async () => {
@@ -1531,15 +1765,31 @@ describe("Enrolments and consents API (e2e)", () => {
      * Logged since `since`: only the global filter's request_failed line per
      * 502, never the database error's code, message or hint.
      */
-    const expectNotLogged = (since: number, error: PgError, failures = 1) => {
-      const lines = logged.slice(since);
+    const expectNotLogged = (
+      since: number,
+      error: PgError,
+      failures = 1,
+      deleteFailures = 0,
+    ) => {
+      const all = logged.slice(since);
       expect(
-        lines.filter((line) =>
+        all.filter((line) =>
           /request_failed .*type=BadGatewayException/.test(line),
         ),
       ).toHaveLength(failures);
+      // "Delete now" logs its failure with the code (and nothing else).
+      const deleteLine = new RegExp(
+        `^\\["enrolment_deletion_failed requestId=\\S+ status=enrolment_delete_failed code=(${error.code}|none)"\\]$`,
+      );
+      expect(all.filter((line) => deleteLine.test(line))).toHaveLength(
+        deleteFailures,
+      );
+      const lines = all.filter((line) => !deleteLine.test(line));
       for (const detail of [error.code, error.message, error.hint]) {
         expect(lines.join("\n")).not.toContain(detail);
+      }
+      for (const detail of [error.message, error.hint]) {
+        expect(all.join("\n")).not.toContain(detail);
       }
     };
     /** Every injected failure was consumed and nothing was written. */
@@ -1787,12 +2037,12 @@ describe("Enrolments and consents API (e2e)", () => {
             ["TH002"],
           ],
           [
-            "DELETE",
-            "enrolments",
+            "POST",
+            "rpc/delete_enrolment_now",
             "DELETE",
             `/v1/enrolments/${id}`,
             DELETE_BODY,
-            [],
+            ["TH012", "TH017"],
           ],
         ];
         const failing = routes.filter(
@@ -1809,7 +2059,40 @@ describe("Enrolments and consents API (e2e)", () => {
           }
         }
         expectRolledBack(id, core);
-        expectNotLogged(since, error, failing.length);
+        expectNotLogged(
+          since,
+          error,
+          failing.length,
+          failing.filter(([, path]) => path === "rpc/delete_enrolment_now")
+            .length,
+        );
+      },
+    );
+
+    it.each([
+      ["TH012", 404, "enrolment_not_found"],
+      ["TH017", 401, "recent_authentication_required"],
+    ] as const)(
+      "delete now maps %s to %d %s and deletes nothing",
+      async (code, status, token) => {
+        const { a, id, core } = await prepared();
+        const error = registryError(
+          DATABASE_ERRORS.find((entry) => entry.code === code)
+            ?.hint as DatabaseErrorHint,
+        );
+        const since = logged.length;
+        fake.failNext("POST", "rpc/delete_enrolment_now", error);
+        const response = await call(
+          a,
+          "DELETE",
+          `/v1/enrolments/${id}`,
+          DELETE_BODY,
+        );
+        expectCoded(response, status, token);
+        // The hint is the same word as the API's code; the message is not sent.
+        expect(response.body).not.toContain(error.message);
+        expectRolledBack(id, core);
+        expect(logged.slice(since)).toEqual([]);
       },
     );
 

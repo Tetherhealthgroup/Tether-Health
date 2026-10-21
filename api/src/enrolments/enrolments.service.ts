@@ -2,6 +2,7 @@ import {
   BadGatewayException,
   BadRequestException,
   Injectable,
+  Logger,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import type { PostgrestError } from "@supabase/supabase-js";
@@ -90,7 +91,20 @@ const {
   // including the revocations that leaving an enrolment cascades into.
   consentAlreadyRevoked: CONSENT_ALREADY_REVOKED,
   consentImmutable: CONSENT_IMMUTABLE,
+  enrolmentNotFound: ENROLMENT_NOT_FOUND,
 } = DatabaseErrorCode;
+
+/**
+ * Raised by public.delete_enrolment_now() when the sign-in behind the token
+ * is not recent (registry hint recent_authentication_required).
+ */
+const RECENT_AUTHENTICATION_REQUIRED = "TH017";
+
+const SQLSTATE = /^[0-9A-Z]{5}$/;
+
+/** The value logged as `code=`: a SQLSTATE, or "none". */
+const loggedCode = (code: string | undefined): string =>
+  code && SQLSTATE.test(code) ? code : "none";
 
 /**
  * The consent revoke-only rules (one trigger, two registry codes), as they
@@ -107,6 +121,8 @@ const isConsentRevokeOnly = (error: PostgrestError) =>
  */
 @Injectable()
 export class EnrolmentsService {
+  private readonly logger = new Logger(EnrolmentsService.name);
+
   constructor(
     private readonly clients: UserSupabaseClientFactory,
     private readonly config: ConfigService,
@@ -190,11 +206,9 @@ export class EnrolmentsService {
     if (dto.mode !== undefined) {
       this.checkMode(current.programme_code, dto.mode);
     }
-    const rejoining =
-      current.status === "left" &&
-      dto.status !== undefined &&
-      dto.status !== "left";
-    if (rejoining) await this.requireDeletionBarrierOpen(client);
+    // Every change, not only a rejoin: the update policy refuses them all
+    // once account deletion has started.
+    await this.requireDeletionBarrierOpen(client);
     // Read before the write, so that failing here changes nothing.
     const versions = await this.currentCoreVersions(client);
 
@@ -244,6 +258,9 @@ export class EnrolmentsService {
     dto: SwapFocusDto,
   ): Promise<FocusSwapResponse> {
     const client = this.clients.forUser(user);
+    // The swap updates both rows as the caller, which the update policy
+    // refuses once account deletion has started.
+    await this.requireDeletionBarrierOpen(client);
     // Postgres returns UUIDs in lower case; compare in the same form.
     const demoteId = dto.demoteId.toLowerCase();
     const promoteId = dto.promoteId.toLowerCase();
@@ -276,23 +293,37 @@ export class EnrolmentsService {
   }
 
   /**
-   * "Delete now": removes the enrolment and every row that references it with
-   * on delete cascade (today its programme consents). Needs an explicit
-   * confirmation and a recent sign-in, like account deletion.
+   * "Delete now": removes the enrolment and that programme's data
+   * (public.delete_enrolment_now). Needs an explicit confirmation and a
+   * recent sign-in, like account deletion; both are checked here first, and
+   * the database checks them again. `requestId` is the only identifier
+   * logged.
    */
   async deleteNow(
     user: AuthUser,
     id: string,
     confirmation: unknown,
+    requestId: string,
   ): Promise<void> {
     if (confirmation !== "DELETE") throw badRequest("confirmation_required");
     this.requireRecentAuthentication(user);
-    const deleted = await this.deleteEnrolmentNow(
-      this.clients.forUser(user),
-      user,
-      id,
+    const error = await this.deleteEnrolmentNow(this.clients.forUser(user), id);
+    if (error) {
+      // No such enrolment for the caller, including another member's.
+      if (error.code === ENROLMENT_NOT_FOUND) {
+        throw notFound("enrolment_not_found");
+      }
+      if (error.code === RECENT_AUTHENTICATION_REQUIRED) {
+        throw unauthorized("recent_authentication_required");
+      }
+      this.logger.error(
+        `enrolment_deletion_failed requestId=${requestId} status=enrolment_delete_failed code=${loggedCode(error.code)}`,
+      );
+      throw new BadGatewayException("Enrolment could not be deleted");
+    }
+    this.logger.log(
+      `enrolment_deleted requestId=${requestId} status=completed`,
     );
-    if (!deleted) throw notFound("enrolment_not_found");
   }
 
   /**
@@ -418,24 +449,20 @@ export class EnrolmentsService {
   }
 
   /**
-   * The single statement behind "Delete now". TH-914 (R-7) replaces it with
-   * the audited definer function:
-   *   client.rpc("delete_enrolment_now", { p_enrolment_id: id })
-   * which checks ownership itself and writes a counts-only deletion audit.
+   * The single call behind "Delete now", as the caller. Members cannot
+   * delete enrolments directly; the function checks ownership, the
+   * confirmation and the sign-in itself, and returns counts only, which the
+   * API does not use. Returns the call's error, or null once it has deleted.
    */
   private async deleteEnrolmentNow(
     client: UserSupabaseClient,
-    user: AuthUser,
     id: string,
-  ): Promise<boolean> {
-    const { data, error } = await client
-      .from("enrolments")
-      .delete()
-      .eq("id", id)
-      .eq("user_id", user.id)
-      .select("id");
-    if (error) throw new BadGatewayException("Enrolment could not be deleted");
-    return data.length > 0;
+  ): Promise<PostgrestError | null> {
+    const { error } = await client.rpc("delete_enrolment_now", {
+      p_enrolment_id: id,
+      p_confirmation: "DELETE",
+    });
+    return error;
   }
 
   private async ownEnrolment(
@@ -491,7 +518,8 @@ export class EnrolmentsService {
     }
   }
 
-  // Rejoining is refused once account deletion has started.
+  // Enrolment changes (status, mode, focus swap) are refused once account
+  // deletion has started.
   private async requireDeletionBarrierOpen(
     client: UserSupabaseClient,
   ): Promise<void> {
