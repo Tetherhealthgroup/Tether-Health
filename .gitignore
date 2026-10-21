@@ -32,6 +32,7 @@ key.properties
 .env.*
 !.env*.example
 *.p8
+private_keys/
 *.mobileprovision
 *.pem
 config/dart_defines.*.json
