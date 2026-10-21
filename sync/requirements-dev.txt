@@ -1,0 +1,13 @@
+-r requirements.txt
+
+# Test and type-check tooling. httpx is what starlette's TestClient drives the
+# app through in-process, so no port is ever bound during a test run.
+httpx==0.28.1
+pytest==9.1.1
+mypy==2.3.1
+
+# PostgreSQL's own parser (libpg_query) as a library. The suite runs on SQLite
+# because no Postgres server can start in this environment, so every statement
+# is additionally compiled for the Postgres dialect and parsed with this — see
+# the listener in tests/conftest.py.
+pglast==8.4

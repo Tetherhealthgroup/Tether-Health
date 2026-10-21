@@ -1,0 +1,6 @@
+-r requirements.txt
+
+# The production driver. Kept in its own file because it needs libpq, which the
+# binary wheel bundles. Installed by the CI sync job, which runs
+# tests/test_postgres.py against a PostgreSQL service container.
+psycopg[binary]==3.3.6

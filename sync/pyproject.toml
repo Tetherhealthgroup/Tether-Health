@@ -1,0 +1,42 @@
+[project]
+name = "thsync"
+version = "0.1.0"
+description = "Tether Health session sync service"
+requires-python = ">=3.12"
+# Dependencies live in requirements*.txt, pinned. Repeated here they would be a
+# second list to keep in step, and the deployment installs from the pinned one.
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.packages.find]
+include = ["thsync*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# `thsync` imports from this directory without an install step.
+pythonpath = ["."]
+# Quiet by default. Every test drives the app in-process; the only network use
+# is loopback (a local key-set server, and the PostgreSQL suite when
+# THSYNC_TEST_DATABASE_URL names a local server).
+addopts = "-q"
+filterwarnings = ["error::DeprecationWarning:thsync.*"]
+markers = [
+  "postgres: needs a local PostgreSQL server (THSYNC_TEST_DATABASE_URL); skipped otherwise",
+]
+
+[tool.mypy]
+python_version = "3.12"
+files = ["thsync", "tests"]
+strict = true
+# SQLAlchemy Core rows are `Row[Any]`; indexing them by attribute is untyped by
+# construction and the alternative is a typed ORM layer this service
+# deliberately does not have (see thsync/schema.py).
+disallow_any_expr = false
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+# Test bodies assert on JSON dictionaries, which are Any all the way down.
+disallow_any_explicit = false
