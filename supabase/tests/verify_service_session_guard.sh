@@ -208,6 +208,11 @@ select th972_test.ok(
      and cmd <> 'SELECT') =
   'public.account_consents:account_consents_insert_own,'
   'public.account_consents:account_consents_update_own,'
+  'public.care_connections:care_connections_update_own,'
+  'public.care_messages:care_messages_insert_own,'
+  'public.care_shares:care_shares_insert_own,public.care_shares:care_shares_update_own,'
+  'public.caregiver_events:caregiver_events_insert_own,'
+  'public.caregivers:caregivers_insert_own,public.caregivers:caregivers_update_own,'
   'public.enrolments:enrolments_delete_own,public.enrolments:enrolments_insert_own,'
   'public.enrolments:enrolments_update_own,'
   'public.profiles:profiles_update_own,'
@@ -216,9 +221,11 @@ select th972_test.ok(
   'public.programme_consents:programme_consents_insert_own,'
   'public.programme_consents:programme_consents_update_own,'
   'public.quit_plans:quit_plans_insert_own,public.quit_plans:quit_plans_update_own,'
+  'public.supporters:supporters_delete_own,public.supporters:supporters_insert_own,'
+  'public.supporters:supporters_update_own,'
   'storage.objects:avatars_delete_own,storage.objects:avatars_insert_own,'
   'storage.objects:avatars_update_own',
-  'the guarded write policies are exactly the 16 expected ones');
+  'the guarded write policies are exactly the 26 expected ones');
 select th972_test.ok(
   not exists (
     select 1 from pg_catalog.pg_policies
@@ -240,7 +247,8 @@ select th972_test.ok(
      and (has_any_column_privilege('authenticated', c.oid, 'INSERT')
           or has_any_column_privilege('authenticated', c.oid, 'UPDATE')
           or has_table_privilege('authenticated', c.oid, 'DELETE'))) =
-  'account_consents,enrolments,profiles,program_data,programme_consents,quit_plans',
+  'account_consents,care_connections,care_messages,care_shares,caregiver_events,caregivers,'
+  'enrolments,profiles,program_data,programme_consents,quit_plans,supporters',
   'tables authenticated can write outside sync_* are exactly the reviewed set');
 select th972_test.ok(
   not exists (
@@ -260,8 +268,8 @@ select th972_test.ok(
 -- Every function authenticated can execute in public is listed here, so a new
 -- one has to be reviewed for the sync-session refusal before this passes.
 -- Writers that refuse a sync session: begin_account_deletion (TH009);
--- save_program_data, swap_focus, supersede_core_consent and delete_my_account
--- (TH010). current_consent_documents only reads. delete_my_app_data is not
+-- save_program_data, swap_focus, supersede_core_consent, delete_my_account
+-- and redeem_care_invite (TH010). current_consent_documents only reads. delete_my_app_data is not
 -- listed: only its owner may execute it; its TH009 guard stays and is
 -- checked statically below.
 select th972_test.ok(
@@ -272,7 +280,7 @@ select th972_test.ok(
   'avatar_write_allowed(text),begin_account_deletion(text),current_consent_documents(),'
   'delete_my_account(text),'
   'deletion_barrier_open(),has_consent(uuid,text,text),is_unique_text_array(text[]),'
-  'is_valid_support_people(jsonb),save_program_data(text,jsonb,integer),'
+  'is_valid_support_people(jsonb),redeem_care_invite(text),save_program_data(text,jsonb,integer),'
   'supersede_core_consent(uuid,text,text),swap_focus(uuid,uuid),sync_writer_session()',
   'functions authenticated can execute are exactly the reviewed set');
 select th972_test.ok(
@@ -658,12 +666,28 @@ select set_config('th972.b_counts', jsonb_build_object(
   'sync_areas', (select count(*) from public.sync_area
                  where user_id = '00000000-0000-4000-8000-000000972002'),
   'sync_accounts', (select count(*) from public.sync_account
-                    where user_id = '00000000-0000-4000-8000-000000972002')
+                    where user_id = '00000000-0000-4000-8000-000000972002'),
+  'care_share_access', (select count(*) from public.care_share_access
+                        where user_id = '00000000-0000-4000-8000-000000972002'),
+  'care_messages', (select count(*) from public.care_messages
+                    where user_id = '00000000-0000-4000-8000-000000972002'),
+  'care_shares', (select count(*) from public.care_shares
+                  where user_id = '00000000-0000-4000-8000-000000972002'),
+  'caregiver_events', (select count(*) from public.caregiver_events
+                       where user_id = '00000000-0000-4000-8000-000000972002'),
+  'caregivers', (select count(*) from public.caregivers
+                 where user_id = '00000000-0000-4000-8000-000000972002'),
+  'care_connections', (select count(*) from public.care_connections
+                       where user_id = '00000000-0000-4000-8000-000000972002'),
+  'supporters', (select count(*) from public.supporters
+                 where user_id = '00000000-0000-4000-8000-000000972002')
 )::text, true);
 select th972_test.ok(
   current_setting('th972.b_counts')::jsonb = '{"profiles": 1, "quit_plans": 1,
     "program_data": 1, "enrolments": 2, "programme_consents": 3, "account_consents": 2,
-    "sync_answers": 1, "sync_lapses": 1, "sync_areas": 1, "sync_accounts": 1}'::jsonb,
+    "sync_answers": 1, "sync_lapses": 1, "sync_areas": 1, "sync_accounts": 1,
+    "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
+    "caregivers": 0, "care_connections": 0, "supporters": 0}'::jsonb,
   'B has the expected rows before deletion');
 select th972_test.become('authenticator', '00000000-0000-4000-8000-000000972002');
 -- A recent sign-in, which begin_account_deletion requires.
@@ -903,6 +927,7 @@ sync_refusal save_program_data TH010
 sync_refusal swap_focus TH010
 sync_refusal supersede_core_consent TH010
 sync_refusal delete_my_account TH010
+sync_refusal redeem_care_invite TH010
 
 for pair in enrolments_focus_cap:TH001 consent_revoke_only:TH002 consent_revoke_only:TH003 \
   sync_area_match_enrolment:TH007 sync_lapse_append_only:TH008; do
@@ -924,7 +949,8 @@ registry=$(sed -nE 's/^\| `(TH[0-9]{3})` \| `([a-z_]+)` \|.*/\1 \2/p' "$contract
 [[ "$(cut -d' ' -f1 <<<"$registry" | sort | uniq -d)" == '' ]] || fail 'registry codes must be unique'
 [[ "$(cut -d' ' -f2 <<<"$registry" | sort | uniq -d)" == '' ]] || fail 'registry names must be unique'
 for code in TH001 TH002 TH003 TH004 TH005 TH006 TH007 TH008 TH009 TH010 \
-  TH011 TH012 TH013 TH014 TH015 TH016 TH017 TH018 TH020; do
+  TH011 TH012 TH013 TH014 TH015 TH016 TH017 TH018 TH020 \
+  TH021 TH022 TH023 TH024 TH025; do
   grep -Eq "^$code " <<<"$registry" || fail "registry is missing $code"
 done
 

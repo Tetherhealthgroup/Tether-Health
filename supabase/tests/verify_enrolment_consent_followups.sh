@@ -416,6 +416,14 @@ insert into auth.users (id, email, aud, role) values
    'authenticated', 'authenticated'),
   ('00000000-0000-4000-8000-0000009720b3', 'synthetic-user-b3@example.test',
    'authenticated', 'authenticated');
+-- A synthetic clinic and a care connection for A: a sharing consent must name
+-- a live connection of the member.
+insert into public.care_orgs (name, verified_at) values ('Synthetic Clinic 972', now());
+with i as (
+  insert into public.care_connections (user_id, org_id)
+  select '00000000-0000-4000-8000-0000009720b1', id from public.care_orgs
+  where name = 'Synthetic Clinic 972' returning id
+) select set_config('th972b.a_connection', id::text, true) from i;
 -- Core versions in order: v1-draft (seed) < v1b < v2-test < v3-cascade
 -- (marked cascades_optional) < v4-after = v4-same (same time).
 insert into public.consent_documents
@@ -525,7 +533,7 @@ insert into public.programme_consents (enrolment_id, purpose, recipient_ref, con
 values
   (current_setting('th972b.a_hw')::uuid, 'reminders', null, 'v1-draft', 'en'),
   (current_setting('th972b.a_hw')::uuid, 'research', null, 'v5-research', 'en'),
-  (current_setting('th972b.a_hw')::uuid, 'share_care_team', 'synthetic-connection-b1', 'v1-draft', 'en');
+  (current_setting('th972b.a_hw')::uuid, 'share_care_team', current_setting('th972b.a_connection'), 'v1-draft', 'en');
 select th972b_test.ok(
   (select bool_and(c.consent_text = d.body) and count(*) = 4
    from public.programme_consents as c
@@ -727,7 +735,7 @@ select th972b_test.ok(
   and public.has_consent(current_setting('th972b.a_hw')::uuid, 'reminders')
   and public.has_consent(current_setting('th972b.a_hw')::uuid, 'research')
   and public.has_consent(current_setting('th972b.a_hw')::uuid, 'share_care_team',
-    'synthetic-connection-b1'),
+    current_setting('th972b.a_connection')),
   'A: supersession does not cascade: reminders, research and sharing stay live and honoured');
 select th972b_test.refused(format(
   'insert into public.programme_consents (enrolment_id, purpose, consent_version, locale)

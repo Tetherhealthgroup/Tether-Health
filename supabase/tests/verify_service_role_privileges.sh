@@ -171,7 +171,14 @@ returns jsonb language sql stable set search_path = '' as $f$
     'sync_answers', (select count(*) from public.sync_answer where user_id = p_user),
     'sync_lapses', (select count(*) from public.sync_lapse where user_id = p_user),
     'sync_areas', (select count(*) from public.sync_area where user_id = p_user),
-    'sync_accounts', (select count(*) from public.sync_account where user_id = p_user))
+    'sync_accounts', (select count(*) from public.sync_account where user_id = p_user),
+    'care_share_access', (select count(*) from public.care_share_access where user_id = p_user),
+    'care_messages', (select count(*) from public.care_messages where user_id = p_user),
+    'care_shares', (select count(*) from public.care_shares where user_id = p_user),
+    'caregiver_events', (select count(*) from public.caregiver_events where user_id = p_user),
+    'caregivers', (select count(*) from public.caregivers where user_id = p_user),
+    'care_connections', (select count(*) from public.care_connections where user_id = p_user),
+    'supporters', (select count(*) from public.supporters where user_id = p_user))
 $f$;
 
 -- The consent release gate, exactly as documented in docs/contracts/database.md
@@ -576,7 +583,9 @@ set constraints public.enrolments_focus_cap deferred;
 select th988_test.ok(
   th988_test.counts('00000000-0000-4000-8000-0000009880a1') = '{"profiles": 1, "quit_plans": 1,
     "program_data": 1, "enrolments": 2, "programme_consents": 3, "account_consents": 1,
-    "sync_answers": 1, "sync_lapses": 1, "sync_areas": 1, "sync_accounts": 1}'::jsonb
+    "sync_answers": 1, "sync_lapses": 1, "sync_areas": 1, "sync_accounts": 1,
+    "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
+    "caregivers": 0, "care_connections": 0, "supporters": 0}'::jsonb
   and th988_test.counts('00000000-0000-4000-8000-0000009880b1') =
       th988_test.counts('00000000-0000-4000-8000-0000009880a1'),
   'setup: synthetic A and B each hold a row in every member table');

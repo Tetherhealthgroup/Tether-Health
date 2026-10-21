@@ -650,7 +650,21 @@ select set_config('th944.a_counts', jsonb_build_object(
   'sync_areas', (select count(*) from public.sync_area
                  where user_id = '00000000-0000-4000-8000-000000944001'),
   'sync_accounts', (select count(*) from public.sync_account
-                    where user_id = '00000000-0000-4000-8000-000000944001')
+                    where user_id = '00000000-0000-4000-8000-000000944001'),
+  'care_share_access', (select count(*) from public.care_share_access
+                        where user_id = '00000000-0000-4000-8000-000000944001'),
+  'care_messages', (select count(*) from public.care_messages
+                    where user_id = '00000000-0000-4000-8000-000000944001'),
+  'care_shares', (select count(*) from public.care_shares
+                  where user_id = '00000000-0000-4000-8000-000000944001'),
+  'caregiver_events', (select count(*) from public.caregiver_events
+                       where user_id = '00000000-0000-4000-8000-000000944001'),
+  'caregivers', (select count(*) from public.caregivers
+                 where user_id = '00000000-0000-4000-8000-000000944001'),
+  'care_connections', (select count(*) from public.care_connections
+                       where user_id = '00000000-0000-4000-8000-000000944001'),
+  'supporters', (select count(*) from public.supporters
+                 where user_id = '00000000-0000-4000-8000-000000944001')
 )::text, true);
 select th944_test.ok(
   current_setting('th944.a_counts')::jsonb @> '{"enrolments": 2, "programme_consents": 2,
