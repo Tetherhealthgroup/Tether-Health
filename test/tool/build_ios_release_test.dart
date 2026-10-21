@@ -4,11 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'release_define_cases.dart';
 
-// Runs only the pre-build checks of tool/build_ios_release.sh (`--check-only`)
-// and the IPA read-back (`--inspect-ipa=`). Nothing is built: the scripts are
-// copied into a temporary project root next to copies of the real iOS project
-// files, and the PATH holds only python3 and a fake flutter that records being
-// called. Every key is a synthetic canary token.
+// Runs the pre-build checks of tool/build_ios_release.sh (`--check-only`), the
+// IPA read-back (`--inspect-ipa=`) and, with a fake flutter, the build path.
+// Nothing is built: the scripts are copied into a temporary project root next
+// to copies of the real iOS project files and a synthetic pubspec.yaml, and the
+// PATH holds only python3 and a fake flutter that records being called. Every
+// key is a synthetic canary token.
 
 String join(List<String> parts) => parts.join(Platform.pathSeparator);
 
@@ -35,6 +36,8 @@ void main() {
       File(join([repo, ...relative.split('/')]))
           .copySync(inRoot(relative).path);
     }
+    // Synthetic, so the build-number minimum (2) does not follow the real one.
+    inRoot('pubspec.yaml').writeAsStringSync('name: x\nversion: 1.0.0+2\n');
     scriptPath = inRoot('tool/build_ios_release.sh').path;
     final fakeBin = Directory(join([root.path, 'bin']))..createSync();
     final python = Process.runSync('which', ['python3']).stdout.toString();
@@ -353,6 +356,284 @@ void main() {
       expect(missing.exitCode, 2);
       expect(output(missing), contains('IPA not found'));
       expect(run(['--inspect-ipa=']).exitCode, 2);
+    });
+  });
+  group('--build-number', () {
+    const minimumError = 'build_ios_release: --build-number must be a '
+        'positive integer (value not shown)\n';
+    const rangeError =
+        'build_ios_release: --build-number must be between 1 and 2100000000\n';
+
+    ProcessResult checkNumber(List<String> numberArgs) => run([
+          '--dart-define-from-file=${writeDefine(valid).path}',
+          ...numberArgs,
+          '--check-only',
+        ]);
+
+    test('accepts a positive integer at or above the pubspec number', () {
+      for (final (given, shown) in [
+        ('2', '2'),
+        ('3', '3'),
+        ('0007', '7'),
+        ('2100000000', '2100000000'),
+      ]) {
+        for (final args in [
+          ['--build-number', given],
+          ['--build-number=$given'],
+        ]) {
+          final r = checkNumber(args);
+          expect(r.exitCode, 0, reason: '$args: ${output(r)}');
+          expect(
+            r.stdout,
+            contains('CFBundleVersion: $shown (from --build-number; '
+                'overrides pubspec.yaml); minimum 2 '
+                '(the pubspec.yaml build number)\n'),
+            reason: '$args',
+          );
+          expect(r.stdout, contains('no build was run'), reason: '$args');
+          expect(flutterMarker.existsSync(), isFalse);
+        }
+      }
+    });
+
+    test('refuses a value that is not all digits, without showing it', () {
+      for (final value in [
+        'abc',
+        '1.2',
+        '-3',
+        '+3',
+        ' 5',
+        '5 ',
+        '1e3',
+        '0x10',
+        '\u0663',
+        '12TH1009CANARY',
+        '5\n6',
+      ]) {
+        for (final args in [
+          ['--build-number', value],
+          ['--build-number=$value'],
+        ]) {
+          final r = checkNumber(args);
+          expect(r.exitCode, 2, reason: '$args');
+          expect(r.stderr, minimumError, reason: '$args');
+          expect(r.stdout, '', reason: '$args');
+          expect(output(r), isNot(contains('CANARY')));
+          expect(flutterMarker.existsSync(), isFalse);
+        }
+      }
+    });
+
+    test('refuses zero and values above the limit', () {
+      for (final value in [
+        '0',
+        '000',
+        '2100000001',
+        '9999999999',
+        '99999999999',
+        '123456789012345678901234567890',
+      ]) {
+        final r = checkNumber(['--build-number', value]);
+        expect(r.exitCode, 2, reason: value);
+        expect(r.stderr, rangeError, reason: value);
+        expect(r.stdout, '', reason: value);
+      }
+    });
+
+    test('refuses a number below the pubspec build number', () {
+      var r = checkNumber(['--build-number', '1']);
+      expect(r.exitCode, 1, reason: output(r));
+      expect(
+        r.stderr,
+        'build_ios_release: --build-number 1 is below the minimum 2 '
+        '(the pubspec.yaml build number).\n',
+      );
+      expect(r.stdout, isNot(contains('no build was run')));
+
+      inRoot('pubspec.yaml').writeAsStringSync('name: x\nversion: 1.2.0+09\n');
+      r = checkNumber(['--build-number=8']);
+      expect(r.exitCode, 1, reason: output(r));
+      expect(r.stderr, contains('below the minimum 9'));
+      r = checkNumber(['--build-number=9']);
+      expect(r.exitCode, 0, reason: output(r));
+      expect(r.stdout, contains('CFBundleVersion: 9 (from --build-number'));
+      expect(flutterMarker.existsSync(), isFalse);
+    });
+
+    test('refuses an empty value and a missing value', () {
+      var r = checkNumber(['--build-number=']);
+      expect(r.exitCode, 2);
+      expect(r.stderr, minimumError);
+      r = run([
+        '--dart-define-from-file=${writeDefine(valid).path}',
+        '--check-only',
+        '--build-number',
+      ]);
+      expect(r.exitCode, 2);
+      expect(r.stderr, 'build_ios_release: --build-number requires a value\n');
+      r = checkNumber(['--build-number', '']);
+      expect(r.exitCode, 2);
+      expect(r.stderr, minimumError);
+    });
+
+    test('refuses --build-number given more than once', () {
+      for (final args in [
+        ['--build-number', '3', '--build-number', '3'],
+        ['--build-number=3', '--build-number=4'],
+        ['--build-number', '3', '--build-number=4'],
+      ]) {
+        final r = checkNumber(args);
+        expect(r.exitCode, 2, reason: '$args');
+        expect(
+          r.stderr,
+          'build_ios_release: --build-number given more than once\n',
+          reason: '$args',
+        );
+      }
+    });
+
+    test('a pubspec without a build number cannot be checked against', () {
+      inRoot('pubspec.yaml').writeAsStringSync('name: x\nversion: 1.0.0\n');
+      var r = checkNumber(['--build-number', '5']);
+      expect(r.exitCode, 1, reason: output(r));
+      expect(r.stderr, contains('pubspec.yaml version has no +<build number>'));
+      // Without the flag the pubspec is not read: the result is unchanged.
+      r = checkOnly(valid);
+      expect(r.exitCode, 0, reason: output(r));
+      expect(r.stdout, 'All pre-build checks passed (no build was run).\n');
+    });
+
+    test('without the flag, --check-only output is unchanged', () {
+      final r = checkOnly(valid);
+      expect(r.exitCode, 0, reason: output(r));
+      expect(r.stdout, 'All pre-build checks passed (no build was run).\n');
+      expect(r.stderr, '');
+    });
+
+    test('is checked only after the define file passes', () {
+      final r = run([
+        '--dart-define-from-file=${writeDefine('{}').path}',
+        '--build-number',
+        '1',
+        '--check-only',
+      ]);
+      expect(r.exitCode, 1);
+      expect(r.stdout, '');
+      expect(r.stderr, isNot(contains('below the minimum')));
+    });
+
+    test('cannot be combined with --inspect-ipa', () {
+      for (final args in [
+        ['--inspect-ipa=x.ipa', '--build-number', '5'],
+        ['--build-number=5', '--inspect-ipa=x.ipa'],
+      ]) {
+        final r = run(args);
+        expect(r.exitCode, 2, reason: '$args');
+        expect(output(r), contains('cannot be combined'), reason: '$args');
+      }
+    });
+  });
+
+  group('build with a fake flutter', () {
+    late File flutterLog;
+    late String define;
+
+    setUp(() {
+      flutterLog = File(join([root.path, 'flutter_log']));
+      define = writeDefine(valid).path;
+      // The format gate is the repo's own script; stub it in the copy.
+      inRoot('tool/check_format.sh').writeAsStringSync('exit 0\n');
+      final makeIpa = inRoot('make_ipa.py')
+        ..writeAsStringSync(
+          'import plistlib, sys, zipfile\n'
+          'info = {"CFBundleShortVersionString": "1.0.0",'
+          ' "CFBundleVersion": sys.argv[2]}\n'
+          'with zipfile.ZipFile(sys.argv[1], "w") as z:\n'
+          '    z.writestr("Payload/Runner.app/Info.plist",'
+          ' plistlib.dumps(info))\n',
+        );
+      // Records each call as [arg][arg]...; `build ipa` writes an IPA whose
+      // CFBundleVersion is the --build-number given (or the pubspec's 2),
+      // unless FAKE_IGNORE_BUILD_NUMBER is set.
+      inRoot('bin/flutter').writeAsStringSync(r'''#!/bin/sh
+for a in "$@"; do printf '[%s]' "$a" >> "LOG"; done
+echo >> "LOG"
+if [ "$1" = build ]; then
+  bn=2
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      --build-number) [ -n "${FAKE_IGNORE_BUILD_NUMBER:-}" ] || bn="$2" ;;
+    esac
+    shift
+  done
+  mkdir -p build/ios/ipa
+  python3 -I "MAKE_IPA" build/ios/ipa/Runner.ipa "$bn"
+fi
+exit 0
+'''
+          .replaceAll('LOG', flutterLog.path)
+          .replaceAll('MAKE_IPA', makeIpa.path));
+    });
+
+    List<String> calls() => flutterLog.existsSync()
+        ? flutterLog.readAsLinesSync()
+        : const <String>[];
+
+    test('passes --build-number to flutter build ipa', () {
+      for (final args in [
+        ['--build-number', '5'],
+        ['--build-number=005'],
+      ]) {
+        if (flutterLog.existsSync()) flutterLog.deleteSync();
+        final r = run(['--dart-define-from-file=$define', ...args]);
+        expect(r.exitCode, 0, reason: '$args: ${output(r)}');
+        expect(calls(), [
+          '[analyze]',
+          '[test]',
+          '[build][ipa][--release][--dart-define-from-file=$define]'
+              '[--build-number][5]',
+        ]);
+        expect(r.stdout, contains('CFBundleVersion: 5 (from --build-number'));
+        expect(r.stdout, contains('\nCFBundleVersion: 5\n'));
+      }
+    });
+
+    test('without the flag the flutter invocation is unchanged', () {
+      final r = run(['--dart-define-from-file=$define']);
+      expect(r.exitCode, 0, reason: output(r));
+      expect(calls(), [
+        '[analyze]',
+        '[test]',
+        '[build][ipa][--release][--dart-define-from-file=$define]',
+      ]);
+      expect(r.stdout, contains('== flutter build ipa --release\n'));
+      expect(r.stdout, contains('\nCFBundleVersion: 2\n'));
+    });
+
+    test('fails when the IPA does not carry the requested number', () {
+      final r = run(
+        ['--dart-define-from-file=$define', '--build-number', '5'],
+        env: {'FAKE_IGNORE_BUILD_NUMBER': '1'},
+      );
+      expect(r.exitCode, 1, reason: output(r));
+      expect(r.stdout, contains('\nCFBundleVersion: 2\n'));
+      expect(
+        r.stderr,
+        "build_ios_release: the IPA's CFBundleVersion is not 5 "
+        '(the --build-number given); do not upload it\n',
+      );
+    });
+
+    test('a refused number never reaches flutter', () {
+      for (final args in [
+        ['--build-number', '1'],
+        ['--build-number', '0'],
+        ['--build-number', 'x'],
+      ]) {
+        final r = run(['--dart-define-from-file=$define', ...args]);
+        expect(r.exitCode, isNonZero, reason: '$args');
+        expect(calls(), isEmpty, reason: '$args');
+      }
     });
   });
 }
