@@ -114,10 +114,12 @@ def verify_token(token: str, settings: Settings) -> Account:
         raise _unauthenticated(
             "invalid-token", "The access token is missing a required claim."
         ) from None
-    except jwt.InvalidTokenError:
+    except (jwt.InvalidTokenError, RecursionError, ValueError, TypeError):
         # The catch-all, and deliberately the least specific message: a bad
         # signature and a malformed token are told apart by PyJWT but must not
         # be told apart by a caller, or the error becomes a signature oracle.
+        # A payload that cannot be decoded at all (too deeply nested, not
+        # JSON) is the same answer, never a 500.
         raise _unauthenticated("invalid-token", "The access token could not be verified.") from None
 
     subject = claims.get("sub")

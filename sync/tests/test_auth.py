@@ -126,3 +126,43 @@ def test_the_problem_body_never_contains_the_token(client: TestClient) -> None:
     )
     assert presented not in response.text
     assert ALICE not in response.text
+
+
+def _nested_payload_token(*, sign_with: str | None) -> str:
+    """A token whose payload is a JSON array nested far beyond the parser's
+    recursion limit. Signed with the test secret, or with a stranger's."""
+    import base64
+    import hashlib
+    import hmac
+    import json as _json
+
+    def segment(raw: bytes) -> bytes:
+        return base64.urlsafe_b64encode(raw).rstrip(b"=")
+
+    depth = 100_000
+    claims = (
+        b'{"sub": "' + ALICE.encode() + b'", "aud": "' + AUDIENCE.encode() + b'", '
+        b'"iss": "' + ISSUER.encode() + b'", "exp": ' + str(int(time.time()) + 600).encode()
+        + b', "deep": ' + b"[" * depth + b"]" * depth + b"}"
+    )
+    header = _json.dumps({"alg": "HS256", "typ": "JWT"}).encode()
+    signing_input = segment(header) + b"." + segment(claims)
+    secret = (sign_with or "a-stranger-s-secret-0123456789abcdef").encode()
+    signature = segment(hmac.new(secret, signing_input, hashlib.sha256).digest())
+    return (signing_input + b"." + signature).decode()
+
+
+@pytest.mark.parametrize("sign_with", [JWT_SECRET, None])
+def test_a_deeply_nested_token_payload_is_a_401_not_a_crash(
+    client: TestClient, sign_with: str | None
+) -> None:
+    """Correctly signed (the decoder reaches the payload) or not, a payload
+    nested too deep to decode is refused like any unverifiable token."""
+    presented = _nested_payload_token(sign_with=sign_with)
+    response = client.post(
+        "/v1/sync/pull", json={"cursor": None}, headers={"Authorization": f"Bearer {presented}"}
+    )
+    assert response.status_code == 401
+    assert response.json()["type"].endswith("/invalid-token")
+    # And the service still answers afterwards.
+    assert client.get("/v1/health").status_code == 200

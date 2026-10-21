@@ -14,5 +14,5 @@ SQLAlchemy==2.0.53
 # Without it, PyJWT imports fine and then refuses every asymmetric token at
 # runtime — and this project's Supabase instance signs with ES256, so the
 # extra is load-bearing rather than optional.
-PyJWT[crypto]==2.14.0
+PyJWT[crypto]==2.15.1
 uvicorn==0.53.0

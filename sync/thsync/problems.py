@@ -18,11 +18,13 @@ in a log we do not control.
 
 from __future__ import annotations
 
+from types import TracebackType
 from typing import Any, Final
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from sqlalchemy.exc import DBAPIError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from thsync.logs import log
@@ -145,10 +147,18 @@ def install_problem_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def _unhandled(_: Request, exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
-        # The exception type and where it was raised go to the log; its
-        # message and traceback do not, because a validation or driver error's
-        # text can carry the values involved. The body says nothing.
-        log.error("unhandled %s at %s", type(exc).__name__, _origin(exc))
+        # The exception type, where it was raised, the innermost frame of
+        # this service on the way there and, for a database error, its
+        # SQLSTATE go to the log. Its message and traceback do not, because a
+        # validation or driver error's text can carry the values involved. The
+        # body says nothing.
+        log.error(
+            "unhandled %s at %s; service frame %s; sqlstate %s",
+            type(exc).__name__,
+            _origin(exc),
+            _service_frame(exc),
+            _sqlstate(exc),
+        )
         return problem_response(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             code="internal-error",
@@ -157,15 +167,41 @@ def install_problem_handlers(app: FastAPI) -> None:
         )
 
 
+def _frame(trace: TracebackType) -> str:
+    code = trace.tb_frame.f_code
+    return f"{code.co_filename.rsplit('/', 1)[-1]}:{trace.tb_lineno} in {code.co_name}"
+
+
 def _origin(exc: BaseException) -> str:
-    """`file:line` of the innermost frame that raised [exc], without values."""
+    """`file:line in function` of the innermost frame that raised [exc]."""
     trace = exc.__traceback__
     if trace is None:
         return "unknown"
     while trace.tb_next is not None:
         trace = trace.tb_next
-    code = trace.tb_frame.f_code
-    return f"{code.co_filename.rsplit('/', 1)[-1]}:{trace.tb_lineno} in {code.co_name}"
+    return _frame(trace)
+
+
+def _service_frame(exc: BaseException) -> str:
+    """The innermost frame of this package (`thsync/`) in [exc]'s traceback."""
+    found = "none"
+    trace = exc.__traceback__
+    while trace is not None:
+        filename = trace.tb_frame.f_code.co_filename.replace("\\", "/")
+        if "/thsync/" in filename:
+            found = _frame(trace)
+        trace = trace.tb_next
+    return found
+
+
+def _sqlstate(exc: BaseException) -> str:
+    """The SQLSTATE of a database error, or `none`. A five-character code."""
+    if not isinstance(exc, DBAPIError):
+        return "none"
+    code = getattr(exc.orig, "sqlstate", None) or getattr(exc.orig, "pgcode", None)
+    if isinstance(code, str) and len(code) == 5 and code.isalnum():
+        return code
+    return "none"
 
 
 #: Field names this API defines. Anything in a validation `loc` that is not one

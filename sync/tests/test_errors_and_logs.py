@@ -135,6 +135,9 @@ def test_a_database_error_logs_no_bound_parameters(
         )
     assert response.status_code == 500
     assert "IntegrityError" in caplog.text
+    # The innermost frame of the service, not only the driver's.
+    assert "service frame repository.py:" in caplog.text
+    assert "in push_bundles" in caplog.text
     assert SECRET_TEXT not in caplog.text
     assert SECRET_TEXT not in response.text
 
@@ -222,3 +225,32 @@ def test_a_rejected_body_s_values_stay_out_of_the_log_and_the_response(
     assert CANARY not in caplog.text
     assert CANARY not in response.text
     assert "high" not in response.text
+
+
+def test_a_database_error_logs_its_sqlstate_and_no_values(
+    client: TestClient, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A PostgreSQL driver error carries `sqlstate`; that code is logged, the
+    driver's message (which may quote a value) is not."""
+    from sqlalchemy.exc import IntegrityError
+
+    class DriverError(Exception):
+        sqlstate = "23505"
+
+    def collide(*_: object, **__: object) -> None:
+        raise IntegrityError(
+            f"insert ... values ('{CANARY}')",
+            {"payload": CANARY},
+            DriverError(f"duplicate key value: ({CANARY})"),
+        )
+
+    monkeypatch.setattr(repository, "pull_since", collide)
+    with caplog.at_level(logging.DEBUG, logger="thsync"):
+        response = client.post("/v1/sync/pull", json={"cursor": None}, headers=auth())
+    assert response.status_code == 500
+    assert "unhandled IntegrityError" in caplog.text
+    assert "sqlstate 23505" in caplog.text
+    assert "service frame api.py:" in caplog.text
+    assert CANARY not in caplog.text
+    assert "Traceback" not in caplog.text
+    assert CANARY not in response.text

@@ -440,3 +440,20 @@ def test_the_key_set_client_has_no_per_key_cache_and_a_short_timeout() -> None:
     # With the per-key cache on, PyJWT wraps get_signing_key in an LRU cache
     # with no expiry.
     assert not hasattr(client.get_signing_key, "cache_info")
+
+
+def test_a_deeply_nested_payload_is_refused_on_the_key_set_path(
+    asymmetric_settings: Settings,
+) -> None:
+    """The key lookup reads the token before any signature check; a payload
+    nested beyond the parser's limit must still end as a 401."""
+    def segment(raw: bytes) -> bytes:
+        return base64.urlsafe_b64encode(raw).rstrip(b"=")
+
+    depth = 100_000
+    header = json.dumps({"alg": "ES256", "typ": "JWT", "kid": KID}).encode()
+    claims = b'{"sub": "' + SUBJECT.encode() + b'", "deep": ' + b"[" * depth + b"]" * depth + b"}"
+    forged = b".".join([segment(header), segment(claims), segment(b"not-a-signature")]).decode()
+    with pytest.raises(Problem) as raised:
+        verify_token(forged, asymmetric_settings)
+    assert raised.value.status_code == 401
