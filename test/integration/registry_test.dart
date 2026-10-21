@@ -539,6 +539,45 @@ void main() {
       expect(key, isNot(contains('canary')));
     });
 
+    test('no cached key is derived from a payload with secrets', () async {
+      final keys = <String>[];
+      final secretApi = AppApi(handlers: {
+        for (final endpoint in [
+          'POST supabase /auth/v1/token',
+          'POST supabase /auth/v1/recover',
+          'POST /v1/care/connections',
+          'DELETE /v1/account/data',
+        ])
+          endpoint: (call) async {
+            keys.add(call.idempotencyKey);
+            return const TResult.ok();
+          },
+      });
+      for (var i = 0; i < 2; i++) {
+        TSession.set('auth_signin.email', 'synthetic-user-01@example.test');
+        TSession.set('auth_signin.password', _canary);
+        await secretApi.submit('POST supabase /auth/v1/token',
+            screenId: 'auth_signin');
+        TSession.set('auth_forgot.email', 'synthetic-user-01@example.test');
+        await secretApi.submit('POST supabase /auth/v1/recover',
+            screenId: 'auth_forgot');
+        TSession.set('support_connect.invite_code', 'SYNTH-0001');
+        await secretApi.submit('POST /v1/care/connections',
+            screenId: 'support_connect');
+        TSession.set('account_delete.password', _canary);
+        await secretApi.submit('DELETE /v1/account/data',
+            screenId: 'account_delete');
+      }
+      expect(secretApi.cachedKeyCount, 0);
+      expect(keys.toSet(), hasLength(keys.length),
+          reason: 'every such submit gets a fresh key');
+
+      TSession.set('checkin.mood', 'Okay');
+      await api.submit('POST /v1/records/check-ins', screenId: 'checkin');
+      expect(api.cachedKeyCount, 1,
+          reason: 'health saves keep their stable key');
+    });
+
     test('content hashes tell close values apart', () {
       expect(contentHash({'a': '1'}), isNot(contentHash({'a': 1})));
       expect(

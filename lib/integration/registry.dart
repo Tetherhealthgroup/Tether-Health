@@ -256,7 +256,9 @@ class AppApi implements TApi {
   final Random _random;
 
   /// Idempotency keys by (screen instance, screen, endpoint, content hash).
-  /// Emptied when the session changes; holds no content.
+  /// Emptied when the session changes; holds no content. Entries that carry
+  /// secrets (passwords, the invite code) and auth submits never enter it:
+  /// nothing derived from a secret outlives the scrub.
   final Map<(int?, String, String, int), String> _keys =
       <(int?, String, String, int), String>{};
   int _keysEpoch = TSession.epoch;
@@ -282,7 +284,7 @@ class AppApi implements TApi {
         endpoint: endpoint,
         screenId: screenId,
         payload: payload,
-        idempotencyKey: _idempotencyKey(endpoint, screenId, payload, epoch),
+        idempotencyKey: _idempotencyKey(entry, screenId, payload, epoch),
       );
       final handler = _handlers[endpoint];
       result = handler == null
@@ -324,8 +326,12 @@ class AppApi implements TApi {
         _ => value,
       };
 
+  /// Number of cached idempotency keys (for tests).
+  @visibleForTesting
+  int get cachedKeyCount => _keys.length;
+
   String _idempotencyKey(
-    String endpoint,
+    EndpointEntry entry,
     String screenId,
     Map<String, Object?> payload,
     int epoch,
@@ -334,10 +340,17 @@ class AppApi implements TApi {
       _keys.clear();
       _keysEpoch = epoch;
     }
+    // A fresh key per call for entries with secrets and for auth submits, so
+    // no hash of a password or invite code is kept.
+    if (entry.scrubPasswords ||
+        entry.scrubKeys.isNotEmpty ||
+        !entry.acceptsQueued) {
+      return _randomKey();
+    }
     final id = (
       _screenInstance?.call(screenId),
       screenId,
-      endpoint,
+      entry.endpoint,
       contentHash(payload),
     );
     final existing = _keys[id];

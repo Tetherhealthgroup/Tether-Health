@@ -235,6 +235,9 @@ void main() {
           .hasMatch(code)) {
         calls.add('$path (values)');
       }
+      if (RegExp(r'\btypedef\s+\w+\s*=\s*TSession\b').hasMatch(code)) {
+        calls.add('$path (alias)');
+      }
     }
     expect(calls, ['lib/integration/session_lifecycle.dart']);
   });

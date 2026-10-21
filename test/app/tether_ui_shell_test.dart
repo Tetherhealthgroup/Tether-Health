@@ -60,6 +60,25 @@ void main() {
     expect(_stack(runtime), [Routes.today]);
   });
 
+  testWidgets(
+      'a guest plan read at launch is dropped once a session ends: guest '
+      'with a plan, first sign-in, sign-out opens welcome', (tester) async {
+    final account = fakeAccount();
+    final runtime = await _start(tester, account: account, guestPlan: true);
+    expect(_stack(runtime), [Routes.today]);
+    await account.signIn(
+      email: 'synthetic-user-01@example.test',
+      password: 'synthetic-password',
+    );
+    await tester.pumpAndSettle();
+    expect(runtime.lifecycle.ended, isEmpty,
+        reason: "a guest's first sign-in is not a session end");
+    expect(_stack(runtime), [Routes.today]);
+    await account.signOut();
+    await tester.pumpAndSettle();
+    expect(_stack(runtime), [Routes.welcome]);
+  });
+
   testWidgets('a pending deletion receipt opens account_deleted',
       (tester) async {
     final account = fakeAccount(
