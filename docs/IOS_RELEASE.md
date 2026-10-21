@@ -312,7 +312,15 @@ None of these were started by any agent. Do them in roughly this order.
   signing manage them under the LLC team. Keep the private key, any exported
   `.p12` certificate file and any `.p8` file (such as an App Store Connect API
   key, downloadable only once) in the macOS Keychain or a password manager,
-  never in the repo and not as loose files in a folder.
+  never in the repo and not as loose files in a folder. The one exception is
+  the App Store Connect API key for the scripted upload in O-10, which must be
+  a file: keep it in a folder that holds nothing else, such as
+  `~/secure/tether-health/asc/` (`chmod 700` on the folder), readable by your
+  account only (`chmod 600` on the key), outside the repository and
+  outside every folder altool searches for keys (`./private_keys`,
+  `~/private_keys`, `~/.private_keys`, `~/.appstoreconnect/private_keys`).
+  `tool/upload_ios_testflight.sh` refuses a key in any of those places, and
+  refuses to run while a file named `AuthKey_<key ID>.p8` is in one of them.
 - **O-6 App Store Connect record.** New app: platform iOS, name (availability
   Unknown), primary language, bundle ID `com.TetherHealthLLC.tetherhealth`,
   SKU. Then category, age rating questionnaire, support URL, and the export
@@ -346,14 +354,42 @@ None of these were started by any agent. Do them in roughly this order.
   `sh tool/build_ios_release.sh --dart-define-from-file=$HOME/secure/tether-health/release.json --check-only`.
   Do not build if it fails. Do not paste the key into chat, tickets or logs.
   Then run the same command without `--check-only`; it builds the IPA and
-  prints its path and version fields. Upload the `.ipa` with Xcode Organizer or
-  Transporter. **No agent has run this against the real release define file or
-  signed a build (NOT RUN)**; signing behaviour on the build Mac is Unknown
-  here. Discard any `Pods` noise a build creates (section 1, SPM).
+  prints its path and version fields. Then, in a fresh terminal at the
+  repository root, upload the `.ipa` with `tool/upload_ios_testflight.sh` and
+  the App Store Connect API key from O-5 (created in App Store Connect under
+  Users and Access, Integrations; its key ID and the issuer ID are shown
+  there; it needs a role that may upload builds, Assumed: Developer or
+  higher):
+
+  ```sh
+  export TETHER_ASC_KEY_PATH=$HOME/secure/tether-health/asc/AuthKey_<key ID>.p8
+  export TETHER_ASC_KEY_ID=<key ID>
+  export TETHER_ASC_ISSUER_ID=<issuer ID>
+  sh tool/upload_ios_testflight.sh --ipa=build/ios/ipa/<name>.ipa --validate
+  sh tool/upload_ios_testflight.sh --ipa=build/ios/ipa/<name>.ipa
+  ```
+
+  `--validate` checks the IPA with App Store Connect without uploading it. Run
+  the script in a normal terminal with your default HOME: its checks of the
+  key folders look in that home folder. The script refuses to run under CI or
+  with DEBUG set, checks the three variables, the key file and the IPA's bundle
+  ID before it calls `xcrun altool`, uploads only the IPA, and hides the key's
+  path and file name in altool's output. Fix the cause of a refusal rather
+  than working around it. If the script cannot
+  be used, upload the `.ipa` with Xcode Organizer or Transporter instead,
+  signed in with the owner's Apple ID.
+  **No agent has run this against the real release define file, signed a
+  build or run the upload script against App Store Connect (NOT RUN)**;
+  signing behaviour on the build Mac is Unknown here. Discard any `Pods` noise
+  a build creates (section 1, SPM).
   Each upload needs a new `CFBundleVersion` (build number) for the same
   version (Assumed).
 - **O-11 TestFlight.** Internal testers first; they must be App Store Connect
-  users on the LLC team (Assumed). External testers require Beta App Review
+  users on the LLC team (Assumed). Give builds uploaded with
+  `tool/upload_ios_testflight.sh` to internal testers only: the script sends
+  the build and nothing else (no tester groups, test notes or Beta App Review
+  submission), and adding a build to an external group is a separate owner
+  decision made in App Store Connect. External testers require Beta App Review
   (Assumed, confirm in TestFlight documentation). For App Review,
   give a demo account in the review notes (Assumed, Guideline **2.1**): use a
   synthetic test account, enter its password only in App Store Connect, never
