@@ -1133,8 +1133,11 @@ select th955_test.affects(format(
   1, 'A: leaves BreatheFree');
 select th955_test.ok(
   (select programme_codes = '{sf}'::text[] from public.supporters), 'supporter: leaving removed bf');
-select th955_test.affects(
-  'delete from public.enrolments where programme_code = ''sf''', 1, 'A: deletes ScrollFree now');
+select th955_test.affects(format(
+  'select public.delete_enrolment_now(%L, ''DELETE'')',
+  (select id from public.enrolments
+   where user_id = '00000000-0000-4000-8000-0000009550a1' and programme_code = 'sf')),
+  1, 'A: deletes ScrollFree now');
 select th955_test.act_as(current_setting('th955.superuser'), null);
 select th955_test.ok(
   (select programme_codes = '{}'::text[] from public.supporters
@@ -1168,7 +1171,7 @@ insert into public.care_share_access (user_id, share_id, channel)
 values ('00000000-0000-4000-8000-0000009550a1', th955_test.v('s7')::uuid, 'secure_link');
 select th955_test.act_as('authenticator', th955_test.claims('00000000-0000-4000-8000-0000009550a1'));
 select th955_test.affects(format(
-  'delete from public.enrolments where id = %L', th955_test.v('a_ck')),
+  'select public.delete_enrolment_now(%L, ''DELETE'')', th955_test.v('a_ck')),
   1, 'delete-now: A deletes Checkup, whose share is attached to a message');
 select th955_test.act_as(current_setting('th955.superuser'), null);
 select th955_test.ok(

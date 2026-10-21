@@ -223,7 +223,7 @@ select th944_test.ok(
     'public.program_data', 'public.programmes', 'public.enrolments',
     'public.programme_consents', 'public.account_consents']::regclass[]) =
   'account_consents:authenticated:SELECT,'
-  'enrolments:authenticated:DELETE,enrolments:authenticated:SELECT,'
+  'enrolments:authenticated:SELECT,'
   'profiles:authenticated:SELECT,'
   'program_data:authenticated:DELETE,program_data:authenticated:INSERT,'
   'program_data:authenticated:SELECT,program_data:authenticated:UPDATE,'
@@ -276,7 +276,7 @@ select th944_test.ok(
     'public.programme_consents', 'public.account_consents']::regclass[]) =
   'account_consents:account_consents_insert_own:a:t,account_consents:account_consents_select_own:r:t,'
   'account_consents:account_consents_update_own:w:t,'
-  'enrolments:enrolments_delete_own:d:t,enrolments:enrolments_insert_own:a:t,'
+  'enrolments:enrolments_insert_own:a:t,'
   'enrolments:enrolments_select_own:r:t,enrolments:enrolments_update_own:w:t,'
   'profiles:profiles_select_own:r:t,profiles:profiles_update_own:w:t,'
   'program_data:program_data_delete_own:d:t,program_data:program_data_insert_own:a:t,'
@@ -615,8 +615,12 @@ select th944_test.ok(
   (select count(*) from public.sync_answer where programme_code = 'hw') = 2
   and (select count(*) from public.sync_lapse where programme_code = 'hw') = 1,
   'A API: Heartwise sync data is kept after leaving');
+-- A recent sign-in, which delete_enrolment_now requires.
+select set_config('request.jwt.claims', (current_setting('request.jwt.claims')::jsonb
+  || jsonb_build_object('amr', jsonb_build_array(jsonb_build_object(
+    'method', 'password', 'timestamp', extract(epoch from now()) - 30))))::text, true);
 select th944_test.affects(format(
-  'delete from public.enrolments where id = %L',
+  'select public.delete_enrolment_now(%L, ''DELETE'')',
   current_setting('th944.a_hw')), 1, 'A API: deletes Heartwise now');
 select th944_test.become(current_setting('th944.superuser'), '');
 select th944_test.ok(

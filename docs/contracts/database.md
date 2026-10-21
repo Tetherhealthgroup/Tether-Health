@@ -10,8 +10,9 @@ Migration sources of truth include `supabase/migrations/202609110001_profiles.sq
 `supabase/migrations/202610180005_consent_truncate_guards.sql`,
 `supabase/migrations/202610180006_service_role_least_privilege.sql`,
 `supabase/migrations/202610180007_sync_truncate_guards.sql`,
-`supabase/migrations/202610180008_delete_my_account.sql` and
-`supabase/migrations/202610180011_care.sql`.
+`supabase/migrations/202610180008_delete_my_account.sql`,
+`supabase/migrations/202610180011_care.sql` and
+`supabase/migrations/202610180012_enrolment_delete_now.sql`.
 
 Every migration file is named `YYYYMMDDNNNN_name.sql`: a 12-digit version (date
 plus a four-digit sequence), then lowercase letters, digits and underscores.
@@ -59,8 +60,9 @@ sync after offline saves. Program payloads are prohibited from logs.
 ## Programmes, enrolments and consents
 
 Migration sources of truth: `supabase/migrations/202610170002_enrolments.sql`,
-`supabase/migrations/202610180003_enrolment_consent_followups.sql` and
-`supabase/migrations/202610180005_consent_truncate_guards.sql`.
+`supabase/migrations/202610180003_enrolment_consent_followups.sql`,
+`supabase/migrations/202610180005_consent_truncate_guards.sql` and
+`supabase/migrations/202610180012_enrolment_delete_now.sql`.
 Programme health data hangs off an enrolment, never off the account, and
 consent is recorded per enrolment, purpose and recipient. Every table below
 has row-level security enabled and forced; `anon` has no access.
@@ -103,10 +105,38 @@ deletes the account; nothing is purged automatically.
 | `joined_at` | set on insert |
 | `left_at` | database managed: set when the status changes to `left`, cleared on rejoin. Clients cannot write it |
 
-Callers select, insert, update and delete only their own rows. Inserts may set
+Callers select, insert and update only their own rows. Inserts may set
 `user_id`, `programme_code`, `status` (not `left`) and `mode`; updates may set
-`status` and `mode` only. "Delete now" on leaving deletes the row, which
-cascades to its consents and programme data.
+`status` and `mode` only. Inserts and updates both require
+`deletion_barrier_open()`: once account deletion has started, or the profile
+is gone, no enrolment can be added, left, rejoined, paused, swapped or have its
+mode changed (`42501`). Members cannot delete an enrolment directly: no role
+the app uses holds `DELETE` on `enrolments`, and there is no delete policy.
+
+"Delete now" is `delete_enrolment_now(p_enrolment_id, p_confirmation)`. It
+deletes one of the caller's enrolments and that programme's data: care share
+access rows, care messages tied to the programme or to its shares, care
+shares, caregiver events, caregivers, sync lapses, answers and area,
+programme consents, the quit plan (BreatheFree only), the program data
+snapshot whose `program_id` is the programme's `slug` (Heartwise, Steady and
+ClearAir only) and the enrolment. Every delete is limited to the caller's
+rows. It returns counts only, one per table, named as in the account deletion
+receipt: `quit_plans`, `program_data`, `enrolments`, `programme_consents`,
+`sync_answers`, `sync_lapses`, `sync_areas`, `care_share_access`,
+`care_messages`, `care_shares`, `caregiver_events` and `caregivers`.
+Connections, supporters (which only lose the programme's code), account
+consents, messages tied to no programme and the profile are account data and
+are kept. Only `authenticated` may execute it; it runs as its owner. It
+refuses, in this order: no caller (`42501`); a sync service session
+(`TH010`); a confirmation other than `DELETE` (`23514`); a sign-in that is not
+recent (`TH017`), by the same rule as account deletion; a function owner that
+neither is a superuser nor bypasses row-level security (`TH020`); and an
+enrolment that does not exist or is not the caller's (`TH012`). It does not
+check the deletion barrier, so a member can still delete a programme's data
+after account deletion has started. Any refusal deletes nothing. It locks the
+enrolment row first, so of two calls for the same enrolment the second finds
+nothing (`TH012`). A left enrolment can be deleted the same way.
+`supabase/tests/verify_enrolment_delete_now.sh` checks this.
 
 At most two enrolments per user may have `status = 'focus'`. A deferred
 constraint trigger checks this at commit, under a per-user advisory lock, so a
@@ -740,17 +770,17 @@ function": every later function that writes and refuses a sync session raises
 | `TH007` | `sync_area_mismatch` | `sync_area_match_enrolment` (trigger on `sync_area`) | Sync area must match its enrolment |
 | `TH008` | `lapses_append_only` | `sync_lapse_append_only` (update trigger on `sync_lapse`) | Lapses are append-only |
 | `TH009` | `deletion_via_api_only` | `begin_account_deletion` and `delete_my_app_data` in a sync service session | Account deletion goes through the API |
-| `TH010` | `sync_session_refused` | `save_program_data`, `swap_focus`, `supersede_core_consent` and `redeem_care_invite` in a sync service session; the shared code for every later writing function that refuses a sync session | The sync service writes only sync tables |
+| `TH010` | `sync_session_refused` | `save_program_data`, `swap_focus`, `supersede_core_consent`, `redeem_care_invite` and `delete_enrolment_now` in a sync service session; the shared code for every later writing function that refuses a sync session | The sync service writes only sync tables |
 | `TH011` | `consent_document_unavailable` | `consent_fill_text` (insert trigger on `programme_consents` and `account_consents`) and `supersede_core_consent`: no effective, unretired document for that purpose, version and locale | No consent document is available for this purpose, version and locale |
-| `TH012` | `enrolment_not_found` | `swap_focus` and `supersede_core_consent`: no such enrolment for the caller | Enrolment not found |
+| `TH012` | `enrolment_not_found` | `swap_focus`, `supersede_core_consent` and `delete_enrolment_now`: no such enrolment for the caller | Enrolment not found |
 | `TH013` | `focus_swap_invalid` | `swap_focus`: the programme to demote is not in focus, the one to promote is already in focus, or both are the same | A swap needs one programme in focus and another not in focus |
 | `TH014` | `consent_version_unchanged` | `programme_consents_check_supersede` (update trigger on `programme_consents`, so also `supersede_core_consent`): the replacement core version is not later than the one it replaces, or is the same version and locale | The core consent is already on this version or a later one |
 | `TH015` | `consent_document_immutable` | `consent_documents_guard` (insert, update, delete and truncate trigger on `consent_documents`): purpose, version, locale or body changed; approved_ref changed after it was set; cascades_optional or effective_from changed on a referenced document; a writer that does not bypass row-level security; a truncate, whatever the role. `consent_documents_check_effective_from` (after each insert or update statement on `consent_documents`): locales of a version with different effective_from | Consent documents are immutable, publish a new version; A consent document version takes effect at the same time in every locale; Consent documents are changed only by a role that bypasses row-level security |
 | `TH016` | `avatar_objects_remain` | `delete_my_account`: an object is still stored in the `avatars` bucket under the caller's folder | Avatar objects must be removed before the account is deleted |
-| `TH017` | `recent_authentication_required` | `begin_account_deletion` and `delete_my_account`: the token has no `amr` sign-in timestamp within the last 600 seconds (or one more than 60 seconds in the future) | Recent authentication is required |
+| `TH017` | `recent_authentication_required` | `begin_account_deletion`, `delete_my_account` and `delete_enrolment_now`: the token has no `amr` sign-in timestamp within the last 600 seconds (or one more than 60 seconds in the future) | Recent authentication is required |
 | `TH018` | `auth_identity_not_deleted` | `delete_my_account`: the caller's `auth.users` row still exists after its delete | The account identity was not deleted |
 | `TH019` | `sync_rows_delete_only` | `sync_truncate_guard` (truncate trigger on `sync_account`, `sync_area`, `sync_answer` and `sync_lapse`: a truncate, whatever the role, including a cascade into them when no other table's guard fires first) | Sync rows are removed only with their enrolment or account |
-| `TH020` | `rls_bypass_required` | `delete_my_account`: the function owner is neither a superuser nor bypasses row-level security | Account deletion requires a function owner that bypasses row-level security |
+| `TH020` | `rls_bypass_required` | `delete_my_account` and `delete_enrolment_now`: the function owner is neither a superuser nor bypasses row-level security | Account deletion requires a function owner that bypasses row-level security |
 | `TH021` | `consent_recipient_invalid` | `care_check_consent_recipient` (insert trigger on `programme_consents`): a sharing consent's `recipient_ref` is not a live connection or caregiver of the enrolment's member (a caregiver of the same enrolment) | A sharing consent must name a live connection or caregiver of the same member |
 | `TH022` | `care_consent_required` | `care_lock_live_consent` (insert trigger on `care_shares` and `caregiver_events`): the named consent, connection or caregiver is not live, or does not match | A live sharing consent for this recipient is required |
 | `TH023` | `care_record_immutable` | `care_revoke_only` (update trigger on `care_connections`, `care_shares` and `caregivers`); `care_append_only` (update trigger on `care_share_access`, `care_messages` and `caregiver_events`) | Care records can only be revoked |

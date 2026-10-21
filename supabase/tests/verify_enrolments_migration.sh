@@ -221,7 +221,7 @@ select th913_test.ok(
   th913_test.table_acl(array['public.programmes', 'public.enrolments',
     'public.programme_consents', 'public.account_consents']::regclass[]) =
   'account_consents:authenticated:SELECT,'
-  'enrolments:authenticated:DELETE,enrolments:authenticated:SELECT,'
+  'enrolments:authenticated:SELECT,'
   'programme_consents:authenticated:SELECT,'
   'programmes:authenticated:SELECT',
   'new tables: only the intended table privileges, none for anon');
@@ -530,9 +530,9 @@ select th913_test.ok(
 select th913_test.affects(format(
   'update public.enrolments set status = ''paused'' where id = %L',
   current_setting('th913.a_hw')), 0, 'B: cannot update A''s enrolment');
-select th913_test.affects(format(
+select th913_test.refused(format(
   'delete from public.enrolments where id = %L',
-  current_setting('th913.a_hw')), 0, 'B: cannot delete A''s enrolment');
+  current_setting('th913.a_hw')), '42501', '%permission denied%', 'B: cannot delete A''s enrolment');
 select th913_test.affects(format(
   'update public.programme_consents set revoked_at = now() where enrolment_id = %L',
   current_setting('th913.a_hw')), 0, 'B: cannot revoke A''s consents');
@@ -643,8 +643,12 @@ values (current_setting('th913.b_hw')::uuid, 'research', 'v1', 'en');
 select th913_test.ok(
   public.has_consent(current_setting('th913.b_hw')::uuid, 'research'),
   'B: an optional consent granted again after rejoin is live');
+-- A recent sign-in, which delete_enrolment_now requires.
+select set_config('request.jwt.claims', (current_setting('request.jwt.claims')::jsonb
+  || jsonb_build_object('amr', jsonb_build_array(jsonb_build_object(
+    'method', 'password', 'timestamp', extract(epoch from now()) - 30))))::text, true);
 select th913_test.affects(format(
-  'delete from public.enrolments where id = %L',
+  'select public.delete_enrolment_now(%L, ''DELETE'')',
   current_setting('th913.b_ca')), 1, 'B: leaves ClearAir deleting data now');
 reset role;
 select th913_test.ok(
