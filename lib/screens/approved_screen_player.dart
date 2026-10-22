@@ -95,9 +95,13 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   late final AppLocale _appLocale;
   late final bool _ownsAppLocale;
   bool _showHotspots = false;
+  bool _usingDesktopLayout = false;
+  // Set once the member reaches Home; from then on the main tabs act as tabs.
+  bool _reachedHome = false;
   WelcomeLanguage get _language =>
       _appLocale.isSpanish ? WelcomeLanguage.spanish : WelcomeLanguage.english;
-  bool _helpfulReminders = true;
+  // Optional consents and reminders start off; the member turns them on.
+  bool _helpfulReminders = false;
   bool _shareWithCareTeam = false;
   bool _helpImproveBreatheFree = false;
   bool _sensitiveDetailsEnabled = false;
@@ -108,41 +112,27 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   ReadinessPath _readinessPath = ReadinessPath.prepare;
   QuitPlanPath _quitPlanPath = QuitPlanPath.setQuitDate;
   DateTime? _quitDate;
-  bool _quitDayCheckIn = true;
-  Set<QuitReason> _quitReasons = <QuitReason>{
-    QuitReason.family,
-    QuitReason.breatheEasier,
-    QuitReason.improveHealth,
-  };
+  bool _quitDayCheckIn = false;
+  // A new plan starts empty: nothing is shown as the member's own until they
+  // enter it. A restored plan replaces these in _applyQuitPlan.
+  Set<QuitReason> _quitReasons = <QuitReason>{};
   String? _customQuitReason;
-  QuitReason? _topQuitReason = QuitReason.family;
-  List<SupportPersonPlan> _supportPeople = const [
-    SupportPersonPlan(
-      id: 'jordan',
-      name: 'Jordan',
-      relationship: 'Friend',
-      channel: SupportChannel.text,
-      checkIn: 'Check in the evening before my quit date',
-    ),
-  ];
-  Set<PreparationTask> _completedPreparationTasks = {
-    PreparationTask.removeSupplies,
-    PreparationTask.smokeFreeSpaces,
-  };
-  bool _treatmentSupport = true;
-  bool _careTeamReminder = true;
+  QuitReason? _topQuitReason;
+  List<SupportPersonPlan> _supportPeople = const [];
+  Set<PreparationTask> _completedPreparationTasks = <PreparationTask>{};
+  bool _treatmentSupport = false;
+  bool _careTeamReminder = false;
   bool _editingPlanFromReview = false;
-  bool _hasUnreadPreparationNotifications = true;
+  bool _hasUnreadPreparationNotifications = false;
+  // Neutral check-in starting points: the middle of each scale, smoking
+  // left as "Skip" and no symptoms, so nothing is answered for the member.
   DailyMood _dailyMood = DailyMood.okay;
-  int _dailyStressLevel = 4;
-  DailySmokingStatus _dailySmokingStatus = DailySmokingStatus.oneOrMore;
-  int _dailyCigaretteCount = 6;
-  int _dailyStrongestCraving = 6;
-  int _dailyConfidence = 7;
-  Set<DailySymptom> _dailySymptoms = {
-    DailySymptom.restless,
-    DailySymptom.irritable,
-  };
+  int _dailyStressLevel = 3;
+  DailySmokingStatus _dailySmokingStatus = DailySmokingStatus.skipped;
+  int _dailyCigaretteCount = 1;
+  int _dailyStrongestCraving = 5;
+  int _dailyConfidence = 5;
+  Set<DailySymptom> _dailySymptoms = <DailySymptom>{};
   String? _dailyOtherSymptom;
   NextStepStrategy? _nextStepStrategyOverride;
   final Set<NextStepStrategy> _copingPlanStrategies = <NextStepStrategy>{};
@@ -168,8 +158,11 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   bool _activeRescueVoiceEnabled = true;
   bool _activeRescueHapticsEnabled = true;
   bool _slipRecoverySaved = false;
+  // How a reminder looks on the lock screen, not a consent: the generic,
+  // private preview stays on.
   bool _medicationReminderPreviews = true;
-  MedicationTodayStatus _medicationTodayStatus = MedicationTodayStatus.taken;
+  // Nothing is recorded for today until the member records it.
+  MedicationTodayStatus? _medicationTodayStatus;
 
   ProfileIdentity get _profileIdentity => ProfileIdentity(
         signedIn: _accountController.isSignedIn,
@@ -192,6 +185,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     _appLocale.addListener(_onLocaleChanged);
     final restoredPlan = _quitPlanController.plan;
     if (restoredPlan != null) _applyQuitPlan(restoredPlan);
+    _reachedHome = _homeScreens.contains(widget.currentIndex);
     _configureSystemUi();
   }
 
@@ -212,6 +206,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   void didUpdateWidget(covariant ApprovedScreenPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.currentIndex != widget.currentIndex) {
+      if (_homeScreens.contains(widget.currentIndex)) _reachedHome = true;
       _configureSystemUi();
     }
   }
@@ -762,8 +757,12 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   }
 
   String _rescueTopReasonLabel(bool isSpanish) {
-    final reason = _topQuitReason ??
-        (_quitReasons.isNotEmpty ? _quitReasons.first : QuitReason.family);
+    final reason =
+        _topQuitReason ?? (_quitReasons.isNotEmpty ? _quitReasons.first : null);
+    // With no reason chosen, no reason is shown as the member's own.
+    if (reason == null) {
+      return isSpanish ? 'Mi razón para dejarlo' : 'My reason to quit';
+    }
     return switch (reason) {
       QuitReason.family =>
         isSpanish ? 'Proteger a mi familia' : 'Protect my family',
@@ -783,7 +782,10 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   }
 
   String _reasonLabel(bool isSpanish) {
-    final reason = _topQuitReason ?? QuitReason.family;
+    final reason = _topQuitReason;
+    if (reason == null) {
+      return isSpanish ? '“Mi razón para dejarlo.”' : '“My reason to quit.”';
+    }
     return switch (reason) {
       QuitReason.family => isSpanish
           ? '“Quiero estar presente para mi familia.”'
@@ -818,6 +820,76 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     return isSpanish ? 'tu persona de apoyo' : 'your support person';
   }
 
+  /// What each screen's own back or close control does. Android system Back
+  /// uses the same action; a screen without one goes to the previous screen.
+  VoidCallback _backActionFor(int index) {
+    // Once a plan has started, the main tabs go back to Home rather than
+    // through onboarding.
+    if (_reachedHome && _mainTabScreens.contains(index)) return _openHome;
+    switch (index) {
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+        return _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious;
+      case 15:
+        return () => widget.onSelectScreen(13);
+      case 17:
+        return () {
+          final returnScreen = _rescueReturnScreen;
+          if (returnScreen != null) {
+            setState(() => _rescueReturnScreen = null);
+            widget.onSelectScreen(returnScreen);
+          } else {
+            widget.onPrevious();
+          }
+        };
+      case 18:
+        return () => widget.onSelectScreen(17);
+      case 19:
+        return () => widget.onSelectScreen(18);
+      case 22:
+        return () => widget.onSelectScreen(21);
+      default:
+        return widget.onPrevious;
+    }
+  }
+
+  /// Home before the quit date (with its countdown) and Home from the quit
+  /// date on. Back leaves the app from either.
+  static const _homeScreens = <int>{11, 21};
+
+  /// Plan, Learn, Progress and Support in the bottom navigation.
+  static const _mainTabScreens = <int>{10, 24, 25, 26};
+
+  bool get _quitDateIsAhead => (_quitDate ?? _defaultQuitDate())
+      .isAfter(DateUtils.dateOnly(DateTime.now()));
+
+  /// The quit-day Home counts time since the quit date, so before that date
+  /// Home is the preparation Home with its countdown.
+  void _openHome() => widget.onSelectScreen(_quitDateIsAhead ? 11 : 21);
+
+  String? get _firstSupporterName {
+    for (final person in _supportPeople) {
+      if (person.enabled && person.name.trim().isNotEmpty) {
+        return person.name.trim();
+      }
+    }
+    return null;
+  }
+
+  /// Screens that confirm before closing handle system Back themselves, so
+  /// Back asks the same question as their close button.
+  static const _screensWithOwnBackHandling = <int>{14, 18};
+
+  void _handleSystemBack() {
+    if (!_usingDesktopLayout &&
+        _screensWithOwnBackHandling.contains(widget.currentIndex)) {
+      return;
+    }
+    _backActionFor(widget.currentIndex)();
+  }
+
   @override
   Widget build(BuildContext context) {
     final spec = approvedScreens[widget.currentIndex];
@@ -826,11 +898,12 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       disableAnimations: media.disableAnimations || _reduceMotionEnabled,
     );
 
-    return MediaQuery(
+    final player = MediaQuery(
       data: effectiveMedia,
       child: LayoutBuilder(
         builder: (context, constraints) {
-          if (constraints.maxWidth >= 900) {
+          _usingDesktopLayout = constraints.maxWidth >= 900;
+          if (_usingDesktopLayout) {
             return _DesktopPlayer(
               spec: spec,
               currentIndex: widget.currentIndex,
@@ -941,8 +1014,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
                   _quitDate = null;
                 });
               },
-              onBack:
-                  _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
+              onBack: _backActionFor(6),
               onContinue:
                   _editingPlanFromReview ? _finishPlanEdit : widget.onNext,
             );
@@ -960,8 +1032,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               onQuitDayCheckInChanged: (value) {
                 setState(() => _quitDayCheckIn = value);
               },
-              onBack:
-                  _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
+              onBack: _backActionFor(7),
               onContinue: (value) {
                 setState(() => _quitDate = value);
                 if (_editingPlanFromReview) {
@@ -988,8 +1059,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               onCustomReasonChanged: (value) {
                 setState(() => _customQuitReason = value);
               },
-              onBack:
-                  _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
+              onBack: _backActionFor(8),
               onContinue:
                   _editingPlanFromReview ? _finishPlanEdit : widget.onNext,
             );
@@ -1014,8 +1084,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               onCareTeamReminderChanged: (value) {
                 setState(() => _careTeamReminder = value);
               },
-              onBack:
-                  _editingPlanFromReview ? _cancelPlanEdit : widget.onPrevious,
+              onBack: _backActionFor(9),
               onContinue:
                   _editingPlanFromReview ? _finishPlanEdit : widget.onNext,
             );
@@ -1033,7 +1102,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               completedTasks: _completedPreparationTasks,
               treatmentSupport: _treatmentSupport,
               careTeamReminder: _careTeamReminder,
-              onBack: widget.onPrevious,
+              onBack: _backActionFor(10),
               onEditQuitDate: () => _openPlanEditor(7),
               onEditApproach: () => _openPlanEditor(6),
               onEditReasons: () => _openPlanEditor(8),
@@ -1252,7 +1321,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
                   _stressResetResultSaved = true;
                   _dailyStrongestCraving = _stressResetRecheckCraving;
                 });
-                widget.onSelectScreen(11);
+                _openHome();
               },
               onRepeat: () {
                 setState(() {
@@ -1265,7 +1334,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
                 widget.onSelectScreen(14);
               },
               onOpenRescue: () => _openRescue(_stressResetRecheckCraving),
-              onClose: () => widget.onSelectScreen(13),
+              onClose: _backActionFor(15),
             );
           }
 
@@ -1300,15 +1369,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               onToolChanged: (value) {
                 setState(() => _rescueTool = value);
               },
-              onBack: () {
-                final returnScreen = _rescueReturnScreen;
-                if (returnScreen != null) {
-                  setState(() => _rescueReturnScreen = null);
-                  widget.onSelectScreen(returnScreen);
-                } else {
-                  widget.onPrevious();
-                }
-              },
+              onBack: _backActionFor(17),
               onStart: () {
                 setState(() {
                   _rescueBeforeIntensity = _rescueIntensity;
@@ -1344,7 +1405,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               onHapticsChanged: (value) {
                 setState(() => _activeRescueHapticsEnabled = value);
               },
-              onClose: () => widget.onSelectScreen(17),
+              onClose: _backActionFor(18),
               onComplete: () {
                 setState(() {
                   _activeRescuePaused = true;
@@ -1370,7 +1431,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               onHelpfulChoiceChanged: (value) {
                 setState(() => _rescueHelpfulChoice = value);
               },
-              onBack: () => widget.onSelectScreen(18),
+              onBack: _backActionFor(19),
               onSaveAndSeeResult: () => widget.onSelectScreen(20),
               onRepeatRescue: () {
                 setState(() {
@@ -1415,7 +1476,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               reasonText: _reasonLabel(isSpanish),
               practiceLabel:
                   _rescueTool == RescueTool.move ? '3 minutes' : '2 minutes',
-              onContinue: () => widget.onSelectScreen(21),
+              onContinue: _openHome,
               onRepeatRescue: () {
                 setState(() {
                   _activeRescueElapsedSeconds = 0;
@@ -1426,7 +1487,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
                 widget.onSelectScreen(18);
               },
               onHumanSupport: () => widget.onSelectScreen(26),
-              onBackToToday: () => widget.onSelectScreen(21),
+              onBackToToday: _openHome,
             );
           }
 
@@ -1462,7 +1523,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             return SlipRecoveryScreen(
               isSpanish: isSpanish,
               initiallySaved: _slipRecoverySaved,
-              onClose: () => widget.onSelectScreen(21),
+              supportName: _firstSupporterName,
+              onClose: _backActionFor(22),
               onSave: () {
                 setState(() => _slipRecoverySaved = true);
                 _openRescue();
@@ -1492,7 +1554,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               onBack: widget.onPrevious,
               onOpenLearn: () => widget.onSelectScreen(24),
               onOpenSupport: () => widget.onSelectScreen(26),
-              onOpenHome: () => widget.onSelectScreen(21),
+              onOpenHome: _openHome,
               onOpenProgress: () => widget.onSelectScreen(25),
             );
           }
@@ -1503,7 +1565,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             return LearnLibraryScreen(
               isSpanish: isSpanish,
               profileIdentity: _profileIdentity,
-              onOpenHome: () => widget.onSelectScreen(21),
+              onOpenHome: _openHome,
               onOpenPlan: () => widget.onSelectScreen(10),
               onOpenProgress: () => widget.onSelectScreen(25),
               onOpenSettings: () => widget.onSelectScreen(27),
@@ -1517,9 +1579,9 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             return ProgressDashboardScreen(
               isSpanish: isSpanish,
               profileIdentity: _profileIdentity,
-              onBack: widget.onPrevious,
+              onBack: _backActionFor(25),
               onOpenSettings: () => widget.onSelectScreen(27),
-              onOpenHome: () => widget.onSelectScreen(21),
+              onOpenHome: _openHome,
               onOpenPlan: () => widget.onSelectScreen(10),
               onOpenLearn: () => widget.onSelectScreen(24),
               onOpenSupport: () => widget.onSelectScreen(26),
@@ -1532,10 +1594,11 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             return SupportHubScreen(
               isSpanish: isSpanish,
               profileIdentity: _profileIdentity,
-              onBack: widget.onPrevious,
+              supportPeople: _supportPeople,
+              onBack: _backActionFor(26),
               onOpenSettings: () => widget.onSelectScreen(27),
               onCallQuitline: () => unawaited(_callQuitline()),
-              onOpenHome: () => widget.onSelectScreen(21),
+              onOpenHome: _openHome,
               onOpenPlan: () => widget.onSelectScreen(10),
               onOpenProgress: () => widget.onSelectScreen(25),
               onOpenLearn: () => widget.onSelectScreen(24),
@@ -1596,6 +1659,18 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
           );
         },
       ),
+    );
+
+    // The player is one route. System Back moves back through its screens and
+    // only leaves the app from the first screen; dialogs and sheets are routes
+    // above this one, so they close first.
+    return PopScope<Object?>(
+      canPop: widget.currentIndex == 0 ||
+          _homeScreens.contains(widget.currentIndex),
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _handleSystemBack();
+      },
+      child: player,
     );
   }
 }

@@ -189,8 +189,8 @@ class TriggerMapScreen extends StatelessWidget {
                               ],
                               Text(
                                 isSpanish
-                                    ? 'PREGUNTA 6 · ELIGE TODAS LAS QUE CORRESPONDAN'
-                                    : 'QUESTION 6 · CHOOSE ALL THAT APPLY',
+                                    ? 'PREGUNTA 2 · ELIGE TODAS LAS QUE CORRESPONDAN'
+                                    : 'QUESTION 2 · CHOOSE ALL THAT APPLY',
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 11,
@@ -477,7 +477,7 @@ class _TriggerHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
       ),
       child: const Text(
-        '6 OF 8',
+        '2 OF 2',
         style: TextStyle(
           color: AppColors.deepTeal,
           fontSize: 10,
@@ -547,7 +547,7 @@ class _TriggerProgress extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             const Text(
-              '75%',
+              '100%',
               style: TextStyle(
                 color: AppColors.mutedTeal,
                 fontSize: 10,
@@ -561,7 +561,7 @@ class _TriggerProgress extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           child: const LinearProgressIndicator(
             key: ValueKey('trigger-progress'),
-            value: .75,
+            value: 1,
             minHeight: 6,
             backgroundColor: Color(0xFFDCE7E1),
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.coral),

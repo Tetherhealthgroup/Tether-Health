@@ -255,7 +255,7 @@ class _AssessmentHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
       ),
       child: const Text(
-        '1 OF 8',
+        '1 OF 2',
         style: TextStyle(
           color: AppColors.deepTeal,
           fontSize: 10,
@@ -319,7 +319,7 @@ class _AssessmentProgress extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             const Text(
-              '12%',
+              '50%',
               style: TextStyle(
                 color: AppColors.mutedTeal,
                 fontSize: 10,
@@ -333,7 +333,7 @@ class _AssessmentProgress extends StatelessWidget {
           borderRadius: BorderRadius.circular(4),
           child: const LinearProgressIndicator(
             key: ValueKey('baseline-progress'),
-            value: .125,
+            value: .5,
             minHeight: 6,
             backgroundColor: Color(0xFFDCE7E1),
             valueColor: AlwaysStoppedAnimation<Color>(AppColors.coral),

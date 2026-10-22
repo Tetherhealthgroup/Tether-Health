@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/profile_avatar.dart';
 import 'resource_screen_widgets.dart';
+import 'support_preparation_screen.dart';
 
 class SupportHubScreen extends StatelessWidget {
   const SupportHubScreen({
@@ -13,6 +14,7 @@ class SupportHubScreen extends StatelessWidget {
     this.onCallQuitline,
     this.onRequestCallback,
     this.onInformation,
+    this.supportPeople = const [],
     required this.onOpenHome,
     required this.onOpenPlan,
     required this.onOpenProgress,
@@ -27,6 +29,9 @@ class SupportHubScreen extends StatelessWidget {
   final VoidCallback? onCallQuitline;
   final VoidCallback? onRequestCallback;
   final ValueChanged<String>? onInformation;
+
+  /// The member's own support people from their plan. Only these are shown.
+  final List<SupportPersonPlan> supportPeople;
   final VoidCallback onOpenHome;
   final VoidCallback onOpenPlan;
   final VoidCallback onOpenProgress;
@@ -97,9 +102,80 @@ class SupportHubScreen extends StatelessWidget {
     );
   }
 
+  List<SupportPersonPlan> get _people => [
+        for (final person in supportPeople)
+          if (person.enabled && person.name.trim().isNotEmpty) person,
+      ];
+
+  String _channelLabel(SupportChannel channel) => switch (channel) {
+        SupportChannel.text => t('Text message', 'Mensaje de texto'),
+        SupportChannel.call => t('Phone call', 'Llamada'),
+      };
+
+  Widget _personRow(BuildContext context, SupportPersonPlan person) {
+    final name = person.name.trim();
+    final relationship = person.relationship.trim();
+    final checkIn = person.checkIn.trim();
+    return Row(
+      key: ValueKey('support-person-${person.id}'),
+      children: [
+        CircleAvatar(
+          radius: 26,
+          backgroundColor: AppColors.mint,
+          child: Text(
+            name.characters.first.toUpperCase(),
+            style: const TextStyle(
+              color: AppColors.deepTeal,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                relationship.isEmpty ? name : '$name · $relationship',
+                style: const TextStyle(
+                  color: AppColors.deepTeal,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Text(
+                checkIn.isEmpty ? _channelLabel(person.channel) : checkIn,
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ),
+        TextButton(
+          key: ValueKey('support-person-message-${person.id}'),
+          onPressed: () => _handleInformation(
+            context,
+            t(
+              'Preview message to $name',
+              'Vista previa del mensaje para $name',
+            ),
+            body: t(
+              'You can review a support message here before anything is sent.',
+              'Puedes revisar un mensaje de apoyo aquí antes de que se envíe.',
+            ),
+          ),
+          child: Text(t('Message', 'Mensaje')),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final usesLargeText = MediaQuery.textScalerOf(context).scale(1) > 1.3;
+    final people = _people;
     return Scaffold(
       key: const ValueKey('functional-support-hub-screen'),
       backgroundColor: AppColors.cream,
@@ -281,105 +357,68 @@ class SupportHubScreen extends StatelessWidget {
                       key: const ValueKey('support-person-card'),
                       child: Column(
                         children: [
-                          Row(
-                            children: [
-                              const CircleAvatar(
-                                radius: 26,
-                                backgroundColor: AppColors.mint,
-                                child: Text(
-                                  'J',
-                                  style: TextStyle(
-                                    color: AppColors.deepTeal,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
+                          if (people.isEmpty)
+                            Text(
+                              key: const ValueKey('support-people-empty'),
+                              t(
+                                'No one has been added yet.',
+                                'Todavía no agregaste a nadie.',
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      t('Jordan · Friend', 'Jordan · Amistad'),
-                                      style: const TextStyle(
-                                        color: AppColors.deepTeal,
-                                        fontSize: 17,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    Text(
+                              style: const TextStyle(
+                                color: AppColors.tealSecondary,
+                                height: 1.35,
+                              ),
+                            )
+                          else ...[
+                            for (final (index, person) in people.indexed) ...[
+                              if (index > 0) const Divider(height: 22),
+                              _personRow(context, person),
+                            ],
+                            const Divider(height: 22),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    key: const ValueKey('support-book-call'),
+                                    onPressed: () => _handleInformation(
+                                      context,
                                       t(
-                                        'Evening check-in by text',
-                                        'Registro por mensaje en la tarde',
+                                        'Book a support call',
+                                        'Programar una llamada de apoyo',
                                       ),
-                                      style: const TextStyle(
-                                        color: AppColors.mutedTeal,
-                                        fontSize: 12,
+                                      body: t(
+                                        'Support-call scheduling can be connected here when scheduling services are available.',
+                                        'La programación de llamadas de apoyo se puede conectar aquí cuando el servicio esté disponible.',
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                              TextButton(
-                                key: const ValueKey('support-person-message'),
-                                onPressed: () => _handleInformation(
-                                  context,
-                                  t(
-                                    'Preview message to Jordan',
-                                    'Vista previa del mensaje para Jordan',
-                                  ),
-                                  body: t(
-                                    'You can review a support message here before anything is sent.',
-                                    'Puedes revisar un mensaje de apoyo aquí antes de que se envíe.',
+                                    icon: const Icon(
+                                      Icons.calendar_month_outlined,
+                                    ),
+                                    label: Text(t('Book call', 'Programar')),
                                   ),
                                 ),
-                                child: Text(t('Message', 'Mensaje')),
-                              ),
-                            ],
-                          ),
-                          const Divider(height: 22),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  key: const ValueKey('support-book-call'),
-                                  onPressed: () => _handleInformation(
-                                    context,
-                                    t(
-                                      'Book a support call',
-                                      'Programar una llamada de apoyo',
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: TextButton(
+                                    key:
+                                        const ValueKey('support-manage-people'),
+                                    onPressed: () => _handleInformation(
+                                      context,
+                                      t(
+                                        'Manage support people',
+                                        'Administrar personas de apoyo',
+                                      ),
+                                      body: t(
+                                        'Support-person management can be connected here while keeping this same screen layout.',
+                                        'La administración de personas de apoyo se puede conectar aquí manteniendo el mismo diseño.',
+                                      ),
                                     ),
-                                    body: t(
-                                      'Support-call scheduling can be connected here when scheduling services are available.',
-                                      'La programación de llamadas de apoyo se puede conectar aquí cuando el servicio esté disponible.',
-                                    ),
+                                    child: Text(t('Manage', 'Administrar')),
                                   ),
-                                  icon: const Icon(
-                                    Icons.calendar_month_outlined,
-                                  ),
-                                  label: Text(t('Book call', 'Programar')),
                                 ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: TextButton(
-                                  key: const ValueKey('support-manage-people'),
-                                  onPressed: () => _handleInformation(
-                                    context,
-                                    t(
-                                      'Manage support people',
-                                      'Administrar personas de apoyo',
-                                    ),
-                                    body: t(
-                                      'Support-person management can be connected here while keeping this same screen layout.',
-                                      'La administración de personas de apoyo se puede conectar aquí manteniendo el mismo diseño.',
-                                    ),
-                                  ),
-                                  child: Text(t('Manage', 'Administrar')),
-                                ),
-                              ),
-                            ],
-                          ),
+                              ],
+                            ),
+                          ],
                         ],
                       ),
                     ),

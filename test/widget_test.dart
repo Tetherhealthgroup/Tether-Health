@@ -1,5 +1,7 @@
 import 'package:breathefree_patient/main.dart';
 import 'package:breathefree_patient/models/screen_spec.dart';
+import 'package:breathefree_patient/quit_plan/quit_plan.dart';
+import 'package:breathefree_patient/quit_plan/quit_plan_controller.dart';
 import 'package:breathefree_patient/screens/support_preparation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -303,10 +305,10 @@ void main() {
     final improve = find.byKey(const ValueKey('consent-help-improve'));
 
     await tester.ensureVisible(reminders);
-    expect(tester.widget<Switch>(reminders).value, isTrue);
+    expect(tester.widget<Switch>(reminders).value, isFalse);
     await tester.tap(reminders);
     await tester.pumpAndSettle();
-    expect(tester.widget<Switch>(reminders).value, isFalse);
+    expect(tester.widget<Switch>(reminders).value, isTrue);
 
     await tester.ensureVisible(careTeam);
     await tester.tap(careTeam);
@@ -328,7 +330,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('why-continue')));
     await tester.pumpAndSettle();
 
-    expect(tester.widget<Switch>(reminders).value, isFalse);
+    expect(tester.widget<Switch>(reminders).value, isTrue);
     await tester.ensureVisible(careTeam);
     expect(tester.widget<Switch>(careTeam).value, isTrue);
     await tester.ensureVisible(improve);
@@ -823,13 +825,14 @@ void main() {
 
     final checkIn = find.byKey(const ValueKey('quit-date-check-in'));
     await tester.ensureVisible(checkIn);
+    expect(tester.widget<Switch>(checkIn).value, isFalse);
     await tester.tap(checkIn);
     await tester.pumpAndSettle();
     expect(
       tester
           .widget<Switch>(find.byKey(const ValueKey('quit-date-check-in')))
           .value,
-      isFalse,
+      isTrue,
     );
 
     await tester.tap(find.byKey(const ValueKey('quit-date-back')));
@@ -853,7 +856,7 @@ void main() {
       tester
           .widget<Switch>(find.byKey(const ValueKey('quit-date-check-in')))
           .value,
-      isFalse,
+      isTrue,
       reason: 'The private check-in choice should remain saved.',
     );
     expect(tester.takeException(), isNull);
@@ -989,10 +992,11 @@ void main() {
       find.byKey(const ValueKey('functional-my-reasons-screen')),
       findsOneWidget,
     );
-    expect(find.text('3 SELECTED'), findsOneWidget);
+    // A new plan starts with no reasons chosen.
+    expect(find.text('0 SELECTED'), findsOneWidget);
     expect(
       find.byKey(const ValueKey('reason-selected-family')),
-      findsOneWidget,
+      findsNothing,
     );
 
     await tester.tap(
@@ -1010,7 +1014,7 @@ void main() {
       find.textContaining('You chose this to save money.'),
       findsOneWidget,
     );
-    expect(find.text('4 SELECTED'), findsOneWidget);
+    expect(find.text('1 SELECTED'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('reasons-back')));
     await tester.pumpAndSettle();
@@ -1071,7 +1075,7 @@ void main() {
       find.textContaining('You chose this because'),
       findsOneWidget,
     );
-    expect(find.text('4 SELECTED'), findsOneWidget);
+    expect(find.text('1 SELECTED'), findsOneWidget);
 
     await tester.tap(
       find.byKey(const ValueKey('reason-custom-remove')),
@@ -1126,6 +1130,8 @@ void main() {
     expect(find.text('Guardar mis razones'), findsOneWidget);
     expect(find.text('3 DE 5'), findsOneWidget);
 
+    await tester.tap(find.byKey(const ValueKey('reason-choice-family')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('reasons-save')));
     await tester.pumpAndSettle();
     expect(
@@ -1295,7 +1301,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 9));
+    await tester.pumpWidget(
+        BreatheFreeApp(quitPlanController: _savedPlan(), initialScreen: 9));
     await tester.pumpAndSettle();
 
     expect(
@@ -1339,7 +1346,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 9));
+    await tester.pumpWidget(
+        BreatheFreeApp(quitPlanController: _savedPlan(), initialScreen: 9));
     await tester.pumpAndSettle();
 
     await tester.tap(
@@ -1422,7 +1430,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 9));
+    await tester.pumpWidget(
+        BreatheFreeApp(quitPlanController: _savedPlan(), initialScreen: 9));
     await tester.pumpAndSettle();
 
     final learn = find.byKey(const ValueKey('support-treatment-learn'));
@@ -1515,7 +1524,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 10));
+    await tester.pumpWidget(
+        BreatheFreeApp(quitPlanController: _savedPlan(), initialScreen: 10));
     await tester.pumpAndSettle();
 
     expect(
@@ -1567,7 +1577,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 10));
+    await tester.pumpWidget(
+        BreatheFreeApp(quitPlanController: _savedPlan(), initialScreen: 10));
     await tester.pumpAndSettle();
 
     final reasons = find.byKey(const ValueKey('review-edit-reasons'));
@@ -1705,7 +1716,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 11));
+    await tester.pumpWidget(
+        BreatheFreeApp(quitPlanController: _savedPlan(), initialScreen: 11));
     await tester.pumpAndSettle();
 
     expect(
@@ -1746,19 +1758,21 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Screen 12 notifications open and clear the unread indicator',
+  testWidgets('Screen 12 notifications open without an unread indicator',
       (tester) async {
     tester.view.physicalSize = const Size(1179, 2556);
     tester.view.devicePixelRatio = 3;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 11));
+    await tester.pumpWidget(
+        BreatheFreeApp(quitPlanController: _savedPlan(), initialScreen: 11));
     await tester.pumpAndSettle();
 
+    // Nothing has been sent to the member, so no unread dot is shown.
     expect(
       find.byKey(const ValueKey('preparation-notification-dot')),
-      findsOneWidget,
+      findsNothing,
     );
     await tester.tap(
       find.byKey(const ValueKey('preparation-notifications')),
@@ -1866,6 +1880,7 @@ void main() {
       await tester.pumpWidget(
         BreatheFreeApp(
           key: ValueKey('screen-12-${device.name}'),
+          quitPlanController: _savedPlan(),
           initialScreen: 11,
         ),
       );
@@ -1951,18 +1966,27 @@ void main() {
       find.byKey(const ValueKey('functional-daily-check-in-screen')),
       findsOneWidget,
     );
-    expect(find.text('6'), findsOneWidget);
-    expect(find.text('6 · Moderate'), findsOneWidget);
-    expect(find.text('7 / 10'), findsOneWidget);
+    // Neutral starting points: no cigarette count until the member reports
+    // smoking, and the middle of each scale.
+    expect(
+      find.byKey(const ValueKey('checkin-cigarette-plus')),
+      findsNothing,
+    );
+    expect(find.text('5 · Moderate'), findsOneWidget);
+    expect(find.text('5 / 10'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('checkin-mood-good')));
+    await tester.pumpAndSettle();
+    final oneOrMore = find.byKey(const ValueKey('checkin-smoking-oneOrMore'));
+    await tester.ensureVisible(oneOrMore);
+    await tester.tap(oneOrMore);
     await tester.pumpAndSettle();
     final cigarettePlus = find.byKey(const ValueKey('checkin-cigarette-plus'));
     await tester.ensureVisible(cigarettePlus);
     await tester.pumpAndSettle();
     await tester.tap(cigarettePlus);
     await tester.pumpAndSettle();
-    expect(find.text('7'), findsWidgets);
+    expect(find.text('2'), findsWidgets);
 
     final symptoms =
         find.byKey(const ValueKey('checkin-symptom-troubleSleeping'));
@@ -1994,7 +2018,7 @@ void main() {
       find.byKey(const ValueKey('functional-daily-check-in-screen')),
       findsOneWidget,
     );
-    expect(find.text('7'), findsWidgets);
+    expect(find.text('2'), findsWidgets);
     expect(find.text('Headache'), findsOneWidget);
     expect(
       tester.widget<FilterChip>(symptoms).selected,
@@ -2120,9 +2144,9 @@ void main() {
     expect(find.text('CHECK-IN SAVED'), findsOneWidget);
     expect(find.text('Try a 3-minute stress reset.'), findsOneWidget);
     expect(find.text('Stress reset'), findsOneWidget);
-    expect(find.text('Stress · High'), findsOneWidget);
-    expect(find.text('Craving · 6/10'), findsOneWidget);
-    expect(find.text('Confidence · 7'), findsOneWidget);
+    expect(find.text('Stress · Moderate'), findsOneWidget);
+    expect(find.text('Craving · 5/10'), findsOneWidget);
+    expect(find.text('Confidence · 5'), findsOneWidget);
 
     final why = find.byKey(const ValueKey('next-step-why'));
     await tester.ensureVisible(why);
@@ -2785,6 +2809,8 @@ void main() {
       findsOneWidget,
       reason: 'Screen 9 should require its explicit Save button.',
     );
+    await tester.tap(find.byKey(const ValueKey('reason-choice-family')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('reasons-save')));
     await tester.pumpAndSettle();
     await tester.fling(
@@ -3400,7 +3426,8 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(const BreatheFreeApp(initialScreen: 16));
+    await tester.pumpWidget(
+        BreatheFreeApp(quitPlanController: _savedPlan(), initialScreen: 16));
     await tester.pumpAndSettle();
 
     expect(
@@ -4066,4 +4093,37 @@ void main() {
     expect(find.text('Show tap areas'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+}
+
+/// A member's saved plan with synthetic answers, for tests that open the app
+/// part-way through. A new plan starts empty, so these tests restore one.
+QuitPlanController _savedPlan() {
+  final today = DateUtils.dateOnly(DateTime.now());
+  return QuitPlanController.disabled()
+    ..plan = QuitPlan(
+      userId: '',
+      dailyCigaretteUse: null,
+      smokingTriggers: const [],
+      customSmokingTrigger: null,
+      readinessPath: 'prepare',
+      quitPlanPath: 'setQuitDate',
+      quitDate: today.add(const Duration(days: 7)),
+      quitDayCheckIn: true,
+      quitReasons: const ['family', 'breatheEasier', 'improveHealth'],
+      customQuitReason: null,
+      topQuitReason: 'family',
+      supportPeople: const [
+        QuitPlanSupportPerson(
+          id: 'jordan',
+          name: 'Jordan',
+          relationship: 'Friend',
+          channel: 'text',
+          checkIn: 'Check in the evening before my quit date',
+          enabled: true,
+        ),
+      ],
+      preparationTasks: const ['removeSupplies', 'smokeFreeSpaces'],
+      treatmentSupport: true,
+      careTeamReminder: true,
+    );
 }
