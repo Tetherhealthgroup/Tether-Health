@@ -1,3 +1,1176 @@
 {
-  "@@locale": "en"
+  "@@locale": "en",
+  "baselineAssessmentAssessmentBottomActionText": "Next",
+  "@baselineAssessmentAssessmentBottomActionText": {
+    "description": "lib/screens/baseline_assessment_screen.dart: AssessmentBottomAction text (line 656 at 97d81ce)"
+  },
+  "baselineAssessmentAssessmentBottomActionText2": "Your answer is saved automatically.",
+  "@baselineAssessmentAssessmentBottomActionText2": {
+    "description": "lib/screens/baseline_assessment_screen.dart: AssessmentBottomAction text (line 676 at 97d81ce)"
+  },
+  "baselineAssessmentAssessmentChoiceText": "Selected",
+  "@baselineAssessmentAssessmentChoiceText": {
+    "description": "lib/screens/baseline_assessment_screen.dart: AssessmentChoice text (line 425 at 97d81ce)"
+  },
+  "baselineAssessmentAssessmentHeaderBackLabel": "About your smoking",
+  "@baselineAssessmentAssessmentHeaderBackLabel": {
+    "description": "lib/screens/baseline_assessment_screen.dart: AssessmentHeader label (line 228 at 97d81ce)"
+  },
+  "baselineAssessmentAssessmentHeaderBackTooltip": "Back",
+  "@baselineAssessmentAssessmentHeaderBackTooltip": {
+    "description": "lib/screens/baseline_assessment_screen.dart: AssessmentHeader tooltip (line 220 at 97d81ce)"
+  },
+  "baselineAssessmentAssessmentProgressText": "ASSESSMENT",
+  "@baselineAssessmentAssessmentProgressText": {
+    "description": "lib/screens/baseline_assessment_screen.dart: AssessmentProgress text (line 311 at 97d81ce)"
+  },
+  "baselineAssessmentChoiceLabel": "I don’t smoke every day",
+  "@baselineAssessmentChoiceLabel": {
+    "description": "lib/screens/baseline_assessment_screen.dart: choiceLabel (line 33 at 97d81ce)"
+  },
+  "baselineAssessmentChoiceLabel2": "10 or fewer cigarettes",
+  "@baselineAssessmentChoiceLabel2": {
+    "description": "lib/screens/baseline_assessment_screen.dart: choiceLabel (line 35 at 97d81ce)"
+  },
+  "baselineAssessmentChoiceLabel3": "11–20 cigarettes",
+  "@baselineAssessmentChoiceLabel3": {
+    "description": "lib/screens/baseline_assessment_screen.dart: choiceLabel (line 37 at 97d81ce)"
+  },
+  "baselineAssessmentChoiceLabel4": "21–30 cigarettes",
+  "@baselineAssessmentChoiceLabel4": {
+    "description": "lib/screens/baseline_assessment_screen.dart: choiceLabel (line 39 at 97d81ce)"
+  },
+  "baselineAssessmentChoiceLabel5": "31 or more cigarettes",
+  "@baselineAssessmentChoiceLabel5": {
+    "description": "lib/screens/baseline_assessment_screen.dart: choiceLabel (line 41 at 97d81ce)"
+  },
+  "baselineAssessmentText": "QUESTION 1",
+  "@baselineAssessmentText": {
+    "description": "lib/screens/baseline_assessment_screen.dart: text (line 130 at 97d81ce)"
+  },
+  "baselineAssessmentText2": "On a typical day, how many cigarettes do you smoke?",
+  "@baselineAssessmentText2": {
+    "description": "lib/screens/baseline_assessment_screen.dart: text (line 141 at 97d81ce)"
+  },
+  "baselineAssessmentText3": "Choose the answer closest to your usual day.",
+  "@baselineAssessmentText3": {
+    "description": "lib/screens/baseline_assessment_screen.dart: text (line 158 at 97d81ce)"
+  },
+  "baselineAssessmentWhyWeAskCardText": "Why we ask",
+  "@baselineAssessmentWhyWeAskCardText": {
+    "description": "lib/screens/baseline_assessment_screen.dart: WhyWeAskCard text (line 538 at 97d81ce)"
+  },
+  "baselineAssessmentWhyWeAskCardText2": "This helps tailor your plan and estimate money saved.",
+  "@baselineAssessmentWhyWeAskCardText2": {
+    "description": "lib/screens/baseline_assessment_screen.dart: WhyWeAskCard text (line 547 at 97d81ce)"
+  },
+  "baselineAssessmentWhyWeAskCardText3": "It is not a diagnosis or a judgment.",
+  "@baselineAssessmentWhyWeAskCardText3": {
+    "description": "lib/screens/baseline_assessment_screen.dart: WhyWeAskCard text (line 558 at 97d81ce)"
+  },
+  "chooseQuitPathDescription": "Prepare for 7–14 days, then stop completely on the date you choose. We’ll guide one small step each day.",
+  "@chooseQuitPathDescription": {
+    "description": "lib/screens/choose_quit_path_screen.dart: description (line 175 at 97d81ce)"
+  },
+  "chooseQuitPathDescription2": "Begin your smoke-free time now and get extra support through the first day.",
+  "@chooseQuitPathDescription2": {
+    "description": "lib/screens/choose_quit_path_screen.dart: description (line 202 at 97d81ce)"
+  },
+  "chooseQuitPathDescription3": "Follow a step-down schedule and work toward stopping completely on a future date.",
+  "@chooseQuitPathDescription3": {
+    "description": "lib/screens/choose_quit_path_screen.dart: description (line 223 at 97d81ce)"
+  },
+  "chooseQuitPathFlexiblePathNoteText": "Your path is flexible. You can adjust it at any time.",
+  "@chooseQuitPathFlexiblePathNoteText": {
+    "description": "lib/screens/choose_quit_path_screen.dart: FlexiblePathNote text (line 687 at 97d81ce)"
+  },
+  "chooseQuitPathPathLabel": "Set a quit date",
+  "@chooseQuitPathPathLabel": {
+    "description": "lib/screens/choose_quit_path_screen.dart: pathLabel (line 27 at 97d81ce)"
+  },
+  "chooseQuitPathPathLabel2": "Quit today",
+  "@chooseQuitPathPathLabel2": {
+    "description": "lib/screens/choose_quit_path_screen.dart: pathLabel (line 28 at 97d81ce)"
+  },
+  "chooseQuitPathPathLabel3": "Reduce gradually",
+  "@chooseQuitPathPathLabel3": {
+    "description": "lib/screens/choose_quit_path_screen.dart: pathLabel (line 30 at 97d81ce)"
+  },
+  "chooseQuitPathQuitPathBottomActionText": "Continue with this path",
+  "@chooseQuitPathQuitPathBottomActionText": {
+    "description": "lib/screens/choose_quit_path_screen.dart: QuitPathBottomAction text (line 759 at 97d81ce)"
+  },
+  "chooseQuitPathQuitPathHeaderBackLabel": "Build your plan",
+  "@chooseQuitPathQuitPathHeaderBackLabel": {
+    "description": "lib/screens/choose_quit_path_screen.dart: QuitPathHeader label (line 276 at 97d81ce)"
+  },
+  "chooseQuitPathQuitPathHeaderBackTooltip": "Back",
+  "@chooseQuitPathQuitPathHeaderBackTooltip": {
+    "description": "lib/screens/choose_quit_path_screen.dart: QuitPathHeader tooltip (line 268 at 97d81ce)"
+  },
+  "chooseQuitPathQuitPathHeaderText": "1 OF 5",
+  "@chooseQuitPathQuitPathHeaderText": {
+    "description": "lib/screens/choose_quit_path_screen.dart: QuitPathHeader text (line 306 at 97d81ce)"
+  },
+  "chooseQuitPathQuitPlanProgressText": "QUIT PLAN",
+  "@chooseQuitPathQuitPlanProgressText": {
+    "description": "lib/screens/choose_quit_path_screen.dart: QuitPlanProgress text (line 364 at 97d81ce)"
+  },
+  "chooseQuitPathRecommendedLabel": "RECOMMENDED",
+  "@chooseQuitPathRecommendedLabel": {
+    "description": "lib/screens/choose_quit_path_screen.dart: recommendedLabel (line 186 at 97d81ce)"
+  },
+  "chooseQuitPathSavedMessage": "{path} selected · Saved automatically",
+  "@chooseQuitPathSavedMessage": {
+    "description": "lib/screens/choose_quit_path_screen.dart: savedMessage (line 36 at 97d81ce)",
+    "placeholders": {
+      "path": {
+        "type": "Object"
+      }
+    }
+  },
+  "chooseQuitPathSupportingText": "Matches your preparation preference",
+  "@chooseQuitPathSupportingText": {
+    "description": "lib/screens/choose_quit_path_screen.dart: supportingText (line 178 at 97d81ce)"
+  },
+  "chooseQuitPathText": "CHOOSE YOUR PATH",
+  "@chooseQuitPathText": {
+    "description": "lib/screens/choose_quit_path_screen.dart: text (line 125 at 97d81ce)"
+  },
+  "chooseQuitPathText2": "What feels possible right now?",
+  "@chooseQuitPathText2": {
+    "description": "lib/screens/choose_quit_path_screen.dart: text (line 137 at 97d81ce)"
+  },
+  "chooseQuitPathText3": "There is no wrong place to start. Choose what fits you.",
+  "@chooseQuitPathText3": {
+    "description": "lib/screens/choose_quit_path_screen.dart: text (line 154 at 97d81ce)"
+  },
+  "consentPrivacyConsentBottomActionText": "Agree and continue",
+  "@consentPrivacyConsentBottomActionText": {
+    "description": "lib/screens/consent_privacy_screen.dart: ConsentBottomAction text (line 994 at 97d81ce)"
+  },
+  "consentPrivacyConsentBottomActionText2": "You can change optional choices anytime in Settings.",
+  "@consentPrivacyConsentBottomActionText2": {
+    "description": "lib/screens/consent_privacy_screen.dart: ConsentBottomAction text (line 1015 at 97d81ce)"
+  },
+  "consentPrivacyConsentHeaderBackTooltip": "Back",
+  "@consentPrivacyConsentHeaderBackTooltip": {
+    "description": "lib/screens/consent_privacy_screen.dart: ConsentHeader tooltip (line 259 at 97d81ce)"
+  },
+  "consentPrivacyOptionalConsentCardBadge": "Optional",
+  "@consentPrivacyOptionalConsentCardBadge": {
+    "description": "lib/screens/consent_privacy_screen.dart: OptionalConsentCard badge (line 618 at 97d81ce)"
+  },
+  "consentPrivacyOptionalConsentCardHelpImproveSubtitle": "Contribute de-identified information to approved research.",
+  "@consentPrivacyOptionalConsentCardHelpImproveSubtitle": {
+    "description": "lib/screens/consent_privacy_screen.dart: OptionalConsentCard subtitle (line 652 at 97d81ce)"
+  },
+  "consentPrivacyOptionalConsentCardHelpImproveTitle": "Help improve BreatheFree",
+  "@consentPrivacyOptionalConsentCardHelpImproveTitle": {
+    "description": "lib/screens/consent_privacy_screen.dart: OptionalConsentCard title (line 649 at 97d81ce)"
+  },
+  "consentPrivacyOptionalConsentCardHelpfulRemindersSubtitle": "Receive private check-ins and plan reminders.",
+  "@consentPrivacyOptionalConsentCardHelpfulRemindersSubtitle": {
+    "description": "lib/screens/consent_privacy_screen.dart: OptionalConsentCard subtitle (line 626 at 97d81ce)"
+  },
+  "consentPrivacyOptionalConsentCardHelpfulRemindersTitle": "Helpful reminders",
+  "@consentPrivacyOptionalConsentCardHelpfulRemindersTitle": {
+    "description": "lib/screens/consent_privacy_screen.dart: OptionalConsentCard title (line 625 at 97d81ce)"
+  },
+  "consentPrivacyOptionalConsentCardShareCareTeamSubtitle": "Allow a connected clinician to view progress summaries.",
+  "@consentPrivacyOptionalConsentCardShareCareTeamSubtitle": {
+    "description": "lib/screens/consent_privacy_screen.dart: OptionalConsentCard subtitle (line 639 at 97d81ce)"
+  },
+  "consentPrivacyOptionalConsentCardShareCareTeamTitle": "Share with my care team",
+  "@consentPrivacyOptionalConsentCardShareCareTeamTitle": {
+    "description": "lib/screens/consent_privacy_screen.dart: OptionalConsentCard title (line 636 at 97d81ce)"
+  },
+  "consentPrivacyOptionalConsentCardTitle": "YOUR CHOICES",
+  "@consentPrivacyOptionalConsentCardTitle": {
+    "description": "lib/screens/consent_privacy_screen.dart: OptionalConsentCard title (line 617 at 97d81ce)"
+  },
+  "consentPrivacyRequiredConsentCardBadge": "Required",
+  "@consentPrivacyRequiredConsentCardBadge": {
+    "description": "lib/screens/consent_privacy_screen.dart: RequiredConsentCard badge (line 516 at 97d81ce)"
+  },
+  "consentPrivacyRequiredConsentCardReviewPrivacyText": "Review Terms and Privacy Notice",
+  "@consentPrivacyRequiredConsentCardReviewPrivacyText": {
+    "description": "lib/screens/consent_privacy_screen.dart: RequiredConsentCard text (line 556 at 97d81ce)"
+  },
+  "consentPrivacyRequiredConsentCardSubtitle": "Save your account, quit plan, and progress securely.",
+  "@consentPrivacyRequiredConsentCardSubtitle": {
+    "description": "lib/screens/consent_privacy_screen.dart: RequiredConsentCard subtitle (line 526 at 97d81ce)"
+  },
+  "consentPrivacyRequiredConsentCardSubtitle2": "Personalize your plan, support tools, and recovery insights.",
+  "@consentPrivacyRequiredConsentCardSubtitle2": {
+    "description": "lib/screens/consent_privacy_screen.dart: RequiredConsentCard subtitle (line 536 at 97d81ce)"
+  },
+  "consentPrivacyRequiredConsentCardTitle": "REQUIRED TO USE BREATHEFREE",
+  "@consentPrivacyRequiredConsentCardTitle": {
+    "description": "lib/screens/consent_privacy_screen.dart: RequiredConsentCard title (line 513 at 97d81ce)"
+  },
+  "consentPrivacyRequiredConsentCardTitle2": "Essential app data",
+  "@consentPrivacyRequiredConsentCardTitle2": {
+    "description": "lib/screens/consent_privacy_screen.dart: RequiredConsentCard title (line 523 at 97d81ce)"
+  },
+  "consentPrivacyRequiredConsentCardTitle3": "Health information",
+  "@consentPrivacyRequiredConsentCardTitle3": {
+    "description": "lib/screens/consent_privacy_screen.dart: RequiredConsentCard title (line 535 at 97d81ce)"
+  },
+  "consentPrivacySheetDoneText": "Done",
+  "@consentPrivacySheetDoneText": {
+    "description": "lib/screens/consent_privacy_screen.dart: showPrivacyReview text (line 98 at 97d81ce)"
+  },
+  "consentPrivacyShowPrivacyReviewText": "Terms and Privacy Notice",
+  "@consentPrivacyShowPrivacyReviewText": {
+    "description": "lib/screens/consent_privacy_screen.dart: showPrivacyReview text (line 60 at 97d81ce)"
+  },
+  "consentPrivacyShowPrivacyReviewText2": "This development build demonstrates how the legal documents will be presented. Before release, the complete Terms of Use and Privacy Notice will appear here, including data practices, retention periods, and your rights.",
+  "@consentPrivacyShowPrivacyReviewText2": {
+    "description": "lib/screens/consent_privacy_screen.dart: showPrivacyReview text (line 70 at 97d81ce)"
+  },
+  "consentPrivacyShowPrivacyReviewText3": "Optional controls can be changed later in Settings. Required processing will be limited to what is necessary to provide and secure the service.",
+  "@consentPrivacyShowPrivacyReviewText3": {
+    "description": "lib/screens/consent_privacy_screen.dart: showPrivacyReview text (line 80 at 97d81ce)"
+  },
+  "consentPrivacyText": "YOUR PRIVACY",
+  "@consentPrivacyText": {
+    "description": "lib/screens/consent_privacy_screen.dart: text (line 160 at 97d81ce)"
+  },
+  "consentPrivacyText2": "Your story stays yours.",
+  "@consentPrivacyText2": {
+    "description": "lib/screens/consent_privacy_screen.dart: text (line 171 at 97d81ce)"
+  },
+  "consentPrivacyText3": "Choose how your information is used. Required items keep the app working; optional choices can change anytime.",
+  "@consentPrivacyText3": {
+    "description": "lib/screens/consent_privacy_screen.dart: text (line 184 at 97d81ce)"
+  },
+  "consentPrivacyTrustNoteText": "No ads. No tobacco-industry funding.",
+  "@consentPrivacyTrustNoteText": {
+    "description": "lib/screens/consent_privacy_screen.dart: TrustNote text (line 911 at 97d81ce)"
+  },
+  "consentPrivacyTrustNoteText2": "We never sell patient health information.",
+  "@consentPrivacyTrustNoteText2": {
+    "description": "lib/screens/consent_privacy_screen.dart: TrustNote text (line 922 at 97d81ce)"
+  },
+  "myReasonsCustomReasonCard": "YOUR OWN REASON",
+  "@myReasonsCustomReasonCard": {
+    "description": "lib/screens/my_reasons_screen.dart: CustomReasonCard (line 751 at 97d81ce)"
+  },
+  "myReasonsCustomReasonCard2": "ADD YOUR OWN REASON",
+  "@myReasonsCustomReasonCard2": {
+    "description": "lib/screens/my_reasons_screen.dart: CustomReasonCard (line 752 at 97d81ce)"
+  },
+  "myReasonsCustomReasonCard3": "Write what matters most in your own words",
+  "@myReasonsCustomReasonCard3": {
+    "description": "lib/screens/my_reasons_screen.dart: CustomReasonCard (line 766 at 97d81ce)"
+  },
+  "myReasonsCustomReasonCardReasonCustomRemoveTooltip": "Remove",
+  "@myReasonsCustomReasonCardReasonCustomRemoveTooltip": {
+    "description": "lib/screens/my_reasons_screen.dart: CustomReasonCard tooltip (line 793 at 97d81ce)"
+  },
+  "myReasonsCustomReasonCardReasonTopCustomTooltip": "Top reason",
+  "@myReasonsCustomReasonCardReasonTopCustomTooltip": {
+    "description": "lib/screens/my_reasons_screen.dart: CustomReasonCard tooltip (line 784 at 97d81ce)"
+  },
+  "myReasonsCustomReasonEditorSheetStateReasonCustomMakeTopText": "Make this my top reason",
+  "@myReasonsCustomReasonEditorSheetStateReasonCustomMakeTopText": {
+    "description": "lib/screens/my_reasons_screen.dart: CustomReasonEditorSheetState text (line 1128 at 97d81ce)"
+  },
+  "myReasonsCustomReasonEditorSheetStateReasonCustomSaveText": "Save reason",
+  "@myReasonsCustomReasonEditorSheetStateReasonCustomSaveText": {
+    "description": "lib/screens/my_reasons_screen.dart: CustomReasonEditorSheetState text (line 1155 at 97d81ce)"
+  },
+  "myReasonsCustomReasonEditorSheetStateReasonCustomTextFieldHintText": "For example: I want more energy",
+  "@myReasonsCustomReasonEditorSheetStateReasonCustomTextFieldHintText": {
+    "description": "lib/screens/my_reasons_screen.dart: CustomReasonEditorSheetState hintText (line 1109 at 97d81ce)"
+  },
+  "myReasonsCustomReasonEditorSheetStateText": "Add your own reason",
+  "@myReasonsCustomReasonEditorSheetStateText": {
+    "description": "lib/screens/my_reasons_screen.dart: CustomReasonEditorSheetState text (line 1084 at 97d81ce)"
+  },
+  "myReasonsCustomReasonEditorSheetStateText2": "Write something you want to remember when a craving hits.",
+  "@myReasonsCustomReasonEditorSheetStateText2": {
+    "description": "lib/screens/my_reasons_screen.dart: CustomReasonEditorSheetState text (line 1093 at 97d81ce)"
+  },
+  "myReasonsLabelFor": "Protect my family",
+  "@myReasonsLabelFor": {
+    "description": "lib/screens/my_reasons_screen.dart: labelFor (line 57 at 97d81ce)"
+  },
+  "myReasonsLabelFor2": "Breathe easier",
+  "@myReasonsLabelFor2": {
+    "description": "lib/screens/my_reasons_screen.dart: labelFor (line 59 at 97d81ce)"
+  },
+  "myReasonsLabelFor3": "Improve my health",
+  "@myReasonsLabelFor3": {
+    "description": "lib/screens/my_reasons_screen.dart: labelFor (line 61 at 97d81ce)"
+  },
+  "myReasonsLabelFor4": "Save money",
+  "@myReasonsLabelFor4": {
+    "description": "lib/screens/my_reasons_screen.dart: labelFor (line 62 at 97d81ce)"
+  },
+  "myReasonsLabelFor5": "Feel more in control",
+  "@myReasonsLabelFor5": {
+    "description": "lib/screens/my_reasons_screen.dart: labelFor (line 64 at 97d81ce)"
+  },
+  "myReasonsLabelFor6": "Be there for my future",
+  "@myReasonsLabelFor6": {
+    "description": "lib/screens/my_reasons_screen.dart: labelFor (line 66 at 97d81ce)"
+  },
+  "myReasonsLabelFor7": "My own reason",
+  "@myReasonsLabelFor7": {
+    "description": "lib/screens/my_reasons_screen.dart: labelFor (line 69 at 97d81ce)"
+  },
+  "myReasonsMotivationPreview": "Choose a top reason anytime",
+  "@myReasonsMotivationPreview": {
+    "description": "lib/screens/my_reasons_screen.dart: MotivationPreview (line 890 at 97d81ce)"
+  },
+  "myReasonsMotivationPreview2": "Based on your top reason: {topLabel}",
+  "@myReasonsMotivationPreview2": {
+    "description": "lib/screens/my_reasons_screen.dart: MotivationPreview (line 893 at 97d81ce)",
+    "placeholders": {
+      "topLabel": {
+        "type": "Object"
+      }
+    }
+  },
+  "myReasonsMotivationPreviewReasonPreviewText": "MOTIVATION PREVIEW",
+  "@myReasonsMotivationPreviewReasonPreviewText": {
+    "description": "lib/screens/my_reasons_screen.dart: MotivationPreview text (line 845 at 97d81ce)"
+  },
+  "myReasonsMotivationPreviewText": "WHEN A CRAVING HITS",
+  "@myReasonsMotivationPreviewText": {
+    "description": "lib/screens/my_reasons_screen.dart: MotivationPreview text (line 866 at 97d81ce)"
+  },
+  "myReasonsPreviewFor": "Choose a reason to create your personal reminder.",
+  "@myReasonsPreviewFor": {
+    "description": "lib/screens/my_reasons_screen.dart: previewFor (line 154 at 97d81ce)"
+  },
+  "myReasonsPreviewFor2": "“You chose this because ‘{value}.’ This feeling will pass.”",
+  "@myReasonsPreviewFor2": {
+    "description": "lib/screens/my_reasons_screen.dart: previewFor (line 160 at 97d81ce)",
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      }
+    }
+  },
+  "myReasonsPreviewFor3": "“You chose this for your family. This feeling will pass.”",
+  "@myReasonsPreviewFor3": {
+    "description": "lib/screens/my_reasons_screen.dart: previewFor (line 165 at 97d81ce)"
+  },
+  "myReasonsPreviewFor4": "“You chose this to breathe easier. This feeling will pass.”",
+  "@myReasonsPreviewFor4": {
+    "description": "lib/screens/my_reasons_screen.dart: previewFor (line 168 at 97d81ce)"
+  },
+  "myReasonsPreviewFor5": "“You chose this for your health. This feeling will pass.”",
+  "@myReasonsPreviewFor5": {
+    "description": "lib/screens/my_reasons_screen.dart: previewFor (line 171 at 97d81ce)"
+  },
+  "myReasonsPreviewFor6": "“You chose this to save money. This feeling will pass.”",
+  "@myReasonsPreviewFor6": {
+    "description": "lib/screens/my_reasons_screen.dart: previewFor (line 174 at 97d81ce)"
+  },
+  "myReasonsPreviewFor7": "“You chose this to feel in control. This feeling will pass.”",
+  "@myReasonsPreviewFor7": {
+    "description": "lib/screens/my_reasons_screen.dart: previewFor (line 177 at 97d81ce)"
+  },
+  "myReasonsPreviewFor8": "“You chose this for your future. This feeling will pass.”",
+  "@myReasonsPreviewFor8": {
+    "description": "lib/screens/my_reasons_screen.dart: previewFor (line 180 at 97d81ce)"
+  },
+  "myReasonsReasonsBottomActionText": "Save my reasons",
+  "@myReasonsReasonsBottomActionText": {
+    "description": "lib/screens/my_reasons_screen.dart: ReasonsBottomAction text (line 1006 at 97d81ce)"
+  },
+  "myReasonsReasonsHeaderBackLabel": "My reasons",
+  "@myReasonsReasonsHeaderBackLabel": {
+    "description": "lib/screens/my_reasons_screen.dart: ReasonsHeader label (line 470 at 97d81ce)"
+  },
+  "myReasonsReasonsHeaderBackTooltip": "Back",
+  "@myReasonsReasonsHeaderBackTooltip": {
+    "description": "lib/screens/my_reasons_screen.dart: ReasonsHeader tooltip (line 462 at 97d81ce)"
+  },
+  "myReasonsReasonsHeaderText": "3 OF 5",
+  "@myReasonsReasonsHeaderText": {
+    "description": "lib/screens/my_reasons_screen.dart: ReasonsHeader text (line 500 at 97d81ce)"
+  },
+  "myReasonsReasonsPrivacyNoteText": "Your reasons stay private and only personalize your quit support.",
+  "@myReasonsReasonsPrivacyNoteText": {
+    "description": "lib/screens/my_reasons_screen.dart: ReasonsPrivacyNote text (line 928 at 97d81ce)"
+  },
+  "myReasonsReasonsProgressText": "QUIT PLAN",
+  "@myReasonsReasonsProgressText": {
+    "description": "lib/screens/my_reasons_screen.dart: ReasonsProgress text (line 560 at 97d81ce)"
+  },
+  "myReasonsSelectedCountText": "{selectionCount} SELECTED",
+  "@myReasonsSelectedCountText": {
+    "description": "lib/screens/my_reasons_screen.dart: text (line 235 at 97d81ce)",
+    "placeholders": {
+      "selectionCount": {
+        "type": "Object"
+      }
+    }
+  },
+  "myReasonsSelectionSummary": "{count} reasons selected · {hasTopReason, select, true{1 top reason} other{no top reason}}",
+  "@myReasonsSelectionSummary": {
+    "description": "lib/screens/my_reasons_screen.dart: bottom bar, reasons selected and whether a top reason is set",
+    "placeholders": {
+      "count": {
+        "type": "Object"
+      },
+      "hasTopReason": {
+        "type": "String"
+      }
+    }
+  },
+  "myReasonsText": "SELECT ALL THAT MATTER",
+  "@myReasonsText": {
+    "description": "lib/screens/my_reasons_screen.dart: text (line 214 at 97d81ce)"
+  },
+  "myReasonsText2": "YOUR MOTIVATION",
+  "@myReasonsText2": {
+    "description": "lib/screens/my_reasons_screen.dart: text (line 306 at 97d81ce)"
+  },
+  "myReasonsText3": "What are you quitting for?",
+  "@myReasonsText3": {
+    "description": "lib/screens/my_reasons_screen.dart: text (line 316 at 97d81ce)"
+  },
+  "myReasonsText4": "Choose everything that matters to you. Tap the star to make one your top reason.",
+  "@myReasonsText4": {
+    "description": "lib/screens/my_reasons_screen.dart: text (line 333 at 97d81ce)"
+  },
+  "readinessResultActionLabel": "Build my preparation plan",
+  "@readinessResultActionLabel": {
+    "description": "lib/screens/readiness_result_screen.dart: actionLabel (line 118 at 97d81ce)"
+  },
+  "readinessResultActionLabel2": "Explore without setting a date",
+  "@readinessResultActionLabel2": {
+    "description": "lib/screens/readiness_result_screen.dart: actionLabel (line 121 at 97d81ce)"
+  },
+  "readinessResultActionLabel3": "Find support options",
+  "@readinessResultActionLabel3": {
+    "description": "lib/screens/readiness_result_screen.dart: actionLabel (line 125 at 97d81ce)"
+  },
+  "readinessResultAlternativePathsPathConnectSubtitle": "Talk with a coach or care team",
+  "@readinessResultAlternativePathsPathConnectSubtitle": {
+    "description": "lib/screens/readiness_result_screen.dart: AlternativePaths subtitle (line 902 at 97d81ce)"
+  },
+  "readinessResultAlternativePathsPathConnectTitle": "Connect",
+  "@readinessResultAlternativePathsPathConnectTitle": {
+    "description": "lib/screens/readiness_result_screen.dart: AlternativePaths title (line 901 at 97d81ce)"
+  },
+  "readinessResultAlternativePathsPathExploreSubtitle": "Learn without setting a date",
+  "@readinessResultAlternativePathsPathExploreSubtitle": {
+    "description": "lib/screens/readiness_result_screen.dart: AlternativePaths subtitle (line 890 at 97d81ce)"
+  },
+  "readinessResultAlternativePathsPathExploreTitle": "Explore first",
+  "@readinessResultAlternativePathsPathExploreTitle": {
+    "description": "lib/screens/readiness_result_screen.dart: AlternativePaths title (line 889 at 97d81ce)"
+  },
+  "readinessResultDoneText": "Done",
+  "@readinessResultDoneText": {
+    "description": "lib/screens/readiness_result_screen.dart: showWhyThisFits text (line 182 at 97d81ce)"
+  },
+  "readinessResultReadinessBottomActionText": "You’re in control. Change your path anytime.",
+  "@readinessResultReadinessBottomActionText": {
+    "description": "lib/screens/readiness_result_screen.dart: ReadinessBottomAction text (line 1095 at 97d81ce)"
+  },
+  "readinessResultReadinessHeaderBackLabel": "Your starting point",
+  "@readinessResultReadinessHeaderBackLabel": {
+    "description": "lib/screens/readiness_result_screen.dart: ReadinessHeader label (line 388 at 97d81ce)"
+  },
+  "readinessResultReadinessHeaderBackTooltip": "Back",
+  "@readinessResultReadinessHeaderBackTooltip": {
+    "description": "lib/screens/readiness_result_screen.dart: ReadinessHeader tooltip (line 380 at 97d81ce)"
+  },
+  "readinessResultReadinessHeaderText": "Complete",
+  "@readinessResultReadinessHeaderText": {
+    "description": "lib/screens/readiness_result_screen.dart: ReadinessHeader text (line 426 at 97d81ce)"
+  },
+  "readinessResultReadinessProgressText": "ASSESSMENT",
+  "@readinessResultReadinessProgressText": {
+    "description": "lib/screens/readiness_result_screen.dart: ReadinessProgress text (line 486 at 97d81ce)"
+  },
+  "readinessResultRecommendationCardFitText": "Why this fits your answers",
+  "@readinessResultRecommendationCardFitText": {
+    "description": "lib/screens/readiness_result_screen.dart: RecommendationCard text (line 850 at 97d81ce)"
+  },
+  "readinessResultRecommendationCardText": "RECOMMENDED",
+  "@readinessResultRecommendationCardText": {
+    "description": "lib/screens/readiness_result_screen.dart: RecommendationCard text (line 793 at 97d81ce)"
+  },
+  "readinessResultRecommendationCardText2": "Practice coping tools and choose a quit date in the next 7–14 days. We’ll guide one small step each day.",
+  "@readinessResultRecommendationCardText2": {
+    "description": "lib/screens/readiness_result_screen.dart: RecommendationCard text (line 830 at 97d81ce)"
+  },
+  "readinessResultRecommendationCardTitle": "Prepare",
+  "@readinessResultRecommendationCardTitle": {
+    "description": "lib/screens/readiness_result_screen.dart: RecommendationCard title (line 749 at 97d81ce)"
+  },
+  "readinessResultReflectionCardLabel": "YOUR PATTERN",
+  "@readinessResultReflectionCardLabel": {
+    "description": "lib/screens/readiness_result_screen.dart: ReflectionCard label (line 638 at 97d81ce)"
+  },
+  "readinessResultReflectionCardLabel2": "TRIGGERS",
+  "@readinessResultReflectionCardLabel2": {
+    "description": "lib/screens/readiness_result_screen.dart: ReflectionCard label (line 646 at 97d81ce)"
+  },
+  "readinessResultReflectionCardLabel3": "STARTING POINT",
+  "@readinessResultReflectionCardLabel3": {
+    "description": "lib/screens/readiness_result_screen.dart: ReflectionCard label (line 654 at 97d81ce)"
+  },
+  "readinessResultShowWhyThisFitsText": "Why preparation may fit",
+  "@readinessResultShowWhyThisFitsText": {
+    "description": "lib/screens/readiness_result_screen.dart: showWhyThisFits text (line 144 at 97d81ce)"
+  },
+  "readinessResultShowWhyThisFitsText2": "You identified your smoking pattern and situations that may bring on an urge. Practicing coping tools before choosing a date can make the next step feel more manageable.",
+  "@readinessResultShowWhyThisFitsText2": {
+    "description": "lib/screens/readiness_result_screen.dart: showWhyThisFits text (line 154 at 97d81ce)"
+  },
+  "readinessResultShowWhyThisFitsText3": "This is a flexible recommendation, not a medical assessment. You can choose another path now or change it later.",
+  "@readinessResultShowWhyThisFitsText3": {
+    "description": "lib/screens/readiness_result_screen.dart: showWhyThisFits text (line 164 at 97d81ce)"
+  },
+  "readinessResultSituationCount": "You identified {count} {count, plural, =1{situation} other{situations}} to prepare for",
+  "@readinessResultSituationCount": {
+    "description": "lib/screens/readiness_result_screen.dart: starting point summary, number of situations",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "readinessResultStartingPointSummary": "You can start small and add details later",
+  "@readinessResultStartingPointSummary": {
+    "description": "lib/screens/readiness_result_screen.dart: startingPointSummary (line 107 at 97d81ce)"
+  },
+  "readinessResultText": "YOUR REFLECTION",
+  "@readinessResultText": {
+    "description": "lib/screens/readiness_result_screen.dart: text (line 276 at 97d81ce)"
+  },
+  "readinessResultText2": "You’re ready to prepare—at your own pace.",
+  "@readinessResultText2": {
+    "description": "lib/screens/readiness_result_screen.dart: text (line 286 at 97d81ce)"
+  },
+  "readinessResultText3": "Here is what we heard from your answers.",
+  "@readinessResultText3": {
+    "description": "lib/screens/readiness_result_screen.dart: text (line 303 at 97d81ce)"
+  },
+  "readinessResultText4": "YOU CAN CHOOSE A DIFFERENT PATH",
+  "@readinessResultText4": {
+    "description": "lib/screens/readiness_result_screen.dart: text (line 332 at 97d81ce)"
+  },
+  "readinessResultTriggerLabel": "stress",
+  "@readinessResultTriggerLabel": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerLabel (line 56 at 97d81ce)"
+  },
+  "readinessResultTriggerLabel10": "before bed",
+  "@readinessResultTriggerLabel10": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerLabel (line 68 at 97d81ce)"
+  },
+  "readinessResultTriggerLabel2": "after meals",
+  "@readinessResultTriggerLabel2": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerLabel (line 58 at 97d81ce)"
+  },
+  "readinessResultTriggerLabel3": "driving",
+  "@readinessResultTriggerLabel3": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerLabel (line 59 at 97d81ce)"
+  },
+  "readinessResultTriggerLabel4": "coffee",
+  "@readinessResultTriggerLabel4": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerLabel (line 60 at 97d81ce)"
+  },
+  "readinessResultTriggerLabel5": "social settings",
+  "@readinessResultTriggerLabel5": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerLabel (line 62 at 97d81ce)"
+  },
+  "readinessResultTriggerLabel6": "work breaks",
+  "@readinessResultTriggerLabel6": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerLabel (line 64 at 97d81ce)"
+  },
+  "readinessResultTriggerLabel7": "alcohol",
+  "@readinessResultTriggerLabel7": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerLabel (line 65 at 97d81ce)"
+  },
+  "readinessResultTriggerLabel8": "boredom",
+  "@readinessResultTriggerLabel8": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerLabel (line 66 at 97d81ce)"
+  },
+  "readinessResultTriggerLabel9": "mornings",
+  "@readinessResultTriggerLabel9": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerLabel (line 67 at 97d81ce)"
+  },
+  "readinessResultTriggerSummary": "You can identify triggers anytime",
+  "@readinessResultTriggerSummary": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerSummary (line 84 at 97d81ce)"
+  },
+  "readinessResultTriggerSummary2": "You want support for {first}",
+  "@readinessResultTriggerSummary2": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerSummary (line 89 at 97d81ce)",
+    "placeholders": {
+      "first": {
+        "type": "Object"
+      }
+    }
+  },
+  "readinessResultTriggerSummary3": "You want support for {first} and {last}",
+  "@readinessResultTriggerSummary3": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerSummary (line 94 at 97d81ce)",
+    "placeholders": {
+      "first": {
+        "type": "Object"
+      },
+      "last": {
+        "type": "Object"
+      }
+    }
+  },
+  "readinessResultTriggerSummary4": "{value}, {value2}, and {remaining} more",
+  "@readinessResultTriggerSummary4": {
+    "description": "lib/screens/readiness_result_screen.dart: triggerSummary (line 99 at 97d81ce)",
+    "placeholders": {
+      "value": {
+        "type": "Object"
+      },
+      "value2": {
+        "type": "Object"
+      },
+      "remaining": {
+        "type": "Object"
+      }
+    }
+  },
+  "readinessResultUsageLabel": "You do not smoke every day",
+  "@readinessResultUsageLabel": {
+    "description": "lib/screens/readiness_result_screen.dart: usageLabel (line 35 at 97d81ce)"
+  },
+  "readinessResultUsageLabel2": "10 or fewer cigarettes on a typical day",
+  "@readinessResultUsageLabel2": {
+    "description": "lib/screens/readiness_result_screen.dart: usageLabel (line 36 at 97d81ce)"
+  },
+  "readinessResultUsageLabel3": "11–20 cigarettes on a typical day",
+  "@readinessResultUsageLabel3": {
+    "description": "lib/screens/readiness_result_screen.dart: usageLabel (line 39 at 97d81ce)"
+  },
+  "readinessResultUsageLabel4": "21–30 cigarettes on a typical day",
+  "@readinessResultUsageLabel4": {
+    "description": "lib/screens/readiness_result_screen.dart: usageLabel (line 42 at 97d81ce)"
+  },
+  "readinessResultUsageLabel5": "31 or more cigarettes on a typical day",
+  "@readinessResultUsageLabel5": {
+    "description": "lib/screens/readiness_result_screen.dart: usageLabel (line 45 at 97d81ce)"
+  },
+  "readinessResultUsageLabel6": "You can add your smoking pattern anytime",
+  "@readinessResultUsageLabel6": {
+    "description": "lib/screens/readiness_result_screen.dart: usageLabel (line 48 at 97d81ce)"
+  },
+  "selectQuitDateCheckInCardText": "Quit-day check-in",
+  "@selectQuitDateCheckInCardText": {
+    "description": "lib/screens/select_quit_date_screen.dart: CheckInCard text (line 1207 at 97d81ce)"
+  },
+  "selectQuitDateCheckInCardText2": "7:00 AM · Private notification",
+  "@selectQuitDateCheckInCardText2": {
+    "description": "lib/screens/select_quit_date_screen.dart: CheckInCard text (line 1215 at 97d81ce)"
+  },
+  "selectQuitDateCheckInCardText3": "Lock screen only shows: “You have a check-in.”",
+  "@selectQuitDateCheckInCardText3": {
+    "description": "lib/screens/select_quit_date_screen.dart: CheckInCard text (line 1270 at 97d81ce)"
+  },
+  "selectQuitDateContinueLabel": "Confirm this date",
+  "@selectQuitDateContinueLabel": {
+    "description": "lib/screens/select_quit_date_screen.dart: continueLabel (line 234 at 97d81ce)"
+  },
+  "selectQuitDateContinueLabel2": "Start my quit today",
+  "@selectQuitDateContinueLabel2": {
+    "description": "lib/screens/select_quit_date_screen.dart: continueLabel (line 236 at 97d81ce)"
+  },
+  "selectQuitDateContinueLabel3": "Confirm target date",
+  "@selectQuitDateContinueLabel3": {
+    "description": "lib/screens/select_quit_date_screen.dart: continueLabel (line 238 at 97d81ce)"
+  },
+  "selectQuitDateDateBottomActionText": "Date saved automatically",
+  "@selectQuitDateDateBottomActionText": {
+    "description": "lib/screens/select_quit_date_screen.dart: DateBottomAction text (line 1409 at 97d81ce)"
+  },
+  "selectQuitDateDateHeaderBackTooltip": "Back",
+  "@selectQuitDateDateHeaderBackTooltip": {
+    "description": "lib/screens/select_quit_date_screen.dart: DateHeader tooltip (line 556 at 97d81ce)"
+  },
+  "selectQuitDateDateHeaderText": "2 OF 5",
+  "@selectQuitDateDateHeaderText": {
+    "description": "lib/screens/select_quit_date_screen.dart: DateHeader text (line 593 at 97d81ce)"
+  },
+  "selectQuitDateDateLabel": "YOUR QUIT DATE",
+  "@selectQuitDateDateLabel": {
+    "description": "lib/screens/select_quit_date_screen.dart: dateLabel (line 210 at 97d81ce)"
+  },
+  "selectQuitDateDateLabel2": "YOUR QUIT DATE IS TODAY",
+  "@selectQuitDateDateLabel2": {
+    "description": "lib/screens/select_quit_date_screen.dart: dateLabel (line 212 at 97d81ce)"
+  },
+  "selectQuitDateDateLabel3": "YOUR TARGET DATE",
+  "@selectQuitDateDateLabel3": {
+    "description": "lib/screens/select_quit_date_screen.dart: dateLabel (line 214 at 97d81ce)"
+  },
+  "selectQuitDateDateProgressText": "QUIT PLAN",
+  "@selectQuitDateDateProgressText": {
+    "description": "lib/screens/select_quit_date_screen.dart: DateProgress text (line 653 at 97d81ce)"
+  },
+  "selectQuitDateDescription": "A date 7–14 days away gives you time to prepare without losing momentum.",
+  "@selectQuitDateDescription": {
+    "description": "lib/screens/select_quit_date_screen.dart: description (line 179 at 97d81ce)"
+  },
+  "selectQuitDateDescription2": "Your smoke-free time begins today. We’ll add extra support through your first day.",
+  "@selectQuitDateDescription2": {
+    "description": "lib/screens/select_quit_date_screen.dart: description (line 182 at 97d81ce)"
+  },
+  "selectQuitDateDescription3": "A target 14–30 days away gives you time to reduce gradually with a clear goal.",
+  "@selectQuitDateDescription3": {
+    "description": "lib/screens/select_quit_date_screen.dart: description (line 185 at 97d81ce)"
+  },
+  "selectQuitDateFlexibleDateNoteText": "You can change this date later without losing progress.",
+  "@selectQuitDateFlexibleDateNoteText": {
+    "description": "lib/screens/select_quit_date_screen.dart: FlexibleDateNote text (line 1304 at 97d81ce)"
+  },
+  "selectQuitDateHeaderTitle": "Choose your quit date",
+  "@selectQuitDateHeaderTitle": {
+    "description": "lib/screens/select_quit_date_screen.dart: headerTitle (line 156 at 97d81ce)"
+  },
+  "selectQuitDateHeaderTitle2": "Start your quit today",
+  "@selectQuitDateHeaderTitle2": {
+    "description": "lib/screens/select_quit_date_screen.dart: headerTitle (line 160 at 97d81ce)"
+  },
+  "selectQuitDateHeaderTitle3": "Choose your target date",
+  "@selectQuitDateHeaderTitle3": {
+    "description": "lib/screens/select_quit_date_screen.dart: headerTitle (line 161 at 97d81ce)"
+  },
+  "selectQuitDateLongDate": "{weekday}, {month} {day}, {year}",
+  "@selectQuitDateLongDate": {
+    "description": "lib/screens/select_quit_date_screen.dart: selected date card, full date",
+    "placeholders": {
+      "weekday": {
+        "type": "Object"
+      },
+      "month": {
+        "type": "Object"
+      },
+      "day": {
+        "type": "Object"
+      },
+      "year": {
+        "type": "Object"
+      }
+    }
+  },
+  "selectQuitDateMonthName": "{month, select, january{January} february{February} march{March} april{April} may{May} june{June} july{July} august{August} september{September} october{October} november{November} december{December} other{}}",
+  "@selectQuitDateMonthName": {
+    "description": "lib/screens/select_quit_date_screen.dart: full month name, chosen by month key (january…december)",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "selectQuitDateMonthShort": "{month, select, january{Jan} february{Feb} march{Mar} april{Apr} may{May} june{Jun} july{Jul} august{Aug} september{Sep} october{Oct} november{Nov} december{Dec} other{}}",
+  "@selectQuitDateMonthShort": {
+    "description": "lib/screens/select_quit_date_screen.dart: short month name, chosen by month key",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "selectQuitDateMonthYear": "{month} {year}",
+  "@selectQuitDateMonthYear": {
+    "description": "lib/screens/select_quit_date_screen.dart: calendar month heading",
+    "placeholders": {
+      "month": {
+        "type": "Object"
+      },
+      "year": {
+        "type": "Object"
+      }
+    }
+  },
+  "selectQuitDateRange": "{startMonth} {start} – {endMonth} {end}",
+  "@selectQuitDateRange": {
+    "description": "lib/screens/select_quit_date_screen.dart: recommended window across two months",
+    "placeholders": {
+      "startMonth": {
+        "type": "Object"
+      },
+      "start": {
+        "type": "Object"
+      },
+      "endMonth": {
+        "type": "Object"
+      },
+      "end": {
+        "type": "Object"
+      }
+    }
+  },
+  "selectQuitDateRangeSameMonth": "{month} {start}–{end}",
+  "@selectQuitDateRangeSameMonth": {
+    "description": "lib/screens/select_quit_date_screen.dart: recommended window within one month",
+    "placeholders": {
+      "month": {
+        "type": "Object"
+      },
+      "start": {
+        "type": "Object"
+      },
+      "end": {
+        "type": "Object"
+      }
+    }
+  },
+  "selectQuitDateSelectedDateCardUnavailableText": "RECOMMENDED",
+  "@selectQuitDateSelectedDateCardUnavailableText": {
+    "description": "lib/screens/select_quit_date_screen.dart: SelectedDateCard text (line 1126 at 97d81ce)"
+  },
+  "selectQuitDateText": "YOUR DATE",
+  "@selectQuitDateText": {
+    "description": "lib/screens/select_quit_date_screen.dart: text (line 432 at 97d81ce)"
+  },
+  "selectQuitDateTimingLabel": "Starting today",
+  "@selectQuitDateTimingLabel": {
+    "description": "lib/screens/select_quit_date_screen.dart: timingLabel (line 220 at 97d81ce)"
+  },
+  "selectQuitDateTimingLabel2": "{days} days to reduce gradually",
+  "@selectQuitDateTimingLabel2": {
+    "description": "lib/screens/select_quit_date_screen.dart: timingLabel (line 223 at 97d81ce)",
+    "placeholders": {
+      "days": {
+        "type": "Object"
+      }
+    }
+  },
+  "selectQuitDateTimingLabel3": "{days} days to prepare",
+  "@selectQuitDateTimingLabel3": {
+    "description": "lib/screens/select_quit_date_screen.dart: timingLabel (line 226 at 97d81ce)",
+    "placeholders": {
+      "days": {
+        "type": "Object"
+      }
+    }
+  },
+  "selectQuitDateTitle": "Choose a day to begin.",
+  "@selectQuitDateTitle": {
+    "description": "lib/screens/select_quit_date_screen.dart: title (line 167 at 97d81ce)"
+  },
+  "selectQuitDateTitle2": "Today is your starting point.",
+  "@selectQuitDateTitle2": {
+    "description": "lib/screens/select_quit_date_screen.dart: title (line 170 at 97d81ce)"
+  },
+  "selectQuitDateTitle3": "Choose the day to become smoke-free.",
+  "@selectQuitDateTitle3": {
+    "description": "lib/screens/select_quit_date_screen.dart: title (line 173 at 97d81ce)"
+  },
+  "selectQuitDateUnavailableMessage": "This date is no longer available. Choose a new date.",
+  "@selectQuitDateUnavailableMessage": {
+    "description": "lib/screens/select_quit_date_screen.dart: selected date card when the saved date is outside the allowed window (QuitDateCopy)"
+  },
+  "selectQuitDateWeekdayInitial": "{weekday, select, sunday{S} monday{M} tuesday{T} wednesday{W} thursday{T} friday{F} saturday{S} other{}}",
+  "@selectQuitDateWeekdayInitial": {
+    "description": "lib/screens/select_quit_date_screen.dart: calendar weekday initial, chosen by weekday key",
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "selectQuitDateWeekdayName": "{weekday, select, monday{Monday} tuesday{Tuesday} wednesday{Wednesday} thursday{Thursday} friday{Friday} saturday{Saturday} sunday{Sunday} other{}}",
+  "@selectQuitDateWeekdayName": {
+    "description": "lib/screens/select_quit_date_screen.dart: weekday name, chosen by weekday key (monday…sunday)",
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "selectQuitDateWindowMessage": "Today is selected based on your path",
+  "@selectQuitDateWindowMessage": {
+    "description": "lib/screens/select_quit_date_screen.dart: windowMessage (line 192 at 97d81ce)"
+  },
+  "selectQuitDateWindowMessage2": "Recommended preparation window: {range}",
+  "@selectQuitDateWindowMessage2": {
+    "description": "lib/screens/select_quit_date_screen.dart: windowMessage (line 198 at 97d81ce)",
+    "placeholders": {
+      "range": {
+        "type": "Object"
+      }
+    }
+  },
+  "selectQuitDateWindowMessage3": "Recommended reduction window: {range}",
+  "@selectQuitDateWindowMessage3": {
+    "description": "lib/screens/select_quit_date_screen.dart: windowMessage (line 201 at 97d81ce)",
+    "placeholders": {
+      "range": {
+        "type": "Object"
+      }
+    }
+  },
+  "triggerMapCustomTriggerCard": "YOUR TRIGGER",
+  "@triggerMapCustomTriggerCard": {
+    "description": "lib/screens/trigger_map_screen.dart: CustomTriggerCard (line 694 at 97d81ce)"
+  },
+  "triggerMapCustomTriggerCard2": "ADD YOUR OWN TRIGGER",
+  "@triggerMapCustomTriggerCard2": {
+    "description": "lib/screens/trigger_map_screen.dart: CustomTriggerCard (line 695 at 97d81ce)"
+  },
+  "triggerMapCustomTriggerCard3": "Type another situation…",
+  "@triggerMapCustomTriggerCard3": {
+    "description": "lib/screens/trigger_map_screen.dart: CustomTriggerCard (line 709 at 97d81ce)"
+  },
+  "triggerMapCustomTriggerCardCustomRemoveTooltip": "Remove",
+  "@triggerMapCustomTriggerCardCustomRemoveTooltip": {
+    "description": "lib/screens/trigger_map_screen.dart: CustomTriggerCard tooltip (line 722 at 97d81ce)"
+  },
+  "triggerMapCustomTriggerEditorSheetStateCustomInputHintText": "For example, phone calls",
+  "@triggerMapCustomTriggerEditorSheetStateCustomInputHintText": {
+    "description": "lib/screens/trigger_map_screen.dart: CustomTriggerEditorSheetState hintText (line 396 at 97d81ce)"
+  },
+  "triggerMapCustomTriggerEditorSheetStateCustomInputLabelText": "My trigger",
+  "@triggerMapCustomTriggerEditorSheetStateCustomInputLabelText": {
+    "description": "lib/screens/trigger_map_screen.dart: CustomTriggerEditorSheetState labelText (line 395 at 97d81ce)"
+  },
+  "triggerMapCustomTriggerEditorSheetStateCustomSaveText": "Save trigger",
+  "@triggerMapCustomTriggerEditorSheetStateCustomSaveText": {
+    "description": "lib/screens/trigger_map_screen.dart: CustomTriggerEditorSheetState text (line 419 at 97d81ce)"
+  },
+  "triggerMapCustomTriggerEditorSheetStateText": "Add your own trigger",
+  "@triggerMapCustomTriggerEditorSheetStateText": {
+    "description": "lib/screens/trigger_map_screen.dart: CustomTriggerEditorSheetState text (line 368 at 97d81ce)"
+  },
+  "triggerMapCustomTriggerEditorSheetStateText2": "Enter a situation, feeling, or routine that makes you want to smoke.",
+  "@triggerMapCustomTriggerEditorSheetStateText2": {
+    "description": "lib/screens/trigger_map_screen.dart: CustomTriggerEditorSheetState text (line 378 at 97d81ce)"
+  },
+  "triggerMapLabelFor": "Stress",
+  "@triggerMapLabelFor": {
+    "description": "lib/screens/trigger_map_screen.dart: labelFor (line 48 at 97d81ce)"
+  },
+  "triggerMapLabelFor10": "Before bed",
+  "@triggerMapLabelFor10": {
+    "description": "lib/screens/trigger_map_screen.dart: labelFor (line 60 at 97d81ce)"
+  },
+  "triggerMapLabelFor2": "After meals",
+  "@triggerMapLabelFor2": {
+    "description": "lib/screens/trigger_map_screen.dart: labelFor (line 50 at 97d81ce)"
+  },
+  "triggerMapLabelFor3": "Driving",
+  "@triggerMapLabelFor3": {
+    "description": "lib/screens/trigger_map_screen.dart: labelFor (line 51 at 97d81ce)"
+  },
+  "triggerMapLabelFor4": "With coffee",
+  "@triggerMapLabelFor4": {
+    "description": "lib/screens/trigger_map_screen.dart: labelFor (line 52 at 97d81ce)"
+  },
+  "triggerMapLabelFor5": "Social settings",
+  "@triggerMapLabelFor5": {
+    "description": "lib/screens/trigger_map_screen.dart: labelFor (line 54 at 97d81ce)"
+  },
+  "triggerMapLabelFor6": "Work breaks",
+  "@triggerMapLabelFor6": {
+    "description": "lib/screens/trigger_map_screen.dart: labelFor (line 56 at 97d81ce)"
+  },
+  "triggerMapLabelFor7": "Alcohol",
+  "@triggerMapLabelFor7": {
+    "description": "lib/screens/trigger_map_screen.dart: labelFor (line 57 at 97d81ce)"
+  },
+  "triggerMapLabelFor8": "Boredom",
+  "@triggerMapLabelFor8": {
+    "description": "lib/screens/trigger_map_screen.dart: labelFor (line 58 at 97d81ce)"
+  },
+  "triggerMapLabelFor9": "Morning",
+  "@triggerMapLabelFor9": {
+    "description": "lib/screens/trigger_map_screen.dart: labelFor (line 59 at 97d81ce)"
+  },
+  "triggerMapQuestionLabel": "QUESTION 2 · CHOOSE ALL THAT APPLY",
+  "@triggerMapQuestionLabel": {
+    "description": "lib/screens/trigger_map_screen.dart: question label above the triggers (line 193 at 97d81ce)"
+  },
+  "triggerMapSelectionCount": "{count} {count, plural, =1{trigger selected} other{triggers selected}} · Saved automatically",
+  "@triggerMapSelectionCount": {
+    "description": "lib/screens/trigger_map_screen.dart: bottom bar, number of triggers selected",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "triggerMapText2": "When are you most likely to want a cigarette?",
+  "@triggerMapText2": {
+    "description": "lib/screens/trigger_map_screen.dart: text (line 204 at 97d81ce)"
+  },
+  "triggerMapText3": "Choose every situation that feels true for you.",
+  "@triggerMapText3": {
+    "description": "lib/screens/trigger_map_screen.dart: text (line 221 at 97d81ce)"
+  },
+  "triggerMapTriggerBottomActionText": "Continue",
+  "@triggerMapTriggerBottomActionText": {
+    "description": "lib/screens/trigger_map_screen.dart: TriggerBottomAction text (line 925 at 97d81ce)"
+  },
+  "triggerMapTriggerHeaderBackLabel": "Your triggers",
+  "@triggerMapTriggerHeaderBackLabel": {
+    "description": "lib/screens/trigger_map_screen.dart: TriggerHeader label (line 450 at 97d81ce)"
+  },
+  "triggerMapTriggerHeaderBackTooltip": "Back",
+  "@triggerMapTriggerHeaderBackTooltip": {
+    "description": "lib/screens/trigger_map_screen.dart: TriggerHeader tooltip (line 442 at 97d81ce)"
+  },
+  "triggerMapTriggerPrivacyNoteText": "Used to prepare, not to monitor",
+  "@triggerMapTriggerPrivacyNoteText": {
+    "description": "lib/screens/trigger_map_screen.dart: TriggerPrivacyNote text (line 799 at 97d81ce)"
+  },
+  "triggerMapTriggerPrivacyNoteText2": "Your choices shape coping tools and reminder timing.",
+  "@triggerMapTriggerPrivacyNoteText2": {
+    "description": "lib/screens/trigger_map_screen.dart: TriggerPrivacyNote text (line 810 at 97d81ce)"
+  },
+  "triggerMapTriggerPrivacyNoteText3": "BreatheFree does not track your location in the background.",
+  "@triggerMapTriggerPrivacyNoteText3": {
+    "description": "lib/screens/trigger_map_screen.dart: TriggerPrivacyNote text (line 821 at 97d81ce)"
+  },
+  "triggerMapTriggerProgressText": "ASSESSMENT",
+  "@triggerMapTriggerProgressText": {
+    "description": "lib/screens/trigger_map_screen.dart: TriggerProgress text (line 539 at 97d81ce)"
+  },
+  "welcomeBenefitsSubtitle": "Quick tools that work anywhere",
+  "@welcomeBenefitsSubtitle": {
+    "description": "lib/screens/welcome_screen.dart: Benefits subtitle (line 680 at 97d81ce)"
+  },
+  "welcomeBenefitsSubtitle2": "A slip never erases your wins",
+  "@welcomeBenefitsSubtitle2": {
+    "description": "lib/screens/welcome_screen.dart: Benefits subtitle (line 689 at 97d81ce)"
+  },
+  "welcomeBenefitsTitle": "Help when cravings hit",
+  "@welcomeBenefitsTitle": {
+    "description": "lib/screens/welcome_screen.dart: Benefits title (line 679 at 97d81ce)"
+  },
+  "welcomeBenefitsTitle2": "Progress that stays",
+  "@welcomeBenefitsTitle2": {
+    "description": "lib/screens/welcome_screen.dart: Benefits title (line 688 at 97d81ce)"
+  },
+  "welcomeHeadline": "Your next breath can be different.",
+  "@welcomeHeadline": {
+    "description": "lib/screens/welcome_screen.dart: headline (line 123 at 97d81ce)"
+  },
+  "welcomeLegalText": "By continuing, you agree to the ",
+  "@welcomeLegalText": {
+    "description": "lib/screens/welcome_screen.dart: LegalText text (line 788 at 97d81ce)"
+  },
+  "welcomeLegalText2": "Terms",
+  "@welcomeLegalText2": {
+    "description": "lib/screens/welcome_screen.dart: LegalText text (line 803 at 97d81ce)"
+  },
+  "welcomeLegalText3": " and acknowledge the ",
+  "@welcomeLegalText3": {
+    "description": "lib/screens/welcome_screen.dart: LegalText text (line 806 at 97d81ce)"
+  },
+  "welcomeLegalText4": "Privacy Notice.",
+  "@welcomeLegalText4": {
+    "description": "lib/screens/welcome_screen.dart: LegalText text (line 819 at 97d81ce)"
+  },
+  "welcomeMessage": "The final Terms of Use will be published before production distribution.",
+  "@welcomeMessage": {
+    "description": "lib/screens/welcome_screen.dart: message (line 263 at 97d81ce)"
+  },
+  "welcomeMessage2": "BreatheFree will clearly explain what data is collected, why it is needed, and how to delete it.",
+  "@welcomeMessage2": {
+    "description": "lib/screens/welcome_screen.dart: message (line 271 at 97d81ce)"
+  },
+  "welcomeShowInformationSheetText": "Done",
+  "@welcomeShowInformationSheetText": {
+    "description": "lib/screens/welcome_screen.dart: showInformationSheet text (line 64 at 97d81ce)"
+  },
+  "welcomeSignInText": "I already have an account",
+  "@welcomeSignInText": {
+    "description": "lib/screens/welcome_screen.dart: text (line 211 at 97d81ce)"
+  },
+  "welcomeText": "WELCOME TO BREATHEFREE",
+  "@welcomeText": {
+    "description": "lib/screens/welcome_screen.dart: text (line 109 at 97d81ce)"
+  },
+  "welcomeText2": "Small steps, practical support, and no judgment—whenever you are ready.",
+  "@welcomeText2": {
+    "description": "lib/screens/welcome_screen.dart: text (line 154 at 97d81ce)"
+  },
+  "welcomeText3": "Get started",
+  "@welcomeText3": {
+    "description": "lib/screens/welcome_screen.dart: text (line 189 at 97d81ce)"
+  },
+  "welcomeText4": "Continuar en español",
+  "@welcomeText4": {
+    "description": "lib/screens/welcome_screen.dart: text (line 247 at 97d81ce)"
+  },
+  "welcomeTitle": "Terms of Use",
+  "@welcomeTitle": {
+    "description": "lib/screens/welcome_screen.dart: title (line 262 at 97d81ce)"
+  },
+  "welcomeTitle2": "Privacy Notice",
+  "@welcomeTitle2": {
+    "description": "lib/screens/welcome_screen.dart: title (line 268 at 97d81ce)"
+  },
+  "whyBreatheFreeBottomActionText": "Continue",
+  "@whyBreatheFreeBottomActionText": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBottomAction text (line 695 at 97d81ce)"
+  },
+  "whyBreatheFreeCardCravingSubtitle": "Open a calming tool in one tap—available offline.",
+  "@whyBreatheFreeCardCravingSubtitle": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen subtitle (line 202 at 97d81ce)"
+  },
+  "whyBreatheFreeCardCravingTitle": "When a craving hits",
+  "@whyBreatheFreeCardCravingTitle": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen title (line 199 at 97d81ce)"
+  },
+  "whyBreatheFreeCardHealingSubtitle": "See smoke-free time, money saved, and recovery.",
+  "@whyBreatheFreeCardHealingSubtitle": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen subtitle (line 227 at 97d81ce)"
+  },
+  "whyBreatheFreeCardHealingTitle": "As your body heals",
+  "@whyBreatheFreeCardHealingTitle": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen title (line 224 at 97d81ce)"
+  },
+  "whyBreatheFreeCardSlipSubtitle": "Keep your progress. Learn, adjust, and continue.",
+  "@whyBreatheFreeCardSlipSubtitle": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen subtitle (line 253 at 97d81ce)"
+  },
+  "whyBreatheFreeCardSlipTitle": "If a slip happens",
+  "@whyBreatheFreeCardSlipTitle": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen title (line 250 at 97d81ce)"
+  },
+  "whyBreatheFreeHeaderBackTooltip": "Back",
+  "@whyBreatheFreeHeaderBackTooltip": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyHeader tooltip (line 312 at 97d81ce)"
+  },
+  "whyBreatheFreeHeadline": "Support for the moments that matter most.",
+  "@whyBreatheFreeHeadline": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen headline (line 150 at 97d81ce)"
+  },
+  "whyBreatheFreeMessage": "Use guided breathing, a brief distraction, or your top reason for quitting. Essential tools will remain available offline.",
+  "@whyBreatheFreeMessage": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen message (line 210 at 97d81ce)"
+  },
+  "whyBreatheFreeMessage2": "Track your smoke-free time and the money you chose not to spend on tobacco. Recovery milestones will be educational and will not replace medical advice.",
+  "@whyBreatheFreeMessage2": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen message (line 235 at 97d81ce)"
+  },
+  "whyBreatheFreeMessage3": "A slip does not erase the work you have already done. BreatheFree will help you record what happened without judgment and choose your next step.",
+  "@whyBreatheFreeMessage3": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen message (line 261 at 97d81ce)"
+  },
+  "whyBreatheFreeSheetDoneText": "Done",
+  "@whyBreatheFreeSheetDoneText": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen showCardDetails text (line 74 at 97d81ce)"
+  },
+  "whyBreatheFreeText": "A BETTER WAY TO QUIT",
+  "@whyBreatheFreeText": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen text (line 136 at 97d81ce)"
+  },
+  "whyBreatheFreeText2": "BreatheFree responds to what you need now—and helps you protect the progress you have already made.",
+  "@whyBreatheFreeText2": {
+    "description": "lib/screens/why_breathefree_screen.dart: WhyBreatheFreeScreen text (line 181 at 97d81ce)"
+  }
 }

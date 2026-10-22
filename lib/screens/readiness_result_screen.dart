@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 import '../theme/app_colors.dart';
 import '../widgets/large_text.dart';
 import 'baseline_assessment_screen.dart';
@@ -29,48 +31,50 @@ class ReadinessResultScreen extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onContinue;
 
-  String _usageLabel() {
+  String _usageLabel(BuildContext context) {
     return switch (dailyCigaretteUse) {
       DailyCigaretteUse.notEveryDay =>
-        isSpanish ? 'No fumas todos los días' : 'You do not smoke every day',
-      DailyCigaretteUse.tenOrFewer => isSpanish
-          ? '10 cigarrillos o menos en un día habitual'
-          : '10 or fewer cigarettes on a typical day',
-      DailyCigaretteUse.elevenToTwenty => isSpanish
-          ? '11–20 cigarrillos en un día habitual'
-          : '11–20 cigarettes on a typical day',
-      DailyCigaretteUse.twentyOneToThirty => isSpanish
-          ? '21–30 cigarrillos en un día habitual'
-          : '21–30 cigarettes on a typical day',
-      DailyCigaretteUse.thirtyOneOrMore => isSpanish
-          ? '31 cigarrillos o más en un día habitual'
-          : '31 or more cigarettes on a typical day',
-      null => isSpanish
-          ? 'Puedes añadir tu patrón de consumo cuando quieras'
-          : 'You can add your smoking pattern anytime',
+        AppLocalizations.of(context).readinessResultUsageLabel,
+      DailyCigaretteUse.tenOrFewer =>
+        AppLocalizations.of(context).readinessResultUsageLabel2,
+      DailyCigaretteUse.elevenToTwenty =>
+        AppLocalizations.of(context).readinessResultUsageLabel3,
+      DailyCigaretteUse.twentyOneToThirty =>
+        AppLocalizations.of(context).readinessResultUsageLabel4,
+      DailyCigaretteUse.thirtyOneOrMore =>
+        AppLocalizations.of(context).readinessResultUsageLabel5,
+      null => AppLocalizations.of(context).readinessResultUsageLabel6,
     };
   }
 
-  String _triggerLabel(SmokingTrigger trigger) {
+  String _triggerLabel(BuildContext context, SmokingTrigger trigger) {
     return switch (trigger) {
-      SmokingTrigger.stress => isSpanish ? 'estrés' : 'stress',
+      SmokingTrigger.stress =>
+        AppLocalizations.of(context).readinessResultTriggerLabel,
       SmokingTrigger.afterMeals =>
-        isSpanish ? 'después de comer' : 'after meals',
-      SmokingTrigger.driving => isSpanish ? 'conducir' : 'driving',
-      SmokingTrigger.coffee => isSpanish ? 'café' : 'coffee',
+        AppLocalizations.of(context).readinessResultTriggerLabel2,
+      SmokingTrigger.driving =>
+        AppLocalizations.of(context).readinessResultTriggerLabel3,
+      SmokingTrigger.coffee =>
+        AppLocalizations.of(context).readinessResultTriggerLabel4,
       SmokingTrigger.socialSettings =>
-        isSpanish ? 'entornos sociales' : 'social settings',
+        AppLocalizations.of(context).readinessResultTriggerLabel5,
       SmokingTrigger.workBreaks =>
-        isSpanish ? 'descansos laborales' : 'work breaks',
-      SmokingTrigger.alcohol => isSpanish ? 'alcohol' : 'alcohol',
-      SmokingTrigger.boredom => isSpanish ? 'aburrimiento' : 'boredom',
-      SmokingTrigger.morning => isSpanish ? 'la mañana' : 'mornings',
-      SmokingTrigger.beforeBed => isSpanish ? 'antes de dormir' : 'before bed',
+        AppLocalizations.of(context).readinessResultTriggerLabel6,
+      SmokingTrigger.alcohol =>
+        AppLocalizations.of(context).readinessResultTriggerLabel7,
+      SmokingTrigger.boredom =>
+        AppLocalizations.of(context).readinessResultTriggerLabel8,
+      SmokingTrigger.morning =>
+        AppLocalizations.of(context).readinessResultTriggerLabel9,
+      SmokingTrigger.beforeBed =>
+        AppLocalizations.of(context).readinessResultTriggerLabel10,
     };
   }
 
-  List<String> _allTriggerLabels() {
-    final labels = selectedTriggers.map(_triggerLabel).toList();
+  List<String> _allTriggerLabels(BuildContext context) {
+    final labels =
+        selectedTriggers.map((t) => _triggerLabel(context, t)).toList();
     final normalizedCustom = customTrigger?.trim();
     if (normalizedCustom != null && normalizedCustom.isNotEmpty) {
       labels.add(normalizedCustom);
@@ -78,51 +82,40 @@ class ReadinessResultScreen extends StatelessWidget {
     return labels;
   }
 
-  String _triggerSummary() {
-    final labels = _allTriggerLabels();
+  String _triggerSummary(BuildContext context) {
+    final labels = _allTriggerLabels(context);
     if (labels.isEmpty) {
-      return isSpanish
-          ? 'Puedes identificar desencadenantes cuando quieras'
-          : 'You can identify triggers anytime';
+      return AppLocalizations.of(context).readinessResultTriggerSummary;
     }
     if (labels.length == 1) {
-      return isSpanish
-          ? 'Quieres prepararte para ${labels.first}'
-          : 'You want support for ${labels.first}';
+      return AppLocalizations.of(context)
+          .readinessResultTriggerSummary2(labels.first);
     }
     if (labels.length == 2) {
-      return isSpanish
-          ? 'Quieres prepararte para ${labels.first} y ${labels.last}'
-          : 'You want support for ${labels.first} and ${labels.last}';
+      return AppLocalizations.of(context)
+          .readinessResultTriggerSummary3(labels.first, labels.last);
     }
     final remaining = labels.length - 2;
-    return isSpanish
-        ? '${labels[0]}, ${labels[1]} y $remaining más'
-        : '${labels[0]}, ${labels[1]}, and $remaining more';
+    return AppLocalizations.of(context)
+        .readinessResultTriggerSummary4(labels[0], labels[1], remaining);
   }
 
-  String _startingPointSummary() {
-    final count = _allTriggerLabels().length;
+  String _startingPointSummary(BuildContext context) {
+    final count = _allTriggerLabels(context).length;
     if (count == 0) {
-      return isSpanish
-          ? 'Puedes empezar con un paso pequeño y añadir detalles después'
-          : 'You can start small and add details later';
+      return AppLocalizations.of(context).readinessResultStartingPointSummary;
     }
-    return isSpanish
-        ? 'Ya identificaste $count ${count == 1 ? 'situación' : 'situaciones'} para preparar'
-        : 'You identified $count ${count == 1 ? 'situation' : 'situations'} to prepare for';
+    return AppLocalizations.of(context).readinessResultSituationCount(count);
   }
 
-  String _actionLabel() {
+  String _actionLabel(BuildContext context) {
     return switch (selectedPath) {
-      ReadinessPath.prepare => isSpanish
-          ? 'Crear mi plan de preparación'
-          : 'Build my preparation plan',
-      ReadinessPath.explore => isSpanish
-          ? 'Explorar sin fijar una fecha'
-          : 'Explore without setting a date',
+      ReadinessPath.prepare =>
+        AppLocalizations.of(context).readinessResultActionLabel,
+      ReadinessPath.explore =>
+        AppLocalizations.of(context).readinessResultActionLabel2,
       ReadinessPath.connect =>
-        isSpanish ? 'Buscar opciones de apoyo' : 'Find support options',
+        AppLocalizations.of(context).readinessResultActionLabel3,
     };
   }
 
@@ -141,9 +134,7 @@ class ReadinessResultScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                isSpanish
-                    ? 'Por qué la preparación puede ayudarte'
-                    : 'Why preparation may fit',
+                AppLocalizations.of(context).readinessResultShowWhyThisFitsText,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: AppColors.deepTeal,
                       fontWeight: FontWeight.w800,
@@ -151,9 +142,8 @@ class ReadinessResultScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                isSpanish
-                    ? 'Ya identificaste tu patrón de consumo y algunas situaciones que pueden provocar ganas de fumar. Practicar herramientas antes de elegir una fecha puede hacer que el siguiente paso se sienta más manejable.'
-                    : 'You identified your smoking pattern and situations that may bring on an urge. Practicing coping tools before choosing a date can make the next step feel more manageable.',
+                AppLocalizations.of(context)
+                    .readinessResultShowWhyThisFitsText2,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppColors.tealSecondary,
                       height: 1.45,
@@ -161,9 +151,8 @@ class ReadinessResultScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                isSpanish
-                    ? 'Esto es una recomendación flexible, no una evaluación médica. Puedes elegir otra ruta ahora o cambiarla después.'
-                    : 'This is a flexible recommendation, not a medical assessment. You can choose another path now or change it later.',
+                AppLocalizations.of(context)
+                    .readinessResultShowWhyThisFitsText3,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.mutedTeal,
                       height: 1.4,
@@ -179,7 +168,8 @@ class ReadinessResultScreen extends StatelessWidget {
                     backgroundColor: AppColors.deepTeal,
                     foregroundColor: Colors.white,
                   ),
-                  child: Text(isSpanish ? 'Listo' : 'Done'),
+                  child: Text(
+                      AppLocalizations.of(context).readinessResultDoneText),
                 ),
               ),
             ],
@@ -191,6 +181,12 @@ class ReadinessResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      isSpanish == (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     return Scaffold(
       key: const ValueKey('functional-readiness-result-screen'),
       backgroundColor: AppColors.cream,
@@ -215,7 +211,7 @@ class ReadinessResultScreen extends StatelessWidget {
 
               final footer = _ReadinessBottomAction(
                 isSpanish: isSpanish,
-                label: _actionLabel(),
+                label: _actionLabel(context),
                 onContinue: onContinue,
                 horizontalPadding: largeText ? 0 : horizontalPadding,
                 compact: compact,
@@ -273,7 +269,8 @@ class ReadinessResultScreen extends StatelessWidget {
                               _ReadinessIllustration(compact: compact),
                               SizedBox(height: compact ? 12 : 20),
                               Text(
-                                isSpanish ? 'TU REFLEXIÓN' : 'YOUR REFLECTION',
+                                AppLocalizations.of(context)
+                                    .readinessResultText,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 11,
@@ -283,9 +280,8 @@ class ReadinessResultScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 9),
                               Text(
-                                isSpanish
-                                    ? 'Estás listo para prepararte—a tu propio ritmo.'
-                                    : 'You’re ready to prepare—at your own pace.',
+                                AppLocalizations.of(context)
+                                    .readinessResultText2,
                                 // Already the largest text on screen; past
                                 // 180% its longest words no longer fit.
                                 textScaler: MediaQuery.textScalerOf(context)
@@ -300,9 +296,8 @@ class ReadinessResultScreen extends StatelessWidget {
                               ),
                               SizedBox(height: compact ? 9 : 13),
                               Text(
-                                isSpanish
-                                    ? 'Esto es lo que entendimos de tus respuestas.'
-                                    : 'Here is what we heard from your answers.',
+                                AppLocalizations.of(context)
+                                    .readinessResultText3,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -315,9 +310,9 @@ class ReadinessResultScreen extends StatelessWidget {
                               SizedBox(height: compact ? 14 : 20),
                               _ReflectionCard(
                                 isSpanish: isSpanish,
-                                usage: _usageLabel(),
-                                triggers: _triggerSummary(),
-                                startingPoint: _startingPointSummary(),
+                                usage: _usageLabel(context),
+                                triggers: _triggerSummary(context),
+                                startingPoint: _startingPointSummary(context),
                               ),
                               const SizedBox(height: 12),
                               _RecommendationCard(
@@ -329,9 +324,8 @@ class ReadinessResultScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 18),
                               Text(
-                                isSpanish
-                                    ? 'PUEDES ELEGIR OTRA RUTA'
-                                    : 'YOU CAN CHOOSE A DIFFERENT PATH',
+                                AppLocalizations.of(context)
+                                    .readinessResultText4,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 10,
@@ -377,7 +371,8 @@ class _ReadinessHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final back = IconButton.outlined(
       key: const ValueKey('readiness-back'),
-      tooltip: isSpanish ? 'Atrás' : 'Back',
+      tooltip: AppLocalizations.of(context)
+          .readinessResultReadinessHeaderBackTooltip,
       onPressed: onBack,
       style: IconButton.styleFrom(
         foregroundColor: AppColors.deepTeal,
@@ -385,7 +380,8 @@ class _ReadinessHeader extends StatelessWidget {
       ),
       icon: const Icon(Icons.arrow_back_rounded),
     );
-    final label = isSpanish ? 'Tu punto de partida' : 'Your starting point';
+    final label =
+        AppLocalizations.of(context).readinessResultReadinessHeaderBackLabel;
     const style = TextStyle(
       color: AppColors.deepTeal,
       fontSize: 16,
@@ -423,7 +419,7 @@ class _ReadinessHeader extends StatelessWidget {
           ),
           const SizedBox(width: 5),
           Text(
-            isSpanish ? 'Completo' : 'Complete',
+            AppLocalizations.of(context).readinessResultReadinessHeaderText,
             style: const TextStyle(
               color: AppColors.tealSecondary,
               fontSize: 10,
@@ -483,7 +479,8 @@ class _ReadinessProgress extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                isSpanish ? 'EVALUACIÓN' : 'ASSESSMENT',
+                AppLocalizations.of(context)
+                    .readinessResultReadinessProgressText,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -635,7 +632,8 @@ class _ReflectionCard extends StatelessWidget {
             icon: Icons.smoke_free_rounded,
             iconColor: AppColors.coral,
             iconBackground: AppColors.coralLight,
-            label: isSpanish ? 'TU PATRÓN' : 'YOUR PATTERN',
+            label:
+                AppLocalizations.of(context).readinessResultReflectionCardLabel,
             value: usage,
           ),
           const Divider(height: 1, color: AppColors.border),
@@ -643,7 +641,8 @@ class _ReflectionCard extends StatelessWidget {
             icon: Icons.route_rounded,
             iconColor: AppColors.deepTeal,
             iconBackground: AppColors.mint,
-            label: isSpanish ? 'DESENCADENANTES' : 'TRIGGERS',
+            label: AppLocalizations.of(context)
+                .readinessResultReflectionCardLabel2,
             value: triggers,
           ),
           const Divider(height: 1, color: AppColors.border),
@@ -651,7 +650,8 @@ class _ReflectionCard extends StatelessWidget {
             icon: Icons.tune_rounded,
             iconColor: AppColors.deepTeal,
             iconBackground: const Color(0xFFF1F8C7),
-            label: isSpanish ? 'PUNTO DE PARTIDA' : 'STARTING POINT',
+            label: AppLocalizations.of(context)
+                .readinessResultReflectionCardLabel3,
             value: startingPoint,
           ),
         ],
@@ -746,7 +746,8 @@ class _RecommendationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = isSpanish ? 'Prepararte' : 'Prepare';
+    final title =
+        AppLocalizations.of(context).readinessResultRecommendationCardTitle;
     const titleStyle = TextStyle(
       color: AppColors.deepTeal,
       fontSize: 20,
@@ -790,7 +791,8 @@ class _RecommendationCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
-                        isSpanish ? 'RECOMENDADO' : 'RECOMMENDED',
+                        AppLocalizations.of(context)
+                            .readinessResultRecommendationCardText,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 9,
@@ -827,9 +829,8 @@ class _RecommendationCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                isSpanish
-                    ? 'Practica herramientas y elige una fecha para dejar de fumar en los próximos 7–14 días. Te guiaremos con un paso pequeño cada día.'
-                    : 'Practice coping tools and choose a quit date in the next 7–14 days. We’ll guide one small step each day.',
+                AppLocalizations.of(context)
+                    .readinessResultRecommendationCardText2,
                 style: const TextStyle(
                   color: AppColors.tealSecondary,
                   fontSize: 13,
@@ -847,9 +848,8 @@ class _RecommendationCard extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 label: Text(
-                  isSpanish
-                      ? 'Por qué encaja contigo'
-                      : 'Why this fits your answers',
+                  AppLocalizations.of(context)
+                      .readinessResultRecommendationCardFitText,
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
@@ -886,10 +886,10 @@ class _AlternativePaths extends StatelessWidget {
       icon: Icons.add_rounded,
       iconColor: AppColors.deepTeal,
       iconBackground: AppColors.mint,
-      title: isSpanish ? 'Explorar primero' : 'Explore first',
-      subtitle: isSpanish
-          ? 'Aprende sin fijar una fecha'
-          : 'Learn without setting a date',
+      title: AppLocalizations.of(context)
+          .readinessResultAlternativePathsPathExploreTitle,
+      subtitle: AppLocalizations.of(context)
+          .readinessResultAlternativePathsPathExploreSubtitle,
       selected: selectedPath == ReadinessPath.explore,
       onTap: () => onPathChanged(ReadinessPath.explore),
     );
@@ -898,10 +898,10 @@ class _AlternativePaths extends StatelessWidget {
       icon: Icons.support_agent_rounded,
       iconColor: AppColors.coral,
       iconBackground: AppColors.coralLight,
-      title: isSpanish ? 'Conectar' : 'Connect',
-      subtitle: isSpanish
-          ? 'Habla con un asesor o equipo de atención'
-          : 'Talk with a coach or care team',
+      title: AppLocalizations.of(context)
+          .readinessResultAlternativePathsPathConnectTitle,
+      subtitle: AppLocalizations.of(context)
+          .readinessResultAlternativePathsPathConnectSubtitle,
       selected: selectedPath == ReadinessPath.connect,
       onTap: () => onPathChanged(ReadinessPath.connect),
     );
@@ -1092,9 +1092,8 @@ class _ReadinessBottomAction extends StatelessWidget {
                 if (!compact) ...[
                   const SizedBox(height: 7),
                   Text(
-                    isSpanish
-                        ? 'Tú tienes el control. Cambia tu ruta cuando quieras.'
-                        : 'You’re in control. Change your path anytime.',
+                    AppLocalizations.of(context)
+                        .readinessResultReadinessBottomActionText,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: AppColors.mutedTeal,

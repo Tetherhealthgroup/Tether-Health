@@ -1,0 +1,1039 @@
+{
+  "baselineAssessmentAssessmentBottomActionText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentAssessmentBottomActionText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentAssessmentChoiceText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentAssessmentHeaderBackLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentAssessmentHeaderBackTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentAssessmentProgressText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentChoiceLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentChoiceLabel2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentChoiceLabel3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentChoiceLabel4": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentChoiceLabel5": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentWhyWeAskCardText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentWhyWeAskCardText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "baselineAssessmentWhyWeAskCardText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "chooseQuitPathDescription": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathDescription2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathDescription3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathFlexiblePathNoteText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathPathLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathPathLabel2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathPathLabel3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathQuitPathBottomActionText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathQuitPathHeaderBackLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathQuitPathHeaderBackTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "chooseQuitPathQuitPathHeaderText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathQuitPlanProgressText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathRecommendedLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathSavedMessage": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathSupportingText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "chooseQuitPathText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "consentPrivacyConsentBottomActionText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyConsentBottomActionText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyConsentHeaderBackTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "consentPrivacyOptionalConsentCardBadge": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyOptionalConsentCardHelpImproveSubtitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyOptionalConsentCardHelpImproveTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyOptionalConsentCardHelpfulRemindersSubtitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyOptionalConsentCardHelpfulRemindersTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyOptionalConsentCardShareCareTeamSubtitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyOptionalConsentCardShareCareTeamTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyOptionalConsentCardTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyRequiredConsentCardBadge": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyRequiredConsentCardReviewPrivacyText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyRequiredConsentCardSubtitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyRequiredConsentCardSubtitle2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyRequiredConsentCardTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyRequiredConsentCardTitle2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyRequiredConsentCardTitle3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacySheetDoneText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyShowPrivacyReviewText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyShowPrivacyReviewText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyShowPrivacyReviewText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyTrustNoteText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "consentPrivacyTrustNoteText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "myReasonsCustomReasonCard": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsCustomReasonCard2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsCustomReasonCard3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsCustomReasonCardReasonCustomRemoveTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsCustomReasonCardReasonTopCustomTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsCustomReasonEditorSheetStateReasonCustomMakeTopText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsCustomReasonEditorSheetStateReasonCustomSaveText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsCustomReasonEditorSheetStateReasonCustomTextFieldHintText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsCustomReasonEditorSheetStateText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsCustomReasonEditorSheetStateText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsLabelFor": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/approved_screen_player.dart"
+  },
+  "myReasonsLabelFor2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/approved_screen_player.dart"
+  },
+  "myReasonsLabelFor3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/approved_screen_player.dart"
+  },
+  "myReasonsLabelFor4": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/approved_screen_player.dart"
+  },
+  "myReasonsLabelFor5": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/approved_screen_player.dart"
+  },
+  "myReasonsLabelFor6": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/approved_screen_player.dart"
+  },
+  "myReasonsLabelFor7": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/approved_screen_player.dart"
+  },
+  "myReasonsMotivationPreview": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsMotivationPreview2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsMotivationPreviewReasonPreviewText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsMotivationPreviewText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsPreviewFor": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsPreviewFor2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsPreviewFor3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsPreviewFor4": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsPreviewFor5": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsPreviewFor6": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsPreviewFor7": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsPreviewFor8": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsReasonsBottomActionText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsReasonsHeaderBackLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsReasonsHeaderBackTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "myReasonsReasonsHeaderText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "myReasonsReasonsPrivacyNoteText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsReasonsProgressText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "myReasonsSelectedCountText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsSelectionSummary": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart",
+    "form": "select"
+  },
+  "myReasonsText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "myReasonsText4": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "readinessResultActionLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultActionLabel2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultActionLabel3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultAlternativePathsPathConnectSubtitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultAlternativePathsPathConnectTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultAlternativePathsPathExploreSubtitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultAlternativePathsPathExploreTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultDoneText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "readinessResultReadinessBottomActionText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultReadinessHeaderBackLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultReadinessHeaderBackTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "readinessResultReadinessHeaderText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultReadinessProgressText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "readinessResultRecommendationCardFitText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultRecommendationCardText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "readinessResultRecommendationCardText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultRecommendationCardTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultReflectionCardLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultReflectionCardLabel2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultReflectionCardLabel3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultShowWhyThisFitsText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultShowWhyThisFitsText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultShowWhyThisFitsText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultSituationCount": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart",
+    "form": "plural"
+  },
+  "readinessResultStartingPointSummary": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultText4": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerLabel10": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerLabel2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerLabel3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerLabel4": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerLabel5": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerLabel6": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerLabel7": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerLabel8": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerLabel9": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerSummary": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerSummary2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerSummary3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultTriggerSummary4": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultUsageLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultUsageLabel2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultUsageLabel3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultUsageLabel4": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultUsageLabel5": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "readinessResultUsageLabel6": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "selectQuitDateCheckInCardText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateCheckInCardText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateCheckInCardText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateContinueLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateContinueLabel2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateContinueLabel3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateDateBottomActionText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateDateHeaderBackTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "selectQuitDateDateHeaderText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "selectQuitDateDateLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateDateLabel2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateDateLabel3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/home_preparation_screen.dart"
+  },
+  "selectQuitDateDateProgressText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "selectQuitDateDescription": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateDescription2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateDescription3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateFlexibleDateNoteText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateHeaderTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateHeaderTitle2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateHeaderTitle3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateLongDate": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart",
+    "form": "composed"
+  },
+  "selectQuitDateMonthName": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart",
+    "form": "table"
+  },
+  "selectQuitDateMonthShort": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart",
+    "form": "table"
+  },
+  "selectQuitDateMonthYear": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart",
+    "form": "composed"
+  },
+  "selectQuitDateRange": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart",
+    "form": "composed"
+  },
+  "selectQuitDateRangeSameMonth": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart",
+    "form": "composed"
+  },
+  "selectQuitDateSelectedDateCardUnavailableText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "selectQuitDateText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateTimingLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/review_quit_plan_screen.dart"
+  },
+  "selectQuitDateTimingLabel2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/review_quit_plan_screen.dart"
+  },
+  "selectQuitDateTimingLabel3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/review_quit_plan_screen.dart"
+  },
+  "selectQuitDateTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateTitle2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateTitle3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateUnavailableMessage": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateWeekdayInitial": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart",
+    "form": "table"
+  },
+  "selectQuitDateWeekdayName": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart",
+    "form": "table"
+  },
+  "selectQuitDateWindowMessage": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateWindowMessage2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "selectQuitDateWindowMessage3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/select_quit_date_screen.dart"
+  },
+  "triggerMapCustomTriggerCard": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapCustomTriggerCard2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapCustomTriggerCard3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapCustomTriggerCardCustomRemoveTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/my_reasons_screen.dart"
+  },
+  "triggerMapCustomTriggerEditorSheetStateCustomInputHintText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapCustomTriggerEditorSheetStateCustomInputLabelText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapCustomTriggerEditorSheetStateCustomSaveText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapCustomTriggerEditorSheetStateText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapCustomTriggerEditorSheetStateText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapLabelFor": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "triggerMapLabelFor10": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapLabelFor2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "triggerMapLabelFor3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "triggerMapLabelFor4": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapLabelFor5": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapLabelFor6": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapLabelFor7": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "triggerMapLabelFor8": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "triggerMapLabelFor9": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapQuestionLabel": {
+    "status": "derived-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart",
+    "source": "PREGUNTA 6 · ELIGE TODAS LAS QUE CORRESPONDAN",
+    "change": "step counter number only (6 to 2)"
+  },
+  "triggerMapSelectionCount": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart",
+    "form": "plural"
+  },
+  "triggerMapText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapTriggerBottomActionText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/learn_library_screen.dart"
+  },
+  "triggerMapTriggerHeaderBackLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapTriggerHeaderBackTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "triggerMapTriggerPrivacyNoteText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapTriggerPrivacyNoteText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapTriggerPrivacyNoteText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/trigger_map_screen.dart"
+  },
+  "triggerMapTriggerProgressText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "welcomeBenefitsSubtitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeBenefitsSubtitle2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeBenefitsTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeBenefitsTitle2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeHeadline": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeLegalText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeLegalText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeLegalText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeLegalText4": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeMessage": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeMessage2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeShowInformationSheetText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "welcomeSignInText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeText3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeText4": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "welcomeTitle2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/welcome_screen.dart"
+  },
+  "whyBreatheFreeBottomActionText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/learn_library_screen.dart"
+  },
+  "whyBreatheFreeCardCravingSubtitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/why_breathefree_screen.dart"
+  },
+  "whyBreatheFreeCardCravingTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/why_breathefree_screen.dart"
+  },
+  "whyBreatheFreeCardHealingSubtitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/why_breathefree_screen.dart"
+  },
+  "whyBreatheFreeCardHealingTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/why_breathefree_screen.dart"
+  },
+  "whyBreatheFreeCardSlipSubtitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/why_breathefree_screen.dart"
+  },
+  "whyBreatheFreeCardSlipTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/why_breathefree_screen.dart"
+  },
+  "whyBreatheFreeHeaderBackTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/baseline_assessment_screen.dart"
+  },
+  "whyBreatheFreeHeadline": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/why_breathefree_screen.dart"
+  },
+  "whyBreatheFreeMessage": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/why_breathefree_screen.dart"
+  },
+  "whyBreatheFreeMessage2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/why_breathefree_screen.dart"
+  },
+  "whyBreatheFreeMessage3": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/why_breathefree_screen.dart"
+  },
+  "whyBreatheFreeSheetDoneText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "whyBreatheFreeText": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/why_breathefree_screen.dart"
+  },
+  "whyBreatheFreeText2": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/why_breathefree_screen.dart"
+  }
+}

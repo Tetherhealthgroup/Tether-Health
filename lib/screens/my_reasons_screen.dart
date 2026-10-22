@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 import '../theme/app_colors.dart';
 import '../widgets/large_text.dart';
 
@@ -51,22 +53,19 @@ class MyReasonsScreen extends StatelessWidget {
     QuitReason.future,
   ];
 
-  String _labelFor(QuitReason reason) {
+  String _labelFor(BuildContext context, QuitReason reason) {
     return switch (reason) {
-      QuitReason.family =>
-        isSpanish ? 'Proteger a mi familia' : 'Protect my family',
+      QuitReason.family => AppLocalizations.of(context).myReasonsLabelFor,
       QuitReason.breatheEasier =>
-        isSpanish ? 'Respirar mejor' : 'Breathe easier',
+        AppLocalizations.of(context).myReasonsLabelFor2,
       QuitReason.improveHealth =>
-        isSpanish ? 'Mejorar mi salud' : 'Improve my health',
-      QuitReason.saveMoney => isSpanish ? 'Ahorrar dinero' : 'Save money',
-      QuitReason.control =>
-        isSpanish ? 'Sentirme en control' : 'Feel more in control',
-      QuitReason.future =>
-        isSpanish ? 'Estar presente para mi futuro' : 'Be there for my future',
+        AppLocalizations.of(context).myReasonsLabelFor3,
+      QuitReason.saveMoney => AppLocalizations.of(context).myReasonsLabelFor4,
+      QuitReason.control => AppLocalizations.of(context).myReasonsLabelFor5,
+      QuitReason.future => AppLocalizations.of(context).myReasonsLabelFor6,
       QuitReason.custom => customReason?.trim().isNotEmpty == true
           ? customReason!.trim()
-          : (isSpanish ? 'Mi propia razón' : 'My own reason'),
+          : (AppLocalizations.of(context).myReasonsLabelFor7),
     };
   }
 
@@ -149,43 +148,35 @@ class MyReasonsScreen extends StatelessWidget {
     );
   }
 
-  String _previewFor(QuitReason? reason) {
+  String _previewFor(BuildContext context, QuitReason? reason) {
     if (reason == null) {
-      return isSpanish
-          ? 'Elige una razón para crear tu recordatorio personal.'
-          : 'Choose a reason to create your personal reminder.';
+      return AppLocalizations.of(context).myReasonsPreviewFor;
     }
     if (reason == QuitReason.custom) {
       final value = customReason?.trim() ?? '';
-      return isSpanish
-          ? '“Elegiste esto porque «$value». Esta sensación pasará.”'
-          : '“You chose this because ‘$value.’ This feeling will pass.”';
+      return AppLocalizations.of(context).myReasonsPreviewFor2(value);
     }
     return switch (reason) {
-      QuitReason.family => isSpanish
-          ? '“Elegiste esto por tu familia. Esta sensación pasará.”'
-          : '“You chose this for your family. This feeling will pass.”',
-      QuitReason.breatheEasier => isSpanish
-          ? '“Elegiste esto para respirar mejor. Esta sensación pasará.”'
-          : '“You chose this to breathe easier. This feeling will pass.”',
-      QuitReason.improveHealth => isSpanish
-          ? '“Elegiste esto por tu salud. Esta sensación pasará.”'
-          : '“You chose this for your health. This feeling will pass.”',
-      QuitReason.saveMoney => isSpanish
-          ? '“Elegiste esto para ahorrar dinero. Esta sensación pasará.”'
-          : '“You chose this to save money. This feeling will pass.”',
-      QuitReason.control => isSpanish
-          ? '“Elegiste esto para recuperar el control. Esta sensación pasará.”'
-          : '“You chose this to feel in control. This feeling will pass.”',
-      QuitReason.future => isSpanish
-          ? '“Elegiste esto por tu futuro. Esta sensación pasará.”'
-          : '“You chose this for your future. This feeling will pass.”',
+      QuitReason.family => AppLocalizations.of(context).myReasonsPreviewFor3,
+      QuitReason.breatheEasier =>
+        AppLocalizations.of(context).myReasonsPreviewFor4,
+      QuitReason.improveHealth =>
+        AppLocalizations.of(context).myReasonsPreviewFor5,
+      QuitReason.saveMoney => AppLocalizations.of(context).myReasonsPreviewFor6,
+      QuitReason.control => AppLocalizations.of(context).myReasonsPreviewFor7,
+      QuitReason.future => AppLocalizations.of(context).myReasonsPreviewFor8,
       QuitReason.custom => '',
     };
   }
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      isSpanish == (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     final hasCustom = customReason?.trim().isNotEmpty == true;
     final selectionCount = selectedReasons.length;
     final canContinue = selectionCount > 0;
@@ -211,9 +202,7 @@ class MyReasonsScreen extends StatelessWidget {
                   largeText ? 12.0 : (narrow ? 18.0 : 22.0);
 
               final selectAll = Text(
-                isSpanish
-                    ? 'ELIGE TODAS LAS QUE TE IMPORTEN'
-                    : 'SELECT ALL THAT MATTER',
+                AppLocalizations.of(context).myReasonsText,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -232,9 +221,8 @@ class MyReasonsScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Text(
-                  isSpanish
-                      ? '$selectionCount ELEGIDAS'
-                      : '$selectionCount SELECTED',
+                  AppLocalizations.of(context)
+                      .myReasonsSelectedCountText(selectionCount),
                   style: const TextStyle(
                     color: AppColors.deepTeal,
                     fontSize: 9,
@@ -303,7 +291,7 @@ class MyReasonsScreen extends StatelessWidget {
                                 const SizedBox(height: 18),
                               ],
                               Text(
-                                isSpanish ? 'TU MOTIVACIÓN' : 'YOUR MOTIVATION',
+                                AppLocalizations.of(context).myReasonsText2,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 11,
@@ -313,9 +301,7 @@ class MyReasonsScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                isSpanish
-                                    ? '¿Por qué quieres dejar de fumar?'
-                                    : 'What are you quitting for?',
+                                AppLocalizations.of(context).myReasonsText3,
                                 // Already the largest text on screen; past
                                 // 180% its longest words no longer fit.
                                 textScaler: MediaQuery.textScalerOf(context)
@@ -330,9 +316,7 @@ class MyReasonsScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                isSpanish
-                                    ? 'Elige todo lo que te importe. Toca la estrella para elegir tu razón principal.'
-                                    : 'Choose everything that matters to you. Tap the star to make one your top reason.',
+                                AppLocalizations.of(context).myReasonsText4,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -372,16 +356,16 @@ class MyReasonsScreen extends StatelessWidget {
                                         context,
                                       ).scale(10) >
                                       10;
-                                  final twoColumns =
-                                      gridConstraints.maxWidth >= 300 &&
-                                          (!enlarged ||
-                                              wordsFit(
-                                                context,
-                                                _standardReasons.map(_labelFor),
-                                                halfWidth -
-                                                    _ReasonChoice.chrome,
-                                                _choiceLabelStyle,
-                                              ));
+                                  final twoColumns = gridConstraints.maxWidth >=
+                                          300 &&
+                                      (!enlarged ||
+                                          wordsFit(
+                                            context,
+                                            _standardReasons.map(
+                                                (r) => _labelFor(context, r)),
+                                            halfWidth - _ReasonChoice.chrome,
+                                            _choiceLabelStyle,
+                                          ));
                                   final itemWidth = twoColumns
                                       ? halfWidth
                                       : gridConstraints.maxWidth;
@@ -394,7 +378,7 @@ class MyReasonsScreen extends StatelessWidget {
                                           width: itemWidth,
                                           child: _ReasonChoice(
                                             reason: reason,
-                                            label: _labelFor(reason),
+                                            label: _labelFor(context, reason),
                                             icon: _iconFor(reason),
                                             accent: _accentFor(reason),
                                             selected: selectedReasons
@@ -421,10 +405,10 @@ class MyReasonsScreen extends StatelessWidget {
                               const SizedBox(height: 12),
                               _MotivationPreview(
                                 isSpanish: isSpanish,
-                                message: _previewFor(topReason),
+                                message: _previewFor(context, topReason),
                                 topLabel: topReason == null
                                     ? null
-                                    : _labelFor(topReason!),
+                                    : _labelFor(context, topReason!),
                               ),
                               const SizedBox(height: 12),
                               _ReasonsPrivacyNote(isSpanish: isSpanish),
@@ -459,7 +443,7 @@ class _ReasonsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final back = IconButton.outlined(
       key: const ValueKey('reasons-back'),
-      tooltip: isSpanish ? 'Atrás' : 'Back',
+      tooltip: AppLocalizations.of(context).myReasonsReasonsHeaderBackTooltip,
       onPressed: onBack,
       style: IconButton.styleFrom(
         foregroundColor: AppColors.deepTeal,
@@ -467,7 +451,7 @@ class _ReasonsHeader extends StatelessWidget {
       ),
       icon: const Icon(Icons.arrow_back_rounded),
     );
-    final label = isSpanish ? 'Mis razones' : 'My reasons';
+    final label = AppLocalizations.of(context).myReasonsReasonsHeaderBackLabel;
     const style = TextStyle(
       color: AppColors.deepTeal,
       fontSize: 16,
@@ -497,7 +481,7 @@ class _ReasonsHeader extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: Text(
-        isSpanish ? '3 DE 5' : '3 OF 5',
+        AppLocalizations.of(context).myReasonsReasonsHeaderText,
         style: const TextStyle(
           color: AppColors.tealSecondary,
           fontSize: 10,
@@ -557,7 +541,7 @@ class _ReasonsProgress extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
+                AppLocalizations.of(context).myReasonsReasonsProgressText,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -748,10 +732,10 @@ class _CustomReasonCard extends StatelessWidget {
                   children: [
                     Text(
                       hasValue
-                          ? (isSpanish ? 'TU PROPIA RAZÓN' : 'YOUR OWN REASON')
-                          : (isSpanish
-                              ? 'AGREGA TU PROPIA RAZÓN'
-                              : 'ADD YOUR OWN REASON'),
+                          ? (AppLocalizations.of(context)
+                              .myReasonsCustomReasonCard)
+                          : (AppLocalizations.of(context)
+                              .myReasonsCustomReasonCard2),
                       style: const TextStyle(
                         color: AppColors.mutedTeal,
                         fontSize: 10,
@@ -763,9 +747,8 @@ class _CustomReasonCard extends StatelessWidget {
                     Text(
                       hasValue
                           ? customReason!.trim()
-                          : (isSpanish
-                              ? 'Escribe lo que más te importa'
-                              : 'Write what matters most in your own words'),
+                          : (AppLocalizations.of(context)
+                              .myReasonsCustomReasonCard3),
                       style: TextStyle(
                         color: hasValue
                             ? AppColors.deepTeal
@@ -781,7 +764,8 @@ class _CustomReasonCard extends StatelessWidget {
               if (hasValue) ...[
                 IconButton(
                   key: const ValueKey('reason-top-custom'),
-                  tooltip: isSpanish ? 'Razón principal' : 'Top reason',
+                  tooltip: AppLocalizations.of(context)
+                      .myReasonsCustomReasonCardReasonTopCustomTooltip,
                   onPressed: onMakeTop,
                   icon: Icon(
                     isTop ? Icons.star_rounded : Icons.star_border_rounded,
@@ -790,7 +774,8 @@ class _CustomReasonCard extends StatelessWidget {
                 ),
                 IconButton(
                   key: const ValueKey('reason-custom-remove'),
-                  tooltip: isSpanish ? 'Eliminar' : 'Remove',
+                  tooltip: AppLocalizations.of(context)
+                      .myReasonsCustomReasonCardReasonCustomRemoveTooltip,
                   onPressed: onRemove,
                   icon: const Icon(Icons.close_rounded, color: AppColors.coral),
                 ),
@@ -842,9 +827,8 @@ class _MotivationPreview extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  isSpanish
-                      ? 'VISTA PREVIA DE MOTIVACIÓN'
-                      : 'MOTIVATION PREVIEW',
+                  AppLocalizations.of(context)
+                      .myReasonsMotivationPreviewReasonPreviewText,
                   style: const TextStyle(
                     color: AppColors.mintStrong,
                     fontSize: 9.5,
@@ -863,7 +847,7 @@ class _MotivationPreview extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            isSpanish ? 'CUANDO LLEGUE UN ANTOJO' : 'WHEN A CRAVING HITS',
+            AppLocalizations.of(context).myReasonsMotivationPreviewText,
             style: const TextStyle(
               color: AppColors.lime,
               fontSize: 9,
@@ -887,12 +871,9 @@ class _MotivationPreview extends StatelessWidget {
           const SizedBox(height: 7),
           Text(
             topLabel == null
-                ? (isSpanish
-                    ? 'Elige una razón principal en cualquier momento'
-                    : 'Choose a top reason anytime')
-                : (isSpanish
-                    ? 'Basado en tu razón principal: $topLabel'
-                    : 'Based on your top reason: $topLabel'),
+                ? (AppLocalizations.of(context).myReasonsMotivationPreview)
+                : (AppLocalizations.of(context)
+                    .myReasonsMotivationPreview2(topLabel!)),
             style: const TextStyle(
               color: AppColors.mintStrong,
               fontSize: 9.5,
@@ -925,9 +906,7 @@ class _ReasonsPrivacyNote extends StatelessWidget {
           const SizedBox(width: 9),
           Expanded(
             child: Text(
-              isSpanish
-                  ? 'Tus razones son privadas y solo personalizan tu apoyo para dejar de fumar.'
-                  : 'Your reasons stay private and only personalize your quit support.',
+              AppLocalizations.of(context).myReasonsReasonsPrivacyNoteText,
               style: const TextStyle(
                 color: AppColors.mutedTeal,
                 fontSize: 10.5,
@@ -1003,7 +982,8 @@ class _ReasonsBottomAction extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        isSpanish ? 'Guardar mis razones' : 'Save my reasons',
+                        AppLocalizations.of(context)
+                            .myReasonsReasonsBottomActionText,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 17,
@@ -1019,9 +999,10 @@ class _ReasonsBottomAction extends StatelessWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                isSpanish
-                    ? '$selectionCount razones elegidas · ${hasTopReason ? '1 razón principal' : 'sin razón principal'}'
-                    : '$selectionCount reasons selected · ${hasTopReason ? '1 top reason' : 'no top reason'}',
+                AppLocalizations.of(context).myReasonsSelectionSummary(
+                  selectionCount,
+                  hasTopReason.toString(),
+                ),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
@@ -1081,7 +1062,8 @@ class _CustomReasonEditorSheetState extends State<_CustomReasonEditorSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            widget.isSpanish ? 'Agrega tu propia razón' : 'Add your own reason',
+            AppLocalizations.of(context)
+                .myReasonsCustomReasonEditorSheetStateText,
             style: const TextStyle(
               color: AppColors.deepTeal,
               fontSize: 22,
@@ -1090,9 +1072,8 @@ class _CustomReasonEditorSheetState extends State<_CustomReasonEditorSheet> {
           ),
           const SizedBox(height: 7),
           Text(
-            widget.isSpanish
-                ? 'Escribe algo que quieras recordar cuando llegue un antojo.'
-                : 'Write something you want to remember when a craving hits.',
+            AppLocalizations.of(context)
+                .myReasonsCustomReasonEditorSheetStateText2,
             style:
                 const TextStyle(color: AppColors.tealSecondary, fontSize: 14),
           ),
@@ -1106,9 +1087,8 @@ class _CustomReasonEditorSheetState extends State<_CustomReasonEditorSheet> {
             maxLines: 3,
             textCapitalization: TextCapitalization.sentences,
             decoration: InputDecoration(
-              hintText: widget.isSpanish
-                  ? 'Por ejemplo: Quiero tener más energía'
-                  : 'For example: I want more energy',
+              hintText: AppLocalizations.of(context)
+                  .myReasonsCustomReasonEditorSheetStateReasonCustomTextFieldHintText,
               filled: true,
               fillColor: AppColors.cream,
               border: OutlineInputBorder(
@@ -1125,9 +1105,8 @@ class _CustomReasonEditorSheetState extends State<_CustomReasonEditorSheet> {
             activeThumbColor: Colors.white,
             activeTrackColor: AppColors.deepTeal,
             title: Text(
-              widget.isSpanish
-                  ? 'Hacerla mi razón principal'
-                  : 'Make this my top reason',
+              AppLocalizations.of(context)
+                  .myReasonsCustomReasonEditorSheetStateReasonCustomMakeTopText,
               style: const TextStyle(
                 color: AppColors.deepTeal,
                 fontSize: 14,
@@ -1152,7 +1131,8 @@ class _CustomReasonEditorSheetState extends State<_CustomReasonEditorSheet> {
                 ),
               ),
               child: Text(
-                widget.isSpanish ? 'Guardar razón' : 'Save reason',
+                AppLocalizations.of(context)
+                    .myReasonsCustomReasonEditorSheetStateReasonCustomSaveText,
                 style: const TextStyle(fontWeight: FontWeight.w800),
               ),
             ),

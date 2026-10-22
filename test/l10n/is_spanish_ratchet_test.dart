@@ -3,6 +3,12 @@
 // from [isSpanishFiles] in the same change; the list only ever shrinks, and
 // the last ticket empties it. The language mapping itself
 // (lib/l10n/app_locale.dart) is not text selection and stays.
+//
+// Choosing text means using isSpanish as a condition (`isSpanish ? … : …`,
+// `if (isSpanish)`, `!isSpanish`, `isSpanish &&`) or handing it to a helper
+// that picks between texts (`localized(isSpanish, english, spanish)`). Until the last ticket a
+// moved screen still takes an isSpanish parameter, passes it on and asserts
+// it matches the app locale; none of that is a condition.
 import 'dart:convert';
 import 'dart:io';
 
@@ -11,9 +17,6 @@ import 'package:flutter_test/flutter_test.dart';
 const isSpanishFiles = <String>{
   'lib/screens/active_craving_rescue_screen.dart',
   'lib/screens/approved_screen_player.dart',
-  'lib/screens/baseline_assessment_screen.dart',
-  'lib/screens/choose_quit_path_screen.dart',
-  'lib/screens/consent_privacy_screen.dart',
   'lib/screens/craving_recheck_screen.dart',
   'lib/screens/craving_rescue_start_screen.dart',
   'lib/screens/daily_check_in_screen.dart',
@@ -22,23 +25,17 @@ const isSpanishFiles = <String>{
   'lib/screens/home_preparation_screen.dart',
   'lib/screens/learn_library_screen.dart',
   'lib/screens/medication_center_screen.dart',
-  'lib/screens/my_reasons_screen.dart',
   'lib/screens/personalized_next_step_screen.dart',
   'lib/screens/progress_dashboard_screen.dart',
   'lib/screens/quit_day_home_screen.dart',
-  'lib/screens/readiness_result_screen.dart',
   'lib/screens/recommended_rescue_tool_screen.dart',
   'lib/screens/rescue_result_next_step_screen.dart',
   'lib/screens/resource_screen_widgets.dart',
   'lib/screens/review_quit_plan_screen.dart',
-  'lib/screens/select_quit_date_screen.dart',
   'lib/screens/settings_privacy_screen.dart',
   'lib/screens/slip_recovery_screen.dart',
   'lib/screens/support_hub_screen.dart',
   'lib/screens/support_preparation_screen.dart',
-  'lib/screens/trigger_map_screen.dart',
-  'lib/screens/welcome_screen.dart',
-  'lib/screens/why_breathefree_screen.dart',
 };
 
 /// The app language mapping: AppLocale.isSpanish says which language the
@@ -47,12 +44,22 @@ const languageMapping = <String>{'lib/l10n/app_locale.dart'};
 
 final _word = RegExp(r'\bisSpanish\b');
 
-Set<String> filesUsingIsSpanish() => {
+/// isSpanish used as a condition, across line breaks.
+final _condition = RegExp(
+    r'\b_?isSpanish\s*\?(?![?.\[])|if\s*\(\s*!?\s*(?:widget\.)?_?isSpanish\s*\)'
+    r'|!\s*(?:widget\.)?_?isSpanish\b|\b_?isSpanish\s*(?:&&|\|\|)|(?:&&|\|\|)\s*(?:widget\.)?_?isSpanish\b'
+    // A helper given the flag to pick between texts: localized(isSpanish, …).
+    r'|\w\(\s*(?:widget\.)?_?isSpanish\s*,');
+
+Set<String> _files(RegExp pattern) => {
       for (final f
           in Directory('lib').listSync(recursive: true).whereType<File>())
-        if (f.path.endsWith('.dart') && _word.hasMatch(f.readAsStringSync()))
+        if (f.path.endsWith('.dart') && pattern.hasMatch(f.readAsStringSync()))
           f.path.replaceAll(r'\', '/'),
     };
+
+/// The files that choose text with isSpanish.
+Set<String> filesUsingIsSpanish() => _files(_condition);
 
 void main() {
   test('only the listed files choose text with isSpanish', () {
@@ -87,6 +94,29 @@ void main() {
   });
 
   test('the language mapping is still where the app reads the language', () {
-    expect(filesUsingIsSpanish().containsAll(languageMapping), isTrue);
+    expect(_files(_word).containsAll(languageMapping), isTrue);
+  });
+
+  test('the condition check sees every form of text selection', () {
+    for (final code in [
+      "isSpanish ? 'a' : 'b'",
+      "widget.isSpanish\n    ? 'a'\n    : 'b'",
+      'if (isSpanish) {',
+      'if (!widget.isSpanish) return x;',
+      "final t = !_isSpanish ? 'a' : 'b';",
+      'isSpanish && other',
+      '_isSpanish ? WelcomeLanguage.english : WelcomeLanguage.spanish',
+      "localized(widget.isSpanish, 'Home', 'Inicio')",
+    ]) {
+      expect(_condition.hasMatch(code), isTrue, reason: code);
+    }
+    for (final code in [
+      'final bool isSpanish;',
+      'required this.isSpanish,',
+      'isSpanish: isSpanish,',
+      'assert(isSpanish == (locale == es));',
+    ]) {
+      expect(_condition.hasMatch(code), isFalse, reason: code);
+    }
   });
 }

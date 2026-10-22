@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 import '../theme/app_colors.dart';
 import '../widgets/large_text.dart';
 
@@ -71,7 +73,8 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                     backgroundColor: AppColors.deepTeal,
                     foregroundColor: Colors.white,
                   ),
-                  child: Text(isSpanish ? 'Listo' : 'Done'),
+                  child: Text(
+                      AppLocalizations.of(context).whyBreatheFreeSheetDoneText),
                 ),
               ),
             ],
@@ -83,6 +86,12 @@ class WhyBreatheFreeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      isSpanish == (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     return Scaffold(
       key: const ValueKey('functional-why-breathefree-screen'),
       backgroundColor: AppColors.cream,
@@ -133,9 +142,7 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                               _WhyHero(compact: compact),
                               SizedBox(height: compact ? 8 : 14),
                               Text(
-                                isSpanish
-                                    ? 'UNA MEJOR FORMA DE DEJARLO'
-                                    : 'A BETTER WAY TO QUIT',
+                                AppLocalizations.of(context).whyBreatheFreeText,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 12,
@@ -147,9 +154,8 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                               const SizedBox(height: 9),
                               LayoutBuilder(
                                 builder: (context, constraints) {
-                                  final headline = isSpanish
-                                      ? 'Apoyo para los momentos más importantes.'
-                                      : 'Support for the moments that matter most.';
+                                  final headline = AppLocalizations.of(context)
+                                      .whyBreatheFreeHeadline;
                                   final style = Theme.of(context)
                                           .textTheme
                                           .displayLarge
@@ -178,9 +184,8 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                isSpanish
-                                    ? 'BreatheFree responde a lo que necesitas ahora y te ayuda a proteger el progreso que ya has logrado.'
-                                    : 'BreatheFree responds to what you need now—and helps you protect the progress you have already made.',
+                                AppLocalizations.of(context)
+                                    .whyBreatheFreeText2,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -196,20 +201,16 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                                 icon: Icons.air_rounded,
                                 iconColor: AppColors.coral,
                                 iconBackground: AppColors.coralLight,
-                                title: isSpanish
-                                    ? 'Cuando llega un antojo'
-                                    : 'When a craving hits',
-                                subtitle: isSpanish
-                                    ? 'Abre una herramienta calmante con un toque, incluso sin conexión.'
-                                    : 'Open a calming tool in one tap—available offline.',
+                                title: AppLocalizations.of(context)
+                                    .whyBreatheFreeCardCravingTitle,
+                                subtitle: AppLocalizations.of(context)
+                                    .whyBreatheFreeCardCravingSubtitle,
                                 onTap: () => _showCardDetails(
                                   context,
-                                  title: isSpanish
-                                      ? 'Cuando llega un antojo'
-                                      : 'When a craving hits',
-                                  message: isSpanish
-                                      ? 'Usa una respiración guiada, una distracción breve o tu razón principal para dejar de fumar. Las herramientas esenciales estarán disponibles sin conexión.'
-                                      : 'Use guided breathing, a brief distraction, or your top reason for quitting. Essential tools will remain available offline.',
+                                  title: AppLocalizations.of(context)
+                                      .whyBreatheFreeCardCravingTitle,
+                                  message: AppLocalizations.of(context)
+                                      .whyBreatheFreeMessage,
                                   icon: Icons.air_rounded,
                                   iconColor: AppColors.coral,
                                   iconBackground: AppColors.coralLight,
@@ -221,20 +222,16 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                                 icon: Icons.bar_chart_rounded,
                                 iconColor: AppColors.deepTeal,
                                 iconBackground: AppColors.mint,
-                                title: isSpanish
-                                    ? 'Mientras tu cuerpo se recupera'
-                                    : 'As your body heals',
-                                subtitle: isSpanish
-                                    ? 'Consulta el tiempo sin fumar, el dinero ahorrado y tu recuperación.'
-                                    : 'See smoke-free time, money saved, and recovery.',
+                                title: AppLocalizations.of(context)
+                                    .whyBreatheFreeCardHealingTitle,
+                                subtitle: AppLocalizations.of(context)
+                                    .whyBreatheFreeCardHealingSubtitle,
                                 onTap: () => _showCardDetails(
                                   context,
-                                  title: isSpanish
-                                      ? 'Mientras tu cuerpo se recupera'
-                                      : 'As your body heals',
-                                  message: isSpanish
-                                      ? 'Sigue tu tiempo sin fumar y el dinero que has elegido no gastar en tabaco. Los hitos de recuperación serán educativos y no sustituirán el consejo médico.'
-                                      : 'Track your smoke-free time and the money you chose not to spend on tobacco. Recovery milestones will be educational and will not replace medical advice.',
+                                  title: AppLocalizations.of(context)
+                                      .whyBreatheFreeCardHealingTitle,
+                                  message: AppLocalizations.of(context)
+                                      .whyBreatheFreeMessage2,
                                   icon: Icons.bar_chart_rounded,
                                   iconColor: AppColors.deepTeal,
                                   iconBackground: AppColors.mint,
@@ -247,20 +244,16 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                                 iconColor: AppColors.deepTeal,
                                 iconBackground: AppColors.paper,
                                 emphasized: true,
-                                title: isSpanish
-                                    ? 'Si ocurre un desliz'
-                                    : 'If a slip happens',
-                                subtitle: isSpanish
-                                    ? 'Conserva tu progreso. Aprende, ajusta y continúa.'
-                                    : 'Keep your progress. Learn, adjust, and continue.',
+                                title: AppLocalizations.of(context)
+                                    .whyBreatheFreeCardSlipTitle,
+                                subtitle: AppLocalizations.of(context)
+                                    .whyBreatheFreeCardSlipSubtitle,
                                 onTap: () => _showCardDetails(
                                   context,
-                                  title: isSpanish
-                                      ? 'Si ocurre un desliz'
-                                      : 'If a slip happens',
-                                  message: isSpanish
-                                      ? 'Un desliz no borra el esfuerzo que ya hiciste. BreatheFree te ayudará a registrar lo ocurrido sin juicios y a elegir tu próximo paso.'
-                                      : 'A slip does not erase the work you have already done. BreatheFree will help you record what happened without judgment and choose your next step.',
+                                  title: AppLocalizations.of(context)
+                                      .whyBreatheFreeCardSlipTitle,
+                                  message: AppLocalizations.of(context)
+                                      .whyBreatheFreeMessage3,
                                   icon: Icons.check_rounded,
                                   iconColor: AppColors.deepTeal,
                                   iconBackground: AppColors.mint,
@@ -309,7 +302,8 @@ class _WhyHeader extends StatelessWidget {
         children: [
           IconButton.outlined(
             key: const ValueKey('why-back'),
-            tooltip: isSpanish ? 'Atrás' : 'Back',
+            tooltip:
+                AppLocalizations.of(context).whyBreatheFreeHeaderBackTooltip,
             onPressed: onBack,
             style: IconButton.styleFrom(
               foregroundColor: AppColors.deepTeal,
@@ -692,7 +686,8 @@ class _WhyBottomAction extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          isSpanish ? 'Continuar' : 'Continue',
+                          AppLocalizations.of(context)
+                              .whyBreatheFreeBottomActionText,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 17,

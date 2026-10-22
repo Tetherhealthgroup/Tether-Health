@@ -293,13 +293,23 @@ void main() {
       expect(AppLocalizations.supportedLocales, releaseLocales);
     });
 
-    test('the Spanish catalog has exactly the English keys', () {
+    test(
+        'the Spanish catalog has the English keys, except the listed English-only ones',
+        () {
       Set<String> keys(String path) =>
           (jsonDecode(File(path).readAsStringSync()) as Map<String, Object?>)
               .keys
               .where((key) => !key.startsWith('@'))
               .toSet();
-      expect(keys('lib/l10n/app_es.arb'), keys('lib/l10n/app_en.arb'));
+      final englishOnly = (jsonDecode(
+                  File('lib/l10n/english_only_keys.json').readAsStringSync())
+              as List)
+          .cast<String>()
+          .toSet();
+      final en = keys('lib/l10n/app_en.arb');
+      final es = keys('lib/l10n/app_es.arb');
+      expect(es.difference(en), isEmpty);
+      expect(en.difference(es), englishOnly);
     });
   });
 }

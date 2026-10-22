@@ -1,5 +1,6 @@
 import 'dart:ui' show Tristate;
 
+import 'package:breathefree_patient/l10n/app_locale.dart';
 import 'package:breathefree_patient/models/tap_target.dart';
 import 'package:breathefree_patient/screens/approved_screen_player.dart';
 import 'package:breathefree_patient/screens/consent_privacy_screen.dart';
@@ -173,6 +174,7 @@ void main() {
                 scaler: scaler.value,
                 font: font,
                 home: screen.value(() => continued++),
+                locale: const Locale('es'),
               );
             });
             expect(describeErrors(errors), isEmpty, reason: 'layout errors');
@@ -344,6 +346,7 @@ void main() {
         size: largeTextDevices['small 375x667']!,
         scaler: TextScaler.noScaling,
         font: LargeTextFont.roboto,
+        locale: Locale(spanish ? 'es' : 'en'),
         home: ConsentPrivacyScreen(
           isSpanish: spanish,
           helpfulReminders: true,
@@ -396,6 +399,7 @@ void main() {
           size: largeTextDevices['small 375x667']!,
           scaler: scaler.value,
           font: LargeTextFont.roboto,
+          locale: Locale(spanish ? 'es' : 'en'),
           home: ConsentPrivacyScreen(
             isSpanish: spanish,
             helpfulReminders: true,
@@ -531,12 +535,19 @@ Future<void> _pumpFirstRun(
 }) async {
   final account = fakeAccount();
   addTearDown(account.dispose);
+  final appLocale = AppLocale(
+    store: MemoryAppLocaleStore(),
+    deviceLocales: () => const [Locale('en', 'US')],
+  );
+  addTearDown(appLocale.dispose);
   await pumpLargeText(
     tester,
     size: size,
     scaler: scaler,
     font: font,
+    appLocale: appLocale,
     home: ApprovedScreenPlayer(
+      appLocale: appLocale,
       accountController: account,
       currentIndex: index,
       onSelectScreen: (_) {},

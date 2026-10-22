@@ -121,25 +121,33 @@ Future<void> pumpLargeText(
   required LargeTextFont font,
   required Widget home,
   Locale? locale,
+  AppLocale? appLocale,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
 
+  // The app's localizations, as at the app root. [locale] should match the
+  // screen's language (null: the test device's, English); with [appLocale]
+  // the locale follows it, as the app root's does.
+  Widget app(Locale? current) => MaterialApp(
+        theme: largeTextTheme(font),
+        locale: current,
+        supportedLocales: releaseLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: scaler),
+          child: child!,
+        ),
+        home: home,
+      );
   await tester.pumpWidget(
-    MaterialApp(
-      theme: largeTextTheme(font),
-      // The app's localizations, as at the app root; [locale] should match
-      // the screen's language (null: the test device's, English).
-      locale: locale,
-      supportedLocales: releaseLocales,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      builder: (context, child) => MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaler: scaler),
-        child: child!,
-      ),
-      home: home,
-    ),
+    appLocale == null
+        ? app(locale)
+        : ListenableBuilder(
+            listenable: appLocale,
+            builder: (context, _) => app(appLocale.locale),
+          ),
   );
   await tester.pumpAndSettle();
 }

@@ -1,3 +1,4 @@
+import 'package:breathefree_patient/l10n/app_locale.dart';
 import 'package:breathefree_patient/models/tap_target.dart';
 import 'package:breathefree_patient/screens/approved_screen_player.dart';
 import 'package:flutter/material.dart';
@@ -373,14 +374,21 @@ Future<void> _pumpOnboarding(
   addTearDown(account.dispose);
   final current = ValueNotifier<int>(spanish ? 0 : index);
   addTearDown(current.dispose);
+  final appLocale = AppLocale(
+    store: MemoryAppLocaleStore(),
+    deviceLocales: () => const [Locale('en', 'US')],
+  );
+  addTearDown(appLocale.dispose);
   await pumpLargeText(
     tester,
     size: size,
     scaler: scaler,
     font: font,
+    appLocale: appLocale,
     home: ValueListenableBuilder<int>(
       valueListenable: current,
       builder: (context, value, _) => ApprovedScreenPlayer(
+        appLocale: appLocale,
         accountController: account,
         currentIndex: value,
         onSelectScreen: (_) {},

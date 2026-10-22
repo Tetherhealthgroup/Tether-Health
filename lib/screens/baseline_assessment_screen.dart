@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 import '../theme/app_colors.dart';
 import '../widgets/large_text.dart';
 
@@ -27,23 +29,29 @@ class BaselineAssessmentScreen extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onContinue;
 
-  String _choiceLabel(DailyCigaretteUse choice) {
+  String _choiceLabel(BuildContext context, DailyCigaretteUse choice) {
     return switch (choice) {
       DailyCigaretteUse.notEveryDay =>
-        isSpanish ? 'No fumo todos los días' : 'I don’t smoke every day',
+        AppLocalizations.of(context).baselineAssessmentChoiceLabel,
       DailyCigaretteUse.tenOrFewer =>
-        isSpanish ? '10 cigarrillos o menos' : '10 or fewer cigarettes',
+        AppLocalizations.of(context).baselineAssessmentChoiceLabel2,
       DailyCigaretteUse.elevenToTwenty =>
-        isSpanish ? '11–20 cigarrillos' : '11–20 cigarettes',
+        AppLocalizations.of(context).baselineAssessmentChoiceLabel3,
       DailyCigaretteUse.twentyOneToThirty =>
-        isSpanish ? '21–30 cigarrillos' : '21–30 cigarettes',
+        AppLocalizations.of(context).baselineAssessmentChoiceLabel4,
       DailyCigaretteUse.thirtyOneOrMore =>
-        isSpanish ? '31 cigarrillos o más' : '31 or more cigarettes',
+        AppLocalizations.of(context).baselineAssessmentChoiceLabel5,
     };
   }
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      isSpanish == (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     return Scaffold(
       key: const ValueKey('functional-baseline-assessment-screen'),
       backgroundColor: AppColors.cream,
@@ -127,7 +135,8 @@ class BaselineAssessmentScreen extends StatelessWidget {
                               _AssessmentIcon(compact: compact),
                               SizedBox(height: compact ? 12 : 22),
                               Text(
-                                isSpanish ? 'PREGUNTA 1' : 'QUESTION 1',
+                                AppLocalizations.of(context)
+                                    .baselineAssessmentText,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 12,
@@ -138,9 +147,8 @@ class BaselineAssessmentScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 9),
                               Text(
-                                isSpanish
-                                    ? 'En un día habitual, ¿cuántos cigarrillos fumas?'
-                                    : 'On a typical day, how many cigarettes do you smoke?',
+                                AppLocalizations.of(context)
+                                    .baselineAssessmentText2,
                                 // Already the largest text on screen; past
                                 // 180% its longest words no longer fit.
                                 textScaler: MediaQuery.textScalerOf(context)
@@ -155,9 +163,8 @@ class BaselineAssessmentScreen extends StatelessWidget {
                               ),
                               SizedBox(height: compact ? 9 : 13),
                               Text(
-                                isSpanish
-                                    ? 'Elige la respuesta más cercana a tu día habitual.'
-                                    : 'Choose the answer closest to your usual day.',
+                                AppLocalizations.of(context)
+                                    .baselineAssessmentText3,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -172,7 +179,7 @@ class BaselineAssessmentScreen extends StatelessWidget {
                                   in DailyCigaretteUse.values) ...[
                                 _AssessmentChoice(
                                   choice: choice,
-                                  label: _choiceLabel(choice),
+                                  label: _choiceLabel(context, choice),
                                   isSpanish: isSpanish,
                                   selected: dailyCigaretteUse == choice,
                                   onTap: () =>
@@ -217,7 +224,8 @@ class _AssessmentHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final back = IconButton.outlined(
       key: const ValueKey('baseline-back'),
-      tooltip: isSpanish ? 'Atrás' : 'Back',
+      tooltip: AppLocalizations.of(context)
+          .baselineAssessmentAssessmentHeaderBackTooltip,
       onPressed: onBack,
       style: IconButton.styleFrom(
         foregroundColor: AppColors.deepTeal,
@@ -225,7 +233,8 @@ class _AssessmentHeader extends StatelessWidget {
       ),
       icon: const Icon(Icons.arrow_back_rounded),
     );
-    final label = isSpanish ? 'Sobre tu consumo' : 'About your smoking';
+    final label = AppLocalizations.of(context)
+        .baselineAssessmentAssessmentHeaderBackLabel;
     const style = TextStyle(
       color: AppColors.deepTeal,
       fontSize: 16,
@@ -308,7 +317,8 @@ class _AssessmentProgress extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                isSpanish ? 'EVALUACIÓN' : 'ASSESSMENT',
+                AppLocalizations.of(context)
+                    .baselineAssessmentAssessmentProgressText,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -422,7 +432,7 @@ class _AssessmentChoice extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
       ),
       child: Text(
-        isSpanish ? 'Elegido' : 'Selected',
+        AppLocalizations.of(context).baselineAssessmentAssessmentChoiceText,
         style: const TextStyle(
           color: AppColors.coral,
           fontSize: 10,
@@ -535,7 +545,7 @@ class _WhyWeAskCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          isSpanish ? 'Por qué preguntamos' : 'Why we ask',
+          AppLocalizations.of(context).baselineAssessmentWhyWeAskCardText,
           style: const TextStyle(
             color: AppColors.deepTeal,
             fontSize: 13,
@@ -544,9 +554,7 @@ class _WhyWeAskCard extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          isSpanish
-              ? 'Esto ayuda a adaptar tu plan y calcular el dinero ahorrado.'
-              : 'This helps tailor your plan and estimate money saved.',
+          AppLocalizations.of(context).baselineAssessmentWhyWeAskCardText2,
           style: const TextStyle(
             color: AppColors.tealSecondary,
             fontSize: 11,
@@ -555,9 +563,7 @@ class _WhyWeAskCard extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          isSpanish
-              ? 'No es un diagnóstico ni un juicio.'
-              : 'It is not a diagnosis or a judgment.',
+          AppLocalizations.of(context).baselineAssessmentWhyWeAskCardText3,
           style: const TextStyle(
             color: AppColors.mutedTeal,
             fontSize: 10,
@@ -653,7 +659,8 @@ class _AssessmentBottomAction extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          isSpanish ? 'Siguiente' : 'Next',
+                          AppLocalizations.of(context)
+                              .baselineAssessmentAssessmentBottomActionText,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 16,
@@ -673,9 +680,8 @@ class _AssessmentBottomAction extends StatelessWidget {
                 if (!compact) ...[
                   const SizedBox(height: 7),
                   Text(
-                    isSpanish
-                        ? 'Tu respuesta se guarda automáticamente.'
-                        : 'Your answer is saved automatically.',
+                    AppLocalizations.of(context)
+                        .baselineAssessmentAssessmentBottomActionText2,
                     style: const TextStyle(
                       color: AppColors.mutedTeal,
                       fontSize: 10,

@@ -2,6 +2,8 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 import '../theme/app_colors.dart';
 import '../widgets/large_text.dart';
 
@@ -57,9 +59,8 @@ class ConsentPrivacyScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                isSpanish
-                    ? 'Términos y Aviso de privacidad'
-                    : 'Terms and Privacy Notice',
+                AppLocalizations.of(context)
+                    .consentPrivacyShowPrivacyReviewText,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: AppColors.deepTeal,
                       fontWeight: FontWeight.w800,
@@ -67,9 +68,8 @@ class ConsentPrivacyScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                isSpanish
-                    ? 'Esta versión de desarrollo muestra cómo se presentarán los documentos legales. Antes del lanzamiento, aquí estarán los Términos de uso y el Aviso de privacidad completos, con las prácticas de datos, los períodos de conservación y tus derechos.'
-                    : 'This development build demonstrates how the legal documents will be presented. Before release, the complete Terms of Use and Privacy Notice will appear here, including data practices, retention periods, and your rights.',
+                AppLocalizations.of(context)
+                    .consentPrivacyShowPrivacyReviewText2,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppColors.tealSecondary,
                       height: 1.45,
@@ -77,9 +77,8 @@ class ConsentPrivacyScreen extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               Text(
-                isSpanish
-                    ? 'Los controles opcionales se pueden cambiar más adelante en Configuración. Las funciones obligatorias se limitarán a lo necesario para proporcionar y proteger el servicio.'
-                    : 'Optional controls can be changed later in Settings. Required processing will be limited to what is necessary to provide and secure the service.',
+                AppLocalizations.of(context)
+                    .consentPrivacyShowPrivacyReviewText3,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.tealSecondary,
                       height: 1.45,
@@ -95,7 +94,8 @@ class ConsentPrivacyScreen extends StatelessWidget {
                     backgroundColor: AppColors.deepTeal,
                     foregroundColor: Colors.white,
                   ),
-                  child: Text(isSpanish ? 'Listo' : 'Done'),
+                  child: Text(
+                      AppLocalizations.of(context).consentPrivacySheetDoneText),
                 ),
               ),
             ],
@@ -107,6 +107,12 @@ class ConsentPrivacyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      isSpanish == (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     return Scaffold(
       key: const ValueKey('functional-consent-privacy-screen'),
       backgroundColor: AppColors.cream,
@@ -157,7 +163,7 @@ class ConsentPrivacyScreen extends StatelessWidget {
                               _ConsentHero(compact: compact),
                               SizedBox(height: compact ? 8 : 14),
                               Text(
-                                isSpanish ? 'TU PRIVACIDAD' : 'YOUR PRIVACY',
+                                AppLocalizations.of(context).consentPrivacyText,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 12,
@@ -168,9 +174,8 @@ class ConsentPrivacyScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 9),
                               Text(
-                                isSpanish
-                                    ? 'Tu historia sigue siendo tuya.'
-                                    : 'Your story stays yours.',
+                                AppLocalizations.of(context)
+                                    .consentPrivacyText2,
                                 style: Theme.of(context)
                                     .textTheme
                                     .displayLarge
@@ -181,9 +186,8 @@ class ConsentPrivacyScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                               Text(
-                                isSpanish
-                                    ? 'Elige cómo se usa tu información. Los elementos obligatorios mantienen la aplicación funcionando; las opciones se pueden cambiar en cualquier momento.'
-                                    : 'Choose how your information is used. Required items keep the app working; optional choices can change anytime.',
+                                AppLocalizations.of(context)
+                                    .consentPrivacyText3,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -256,7 +260,8 @@ class _ConsentHeader extends StatelessWidget {
         children: [
           IconButton.outlined(
             key: const ValueKey('consent-back'),
-            tooltip: isSpanish ? 'Atrás' : 'Back',
+            tooltip: AppLocalizations.of(context)
+                .consentPrivacyConsentHeaderBackTooltip,
             onPressed: onBack,
             style: IconButton.styleFrom(
               foregroundColor: AppColors.deepTeal,
@@ -510,32 +515,30 @@ class _RequiredConsentCard extends StatelessWidget {
       child: Column(
         children: [
           _CardSectionHeader(
-            title: isSpanish
-                ? 'OBLIGATORIO PARA USAR BREATHEFREE'
-                : 'REQUIRED TO USE BREATHEFREE',
-            badge: isSpanish ? 'Obligatorio' : 'Required',
+            title: AppLocalizations.of(context)
+                .consentPrivacyRequiredConsentCardTitle,
+            badge: AppLocalizations.of(context)
+                .consentPrivacyRequiredConsentCardBadge,
           ),
           const SizedBox(height: 10),
           _ConsentInfoRow(
             icon: Icons.check_rounded,
             iconBackground: AppColors.deepTeal,
             iconColor: Colors.white,
-            title: isSpanish
-                ? 'Datos esenciales de la aplicación'
-                : 'Essential app data',
-            subtitle: isSpanish
-                ? 'Guarda tu cuenta, plan para dejar de fumar y progreso de forma segura.'
-                : 'Save your account, quit plan, and progress securely.',
+            title: AppLocalizations.of(context)
+                .consentPrivacyRequiredConsentCardTitle2,
+            subtitle: AppLocalizations.of(context)
+                .consentPrivacyRequiredConsentCardSubtitle,
           ),
           const Divider(height: 18),
           _ConsentInfoRow(
             icon: Icons.check_rounded,
             iconBackground: AppColors.deepTeal,
             iconColor: Colors.white,
-            title: isSpanish ? 'Información de salud' : 'Health information',
-            subtitle: isSpanish
-                ? 'Personaliza tu plan, herramientas de apoyo e información de recuperación.'
-                : 'Personalize your plan, support tools, and recovery insights.',
+            title: AppLocalizations.of(context)
+                .consentPrivacyRequiredConsentCardTitle3,
+            subtitle: AppLocalizations.of(context)
+                .consentPrivacyRequiredConsentCardSubtitle2,
           ),
           const SizedBox(height: 8),
           Align(
@@ -553,9 +556,8 @@ class _RequiredConsentCard extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          isSpanish
-                              ? 'Revisar Términos y Aviso de privacidad'
-                              : 'Review Terms and Privacy Notice',
+                          AppLocalizations.of(context)
+                              .consentPrivacyRequiredConsentCardReviewPrivacyText,
                           style: const TextStyle(
                             color: AppColors.deepTeal,
                             fontSize: 12,
@@ -614,18 +616,20 @@ class _OptionalConsentCard extends StatelessWidget {
       child: Column(
         children: [
           _CardSectionHeader(
-            title: isSpanish ? 'TUS OPCIONES' : 'YOUR CHOICES',
-            badge: isSpanish ? 'Opcional' : 'Optional',
+            title: AppLocalizations.of(context)
+                .consentPrivacyOptionalConsentCardTitle,
+            badge: AppLocalizations.of(context)
+                .consentPrivacyOptionalConsentCardBadge,
             lightBadge: true,
           ),
           const SizedBox(height: 7),
           _ConsentSwitchRow(
             switchKey: const ValueKey('consent-helpful-reminders'),
             icon: Icons.chat_bubble_outline_rounded,
-            title: isSpanish ? 'Recordatorios útiles' : 'Helpful reminders',
-            subtitle: isSpanish
-                ? 'Recibe controles privados y recordatorios del plan.'
-                : 'Receive private check-ins and plan reminders.',
+            title: AppLocalizations.of(context)
+                .consentPrivacyOptionalConsentCardHelpfulRemindersTitle,
+            subtitle: AppLocalizations.of(context)
+                .consentPrivacyOptionalConsentCardHelpfulRemindersSubtitle,
             value: helpfulReminders,
             onChanged: onHelpfulRemindersChanged,
           ),
@@ -633,12 +637,10 @@ class _OptionalConsentCard extends StatelessWidget {
           _ConsentSwitchRow(
             switchKey: const ValueKey('consent-share-care-team'),
             icon: Icons.person_outline_rounded,
-            title: isSpanish
-                ? 'Compartir con mi equipo de atención'
-                : 'Share with my care team',
-            subtitle: isSpanish
-                ? 'Permite que un profesional conectado vea resúmenes de progreso.'
-                : 'Allow a connected clinician to view progress summaries.',
+            title: AppLocalizations.of(context)
+                .consentPrivacyOptionalConsentCardShareCareTeamTitle,
+            subtitle: AppLocalizations.of(context)
+                .consentPrivacyOptionalConsentCardShareCareTeamSubtitle,
             value: shareWithCareTeam,
             onChanged: onShareWithCareTeamChanged,
           ),
@@ -646,12 +648,10 @@ class _OptionalConsentCard extends StatelessWidget {
           _ConsentSwitchRow(
             switchKey: const ValueKey('consent-help-improve'),
             icon: Icons.show_chart_rounded,
-            title: isSpanish
-                ? 'Ayudar a mejorar BreatheFree'
-                : 'Help improve BreatheFree',
-            subtitle: isSpanish
-                ? 'Aporta información desidentificada a investigaciones aprobadas.'
-                : 'Contribute de-identified information to approved research.',
+            title: AppLocalizations.of(context)
+                .consentPrivacyOptionalConsentCardHelpImproveTitle,
+            subtitle: AppLocalizations.of(context)
+                .consentPrivacyOptionalConsentCardHelpImproveSubtitle,
             value: helpImproveBreatheFree,
             onChanged: onHelpImproveBreatheFreeChanged,
           ),
@@ -908,9 +908,7 @@ class _TrustNote extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                isSpanish
-                    ? 'Sin anuncios. Sin financiación de la industria tabacalera.'
-                    : 'No ads. No tobacco-industry funding.',
+                AppLocalizations.of(context).consentPrivacyTrustNoteText,
                 style: const TextStyle(
                   color: AppColors.deepTeal,
                   fontSize: 12,
@@ -919,9 +917,7 @@ class _TrustNote extends StatelessWidget {
                 ),
               ),
               Text(
-                isSpanish
-                    ? 'Nunca vendemos información de salud del paciente.'
-                    : 'We never sell patient health information.',
+                AppLocalizations.of(context).consentPrivacyTrustNoteText2,
                 style: const TextStyle(
                   color: AppColors.tealSecondary,
                   fontSize: 11,
@@ -991,9 +987,8 @@ class _ConsentBottomAction extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          isSpanish
-                              ? 'Aceptar y continuar'
-                              : 'Agree and continue',
+                          AppLocalizations.of(context)
+                              .consentPrivacyConsentBottomActionText,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 16,
@@ -1012,9 +1007,8 @@ class _ConsentBottomAction extends StatelessWidget {
                 if (!compact) ...[
                   const SizedBox(height: 6),
                   Text(
-                    isSpanish
-                        ? 'Puedes cambiar las opciones en Configuración.'
-                        : 'You can change optional choices anytime in Settings.',
+                    AppLocalizations.of(context)
+                        .consentPrivacyConsentBottomActionText2,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: AppColors.mutedTeal,
