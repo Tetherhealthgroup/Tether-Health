@@ -26,8 +26,6 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  bool get _isSpanish => widget.language == WelcomeLanguage.spanish;
-
   void _selectLanguage(WelcomeLanguage language) {
     widget.onLanguageSelected(language);
   }
@@ -166,7 +164,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   ),
                         ),
                         SizedBox(height: compactHeight ? 14 : 24),
-                        _WelcomeBenefits(isSpanish: _isSpanish),
+                        const _WelcomeBenefits(),
                         SizedBox(height: compactHeight ? 16 : 28),
                         FilledButton(
                           key: const ValueKey('welcome-get-started'),
@@ -259,7 +257,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                         SizedBox(height: compactHeight ? 6 : 12),
                         _WelcomeLegalText(
-                          isSpanish: _isSpanish,
                           onTerms: () => _showInformationSheet(
                             title: AppLocalizations.of(context)
                                 .welcomeTermsSheetTitle,
@@ -666,9 +663,7 @@ class _WelcomeHeroPainter extends CustomPainter {
 }
 
 class _WelcomeBenefits extends StatelessWidget {
-  const _WelcomeBenefits({required this.isSpanish});
-
-  final bool isSpanish;
+  const _WelcomeBenefits();
 
   @override
   Widget build(BuildContext context) {
@@ -765,12 +760,10 @@ class _WelcomeBenefit extends StatelessWidget {
 
 class _WelcomeLegalText extends StatelessWidget {
   const _WelcomeLegalText({
-    required this.isSpanish,
     required this.onTerms,
     required this.onPrivacy,
   });
 
-  final bool isSpanish;
   final VoidCallback onTerms;
   final VoidCallback onPrivacy;
 

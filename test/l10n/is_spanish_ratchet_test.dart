@@ -61,6 +61,44 @@ Set<String> _files(RegExp pattern) => {
 /// The files that choose text with isSpanish.
 Set<String> filesUsingIsSpanish() => _files(_condition);
 
+/// The isSpanish forms a file may keep once it has left the list: the
+/// field, the constructor parameter, passing it on unchanged, and the debug
+/// assert that it matches the app locale.
+final _allowedForms = <RegExp>[
+  RegExp(r'final\s+bool\s+isSpanish\s*;'),
+  RegExp(r'required\s+this\.isSpanish\b'),
+  RegExp(r'\bisSpanish\s*:\s*(?:widget\.)?isSpanish\b'),
+  RegExp(
+      r"assert\(\s*(?:widget\.)?isSpanish\s*==\s*\(\s*Localizations\.localeOf\(context\)\.languageCode\s*==\s*'es'\s*\)"),
+];
+
+/// Every other occurrence of isSpanish (any identifier containing it) in
+/// [source], as `line: text`, comments ignored.
+List<String> otherIsSpanishUses(String source) {
+  var code = source.replaceAllMapped(
+      RegExp(r'//[^\n]*'), (m) => ' ' * m.group(0)!.length);
+  for (final form in _allowedForms) {
+    code = code.replaceAllMapped(form, (m) => ' ' * m.group(0)!.length);
+  }
+  return [
+    for (final m in RegExp(r'\w*isSpanish\w*').allMatches(code))
+      '${'\n'.allMatches(code.substring(0, m.start)).length + 1}: ${m.group(0)}'
+  ];
+}
+
+/// The files with English/Spanish branches at the baseline.
+Set<String> filesWithBaselineText() {
+  final inventory = jsonDecode(
+          File('test/l10n/baseline/legacy_literals.json').readAsStringSync())
+      as Map<String, Object?>;
+  return {
+    for (final e in (inventory['files']! as Map<String, Object?>).entries)
+      if ((e.value! as List).any((r) =>
+          const {'en', 'es'}.contains((r as Map<String, Object?>)['branch'])))
+        e.key
+  };
+}
+
 void main() {
   test('only the listed files choose text with isSpanish', () {
     final using = filesUsingIsSpanish();
@@ -95,6 +133,46 @@ void main() {
 
   test('the language mapping is still where the app reads the language', () {
     expect(_files(_word).containsAll(languageMapping), isTrue);
+  });
+
+  test('a file that left the list keeps only the allowed isSpanish forms', () {
+    final moved = filesWithBaselineText()
+        .difference({...isSpanishFiles, ...languageMapping});
+    for (final path in moved) {
+      final file = File(path);
+      if (!file.existsSync()) continue;
+      expect(otherIsSpanishUses(file.readAsStringSync()), isEmpty,
+          reason: '$path left the isSpanish list; it may only declare, take, '
+              'pass on and assert the flag');
+    }
+  });
+
+  test('the allowed-forms check rejects every other use', () {
+    const allowed = """
+class A extends StatelessWidget {
+  const A({required this.isSpanish, super.key});
+  final bool isSpanish; // isSpanish in a comment is fine
+  Widget build(BuildContext context) {
+    assert(
+      isSpanish == (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
+    return B(isSpanish: isSpanish, other: C(isSpanish: widget.isSpanish));
+  }
+}
+""";
+    expect(otherIsSpanishUses(allowed), isEmpty);
+    for (final code in [
+      "(isSpanish) ? 'a' : 'b'",
+      "isSpanish == true ? 'a' : 'b'",
+      "switch (isSpanish) { true => 'a', false => 'b' }",
+      "final es = isSpanish; es ? 'a' : 'b'",
+      "const {true: 'a', false: 'b'}[isSpanish]!",
+      'bool get _isSpanish => language == spanish;',
+      'B(isSpanish: true)',
+    ]) {
+      expect(otherIsSpanishUses(code), isNotEmpty, reason: code);
+    }
   });
 
   test('the condition check sees every form of text selection', () {
