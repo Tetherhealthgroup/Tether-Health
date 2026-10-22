@@ -12,7 +12,7 @@ import '../../ui/ui.dart';
 /// Actions (generated from spec/screens/auth_session_apple.json):
 ///   • Continue with Apple → auth (apple): Sign in with Apple result → Success: close | Cancelled: toast “Still signed out. Rescue works without signing in.” | Error: push → auth_social_error
 ///   • Use Face ID → close
-/// API: POST supabase /auth/v1/token?grant_type=id_token
+/// API: —
 class AuthSessionAppleScreen extends StatelessWidget {
   const AuthSessionAppleScreen({super.key});
 

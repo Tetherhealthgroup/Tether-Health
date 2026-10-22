@@ -543,7 +543,6 @@ def p36_gaps():
           ], footer=[authbuttons(**{prov: auth(prov, [('Success', close()), ('Cancelled', toast('Still signed out. Rescue works without signing in.')),
                                                       ('Error', go('auth_social_error'))])}),
                      button('Use Face ID', close(), v='secondary')],
-          api=['POST supabase /auth/v1/token?grant_type=id_token'],
           source='auth_session in this spec; Supabase signInWithIdToken',
           desc=f'Same as Session expired, with the password field and Sign in button replaced by the native {name} button.')
 

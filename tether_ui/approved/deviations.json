@@ -71,29 +71,44 @@
       "screen": "auth_signin",
       "decisions": [
         "P-31",
-        "TH-902"
+        "TH-902",
+        "P-73"
       ],
       "tickets": [
         "TH-907",
-        "TH-986a"
+        "TH-986a",
+        "TH-907d"
       ],
-      "sha256": "c1e04f8e565da38ef5513a603ccb1a89f8f65b3b5169dafea2adf9fdf5690b7d",
-      "change": "P-31 placeholders, fields start empty: body[3] \"Email\" example \"alex@example.com\" -> placeholder; body[4] \"Password\" example \"••••••••\" -> placeholder | TH-986a: Decision source only, no visual change: footer[0] \"Sign in\" branch \"Sign-in result\" is wrapped in submit \"POST supabase /auth/v1/token\", so the server outcome decides it (labels and targets unchanged; the action summary names the endpoint)"
+      "sha256": "6be68d7ebf075d1520f4fe5ecda74b48ee5d2822c06fa31ea94d094af4a67b42",
+      "change": "P-31 placeholders, fields start empty: body[3] \"Email\" example \"alex@example.com\" -> placeholder; body[4] \"Password\" example \"••••••••\" -> placeholder | TH-986a: Decision source only, no visual change: footer[0] \"Sign in\" branch \"Sign-in result\" is wrapped in submit \"POST supabase /auth/v1/token\", so the server outcome decides it (labels and targets unchanged; the action summary names the endpoint) | P-73, a new Apple ID or Google account goes through the normal sign-up: on body[1].items[0] \"Continue with Apple\" and body[1].items[1] \"Continue with Google\", the outcomes \"New Apple ID, no Tether account\" and \"New Google account, no Tether account\" replace the sheet with ob_programs, the start of the normal sign-up (as welcome \"Get started\"), instead of pushing auth_social_new; action summaries follow. No visible element changes"
     },
     {
       "screen": "auth_signin_error",
       "decisions": [
         "P-31",
         "TH-902",
-        "P-51"
+        "P-51",
+        "P-73"
       ],
       "tickets": [
         "TH-907",
         "TH-986a",
-        "TH-986b"
+        "TH-986b",
+        "TH-907d"
       ],
-      "sha256": "f4de80876ac203a17fbf529829062a3684abdec907969f2a51096fce786ff539",
-      "change": "P-31 placeholders, fields start empty: body[4] \"Email\" example \"alex@example.com\" -> placeholder; body[5] \"Password\" example \"••••••••\" -> placeholder | TH-986a, TH-986b: Decision source: footer[0] \"Try again\" branch \"Sign-in result\" is wrapped in submit \"POST supabase /auth/v1/token\" (TH-902, TH-986a), and gains the case \"Success · guest plan on phone\" -> push auth_merge, as on auth_signin (P-51, TH-986b)"
+      "sha256": "25610f7c45795ce1bfe40905548837104f1f6b06a24c4eb1f66114667e082630",
+      "change": "P-31 placeholders, fields start empty: body[4] \"Email\" example \"alex@example.com\" -> placeholder; body[5] \"Password\" example \"••••••••\" -> placeholder | TH-986a, TH-986b: Decision source: footer[0] \"Try again\" branch \"Sign-in result\" is wrapped in submit \"POST supabase /auth/v1/token\" (TH-902, TH-986a), and gains the case \"Success · guest plan on phone\" -> push auth_merge, as on auth_signin (P-51, TH-986b) | P-73, a new Apple ID or Google account goes through the normal sign-up: on body[2].items[0] \"Continue with Apple\" and body[2].items[1] \"Continue with Google\", the outcomes \"New Apple ID, no Tether account\" and \"New Google account, no Tether account\" replace the sheet with ob_programs, the start of the normal sign-up (as welcome \"Get started\"), instead of pushing auth_social_new; action summaries follow. No visible element changes"
+    },
+    {
+      "screen": "auth_social_new",
+      "decisions": [
+        "P-73"
+      ],
+      "tickets": [
+        "TH-907d"
+      ],
+      "sha256": "546f4c0512938f02b52ad81c271b47fa0b946b63e8e0074fcd11e8eb5666d50e",
+      "change": "P-73, not routed: no screen opens it any more (new Apple and Google accounts go through the normal sign-up from its start, ob_programs); it is kept as the approved design and listed as a reference entry point. footer[0] \"Create my account\": submit \"POST supabase /auth/v1/token?grant_type=id_token\" then push ob_programs -> push ob_programs, so it creates no account; api [that endpoint] -> []; desc rewritten to say so. No visible element changes"
     },
     {
       "screen": "be_q2",

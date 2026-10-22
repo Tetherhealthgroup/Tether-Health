@@ -323,13 +323,6 @@
     ]
   },
   {
-    "endpoint": "POST supabase /auth/v1/token?grant_type=id_token",
-    "queueable": false,
-    "screens": [
-      "auth_social_new"
-    ]
-  },
-  {
     "endpoint": "POST supabase /auth/v1/user/identities (linkIdentity)",
     "queueable": false,
     "screens": [

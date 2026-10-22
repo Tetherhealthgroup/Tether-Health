@@ -81,7 +81,7 @@
     "id": "auth-apple-new",
     "program": null,
     "function": "Sign-in",
-    "title": "New Apple ID starts onboarding with an account",
+    "title": "New Apple ID goes through the normal sign-up",
     "start": "welcome",
     "steps": [
       [
@@ -95,14 +95,6 @@
       [
         "tap",
         "Continue with Apple"
-      ],
-      [
-        "expect",
-        "auth_social_new"
-      ],
-      [
-        "tap",
-        "Create my account"
       ]
     ],
     "expect": "ob_programs"

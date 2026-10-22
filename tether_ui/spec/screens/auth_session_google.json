@@ -89,9 +89,7 @@
     "Source: auth_session in this spec; Supabase signInWithIdToken"
   ],
   "over": "Today",
-  "api": [
-    "POST supabase /auth/v1/token?grant_type=id_token"
-  ],
+  "api": [],
   "actions": [
     {
       "element": "Continue with Google",

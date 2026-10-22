@@ -117,6 +117,7 @@ def validate():
         base = s['variantOf']
         if sid not in seen and not (base and base in seen):
             errors.append(f'{sid}: unreachable from any entry point')
+    errors += check_age_gate(SCREENS, list(SCREENS), PRE_AGE_SIGN_IN)
     inbound = {}
     for f, l, ty, t in edges: inbound.setdefault(t, set()).add(f)
     for sid, s in SCREENS.items():
@@ -130,6 +131,98 @@ def validate():
         # account phase is covered by shared program_settings for every program
         if missing: warns.append(f'INFO {p}: phases without a program-specific screen: {", ".join(missing)} (covered by shared screens)')
     return errors, warns, edges
+
+# ---------------------------------------------------------------- sign-up age check (P-68, P-72, P-73)
+# The checks fail closed. sign_up_age_route_test.dart carries the same two
+# tables and runs the same checks on the emitted spec.
+#  - Every submit to supabase /auth/ creates an account unless
+#    AUTH_NOT_CREATING lists it, with the reason. Each account-creating submit
+#    sits inside the ob.age rule's "Age confirmed" case on its own screen.
+#  - Every native sign-in branch outside "Age confirmed" is listed in
+#    PRE_AGE_SIGN_IN with exactly its outcome labels. Each only signs in,
+#    links or re-confirms an existing account; any change to the set or to a
+#    label needs the same review.
+#  - A "… no Tether account" outcome enters the normal sign-up at its start
+#    (ob_programs, as welcome "Get started" does) and creates nothing itself.
+# validate() walks from every screen, so a screen no route reaches yet is
+# checked too.
+AUTH_NOT_CREATING = {
+    'POST supabase /auth/v1/recover': 'sends a reset link for an existing account',
+    'POST supabase /auth/v1/token': 'password grant: signs in an existing account',
+    'POST supabase /auth/v1/user/identities (linkIdentity)': 'links an identity to the signed-in account',
+    'PUT supabase /auth/v1/user': 'sets a new password on the signed-in account',
+}
+PRE_AGE_SIGN_IN = {
+    ('auth_signin', 'body[1].items[0]'): [('Success', 'Success · guest plan on phone', 'New Apple ID, no Tether account', 'Cancelled', 'Error')],
+    ('auth_signin', 'body[1].items[1]'): [('Success', 'Success · guest plan on phone', 'New Google account, no Tether account', 'Cancelled', 'Error')],
+    ('auth_signin_error', 'body[2].items[0]'): [('Success', 'Success · guest plan on phone', 'New Apple ID, no Tether account', 'Cancelled', 'Error')],
+    ('auth_signin_error', 'body[2].items[1]'): [('Success', 'Success · guest plan on phone', 'New Google account, no Tether account', 'Cancelled', 'Error')],
+    ('auth_social_error', 'footer[0]'): [('Success', 'Error')],
+    ('account_signin_methods', 'body[1].rows[1]'): [('Success', 'Email already has a Tether account', 'Cancelled', 'Error')],
+    ('account_delete_apple', 'footer[0]'): [('Success', 'Different account', 'Cancelled', 'Error')],
+    ('account_delete_google', 'footer[0]'): [('Success', 'Different account', 'Cancelled', 'Error')],
+    ('auth_session_apple', 'footer[0].items[0]'): [('Success', 'Cancelled', 'Error')],
+    ('auth_session_google', 'footer[0].items[0]'): [('Success', 'Cancelled', 'Error')],
+}
+AGE_RULE, AGE_CONFIRMED, SIGN_UP, NEW_IDENTITY = 'ob.age', 'Age confirmed', 'ob_programs', 'no Tether account'
+NAVIGATIONS = ('push', 'replace', 'tab', 'sheet', 'reset', 'popto')
+
+def creates_account(endpoint, allow=AUTH_NOT_CREATING):
+    """True for a submit endpoint on supabase /auth/ that `allow` does not list."""
+    return is_auth_endpoint(endpoint) and endpoint not in allow
+
+def check_age_gate(screens, entries, pinned=None, allow=AUTH_NOT_CREATING):
+    """Walk every route from `entries`, remembering whether it has passed
+    "Age confirmed". Back and close are not followed: they return to a screen
+    the walk already reached. A variant counts as reachable from its base,
+    as in the reachability check. With `pinned`, the native sign-in branches
+    reached before "Age confirmed" must equal it, and every `allow` entry
+    must be submitted somewhere."""
+    errors, via, todo, native = [], {}, [], {}
+    def reach(state, prev, label):
+        if state[0] in screens and state not in via:
+            via[state] = (prev, label); todo.append(state)
+    def route(state):
+        out = []
+        while state:
+            prev, label = via[state]
+            out.append((f'"{label}" → ' if label else '') + state[0])
+            state = prev
+        return ' '.join(reversed(out))
+    def visit(state, label, path, a, ok):
+        if not a: return
+        t = a['type']
+        if t == 'submit' and creates_account(a['api'], allow) and not ok:
+            errors.append(f'age gate: {state[0]} "{label}" submits {a["api"]} outside {AGE_RULE} "{AGE_CONFIRMED}" '
+                          f'(an auth endpoint creates an account unless AUTH_NOT_CREATING lists it); route: {route(state)}')
+        if t in ('submit', 'toast'): visit(state, label, path, a.get('then'), ok)
+        if t == 'branch':
+            if a.get('provider') and not ok:
+                native.setdefault((state[0], path), set()).add(tuple(c['label'] for c in a['cases']))
+            for c in a['cases']:
+                nxt = c['action']
+                if a.get('provider') and NEW_IDENTITY in c['label'] and not (nxt['type'] in NAVIGATIONS and nxt['to'] == SIGN_UP):
+                    errors.append(f'age gate: {state[0]} "{label}" outcome "{c["label"]}" must enter the normal sign-up ({SIGN_UP}) (P-73)')
+                visit(state, label, path, nxt, ok or (a.get('decide') == AGE_RULE and c['label'] == AGE_CONFIRMED))
+        if t in NAVIGATIONS:
+            for to in (a['to'], (a.get('context') or {}).get('onboarding')):
+                if to: reach((to, ok), state, label)
+    for sid in entries: reach((sid, False), None, None)
+    while todo:
+        state = todo.pop(0)
+        for label, path, a in actions_of(screens[state[0]]): visit(state, label, path, a, state[1])
+        for vid, v in screens.items():
+            if v.get('variantOf') == state[0]: reach((vid, state[1]), state, None)
+    if pinned is not None:
+        want = {k: set(v) for k, v in pinned.items()}
+        for k in sorted(set(native) | set(want)):
+            if native.get(k) != want.get(k):
+                errors.append(f'age gate: native sign-in at {k[0]} {k[1]} outside "{AGE_CONFIRMED}" has outcomes {sorted(native.get(k, ()))}, '
+                              f'PRE_AGE_SIGN_IN pins {sorted(want.get(k, ()))}')
+        used = submit_endpoints(screens)
+        for e in allow:
+            if e not in used: errors.append(f'age gate: AUTH_NOT_CREATING lists {e!r}, which no screen submits')
+    return list(dict.fromkeys(errors))
 
 # ---------------------------------------------------------------- decision sources (R-31)
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -406,7 +499,47 @@ def _self_test():
         leaked = [dict(cat[0], question='Q')] + cat[1:]
         _expect(any('carries question text' in e for e in write(leaked, eps)), 'V6 question text not reported')
         _expect(any('cannot read' in e for e in check_emitted(os.path.join(d, 'missing'))), 'V6 missing catalogue not reported')
+    _age_gate_self_test(scr)
     print('validate self-test: ok')
+
+def _age_gate_self_test(scr):
+    """check_age_gate fails closed: an account-creating or unknown auth submit
+    outside "Age confirmed", a new-identity outcome that does not enter the
+    normal sign-up, and a native sign-in branch that differs from the pinned
+    table are each reported; the gated spec passes."""
+    def sc(sid, *actions): return dict(scr(*actions), id=sid)
+    new = 'New Apple ID, no Tether account'
+    def social(to, *more): return branch('Apple', [(new, go(to)), ('Cancelled', back())] + list(more)) | {'provider': 'apple', 'decide': None}
+    gate = lambda a: branch('Age', [('Age confirmed', a), ('Age not confirmed', toast('x'))], decide='ob.age')
+    pin = {('si', 'footer[0]'): [(new, 'Cancelled')]}
+    allow = {'POST supabase /auth/v1/token': 'signs in'}
+    fixed = {'w': sc('w', sheet('si')), 'si': sc('si', social('ob_programs'), submit('POST supabase /auth/v1/token', back())),
+             'ob_programs': sc('ob_programs', go('ob_account')),
+             'ob_account': sc('ob_account', gate(submit('POST supabase /auth/v1/signup', back())), gate(social('ob_programs')))}
+    def run(spec, entries=None): return check_age_gate(spec, list(spec) if entries is None else entries, pin, allow)
+    _expect(run(fixed) == [], run(fixed))
+    def has(spec, text, why, entries=None):
+        got = run(spec, entries)
+        _expect(any(text in e for e in got), f'{why} not reported; got {got}')
+    old = dict(fixed, si=sc('si', social('sn'), submit('POST supabase /auth/v1/token', back())),
+               sn=sc('sn', submit('POST supabase /auth/v1/token?grant_type=id_token', go('w'))))
+    got = check_age_gate(old, ['w'], None, allow)
+    _expect('age gate: sn "B0" submits POST supabase /auth/v1/token?grant_type=id_token outside ob.age "Age confirmed" '
+            '(an auth endpoint creates an account unless AUTH_NOT_CREATING lists it); route: w "B0" → si "B0" → sn' in got, got)
+    has(old, 'must enter the normal sign-up (ob_programs) (P-73)', 'new identity not entering the normal sign-up')
+    has(dict(fixed, si=sc('si', social('ob_account'), submit('POST supabase /auth/v1/token', back()))), 'must enter the normal sign-up', 'new identity straight to ob_account')
+    has(dict(fixed, ob_account=sc('ob_account', submit('POST supabase /auth/v1/signup', back()), gate(social('ob_programs')))), 'submits POST supabase /auth/v1/signup outside', 'ungated sign-up')
+    has(dict(fixed, w=sc('w', sheet('si'), submit('POST supabase /auth/v1/otp', back()))), 'submits POST supabase /auth/v1/otp outside', 'unlisted auth endpoint')
+    has(dict(fixed, x=sc('x', submit('POST supabase /auth/v1/signup', back()))), 'age gate: x ', 'screen no route reaches')
+    has(dict(fixed, si=sc('si', social('ob_programs', ('Success', reset('today'))), submit('POST supabase /auth/v1/token', back()))), 'PRE_AGE_SIGN_IN pins', 'changed outcome labels')
+    has(dict(fixed, w=sc('w', sheet('si'), social('ob_programs'))), 'native sign-in at w footer[1]', 'unpinned native sign-in')
+    has(dict(fixed, ob_account=sc('ob_account', gate(submit('POST supabase /auth/v1/signup', back())), social('ob_programs'))), 'native sign-in at ob_account footer[1]', 'native sign-in before the age check')
+    has({k: v for k, v in fixed.items() if k != 'si'} | {'w': sc('w', back())}, 'at si footer[0] outside "Age confirmed" has outcomes []', 'stale pinned entry')
+    has(dict(fixed, si=sc('si', social('ob_programs'))), "AUTH_NOT_CREATING lists 'POST supabase /auth/v1/token'", 'unused allowlist entry')
+    onb = {'w': sc('w', {'type': 'replace', 'to': 'x', 'context': {'onboarding': 'sn'}}), 'x': sc('x', back()), 'sn': old['sn']}
+    _expect(any(e.startswith('age gate: sn ') for e in check_age_gate(onb, ['w'], None, allow)), 'onboarding-context route not followed')
+    var = {'w': sc('w', back()), 'v': dict(sc('v', submit('POST supabase /auth/v1/signup', back())), variantOf='w')}
+    _expect(any(e.startswith('age gate: v ') for e in check_age_gate(var, ['w'], None, allow)), 'variant of a reached screen not walked')
 
 if __name__ == '__main__':
     _self_test()

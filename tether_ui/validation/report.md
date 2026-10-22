@@ -1,6 +1,6 @@
 # Validation report
 
-Generated 2026-10-21T19:12:48+00:00 from the spec, the Flutter package and the HTML prototype.
+Generated 2026-10-22T00:21:24+00:00 from the spec, the Flutter package and the HTML prototype.
 
 | Check | Flutter | Prototype |
 |---|---|---|
@@ -34,7 +34,7 @@ Generated 2026-10-21T19:12:48+00:00 from the spec, the Flutter package and the H
 | auth-email: Create account with email, verify, keep both plans | — | tap “I’m 18 or older” → tap “Create account” → at auth_verify → tap “I’ve confirmed my email” → at auth_merge → tap “Continue” | `today` | ✅ | ✅ |
 | auth-apple: Sign in with Apple (iPhone) | — | tap “I already have an account” → outcome “Success” → tap “Continue with Apple” | `today` | ✅ | ✅ |
 | auth-google: Sign in with Google (Android) | — | tap “I already have an account” → outcome “Success” → tap “Continue with Google” | `today` | ✅ | ✅ |
-| auth-apple-new: New Apple ID starts onboarding with an account | — | tap “I already have an account” → outcome “New Apple ID, no Tether account” → tap “Continue with Apple” → at auth_social_new → tap “Create my account” | `ob_programs` | ✅ | ✅ |
+| auth-apple-new: New Apple ID goes through the normal sign-up | — | tap “I already have an account” → outcome “New Apple ID, no Tether account” → tap “Continue with Apple” | `ob_programs` | ✅ | ✅ |
 | auth-google-link: Google email already used → link accounts | — | tap “I’m 18 or older” → outcome “Email already has a Tether account” → tap “Continue with Google” → at auth_link → tap “Link and sign in” | `today` | ✅ | ✅ |
 | auth-google-error: Google sign-in fails → error with email fallback | — | tap “I’m 18 or older” → outcome “Error” → tap “Continue with Google” → at auth_social_error → tap “Use email instead” | `auth_signin` | ✅ | ✅ |
 | auth-wrong-password: Wrong password shows inline error | — | tap “I already have an account” → outcome “Wrong password” → tap “Sign in” | `auth_signin_error` | ✅ | ✅ |

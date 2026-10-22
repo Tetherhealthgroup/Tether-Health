@@ -413,6 +413,11 @@ class PreviewApi implements TApi {
 /// `google_sign_in` (Android/iOS), then Supabase `signInWithIdToken`.
 /// Return the outcome label the screen expects (e.g. 'Success',
 /// 'Cancelled', 'Error', 'Email already has a Tether account').
+/// Only the sign-up branches on ob_account, which run after the age check,
+/// may create an account. Elsewhere, for an Apple ID or Google account with
+/// no Tether account, return the '… no Tether account' outcome when the
+/// branch has one (it enters the normal sign-up at its start, P-73), and
+/// otherwise null.
 abstract class TAuth {
   static TAuth? instance;
   Future<String?> signIn(String provider, List<String> outcomes);
