@@ -270,6 +270,9 @@ void main() {
     addTearDown(account.dispose);
     addTearDown(quitPlan.dispose);
 
+    // The member's earlier answers; a new plan starts empty.
+    quitPlan.plan = _plan();
+
     var advanced = false;
     await tester.pumpWidget(MaterialApp(
       home: ApprovedScreenPlayer(

@@ -439,7 +439,7 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
     final compact = size.height < 760;
     final horizontalPadding = size.width < 390 ? 16.0 : 20.0;
 
-    return Scaffold(
+    final screen = Scaffold(
       key: const ValueKey('functional-guided-stress-reset-screen'),
       backgroundColor: AppColors.cream,
       body: SafeArea(
@@ -562,6 +562,15 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
           ],
         ),
       ),
+    );
+
+    // System Back asks the same question as the close button.
+    return PopScope<Object?>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _showExitConfirmation();
+      },
+      child: screen,
     );
   }
 }

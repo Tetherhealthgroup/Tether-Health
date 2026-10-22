@@ -234,7 +234,8 @@ class _QuitDayHomeScreenState extends State<QuitDayHomeScreen> {
           children: [
             _Header(
               isSpanish: widget.isSpanish,
-              hasUnreadNotifications: true,
+              // Nothing has been sent to the member, so no unread dot.
+              hasUnreadNotifications: false,
               onNotifications: _openNotifications,
               onProfile: widget.onOpenProfile,
               profileIdentity: widget.profileIdentity,
@@ -399,6 +400,7 @@ class _Header extends StatelessWidget {
                 ),
                 if (hasUnreadNotifications)
                   const Positioned(
+                    key: ValueKey('quit-day-notification-dot'),
                     right: 3,
                     top: 2,
                     child: CircleAvatar(

@@ -509,7 +509,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
     final compact = size.height < 760;
     final horizontalPadding = size.width < 390 ? 16.0 : 20.0;
 
-    return Scaffold(
+    final screen = Scaffold(
       key: const ValueKey('functional-active-craving-rescue-screen'),
       backgroundColor: AppColors.cream,
       body: SafeArea(
@@ -698,6 +698,15 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
           ],
         ),
       ),
+    );
+
+    // System Back asks the same question as the close button.
+    return PopScope<Object?>(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _showCloseConfirmation();
+      },
+      child: screen,
     );
   }
 }
