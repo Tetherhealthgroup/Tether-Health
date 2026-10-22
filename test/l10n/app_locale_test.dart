@@ -203,6 +203,11 @@ void main() {
         '{"choice":"es"}',
         '{"choice":"es","deviceLocale":"en-US","extra":"x"}',
         '{"choice":"es; drop","deviceLocale":"en-US"}',
+        // Not a release locale.
+        '{"choice":"de","deviceLocale":"en-US"}',
+        '{"choice":"es-MX","deviceLocale":"en-US"}',
+        // Longer than the code cap.
+        '{"choice":"es","deviceLocale":"en-aaaaaaaa-bbbbbbbb-cccccccc-dddddd"}',
       ]) {
         FlutterSecureStorage.setMockInitialValues({_key: bad});
         final locale =
@@ -213,16 +218,59 @@ void main() {
       }
     });
 
-    test('unreadable storage counts as no choice', () async {
+    test('a code of exactly the cap length is kept', () async {
+      final device = 'en-${'a' * 8}-${'b' * 8}-${'c' * 8}-${'d' * 5}';
+      expect(device.length, SavedLocaleChoice.maxCodeLength);
+      FlutterSecureStorage.setMockInitialValues({
+        _key: jsonEncode({'choice': 'es', 'deviceLocale': device}),
+      });
+      final locale = AppLocale(
+        deviceLocales: () => const [Locale('en')],
+      );
+      final restored = await const SecureAppLocaleStore().load();
+      expect(restored?.deviceLocale, device);
+      await locale.load();
+      await pumpEventQueue();
+      expect(await _stored(), isNull, reason: 'phone differs, choice dropped');
+    });
+
+    test('unreadable storage counts as no choice; failures are reported',
+        () async {
       final locale = AppLocale(
         store: _FailingStore(),
         deviceLocales: () => const [Locale('es', 'US')],
       );
       await locale.load();
       expect(locale.locale, const Locale('es'));
-      await locale.choose(const Locale('en'));
+      expect(await locale.choose(const Locale('en')), isFalse);
       expect(locale.locale, const Locale('en'));
+      await expectLater(locale.clearSavedChoice(), throwsStateError);
+      expect(locale.locale, const Locale('es'));
+      // The queue carries on after a failure.
+      expect(await locale.choose(const Locale('en')), isFalse);
+    });
+
+    test('a saved choice reports success', () async {
+      final locale = AppLocale(deviceLocales: () => const [Locale('en', 'US')]);
+      expect(await locale.choose(const Locale('es')), isTrue);
       await locale.clearSavedChoice();
+      expect(await _stored(), isNull);
+    });
+
+    test('a failed best-effort clear does not surface as an uncaught error',
+        () async {
+      final store = _FailingStore(
+          loadValue: const SavedLocaleChoice(
+        choice: 'es',
+        deviceLocale: 'en-US',
+      ));
+      var device = const [Locale('en', 'GB')];
+      final locale = AppLocale(store: store, deviceLocales: () => device);
+      await locale.load();
+      expect(locale.locale, const Locale('en'));
+      device = const [Locale('es')];
+      locale.didChangeLocales(device);
+      await pumpEventQueue();
       expect(locale.locale, const Locale('es'));
     });
   });
@@ -268,8 +316,13 @@ class _SlowStore extends MemoryAppLocaleStore {
 }
 
 class _FailingStore implements AppLocaleStore {
+  _FailingStore({this.loadValue});
+
+  final SavedLocaleChoice? loadValue;
+
   @override
-  Future<SavedLocaleChoice?> load() => Future.error(StateError('locked'));
+  Future<SavedLocaleChoice?> load() async =>
+      loadValue ?? (throw StateError('locked'));
 
   @override
   Future<void> save(SavedLocaleChoice choice) =>

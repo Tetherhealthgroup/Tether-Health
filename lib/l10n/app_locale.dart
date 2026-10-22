@@ -5,7 +5,10 @@
 // the app ships; otherwise English. A choice made in the app (the welcome
 // language menu) overrides that and is saved on the device. If the phone's
 // language changes after the choice was made, the phone wins and the saved
-// choice is dropped: the most recent explicit choice wins.
+// choice is dropped: the most recent explicit choice wins. "Changes" means any
+// change of the phone's first locale tag, region included: en-US to en-GB, or
+// another language moved to the top of the phone's list, drops the choice even
+// when the app language would stay the same.
 //
 // The saved value is two locale codes and nothing else. It is a device UI
 // preference, not health data: it survives sign-out and is removed with the
@@ -56,15 +59,26 @@ class SavedLocaleChoice {
 
   static final _code = RegExp(r'^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$');
 
-  /// Returns null unless [encoded] holds exactly two well-formed codes.
+  /// The longest code accepted; longer stored values are discarded.
+  static const maxCodeLength = 35;
+
+  static bool _wellFormed(String code) =>
+      code.length <= maxCodeLength && _code.hasMatch(code);
+
+  /// Returns null unless [encoded] holds exactly two well-formed codes and
+  /// the choice is a release locale.
   static SavedLocaleChoice? decode(String encoded) {
+    if (encoded.length > 4 * maxCodeLength) return null;
     try {
       final json = jsonDecode(encoded);
       if (json is! Map || json.length != 2) return null;
       final choice = json['choice'];
       final device = json['deviceLocale'];
       if (choice is! String || device is! String) return null;
-      if (!_code.hasMatch(choice) || !_code.hasMatch(device)) return null;
+      if (!_wellFormed(choice) || !_wellFormed(device)) return null;
+      if (!releaseLocales.any((release) => release.languageCode == choice)) {
+        return null;
+      }
       return SavedLocaleChoice(choice: choice, deviceLocale: device);
     } on FormatException {
       return null;
@@ -181,8 +195,9 @@ class AppLocale extends ChangeNotifier with WidgetsBindingObserver {
     _update();
   }
 
-  /// Saves [locale] as the member's choice and switches to it.
-  Future<void> choose(Locale locale) {
+  /// Saves [locale] as the member's choice and switches to it. Completes with
+  /// false if the choice could not be saved; it still applies until restart.
+  Future<bool> choose(Locale locale) {
     final chosen = resolveAppLocale(choice: locale, deviceLocales: const []);
     final record = SavedLocaleChoice(
       choice: chosen.languageCode,
@@ -192,10 +207,15 @@ class AppLocale extends ChangeNotifier with WidgetsBindingObserver {
     _choice = chosen;
     _choiceDeviceTag = record.deviceLocale;
     _update();
-    return _enqueue(() => _store.save(record));
+    return _enqueue(() => _store.save(record)).then(
+      (_) => true,
+      onError: (Object _) => false,
+    );
   }
 
   /// Removes the saved choice (on-device data wipe) and follows the phone.
+  /// Completes with the storage error if the stored value could not be
+  /// removed, so the wipe can report that cleanup did not finish.
   Future<void> clearSavedChoice() {
     _generation++;
     _choice = null;
@@ -216,10 +236,12 @@ class AppLocale extends ChangeNotifier with WidgetsBindingObserver {
     _update();
   }
 
+  // Runs storage operations one after another. The returned future carries
+  // the operation's error; the queue itself carries on after a failure.
   Future<void> _enqueue(Future<void> Function() write) {
-    final next = _writes.then((_) => write()).catchError((Object _) {});
-    _writes = next;
-    return next;
+    final result = _writes.then((_) => write());
+    _writes = result.catchError((Object _) {});
+    return result;
   }
 
   void _update() {

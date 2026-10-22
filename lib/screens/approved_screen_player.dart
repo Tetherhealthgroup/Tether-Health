@@ -744,7 +744,11 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
         } catch (error) {
           cleanupError ??= error;
         }
-        await _appLocale.clearSavedChoice();
+        try {
+          await _appLocale.clearSavedChoice();
+        } catch (error) {
+          cleanupError ??= error;
+        }
         if (cleanupError != null) throw cleanupError;
       },
     );

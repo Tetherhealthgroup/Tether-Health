@@ -34,8 +34,9 @@ Future<AppLocale> _launch(
   int initialScreen = 0,
   AccountController? account,
   QuitPlanController? quitPlan,
+  AppLocaleStore store = const SecureAppLocaleStore(),
 }) async {
-  final locale = AppLocale(deviceLocales: () => device);
+  final locale = AppLocale(store: store, deviceLocales: () => device);
   await tester.runAsync(locale.load);
   await tester.pumpWidget(BreatheFreeApp(
     key: UniqueKey(),
@@ -212,6 +213,92 @@ void main() {
   });
 
   testWidgets(
+      'a language choice that cannot be removed fails the deletion cleanup '
+      'until Done retries it', (tester) async {
+    _phoneSize(tester);
+    final store = _FlakyClearStore(failures: 1);
+    final account = _signedInAccount();
+    final locale = await _launch(
+      tester,
+      initialScreen: 27,
+      account: account,
+      quitPlan: _noPlan(),
+      store: store,
+    );
+    expect(locale.locale, const Locale('es'));
+
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('settings-delete-account')),
+    );
+    await tester.tap(find.byKey(const ValueKey('settings-delete-account')));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('account-delete-password')),
+      'synthetic-password',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('account-delete-confirmation')),
+      'DELETE',
+    );
+    await tester.pump();
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('account-delete-confirm')),
+    );
+    await tester.tap(find.byKey(const ValueKey('account-delete-confirm')));
+    await tester.pumpAndSettle();
+
+    expect(store.saved, isNotNull);
+    expect(
+      find.byKey(const ValueKey('account-delete-finish-error')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('account-delete-done')));
+    await tester.pumpAndSettle();
+    expect(store.saved, isNull);
+    expect(find.text(_englishHeadline), findsOneWidget);
+  });
+
+  testWidgets(
+      'after a restart, a choice that cannot be removed is retried by Done',
+      (tester) async {
+    _phoneSize(tester);
+    final store = _FlakyClearStore(failures: 2);
+    final receipts = FakeReceipts(PendingAccountDeletion(
+      accountId: 'synthetic-user-01',
+      receipt: AccountDeletionReceipt(
+        requestId: 'synthetic-receipt-03',
+        completedAt: DateTime.utc(2026, 10, 22),
+        profileRowsDeleted: 1,
+        quitPlanRowsDeleted: 0,
+        avatarObjectsDeleted: 0,
+        authIdentityDeleted: true,
+      ),
+    ));
+    final account = fakeAccount(receipts: receipts);
+    addTearDown(account.dispose);
+    await _launch(tester, account: account, quitPlan: _noPlan(), store: store);
+
+    expect(find.text('Account deleted'), findsOneWidget);
+    expect(store.saved, isNotNull);
+
+    // Done retries the cleanup; the removal fails again, so the receipt stays.
+    await tester.tap(find.byKey(const ValueKey('account-delete-done')));
+    await tester.pumpAndSettle();
+    expect(store.saved, isNotNull);
+    expect(receipts.saved, isNotNull);
+    expect(
+      find.byKey(const ValueKey('account-delete-finish-error')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const ValueKey('account-delete-done')));
+    await tester.pumpAndSettle();
+    expect(store.saved, isNull);
+    expect(receipts.saved, isNull);
+  });
+
+  testWidgets(
       'finishing a deletion after a restart clears the language choice too',
       (tester) async {
     _phoneSize(tester);
@@ -275,4 +362,22 @@ void main() {
     await tester.pumpAndSettle();
     expect(root().locale, const Locale('en'));
   });
+}
+
+/// Holds a Spanish choice; the first [failures] clears fail.
+class _FlakyClearStore extends MemoryAppLocaleStore {
+  _FlakyClearStore({required this.failures}) {
+    saved = const SavedLocaleChoice(choice: 'es', deviceLocale: 'en-US');
+  }
+
+  int failures;
+
+  @override
+  Future<void> clear() async {
+    if (failures > 0) {
+      failures--;
+      throw StateError('locked');
+    }
+    await super.clear();
+  }
 }
