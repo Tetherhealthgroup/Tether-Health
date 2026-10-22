@@ -1,11 +1,21 @@
 openapi: 3.1.0
 info:
   title: Tether Health API
-  version: 1.7.0
+  version: 1.8.0
   description: >-
     Development contract for authenticated profiles and bounded program data.
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
+    Added in 1.8.0, each for app use: `POST /v1/records/check-ins` (one
+    row per focus programme with a live core consent, each with only its
+    own answer), `POST /v1/records/rescues` (a BreatheFree rescue always
+    carries the BreatheFree enrolment or is refused), `POST
+    /v1/records/lessons`, `GET /v1/today`, `GET /v1/records/summary` (one
+    programme per call), `GET` and `PATCH /v1/notifications/preferences`,
+    `GET` and `PUT /v1/profile/baseline`, and the public `GET
+    /v1/app/config`, with their own coded error body
+    `RecordsRequestRejected` (the programme event codes plus
+    `no_focus_programme`).
     Added in 1.7.0: the fifteen programme event routes
     `POST /v1/program-data/{code}/{kind}` (Heartwise readings and lipids,
     Steady readings and A1C, Renew labs, ClearAir zone checks and symptoms,
@@ -1067,6 +1077,270 @@ paths:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
         '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/records/check-ins:
+    post:
+      operationId: recordCheckIn
+      summary: Daily check-in
+      description: >-
+        Writes one `checkin` programme entry per enrolment that is in focus
+        and holds a live core consent: each row holds `feel` and `stress`
+        and only its own programme's answer (`answers.bf` only in the
+        BreatheFree row, `answers.sf` only in the ScrollFree row). A
+        programme whose row would hold nothing gets no row. One bulk
+        insert. A repeat of a stored submission compares the stored rows of
+        enrolments that still qualify and inserts nothing new.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CheckIn'}
+      responses:
+        '201':
+          description: The check-in was written
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CheckInCreated'}
+        '200':
+          description: A repeat of a stored check-in with the same content; nothing was written
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CheckInReplayed'}
+        '400': {$ref: '#/components/responses/RecordsBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '409':
+          description: '`account_deletion_in_progress`, `no_focus_programme` (no enrolment in focus with a live core consent), `idempotency_key_conflict`, or `record_not_allowed` (an enrolment was left, its consent revoked or account deletion started while the request ran). Nothing was written.'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RecordsRequestRejected'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422': {$ref: '#/components/responses/RecordsInvalidRecord'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/records/rescues:
+    post:
+      operationId: recordRescue
+      summary: Rescue tool used
+      description: >-
+        `programme: "bf"` writes the rescue into the caller's BreatheFree
+        enrolment after its checks; when it has none, has left, has no live
+        core consent or account deletion has started, the rescue is refused
+        and nothing is written (never stored as a shared rescue). Without
+        `programme` the rescue is shared (no enrolment); the programme is
+        never inferred. A repeat compares every field except `openedAt`.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/Rescue'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/RecordsBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/RecordsNotEnrolled'}
+        '409': {$ref: '#/components/responses/RecordsConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422': {$ref: '#/components/responses/RecordsInvalidRecord'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/records/lessons:
+    post:
+      operationId: recordLesson
+      summary: Lesson completed
+      description: >-
+        Records a completed lesson in the caller's enrolment in
+        `programme`. The lesson is the identity: completing it again
+        answers 200 `replayed` whatever the key. The key is still required.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/Lesson'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/RecordsBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/RecordsNotEnrolled'}
+        '409': {$ref: '#/components/responses/RecordsConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422': {$ref: '#/components/responses/RecordsInvalidRecord'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/today:
+    get:
+      operationId: getToday
+      summary: The member's day
+      description: >-
+        The day in the member's time zone (UTC when none is set or the zone
+        is unknown): whether a check-in happened today, the newest shared
+        rescue that helped ("Yes" or "A little"), and one block per
+        enrolment that is not left, each built only from that programme's
+        own rows. Lapse counts and times come from the synced lapses of
+        that programme; nothing else of the synced data is read. "Last 7
+        days" is today and the six local days before it.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: The member's day
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Today'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/records/summary:
+    get:
+      operationId: getRecordsSummary
+      summary: One programme's records
+      description: >-
+        One programme per call: its observations, entries and lessons from
+        the last `days` days, its lapses (bf, sf) and its rescues (bf
+        only). A programme the member left is summarised too (its data is
+        kept until deleted).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {name: programme, in: query, required: true, schema: {type: string, pattern: '^[a-z]{2}$'}}
+        - {name: days, in: query, required: true, schema: {type: integer, enum: [7, 30, 90]}}
+      responses:
+        '200':
+          description: The programme's records
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RecordsSummary'}
+        '400':
+          description: '`invalid_request`: a missing, repeated, unknown or invalid query parameter'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RecordsRequestRejected'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/RecordsNotEnrolled'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/notifications/preferences:
+    get:
+      operationId: getNotificationPreferences
+      summary: Notification preferences
+      description: >-
+        The stored switches and reminder times. A member who never saved
+        gets the stored defaults with `persisted: false`: check-ins and plan
+        reminders off, sensitive details off, quiet hours on.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: The member's notification preferences
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/NotificationPreferences'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+    patch:
+      operationId: updateNotificationPreferences
+      summary: Change notification preferences
+      description: >-
+        Changes only the fields present (last write wins). Each reminder is
+        stored for the caller's enrolment in its programme, which must not
+        be left and must hold a live core consent; a reminder time can be
+        changed but not cleared. Storing a time sends nothing: whether a
+        reminder fires is the programme's reminders consent. An
+        `Idempotency-Key` header is accepted and ignored. Answers the state
+        after the change.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PatchNotificationPreferences'}
+      responses:
+        '200':
+          description: The member's notification preferences after the change
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/NotificationPreferences'}
+        '400': {$ref: '#/components/responses/RecordsBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/RecordsNotEnrolled'}
+        '409': {$ref: '#/components/responses/RecordsConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422': {$ref: '#/components/responses/RecordsInvalidRecord'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/profile/baseline:
+    get:
+      operationId: getWellbeingBaseline
+      summary: Onboarding baseline
+      description: The member's age band, sleep band and stress band, each null when not given. Kept apart from the identity profile; never shared.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: The member's baseline
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Baseline'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+    put:
+      operationId: putWellbeingBaseline
+      summary: Replace the onboarding baseline
+      description: Replaces all three values; a field that is absent or null is stored as null. Answers the stored baseline.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/PutBaseline'}
+      responses:
+        '200':
+          description: The stored baseline
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Baseline'}
+        '400': {$ref: '#/components/responses/RecordsBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '409': {$ref: '#/components/responses/RecordsConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422': {$ref: '#/components/responses/RecordsInvalidRecord'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/app/config:
+    get:
+      operationId: getAppConfig
+      summary: App configuration
+      description: Public. The lowest app version the API serves, per platform (0.0.0 asks no version to update). Nothing else.
+      x-app-use: true
+      security: []
+      responses:
+        '200':
+          description: The app configuration
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AppConfig'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
 components:
   securitySchemes:
     supabaseJwt: {type: http, scheme: bearer, bearerFormat: JWT}
@@ -1144,6 +1418,36 @@ components:
           schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
     ProgrammeRecordUnavailable:
       description: Record storage is temporarily unavailable, or the database refused the record for a reason the caller cannot fix
+    RecordsBadRequest:
+      description: >-
+        `idempotency_key_required` or `idempotency_key_invalid` (POST
+        routes; checked before the body), or `invalid_request` (an unknown
+        key, a missing required field, a value of the wrong type, a code
+        not in its list, a time more than 5 minutes ahead, a check-in with
+        no value, or a lesson id without its programme's prefix). A body
+        the JSON parser refuses gets the generic body without a code
+        (`RequestRejected`). Nothing was written.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - {$ref: '#/components/schemas/RecordsRequestRejected'}
+              - {$ref: '#/components/schemas/RequestRejected'}
+    RecordsNotEnrolled:
+      description: '`enrolment_not_found`: the caller has no enrolment in this programme (also when it was deleted meanwhile); nothing was written'
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/RecordsRequestRejected'}
+    RecordsConflict:
+      description: '`account_deletion_in_progress`, `enrolment_left`, `core_consent_required` (no live core consent), `idempotency_key_conflict` (the key was used with other content), or `record_not_allowed` (the enrolment was left, its consent revoked or account deletion started while the request ran). Nothing was written by the refused write.'
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/RecordsRequestRejected'}
+    RecordsInvalidRecord:
+      description: '`invalid_record`: the database refused the record''s shape or bounds, or a check-in answered for a programme that is not an enrolment in focus with a live core consent; nothing was written'
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/RecordsRequestRejected'}
   schemas:
     Health:
       type: object
@@ -1705,3 +2009,302 @@ components:
       properties:
         feeling: {enum: [hard, mixed, good]}
         occurredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+    RecordsRequestRejected:
+      description: Error body of the records, Today, notification preference and baseline routes, with a stable code naming the refused rule. The programme event routes' codes plus `no_focus_programme`. Never contains submitted values, field contents or identifiers.
+      type: object
+      additionalProperties: false
+      required: [statusCode, error, code, requestId]
+      properties:
+        statusCode: {type: integer}
+        error: {const: Request rejected}
+        code:
+          type: string
+          enum:
+            - invalid_request
+            - idempotency_key_required
+            - idempotency_key_invalid
+            - idempotency_key_conflict
+            - value_out_of_range
+            - invalid_record
+            - enrolment_not_found
+            - enrolment_left
+            - core_consent_required
+            - account_deletion_in_progress
+            - record_not_allowed
+            - no_focus_programme
+        requestId: {type: string}
+    CheckIn:
+      type: object
+      additionalProperties: false
+      description: At least one of `feel`, `stress` or an answer (otherwise 400 `invalid_request`). "Skip" means the key is omitted.
+      properties:
+        feel: {enum: [low, not_great, okay, good, great]}
+        stress: {enum: [low, some, high]}
+        answers:
+          type: object
+          additionalProperties: false
+          properties:
+            bf: {enum: [no, a_puff, one_or_more]}
+            sf: {enum: [better, same, drained]}
+        occurredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+    CheckInCreated:
+      type: object
+      additionalProperties: false
+      required: [submissionId, entries]
+      properties:
+        submissionId: {type: string, format: uuid}
+        entries:
+          type: array
+          description: The programmes that hold a row of this check-in, sorted
+          items: {type: string, pattern: '^[a-z]{2}$'}
+    CheckInReplayed:
+      type: object
+      additionalProperties: false
+      required: [submissionId, replayed, entries]
+      properties:
+        submissionId: {type: string, format: uuid}
+        replayed: {const: true}
+        entries:
+          type: array
+          items: {type: string, pattern: '^[a-z]{2}$'}
+    Rescue:
+      type: object
+      additionalProperties: false
+      required: [tool]
+      properties:
+        programme: {const: bf, description: 'BreatheFree only; absent means a shared rescue'}
+        tool: {type: string, pattern: '^[a-z0-9_]{1,40}$'}
+        openedAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+        intensityBefore: {type: integer, minimum: 0, maximum: 10}
+        intensityAfter: {type: integer, minimum: 0, maximum: 10}
+        helped: {enum: [yes, a_little, no], description: '"Not this time" is `no`'}
+        escalated: {type: boolean, description: 'Default false'}
+    Lesson:
+      type: object
+      additionalProperties: false
+      required: [programme, lessonId]
+      properties:
+        programme: {type: string, pattern: '^[a-z]{2}$'}
+        lessonId: {type: string, pattern: '^[a-z0-9][a-z0-9_.-]{0,79}$', description: 'Starts with `<programme>.`; the spec has no lesson ids yet'}
+    TodayMeasurement:
+      type: [object, 'null']
+      additionalProperties: false
+      required: [value, at]
+      properties:
+        value: {type: number}
+        at: {type: string}
+    TodayRescue:
+      type: [object, 'null']
+      additionalProperties: false
+      required: [tool, at]
+      properties:
+        tool: {type: string}
+        at: {type: string}
+    TodayProgramme:
+      type: object
+      additionalProperties: false
+      required: [code, status, mode, reminderAt, lessonsCompleted]
+      description: Common fields, plus only the fixed fields of the block's own programme (hw lastBp; st lastGlucose, lastA1c; re lastLabs; ca lastZoneCheck; ea lastMood; sd sessionsLast7Days, lastFallAt; sf pausesToday, lapsesLast7Days; ck lastDone; be lastDiary; bf lapsesLast7Days, lastLapseAt, lastHelpfulRescue).
+      properties:
+        code: {type: string, pattern: '^[a-z]{2}$'}
+        status: {enum: [focus, learn_only, paused]}
+        mode: {enum: [quit, reduce, null]}
+        reminderAt: {type: [string, 'null'], pattern: '^[0-9]{2}:[0-9]{2}$'}
+        lessonsCompleted: {type: integer, minimum: 0}
+        lastBp:
+          type: [object, 'null']
+          additionalProperties: false
+          required: [systolic, diastolic, pulse, at]
+          properties:
+            systolic: {type: number}
+            diastolic: {type: [number, 'null']}
+            pulse: {type: [number, 'null']}
+            at: {type: string}
+        lastGlucose: {$ref: '#/components/schemas/TodayMeasurement'}
+        lastA1c: {$ref: '#/components/schemas/TodayMeasurement'}
+        lastLabs:
+          type: object
+          additionalProperties: false
+          required: [egfr, urineAcr, alt]
+          properties:
+            egfr: {$ref: '#/components/schemas/TodayMeasurement'}
+            urineAcr: {$ref: '#/components/schemas/TodayMeasurement'}
+            alt: {$ref: '#/components/schemas/TodayMeasurement'}
+        lastZoneCheck:
+          type: [object, 'null']
+          additionalProperties: false
+          required: [zone, at]
+          properties:
+            zone: {type: string}
+            at: {type: string}
+        lastMood:
+          type: [object, 'null']
+          additionalProperties: false
+          required: [mood, at]
+          properties:
+            mood: {type: string}
+            at: {type: string}
+        sessionsLast7Days: {type: integer, minimum: 0}
+        lastFallAt: {type: [string, 'null']}
+        pausesToday: {type: integer, minimum: 0}
+        lapsesLast7Days: {type: integer, minimum: 0}
+        lastLapseAt: {type: [string, 'null']}
+        lastDone:
+          type: [object, 'null']
+          additionalProperties: false
+          required: [item, doneOn, at]
+          properties:
+            item: {type: string}
+            doneOn: {type: string, format: date}
+            at: {type: string}
+        lastDiary:
+          type: [object, 'null']
+          additionalProperties: false
+          required: [fatigue, at]
+          properties:
+            fatigue: {type: integer, minimum: 0, maximum: 10}
+            at: {type: string}
+        lastHelpfulRescue: {$ref: '#/components/schemas/TodayRescue'}
+    Today:
+      type: object
+      additionalProperties: false
+      required: [date, checkin, account, programmes]
+      properties:
+        date: {type: string, format: date, description: "Today's date in the member's time zone"}
+        checkin:
+          type: object
+          additionalProperties: false
+          required: [doneToday]
+          properties:
+            doneToday: {type: boolean}
+        account:
+          type: object
+          additionalProperties: false
+          required: [lastHelpfulRescue]
+          properties:
+            lastHelpfulRescue: {$ref: '#/components/schemas/TodayRescue'}
+        programmes:
+          type: array
+          items: {$ref: '#/components/schemas/TodayProgramme'}
+    RecordsSummary:
+      type: object
+      additionalProperties: false
+      required: [programme, days, since, status, observations, entries, lessons]
+      properties:
+        programme: {type: string, pattern: '^[a-z]{2}$'}
+        days: {enum: [7, 30, 90]}
+        since: {type: string, format: date-time}
+        status: {enum: [focus, learn_only, paused, left]}
+        observations:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [metric, value, unit, at, attributes]
+            properties:
+              metric: {type: string}
+              value: {type: number}
+              unit: {type: string}
+              at: {type: string}
+              attributes: {type: object}
+        entries:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [kind, at, payload]
+            properties:
+              kind: {type: string}
+              at: {type: string}
+              payload: {type: object}
+        lessons:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [lessonId, completedAt]
+            properties:
+              lessonId: {type: string}
+              completedAt: {type: string}
+        lapses:
+          type: array
+          description: bf and sf only
+          items:
+            type: object
+            additionalProperties: false
+            required: [at]
+            properties:
+              at: {type: string}
+        rescues:
+          type: array
+          description: bf only (its own rescues; shared rescues are not a programme's)
+          items:
+            type: object
+            additionalProperties: false
+            required: [tool, openedAt, intensityBefore, intensityAfter, helped, escalated]
+            properties:
+              tool: {type: string}
+              openedAt: {type: string}
+              intensityBefore: {type: [integer, 'null']}
+              intensityAfter: {type: [integer, 'null']}
+              helped: {enum: [yes, a_little, no, null]}
+              escalated: {type: boolean}
+    ProgrammeReminder:
+      type: object
+      additionalProperties: false
+      required: [programme, remindAt]
+      properties:
+        programme: {type: string, pattern: '^[a-z]{2}$'}
+        remindAt: {type: string, pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'}
+    NotificationPreferences:
+      type: object
+      additionalProperties: false
+      required: [remindersEnabled, sensitiveDetails, quietHoursEnabled, persisted, programmeReminders]
+      properties:
+        remindersEnabled: {type: boolean}
+        sensitiveDetails: {type: boolean}
+        quietHoursEnabled: {type: boolean}
+        persisted: {type: boolean, description: 'False when the member never saved the switches (the values are the stored defaults)'}
+        programmeReminders:
+          type: array
+          items: {$ref: '#/components/schemas/ProgrammeReminder'}
+    PatchNotificationPreferences:
+      type: object
+      additionalProperties: false
+      properties:
+        remindersEnabled: {type: boolean}
+        sensitiveDetails: {type: boolean}
+        quietHoursEnabled: {type: boolean}
+        programmeReminders:
+          type: array
+          maxItems: 11
+          description: Each programme at most once
+          items: {$ref: '#/components/schemas/ProgrammeReminder'}
+    Baseline:
+      type: object
+      additionalProperties: false
+      required: [ageRange, sleepBand, stressBand]
+      properties:
+        ageRange: {enum: ['18_24', '25_34', '35_44', '45_54', '55_64', '65_74', '75_plus', null]}
+        sleepBand: {enum: [lt5, '5_6', '7_8', '9plus', null]}
+        stressBand: {enum: [low, some, high, null]}
+    PutBaseline:
+      type: object
+      additionalProperties: false
+      description: Absent or null stores null.
+      properties:
+        ageRange: {enum: ['18_24', '25_34', '35_44', '45_54', '55_64', '65_74', '75_plus', null], description: 'Age band; everyone 75 and over is 75_plus'}
+        sleepBand: {enum: [lt5, '5_6', '7_8', '9plus', null], description: '"< 5 h", "5–6 h", "7–8 h", "9+ h"'}
+        stressBand: {enum: [low, some, high, null]}
+    AppConfig:
+      type: object
+      additionalProperties: false
+      required: [minimumVersion]
+      properties:
+        minimumVersion:
+          type: object
+          additionalProperties: false
+          required: [ios, android]
+          properties:
+            ios: {type: string, pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'}
+            android: {type: string, pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'}

@@ -21,6 +21,18 @@ import { ConsentsController } from "./enrolments/consents.controller";
 import { EnrolmentsController } from "./enrolments/enrolments.controller";
 import { EnrolmentsService } from "./enrolments/enrolments.service";
 import { UserSupabaseClientFactory } from "./enrolments/user-supabase-client";
+import { RecordsEventsController } from "./records-events/records-events.controller";
+import { RecordsEventsService } from "./records-events/records-events.service";
+import {
+  RecordsSummaryController,
+  TodayController,
+} from "./today/today.controller";
+import { TodayService } from "./today/today.service";
+import { NotificationsController } from "./notifications/notifications.controller";
+import { NotificationsService } from "./notifications/notifications.service";
+import { BaselineController } from "./baseline/baseline.controller";
+import { BaselineService } from "./baseline/baseline.service";
+import { AppConfigController } from "./app-config/app-config.controller";
 
 @Module({
   imports: [
@@ -39,6 +51,12 @@ import { UserSupabaseClientFactory } from "./enrolments/user-supabase-client";
     EnrolmentsController,
     ConsentsController,
     CatalogueController,
+    RecordsEventsController,
+    TodayController,
+    RecordsSummaryController,
+    NotificationsController,
+    BaselineController,
+    AppConfigController,
   ],
   providers: [
     TokenVerifier,
@@ -50,6 +68,10 @@ import { UserSupabaseClientFactory } from "./enrolments/user-supabase-client";
     UserSupabaseClientFactory,
     EnrolmentsService,
     CatalogueService,
+    RecordsEventsService,
+    TodayService,
+    NotificationsService,
+    BaselineService,
     { provide: APP_GUARD, useClass: AuthGuard },
   ],
 })
