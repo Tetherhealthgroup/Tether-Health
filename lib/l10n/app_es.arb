@@ -143,7 +143,7 @@
   "readinessResultTriggerStress": "estrés",
   "readinessResultTriggerWorkBreaks": "descansos laborales",
   "readinessResultTriggersLabel": "DESENCADENANTES",
-  "readinessResultTriggersMany": "{value}, {value2} y {remaining} más",
+  "readinessResultTriggersMany": "{first}, {second} y {remaining} más",
   "readinessResultTriggersNone": "Puedes identificar desencadenantes cuando quieras",
   "readinessResultTriggersOne": "Quieres prepararte para {first}",
   "readinessResultTriggersTwo": "Quieres prepararte para {first} y {last}",

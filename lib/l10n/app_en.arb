@@ -605,14 +605,14 @@
   "@readinessResultTriggersLabel": {
     "description": "lib/screens/readiness_result_screen.dart: Label in the summary card: the triggers"
   },
-  "readinessResultTriggersMany": "{value}, {value2}, and {remaining} more",
+  "readinessResultTriggersMany": "{first}, {second}, and {remaining} more",
   "@readinessResultTriggersMany": {
-    "description": "lib/screens/readiness_result_screen.dart: Short list of many triggers: the first two ({value}, {value2}) and how many more ({remaining})",
+    "description": "lib/screens/readiness_result_screen.dart: Short list of many triggers: the first two ({first}, {second}) and how many more ({remaining})",
     "placeholders": {
-      "value": {
+      "first": {
         "type": "Object"
       },
-      "value2": {
+      "second": {
         "type": "Object"
       },
       "remaining": {

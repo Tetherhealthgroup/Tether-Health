@@ -512,8 +512,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String readinessResultTriggersMany(
-      Object value, Object value2, Object remaining) {
-    return '$value, $value2, and $remaining more';
+      Object first, Object second, Object remaining) {
+    return '$first, $second, and $remaining more';
   }
 
   @override

@@ -956,12 +956,12 @@ abstract class AppLocalizations {
   /// **'TRIGGERS'**
   String get readinessResultTriggersLabel;
 
-  /// lib/screens/readiness_result_screen.dart: Short list of many triggers: the first two ({value}, {value2}) and how many more ({remaining})
+  /// lib/screens/readiness_result_screen.dart: Short list of many triggers: the first two ({first}, {second}) and how many more ({remaining})
   ///
   /// In en, this message translates to:
-  /// **'{value}, {value2}, and {remaining} more'**
+  /// **'{first}, {second}, and {remaining} more'**
   String readinessResultTriggersMany(
-      Object value, Object value2, Object remaining);
+      Object first, Object second, Object remaining);
 
   /// lib/screens/readiness_result_screen.dart: Triggers summary when none were chosen
   ///
