@@ -6,6 +6,12 @@ import {
   observationCheckFails,
   payloadTriggerFails,
 } from "./fake-programme-records";
+import {
+  baselineCheckFails,
+  lessonCheckFails,
+  rescueCheckFails,
+  timeValue,
+} from "./fake-member-records";
 
 /**
  * In-memory stand-in for PostgREST over the TH-913 schema
@@ -86,6 +92,25 @@ import {
  *   cascade). The sync writer session guard is not emulated (no sync
  *   session exists here), and the account and "Delete now" receipts keep
  *   their earlier keys (the new tables' counts are not returned);
+ * - the other 0013 tables (with 0014's age bands): rescue_events,
+ *   lesson_progress and programme_reminders (insert check: own user_id,
+ *   deletion barrier, and has_consent(enrolment_id, 'core') — for a rescue
+ *   only when it names an enrolment), notification_preferences and
+ *   wellbeing_baseline (insert check: own user_id and the deletion
+ *   barrier); their column grants (insert; update of the reminder time and
+ *   of the settings columns only; no delete), the update policies (own
+ *   row), NOT NULL, CHECK constraints (see fake-member-records.ts), the
+ *   unique keys (rescue submission, lesson and reminder primary keys, one
+ *   settings row per member) and the composite enrolment foreign key
+ *   (skipped for a rescue with no enrolment, MATCH SIMPLE). A reminder time
+ *   that is not a time fails the cast (22007). profiles.time_zone is
+ *   readable (UTC unless setProfileTimeZone);
+ * - sync_lapse: select own rows only (members never write it; addSyncLapse
+ *   seeds rows as the sync writer would). Account deletion and "Delete now"
+ *   remove and count them;
+ * - filters gte and lt (timestamps compare as instants), offset, and HEAD
+ *   with an exact count (the count ignores limit and offset, as PostgREST's
+ *   does);
  * - error bodies: standard SQLSTATEs for constraints and RLS, and the
  *   database's own `TH` codes with the registry's exact message and hint
  *   (test/support/database-errors.ts), answered as HTTP 400 the way
@@ -111,6 +136,13 @@ interface State {
   program_data: Row[];
   observations: Row[];
   programme_entries: Row[];
+  rescue_events: Row[];
+  lesson_progress: Row[];
+  programme_reminders: Row[];
+  notification_preferences: Row[];
+  wellbeing_baseline: Row[];
+  /** Written by the sync writer only (addSyncLapse); members read. */
+  sync_lapse: Row[];
   /** Stand-in for auth.users (id only). */
   auth_users: Row[];
   /** Stand-in for storage.objects (bucket_id, name). */
@@ -242,13 +274,73 @@ const INSERT_GRANTS: Record<string, string[]> = {
     "occurred_at",
     "payload",
   ],
+  rescue_events: [
+    "user_id",
+    "enrolment_id",
+    "programme_code",
+    "submission_id",
+    "tool",
+    "opened_at",
+    "intensity_before",
+    "intensity_after",
+    "helped",
+    "escalated",
+  ],
+  lesson_progress: ["user_id", "enrolment_id", "programme_code", "lesson_id"],
+  programme_reminders: [
+    "user_id",
+    "enrolment_id",
+    "programme_code",
+    "remind_at",
+  ],
+  notification_preferences: [
+    "user_id",
+    "reminders_enabled",
+    "sensitive_details",
+    "quiet_hours_enabled",
+  ],
+  wellbeing_baseline: ["user_id", "age_range", "sleep_band", "stress_band"],
 };
+/** The other 0013 tables a member writes (one row per statement row). */
+const MEMBER_TABLES = [
+  "rescue_events",
+  "lesson_progress",
+  "programme_reminders",
+  "notification_preferences",
+  "wellbeing_baseline",
+];
 /** observations and programme_entries (202610180013). */
 const RECORD_TABLES = ["observations", "programme_entries"];
+/** Rows that go with their enrolment ("Delete now", on delete cascade). */
+const ENROLMENT_TABLES = [
+  ...RECORD_TABLES,
+  "rescue_events",
+  "lesson_progress",
+  "programme_reminders",
+];
+/** Rows that go with their member (on delete cascade from auth.users). */
+const MEMBER_ROW_TABLES = [
+  ...ENROLMENT_TABLES,
+  "notification_preferences",
+  "wellbeing_baseline",
+];
 const UPDATE_GRANTS: Record<string, string[]> = {
   enrolments: ["status", "mode"],
   programme_consents: ["revoked_at", "superseded_by"],
+  programme_reminders: ["remind_at"],
+  notification_preferences: [
+    "reminders_enabled",
+    "sensitive_details",
+    "quiet_hours_enabled",
+  ],
+  wellbeing_baseline: ["age_range", "sleep_band", "stress_band"],
 };
+/** The member's settings rows: updatable, keyed by these columns. */
+const SETTINGS_TABLES = [
+  "programme_reminders",
+  "notification_preferences",
+  "wellbeing_baseline",
+];
 /**
  * No table: members lost DELETE on enrolments in 202610180012 (consents never
  * had it); "Delete now" goes through delete_enrolment_now().
@@ -299,6 +391,26 @@ const PROGRAMMES: [string, string, string, string, string, string[]][] = [
 
 const text = (value: unknown): string =>
   typeof value === "string" ? value : JSON.stringify(value);
+
+const TIMESTAMP_TEXT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
+/**
+ * Compares two cells as Postgres would for the API's columns: timestamps
+ * (with any offset) as instants, numbers as numbers, other values as text.
+ */
+const compareCells = (a: unknown, b: unknown): number => {
+  if (
+    typeof a === "string" &&
+    typeof b === "string" &&
+    TIMESTAMP_TEXT.test(a) &&
+    TIMESTAMP_TEXT.test(b)
+  ) {
+    return Math.sign(Date.parse(a) - Date.parse(b));
+  }
+  if (typeof a === "number" || typeof b === "number") {
+    return Math.sign(Number(a) - Number(b));
+  }
+  return text(a).localeCompare(text(b));
+};
 
 class PgFailure extends Error {
   constructor(readonly pg: PgError) {
@@ -375,6 +487,12 @@ export class FakePostgrest {
     program_data: [],
     observations: [],
     programme_entries: [],
+    rescue_events: [],
+    lesson_progress: [],
+    programme_reminders: [],
+    notification_preferences: [],
+    wellbeing_baseline: [],
+    sync_lapse: [],
     auth_users: [],
     storage_objects: [],
   };
@@ -402,8 +520,41 @@ export class FakePostgrest {
     this.state.profiles.push({
       id: userId,
       locale: "en",
+      time_zone: "UTC",
       account_deletion_started_at: null,
     });
+  }
+
+  /** Superuser write of a profile's time zone (profiles.time_zone). */
+  setProfileTimeZone(userId: string, zone: string): void {
+    const profile = this.state.profiles.find((row) => row.id === userId);
+    if (profile) profile.time_zone = zone;
+  }
+
+  /**
+   * A lapse as the sync writer records it (sync_lapse: user, programme,
+   * ordinal, time). Members cannot write this table.
+   */
+  addSyncLapse(userId: string, programmeCode: string, at: string): void {
+    const ordinal = this.state.sync_lapse.filter(
+      (row) => row.user_id === userId && row.programme_code === programmeCode,
+    ).length;
+    this.state.sync_lapse.push({
+      user_id: userId,
+      programme_code: programmeCode,
+      ordinal,
+      at,
+      severity: "",
+      context: [],
+    });
+  }
+
+  /**
+   * Superuser insert into one of the member tables, without RLS or checks
+   * (rows a test needs at a fixed time, such as an old rescue).
+   */
+  seedRow(table: keyof State, row: Row): void {
+    this.state[table].push(structuredClone(row));
   }
 
   /** Sets how long ago `token`'s sign-in was (null: no usable amr). */
@@ -662,6 +813,8 @@ export class FakePostgrest {
         "programme_consents",
         "consent_documents",
         ...RECORD_TABLES,
+        ...MEMBER_TABLES,
+        "sync_lapse",
       ].includes(path)
     ) {
       return fail(404, "PGRST205", "Table not found");
@@ -669,13 +822,15 @@ export class FakePostgrest {
     const table = path as keyof State;
     let rows: Row[];
     let status = 200;
-    if (method === "GET") {
+    if (method === "GET" || method === "HEAD") {
       rows = this.filter(this.visible(uid, table), url);
     } else if (method === "POST") {
       const values = Array.isArray(body) ? (body as Row[]) : [body as Row];
       rows = RECORD_TABLES.includes(table)
         ? this.insertRecords(uid, table, values)
-        : values.map((value) => this.insert(uid, table, value));
+        : MEMBER_TABLES.includes(table)
+          ? this.insertMemberRows(uid, table, values)
+          : values.map((value) => this.insert(uid, table, value));
       status = 201;
     } else if (method === "PATCH") {
       rows = this.update(uid, table, url, body as Row);
@@ -684,21 +839,29 @@ export class FakePostgrest {
     } else {
       return fail(405, "PGRST117", "Unsupported method");
     }
-    if (method !== "GET") this.deferredChecks(uid);
+    const read = method === "GET" || method === "HEAD";
+    if (!read) this.deferredChecks(uid);
 
     const representation =
-      method === "GET" ||
-      (headers.get("prefer") ?? "").includes("return=representation");
+      read || (headers.get("prefer") ?? "").includes("return=representation");
     if (!representation)
       return { status: method === "POST" ? 201 : 204, body: null };
     const ordered = this.order(rows, url);
+    // The exact count is the filtered total, before offset and limit.
     const total = ordered.length;
+    const offset = Number(url.searchParams.get("offset") ?? 0);
+    const limit = url.searchParams.get("limit");
+    const paged = read
+      ? ordered.slice(
+          offset,
+          limit === null ? undefined : offset + Number(limit),
+        )
+      : ordered;
     // PostgREST's server-side row limit (db-max-rows) truncates reads; the
     // exact count still reports the full total.
     const limited =
-      method === "GET" && this.maxRows !== null
-        ? ordered.slice(0, this.maxRows)
-        : ordered;
+      read && this.maxRows !== null ? paged.slice(0, this.maxRows) : paged;
+    if (method === "HEAD") return { status, body: [], total };
     const projected = limited.map((row) => this.project(row, url));
     if (
       (headers.get("accept") ?? "").includes(
@@ -820,7 +983,7 @@ export class FakePostgrest {
       return before - this.state[table].length;
     };
     const counts = {
-      sync_lapses: 0,
+      sync_lapses: removeWhere("sync_lapse", (row) => row.user_id === uid),
       sync_answers: 0,
       sync_areas: 0,
       sync_accounts: 0,
@@ -835,7 +998,7 @@ export class FakePostgrest {
     };
     // Programme records go with the account (their counts are not part of
     // this fake's receipt).
-    for (const table of RECORD_TABLES) {
+    for (const table of MEMBER_ROW_TABLES) {
       removeWhere(table as keyof State, (row) => row.user_id === uid);
     }
     removeWhere("auth_users", (row) => row.id === uid);
@@ -894,19 +1057,23 @@ export class FakePostgrest {
       ),
     };
     // The programme's records go with its enrolment (counts not returned).
-    for (const table of RECORD_TABLES) {
+    for (const table of ENROLMENT_TABLES) {
       removeWhere(
         table as keyof State,
         (row) => row.enrolment_id === enrolment.id,
       );
     }
+    const syncLapses = removeWhere(
+      "sync_lapse",
+      (row) => row.user_id === uid && row.programme_code === code,
+    );
     return {
       quit_plans: counts.quit_plans,
       program_data: counts.program_data,
       enrolments: counts.enrolments,
       programme_consents: counts.programme_consents,
       sync_answers: 0,
-      sync_lapses: 0,
+      sync_lapses: syncLapses,
       sync_areas: 0,
       care_share_access: 0,
       care_messages: 0,
@@ -1134,7 +1301,11 @@ export class FakePostgrest {
     if (table === "enrolments") {
       return this.state.enrolments.filter((row) => row.user_id === uid);
     }
-    if (RECORD_TABLES.includes(table)) {
+    if (
+      RECORD_TABLES.includes(table) ||
+      MEMBER_TABLES.includes(table) ||
+      table === "sync_lapse"
+    ) {
       return this.state[table].filter((row) => row.user_id === uid);
     }
     if (table === "programme_consents") {
@@ -1401,6 +1572,210 @@ export class FakePostgrest {
     return inserted;
   }
 
+  /**
+   * A bulk insert into one of the other 0013 tables: one statement, per
+   * row in Postgres executor order (grants 42501, the time cast 22007, RLS
+   * 42501, NOT NULL 23502, CHECK 23514, unique keys 23505 — also against
+   * earlier rows of the statement), then the composite foreign key at the
+   * end of the statement (23503).
+   */
+  private insertMemberRows(uid: string, table: string, values: Row[]): Row[] {
+    const granted = INSERT_GRANTS[table] ?? [];
+    const lower = (value: unknown) =>
+      typeof value === "string" ? value.toLowerCase() : value;
+    const createdAt = new Date().toISOString();
+    const inserted: Row[] = [];
+    const taken = (key: (row: Row) => string, row: Row) =>
+      [...this.state[table as keyof State], ...inserted].some(
+        (other) => key(other) === key(row),
+      );
+    for (const value of values) {
+      if (Object.keys(value).some((column) => !granted.includes(column))) {
+        fail(403, "42501", `permission denied for table ${table}`);
+      }
+      const given = (column: string, fallback: unknown = null) =>
+        column in value ? value[column] : fallback;
+      let row: Row;
+      let key: (other: Row) => string;
+      let needsCore: boolean;
+      let failed: string | null = null;
+      if (table === "rescue_events") {
+        row = {
+          id: randomUUID(),
+          user_id: lower(given("user_id")),
+          enrolment_id: lower(given("enrolment_id")),
+          programme_code: given("programme_code"),
+          submission_id: lower(given("submission_id")),
+          tool: given("tool"),
+          opened_at: given("opened_at"),
+          intensity_before: given("intensity_before"),
+          intensity_after: given("intensity_after"),
+          helped: given("helped"),
+          escalated: given("escalated", false),
+          created_at: createdAt,
+        };
+        key = (other) => `${text(other.user_id)}/${text(other.submission_id)}`;
+        needsCore = row.enrolment_id !== null;
+      } else if (table === "lesson_progress") {
+        row = {
+          user_id: lower(given("user_id")),
+          enrolment_id: lower(given("enrolment_id")),
+          programme_code: given("programme_code"),
+          lesson_id: given("lesson_id"),
+          completed_at: createdAt,
+        };
+        key = (other) => `${text(other.enrolment_id)}/${text(other.lesson_id)}`;
+        needsCore = true;
+      } else if (table === "programme_reminders") {
+        const remindAt = timeValue(given("remind_at"));
+        if (given("remind_at") !== null && remindAt === null) {
+          fail(400, "22007", "invalid input syntax for type time");
+        }
+        row = {
+          user_id: lower(given("user_id")),
+          enrolment_id: lower(given("enrolment_id")),
+          programme_code: given("programme_code"),
+          remind_at: remindAt,
+          created_at: createdAt,
+          updated_at: createdAt,
+        };
+        key = (other) => text(other.enrolment_id);
+        needsCore = true;
+      } else if (table === "notification_preferences") {
+        row = {
+          user_id: lower(given("user_id")),
+          reminders_enabled: given("reminders_enabled", false),
+          sensitive_details: given("sensitive_details", false),
+          quiet_hours_enabled: given("quiet_hours_enabled", true),
+          created_at: createdAt,
+          updated_at: createdAt,
+        };
+        key = (other) => text(other.user_id);
+        needsCore = false;
+      } else {
+        row = {
+          user_id: lower(given("user_id")),
+          age_range: given("age_range"),
+          sleep_band: given("sleep_band"),
+          stress_band: given("stress_band"),
+          created_at: createdAt,
+          updated_at: createdAt,
+        };
+        key = (other) => text(other.user_id);
+        needsCore = false;
+      }
+      // RLS WITH CHECK.
+      if (
+        row.user_id !== uid ||
+        !this.barrierOpen(uid) ||
+        (needsCore &&
+          (typeof row.enrolment_id !== "string" ||
+            !this.hasConsent(uid, row.enrolment_id, "core")))
+      ) {
+        rlsViolation(table);
+      }
+      const nullable =
+        table === "rescue_events"
+          ? [
+              "enrolment_id",
+              "programme_code",
+              "intensity_before",
+              "intensity_after",
+              "helped",
+            ]
+          : table === "wellbeing_baseline"
+            ? ["age_range", "sleep_band", "stress_band"]
+            : [];
+      const notNull = Object.entries(row).find(
+        ([column, cell]) => cell === null && !nullable.includes(column),
+      );
+      if (notNull) {
+        fail(400, "23502", `null value in column "${notNull[0]}"`);
+      }
+      if (table === "rescue_events") failed = rescueCheckFails(row);
+      if (table === "lesson_progress") failed = lessonCheckFails(row);
+      if (table === "wellbeing_baseline") failed = baselineCheckFails(row);
+      if (failed) {
+        fail(
+          400,
+          "23514",
+          `new row for relation "${table}" violates check constraint "${failed}"`,
+        );
+      }
+      if (taken(key, row)) {
+        fail(
+          409,
+          "23505",
+          `duplicate key value violates unique constraint "${table}_key"`,
+        );
+      }
+      inserted.push(row);
+    }
+    // The composite foreign key (MATCH SIMPLE: a null column skips it).
+    for (const row of inserted) {
+      if (!("enrolment_id" in row) || row.enrolment_id === null) continue;
+      const enrolment = this.state.enrolments.find(
+        (other) =>
+          other.id === row.enrolment_id &&
+          other.user_id === row.user_id &&
+          other.programme_code === row.programme_code,
+      );
+      if (!enrolment) {
+        fail(
+          409,
+          "23503",
+          `insert or update on table "${table}" violates foreign key constraint "${table}_enrolment_fkey"`,
+        );
+      }
+    }
+    this.state[table as keyof State].push(...inserted);
+    return inserted;
+  }
+
+  /**
+   * An update of a settings row: the update policy's USING clause (own
+   * rows only; others are not matched), the time cast, the WITH CHECK
+   * (own row), the CHECK constraints, then set_updated_at.
+   */
+  private updateSettings(
+    uid: string,
+    table: keyof State,
+    url: URL,
+    change: Row,
+  ): Row[] {
+    const targets = this.filter(this.visible(uid, table), url);
+    for (const row of targets) {
+      const next: Row = { ...row, ...change };
+      if (table === "programme_reminders") {
+        const remindAt = timeValue(change.remind_at);
+        if (remindAt === null) {
+          fail(400, "22007", "invalid input syntax for type time");
+        }
+        next.remind_at = remindAt;
+      }
+      if (next.user_id !== uid) rlsViolation(table);
+      const notNull = Object.entries(next).find(
+        ([column, cell]) =>
+          cell === null &&
+          !["age_range", "sleep_band", "stress_band"].includes(column),
+      );
+      if (notNull) {
+        fail(400, "23502", `null value in column "${notNull[0]}"`);
+      }
+      const failed =
+        table === "wellbeing_baseline" ? baselineCheckFails(next) : null;
+      if (failed) {
+        fail(
+          400,
+          "23514",
+          `new row for relation "${table}" violates check constraint "${failed}"`,
+        );
+      }
+      Object.assign(row, next, { updated_at: new Date().toISOString() });
+    }
+    return targets;
+  }
+
   private update(
     uid: string,
     table: keyof State,
@@ -1413,6 +1788,9 @@ export class FakePostgrest {
       Object.keys(change).some((column) => !granted.includes(column))
     ) {
       return fail(403, "42501", `permission denied for table ${table}`);
+    }
+    if (SETTINGS_TABLES.includes(table)) {
+      return this.updateSettings(uid, table, url, change);
     }
     const targets = this.filter(this.visible(uid, table), url);
     for (const row of targets) {
@@ -1568,6 +1946,12 @@ export class FakePostgrest {
         );
       } else if (operator === "is" && operand === "null") {
         result = result.filter((row) => row[column] === null);
+      } else if (operator === "gte" || operator === "lt") {
+        result = result.filter((row) => {
+          if (row[column] === null || row[column] === undefined) return false;
+          const order = compareCells(row[column], operand);
+          return operator === "gte" ? order >= 0 : order < 0;
+        });
       } else if (operator === "in") {
         const values = operand
           .replace(/^\(|\)$/g, "")
@@ -1578,8 +1962,7 @@ export class FakePostgrest {
         fail(400, "PGRST100", "Unsupported filter");
       }
     }
-    const limit = url.searchParams.get("limit");
-    return limit === null ? result : result.slice(0, Number(limit));
+    return result;
   }
 
   private order(rows: Row[], url: URL): Row[] {
@@ -1588,9 +1971,7 @@ export class FakePostgrest {
     const [column, direction] = order.split(".");
     const sign = direction === "desc" ? -1 : 1;
     return [...rows].sort(
-      (a, b) =>
-        sign *
-        text(a[column as string]).localeCompare(text(b[column as string])),
+      (a, b) => sign * compareCells(a[column as string], b[column as string]),
     );
   }
 

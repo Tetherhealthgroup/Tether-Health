@@ -183,6 +183,19 @@ export function fastifyTrustProxy(
   };
 }
 
+/** A minimum app version: MAJOR.MINOR.PATCH, no leading zeros. */
+export const MINIMUM_APP_VERSION =
+  /^(0|[1-9][0-9]{0,3})\.(0|[1-9][0-9]{0,3})\.(0|[1-9][0-9]{0,3})$/;
+
+/** Errors name the variable, never the value. */
+const minimumAppVersion = Joi.custom(
+  (value: unknown, helpers: Joi.CustomHelpers) =>
+    typeof value === "string" && MINIMUM_APP_VERSION.test(value)
+      ? value
+      : helpers.error("any.invalid"),
+  "minimum app version",
+);
+
 const trustedProxyList = Joi.custom(
   trustedProxyRanges,
   "trusted proxy address list",
@@ -255,4 +268,9 @@ export const environmentSchema = Joi.object({
     otherwise: trustedProxyList.required().custom(nonEmptyRanges),
   }),
   CORS_ALLOWED_ORIGINS: Joi.string().allow("").default(""),
+  // Lowest app version the API still serves, per platform, shown by
+  // GET /v1/app/config. Not secret. MAJOR.MINOR.PATCH; the default 0.0.0
+  // asks no installed version to update.
+  MINIMUM_APP_VERSION_IOS: minimumAppVersion.default("0.0.0"),
+  MINIMUM_APP_VERSION_ANDROID: minimumAppVersion.default("0.0.0"),
 });
