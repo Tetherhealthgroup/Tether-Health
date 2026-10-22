@@ -356,7 +356,7 @@ rescue_events.rescue_events_programme_check: CHECK (((programme_code IS NULL) OR
 rescue_events.rescue_events_submission_key: UNIQUE (user_id, submission_id)
 rescue_events.rescue_events_tool_check: CHECK ((tool ~ '^[a-z0-9_]{1,40}$'::text))
 rescue_events.rescue_events_user_id_fkey: FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE
-wellbeing_baseline.wellbeing_baseline_age_range_check: CHECK ((age_range ~ '^[0-9]{2}_([0-9]{2}|plus)$'::text))
+wellbeing_baseline.wellbeing_baseline_age_range_check: CHECK ((age_range = ANY (ARRAY['18_24'::text, '25_34'::text, '35_44'::text, '45_54'::text, '55_64'::text, '65_74'::text, '75_plus'::text])))
 wellbeing_baseline.wellbeing_baseline_pkey: PRIMARY KEY (user_id)
 wellbeing_baseline.wellbeing_baseline_sleep_band_check: CHECK ((sleep_band = ANY (ARRAY['lt5'::text, '5_6'::text, '7_8'::text, '9plus'::text])))
 wellbeing_baseline.wellbeing_baseline_stress_band_check: CHECK ((stress_band = ANY (ARRAY['low'::text, 'some'::text, 'high'::text])))
@@ -914,8 +914,14 @@ select th914b_test.refused(pg_catalog.format(
   th914b_test.v('a_hw')), '23514', '%lesson_progress_lesson_id_check%', 'A API: a lesson id that is not a slug is refused');
 select th914b_test.refused('update public.wellbeing_baseline set age_range = ''35-44''',
   '23514', '%wellbeing_baseline_age_range_check%', 'A API: an age range not like 35_44 or 75_plus is refused');
+select th914b_test.refused('update public.wellbeing_baseline set age_range = ''35_35''',
+  '23514', '%wellbeing_baseline_age_range_check%', 'A API: an age range outside the fixed bands (35_35) is refused');
+select th914b_test.refused('update public.wellbeing_baseline set age_range = ''95_99''',
+  '23514', '%wellbeing_baseline_age_range_check%', 'A API: an age range outside the fixed bands (95_99) is refused');
 select th914b_test.affects('update public.wellbeing_baseline set age_range = ''75_plus''', 1,
   'A API: an age range like 75_plus is accepted');
+select th914b_test.affects('update public.wellbeing_baseline set age_range = ''18_24''', 1,
+  'A API: the age band 18_24 is accepted');
 select th914b_test.refused('update public.wellbeing_baseline set sleep_band = ''8plus''',
   '23514', '%wellbeing_baseline_sleep_band_check%', 'A API: an unknown sleep band is refused');
 select th914b_test.refused('update public.wellbeing_baseline set stress_band = ''extreme''',

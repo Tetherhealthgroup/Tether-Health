@@ -664,7 +664,8 @@ Rules:
 
 ## Programme records
 
-Migration source of truth: `supabase/migrations/202610180013_programme_records.sql`.
+Migration sources of truth: `supabase/migrations/202610180013_programme_records.sql` and
+`supabase/migrations/202610180014_baseline_age_bands.sql`.
 `supabase/tests/verify_programme_records_migration.sh` checks this section.
 
 Seven tables. Row-level security is enabled and forced on all of them;
@@ -687,7 +688,7 @@ created; a replay of the same submission is refused by the unique keys
 | `lesson_progress` | A completed lesson: `enrolment_id`, `programme_code`, `lesson_id`, `completed_at`. Primary key `(enrolment_id, lesson_id)` | read own; insert own |
 | `programme_reminders` | A programme's reminder time: `enrolment_id` (primary key), `programme_code`, `remind_at`, `updated_at`. Storing a time sends nothing; whether a reminder fires stays governed by the programme's `reminders` consent | read own; insert own; change `remind_at` |
 | `notification_preferences` | Account-level switches: `user_id` (primary key), `reminders_enabled`, `sensitive_details`, `quiet_hours_enabled`, `updated_at` | read, insert and update own |
-| `wellbeing_baseline` | Account-level onboarding answers, never shared: `user_id` (primary key), `age_range` (two digits, `_`, then two digits or `plus`), `sleep_band` (`lt5`, `5_6`, `7_8`, `9plus`), `stress_band` (`low`, `some`, `high`), `updated_at` | read, insert and update own |
+| `wellbeing_baseline` | Account-level onboarding answers, never shared: `user_id` (primary key), `age_range` (`18_24`, `25_34`, `35_44`, `45_54`, `55_64`, `65_74`, `75_plus`), `sleep_band` (`lt5`, `5_6`, `7_8`, `9plus`), `stress_band` (`low`, `some`, `high`), `updated_at` | read, insert and update own |
 
 `observations.metric` is an internal key with one fixed UCUM unit and one
 programme: `bp_systolic`, `bp_diastolic` (`mm[Hg]`), `heart_rate` (`/min`),
@@ -714,7 +715,7 @@ spec, not the database's.
 
 | Kind or metric | Keys |
 |---|---|
-| `checkin` | `feel`, `stress`, `answer` (codes; at least one present) |
+| `checkin` | `feel` code, `stress` code, `answer` code — at least one present |
 | `ca.zone_check` | **`zone`** code, `symptoms` codes |
 | `ca.symptom` | **`symptoms`** codes, `severity` code, `triggers` codes, `note` text |
 | `ea.mood` | **`mood`** code, `topics` codes |
@@ -739,8 +740,8 @@ Rules:
   enrolments may still record.
 - Members cannot delete any of these rows directly. They are deleted with
   their enrolment ("Delete now") or with the account.
-- Observations, programme entries, rescue events and lesson progress never
-  change: any update, whatever the role, raises `TH026`. A trigger refuses
+- Observations, programme entries, rescue events and lesson progress are
+  append-only: an update to any of their rows raises `TH026`. A trigger refuses
   `TRUNCATE` on those four tables for every role, in every session mode
   (`TH027`); `TRUNCATE` is not granted on them to `PUBLIC`, `anon`,
   `authenticated` or `thsync`. The reminder time and the two settings tables
@@ -882,7 +883,7 @@ function": every later function that writes and refuses a sync session raises
 | `TH023` | `care_record_immutable` | `care_revoke_only` (update trigger on `care_connections`, `care_shares` and `caregivers`); `care_append_only` (update trigger on `care_share_access`, `care_messages` and `caregiver_events`) | Care records can only be revoked |
 | `TH024` | `care_rows_delete_only` | `care_truncate_guard` (truncate trigger on `care_connections`, `care_shares`, `care_share_access`, `care_messages`, `caregivers` and `caregiver_events`: a truncate, whatever the role) | Care rows are removed only with their programme or account |
 | `TH025` | `care_invite_invalid` | `redeem_care_invite`: the code is malformed or unknown, its clinic is not verified or is disabled, or it is expired or used up (for a member not already connected to that clinic) | Invite code is not valid |
-| `TH026` | `programme_records_append_only` | `programme_records_append_only` (update trigger on `observations`, `programme_entries`, `rescue_events` and `lesson_progress`: any update, whatever the role) | Programme records are append-only |
+| `TH026` | `programme_records_append_only` | `programme_records_append_only` (update trigger on `observations`, `programme_entries`, `rescue_events` and `lesson_progress`) | Programme records are append-only |
 | `TH027` | `programme_rows_delete_only` | `programme_records_truncate_guard` (truncate trigger on `observations`, `programme_entries`, `rescue_events` and `lesson_progress`: a truncate, whatever the role, including a cascade into them when no other table's guard fires first) | Programme records are removed only with their programme or account |
 
 Standard SQLSTATEs are kept where PostgreSQL defines the condition:
