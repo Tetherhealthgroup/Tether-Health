@@ -1,47 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/large_text.dart';
 import 'choose_quit_path_screen.dart';
-
-/// Above 140% text (the iOS accessibility sizes and Android 14's largest
-/// font sizes) side-by-side pieces are stacked so text can grow.
-bool _usesLargeTextLayout(BuildContext context) =>
-    MediaQuery.textScalerOf(context).scale(10) > 14;
-
-/// The text scale for [text] in [style], lowered only as far as needed for
-/// its longest word to fit [width]: a word too long for a whole line scales
-/// down instead of splitting.
-TextScaler _wordFitScaler(
-  BuildContext context,
-  String text,
-  TextStyle style,
-  double width,
-) {
-  final scaler = MediaQuery.textScalerOf(context);
-  final painter = TextPainter(
-    text: TextSpan(
-      text: text,
-      style: DefaultTextStyle.of(context).style.merge(style),
-    ),
-    textDirection: Directionality.of(context),
-  );
-  try {
-    var fitted = scaler;
-    for (var attempt = 0; attempt < 4; attempt++) {
-      painter
-        ..textScaler = fitted
-        ..layout();
-      final longestWord = painter.minIntrinsicWidth;
-      if (longestWord <= width) return fitted;
-      final fontSize = style.fontSize ?? 14;
-      final factor = fitted.scale(fontSize) / fontSize * width / longestWord;
-      fitted = scaler.clamp(maxScaleFactor: factor * 0.99);
-    }
-    return fitted;
-  } finally {
-    painter.dispose();
-  }
-}
 
 DateTime _addCalendarDays(DateTime date, int days) {
   return DateTime(date.year, date.month, date.day + days);
@@ -361,7 +322,7 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
               // Above 140% text the side margins narrow so long words fit, and
               // the header, progress and main action scroll with the content
               // so they never squeeze the questions out of view.
-              final largeText = _usesLargeTextLayout(context);
+              final largeText = usesLargeTextLayout(context);
               final horizontalPadding =
                   largeText ? 12.0 : (narrow ? 18.0 : 22.0);
 
@@ -469,7 +430,13 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
                                 maximumDate: _maximumDate,
                                 windowMessage: _windowMessage,
                                 isSelectable: _isSelectable,
-                                onDateSelected: widget.onDateChanged,
+                                // Only days in the quit path's window can
+                                // be chosen, whichever layout is shown.
+                                onDateSelected: (date) {
+                                  if (_isSelectable(date)) {
+                                    widget.onDateChanged(date);
+                                  }
+                                },
                                 onPreviousMonth: () => _changeMonth(-1),
                                 onNextMonth: () => _changeMonth(1),
                                 monthLabel:
@@ -551,7 +518,7 @@ class _DateHeader extends StatelessWidget {
       builder: (context, constraints) => Text(
         title,
         textAlign: TextAlign.center,
-        textScaler: _wordFitScaler(
+        textScaler: wordFitScaler(
           context,
           title,
           style,
@@ -580,7 +547,7 @@ class _DateHeader extends StatelessWidget {
 
     // Between the back button and the step, the title's words split at
     // accessibility text sizes, so it takes a line of its own.
-    if (_usesLargeTextLayout(context)) {
+    if (usesLargeTextLayout(context)) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -772,7 +739,7 @@ class _QuitCalendar extends StatelessWidget {
     final weekdays = isSpanish
         ? const ['D', 'L', 'M', 'M', 'J', 'V', 'S']
         : const ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-    final largeText = _usesLargeTextLayout(context);
+    final largeText = usesLargeTextLayout(context);
     final previous = IconButton.filledTonal(
       key: const ValueKey('quit-date-previous-month'),
       onPressed: canGoBack ? onPreviousMonth : null,
@@ -801,7 +768,7 @@ class _QuitCalendar extends StatelessWidget {
       builder: (context, constraints) => Text(
         monthLabel,
         textAlign: TextAlign.center,
-        textScaler: _wordFitScaler(
+        textScaler: wordFitScaler(
           context,
           monthLabel,
           monthStyle,
@@ -998,7 +965,7 @@ class _SelectedDateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final largeText = _usesLargeTextLayout(context);
+    final largeText = usesLargeTextLayout(context);
     final tileContent = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -1155,7 +1122,7 @@ class _CheckInCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final largeText = _usesLargeTextLayout(context);
+    final largeText = usesLargeTextLayout(context);
     const icon = CircleAvatar(
       radius: 18,
       backgroundColor: AppColors.coralLight,

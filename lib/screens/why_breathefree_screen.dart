@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/large_text.dart';
 
 class WhyBreatheFreeScreen extends StatelessWidget {
   const WhyBreatheFreeScreen({
@@ -144,21 +145,36 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 9),
-                              Text(
-                                isSpanish
-                                    ? 'Apoyo para los momentos más importantes.'
-                                    : 'Support for the moments that matter most.',
-                                // Already the largest text on screen; past
-                                // 180% its longest words no longer fit.
-                                textScaler: MediaQuery.textScalerOf(context)
-                                    .clamp(maxScaleFactor: 1.8),
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .displayLarge
-                                    ?.copyWith(
-                                      fontSize: narrow ? 32 : 36,
-                                      height: 1.06,
+                              LayoutBuilder(
+                                builder: (context, constraints) {
+                                  final headline = isSpanish
+                                      ? 'Apoyo para los momentos más importantes.'
+                                      : 'Support for the moments that matter most.';
+                                  final style = Theme.of(context)
+                                          .textTheme
+                                          .displayLarge
+                                          ?.copyWith(
+                                            fontSize: narrow ? 32 : 36,
+                                            height: 1.06,
+                                          ) ??
+                                      const TextStyle();
+                                  return Text(
+                                    headline,
+                                    // Already the largest text on screen;
+                                    // past 180% its longest words no longer
+                                    // fit, and on the narrowest phones a word
+                                    // too long for the line scales down
+                                    // instead of splitting.
+                                    textScaler: wordFitScaler(
+                                      context,
+                                      headline,
+                                      style,
+                                      constraints.maxWidth,
+                                      maxScaleFactor: 1.8,
                                     ),
+                                    style: style,
+                                  );
+                                },
                               ),
                               const SizedBox(height: 12),
                               Text(
@@ -281,6 +297,9 @@ class _WhyHeader extends StatelessWidget {
   final bool isSpanish;
   final VoidCallback onBack;
 
+  /// The logo and the gap after it.
+  static const _logoWidth = 23.0 + 7;
+
   @override
   Widget build(BuildContext context) {
     // A minimum height: large text grows the header instead of clipping it.
@@ -298,29 +317,36 @@ class _WhyHeader extends StatelessWidget {
             ),
             icon: const Icon(Icons.arrow_back_rounded),
           ),
-          const Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.eco_rounded, color: AppColors.coral, size: 23),
-                SizedBox(width: 7),
-                // One word: at the largest sizes it scales down to the
-                // space left instead of being cut to "B…".
-                Flexible(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      'BreatheFree',
-                      maxLines: 1,
-                      style: TextStyle(
-                        color: AppColors.deepTeal,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
+          Expanded(
+            // When even the logo does not fit beside the back button and the
+            // step (the largest sizes on the narrowest phones), only the
+            // name is shown.
+            child: LayoutBuilder(
+              builder: (context, constraints) => Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (constraints.maxWidth >= _logoWidth) ...const [
+                    Icon(Icons.eco_rounded, color: AppColors.coral, size: 23),
+                    SizedBox(width: 7),
+                  ],
+                  // One word: at the largest sizes it scales down to the
+                  // space left instead of being cut to "B…".
+                  const Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'BreatheFree',
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: AppColors.deepTeal,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           Container(
