@@ -448,8 +448,8 @@
         "TH-907",
         "TH-1008a"
       ],
-      "sha256": "b7acd168a9352f135694ceecf487c16f2418ce7ed95a40238410216e03d13c3c",
-      "change": "Leave row subtitle: \"Keep data 30 days or delete now\" -> \"Keep your data or delete it now\" | TH-907: Session key only, no visual change: body[2].children[0] toggle key \"care_team_dr_patel_s_clinic\" -> \"care_team_sharing\" | P-71 settings binding, data only, no visual change: body[1] radio \"status\" gets bind \"enrolment.status\"; body[2].children[0] toggle \"care_team_sharing\" gets bind \"enrolment.care_team_sharing\"; body[2].children[1] toggle \"de_identified_research\" gets bind \"enrolment.de_identified_research\""
+      "sha256": "bdd53b64cb53b68468e4f6669ba8ad34da062d29cc34313c1528e1d089875183",
+      "change": "Leave row subtitle: \"Keep data 30 days or delete now\" -> \"Keep your data or delete it now\" | TH-907: Session key only, no visual change: body[2].children[0] toggle key \"care_team_dr_patel_s_clinic\" -> \"care_team_sharing\" | P-71 settings binding, data only, no visual change: body[1] radio \"status\" gets bind \"enrolment.:program.status\"; body[2].children[0] toggle \"care_team_sharing\" gets bind \"enrolment.:program.care_team_sharing\"; body[2].children[1] toggle \"de_identified_research\" gets bind \"enrolment.:program.de_identified_research\""
     },
     {
       "screen": "re_labs",

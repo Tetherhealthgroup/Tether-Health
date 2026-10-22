@@ -98,7 +98,8 @@ def validate():
     errors += check_catalogues(SCREENS)
     # Settings binding and first-run consents (P-71, P-52).
     errors += check_settings(SCREENS)
-    errors += check_first_run_consents(SCREENS)
+    errors += check_program_context(SCREENS)
+    errors += check_consent_starts(SCREENS)
     # tab roots
     for t in TABS:
         if t not in SCREENS: errors.append(f'tab root {t} missing')
@@ -423,24 +424,53 @@ def check_emitted(spec_dir):
 # ---------------------------------------------------------------- settings binding (P-71, P-52; TH-1008)
 # A settings screen is any screen whose submit updates existing state: a
 # PATCH or PUT, or a POST that changes an existing sharing grant
-# (SETTINGS_POSTS). ob_consent's POST creates the first consents during
-# onboarding; the first-run rule below governs it instead. The list is
-# pinned: a screen that starts or stops matching the rule fails until
-# SETTINGS_SCREENS is updated in the same change. The generator emits the
-# list for the app as `settingsScreens` (lib/router/settings_screens.dart).
+# (SETTINGS_POSTS). Each one is in exactly one of three pinned lists:
+#  - CONSENT_SCREENS: controls that create, keep or end a consent, share,
+#    caregiver alert, buddy message or cross-programme setting, and the
+#    notification switches. They start from the stored value only; "nothing
+#    stored" and "not loaded" both show the empty (off) state and write
+#    nothing, and a save sends only what the member changed.
+#  - PLAN_SCREENS: plans and profiles. A stored value seeds the control;
+#    "nothing stored" seeds the designed starting value; "not loaded" writes
+#    nothing. A save sends the whole screen state.
+#  - NOT_BOUND_SCREENS: not bound, with the reason. On a settings screen in
+#    this list every control that writes the session is in BIND_EXEMPT.
+# The generator emits the first two lists for the app
+# (lib/router/settings_screens.dart) and tells each bound control its class.
 SETTINGS_POSTS = ('POST /v1/care/caregivers',)
-SETTINGS_SCREENS = (
-    'account_notifications', 'account_privacy', 'auth_newpass', 'be_q2', 'bf_meds_edit', 'bf_review', 'ca_plan', 'ck_q1',
-    'ea_plan', 'hw_targets', 'nu_habit', 'program_settings', 'program_settings_sf', 're_result', 'sd_caregiver', 'sd_plan',
-    'sd_safety', 'sf_buddy', 'sf_unplug_off', 'st_range',
-)
-# First-run consent rule (P-52 made mechanical): on a first-run screen (the
-# onboarding flow or phase) an optional consent or attestation control starts
-# off. Consent controls are the toggles and checklists on a screen that
-# submits to CONSENT_ENDPOINTS, and the consent checklists (CONSENT_CHECKLISTS).
-# FIRST_RUN_ON lists the only control allowed to start on, with the reason.
-CONSENT_ENDPOINTS = ('POST /v1/enrolments/consents', 'PATCH /v1/enrolments/consents')
+CONSENT_SCREENS = ('account_notifications', 'account_privacy', 'program_settings', 'program_settings_sf', 'sd_caregiver', 'sf_buddy')
+PLAN_SCREENS = ('be_q2', 'bf_meds_edit', 'bf_review', 'ca_plan', 'ck_q1', 'ea_plan', 'hw_targets', 'nu_habit', 're_result', 'sd_plan', 'sd_safety', 'st_range')
+NOT_BOUND_SCREENS = {
+    'auth_newpass': 'a new password: secret, and there is no stored state to show',
+    'ob_consent': 'the first consents, in onboarding: the consent starting-state rule governs it',
+    'sf_unplug_off': 'its only control is an action choice (BIND_EXEMPT)',
+}
+BIND_EXEMPT = {
+    ('sf_unplug_off', 'scope'): 'action choice: what to turn off now, not stored state; either option only turns something off, so it keeps its designed start',
+}
+# A bind segment ":program" is replaced by the programme the screen was
+# opened for (a route with ":program"); without one the control shows
+# nothing and writes nothing.
+PROGRAM_SEGMENT = ':program'
+
+# Consent starting states (P-52 made mechanical, extended to every screen
+# that creates a consent). On a screen that submits to CONSENT_CREATING, or
+# carries a consent checklist (CONSENT_CHECKLISTS), an optional consent,
+# sharing or import selection starts off: no toggle on, no item ticked, no
+# chip or tile selected. Bound controls are exempt (the consent class above
+# governs them). FIRST_RUN_ON is the permanent allowlist; CONSENT_START_PENDING
+# lists screens whose designed selection waits for an owner decision, and
+# those screens must not be mapped to their endpoints until it is made.
+CONSENT_CREATING = ('POST /v1/enrolments/consents', 'PATCH /v1/enrolments/consents', 'POST /v1/care/caregivers', 'POST /v1/care/supporters',
+                    'POST /v1/care/connections', 'POST /v1/care/summaries')
 FIRST_RUN_ON = {('ob_consent', 'essential_app_data'): 'Essential app data: required for the app to work, not optional'}
+_PENDING = 'designed selection kept until owner question Q-j5 (starting state of consent-creating selections) is answered; not mapped until then'
+CONSENT_START_PENDING = {
+    ('records_consent', 'resources'): _PENDING,
+    ('records_consent_bb', 'resources'): _PENDING,
+    ('records_consent_device', 'data_types'): _PENDING,
+    ('support_add_person', 'which_programs'): _PENDING,
+}
 
 def _submits(a, out):
     if not a: return
@@ -459,6 +489,10 @@ def is_settings(s):
 
 def is_first_run(s): return s.get('flow') == 'onboarding' or s.get('phase') == 'onboarding'
 
+def bind_class(sid, consent=CONSENT_SCREENS, plan=PLAN_SCREENS):
+    """'consent', 'plan' or None for screen `sid`."""
+    return 'consent' if sid in consent else 'plan' if sid in plan else None
+
 def needs_bind(n):
     """True for a control that writes the session and so must be bound on a
     settings screen: every keyed input except text-like fields (P-31 already
@@ -468,62 +502,119 @@ def needs_bind(n):
     if t == 'field': return n.get('kind') == 'select'
     return t in INPUTS or t in KEYED
 
-def bindings(screens):
-    """(screen id, path, session key, bind key) for every bound control."""
-    return [(sid, p, n.get('key'), n['bind']) for sid, s in screens.items() for part in ('body', 'footer') for n, p in walk(s[part], part) if n.get('bind') is not None]
-
-def check_settings(screens, pinned=SETTINGS_SCREENS):
-    """Every input control on a settings screen is bound (Rule 1) with a
-    well-formed bind key; bind appears only on bindable controls of settings
-    screens; and the settings screens equal the pinned list."""
-    errors = []
-    found = sorted(sid for sid, s in screens.items() if is_settings(s))
-    if pinned is not None and found != sorted(pinned):
-        add, gone = sorted(set(found) - set(pinned)), sorted(set(pinned) - set(found))
-        errors.append(f'settings screens changed: new {add}, no longer settings {gone}. Update validate.SETTINGS_SCREENS (and bind the new screens\' controls).')
+def check_settings(screens, consent=CONSENT_SCREENS, plan=PLAN_SCREENS, not_bound=None, exempt=None):
+    """Every settings screen is classified once; every control that writes
+    the session on a consent or plan screen is bound (Rule 1) unless exempt,
+    with a well-formed bind key; bind appears only on bindable controls of
+    consent or plan screens; every exemption is used."""
+    not_bound = NOT_BOUND_SCREENS if not_bound is None else not_bound
+    exempt = BIND_EXEMPT if exempt is None else exempt
+    errors, used = [], set()
+    lists = {'CONSENT_SCREENS': set(consent), 'PLAN_SCREENS': set(plan), 'NOT_BOUND_SCREENS': set(not_bound)}
+    for a, b in (('CONSENT_SCREENS', 'PLAN_SCREENS'), ('CONSENT_SCREENS', 'NOT_BOUND_SCREENS'), ('PLAN_SCREENS', 'NOT_BOUND_SCREENS')):
+        for sid in sorted(lists[a] & lists[b]): errors.append(f'{sid} is in both validate.{a} and validate.{b}.')
+    for name, ids in lists.items():
+        for sid in sorted(ids):
+            if sid not in screens: errors.append(f'validate.{name} lists {sid}, which is not a screen.')
+            elif name != 'NOT_BOUND_SCREENS' and not is_settings(screens[sid]):
+                errors.append(f'validate.{name} lists {sid}, which no longer updates existing state (PATCH, PUT or a sharing POST).')
     for sid, s in screens.items():
-        settings, seen = is_settings(s), {}
+        if is_settings(s) and not any(sid in ids for ids in lists.values()):
+            errors.append(f'{sid} updates existing state but is not classified: add it to validate.CONSENT_SCREENS, PLAN_SCREENS or NOT_BOUND_SCREENS (and bind its controls).')
+    for sid, s in screens.items():
+        cls, seen = bind_class(sid, consent, plan), {}
         for part in ('body', 'footer'):
             for n, p in walk(s[part], part):
-                b = n.get('bind')
-                if settings and needs_bind(n) and b is None:
-                    errors.append(f'{sid}: {n["t"]} {n.get("key")!r} at {p} on a settings screen has no bind= (P-71: it must start from the member\'s stored state).')
+                b, k = n.get('bind'), (sid, n.get('key'))
+                if needs_bind(n) and b is None and (cls or (sid in not_bound and is_settings(s))):
+                    if k in exempt: used.add(k)
+                    elif cls:
+                        errors.append(f'{sid}: {n["t"]} {n.get("key")!r} at {p} on a {cls}-class settings screen has no bind= (P-71: it must start from the member\'s stored state).')
+                    else:
+                        errors.append(f'{sid}: {n["t"]} {n.get("key")!r} at {p} writes the session on a screen listed as not bound: classify the screen, or list the control in validate.BIND_EXEMPT with a reason.')
                 if b is None: continue
-                if not settings:
-                    errors.append(f'{sid}: bind {b!r} at {p} is not on a settings screen (bound inputs are for settings screens only).')
+                if k in exempt:
+                    errors.append(f'{sid}: {n.get("key")!r} at {p} is in validate.BIND_EXEMPT but has bind {b!r}.')
+                if not cls:
+                    errors.append(f'{sid}: bind {b!r} at {p} is not on a consent- or plan-class settings screen.')
                 if n['t'] not in BINDABLE or (n['t'] == 'field' and n.get('kind') != 'select'):
                     errors.append(f'{sid}: bind {b!r} at {p} is on a {n["t"]}{" " + n.get("kind", "") if n["t"] == "field" else ""}; the kit binds only {", ".join(BINDABLE)} (select fields).')
                 if not n.get('key'):
                     errors.append(f'{sid}: bind {b!r} at {p} is on a control with no key=.')
                 if not isinstance(b, str) or not BIND_KEY.match(b):
-                    errors.append(f'{sid}: bind {b!r} at {p} must be dot-separated lower-case segments (for example notifications.quiet_hours).')
-                elif b in seen:
+                    errors.append(f'{sid}: bind {b!r} at {p} must be dot-separated lower-case segments or {PROGRAM_SEGMENT} (for example notifications.quiet_hours).')
+                    continue
+                per_program = PROGRAM_SEGMENT in s.get('route', '')
+                if per_program and PROGRAM_SEGMENT not in b.split('.'):
+                    errors.append(f'{sid}: bind {b!r} at {p} needs a {PROGRAM_SEGMENT} segment: the screen is opened per programme.')
+                if not per_program and PROGRAM_SEGMENT in b.split('.'):
+                    errors.append(f'{sid}: bind {b!r} at {p} has a {PROGRAM_SEGMENT} segment, but the screen\'s route has none.')
+                if b in seen:
                     errors.append(f'{sid}: bind {b!r} at {p} is also used at {seen[b]}.')
-                else:
-                    seen[b] = p
+                seen[b] = p
+    for k in exempt:
+        if k not in used:
+            errors.append(f'validate.BIND_EXEMPT entry {k} matches no unbound control that writes the session on a settings screen: remove it.')
     return errors
 
-def check_first_run_consents(screens, allowed=FIRST_RUN_ON, checklists=None):
-    """P-52: an optional consent or attestation control on a first-run screen
-    starts off, except the entries of `allowed`. Settings screens are exempt
-    (check_settings governs them). Every `allowed` entry must be used."""
+def element_programs(s):
+    """(path, action, programme) for every interactive element of screen
+    `s`: a list row or tile takes its own programme (its lead or `program`),
+    anything else the screen's."""
+    out = []
+    for part in ('body', 'footer'):
+        for n, p in walk(s[part], part):
+            if n['t'] == 'list':
+                out += [(f'{p}.rows[{j}]', r['action'], (r.get('lead') or {}).get('program') or s.get('program')) for j, r in enumerate(n['rows']) if r.get('action')]
+            elif n['t'] == 'tiles':
+                out += [(f'{p}.items[{j}]', r['action'], r.get('program') or s.get('program')) for j, r in enumerate(n['items']) if r.get('action')]
+            elif n.get('action') and n['t'] in ('button', 'link', 'authbtn', 'card', 'chart', 'banner'):
+                out.append((p, n['action'], s.get('program')))
+    return out
+
+def check_program_context(screens):
+    """A screen opened per programme (route with :program) is only pushed,
+    from an element whose programme is known, so the kit can pass it on."""
+    errors = []
+    per = {sid for sid, s in screens.items() if PROGRAM_SEGMENT in s.get('route', '')}
+    def visit(sid, p, a, prog):
+        if not a: return
+        if a.get('to') in per or any(v in per for v in (a.get('context') or {}).values()):
+            if a['type'] != 'push': errors.append(f'{sid}: {p} opens {a.get("to")} with {a["type"]}; a per-programme screen is opened with a push only.')
+            elif not prog: errors.append(f'{sid}: {p} opens {a["to"]} but no programme is known there (row lead, tile programme or screen programme).')
+        for c in a.get('cases', []): visit(sid, p, c['action'], prog)
+        visit(sid, p, a.get('then'), prog)
+    for sid, s in screens.items():
+        for p, a, prog in element_programs(s): visit(sid, p, a, prog)
+    return errors
+
+def check_consent_starts(screens, allowed=None, checklists=None, plan=PLAN_SCREENS):
+    """P-52, extended: an optional consent, sharing or import selection on a
+    consent-creating screen starts off, except the entries of `allowed`
+    (FIRST_RUN_ON and CONSENT_START_PENDING). Bound controls and plan-class
+    screens are not checked. Every `allowed` entry must be used."""
+    allowed = {**FIRST_RUN_ON, **CONSENT_START_PENDING} if allowed is None else allowed
     checklists = CONSENT_CHECKLISTS if checklists is None else checklists
     errors, used = [], set()
     for sid, s in screens.items():
-        if not is_first_run(s) or is_settings(s): continue
-        consent_screen = any(e in CONSENT_ENDPOINTS for e in submits_of(s))
+        if sid in plan: continue
+        creating = any(e in CONSENT_CREATING for e in submits_of(s))
         for part in ('body', 'footer'):
             for n, p in walk(s[part], part):
-                if n['t'] == 'toggle' and consent_screen: on = bool(n.get('on'))
-                elif n['t'] == 'checklist' and (consent_screen or checklists.get(sid) == n.get('key')): on = any(i.get('done') for i in n['items'])
+                if n.get('bind') is not None: continue
+                t = n['t']
+                if t == 'toggle' and creating: on = bool(n.get('on'))
+                elif t == 'checklist' and (creating or (n.get('key') is not None and checklists.get(sid) == n.get('key'))): on = any(i.get('done') for i in n['items'])
+                elif t == 'chips' and creating: on = bool(n.get('selected'))
+                elif t == 'tiles' and creating and n.get('key'): on = any(i.get('selected') for i in n['items'] if not i.get('action'))
                 else: continue
                 if not on: continue
                 if (sid, n.get('key')) in allowed:
                     used.add((sid, n.get('key'))); continue
-                errors.append(f'{sid}: optional consent {n["t"]} {n.get("key")!r} at {p} starts on. P-52: on a first-run screen the member turns it on (allowlist: validate.FIRST_RUN_ON).')
+                errors.append(f'{sid}: optional consent {t} {n.get("key")!r} at {p} starts on. P-52: the member turns it on; a starting value is never a consent (allowlists: validate.FIRST_RUN_ON, CONSENT_START_PENDING).')
     for k in allowed:
         if k not in used:
-            errors.append(f'first-run consent allowlist entry {k} matches no first-run consent control that starts on: remove it from validate.FIRST_RUN_ON.')
+            errors.append(f'consent allowlist entry {k} matches no consent control that starts on: remove it from validate.FIRST_RUN_ON or CONSENT_START_PENDING.')
     return errors
 
 
@@ -614,57 +705,87 @@ def _self_test():
     print('validate self-test: ok')
 
 def _settings_self_test():
-    """check_settings and check_first_run_consents (P-71, P-52) report each
-    error on a synthetic spec, and a correct spec passes."""
-    def sc(sid, body, api=None, flow='account', phase='account'):
-        footer = [button('Save', submit(api, back()))] if api else [button('Done', back())]
-        return {'id': sid, 'flow': flow, 'phase': phase, 'header': None, 'body': body, 'footer': footer, 'tab': None}
-    def settings(*body, api='PATCH /v1/x'): return sc('set', list(body), api)
-    def run(screens, pinned=('set',)): return check_settings(screens, pinned)
-    def has(screens, text, why, pinned=('set',)):
-        got = run(screens, pinned)
+    """check_settings, check_program_context and check_consent_starts (P-71,
+    P-52) report each error on a synthetic spec, and a correct spec passes."""
+    def sc(sid, body, api=None, flow='account', phase='account', route=None, program=None, footer=None):
+        footer = footer if footer is not None else ([button('Save', submit(api, back()))] if api else [button('Done', back())])
+        return {'id': sid, 'flow': flow, 'phase': phase, 'route': route or f'/{sid}', 'program': program, 'header': None, 'body': body, 'footer': footer, 'tab': None}
+    def settings(*body, api='PATCH /v1/x', sid='set'): return sc(sid, list(body), api)
+    def run(screens, consent=('set',), plan=(), not_bound=None, exempt=None): return check_settings(screens, consent, plan, not_bound or {}, exempt or {})
+    def has(screens, text, why, **kw):
+        got = run(screens, **kw)
         _expect(any(text in e for e in got), f'{why} not reported; got {got}')
     ok = {'set': settings(toggle('A', key='a', bind='x.a'), field('Name', key='name'), checklist(['One']), field('Pick', kind='select', key='pick', bind='x.pick')),
+          'pl': settings(seg(['A', 'B'], 'A', key='u', bind='p.u'), api='PUT /v1/p', sid='pl'),
+          'off': settings(radio(['Now', 'Later'], key='scope'), sid='off'),
+          'pw': settings(field('Password', kind='password', key='password'), api='PUT /v1/pw', sid='pw'),
+          'per': dict(settings(toggle('S', key='s', bind='e.:program.s'), sid='per'), route='/p/:program/settings'),
           'other': sc('other', [toggle('B', on=True, key='b')], 'POST /v1/x')}
-    _expect(run(ok) == [], f'a correct spec reports {run(ok)}')
-    has({'set': settings(toggle('A', key='a'))}, "toggle 'a' at body[0] on a settings screen has no bind=", 'unbound toggle')
+    good = dict(consent=('set', 'per'), plan=('pl',), not_bound={'off': 'action', 'pw': 'secret'}, exempt={('off', 'scope'): 'action choice'})
+    _expect(run(ok, **good) == [], f'a correct spec reports {run(ok, **good)}')
+    has({'set': settings(toggle('A', key='a'))}, "toggle 'a' at body[0] on a consent-class settings screen has no bind=", 'unbound consent toggle')
+    has({'pl': settings(toggle('A', key='a'), api='PUT /v1/p', sid='pl')}, "toggle 'a' at body[0] on a plan-class settings screen has no bind=", 'unbound plan toggle', consent=(), plan=('pl',))
     has({'set': settings(field('Pick', kind='select', key='pick'))}, "field 'pick'", 'unbound select field')
     has({'set': settings(checklist(['One'], key='c'))}, "checklist 'c'", 'unbound keyed checklist')
     has({'set': settings(chips(['A'], key='c'))}, "chips 'c'", 'unbound chips')
     has({'set': settings(seg(['A', 'B'], 'A', key='c'))}, "segmented 'c'", 'unbound segmented')
     has({'set': settings(radio(['A'], key='c'))}, "radio 'c'", 'unbound radio')
-    has({'set': settings(toggle('A', key='a', bind='x.a'), api='PUT /v1/x')} | {'set2': dict(settings(toggle('B', key='b')), id='set2')}, "set2: toggle 'b'", 'unbound control on a PUT screen', pinned=('set', 'set2'))
+    has({'set': settings(slider('S', 1, key='s'))}, "slider 's'", 'unbound slider')
     has({'set': sc('set', [toggle('A', key='a')], 'POST /v1/care/caregivers')}, "toggle 'a'", 'unbound control on a sharing POST screen')
-    has({'set': settings(toggle('A', key='a', bind='x.a')), 'other': sc('other', [toggle('B', key='b', bind='x.b')], 'POST /v1/x')}, "other: bind 'x.b' at body[0] is not on a settings screen", 'bind outside settings')
+    # Classification.
+    has({'set': settings(toggle('A', key='a', bind='x.a')), 'new': settings(sid='new')}, 'new updates existing state but is not classified', 'unclassified settings screen')
+    has({'set': sc('set', [], 'POST /v1/x')}, 'validate.CONSENT_SCREENS lists set, which no longer updates existing state', 'stale consent entry')
+    has({'pl': sc('pl', [], 'POST /v1/x')}, 'validate.PLAN_SCREENS lists pl', 'stale plan entry', consent=(), plan=('pl',))
+    has({'set': settings(toggle('A', key='a', bind='x.a'))}, 'set is in both validate.CONSENT_SCREENS and validate.PLAN_SCREENS', 'screen in two classes', plan=('set',))
+    has({'set': settings(toggle('A', key='a', bind='x.a'))}, 'validate.NOT_BOUND_SCREENS lists gone, which is not a screen', 'missing not-bound screen', not_bound={'gone': 'x'})
+    # Exemptions.
+    has({'set': settings(toggle('A', key='a', bind='x.a')), 'off': settings(radio(['Now'], key='scope'), sid='off')}, 'off: radio \'scope\' at body[0] writes the session on a screen listed as not bound', 'unexempt control on a not-bound screen', not_bound={'off': 'x'})
+    has({'set': settings(toggle('A', key='a', bind='x.a'))}, "validate.BIND_EXEMPT entry ('set', 'gone') matches no unbound control", 'stale exemption', exempt={('set', 'gone'): 'x'})
+    has({'set': settings(toggle('A', key='a', bind='x.a'))}, "is in validate.BIND_EXEMPT but has bind", 'exempt control that is bound', exempt={('set', 'a'): 'x'})
+    _expect(run({'set': settings(toggle('A', key='a'))}, exempt={('set', 'a'): 'action choice'}) == [], 'an exempt consent-screen control is reported')
+    # Bind placement and form.
+    has({'set': settings(toggle('A', key='a', bind='x.a')), 'other': sc('other', [toggle('B', key='b', bind='x.b')], 'POST /v1/x')}, "other: bind 'x.b' at body[0] is not on a consent- or plan-class settings screen", 'bind outside settings')
     has({'set': settings(field('Name', key='name', bind='x.name'))}, 'is on a field text', 'bind on a text field')
     has({'set': settings(dict(slider('S', 1, key='s'), bind='x.s'))}, 'is on a slider', 'bind on a slider')
-    has({'set': settings(slider('S', 1, key='s'))}, "slider 's'", 'unbound slider on a settings screen')
     has({'set': settings(checklist(['One'], bind='x.c'))}, 'is on a control with no key=', 'bind without key')
     has({'set': settings(toggle('A', key='a', bind='X.a'))}, 'must be dot-separated', 'bad bind format')
     has({'set': settings(toggle('A', key='a', bind='single'))}, 'must be dot-separated', 'one-segment bind')
     has({'set': settings(toggle('A', key='a', bind='x.a'), toggle('B', key='b', bind='x.a'))}, 'is also used at body[0]', 'duplicate bind')
-    has({'set': settings(toggle('A', key='a', bind='x.a')), 'new': dict(settings(), id='new')}, "new ['new']", 'unpinned settings screen')
-    has({'set': sc('set', [], 'POST /v1/x')}, "no longer settings ['set']", 'pinned screen that no longer matches')
-    # First-run consents.
+    has({'set': dict(settings(toggle('A', key='a', bind='x.a')), route='/p/:program/s')}, 'needs a :program segment', 'per-programme screen without :program')
+    has({'set': settings(toggle('A', key='a', bind='x.:program.a'))}, "has a :program segment, but the screen's route has none", ':program on a plain screen')
+    # Programme context.
+    per = dict(sc('ps', [], route='/p/:program/settings'))
+    pc = lambda **s: check_program_context(dict(s, ps=per))
+    _expect(pc(home=sc('home', [button('Settings', go('ps'))], program='bf'), acct=sc('acct', [rows([row('BreatheFree', lead=L_prog('bf'), action=go('ps'))])])) == [], 'a known programme is reported')
+    _expect(any('no programme is known there' in e for e in pc(acct=sc('acct', [rows([row('Any', action=go('ps'))])]))), 'a push without a programme not reported')
+    _expect(any('a per-programme screen is opened with a push only' in e for e in pc(home=sc('home', [button('Settings', rep('ps'))], program='bf'))), 'a replace to a per-programme screen not reported')
+    _expect(any('no programme is known there' in e for e in pc(home=sc('home', [button('Settings', toast('x', go('ps')))]))), 'a nested push without a programme not reported')
+    # Consent starting states (first run and every consent-creating screen).
     def fr(sid, body, api='POST /v1/enrolments/consents', flow='onboarding', phase='onboarding'): return sc(sid, body, api, flow, phase)
     allow = {('ob', 'req'): 'required'}
-    def run5(screens, allowed=allow, checklists=None): return check_first_run_consents(screens, allowed, checklists or {})
-    def has5(screens, text, why, allowed=allow, checklists=None):
-        got = run5(screens, allowed, checklists)
+    def run5(screens, allowed=allow, checklists=None, plan=()): return check_consent_starts(screens, allowed, checklists or {}, plan)
+    def has5(screens, text, why, allowed=allow, checklists=None, plan=()):
+        got = run5(screens, allowed, checklists, plan)
         _expect(any(text in e for e in got), f'{why} not reported; got {got}')
     good5 = {'ob': fr('ob', [toggle('Required', on=True, key='req'), toggle('Optional', key='opt')]),
              'acct': sc('acct', [checklist(['Me'], key='age')], None, 'onboarding', 'account'),
              'pref': fr('pref', [toggle('Quiet hours', on=True, key='quiet')], None),
-             'later': sc('later', [toggle('Share', on=True, key='share')], 'POST /v1/enrolments/consents'),
-             'set': fr('set', [toggle('Share', on=True, key='share', bind='x.share')], 'PATCH /v1/enrolments/consents')}
-    _expect(run5(good5, checklists={'acct': 'age'}) == [], f'a correct first-run spec reports {run5(good5, checklists={"acct": "age"})}')
-    has5(dict(good5, ob=fr('ob', [toggle('Required', on=True, key='req'), toggle('Optional', on=True, key='opt')])), "ob: optional consent toggle 'opt' at body[1] starts on", 'optional consent starting on')
-    has5(dict(good5, acct=sc('acct', [checklist([ci('Me', done=True)], key='age')], None, 'onboarding', 'account')), "acct: optional consent checklist 'age'", 'consent checklist ticked (onboarding flow)', checklists={'acct': 'age'})
-    has5(dict(good5, ob=fr('ob', [toggle('Required', on=True, key='req'), checklist([ci('One', done=True)], key='c')])), "checklist 'c'", 'ticked checklist on a consent screen')
-    has5(dict(good5, q=fr('q', [toggle('Share', on=True, key='share')], 'POST /v1/enrolments/consents', 'prog', 'onboarding')), "q: optional consent toggle 'share'", 'consent screen in the onboarding phase of another flow')
-    has5(dict(good5, ob=fr('ob', [toggle('Required', key='req'), toggle('Optional', key='opt')])), "('ob', 'req') matches no first-run consent control", 'stale allowlist entry')
-    has5(good5, "('ob', 'gone')", 'allowlist entry for a missing control', allowed=dict(allow, **{}) | {('ob', 'gone'): 'x'})
-    _expect(any('starts on' in e for e in run5(good5, allowed={})), 'the required control is not reported without its allowlist entry')
+             'sup': sc('sup', [chips(['A', 'B'], key='progs'), field('Name', key='name')], 'POST /v1/care/supporters'),
+             'set': sc('set', [toggle('Share', on=True, key='share', bind='x.share')], 'PATCH /v1/enrolments/consents'),
+             'pl': sc('pl', [toggle('Remind', on=True, key='r')], 'POST /v1/enrolments/consents'),
+             'todo': sc('todo', [checklist([ci('Walk', done=True)])], 'POST /v1/records/x')}
+    _expect(run5(good5, checklists={'acct': 'age'}, plan=('pl',)) == [], f'a correct consent spec reports {run5(good5, checklists={"acct": "age"}, plan=("pl",))}')
+    has5(dict(good5, ob=fr('ob', [toggle('Required', on=True, key='req'), toggle('Optional', on=True, key='opt')])), "ob: optional consent toggle 'opt' at body[1] starts on", 'optional consent starting on', plan=('pl',))
+    has5(dict(good5, acct=sc('acct', [checklist([ci('Me', done=True)], key='age')], None, 'onboarding', 'account')), "acct: optional consent checklist 'age'", 'consent checklist ticked', checklists={'acct': 'age'}, plan=('pl',))
+    has5(dict(good5, ob=fr('ob', [toggle('Required', on=True, key='req'), checklist([ci('One', done=True)], key='c')])), "checklist 'c'", 'ticked checklist on a consent screen', plan=('pl',))
+    has5(dict(good5, sup=sc('sup', [chips(['A', 'B'], ['A'], key='progs')], 'POST /v1/care/supporters')), "sup: optional consent chips 'progs' at body[0] starts on", 'preselected programme on a supporter screen (not first run)', plan=('pl',))
+    has5(dict(good5, rc=sc('rc', [checklist([ci('Labs', done=True)], key='res')], None, 'records', 'resources')), "rc: optional consent checklist 'res'", 'ticked records-import checklist', checklists={'acct': 'age', 'rc': 'res'}, plan=('pl',))
+    has5(dict(good5, t=sc('t', [tiles([tl('Bf', selected=True), tl('Sf')], key='who')], 'POST /v1/care/summaries')), "t: optional consent tiles 'who'", 'preselected tile on a sharing screen', plan=('pl',))
+    has5(good5, "pl: optional consent toggle 'r'", 'a plan-class exemption leaking to other screens')
+    has5(dict(good5, ob=fr('ob', [toggle('Required', key='req'), toggle('Optional', key='opt')])), "('ob', 'req') matches no consent control", 'stale allowlist entry', plan=('pl',))
+    _expect(any('starts on' in e for e in run5(good5, allowed={}, plan=('pl',))), 'the required control is not reported without its allowlist entry')
+    pend = dict(good5, sup=sc('sup', [chips(['A', 'B'], ['A'], key='progs')], 'POST /v1/care/supporters'))
+    _expect(run5(pend, allowed=dict(allow, **{}) | {('sup', 'progs'): 'pending owner decision'}, plan=('pl',)) == [], 'a pending allowlist entry does not pass its screen')
 
 def _age_gate_self_test(scr):
     """check_age_gate fails closed: an account-creating or unknown auth submit

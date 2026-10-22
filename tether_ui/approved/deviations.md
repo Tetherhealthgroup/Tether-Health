@@ -331,8 +331,9 @@ on the condition that a settings screen shows the member's stored state and
 never submits a starting value. Each input control on a settings screen now
 names the data key of that stored state (`bind`). This changes data only: in
 the preview and in screenshots the controls show the designed starting value,
-as before. `program_settings_sf` and `sf_unplug_off` gain the same keys; they
-are additions, which have no sha256 pin.
+as before. `program_settings_sf` gains the same keys as `program_settings`;
+it is an addition, which has no sha256 pin. `:program` stands for the
+programme the screen was opened for.
 
 | Screen | Field | `bind` |
 |---|---|---|
@@ -343,15 +344,18 @@ are additions, which have no sha256 pin.
 | `ck_q1` | `body[3]` segmented, `body[4]` chips | `ck.profile.sex_assigned_at_birth`, `ck.profile.any_of_these` |
 | `hw_targets` | `body[3]` radio, `body[4]` chips | `hw.targets.no_target_yet`, `hw.targets.reminder_time` |
 | `nu_habit` | `body[1]` radio, `body[2].children[0]` toggle | `nu.habit.habit`, `nu.habit.track_weight` |
-| `program_settings` | `body[1]` radio, `body[2].children[0]` toggle, `body[2].children[1]` toggle | `enrolment.status`, `enrolment.care_team_sharing`, `enrolment.de_identified_research` |
+| `program_settings` | `body[1]` radio, `body[2].children[0]` toggle, `body[2].children[1]` toggle | `enrolment.:program.status`, `enrolment.:program.care_team_sharing`, `enrolment.:program.de_identified_research` |
 | `sd_caregiver` | `body[3]` checklist | `sd.caregiver.can_see` |
 | `sf_buddy` | `body[3]` checklist | `sf.buddy.can_see` |
 | `st_range` | `body[2]` segmented | `st.range.unit` |
 
-In the app, a bound control shows the stored value; while it is unknown it
-shows its empty state (off, nothing selected), and it writes nothing until
-the member sets it. That comes from the shared input components, not from
-`spec/screens`.
+In the app a bound control shows the stored value. While the value is not
+loaded it shows its empty state (off, nothing selected) and writes nothing.
+When the member has nothing stored, controls on the sharing and
+notification screens (`account_notifications`, `account_privacy`,
+`program_settings`, `sd_caregiver`, `sf_buddy`) stay off, and plan and
+profile screens show their designed starting value. That comes from the
+shared input components, not from `spec/screens`.
 
 ## Rendering changes with no spec change (TH-907)
 

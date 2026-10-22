@@ -266,8 +266,8 @@ def shared():
     ], footer=[button('Continue', branch('Chosen option', [('Learn only', toast('Heartwise added as Learn only', tab('plans'))), ('Swap', rep('hw_q1'))], on='radio', key='option')), button('Cancel', close(), v='secondary')])
     S('program_settings', 'Program settings', '/p/:program/settings', 'plans', phase='account', hdr=H('BreatheFree settings'), body=[
         rows([row('BreatheFree', 'Focus since Aug 14', lead=L_prog('bf'))], flat=True),
-        radio([ri('Focus', 'Daily steps and reminders'), ri('Learn only', 'Keep lessons, stop tracking'), ri('Pause', 'Stop reminders; keep everything')], 0, label='Status', key='status', bind='enrolment.status'),
-        card(toggle('Care team · Dr. Patel’s clinic', 'Manual: you approve each summary', True, key='care_team_sharing', bind='enrolment.care_team_sharing'), toggle('De-identified research', None, False, key='de_identified_research', bind='enrolment.de_identified_research'), eyebrow='Sharing'),
+        radio([ri('Focus', 'Daily steps and reminders'), ri('Learn only', 'Keep lessons, stop tracking'), ri('Pause', 'Stop reminders; keep everything')], 0, label='Status', key='status', bind='enrolment.:program.status'),
+        card(toggle('Care team · Dr. Patel’s clinic', 'Manual: you approve each summary', True, key='care_team_sharing', bind='enrolment.:program.care_team_sharing'), toggle('De-identified research', None, False, key='de_identified_research', bind='enrolment.:program.de_identified_research'), eyebrow='Sharing'),
         rows([row('Export BreatheFree data', 'PDF + JSON', action=toast('Export is being prepared. We’ll notify you.')), row('Leave BreatheFree', 'Keep your data or delete it now', action=sheet('account_leave'), danger=True)], title='Data'),
     ], footer=[button('Save changes', submit('PATCH /v1/enrolments/:id', toast('Saved', back())))], api=['PATCH /v1/enrolments/:id'],
        desc='Parameterized by program. Shown here with BreatheFree data.')

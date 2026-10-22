@@ -33,7 +33,7 @@ class BeSurvivorScreen extends StatelessWidget {
         TSegmented(fieldKey: 'be_survivor.value', options: ['Hard', 'Mixed', 'Good'], selected: 'Mixed'),
         TCard(title: 'Worried about it coming back?', text: 'Very common. Ease has tools for this, and your team can help.', cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: 'Open Ease', onPressed: () => TNav.push(context, Routes.eaIntro), variant: TButtonVariant.secondary, small: true)),
         TKeyValue(rows: [('Next follow-up', 'Jan 14, 2027')]),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: 'Program settings', onTap: () => TNav.push(context, Routes.programSettings))]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: 'Program settings', onTap: () => TNav.push(context, Routes.programSettings, program: 'be'))]),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Save check-in', onPressed: () => TNav.submit(context, 'POST /v1/program-data/be/survivorship', screenId: 'be_survivor', then: () => TNav.toast(context, 'Saved')), arrow: true),

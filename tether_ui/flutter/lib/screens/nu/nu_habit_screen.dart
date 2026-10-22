@@ -22,8 +22,8 @@ class NuHabitScreen extends StatelessWidget {
       header: THeader(title: 'This week’s habit', pill: 'Plan'),
       children: [
         TTitle('Pick one habit for this week.'),
-        TRadioList(fieldKey: 'nu_habit.value', items: [TRadioItem('Add a vegetable to dinner', sub: '5 nights this week', badge: 'Suggested'), TRadioItem('Water before each meal', sub: 'Every day'), TRadioItem('Cook at home', sub: '3 times this week'), TRadioItem('10-minute walk after a meal', sub: '4 times')], selected: 0, bind: 'nu.habit.habit'),
-        TCard(children: [TToggleRow(fieldKey: 'nu_habit.track_weight', label: 'Track weight', sub: 'Off by default · can stay off forever', bind: 'nu.habit.track_weight')]),
+        TRadioList(fieldKey: 'nu_habit.value', items: [TRadioItem('Add a vegetable to dinner', sub: '5 nights this week', badge: 'Suggested'), TRadioItem('Water before each meal', sub: 'Every day'), TRadioItem('Cook at home', sub: '3 times this week'), TRadioItem('10-minute walk after a meal', sub: '4 times')], selected: 0, bind: 'nu.habit.habit', bindClass: TBindClass.plan),
+        TCard(children: [TToggleRow(fieldKey: 'nu_habit.track_weight', label: 'Track weight', sub: 'Off by default · can stay off forever', bind: 'nu.habit.track_weight', bindClass: TBindClass.plan)]),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Start this habit', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/nu/habit', screenId: 'nu_habit', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.nuHome))), arrow: true),

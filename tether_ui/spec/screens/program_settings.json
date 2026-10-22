@@ -50,7 +50,7 @@
       "selected": 0,
       "label": "Status",
       "key": "status",
-      "bind": "enrolment.status"
+      "bind": "enrolment.:program.status"
     },
     {
       "t": "card",
@@ -63,14 +63,14 @@
           "sub": "Manual: you approve each summary",
           "on": true,
           "key": "care_team_sharing",
-          "bind": "enrolment.care_team_sharing"
+          "bind": "enrolment.:program.care_team_sharing"
         },
         {
           "t": "toggle",
           "label": "De-identified research",
           "on": false,
           "key": "de_identified_research",
-          "bind": "enrolment.de_identified_research"
+          "bind": "enrolment.:program.de_identified_research"
         }
       ]
     },

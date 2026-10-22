@@ -251,16 +251,18 @@ INPUTS = ('field', 'chips', 'segmented', 'radio', 'toggle', 'slider')
 # auto-keyed.
 KEYED = ('checklist', 'tiles')
 AUTO_KEYS = []  # (screen id, path, key) of inputs without an explicit key
-# Settings binding (P-71, TH-1008). On a settings screen
-# (validate.SETTINGS_SCREENS) every input control that writes to the session
-# carries `bind=`: the TData key of the member's stored value. The kit shows
-# that value, writes nothing to the session while it is unknown (null), and
-# records which keys the member changed (TSession.touched). BINDABLE lists the
+# Settings binding (P-71, TH-1008). On a consent- or plan-class settings
+# screen (validate.CONSENT_SCREENS, PLAN_SCREENS) every input control that
+# writes to the session carries `bind=`: the TData key of the member's stored
+# value. The kit starts the control from that value, writes nothing to the
+# session while it is not loaded (null), and records which keys the member
+# changed (TSession.touched). BINDABLE lists the
 # controls the kit can bind; among fields only kind 'select' is bound (text
 # fields already start empty, P-31). The bind key itself is never written to
-# the session.
+# the session. A ":program" segment stands for the programme the screen was
+# opened for (screens whose route has ":program").
 BINDABLE = ('toggle', 'checklist', 'chips', 'segmented', 'radio', 'field')
-BIND_KEY = re.compile(r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$')
+BIND_KEY = re.compile(r'^[a-z][a-z0-9_]*(\.([a-z][a-z0-9_]*|:program))+$')
 
 def walk(nodes, path='body'):
     for i, n in enumerate(nodes or []):

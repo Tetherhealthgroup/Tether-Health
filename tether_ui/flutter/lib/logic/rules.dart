@@ -47,9 +47,9 @@ abstract final class TSession {
   /// value the control started from (the stored value on a settings screen).
   /// A control that the member sets back to its starting value is not
   /// touched. Every input control resets its key when it is built, so keys
-  /// from an earlier visit to the screen are not included. For a settings
-  /// screen (`settingsScreens`) the app submits only these keys; none means
-  /// there is nothing to send.
+  /// from an earlier visit to the screen are not included. For a
+  /// consent-class settings screen (`consentSettingsScreens`) a submit
+  /// carries only these keys; none means there is nothing to send.
   static Set<String> touched(String screenId) => Set<String>.unmodifiable(_touched.where((k) => k.startsWith('$screenId.')));
 
   /// Whether the member changed [key] on its screen (see [touched]).
@@ -62,10 +62,11 @@ abstract final class TSession {
     touched ? _touched.add(key) : _touched.remove(key);
   }
 
-  /// Kit use: a bound control (settings screen) is being built. Removes
-  /// [key] and its touched mark without notifying [changes], so a value from
-  /// an earlier visit is neither shown as current nor submitted. A bound
-  /// control writes [key] only when the member sets it.
+  /// Kit use: a bound control (settings screen) is being built, or its
+  /// value is not loaded. Removes [key] and its touched mark without
+  /// notifying [changes], so a value from an earlier visit is neither shown
+  /// as current nor submitted. A consent-class control writes [key] only when
+  /// the member sets it; a plan-class one also writes its loaded value.
   static void forget(String? key) {
     if (key == null) return;
     _touched.remove(key);

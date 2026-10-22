@@ -21,10 +21,10 @@ class BfMedsEditScreen extends StatelessWidget {
       header: THeader(title: 'Recorded plan'),
       children: [
         TTitle('Record the plan from your clinician'),
-        TField(fieldKey: 'bf_meds_edit.medicine', label: 'Medicine', placeholder: 'Nicotine patch', kind: TFieldKind.select, bind: 'bf.meds.medicine'),
+        TField(fieldKey: 'bf_meds_edit.medicine', label: 'Medicine', placeholder: 'Nicotine patch', kind: TFieldKind.select, bind: 'bf.meds.medicine', bindClass: TBindClass.plan),
         TField(fieldKey: 'bf_meds_edit.strength', label: 'Strength', placeholder: '21 mg / 24 h'),
-        TField(fieldKey: 'bf_meds_edit.when', label: 'When', placeholder: 'Every morning', kind: TFieldKind.select, bind: 'bf.meds.when'),
-        TToggleRow(fieldKey: 'bf_meds_edit.private_reminder', label: 'Private reminder', sub: 'Lock screen hides the medicine name', value: true, bind: 'bf.meds.private_reminder'),
+        TField(fieldKey: 'bf_meds_edit.when', label: 'When', placeholder: 'Every morning', kind: TFieldKind.select, bind: 'bf.meds.when', bindClass: TBindClass.plan),
+        TToggleRow(fieldKey: 'bf_meds_edit.private_reminder', label: 'Private reminder', sub: 'Lock screen hides the medicine name', value: true, bind: 'bf.meds.private_reminder', bindClass: TBindClass.plan),
         TBody('You’re recording, not changing, your plan. Ask your clinician about any change.', tone: TTextTone.small),
       ],
       footer: [

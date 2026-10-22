@@ -1,11 +1,15 @@
-// Settings binding (P-71). On a settings screen (`settingsScreens`) every
-// input control that writes the session is bound (spec `bind`) and starts
-// from the member's stored value in TData:
-// - while that value is null the control shows its empty state and writes
-//   nothing to TSession; the spec's starting value is never written;
+// Settings binding (P-71). On a settings screen every input control that
+// writes the session is bound (spec `bind`) and starts from the member's
+// stored value in TData, by class:
+// - consent class (`consentSettingsScreens`): only a stored value is shown;
+//   nothing stored (TData.unset) and not loaded (null) show the empty (off)
+//   state and write nothing, so the spec's starting value is never written;
+// - plan class (`planSettingsScreens`): a stored value is shown and written;
+//   TData.unset shows and writes the spec's starting value; null writes
+//   nothing;
 // - TSession.touched lists only the keys the member changed on the screen
-//   now shown, so a save without changes has nothing to send;
-// - a control set back to its starting value is not touched.
+//   now shown, and a control set back to its starting value is not touched;
+// - `:program` in a bind key is the programme the screen was opened for.
 // Unbound controls (first-run and other screens) keep writing their
 // starting value when built.
 import 'dart:convert';
@@ -19,14 +23,12 @@ import 'package:tether_ui/router/routes.dart';
 import 'package:tether_ui/router/settings_screens.dart';
 import 'package:tether_ui/ui/ui.dart';
 
-/// The settings screens, by the rule "a submit updates existing state"
-/// (PATCH, PUT, or the caregiver sharing POST). Pinned here and in
-/// generator/validate.py (SETTINGS_SCREENS).
-const _pinned = <String>{
-  'account_notifications', 'account_privacy', 'auth_newpass', 'be_q2', 'bf_meds_edit', 'bf_review', 'ca_plan', 'ck_q1', //
-  'ea_plan', 'hw_targets', 'nu_habit', 'program_settings', 'program_settings_sf', 're_result', 'sd_caregiver', 'sd_plan', //
-  'sd_safety', 'sf_buddy', 'sf_unplug_off', 'st_range',
-};
+/// Pinned here and in generator/validate.py (CONSENT_SCREENS, PLAN_SCREENS).
+const _consent = <String>{'account_notifications', 'account_privacy', 'program_settings', 'program_settings_sf', 'sd_caregiver', 'sf_buddy'};
+const _plan = <String>{'be_q2', 'bf_meds_edit', 'bf_review', 'ca_plan', 'ck_q1', 'ea_plan', 'hw_targets', 'nu_habit', 're_result', 'sd_plan', 'sd_safety', 'st_range'};
+
+/// Settings screens that are not bound (validate.NOT_BOUND_SCREENS).
+const _notBound = <String>{'auth_newpass', 'sf_unplug_off'};
 
 /// A TData backed by notifiers, standing in for the app's real one.
 class _MapData implements TData {
@@ -34,6 +36,23 @@ class _MapData implements TData {
   final Map<String, ValueNotifier<Object?>> notifiers;
   @override
   ValueListenable<Object?> watch(String bindKey) => notifiers.putIfAbsent(bindKey, () => ValueNotifier<Object?>(null));
+}
+
+/// A loaded TData in which the member has nothing stored.
+class _UnsetData implements TData {
+  static const ValueListenable<Object?> _unset = _Fixed(TData.unset);
+  @override
+  ValueListenable<Object?> watch(String bindKey) => _unset;
+}
+
+class _Fixed implements ValueListenable<Object?> {
+  const _Fixed(this.value);
+  @override
+  final Object? value;
+  @override
+  void addListener(VoidCallback listener) {}
+  @override
+  void removeListener(VoidCallback listener) {}
 }
 
 /// Records each submit with the touched keys and the session at that time.
@@ -87,7 +106,7 @@ Future<void> _settle(WidgetTester tester) async {
   }
 }
 
-Future<void> _open(WidgetTester tester, String route) async {
+Future<void> _open(WidgetTester tester, String route, {String? program}) async {
   tester.view.physicalSize = const Size(1170, 2532);
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
@@ -97,7 +116,7 @@ Future<void> _open(WidgetTester tester, String route) async {
     onGenerateRoute: (s) => s.name == '/__host' ? MaterialPageRoute<void>(builder: (_) => const Scaffold(), settings: s) : AppRouter.onGenerateRoute(s),
     onGenerateInitialRoutes: (_) => [
       MaterialPageRoute<void>(builder: (_) => const Scaffold(), settings: const RouteSettings(name: '/__host')),
-      AppRouter.onGenerateRoute(RouteSettings(name: route))!,
+      AppRouter.onGenerateRoute(RouteSettings(name: route, arguments: program == null ? null : TRouteArgs(program: program)))!,
     ],
   ));
   await _settle(tester);
@@ -160,42 +179,63 @@ void main() {
   });
 
   group('spec', () {
-    test('settingsScreens is the pinned list', () {
-      expect(settingsScreens, _pinned);
+    test('the generated class lists are the pinned ones', () {
+      expect(consentSettingsScreens, _consent);
+      expect(planSettingsScreens, _plan);
     });
 
-    test('every session-writing control on a settings screen is bound, and only there', () {
+    test('every session-writing control on a consent or plan screen is bound, and only there', () {
       final screens = _screens();
+      final bound = {..._consent, ..._plan};
       for (final MapEntry(key: sid, value: s) in screens.entries) {
         for (final n in _controls(s as Map<String, dynamic>)) {
-          if (settingsScreens.contains(sid) && _needsBind(n)) expect(n['bind'], isA<String>(), reason: '$sid ${n['t']} ${n['key']} has no bind');
-          if (n['bind'] != null) expect(settingsScreens, contains(sid), reason: '$sid ${n['key']} is bound but not a settings screen');
+          if (bound.contains(sid) && _needsBind(n)) expect(n['bind'], isA<String>(), reason: '$sid ${n['t']} ${n['key']} has no bind');
+          if (n['bind'] != null) expect(bound, contains(sid), reason: '$sid ${n['key']} is bound but not a consent or plan screen');
         }
       }
     });
 
-    test('the six screens named by the ruling are settings screens with bound controls', () {
+    test('sf_unplug_off keeps its action choice unbound; every consent screen has bound controls', () {
       final screens = _screens();
-      for (final sid in ['account_notifications', 'account_privacy', 'program_settings', 'sf_unplug_off', 'sd_caregiver', 'sf_buddy']) {
-        expect(settingsScreens, contains(sid));
+      expect(_boundKeys(screens, 'sf_unplug_off'), isEmpty);
+      for (final sid in _consent) {
         expect(_boundKeys(screens, sid), isNotEmpty, reason: sid);
+      }
+    });
+
+    test('program_settings binds per programme', () {
+      final screens = _screens();
+      for (final sid in ['program_settings', 'program_settings_sf']) {
+        for (final n in _controls(screens[sid] as Map<String, dynamic>)) {
+          if (n['bind'] != null) expect((n['bind'] as String).split('.'), contains(':program'), reason: '$sid ${n['key']}');
+        }
       }
     });
   });
 
   group('every settings screen', () {
     final screens = _screens();
-    for (final sid in _pinned) {
+    for (final sid in {..._consent, ..._plan, ..._notBound}) {
       final route = (screens[sid] as Map<String, dynamic>)['route'] as String;
       final bound = _boundKeys(screens, sid);
+      // P-31: a field's starting value is empty, so a bound field never writes one.
+      final fields = {
+        for (final n in _controls(screens[sid] as Map<String, dynamic>))
+          if (n['bind'] != null && n['t'] == 'field') '$sid.${n['key']}'
+      };
       final footer = (screens[sid] as Map<String, dynamic>)['footer'] as List;
       final submits = footer.isNotEmpty && _nodes((footer.first as Map<String, dynamic>)['action']).any((n) => n['type'] == 'submit');
-      for (final (name, data) in [('no stored state', () => const TEmptyData() as TData), ('preview data', () => PreviewData() as TData)]) {
-        testWidgets('$sid · $name: opening writes no bound key and an untouched save has no touched key', (tester) async {
+      final cases = <(String, TData Function(), bool)>[
+        ('not loaded', () => _MapData(), false),
+        ('nothing stored', () => _UnsetData(), _plan.contains(sid)),
+        ('preview data', () => PreviewData(), _plan.contains(sid)),
+      ];
+      for (final (name, data, writes) in cases) {
+        testWidgets('$sid · $name: bound keys ${writes ? 'hold the starting value' : 'are not written'}; an untouched save has no touched key', (tester) async {
           TData.instance = data();
-          await _open(tester, route);
+          await _open(tester, route, program: 'bf');
           for (final key in bound) {
-            expect(TSession.values.containsKey(key), isFalse, reason: '$key was written on open');
+            expect(TSession.values.containsKey(key), writes && !fields.contains(key), reason: '$key on open');
           }
           expect(TSession.touched(sid), isEmpty);
           final save = find.byKey(const ValueKey('a:footer[0]'));
@@ -205,7 +245,7 @@ void main() {
             expect(screenId, sid, reason: endpoint);
             expect(touched, isEmpty, reason: '$endpoint: nothing was changed');
             for (final key in bound) {
-              expect(values.containsKey(key), isFalse, reason: '$endpoint carried $key');
+              expect(values.containsKey(key), writes && !fields.contains(key), reason: '$endpoint and $key');
             }
           }
           await _drain(tester);
@@ -356,15 +396,67 @@ void main() {
       await _drain(tester);
     });
 
-    testWidgets('segmented (st_range): stored option shown; unknown shows none selected', (tester) async {
+    testWidgets('typed fields on a plan screen are touched while they differ from the start', (tester) async {
+      TData.instance = _MapData();
+      await _open(tester, Routes.stRange);
+      final low = find.descendant(of: find.byKey(const ValueKey('field:st_range.low')), matching: find.byType(EditableText));
+      await tester.enterText(low, '70');
+      await _settle(tester);
+      expect(TSession.touched('st_range'), {'st_range.low'});
+      await _drain(tester);
+    });
+  });
+
+  group('class × stored value', () {
+    // Consent class: account_privacy "Cross-program insights" is designed on.
+    for (final (name, stored) in [('stored off', false as Object?), ('nothing stored', TData.unset), ('not loaded', null)]) {
+      testWidgets('consent · $name: shows off and writes nothing', (tester) async {
+        TData.instance = _MapData({'consents.cross_program_insights': stored});
+        await _open(tester, Routes.accountPrivacy);
+        expect(_switchOn(tester, 'Cross-program insights'), isFalse);
+        expect(TSession.values.containsKey('account_privacy.cross_program_insights'), isFalse);
+        expect(TSession.touched('account_privacy'), isEmpty);
+        await _drain(tester);
+      });
+    }
+
+    testWidgets('consent · stored on: shows on and writes nothing', (tester) async {
+      TData.instance = _MapData({'consents.anonymous_app_diagnostics': true});
+      await _open(tester, Routes.accountPrivacy);
+      expect(_switchOn(tester, 'Anonymous app diagnostics'), isTrue);
+      expect(_keysOf('account_privacy'), isEmpty);
+      await _drain(tester);
+    });
+
+    // Plan class: st_range unit is designed "mg/dL".
+    testWidgets('plan · stored: the stored option is shown and written', (tester) async {
       TData.instance = _MapData({'st.range.unit': 'mmol/L'});
       await _open(tester, Routes.stRange);
       expect(_marked(tester, TSegmented, 'mmol/L'), isTrue);
       expect(_marked(tester, TSegmented, 'mg/dL'), isFalse);
+      expect(TSession.values['st_range.value'], 'mmol/L');
+      expect(TSession.touched('st_range'), isEmpty);
+      await _drain(tester);
+    });
+
+    testWidgets('plan · nothing stored: the designed option is shown and written', (tester) async {
+      TData.instance = _MapData({'st.range.unit': TData.unset});
+      await _open(tester, Routes.stRange);
+      expect(_marked(tester, TSegmented, 'mg/dL'), isTrue);
+      expect(TSession.values['st_range.value'], 'mg/dL');
+      expect(TSession.touched('st_range'), isEmpty);
+      await _tap(tester, _in(TSegmented, 'mmol/L'));
+      expect(TSession.touched('st_range'), {'st_range.value'});
+      await _tap(tester, _in(TSegmented, 'mg/dL'));
+      expect(TSession.touched('st_range'), isEmpty);
+      await _drain(tester);
+    });
+
+    testWidgets('plan · not loaded: nothing selected and nothing written', (tester) async {
       TData.instance = _MapData();
       await _open(tester, Routes.stRange);
-      expect(_marked(tester, TSegmented, 'mmol/L'), isFalse);
       expect(_marked(tester, TSegmented, 'mg/dL'), isFalse);
+      expect(_marked(tester, TSegmented, 'mmol/L'), isFalse);
       expect(TSession.values.containsKey('st_range.value'), isFalse);
       await _tap(tester, _in(TSegmented, 'mg/dL'));
       expect(TSession.values['st_range.value'], 'mg/dL');
@@ -372,42 +464,54 @@ void main() {
       await _drain(tester);
     });
 
-    testWidgets('radio (program_settings): stored status shown; unknown shows none; a tap is touched', (tester) async {
-      TData.instance = _MapData({'enrolment.status': 'Pause'});
-      await _open(tester, Routes.programSettings);
-      expect(_marked(tester, TRadioList, 'Pause'), isTrue);
-      expect(_marked(tester, TRadioList, 'Focus'), isFalse);
-      expect(_switchOn(tester, 'Care team · Dr. Patel’s clinic'), isFalse);
-      expect(_keysOf('program_settings'), isEmpty);
-      TData.instance = _MapData();
-      await _open(tester, Routes.programSettings);
-      for (final label in ['Focus', 'Learn only', 'Pause']) {
-        expect(_marked(tester, TRadioList, label), isFalse, reason: label);
-      }
-      await _tap(tester, _in(TRadioList, 'Focus'));
-      expect(TSession.values['program_settings.status'], 'Focus');
-      expect(TSession.touched('program_settings'), {'program_settings.status'});
+    testWidgets('plan · loaded later: not loaded writes nothing, then the stored value is written', (tester) async {
+      final data = _MapData();
+      TData.instance = data;
+      await _open(tester, Routes.stRange);
+      expect(TSession.values.containsKey('st_range.value'), isFalse);
+      data.notifiers['st.range.unit']!.value = TData.unset;
+      await _settle(tester);
+      expect(TSession.values['st_range.value'], 'mg/dL');
+      data.notifiers['st.range.unit']!.value = null;
+      await _settle(tester);
+      expect(TSession.values.containsKey('st_range.value'), isFalse);
       await _drain(tester);
     });
 
-    testWidgets('chips (hw_targets): stored choice shown; a different choice is touched', (tester) async {
+    testWidgets('plan toggle (bf_meds_edit): nothing stored keeps the designed "on"; stored off is shown and written', (tester) async {
+      TData.instance = _MapData({'bf.meds.private_reminder': TData.unset});
+      await _open(tester, Routes.bfMedsEdit);
+      expect(_switchOn(tester, 'Private reminder'), isTrue);
+      expect(TSession.values['bf_meds_edit.private_reminder'], isTrue);
+      TData.instance = _MapData({'bf.meds.private_reminder': false});
+      await _open(tester, Routes.bfMedsEdit);
+      expect(_switchOn(tester, 'Private reminder'), isFalse);
+      expect(TSession.values['bf_meds_edit.private_reminder'], isFalse);
+      await _drain(tester);
+    });
+
+    testWidgets('plan chips (hw_targets): nothing stored keeps "Both"; stored "Morning" is shown and written; a new choice is touched', (tester) async {
+      TData.instance = _MapData({'hw.targets.reminder_time': TData.unset});
+      await _open(tester, Routes.hwTargets);
+      expect(_marked(tester, TChips, 'Both'), isTrue);
+      expect(TSession.values['hw_targets.when_should_we_remind_you'], ['Both']);
       TData.instance = _MapData({'hw.targets.reminder_time': ['Morning']});
       await _open(tester, Routes.hwTargets);
       expect(_marked(tester, TChips, 'Morning'), isTrue);
       expect(_marked(tester, TChips, 'Both'), isFalse);
-      expect(TSession.values.containsKey('hw_targets.when_should_we_remind_you'), isFalse);
+      expect(TSession.values['hw_targets.when_should_we_remind_you'], ['Morning']);
       await _tap(tester, _in(TChips, 'Evening'));
       expect(TSession.values['hw_targets.when_should_we_remind_you'], ['Evening']);
       expect(TSession.touched('hw_targets'), {'hw_targets.when_should_we_remind_you'});
       await _drain(tester);
     });
 
-    testWidgets('select field (bf_meds_edit): stored text shown; unknown leaves it empty; neither is written', (tester) async {
-      TData.instance = _MapData({'bf.meds.medicine': 'Synthetic medicine'});
+    testWidgets('plan select field (bf_meds_edit): stored text shown and written; nothing stored or not loaded leaves it empty and unwritten', (tester) async {
+      TData.instance = _MapData({'bf.meds.medicine': 'Synthetic medicine', 'bf.meds.when': TData.unset});
       await _open(tester, Routes.bfMedsEdit);
       expect(_fieldText(tester, 'bf_meds_edit.medicine'), 'Synthetic medicine');
+      expect(TSession.values['bf_meds_edit.medicine'], 'Synthetic medicine');
       expect(_fieldText(tester, 'bf_meds_edit.when'), isEmpty);
-      expect(TSession.values.containsKey('bf_meds_edit.medicine'), isFalse);
       expect(TSession.values.containsKey('bf_meds_edit.when'), isFalse);
       // Another key changing does not empty the shown stored text.
       final strength = find.descendant(of: find.byKey(const ValueKey('field:bf_meds_edit.strength')), matching: find.byType(EditableText));
@@ -415,6 +519,67 @@ void main() {
       await _settle(tester);
       expect(_fieldText(tester, 'bf_meds_edit.medicine'), 'Synthetic medicine');
       await _drain(tester);
+    });
+
+    testWidgets('consent radio (program_settings): nothing stored shows no status and writes nothing', (tester) async {
+      TData.instance = _MapData({'enrolment.bf.status': TData.unset});
+      await _open(tester, Routes.programSettings, program: 'bf');
+      for (final label in ['Focus', 'Learn only', 'Pause']) {
+        expect(_marked(tester, TRadioList, label), isFalse, reason: label);
+      }
+      expect(_keysOf('program_settings'), isEmpty);
+      await _drain(tester);
+    });
+  });
+
+  group('programme context (program_settings)', () {
+    testWidgets('stored values are read for the programme the screen was opened for', (tester) async {
+      TData.instance = _MapData({'enrolment.bf.status': 'Pause', 'enrolment.sf.status': 'Focus', 'enrolment.bf.care_team_sharing': false});
+      await _open(tester, Routes.programSettings, program: 'bf');
+      expect(_marked(tester, TRadioList, 'Pause'), isTrue);
+      expect(_marked(tester, TRadioList, 'Focus'), isFalse);
+      expect(_switchOn(tester, 'Care team · Dr. Patel’s clinic'), isFalse);
+      expect(_keysOf('program_settings'), isEmpty);
+      await _tap(tester, _in(TRadioList, 'Focus'));
+      expect(TSession.values['program_settings.status'], 'Focus');
+      expect(TSession.touched('program_settings'), {'program_settings.status'});
+      await _drain(tester);
+    });
+
+    testWidgets('opened without a programme: nothing is shown or written, whatever is stored', (tester) async {
+      TData.instance = _MapData({'enrolment.bf.status': 'Pause', 'enrolment.:program.status': 'Pause', 'enrolment.status': 'Pause'});
+      await _open(tester, Routes.programSettings);
+      for (final label in ['Focus', 'Learn only', 'Pause']) {
+        expect(_marked(tester, TRadioList, label), isFalse, reason: label);
+      }
+      expect(_keysOf('program_settings'), isEmpty);
+      await _drain(tester);
+    });
+
+    testWidgets('a programme home passes its programme to program settings', (tester) async {
+      TData.instance = _MapData({'enrolment.hw.status': 'Learn only'});
+      await _open(tester, Routes.hwHome);
+      final row = find.text('Program settings');
+      await tester.ensureVisible(row);
+      await _tap(tester, row);
+      expect(find.byType(TRadioList), findsOneWidget);
+      expect(_marked(tester, TRadioList, 'Learn only'), isTrue);
+      await _drain(tester);
+    });
+
+    testWidgets('each Programs & sharing row passes its own programme', (tester) async {
+      TData.instance = _MapData({'enrolment.ca.status': 'Pause'});
+      await _open(tester, Routes.accountPrograms);
+      await _tap(tester, find.text('ClearAir'));
+      expect(_marked(tester, TRadioList, 'Pause'), isTrue);
+      await _drain(tester);
+    });
+
+    test('TData.resolve', () {
+      expect(TData.resolve('enrolment.:program.status', 'bf'), 'enrolment.bf.status');
+      expect(TData.resolve('enrolment.:program.status', null), isNull);
+      expect(TData.resolve('enrolment.:program.status', ''), isNull);
+      expect(TData.resolve('consents.de_identified_research', null), 'consents.de_identified_research');
     });
   });
 
