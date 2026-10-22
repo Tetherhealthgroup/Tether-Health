@@ -14,6 +14,16 @@ int _calendarDayDifference(DateTime later, DateTime earlier) {
   return laterUtc.difference(earlierUtc).inDays;
 }
 
+/// What the selected-date card says when the saved date is outside the days
+/// the quit path allows (for example, a plan reopened after its quit date
+/// passed). Draft copy, pending clinical and legal review.
+abstract final class QuitDateCopy {
+  static const String unavailableEnglish =
+      'This date is no longer available. Choose a new date.';
+  static const String unavailableSpanish =
+      'Esta fecha ya no está disponible. Elige una nueva fecha.';
+}
+
 class SelectQuitDateScreen extends StatefulWidget {
   const SelectQuitDateScreen({
     required this.isSpanish,
@@ -77,19 +87,49 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
         QuitPlanPath.reduceGradually => _addCalendarDays(_today, 30),
       };
 
+  /// Whether the date on screen can be kept. A saved date outside the quit
+  /// path's window stays saved, but must be replaced before Confirm.
+  bool get _dateAvailable => _isSelectable(_effectiveDate);
+
+  String get _unavailableMessage => widget.isSpanish
+      ? QuitDateCopy.unavailableSpanish
+      : QuitDateCopy.unavailableEnglish;
+
+  DateTime get _firstAllowedMonth =>
+      DateTime(_minimumDate.year, _minimumDate.month);
+
+  DateTime get _lastAllowedMonth =>
+      DateTime(_maximumDate.year, _maximumDate.month);
+
+  /// [month] moved into the months that contain an allowed day.
+  DateTime _clampToAllowedMonths(DateTime month) {
+    if (month.isBefore(_firstAllowedMonth)) return _firstAllowedMonth;
+    if (month.isAfter(_lastAllowedMonth)) return _lastAllowedMonth;
+    return month;
+  }
+
+  /// The month of the date on screen, or the first allowed month when that
+  /// date is outside the window.
+  DateTime get _openingMonth {
+    if (!_dateAvailable) return _firstAllowedMonth;
+    final date = _effectiveDate;
+    return DateTime(date.year, date.month);
+  }
+
+  /// The month shown, always one with an allowed day.
+  DateTime get _shownMonth => _clampToAllowedMonths(_visibleMonth);
+
   @override
   void initState() {
     super.initState();
-    final date = _effectiveDate;
-    _visibleMonth = DateTime(date.year, date.month);
+    _visibleMonth = _openingMonth;
   }
 
   @override
   void didUpdateWidget(covariant SelectQuitDateScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.quitPath != widget.quitPath) {
-      final date = _effectiveDate;
-      _visibleMonth = DateTime(date.year, date.month);
+      _visibleMonth = _openingMonth;
     }
   }
 
@@ -104,15 +144,11 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
   }
 
   void _changeMonth(int amount) {
-    final candidate = DateTime(
-      _visibleMonth.year,
-      _visibleMonth.month + amount,
+    final shown = _shownMonth;
+    final candidate = _clampToAllowedMonths(
+      DateTime(shown.year, shown.month + amount),
     );
-    final firstAllowed = DateTime(_minimumDate.year, _minimumDate.month);
-    final lastAllowed = DateTime(_maximumDate.year, _maximumDate.month);
-    if (candidate.isBefore(firstAllowed) || candidate.isAfter(lastAllowed)) {
-      return;
-    }
+    if (candidate == shown) return;
     setState(() => _visibleMonth = candidate);
   }
 
@@ -326,10 +362,18 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
               final horizontalPadding =
                   largeText ? 12.0 : (narrow ? 18.0 : 22.0);
 
+              final dateAvailable = _dateAvailable;
+              final shownMonth = _shownMonth;
               final footer = _DateBottomAction(
                 isSpanish: widget.isSpanish,
                 label: _continueLabel,
-                onContinue: () => widget.onContinue(_effectiveDate),
+                // Until a day in the window is chosen, Confirm stays
+                // disabled and the saved date is left as it is.
+                blockedReason: dateAvailable ? null : _unavailableMessage,
+                onContinue: () {
+                  final date = _effectiveDate;
+                  if (_isSelectable(date)) widget.onContinue(date);
+                },
                 horizontalPadding: largeText ? 0 : horizontalPadding,
                 compact: compact,
               );
@@ -423,11 +467,12 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
                               SizedBox(height: compact ? 14 : 18),
                               _QuitCalendar(
                                 isSpanish: widget.isSpanish,
-                                visibleMonth: _visibleMonth,
-                                selectedDate: _effectiveDate,
+                                visibleMonth: shownMonth,
+                                // A saved day outside the window is not
+                                // shown as chosen in the calendar.
+                                selectedDate:
+                                    dateAvailable ? _effectiveDate : null,
                                 today: _today,
-                                minimumDate: _minimumDate,
-                                maximumDate: _maximumDate,
                                 windowMessage: _windowMessage,
                                 isSelectable: _isSelectable,
                                 // Only days in the quit path's window can
@@ -437,10 +482,16 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
                                     widget.onDateChanged(date);
                                   }
                                 },
+                                // Each arrow is enabled only while a month
+                                // with an allowed day lies that way.
+                                canGoBack:
+                                    shownMonth.isAfter(_firstAllowedMonth),
+                                canGoForward:
+                                    shownMonth.isBefore(_lastAllowedMonth),
                                 onPreviousMonth: () => _changeMonth(-1),
                                 onNextMonth: () => _changeMonth(1),
                                 monthLabel:
-                                    '${_monthName(_visibleMonth.month)} ${_visibleMonth.year}',
+                                    '${_monthName(shownMonth.month)} ${shownMonth.year}',
                                 weekdayName: _weekdayName,
                               ),
                               const SizedBox(height: 12),
@@ -450,7 +501,10 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
                                 label: _dateLabel,
                                 longDate: _longDate(_effectiveDate),
                                 timingLabel: _timingLabel,
-                                recommended: _isRecommended(_effectiveDate),
+                                unavailableMessage:
+                                    dateAvailable ? null : _unavailableMessage,
+                                recommended: dateAvailable &&
+                                    _isRecommended(_effectiveDate),
                                 monthLabel: _shortMonth(_effectiveDate.month),
                                 weekdayLabel:
                                     _weekdayName(_effectiveDate.weekday),
@@ -638,11 +692,11 @@ class _QuitCalendar extends StatelessWidget {
     required this.visibleMonth,
     required this.selectedDate,
     required this.today,
-    required this.minimumDate,
-    required this.maximumDate,
     required this.windowMessage,
     required this.isSelectable,
     required this.onDateSelected,
+    required this.canGoBack,
+    required this.canGoForward,
     required this.onPreviousMonth,
     required this.onNextMonth,
     required this.monthLabel,
@@ -651,13 +705,13 @@ class _QuitCalendar extends StatelessWidget {
 
   final bool isSpanish;
   final DateTime visibleMonth;
-  final DateTime selectedDate;
+  final DateTime? selectedDate;
   final DateTime today;
-  final DateTime minimumDate;
-  final DateTime maximumDate;
   final String windowMessage;
   final bool Function(DateTime) isSelectable;
   final ValueChanged<DateTime> onDateSelected;
+  final bool canGoBack;
+  final bool canGoForward;
   final VoidCallback onPreviousMonth;
   final VoidCallback onNextMonth;
   final String monthLabel;
@@ -678,6 +732,7 @@ class _QuitCalendar extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 6),
       child: Semantics(
         selected: selected,
+        enabled: isSelectable(date),
         label: '${date.month}/${date.day}/${date.year}',
         child: Material(
           color: selected ? AppColors.coral : Colors.transparent,
@@ -732,10 +787,6 @@ class _QuitCalendar extends StatelessWidget {
     final first = DateTime(visibleMonth.year, visibleMonth.month, 1);
     final leading = first.weekday % 7;
     final firstCell = first.subtract(Duration(days: leading));
-    final canGoBack = DateTime(visibleMonth.year, visibleMonth.month)
-        .isAfter(DateTime(minimumDate.year, minimumDate.month));
-    final canGoForward = DateTime(visibleMonth.year, visibleMonth.month)
-        .isBefore(DateTime(maximumDate.year, maximumDate.month));
     final weekdays = isSpanish
         ? const ['D', 'L', 'M', 'M', 'J', 'V', 'S']
         : const ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -949,6 +1000,7 @@ class _SelectedDateCard extends StatelessWidget {
     required this.label,
     required this.longDate,
     required this.timingLabel,
+    required this.unavailableMessage,
     required this.recommended,
     required this.monthLabel,
     required this.weekdayLabel,
@@ -959,6 +1011,9 @@ class _SelectedDateCard extends StatelessWidget {
   final String label;
   final String longDate;
   final String timingLabel;
+
+  /// Set when [date] is a saved date the quit path no longer allows.
+  final String? unavailableMessage;
   final bool recommended;
   final String monthLabel;
   final String weekdayLabel;
@@ -1032,20 +1087,33 @@ class _SelectedDateCard extends StatelessWidget {
         const SizedBox(height: 3),
         Text(
           longDate,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.deepTeal,
             fontSize: 14,
             fontWeight: FontWeight.w800,
+            decoration:
+                unavailableMessage == null ? null : TextDecoration.lineThrough,
           ),
         ),
         const SizedBox(height: 2),
-        Text(
-          timingLabel,
-          style: const TextStyle(
-            color: AppColors.tealSecondary,
-            fontSize: 11,
+        if (unavailableMessage case final message?)
+          Text(
+            message,
+            key: const ValueKey('quit-date-unavailable'),
+            style: const TextStyle(
+              color: AppColors.deepTeal,
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+            ),
+          )
+        else
+          Text(
+            timingLabel,
+            style: const TextStyle(
+              color: AppColors.tealSecondary,
+              fontSize: 11,
+            ),
           ),
-        ),
       ],
     );
     final badge = Container(
@@ -1252,6 +1320,7 @@ class _DateBottomAction extends StatelessWidget {
   const _DateBottomAction({
     required this.isSpanish,
     required this.label,
+    required this.blockedReason,
     required this.onContinue,
     required this.horizontalPadding,
     required this.compact,
@@ -1259,12 +1328,62 @@ class _DateBottomAction extends StatelessWidget {
 
   final bool isSpanish;
   final String label;
+
+  /// Why Confirm is disabled, or null when it can be used.
+  final String? blockedReason;
   final VoidCallback onContinue;
   final double horizontalPadding;
   final bool compact;
 
   @override
   Widget build(BuildContext context) {
+    final blocked = blockedReason != null;
+    Widget button = FilledButton(
+      key: const ValueKey('quit-date-confirm'),
+      onPressed: blocked ? null : onContinue,
+      style: FilledButton.styleFrom(
+        backgroundColor: AppColors.deepTeal,
+        foregroundColor: Colors.white,
+        disabledBackgroundColor: AppColors.border,
+        disabledForegroundColor: AppColors.tealSecondary,
+        // A minimum, not a fixed height: large text wraps and
+        // grows the button instead of being clipped.
+        minimumSize: Size.fromHeight(compact ? 54 : 58),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 10,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Icon(
+            Icons.arrow_forward_rounded,
+            color: blocked ? AppColors.mutedTeal : AppColors.lime,
+          ),
+        ],
+      ),
+    );
+    // Screen readers hear why the disabled button cannot be used.
+    if (blockedReason case final reason?) {
+      button = MergeSemantics(
+        child: Semantics(hint: reason, child: button),
+      );
+    }
     return DecoratedBox(
       decoration: const BoxDecoration(
         color: AppColors.cream,
@@ -1283,44 +1402,7 @@ class _DateBottomAction extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                FilledButton(
-                  key: const ValueKey('quit-date-confirm'),
-                  onPressed: onContinue,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.deepTeal,
-                    foregroundColor: Colors.white,
-                    // A minimum, not a fixed height: large text wraps and
-                    // grows the button instead of being clipped.
-                    minimumSize: Size.fromHeight(compact ? 54 : 58),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          label,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      const Icon(
-                        Icons.arrow_forward_rounded,
-                        color: AppColors.lime,
-                      ),
-                    ],
-                  ),
-                ),
+                button,
                 if (!compact) ...[
                   const SizedBox(height: 6),
                   Text(
