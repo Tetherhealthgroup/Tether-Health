@@ -50,7 +50,7 @@ chmod +x tool/*.sh
 ./tool/setup_macos_linux.sh
 ```
 
-On macOS, run the iPhone Simulator:
+On macOS, run the iPhone Simulator (for a scripted smoke check with screenshots, see [docs/IOS_SIMULATOR.md](docs/IOS_SIMULATOR.md)):
 
 ```bash
 ./tool/run_iphone_simulator.sh
