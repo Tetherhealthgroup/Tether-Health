@@ -464,7 +464,7 @@ PROGRAM_SEGMENT = ':program'
 CONSENT_CREATING = ('POST /v1/enrolments/consents', 'PATCH /v1/enrolments/consents', 'POST /v1/care/caregivers', 'POST /v1/care/supporters',
                     'POST /v1/care/connections', 'POST /v1/care/summaries')
 FIRST_RUN_ON = {('ob_consent', 'essential_app_data'): 'Essential app data: required for the app to work, not optional'}
-_PENDING = 'designed selection kept until owner question Q-j5 (starting state of consent-creating selections) is answered; not mapped until then'
+_PENDING = 'pending owner decision on starting selections; not mapped until then'
 CONSENT_START_PENDING = {
     ('records_consent', 'resources'): _PENDING,
     ('records_consent_bb', 'resources'): _PENDING,
