@@ -1,46 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
-
-/// Above 140% text (the iOS accessibility sizes and Android 14's largest
-/// font sizes) side-by-side pieces are stacked so text can grow.
-bool _usesLargeTextLayout(BuildContext context) =>
-    MediaQuery.textScalerOf(context).scale(10) > 14;
-
-/// The text scale for [text] in [style], lowered only as far as needed for
-/// its longest word to fit [width]: a word too long for a whole line scales
-/// down instead of splitting.
-TextScaler _wordFitScaler(
-  BuildContext context,
-  String text,
-  TextStyle style,
-  double width,
-) {
-  final scaler = MediaQuery.textScalerOf(context);
-  final painter = TextPainter(
-    text: TextSpan(
-      text: text,
-      style: DefaultTextStyle.of(context).style.merge(style),
-    ),
-    textDirection: Directionality.of(context),
-  );
-  try {
-    var fitted = scaler;
-    for (var attempt = 0; attempt < 4; attempt++) {
-      painter
-        ..textScaler = fitted
-        ..layout();
-      final longestWord = painter.minIntrinsicWidth;
-      if (longestWord <= width) return fitted;
-      final fontSize = style.fontSize ?? 14;
-      final factor = fitted.scale(fontSize) / fontSize * width / longestWord;
-      fitted = scaler.clamp(maxScaleFactor: factor * 0.99);
-    }
-    return fitted;
-  } finally {
-    painter.dispose();
-  }
-}
+import '../widgets/large_text.dart';
 
 enum QuitPlanPath { setQuitDate, quitToday, reduceGradually }
 
@@ -97,7 +58,7 @@ class ChooseQuitPathScreen extends StatelessWidget {
               // Above 140% text the side margins narrow so long words fit, and
               // the header, progress and main action scroll with the content
               // so they never squeeze the questions out of view.
-              final largeText = _usesLargeTextLayout(context);
+              final largeText = usesLargeTextLayout(context);
               final horizontalPadding =
                   largeText ? 12.0 : (narrow ? 18.0 : 24.0);
 
@@ -324,7 +285,7 @@ class _QuitPathHeader extends StatelessWidget {
       builder: (context, constraints) => Text(
         label,
         textAlign: TextAlign.center,
-        textScaler: _wordFitScaler(
+        textScaler: wordFitScaler(
           context,
           label,
           style,
@@ -353,7 +314,7 @@ class _QuitPathHeader extends StatelessWidget {
 
     // Between the back button and the step, the title's words split at
     // accessibility text sizes, so it takes a line of its own.
-    if (_usesLargeTextLayout(context)) {
+    if (usesLargeTextLayout(context)) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -556,7 +517,7 @@ class _QuitPathCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final largeText = _usesLargeTextLayout(context);
+    final largeText = usesLargeTextLayout(context);
     final badge = Container(
       width: 38,
       height: 38,
@@ -575,7 +536,7 @@ class _QuitPathCard extends StatelessWidget {
     final heading = LayoutBuilder(
       builder: (context, constraints) => Text(
         title,
-        textScaler: _wordFitScaler(
+        textScaler: wordFitScaler(
           context,
           title,
           headingStyle,

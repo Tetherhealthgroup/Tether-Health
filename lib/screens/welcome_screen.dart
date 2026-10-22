@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../widgets/large_text.dart';
 
 enum WelcomeLanguage { english, spanish }
-
-/// Above 140% text (the iOS accessibility sizes, and Android 14's largest
-/// font sizes, which go up to 200% with non-linear scaling) side-by-side
-/// pieces of the welcome screen are stacked so text can grow.
-bool _usesLargeTextLayout(BuildContext context) =>
-    MediaQuery.textScalerOf(context).scale(10) > 14;
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({
@@ -123,21 +118,36 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           ),
                         ),
                         SizedBox(height: compactHeight ? 8 : 14),
-                        Text(
-                          _isSpanish
-                              ? 'Tu próxima respiración puede ser diferente.'
-                              : 'Your next breath can be different.',
-                          // Already the largest text on screen; past 180% its
-                          // longest words no longer fit a phone-width line.
-                          textScaler: MediaQuery.textScalerOf(context)
-                              .clamp(maxScaleFactor: 1.8),
-                          style: Theme.of(context)
-                              .textTheme
-                              .displayLarge
-                              ?.copyWith(
-                                fontSize: compactHeight ? 36 : 40,
-                                height: compactHeight ? 1.05 : 1.08,
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final headline = _isSpanish
+                                ? 'Tu próxima respiración puede ser diferente.'
+                                : 'Your next breath can be different.';
+                            final style = Theme.of(context)
+                                    .textTheme
+                                    .displayLarge
+                                    ?.copyWith(
+                                      fontSize: compactHeight ? 36 : 40,
+                                      height: compactHeight ? 1.05 : 1.08,
+                                    ) ??
+                                const TextStyle();
+                            return Text(
+                              headline,
+                              // Already the largest text on screen; past 180%
+                              // its longest words no longer fit a phone-width
+                              // line, and on the narrowest phones a word too
+                              // long for the line scales down instead of
+                              // splitting.
+                              textScaler: wordFitScaler(
+                                context,
+                                headline,
+                                style,
+                                constraints.maxWidth,
+                                maxScaleFactor: 1.8,
                               ),
+                              style: style,
+                            );
+                          },
                         ),
                         SizedBox(height: compactHeight ? 10 : 18),
                         Text(
@@ -430,7 +440,7 @@ class _WelcomeHero extends StatelessWidget {
     // Large text makes the floating cards taller and wider than the space
     // between them, so they would overlap each other and the art. List them
     // under the art instead.
-    if (_usesLargeTextLayout(context)) {
+    if (usesLargeTextLayout(context)) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -682,7 +692,7 @@ class _WelcomeBenefits extends StatelessWidget {
     );
 
     // Two half-width columns split words mid-way at large text sizes.
-    if (_usesLargeTextLayout(context)) {
+    if (usesLargeTextLayout(context)) {
       return Column(
         children: [cravings, const SizedBox(height: 14), progress],
       );

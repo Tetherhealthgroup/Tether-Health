@@ -75,35 +75,18 @@ final _spanishScreens = <String, Widget Function(VoidCallback onContinue)>{
       ),
 };
 
-/// Known gaps on a 320-pt-wide phone, skipped rather than dropped so they
-/// show in every run: at 200% the Spanish welcome and why-BreatheFree
-/// headlines and the sign-in title split a word, and at 310% with the wide
-/// test font the why-BreatheFree and consent headers overflow by a few
-/// pixels.
+/// Known gap on a 320-pt-wide phone, skipped rather than dropped so it shows
+/// in every run: at 200% the sign-in title splits a word.
 bool _knownNarrowGap(
   String test,
   Size device,
   String scaler,
   LargeTextFont font,
-) {
-  if (device.width >= 360) return false;
-  return switch (scaler) {
-    'text scale 2.0' => font == LargeTextFont.roboto &&
-        const {
-          'welcome in Spanish',
-          'why BreatheFree in Spanish',
-          'sign-in dialog',
-        }.contains(test),
-    'text scale 3.1' => font == LargeTextFont.wideTestGlyphs &&
-        const {
-          'why BreatheFree',
-          'why BreatheFree in Spanish',
-          'consent and privacy',
-          'consent and privacy in Spanish',
-        }.contains(test),
-    _ => false,
-  };
-}
+) =>
+    device.width < 360 &&
+    scaler == 'text scale 2.0' &&
+    font == LargeTextFont.roboto &&
+    test == 'sign-in dialog';
 
 void main() {
   setUpAll(loadRoboto);
@@ -396,6 +379,110 @@ void main() {
     }
     semantics.dispose();
   });
+
+  // A screen reader stops once on each consent row: the switch, named by its
+  // title, with the description as its hint. The title is not read again as
+  // separate text.
+  for (final scaler in {
+    'default size': TextScaler.noScaling,
+    'text scale 2.0': const TextScaler.linear(2.0),
+  }.entries) {
+    testWidgets('each consent row is read once, as its switch (${scaler.key})',
+        (tester) async {
+      final semantics = tester.ensureSemantics();
+      for (final spanish in [false, true]) {
+        await pumpLargeText(
+          tester,
+          size: largeTextDevices['small 375x667']!,
+          scaler: scaler.value,
+          font: LargeTextFont.roboto,
+          home: ConsentPrivacyScreen(
+            isSpanish: spanish,
+            helpfulReminders: true,
+            shareWithCareTeam: false,
+            helpImproveBreatheFree: false,
+            onHelpfulRemindersChanged: (_) {},
+            onShareWithCareTeamChanged: (_) {},
+            onHelpImproveBreatheFreeChanged: (_) {},
+            onBack: () {},
+            onContinue: () {},
+          ),
+        );
+        final rows = spanish
+            ? const {
+                'consent-helpful-reminders': (
+                  'Recordatorios útiles',
+                  'Recibe controles privados y recordatorios del plan.',
+                ),
+                'consent-share-care-team': (
+                  'Compartir con mi equipo de atención',
+                  'Permite que un profesional conectado vea resúmenes de '
+                      'progreso.',
+                ),
+                'consent-help-improve': (
+                  'Ayudar a mejorar BreatheFree',
+                  'Aporta información desidentificada a investigaciones '
+                      'aprobadas.',
+                ),
+              }
+            : const {
+                'consent-helpful-reminders': (
+                  'Helpful reminders',
+                  'Receive private check-ins and plan reminders.',
+                ),
+                'consent-share-care-team': (
+                  'Share with my care team',
+                  'Allow a connected clinician to view progress summaries.',
+                ),
+                'consent-help-improve': (
+                  'Help improve BreatheFree',
+                  'Contribute de-identified information to approved research.',
+                ),
+              };
+        for (final entry in rows.entries) {
+          final (title, subtitle) = entry.value;
+          final toggle = find.byKey(ValueKey(entry.key));
+          await tester.ensureVisible(toggle);
+          await tester.pumpAndSettle();
+          final mentions = find.semantics
+              .byPredicate(
+                (node) =>
+                    node.label.contains(title) ||
+                    node.hint.contains(title) ||
+                    node.value.contains(title),
+                describeMatch: (_) => 'nodes that read "$title"',
+              )
+              .evaluate()
+              .toList();
+          expect(mentions, hasLength(1), reason: '"$title" is read once');
+          final node = mentions.single;
+          expect(node, same(tester.getSemantics(toggle)), reason: entry.key);
+          // The visible title belongs to the same stop, so the screen
+          // reader's focus covers the whole row.
+          expect(
+            tester.getSemantics(find.text(title)),
+            same(node),
+            reason: '${entry.key} row is one stop',
+          );
+          expect(node.label, title, reason: entry.key);
+          expect(node.hint, subtitle, reason: entry.key);
+          expect(
+            node.getSemanticsData().flagsCollection.isToggled,
+            isNot(Tristate.none),
+            reason: '${entry.key} is a switch',
+          );
+          expect(
+            find.semantics
+                .byPredicate((node) => node.label.contains(subtitle))
+                .evaluate(),
+            isEmpty,
+            reason: '"$subtitle" is the hint, not read again as text',
+          );
+        }
+      }
+      semantics.dispose();
+    });
+  }
 
   testWidgets('welcome keeps its side-by-side layout at default text size',
       (tester) async {

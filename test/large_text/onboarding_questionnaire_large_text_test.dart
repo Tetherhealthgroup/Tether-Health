@@ -113,8 +113,76 @@ const _screens = <_OnboardingScreen>[
   ),
 ];
 
+/// Phone widths checked at the default text size, from the narrowest phone to
+/// a large one.
+const _defaultSizeDevices = <String, Size>{
+  '320x568': Size(320, 568),
+  '360x780': Size(360, 780),
+  '375x667': Size(375, 667),
+  '393x852': Size(393, 852),
+  '430x932': Size(430, 932),
+};
+
+/// The choice grids of the triggers and reasons screens: the screen index
+/// and the key prefix of its choice cards.
+const _choiceGrids = <String, (int, String)>{
+  'trigger map': (4, 'trigger-choice-'),
+  'my reasons': (8, 'reason-choice-'),
+};
+
 void main() {
   setUpAll(loadRoboto);
+
+  // At the default text size the trigger and reason choices keep their
+  // approved two-column grid on phones 360pt and wider; only a 320pt phone
+  // drops to one column.
+  for (final grid in _choiceGrids.entries) {
+    for (final device in _defaultSizeDevices.entries) {
+      for (final spanish in [false, true]) {
+        final language = spanish ? ' in Spanish' : '';
+        final columns = device.value.width >= 360 ? 2 : 1;
+        testWidgets(
+            '${grid.key}$language shows $columns column(s) at default size '
+            'on ${device.key}', (tester) async {
+          final (index, prefix) = grid.value;
+          await _pumpOnboarding(
+            tester,
+            size: device.value,
+            scaler: TextScaler.noScaling,
+            font: LargeTextFont.roboto,
+            index: index,
+            spanish: spanish,
+          );
+          final choices = find.byWidgetPredicate(
+            (widget) =>
+                widget.key is ValueKey<String> &&
+                (widget.key! as ValueKey<String>).value.startsWith(prefix),
+            description: '$prefix* choices',
+          );
+          final rects = [
+            for (final element in choices.evaluate())
+              tester.getRect(find.byWidget(element.widget)),
+          ];
+          expect(rects.length, greaterThanOrEqualTo(4));
+          final lefts = {for (final rect in rects) rect.left.round()};
+          expect(lefts, hasLength(columns), reason: 'column starts $lefts');
+          final rows = {for (final rect in rects) rect.top.round()};
+          expect(
+            rows,
+            hasLength((rects.length / columns).ceil()),
+            reason: 'row starts $rows',
+          );
+          if (columns == 2) {
+            final first = rects[0];
+            final second = rects[1];
+            expect(second.top, moreOrLessEquals(first.top, epsilon: 0.5));
+            expect(second.left, greaterThan(first.right));
+            expect(second.width, moreOrLessEquals(first.width, epsilon: 0.5));
+          }
+        });
+      }
+    }
+  }
 
   // The quit-date calendar lists its days at accessibility sizes instead of
   // shrinking them into a grid; each day stays tappable at full text size.

@@ -3,12 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
-
-/// Above 140% text (the iOS accessibility sizes, and Android 14's largest
-/// font sizes, which go up to 200% with non-linear scaling) side-by-side
-/// pieces of the consent cards are stacked so text can grow.
-bool _usesLargeTextLayout(BuildContext context) =>
-    MediaQuery.textScalerOf(context).scale(10) > 14;
+import '../widgets/large_text.dart';
 
 class ConsentPrivacyScreen extends StatelessWidget {
   const ConsentPrivacyScreen({
@@ -249,6 +244,9 @@ class _ConsentHeader extends StatelessWidget {
   final bool isSpanish;
   final VoidCallback onBack;
 
+  /// The logo and the gap after it.
+  static const _logoWidth = 23.0 + 7;
+
   @override
   Widget build(BuildContext context) {
     // A minimum height: large text grows the header instead of clipping it.
@@ -266,29 +264,36 @@ class _ConsentHeader extends StatelessWidget {
             ),
             icon: const Icon(Icons.arrow_back_rounded),
           ),
-          const Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.eco_rounded, color: AppColors.coral, size: 23),
-                SizedBox(width: 7),
-                // One word: at the largest sizes it scales down to the
-                // space left instead of being cut to "B…".
-                Flexible(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      'BreatheFree',
-                      maxLines: 1,
-                      style: TextStyle(
-                        color: AppColors.deepTeal,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
+          Expanded(
+            // When even the logo does not fit beside the back button and the
+            // step (the largest sizes on the narrowest phones), only the
+            // name is shown.
+            child: LayoutBuilder(
+              builder: (context, constraints) => Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (constraints.maxWidth >= _logoWidth) ...const [
+                    Icon(Icons.eco_rounded, color: AppColors.coral, size: 23),
+                    SizedBox(width: 7),
+                  ],
+                  // One word: at the largest sizes it scales down to the
+                  // space left instead of being cut to "B…".
+                  const Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        'BreatheFree',
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: AppColors.deepTeal,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           Container(
@@ -697,7 +702,7 @@ class _CardSectionHeader extends StatelessWidget {
 
     // Beside the badge, the heading's longest word no longer fits at
     // accessibility text sizes.
-    if (_usesLargeTextLayout(context)) {
+    if (usesLargeTextLayout(context)) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [heading, const SizedBox(height: 8), badgeChip],
@@ -791,8 +796,12 @@ class _ConsentSwitchRow extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
+  // The row is one stop for a screen reader: the switch, read with the
+  // title and, as its hint, the subtitle. The text itself is not read again.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => MergeSemantics(child: _row(context));
+
+  Widget _row(BuildContext context) {
     final text = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -819,6 +828,7 @@ class _ConsentSwitchRow extends StatelessWidget {
     // The switch is announced with its visible title.
     final toggle = Semantics(
       label: title,
+      hint: subtitle,
       child: Switch(
         key: switchKey,
         value: value,
@@ -832,12 +842,16 @@ class _ConsentSwitchRow extends StatelessWidget {
 
     // Between the icon and the switch, words split mid-way at accessibility
     // text sizes. The text takes the full width and the switch follows it.
-    if (_usesLargeTextLayout(context)) {
+    if (usesLargeTextLayout(context)) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 9),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [text, const SizedBox(height: 6), toggle],
+          children: [
+            ExcludeSemantics(child: text),
+            const SizedBox(height: 6),
+            toggle,
+          ],
         ),
       );
     }
@@ -856,7 +870,7 @@ class _ConsentSwitchRow extends StatelessWidget {
             child: Icon(icon, color: AppColors.deepTeal, size: 21),
           ),
           const SizedBox(width: 10),
-          Expanded(child: text),
+          Expanded(child: ExcludeSemantics(child: text)),
           const SizedBox(width: 8),
           toggle,
         ],
