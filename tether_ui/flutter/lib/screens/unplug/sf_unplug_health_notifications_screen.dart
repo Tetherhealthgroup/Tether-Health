@@ -19,15 +19,16 @@ class SfUnplugHealthNotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Tracking check'),
+      header: THeader(title: s.sfUnplugHealthNotificationsHeaderTitle),
       children: [
-        TBanner(kind: TBannerKind.info, text: 'Notifications are off. Unplug still pauses apps, but the pause screen can’t open Tether for you. Open Tether yourself for support.'),
-        TChecklist(items: [TCheckItem('Screen Time permission', sub: 'Allowed', done: true), TCheckItem('Daily schedule', sub: 'Running', done: true), TCheckItem('Settings shared with the pause screen', sub: 'Ready', done: true), TCheckItem('Notifications', sub: 'Off in Settings')], label: 'Checks'),
+        TBanner(kind: TBannerKind.info, text: s.sfUnplugHealthNotificationsBodyN0Text),
+        TChecklist(items: [TCheckItem(s.sfUnplugHealthNotificationsBodyN1ItemsN0Label, value: 'Screen Time permission', sub: s.sfUnplugHealthNotificationsBodyN1ItemsN0Sub, done: true), TCheckItem(s.sfUnplugHealthNotificationsBodyN1ItemsN1Label, value: 'Daily schedule', sub: s.sfUnplugHealthNotificationsBodyN1ItemsN1Sub, done: true), TCheckItem(s.sfUnplugHealthNotificationsBodyN1ItemsN2Label, value: 'Settings shared with the pause screen', sub: s.sfUnplugHealthNotificationsBodyN1ItemsN2Sub, done: true), TCheckItem(s.sfUnplugHealthNotificationsBodyN1ItemsN3Label, value: 'Notifications', sub: s.sfUnplugHealthNotificationsBodyN1ItemsN3Sub)], label: s.sfUnplugHealthNotificationsBodyN1Label),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Open phone settings', onPressed: () => TNav.osSettings(context), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Check again', onPressed: () => TNav.branch(context, 'Notification permission (checked on return)', <String, VoidCallback>{'On': () => TNav.replace(context, Routes.sfUnplugHealth), 'Still off': () => TNav.toast(context, 'Notifications are still off.')}, device: const TBranchRef('unplug.health.notifications_check', TAsk.notificationsCheck, 'sf_unplug_health_notifications'), when: const <TAnswer, String>{TAnswer.granted: 'On', TAnswer.denied: 'Still off'}), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugHealthNotificationsFooterN0Label, onPressed: () => TNav.osSettings(context), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfUnplugHealthNotificationsFooterN1Label, onPressed: () => TNav.branch(context, 'Notification permission (checked on return)', <String, VoidCallback>{'On': () => TNav.replace(context, Routes.sfUnplugHealth), 'Still off': () => TNav.toast(context, s.sfUnplugHealthNotificationsFooterN1ActionCasesN1ActionValue)}, device: const TBranchRef('unplug.health.notifications_check', TAsk.notificationsCheck, 'sf_unplug_health_notifications'), when: const <TAnswer, String>{TAnswer.granted: 'On', TAnswer.denied: 'Still off'}), variant: TButtonVariant.secondary),
       ],
     );
   }

@@ -19,17 +19,18 @@ class SfUnplugAuthScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Unplug', pill: 'Step 1 of 3'),
+      header: THeader(title: 'Unplug', pill: s.sfUnplugAuthHeaderPill),
       children: [
         TIllustration(glyph: '◷'),
-        TTitle('Allow Screen Time for Unplug', center: true),
-        TBody('Apple will ask you to let Tether Health use Screen Time. This lets Unplug pause apps. It doesn’t let Tether see what you do in them.', tone: TTextTone.muted, center: true),
-        TKeyValue(rows: [('Lets Unplug', 'Pause apps you choose'), ('Never shares', 'App names, content, messages'), ('Turn off', 'Anytime in Account → ScrollFree')]),
+        TTitle(s.sfUnplugAuthBodyN1Text, center: true),
+        TBody(s.sfUnplugAuthBodyN2Text, tone: TTextTone.muted, center: true),
+        TKeyValue(rows: [(s.sfUnplugAuthBodyN3RowsN0N0, s.sfUnplugAuthBodyN3RowsN0N1), (s.sfUnplugAuthBodyN3RowsN1N0, s.sfUnplugAuthBodyN3RowsN1N1), (s.sfUnplugAuthBodyN3RowsN2N0, s.sfUnplugAuthBodyN3RowsN2N1)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.branch(context, 'Screen Time authorization (iOS Family Controls, individual)', <String, VoidCallback>{'Approved': () => TNav.replace(context, Routes.sfUnplugApps), 'Approved · notifications off': () => TNav.replace(context, Routes.sfUnplugAuthNotifications), 'Denied': () => TNav.replace(context, Routes.sfUnplugAuthDenied), 'Unavailable': () => TNav.replace(context, Routes.sfUnplugAuthUnavailable)}, device: const TBranchRef('unplug.setup.ios_authorization', TAsk.unplugAuthIos, 'sf_unplug_auth'), when: const <TAnswer, String>{TAnswer.granted: 'Approved', TAnswer.grantedNotificationsOff: 'Approved · notifications off', TAnswer.denied: 'Denied', TAnswer.unavailable: 'Unavailable'}), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugAuthFooterN0Label, onPressed: () => TNav.branch(context, 'Screen Time authorization (iOS Family Controls, individual)', <String, VoidCallback>{'Approved': () => TNav.replace(context, Routes.sfUnplugApps), 'Approved · notifications off': () => TNav.replace(context, Routes.sfUnplugAuthNotifications), 'Denied': () => TNav.replace(context, Routes.sfUnplugAuthDenied), 'Unavailable': () => TNav.replace(context, Routes.sfUnplugAuthUnavailable)}, device: const TBranchRef('unplug.setup.ios_authorization', TAsk.unplugAuthIos, 'sf_unplug_auth'), when: const <TAnswer, String>{TAnswer.granted: 'Approved', TAnswer.grantedNotificationsOff: 'Approved · notifications off', TAnswer.denied: 'Denied', TAnswer.unavailable: 'Unavailable'}), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfUnplugAuthFooterN1Label, onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );
   }

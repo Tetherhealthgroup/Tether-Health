@@ -18,17 +18,18 @@ class SfQ1Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'About your use', pill: '1 of 2'),
+      header: THeader(title: s.sfQ1HeaderTitle, pill: s.sfQ1HeaderPill),
       children: [
         TSteps(n: 1, total: 2),
-        TTitle('On a typical day, how long on social apps?'),
-        TBody('A rough guess is fine.', tone: TTextTone.muted),
-        TRadioList(fieldKey: 'sf_q1.value', items: [TRadioItem('Less than 1 hour'), TRadioItem('1–2 hours'), TRadioItem('3–4 hours'), TRadioItem('5+ hours')], selected: 2),
-        TChips(fieldKey: 'sf_q1.which_pull_hardest_categories_on', options: ['Short video', 'Feeds', 'Messaging', 'Games', 'News'], selected: ['Short video', 'Feeds'], label: 'Which pull hardest? (categories only)'),
+        TTitle(s.sfQ1BodyN1Text),
+        TBody(s.sfQ1BodyN2Text, tone: TTextTone.muted),
+        TRadioList(fieldKey: 'sf_q1.value', items: [TRadioItem(s.sfQ1BodyN3ItemsN0Label, value: 'Less than 1 hour'), TRadioItem(s.sfQ1BodyN3ItemsN1Label, value: '1–2 hours'), TRadioItem(s.sfQ1BodyN3ItemsN2Label, value: '3–4 hours'), TRadioItem(s.sfQ1BodyN3ItemsN3Label, value: '5+ hours')], selected: 2),
+        TChips(fieldKey: 'sf_q1.which_pull_hardest_categories_on', options: ['Short video', 'Feeds', 'Messaging', 'Games', 'News'], labels: [s.sfQ1BodyN4OptionsN0, s.sfQ1BodyN4OptionsN1, s.sfQ1BodyN4OptionsN2, s.sfQ1BodyN4OptionsN3, s.sfQ1BodyN4OptionsN4], selected: ['Short video', 'Feeds'], label: s.sfQ1BodyN4Label),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Next', onPressed: () => TNav.push(context, Routes.sfQ2), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfQ1FooterN0Label, onPressed: () => TNav.push(context, Routes.sfQ2), arrow: true),
       ],
     );
   }

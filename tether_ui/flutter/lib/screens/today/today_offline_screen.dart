@@ -22,15 +22,16 @@ class TodayOfflineScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Today', left: THeaderLeft.logo, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
+      header: THeader(title: s.todayOfflineHeaderTitle, left: THeaderLeft.logo, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'today',
       children: [
-        TBanner(kind: TBannerKind.offline, text: 'Offline · 3 entries will sync when you reconnect.'),
-        TTitle('Good morning, Alex.'),
-        TCard(variant: TCardVariant.coral, title: 'Craving or urge?', text: 'One tap · no typing', cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: 'Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
-        TCard(eyebrow: 'Today', children: [TChecklist(items: [TCheckItem('Stock gum, water or snacks', sub: 'Saved on this phone', done: true)])]),
-        TBody('Lessons not downloaded load when you’re back online.', tone: TTextTone.small),
+        TBanner(kind: TBannerKind.offline, text: s.todayOfflineBodyN0Text),
+        TTitle(s.todayOfflineBodyN1Text),
+        TCard(variant: TCardVariant.coral, title: s.todayOfflineBodyN2Title, text: s.todayOfflineBodyN2Text, cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: s.todayOfflineBodyN2CtaN0Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
+        TCard(eyebrow: s.todayOfflineBodyN3Eyebrow, children: [TChecklist(items: [TCheckItem(s.todayOfflineBodyN3ChildrenN0ItemsN0Label, value: 'Stock gum, water or snacks', sub: s.todayOfflineBodyN3ChildrenN0ItemsN0Sub, done: true)])]),
+        TBody(s.todayOfflineBodyN4Text, tone: TTextTone.small),
       ],
     );
   }

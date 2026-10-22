@@ -19,19 +19,20 @@ class SdSessionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Balance · 8 min', left: THeaderLeft.close, pill: '2 of 6'),
+      header: THeader(title: s.sdSessionHeaderTitle, left: THeaderLeft.close, pill: s.sdSessionHeaderPill),
       background: TBackground.dark,
       children: [
         TIllustration(glyph: '⇅', tone: TTone.dark),
-        TTitle('Heel-to-toe stand', size: TTitleSize.xl, center: true),
-        TBody('Hold the chair. Place one foot in front of the other. Hold 10 seconds.', center: true),
+        TTitle(s.sdSessionBodyN1Text, size: TTitleSize.xl, center: true),
+        TBody(s.sdSessionBodyN2Text, center: true),
         TBreathRing(value: '7'),
-        TChips(fieldKey: 'sd_session.value', options: ['Audio on', 'Large text', 'Captions'], selected: ['Audio on', 'Large text', 'Captions']),
+        TChips(fieldKey: 'sd_session.value', options: ['Audio on', 'Large text', 'Captions'], labels: [s.sdSessionBodyN4OptionsN0, s.sdSessionBodyN4OptionsN1, s.sdSessionBodyN4OptionsN2], selected: ['Audio on', 'Large text', 'Captions']),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Next exercise', onPressed: () => TNav.toast(context, 'Exercise 3 of 6'), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Finish session', onPressed: () => TNav.submit(context, 'POST /v1/program-data/sd/sessions', screenId: 'sd_session', then: () => TNav.toast(context, 'Session saved', then: () => TNav.replace(context, Routes.sdHome))), variant: TButtonVariant.white, arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sdSessionFooterN0Label, onPressed: () => TNav.toast(context, s.sdSessionFooterN0ActionValue), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sdSessionFooterN1Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/sd/sessions', screenId: 'sd_session', then: () => TNav.toast(context, s.sdSessionFooterN1ActionThenValue, then: () => TNav.replace(context, Routes.sdHome))), variant: TButtonVariant.white, arrow: true),
       ],
     );
   }

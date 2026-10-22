@@ -19,15 +19,16 @@ class SfUnplugSessionActiveScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Focus session', left: THeaderLeft.close, pill: 'Strict'),
+      header: THeader(title: s.sfUnplugSessionActiveHeaderTitle, left: THeaderLeft.close, pill: s.sfUnplugSessionActiveHeaderPill),
       children: [
-        TTimer(value: '32:18', label: 'left of 45 min · until 3:45 PM'),
-        TBody('Video apps and Feeds are paused. Tether, phone calls and emergency calls stay open.', center: true),
-        TCard(variant: TCardVariant.coral, title: 'Urge to check?', text: 'Take 60 seconds first', cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: 'Pause 60', onPressed: () => TNav.push(context, Routes.sfPause), variant: TButtonVariant.rescue, small: true)),
+        TTimer(value: '32:18', label: s.sfUnplugSessionActiveBodyN0Label),
+        TBody(s.sfUnplugSessionActiveBodyN1Text, center: true),
+        TCard(variant: TCardVariant.coral, title: s.sfUnplugSessionActiveBodyN2Title, text: s.sfUnplugSessionActiveBodyN2Text, cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: s.sfUnplugSessionActiveBodyN2CtaN0Label, onPressed: () => TNav.push(context, Routes.sfPause), variant: TButtonVariant.rescue, small: true)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'End early', onPressed: () => TNav.sheet(context, Routes.sfUnplugSessionEnd), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugSessionActiveFooterN0Label, onPressed: () => TNav.sheet(context, Routes.sfUnplugSessionEnd), variant: TButtonVariant.secondary),
       ],
     );
   }

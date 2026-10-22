@@ -23,17 +23,18 @@ class BfMedsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Medication center'),
+      header: THeader(title: s.bfMedsHeaderTitle),
       children: [
-        TBanner(kind: TBannerKind.info, text: 'Education and tracking, not prescribing. The app never selects a medicine or changes a dose.'),
-        TCard(eyebrow: 'Your recorded plan', title: 'Nicotine patch · morning', text: 'Entered by you · follow your clinician’s instructions', children: [TButtonRow(children: [TButton(key: const ValueKey('a:body[1].children[0].items[0]'), label: 'Taken today', onPressed: () => TNav.toast(context, 'Recorded: taken at 8:07 AM'), small: true), TButton(key: const ValueKey('a:body[1].children[0].items[1]'), label: 'Not today', onPressed: () => TNav.toast(context, 'Recorded: not taken'), variant: TButtonVariant.secondary, small: true)])]),
-        TListGroup(title: 'Learn', rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: 'Nicotine replacement', sub: 'Patch, gum, lozenge', onTap: () => TNav.push(context, Routes.learnLesson)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: 'Prescription options', sub: 'Varenicline · bupropion SR', onTap: () => TNav.push(context, Routes.learnLesson))]),
-        TCard(variant: TCardVariant.warn, title: 'Pregnant, breastfeeding or under 18?', text: 'Talk with a doctor before using quit medicines.'),
-        TCard(key: const ValueKey('a:body[4]'), variant: TCardVariant.urgent, title: 'Side effect or worrying symptom?', text: 'Contact your care team or pharmacist. Emergency: 911.', onTap: () => TNav.push(context, Routes.supportMessageCare)),
+        TBanner(kind: TBannerKind.info, text: s.bfMedsBodyN0Text),
+        TCard(eyebrow: s.bfMedsBodyN1Eyebrow, title: s.bfMedsBodyN1Title, text: s.bfMedsBodyN1Text, children: [TButtonRow(children: [TButton(key: const ValueKey('a:body[1].children[0].items[0]'), label: s.bfMedsBodyN1ChildrenN0ItemsN0Label, onPressed: () => TNav.toast(context, s.bfMedsBodyN1ChildrenN0ItemsN0ActionValue), small: true), TButton(key: const ValueKey('a:body[1].children[0].items[1]'), label: s.bfMedsBodyN1ChildrenN0ItemsN1Label, onPressed: () => TNav.toast(context, s.bfMedsBodyN1ChildrenN0ItemsN1ActionValue), variant: TButtonVariant.secondary, small: true)])]),
+        TListGroup(title: s.bfMedsBodyN2Title, rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: s.bfMedsBodyN2RowsN0Label, sub: s.bfMedsBodyN2RowsN0Sub, onTap: () => TNav.push(context, Routes.learnLesson)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: s.bfMedsBodyN2RowsN1Label, sub: s.bfMedsBodyN2RowsN1Sub, onTap: () => TNav.push(context, Routes.learnLesson))]),
+        TCard(variant: TCardVariant.warn, title: s.bfMedsBodyN3Title, text: s.bfMedsBodyN3Text),
+        TCard(key: const ValueKey('a:body[4]'), variant: TCardVariant.urgent, title: s.bfMedsBodyN4Title, text: s.bfMedsBodyN4Text, onTap: () => TNav.push(context, Routes.supportMessageCare)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Add or update recorded plan', onPressed: () => TNav.push(context, Routes.bfMedsEdit), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.bfMedsFooterN0Label, onPressed: () => TNav.push(context, Routes.bfMedsEdit), variant: TButtonVariant.secondary),
       ],
     );
   }

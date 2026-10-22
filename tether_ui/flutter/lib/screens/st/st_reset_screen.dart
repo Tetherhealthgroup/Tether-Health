@@ -17,15 +17,16 @@ class StResetScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Meal energy reset', pill: '3 min'),
+      header: THeader(title: s.stResetHeaderTitle, pill: s.stResetHeaderPill),
       children: [
-        TTitle('Feeling the post-meal slump?'),
-        TCard(children: [TChecklist(items: [TCheckItem('Drink a glass of water', done: true), TCheckItem('Take a 10-minute walk if you can', done: true), TCheckItem('Take five slow breaths'), TCheckItem('Feel unwell? Contact your clinician')])]),
-        TCard(variant: TCardVariant.mint, text: 'Walking after meals helps some people’s readings. Check with your clinician what’s right for you.'),
+        TTitle(s.stResetBodyN0Text),
+        TCard(children: [TChecklist(items: [TCheckItem(s.stResetBodyN1ChildrenN0ItemsN0Label, value: 'Drink a glass of water', done: true), TCheckItem(s.stResetBodyN1ChildrenN0ItemsN1Label, value: 'Take a 10-minute walk if you can', done: true), TCheckItem(s.stResetBodyN1ChildrenN0ItemsN2Label, value: 'Take five slow breaths'), TCheckItem(s.stResetBodyN1ChildrenN0ItemsN3Label, value: 'Feel unwell? Contact your clinician')])]),
+        TCard(variant: TCardVariant.mint, text: s.stResetBodyN2Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Done', onPressed: () => TNav.toast(context, 'Nice work', then: () => TNav.back(context)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.stResetFooterN0Label, onPressed: () => TNav.toast(context, s.stResetFooterN0ActionValue, then: () => TNav.back(context)), arrow: true),
       ],
     );
   }

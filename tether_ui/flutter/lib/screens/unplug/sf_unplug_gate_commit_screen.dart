@@ -20,17 +20,18 @@ class SfUnplugGateCommitScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Small step', left: THeaderLeft.close, pill: 'Unplug'),
+      header: THeader(title: s.sfUnplugGateCommitHeaderTitle, left: THeaderLeft.close, pill: 'Unplug'),
       children: [
-        TTitle('Type it out, then decide.', size: TTitleSize.l),
-        TBody('“I can come back to this later”'),
-        TField(fieldKey: 'sf_unplug_gate_commit.sentence', label: 'Type the sentence', placeholder: 'I can come back to this later'),
-        TCard(variant: TCardVariant.coral, title: 'Need help right now?', text: 'Rescue opens in one tap.', cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: 'Get support', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
+        TTitle(s.sfUnplugGateCommitBodyN0Text, size: TTitleSize.l),
+        TBody(s.sfUnplugGateCommitBodyN1Text),
+        TField(fieldKey: 'sf_unplug_gate_commit.sentence', label: s.sfUnplugGateCommitBodyN2Label, placeholder: s.sfUnplugGateCommitBodyN2Placeholder),
+        TCard(variant: TCardVariant.coral, title: s.sfUnplugGateCommitBodyN3Title, text: s.sfUnplugGateCommitBodyN3Text, cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: s.sfUnplugGateCommitBodyN3CtaN0Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Keep it closed', onPressed: () => TNav.toast(context, 'Nice. The app stays closed.', then: () => TNav.reset(context, Routes.sfHome)), arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Open it for 10 minutes', onTap: () => TNav.branch(context, 'Small step done?', <String, VoidCallback>{'Step done': () => TNav.toast(context, 'Open for 10 minutes. The pause screen comes back after.', then: () => TNav.reset(context, Routes.sfHome)), 'Step not done': () => TNav.toast(context, 'Type the whole sentence first.')}, decide: 'sf.unplug.sentence')),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugGateCommitFooterN0Label, onPressed: () => TNav.toast(context, s.sfUnplugGateCommitFooterN0ActionValue, then: () => TNav.reset(context, Routes.sfHome)), arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.sfUnplugGateCommitFooterN1Label, onTap: () => TNav.branch(context, 'Small step done?', <String, VoidCallback>{'Step done': () => TNav.toast(context, s.sfUnplugGateCommitFooterN1ActionCasesN0ActionValue, then: () => TNav.reset(context, Routes.sfHome)), 'Step not done': () => TNav.toast(context, s.sfUnplugGateCommitFooterN1ActionCasesN1ActionValue)}, decide: 'sf.unplug.sentence')),
       ],
     );
   }

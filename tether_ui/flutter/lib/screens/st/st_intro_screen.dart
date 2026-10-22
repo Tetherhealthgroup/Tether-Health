@@ -19,17 +19,18 @@ class StIntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Steady', pill: '~2 min/day'),
+      header: THeader(title: 'Steady', pill: s.stIntroHeaderPill),
       children: [
-        TProgramTag(program: 'st', extra: 'Diabetes & metabolic health'),
-        TTitle('Notice glucose patterns, without judgment.', size: TTitleSize.l),
-        TKeyValue(rows: [('Readings', 'meter or CGM entries'), ('Range', 'from your clinician'), ('A high reading is', 'information, not failure')]),
-        TBody('Log readings, see patterns around meals and sleep, and follow the low plan your clinician gave you. Steady never counts calories.', tone: TTextTone.muted),
+        TProgramTag(program: 'st', extra: s.stIntroBodyN0Extra),
+        TTitle(s.stIntroBodyN1Text, size: TTitleSize.l),
+        TKeyValue(rows: [(s.stIntroBodyN2RowsN0N0, s.stIntroBodyN2RowsN0N1), (s.stIntroBodyN2RowsN1N0, s.stIntroBodyN2RowsN1N1), (s.stIntroBodyN2RowsN2N0, s.stIntroBodyN2RowsN2N1)]),
+        TBody(s.stIntroBodyN3Text, tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Set up Steady', onPressed: () => TNav.push(context, Routes.stQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Add as Learn only', onPressed: () => TNav.toast(context, 'Steady added as Learn only', then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.stIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.stQ1), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.stIntroFooterN1Label, onPressed: () => TNav.toast(context, s.stIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
       ],
     );
   }

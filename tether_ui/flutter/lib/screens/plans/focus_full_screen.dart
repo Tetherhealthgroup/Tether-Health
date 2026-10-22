@@ -18,15 +18,16 @@ class FocusFullScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TSheet(
       children: [
-        TEyebrow('Both focus slots are in use'),
-        TTitle('Add Heartwise as…'),
-        TRadioList(fieldKey: 'focus_full.option', items: [TRadioItem('Learn only for now', sub: 'Lessons, no reminders. Upgrade anytime.', badge: 'Suggested'), TRadioItem('Swap with ScrollFree', sub: 'ScrollFree pauses. Its data is kept.'), TRadioItem('Swap with BreatheFree', sub: 'Not suggested during your quit week.')], selected: 0),
+        TEyebrow(s.focusFullBodyN0Text),
+        TTitle(s.focusFullBodyN1Text),
+        TRadioList(fieldKey: 'focus_full.option', items: [TRadioItem(s.focusFullBodyN2ItemsN0Label, value: 'Learn only for now', sub: s.focusFullBodyN2ItemsN0Sub, badge: s.focusFullBodyN2ItemsN0Badge), TRadioItem(s.focusFullBodyN2ItemsN1Label, value: 'Swap with ScrollFree', sub: s.focusFullBodyN2ItemsN1Sub), TRadioItem(s.focusFullBodyN2ItemsN2Label, value: 'Swap with BreatheFree', sub: s.focusFullBodyN2ItemsN2Sub)], selected: 0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.branch(context, 'Chosen option', <String, VoidCallback>{'Learn only': () => TNav.toast(context, 'Heartwise added as Learn only', then: () => TNav.tab(context, Routes.plans)), 'Swap': () => TNav.replace(context, Routes.hwQ1)}, decide: 'choice:focus_full.option'), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.focusFullFooterN0Label, onPressed: () => TNav.branch(context, 'Chosen option', <String, VoidCallback>{'Learn only': () => TNav.toast(context, s.focusFullFooterN0ActionCasesN0ActionValue, then: () => TNav.tab(context, Routes.plans)), 'Swap': () => TNav.replace(context, Routes.hwQ1)}, decide: 'choice:focus_full.option'), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.focusFullFooterN1Label, onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );
   }

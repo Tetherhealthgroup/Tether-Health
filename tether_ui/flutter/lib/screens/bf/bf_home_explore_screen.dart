@@ -26,16 +26,17 @@ class BfHomeExploreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       header: THeader(title: 'BreatheFree', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TEyebrow('Exploring · no date set'),
-        TTitle('Learn at your own pace.'),
-        TCard(variant: TCardVariant.coral, title: 'Craving now?', text: 'Rescue works without a plan', cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: 'Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
-        TCard(key: const ValueKey('a:body[3]'), tag: 'bf', title: 'Cravings: what to expect', text: '4 min read', onTap: () => TNav.push(context, Routes.learnLesson)),
-        TCard(key: const ValueKey('a:body[4]'), tag: 'bf', title: 'What quit medicines can do', text: 'Education only · 5 min', onTap: () => TNav.push(context, Routes.learnLesson)),
-        TCard(variant: TCardVariant.mint, title: 'Ready when you are', text: 'Setting a date takes 2 minutes.', cta: TButton(key: const ValueKey('a:body[5].cta[0]'), label: 'Choose a path', onPressed: () => TNav.push(context, Routes.bfPath), small: true)),
+        TEyebrow(s.bfHomeExploreBodyN0Text),
+        TTitle(s.bfHomeExploreBodyN1Text),
+        TCard(variant: TCardVariant.coral, title: s.bfHomeExploreBodyN2Title, text: s.bfHomeExploreBodyN2Text, cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: s.bfHomeExploreBodyN2CtaN0Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
+        TCard(key: const ValueKey('a:body[3]'), tag: 'bf', title: s.bfHomeExploreBodyN3Title, text: s.bfHomeExploreBodyN3Text, onTap: () => TNav.push(context, Routes.learnLesson)),
+        TCard(key: const ValueKey('a:body[4]'), tag: 'bf', title: s.bfHomeExploreBodyN4Title, text: s.bfHomeExploreBodyN4Text, onTap: () => TNav.push(context, Routes.learnLesson)),
+        TCard(variant: TCardVariant.mint, title: s.bfHomeExploreBodyN5Title, text: s.bfHomeExploreBodyN5Text, cta: TButton(key: const ValueKey('a:body[5].cta[0]'), label: s.bfHomeExploreBodyN5CtaN0Label, onPressed: () => TNav.push(context, Routes.bfPath), small: true)),
       ],
     );
   }

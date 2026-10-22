@@ -18,14 +18,15 @@ class ReHistoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Lab history', pill: 'Renew'),
+      header: THeader(title: s.reHistoryHeaderTitle, pill: 'Renew'),
       children: [
-        TLineChart(values: [72.0, 69.0, 66.0, 64.0, 61.0, 58.0], color: TColors.program('re'), title: 'eGFR · 2 years', unit: 'mL/min', caption: 'Lower over time. Bring this to your next visit.'),
-        TKeyValue(rows: [('Latest eGFR', '58 · Oct 3'), ('Latest ACR', '42 mg/g'), ('Next check', 'Apr 2027 (from your clinician)')]),
+        TLineChart(values: [72.0, 69.0, 66.0, 64.0, 61.0, 58.0], color: TColors.program('re'), title: s.reHistoryBodyN0Title, unit: 'mL/min', caption: s.reHistoryBodyN0Caption),
+        TKeyValue(rows: [(s.reHistoryBodyN1RowsN0N0, s.reHistoryBodyN1RowsN0N1), (s.reHistoryBodyN1RowsN1N0, s.reHistoryBodyN1RowsN1N1), (s.reHistoryBodyN1RowsN2N0, s.reHistoryBodyN1RowsN2N1)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Create visit summary', onPressed: () => TNav.push(context, Routes.hwSummary), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.reHistoryFooterN0Label, onPressed: () => TNav.push(context, Routes.hwSummary), variant: TButtonVariant.secondary),
       ],
     );
   }

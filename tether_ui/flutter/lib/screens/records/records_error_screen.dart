@@ -20,17 +20,18 @@ class RecordsErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Connect'),
+      header: THeader(title: s.recordsErrorHeaderTitle),
       children: [
         TIllustration(glyph: '!', tone: TTone.error),
-        TTitle('Couldn’t connect', size: TTitleSize.l, center: true),
-        TBody('Sign-in was cancelled, denied, or the server isn’t a SMART on FHIR R4 server. Nothing was imported.', tone: TTextTone.muted, center: true),
+        TTitle(s.recordsErrorBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.recordsErrorBodyN2Text, tone: TTextTone.muted, center: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Try again', onPressed: () => TNav.back(context), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Choose another source', onPressed: () => TNav.replace(context, Routes.recordsAdd), variant: TButtonVariant.secondary),
-        TLink(key: const ValueKey('a:footer[2]'), label: 'Enter manually instead', onTap: () => TNav.replace(context, Routes.recordsManual)),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.recordsErrorFooterN0Label, onPressed: () => TNav.back(context), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.recordsErrorFooterN1Label, onPressed: () => TNav.replace(context, Routes.recordsAdd), variant: TButtonVariant.secondary),
+        TLink(key: const ValueKey('a:footer[2]'), label: s.recordsErrorFooterN2Label, onTap: () => TNav.replace(context, Routes.recordsManual)),
       ],
     );
   }

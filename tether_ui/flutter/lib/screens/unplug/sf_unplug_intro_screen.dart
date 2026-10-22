@@ -19,17 +19,18 @@ class SfUnplugIntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Unplug', pill: 'Optional'),
+      header: THeader(title: 'Unplug', pill: s.sfUnplugIntroHeaderPill),
       children: [
         TProgramTag(program: 'sf', extra: 'Unplug'),
-        TTitle('Pause the apps you choose, when you choose.', size: TTitleSize.l),
-        TBody('Unplug is optional. It adds a pause screen to apps you pick, after limits you set. Pause 60 stays the same: a moment to check in, never a lock.', tone: TTextTone.muted),
-        TKeyValue(rows: [('Can', 'Pause apps you pick, after your limits'), ('Can’t', 'See what you do inside any app'), ('On iPhone', 'Apple doesn’t share app names or minutes with Tether'), ('Stays', 'On this phone. Your app list never reaches Tether'), ('Never paused', 'Tether, phone calls and emergency calls')]),
+        TTitle(s.sfUnplugIntroBodyN1Text, size: TTitleSize.l),
+        TBody(s.sfUnplugIntroBodyN2Text, tone: TTextTone.muted),
+        TKeyValue(rows: [(s.sfUnplugIntroBodyN3RowsN0N0, s.sfUnplugIntroBodyN3RowsN0N1), (s.sfUnplugIntroBodyN3RowsN1N0, s.sfUnplugIntroBodyN3RowsN1N1), (s.sfUnplugIntroBodyN3RowsN2N0, s.sfUnplugIntroBodyN3RowsN2N1), (s.sfUnplugIntroBodyN3RowsN3N0, s.sfUnplugIntroBodyN3RowsN3N1), (s.sfUnplugIntroBodyN3RowsN4N0, s.sfUnplugIntroBodyN3RowsN4N1)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Set up Unplug', onPressed: () => TNav.branch(context, 'Platform', <String, VoidCallback>{'iPhone': () => TNav.push(context, Routes.sfUnplugAuth), 'Android': () => TNav.push(context, Routes.sfUnplugAuthAndroid)}, device: const TBranchRef('unplug.intro.platform', TAsk.platform, 'sf_unplug_intro'), when: const <TAnswer, String>{TAnswer.ios: 'iPhone', TAnswer.android: 'Android'}), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugIntroFooterN0Label, onPressed: () => TNav.branch(context, 'Platform', <String, VoidCallback>{'iPhone': () => TNav.push(context, Routes.sfUnplugAuth), 'Android': () => TNav.push(context, Routes.sfUnplugAuthAndroid)}, device: const TBranchRef('unplug.intro.platform', TAsk.platform, 'sf_unplug_intro'), when: const <TAnswer, String>{TAnswer.ios: 'iPhone', TAnswer.android: 'Android'}), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfUnplugIntroFooterN1Label, onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );
   }

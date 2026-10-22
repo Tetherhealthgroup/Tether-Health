@@ -24,14 +24,15 @@ class RecordsAddScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Add a source'),
+      header: THeader(title: s.recordsAddHeaderTitle),
       children: [
-        TTitle('Where is your health information?'),
-        TBody('You sign in with your provider. Tether never sees that password.', tone: TTextTone.muted),
-        TListGroup(title: 'Connect', rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: 'Hospital or clinic', sub: 'Epic MyChart · find yours', lead: TLead.icon('E'), onTap: () => TNav.push(context, Routes.recordsSearch)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: 'Oracle Health (Cerner)', sub: 'Patient portal', lead: TLead.icon('O'), onTap: () => TNav.push(context, Routes.recordsSearch)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: 'Medicare · Blue Button 2.0', sub: 'Claims, prescriptions, diagnoses', lead: TLead.icon('M'), onTap: () => TNav.push(context, Routes.recordsConsentBb)), TListRow(key: const ValueKey('a:body[2].rows[3]'), label: 'Apple Health Records', sub: 'iPhone · records you already added to Health', lead: TLead.icon(''), onTap: () => TNav.push(context, Routes.recordsConsentDevice)), TListRow(key: const ValueKey('a:body[2].rows[4]'), label: 'Health Connect', sub: 'Android · readings from your devices', lead: TLead.icon('H'), onTap: () => TNav.push(context, Routes.recordsConsentDevice)), TListRow(key: const ValueKey('a:body[2].rows[5]'), label: 'Other FHIR server', sub: 'Enter the address your provider gave you', lead: TLead.icon('F'), onTap: () => TNav.push(context, Routes.recordsFhirUrl))]),
-        TListGroup(title: 'Or', rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'Enter manually', sub: 'Type a value from a paper report', lead: TLead.icon('+'), onTap: () => TNav.push(context, Routes.recordsManual))]),
-        TBody('Uses SMART on FHIR R4 with OAuth 2.0 + PKCE in your phone’s browser.', tone: TTextTone.small),
+        TTitle(s.recordsAddBodyN0Text),
+        TBody(s.recordsAddBodyN1Text, tone: TTextTone.muted),
+        TListGroup(title: s.recordsAddBodyN2Title, rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: s.recordsAddBodyN2RowsN0Label, sub: s.recordsAddBodyN2RowsN0Sub, lead: TLead.icon('E'), onTap: () => TNav.push(context, Routes.recordsSearch)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: 'Oracle Health (Cerner)', sub: s.recordsAddBodyN2RowsN1Sub, lead: TLead.icon('O'), onTap: () => TNav.push(context, Routes.recordsSearch)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: s.recordsAddBodyN2RowsN2Label, sub: s.recordsAddBodyN2RowsN2Sub, lead: TLead.icon('M'), onTap: () => TNav.push(context, Routes.recordsConsentBb)), TListRow(key: const ValueKey('a:body[2].rows[3]'), label: 'Apple Health Records', sub: s.recordsAddBodyN2RowsN3Sub, lead: TLead.icon(''), onTap: () => TNav.push(context, Routes.recordsConsentDevice)), TListRow(key: const ValueKey('a:body[2].rows[4]'), label: 'Health Connect', sub: s.recordsAddBodyN2RowsN4Sub, lead: TLead.icon('H'), onTap: () => TNav.push(context, Routes.recordsConsentDevice)), TListRow(key: const ValueKey('a:body[2].rows[5]'), label: s.recordsAddBodyN2RowsN5Label, sub: s.recordsAddBodyN2RowsN5Sub, lead: TLead.icon('F'), onTap: () => TNav.push(context, Routes.recordsFhirUrl))]),
+        TListGroup(title: s.recordsAddBodyN3Title, rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: s.recordsAddBodyN3RowsN0Label, sub: s.recordsAddBodyN3RowsN0Sub, lead: TLead.icon('+'), onTap: () => TNav.push(context, Routes.recordsManual))]),
+        TBody(s.recordsAddBodyN4Text, tone: TTextTone.small),
       ],
     );
   }

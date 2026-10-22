@@ -17,15 +17,16 @@ class SfUnplugSessionDoneEarlyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Focus session', left: THeaderLeft.none),
+      header: THeader(title: s.sfUnplugSessionDoneEarlyHeaderTitle, left: THeaderLeft.none),
       children: [
-        TBigNumber(value: '18', unit: 'min', caption: 'Ended early · your apps are open again', center: true),
-        TKeyValue(rows: [('Reason', 'Expecting a message'), ('Kept', 'On this phone only')]),
-        TBody('Nothing resets. 18 focused minutes still count.', tone: TTextTone.muted),
+        TBigNumber(value: '18', unit: 'min', caption: s.sfUnplugSessionDoneEarlyBodyN0Caption, center: true),
+        TKeyValue(rows: [(s.sfUnplugSessionDoneEarlyBodyN1RowsN0N0, s.sfUnplugSessionDoneEarlyBodyN1RowsN0N1), (s.sfUnplugSessionDoneEarlyBodyN1RowsN1N0, s.sfUnplugSessionDoneEarlyBodyN1RowsN1N1)]),
+        TBody(s.sfUnplugSessionDoneEarlyBodyN2Text, tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Done', onPressed: () => TNav.replace(context, Routes.sfUnplugHome), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugSessionDoneEarlyFooterN0Label, onPressed: () => TNav.replace(context, Routes.sfUnplugHome), arrow: true),
       ],
     );
   }

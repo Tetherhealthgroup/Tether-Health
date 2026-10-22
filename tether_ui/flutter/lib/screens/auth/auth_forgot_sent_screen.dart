@@ -18,16 +18,17 @@ class AuthForgotSentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Reset password'),
+      header: THeader(title: s.authForgotSentHeaderTitle),
       children: [
         TIllustration(glyph: '✓'),
-        TTitle('Check your email', size: TTitleSize.l, center: true),
-        TBody('If an account exists for that address, a reset link is on its way. It expires in 1 hour.', center: true),
-        TBody('We never say whether an email is registered, to protect your privacy.', tone: TTextTone.small, center: true),
+        TTitle(s.authForgotSentBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.authForgotSentBodyN2Text, center: true),
+        TBody(s.authForgotSentBodyN3Text, tone: TTextTone.small, center: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Back to welcome', onPressed: () => TNav.reset(context, Routes.welcome), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.authForgotSentFooterN0Label, onPressed: () => TNav.reset(context, Routes.welcome), variant: TButtonVariant.secondary),
       ],
     );
   }

@@ -18,17 +18,18 @@ class HwSummaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Visit summary', pill: 'Preview'),
+      header: THeader(title: s.hwSummaryHeaderTitle, pill: s.hwSummaryHeaderPill),
       children: [
-        TTitle('Share with Dr. Patel’s clinic?'),
-        TKeyValue(rows: [('Dates', 'Sep 17 – Oct 17'), ('BP average', '132/82 (48 readings)'), ('Highest', '186/122 · Oct 2 · re-checked 144/90'), ('Latest panel', 'LDL 138 · Sep 30')]),
-        TBody('Only Heartwise data. Nothing from your other programs.', tone: TTextTone.small),
-        TToggleRow(fieldKey: 'hw_summary.include_notes', label: 'Include notes'),
+        TTitle(s.hwSummaryBodyN0Text),
+        TKeyValue(rows: [(s.hwSummaryBodyN1RowsN0N0, s.hwSummaryBodyN1RowsN0N1), (s.hwSummaryBodyN1RowsN1N0, s.hwSummaryBodyN1RowsN1N1), (s.hwSummaryBodyN1RowsN2N0, s.hwSummaryBodyN1RowsN2N1), (s.hwSummaryBodyN1RowsN3N0, s.hwSummaryBodyN1RowsN3N1)]),
+        TBody(s.hwSummaryBodyN2Text, tone: TTextTone.small),
+        TToggleRow(fieldKey: 'hw_summary.include_notes', label: s.hwSummaryBodyN3Label),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Send summary', onPressed: () => TNav.submit(context, 'POST /v1/care/summaries', screenId: 'hw_summary', then: () => TNav.toast(context, 'Summary sent to Dr. Patel’s clinic', then: () => TNav.back(context))), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Save as PDF', onPressed: () => TNav.toast(context, 'PDF saved to Files'), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.hwSummaryFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/care/summaries', screenId: 'hw_summary', then: () => TNav.toast(context, s.hwSummaryFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.hwSummaryFooterN1Label, onPressed: () => TNav.toast(context, s.hwSummaryFooterN1ActionValue), variant: TButtonVariant.secondary),
       ],
     );
   }

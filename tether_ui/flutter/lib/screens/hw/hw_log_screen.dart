@@ -18,17 +18,18 @@ class HwLogScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Log blood pressure', pill: '1 of 2'),
+      header: THeader(title: s.hwLogHeaderTitle, pill: s.hwLogHeaderPill),
       children: [
-        TTitle('Sit quietly for 5 minutes first.'),
-        TFieldRow(children: [TField(fieldKey: 'hw_log.systolic', label: 'Top (systolic)', unit: 'mmHg', placeholder: '138', kind: TFieldKind.number), TField(fieldKey: 'hw_log.diastolic', label: 'Bottom (diastolic)', unit: 'mmHg', placeholder: '86', kind: TFieldKind.number)]),
-        TField(fieldKey: 'hw_log.pulse_optional', label: 'Pulse (optional)', unit: 'bpm', placeholder: '72', kind: TFieldKind.number),
-        TChips(fieldKey: 'hw_log.value', options: ['Left arm', 'Right arm'], selected: ['Left arm'], multi: false),
-        TCard(variant: TCardVariant.mint, title: 'Tip', text: 'Take a second reading after 1 minute. We’ll average them.'),
+        TTitle(s.hwLogBodyN0Text),
+        TFieldRow(children: [TField(fieldKey: 'hw_log.systolic', label: s.hwLogBodyN1FieldsN0Label, unit: 'mmHg', placeholder: '138', kind: TFieldKind.number), TField(fieldKey: 'hw_log.diastolic', label: s.hwLogBodyN1FieldsN1Label, unit: 'mmHg', placeholder: '86', kind: TFieldKind.number)]),
+        TField(fieldKey: 'hw_log.pulse_optional', label: s.hwLogBodyN2Label, unit: 'bpm', placeholder: '72', kind: TFieldKind.number),
+        TChips(fieldKey: 'hw_log.value', options: ['Left arm', 'Right arm'], labels: [s.hwLogBodyN3OptionsN0, s.hwLogBodyN3OptionsN1], selected: ['Left arm'], multi: false),
+        TCard(variant: TCardVariant.mint, title: s.hwLogBodyN4Title, text: s.hwLogBodyN4Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Next reading', onPressed: () => TNav.push(context, Routes.hwLog2), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.hwLogFooterN0Label, onPressed: () => TNav.push(context, Routes.hwLog2), arrow: true),
       ],
     );
   }

@@ -17,17 +17,18 @@ class CaSymptomsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Log symptoms'),
+      header: THeader(title: s.caSymptomsHeaderTitle),
       children: [
-        TTitle('What are you noticing?'),
-        TChips(fieldKey: 'ca_symptoms.value', options: ['Coughing', 'Wheezing', 'Short of breath', 'Chest tightness', 'Woke at night'], selected: ['Wheezing', 'Woke at night']),
-        TSegmented(fieldKey: 'ca_symptoms.how_bad', options: ['Mild', 'Moderate', 'Severe'], selected: 'Mild', label: 'How bad?'),
-        TChips(fieldKey: 'ca_symptoms.possible_trigger', options: ['Cold air', 'Smoke', 'Pollen', 'Exercise', 'Not sure'], selected: ['Cold air'], label: 'Possible trigger'),
-        TField(fieldKey: 'ca_symptoms.note_optional', label: 'Note (optional)', placeholder: 'Anything else to tell your clinician', kind: TFieldKind.multiline),
+        TTitle(s.caSymptomsBodyN0Text),
+        TChips(fieldKey: 'ca_symptoms.value', options: ['Coughing', 'Wheezing', 'Short of breath', 'Chest tightness', 'Woke at night'], labels: [s.caSymptomsBodyN1OptionsN0, s.caSymptomsBodyN1OptionsN1, s.caSymptomsBodyN1OptionsN2, s.caSymptomsBodyN1OptionsN3, s.caSymptomsBodyN1OptionsN4], selected: ['Wheezing', 'Woke at night']),
+        TSegmented(fieldKey: 'ca_symptoms.how_bad', options: ['Mild', 'Moderate', 'Severe'], labels: [s.caSymptomsBodyN2OptionsN0, s.caSymptomsBodyN2OptionsN1, s.caSymptomsBodyN2OptionsN2], selected: 'Mild', label: s.caSymptomsBodyN2Label),
+        TChips(fieldKey: 'ca_symptoms.possible_trigger', options: ['Cold air', 'Smoke', 'Pollen', 'Exercise', 'Not sure'], labels: [s.caSymptomsBodyN3OptionsN0, s.caSymptomsBodyN3OptionsN1, s.caSymptomsBodyN3OptionsN2, s.caSymptomsBodyN3OptionsN3, s.caSymptomsBodyN3OptionsN4], selected: ['Cold air'], label: s.caSymptomsBodyN3Label),
+        TField(fieldKey: 'ca_symptoms.note_optional', label: s.caSymptomsBodyN4Label, placeholder: s.caSymptomsBodyN4Placeholder, kind: TFieldKind.multiline),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/ca/symptoms', screenId: 'ca_symptoms', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.caSymptomsFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/ca/symptoms', screenId: 'ca_symptoms', then: () => TNav.toast(context, s.caSymptomsFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

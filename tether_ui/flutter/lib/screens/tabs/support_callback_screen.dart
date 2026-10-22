@@ -17,16 +17,17 @@ class SupportCallbackScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TSheet(
       children: [
-        TTitle('Request a counselor call-back?'),
-        TBody('Review exactly what will be sent before you agree.', tone: TTextTone.muted),
-        TKeyValue(rows: [('Sent to', 'California Smokers’ Helpline'), ('Shared', 'First name, phone, preferred time'), ('Not shared', 'Your plan, check-ins, health details'), ('Consent expires', '30 days')]),
-        TField(fieldKey: 'support_callback.best_time_to_call', label: 'Best time to call', placeholder: 'Weekdays after 5 PM', kind: TFieldKind.select),
+        TTitle(s.supportCallbackBodyN0Text),
+        TBody(s.supportCallbackBodyN1Text, tone: TTextTone.muted),
+        TKeyValue(rows: [(s.supportCallbackBodyN2RowsN0N0, s.supportCallbackBodyN2RowsN0N1), (s.supportCallbackBodyN2RowsN1N0, s.supportCallbackBodyN2RowsN1N1), (s.supportCallbackBodyN2RowsN2N0, s.supportCallbackBodyN2RowsN2N1), (s.supportCallbackBodyN2RowsN3N0, s.supportCallbackBodyN2RowsN3N1)]),
+        TField(fieldKey: 'support_callback.best_time_to_call', label: s.supportCallbackBodyN3Label, placeholder: s.supportCallbackBodyN3Placeholder, kind: TFieldKind.select),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Send referral', onPressed: () => TNav.submit(context, 'POST /v1/care/referrals', screenId: 'support_callback', then: () => TNav.toast(context, 'Request sent. Expect a call within 2 business days.', then: () => TNav.close(context))), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.supportCallbackFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/care/referrals', screenId: 'support_callback', then: () => TNav.toast(context, s.supportCallbackFooterN0ActionThenValue, then: () => TNav.close(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.supportCallbackFooterN1Label, onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );
   }

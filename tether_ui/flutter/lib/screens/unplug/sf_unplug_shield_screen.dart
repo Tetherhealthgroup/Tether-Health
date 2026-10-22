@@ -18,17 +18,18 @@ class SfUnplugShieldScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       background: TBackground.dark,
       children: [
         SizedBox(height: 60.0),
         TIllustration(glyph: 'T', tone: TTone.dark),
-        TTitle('Paused for a moment', size: TTitleSize.l, center: true),
-        TBody('You asked to slow this one down. Video apps is on your list. 2 of 3 “open anyway” left today. Open Tether for support.', center: true),
+        TTitle(s.sfUnplugShieldBodyN2Text, size: TTitleSize.l, center: true),
+        TBody(s.sfUnplugShieldBodyN3Text, center: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Take a breath', onPressed: () => TNav.toast(context, 'Notification: open Tether to take your breath, or get support', then: () => TNav.branch(context, 'Notification action', <String, VoidCallback>{'Take my breath': () => TNav.push(context, Routes.sfUnplugGate), 'Get support': () => TNav.sheet(context, Routes.rescuePick)}, device: const TBranchRef('unplug.shield.notification_action', TAsk.reference, 'sf_unplug_shield'))), variant: TButtonVariant.lime),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Open anyway', onTap: () => TNav.toast(context, 'Opened · 1 “open anyway” left today', then: () => TNav.close(context))),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugShieldFooterN0Label, onPressed: () => TNav.toast(context, s.sfUnplugShieldFooterN0ActionValue, then: () => TNav.branch(context, 'Notification action', <String, VoidCallback>{'Take my breath': () => TNav.push(context, Routes.sfUnplugGate), 'Get support': () => TNav.sheet(context, Routes.rescuePick)}, device: const TBranchRef('unplug.shield.notification_action', TAsk.reference, 'sf_unplug_shield'))), variant: TButtonVariant.lime),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.sfUnplugShieldFooterN1Label, onTap: () => TNav.toast(context, s.sfUnplugShieldFooterN1ActionValue, then: () => TNav.close(context))),
       ],
     );
   }

@@ -18,17 +18,18 @@ class SdQ1Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'How you move', pill: '1 of 1'),
+      header: THeader(title: s.sdQ1HeaderTitle, pill: s.sdQ1HeaderPill),
       children: [
         TSteps(n: 1, total: 1),
-        TSegmented(fieldKey: 'sd_q1.in_the_last_year_have_you_fallen', options: ['No', 'Once', '2+ times'], selected: 'Once', label: 'In the last year, have you fallen?'),
-        TSegmented(fieldKey: 'sd_q1.do_you_feel_unsteady_standing_or', options: ['No', 'Sometimes', 'Often'], selected: 'Sometimes', label: 'Do you feel unsteady standing or walking?'),
-        TSegmented(fieldKey: 'sd_q1.do_you_worry_about_falling', options: ['No', 'A little', 'A lot'], selected: 'A little', label: 'Do you worry about falling?'),
-        TCard(variant: TCardVariant.mint, text: 'A fall plus feeling unsteady is worth mentioning to your clinician. We’ll add it to your visit list.'),
+        TSegmented(fieldKey: 'sd_q1.in_the_last_year_have_you_fallen', options: ['No', 'Once', '2+ times'], labels: [s.sdQ1BodyN1OptionsN0, s.sdQ1BodyN1OptionsN1, s.sdQ1BodyN1OptionsN2], selected: 'Once', label: s.sdQ1BodyN1Label),
+        TSegmented(fieldKey: 'sd_q1.do_you_feel_unsteady_standing_or', options: ['No', 'Sometimes', 'Often'], labels: [s.sdQ1BodyN2OptionsN0, s.sdQ1BodyN2OptionsN1, s.sdQ1BodyN2OptionsN2], selected: 'Sometimes', label: s.sdQ1BodyN2Label),
+        TSegmented(fieldKey: 'sd_q1.do_you_worry_about_falling', options: ['No', 'A little', 'A lot'], labels: [s.sdQ1BodyN3OptionsN0, s.sdQ1BodyN3OptionsN1, s.sdQ1BodyN3OptionsN2], selected: 'A little', label: s.sdQ1BodyN3Label),
+        TCard(variant: TCardVariant.mint, text: s.sdQ1BodyN4Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Next', onPressed: () => TNav.push(context, Routes.sdPlan), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sdQ1FooterN0Label, onPressed: () => TNav.push(context, Routes.sdPlan), arrow: true),
       ],
     );
   }

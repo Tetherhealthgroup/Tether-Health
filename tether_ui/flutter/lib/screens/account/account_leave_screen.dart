@@ -18,15 +18,16 @@ class AccountLeaveScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TSheet(
       children: [
-        TTitle('Leave BreatheFree?'),
-        TBody('Reminders stop right away. Your other programs are not affected.', tone: TTextTone.muted),
-        TRadioList(fieldKey: 'account_leave.value', items: [TRadioItem('Keep my data', sub: 'Kept until you delete it or delete your account. Rejoin anytime.', badge: 'Default'), TRadioItem('Delete BreatheFree data now', sub: '63 check-ins, 14 rescues, 1 plan')], selected: 0),
+        TTitle(s.accountLeaveBodyN0Text),
+        TBody(s.accountLeaveBodyN1Text, tone: TTextTone.muted),
+        TRadioList(fieldKey: 'account_leave.value', items: [TRadioItem(s.accountLeaveBodyN2ItemsN0Label, value: 'Keep my data', sub: s.accountLeaveBodyN2ItemsN0Sub, badge: s.accountLeaveBodyN2ItemsN0Badge), TRadioItem(s.accountLeaveBodyN2ItemsN1Label, value: 'Delete BreatheFree data now', sub: s.accountLeaveBodyN2ItemsN1Sub)], selected: 0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Leave BreatheFree', onPressed: () => TNav.submit(context, 'DELETE /v1/enrolments/:id', screenId: 'account_leave', then: () => TNav.toast(context, 'You left BreatheFree', then: () => TNav.reset(context, Routes.plans))), variant: TButtonVariant.danger),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.accountLeaveFooterN0Label, onPressed: () => TNav.submit(context, 'DELETE /v1/enrolments/:id', screenId: 'account_leave', then: () => TNav.toast(context, s.accountLeaveFooterN0ActionThenValue, then: () => TNav.reset(context, Routes.plans))), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.accountLeaveFooterN1Label, onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );
   }

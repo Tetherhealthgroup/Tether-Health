@@ -18,15 +18,16 @@ class SfWeekUnplugScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Week 2', pill: 'ScrollFree'),
+      header: THeader(title: s.sfWeekUnplugHeaderTitle, pill: 'ScrollFree'),
       children: [
-        TTitle('Your week, honestly.'),
-        TNativeSlot(id: 'ios.deviceActivityReport.week', label: 'Screen Time this week', caption: 'Shown by Apple’s Screen Time on this phone. Tether can’t read, store or share these minutes.', height: 200.0),
-        TBarChart(values: [190.0, 160.0, 130.0, 0.0, 110.0, 95.0, 85.0], color: TColors.program('sf'), missing: [3], target: 90.0, labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'], title: 'Your estimates · minutes / day', caption: 'Thursday: no check-in · not counted as zero'),
-        TStatGrid(stats: [TStat(label: 'Phone-free nights', value: '5/7'), TStat(label: 'Urges paused', value: '11', sub: '7 put down')]),
-        TCard(variant: TCardVariant.mint, eyebrow: 'You said', text: '“Drained” was 4× less common on phone-free nights.', children: [TQuote('I feel drained after long scrolls.')]),
-        TCard(eyebrow: 'Next week', title: 'Step down to 75 min?', children: [TButtonRow(children: [TButton(key: const ValueKey('a:body[5].children[0].items[0]'), label: 'Yes', onPressed: () => TNav.toast(context, 'Goal set to 75 min', then: () => TNav.back(context)), small: true), TButton(key: const ValueKey('a:body[5].children[0].items[1]'), label: 'Stay at 90', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary, small: true)])]),
+        TTitle(s.sfWeekUnplugBodyN0Text),
+        TNativeSlot(id: 'ios.deviceActivityReport.week', label: s.sfWeekUnplugBodyN1Label, caption: s.sfWeekUnplugBodyN1Caption, height: 200.0),
+        TBarChart(values: [190.0, 160.0, 130.0, 0.0, 110.0, 95.0, 85.0], color: TColors.program('sf'), missing: [3], target: 90.0, labels: [s.sfWeekUnplugBodyN2LabelsN0, s.sfWeekUnplugBodyN2LabelsN1, s.sfWeekUnplugBodyN2LabelsN2, s.sfWeekUnplugBodyN2LabelsN3, s.sfWeekUnplugBodyN2LabelsN4, s.sfWeekUnplugBodyN2LabelsN5, s.sfWeekUnplugBodyN2LabelsN6], title: s.sfWeekUnplugBodyN2Title, caption: s.sfWeekUnplugBodyN2Caption),
+        TStatGrid(stats: [TStat(label: s.sfWeekUnplugBodyN3ItemsN0Label, value: '5/7'), TStat(label: s.sfWeekUnplugBodyN3ItemsN1Label, value: '11', sub: s.sfWeekUnplugBodyN3ItemsN1Sub)]),
+        TCard(variant: TCardVariant.mint, eyebrow: s.sfWeekUnplugBodyN4Eyebrow, text: s.sfWeekUnplugBodyN4Text, children: [TQuote(s.sfWeekUnplugBodyN4ChildrenN0Text)]),
+        TCard(eyebrow: s.sfWeekUnplugBodyN5Eyebrow, title: s.sfWeekUnplugBodyN5Title, children: [TButtonRow(children: [TButton(key: const ValueKey('a:body[5].children[0].items[0]'), label: s.sfWeekUnplugBodyN5ChildrenN0ItemsN0Label, onPressed: () => TNav.toast(context, s.sfWeekUnplugBodyN5ChildrenN0ItemsN0ActionValue, then: () => TNav.back(context)), small: true), TButton(key: const ValueKey('a:body[5].children[0].items[1]'), label: s.sfWeekUnplugBodyN5ChildrenN0ItemsN1Label, onPressed: () => TNav.back(context), variant: TButtonVariant.secondary, small: true)])]),
       ],
     );
   }

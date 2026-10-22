@@ -19,17 +19,18 @@ class HwIntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Heartwise', pill: '~2 min/day'),
+      header: THeader(title: 'Heartwise', pill: s.hwIntroHeaderPill),
       children: [
-        TProgramTag(program: 'hw', extra: 'Cardiovascular health'),
-        TTitle('Know your numbers. Share them on your terms.', size: TTitleSize.l),
-        TKeyValue(rows: [('Readings', 'BP + cholesterol panels'), ('Targets', 'from your clinician'), ('A reading is', 'information, not a grade')]),
-        TBody('Log blood pressure and cholesterol, see trends and prepare for visits. Both focus slots are in use, so you’ll choose how to add it.', tone: TTextTone.muted),
+        TProgramTag(program: 'hw', extra: s.hwIntroBodyN0Extra),
+        TTitle(s.hwIntroBodyN1Text, size: TTitleSize.l),
+        TKeyValue(rows: [(s.hwIntroBodyN2RowsN0N0, s.hwIntroBodyN2RowsN0N1), (s.hwIntroBodyN2RowsN1N0, s.hwIntroBodyN2RowsN1N1), (s.hwIntroBodyN2RowsN2N0, s.hwIntroBodyN2RowsN2N1)]),
+        TBody(s.hwIntroBodyN3Text, tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Set up Heartwise', onPressed: () => TNav.sheet(context, Routes.focusFull), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Add as Learn only', onPressed: () => TNav.toast(context, 'Heartwise added as Learn only', then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.hwIntroFooterN0Label, onPressed: () => TNav.sheet(context, Routes.focusFull), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.hwIntroFooterN1Label, onPressed: () => TNav.toast(context, s.hwIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
       ],
     );
   }

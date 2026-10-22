@@ -18,17 +18,18 @@ class HwQ1Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'About you', pill: '1 of 2'),
+      header: THeader(title: s.hwQ1HeaderTitle, pill: s.hwQ1HeaderPill),
       children: [
         TSteps(n: 1, total: 2),
-        TTitle('Has a clinician talked with you about…'),
-        TChips(fieldKey: 'hw_q1.value', options: ['High blood pressure', 'High cholesterol', 'Heart disease', 'Stroke', 'None of these'], selected: ['High blood pressure']),
-        TSegmented(fieldKey: 'hw_q1.do_you_have_a_home_bp_monitor', options: ['Yes', 'No', 'Not sure'], selected: 'Yes', label: 'Do you have a home BP monitor?'),
-        TCard(variant: TCardVariant.mint, text: 'No monitor? Many pharmacies have free kiosks. We’ll show how to measure correctly.'),
+        TTitle(s.hwQ1BodyN1Text),
+        TChips(fieldKey: 'hw_q1.value', options: ['High blood pressure', 'High cholesterol', 'Heart disease', 'Stroke', 'None of these'], labels: [s.hwQ1BodyN2OptionsN0, s.hwQ1BodyN2OptionsN1, s.hwQ1BodyN2OptionsN2, s.hwQ1BodyN2OptionsN3, s.hwQ1BodyN2OptionsN4], selected: ['High blood pressure']),
+        TSegmented(fieldKey: 'hw_q1.do_you_have_a_home_bp_monitor', options: ['Yes', 'No', 'Not sure'], labels: [s.hwQ1BodyN3OptionsN0, s.hwQ1BodyN3OptionsN1, s.hwQ1BodyN3OptionsN2], selected: 'Yes', label: s.hwQ1BodyN3Label),
+        TCard(variant: TCardVariant.mint, text: s.hwQ1BodyN4Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Next', onPressed: () => TNav.push(context, Routes.hwTargets), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.hwQ1FooterN0Label, onPressed: () => TNav.push(context, Routes.hwTargets), arrow: true),
       ],
     );
   }

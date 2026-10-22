@@ -17,16 +17,17 @@ class AuthMergeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TSheet(
       children: [
-        TEyebrow('You’re signed in'),
-        TTitle('Upload the plan on this phone?'),
-        TListGroup(rows: [TListRow(label: 'BreatheFree plan · this phone', sub: 'Quit date Aug 28 · 3 reasons', lead: TLead.program('bf'))]),
-        TBody('Your account already has a BreatheFree plan from Aug 12.', tone: TTextTone.small),
-        TRadioList(fieldKey: 'auth_merge.value', items: [TRadioItem('Keep both, choose later', sub: 'Nothing is overwritten', badge: 'Safest'), TRadioItem('Use this phone’s plan'), TRadioItem('Use the account’s plan')], selected: 0),
+        TEyebrow(s.authMergeBodyN0Text),
+        TTitle(s.authMergeBodyN1Text),
+        TListGroup(rows: [TListRow(label: s.authMergeBodyN2RowsN0Label, sub: s.authMergeBodyN2RowsN0Sub, lead: TLead.program('bf'))]),
+        TBody(s.authMergeBodyN3Text, tone: TTextTone.small),
+        TRadioList(fieldKey: 'auth_merge.value', items: [TRadioItem(s.authMergeBodyN4ItemsN0Label, value: 'Keep both, choose later', sub: s.authMergeBodyN4ItemsN0Sub, badge: s.authMergeBodyN4ItemsN0Badge), TRadioItem(s.authMergeBodyN4ItemsN1Label, value: 'Use this phone’s plan'), TRadioItem(s.authMergeBodyN4ItemsN2Label, value: 'Use the account’s plan')], selected: 0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.submit(context, 'POST /v1/quit-plan/guest-import', screenId: 'auth_merge', then: () => TNav.reset(context, Routes.today)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.authMergeFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/quit-plan/guest-import', screenId: 'auth_merge', then: () => TNav.reset(context, Routes.today)), arrow: true),
       ],
     );
   }

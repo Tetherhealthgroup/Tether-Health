@@ -20,17 +20,18 @@ class SfUnplugAuthAndroidScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Unplug', pill: 'Step 1 of 3'),
+      header: THeader(title: 'Unplug', pill: s.sfUnplugAuthAndroidHeaderPill),
       children: [
-        TTitle('Two Android settings for Unplug'),
-        TBody('Android asks for each one separately. You can turn either off later, and Unplug will tell you if it stops working.', tone: TTextTone.muted),
-        TChecklist(items: [TCheckItem('Usage access', sub: 'On · lets Unplug see which app is open and for how long', done: true), TCheckItem('Display over other apps', sub: 'Off · lets Unplug show the pause screen'), TCheckItem('Notifications', sub: 'Android shows a quiet “Tether is running” notice while Unplug is on')], label: 'Needed'),
+        TTitle(s.sfUnplugAuthAndroidBodyN0Text),
+        TBody(s.sfUnplugAuthAndroidBodyN1Text, tone: TTextTone.muted),
+        TChecklist(items: [TCheckItem(s.sfUnplugAuthAndroidBodyN2ItemsN0Label, value: 'Usage access', sub: s.sfUnplugAuthAndroidBodyN2ItemsN0Sub, done: true), TCheckItem(s.sfUnplugAuthAndroidBodyN2ItemsN1Label, value: 'Display over other apps', sub: s.sfUnplugAuthAndroidBodyN2ItemsN1Sub), TCheckItem(s.sfUnplugAuthAndroidBodyN2ItemsN2Label, value: 'Notifications', sub: s.sfUnplugAuthAndroidBodyN2ItemsN2Sub)], label: s.sfUnplugAuthAndroidBodyN2Label),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Turn on display over apps', onPressed: () => TNav.osSettings(context), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Turn on usage access', onPressed: () => TNav.osSettings(context), variant: TButtonVariant.secondary),
-        TLink(key: const ValueKey('a:footer[2]'), label: 'I’ve turned them on', onTap: () => TNav.branch(context, 'Android permissions (checked on return)', <String, VoidCallback>{'All on': () => TNav.replace(context, Routes.sfUnplugAppsAndroid), 'Notifications off': () => TNav.replace(context, Routes.sfUnplugAuthNotifications), 'Missing': () => TNav.toast(context, 'Unplug still needs both settings.')}, device: const TBranchRef('unplug.setup.android_check', TAsk.unplugAndroidCheck, 'sf_unplug_auth_android'), when: const <TAnswer, String>{TAnswer.allOn: 'All on', TAnswer.notificationsOff: 'Notifications off', TAnswer.missing: 'Missing'})),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugAuthAndroidFooterN0Label, onPressed: () => TNav.osSettings(context), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfUnplugAuthAndroidFooterN1Label, onPressed: () => TNav.osSettings(context), variant: TButtonVariant.secondary),
+        TLink(key: const ValueKey('a:footer[2]'), label: s.sfUnplugAuthAndroidFooterN2Label, onTap: () => TNav.branch(context, 'Android permissions (checked on return)', <String, VoidCallback>{'All on': () => TNav.replace(context, Routes.sfUnplugAppsAndroid), 'Notifications off': () => TNav.replace(context, Routes.sfUnplugAuthNotifications), 'Missing': () => TNav.toast(context, s.sfUnplugAuthAndroidFooterN2ActionCasesN2ActionValue)}, device: const TBranchRef('unplug.setup.android_check', TAsk.unplugAndroidCheck, 'sf_unplug_auth_android'), when: const <TAnswer, String>{TAnswer.allOn: 'All on', TAnswer.notificationsOff: 'Notifications off', TAnswer.missing: 'Missing'})),
       ],
     );
   }

@@ -23,14 +23,15 @@ class CkUptodateScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       header: THeader(title: 'Checkup', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
         TIllustration(glyph: '✓'),
-        TTitle('You’re up to date', size: TTitleSize.l, center: true),
-        TBody('Next: flu vaccine in Sep 2027. We’ll remind you a month before.', tone: TTextTone.muted, center: true),
-        TButton(key: const ValueKey('a:body[3]'), label: 'See full schedule', onPressed: () => TNav.replace(context, Routes.ckList), variant: TButtonVariant.secondary),
+        TTitle(s.ckUptodateBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.ckUptodateBodyN2Text, tone: TTextTone.muted, center: true),
+        TButton(key: const ValueKey('a:body[3]'), label: s.ckUptodateBodyN3Label, onPressed: () => TNav.replace(context, Routes.ckList), variant: TButtonVariant.secondary),
       ],
     );
   }

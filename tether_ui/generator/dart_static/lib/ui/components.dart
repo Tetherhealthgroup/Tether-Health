@@ -9,9 +9,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
+import '../l10n/strings.g.dart';
 import '../logic/rules.dart';
 import 'data.dart';
 import 'nav.dart';
+import 'strings.dart';
 import 'tokens.dart';
 
 // ============================================================== scaffolding
@@ -62,9 +64,9 @@ class _TScreenState extends State<TScreen> with _FooterPlacement<TScreen> {
   Widget build(BuildContext context) {
     final TScreen(:header, :children, :footer, :tab, :background, :dark) = widget;
     final decoration = switch (background) {
-      TBackground.paper => const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFBF8F0), Color(0xFFF3F0E6)])),
-      TBackground.dark => const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [TColors.teal, Color(0xFF1C5149)])),
-      TBackground.indigo => const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF1F2A6B), Color(0xFF3B4CC0)])),
+      TBackground.paper => const BoxDecoration(gradient: LinearGradient(begin: AlignmentDirectional.topStart, end: AlignmentDirectional.bottomEnd, colors: [Color(0xFFFBF8F0), Color(0xFFF3F0E6)])),
+      TBackground.dark => const BoxDecoration(gradient: LinearGradient(begin: AlignmentDirectional.topStart, end: AlignmentDirectional.bottomEnd, colors: [TColors.teal, Color(0xFF1C5149)])),
+      TBackground.indigo => const BoxDecoration(gradient: LinearGradient(begin: AlignmentDirectional.topStart, end: AlignmentDirectional.bottomEnd, colors: [Color(0xFF1F2A6B), Color(0xFF3B4CC0)])),
     };
     // Lays out above the call fallback while it shows (TCallFallback); the
     // footer then scrolls with the body so nothing overflows.
@@ -93,13 +95,13 @@ class _TScreenState extends State<TScreen> with _FooterPlacement<TScreen> {
                         children: [
                           Expanded(
                             child: SingleChildScrollView(
-                              padding: const EdgeInsets.fromLTRB(TSpace.screen, 6, TSpace.screen, 20),
+                              padding: const EdgeInsetsDirectional.fromSTEB(TSpace.screen, 6, TSpace.screen, 20),
                               child: Column(key: _bodyKey, crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (inBody && footer.isNotEmpty) ...[const SizedBox(height: 16), fit]]),
                             ),
                           ),
                           if (!inBody && footer.isNotEmpty)
                             Padding(
-                              padding: const EdgeInsets.fromLTRB(TSpace.screen, 10, TSpace.screen, 12),
+                              padding: const EdgeInsetsDirectional.fromSTEB(TSpace.screen, 10, TSpace.screen, 12),
                               child: fit,
                             ),
                         ],
@@ -156,16 +158,16 @@ class _TSheetState extends State<TSheet> with _FooterPlacement<TSheet> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Center(child: Container(width: 40, height: 5, margin: const EdgeInsets.fromLTRB(0, 9, 0, 6), decoration: BoxDecoration(color: TColors.line, borderRadius: BorderRadius.circular(3)))),
+                Center(child: Container(width: 40, height: 5, margin: const EdgeInsetsDirectional.fromSTEB(0, 9, 0, 6), decoration: BoxDecoration(color: TColors.line, borderRadius: BorderRadius.circular(3)))),
                 Flexible(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(TSpace.screen, 6, TSpace.screen, 12),
+                    padding: const EdgeInsetsDirectional.fromSTEB(TSpace.screen, 6, TSpace.screen, 12),
                     child: Column(key: _bodyKey, crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (inBody && footer.isNotEmpty) ...[const SizedBox(height: 16), fit]]),
                   ),
                 ),
                 if (!inBody && footer.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(TSpace.screen, 8, TSpace.screen, 12),
+                    padding: const EdgeInsetsDirectional.fromSTEB(TSpace.screen, 8, TSpace.screen, 12),
                     child: fit,
                   ),
               ],
@@ -358,13 +360,13 @@ class _Header extends StatelessWidget {
       case THeaderLeft.logo:
         left = Row(children: [const TLogoMark(), const SizedBox(width: 10), Text(spec.title, style: TText.headerTitle.copyWith(fontSize: 20, fontWeight: FontWeight.w800, color: fg))]);
       case THeaderLeft.none:
-        left = Padding(padding: const EdgeInsets.only(left: 4), child: Text(spec.title, style: TText.largeTitle.copyWith(color: fg)));
+        left = Padding(padding: const EdgeInsetsDirectional.only(start: 4), child: Text(spec.title, style: TText.largeTitle.copyWith(color: fg)));
       case THeaderLeft.back:
       case THeaderLeft.close:
         final isBack = spec.left == THeaderLeft.back;
         left = _CircleButton(
           key: const ValueKey('a:header.left'),
-          label: isBack ? 'Back' : 'Close',
+          label: isBack ? TStrings.of(context).kitBack : TStrings.of(context).kitClose,
           icon: isBack ? Icons.chevron_left_rounded : Icons.close_rounded,
           dark: dark,
           onTap: () => isBack ? TNav.back(context) : TNav.close(context),
@@ -373,7 +375,7 @@ class _Header extends StatelessWidget {
     }
     final right = <Widget>[
       if (spec.pill != null) TPill(spec.pill!),
-      if (spec.avatar != null) ...[const SizedBox(width: 8), TAvatar(spec.avatar!, key: const ValueKey('a:header.avatar'), onTap: spec.onAvatar, semanticLabel: 'Account')],
+      if (spec.avatar != null) ...[const SizedBox(width: 8), TAvatar(spec.avatar!, key: const ValueKey('a:header.avatar'), onTap: spec.onAvatar, semanticLabel: TStrings.of(context).kitAccount)],
     ];
     final isNav = spec.left == THeaderLeft.back || spec.left == THeaderLeft.close;
     return MediaQuery.withClampedTextScaling(
@@ -383,7 +385,7 @@ class _Header extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(children: [
-            if (isNav) ...[left, const SizedBox(width: 8), middle] else Expanded(child: Align(alignment: Alignment.centerLeft, child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: left))),
+            if (isNav) ...[left, const SizedBox(width: 8), middle] else Expanded(child: Align(alignment: AlignmentDirectional.centerStart, child: FittedBox(fit: BoxFit.scaleDown, alignment: AlignmentDirectional.centerStart, child: left))),
             const SizedBox(width: 8),
             ConstrainedBox(constraints: const BoxConstraints(minWidth: 44), child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, children: right)),
           ]),
@@ -435,15 +437,25 @@ class TLogoMark extends StatelessWidget {
 class TTabBar extends StatelessWidget {
   const TTabBar({super.key, required this.active});
   final String active;
-  static const _tabs = <(String, String, IconData)>[
-    ('today', 'Today', Icons.home_outlined),
-    ('plans', 'Plans', Icons.list_alt_rounded),
-    ('progress', 'Progress', Icons.bar_chart_rounded),
-    ('learn', 'Learn', Icons.menu_book_outlined),
-    ('support', 'Support', Icons.favorite_border_rounded),
+  static const _tabs = <(String, IconData)>[
+    ('today', Icons.home_outlined),
+    ('plans', Icons.list_alt_rounded),
+    ('progress', Icons.bar_chart_rounded),
+    ('learn', Icons.menu_book_outlined),
+    ('support', Icons.favorite_border_rounded),
   ];
+
+  static String _name(TStrings s, String tab) => switch (tab) {
+        'today' => s.kitTabToday,
+        'plans' => s.kitTabPlans,
+        'progress' => s.kitTabProgress,
+        'learn' => s.kitTabLearn,
+        _ => s.kitTabSupport,
+      };
+
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return Container(
       decoration: const BoxDecoration(color: TColors.paper, border: Border(top: BorderSide(color: TColors.line2))),
       child: SafeArea(
@@ -457,7 +469,7 @@ class TTabBar extends StatelessWidget {
                   child: Semantics(
                     selected: t.$1 == active,
                     button: true,
-                    label: '${t.$2} tab',
+                    label: s.kitTabSemantics(tab: _name(s, t.$1)),
                     child: InkWell(
                       key: ValueKey('a:tabbar.${t.$1}'),
                       onTap: t.$1 == active ? null : () => TNav.tab(context, TNav.tabRoute(t.$1)),
@@ -466,10 +478,10 @@ class TTabBar extends StatelessWidget {
                           width: 48,
                           height: 28,
                           decoration: BoxDecoration(color: t.$1 == active ? TColors.mint : Colors.transparent, borderRadius: BorderRadius.circular(14)),
-                          child: Icon(t.$3, size: 21, color: t.$1 == active ? TColors.teal : TColors.muted),
+                          child: Icon(t.$2, size: 21, color: t.$1 == active ? TColors.teal : TColors.muted),
                         ),
                         const SizedBox(height: 2),
-                        Text(t.$2, maxLines: 1, overflow: TextOverflow.ellipsis, style: TText.tab.copyWith(color: t.$1 == active ? TColors.teal : TColors.muted, fontWeight: t.$1 == active ? FontWeight.w800 : FontWeight.w600)),
+                        Text(_name(s, t.$1), maxLines: 1, overflow: TextOverflow.ellipsis, style: TText.tab.copyWith(color: t.$1 == active ? TColors.teal : TColors.muted, fontWeight: t.$1 == active ? FontWeight.w800 : FontWeight.w600)),
                       ])),
                     ),
                   ),
@@ -602,7 +614,7 @@ class TSteps extends StatelessWidget {
   final int total;
   @override
   Widget build(BuildContext context) => Semantics(
-        label: 'Step $n of $total',
+        label: TStrings.of(context).kitStepOf(n: n, total: total),
         child: Row(children: [
           for (var i = 0; i < total; i++) ...[
             if (i > 0) const SizedBox(width: 4),
@@ -728,7 +740,8 @@ mixin _TInput<W extends StatefulWidget, T> on State<W> {
 }
 
 class TChips extends StatefulWidget {
-  const TChips({super.key, required this.options, this.selected = const [], this.multi = true, this.dots = const {}, this.label, this.onChanged, this.fieldKey, this.bind, this.bindClass = TBindClass.consent});
+  const TChips({super.key, required this.options, this.labels, this.selected = const [], this.multi = true, this.dots = const {}, this.label, this.onChanged, this.fieldKey, this.bind, this.bindClass = TBindClass.consent})
+      : assert(labels == null || labels.length == options.length);
   final String? fieldKey;
 
   /// Settings binding (spec `bind`): the stored labels (see [_TInput]).
@@ -736,7 +749,13 @@ class TChips extends StatefulWidget {
 
   /// How the bound control starts ([_TInput]).
   final TBindClass bindClass;
+  /// The option values: what [selected], [dots], the session and the
+  /// bound value hold. Stable across languages.
   final List<String> options;
+
+  /// The text shown for each option, in the app language; the values
+  /// themselves when null.
+  final List<String>? labels;
   final List<String> selected;
   final bool multi;
   final Map<String, Color> dots;
@@ -801,7 +820,7 @@ class _TChipsState extends State<TChips> with _TInput<TChips, Set<String>> {
     return _labelled(
       widget.label,
       Wrap(spacing: 8, runSpacing: 8, children: [
-        for (final o in widget.options)
+        for (final (i, o) in widget.options.indexed)
           Semantics(
             checked: _sel.contains(o),
             button: true,
@@ -819,7 +838,7 @@ class _TChipsState extends State<TChips> with _TInput<TChips, Set<String>> {
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   if (_sel.contains(o)) ...[Icon(Icons.check_rounded, size: 15, color: dark ? Colors.white : TColors.teal), const SizedBox(width: 5)],
                   if (widget.dots[o] != null) ...[Container(width: 10, height: 10, decoration: BoxDecoration(color: widget.dots[o], borderRadius: BorderRadius.circular(3))), const SizedBox(width: 6)],
-                  Flexible(child: Text(o, style: TText.chip.copyWith(color: dark ? Colors.white : null))),
+                  Flexible(child: Text(widget.labels?[i] ?? o, style: TText.chip.copyWith(color: dark ? Colors.white : null))),
                 ]),
               ),
             ),
@@ -830,7 +849,8 @@ class _TChipsState extends State<TChips> with _TInput<TChips, Set<String>> {
 }
 
 class TSegmented extends StatefulWidget {
-  const TSegmented({super.key, required this.options, required this.selected, this.label, this.onChanged, this.fieldKey, this.bind, this.bindClass = TBindClass.consent});
+  const TSegmented({super.key, required this.options, this.labels, required this.selected, this.label, this.onChanged, this.fieldKey, this.bind, this.bindClass = TBindClass.consent})
+      : assert(labels == null || labels.length == options.length);
   final String? fieldKey;
 
   /// Settings binding (spec `bind`): the stored option (see [_TInput]).
@@ -838,7 +858,12 @@ class TSegmented extends StatefulWidget {
 
   /// How the bound control starts ([_TInput]).
   final TBindClass bindClass;
+  /// The option values: what [selected], the session and the bound value
+  /// hold. Stable across languages.
   final List<String> options;
+
+  /// The text shown for each option; the values themselves when null.
+  final List<String>? labels;
   final String selected;
   final String? label;
   final ValueChanged<String>? onChanged;
@@ -883,7 +908,7 @@ class _TSegmentedState extends State<TSegmented> with _TInput<TSegmented, String
           padding: const EdgeInsets.all(3),
           decoration: BoxDecoration(color: TColors.segBg, borderRadius: BorderRadius.circular(12)),
           child: Row(children: [
-            for (final o in widget.options)
+            for (final (i, o) in widget.options.indexed)
               Expanded(
                 child: Semantics(
                   selected: o == _sel,
@@ -903,7 +928,7 @@ class _TSegmentedState extends State<TSegmented> with _TInput<TSegmented, String
                         borderRadius: BorderRadius.circular(9),
                         boxShadow: o == _sel ? const [BoxShadow(color: Color(0x24123C37), blurRadius: 5, offset: Offset(0, 2))] : null,
                       ),
-                      child: Text(o, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: TText.chip.copyWith(fontSize: 13.5, color: o == _sel ? TColors.teal : TColors.teal2)),
+                      child: Text(widget.labels?[i] ?? o, maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: TText.chip.copyWith(fontSize: 13.5, color: o == _sel ? TColors.teal : TColors.teal2)),
                     ),
                   ),
                 ),
@@ -914,8 +939,15 @@ class _TSegmentedState extends State<TSegmented> with _TInput<TSegmented, String
 }
 
 class TRadioItem {
-  const TRadioItem(this.label, {this.sub, this.badge});
+  const TRadioItem(this.label, {String? value, this.sub, this.badge}) : _value = value;
+
+  /// The text shown, in the app language.
   final String label;
+  final String? _value;
+
+  /// The stable value written to the session and matched against the bound
+  /// value; [label] when not given.
+  String get value => _value ?? label;
   final String? sub;
   final String? badge;
 }
@@ -950,12 +982,12 @@ class _TRadioListState extends State<TRadioList> with _TInput<TRadioList, int> {
   int get empty => -1;
   @override
   int? fromStored(Object stored) {
-    final i = widget.items.indexWhere((item) => item.label == stored);
+    final i = widget.items.indexWhere((item) => item.value == stored);
     return i < 0 ? null : i;
   }
 
   @override
-  Object? toSession(int value) => value >= 0 && value < widget.items.length ? widget.items[value].label : null;
+  Object? toSession(int value) => value >= 0 && value < widget.items.length ? widget.items[value].value : null;
 
   int get _sel => current;
 
@@ -1016,8 +1048,14 @@ class _TRadioListState extends State<TRadioList> with _TInput<TRadioList, int> {
 }
 
 class TCheckItem {
-  const TCheckItem(this.label, {this.sub, this.done = false});
+  const TCheckItem(this.label, {String? value, this.sub, this.done = false}) : _value = value;
+
+  /// The text shown, in the app language.
   final String label;
+  final String? _value;
+
+  /// The stable value written to the session; [label] when not given.
+  String get value => _value ?? label;
   final String? sub;
   final bool done;
 }
@@ -1057,13 +1095,13 @@ class _TChecklistState extends State<TChecklist> with _TInput<TChecklist, List<b
   List<bool>? fromStored(Object stored) {
     if (stored is! Iterable) return null;
     final labels = stored.whereType<String>().toSet();
-    return [for (final i in widget.items) labels.contains(i.label)];
+    return [for (final i in widget.items) labels.contains(i.value)];
   }
 
   @override
   Object? toSession(List<bool> value) => [
         for (var i = 0; i < widget.items.length; i++)
-          if (value[i]) widget.items[i].label
+          if (value[i]) widget.items[i].value
       ];
 
   List<bool> get _done => current;
@@ -1409,7 +1447,7 @@ class _TFieldState extends State<TField> {
               suffixIcon: readOnly
                   ? const Icon(Icons.expand_more_rounded, color: TColors.muted)
                   : unitIcon
-                      ? Padding(padding: const EdgeInsets.only(left: 8, right: 18, top: 2.67), child: Text(unit!, style: unitStyle, textScaler: unitScaler))
+                      ? Padding(padding: const EdgeInsetsDirectional.only(start: 8, end: 18, top: 2.67), child: Text(unit!, style: unitStyle, textScaler: unitScaler))
                       : null,
               suffixIconConstraints: unitIcon ? const BoxConstraints(minWidth: 0, minHeight: 0) : null,
               suffix: unit == null || unitIcon ? null : Text(unit!, style: unitStyle, textScaler: unitScaler),
@@ -1532,11 +1570,18 @@ class _TZoneSelectorState extends State<TZoneSelector> {
     if (z != null && z != _sel && ['green', 'yellow', 'red'].contains(z)) setState(() => _sel = z);
   }
 
-  static const _z = <(String, String, Color, Color)>[
-    ('green', 'Green', TColors.okFill, TColors.okText),
-    ('yellow', 'Yellow', TColors.warnFill, TColors.warnText),
-    ('red', 'Red', TColors.errorFill, TColors.errorText),
+  static const _z = <(String, Color, Color)>[
+    ('green', TColors.okFill, TColors.okText),
+    ('yellow', TColors.warnFill, TColors.warnText),
+    ('red', TColors.errorFill, TColors.errorText),
   ];
+
+  static String _name(TStrings s, String zone) => switch (zone) {
+        'green' => s.kitZoneGreen,
+        'yellow' => s.kitZoneYellow,
+        _ => s.kitZoneRed,
+      };
+
   @override
   Widget build(BuildContext context) => Row(children: [
         for (var i = 0; i < _z.length; i++) ...[
@@ -1545,7 +1590,7 @@ class _TZoneSelectorState extends State<TZoneSelector> {
             child: Semantics(
               selected: _sel == _z[i].$1,
               button: true,
-              label: '${_z[i].$2} zone',
+              label: TStrings.of(context).kitZoneSemantics(zone: _name(TStrings.of(context), _z[i].$1)),
               child: GestureDetector(
                 onTap: widget.rule != null
                     ? null
@@ -1556,8 +1601,8 @@ class _TZoneSelectorState extends State<TZoneSelector> {
                 child: Container(
                   height: 56,
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(color: _z[i].$3, borderRadius: BorderRadius.circular(12), border: Border.all(width: 2, color: _sel == _z[i].$1 ? TColors.teal : Colors.transparent)),
-                  child: Text(_z[i].$2, style: TText.optionLabel.copyWith(color: _z[i].$4, fontWeight: FontWeight.w800)),
+                  decoration: BoxDecoration(color: _z[i].$2, borderRadius: BorderRadius.circular(12), border: Border.all(width: 2, color: _sel == _z[i].$1 ? TColors.teal : Colors.transparent)),
+                  child: Text(_name(TStrings.of(context), _z[i].$1), style: TText.optionLabel.copyWith(color: _z[i].$3, fontWeight: FontWeight.w800)),
                 ),
               ),
             ),
@@ -1633,7 +1678,7 @@ class TCard extends StatelessWidget {
     final titleColor = dark ? Colors.white : (variant == TCardVariant.urgent ? TColors.errorText : TColors.teal);
     final textColor = dark ? TColors.onDarkMuted : (variant == TCardVariant.urgent ? TColors.errorText : TColors.teal2);
     final content = Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
-      if (tag != null) ...[Align(alignment: Alignment.centerLeft, child: TProgramTag(program: tag!, extra: tagExtra)), const SizedBox(height: 6)],
+      if (tag != null) ...[Align(alignment: AlignmentDirectional.centerStart, child: TProgramTag(program: tag!, extra: tagExtra)), const SizedBox(height: 6)],
       if (eyebrow != null) ...[TEyebrow(eyebrow!), const SizedBox(height: 4)],
       if (title != null) Text(title!, style: TText.cardTitle.copyWith(color: titleColor)),
       if (text != null) ...[const SizedBox(height: 3), Text(text!, style: TText.cardText.copyWith(color: textColor))],
@@ -1648,7 +1693,7 @@ class TCard extends StatelessWidget {
       ]);
     }
     final card = Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      padding: const EdgeInsetsDirectional.fromSTEB(16, 14, 16, 14),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(TRadius.card),
@@ -1661,7 +1706,7 @@ class TCard extends StatelessWidget {
         ? card
         : ClipRRect(
             borderRadius: BorderRadius.circular(TRadius.card),
-            child: Stack(children: [card, Positioned(left: 0, top: 0, bottom: 0, child: Container(width: 4, color: TColors.program(accent!)))]),
+            child: Stack(children: [card, PositionedDirectional(start: 0, top: 0, bottom: 0, child: Container(width: 4, color: TColors.program(accent!)))]),
           );
     if (onTap == null) return framed;
     return Semantics(button: true, child: InkWell(borderRadius: BorderRadius.circular(TRadius.card), onTap: onTap, child: framed));
@@ -1680,7 +1725,7 @@ class TKeyValue extends StatelessWidget {
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Expanded(child: Text(rows[i].$1, style: TText.cardText.copyWith(fontSize: 14))),
               const SizedBox(width: 16),
-              Flexible(child: Text(rows[i].$2, textAlign: TextAlign.right, style: TText.cardText.copyWith(fontSize: 14, color: TColors.teal, fontWeight: FontWeight.w700))),
+              Flexible(child: Text(rows[i].$2, textAlign: TextAlign.end, style: TText.cardText.copyWith(fontSize: 14, color: TColors.teal, fontWeight: FontWeight.w700))),
             ]),
           ),
       ]);
@@ -1756,9 +1801,15 @@ class TListGroup extends StatelessWidget {
 }
 
 class TTile {
-  const TTile({required this.label, this.sub, this.program, this.glyph, this.color, this.selected = false, this.onTap, this.key});
+  const TTile({required this.label, String? value, this.sub, this.program, this.glyph, this.color, this.selected = false, this.onTap, this.key}) : _value = value;
   final Key? key;
+
+  /// The text shown, in the app language.
   final String label;
+  final String? _value;
+
+  /// The stable value written to the session; [label] when not given.
+  String get value => _value ?? label;
   final String? sub;
   final String? program;
   final String? glyph;
@@ -1783,7 +1834,7 @@ class _TTileGridState extends State<TTileGrid> {
   late final List<bool> _sel = [for (final t in widget.tiles) t.selected];
   List<String> get _labels => [
         for (var i = 0; i < widget.tiles.length; i++)
-          if (_sel[i] && widget.tiles[i].onTap == null) widget.tiles[i].label
+          if (_sel[i] && widget.tiles[i].onTap == null) widget.tiles[i].value
       ];
   late final List<String> _start = _labels;
   void _store() {
@@ -1842,7 +1893,7 @@ class _TTileGridState extends State<TTileGrid> {
               Text(t.label, style: TText.optionLabel.copyWith(fontSize: 15)),
               if (t.sub != null) Text(t.sub!, style: TText.sub),
             ]),
-            if (on) const Positioned(top: 0, right: 0, child: CircleAvatar(radius: 11, backgroundColor: TColors.teal, child: Icon(Icons.check_rounded, size: 14, color: TColors.lime))),
+            if (on) const PositionedDirectional(top: 0, end: 0, child: CircleAvatar(radius: 11, backgroundColor: TColors.teal, child: Icon(Icons.check_rounded, size: 14, color: TColors.lime))),
           ]),
         ),
       ),
@@ -1903,7 +1954,7 @@ class _ChartCard extends StatelessWidget {
         Row(children: [
           if (tag != null) ...[TProgramTag(program: tag!), const SizedBox(width: 8)],
           Expanded(child: Text(title ?? '', style: TText.label)),
-          if (unit != null) Flexible(child: Text(unit!, textAlign: TextAlign.right, style: TText.sub)),
+          if (unit != null) Flexible(child: Text(unit!, textAlign: TextAlign.end, style: TText.sub)),
         ]),
         chart,
         if (caption != null) Text(caption!, style: TText.cardText),
@@ -1933,7 +1984,7 @@ class TBarChart extends StatelessWidget {
       caption: caption,
       onTap: onTap,
       chart: Semantics(
-        label: '${title ?? 'Chart'}: ${[for (var i = 0; i < values.length; i++) missing.contains(i) ? 'no entry' : values[i].round().toString()].join(', ')}',
+        label: TStrings.of(context).kitChartSemantics(title: title ?? TStrings.of(context).kitChart, values: [for (var i = 0; i < values.length; i++) missing.contains(i) ? TStrings.of(context).kitChartNoEntry : values[i].round().toString()].join(', ')),
         child: Column(children: [
           SizedBox(
             height: 96,
@@ -1948,7 +1999,7 @@ class TBarChart extends StatelessWidget {
                   ),
                 ]
               ]),
-              if (target != null) Positioned(left: 0, right: 0, bottom: target! / maxV * 96, child: Container(height: 2, color: TColors.teal)),
+              if (target != null) PositionedDirectional(start: 0, end: 0, bottom: target! / maxV * 96, child: Container(height: 2, color: TColors.teal)),
             ]),
           ),
           if (labels.isNotEmpty)
@@ -1982,7 +2033,7 @@ class TLineChart extends StatelessWidget {
         caption: caption,
         onTap: onTap,
         chart: Semantics(
-          label: '${title ?? 'Chart'}: ${values.map((v) => v.round()).join(', ')}',
+          label: TStrings.of(context).kitChartSemantics(title: title ?? TStrings.of(context).kitChart, values: values.map((v) => v.round()).join(', ')),
           child: SizedBox(height: 110, width: double.infinity, child: CustomPaint(painter: _LinePainter(values, color, band))),
         ),
       );
@@ -2027,9 +2078,11 @@ enum TRingPalette { teal, indigo }
 
 /// Breathing guide. Scales gently; respects the OS Reduce Motion setting.
 class TBreathRing extends StatefulWidget {
-  const TBreathRing({super.key, required this.value, this.label = 'SECONDS', this.palette = TRingPalette.teal});
+  const TBreathRing({super.key, required this.value, this.label, this.palette = TRingPalette.teal});
   final String value;
-  final String label;
+
+  /// The label under the number; the kit's localized "SECONDS" when null.
+  final String? label;
   final TRingPalette palette;
   @override
   State<TBreathRing> createState() => _TBreathRingState();
@@ -2057,10 +2110,11 @@ class _TBreathRingState extends State<TBreathRing> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final label = widget.label ?? TStrings.of(context).kitSeconds;
     final cols = widget.palette == TRingPalette.teal ? const [Color(0xFF2B6258), Color(0xFF1C5149), Color(0xFF174640)] : const [Color(0xFF5566D8), Color(0xFF4656C9), Color(0xFF3A49B5)];
     return Center(
       child: Semantics(
-        label: '${widget.value} ${widget.label.toLowerCase()}',
+        label: TStrings.of(context).kitRingSemantics(value: widget.value, label: label.toLowerCase()),
         child: ScaleTransition(
           scale: Tween(begin: 0.9, end: 1.04).animate(CurvedAnimation(parent: _c, curve: Curves.easeInOut)),
           child: Container(
@@ -2083,7 +2137,7 @@ class _TBreathRingState extends State<TBreathRing> with SingleTickerProviderStat
                   fit: BoxFit.scaleDown,
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     Text(widget.value, style: const TextStyle(color: Colors.white, fontSize: 46, fontWeight: FontWeight.w800, height: 1)),
-                    Text(widget.label, style: const TextStyle(color: Colors.white, fontSize: 11, letterSpacing: 1.3)),
+                    Text(label, style: const TextStyle(color: Colors.white, fontSize: 11, letterSpacing: 1.3)),
                   ]),
                 ),
               ),
@@ -2106,7 +2160,7 @@ class TBigNumber extends StatelessWidget {
     final dark = TDark.of(context);
     return Column(crossAxisAlignment: center ? CrossAxisAlignment.center : CrossAxisAlignment.start, children: [
       Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
-        Flexible(child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(value, maxLines: 1, style: TText.big.copyWith(color: dark ? Colors.white : null)))),
+        Flexible(child: FittedBox(fit: BoxFit.scaleDown, alignment: AlignmentDirectional.centerStart, child: Text(value, maxLines: 1, style: TText.big.copyWith(color: dark ? Colors.white : null)))),
         if (unit != null) ...[const SizedBox(width: 6), Text(unit!, style: TText.sub.copyWith(fontSize: 15, fontWeight: FontWeight.w700, color: dark ? TColors.onDarkMuted : null))],
       ]),
       if (caption != null) ...[const SizedBox(height: 4), Text(caption!, style: TText.small.copyWith(color: dark ? TColors.onDarkMuted : TColors.teal2))],
@@ -2121,7 +2175,7 @@ class TTimer extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
         liveRegion: true,
-        label: '$value $label',
+        label: TStrings.of(context).kitTimerSemantics(value: value, label: label),
         child: Column(children: [
           Text(value, style: TText.big.copyWith(fontSize: 56, fontFeatures: const [FontFeature.tabularFigures()])),
           Text(label, style: TText.small),
@@ -2140,13 +2194,13 @@ class TCalendar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cells = <Widget>[
-      for (final d in const ['S', 'M', 'T', 'W', 'T', 'F', 'S']) Center(child: Text(d, style: TText.eyebrow)),
+      for (final d in TStrings.of(context).kitWeekdayInitials.split(' ')) Center(child: Text(d, style: TText.eyebrow)),
       for (var i = 0; i < firstWeekday; i++) const SizedBox(),
       for (var d = 1; d <= days; d++)
         Semantics(
           selected: d == selected,
           button: true,
-          label: '$month $d',
+          label: TStrings.of(context).kitCalendarDay(month: month, day: d),
           child: Container(
             alignment: Alignment.center,
             decoration: BoxDecoration(
@@ -2214,7 +2268,7 @@ class TButton extends StatelessWidget {
             constraints: BoxConstraints(minHeight: small ? 40 : 52, minWidth: 44),
             width: small ? null : double.infinity,
             padding: EdgeInsets.symmetric(horizontal: small ? 14 : 18, vertical: 8),
-            alignment: arrow ? Alignment.centerLeft : Alignment.center,
+            alignment: arrow ? AlignmentDirectional.centerStart : Alignment.center,
             child: child,
           ),
         ),
@@ -2237,7 +2291,7 @@ class TLink extends StatelessWidget {
   final bool alignLeft;
   @override
   Widget build(BuildContext context) => Align(
-        alignment: alignLeft ? Alignment.centerLeft : Alignment.center,
+        alignment: alignLeft ? AlignmentDirectional.centerStart : Alignment.center,
         child: Semantics(
           link: true,
           child: InkWell(
@@ -2260,7 +2314,7 @@ class TQuote extends StatelessWidget {
   final String? caption;
   @override
   Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('“$text”', style: TText.quote),
+        Text(TStrings.of(context).kitQuote(text: text), style: TText.quote),
         if (caption != null) Padding(padding: const EdgeInsets.only(top: 4), child: Text(caption!, style: TText.sub)),
       ]);
 }
@@ -2301,7 +2355,7 @@ class TEmergencyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
         container: true,
-        label: 'Emergency help',
+        label: TStrings.of(context).kitEmergencyHelp,
         child: TCard(variant: TCardVariant.urgent, title: text, children: [TButtonRow(children: actions)]),
       );
 }
@@ -2331,12 +2385,12 @@ class _TSkeletonState extends State<TSkeleton> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
     const widths = [0.55, 0.9, 0.72, 0.4];
     return Semantics(
-      label: 'Loading',
+      label: TStrings.of(context).kitLoading,
       child: TCard(children: [
         for (var i = 0; i < widget.lines.clamp(1, 4); i++)
           FadeTransition(
             opacity: Tween(begin: 0.45, end: 1.0).animate(_c),
-            child: FractionallySizedBox(alignment: Alignment.centerLeft, widthFactor: widths[i], child: Container(height: 12, decoration: BoxDecoration(color: const Color(0xFFE8EEEA), borderRadius: BorderRadius.circular(6)))),
+            child: FractionallySizedBox(alignment: AlignmentDirectional.centerStart, widthFactor: widths[i], child: Container(height: 12, decoration: BoxDecoration(color: const Color(0xFFE8EEEA), borderRadius: BorderRadius.circular(6)))),
           ),
       ]),
     );

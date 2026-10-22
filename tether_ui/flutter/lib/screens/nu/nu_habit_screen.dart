@@ -18,15 +18,16 @@ class NuHabitScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'This week’s habit', pill: 'Plan'),
+      header: THeader(title: s.nuHabitHeaderTitle, pill: s.nuHabitHeaderPill),
       children: [
-        TTitle('Pick one habit for this week.'),
-        TRadioList(fieldKey: 'nu_habit.value', items: [TRadioItem('Add a vegetable to dinner', sub: '5 nights this week', badge: 'Suggested'), TRadioItem('Water before each meal', sub: 'Every day'), TRadioItem('Cook at home', sub: '3 times this week'), TRadioItem('10-minute walk after a meal', sub: '4 times')], selected: 0, bind: 'nu.habit.habit', bindClass: TBindClass.plan),
-        TCard(children: [TToggleRow(fieldKey: 'nu_habit.track_weight', label: 'Track weight', sub: 'Off by default · can stay off forever', bind: 'nu.habit.track_weight', bindClass: TBindClass.plan)]),
+        TTitle(s.nuHabitBodyN0Text),
+        TRadioList(fieldKey: 'nu_habit.value', items: [TRadioItem(s.nuHabitBodyN1ItemsN0Label, value: 'Add a vegetable to dinner', sub: s.nuHabitBodyN1ItemsN0Sub, badge: s.nuHabitBodyN1ItemsN0Badge), TRadioItem(s.nuHabitBodyN1ItemsN1Label, value: 'Water before each meal', sub: s.nuHabitBodyN1ItemsN1Sub), TRadioItem(s.nuHabitBodyN1ItemsN2Label, value: 'Cook at home', sub: s.nuHabitBodyN1ItemsN2Sub), TRadioItem(s.nuHabitBodyN1ItemsN3Label, value: '10-minute walk after a meal', sub: s.nuHabitBodyN1ItemsN3Sub)], selected: 0, bind: 'nu.habit.habit', bindClass: TBindClass.plan),
+        TCard(children: [TToggleRow(fieldKey: 'nu_habit.track_weight', label: s.nuHabitBodyN2ChildrenN0Label, sub: s.nuHabitBodyN2ChildrenN0Sub, bind: 'nu.habit.track_weight', bindClass: TBindClass.plan)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Start this habit', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/nu/habit', screenId: 'nu_habit', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.nuHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.nuHabitFooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/program-data/nu/habit', screenId: 'nu_habit', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.nuHome))), arrow: true),
       ],
     );
   }

@@ -18,16 +18,17 @@ class SysUpdateScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Update needed', left: THeaderLeft.none),
+      header: THeader(title: s.sysUpdateHeaderTitle, left: THeaderLeft.none),
       children: [
         TIllustration(glyph: '↑', tone: TTone.warn),
-        TTitle('A safety update is ready', size: TTitleSize.l, center: true),
-        TBody('This version has important fixes. Rescue and Support still work until you update.', tone: TTextTone.muted, center: true),
+        TTitle(s.sysUpdateBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.sysUpdateBodyN2Text, tone: TTextTone.muted, center: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Update now', onPressed: () => TNav.external(context, 'https://apps.apple.com/app/tether-health'), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Open Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sysUpdateFooterN0Label, onPressed: () => TNav.external(context, 'https://apps.apple.com/app/tether-health'), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sysUpdateFooterN1Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue),
       ],
     );
   }

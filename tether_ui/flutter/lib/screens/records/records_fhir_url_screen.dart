@@ -18,15 +18,16 @@ class RecordsFhirUrlScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Other FHIR server'),
+      header: THeader(title: s.recordsFhirUrlHeaderTitle),
       children: [
-        TTitle('Enter your provider’s FHIR address'),
-        TField(fieldKey: 'records_fhir_url.base_url', label: 'FHIR server address', hint: 'Starts with https:// · your provider gives you this', placeholder: 'https://fhir.example-health.org/r4'),
-        TBody('We check it supports SMART on FHIR R4 (/.well-known/smart-configuration) before you sign in.', tone: TTextTone.small),
+        TTitle(s.recordsFhirUrlBodyN0Text),
+        TField(fieldKey: 'records_fhir_url.base_url', label: s.recordsFhirUrlBodyN1Label, hint: s.recordsFhirUrlBodyN1Hint, placeholder: 'https://fhir.example-health.org/r4'),
+        TBody(s.recordsFhirUrlBodyN2Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Check and continue', onPressed: () => TNav.branch(context, 'Server check', <String, VoidCallback>{'SMART on FHIR R4 supported': () => TNav.push(context, Routes.recordsConsent), 'Not a FHIR R4 server': () => TNav.push(context, Routes.recordsError)}, device: const TBranchRef('records.fhir_url.server_check', TAsk.fhirServerCheck, 'records_fhir_url'), when: const <TAnswer, String>{TAnswer.supported: 'SMART on FHIR R4 supported', TAnswer.unsupported: 'Not a FHIR R4 server'}), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.recordsFhirUrlFooterN0Label, onPressed: () => TNav.branch(context, 'Server check', <String, VoidCallback>{'SMART on FHIR R4 supported': () => TNav.push(context, Routes.recordsConsent), 'Not a FHIR R4 server': () => TNav.push(context, Routes.recordsError)}, device: const TBranchRef('records.fhir_url.server_check', TAsk.fhirServerCheck, 'records_fhir_url'), when: const <TAnswer, String>{TAnswer.supported: 'SMART on FHIR R4 supported', TAnswer.unsupported: 'Not a FHIR R4 server'}), arrow: true),
       ],
     );
   }

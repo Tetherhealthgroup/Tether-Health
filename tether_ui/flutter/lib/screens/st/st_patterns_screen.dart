@@ -16,13 +16,14 @@ class StPatternsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Patterns', pill: 'Steady'),
+      header: THeader(title: s.stPatternsHeaderTitle, pill: 'Steady'),
       children: [
-        TSegmented(fieldKey: 'st_patterns.value', options: ['7 days', '14 days', '30 days'], selected: '14 days'),
-        TLineChart(values: [196.0, 182.0, 175.0, 190.0, 168.0, 160.0, 172.0, 158.0, 165.0, 150.0, 162.0, 149.0], color: TColors.program('st'), band: [80.0, 180.0], title: 'After meals', unit: 'mg/dL · range ≤ 180'),
-        TStatGrid(stats: [TStat(label: 'In your range', value: '71%', sub: 'of 38 readings'), TStat(label: 'Lows', value: '1', sub: 'Oct 9 · treated')]),
-        TCard(variant: TCardVariant.mint, eyebrow: 'Pattern', title: 'Readings were higher on nights with less than 6 h sleep.'),
+        TSegmented(fieldKey: 'st_patterns.value', options: ['7 days', '14 days', '30 days'], labels: [s.stPatternsBodyN0OptionsN0, s.stPatternsBodyN0OptionsN1, s.stPatternsBodyN0OptionsN2], selected: '14 days'),
+        TLineChart(values: [196.0, 182.0, 175.0, 190.0, 168.0, 160.0, 172.0, 158.0, 165.0, 150.0, 162.0, 149.0], color: TColors.program('st'), band: [80.0, 180.0], title: s.stPatternsBodyN1Title, unit: 'mg/dL · range ≤ 180'),
+        TStatGrid(stats: [TStat(label: s.stPatternsBodyN2ItemsN0Label, value: '71%', sub: s.stPatternsBodyN2ItemsN0Sub), TStat(label: s.stPatternsBodyN2ItemsN1Label, value: '1', sub: s.stPatternsBodyN2ItemsN1Sub)]),
+        TCard(variant: TCardVariant.mint, eyebrow: s.stPatternsBodyN3Eyebrow, title: s.stPatternsBodyN3Title),
       ],
     );
   }

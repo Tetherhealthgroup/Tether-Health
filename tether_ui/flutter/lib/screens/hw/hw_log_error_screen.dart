@@ -19,16 +19,17 @@ class HwLogErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Log blood pressure', pill: 'Check'),
+      header: THeader(title: s.hwLogErrorHeaderTitle, pill: s.hwLogErrorHeaderPill),
       children: [
-        TTitle('Let’s double-check that.'),
-        TFieldRow(children: [TField(fieldKey: 'hw_log_error.top_systolic', label: 'Top (systolic)', unit: 'mmHg', placeholder: '128', kind: TFieldKind.number), TField(fieldKey: 'hw_log_error.bottom_diastolic', label: 'Bottom (diastolic)', unit: 'mmHg', error: 'Too high for the bottom number. Did you mean 81?', placeholder: '310', kind: TFieldKind.number)]),
-        TBody('Valid range: top 70–250, bottom 40–150, bottom lower than top.', tone: TTextTone.small),
+        TTitle(s.hwLogErrorBodyN0Text),
+        TFieldRow(children: [TField(fieldKey: 'hw_log_error.top_systolic', label: s.hwLogErrorBodyN1FieldsN0Label, unit: 'mmHg', placeholder: '128', kind: TFieldKind.number), TField(fieldKey: 'hw_log_error.bottom_diastolic', label: s.hwLogErrorBodyN1FieldsN1Label, unit: 'mmHg', error: s.hwLogErrorBodyN1FieldsN1Error, placeholder: '310', kind: TFieldKind.number)]),
+        TBody(s.hwLogErrorBodyN2Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(label: 'Save readings', onPressed: null, arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Edit reading', onTap: () => TNav.replace(context, Routes.hwLog2)),
+        TButton(label: s.hwLogErrorFooterN0Label, onPressed: null, arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.hwLogErrorFooterN1Label, onTap: () => TNav.replace(context, Routes.hwLog2)),
       ],
     );
   }

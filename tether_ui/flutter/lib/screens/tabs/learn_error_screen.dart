@@ -23,15 +23,16 @@ class LearnErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Learn', left: THeaderLeft.none, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
+      header: THeader(title: s.learnErrorHeaderTitle, left: THeaderLeft.none, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'learn',
       children: [
         TIllustration(glyph: '!', tone: TTone.warn),
-        TTitle('Can’t load lessons', center: true),
-        TBody('Check your connection. Downloaded lessons still work.', tone: TTextTone.muted, center: true),
-        TButton(key: const ValueKey('a:body[3]'), label: 'Try again', onPressed: () => TNav.replace(context, Routes.learn), arrow: true),
-        TButton(key: const ValueKey('a:body[4]'), label: 'Open downloads', onPressed: () => TNav.push(context, Routes.learnLesson), variant: TButtonVariant.secondary),
+        TTitle(s.learnErrorBodyN1Text, center: true),
+        TBody(s.learnErrorBodyN2Text, tone: TTextTone.muted, center: true),
+        TButton(key: const ValueKey('a:body[3]'), label: s.learnErrorBodyN3Label, onPressed: () => TNav.replace(context, Routes.learn), arrow: true),
+        TButton(key: const ValueKey('a:body[4]'), label: s.learnErrorBodyN4Label, onPressed: () => TNav.push(context, Routes.learnLesson), variant: TButtonVariant.secondary),
       ],
     );
   }

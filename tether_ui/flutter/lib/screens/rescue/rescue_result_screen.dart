@@ -19,18 +19,19 @@ class RescueResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Rescue done', left: THeaderLeft.close, pill: 'Saved'),
+      header: THeader(title: s.rescueResultHeaderTitle, left: THeaderLeft.close, pill: s.rescueResultHeaderPill),
       children: [
-        TTitle('This craving eased.'),
-        TSliderField(fieldKey: 'rescue_result.how_strong_is_it_now', label: 'How strong is it now?', value: 3.0, min: 0.0, max: 10.0, minLabel: '0', maxLabel: '10', color: TColors.coral),
-        TStatGrid(stats: [TStat(label: 'Before', value: '8'), TStat(label: 'Now', value: '3', sub: 'Your rating, not a diagnosis')]),
-        TChips(fieldKey: 'rescue_result.did_it_help', options: ['Yes', 'A little', 'Not this time'], selected: ['Yes'], multi: false, label: 'Did it help?'),
-        TCard(variant: TCardVariant.mint, eyebrow: 'Next 10 minutes', title: 'Stay somewhere smoke-free and sip water.'),
-        TLink(key: const ValueKey('a:body[5]'), label: 'Still strong? Get more help', onTap: () => TNav.push(context, Routes.rescueEscalate)),
+        TTitle(s.rescueResultBodyN0Text),
+        TSliderField(fieldKey: 'rescue_result.how_strong_is_it_now', label: s.rescueResultBodyN1Label, value: 3.0, min: 0.0, max: 10.0, minLabel: '0', maxLabel: '10', color: TColors.coral),
+        TStatGrid(stats: [TStat(label: s.rescueResultBodyN2ItemsN0Label, value: '8'), TStat(label: s.rescueResultBodyN2ItemsN1Label, value: '3', sub: s.rescueResultBodyN2ItemsN1Sub)]),
+        TChips(fieldKey: 'rescue_result.did_it_help', options: ['Yes', 'A little', 'Not this time'], labels: [s.rescueResultBodyN3OptionsN0, s.rescueResultBodyN3OptionsN1, s.rescueResultBodyN3OptionsN2], selected: ['Yes'], multi: false, label: s.rescueResultBodyN3Label),
+        TCard(variant: TCardVariant.mint, eyebrow: s.rescueResultBodyN4Eyebrow, title: s.rescueResultBodyN4Title),
+        TLink(key: const ValueKey('a:body[5]'), label: s.rescueResultBodyN5Label, onTap: () => TNav.push(context, Routes.rescueEscalate)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Back to Today', onPressed: () => TNav.submit(context, 'POST /v1/records/rescues', screenId: 'rescue_result', then: () => TNav.reset(context, Routes.today)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.rescueResultFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/records/rescues', screenId: 'rescue_result', then: () => TNav.reset(context, Routes.today)), arrow: true),
       ],
     );
   }

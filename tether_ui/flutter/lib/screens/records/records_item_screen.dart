@@ -18,15 +18,16 @@ class RecordsItemScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Blood pressure', pill: '12 + 36'),
+      header: THeader(title: s.recordsItemHeaderTitle, pill: '12 + 36'),
       children: [
-        TLineChart(values: [142.0, 140.0, 138.0, 139.0, 135.0, 133.0, 136.0, 131.0, 129.0, 130.0, 128.0, 127.0], color: TColors.program('hw'), title: 'Systolic · all sources', unit: 'mmHg'),
-        TListGroup(title: 'Latest', rows: [TListRow(label: '128/82 · Oct 15', sub: 'Patel Family Medicine (Epic) · clinic reading'), TListRow(label: '135/85 · Oct 14', sub: 'Entered by you · home monitor'), TListRow(label: '131/80 · Oct 2', sub: 'Patel Family Medicine (Epic)')]),
-        TKeyValue(rows: [('Coded as', 'LOINC 85354-9 (8480-6 / 8462-4)'), ('Used by', 'Heartwise')]),
+        TLineChart(values: [142.0, 140.0, 138.0, 139.0, 135.0, 133.0, 136.0, 131.0, 129.0, 130.0, 128.0, 127.0], color: TColors.program('hw'), title: s.recordsItemBodyN0Title, unit: 'mmHg'),
+        TListGroup(title: s.recordsItemBodyN1Title, rows: [TListRow(label: s.recordsItemBodyN1RowsN0Label, sub: s.recordsItemBodyN1RowsN0Sub), TListRow(label: s.recordsItemBodyN1RowsN1Label, sub: s.recordsItemBodyN1RowsN1Sub), TListRow(label: s.recordsItemBodyN1RowsN2Label, sub: s.recordsItemBodyN1RowsN2Sub)]),
+        TKeyValue(rows: [(s.recordsItemBodyN2RowsN0N0, s.recordsItemBodyN2RowsN0N1), (s.recordsItemBodyN2RowsN1N0, 'Heartwise')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Open in Heartwise', onPressed: () => TNav.push(context, Routes.hwTrends), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.recordsItemFooterN0Label, onPressed: () => TNav.push(context, Routes.hwTrends), variant: TButtonVariant.secondary),
       ],
     );
   }

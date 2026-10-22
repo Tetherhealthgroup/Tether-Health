@@ -20,11 +20,12 @@ class AccountDataScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your data'),
+      header: THeader(title: s.accountDataHeaderTitle),
       children: [
-        TListGroup(title: 'Export', rows: [TListRow(key: const ValueKey('a:body[0].rows[0]'), label: 'Download everything', sub: 'Every program · PDF + JSON', onTap: () => TNav.submit(context, 'POST /v1/account/export', screenId: 'account_data', then: () => TNav.toast(context, 'We’re preparing your file. We’ll notify you when it’s ready.'))), TListRow(key: const ValueKey('a:body[0].rows[1]'), label: 'Export a care summary', sub: 'Choose dates and preview every detail', onTap: () => TNav.push(context, Routes.hwSummary))]),
-        TListGroup(title: 'Delete', rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'Delete account and all data', sub: 'Permanent · requires confirmation', danger: true, onTap: () => TNav.push(context, Routes.accountDelete))]),
+        TListGroup(title: s.accountDataBodyN0Title, rows: [TListRow(key: const ValueKey('a:body[0].rows[0]'), label: s.accountDataBodyN0RowsN0Label, sub: s.accountDataBodyN0RowsN0Sub, onTap: () => TNav.submit(context, 'POST /v1/account/export', screenId: 'account_data', then: () => TNav.toast(context, s.accountDataBodyN0RowsN0ActionThenValue))), TListRow(key: const ValueKey('a:body[0].rows[1]'), label: s.accountDataBodyN0RowsN1Label, sub: s.accountDataBodyN0RowsN1Sub, onTap: () => TNav.push(context, Routes.hwSummary))]),
+        TListGroup(title: s.accountDataBodyN1Title, rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: s.accountDataBodyN1RowsN0Label, sub: s.accountDataBodyN1RowsN0Sub, danger: true, onTap: () => TNav.push(context, Routes.accountDelete))]),
       ],
     );
   }

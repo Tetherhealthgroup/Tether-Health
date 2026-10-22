@@ -19,19 +19,20 @@ class SfPauseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Pause 60', left: THeaderLeft.close, pill: 'Urge rescue'),
+      header: THeader(title: s.sfPauseHeaderTitle, left: THeaderLeft.close, pill: s.sfPauseHeaderPill),
       background: TBackground.indigo,
       children: [
-        TTitle('Before you open it, one breath.', size: TTitleSize.l),
-        TBody('What did you pick up your phone for?'),
+        TTitle(s.sfPauseBodyN0Text, size: TTitleSize.l),
+        TBody(s.sfPauseBodyN1Text),
         TBreathRing(value: '42', palette: TRingPalette.indigo),
-        TChips(fieldKey: 'sf_pause.value', options: ['Message someone', 'Bored', 'Avoiding something', 'Can’t sleep'], selected: ['Bored'], multi: false),
-        TCard(variant: TCardVariant.dark2, title: 'Bored? Try instead:', text: '2-min walk · text one real person · a short lesson'),
+        TChips(fieldKey: 'sf_pause.value', options: ['Message someone', 'Bored', 'Avoiding something', 'Can’t sleep'], labels: [s.sfPauseBodyN3OptionsN0, s.sfPauseBodyN3OptionsN1, s.sfPauseBodyN3OptionsN2, s.sfPauseBodyN3OptionsN3], selected: ['Bored'], multi: false),
+        TCard(variant: TCardVariant.dark2, title: s.sfPauseBodyN4Title, text: s.sfPauseBodyN4Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'I’m good, put it down', onPressed: () => TNav.submit(context, 'POST /v1/program-data/sf/pauses', screenId: 'sf_pause', then: () => TNav.toast(context, 'Nice. Logged as a pause.', then: () => TNav.reset(context, Routes.today))), variant: TButtonVariant.white, arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Open anyway (logged as information)', onTap: () => TNav.toast(context, 'Logged. No judgment.', then: () => TNav.close(context))),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfPauseFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/sf/pauses', screenId: 'sf_pause', then: () => TNav.toast(context, s.sfPauseFooterN0ActionThenValue, then: () => TNav.reset(context, Routes.today))), variant: TButtonVariant.white, arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.sfPauseFooterN1Label, onTap: () => TNav.toast(context, s.sfPauseFooterN1ActionValue, then: () => TNav.close(context))),
       ],
     );
   }

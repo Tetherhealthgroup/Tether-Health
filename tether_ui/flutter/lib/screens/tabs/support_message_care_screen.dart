@@ -20,17 +20,18 @@ class SupportMessageCareScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Dr. Patel’s clinic'),
+      header: THeader(title: s.supportMessageCareHeaderTitle),
       children: [
-        TBody('Secure message · usually replies within 1 business day. Not for emergencies.', tone: TTextTone.small),
-        TField(fieldKey: 'support_message_care.topic', label: 'Topic', placeholder: 'Question about my plan', kind: TFieldKind.select),
-        TField(fieldKey: 'support_message_care.message', label: 'Message', placeholder: 'I’ve been feeling dizzy in the mornings since starting the patch.', kind: TFieldKind.multiline),
-        TToggleRow(fieldKey: 'support_message_care.attach_a_summary', label: 'Attach a summary', sub: 'You’ll preview it before sending'),
-        TEmergencyCard(text: 'Chest pain, trouble breathing or thoughts of harming yourself? Call 911 · call or text 988.', actions: [TButton(key: const ValueKey('a:body[4].actions[0]'), label: 'Call or text 988', onPressed: () => TNav.push(context, Routes.crisis), variant: TButtonVariant.danger, small: true), TButton(key: const ValueKey('a:body[4].actions[1]'), label: 'Call 911', onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.secondary, small: true)]),
+        TBody(s.supportMessageCareBodyN0Text, tone: TTextTone.small),
+        TField(fieldKey: 'support_message_care.topic', label: s.supportMessageCareBodyN1Label, placeholder: s.supportMessageCareBodyN1Placeholder, kind: TFieldKind.select),
+        TField(fieldKey: 'support_message_care.message', label: s.supportMessageCareBodyN2Label, placeholder: s.supportMessageCareBodyN2Placeholder, kind: TFieldKind.multiline),
+        TToggleRow(fieldKey: 'support_message_care.attach_a_summary', label: s.supportMessageCareBodyN3Label, sub: s.supportMessageCareBodyN3Sub),
+        TEmergencyCard(text: s.supportMessageCareBodyN4Text, actions: [TButton(key: const ValueKey('a:body[4].actions[0]'), label: s.supportMessageCareBodyN4ActionsN0Label, onPressed: () => TNav.push(context, Routes.crisis), variant: TButtonVariant.danger, small: true), TButton(key: const ValueKey('a:body[4].actions[1]'), label: s.supportMessageCareBodyN4ActionsN1Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.secondary, small: true)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Send message', onPressed: () => TNav.submit(context, 'POST /v1/care/messages', screenId: 'support_message_care', then: () => TNav.toast(context, 'Message sent', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.supportMessageCareFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/care/messages', screenId: 'support_message_care', then: () => TNav.toast(context, s.supportMessageCareFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

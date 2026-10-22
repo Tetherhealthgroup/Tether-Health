@@ -20,17 +20,18 @@ class SfUnplugGateScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Small step', left: THeaderLeft.close, pill: 'Unplug'),
+      header: THeader(title: s.sfUnplugGateHeaderTitle, left: THeaderLeft.close, pill: 'Unplug'),
       children: [
-        TTitle('One breath, then decide.', size: TTitleSize.l),
+        TTitle(s.sfUnplugGateBodyN0Text, size: TTitleSize.l),
         TBreathRing(value: '30'),
-        TBody('Breathe in as the circle grows, out as it shrinks.', center: true),
-        TCard(variant: TCardVariant.coral, title: 'Need help right now?', text: 'Rescue opens in one tap.', cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: 'Get support', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
+        TBody(s.sfUnplugGateBodyN2Text, center: true),
+        TCard(variant: TCardVariant.coral, title: s.sfUnplugGateBodyN3Title, text: s.sfUnplugGateBodyN3Text, cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: s.sfUnplugGateBodyN3CtaN0Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Keep it closed', onPressed: () => TNav.toast(context, 'Nice. The app stays closed.', then: () => TNav.reset(context, Routes.sfHome)), arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Open it for 10 minutes', onTap: () => TNav.toast(context, 'Open for 10 minutes. The pause screen comes back after.', then: () => TNav.reset(context, Routes.sfHome))),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugGateFooterN0Label, onPressed: () => TNav.toast(context, s.sfUnplugGateFooterN0ActionValue, then: () => TNav.reset(context, Routes.sfHome)), arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.sfUnplugGateFooterN1Label, onTap: () => TNav.toast(context, s.sfUnplugGateFooterN1ActionValue, then: () => TNav.reset(context, Routes.sfHome))),
       ],
     );
   }

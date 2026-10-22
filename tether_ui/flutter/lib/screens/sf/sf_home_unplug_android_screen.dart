@@ -29,17 +29,18 @@ class SfHomeUnplugAndroidScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       header: THeader(title: 'ScrollFree', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TCard(variant: TCardVariant.dark, eyebrow: 'Yesterday · measured on this phone', children: [TBigNumber(value: '2h 10m', caption: 'Goal 90 min · down from 3h')]),
-        TStatGrid(stats: [TStat(label: 'Today so far', value: '48 min', sub: 'Short video and Feeds'), TStat(label: 'Opens today', value: '14', sub: 'On this phone only · pause screen after 20')]),
-        TBody('Measured by Tether on this phone with usage access. Only daily totals by category are saved to your account.', tone: TTextTone.small),
-        TCard(variant: TCardVariant.coral, title: 'Urge to scroll?', text: 'Take 60 seconds first', cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: 'Pause 60', onPressed: () => TNav.push(context, Routes.sfPause), variant: TButtonVariant.rescue, small: true)),
-        TCard(key: const ValueKey('a:body[4]'), variant: TCardVariant.mint, title: 'Unplug is on', text: '2 groups · pause screen after 60 min or 20 opens', onTap: () => TNav.push(context, Routes.sfUnplugHome)),
-        TCard(eyebrow: 'Today’s step', children: [TChecklist(items: [TCheckItem('Charge your phone outside the bedroom', sub: 'Tonight · bedtime window 10 PM')])]),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[6].rows[0]'), label: 'This week', sub: '5 of 7 phone-free nights', onTap: () => TNav.push(context, Routes.sfWeek)), TListRow(key: const ValueKey('a:body[6].rows[1]'), label: 'Had a long scroll?', sub: 'Reflect, nothing resets', onTap: () => TNav.push(context, Routes.sfSlip)), TListRow(key: const ValueKey('a:body[6].rows[2]'), label: 'Goal & windows', sub: '90 min · bedtime', onTap: () => TNav.push(context, Routes.sfGoal)), TListRow(key: const ValueKey('a:body[6].rows[3]'), label: 'Buddy', sub: 'Sam · weekly message', onTap: () => TNav.push(context, Routes.sfBuddy)), TListRow(key: const ValueKey('a:body[6].rows[4]'), label: 'Program settings', sub: 'Status, sharing, export, leave', onTap: () => TNav.push(context, Routes.programSettings, program: 'sf'))]),
+        TCard(variant: TCardVariant.dark, eyebrow: s.sfHomeUnplugAndroidBodyN0Eyebrow, children: [TBigNumber(value: s.sfHomeUnplugAndroidBodyN0ChildrenN0Value, caption: s.sfHomeUnplugAndroidBodyN0ChildrenN0Caption)]),
+        TStatGrid(stats: [TStat(label: s.sfHomeUnplugAndroidBodyN1ItemsN0Label, value: s.sfHomeUnplugAndroidBodyN1ItemsN0Value, sub: s.sfHomeUnplugAndroidBodyN1ItemsN0Sub), TStat(label: s.sfHomeUnplugAndroidBodyN1ItemsN1Label, value: '14', sub: s.sfHomeUnplugAndroidBodyN1ItemsN1Sub)]),
+        TBody(s.sfHomeUnplugAndroidBodyN2Text, tone: TTextTone.small),
+        TCard(variant: TCardVariant.coral, title: s.sfHomeUnplugAndroidBodyN3Title, text: s.sfHomeUnplugAndroidBodyN3Text, cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: s.sfHomeUnplugAndroidBodyN3CtaN0Label, onPressed: () => TNav.push(context, Routes.sfPause), variant: TButtonVariant.rescue, small: true)),
+        TCard(key: const ValueKey('a:body[4]'), variant: TCardVariant.mint, title: s.sfHomeUnplugAndroidBodyN4Title, text: s.sfHomeUnplugAndroidBodyN4Text, onTap: () => TNav.push(context, Routes.sfUnplugHome)),
+        TCard(eyebrow: s.sfHomeUnplugAndroidBodyN5Eyebrow, children: [TChecklist(items: [TCheckItem(s.sfHomeUnplugAndroidBodyN5ChildrenN0ItemsN0Label, value: 'Charge your phone outside the bedroom', sub: s.sfHomeUnplugAndroidBodyN5ChildrenN0ItemsN0Sub)])]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[6].rows[0]'), label: s.sfHomeUnplugAndroidBodyN6RowsN0Label, sub: s.sfHomeUnplugAndroidBodyN6RowsN0Sub, onTap: () => TNav.push(context, Routes.sfWeek)), TListRow(key: const ValueKey('a:body[6].rows[1]'), label: s.sfHomeUnplugAndroidBodyN6RowsN1Label, sub: s.sfHomeUnplugAndroidBodyN6RowsN1Sub, onTap: () => TNav.push(context, Routes.sfSlip)), TListRow(key: const ValueKey('a:body[6].rows[2]'), label: s.sfHomeUnplugAndroidBodyN6RowsN2Label, sub: s.sfHomeUnplugAndroidBodyN6RowsN2Sub, onTap: () => TNav.push(context, Routes.sfGoal)), TListRow(key: const ValueKey('a:body[6].rows[3]'), label: s.sfHomeUnplugAndroidBodyN6RowsN3Label, sub: s.sfHomeUnplugAndroidBodyN6RowsN3Sub, onTap: () => TNav.push(context, Routes.sfBuddy)), TListRow(key: const ValueKey('a:body[6].rows[4]'), label: s.sfHomeUnplugAndroidBodyN6RowsN4Label, sub: s.sfHomeUnplugAndroidBodyN6RowsN4Sub, onTap: () => TNav.push(context, Routes.programSettings, program: 'sf'))]),
       ],
     );
   }

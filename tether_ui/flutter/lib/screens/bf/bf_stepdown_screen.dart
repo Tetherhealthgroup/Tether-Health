@@ -18,16 +18,17 @@ class BfStepdownScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Step-down schedule', pill: 'Plan 2 of 3'),
+      header: THeader(title: s.bfStepdownHeaderTitle, pill: s.bfStepdownHeaderPill),
       children: [
-        TTitle('Cut back at your pace.'),
-        TBody('From your baseline of 15 a day. Adjust any week.', tone: TTextTone.muted),
-        TKeyValue(rows: [('This week', '15 → 12 a day'), ('Week 2', '9 a day'), ('Week 3', '5 a day'), ('Week 4', '2 a day'), ('Quit day · Sep 18', '0')]),
-        TCard(variant: TCardVariant.mint, text: 'Reducing works best paired with a quit date. Ask your clinician about nicotine replacement while cutting down.'),
+        TTitle(s.bfStepdownBodyN0Text),
+        TBody(s.bfStepdownBodyN1Text, tone: TTextTone.muted),
+        TKeyValue(rows: [(s.bfStepdownBodyN2RowsN0N0, s.bfStepdownBodyN2RowsN0N1), (s.bfStepdownBodyN2RowsN1N0, s.bfStepdownBodyN2RowsN1N1), (s.bfStepdownBodyN2RowsN2N0, s.bfStepdownBodyN2RowsN2N1), (s.bfStepdownBodyN2RowsN3N0, s.bfStepdownBodyN2RowsN3N1), (s.bfStepdownBodyN2RowsN4N0, '0')]),
+        TCard(variant: TCardVariant.mint, text: s.bfStepdownBodyN3Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save schedule', onPressed: () => TNav.push(context, Routes.bfSupport), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.bfStepdownFooterN0Label, onPressed: () => TNav.push(context, Routes.bfSupport), arrow: true),
       ],
     );
   }

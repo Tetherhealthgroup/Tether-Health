@@ -19,15 +19,16 @@ class SfUnplugHealthStoppedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Tracking check'),
+      header: THeader(title: s.sfUnplugHealthStoppedHeaderTitle),
       children: [
-        TBanner(kind: TBannerKind.error, text: 'Unplug has stopped. Nothing is being counted or paused until this is fixed.'),
-        TChecklist(items: [TCheckItem('Screen Time permission', sub: 'Turned off in Settings'), TCheckItem('Daily schedule', sub: 'Running', done: true), TCheckItem('Settings shared with the pause screen', sub: 'Ready', done: true)], label: 'iPhone checks'),
+        TBanner(kind: TBannerKind.error, text: s.sfUnplugHealthStoppedBodyN0Text),
+        TChecklist(items: [TCheckItem(s.sfUnplugHealthStoppedBodyN1ItemsN0Label, value: 'Screen Time permission', sub: s.sfUnplugHealthStoppedBodyN1ItemsN0Sub), TCheckItem(s.sfUnplugHealthStoppedBodyN1ItemsN1Label, value: 'Daily schedule', sub: s.sfUnplugHealthStoppedBodyN1ItemsN1Sub, done: true), TCheckItem(s.sfUnplugHealthStoppedBodyN1ItemsN2Label, value: 'Settings shared with the pause screen', sub: s.sfUnplugHealthStoppedBodyN1ItemsN2Sub, done: true)], label: s.sfUnplugHealthStoppedBodyN1Label),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Open phone settings', onPressed: () => TNav.osSettings(context), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Check again', onPressed: () => TNav.branch(context, 'Tracking health result', <String, VoidCallback>{'All pass': () => TNav.replace(context, Routes.sfUnplugHealth), 'Still failing': () => TNav.toast(context, 'Still not working. Turn Screen Time access on again in Settings.')}, device: const TBranchRef('unplug.health.tracking_check', TAsk.unplugTrackingCheck, 'sf_unplug_health_stopped'), when: const <TAnswer, String>{TAnswer.healthy: 'All pass', TAnswer.failing: 'Still failing'}), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugHealthStoppedFooterN0Label, onPressed: () => TNav.osSettings(context), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfUnplugHealthStoppedFooterN1Label, onPressed: () => TNav.branch(context, 'Tracking health result', <String, VoidCallback>{'All pass': () => TNav.replace(context, Routes.sfUnplugHealth), 'Still failing': () => TNav.toast(context, s.sfUnplugHealthStoppedFooterN1ActionCasesN1ActionValue)}, device: const TBranchRef('unplug.health.tracking_check', TAsk.unplugTrackingCheck, 'sf_unplug_health_stopped'), when: const <TAnswer, String>{TAnswer.healthy: 'All pass', TAnswer.failing: 'Still failing'}), variant: TButtonVariant.secondary),
       ],
     );
   }

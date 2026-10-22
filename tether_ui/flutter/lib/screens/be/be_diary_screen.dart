@@ -18,16 +18,17 @@ class BeDiaryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Treatment diary', pill: 'Treatment'),
+      header: THeader(title: s.beDiaryHeaderTitle, pill: s.beDiaryHeaderPill),
       children: [
-        TTitle('How are you feeling today?'),
-        TSliderField(fieldKey: 'be_diary.fatigue', label: 'Fatigue', value: 6.0, min: 0.0, max: 10.0, minLabel: '0', maxLabel: '10', color: TColors.program('be')),
-        TChips(fieldKey: 'be_diary.anything_else', options: ['Nausea', 'Pain', 'Mouth sores', 'Numbness', 'Low mood'], selected: ['Nausea'], label: 'Anything else?'),
-        TCard(variant: TCardVariant.urgent, title: 'Fever of 100.4°F (38°C) or higher?', text: 'Call your oncology team now.', cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: 'Call', onPressed: () => TNav.call(context, '(555) 010-7000', label: 'Call oncology team'), variant: TButtonVariant.danger, small: true)),
+        TTitle(s.beDiaryBodyN0Text),
+        TSliderField(fieldKey: 'be_diary.fatigue', label: s.beDiaryBodyN1Label, value: 6.0, min: 0.0, max: 10.0, minLabel: '0', maxLabel: '10', color: TColors.program('be')),
+        TChips(fieldKey: 'be_diary.anything_else', options: ['Nausea', 'Pain', 'Mouth sores', 'Numbness', 'Low mood'], labels: [s.beDiaryBodyN2OptionsN0, s.beDiaryBodyN2OptionsN1, s.beDiaryBodyN2OptionsN2, s.beDiaryBodyN2OptionsN3, s.beDiaryBodyN2OptionsN4], selected: ['Nausea'], label: s.beDiaryBodyN2Label),
+        TCard(variant: TCardVariant.urgent, title: s.beDiaryBodyN3Title, text: s.beDiaryBodyN3Text, cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: s.beDiaryBodyN3CtaN0Label, onPressed: () => TNav.call(context, '(555) 010-7000', label: 'Call oncology team'), variant: TButtonVariant.danger, small: true)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/be/diary', screenId: 'be_diary', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.beDiaryFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/be/diary', screenId: 'be_diary', then: () => TNav.toast(context, s.beDiaryFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

@@ -435,6 +435,22 @@ the consent checklist's categories and subtitles, from one list in
 | `records_consent_device` | `body[2]` checklist "What Tether will ask for" (key `data_types`), new `body[3]` | "Steps and sleep" ("Not requested") leaves the checklist and becomes a flat read-only list row at `body[3]`. |
 | `records_source` | `body[1]` list, new `body[2]` | the "What we read" row (push to `records_consent`) is removed; a new list titled "What we read" shows Conditions, Vital signs, Lab results, Medications, Immunizations and Smoking status as rows with no action. |
 
+## P-80: the language choice stores the language code (TH-1014c)
+
+The app offers English and Spanish (P-80). The welcome language selector's
+options get stable values, so the stored choice is the language code, not
+the label shown: the labels stay "English" and "Español", each written in
+its own language and never translated. Nothing visible changes.
+
+| Screen | Node | Change |
+|---|---|---|
+| `welcome` | `body[0]` segmented "English" / "Español" (key `value`) | gains `values` `["en", "es"]`; the starting selection "English" now stores `en`. |
+
+Translated text is not part of `spec/screens`: the generator keys every
+member-visible string by screen, element path and property, and writes the
+keys only to `spec/l10n/en.arb` and the generated Dart. So adding or
+changing a translation never changes a screen file or its sha256.
+
 ## Rendering changes with no spec change (TH-907)
 
 These come from the shared field component, not from `spec/screens`, so the

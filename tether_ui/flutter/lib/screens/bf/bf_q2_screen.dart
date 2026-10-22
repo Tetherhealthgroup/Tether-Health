@@ -18,18 +18,19 @@ class BfQ2Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your triggers', pill: '2 of 3'),
+      header: THeader(title: s.bfQ2HeaderTitle, pill: s.bfQ2HeaderPill),
       children: [
         TSteps(n: 2, total: 3),
-        TEyebrow('Choose all that apply'),
-        TTitle('When do you most want a cigarette?'),
-        TChips(fieldKey: 'bf_q2.value', options: ['Stress', 'After meals', 'Driving', 'With coffee', 'Social', 'Work breaks', 'Alcohol', 'Boredom', 'Morning', 'Scrolling'], selected: ['Stress', 'After meals', 'Driving', 'With coffee']),
-        TField(fieldKey: 'bf_q2.add_your_own', label: 'Add your own', placeholder: 'Type another situation…'),
-        TBody('Used to prepare, never to monitor. No background location.', tone: TTextTone.small),
+        TEyebrow(s.bfQ2BodyN1Text),
+        TTitle(s.bfQ2BodyN2Text),
+        TChips(fieldKey: 'bf_q2.value', options: ['Stress', 'After meals', 'Driving', 'With coffee', 'Social', 'Work breaks', 'Alcohol', 'Boredom', 'Morning', 'Scrolling'], labels: [s.bfQ2BodyN3OptionsN0, s.bfQ2BodyN3OptionsN1, s.bfQ2BodyN3OptionsN2, s.bfQ2BodyN3OptionsN3, s.bfQ2BodyN3OptionsN4, s.bfQ2BodyN3OptionsN5, s.bfQ2BodyN3OptionsN6, s.bfQ2BodyN3OptionsN7, s.bfQ2BodyN3OptionsN8, s.bfQ2BodyN3OptionsN9], selected: ['Stress', 'After meals', 'Driving', 'With coffee']),
+        TField(fieldKey: 'bf_q2.add_your_own', label: s.bfQ2BodyN4Label, placeholder: s.bfQ2BodyN4Placeholder),
+        TBody(s.bfQ2BodyN5Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Next', onPressed: () => TNav.push(context, Routes.bfQ3), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.bfQ2FooterN0Label, onPressed: () => TNav.push(context, Routes.bfQ3), arrow: true),
       ],
     );
   }

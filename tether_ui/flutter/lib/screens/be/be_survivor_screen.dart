@@ -25,18 +25,19 @@ class BeSurvivorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       header: THeader(title: 'Beacon', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TTitle('How have the last 3 months been?'),
-        TSegmented(fieldKey: 'be_survivor.value', options: ['Hard', 'Mixed', 'Good'], selected: 'Mixed'),
-        TCard(title: 'Worried about it coming back?', text: 'Very common. Ease has tools for this, and your team can help.', cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: 'Open Ease', onPressed: () => TNav.push(context, Routes.eaIntro), variant: TButtonVariant.secondary, small: true)),
-        TKeyValue(rows: [('Next follow-up', 'Jan 14, 2027')]),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: 'Program settings', onTap: () => TNav.push(context, Routes.programSettings, program: 'be'))]),
+        TTitle(s.beSurvivorBodyN0Text),
+        TSegmented(fieldKey: 'be_survivor.value', options: ['Hard', 'Mixed', 'Good'], labels: [s.beSurvivorBodyN1OptionsN0, s.beSurvivorBodyN1OptionsN1, s.beSurvivorBodyN1OptionsN2], selected: 'Mixed'),
+        TCard(title: s.beSurvivorBodyN2Title, text: s.beSurvivorBodyN2Text, cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: s.beSurvivorBodyN2CtaN0Label, onPressed: () => TNav.push(context, Routes.eaIntro), variant: TButtonVariant.secondary, small: true)),
+        TKeyValue(rows: [(s.beSurvivorBodyN3RowsN0N0, s.beSurvivorBodyN3RowsN0N1)]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: s.beSurvivorBodyN4RowsN0Label, onTap: () => TNav.push(context, Routes.programSettings, program: 'be'))]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save check-in', onPressed: () => TNav.submit(context, 'POST /v1/program-data/be/survivorship', screenId: 'be_survivor', then: () => TNav.toast(context, 'Saved')), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.beSurvivorFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/be/survivorship', screenId: 'be_survivor', then: () => TNav.toast(context, s.beSurvivorFooterN0ActionThenValue)), arrow: true),
       ],
     );
   }

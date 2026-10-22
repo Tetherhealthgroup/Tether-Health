@@ -126,6 +126,8 @@ def validate():
         if sid not in seen and not (base and base in seen):
             errors.append(f'{sid}: unreachable from any entry point')
     errors += check_age_gate(SCREENS, list(SCREENS), PRE_AGE_SIGN_IN)
+    errors += check_l10n(SCREENS)
+    errors += check_directional()
     inbound = {}
     for f, l, ty, t in edges: inbound.setdefault(t, set()).add(f)
     for sid, s in SCREENS.items():
@@ -139,6 +141,53 @@ def validate():
         # account phase is covered by shared program_settings for every program
         if missing: warns.append(f'INFO {p}: phases without a program-specific screen: {", ".join(missing)} (covered by shared screens)')
     return errors, warns, edges
+
+# ---------------------------------------------------------------- localization (l10n.py)
+# Every literal in the spec has exactly one class (l10n.PROPS): member-visible
+# text is translated, identifiers and data stay as they are. An explicit
+# translation id (`sid`) is a lower-case name, unique on its screen. Option
+# values (`values`) are unique and one per option.
+
+def check_l10n(screens):
+    import l10n
+    errors = l10n.check_literals(screens)
+    for sid, s in screens.items():
+        seen = {}
+        for part in ('body', 'footer'):
+            for n, p in walk(s[part], part):
+                if 'sid' in n:
+                    if not isinstance(n['sid'], str) or not l10n.SID.match(n['sid']):
+                        errors.append(f"{sid}: {p} sid {n.get('sid')!r} must match {l10n.SID.pattern}")
+                    elif n['sid'] in seen:
+                        errors.append(f"{sid}: {p} sid {n['sid']!r} is already used at {seen[n['sid']]}")
+                    else:
+                        seen[n['sid']] = p
+                if n['t'] in ('segmented', 'chips', 'radio', 'checklist') and n.get('values') is not None:
+                    v = n['values']
+                    if n['t'] != 'segmented' or len(v) != len(n['options']) or len(set(v)) != len(v):
+                        errors.append(f"{sid}: {p} values {v!r} must be unique, one per option of a segmented control")
+    return errors
+
+
+# Direction-neutral layout: kit code uses start/end, never left/right,
+# so a right-to-left language mirrors correctly. The generated screens only
+# use kit widgets.
+PHYSICAL = re.compile(r'EdgeInsets\.only\([^)]*\b(left|right)\s*:|\bAlignment\.(topLeft|topRight|centerLeft|centerRight|bottomLeft|bottomRight)\b'
+                      r'|TextAlign\.(left|right)\b|\bPositioned\([^)]*\b(left|right)\s*:|EdgeInsets\.fromLTRB|BorderRadius\.only\([^)]*\b(topLeft|topRight|bottomLeft|bottomRight)\s*:')
+
+def check_directional(dirs=None):
+    errors = []
+    for d in dirs or [os.path.join(HERE, 'dart_static', 'lib')]:
+        for root, _, files in os.walk(d):
+            for f in sorted(files):
+                if not f.endswith('.dart'): continue
+                path = os.path.join(root, f)
+                for i, line in enumerate(open(path, encoding='utf-8'), 1):
+                    code = line.split('//')[0]
+                    for m in PHYSICAL.finditer(code):
+                        errors.append(f'{os.path.relpath(path, HERE)}:{i}: physical direction {m.group(0)!r}; use the start/end form')
+    return errors
+
 
 # ---------------------------------------------------------------- sign-up age check (P-68, P-72, P-73)
 # The checks fail closed. sign_up_age_route_test.dart carries the same two
@@ -907,7 +956,25 @@ def _self_test():
         _expect(any('cannot read' in e for e in check_emitted(os.path.join(d, 'missing'))), 'V6 missing catalogue not reported')
     _age_gate_self_test(scr)
     _settings_self_test()
+    _l10n_self_test()
     print('validate self-test: ok')
+
+def _l10n_self_test():
+    """Literal classes, translation ids, option values and direction-neutral
+    kit code are checked."""
+    import tempfile
+    def scr(*body): return {'x': {'id': 'x', 'header': None, 'body': list(body), 'footer': []}}
+    _expect(check_l10n(scr(button('Go', back()))) == [], 'a classified literal was reported')
+    _expect(any('no literal class' in e for e in check_l10n(scr(dict(button('Go', back()), extra='?')))), 'an unclassified literal was not reported')
+    _expect(any('sid' in e for e in check_l10n(scr(with_sid(title('A'), 'Bad-Id')))), 'a malformed sid was not reported')
+    _expect(any('already used' in e for e in check_l10n(scr(with_sid(title('A'), 'a'), with_sid(text('B'), 'a')))), 'a duplicate sid was not reported')
+    _expect(check_l10n(scr(seg(['English', 'Español'], 'English', values=['en', 'es'], key='l'))) == [], 'valid values were reported')
+    bad = seg(['A', 'B'], 'A', key='l'); bad['values'] = ['x', 'x']
+    _expect(any('values' in e for e in check_l10n(scr(bad))), 'duplicate option values were not reported')
+    with tempfile.TemporaryDirectory() as d:
+        open(os.path.join(d, 'a.dart'), 'w').write("x(alignment: Alignment.centerLeft); y(textAlign: TextAlign.right);\n// Alignment.centerRight in a comment\nz(padding: EdgeInsets.only(left: 4));\nw(EdgeInsetsDirectional.only(start: 4), AlignmentDirectional.centerStart, TextAlign.end);\nPositioned(top: 0, left: 0);\n")
+        found = check_directional([d])
+        _expect(len(found) == 4 and all('physical direction' in e for e in found), found)
 
 def _settings_self_test():
     """check_settings, check_program_context and check_consent_starts (P-71,

@@ -19,18 +19,19 @@ class RecordsConsentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Connect', pill: 'Read-only'),
+      header: THeader(title: s.recordsConsentHeaderTitle, pill: s.recordsConsentHeaderPill),
       children: [
-        TTitle('Connect Patel Family Medicine?'),
-        TKeyValue(rows: [('Source', 'Epic MyChart · SMART on FHIR R4'), ('Access', 'Read-only'), ('Refresh', 'Daily while connected'), ('Stop', 'Disconnect anytime')]),
-        TChecklist(fieldKey: 'records_consent.resources', items: [TCheckItem('Conditions', sub: 'Condition'), TCheckItem('Vital signs', sub: 'Observation · blood pressure, weight'), TCheckItem('Lab results', sub: 'Observation · A1C, lipids, eGFR'), TCheckItem('Medications', sub: 'MedicationRequest'), TCheckItem('Immunizations', sub: 'Immunization'), TCheckItem('Smoking status', sub: 'Observation · LOINC 72166-2')], label: 'What Tether will read'),
-        TListGroup(flat: true, rows: [TListRow(label: 'Clinical notes', sub: 'Not requested')]),
-        TCard(variant: TCardVariant.mint, title: 'Only the programs you joined get data', text: 'Heartwise ← blood pressure, lipids · Steady ← A1C, glucose · Renew ← eGFR · Checkup ← immunizations · BreatheFree ← smoking status. Ease and ScrollFree get nothing.'),
+        TTitle(s.recordsConsentBodyN0Text),
+        TKeyValue(rows: [(s.recordsConsentBodyN1RowsN0N0, s.recordsConsentBodyN1RowsN0N1), (s.recordsConsentBodyN1RowsN1N0, s.recordsConsentBodyN1RowsN1N1), (s.recordsConsentBodyN1RowsN2N0, s.recordsConsentBodyN1RowsN2N1), (s.recordsConsentBodyN1RowsN3N0, s.recordsConsentBodyN1RowsN3N1)]),
+        TChecklist(fieldKey: 'records_consent.resources', items: [TCheckItem(s.recordsConsentBodyN2ItemsN0Label, value: 'Conditions', sub: s.recordsConsentBodyN2ItemsN0Sub), TCheckItem(s.recordsConsentBodyN2ItemsN1Label, value: 'Vital signs', sub: s.recordsConsentBodyN2ItemsN1Sub), TCheckItem(s.recordsConsentBodyN2ItemsN2Label, value: 'Lab results', sub: s.recordsConsentBodyN2ItemsN2Sub), TCheckItem(s.recordsConsentBodyN2ItemsN3Label, value: 'Medications', sub: s.recordsConsentBodyN2ItemsN3Sub), TCheckItem(s.recordsConsentBodyN2ItemsN4Label, value: 'Immunizations', sub: s.recordsConsentBodyN2ItemsN4Sub), TCheckItem(s.recordsConsentBodyN2ItemsN5Label, value: 'Smoking status', sub: s.recordsConsentBodyN2ItemsN5Sub)], label: s.recordsConsentBodyN2Label),
+        TListGroup(flat: true, rows: [TListRow(label: s.recordsConsentBodyN3RowsN0Label, sub: s.recordsConsentBodyN3RowsN0Sub)]),
+        TCard(variant: TCardVariant.mint, title: s.recordsConsentBodyN4Title, text: s.recordsConsentBodyN4Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue to MyChart', onPressed: () => TNav.branch(context, 'Anything selected?', <String, VoidCallback>{'Chosen': () => TNav.branch(context, 'MyChart sign-in result', <String, VoidCallback>{'Approved': () => TNav.push(context, Routes.recordsImporting), 'Cancelled': () => TNav.toast(context, 'Connection cancelled. Nothing was imported.'), 'Denied or error': () => TNav.push(context, Routes.recordsError)}, device: const TBranchRef('records.connect.mychart', TAsk.smartConnect, 'records_consent'), when: const <TAnswer, String>{TAnswer.approved: 'Approved', TAnswer.cancelled: 'Cancelled', TAnswer.failed: 'Denied or error'}), 'Nothing chosen': () => TNav.toast(context, 'Select at least one item to continue.')}, decide: 'rec.consent.epic'), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.recordsConsentFooterN0Label, onPressed: () => TNav.branch(context, 'Anything selected?', <String, VoidCallback>{'Chosen': () => TNav.branch(context, 'MyChart sign-in result', <String, VoidCallback>{'Approved': () => TNav.push(context, Routes.recordsImporting), 'Cancelled': () => TNav.toast(context, s.recordsConsentFooterN0ActionCasesN0ActionCasesN1ActionValue), 'Denied or error': () => TNav.push(context, Routes.recordsError)}, device: const TBranchRef('records.connect.mychart', TAsk.smartConnect, 'records_consent'), when: const <TAnswer, String>{TAnswer.approved: 'Approved', TAnswer.cancelled: 'Cancelled', TAnswer.failed: 'Denied or error'}), 'Nothing chosen': () => TNav.toast(context, s.recordsConsentFooterN0ActionCasesN1ActionValue)}, decide: 'rec.consent.epic'), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.recordsConsentFooterN1Label, onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );
   }

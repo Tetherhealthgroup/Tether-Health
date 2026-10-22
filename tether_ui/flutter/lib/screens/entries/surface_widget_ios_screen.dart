@@ -18,11 +18,12 @@ class SurfaceWidgetIosScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'iPhone widget', left: THeaderLeft.close),
+      header: THeader(title: s.surfaceWidgetIosHeaderTitle, left: THeaderLeft.close),
       background: TBackground.dark,
       children: [
-        TCard(key: const ValueKey('a:body[0]'), variant: TCardVariant.coral, title: 'Rescue', text: 'Help for the next few minutes', onTap: () => TNav.sheet(context, Routes.rescuePick)),
+        TCard(key: const ValueKey('a:body[0]'), variant: TCardVariant.coral, title: s.surfaceWidgetIosBodyN0Title, text: s.surfaceWidgetIosBodyN0Text, onTap: () => TNav.sheet(context, Routes.rescuePick)),
       ],
     );
   }

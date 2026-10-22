@@ -17,17 +17,18 @@ class HwLipidsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Cholesterol panel', pill: 'Lab'),
+      header: THeader(title: s.hwLipidsHeaderTitle, pill: s.hwLipidsHeaderPill),
       children: [
-        TTitle('Add your lab results'),
-        TBody('Copy from your lab report. Units: mg/dL.', tone: TTextTone.muted),
-        TFieldRow(children: [TField(fieldKey: 'hw_lipids.total', label: 'Total', unit: 'mg/dL', placeholder: '212', kind: TFieldKind.number), TField(fieldKey: 'hw_lipids.ldl', label: 'LDL', unit: 'mg/dL', placeholder: '138', kind: TFieldKind.number)]),
-        TFieldRow(children: [TField(fieldKey: 'hw_lipids.hdl', label: 'HDL', unit: 'mg/dL', placeholder: '46', kind: TFieldKind.number), TField(fieldKey: 'hw_lipids.triglycerides', label: 'Triglycerides', unit: 'mg/dL', placeholder: 'Optional', kind: TFieldKind.number)]),
-        TField(fieldKey: 'hw_lipids.lab_date', label: 'Lab date', placeholder: 'Sep 30, 2026', kind: TFieldKind.date),
+        TTitle(s.hwLipidsBodyN0Text),
+        TBody(s.hwLipidsBodyN1Text, tone: TTextTone.muted),
+        TFieldRow(children: [TField(fieldKey: 'hw_lipids.total', label: s.hwLipidsBodyN2FieldsN0Label, unit: 'mg/dL', placeholder: '212', kind: TFieldKind.number), TField(fieldKey: 'hw_lipids.ldl', label: s.hwLipidsBodyN2FieldsN1Label, unit: 'mg/dL', placeholder: '138', kind: TFieldKind.number)]),
+        TFieldRow(children: [TField(fieldKey: 'hw_lipids.hdl', label: s.hwLipidsBodyN3FieldsN0Label, unit: 'mg/dL', placeholder: '46', kind: TFieldKind.number), TField(fieldKey: 'hw_lipids.triglycerides', label: s.hwLipidsBodyN3FieldsN1Label, unit: 'mg/dL', placeholder: s.hwLipidsBodyN3FieldsN1Placeholder, kind: TFieldKind.number)]),
+        TField(fieldKey: 'hw_lipids.lab_date', label: s.hwLipidsBodyN4Label, placeholder: s.hwLipidsBodyN4Placeholder, kind: TFieldKind.date),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save panel', onPressed: () => TNav.submit(context, 'POST /v1/program-data/hw/lipids', screenId: 'hw_lipids', then: () => TNav.toast(context, 'Panel saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.hwLipidsFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/hw/lipids', screenId: 'hw_lipids', then: () => TNav.toast(context, s.hwLipidsFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

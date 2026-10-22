@@ -20,17 +20,18 @@ class HwRecheckScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Re-check', left: THeaderLeft.close),
+      header: THeader(title: s.hwRecheckHeaderTitle, left: THeaderLeft.close),
       children: [
-        TTitle('Rest, then measure again.', center: true),
-        TTimer(value: '4:12', label: 'until re-check'),
-        TCard(children: [TChecklist(items: [TCheckItem('Sit with your back supported'), TCheckItem('Feet flat, arm at heart level'), TCheckItem('No talking while measuring')])]),
-        TEmergencyCard(text: 'New chest pain, weakness or trouble speaking? Call 911 now.', actions: [TButton(key: const ValueKey('a:body[3].actions[0]'), label: 'Call 911', onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger, small: true)]),
+        TTitle(s.hwRecheckBodyN0Text, center: true),
+        TTimer(value: '4:12', label: s.hwRecheckBodyN1Label),
+        TCard(children: [TChecklist(items: [TCheckItem(s.hwRecheckBodyN2ChildrenN0ItemsN0Label, value: 'Sit with your back supported'), TCheckItem(s.hwRecheckBodyN2ChildrenN0ItemsN1Label, value: 'Feet flat, arm at heart level'), TCheckItem(s.hwRecheckBodyN2ChildrenN0ItemsN2Label, value: 'No talking while measuring')])]),
+        TEmergencyCard(text: s.hwRecheckBodyN3Text, actions: [TButton(key: const ValueKey('a:body[3].actions[0]'), label: s.hwRecheckBodyN3ActionsN0Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger, small: true)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Re-check now', onPressed: () => TNav.replace(context, Routes.hwLog), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Contact my clinician', onPressed: () => TNav.push(context, Routes.supportMessageCare), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.hwRecheckFooterN0Label, onPressed: () => TNav.replace(context, Routes.hwLog), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.hwRecheckFooterN1Label, onPressed: () => TNav.push(context, Routes.supportMessageCare), variant: TButtonVariant.secondary),
       ],
     );
   }

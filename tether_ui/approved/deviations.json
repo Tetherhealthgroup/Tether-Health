@@ -778,13 +778,15 @@
     {
       "screen": "welcome",
       "decisions": [
-        "P-22"
+        "P-22",
+        "P-80"
       ],
       "tickets": [
-        "TH-942"
+        "TH-942",
+        "TH-1014c"
       ],
-      "sha256": "52091cb3139341cf90acb546f4b30bc2b5b64a90e15ba1e7e55a1a151887bdbe",
-      "change": "Row value: \"Works offline\" -> \"No typing needed\""
+      "sha256": "a8c929e9681b2056e42c06042c1d736c09a58d705afdc661e92da25883ae67cb",
+      "change": "Row value: \"Works offline\" -> \"No typing needed\"; language selector body[0] gains values [\"en\", \"es\"]: the stored choice is the language code, the shown labels stay \"English\" / \"Español\""
     }
   ]
 }

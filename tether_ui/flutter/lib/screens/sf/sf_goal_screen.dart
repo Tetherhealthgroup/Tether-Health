@@ -19,17 +19,18 @@ class SfGoalScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your goal', pill: 'Plan'),
+      header: THeader(title: s.sfGoalHeaderTitle, pill: s.sfGoalHeaderPill),
       children: [
-        TTitle('Set a goal that feels doable.'),
-        TBody('From about 3 hours a day.', tone: TTextTone.muted),
-        TCard(children: [TSliderField(fieldKey: 'sf_goal.daily_social_time', label: 'Daily social time', value: 90.0, min: 30.0, max: 240.0, minLabel: '30 min', maxLabel: '4 h', color: TColors.program('sf'), suffix: ' min'), TToggleRow(fieldKey: 'sf_goal.step_down_15_min_each_week', label: 'Step down 15 min each week', value: true)]),
-        TCard(eyebrow: 'App-free times', children: [TChecklist(items: [TCheckItem('Bedtime', sub: '10:00 PM – 7:00 AM', done: true), TCheckItem('Meals', sub: 'When you mark a meal', done: true), TCheckItem('First hour awake')])]),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: 'Connect Screen Time', sub: 'Optional · totals only', onTap: () => TNav.push(context, Routes.sfScreentime))]),
+        TTitle(s.sfGoalBodyN0Text),
+        TBody(s.sfGoalBodyN1Text, tone: TTextTone.muted),
+        TCard(children: [TSliderField(fieldKey: 'sf_goal.daily_social_time', label: s.sfGoalBodyN2ChildrenN0Label, value: 90.0, min: 30.0, max: 240.0, minLabel: s.sfGoalBodyN2ChildrenN0MinLabel, maxLabel: s.sfGoalBodyN2ChildrenN0MaxLabel, color: TColors.program('sf'), suffix: ' min'), TToggleRow(fieldKey: 'sf_goal.step_down_15_min_each_week', label: s.sfGoalBodyN2ChildrenN1Label, value: true)]),
+        TCard(eyebrow: s.sfGoalBodyN3Eyebrow, children: [TChecklist(items: [TCheckItem(s.sfGoalBodyN3ChildrenN0ItemsN0Label, value: 'Bedtime', sub: s.sfGoalBodyN3ChildrenN0ItemsN0Sub, done: true), TCheckItem(s.sfGoalBodyN3ChildrenN0ItemsN1Label, value: 'Meals', sub: s.sfGoalBodyN3ChildrenN0ItemsN1Sub, done: true), TCheckItem(s.sfGoalBodyN3ChildrenN0ItemsN2Label, value: 'First hour awake')])]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: s.sfGoalBodyN4RowsN0Label, sub: s.sfGoalBodyN4RowsN0Sub, onTap: () => TNav.push(context, Routes.sfScreentime))]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save my goal', onPressed: () => TNav.push(context, Routes.sfBuddy), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfGoalFooterN0Label, onPressed: () => TNav.push(context, Routes.sfBuddy), arrow: true),
       ],
     );
   }

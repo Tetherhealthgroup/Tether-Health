@@ -30,7 +30,7 @@ def shared():
     # ================================================================ ONBOARDING
     flow('onboarding', 'First run', 'Welcome → choose programs → focus → consent → basics → set up each focus program → reminders → save progress → Today.')
     S('welcome', 'Welcome', '/welcome', 'onboarding', phase='welcome', hdr=H('', left='logo', pill=None), body=[
-        seg(['English', 'Español'], 'English', key='value'),
+        seg(['English', 'Español'], 'English', values=['en', 'es'], key='value'),
         illus('✿'),
         eyebrow('Welcome to Tether Health'), title('Care that meets you where you are.', 'xl'),
         text('Small steps, practical support and no judgment, for the parts of your health you choose.'),

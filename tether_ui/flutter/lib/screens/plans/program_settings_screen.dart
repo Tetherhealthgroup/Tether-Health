@@ -20,16 +20,17 @@ class ProgramSettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'BreatheFree settings'),
+      header: THeader(title: s.programSettingsHeaderTitle),
       children: [
-        TListGroup(flat: true, rows: [TListRow(label: 'BreatheFree', sub: 'Focus since Aug 14', lead: TLead.program('bf'))]),
-        TRadioList(fieldKey: 'program_settings.status', items: [TRadioItem('Focus', sub: 'Daily steps and reminders'), TRadioItem('Learn only', sub: 'Keep lessons, stop tracking'), TRadioItem('Pause', sub: 'Stop reminders; keep everything')], selected: 0, label: 'Status', bind: 'enrolment.:program.status'),
-        TCard(eyebrow: 'Sharing', children: [TToggleRow(fieldKey: 'program_settings.care_team_sharing', label: 'Care team · Dr. Patel’s clinic', sub: 'Manual: you approve each summary', value: true, bind: 'enrolment.:program.care_team_sharing'), TToggleRow(fieldKey: 'program_settings.de_identified_research', label: 'De-identified research', bind: 'enrolment.:program.de_identified_research')]),
-        TListGroup(title: 'Data', rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'Export BreatheFree data', sub: 'PDF + JSON', onTap: () => TNav.toast(context, 'Export is being prepared. We’ll notify you.')), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: 'Leave BreatheFree', sub: 'Keep your data or delete it now', danger: true, onTap: () => TNav.sheet(context, Routes.accountLeave))]),
+        TListGroup(flat: true, rows: [TListRow(label: 'BreatheFree', sub: s.programSettingsBodyN0RowsN0Sub, lead: TLead.program('bf'))]),
+        TRadioList(fieldKey: 'program_settings.status', items: [TRadioItem(s.programSettingsBodyN1ItemsN0Label, value: 'Focus', sub: s.programSettingsBodyN1ItemsN0Sub), TRadioItem(s.programSettingsBodyN1ItemsN1Label, value: 'Learn only', sub: s.programSettingsBodyN1ItemsN1Sub), TRadioItem(s.programSettingsBodyN1ItemsN2Label, value: 'Pause', sub: s.programSettingsBodyN1ItemsN2Sub)], selected: 0, label: s.programSettingsBodyN1Label, bind: 'enrolment.:program.status'),
+        TCard(eyebrow: s.programSettingsBodyN2Eyebrow, children: [TToggleRow(fieldKey: 'program_settings.care_team_sharing', label: s.programSettingsBodyN2ChildrenN0Label, sub: s.programSettingsBodyN2ChildrenN0Sub, value: true, bind: 'enrolment.:program.care_team_sharing'), TToggleRow(fieldKey: 'program_settings.de_identified_research', label: s.programSettingsBodyN2ChildrenN1Label, bind: 'enrolment.:program.de_identified_research')]),
+        TListGroup(title: s.programSettingsBodyN3Title, rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: s.programSettingsBodyN3RowsN0Label, sub: s.programSettingsBodyN3RowsN0Sub, onTap: () => TNav.toast(context, s.programSettingsBodyN3RowsN0ActionValue)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: s.programSettingsBodyN3RowsN1Label, sub: s.programSettingsBodyN3RowsN1Sub, danger: true, onTap: () => TNav.sheet(context, Routes.accountLeave))]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save changes', onPressed: () => TNav.submit(context, 'PATCH /v1/enrolments/:id', screenId: 'program_settings', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.programSettingsFooterN0Label, onPressed: () => TNav.submit(context, 'PATCH /v1/enrolments/:id', screenId: 'program_settings', then: () => TNav.toast(context, s.programSettingsFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

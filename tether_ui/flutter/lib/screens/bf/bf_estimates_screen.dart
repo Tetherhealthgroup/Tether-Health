@@ -17,15 +17,16 @@ class BfEstimatesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TSheet(
       children: [
-        TTitle('How estimates are calculated'),
-        TKeyValue(rows: [('Baseline', '10 cigarettes a day'), ('Price', '\$14.00 per pack'), ('Time per cigarette', '5 minutes'), ('Avoided', 'baseline − reported')]),
-        TBody('Estimates, not measurements. Missing days are left out.', tone: TTextTone.small),
+        TTitle(s.bfEstimatesBodyN0Text),
+        TKeyValue(rows: [(s.bfEstimatesBodyN1RowsN0N0, s.bfEstimatesBodyN1RowsN0N1), (s.bfEstimatesBodyN1RowsN1N0, s.bfEstimatesBodyN1RowsN1N1), (s.bfEstimatesBodyN1RowsN2N0, s.bfEstimatesBodyN1RowsN2N1), (s.bfEstimatesBodyN1RowsN3N0, s.bfEstimatesBodyN1RowsN3N1)]),
+        TBody(s.bfEstimatesBodyN2Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Edit numbers', onPressed: () => TNav.toast(context, 'Opened baseline settings', then: () => TNav.close(context)), variant: TButtonVariant.secondary),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Done', onPressed: () => TNav.close(context), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.bfEstimatesFooterN0Label, onPressed: () => TNav.toast(context, s.bfEstimatesFooterN0ActionValue, then: () => TNav.close(context)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.bfEstimatesFooterN1Label, onPressed: () => TNav.close(context), arrow: true),
       ],
     );
   }

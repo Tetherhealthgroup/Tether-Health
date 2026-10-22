@@ -19,16 +19,17 @@ class BfPathScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your path', pill: 'Plan 1 of 3'),
+      header: THeader(title: s.bfPathHeaderTitle, pill: s.bfPathHeaderPill),
       children: [
-        TTitle('What feels possible right now?'),
-        TBody('There’s no wrong place to start.', tone: TTextTone.muted),
-        TRadioList(fieldKey: 'bf_path.path', items: [TRadioItem('Set a quit date', sub: 'Prepare 7–14 days, then stop', badge: 'Recommended'), TRadioItem('Quit today', sub: 'Skip the calendar; extra support now'), TRadioItem('Reduce gradually', sub: 'Step down to zero over 4 weeks'), TRadioItem('Explore first', sub: 'No date. Lessons and Rescue only')], selected: 0),
-        TCard(key: const ValueKey('a:body[3]'), variant: TCardVariant.coral, title: 'Talk to a person first?', text: 'Quitline counselor or your care team', onTap: () => TNav.tab(context, Routes.support)),
+        TTitle(s.bfPathBodyN0Text),
+        TBody(s.bfPathBodyN1Text, tone: TTextTone.muted),
+        TRadioList(fieldKey: 'bf_path.path', items: [TRadioItem(s.bfPathBodyN2ItemsN0Label, value: 'Set a quit date', sub: s.bfPathBodyN2ItemsN0Sub, badge: s.bfPathBodyN2ItemsN0Badge), TRadioItem(s.bfPathBodyN2ItemsN1Label, value: 'Quit today', sub: s.bfPathBodyN2ItemsN1Sub), TRadioItem(s.bfPathBodyN2ItemsN2Label, value: 'Reduce gradually', sub: s.bfPathBodyN2ItemsN2Sub), TRadioItem(s.bfPathBodyN2ItemsN3Label, value: 'Explore first', sub: s.bfPathBodyN2ItemsN3Sub)], selected: 0),
+        TCard(key: const ValueKey('a:body[3]'), variant: TCardVariant.coral, title: s.bfPathBodyN3Title, text: s.bfPathBodyN3Text, onTap: () => TNav.tab(context, Routes.support)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue with this path', onPressed: () => TNav.branch(context, 'Selected path', <String, VoidCallback>{'Set a quit date': () => TNav.push(context, Routes.bfDate), 'Quit today': () => TNav.push(context, Routes.bfSupport), 'Reduce gradually': () => TNav.push(context, Routes.bfStepdown), 'Explore first': () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.bfHomeExplore))}, decide: 'choice:bf_path.path'), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.bfPathFooterN0Label, onPressed: () => TNav.branch(context, 'Selected path', <String, VoidCallback>{'Set a quit date': () => TNav.push(context, Routes.bfDate), 'Quit today': () => TNav.push(context, Routes.bfSupport), 'Reduce gradually': () => TNav.push(context, Routes.bfStepdown), 'Explore first': () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.bfHomeExplore))}, decide: 'choice:bf_path.path'), arrow: true),
       ],
     );
   }

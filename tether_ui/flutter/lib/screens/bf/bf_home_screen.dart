@@ -28,15 +28,16 @@ class BfHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       header: THeader(title: 'BreatheFree', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TCard(variant: TCardVariant.dark, eyebrow: 'Your quit day', children: [TBigNumber(value: '7 days', caption: 'Friday, August 28 · Pacific Time')]),
-        TCard(variant: TCardVariant.coral, title: 'Craving now?', text: 'One tap · no typing', cta: TButton(key: const ValueKey('a:body[1].cta[0]'), label: 'Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
-        TCard(eyebrow: 'Today’s step', children: [TChecklist(items: [TCheckItem('Stock gum, water or healthy snacks', sub: 'About 3 minutes')])]),
-        TCard(variant: TCardVariant.mint, eyebrow: 'Your top reason', children: [TQuote('Protect my family.')]),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: 'Daily check-in', sub: 'About 60 seconds', onTap: () => TNav.sheet(context, Routes.checkin)), TListRow(key: const ValueKey('a:body[4].rows[1]'), label: 'Medication center', sub: 'Nicotine patch · recorded plan', onTap: () => TNav.push(context, Routes.bfMeds)), TListRow(key: const ValueKey('a:body[4].rows[2]'), label: 'Progress', sub: 'Saved \$42.70 so far', onTap: () => TNav.push(context, Routes.bfProgress)), TListRow(key: const ValueKey('a:body[4].rows[3]'), label: 'Edit my plan', onTap: () => TNav.push(context, Routes.bfReview)), TListRow(key: const ValueKey('a:body[4].rows[4]'), label: 'Program settings', sub: 'Status, sharing, export, leave', onTap: () => TNav.push(context, Routes.programSettings, program: 'bf'))]),
+        TCard(variant: TCardVariant.dark, eyebrow: s.bfHomeBodyN0Eyebrow, children: [TBigNumber(value: s.bfHomeBodyN0ChildrenN0Value, caption: s.bfHomeBodyN0ChildrenN0Caption)]),
+        TCard(variant: TCardVariant.coral, title: s.bfHomeBodyN1Title, text: s.bfHomeBodyN1Text, cta: TButton(key: const ValueKey('a:body[1].cta[0]'), label: s.bfHomeBodyN1CtaN0Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
+        TCard(eyebrow: s.bfHomeBodyN2Eyebrow, children: [TChecklist(items: [TCheckItem(s.bfHomeBodyN2ChildrenN0ItemsN0Label, value: 'Stock gum, water or healthy snacks', sub: s.bfHomeBodyN2ChildrenN0ItemsN0Sub)])]),
+        TCard(variant: TCardVariant.mint, eyebrow: s.bfHomeBodyN3Eyebrow, children: [TQuote(s.bfHomeBodyN3ChildrenN0Text)]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: s.bfHomeBodyN4RowsN0Label, sub: s.bfHomeBodyN4RowsN0Sub, onTap: () => TNav.sheet(context, Routes.checkin)), TListRow(key: const ValueKey('a:body[4].rows[1]'), label: s.bfHomeBodyN4RowsN1Label, sub: s.bfHomeBodyN4RowsN1Sub, onTap: () => TNav.push(context, Routes.bfMeds)), TListRow(key: const ValueKey('a:body[4].rows[2]'), label: s.bfHomeBodyN4RowsN2Label, sub: s.bfHomeBodyN4RowsN2Sub, onTap: () => TNav.push(context, Routes.bfProgress)), TListRow(key: const ValueKey('a:body[4].rows[3]'), label: s.bfHomeBodyN4RowsN3Label, onTap: () => TNav.push(context, Routes.bfReview)), TListRow(key: const ValueKey('a:body[4].rows[4]'), label: s.bfHomeBodyN4RowsN4Label, sub: s.bfHomeBodyN4RowsN4Sub, onTap: () => TNav.push(context, Routes.programSettings, program: 'bf'))]),
       ],
     );
   }

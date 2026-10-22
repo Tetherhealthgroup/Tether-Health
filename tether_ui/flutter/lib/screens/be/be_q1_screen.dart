@@ -18,15 +18,16 @@ class BeQ1Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Where are you?', pill: '1 of 2'),
+      header: THeader(title: s.beQ1HeaderTitle, pill: s.beQ1HeaderPill),
       children: [
         TSteps(n: 1, total: 2),
-        TTitle('Which fits you best?'),
-        TRadioList(fieldKey: 'be_q1.stage', items: [TRadioItem('Lowering my risk', sub: 'Prevention and screening'), TRadioItem('Going through treatment', sub: 'Support between appointments'), TRadioItem('After treatment', sub: 'Survivorship'), TRadioItem('Supporting someone', sub: 'Caregiver resources')], selected: 0),
+        TTitle(s.beQ1BodyN1Text),
+        TRadioList(fieldKey: 'be_q1.stage', items: [TRadioItem(s.beQ1BodyN2ItemsN0Label, value: 'Lowering my risk', sub: s.beQ1BodyN2ItemsN0Sub), TRadioItem(s.beQ1BodyN2ItemsN1Label, value: 'Going through treatment', sub: s.beQ1BodyN2ItemsN1Sub), TRadioItem(s.beQ1BodyN2ItemsN2Label, value: 'After treatment', sub: s.beQ1BodyN2ItemsN2Sub), TRadioItem(s.beQ1BodyN2ItemsN3Label, value: 'Supporting someone', sub: s.beQ1BodyN2ItemsN3Sub)], selected: 0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Next', onPressed: () => TNav.branch(context, 'Journey stage', <String, VoidCallback>{'Lowering my risk': () => TNav.push(context, Routes.beQ2), 'Going through treatment': () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.beTx)), 'After treatment': () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.beSurvivor)), 'Supporting someone': () => TNav.tab(context, Routes.learn)}, decide: 'choice:be_q1.stage'), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.beQ1FooterN0Label, onPressed: () => TNav.branch(context, 'Journey stage', <String, VoidCallback>{'Lowering my risk': () => TNav.push(context, Routes.beQ2), 'Going through treatment': () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.beTx)), 'After treatment': () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.beSurvivor)), 'Supporting someone': () => TNav.tab(context, Routes.learn)}, decide: 'choice:be_q1.stage'), arrow: true),
       ],
     );
   }

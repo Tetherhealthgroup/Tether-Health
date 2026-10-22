@@ -28,14 +28,15 @@ class StHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       header: THeader(title: 'Steady', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TCard(variant: TCardVariant.dark, eyebrow: 'Last reading · 2 h after lunch', children: [TBigNumber(value: '142', unit: 'mg/dL', caption: 'Within your after-meal range (below 180)')]),
-        TButton(key: const ValueKey('a:body[1]'), label: 'Log a reading', onPressed: () => TNav.push(context, Routes.stLog), arrow: true),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: 'Meal energy reset', sub: '3 minutes', onTap: () => TNav.push(context, Routes.stReset)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: 'Patterns', sub: '71% in range · 14 days', onTap: () => TNav.push(context, Routes.stPatterns)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: 'A1C history', sub: '7.4% · Oct 1', onTap: () => TNav.push(context, Routes.stA1c)), TListRow(key: const ValueKey('a:body[2].rows[3]'), label: 'My range & low plan', onTap: () => TNav.push(context, Routes.stRange)), TListRow(key: const ValueKey('a:body[2].rows[4]'), label: 'Program settings', sub: 'Status, sharing, export, leave', onTap: () => TNav.push(context, Routes.programSettings, program: 'st'))]),
-        TCard(variant: TCardVariant.mint, text: 'Steady never counts calories. A high reading is information, not failure.'),
+        TCard(variant: TCardVariant.dark, eyebrow: s.stHomeBodyN0Eyebrow, children: [TBigNumber(value: '142', unit: 'mg/dL', caption: s.stHomeBodyN0ChildrenN0Caption)]),
+        TButton(key: const ValueKey('a:body[1]'), label: s.stHomeBodyN1Label, onPressed: () => TNav.push(context, Routes.stLog), arrow: true),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: s.stHomeBodyN2RowsN0Label, sub: s.stHomeBodyN2RowsN0Sub, onTap: () => TNav.push(context, Routes.stReset)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: s.stHomeBodyN2RowsN1Label, sub: s.stHomeBodyN2RowsN1Sub, onTap: () => TNav.push(context, Routes.stPatterns)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: s.stHomeBodyN2RowsN2Label, sub: s.stHomeBodyN2RowsN2Sub, onTap: () => TNav.push(context, Routes.stA1c)), TListRow(key: const ValueKey('a:body[2].rows[3]'), label: s.stHomeBodyN2RowsN3Label, onTap: () => TNav.push(context, Routes.stRange)), TListRow(key: const ValueKey('a:body[2].rows[4]'), label: s.stHomeBodyN2RowsN4Label, sub: s.stHomeBodyN2RowsN4Sub, onTap: () => TNav.push(context, Routes.programSettings, program: 'st'))]),
+        TCard(variant: TCardVariant.mint, text: s.stHomeBodyN3Text),
       ],
     );
   }

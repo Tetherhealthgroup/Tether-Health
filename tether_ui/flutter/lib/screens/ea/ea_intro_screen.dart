@@ -19,16 +19,17 @@ class EaIntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Ease', pill: '~2 min/day'),
+      header: THeader(title: 'Ease', pill: s.eaIntroHeaderPill),
       children: [
-        TProgramTag(program: 'ea', extra: 'Mental & behavioral health'),
-        TTitle('Support for how you feel.', size: TTitleSize.l),
-        TKeyValue(rows: [('Mood check-in', '30 seconds'), ('Screening', 'optional, private'), ('Help now', '988 always one tap away')]),
+        TProgramTag(program: 'ea', extra: s.eaIntroBodyN0Extra),
+        TTitle(s.eaIntroBodyN1Text, size: TTitleSize.l),
+        TKeyValue(rows: [(s.eaIntroBodyN2RowsN0N0, s.eaIntroBodyN2RowsN0N1), (s.eaIntroBodyN2RowsN1N0, s.eaIntroBodyN2RowsN1N1), (s.eaIntroBodyN2RowsN2N0, s.eaIntroBodyN2RowsN2N1)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Set up Ease', onPressed: () => TNav.push(context, Routes.eaQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Add as Learn only', onPressed: () => TNav.toast(context, 'Ease added as Learn only', then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.eaIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.eaQ1), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.eaIntroFooterN1Label, onPressed: () => TNav.toast(context, s.eaIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
       ],
     );
   }

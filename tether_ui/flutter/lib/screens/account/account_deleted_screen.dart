@@ -17,16 +17,17 @@ class AccountDeletedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Deleted', left: THeaderLeft.none),
+      header: THeader(title: s.accountDeletedHeaderTitle, left: THeaderLeft.none),
       children: [
         TIllustration(glyph: '✓'),
-        TTitle('Your data has been deleted.', size: TTitleSize.l, center: true),
-        TKeyValue(rows: [('Receipt', 'DEL-7F3A-21C9'), ('Completed', 'Oct 17, 2026 · 9:41 AM'), ('Signed out on', 'this phone')]),
-        TBody('Keep this receipt if you contact support. Backups are purged within 30 days.', tone: TTextTone.small),
+        TTitle(s.accountDeletedBodyN1Text, size: TTitleSize.l, center: true),
+        TKeyValue(rows: [(s.accountDeletedBodyN2RowsN0N0, s.accountDeletedBodyN2RowsN0N1), (s.accountDeletedBodyN2RowsN1N0, s.accountDeletedBodyN2RowsN1N1), (s.accountDeletedBodyN2RowsN2N0, s.accountDeletedBodyN2RowsN2N1)]),
+        TBody(s.accountDeletedBodyN3Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Done', onPressed: () => TNav.reset(context, Routes.welcome), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.accountDeletedFooterN0Label, onPressed: () => TNav.reset(context, Routes.welcome), arrow: true),
       ],
     );
   }

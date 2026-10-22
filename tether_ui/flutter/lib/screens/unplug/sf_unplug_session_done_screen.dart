@@ -17,15 +17,16 @@ class SfUnplugSessionDoneScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Focus session', left: THeaderLeft.none),
+      header: THeader(title: s.sfUnplugSessionDoneHeaderTitle, left: THeaderLeft.none),
       children: [
         TIllustration(glyph: '✓'),
-        TBigNumber(value: '45', unit: 'min', caption: 'Session complete · your apps are open again', center: true),
-        TBody('Want to make this a habit? You can start one from ScrollFree anytime.', tone: TTextTone.muted, center: true),
+        TBigNumber(value: '45', unit: 'min', caption: s.sfUnplugSessionDoneBodyN1Caption, center: true),
+        TBody(s.sfUnplugSessionDoneBodyN2Text, tone: TTextTone.muted, center: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Done', onPressed: () => TNav.replace(context, Routes.sfUnplugHome), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugSessionDoneFooterN0Label, onPressed: () => TNav.replace(context, Routes.sfUnplugHome), arrow: true),
       ],
     );
   }

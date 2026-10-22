@@ -19,17 +19,18 @@ class ObProgramsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Choose programs', pill: '1 of 5'),
+      header: THeader(title: s.obProgramsHeaderTitle, pill: s.obProgramsHeaderPill),
       children: [
         TSteps(n: 1, total: 5),
-        TTitle('What would you like support with?'),
-        TBody('Choose any. You can add, pause or leave a program anytime.', tone: TTextTone.muted),
-        TTileGrid(fieldKey: 'ob_programs.programs', tiles: [TTile(label: 'BreatheFree', sub: 'Tobacco & nicotine', program: 'bf', selected: true), TTile(label: 'ScrollFree', sub: 'Social media use', program: 'sf', selected: true), TTile(label: 'ClearAir', sub: 'Respiratory health', program: 'ca'), TTile(label: 'Heartwise', sub: 'Cardiovascular health', program: 'hw'), TTile(label: 'Steady', sub: 'Diabetes & metabolic health', program: 'st'), TTile(label: 'Ease', sub: 'Mental & behavioral health', program: 'ea'), TTile(label: 'Nourish', sub: 'Obesity & nutrition', program: 'nu'), TTile(label: 'Stride', sub: 'Healthy aging', program: 'sd')]),
-        TLink(key: const ValueKey('a:body[4]'), label: 'See all 11 programs', onTap: () => TNav.push(context, Routes.catalog)),
+        TTitle(s.obProgramsBodyN1Text),
+        TBody(s.obProgramsBodyN2Text, tone: TTextTone.muted),
+        TTileGrid(fieldKey: 'ob_programs.programs', tiles: [TTile(label: 'BreatheFree', sub: s.obProgramsBodyN3ItemsN0Sub, program: 'bf', selected: true), TTile(label: 'ScrollFree', sub: s.obProgramsBodyN3ItemsN1Sub, program: 'sf', selected: true), TTile(label: 'ClearAir', sub: s.obProgramsBodyN3ItemsN2Sub, program: 'ca'), TTile(label: 'Heartwise', sub: s.obProgramsBodyN3ItemsN3Sub, program: 'hw'), TTile(label: 'Steady', sub: s.obProgramsBodyN3ItemsN4Sub, program: 'st'), TTile(label: 'Ease', sub: s.obProgramsBodyN3ItemsN5Sub, program: 'ea'), TTile(label: 'Nourish', sub: s.obProgramsBodyN3ItemsN6Sub, program: 'nu'), TTile(label: 'Stride', sub: s.obProgramsBodyN3ItemsN7Sub, program: 'sd')]),
+        TLink(key: const ValueKey('a:body[4]'), label: s.obProgramsBodyN4Label, onTap: () => TNav.push(context, Routes.catalog)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue with 2 programs', onPressed: () => TNav.push(context, Routes.obFocus), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.obProgramsFooterN0Label, onPressed: () => TNav.push(context, Routes.obFocus), arrow: true),
       ],
     );
   }

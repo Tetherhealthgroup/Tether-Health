@@ -22,14 +22,15 @@ class AccountProgramsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Programs & sharing'),
+      header: THeader(title: s.accountProgramsHeaderTitle),
       children: [
-        TBody('2 of 2 focus slots used', tone: TTextTone.small),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'BreatheFree', sub: 'Focus · sharing manual', lead: TLead.program('bf'), onTap: () => TNav.push(context, Routes.programSettings, program: 'bf')), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: 'ScrollFree', sub: 'Focus · not shared', lead: TLead.program('sf'), onTap: () => TNav.push(context, Routes.programSettings, program: 'sf')), TListRow(key: const ValueKey('a:body[1].rows[2]'), label: 'ClearAir', sub: 'Learn only · no data', lead: TLead.program('ca'), onTap: () => TNav.push(context, Routes.programSettings, program: 'ca')), TListRow(key: const ValueKey('a:body[1].rows[3]'), label: 'Heartwise', sub: 'Paused Sep 2 · data kept', lead: TLead.program('hw'), onTap: () => TNav.push(context, Routes.programSettings, program: 'hw'))]),
+        TBody(s.accountProgramsBodyN0Text, tone: TTextTone.small),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'BreatheFree', sub: s.accountProgramsBodyN1RowsN0Sub, lead: TLead.program('bf'), onTap: () => TNav.push(context, Routes.programSettings, program: 'bf')), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: 'ScrollFree', sub: s.accountProgramsBodyN1RowsN1Sub, lead: TLead.program('sf'), onTap: () => TNav.push(context, Routes.programSettings, program: 'sf')), TListRow(key: const ValueKey('a:body[1].rows[2]'), label: 'ClearAir', sub: s.accountProgramsBodyN1RowsN2Sub, lead: TLead.program('ca'), onTap: () => TNav.push(context, Routes.programSettings, program: 'ca')), TListRow(key: const ValueKey('a:body[1].rows[3]'), label: 'Heartwise', sub: s.accountProgramsBodyN1RowsN3Sub, lead: TLead.program('hw'), onTap: () => TNav.push(context, Routes.programSettings, program: 'hw'))]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Add a program', onPressed: () => TNav.push(context, Routes.catalog), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.accountProgramsFooterN0Label, onPressed: () => TNav.push(context, Routes.catalog), variant: TButtonVariant.secondary),
       ],
     );
   }

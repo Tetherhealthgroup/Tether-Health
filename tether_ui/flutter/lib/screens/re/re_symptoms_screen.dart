@@ -19,16 +19,17 @@ class ReSymptomsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Check symptoms', left: THeaderLeft.close),
+      header: THeader(title: s.reSymptomsHeaderTitle, left: THeaderLeft.close),
       children: [
-        TTitle('Do you have any of these?'),
-        TChips(fieldKey: 're_symptoms.value', options: ['Very little urine', 'Swelling in legs or face', 'Yellow skin or eyes', 'Confusion', 'Vomiting blood', 'None'], selected: ['Yellow skin or eyes']),
-        TBanner(kind: TBannerKind.urgent, text: 'Yellow skin or eyes needs a clinician today.'),
+        TTitle(s.reSymptomsBodyN0Text),
+        TChips(fieldKey: 're_symptoms.value', options: ['Very little urine', 'Swelling in legs or face', 'Yellow skin or eyes', 'Confusion', 'Vomiting blood', 'None'], labels: [s.reSymptomsBodyN1OptionsN0, s.reSymptomsBodyN1OptionsN1, s.reSymptomsBodyN1OptionsN2, s.reSymptomsBodyN1OptionsN3, s.reSymptomsBodyN1OptionsN4, s.reSymptomsBodyN1OptionsN5], selected: ['Yellow skin or eyes']),
+        TBanner(kind: TBannerKind.urgent, text: s.reSymptomsBodyN2Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Contact my care team', onPressed: () => TNav.push(context, Routes.supportMessageCare), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Vomiting blood or confused? Call 911', onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.reSymptomsFooterN0Label, onPressed: () => TNav.push(context, Routes.supportMessageCare), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.reSymptomsFooterN1Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger),
       ],
     );
   }

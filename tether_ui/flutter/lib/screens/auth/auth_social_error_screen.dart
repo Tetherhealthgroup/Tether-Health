@@ -19,17 +19,18 @@ class AuthSocialErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Sign in', left: THeaderLeft.close),
+      header: THeader(title: s.authSocialErrorHeaderTitle, left: THeaderLeft.close),
       children: [
         TIllustration(glyph: '!', tone: TTone.error),
-        TTitle('Couldn’t sign in', size: TTitleSize.l, center: true),
-        TBody('Google sign-in didn’t finish. Check your connection and try again, or use email.', tone: TTextTone.muted, center: true),
-        TBody('Nothing was saved or shared.', tone: TTextTone.small, center: true),
+        TTitle(s.authSocialErrorBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.authSocialErrorBodyN2Text, tone: TTextTone.muted, center: true),
+        TBody(s.authSocialErrorBodyN3Text, tone: TTextTone.small, center: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Try again', onPressed: () => TNav.branch(context, 'Sign in with Google result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Error': () => TNav.toast(context, 'Still can’t reach Google. Try email.')}, provider: 'google'), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Use email instead', onPressed: () => TNav.replace(context, Routes.authSignin), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.authSocialErrorFooterN0Label, onPressed: () => TNav.branch(context, 'Sign in with Google result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Error': () => TNav.toast(context, s.authSocialErrorFooterN0ActionCasesN1ActionValue)}, provider: 'google'), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.authSocialErrorFooterN1Label, onPressed: () => TNav.replace(context, Routes.authSignin), variant: TButtonVariant.secondary),
       ],
     );
   }

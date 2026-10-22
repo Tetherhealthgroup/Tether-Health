@@ -18,16 +18,17 @@ class NuWeek4Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Week 4', pill: 'Milestone'),
+      header: THeader(title: s.nuWeek4HeaderTitle, pill: s.nuWeek4HeaderPill),
       children: [
         TIllustration(glyph: '4'),
-        TTitle('Four weeks of small habits.', size: TTitleSize.l, center: true),
-        TKeyValue(rows: [('Habits tried', '4'), ('Days done', '19'), ('Favorite', 'Water before meals')]),
-        TSegmented(fieldKey: 'nu_week4.how_do_you_feel_about_food_latel', options: ['Worse', 'Same', 'Better'], selected: 'Better', label: 'How do you feel about food lately?'),
+        TTitle(s.nuWeek4BodyN1Text, size: TTitleSize.l, center: true),
+        TKeyValue(rows: [(s.nuWeek4BodyN2RowsN0N0, '4'), (s.nuWeek4BodyN2RowsN1N0, '19'), (s.nuWeek4BodyN2RowsN2N0, s.nuWeek4BodyN2RowsN2N1)]),
+        TSegmented(fieldKey: 'nu_week4.how_do_you_feel_about_food_latel', options: ['Worse', 'Same', 'Better'], labels: [s.nuWeek4BodyN3OptionsN0, s.nuWeek4BodyN3OptionsN1, s.nuWeek4BodyN3OptionsN2], selected: 'Better', label: s.nuWeek4BodyN3Label),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Choose next habit', onPressed: () => TNav.replace(context, Routes.nuHabit), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.nuWeek4FooterN0Label, onPressed: () => TNav.replace(context, Routes.nuHabit), arrow: true),
       ],
     );
   }

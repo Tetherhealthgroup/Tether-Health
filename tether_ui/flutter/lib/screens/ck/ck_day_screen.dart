@@ -20,16 +20,17 @@ class CkDayScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Screening day', pill: 'Tomorrow'),
+      header: THeader(title: s.ckDayHeaderTitle, pill: s.ckDayHeaderPill),
       children: [
-        TTitle('Mammogram tomorrow at 9:30 AM'),
-        TCard(children: [TChecklist(items: [TCheckItem('Skip deodorant or powder', done: true), TCheckItem('Wear a two-piece outfit'), TCheckItem('Bring ID and insurance card')])]),
-        TCard(variant: TCardVariant.mint, title: 'Nervous?', text: 'It’s common. The scan takes about 20 minutes.', cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: '2-min breathing', onPressed: () => TNav.push(context, Routes.rescueActive), small: true)),
+        TTitle(s.ckDayBodyN0Text),
+        TCard(children: [TChecklist(items: [TCheckItem(s.ckDayBodyN1ChildrenN0ItemsN0Label, value: 'Skip deodorant or powder', done: true), TCheckItem(s.ckDayBodyN1ChildrenN0ItemsN1Label, value: 'Wear a two-piece outfit'), TCheckItem(s.ckDayBodyN1ChildrenN0ItemsN2Label, value: 'Bring ID and insurance card')])]),
+        TCard(variant: TCardVariant.mint, title: s.ckDayBodyN2Title, text: s.ckDayBodyN2Text, cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: s.ckDayBodyN2CtaN0Label, onPressed: () => TNav.push(context, Routes.rescueActive), small: true)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Add to calendar', onPressed: () => TNav.toast(context, 'Added to your calendar'), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Mark as done', onPressed: () => TNav.push(context, Routes.ckDone), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.ckDayFooterN0Label, onPressed: () => TNav.toast(context, s.ckDayFooterN0ActionValue), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.ckDayFooterN1Label, onPressed: () => TNav.push(context, Routes.ckDone), variant: TButtonVariant.secondary),
       ],
     );
   }

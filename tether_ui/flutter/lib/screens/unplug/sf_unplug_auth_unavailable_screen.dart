@@ -17,15 +17,16 @@ class SfUnplugAuthUnavailableScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Unplug', pill: 'Optional'),
+      header: THeader(title: 'Unplug', pill: s.sfUnplugAuthUnavailableHeaderPill),
       children: [
-        TBanner(kind: TBannerKind.info, text: 'Screen Time isn’t available on this phone.'),
-        TTitle('Unplug can’t run here.'),
-        TBody('This can happen when Screen Time is managed by an organization or limited by a parent. ScrollFree still works without Unplug.', tone: TTextTone.muted),
+        TBanner(kind: TBannerKind.info, text: s.sfUnplugAuthUnavailableBodyN0Text),
+        TTitle(s.sfUnplugAuthUnavailableBodyN1Text),
+        TBody(s.sfUnplugAuthUnavailableBodyN2Text, tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Back to ScrollFree', onPressed: () => TNav.back(context), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugAuthUnavailableFooterN0Label, onPressed: () => TNav.back(context), arrow: true),
       ],
     );
   }

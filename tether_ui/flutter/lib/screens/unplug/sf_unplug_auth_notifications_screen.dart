@@ -20,17 +20,18 @@ class SfUnplugAuthNotificationsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Unplug', pill: 'Step 1 of 3'),
+      header: THeader(title: 'Unplug', pill: s.sfUnplugAuthNotificationsHeaderPill),
       children: [
-        TBanner(kind: TBannerKind.info, text: 'Notifications are off for Tether.'),
-        TTitle('Turn on notifications for Unplug?'),
-        TBody('When a pause screen sends you to Tether, including Get support, it uses a notification. With notifications off, Unplug still pauses apps, and the pause screen tells you to open Tether yourself for support.', tone: TTextTone.muted),
+        TBanner(kind: TBannerKind.info, text: s.sfUnplugAuthNotificationsBodyN0Text),
+        TTitle(s.sfUnplugAuthNotificationsBodyN1Text),
+        TBody(s.sfUnplugAuthNotificationsBodyN2Text, tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Open phone settings', onPressed: () => TNav.osSettings(context), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Check again', onPressed: () => TNav.branch(context, 'Notification permission (checked on return)', <String, VoidCallback>{'On (iPhone)': () => TNav.replace(context, Routes.sfUnplugApps), 'On (Android)': () => TNav.replace(context, Routes.sfUnplugAppsAndroid), 'Still off': () => TNav.toast(context, 'Notifications are still off. You can turn them on later in Settings.')}, device: const TBranchRef('unplug.setup.notifications_check', TAsk.notificationsCheck, 'sf_unplug_auth_notifications'), when: const <TAnswer, String>{TAnswer.denied: 'Still off'}, whenByPlatform: const <TAnswer, Map<TAnswer, String>>{TAnswer.granted: {TAnswer.ios: 'On (iPhone)', TAnswer.android: 'On (Android)'}}), variant: TButtonVariant.secondary),
-        TLink(key: const ValueKey('a:footer[2]'), label: 'Continue without notifications', onTap: () => TNav.branch(context, 'Platform', <String, VoidCallback>{'iPhone': () => TNav.replace(context, Routes.sfUnplugApps), 'Android': () => TNav.replace(context, Routes.sfUnplugAppsAndroid)}, device: const TBranchRef('unplug.setup.continue_platform', TAsk.platform, 'sf_unplug_auth_notifications'), when: const <TAnswer, String>{TAnswer.ios: 'iPhone', TAnswer.android: 'Android'})),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugAuthNotificationsFooterN0Label, onPressed: () => TNav.osSettings(context), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfUnplugAuthNotificationsFooterN1Label, onPressed: () => TNav.branch(context, 'Notification permission (checked on return)', <String, VoidCallback>{'On (iPhone)': () => TNav.replace(context, Routes.sfUnplugApps), 'On (Android)': () => TNav.replace(context, Routes.sfUnplugAppsAndroid), 'Still off': () => TNav.toast(context, s.sfUnplugAuthNotificationsFooterN1ActionCasesN2ActionValue)}, device: const TBranchRef('unplug.setup.notifications_check', TAsk.notificationsCheck, 'sf_unplug_auth_notifications'), when: const <TAnswer, String>{TAnswer.denied: 'Still off'}, whenByPlatform: const <TAnswer, Map<TAnswer, String>>{TAnswer.granted: {TAnswer.ios: 'On (iPhone)', TAnswer.android: 'On (Android)'}}), variant: TButtonVariant.secondary),
+        TLink(key: const ValueKey('a:footer[2]'), label: s.sfUnplugAuthNotificationsFooterN2Label, onTap: () => TNav.branch(context, 'Platform', <String, VoidCallback>{'iPhone': () => TNav.replace(context, Routes.sfUnplugApps), 'Android': () => TNav.replace(context, Routes.sfUnplugAppsAndroid)}, device: const TBranchRef('unplug.setup.continue_platform', TAsk.platform, 'sf_unplug_auth_notifications'), when: const <TAnswer, String>{TAnswer.ios: 'iPhone', TAnswer.android: 'Android'})),
       ],
     );
   }

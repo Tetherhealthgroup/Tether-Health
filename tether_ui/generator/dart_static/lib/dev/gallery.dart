@@ -21,7 +21,7 @@ class GalleryScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
           for (final flow in byFlow.entries) ...[
-            Padding(padding: const EdgeInsets.fromLTRB(4, 16, 4, 6), child: TEyebrow(flow.key)),
+            Padding(padding: const EdgeInsetsDirectional.fromSTEB(4, 16, 4, 6), child: TEyebrow(flow.key)),
             Card(
               color: TColors.paper,
               child: Column(children: [

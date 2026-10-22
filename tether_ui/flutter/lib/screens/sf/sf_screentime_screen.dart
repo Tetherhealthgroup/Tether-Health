@@ -19,17 +19,18 @@ class SfScreentimeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Screen Time', pill: 'Optional'),
+      header: THeader(title: s.sfScreentimeHeaderTitle, pill: s.sfScreentimeHeaderPill),
       children: [
         TIllustration(glyph: '◷'),
-        TTitle('See your Screen Time here, if you want.', center: true),
-        TBody('Apple’s Screen Time shows your daily totals by category inside Tether. Tether can’t read, store or share those minutes.', tone: TTextTone.muted, center: true),
-        TKeyValue(rows: [('Shows', 'Minutes per category, on this phone'), ('Never reads', 'Content, messages, contacts'), ('Turn off', 'Anytime in Account')]),
+        TTitle(s.sfScreentimeBodyN1Text, center: true),
+        TBody(s.sfScreentimeBodyN2Text, tone: TTextTone.muted, center: true),
+        TKeyValue(rows: [(s.sfScreentimeBodyN3RowsN0N0, s.sfScreentimeBodyN3RowsN0N1), (s.sfScreentimeBodyN3RowsN1N0, s.sfScreentimeBodyN3RowsN1N1), (s.sfScreentimeBodyN3RowsN2N0, s.sfScreentimeBodyN3RowsN2N1)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Allow access', onPressed: () => TNav.branch(context, 'iOS Screen Time permission', <String, VoidCallback>{'Allowed': () => TNav.toast(context, 'Screen Time connected', then: () => TNav.back(context)), 'Not allowed': () => TNav.replace(context, Routes.sfScreentimeDenied)}, device: const TBranchRef('sf.screentime.ios_request', TAsk.screenTimeRequest, 'sf_screentime'), when: const <TAnswer, String>{TAnswer.granted: 'Allowed', TAnswer.denied: 'Not allowed', TAnswer.unavailable: 'Not allowed'}), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfScreentimeFooterN0Label, onPressed: () => TNav.branch(context, 'iOS Screen Time permission', <String, VoidCallback>{'Allowed': () => TNav.toast(context, s.sfScreentimeFooterN0ActionCasesN0ActionValue, then: () => TNav.back(context)), 'Not allowed': () => TNav.replace(context, Routes.sfScreentimeDenied)}, device: const TBranchRef('sf.screentime.ios_request', TAsk.screenTimeRequest, 'sf_screentime'), when: const <TAnswer, String>{TAnswer.granted: 'Allowed', TAnswer.denied: 'Not allowed', TAnswer.unavailable: 'Not allowed'}), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfScreentimeFooterN1Label, onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );
   }

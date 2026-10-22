@@ -18,19 +18,20 @@ class SfUnplugLimitsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Limits', pill: 'Step 3 of 3'),
+      header: THeader(title: s.sfUnplugLimitsHeaderTitle, pill: s.sfUnplugLimitsHeaderPill),
       children: [
-        TTitle('When should Unplug step in?'),
-        TCard(children: [TSliderField(fieldKey: 'sf_unplug_limits.daily_minutes', label: 'Daily time in these apps', value: 60.0, min: 15.0, max: 240.0, minLabel: '15 min', maxLabel: '4 h', color: TColors.program('sf'), suffix: ' min'), TSliderField(fieldKey: 'sf_unplug_limits.daily_opens', label: 'Opens a day', value: 20.0, min: 5.0, max: 60.0, minLabel: '5', maxLabel: '60', color: TColors.program('sf')), TBody('On iPhone, opens are counted from pause screens shown, so the number is approximate.', tone: TTextTone.small)]),
-        TRadioList(fieldKey: 'sf_unplug_limits.level', items: [TRadioItem('Notice only', sub: 'Count time, no pause screen'), TRadioItem('Pause screen', sub: 'A pause before the app opens'), TRadioItem('Pause and one small step', sub: 'A breath, a typed sentence or a quick sum first', badge: 'Suggested'), TRadioItem('Firm', sub: 'No “open anyway” until tomorrow')], selected: 2, label: 'When you reach a limit'),
-        TChips(fieldKey: 'sf_unplug_limits.gate', options: ['One breath', 'Type a sentence', 'Quick sum'], selected: ['One breath'], multi: false, label: 'Small step'),
-        TSegmented(fieldKey: 'sf_unplug_limits.overrides', options: ['0', '1', '3', '5'], selected: '3', label: '“Open anyway” per day'),
-        TBody('Stricter limits apply now. Looser limits start tomorrow, so one hard moment doesn’t change your plan.', tone: TTextTone.small),
-        TBody('Every pause screen has a Get support button. Tether, the phone dialer and emergency calling can never be chosen or paused.', tone: TTextTone.small),
+        TTitle(s.sfUnplugLimitsBodyN0Text),
+        TCard(children: [TSliderField(fieldKey: 'sf_unplug_limits.daily_minutes', label: s.sfUnplugLimitsBodyN1ChildrenN0Label, value: 60.0, min: 15.0, max: 240.0, minLabel: s.sfUnplugLimitsBodyN1ChildrenN0MinLabel, maxLabel: s.sfUnplugLimitsBodyN1ChildrenN0MaxLabel, color: TColors.program('sf'), suffix: ' min'), TSliderField(fieldKey: 'sf_unplug_limits.daily_opens', label: s.sfUnplugLimitsBodyN1ChildrenN1Label, value: 20.0, min: 5.0, max: 60.0, minLabel: '5', maxLabel: '60', color: TColors.program('sf')), TBody(s.sfUnplugLimitsBodyN1ChildrenN2Text, tone: TTextTone.small)]),
+        TRadioList(fieldKey: 'sf_unplug_limits.level', items: [TRadioItem(s.sfUnplugLimitsBodyN2ItemsN0Label, value: 'Notice only', sub: s.sfUnplugLimitsBodyN2ItemsN0Sub), TRadioItem(s.sfUnplugLimitsBodyN2ItemsN1Label, value: 'Pause screen', sub: s.sfUnplugLimitsBodyN2ItemsN1Sub), TRadioItem(s.sfUnplugLimitsBodyN2ItemsN2Label, value: 'Pause and one small step', sub: s.sfUnplugLimitsBodyN2ItemsN2Sub, badge: s.sfUnplugLimitsBodyN2ItemsN2Badge), TRadioItem(s.sfUnplugLimitsBodyN2ItemsN3Label, value: 'Firm', sub: s.sfUnplugLimitsBodyN2ItemsN3Sub)], selected: 2, label: s.sfUnplugLimitsBodyN2Label),
+        TChips(fieldKey: 'sf_unplug_limits.gate', options: ['One breath', 'Type a sentence', 'Quick sum'], labels: [s.sfUnplugLimitsBodyN3OptionsN0, s.sfUnplugLimitsBodyN3OptionsN1, s.sfUnplugLimitsBodyN3OptionsN2], selected: ['One breath'], multi: false, label: s.sfUnplugLimitsBodyN3Label),
+        TSegmented(fieldKey: 'sf_unplug_limits.overrides', options: ['0', '1', '3', '5'], selected: '3', label: s.sfUnplugLimitsBodyN4Label),
+        TBody(s.sfUnplugLimitsBodyN5Text, tone: TTextTone.small),
+        TBody(s.sfUnplugLimitsBodyN6Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save limits', onPressed: () => TNav.submit(context, 'CALL device:unplug/setThresholds+applyShield', screenId: 'sf_unplug_limits', then: () => TNav.toast(context, 'Unplug is on', then: () => TNav.replace(context, Routes.sfUnplugHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugLimitsFooterN0Label, onPressed: () => TNav.submit(context, 'CALL device:unplug/setThresholds+applyShield', screenId: 'sf_unplug_limits', then: () => TNav.toast(context, s.sfUnplugLimitsFooterN0ActionThenValue, then: () => TNav.replace(context, Routes.sfUnplugHome))), arrow: true),
       ],
     );
   }

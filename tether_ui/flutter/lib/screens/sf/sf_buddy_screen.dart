@@ -19,18 +19,19 @@ class SfBuddyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Buddy', pill: 'Optional'),
+      header: THeader(title: s.sfBuddyHeaderTitle, pill: s.sfBuddyHeaderPill),
       children: [
-        TTitle('Want someone in your corner?'),
-        TBody('Your buddy only sees what you choose to send.', tone: TTextTone.muted),
-        TField(fieldKey: 'sf_buddy.name', label: 'Name', placeholder: 'Sam'),
-        TChecklist(fieldKey: 'sf_buddy.buddy_can_see', items: [TCheckItem('A weekly “I hit my goal” message', done: true), TCheckItem('My minutes per day'), TCheckItem('Nothing automatic: I send each one', done: true)], label: 'They can see', bind: 'sf.buddy.can_see'),
-        TCard(variant: TCardVariant.mint, eyebrow: 'Preview', children: [TQuote('Phone-free nights this week: 5. Thanks for cheering me on!')]),
+        TTitle(s.sfBuddyBodyN0Text),
+        TBody(s.sfBuddyBodyN1Text, tone: TTextTone.muted),
+        TField(fieldKey: 'sf_buddy.name', label: s.sfBuddyBodyN2Label, placeholder: s.sfBuddyBodyN2Placeholder),
+        TChecklist(fieldKey: 'sf_buddy.buddy_can_see', items: [TCheckItem(s.sfBuddyBodyN3ItemsN0Label, value: 'A weekly “I hit my goal” message', done: true), TCheckItem(s.sfBuddyBodyN3ItemsN1Label, value: 'My minutes per day'), TCheckItem(s.sfBuddyBodyN3ItemsN2Label, value: 'Nothing automatic: I send each one', done: true)], label: s.sfBuddyBodyN3Label, bind: 'sf.buddy.can_see'),
+        TCard(variant: TCardVariant.mint, eyebrow: s.sfBuddyBodyN4Eyebrow, children: [TQuote(s.sfBuddyBodyN4ChildrenN0Text)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save and finish', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sf/plan', screenId: 'sf_buddy', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.sfHome))), arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Skip for now', onTap: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.sfHome))),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfBuddyFooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sf/plan', screenId: 'sf_buddy', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.sfHome))), arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.sfBuddyFooterN1Label, onTap: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.sfHome))),
       ],
     );
   }
