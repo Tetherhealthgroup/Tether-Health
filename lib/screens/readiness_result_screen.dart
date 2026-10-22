@@ -4,6 +4,46 @@ import '../theme/app_colors.dart';
 import 'baseline_assessment_screen.dart';
 import 'trigger_map_screen.dart';
 
+/// Above 140% text (the iOS accessibility sizes and Android 14's largest
+/// font sizes) side-by-side pieces are stacked so text can grow.
+bool _usesLargeTextLayout(BuildContext context) =>
+    MediaQuery.textScalerOf(context).scale(10) > 14;
+
+/// The text scale for [text] in [style], lowered only as far as needed for
+/// its longest word to fit [width]: a word too long for a whole line scales
+/// down instead of splitting.
+TextScaler _wordFitScaler(
+  BuildContext context,
+  String text,
+  TextStyle style,
+  double width,
+) {
+  final scaler = MediaQuery.textScalerOf(context);
+  final painter = TextPainter(
+    text: TextSpan(
+      text: text,
+      style: DefaultTextStyle.of(context).style.merge(style),
+    ),
+    textDirection: Directionality.of(context),
+  );
+  try {
+    var fitted = scaler;
+    for (var attempt = 0; attempt < 4; attempt++) {
+      painter
+        ..textScaler = fitted
+        ..layout();
+      final longestWord = painter.minIntrinsicWidth;
+      if (longestWord <= width) return fitted;
+      final fontSize = style.fontSize ?? 14;
+      final factor = fitted.scale(fontSize) / fontSize * width / longestWord;
+      fitted = scaler.clamp(maxScaleFactor: factor * 0.99);
+    }
+    return fitted;
+  } finally {
+    painter.dispose();
+  }
+}
+
 enum ReadinessPath { prepare, explore, connect }
 
 class ReadinessResultScreen extends StatelessWidget {
@@ -205,31 +245,49 @@ class ReadinessResultScreen extends StatelessWidget {
             builder: (context, constraints) {
               final narrow = constraints.maxWidth < 380;
               final compact = constraints.maxHeight < 760;
-              final horizontalPadding = narrow ? 18.0 : 24.0;
+              // Above 140% text the side margins narrow so long words fit, and
+              // the header, progress and main action scroll with the content
+              // so they never squeeze the questions out of view.
+              final largeText = _usesLargeTextLayout(context);
+              final horizontalPadding =
+                  largeText ? 12.0 : (narrow ? 18.0 : 24.0);
+
+              final footer = _ReadinessBottomAction(
+                isSpanish: isSpanish,
+                label: _actionLabel(),
+                onContinue: onContinue,
+                horizontalPadding: largeText ? 0 : horizontalPadding,
+                compact: compact,
+              );
+
+              final header = _ReadinessHeader(
+                isSpanish: isSpanish,
+                onBack: onBack,
+              );
+              final progress = _ReadinessProgress(isSpanish: isSpanish);
 
               return Column(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 10,
-                      horizontalPadding,
-                      0,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 10,
+                        horizontalPadding,
+                        0,
+                      ),
+                      child: header,
                     ),
-                    child: _ReadinessHeader(
-                      isSpanish: isSpanish,
-                      onBack: onBack,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 8,
+                        horizontalPadding,
+                        compact ? 7 : 10,
+                      ),
+                      child: progress,
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 8,
-                      horizontalPadding,
-                      compact ? 7 : 10,
-                    ),
-                    child: _ReadinessProgress(isSpanish: isSpanish),
-                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       key: const ValueKey('readiness-content-scroll'),
@@ -245,6 +303,12 @@ class ReadinessResultScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              if (largeText) ...[
+                                header,
+                                const SizedBox(height: 10),
+                                progress,
+                                const SizedBox(height: 18),
+                              ],
                               _ReadinessIllustration(compact: compact),
                               SizedBox(height: compact ? 12 : 20),
                               Text(
@@ -261,6 +325,10 @@ class ReadinessResultScreen extends StatelessWidget {
                                 isSpanish
                                     ? 'Estás listo para prepararte—a tu propio ritmo.'
                                     : 'You’re ready to prepare—at your own pace.',
+                                // Already the largest text on screen; past
+                                // 180% its longest words no longer fit.
+                                textScaler: MediaQuery.textScalerOf(context)
+                                    .clamp(maxScaleFactor: 1.8),
                                 style: Theme.of(context)
                                     .textTheme
                                     .displayLarge
@@ -317,19 +385,17 @@ class ReadinessResultScreen extends StatelessWidget {
                                 selectedPath: selectedPath,
                                 onPathChanged: onPathChanged,
                               ),
+                              if (largeText) ...[
+                                const SizedBox(height: 18),
+                                footer,
+                              ],
                             ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                  _ReadinessBottomAction(
-                    isSpanish: isSpanish,
-                    label: _actionLabel(),
-                    onContinue: onContinue,
-                    horizontalPadding: horizontalPadding,
-                    compact: compact,
-                  ),
+                  if (!largeText) footer,
                 ],
               );
             },
@@ -348,60 +414,94 @@ class _ReadinessHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
+    final back = IconButton.outlined(
+      key: const ValueKey('readiness-back'),
+      tooltip: isSpanish ? 'Atrás' : 'Back',
+      onPressed: onBack,
+      style: IconButton.styleFrom(
+        foregroundColor: AppColors.deepTeal,
+        side: const BorderSide(color: AppColors.border),
+      ),
+      icon: const Icon(Icons.arrow_back_rounded),
+    );
+    final label = isSpanish ? 'Tu punto de partida' : 'Your starting point';
+    const style = TextStyle(
+      color: AppColors.deepTeal,
+      fontSize: 16,
+      fontWeight: FontWeight.w800,
+    );
+    // The title wraps instead of ending in "…"; a word too long for the
+    // line scales down instead of splitting.
+    final title = LayoutBuilder(
+      builder: (context, constraints) => Text(
+        label,
+        textAlign: TextAlign.center,
+        textScaler: _wordFitScaler(
+          context,
+          label,
+          style,
+          constraints.maxWidth,
+        ),
+        style: style,
+      ),
+    );
+    final step = Container(
+      constraints: const BoxConstraints(minHeight: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: AppColors.mint,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Icons.check_circle_rounded,
+            size: 17,
+            color: AppColors.deepTeal,
+          ),
+          const SizedBox(width: 5),
+          Text(
+            isSpanish ? 'Completo' : 'Complete',
+            style: const TextStyle(
+              color: AppColors.tealSecondary,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    // Between the back button and the step, the title's words split at
+    // accessibility text sizes, so it takes a line of its own.
+    if (_usesLargeTextLayout(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [back, step],
+            ),
+          ),
+          const SizedBox(height: 6),
+          title,
+        ],
+      );
+    }
+    // A minimum height: larger text grows the header instead of clipping it.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
       child: Row(
         children: [
-          IconButton.outlined(
-            key: const ValueKey('readiness-back'),
-            tooltip: isSpanish ? 'Atrás' : 'Back',
-            onPressed: onBack,
-            style: IconButton.styleFrom(
-              foregroundColor: AppColors.deepTeal,
-              side: const BorderSide(color: AppColors.border),
-            ),
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
-          Expanded(
-            child: Text(
-              isSpanish ? 'Tu punto de partida' : 'Your starting point',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.deepTeal,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          Container(
-            height: 32,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            decoration: BoxDecoration(
-              color: AppColors.mint,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.check_circle_rounded,
-                  size: 17,
-                  color: AppColors.deepTeal,
-                ),
-                const SizedBox(width: 5),
-                Text(
-                  isSpanish ? 'Completo' : 'Complete',
-                  style: const TextStyle(
-                    color: AppColors.tealSecondary,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          back,
+          Expanded(child: title),
+          step,
         ],
       ),
     );
@@ -418,17 +518,20 @@ class _ReadinessProgress extends StatelessWidget {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              isSpanish ? 'EVALUACIÓN' : 'ASSESSMENT',
-              style: const TextStyle(
-                color: AppColors.mutedTeal,
-                fontSize: 10,
-                letterSpacing: 1.6,
-                fontWeight: FontWeight.w800,
+            Flexible(
+              child: Text(
+                isSpanish ? 'EVALUACIÓN' : 'ASSESSMENT',
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 10,
+                  letterSpacing: 1.6,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: 8),
             const Text(
               '100%',
               style: TextStyle(
@@ -547,7 +650,12 @@ class _ReflectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const ValueKey('readiness-reflection-card'),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+      // Narrower side padding at accessibility text sizes leaves room for
+      // long words.
+      padding: EdgeInsets.symmetric(
+        horizontal: _usesLargeTextLayout(context) ? 8 : 14,
+        vertical: 4,
+      ),
       decoration: BoxDecoration(
         color: AppColors.paper,
         borderRadius: BorderRadius.circular(16),
@@ -608,49 +716,56 @@ class _ReflectionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final badge = Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: iconBackground,
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, color: iconColor, size: 21),
+    );
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.mutedTeal,
+            fontSize: 10,
+            letterSpacing: 1.2,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: const TextStyle(
+            color: AppColors.deepTeal,
+            fontSize: 13,
+            height: 1.25,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ],
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: iconBackground,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: iconColor, size: 21),
-          ),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Column(
+      // At accessibility text sizes the text takes the row's full width
+      // under the icon.
+      child: _usesLargeTextLayout(context)
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [badge, const SizedBox(height: 8), text],
+            )
+          : Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: AppColors.mutedTeal,
-                    fontSize: 10,
-                    letterSpacing: 1.2,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    color: AppColors.deepTeal,
-                    fontSize: 13,
-                    height: 1.25,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
+                badge,
+                const SizedBox(width: 11),
+                Expanded(child: text),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -670,6 +785,12 @@ class _RecommendationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final title = isSpanish ? 'Prepararte' : 'Prepare';
+    const titleStyle = TextStyle(
+      color: AppColors.deepTeal,
+      fontSize: 20,
+      fontWeight: FontWeight.w800,
+    );
     return Material(
       color: AppColors.mint,
       shape: RoundedRectangleBorder(
@@ -688,42 +809,59 @@ class _RecommendationCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: AppColors.deepTeal,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      isSpanish ? 'RECOMENDADO' : 'RECOMMENDED',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9,
-                        letterSpacing: 1,
-                        fontWeight: FontWeight.w800,
+              // A Wrap rather than a Row: at accessibility text sizes the
+              // badge can take a line of its own instead of overflowing.
+              SizedBox(
+                width: double.infinity,
+                child: Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.deepTeal,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        isSpanish ? 'RECOMENDADO' : 'RECOMMENDED',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9,
+                          letterSpacing: 1,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
-                  ),
-                  const Spacer(),
-                  Icon(
-                    selected
-                        ? Icons.check_circle_rounded
-                        : Icons.circle_outlined,
-                    color: selected ? AppColors.coral : AppColors.tealSecondary,
-                    size: 28,
-                  ),
-                ],
+                    Icon(
+                      selected
+                          ? Icons.check_circle_rounded
+                          : Icons.circle_outlined,
+                      color:
+                          selected ? AppColors.coral : AppColors.tealSecondary,
+                      size: 28,
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 9),
-              Text(
-                isSpanish ? 'Prepararte' : 'Prepare',
-                style: const TextStyle(
-                  color: AppColors.deepTeal,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
+              // The card's heading: a word too long for the line scales down
+              // instead of splitting.
+              LayoutBuilder(
+                builder: (context, constraints) => Text(
+                  title,
+                  textScaler: _wordFitScaler(
+                    context,
+                    title,
+                    titleStyle,
+                    constraints.maxWidth,
+                  ),
+                  style: titleStyle,
                 ),
               ),
               const SizedBox(height: 4),
@@ -807,7 +945,8 @@ class _AlternativePaths extends StatelessWidget {
       onTap: () => onPathChanged(ReadinessPath.connect),
     );
 
-    if (narrow) {
+    // Side by side, the cards' words split at accessibility text sizes.
+    if (narrow || _usesLargeTextLayout(context)) {
       return Column(
         children: [
           explore,
@@ -950,42 +1089,43 @@ class _ReadinessBottomAction extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: compact ? 54 : 60,
-                  child: FilledButton(
-                    key: const ValueKey('readiness-continue'),
-                    onPressed: onContinue,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.deepTeal,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                FilledButton(
+                  key: const ValueKey('readiness-continue'),
+                  onPressed: onContinue,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.deepTeal,
+                    foregroundColor: Colors.white,
+                    // A minimum, not a fixed height: large text wraps and
+                    // grows the button instead of being clipped.
+                    minimumSize: Size.fromHeight(compact ? 54 : 60),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            label,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              height: 1.05,
-                              fontWeight: FontWeight.w800,
-                            ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          label,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            height: 1.05,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        const Icon(
-                          Icons.arrow_forward_rounded,
-                          color: AppColors.lime,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: AppColors.lime,
+                      ),
+                    ],
                   ),
                 ),
                 if (!compact) ...[
@@ -994,8 +1134,7 @@ class _ReadinessBottomAction extends StatelessWidget {
                     isSpanish
                         ? 'Tú tienes el control. Cambia tu ruta cuando quieras.'
                         : 'You’re in control. Change your path anytime.',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: AppColors.mutedTeal,
                       fontSize: 10,

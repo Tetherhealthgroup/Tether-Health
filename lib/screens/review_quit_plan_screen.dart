@@ -7,6 +7,46 @@ import 'choose_quit_path_screen.dart';
 import 'my_reasons_screen.dart';
 import 'support_preparation_screen.dart';
 
+/// Above 140% text (the iOS accessibility sizes and Android 14's largest
+/// font sizes) side-by-side pieces are stacked so text can grow.
+bool _usesLargeTextLayout(BuildContext context) =>
+    MediaQuery.textScalerOf(context).scale(10) > 14;
+
+/// The text scale for [text] in [style], lowered only as far as needed for
+/// its longest word to fit [width]: a word too long for a whole line scales
+/// down instead of splitting.
+TextScaler _wordFitScaler(
+  BuildContext context,
+  String text,
+  TextStyle style,
+  double width,
+) {
+  final scaler = MediaQuery.textScalerOf(context);
+  final painter = TextPainter(
+    text: TextSpan(
+      text: text,
+      style: DefaultTextStyle.of(context).style.merge(style),
+    ),
+    textDirection: Directionality.of(context),
+  );
+  try {
+    var fitted = scaler;
+    for (var attempt = 0; attempt < 4; attempt++) {
+      painter
+        ..textScaler = fitted
+        ..layout();
+      final longestWord = painter.minIntrinsicWidth;
+      if (longestWord <= width) return fitted;
+      final fontSize = style.fontSize ?? 14;
+      final factor = fitted.scale(fontSize) / fontSize * width / longestWord;
+      fitted = scaler.clamp(maxScaleFactor: factor * 0.99);
+    }
+    return fitted;
+  } finally {
+    painter.dispose();
+  }
+}
+
 class ReviewQuitPlanScreen extends StatelessWidget {
   const ReviewQuitPlanScreen({
     required this.isSpanish,
@@ -289,31 +329,66 @@ class ReviewQuitPlanScreen extends StatelessWidget {
             builder: (context, constraints) {
               final narrow = constraints.maxWidth < 380;
               final compact = constraints.maxHeight < 760;
-              final horizontalPadding = narrow ? 18.0 : 22.0;
+              // Above 140% text the side margins narrow so long words fit, and
+              // the header, progress and main action scroll with the content
+              // so they never squeeze the questions out of view.
+              final largeText = _usesLargeTextLayout(context);
+              final horizontalPadding =
+                  largeText ? 12.0 : (narrow ? 18.0 : 22.0);
+
+              final detailsHeading = Text(
+                isSpanish ? 'DETALLES DEL PLAN' : 'PLAN DETAILS',
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 11,
+                  letterSpacing: 1.8,
+                  fontWeight: FontWeight.w800,
+                ),
+              );
+              final editHint = Text(
+                isSpanish ? 'Toca para editar' : 'Tap any item to edit',
+                textAlign: largeText ? TextAlign.start : TextAlign.end,
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 11,
+                ),
+              );
+              final footer = _ReviewBottomActions(
+                isSpanish: isSpanish,
+                compact: compact,
+                horizontalPadding: largeText ? 0 : horizontalPadding,
+                onStartPlan: onStartPlan,
+                onSaveForLater: () => unawaited(_saveForLater(context)),
+              );
+
+              final header = _ReviewHeader(
+                isSpanish: isSpanish,
+                onBack: onBack,
+              );
+              final progress = _ReviewProgress(isSpanish: isSpanish);
 
               return Column(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 9,
-                      horizontalPadding,
-                      0,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 9,
+                        horizontalPadding,
+                        0,
+                      ),
+                      child: header,
                     ),
-                    child: _ReviewHeader(
-                      isSpanish: isSpanish,
-                      onBack: onBack,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 8,
+                        horizontalPadding,
+                        compact ? 7 : 10,
+                      ),
+                      child: progress,
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 8,
-                      horizontalPadding,
-                      compact ? 7 : 10,
-                    ),
-                    child: _ReviewProgress(isSpanish: isSpanish),
-                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       key: const ValueKey('review-content-scroll'),
@@ -329,6 +404,12 @@ class ReviewQuitPlanScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              if (largeText) ...[
+                                header,
+                                const SizedBox(height: 10),
+                                progress,
+                                const SizedBox(height: 18),
+                              ],
                               Text(
                                 isSpanish
                                     ? 'TU PLAN PARA DEJARLO'
@@ -345,6 +426,10 @@ class ReviewQuitPlanScreen extends StatelessWidget {
                                 isSpanish
                                     ? 'Tu plan está listo.'
                                     : 'Your plan is ready.',
+                                // Already the largest text on screen; past
+                                // 180% its longest words no longer fit.
+                                textScaler: MediaQuery.textScalerOf(context)
+                                    .clamp(maxScaleFactor: 1.8),
                                 style: Theme.of(context)
                                     .textTheme
                                     .displayLarge
@@ -384,40 +469,20 @@ class ReviewQuitPlanScreen extends StatelessWidget {
                                 compact: compact,
                               ),
                               SizedBox(height: compact ? 16 : 20),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      isSpanish
-                                          ? 'DETALLES DEL PLAN'
-                                          : 'PLAN DETAILS',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        color: AppColors.mutedTeal,
-                                        fontSize: 11,
-                                        letterSpacing: 1.8,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Flexible(
-                                    child: Text(
-                                      isSpanish
-                                          ? 'Toca para editar'
-                                          : 'Tap any item to edit',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      textAlign: TextAlign.end,
-                                      style: const TextStyle(
-                                        color: AppColors.mutedTeal,
-                                        fontSize: 11,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              // Side by side, these split mid-word at
+                              // accessibility text sizes.
+                              if (largeText) ...[
+                                detailsHeading,
+                                const SizedBox(height: 4),
+                                editHint,
+                              ] else
+                                Row(
+                                  children: [
+                                    Expanded(child: detailsHeading),
+                                    const SizedBox(width: 12),
+                                    Flexible(child: editHint),
+                                  ],
+                                ),
                               const SizedBox(height: 9),
                               _PlanDetailsCard(
                                 isSpanish: isSpanish,
@@ -434,19 +499,17 @@ class ReviewQuitPlanScreen extends StatelessWidget {
                               ),
                               SizedBox(height: compact ? 13 : 17),
                               _ActivationNote(isSpanish: isSpanish),
+                              if (largeText) ...[
+                                const SizedBox(height: 18),
+                                footer,
+                              ],
                             ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                  _ReviewBottomActions(
-                    isSpanish: isSpanish,
-                    compact: compact,
-                    horizontalPadding: horizontalPadding,
-                    onStartPlan: onStartPlan,
-                    onSaveForLater: () => unawaited(_saveForLater(context)),
-                  ),
+                  if (!largeText) footer,
                 ],
               );
             },
@@ -465,50 +528,84 @@ class _ReviewHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
+    final back = IconButton.outlined(
+      key: const ValueKey('review-back'),
+      tooltip: isSpanish ? 'Atrás' : 'Back',
+      onPressed: onBack,
+      style: IconButton.styleFrom(
+        foregroundColor: AppColors.deepTeal,
+        side: const BorderSide(color: AppColors.border),
+      ),
+      icon: const Icon(Icons.arrow_back_rounded),
+    );
+    final label = isSpanish ? 'Revisa tu plan' : 'Review your plan';
+    const style = TextStyle(
+      color: AppColors.deepTeal,
+      fontSize: 16,
+      fontWeight: FontWeight.w800,
+    );
+    // The title wraps instead of ending in "…"; a word too long for the
+    // line scales down instead of splitting.
+    final title = LayoutBuilder(
+      builder: (context, constraints) => Text(
+        label,
+        textAlign: TextAlign.center,
+        textScaler: _wordFitScaler(
+          context,
+          label,
+          style,
+          constraints.maxWidth,
+        ),
+        style: style,
+      ),
+    );
+    final step = Container(
+      constraints: const BoxConstraints(minHeight: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppColors.mint,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        isSpanish ? '5 DE 5' : '5 OF 5',
+        style: const TextStyle(
+          color: AppColors.tealSecondary,
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+
+    // Between the back button and the step, the title's words split at
+    // accessibility text sizes, so it takes a line of its own.
+    if (_usesLargeTextLayout(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [back, step],
+            ),
+          ),
+          const SizedBox(height: 6),
+          title,
+        ],
+      );
+    }
+    // A minimum height: larger text grows the header instead of clipping it.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
       child: Row(
         children: [
-          IconButton.outlined(
-            key: const ValueKey('review-back'),
-            tooltip: isSpanish ? 'Atrás' : 'Back',
-            onPressed: onBack,
-            style: IconButton.styleFrom(
-              foregroundColor: AppColors.deepTeal,
-              side: const BorderSide(color: AppColors.border),
-            ),
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
-          Expanded(
-            child: Text(
-              isSpanish ? 'Revisa tu plan' : 'Review your plan',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.deepTeal,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          Container(
-            height: 32,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: AppColors.mint,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              isSpanish ? '5 DE 5' : '5 OF 5',
-              style: const TextStyle(
-                color: AppColors.tealSecondary,
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+          back,
+          Expanded(child: title),
+          step,
         ],
       ),
     );
@@ -525,17 +622,20 @@ class _ReviewProgress extends StatelessWidget {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
-              style: const TextStyle(
-                color: AppColors.mutedTeal,
-                fontSize: 10,
-                letterSpacing: 1.6,
-                fontWeight: FontWeight.w800,
+            Flexible(
+              child: Text(
+                isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 10,
+                  letterSpacing: 1.6,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: 8),
             const Text(
               '100%',
               style: TextStyle(
@@ -595,6 +695,129 @@ class _QuitDateHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final largeText = _usesLargeTextLayout(context);
+    final tileContent = Column(
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          color: AppColors.coral,
+          child: Text(
+            monthLabel.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 11,
+              letterSpacing: 1,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(6, 5, 6, 7),
+          child: Column(
+            children: [
+              Text(
+                '${date.day}',
+                style: const TextStyle(
+                  color: AppColors.deepTeal,
+                  fontSize: 35,
+                  height: 1,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                weekdayLabel.toUpperCase(),
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+    final tileWidth = compact ? 84.0 : 92.0;
+    final tile = Container(
+      width: largeText ? null : tileWidth,
+      constraints: BoxConstraints(minWidth: tileWidth),
+      decoration: BoxDecoration(
+        color: AppColors.paper,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: largeText ? IntrinsicWidth(child: tileContent) : tileContent,
+    );
+    final dateStyle = TextStyle(
+      color: Colors.white,
+      fontSize: compact ? 18 : 20,
+      height: 1.12,
+      fontWeight: FontWeight.w800,
+    );
+    // The date, timing and badge wrap instead of ending in "…".
+    final details = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // The card's heading: a word too long for the line scales down
+        // instead of splitting.
+        LayoutBuilder(
+          builder: (context, constraints) => Text(
+            longDate,
+            textScaler: _wordFitScaler(
+              context,
+              longDate,
+              dateStyle,
+              constraints.maxWidth,
+            ),
+            style: dateStyle,
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(
+          '$timingLabel · ${isSpanish ? 'Hora del Pacífico' : 'Pacific Time'}',
+          style: const TextStyle(
+            color: AppColors.mintStrong,
+            fontSize: 12,
+            height: 1.25,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 9,
+            vertical: 5,
+          ),
+          decoration: BoxDecoration(
+            color: const Color(0xFF234E48),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.check_circle_rounded,
+                color: AppColors.lime,
+                size: 17,
+              ),
+              const SizedBox(width: 5),
+              Flexible(
+                child: Text(
+                  _badgeLabel,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
     return Material(
       key: const ValueKey('review-quit-date-card'),
       color: AppColors.deepTeal,
@@ -633,148 +856,45 @@ class _QuitDateHero extends StatelessWidget {
                 ],
               ),
               SizedBox(height: compact ? 5 : 8),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: compact ? 84 : 92,
-                    decoration: BoxDecoration(
-                      color: AppColors.paper,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Column(
-                      children: [
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          color: AppColors.coral,
-                          child: Text(
-                            monthLabel.toUpperCase(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              letterSpacing: 1,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(6, 5, 6, 7),
-                          child: Column(
-                            children: [
-                              Text(
-                                '${date.day}',
-                                style: const TextStyle(
-                                  color: AppColors.deepTeal,
-                                  fontSize: 35,
-                                  height: 1,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                weekdayLabel.toUpperCase(),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: AppColors.mutedTeal,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          longDate,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: compact ? 18 : 20,
-                            height: 1.12,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          '$timingLabel · ${isSpanish ? 'Hora del Pacífico' : 'Pacific Time'}',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.mintStrong,
-                            fontSize: 12,
-                            height: 1.25,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 9,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF234E48),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.check_circle_rounded,
-                                color: AppColors.lime,
-                                size: 17,
-                              ),
-                              const SizedBox(width: 5),
-                              Flexible(
-                                child: Text(
-                                  _badgeLabel,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+              // At accessibility text sizes the date tile grows with its
+              // text and the date details take the card's full width below.
+              if (largeText) ...[
+                tile,
+                const SizedBox(height: 12),
+                details,
+              ] else
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    tile,
+                    const SizedBox(width: 14),
+                    Expanded(child: details),
+                  ],
+                ),
               SizedBox(height: compact ? 13 : 16),
               const _PlanTimeline(),
               const SizedBox(height: 5),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    isSpanish ? 'HOY' : 'TODAY',
-                    style: const TextStyle(
-                      color: AppColors.mintStrong,
-                      fontSize: 9,
+                  Flexible(
+                    child: Text(
+                      isSpanish ? 'HOY' : 'TODAY',
+                      style: const TextStyle(
+                        color: AppColors.mintStrong,
+                        fontSize: 9,
+                      ),
                     ),
                   ),
-                  const Spacer(),
-                  Text(
-                    isSpanish ? 'DÍA DE DEJARLO' : 'QUIT DAY',
-                    style: const TextStyle(
-                      color: AppColors.mintStrong,
-                      fontSize: 9,
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      isSpanish ? 'DÍA DE DEJARLO' : 'QUIT DAY',
+                      textAlign: TextAlign.end,
+                      style: const TextStyle(
+                        color: AppColors.mintStrong,
+                        fontSize: 9,
+                      ),
                     ),
                   ),
                 ],
@@ -951,6 +1071,41 @@ class _PlanDetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final avatar = CircleAvatar(
+      radius: 21,
+      backgroundColor: iconBackground,
+      child: Icon(icon, color: iconColor, size: 23),
+    );
+    // The value wraps instead of ending in "…".
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.mutedTeal,
+            fontSize: 9.5,
+            letterSpacing: 1.1,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          value,
+          style: const TextStyle(
+            color: AppColors.deepTeal,
+            fontSize: 14,
+            height: 1.2,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ],
+    );
+    const chevron = Icon(
+      Icons.chevron_right_rounded,
+      color: AppColors.deepTeal,
+      size: 28,
+    );
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -958,50 +1113,26 @@ class _PlanDetailRow extends StatelessWidget {
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 21,
-                backgroundColor: iconBackground,
-                child: Icon(icon, color: iconColor, size: 23),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
+          // At accessibility text sizes the text takes the row's full width
+          // under the icon and arrow.
+          child: _usesLargeTextLayout(context)
+              ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      label,
-                      style: const TextStyle(
-                        color: AppColors.mutedTeal,
-                        fontSize: 9.5,
-                        letterSpacing: 1.1,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      value,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.deepTeal,
-                        fontSize: 14,
-                        height: 1.2,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
+                    Row(children: [avatar, const Spacer(), chevron]),
+                    const SizedBox(height: 8),
+                    text,
+                  ],
+                )
+              : Row(
+                  children: [
+                    avatar,
+                    const SizedBox(width: 12),
+                    Expanded(child: text),
+                    const SizedBox(width: 8),
+                    chevron,
                   ],
                 ),
-              ),
-              const SizedBox(width: 8),
-              const Icon(
-                Icons.chevron_right_rounded,
-                color: AppColors.deepTeal,
-                size: 28,
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -1015,56 +1146,63 @@ class _ActivationNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const icon = CircleAvatar(
+      radius: 18,
+      backgroundColor: AppColors.deepTeal,
+      child: Icon(
+        Icons.priority_high_rounded,
+        color: AppColors.lime,
+        size: 21,
+      ),
+    );
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isSpanish
+              ? 'Al comenzar se activan tus tareas y recordatorios.'
+              : 'Starting activates your preparation tasks and reminders.',
+          style: const TextStyle(
+            color: AppColors.deepTeal,
+            fontSize: 12,
+            height: 1.25,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          isSpanish
+              ? 'Los mensajes de apoyo aún necesitan tu aprobación antes de enviarse.'
+              : 'Support messages still require your approval before sending.',
+          style: const TextStyle(
+            color: AppColors.tealSecondary,
+            fontSize: 11,
+            height: 1.3,
+          ),
+        ),
+      ],
+    );
     return Container(
       padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: AppColors.mint,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const CircleAvatar(
-            radius: 18,
-            backgroundColor: AppColors.deepTeal,
-            child: Icon(
-              Icons.priority_high_rounded,
-              color: AppColors.lime,
-              size: 21,
-            ),
-          ),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Column(
+      // At accessibility text sizes the text takes the note's full width
+      // under the icon.
+      child: _usesLargeTextLayout(context)
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [icon, const SizedBox(height: 8), text],
+            )
+          : Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  isSpanish
-                      ? 'Al comenzar se activan tus tareas y recordatorios.'
-                      : 'Starting activates your preparation tasks and reminders.',
-                  style: const TextStyle(
-                    color: AppColors.deepTeal,
-                    fontSize: 12,
-                    height: 1.25,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  isSpanish
-                      ? 'Los mensajes de apoyo aún necesitan tu aprobación antes de enviarse.'
-                      : 'Support messages still require your approval before sending.',
-                  style: const TextStyle(
-                    color: AppColors.tealSecondary,
-                    fontSize: 11,
-                    height: 1.3,
-                  ),
-                ),
+                icon,
+                const SizedBox(width: 11),
+                Expanded(child: text),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -1108,7 +1246,13 @@ class _ReviewBottomActions extends StatelessWidget {
                 key: const ValueKey('review-start-plan'),
                 onPressed: onStartPlan,
                 style: FilledButton.styleFrom(
+                  // A minimum height: large text wraps the label and grows
+                  // the button instead of cutting the label off.
                   minimumSize: Size.fromHeight(compact ? 48 : 54),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
                   backgroundColor: AppColors.deepTeal,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
@@ -1123,7 +1267,7 @@ class _ReviewBottomActions extends StatelessWidget {
                         isSpanish
                             ? 'Comenzar mi plan para dejarlo'
                             : 'Start my quit plan',
-                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
@@ -1166,8 +1310,6 @@ class _ReviewBottomActions extends StatelessWidget {
                   isSpanish
                       ? 'Guardado automáticamente · Puedes editar tu plan en cualquier momento'
                       : 'Saved automatically · You can edit your plan at any time',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: AppColors.mutedTeal,

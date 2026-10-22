@@ -2,6 +2,74 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+/// Above 140% text (the iOS accessibility sizes and Android 14's largest
+/// font sizes) side-by-side pieces are stacked so text can grow.
+bool _usesLargeTextLayout(BuildContext context) =>
+    MediaQuery.textScalerOf(context).scale(10) > 14;
+
+const _choiceLabelStyle = TextStyle(
+  color: AppColors.deepTeal,
+  fontSize: 13.5,
+  height: 1.1,
+  fontWeight: FontWeight.w800,
+);
+
+/// Whether the longest word of every label fits [width] at the current text
+/// size.
+bool _wordsFit(BuildContext context, Iterable<String> labels, double width) {
+  final painter = TextPainter(
+    textDirection: Directionality.of(context),
+    textScaler: MediaQuery.textScalerOf(context),
+  );
+  try {
+    final style = DefaultTextStyle.of(context).style.merge(_choiceLabelStyle);
+    for (final label in labels) {
+      painter
+        ..text = TextSpan(text: label, style: style)
+        ..layout();
+      if (painter.minIntrinsicWidth > width) return false;
+    }
+    return true;
+  } finally {
+    painter.dispose();
+  }
+}
+
+/// The text scale for [text] in [style], lowered only as far as needed for
+/// its longest word to fit [width]: a word too long for a whole line scales
+/// down instead of splitting.
+TextScaler _wordFitScaler(
+  BuildContext context,
+  String text,
+  TextStyle style,
+  double width,
+) {
+  final scaler = MediaQuery.textScalerOf(context);
+  final painter = TextPainter(
+    text: TextSpan(
+      text: text,
+      style: DefaultTextStyle.of(context).style.merge(style),
+    ),
+    textDirection: Directionality.of(context),
+  );
+  try {
+    var fitted = scaler;
+    for (var attempt = 0; attempt < 4; attempt++) {
+      painter
+        ..textScaler = fitted
+        ..layout();
+      final longestWord = painter.minIntrinsicWidth;
+      if (longestWord <= width) return fitted;
+      final fontSize = style.fontSize ?? 14;
+      final factor = fitted.scale(fontSize) / fontSize * width / longestWord;
+      fitted = scaler.clamp(maxScaleFactor: factor * 0.99);
+    }
+    return fitted;
+  } finally {
+    painter.dispose();
+  }
+}
+
 enum QuitReason {
   family,
   breatheEasier,
@@ -195,31 +263,84 @@ class MyReasonsScreen extends StatelessWidget {
             builder: (context, constraints) {
               final narrow = constraints.maxWidth < 380;
               final compact = constraints.maxHeight < 760;
-              final horizontalPadding = narrow ? 18.0 : 22.0;
+              // Above 140% text the side margins narrow so long words fit, and
+              // the header, progress and main action scroll with the content
+              // so they never squeeze the questions out of view.
+              final largeText = _usesLargeTextLayout(context);
+              final horizontalPadding =
+                  largeText ? 12.0 : (narrow ? 18.0 : 22.0);
+
+              final selectAll = Text(
+                isSpanish
+                    ? 'ELIGE TODAS LAS QUE TE IMPORTEN'
+                    : 'SELECT ALL THAT MATTER',
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 10,
+                  letterSpacing: 1.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              );
+              final selectedCount = Container(
+                key: const ValueKey('reasons-selected-count'),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.mint,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Text(
+                  isSpanish
+                      ? '$selectionCount ELEGIDAS'
+                      : '$selectionCount SELECTED',
+                  style: const TextStyle(
+                    color: AppColors.deepTeal,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              );
+
+              final footer = _ReasonsBottomAction(
+                isSpanish: isSpanish,
+                selectionCount: selectionCount,
+                hasTopReason: topReason != null,
+                canContinue: canContinue,
+                onContinue: onContinue,
+                horizontalPadding: largeText ? 0 : horizontalPadding,
+                compact: compact,
+              );
+
+              final header = _ReasonsHeader(
+                isSpanish: isSpanish,
+                onBack: onBack,
+              );
+              final progress = _ReasonsProgress(isSpanish: isSpanish);
 
               return Column(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 9,
-                      horizontalPadding,
-                      0,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 9,
+                        horizontalPadding,
+                        0,
+                      ),
+                      child: header,
                     ),
-                    child: _ReasonsHeader(
-                      isSpanish: isSpanish,
-                      onBack: onBack,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 8,
+                        horizontalPadding,
+                        compact ? 7 : 10,
+                      ),
+                      child: progress,
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 8,
-                      horizontalPadding,
-                      compact ? 7 : 10,
-                    ),
-                    child: _ReasonsProgress(isSpanish: isSpanish),
-                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       key: const ValueKey('reasons-content-scroll'),
@@ -235,6 +356,12 @@ class MyReasonsScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              if (largeText) ...[
+                                header,
+                                const SizedBox(height: 10),
+                                progress,
+                                const SizedBox(height: 18),
+                              ],
                               Text(
                                 isSpanish ? 'TU MOTIVACIÓN' : 'YOUR MOTIVATION',
                                 style: const TextStyle(
@@ -249,6 +376,10 @@ class MyReasonsScreen extends StatelessWidget {
                                 isSpanish
                                     ? '¿Por qué quieres dejar de fumar?'
                                     : 'What are you quitting for?',
+                                // Already the largest text on screen; past
+                                // 180% its longest words no longer fit.
+                                textScaler: MediaQuery.textScalerOf(context)
+                                    .clamp(maxScaleFactor: 1.8),
                                 style: Theme.of(context)
                                     .textTheme
                                     .displayLarge
@@ -272,52 +403,47 @@ class MyReasonsScreen extends StatelessWidget {
                                     ),
                               ),
                               SizedBox(height: compact ? 14 : 18),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      isSpanish
-                                          ? 'ELIGE TODAS LAS QUE TE IMPORTEN'
-                                          : 'SELECT ALL THAT MATTER',
-                                      style: const TextStyle(
-                                        color: AppColors.mutedTeal,
-                                        fontSize: 10,
-                                        letterSpacing: 1.5,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    key: const ValueKey(
-                                        'reasons-selected-count'),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.mint,
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    child: Text(
-                                      isSpanish
-                                          ? '$selectionCount ELEGIDAS'
-                                          : '$selectionCount SELECTED',
-                                      style: const TextStyle(
-                                        color: AppColors.deepTeal,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              // Beside the count, the heading's words split at accessibility
+                              // text sizes.
+                              if (largeText) ...[
+                                selectAll,
+                                const SizedBox(height: 6),
+                                selectedCount,
+                              ] else
+                                Row(
+                                  children: [
+                                    Expanded(child: selectAll),
+                                    const SizedBox(width: 8),
+                                    selectedCount,
+                                  ],
+                                ),
                               const SizedBox(height: 12),
                               LayoutBuilder(
                                 builder: (context, gridConstraints) {
                                   const gap = 10.0;
-                                  final itemWidth =
+                                  final halfWidth =
                                       (gridConstraints.maxWidth - gap) / 2;
+                                  // Two columns at the default text size
+                                  // on phones 360pt and wider, and at
+                                  // larger sizes while every label's
+                                  // longest word still fits a half-width
+                                  // card; otherwise one column.
+                                  final enlarged = MediaQuery.textScalerOf(
+                                        context,
+                                      ).scale(10) >
+                                      10;
+                                  final twoColumns =
+                                      gridConstraints.maxWidth >= 300 &&
+                                          (!enlarged ||
+                                              _wordsFit(
+                                                context,
+                                                _standardReasons.map(_labelFor),
+                                                halfWidth -
+                                                    _ReasonChoice.chrome,
+                                              ));
+                                  final itemWidth = twoColumns
+                                      ? halfWidth
+                                      : gridConstraints.maxWidth;
                                   return Wrap(
                                     spacing: gap,
                                     runSpacing: gap,
@@ -361,21 +487,17 @@ class MyReasonsScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                               _ReasonsPrivacyNote(isSpanish: isSpanish),
+                              if (largeText) ...[
+                                const SizedBox(height: 18),
+                                footer,
+                              ],
                             ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                  _ReasonsBottomAction(
-                    isSpanish: isSpanish,
-                    selectionCount: selectionCount,
-                    hasTopReason: topReason != null,
-                    canContinue: canContinue,
-                    onContinue: onContinue,
-                    horizontalPadding: horizontalPadding,
-                    compact: compact,
-                  ),
+                  if (!largeText) footer,
                 ],
               );
             },
@@ -394,50 +516,86 @@ class _ReasonsHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
+    final back = IconButton.outlined(
+      key: const ValueKey('reasons-back'),
+      tooltip: isSpanish ? 'Atrás' : 'Back',
+      onPressed: onBack,
+      style: IconButton.styleFrom(
+        foregroundColor: AppColors.deepTeal,
+        side: const BorderSide(color: AppColors.border),
+      ),
+      icon: const Icon(Icons.arrow_back_rounded),
+    );
+    final label = isSpanish ? 'Mis razones' : 'My reasons';
+    const style = TextStyle(
+      color: AppColors.deepTeal,
+      fontSize: 16,
+      fontWeight: FontWeight.w800,
+    );
+    // The title wraps instead of ending in "…"; a word too long for the
+    // line scales down instead of splitting.
+    final title = LayoutBuilder(
+      builder: (context, constraints) => Text(
+        label,
+        textAlign: TextAlign.center,
+        textScaler: _wordFitScaler(
+          context,
+          label,
+          style,
+          constraints.maxWidth,
+        ),
+        style: style,
+      ),
+    );
+    final step = Container(
+      constraints: const BoxConstraints(minHeight: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppColors.mint,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        isSpanish ? '3 DE 5' : '3 OF 5',
+        style: const TextStyle(
+          color: AppColors.tealSecondary,
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+
+    // Between the back button and the step, the title's words split at
+    // accessibility text sizes, so it takes a line of its own.
+    if (_usesLargeTextLayout(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [back, step],
+            ),
+          ),
+          const SizedBox(height: 6),
+          title,
+        ],
+      );
+    }
+    // A minimum height: larger text grows the header instead of clipping it.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
       child: Row(
         children: [
-          IconButton.outlined(
-            key: const ValueKey('reasons-back'),
-            tooltip: isSpanish ? 'Atrás' : 'Back',
-            onPressed: onBack,
-            style: IconButton.styleFrom(
-              foregroundColor: AppColors.deepTeal,
-              side: const BorderSide(color: AppColors.border),
-            ),
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
+          back,
           const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              isSpanish ? 'Mis razones' : 'My reasons',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.deepTeal,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+          Expanded(child: title),
           const SizedBox(width: 8),
-          Container(
-            height: 32,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: AppColors.mint,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              isSpanish ? '3 DE 5' : '3 OF 5',
-              style: const TextStyle(
-                color: AppColors.tealSecondary,
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+          step,
         ],
       ),
     );
@@ -454,17 +612,20 @@ class _ReasonsProgress extends StatelessWidget {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
-              style: const TextStyle(
-                color: AppColors.mutedTeal,
-                fontSize: 10,
-                letterSpacing: 1.6,
-                fontWeight: FontWeight.w800,
+            Flexible(
+              child: Text(
+                isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 10,
+                  letterSpacing: 1.6,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: 8),
             const Text(
               '60%',
               style: TextStyle(
@@ -514,6 +675,9 @@ class _ReasonChoice extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onMakeTop;
 
+  /// Width of the padding, icon, gap and star column beside the label.
+  static const chrome = 10.0 + 40 + 9 + 21 + 9;
+
   @override
   Widget build(BuildContext context) {
     return Semantics(
@@ -527,7 +691,9 @@ class _ReasonChoice extends StatelessWidget {
         child: AnimatedContainer(
           key: selected ? ValueKey('reason-selected-${reason.name}') : null,
           duration: const Duration(milliseconds: 150),
-          height: 91,
+          // A minimum height: larger text grows the card instead of cutting
+          // the label off.
+          constraints: const BoxConstraints(minHeight: 91),
           padding: const EdgeInsets.fromLTRB(10, 9, 9, 9),
           decoration: BoxDecoration(
             color: selected ? AppColors.mint : AppColors.paper,
@@ -541,52 +707,46 @@ class _ReasonChoice extends StatelessWidget {
               width: isTop ? 1.7 : 1.1,
             ),
           ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: accent == AppColors.coral
-                    ? AppColors.coralLight
-                    : AppColors.cream,
-                child: Icon(icon, color: accent, size: 25),
-              ),
-              const SizedBox(width: 9),
-              Expanded(
-                child: Text(
-                  label,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.deepTeal,
-                    fontSize: 13.5,
-                    height: 1.1,
-                    fontWeight: FontWeight.w800,
-                  ),
+          // The star and check keep to the card's top and bottom corners
+          // however tall larger text makes it.
+          child: IntrinsicHeight(
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundColor: accent == AppColors.coral
+                      ? AppColors.coralLight
+                      : AppColors.cream,
+                  child: Icon(icon, color: accent, size: 25),
                 ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  InkResponse(
-                    key: ValueKey('reason-top-${reason.name}'),
-                    onTap: onMakeTop,
-                    radius: 18,
-                    child: Icon(
-                      isTop ? Icons.star_rounded : Icons.star_border_rounded,
-                      color: isTop ? AppColors.coral : AppColors.border,
-                      size: 21,
+                const SizedBox(width: 9),
+                Expanded(
+                  child: Text(label, style: _choiceLabelStyle),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkResponse(
+                      key: ValueKey('reason-top-${reason.name}'),
+                      onTap: onMakeTop,
+                      radius: 18,
+                      child: Icon(
+                        isTop ? Icons.star_rounded : Icons.star_border_rounded,
+                        color: isTop ? AppColors.coral : AppColors.border,
+                        size: 21,
+                      ),
                     ),
-                  ),
-                  Icon(
-                    selected
-                        ? Icons.check_circle_rounded
-                        : Icons.radio_button_unchecked_rounded,
-                    color: selected ? AppColors.deepTeal : AppColors.border,
-                    size: 19,
-                  ),
-                ],
-              ),
-            ],
+                    Icon(
+                      selected
+                          ? Icons.check_circle_rounded
+                          : Icons.radio_button_unchecked_rounded,
+                      color: selected ? AppColors.deepTeal : AppColors.border,
+                      size: 19,
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -665,8 +825,6 @@ class _CustomReasonCard extends StatelessWidget {
                           : (isSpanish
                               ? 'Escribe lo que más te importa'
                               : 'Write what matters most in your own words'),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: hasValue
                             ? AppColors.deepTeal
@@ -881,38 +1039,41 @@ class _ReasonsBottomAction extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SizedBox(
-                width: double.infinity,
-                height: compact ? 52 : 56,
-                child: FilledButton(
-                  key: const ValueKey('reasons-save'),
-                  onPressed: canContinue ? onContinue : null,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.deepTeal,
-                    disabledBackgroundColor: AppColors.border,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
+              FilledButton(
+                key: const ValueKey('reasons-save'),
+                onPressed: canContinue ? onContinue : null,
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.deepTeal,
+                  disabledBackgroundColor: AppColors.border,
+                  foregroundColor: Colors.white,
+                  // A minimum, not a fixed height: large text wraps and
+                  // grows the button instead of being clipped.
+                  minimumSize: Size.fromHeight(compact ? 52 : 56),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          isSpanish ? 'Guardar mis razones' : 'Save my reasons',
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w800,
-                          ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        isSpanish ? 'Guardar mis razones' : 'Save my reasons',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      const Icon(Icons.arrow_forward_rounded,
-                          color: AppColors.lime),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Icon(Icons.arrow_forward_rounded,
+                        color: AppColors.lime),
+                  ],
                 ),
               ),
               const SizedBox(height: 6),

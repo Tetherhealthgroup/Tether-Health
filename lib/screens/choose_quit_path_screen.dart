@@ -2,6 +2,46 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+/// Above 140% text (the iOS accessibility sizes and Android 14's largest
+/// font sizes) side-by-side pieces are stacked so text can grow.
+bool _usesLargeTextLayout(BuildContext context) =>
+    MediaQuery.textScalerOf(context).scale(10) > 14;
+
+/// The text scale for [text] in [style], lowered only as far as needed for
+/// its longest word to fit [width]: a word too long for a whole line scales
+/// down instead of splitting.
+TextScaler _wordFitScaler(
+  BuildContext context,
+  String text,
+  TextStyle style,
+  double width,
+) {
+  final scaler = MediaQuery.textScalerOf(context);
+  final painter = TextPainter(
+    text: TextSpan(
+      text: text,
+      style: DefaultTextStyle.of(context).style.merge(style),
+    ),
+    textDirection: Directionality.of(context),
+  );
+  try {
+    var fitted = scaler;
+    for (var attempt = 0; attempt < 4; attempt++) {
+      painter
+        ..textScaler = fitted
+        ..layout();
+      final longestWord = painter.minIntrinsicWidth;
+      if (longestWord <= width) return fitted;
+      final fontSize = style.fontSize ?? 14;
+      final factor = fitted.scale(fontSize) / fontSize * width / longestWord;
+      fitted = scaler.clamp(maxScaleFactor: factor * 0.99);
+    }
+    return fitted;
+  } finally {
+    painter.dispose();
+  }
+}
+
 enum QuitPlanPath { setQuitDate, quitToday, reduceGradually }
 
 class ChooseQuitPathScreen extends StatelessWidget {
@@ -54,31 +94,49 @@ class ChooseQuitPathScreen extends StatelessWidget {
             builder: (context, constraints) {
               final narrow = constraints.maxWidth < 380;
               final compact = constraints.maxHeight < 760;
-              final horizontalPadding = narrow ? 18.0 : 24.0;
+              // Above 140% text the side margins narrow so long words fit, and
+              // the header, progress and main action scroll with the content
+              // so they never squeeze the questions out of view.
+              final largeText = _usesLargeTextLayout(context);
+              final horizontalPadding =
+                  largeText ? 12.0 : (narrow ? 18.0 : 24.0);
+
+              final footer = _QuitPathBottomAction(
+                isSpanish: isSpanish,
+                savedMessage: _savedMessage(),
+                onContinue: onContinue,
+                horizontalPadding: largeText ? 0 : horizontalPadding,
+                compact: compact,
+              );
+
+              final header = _QuitPathHeader(
+                isSpanish: isSpanish,
+                onBack: onBack,
+              );
+              final progress = _QuitPlanProgress(isSpanish: isSpanish);
 
               return Column(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 10,
-                      horizontalPadding,
-                      0,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 10,
+                        horizontalPadding,
+                        0,
+                      ),
+                      child: header,
                     ),
-                    child: _QuitPathHeader(
-                      isSpanish: isSpanish,
-                      onBack: onBack,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 8,
+                        horizontalPadding,
+                        compact ? 7 : 10,
+                      ),
+                      child: progress,
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 8,
-                      horizontalPadding,
-                      compact ? 7 : 10,
-                    ),
-                    child: _QuitPlanProgress(isSpanish: isSpanish),
-                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       key: const ValueKey('quit-path-content-scroll'),
@@ -94,6 +152,12 @@ class ChooseQuitPathScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              if (largeText) ...[
+                                header,
+                                const SizedBox(height: 10),
+                                progress,
+                                const SizedBox(height: 18),
+                              ],
                               _PathIllustration(compact: compact),
                               SizedBox(height: compact ? 12 : 20),
                               Text(
@@ -112,6 +176,10 @@ class ChooseQuitPathScreen extends StatelessWidget {
                                 isSpanish
                                     ? '¿Qué te parece posible ahora mismo?'
                                     : 'What feels possible right now?',
+                                // Already the largest text on screen; past
+                                // 180% its longest words no longer fit.
+                                textScaler: MediaQuery.textScalerOf(context)
+                                    .clamp(maxScaleFactor: 1.8),
                                 style: Theme.of(context)
                                     .textTheme
                                     .displayLarge
@@ -205,19 +273,17 @@ class ChooseQuitPathScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 13),
                               _FlexiblePathNote(isSpanish: isSpanish),
+                              if (largeText) ...[
+                                const SizedBox(height: 18),
+                                footer,
+                              ],
                             ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                  _QuitPathBottomAction(
-                    isSpanish: isSpanish,
-                    savedMessage: _savedMessage(),
-                    onContinue: onContinue,
-                    horizontalPadding: horizontalPadding,
-                    compact: compact,
-                  ),
+                  if (!largeText) footer,
                 ],
               );
             },
@@ -236,50 +302,84 @@ class _QuitPathHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
+    final back = IconButton.outlined(
+      key: const ValueKey('quit-path-back'),
+      tooltip: isSpanish ? 'Atrás' : 'Back',
+      onPressed: onBack,
+      style: IconButton.styleFrom(
+        foregroundColor: AppColors.deepTeal,
+        side: const BorderSide(color: AppColors.border),
+      ),
+      icon: const Icon(Icons.arrow_back_rounded),
+    );
+    final label = isSpanish ? 'Crea tu plan' : 'Build your plan';
+    const style = TextStyle(
+      color: AppColors.deepTeal,
+      fontSize: 16,
+      fontWeight: FontWeight.w800,
+    );
+    // The title wraps instead of ending in "…"; a word too long for the
+    // line scales down instead of splitting.
+    final title = LayoutBuilder(
+      builder: (context, constraints) => Text(
+        label,
+        textAlign: TextAlign.center,
+        textScaler: _wordFitScaler(
+          context,
+          label,
+          style,
+          constraints.maxWidth,
+        ),
+        style: style,
+      ),
+    );
+    final step = Container(
+      constraints: const BoxConstraints(minHeight: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppColors.mint,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        isSpanish ? '1 DE 5' : '1 OF 5',
+        style: const TextStyle(
+          color: AppColors.tealSecondary,
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+
+    // Between the back button and the step, the title's words split at
+    // accessibility text sizes, so it takes a line of its own.
+    if (_usesLargeTextLayout(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [back, step],
+            ),
+          ),
+          const SizedBox(height: 6),
+          title,
+        ],
+      );
+    }
+    // A minimum height: larger text grows the header instead of clipping it.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
       child: Row(
         children: [
-          IconButton.outlined(
-            key: const ValueKey('quit-path-back'),
-            tooltip: isSpanish ? 'Atrás' : 'Back',
-            onPressed: onBack,
-            style: IconButton.styleFrom(
-              foregroundColor: AppColors.deepTeal,
-              side: const BorderSide(color: AppColors.border),
-            ),
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
-          Expanded(
-            child: Text(
-              isSpanish ? 'Crea tu plan' : 'Build your plan',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.deepTeal,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          Container(
-            height: 32,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: AppColors.mint,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              isSpanish ? '1 DE 5' : '1 OF 5',
-              style: const TextStyle(
-                color: AppColors.tealSecondary,
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+          back,
+          Expanded(child: title),
+          step,
         ],
       ),
     );
@@ -296,17 +396,20 @@ class _QuitPlanProgress extends StatelessWidget {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
-              style: const TextStyle(
-                color: AppColors.mutedTeal,
-                fontSize: 10,
-                letterSpacing: 1.6,
-                fontWeight: FontWeight.w800,
+            Flexible(
+              child: Text(
+                isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 10,
+                  letterSpacing: 1.6,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: 8),
             const Text(
               '20%',
               style: TextStyle(
@@ -453,6 +556,60 @@ class _QuitPathCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final largeText = _usesLargeTextLayout(context);
+    final badge = Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: iconBackground,
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, color: iconColor, size: 22),
+    );
+    const headingStyle = TextStyle(
+      color: AppColors.deepTeal,
+      fontSize: 18,
+      fontWeight: FontWeight.w800,
+    );
+    // A word too long for the line scales down instead of splitting.
+    final heading = LayoutBuilder(
+      builder: (context, constraints) => Text(
+        title,
+        textScaler: _wordFitScaler(
+          context,
+          title,
+          headingStyle,
+          constraints.maxWidth,
+        ),
+        style: headingStyle,
+      ),
+    );
+    final marker = recommended
+        ? Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 9,
+              vertical: 5,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.deepTeal,
+              borderRadius: BorderRadius.circular(13),
+            ),
+            child: Text(
+              recommendedLabel,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 8.5,
+                letterSpacing: 0.8,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          )
+        : Icon(
+            selected ? Icons.check_circle_rounded : Icons.circle_outlined,
+            key: selected ? selectionKey : null,
+            color: selected ? AppColors.coral : AppColors.border,
+            size: 28,
+          );
     return Material(
       color: selected ? AppColors.mint : AppColors.paper,
       shape: RoundedRectangleBorder(
@@ -471,63 +628,36 @@ class _QuitPathCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: iconBackground,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(icon, color: iconColor, size: 22),
+              // At accessibility text sizes the title takes the card's full
+              // width under the icon and badge.
+              if (largeText) ...[
+                SizedBox(
+                  width: double.infinity,
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [badge, marker],
                   ),
-                  const SizedBox(width: 11),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 6),
-                      child: Text(
-                        title,
-                        style: const TextStyle(
-                          color: AppColors.deepTeal,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w800,
-                        ),
+                ),
+                const SizedBox(height: 9),
+                heading,
+              ] else
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    badge,
+                    const SizedBox(width: 11),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: heading,
                       ),
                     ),
-                  ),
-                  if (recommended)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 9,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.deepTeal,
-                        borderRadius: BorderRadius.circular(13),
-                      ),
-                      child: Text(
-                        recommendedLabel,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 8.5,
-                          letterSpacing: 0.8,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    )
-                  else
-                    Icon(
-                      selected
-                          ? Icons.check_circle_rounded
-                          : Icons.circle_outlined,
-                      key: selected ? selectionKey : null,
-                      color: selected ? AppColors.coral : AppColors.border,
-                      size: 28,
-                    ),
-                ],
-              ),
+                    marker,
+                  ],
+                ),
               const SizedBox(height: 9),
               Text(
                 description,
@@ -643,51 +773,51 @@ class _QuitPathBottomAction extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: compact ? 54 : 60,
-                  child: FilledButton(
-                    key: const ValueKey('quit-path-continue'),
-                    onPressed: onContinue,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.deepTeal,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                FilledButton(
+                  key: const ValueKey('quit-path-continue'),
+                  onPressed: onContinue,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.deepTeal,
+                    foregroundColor: Colors.white,
+                    // A minimum, not a fixed height: large text wraps and
+                    // grows the button instead of being clipped.
+                    minimumSize: Size.fromHeight(compact ? 54 : 60),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            isSpanish
-                                ? 'Continuar con este camino'
-                                : 'Continue with this path',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                            ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          isSpanish
+                              ? 'Continuar con este camino'
+                              : 'Continue with this path',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        const Icon(
-                          Icons.arrow_forward_rounded,
-                          color: AppColors.lime,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: AppColors.lime,
+                      ),
+                    ],
                   ),
                 ),
                 if (!compact) ...[
                   const SizedBox(height: 7),
                   Text(
                     savedMessage,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: AppColors.mutedTeal,
                       fontSize: 10,

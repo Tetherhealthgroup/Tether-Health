@@ -4,8 +4,9 @@ import '../theme/app_colors.dart';
 
 enum WelcomeLanguage { english, spanish }
 
-/// Above 140% text (the iOS accessibility sizes; Android tops out at 135%)
-/// side-by-side pieces of the welcome screen are stacked so text can grow.
+/// Above 140% text (the iOS accessibility sizes, and Android 14's largest
+/// font sizes, which go up to 200% with non-linear scaling) side-by-side
+/// pieces of the welcome screen are stacked so text can grow.
 bool _usesLargeTextLayout(BuildContext context) =>
     MediaQuery.textScalerOf(context).scale(10) > 14;
 

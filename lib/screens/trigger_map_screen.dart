@@ -2,6 +2,74 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+/// Above 140% text (the iOS accessibility sizes and Android 14's largest
+/// font sizes) side-by-side pieces are stacked so text can grow.
+bool _usesLargeTextLayout(BuildContext context) =>
+    MediaQuery.textScalerOf(context).scale(10) > 14;
+
+/// The text scale for [text] in [style], lowered only as far as needed for
+/// its longest word to fit [width]: a word too long for a whole line scales
+/// down instead of splitting.
+TextScaler _wordFitScaler(
+  BuildContext context,
+  String text,
+  TextStyle style,
+  double width,
+) {
+  final scaler = MediaQuery.textScalerOf(context);
+  final painter = TextPainter(
+    text: TextSpan(
+      text: text,
+      style: DefaultTextStyle.of(context).style.merge(style),
+    ),
+    textDirection: Directionality.of(context),
+  );
+  try {
+    var fitted = scaler;
+    for (var attempt = 0; attempt < 4; attempt++) {
+      painter
+        ..textScaler = fitted
+        ..layout();
+      final longestWord = painter.minIntrinsicWidth;
+      if (longestWord <= width) return fitted;
+      final fontSize = style.fontSize ?? 14;
+      final factor = fitted.scale(fontSize) / fontSize * width / longestWord;
+      fitted = scaler.clamp(maxScaleFactor: factor * 0.99);
+    }
+    return fitted;
+  } finally {
+    painter.dispose();
+  }
+}
+
+const _choiceLabelStyle = TextStyle(
+  color: AppColors.deepTeal,
+  fontSize: 13.5,
+  height: 1.15,
+  fontWeight: FontWeight.w800,
+);
+
+/// Whether the longest word of every label fits [width] at the current text
+/// size.
+bool _wordsFit(BuildContext context, Iterable<String> labels, double width) {
+  final painter = TextPainter(
+    textDirection: Directionality.of(context),
+    textScaler: MediaQuery.textScalerOf(context),
+  );
+  try {
+    final style = DefaultTextStyle.of(context).style.merge(_choiceLabelStyle);
+    for (final label in labels) {
+      painter
+        ..text = TextSpan(text: label, style: style)
+        ..layout();
+      if (painter.minIntrinsicWidth > width) return false;
+    }
+    return true;
+  } finally {
+    painter.dispose();
+  }
+}
+
 enum SmokingTrigger {
   stress,
   afterMeals,
@@ -114,31 +182,50 @@ class TriggerMapScreen extends StatelessWidget {
             builder: (context, constraints) {
               final narrow = constraints.maxWidth < 380;
               final compact = constraints.maxHeight < 760;
-              final horizontalPadding = narrow ? 18.0 : 24.0;
+              // Above 140% text the side margins narrow so long words fit, and
+              // the header, progress and main action scroll with the content
+              // so they never squeeze the questions out of view.
+              final largeText = _usesLargeTextLayout(context);
+              final horizontalPadding =
+                  largeText ? 12.0 : (narrow ? 18.0 : 24.0);
+
+              final footer = _TriggerBottomAction(
+                isSpanish: isSpanish,
+                selectionCount: selectionCount,
+                canContinue: canContinue,
+                onContinue: onContinue,
+                horizontalPadding: largeText ? 0 : horizontalPadding,
+                compact: compact,
+              );
+
+              final header = _TriggerHeader(
+                isSpanish: isSpanish,
+                onBack: onBack,
+              );
+              final progress = _TriggerProgress(isSpanish: isSpanish);
 
               return Column(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 10,
-                      horizontalPadding,
-                      0,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 10,
+                        horizontalPadding,
+                        0,
+                      ),
+                      child: header,
                     ),
-                    child: _TriggerHeader(
-                      isSpanish: isSpanish,
-                      onBack: onBack,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 8,
+                        horizontalPadding,
+                        compact ? 7 : 10,
+                      ),
+                      child: progress,
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 8,
-                      horizontalPadding,
-                      compact ? 7 : 10,
-                    ),
-                    child: _TriggerProgress(isSpanish: isSpanish),
-                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       key: const ValueKey('trigger-content-scroll'),
@@ -154,6 +241,12 @@ class TriggerMapScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              if (largeText) ...[
+                                header,
+                                const SizedBox(height: 10),
+                                progress,
+                                const SizedBox(height: 18),
+                              ],
                               Text(
                                 isSpanish
                                     ? 'PREGUNTA 6 · ELIGE TODAS LAS QUE CORRESPONDAN'
@@ -171,6 +264,10 @@ class TriggerMapScreen extends StatelessWidget {
                                 isSpanish
                                     ? '¿Cuándo es más probable que quieras fumar?'
                                     : 'When are you most likely to want a cigarette?',
+                                // Already the largest text on screen; past
+                                // 180% its longest words no longer fit.
+                                textScaler: MediaQuery.textScalerOf(context)
+                                    .clamp(maxScaleFactor: 1.8),
                                 style: Theme.of(context)
                                     .textTheme
                                     .displayLarge
@@ -197,8 +294,30 @@ class TriggerMapScreen extends StatelessWidget {
                               LayoutBuilder(
                                 builder: (context, gridConstraints) {
                                   const gap = 10.0;
-                                  final itemWidth =
+                                  final halfWidth =
                                       (gridConstraints.maxWidth - gap) / 2;
+                                  // Two columns at the default text size
+                                  // on phones 360pt and wider, and at
+                                  // larger sizes while every label's
+                                  // longest word still fits a half-width
+                                  // card; otherwise one column.
+                                  final enlarged = MediaQuery.textScalerOf(
+                                        context,
+                                      ).scale(10) >
+                                      10;
+                                  final twoColumns =
+                                      gridConstraints.maxWidth >= 300 &&
+                                          (!enlarged ||
+                                              _wordsFit(
+                                                context,
+                                                SmokingTrigger.values
+                                                    .map(_labelFor),
+                                                halfWidth -
+                                                    _TriggerChoice.chrome,
+                                              ));
+                                  final itemWidth = twoColumns
+                                      ? halfWidth
+                                      : gridConstraints.maxWidth;
                                   return Wrap(
                                     spacing: gap,
                                     runSpacing: gap,
@@ -230,20 +349,17 @@ class TriggerMapScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 12),
                               _TriggerPrivacyNote(isSpanish: isSpanish),
+                              if (largeText) ...[
+                                const SizedBox(height: 18),
+                                footer,
+                              ],
                             ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                  _TriggerBottomAction(
-                    isSpanish: isSpanish,
-                    selectionCount: selectionCount,
-                    canContinue: canContinue,
-                    onContinue: onContinue,
-                    horizontalPadding: horizontalPadding,
-                    compact: compact,
-                  ),
+                  if (!largeText) footer,
                 ],
               );
             },
@@ -380,51 +496,85 @@ class _TriggerHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
+    final back = IconButton.outlined(
+      key: const ValueKey('trigger-back'),
+      tooltip: isSpanish ? 'Atrás' : 'Back',
+      onPressed: onBack,
+      style: IconButton.styleFrom(
+        foregroundColor: AppColors.deepTeal,
+        side: const BorderSide(color: AppColors.border),
+      ),
+      icon: const Icon(Icons.arrow_back_rounded),
+    );
+    final label = isSpanish ? 'Tus desencadenantes' : 'Your triggers';
+    const style = TextStyle(
+      color: AppColors.deepTeal,
+      fontSize: 16,
+      fontWeight: FontWeight.w800,
+    );
+    // The title wraps instead of ending in "…"; a word too long for the
+    // line scales down instead of splitting.
+    final title = LayoutBuilder(
+      builder: (context, constraints) => Text(
+        label,
+        textAlign: TextAlign.center,
+        textScaler: _wordFitScaler(
+          context,
+          label,
+          style,
+          constraints.maxWidth,
+        ),
+        style: style,
+      ),
+    );
+    final step = Container(
+      constraints: const BoxConstraints(minHeight: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 11),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: AppColors.mint,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: const Text(
+        '6 OF 8',
+        style: TextStyle(
+          color: AppColors.deepTeal,
+          fontSize: 10,
+          letterSpacing: .6,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+
+    // Between the back button and the step, the title's words split at
+    // accessibility text sizes, so it takes a line of its own.
+    if (_usesLargeTextLayout(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [back, step],
+            ),
+          ),
+          const SizedBox(height: 6),
+          title,
+        ],
+      );
+    }
+    // A minimum height: larger text grows the header instead of clipping it.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
       child: Row(
         children: [
-          IconButton.outlined(
-            key: const ValueKey('trigger-back'),
-            tooltip: isSpanish ? 'Atrás' : 'Back',
-            onPressed: onBack,
-            style: IconButton.styleFrom(
-              foregroundColor: AppColors.deepTeal,
-              side: const BorderSide(color: AppColors.border),
-            ),
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
-          Expanded(
-            child: Text(
-              isSpanish ? 'Tus desencadenantes' : 'Your triggers',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.deepTeal,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          Container(
-            height: 30,
-            padding: const EdgeInsets.symmetric(horizontal: 11),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppColors.mint,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Text(
-              '6 OF 8',
-              style: TextStyle(
-                color: AppColors.deepTeal,
-                fontSize: 10,
-                letterSpacing: .6,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+          back,
+          Expanded(child: title),
+          step,
         ],
       ),
     );
@@ -441,17 +591,20 @@ class _TriggerProgress extends StatelessWidget {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              isSpanish ? 'EVALUACIÓN' : 'ASSESSMENT',
-              style: const TextStyle(
-                color: AppColors.mutedTeal,
-                fontSize: 10,
-                letterSpacing: 1.6,
-                fontWeight: FontWeight.w800,
+            Flexible(
+              child: Text(
+                isSpanish ? 'EVALUACIÓN' : 'ASSESSMENT',
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 10,
+                  letterSpacing: 1.6,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: 8),
             const Text(
               '75%',
               style: TextStyle(
@@ -492,6 +645,9 @@ class _TriggerChoice extends StatelessWidget {
   final IconData icon;
   final bool selected;
   final VoidCallback onTap;
+
+  /// Width of the padding, icon and gap beside the label.
+  static const chrome = 11.0 + 34 + 9 + 11;
 
   @override
   Widget build(BuildContext context) {
@@ -535,17 +691,7 @@ class _TriggerChoice extends StatelessWidget {
                       ),
                       const SizedBox(width: 9),
                       Expanded(
-                        child: Text(
-                          label,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: AppColors.deepTeal,
-                            fontSize: 13.5,
-                            height: 1.15,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
+                        child: Text(label, style: _choiceLabelStyle),
                       ),
                     ],
                   ),
@@ -586,6 +732,59 @@ class _CustomTriggerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasValue = customTrigger?.trim().isNotEmpty ?? false;
+    final icon = Container(
+      width: 34,
+      height: 34,
+      decoration: const BoxDecoration(
+        color: AppColors.mint,
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        hasValue ? Icons.edit_rounded : Icons.add_rounded,
+        color: AppColors.deepTeal,
+        size: 22,
+      ),
+    );
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          hasValue
+              ? (isSpanish ? 'TU DESENCADENANTE' : 'YOUR TRIGGER')
+              : (isSpanish
+                  ? 'AÑADE TU DESENCADENANTE'
+                  : 'ADD YOUR OWN TRIGGER'),
+          style: const TextStyle(
+            color: AppColors.mutedTeal,
+            fontSize: 10,
+            letterSpacing: 1.4,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          hasValue
+              ? customTrigger!
+              : (isSpanish
+                  ? 'Escribe otra situación…'
+                  : 'Type another situation…'),
+          style: TextStyle(
+            color: AppColors.deepTeal,
+            fontSize: hasValue ? 13.5 : 12,
+            fontWeight: hasValue ? FontWeight.w800 : FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+    final remove = IconButton(
+      key: const ValueKey('trigger-custom-remove'),
+      tooltip: isSpanish ? 'Eliminar' : 'Remove',
+      onPressed: onRemove,
+      icon: const Icon(
+        Icons.close_rounded,
+        color: AppColors.coral,
+      ),
+    );
     return Material(
       color: hasValue ? AppColors.coralLight : AppColors.paper,
       shape: RoundedRectangleBorder(
@@ -601,70 +800,31 @@ class _CustomTriggerCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(13, 11, 11, 11),
-          child: Row(
-            children: [
-              Container(
-                width: 34,
-                height: 34,
-                decoration: const BoxDecoration(
-                  color: AppColors.mint,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  hasValue ? Icons.edit_rounded : Icons.add_rounded,
-                  color: AppColors.deepTeal,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Column(
+          // At accessibility text sizes the text takes the card's full width
+          // under the icon.
+          child: _usesLargeTextLayout(context)
+              ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      hasValue
-                          ? (isSpanish ? 'TU DESENCADENANTE' : 'YOUR TRIGGER')
-                          : (isSpanish
-                              ? 'AÑADE TU DESENCADENANTE'
-                              : 'ADD YOUR OWN TRIGGER'),
-                      style: const TextStyle(
-                        color: AppColors.mutedTeal,
-                        fontSize: 10,
-                        letterSpacing: 1.4,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    Row(
+                      children: [
+                        icon,
+                        const Spacer(),
+                        if (hasValue) remove,
+                      ],
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      hasValue
-                          ? customTrigger!
-                          : (isSpanish
-                              ? 'Escribe otra situación…'
-                              : 'Type another situation…'),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: AppColors.deepTeal,
-                        fontSize: hasValue ? 13.5 : 12,
-                        fontWeight:
-                            hasValue ? FontWeight.w800 : FontWeight.w500,
-                      ),
-                    ),
+                    const SizedBox(height: 8),
+                    text,
+                  ],
+                )
+              : Row(
+                  children: [
+                    icon,
+                    const SizedBox(width: 11),
+                    Expanded(child: text),
+                    if (hasValue) remove,
                   ],
                 ),
-              ),
-              if (hasValue)
-                IconButton(
-                  key: const ValueKey('trigger-custom-remove'),
-                  tooltip: isSpanish ? 'Eliminar' : 'Remove',
-                  onPressed: onRemove,
-                  icon: const Icon(
-                    Icons.close_rounded,
-                    color: AppColors.coral,
-                  ),
-                ),
-            ],
-          ),
         ),
       ),
     );
@@ -678,6 +838,56 @@ class _TriggerPrivacyNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icon = Container(
+      width: 34,
+      height: 34,
+      decoration: const BoxDecoration(
+        color: AppColors.paper,
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(
+        Icons.lock_outline_rounded,
+        color: AppColors.deepTeal,
+        size: 21,
+      ),
+    );
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isSpanish
+              ? 'Se usa para prepararte, no para vigilarte'
+              : 'Used to prepare, not to monitor',
+          style: const TextStyle(
+            color: AppColors.deepTeal,
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          isSpanish
+              ? 'Tus elecciones adaptan las herramientas y los recordatorios.'
+              : 'Your choices shape coping tools and reminder timing.',
+          style: const TextStyle(
+            color: AppColors.tealSecondary,
+            fontSize: 11,
+            height: 1.3,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          isSpanish
+              ? 'BreatheFree no rastrea tu ubicación en segundo plano.'
+              : 'BreatheFree does not track your location in the background.',
+          style: const TextStyle(
+            color: AppColors.mutedTeal,
+            fontSize: 10,
+            height: 1.3,
+          ),
+        ),
+      ],
+    );
     return Container(
       key: const ValueKey('trigger-privacy-note'),
       width: double.infinity,
@@ -687,64 +897,21 @@ class _TriggerPrivacyNote extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.mintStrong),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: const BoxDecoration(
-              color: AppColors.paper,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.lock_outline_rounded,
-              color: AppColors.deepTeal,
-              size: 21,
-            ),
-          ),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Column(
+      // At accessibility text sizes the text takes the card's full width
+      // under the icon.
+      child: _usesLargeTextLayout(context)
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [icon, const SizedBox(height: 8), text],
+            )
+          : Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  isSpanish
-                      ? 'Se usa para prepararte, no para vigilarte'
-                      : 'Used to prepare, not to monitor',
-                  style: const TextStyle(
-                    color: AppColors.deepTeal,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  isSpanish
-                      ? 'Tus elecciones adaptan las herramientas y los recordatorios.'
-                      : 'Your choices shape coping tools and reminder timing.',
-                  style: const TextStyle(
-                    color: AppColors.tealSecondary,
-                    fontSize: 11,
-                    height: 1.3,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  isSpanish
-                      ? 'BreatheFree no rastrea tu ubicación en segundo plano.'
-                      : 'BreatheFree does not track your location in the background.',
-                  style: const TextStyle(
-                    color: AppColors.mutedTeal,
-                    fontSize: 10,
-                    height: 1.3,
-                  ),
-                ),
+                icon,
+                const SizedBox(width: 11),
+                Expanded(child: text),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -790,48 +957,52 @@ class _TriggerBottomAction extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: compact ? 50 : 54,
-                  child: FilledButton(
-                    key: const ValueKey('trigger-continue'),
-                    onPressed: canContinue ? onContinue : null,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.deepTeal,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: AppColors.border,
-                      disabledForegroundColor: AppColors.tealSecondary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                FilledButton(
+                  key: const ValueKey('trigger-continue'),
+                  onPressed: canContinue ? onContinue : null,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.deepTeal,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: AppColors.border,
+                    disabledForegroundColor: AppColors.tealSecondary,
+                    // A minimum, not a fixed height: large text wraps and
+                    // grows the button instead of being clipped.
+                    minimumSize: Size.fromHeight(compact ? 50 : 54),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
                           isSpanish ? 'Continuar' : 'Continue',
+                          textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(width: 14),
-                        Icon(
-                          Icons.arrow_forward_rounded,
-                          color: canContinue
-                              ? AppColors.lime
-                              : AppColors.mutedTeal,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 14),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        color:
+                            canContinue ? AppColors.lime : AppColors.mutedTeal,
+                      ),
+                    ],
                   ),
                 ),
                 if (!compact) ...[
                   const SizedBox(height: 7),
                   Text(
                     countLabel,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: AppColors.mutedTeal,
                       fontSize: 10,

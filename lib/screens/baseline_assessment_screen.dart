@@ -2,6 +2,46 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+/// Above 140% text (the iOS accessibility sizes and Android 14's largest
+/// font sizes) side-by-side pieces are stacked so text can grow.
+bool _usesLargeTextLayout(BuildContext context) =>
+    MediaQuery.textScalerOf(context).scale(10) > 14;
+
+/// The text scale for [text] in [style], lowered only as far as needed for
+/// its longest word to fit [width]: a word too long for a whole line scales
+/// down instead of splitting.
+TextScaler _wordFitScaler(
+  BuildContext context,
+  String text,
+  TextStyle style,
+  double width,
+) {
+  final scaler = MediaQuery.textScalerOf(context);
+  final painter = TextPainter(
+    text: TextSpan(
+      text: text,
+      style: DefaultTextStyle.of(context).style.merge(style),
+    ),
+    textDirection: Directionality.of(context),
+  );
+  try {
+    var fitted = scaler;
+    for (var attempt = 0; attempt < 4; attempt++) {
+      painter
+        ..textScaler = fitted
+        ..layout();
+      final longestWord = painter.minIntrinsicWidth;
+      if (longestWord <= width) return fitted;
+      final fontSize = style.fontSize ?? 14;
+      final factor = fitted.scale(fontSize) / fontSize * width / longestWord;
+      fitted = scaler.clamp(maxScaleFactor: factor * 0.99);
+    }
+    return fitted;
+  } finally {
+    painter.dispose();
+  }
+}
+
 enum DailyCigaretteUse {
   notEveryDay,
   tenOrFewer,
@@ -59,31 +99,49 @@ class BaselineAssessmentScreen extends StatelessWidget {
             builder: (context, constraints) {
               final narrow = constraints.maxWidth < 380;
               final compact = constraints.maxHeight < 760;
-              final horizontalPadding = narrow ? 18.0 : 24.0;
+              // Above 140% text the side margins narrow so long words fit, and
+              // the header, progress and main action scroll with the content
+              // so they never squeeze the questions out of view.
+              final largeText = _usesLargeTextLayout(context);
+              final horizontalPadding =
+                  largeText ? 12.0 : (narrow ? 18.0 : 24.0);
+
+              final footer = _AssessmentBottomAction(
+                isSpanish: isSpanish,
+                canContinue: dailyCigaretteUse != null,
+                onContinue: onContinue,
+                horizontalPadding: largeText ? 0 : horizontalPadding,
+                compact: compact,
+              );
+
+              final header = _AssessmentHeader(
+                isSpanish: isSpanish,
+                onBack: onBack,
+              );
+              final progress = _AssessmentProgress(isSpanish: isSpanish);
 
               return Column(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 10,
-                      horizontalPadding,
-                      0,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 10,
+                        horizontalPadding,
+                        0,
+                      ),
+                      child: header,
                     ),
-                    child: _AssessmentHeader(
-                      isSpanish: isSpanish,
-                      onBack: onBack,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 8,
+                        horizontalPadding,
+                        compact ? 7 : 10,
+                      ),
+                      child: progress,
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 8,
-                      horizontalPadding,
-                      compact ? 7 : 10,
-                    ),
-                    child: _AssessmentProgress(isSpanish: isSpanish),
-                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       key: const ValueKey('baseline-content-scroll'),
@@ -99,6 +157,12 @@ class BaselineAssessmentScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              if (largeText) ...[
+                                header,
+                                const SizedBox(height: 10),
+                                progress,
+                                const SizedBox(height: 18),
+                              ],
                               _AssessmentIcon(compact: compact),
                               SizedBox(height: compact ? 12 : 22),
                               Text(
@@ -116,6 +180,10 @@ class BaselineAssessmentScreen extends StatelessWidget {
                                 isSpanish
                                     ? 'En un día habitual, ¿cuántos cigarrillos fumas?'
                                     : 'On a typical day, how many cigarettes do you smoke?',
+                                // Already the largest text on screen; past
+                                // 180% its longest words no longer fit.
+                                textScaler: MediaQuery.textScalerOf(context)
+                                    .clamp(maxScaleFactor: 1.8),
                                 style: Theme.of(context)
                                     .textTheme
                                     .displayLarge
@@ -154,19 +222,17 @@ class BaselineAssessmentScreen extends StatelessWidget {
                               ],
                               SizedBox(height: compact ? 14 : 18),
                               _WhyWeAskCard(isSpanish: isSpanish),
+                              if (largeText) ...[
+                                const SizedBox(height: 18),
+                                footer,
+                              ],
                             ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                  _AssessmentBottomAction(
-                    isSpanish: isSpanish,
-                    canContinue: dailyCigaretteUse != null,
-                    onContinue: onContinue,
-                    horizontalPadding: horizontalPadding,
-                    compact: compact,
-                  ),
+                  if (!largeText) footer,
                 ],
               );
             },
@@ -188,53 +254,81 @@ class _AssessmentHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
-      child: Row(
-        children: [
-          IconButton.outlined(
-            key: const ValueKey('baseline-back'),
-            tooltip: isSpanish ? 'Atrás' : 'Back',
-            onPressed: onBack,
-            style: IconButton.styleFrom(
-              foregroundColor: AppColors.deepTeal,
-              side: const BorderSide(color: AppColors.border),
-            ),
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
-          Expanded(
-            child: Text(
-              isSpanish ? 'Sobre tu consumo' : 'About your smoking',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.deepTeal,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          Container(
-            height: 30,
-            padding: const EdgeInsets.symmetric(horizontal: 11),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppColors.mint,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Text(
-              '1 OF 8',
-              style: TextStyle(
-                color: AppColors.deepTeal,
-                fontSize: 10,
-                letterSpacing: .6,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-        ],
+    final back = IconButton.outlined(
+      key: const ValueKey('baseline-back'),
+      tooltip: isSpanish ? 'Atrás' : 'Back',
+      onPressed: onBack,
+      style: IconButton.styleFrom(
+        foregroundColor: AppColors.deepTeal,
+        side: const BorderSide(color: AppColors.border),
       ),
+      icon: const Icon(Icons.arrow_back_rounded),
+    );
+    final label = isSpanish ? 'Sobre tu consumo' : 'About your smoking';
+    const style = TextStyle(
+      color: AppColors.deepTeal,
+      fontSize: 16,
+      fontWeight: FontWeight.w800,
+    );
+    // The title wraps instead of ending in "…"; a word too long for the
+    // line scales down instead of splitting.
+    final title = LayoutBuilder(
+      builder: (context, constraints) => Text(
+        label,
+        textAlign: TextAlign.center,
+        textScaler: _wordFitScaler(
+          context,
+          label,
+          style,
+          constraints.maxWidth,
+        ),
+        style: style,
+      ),
+    );
+    final step = Container(
+      constraints: const BoxConstraints(minHeight: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 11),
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: AppColors.mint,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: const Text(
+        '1 OF 8',
+        style: TextStyle(
+          color: AppColors.deepTeal,
+          fontSize: 10,
+          letterSpacing: .6,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+
+    // Between the back button and the step, the title's words split at
+    // accessibility text sizes, so it takes a line of its own.
+    if (_usesLargeTextLayout(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [back, step],
+            ),
+          ),
+          const SizedBox(height: 6),
+          title,
+        ],
+      );
+    }
+    // A minimum height: larger text grows the header instead of clipping it.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
+      child: Row(children: [back, Expanded(child: title), step]),
     );
   }
 }
@@ -249,17 +343,20 @@ class _AssessmentProgress extends StatelessWidget {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              isSpanish ? 'EVALUACIÓN' : 'ASSESSMENT',
-              style: const TextStyle(
-                color: AppColors.mutedTeal,
-                fontSize: 10,
-                letterSpacing: 1.6,
-                fontWeight: FontWeight.w800,
+            Flexible(
+              child: Text(
+                isSpanish ? 'EVALUACIÓN' : 'ASSESSMENT',
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 10,
+                  letterSpacing: 1.6,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: 8),
             const Text(
               '12%',
               style: TextStyle(
@@ -343,6 +440,35 @@ class _AssessmentChoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final largeText = _usesLargeTextLayout(context);
+    final answer = Text(
+      label,
+      style: const TextStyle(
+        color: AppColors.deepTeal,
+        fontSize: 14,
+        height: 1.2,
+        fontWeight: FontWeight.w800,
+      ),
+    );
+    final badge = Container(
+      key: ValueKey('baseline-selected-${choice.name}'),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 5,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.paper,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Text(
+        isSpanish ? 'Elegido' : 'Selected',
+        style: const TextStyle(
+          color: AppColors.coral,
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
     return Semantics(
       selected: selected,
       button: true,
@@ -392,38 +518,27 @@ class _AssessmentChoice extends StatelessWidget {
                         : null,
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      label,
-                      style: const TextStyle(
-                        color: AppColors.deepTeal,
-                        fontSize: 14,
-                        height: 1.2,
-                        fontWeight: FontWeight.w800,
+                  // At accessibility text sizes the "Selected" badge sits
+                  // under the answer so the answer keeps the row's width.
+                  if (largeText)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          answer,
+                          if (selected) ...[
+                            const SizedBox(height: 6),
+                            badge,
+                          ],
+                        ],
                       ),
-                    ),
-                  ),
-                  if (selected) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      key: ValueKey('baseline-selected-${choice.name}'),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.paper,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Text(
-                        isSpanish ? 'Elegido' : 'Selected',
-                        style: const TextStyle(
-                          color: AppColors.coral,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
+                    )
+                  else ...[
+                    Expanded(child: answer),
+                    if (selected) ...[
+                      const SizedBox(width: 8),
+                      badge,
+                    ],
                   ],
                 ],
               ),
@@ -442,6 +557,54 @@ class _WhyWeAskCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final icon = Container(
+      width: 34,
+      height: 34,
+      decoration: const BoxDecoration(
+        color: AppColors.paper,
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(
+        Icons.info_outline_rounded,
+        color: AppColors.deepTeal,
+        size: 20,
+      ),
+    );
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isSpanish ? 'Por qué preguntamos' : 'Why we ask',
+          style: const TextStyle(
+            color: AppColors.deepTeal,
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          isSpanish
+              ? 'Esto ayuda a adaptar tu plan y calcular el dinero ahorrado.'
+              : 'This helps tailor your plan and estimate money saved.',
+          style: const TextStyle(
+            color: AppColors.tealSecondary,
+            fontSize: 11,
+            height: 1.3,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          isSpanish
+              ? 'No es un diagnóstico ni un juicio.'
+              : 'It is not a diagnosis or a judgment.',
+          style: const TextStyle(
+            color: AppColors.mutedTeal,
+            fontSize: 10,
+            height: 1.3,
+          ),
+        ),
+      ],
+    );
     return Container(
       key: const ValueKey('baseline-why-we-ask'),
       width: double.infinity,
@@ -451,62 +614,21 @@ class _WhyWeAskCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: AppColors.mintStrong),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: const BoxDecoration(
-              color: AppColors.paper,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.info_outline_rounded,
-              color: AppColors.deepTeal,
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Column(
+      // At accessibility text sizes the text takes the card's full width
+      // under the icon.
+      child: _usesLargeTextLayout(context)
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [icon, const SizedBox(height: 8), text],
+            )
+          : Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  isSpanish ? 'Por qué preguntamos' : 'Why we ask',
-                  style: const TextStyle(
-                    color: AppColors.deepTeal,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  isSpanish
-                      ? 'Esto ayuda a adaptar tu plan y calcular el dinero ahorrado.'
-                      : 'This helps tailor your plan and estimate money saved.',
-                  style: const TextStyle(
-                    color: AppColors.tealSecondary,
-                    fontSize: 11,
-                    height: 1.3,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  isSpanish
-                      ? 'No es un diagnóstico ni un juicio.'
-                      : 'It is not a diagnosis or a judgment.',
-                  style: const TextStyle(
-                    color: AppColors.mutedTeal,
-                    fontSize: 10,
-                    height: 1.3,
-                  ),
-                ),
+                icon,
+                const SizedBox(width: 11),
+                Expanded(child: text),
               ],
             ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -546,40 +668,45 @@ class _AssessmentBottomAction extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: compact ? 50 : 54,
-                  child: FilledButton(
-                    key: const ValueKey('baseline-next'),
-                    onPressed: canContinue ? onContinue : null,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.deepTeal,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: AppColors.border,
-                      disabledForegroundColor: AppColors.tealSecondary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                FilledButton(
+                  key: const ValueKey('baseline-next'),
+                  onPressed: canContinue ? onContinue : null,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.deepTeal,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: AppColors.border,
+                    disabledForegroundColor: AppColors.tealSecondary,
+                    // A minimum, not a fixed height: large text wraps and
+                    // grows the button instead of being clipped.
+                    minimumSize: Size.fromHeight(compact ? 50 : 54),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
                           isSpanish ? 'Siguiente' : 'Next',
+                          textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(width: 14),
-                        Icon(
-                          Icons.arrow_forward_rounded,
-                          color: canContinue
-                              ? AppColors.lime
-                              : AppColors.mutedTeal,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 14),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        color:
+                            canContinue ? AppColors.lime : AppColors.mutedTeal,
+                      ),
+                    ],
                   ),
                 ),
                 if (!compact) ...[
