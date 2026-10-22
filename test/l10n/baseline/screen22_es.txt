@@ -1,0 +1,90 @@
+# baseline 97d81ce · screen22 · es
+T Recuperación tras un desliz
+T PRIVADO
+T TU PROGRESO SIGUE AQUÍ
+T Un desliz es información, no el final.
+T Comparte solo lo que te resulte útil. Te ayudaremos con la siguiente elección.
+T Nada de lo que aparece abajo cambia ni elimina tu progreso anterior.
+T ¿Qué pasó?
+T Elige uno
+T Una o dos bocanadas
+T Un cigarrillo
+T Más de uno
+T Prefiero no responder
+T ¿CUÁNDO?
+T Justo ahora
+T Hoy más temprano
+T Otro día
+T ¿Qué estaba pasando?
+T Opcional
+T Elige cualquiera que encaje. Esto ayuda a actualizar tu plan de desencadenantes.
+T Estrés
+T Cerca de fumadores
+T Rutina
+T Alcohol
+T Después de comer
+T No estoy seguro
+T Algo más
+T ¿Qué te parece bien ahora?
+T Tú sigues teniendo el control del plan.
+T Continuar desde este momento
+T Mantén el plan actual y actualiza el apoyo de hoy.
+T RECOMMENDED
+T Elegir una nueva hora para dejarlo
+T Hoy u otra fecha
+T Ayúdame a decidir
+T Revisar opciones sin presión
+T TU SIGUIENTE PASO
+T Aleja los cigarrillos, luego usa un Rescate de 2 minutos.
+T Según el desencadenante y lo que te ayudó antes.
+T Puedes cambiar de herramienta o contactar con apoyo en cualquier momento.
+T Abrir después de guardar
+T Habla con un consejero de la línea para dejar de fumar
+T Nadie recibe una notificación a menos que tú lo elijas.
+T Ver apoyo
+T Guardar y comenzar la recuperación
+T Se guarda sin conexión y se sincroniza después. Puedes eliminar este evento más tarde.
+T Content v1.0
+T Omitir por ahora y volver a Inicio
+SL Recuperación tras un desliz
+SL PRIVADO
+SL TU PROGRESO SIGUE AQUÍ
+SL Un desliz es información, no el final.
+SL Comparte solo lo que te resulte útil. Te ayudaremos con la siguiente elección.
+SL Nada de lo que aparece abajo cambia ni elimina tu progreso anterior.
+SL ¿Qué pasó?
+SL Elige uno
+SL Una o dos bocanadas
+SL Un cigarrillo
+SL Más de uno
+SL Prefiero no responder
+SL ¿CUÁNDO?
+SL Justo ahora
+SL Hoy más temprano
+SL Otro día
+SL ¿Qué estaba pasando?
+SL Opcional
+SL Elige cualquiera que encaje. Esto ayuda a actualizar tu plan de desencadenantes.
+SL Estrés
+SL Cerca de fumadores
+SL Rutina
+SL Alcohol
+SL Después de comer
+SL No estoy seguro
+SL Algo más
+SL ¿Qué te parece bien ahora?
+SL Tú sigues teniendo el control del plan.
+SL Continuar desde este momento\nMantén el plan actual y actualiza el apoyo de hoy.\nRECOMMENDED
+SL Elegir una nueva hora para dejarlo\nHoy u otra fecha
+SL Ayúdame a decidir\nRevisar opciones sin presión
+SL TU SIGUIENTE PASO
+SL Aleja los cigarrillos, luego usa un Rescate de 2 minutos.
+SL Según el desencadenante y lo que te ayudó antes.
+SL Puedes cambiar de herramienta o contactar con apoyo en cualquier momento.
+SL Abrir después de guardar
+SL Habla con un consejero de la línea para dejar de fumar\nNadie recibe una notificación a menos que tú lo elijas.
+SL Ver apoyo
+SL Guardar y comenzar la recuperación
+SL Se guarda sin conexión y se sincroniza después. Puedes eliminar este evento más tarde.
+SL Content v1.0
+SL Omitir por ahora y volver a Inicio

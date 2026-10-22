@@ -1,0 +1,65 @@
+# baseline 97d81ce · screen23 · es
+T Centro de medicamentos
+T i
+T Educación y seguimiento—sin recetar
+T La app nunca selecciona un medicamento ni cambia una dosis.
+T Contenido clínico v3.2
+T Plan de medicamentos registrado
+T Registra un plan que ya usas con tu profesional clínico o equipo de atención. BreatheFree no receta ni cambia una dosis.
+T Vistas previas privadas
+T La pantalla bloqueada muestra “Tienes un recordatorio de BreatheFree”.
+T ON
+T Aprende sobre medicamentos para dejar de fumar
+T Revisado clínicamente
+T Reemplazo de nicotina
+T Parche, chicle, pastilla y más
+T Beneficios · uso · precauciones
+T Opciones con receta
+T Vareniclina · bupropión SR
+T Requiere quien recete
+T ¿Embarazo, lactancia o menor de 18 años?
+T Habla con un médico antes de usar medicamentos para dejar de fumar.
+T Contactar al equipo ›
+T Ayuda con el plan
+T ¿Omitiste o no estás seguro de algo?
+T Revisa las instrucciones aprobadas o contacta a un profesional clínico o farmacéutico.
+T Revisar ›
+T Efecto secundario o síntoma preocupante
+T Abre la ruta de seguridad aprobada; la app no diagnostica.
+T Obtener ayuda ›
+T ¿Pregunta sobre resurtido?
+T Contactar farmacia o equipo de atención ›
+T Agregar o actualizar el plan registrado
+T El plan sigue disponible sin conexión · Última sincronización 9:12 AM
+T Aprobado ago 2026
+T Inicio
+T Plan
+T Progreso
+T Aprender
+T Apoyo
+SL Centro de medicamentos
+SL i
+SL Educación y seguimiento—sin recetar
+SL La app nunca selecciona un medicamento ni cambia una dosis.
+SL Contenido clínico v3.2
+SL Plan de medicamentos registrado\nRegistra un plan que ya usas con tu profesional clínico o equipo de atención. BreatheFree no receta ni cambia una dosis.
+SL Vistas previas privadas
+SL La pantalla bloqueada muestra “Tienes un recordatorio de BreatheFree”.
+SL ON
+SL Aprende sobre medicamentos para dejar de fumar
+SL Revisado clínicamente
+SL Reemplazo de nicotina\nParche, chicle, pastilla y más\nBeneficios · uso · precauciones
+SL Opciones con receta\nVareniclina · bupropión SR\nRequiere quien recete
+SL ¿Embarazo, lactancia o menor de 18 años?\nHabla con un médico antes de usar medicamentos para dejar de fumar.\nContactar al equipo ›
+SL Ayuda con el plan
+SL ¿Omitiste o no estás seguro de algo?\nRevisa las instrucciones aprobadas o contacta a un profesional clínico o farmacéutico.\nRevisar ›
+SL Efecto secundario o síntoma preocupante\nAbre la ruta de seguridad aprobada; la app no diagnostica.\nObtener ayuda ›
+SL ¿Pregunta sobre resurtido?\nContactar farmacia o equipo de atención ›
+SL Agregar o actualizar el plan registrado
+SL El plan sigue disponible sin conexión · Última sincronización 9:12 AM
+SL Aprobado ago 2026
+SL Inicio
+SL Plan
+SL Progreso
+SL Aprender
+SL Apoyo

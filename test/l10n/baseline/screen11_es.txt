@@ -1,0 +1,68 @@
+# baseline 97d81ce · screen11 · es
+T BreatheFree
+T <weekday>, <day> DE <month>
+T <greeting>.
+T TU DÍA PARA DEJARLO
+T 7 días
+T <weekday>, <day> de <month> · Hora del Pacífico
+T DÍA 1
+T DÍA DE DEJARLO
+T PRÓXIMO PASO DE HOY
+T Retira cigarrillos, encendedores y ceniceros
+T Aproximadamente 3 minutos
+T Marcar como hecha
+T Una pequeña acción es suficiente por hoy.
+T ¿Tienes un antojo?
+T Recibe apoyo durante los próximos minutos.
+T Abrir Rescate
+T Tu preparación
+T Ver progreso
+T Plan listo
+T Activado hoy
+T 0/3
+T Espacio listo
+T Faltan 3 tareas
+T 0 personas
+T Agrega apoyo
+T TU RAZÓN PRINCIPAL
+T “Mi razón para dejarlo.”
+T Próximamente
+T No hay recordatorios programados. Puedes agregarlos desde tu plan.
+T Tu plan y las herramientas de Rescate siguen disponibles sin conexión.
+T Inicio
+T Plan
+T Progreso
+T Aprender
+T Apoyo
+SL BreatheFree
+ST Notificaciones
+SL Guest profile
+SL <weekday>, <day> DE <month>
+SL <greeting>.
+SL TU DÍA PARA DEJARLO
+SL 7 días
+SL <weekday>, <day> de <month> · Hora del Pacífico
+SL DÍA 1
+SL DÍA DE DEJARLO
+SL PRÓXIMO PASO DE HOY
+SL Retira cigarrillos, encendedores y ceniceros
+SL Aproximadamente 3 minutos
+SL Marcar como hecha
+SL Una pequeña acción es suficiente por hoy.
+SL ¿Tienes un antojo?
+SL Recibe apoyo durante los próximos minutos.
+SL Abrir Rescate
+SL Tu preparación
+SL Ver progreso
+SL Plan listo\nActivado hoy
+SL 0/3\nEspacio listo\nFaltan 3 tareas
+SL 0 personas\nAgrega apoyo
+SL TU RAZÓN PRINCIPAL\n“Mi razón para dejarlo.”
+SL Próximamente
+SL No hay recordatorios programados. Puedes agregarlos desde tu plan.
+SL Tu plan y las herramientas de Rescate siguen disponibles sin conexión.
+SL Inicio
+SL Plan
+SL Progreso
+SL Aprender
+SL Apoyo

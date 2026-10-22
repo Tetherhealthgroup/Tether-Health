@@ -1,0 +1,42 @@
+# baseline 97d81ce · screen00 · en
+T BreatheFree
+T English
+T No judgment
+T just support
+T Private
+T by design
+T WELCOME TO BREATHEFREE
+T Your next breath can be different.
+T Small steps, practical support, and no judgment—whenever you are ready.
+T Help when cravings hit
+T Quick tools that work anywhere
+T Progress that stays
+T A slip never erases your wins
+T Get started
+T I already have an account
+T Continuar en español
+T By continuing, you agree to the 
+T Terms
+T  and acknowledge the 
+T Privacy Notice.
+SL BreatheFree
+SL English
+ST Show menu
+SL No judgment
+SL just support
+SL Private
+SL by design
+SL WELCOME TO BREATHEFREE
+SL Your next breath can be different.
+SL Small steps, practical support, and no judgment—whenever you are ready.
+SL Help when cravings hit
+SL Quick tools that work anywhere
+SL Progress that stays
+SL A slip never erases your wins
+SL Get started
+SL I already have an account
+SL Continuar en español
+SL By continuing, you agree to the 
+SL Terms
+SL  and acknowledge the 
+SL Privacy Notice.

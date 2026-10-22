@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:breathefree_patient/l10n/app_locale.dart';
+import 'package:breathefree_patient/l10n/app_localizations.dart';
 import 'package:breathefree_patient/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -118,6 +120,7 @@ Future<void> pumpLargeText(
   required TextScaler scaler,
   required LargeTextFont font,
   required Widget home,
+  Locale? locale,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1.0;
@@ -126,6 +129,11 @@ Future<void> pumpLargeText(
   await tester.pumpWidget(
     MaterialApp(
       theme: largeTextTheme(font),
+      // The app's localizations, as at the app root; [locale] should match
+      // the screen's language (null: the test device's, English).
+      locale: locale,
+      supportedLocales: releaseLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
       builder: (context, child) => MediaQuery(
         data: MediaQuery.of(context).copyWith(textScaler: scaler),
         child: child!,

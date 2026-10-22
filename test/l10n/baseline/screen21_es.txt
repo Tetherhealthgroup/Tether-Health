@@ -1,0 +1,70 @@
+# baseline 97d81ce · screen21 · es
+T BreatheFree
+T DÍA DE DEJARLO · OCT 22
+T <greeting>.
+T Mantén el día sencillo. Una elección a la vez.
+T DESDE TU HORA PLANIFICADA PARA DEJARLO
+T <elapsed>
+T Comenzaste a las 12:00 AM · Hora del Pacífico
+T Tengo un antojo
+T Abre apoyo rápido para los próximos minutos.
+T Abrir Rescate
+T Fumé o tuve un desliz
+T Tu progreso no se borrará
+T SIGUIENTE PASO
+T Haz tu acción de la mañana
+T Bebe agua y camina cinco minutos en un lugar sin humo.
+T Unos 5 minutos
+T Completar
+T Lo esencial de hoy
+T 2 elementos
+T REGISTRO DE LA MAÑANA
+T ¿Cómo va tu primera mañana?
+T Registrar
+T PLAN DE TRATAMIENTO REGISTRADO
+T Confirma el estado de tu plan matutino
+T Sigue solo el plan registrado contigo o con tu equipo de atención.
+T Revisar estado
+T TU RAZÓN HOY
+T “Mi razón para dejarlo.”
+T De mi plan
+T Tu equipo de apoyo
+T Envía tu frase de ayuda guardada o contacta a un consejero.
+T Nada se envía a menos que tú lo elijas.
+T Ver apoyo
+T Hoy se adapta a tus respuestas. No hay una forma perfecta de hacerlo.
+T Inicio
+T Plan
+T Progreso
+T Aprender
+T Apoyo
+SL BreatheFree
+ST Notifications
+SL Guest profile
+SL DÍA DE DEJARLO · OCT 22
+SL <greeting>.
+SL Mantén el día sencillo. Una elección a la vez.
+SL DESDE TU HORA PLANIFICADA PARA DEJARLO
+SL <elapsed>
+SL Comenzaste a las 12:00 AM · Hora del Pacífico
+SL Tengo un antojo\nAbre apoyo rápido para los próximos minutos.\nAbrir Rescate
+SL Fumé o tuve un desliz\nTu progreso no se borrará
+SL SIGUIENTE PASO
+SL Haz tu acción de la mañana
+SL Bebe agua y camina cinco minutos en un lugar sin humo.
+SL Unos 5 minutos
+SL Completar
+SL Lo esencial de hoy
+SL 2 elementos
+SL REGISTRO DE LA MAÑANA\n¿Cómo va tu primera mañana?\nRegistrar
+SL PLAN DE TRATAMIENTO REGISTRADO\nConfirma el estado de tu plan matutino\nSigue solo el plan registrado contigo o con tu equipo de atención.\nRevisar estado
+SL TU RAZÓN HOY
+SL “Mi razón para dejarlo.”
+SL De mi plan
+SL Tu equipo de apoyo\nEnvía tu frase de ayuda guardada o contacta a un consejero.\nNada se envía a menos que tú lo elijas.\nVer apoyo
+SL Hoy se adapta a tus respuestas. No hay una forma perfecta de hacerlo.
+SL Inicio
+SL Plan
+SL Progreso
+SL Aprender
+SL Apoyo

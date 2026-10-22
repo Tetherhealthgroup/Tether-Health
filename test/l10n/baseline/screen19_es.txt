@@ -1,0 +1,81 @@
+# baseline 97d81ce · screen19 · es
+T Craving Rescue
+T 4 DE 5
+T RECHECK CRAVING
+T 80%
+T RESCATE DE 2 MINUTOS COMPLETADO
+T Te quedaste con el antojo.
+T Ahora nota lo que es verdad, no lo que debería ser.
+T 2:00
+T RESPIRACIÓN
+T ¿Qué tan fuerte es el antojo ahora?
+T Toca un número o arrastra el control.
+T 0
+T <calendar days>
+T Sin antojo
+T Más fuerte
+T Cualquier respuesta es útil. La aplicación responde a lo que eliges.
+T Obligatorio
+T ESTE RESCATE
+T ANTES
+T 6 / 10
+T AHORA
+T — / 10
+T Elige una calificación para comparar este rescate.
+T No es una medición médica
+T ¿Te ayudó la respiración lenta?
+T Opcional
+T Esto mejora las recomendaciones futuras.
+T Sí
+T Un poco
+T Esta vez no
+T Guardar y ver resultado
+T Guardado de forma privada en este dispositivo mientras estás sin conexión.
+T Repetir la respiración de 2 minutos
+T Cualquier respuesta es útil. La aplicación responde a lo que eliges.
+ST Atrás
+SL Craving Rescue
+SL 4 DE 5
+SL RECHECK CRAVING
+SL 80%
+SV 80
+SL RESCATE DE 2 MINUTOS COMPLETADO
+SL Te quedaste con el antojo.
+SL Ahora nota lo que es verdad, no lo que debería ser.
+SL 2:00
+SL RESPIRACIÓN
+SL ¿Qué tan fuerte es el antojo ahora?
+SL Toca un número o arrastra el control.
+SV 0%
+SL 0
+SL 1
+SL 2
+SL 3
+SL 4
+SL 5
+SL 6
+SL 7
+SL 8
+SL 9
+SL 10
+SL Sin antojo
+SL Más fuerte
+SL Cualquier respuesta es útil. La aplicación responde a lo que eliges.
+SL Obligatorio
+SL ESTE RESCATE
+SL ANTES
+SL 6 / 10
+SL AHORA
+SL — / 10
+SL Elige una calificación para comparar este rescate.
+SL No es una medición médica
+SL ¿Te ayudó la respiración lenta?
+SL Opcional
+SL Esto mejora las recomendaciones futuras.
+SL Sí
+SL Un poco
+SL Esta vez no
+SL Guardar y ver resultado
+SL Guardado de forma privada en este dispositivo mientras estás sin conexión.
+SL Repetir la respiración de 2 minutos
+SL Cualquier respuesta es útil. La aplicación responde a lo que eliges.

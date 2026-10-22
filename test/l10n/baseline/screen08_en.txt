@@ -1,0 +1,46 @@
+# baseline 97d81ce · screen08 · en
+T My reasons
+T 3 OF 5
+T QUIT PLAN
+T 60%
+T YOUR MOTIVATION
+T What are you quitting for?
+T Choose everything that matters to you. Tap the star to make one your top reason.
+T SELECT ALL THAT MATTER
+T 0 SELECTED
+T Protect my family
+T Breathe easier
+T Improve my health
+T Save money
+T Feel more in control
+T Be there for my future
+T ADD YOUR OWN REASON
+T Write what matters most in your own words
+T MOTIVATION PREVIEW
+T WHEN A CRAVING HITS
+T Choose a reason to create your personal reminder.
+T Choose a top reason anytime
+T Your reasons stay private and only personalize your quit support.
+T Save my reasons
+T 0 reasons selected · no top reason
+SL My reasons\n3 OF 5\nQUIT PLAN\n60%\n0 reasons selected · no top reason
+SV 60
+ST Back
+SL YOUR MOTIVATION
+SL What are you quitting for?
+SL Choose everything that matters to you. Tap the star to make one your top reason.
+SL SELECT ALL THAT MATTER
+SL 0 SELECTED
+SL Protect my family\nProtect my family
+SL Breathe easier\nBreathe easier
+SL Improve my health\nImprove my health
+SL Save money\nSave money
+SL Feel more in control\nFeel more in control
+SL Be there for my future\nBe there for my future
+SL ADD YOUR OWN REASON\nWrite what matters most in your own words
+SL MOTIVATION PREVIEW
+SL WHEN A CRAVING HITS
+SL Choose a reason to create your personal reminder.
+SL Choose a top reason anytime
+SL Your reasons stay private and only personalize your quit support.
+SL Save my reasons

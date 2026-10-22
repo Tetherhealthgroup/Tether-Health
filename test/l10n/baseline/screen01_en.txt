@@ -1,0 +1,22 @@
+# baseline 97d81ce · screen01 · en
+T BreatheFree
+T 1 OF 3
+T A BETTER WAY TO QUIT
+T Support for the moments that matter most.
+T BreatheFree responds to what you need now—and helps you protect the progress you have already made.
+T When a craving hits
+T Open a calming tool in one tap—available offline.
+T As your body heals
+T See smoke-free time, money saved, and recovery.
+T If a slip happens
+T Keep your progress. Learn, adjust, and continue.
+T Continue
+SL BreatheFree\n1 OF 3
+ST Back
+SL A BETTER WAY TO QUIT
+SL Support for the moments that matter most.
+SL BreatheFree responds to what you need now—and helps you protect the progress you have already made.
+SL When a craving hits\nOpen a calming tool in one tap—available offline.
+SL As your body heals\nSee smoke-free time, money saved, and recovery.
+SL If a slip happens\nKeep your progress. Learn, adjust, and continue.
+SL Continue

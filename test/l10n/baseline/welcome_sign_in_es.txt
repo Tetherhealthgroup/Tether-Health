@@ -1,0 +1,39 @@
+# baseline 97d81ce · welcome_sign_in · es
+T BreatheFree
+T Español
+T No judgment
+T just support
+T Private
+T by design
+T BIENVENIDO A BREATHEFREE
+T Tu próxima respiración puede ser diferente.
+T Pequeños pasos, apoyo práctico y sin juicios—cuando estés listo.
+T Ayuda con los antojos
+T Herramientas rápidas en cualquier lugar
+T Progreso que permanece
+T Un desliz no borra tus logros
+T Comenzar
+T Ya tengo una cuenta
+T Continue in English
+T Al continuar, aceptas los 
+T Términos
+T  y reconoces el 
+T Aviso de privacidad.
+T Sign in to BreatheFree
+T Account services are not configured for this build.
+T Email
+T Password
+T Forgot password?
+T Cancel
+T Create account
+T Sign in
+SL Cerrar
+SL Alerta
+SL Sign in to BreatheFree
+SL Account services are not configured for this build.
+SL Email
+SL Password
+SL Forgot password?
+SL Cancel
+SL Create account
+SL Sign in

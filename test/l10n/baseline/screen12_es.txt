@@ -1,0 +1,89 @@
+# baseline 97d81ce · screen12 · es
+T Registro diario
+T APROX. 60 S
+T HOY · <day> DE <month>
+T CASI LISTO
+T ¿Cómo estás hoy?
+T No hay respuestas correctas. Esto nos ayuda a ofrecerte el apoyo que necesitas.
+T ¿Cómo te sientes?
+T Regular
+T Bajo
+T No muy bien
+T Regular
+T Bien
+T Muy bien
+T Estrés hoy
+T Moderado
+T Desde tu último registro, ¿fumaste?
+T Antes del día para dejarlo, esto es esperado; no es un retroceso.
+T No
+T Una calada
+T Uno o más
+T Omitir
+T Antojo más fuerte de hoy
+T 5 · Moderado
+T 0 · Ninguno
+T 10 · Más fuerte
+T Confianza para las próximas 24 horas
+T 5 / 10
+T 0 · Baja
+T 10 · Alta
+T ¿Algo te está afectando hoy?
+T Opcional
+T Inquietud
+T Irritabilidad
+T Dificultad para concentrarme
+T Dificultad para dormir
+T Otro
+T Podemos sugerir apoyo adicional para síntomas intensos o inesperados.
+T ¿Necesitas apoyo ahora?
+T Abrir Rescate
+T Guardar registro
+T Privado · Funciona sin conexión · Se sincroniza de forma segura
+ST Cerrar
+SL Registro diario
+SL APROX. 60 S
+SL HOY · <day> DE <month>
+SL CASI LISTO
+SV 84
+SL ¿Cómo estás hoy?
+SL No hay respuestas correctas. Esto nos ayuda a ofrecerte el apoyo que necesitas.
+SL ¿Cómo te sientes?
+SL Regular
+SL Bajo
+SL No muy bien
+SL Regular
+SL Bien
+SL Muy bien
+SL Estrés hoy
+SL Moderado
+SV 50%
+SL Desde tu último registro, ¿fumaste?
+SL Antes del día para dejarlo, esto es esperado; no es un retroceso.
+SL No
+SL Una calada
+SL Uno o más
+SL Omitir
+SL Antojo más fuerte de hoy
+SL 5 · Moderado
+SL 5
+SV 50%
+SL 0 · Ninguno
+SL 10 · Más fuerte
+SL Confianza para las próximas 24 horas
+SL 5 / 10
+SL 5
+SV 50%
+SL 0 · Baja
+SL 10 · Alta
+SL ¿Algo te está afectando hoy?
+SL Opcional
+SL Inquietud
+SL Irritabilidad
+SL Dificultad para concentrarme
+SL Dificultad para dormir
+SL Otro
+SL Podemos sugerir apoyo adicional para síntomas intensos o inesperados.
+SL ¿Necesitas apoyo ahora?\nAbrir Rescate
+SL Guardar registro
+SL Privado · Funciona sin conexión · Se sincroniza de forma segura

@@ -1,0 +1,42 @@
+# baseline 97d81ce · screen00 · es
+T BreatheFree
+T Español
+T No judgment
+T just support
+T Private
+T by design
+T BIENVENIDO A BREATHEFREE
+T Tu próxima respiración puede ser diferente.
+T Pequeños pasos, apoyo práctico y sin juicios—cuando estés listo.
+T Ayuda con los antojos
+T Herramientas rápidas en cualquier lugar
+T Progreso que permanece
+T Un desliz no borra tus logros
+T Comenzar
+T Ya tengo una cuenta
+T Continue in English
+T Al continuar, aceptas los 
+T Términos
+T  y reconoces el 
+T Aviso de privacidad.
+SL BreatheFree
+SL Español
+ST Mostrar menú
+SL No judgment
+SL just support
+SL Private
+SL by design
+SL BIENVENIDO A BREATHEFREE
+SL Tu próxima respiración puede ser diferente.
+SL Pequeños pasos, apoyo práctico y sin juicios—cuando estés listo.
+SL Ayuda con los antojos
+SL Herramientas rápidas en cualquier lugar
+SL Progreso que permanece
+SL Un desliz no borra tus logros
+SL Comenzar
+SL Ya tengo una cuenta
+SL Continue in English
+SL Al continuar, aceptas los 
+SL Términos
+SL  y reconoces el 
+SL Aviso de privacidad.

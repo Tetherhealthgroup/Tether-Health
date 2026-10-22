@@ -1,0 +1,59 @@
+# baseline 97d81ce · screen07 · es
+T Elige tu fecha para dejarlo
+T 2 DE 5
+T PLAN PARA DEJARLO
+T 40%
+T TU FECHA
+T Elige un día para comenzar.
+T Una fecha dentro de 7–14 días te da tiempo para prepararte sin perder el impulso.
+T <month> <year>
+T D
+T L
+T M
+T J
+T V
+T S
+T <calendar days>
+T Ventana de preparación recomendada: <month> <day> – <month> <day>
+T OCT
+T 29
+T JUE
+T TU FECHA PARA DEJARLO
+T <weekday>, <day> de <month> de <year>
+T 7 días para prepararte
+T RECOMENDADO
+T Registro del día de dejarlo
+T 7:00 a. m. · Notificación privada
+T La pantalla bloqueada solo muestra: “Tienes un registro”.
+T Puedes cambiar esta fecha después sin perder tu progreso.
+T Confirmar esta fecha
+T Fecha guardada automáticamente
+SL Elige tu fecha para dejarlo\n2 DE 5\nPLAN PARA DEJARLO\n40%\nFecha guardada automáticamente
+SV 40
+ST Atrás
+SL TU FECHA
+SL Elige un día para comenzar.
+SL Una fecha dentro de 7–14 días te da tiempo para prepararte sin perder el impulso.
+SL <month> <year>
+SL D
+SL L
+SL M
+SL J
+SL V
+SL S
+SL <date>
+SL <date>\n<day>
+SL <date>
+SL Ventana de preparación recomendada: <month> <day> – <month> <day>
+SL OCT
+SL 29
+SL JUE
+SL TU FECHA PARA DEJARLO
+SL <weekday>, <day> de <month> de <year>
+SL 7 días para prepararte
+SL RECOMENDADO
+SL Registro del día de dejarlo
+SL 7:00 a. m. · Notificación privada
+SL La pantalla bloqueada solo muestra: “Tienes un registro”.
+SL Puedes cambiar esta fecha después sin perder tu progreso.
+SL Confirmar esta fecha

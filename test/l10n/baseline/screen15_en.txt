@@ -1,0 +1,77 @@
+# baseline 97d81ce · screen15 · en
+T Stress reset
+T COMPLETE
+T You gave the feeling time to change.
+T Take a moment to notice what is different now.
+T TIME
+T 0:00
+T STEPS
+T 3 of 3
+T STATUS
+T Saved
+T How strong is the craving now?
+T Choose the number that feels closest.
+T 6 · Moderate
+T No craving
+T Strongest
+T There is no “good” score—honest answers improve your support.
+T TODAY’S RESULT
+T BEFORE
+T 6 / 10
+T NOW
+T 6 / 10
+T — 0
+T POINTS
+T One result, not a promise—patterns become clearer over time.
+T What helped most?
+T Optional
+T Slow breathing
+T Water
+T Switching activities
+T Not sure yet
+T You can tell us what helped whenever you’re ready.
+T You can change this preference anytime.
+T Still need more support?
+T Open Rescue
+T Result saves offline and syncs securely.
+T Save result
+T Repeat exercise
+ST Close
+SL Stress reset
+SL COMPLETE
+SL You gave the feeling time to change.
+SL Take a moment to notice what is different now.
+SL TIME
+SL 0:00
+SL STEPS
+SL 3 of 3
+SL STATUS
+SL Saved
+SL How strong is the craving now?
+SL Choose the number that feels closest.
+SL 6 · Moderate
+SL 6
+SV 60%
+SL No craving
+SL Strongest
+SL There is no “good” score—honest answers improve your support.
+SL TODAY’S RESULT
+SL BEFORE
+SL 6 / 10
+SL NOW
+SL 6 / 10
+SL — 0
+SL POINTS
+SL One result, not a promise—patterns become clearer over time.
+SL What helped most?
+SL Optional
+SL Slow breathing
+SL Water
+SL Switching activities
+SL Not sure yet
+SL You can tell us what helped whenever you’re ready.
+SL You can change this preference anytime.
+SL Still need more support?\nOpen Rescue
+SL Result saves offline and syncs securely.
+SL Save result
+SL Repeat exercise

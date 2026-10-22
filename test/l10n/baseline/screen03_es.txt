@@ -1,0 +1,33 @@
+# baseline 97d81ce · screen03 · es
+T Sobre tu consumo
+T 1 OF 2
+T EVALUACIÓN
+T 50%
+T PREGUNTA 1
+T En un día habitual, ¿cuántos cigarrillos fumas?
+T Elige la respuesta más cercana a tu día habitual.
+T No fumo todos los días
+T 10 cigarrillos o menos
+T 11–20 cigarrillos
+T 21–30 cigarrillos
+T 31 cigarrillos o más
+T Por qué preguntamos
+T Esto ayuda a adaptar tu plan y calcular el dinero ahorrado.
+T No es un diagnóstico ni un juicio.
+T Siguiente
+T Tu respuesta se guarda automáticamente.
+SL Sobre tu consumo\n1 OF 2\nEVALUACIÓN\n50%\nTu respuesta se guarda automáticamente.
+SV 50
+ST Atrás
+SL PREGUNTA 1
+SL En un día habitual, ¿cuántos cigarrillos fumas?
+SL Elige la respuesta más cercana a tu día habitual.
+SL No fumo todos los días\nNo fumo todos los días
+SL 10 cigarrillos o menos\n10 cigarrillos o menos
+SL 11–20 cigarrillos\n11–20 cigarrillos
+SL 21–30 cigarrillos\n21–30 cigarrillos
+SL 31 cigarrillos o más\n31 cigarrillos o más
+SL Por qué preguntamos
+SL Esto ayuda a adaptar tu plan y calcular el dinero ahorrado.
+SL No es un diagnóstico ni un juicio.
+SL Siguiente

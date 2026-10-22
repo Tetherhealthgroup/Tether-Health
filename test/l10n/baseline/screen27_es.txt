@@ -1,0 +1,80 @@
+# baseline 97d81ce · screen27 · es
+T Configuración y privacidad
+T Tu cuenta, tus decisiones y tus datos.
+T PRIVADO DE FORMA PREDETERMINADA
+T Tus decisiones permanecen en tus manos
+T Sin anuncios. Nunca vendemos tus datos de salud.
+T Opciones de privacidad revisadas el <day> <month> <year>
+T Cuenta
+T Sesión no iniciada
+T Inicia sesión para sincronizar tu perfil.
+T Programas de salud
+T Elige BreatheFree, Heartwise, Steady o ClearAir.
+T Notificaciones
+T Registros y recordatorios del plan
+T Avisos útiles basados en tu plan
+T Mostrar detalles sensibles
+T El estado y medicamentos quedan ocultos al desactivar
+T Horario silencioso
+T 9:00 PM–7:00 AM · las alertas urgentes aún aparecen
+T Cambiar
+T Vista previa: “Tienes un recordatorio de BreatheFree”.
+T Privacidad y permisos
+T Consentimiento y permisos
+T Revisa las opciones de apoyo, investigación y comunicación
+T Revisar
+T Compartir con el equipo
+T Nada se envía sin tu vista previa y confirmación
+T Solo manual
+T Aplicaciones y dispositivos conectados
+T Sin conexiones activas
+T Administrar
+T Diagnóstico anónimo de la aplicación
+T Datos técnicos opcionales sin registros de salud
+T Tus datos
+T Descargar una copia
+T Tu perfil y plan guardado · JSON
+T Solicitar
+T Exportar un resumen de atención
+T Elige fechas y revisa cada detalle antes de compartir
+T Crear
+T Eliminar cuenta y datos
+T La eliminación permanente requiere revisión y confirmación
+T Accesibilidad y aplicación
+T Tamaño y contraste del texto
+T Sigue la configuración de tu dispositivo
+T Sistema
+T Reducir movimiento
+T Usa transiciones suaves sin efectos de celebración
+T Política de privacidad, términos y ayuda
+T BreatheFree version 1.0.0 (100)
+T Abrir
+T Iniciar sesión
+T Los cambios se guardan automáticamente y se sincronizan de forma segura.
+SL Volver
+SL Configuración y privacidad
+SL Tu cuenta, tus decisiones y tus datos.
+SL Guest profile
+SL PRIVADO DE FORMA PREDETERMINADA\nTus decisiones permanecen en tus manos\nSin anuncios. Nunca vendemos tus datos de salud.\nOpciones de privacidad revisadas el <day> <month> <year>
+SL Cuenta
+SL Sesión no iniciada\nInicia sesión para sincronizar tu perfil.
+SL Programas de salud\nElige BreatheFree, Heartwise, Steady o ClearAir.
+SL Notificaciones
+SL Horario silencioso. 9:00 PM–7:00 AM · las alertas urgentes aún aparecen. Cambiar\nVista previa: “Tienes un recordatorio de BreatheFree”.
+SL Registros y recordatorios del plan\nAvisos útiles basados en tu plan
+SL Mostrar detalles sensibles\nEl estado y medicamentos quedan ocultos al desactivar
+SL Privacidad y permisos
+SL Consentimiento y permisos. Revisa las opciones de apoyo, investigación y comunicación. Revisar
+SL Compartir con el equipo. Nada se envía sin tu vista previa y confirmación. Solo manual
+SL Aplicaciones y dispositivos conectados. Sin conexiones activas. Administrar
+SL Diagnóstico anónimo de la aplicación\nDatos técnicos opcionales sin registros de salud
+SL Tus datos
+SL Descargar una copia. Tu perfil y plan guardado · JSON. Solicitar
+SL Exportar un resumen de atención. Elige fechas y revisa cada detalle antes de compartir. Crear
+SL Eliminar cuenta y datos\nLa eliminación permanente requiere revisión y confirmación
+SL Accesibilidad y aplicación
+SL Tamaño y contraste del texto. Sigue la configuración de tu dispositivo. Sistema
+SL Reducir movimiento\nUsa transiciones suaves sin efectos de celebración
+SL Política de privacidad, términos y ayuda. BreatheFree version 1.0.0 (100). Abrir
+SL Iniciar sesión
+SL Los cambios se guardan automáticamente y se sincronizan de forma segura.

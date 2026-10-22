@@ -1,0 +1,48 @@
+# baseline 97d81ce · screen02 · es
+T BreatheFree
+T 2 OF 3
+T TU PRIVACIDAD
+T Tu historia sigue siendo tuya.
+T Elige cómo se usa tu información. Los elementos obligatorios mantienen la aplicación funcionando; las opciones se pueden cambiar en cualquier momento.
+T OBLIGATORIO PARA USAR BREATHEFREE
+T Obligatorio
+T Datos esenciales de la aplicación
+T Guarda tu cuenta, plan para dejar de fumar y progreso de forma segura.
+T Información de salud
+T Personaliza tu plan, herramientas de apoyo e información de recuperación.
+T Revisar Términos y Aviso de privacidad
+T TUS OPCIONES
+T Opcional
+T Recordatorios útiles
+T Recibe controles privados y recordatorios del plan.
+T Compartir con mi equipo de atención
+T Permite que un profesional conectado vea resúmenes de progreso.
+T Ayudar a mejorar BreatheFree
+T Aporta información desidentificada a investigaciones aprobadas.
+T Sin anuncios. Sin financiación de la industria tabacalera.
+T Nunca vendemos información de salud del paciente.
+T Aceptar y continuar
+T Puedes cambiar las opciones en Configuración.
+SL BreatheFree\n2 OF 3\nPuedes cambiar las opciones en Configuración.
+ST Atrás
+SL TU PRIVACIDAD
+SL Tu historia sigue siendo tuya.
+SL Elige cómo se usa tu información. Los elementos obligatorios mantienen la aplicación funcionando; las opciones se pueden cambiar en cualquier momento.
+SL OBLIGATORIO PARA USAR BREATHEFREE
+SL Obligatorio
+SL Datos esenciales de la aplicación
+SL Guarda tu cuenta, plan para dejar de fumar y progreso de forma segura.
+SL Información de salud
+SL Personaliza tu plan, herramientas de apoyo e información de recuperación.
+SL Revisar Términos y Aviso de privacidad
+SL TUS OPCIONES
+SL Opcional
+SL Recordatorios útiles
+SH Recibe controles privados y recordatorios del plan.
+SL Compartir con mi equipo de atención
+SH Permite que un profesional conectado vea resúmenes de progreso.
+SL Ayudar a mejorar BreatheFree
+SH Aporta información desidentificada a investigaciones aprobadas.
+SL Sin anuncios. Sin financiación de la industria tabacalera.
+SL Nunca vendemos información de salud del paciente.
+SL Aceptar y continuar

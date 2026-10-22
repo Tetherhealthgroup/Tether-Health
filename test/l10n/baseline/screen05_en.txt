@@ -1,0 +1,43 @@
+# baseline 97d81ce · screen05 · en
+T Your starting point
+T Complete
+T ASSESSMENT
+T 100%
+T YOUR REFLECTION
+T You’re ready to prepare—at your own pace.
+T Here is what we heard from your answers.
+T YOUR PATTERN
+T You can add your smoking pattern anytime
+T TRIGGERS
+T You can identify triggers anytime
+T STARTING POINT
+T You can start small and add details later
+T RECOMMENDED
+T Prepare
+T Practice coping tools and choose a quit date in the next 7–14 days. We’ll guide one small step each day.
+T Why this fits your answers
+T YOU CAN CHOOSE A DIFFERENT PATH
+T Explore first
+T Learn without setting a date
+T Connect
+T Talk with a coach or care team
+T Build my preparation plan
+T You’re in control. Change your path anytime.
+SL Your starting point\nComplete\nASSESSMENT\n100%\nYou’re in control. Change your path anytime.
+SV 100
+ST Back
+SL YOUR REFLECTION
+SL You’re ready to prepare—at your own pace.
+SL Here is what we heard from your answers.
+SL YOUR PATTERN
+SL You can add your smoking pattern anytime
+SL TRIGGERS
+SL You can identify triggers anytime
+SL STARTING POINT
+SL You can start small and add details later
+SL RECOMMENDED\nPrepare\nPractice coping tools and choose a quit date in the next 7–14 days. We’ll guide one small step each day.
+SL Why this fits your answers
+SL YOU CAN CHOOSE A DIFFERENT PATH
+SL Explore first\nLearn without setting a date
+SL Connect\nTalk with a coach or care team
+SL Build my preparation plan

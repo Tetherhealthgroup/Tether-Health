@@ -1,0 +1,70 @@
+# baseline 97d81ce · screen21 · en
+T BreatheFree
+T QUIT DAY · OCT 22
+T <greeting>.
+T Keep today simple. One choice at a time.
+T SINCE YOUR PLANNED QUIT TIME
+T <elapsed>
+T Started at 12:00 AM · Pacific Time
+T I have a craving
+T Open fast support for the next few minutes.
+T Open Rescue
+T I smoked or had a slip
+T Your progress will not be erased
+T NEXT BEST STEP
+T Take your planned morning action
+T Drink water, then walk for five minutes in a smoke-free place.
+T About 5 minutes
+T Mark complete
+T Today's essentials
+T 2 items
+T MORNING CHECK-IN
+T How is your first morning going?
+T Check in
+T RECORDED TREATMENT PLAN
+T Confirm your morning plan status
+T Follow only the plan recorded with you or your care team.
+T Review status
+T YOUR REASON TODAY
+T “My reason to quit.”
+T From My Plan
+T Your support team
+T Send your saved help phrase or contact a quitline counselor.
+T Nothing is sent unless you choose it.
+T View support
+T Today adapts to your answers. There is no perfect way to do this.
+T Home
+T Plan
+T Progress
+T Learn
+T Support
+SL BreatheFree
+ST Notifications
+SL Guest profile
+SL QUIT DAY · OCT 22
+SL <greeting>.
+SL Keep today simple. One choice at a time.
+SL SINCE YOUR PLANNED QUIT TIME
+SL <elapsed>
+SL Started at 12:00 AM · Pacific Time
+SL I have a craving\nOpen fast support for the next few minutes.\nOpen Rescue
+SL I smoked or had a slip\nYour progress will not be erased
+SL NEXT BEST STEP
+SL Take your planned morning action
+SL Drink water, then walk for five minutes in a smoke-free place.
+SL About 5 minutes
+SL Mark complete
+SL Today's essentials
+SL 2 items
+SL MORNING CHECK-IN\nHow is your first morning going?\nCheck in
+SL RECORDED TREATMENT PLAN\nConfirm your morning plan status\nFollow only the plan recorded with you or your care team.\nReview status
+SL YOUR REASON TODAY
+SL “My reason to quit.”
+SL From My Plan
+SL Your support team\nSend your saved help phrase or contact a quitline counselor.\nNothing is sent unless you choose it.\nView support
+SL Today adapts to your answers. There is no perfect way to do this.
+SL Home
+SL Plan
+SL Progress
+SL Learn
+SL Support

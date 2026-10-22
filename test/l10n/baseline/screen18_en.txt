@@ -1,0 +1,69 @@
+# baseline 97d81ce · screen18 · en
+T Craving Rescue
+T 3 OF 5
+T ACTIVE TOOL
+T 60%
+T Stay with this moment.
+T Follow the circle—or breathe slowly in your own way.
+T SLOW BREATHING
+T 2:00 LEFT
+T BREATHE IN
+T Slowly
+T 4
+T SECONDS
+T Let the breath come in gently.
+T THIS BREATH
+T In 4 · Out 6
+T Inhale gently
+T Exhale slowly
+T Pause
+T Voice\nOn
+T Haptics\nOn
+T Reduced motion follows your phone setting
+T Works offline
+T The urge is a wave.
+T You can let it rise and pass without smoking.
+T You only need to stay with this breath—not solve the whole day.
+T Need different support right now?
+T You can change tools without losing this check-in.
+T Switch coping tool
+T Get support from a person
+T End exercise
+T No data is being sent or shared during this exercise.\nContent v1.0
+T After 2 minutes, you’ll rate the craving again
+ST Close
+SL Craving Rescue
+SL 3 OF 5
+SL ACTIVE TOOL
+SL 60%
+SV 60
+SL Stay with this moment.
+SL Follow the circle—or breathe slowly in your own way.
+SL SLOW BREATHING
+SL 2:00 LEFT
+SL BREATHE IN
+SL Slowly
+SL 4
+SL SECONDS
+SL Let the breath come in gently.
+SL THIS BREATH
+SL In 4 · Out 6
+SV 0
+SL Inhale gently
+SL Exhale slowly
+SL Pause
+SL Voice\nOn
+SL Haptics\nOn
+SL Reduced motion follows your phone setting
+SL Works offline
+SV 0
+SL The urge is a wave.
+SL You can let it rise and pass without smoking.
+SL You only need to stay with this breath—not solve the whole day.
+SL Need different support right now?
+SL You can change tools without losing this check-in.
+SL Switch coping tool
+SL Get support from a person
+SL End exercise
+SL No data is being sent or shared during this exercise.\nContent v1.0
+SL After 2 minutes, you’ll rate the craving again

@@ -1,0 +1,24 @@
+# baseline 97d81ce · program_heartwise · en
+T Works offline — your information stays on this device.
+T Emergency
+T Chest pain, pressure, or trouble breathing? Call emergency services now.
+T Call emergency services
+T Today's focus
+T No readings yet. Log your blood pressure whenever you take it — there is no schedule to keep up with.
+T Log blood pressure
+T Cholesterol panel
+T When to call your doctor
+T New or worsening symptoms your clinician asked you to watch for.
+T You ran out of a medication or have questions about it.
+T You want help understanding your readings or your plan.
+T Target ranges come from your clinician. This app never sets or grades them — readings are information, not a grade.
+T Heartwise
+SL Works offline — your information stays on this device.
+SL Emergency. Chest pain, pressure, or trouble breathing? Call emergency services now.
+SL Today's focus\nNo readings yet. Log your blood pressure whenever you take it — there is no schedule to keep up with.
+SL Log blood pressure
+SL Open cholesterol panel
+SL When to call your doctor\n•  \nNew or worsening symptoms your clinician asked you to watch for.\n•  \nYou ran out of a medication or have questions about it.\n•  \nYou want help understanding your readings or your plan.
+SL Target ranges come from your clinician. This app never sets or grades them — readings are information, not a grade.
+SL Heartwise
+ST Choose program

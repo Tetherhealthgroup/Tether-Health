@@ -1,0 +1,27 @@
+# baseline 97d81ce · welcome_language_menu · en
+T BreatheFree
+T English
+T No judgment
+T just support
+T Private
+T by design
+T WELCOME TO BREATHEFREE
+T Your next breath can be different.
+T Small steps, practical support, and no judgment—whenever you are ready.
+T Help when cravings hit
+T Quick tools that work anywhere
+T Progress that stays
+T A slip never erases your wins
+T Get started
+T I already have an account
+T Continuar en español
+T By continuing, you agree to the 
+T Terms
+T  and acknowledge the 
+T Privacy Notice.
+T English
+T Español
+SL Dismiss menu
+SL Popup menu
+SL English
+SL Español

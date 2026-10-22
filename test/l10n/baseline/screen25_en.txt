@@ -1,0 +1,24 @@
+# baseline 97d81ce · screen25 · en
+T Progress
+T Patterns, practice and progress—without punishment.
+T Nothing to show yet
+T Progress here comes only from what you record. No numbers or charts are shown until there is something of yours to report.
+T Health benefits build over time
+T View a clinically reviewed general timeline—not a personal test result.
+T Home
+T Plan
+T Progress
+T Learn
+T Support
+SL Go back
+SL Progress
+SL Patterns, practice and progress—without punishment.
+SL Guest profile
+ST Settings and privacy
+SL Nothing to show yet\nProgress here comes only from what you record. No numbers or charts are shown until there is something of yours to report.
+SL Health benefits build over time\nView a clinically reviewed general timeline—not a personal test result.
+SL Home
+SL Plan
+SL Progress
+SL Learn
+SL Support

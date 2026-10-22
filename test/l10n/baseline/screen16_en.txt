@@ -1,0 +1,72 @@
+# baseline 97d81ce · screen16 · en
+T Craving Rescue
+T OFFLINE READY
+T RIGHT NOW
+T Let’s get through this moment.
+T Start with what you feel now. No typing is required.
+T CRAVING INTENSITY
+T How strong is it right now?
+T 6
+T MODERATE
+T Mild
+T Strongest
+T You only need to choose a number.
+T The next screen gives one recommended action.
+T What might be behind it?
+T Optional · Skip anytime
+T Stress
+T After a meal
+T Around someone smoking
+T Driving
+T Alcohol
+T Bored
+T Not sure
+T Used to personalize support — never to monitor you.\nNo background location or conversation tracking.
+T YOUR TOP REASON
+T “My reason to quit.”
+T This moment can pass without changing your goal.
+T Want a person instead?
+T Contact your support person or a trained quitline counselor.
+T View support
+T Messages and calls only happen when you choose them.
+T Show me what to do
+T Private · Works offline
+T Medical emergency?
+T Trigger details are optional and never block Rescue.
+ST Go back
+SL Craving Rescue
+SL OFFLINE READY
+SL RIGHT NOW
+SL Let’s get through this moment.
+SL Start with what you feel now. No typing is required.
+SL CRAVING INTENSITY
+SL How strong is it right now?
+SL 6
+SL MODERATE
+SL 6
+SV 56%
+SL Mild
+SL Strongest
+SL You only need to choose a number.
+SL The next screen gives one recommended action.
+SL What might be behind it?
+SL Optional · Skip anytime
+SL Stress
+SL After a meal
+SL Around someone smoking
+SL Driving
+SL Alcohol
+SL Bored
+SL Not sure
+SL Used to personalize support — never to monitor you.\nNo background location or conversation tracking.
+SL YOUR TOP REASON
+SL “My reason to quit.”
+SL This moment can pass without changing your goal.
+SL Want a person instead?
+SL Contact your support person or a trained quitline counselor.
+SL View support
+SL Messages and calls only happen when you choose them.
+SL Show me what to do
+SL Private · Works offline
+SL Medical emergency?
+SL Trigger details are optional and never block Rescue.

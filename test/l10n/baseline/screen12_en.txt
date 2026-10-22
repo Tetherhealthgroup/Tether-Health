@@ -1,0 +1,89 @@
+# baseline 97d81ce · screen12 · en
+T Daily check-in
+T ABOUT 60 SEC
+T TODAY · <month> <day>
+T ALMOST DONE
+T How are you doing today?
+T No right answers. This helps us support what you need next.
+T How do you feel?
+T Okay
+T Low
+T Not great
+T Okay
+T Good
+T Great
+T Stress today
+T Moderate
+T Since your last check-in, did you smoke?
+T Before your quit day, this is expected — it is not a setback.
+T No
+T A puff
+T One or more
+T Skip
+T Strongest craving today
+T 5 · Moderate
+T 0 · None
+T 10 · Strongest
+T Confidence for the next 24 hours
+T 5 / 10
+T 0 · Low
+T 10 · High
+T Anything affecting you today?
+T Optional
+T Restless
+T Irritable
+T Trouble concentrating
+T Trouble sleeping
+T Other
+T We may suggest extra support for severe or unexpected symptoms.
+T Need support right now?
+T Open Rescue
+T Save check-in
+T Private · Works offline · Syncs securely when connected
+ST Close
+SL Daily check-in
+SL ABOUT 60 SEC
+SL TODAY · <month> <day>
+SL ALMOST DONE
+SV 84
+SL How are you doing today?
+SL No right answers. This helps us support what you need next.
+SL How do you feel?
+SL Okay
+SL Low
+SL Not great
+SL Okay
+SL Good
+SL Great
+SL Stress today
+SL Moderate
+SV 50%
+SL Since your last check-in, did you smoke?
+SL Before your quit day, this is expected — it is not a setback.
+SL No
+SL A puff
+SL One or more
+SL Skip
+SL Strongest craving today
+SL 5 · Moderate
+SL 5
+SV 50%
+SL 0 · None
+SL 10 · Strongest
+SL Confidence for the next 24 hours
+SL 5 / 10
+SL 5
+SV 50%
+SL 0 · Low
+SL 10 · High
+SL Anything affecting you today?
+SL Optional
+SL Restless
+SL Irritable
+SL Trouble concentrating
+SL Trouble sleeping
+SL Other
+SL We may suggest extra support for severe or unexpected symptoms.
+SL Need support right now?\nOpen Rescue
+SL Save check-in
+SL Private · Works offline · Syncs securely when connected

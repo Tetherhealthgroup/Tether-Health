@@ -1,0 +1,22 @@
+# baseline 97d81ce · program_clearair · es
+T Works offline — your information stays on this device.
+T No action plan recorded yet. Your clinician provides your green, yellow, and red zones.
+T Daily zone check
+T Red-zone plan
+T Action plan
+T No plan recorded yet. Your action-plan zones come from your clinician — the app does not decide them.
+T Record action plan
+T Recent check-ins
+T No check-ins yet. Your daily zone check takes under a minute.
+T Nothing is sent unless you choose it. Works offline.
+T Tether does not diagnose or treat any condition and does not replace professional care.
+T ClearAir
+SL Works offline — your information stays on this device.
+SL Action plan zone. No action plan recorded yet. Your clinician provides your green, yellow, and red zones.
+SL Daily zone check
+SL Red-zone plan
+SL Action plan\nNo plan recorded yet. Your action-plan zones come from your clinician — the app does not decide them.\nRecord action plan
+SL Recent check-ins\nNo check-ins yet. Your daily zone check takes under a minute.
+SL Privacy. Nothing is sent unless you choose it. Works offline.\nMedical disclaimer. Tether does not diagnose or treat any condition and does not replace professional care.
+SL ClearAir
+ST Choose program

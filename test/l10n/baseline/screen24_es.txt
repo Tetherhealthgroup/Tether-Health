@@ -1,0 +1,70 @@
+# baseline 97d81ce · screen24 · es
+T Aprende
+T Lecciones breves y revisadas para tu momento actual.
+T Busca antojos, sueño, medicamentos, apoyo…
+T EN · ES
+T Para ti
+T 2–5 min
+T Audio
+T Sin conexión
+T Guardado
+T PARA TU DÍA DE DEJARLO
+T Antojos: qué esperar hoy
+T Reconoce los impulsos comunes y elige un plan antes de que aumenten.
+T 4 min de lectura
+T audio 3:12
+T Lenguaje claro
+T Iniciar lección
+T Incluye transcripción
+T Seguir aprendiendo
+T DESENCADENANTES · 2 DE 4
+T Conoce tus desencadenantes de estrés
+T Continuar
+T Explorar temas
+T Antojos
+T 8 lecciones cortas
+T Abstinencia
+T Qué esperar
+T Medicamentos
+T Solo educación
+T Recuperación tras un desliz
+T Regresa sin culpa
+T Estrés y ánimo
+T Habilidades para afrontarlo
+T Apoyo
+T Personas y líneas de ayuda
+T 3 lecciones guardadas sin conexión\nAudio, texto y transcripciones disponibles.
+T Inicio
+T Plan
+T Progreso
+T Aprender
+T Apoyo
+SL Aprende
+SL Lecciones breves y revisadas para tu momento actual.
+ST Guardar lección destacada
+SL Guest profile
+ST Configuración y privacidad
+SL EN · ES
+SL Busca antojos, sueño, medicamentos, apoyo…
+SL Para ti
+SL 2–5 min
+SL Audio
+SL Sin conexión
+SL Guardado
+SL Iniciar lección destacada\nPARA TU DÍA DE DEJARLO\nAntojos: qué esperar hoy\nReconoce los impulsos comunes y elige un plan antes de que aumenten.\n4 min de lectura\naudio 3:12\nLenguaje claro\nIniciar lección\nIncluye transcripción
+SL Seguir aprendiendo
+SL DESENCADENANTES · 2 DE 4\nConoce tus desencadenantes de estrés\nContinuar
+SV 60
+SL Explorar temas
+SL Antojos\n8 lecciones cortas
+SL Abstinencia\nQué esperar
+SL Medicamentos\nSolo educación
+SL Recuperación tras un desliz\nRegresa sin culpa
+SL Estrés y ánimo\nHabilidades para afrontarlo
+SL Apoyo\nPersonas y líneas de ayuda
+SL 3 lecciones guardadas sin conexión\nAudio, texto y transcripciones disponibles.
+SL Inicio
+SL Plan
+SL Progreso
+SL Aprender
+SL Apoyo
