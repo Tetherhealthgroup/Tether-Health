@@ -12,7 +12,12 @@ import { configureApp } from "../src/configure-app";
 import { UserSupabaseClientFactory } from "../src/enrolments/user-supabase-client";
 import { programmeDataErrorCodes } from "../src/programme-data/programme-data-errors";
 import { recordsErrorCodes } from "../src/records-events/records-errors";
-import { localDate } from "../src/today/day-window";
+import {
+  addDays,
+  dayWindow,
+  localDate,
+  startOfLocalDate,
+} from "../src/today/day-window";
 import { DB_CANARY, FakePostgrest } from "./support/fake-postgrest";
 import {
   openApiDocument,
@@ -252,6 +257,42 @@ describe("Records, Today, preferences, baseline and app config (e2e)", () => {
         kind: "checkin",
         payload: { feel: "not_great", stress: "high", answer: "drained" },
       });
+      // Exact payloads: no row carries another card's answer.
+      expect(byProgramme.bf?.payload).toEqual({
+        feel: "not_great",
+        stress: "high",
+        answer: "a_puff",
+      });
+      expect(byProgramme.sf?.payload).toEqual({
+        feel: "not_great",
+        stress: "high",
+        answer: "drained",
+      });
+    });
+
+    it("bf and a programme without a card: bf's row has its answer, the other row only the shared values", async () => {
+      const a = newCaller();
+      await enrol(a, "bf", { status: "focus" });
+      await enrol(a, "ea", { status: "focus" });
+      const response = await post(a, path, {
+        feel: "good",
+        answers: { bf: "a_puff" },
+      });
+      expect(response.statusCode).toBe(201);
+      expect(response.json<{ entries: string[] }>().entries).toEqual([
+        "bf",
+        "ea",
+      ]);
+      const payloads = Object.fromEntries(
+        rows("programme_entries", a).map((row) => [
+          String(row.programme_code),
+          row.payload,
+        ]),
+      );
+      expect(payloads).toEqual({
+        bf: { feel: "good", answer: "a_puff" },
+        ea: { feel: "good" },
+      });
     });
 
     it("a focus enrolment without live core consent gets no row", async () => {
@@ -262,8 +303,11 @@ describe("Records, Today, preferences, baseline and app config (e2e)", () => {
       expect(response.statusCode).toBe(201);
       expect(response.json<{ entries: string[] }>().entries).toEqual(["bf"]);
       expect(
-        rows("programme_entries", a).map((row) => row.programme_code),
-      ).toEqual(["bf"]);
+        rows("programme_entries", a).map((row) => [
+          row.programme_code,
+          row.payload,
+        ]),
+      ).toEqual([["bf", { feel: "okay" }]]);
     });
 
     it("a programme whose row would hold nothing gets none (answer only for another card)", async () => {
@@ -1272,6 +1316,329 @@ describe("Records, Today, preferences, baseline and app config (e2e)", () => {
         minimumVersion: { ios: "0.0.0", android: "0.0.0" },
       });
       expectSchema("AppConfig", response.json());
+    });
+  });
+
+  // ---- boundaries, Today fields, replay before pre-checks -------------------
+
+  describe("time windows (boundaries)", () => {
+    const seedEntry = (
+      caller: Caller,
+      enrolmentId: string,
+      code: string,
+      kind: string,
+      payload: object,
+      occurredAt: string,
+    ) =>
+      fake.seedRow("programme_entries", {
+        id: randomUUID(),
+        user_id: caller.id,
+        enrolment_id: enrolmentId,
+        programme_code: code,
+        submission_id: randomUUID(),
+        kind,
+        occurred_at: occurredAt,
+        payload,
+        created_at: new Date().toISOString(),
+      });
+
+    it("a check-in one minute before today's start (UTC) is not today's", async () => {
+      const a = newCaller();
+      const bf = await enrol(a, "bf", { status: "focus" });
+      const window = dayWindow("UTC");
+      seedEntry(
+        a,
+        bf,
+        "bf",
+        "checkin",
+        { feel: "okay" },
+        new Date(Date.parse(window.todayStart) - 60_000).toISOString(),
+      );
+      const body = (await call(a, "GET", "/v1/today")).json<{
+        checkin: { doneToday: boolean };
+      }>();
+      expect(body.checkin.doneToday).toBe(false);
+      seedEntry(a, bf, "bf", "checkin", { feel: "okay" }, window.todayStart);
+      expect(
+        (await call(a, "GET", "/v1/today")).json<{
+          checkin: { doneToday: boolean };
+        }>().checkin.doneToday,
+      ).toBe(true);
+    });
+
+    it("the 7-day window starts at the local start of day −6 in the member's zone", async () => {
+      const a = newCaller();
+      fake.setProfileTimeZone(a.id, "Asia/Kolkata");
+      const sd = await enrol(a, "sd");
+      const start = Date.parse(dayWindow("Asia/Kolkata").last7Start);
+      expect(start).toBe(
+        startOfLocalDate(
+          "Asia/Kolkata",
+          addDays(localDate("Asia/Kolkata", Date.now()), -6),
+        ),
+      );
+      seedEntry(
+        a,
+        sd,
+        "sd",
+        "sd.session",
+        {},
+        new Date(start + 60_000).toISOString(),
+      );
+      seedEntry(
+        a,
+        sd,
+        "sd",
+        "sd.session",
+        {},
+        new Date(start - 60_000).toISOString(),
+      );
+      const body = (await call(a, "GET", "/v1/today")).json<{
+        programmes: { code: string; sessionsLast7Days?: number }[];
+      }>();
+      expect(body.programmes[0]?.sessionsLast7Days).toBe(1);
+    });
+
+    it("summary days=7 excludes a row 7 days and 1 hour old and keeps one 6 days 23 hours old", async () => {
+      const a = newCaller();
+      const ea = await enrol(a, "ea");
+      const hour = 3_600_000;
+      seedEntry(
+        a,
+        ea,
+        "ea",
+        "ea.mood",
+        { mood: "low" },
+        new Date(Date.now() - 7 * 24 * hour - hour).toISOString(),
+      );
+      seedEntry(
+        a,
+        ea,
+        "ea",
+        "ea.mood",
+        { mood: "good" },
+        new Date(Date.now() - 7 * 24 * hour + hour).toISOString(),
+      );
+      const body = (
+        await call(a, "GET", "/v1/records/summary?programme=ea&days=7")
+      ).json<{ entries: { payload: { mood: string } }[] }>();
+      expect(body.entries.map((entry) => entry.payload.mood)).toEqual(["good"]);
+    });
+  });
+
+  describe("Today fields of re, ck, be and sd", () => {
+    it("each field holds its own metric or kind, with its values", async () => {
+      const a = newCaller();
+      for (const code of ["re", "ck", "be", "sd"]) await enrol(a, code);
+      const submit = async (route: string, body: object) =>
+        expect(
+          (await post(a, `/v1/program-data/${route}`, body)).statusCode,
+        ).toBe(201);
+      await submit("re/labs", {
+        egfr: 58,
+        urineAcr: 42,
+        alt: 31.25,
+        labDate: LAB_DATE,
+      });
+      await submit("re/labs", { egfr: 61, labDate: "2026-10-01" });
+      await submit("ck/done", { item: "flu_vaccine", doneOn: "2026-10-12" });
+      await submit("be/diary", { fatigue: 6, symptoms: ["nausea"] });
+      await submit("sd/falls", { occurredAt: minutesAgo(3) });
+      await submit("sd/sessions", { settings: ["audio_on"] });
+      const body = (await call(a, "GET", "/v1/today")).json<{
+        programmes: Record<string, unknown>[];
+      }>();
+      expectSchema("Today", body);
+      const block = (code: string) =>
+        body.programmes.find((entry) => entry.code === code);
+      expect(block("re")?.lastLabs).toEqual({
+        egfr: { value: 61, at: "2026-10-01T00:00:00Z" },
+        urineAcr: { value: 42, at: `${LAB_DATE}T00:00:00Z` },
+        alt: { value: 31.25, at: `${LAB_DATE}T00:00:00Z` },
+      });
+      expect(block("ck")?.lastDone).toEqual({
+        item: "flu_vaccine",
+        doneOn: "2026-10-12",
+        at: anyString,
+      });
+      expect(block("be")?.lastDiary).toEqual({ fatigue: 6, at: anyString });
+      expect(block("sd")).toMatchObject({ sessionsLast7Days: 1 });
+      const fallAt = block("sd")?.lastFallAt;
+      expect(typeof fallAt).toBe("string");
+      expect(
+        Math.abs(Date.parse(fallAt as string) - Date.parse(minutesAgo(3))),
+      ).toBeLessThan(60_000);
+    });
+  });
+
+  describe("replay is detected before the pre-checks", () => {
+    it("check-in: replay after leaving bf, with a bf answer → 200; other content → 409; never 422", async () => {
+      const a = newCaller();
+      const bf = await enrol(a, "bf", { status: "focus" });
+      await enrol(a, "sf", { status: "focus" });
+      const key = newKey();
+      const body = { feel: "low", answers: { bf: "no" } };
+      expect(
+        (await post(a, "/v1/records/check-ins", body, key)).statusCode,
+      ).toBe(201);
+      await leave(a, bf);
+      const replay = await post(a, "/v1/records/check-ins", body, key);
+      expect(replay.statusCode).toBe(200);
+      expect(replay.json<{ replayed: boolean }>().replayed).toBe(true);
+      expectCoded(
+        await post(
+          a,
+          "/v1/records/check-ins",
+          { feel: "great", answers: { bf: "no" } },
+          key,
+        ),
+        409,
+        "idempotency_key_conflict",
+      );
+      expect(rows("programme_entries", a)).toHaveLength(2);
+    });
+
+    it("check-in: replay after leaving the only focus programme → 200, not no_focus_programme", async () => {
+      const a = newCaller();
+      const bf = await enrol(a, "bf", { status: "focus" });
+      const key = newKey();
+      const body = { stress: "some", answers: { bf: "one_or_more" } };
+      expect(
+        (await post(a, "/v1/records/check-ins", body, key)).statusCode,
+      ).toBe(201);
+      await leave(a, bf);
+      expect(
+        (await post(a, "/v1/records/check-ins", body, key)).statusCode,
+      ).toBe(200);
+      // A new submission is refused as before.
+      expectCoded(
+        await post(a, "/v1/records/check-ins", body),
+        409,
+        "no_focus_programme",
+      );
+      expect(rows("programme_entries", a)).toHaveLength(1);
+    });
+
+    it("rescue: a bf rescue replayed after leaving bf → 200; other content → 409", async () => {
+      const a = newCaller();
+      const bf = await enrol(a, "bf");
+      const key = newKey();
+      const body = { tool: "walk", programme: "bf", helped: "yes" };
+      expect((await post(a, "/v1/records/rescues", body, key)).statusCode).toBe(
+        201,
+      );
+      await leave(a, bf);
+      expect((await post(a, "/v1/records/rescues", body, key)).statusCode).toBe(
+        200,
+      );
+      expectCoded(
+        await post(a, "/v1/records/rescues", { ...body, helped: "no" }, key),
+        409,
+        "idempotency_key_conflict",
+      );
+      expectCoded(
+        await post(a, "/v1/records/rescues", body),
+        409,
+        "enrolment_left",
+      );
+      expect(rows("rescue_events", a)).toHaveLength(1);
+    });
+
+    it("lesson: a completed lesson replayed after leaving → 200; a new one → 409 enrolment_left", async () => {
+      const a = newCaller();
+      const ck = await enrol(a, "ck");
+      expect(
+        (
+          await post(a, "/v1/records/lessons", {
+            programme: "ck",
+            lessonId: "ck.flu",
+          })
+        ).statusCode,
+      ).toBe(201);
+      await leave(a, ck);
+      expect(
+        (
+          await post(a, "/v1/records/lessons", {
+            programme: "ck",
+            lessonId: "ck.flu",
+          })
+        ).statusCode,
+      ).toBe(200);
+      expectCoded(
+        await post(a, "/v1/records/lessons", {
+          programme: "ck",
+          lessonId: "ck.salt",
+        }),
+        409,
+        "enrolment_left",
+      );
+      expect(rows("lesson_progress", a)).toHaveLength(1);
+    });
+  });
+
+  describe("rescue and lesson refusals", () => {
+    it("rescue: missing key → 400 required; invalid key → 400 invalid; the key is checked before the body", async () => {
+      const a = newCaller();
+      expectCoded(
+        await post(a, "/v1/records/rescues", { tool: "walk" }, null),
+        400,
+        "idempotency_key_required",
+      );
+      expectCoded(
+        await post(a, "/v1/records/rescues", { tool: "walk" }, "ABC"),
+        400,
+        "idempotency_key_invalid",
+      );
+      expectCoded(
+        await post(a, "/v1/records/rescues", { bad: true }, "ABC"),
+        400,
+        "idempotency_key_invalid",
+      );
+      expectCoded(
+        await post(a, "/v1/records/lessons", { bad: true }, null),
+        400,
+        "idempotency_key_required",
+      );
+      expect(rows("rescue_events", a)).toHaveLength(0);
+    });
+
+    it("rescue: a shared rescue after account deletion started → 409, nothing written", async () => {
+      const a = newCaller();
+      fake.startAccountDeletion(a.id);
+      expectCoded(
+        await post(a, "/v1/records/rescues", { tool: "walk" }),
+        409,
+        "account_deletion_in_progress",
+      );
+      expect(rows("rescue_events", a)).toHaveLength(0);
+    });
+
+    it("lesson: left → 409 enrolment_left; deletion started → 409", async () => {
+      const a = newCaller();
+      await leave(a, await enrol(a, "be"));
+      expectCoded(
+        await post(a, "/v1/records/lessons", {
+          programme: "be",
+          lessonId: "be.sleep",
+        }),
+        409,
+        "enrolment_left",
+      );
+      const b = newCaller();
+      await enrol(b, "be");
+      fake.startAccountDeletion(b.id);
+      expectCoded(
+        await post(b, "/v1/records/lessons", {
+          programme: "be",
+          lessonId: "be.sleep",
+        }),
+        409,
+        "account_deletion_in_progress",
+      );
+      expect([
+        ...rows("lesson_progress", a),
+        ...rows("lesson_progress", b),
+      ]).toHaveLength(0);
     });
   });
 

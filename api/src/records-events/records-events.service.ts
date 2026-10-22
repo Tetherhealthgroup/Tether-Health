@@ -151,6 +151,13 @@ export class RecordsEventsService {
 
   constructor(private readonly clients: UserSupabaseClientFactory) {}
 
+  /**
+   * Order: the body, then replay detection (any stored check-in row of
+   * this submission makes the request a replay, answered 200 or 409 and
+   * never refused by the checks below), then the deletion barrier, the
+   * qualifying enrolments (none → 409 `no_focus_programme`), the answers
+   * (one for a programme that does not qualify → 422), and the insert.
+   */
   async checkIn(
     user: AuthUser,
     rawBody: unknown,
@@ -167,6 +174,25 @@ export class RecordsEventsService {
       throw invalidRequest();
     }
     const client = this.clients.forUser(user);
+    const computed = async () =>
+      checkInRows(
+        body,
+        await this.focusWithCore(client, user.id),
+        user.id,
+        submissionId,
+        new Date().toISOString(),
+      );
+
+    let stored = await this.storedCheckIns(
+      client,
+      user.id,
+      submissionId,
+      requestId,
+    );
+    if (stored.length > 0) {
+      return this.checkInReplay(stored, await computed(), submissionId);
+    }
+
     await requireBarrierOpen(client);
     const targets = await this.focusWithCore(client, user.id);
     if (targets.length === 0) throw new NoFocusProgrammeException();
@@ -186,33 +212,32 @@ export class RecordsEventsService {
       submissionId,
       new Date().toISOString(),
     );
-
-    // Any stored row of this submission makes the request a replay.
-    let stored = await this.storedCheckIns(
+    const { error } = await client.from("programme_entries").insert(rows);
+    if (!error) {
+      return {
+        status: 201,
+        body: { submissionId, entries: programmesOf(rows) },
+      };
+    }
+    if (error.code !== DatabaseErrorCode.uniqueViolation) {
+      throw this.insertFailure(error.code, requestId, CHECK_IN_ROUTE);
+    }
+    // A concurrent request stored the submission first.
+    stored = await this.storedCheckIns(
       client,
       user.id,
       submissionId,
       requestId,
     );
-    if (stored.length === 0) {
-      const { error } = await client.from("programme_entries").insert(rows);
-      if (!error) {
-        return {
-          status: 201,
-          body: { submissionId, entries: programmesOf(rows) },
-        };
-      }
-      if (error.code !== DatabaseErrorCode.uniqueViolation) {
-        throw this.insertFailure(error.code, requestId, CHECK_IN_ROUTE);
-      }
-      stored = await this.storedCheckIns(
-        client,
-        user.id,
-        submissionId,
-        requestId,
-      );
-    }
-    if (!checkInReplayMatches(stored, rows)) {
+    return this.checkInReplay(stored, rows, submissionId);
+  }
+
+  private checkInReplay(
+    stored: Row[],
+    computed: Row[],
+    submissionId: string,
+  ): CheckInResult {
+    if (!checkInReplayMatches(stored, computed)) {
       throw conflict("idempotency_key_conflict");
     }
     return {
@@ -225,7 +250,9 @@ export class RecordsEventsService {
    * A rescue. `programme: "bf"` writes into the caller's BreatheFree
    * enrolment after its pre-checks, and is refused (never written as a
    * shared rescue) when they fail; no `programme` is a shared rescue with
-   * no enrolment. The programme is never inferred.
+   * no enrolment. The programme is never inferred. A stored rescue under
+   * this submission is detected first: a replay is answered 200 or 409
+   * whatever the enrolment's state now.
    */
   async rescue(
     user: AuthUser,
@@ -235,15 +262,10 @@ export class RecordsEventsService {
   ): Promise<SubmitResult> {
     const body = await parseBody(rawBody, RescueDto, RESCUE_FIELDS);
     const client = this.clients.forUser(user);
-    await requireBarrierOpen(client);
-    const enrolmentId =
-      body.programme === "bf"
-        ? await requireWritableEnrolment(client, user.id, "bf")
-        : null;
-    const row: Row = {
+    const rowFor = (enrolmentId: string | null): Row => ({
       user_id: user.id,
       enrolment_id: enrolmentId,
-      programme_code: enrolmentId === null ? null : "bf",
+      programme_code: body.programme === "bf" ? "bf" : null,
       submission_id: submissionId,
       tool: body.tool,
       opened_at: body.openedAt ?? new Date().toISOString(),
@@ -251,30 +273,47 @@ export class RecordsEventsService {
       intensity_after: body.intensityAfter ?? null,
       helped: body.helped ?? null,
       escalated: body.escalated ?? false,
+    });
+    const replay = async (stored: Row[]): Promise<SubmitResult> => {
+      // The bf enrolment in any state (a left enrolment keeps its rows).
+      const enrolmentId =
+        body.programme === "bf"
+          ? await this.anyEnrolmentId(client, user.id, "bf")
+          : null;
+      if (!sameRows(stored, [rowFor(enrolmentId)], RESCUE_COMPARED)) {
+        throw conflict("idempotency_key_conflict");
+      }
+      return { status: 200, body: { submissionId, replayed: true } };
     };
+
+    const stored = await this.storedRescues(
+      client,
+      user.id,
+      submissionId,
+      requestId,
+    );
+    if (stored.length > 0) return replay(stored);
+
+    await requireBarrierOpen(client);
+    const row = rowFor(
+      body.programme === "bf"
+        ? await requireWritableEnrolment(client, user.id, "bf")
+        : null,
+    );
     const { error } = await client.from("rescue_events").insert([row]);
     if (!error) return { status: 201, body: { submissionId } };
     if (error.code !== DatabaseErrorCode.uniqueViolation) {
       throw this.insertFailure(error.code, requestId, RESCUE_ROUTE);
     }
-    const stored = await client
-      .from("rescue_events")
-      .select(RESCUE_COMPARED.join(","))
-      .eq("user_id", user.id)
-      .eq("submission_id", submissionId)
-      .returns<Row[]>();
-    if (stored.error || stored.data === null) {
-      unavailable(this.logger, requestId, RESCUE_ROUTE, stored.error?.code);
-    }
-    if (!sameRows(stored.data, [row], RESCUE_COMPARED)) {
-      throw conflict("idempotency_key_conflict");
-    }
-    return { status: 200, body: { submissionId, replayed: true } };
+    return replay(
+      await this.storedRescues(client, user.id, submissionId, requestId),
+    );
   }
 
   /**
-   * A completed lesson. The lesson is the identity: completing it again is
-   * a 200 replay whatever the key.
+   * A completed lesson. The lesson is the identity: a lesson already
+   * completed is a 200 replay whatever the key, detected before the
+   * pre-checks (so also after the enrolment was left).
    */
   async lesson(
     user: AuthUser,
@@ -287,6 +326,28 @@ export class RecordsEventsService {
       throw invalidRequest();
     }
     const client = this.clients.forUser(user);
+    const replayed = {
+      status: 200,
+      body: { submissionId, replayed: true },
+    } as const;
+    const done = await client
+      .from("lesson_progress")
+      .select("lesson_id")
+      .eq("user_id", user.id)
+      .eq("programme_code", body.programme)
+      .eq("lesson_id", body.lessonId)
+      .limit(1)
+      .returns<Row[]>();
+    if (done.error || done.data === null) {
+      return unavailable(
+        this.logger,
+        requestId,
+        LESSON_ROUTE,
+        done.error?.code,
+      );
+    }
+    if (done.data.length > 0) return replayed;
+
     await requireBarrierOpen(client);
     const enrolmentId = await requireWritableEnrolment(
       client,
@@ -302,10 +363,43 @@ export class RecordsEventsService {
       },
     ]);
     if (!error) return { status: 201, body: { submissionId } };
-    if (error.code === DatabaseErrorCode.uniqueViolation) {
-      return { status: 200, body: { submissionId, replayed: true } };
-    }
+    if (error.code === DatabaseErrorCode.uniqueViolation) return replayed;
     throw this.insertFailure(error.code, requestId, LESSON_ROUTE);
+  }
+
+  /** The caller's enrolment id in `programmeCode`, in any state, or null. */
+  private async anyEnrolmentId(
+    client: UserSupabaseClient,
+    userId: string,
+    programmeCode: string,
+  ): Promise<string | null> {
+    const { data, error } = await client
+      .from("enrolments")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("programme_code", programmeCode)
+      .maybeSingle<{ id: string }>();
+    if (error) throw new BadGatewayException("Records unavailable");
+    return data?.id ?? null;
+  }
+
+  /** The caller's rescue stored under this submission (at most one). */
+  private async storedRescues(
+    client: UserSupabaseClient,
+    userId: string,
+    submissionId: string,
+    requestId: string,
+  ): Promise<Row[]> {
+    const { data, error } = await client
+      .from("rescue_events")
+      .select(RESCUE_COMPARED.join(","))
+      .eq("user_id", userId)
+      .eq("submission_id", submissionId)
+      .returns<Row[]>();
+    if (error || data === null) {
+      unavailable(this.logger, requestId, RESCUE_ROUTE, error?.code);
+    }
+    return data;
   }
 
   /** The caller's focus enrolments that hold a live core consent. */

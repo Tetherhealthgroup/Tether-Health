@@ -1087,8 +1087,11 @@ paths:
         and only its own programme's answer (`answers.bf` only in the
         BreatheFree row, `answers.sf` only in the ScrollFree row). A
         programme whose row would hold nothing gets no row. One bulk
-        insert. A repeat of a stored submission compares the stored rows of
-        enrolments that still qualify and inserts nothing new.
+        insert. A stored row under the key makes the request a repeat,
+        detected right after the key and the body and before every other
+        check: the stored rows of enrolments that still qualify are compared
+        (200 `replayed` or 409 `idempotency_key_conflict`, never 409
+        `no_focus_programme` or 422) and nothing new is inserted.
       x-app-use: true
       security: [{supabaseJwt: []}]
       parameters:
@@ -1131,7 +1134,10 @@ paths:
         core consent or account deletion has started, the rescue is refused
         and nothing is written (never stored as a shared rescue). Without
         `programme` the rescue is shared (no enrolment); the programme is
-        never inferred. A repeat compares every field except `openedAt`.
+        never inferred. A repeat (a rescue stored under the key) is detected
+        right after the key and the body and before every other check; it
+        compares every field except `openedAt` and answers 200 or 409
+        whatever the enrolment's state now.
       x-app-use: true
       security: [{supabaseJwt: []}]
       parameters:
@@ -1160,7 +1166,9 @@ paths:
       description: >-
         Records a completed lesson in the caller's enrolment in
         `programme`. The lesson is the identity: completing it again
-        answers 200 `replayed` whatever the key. The key is still required.
+        answers 200 `replayed` whatever the key, detected right after the
+        key and the body and before every other check (so also after the
+        programme was left). The key is still required.
       x-app-use: true
       security: [{supabaseJwt: []}]
       parameters:
