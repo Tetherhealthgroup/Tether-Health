@@ -189,6 +189,17 @@
     "decide": "choice:focus_full.option"
   },
   {
+    "screen": "support_add_person",
+    "path": "footer[0]",
+    "at": "",
+    "source": "rule",
+    "labels": [
+      "Chosen",
+      "Nothing chosen"
+    ],
+    "decide": "sup.programs"
+  },
+  {
     "screen": "account_signin_methods",
     "path": "body[1].rows[1]",
     "at": "",
@@ -357,6 +368,17 @@
     "screen": "records_consent",
     "path": "footer[0]",
     "at": "",
+    "source": "rule",
+    "labels": [
+      "Chosen",
+      "Nothing chosen"
+    ],
+    "decide": "rec.consent.epic"
+  },
+  {
+    "screen": "records_consent",
+    "path": "footer[0]",
+    "at": "cases[0].action",
     "source": "device",
     "labels": [
       "Approved",
@@ -375,6 +397,17 @@
     "screen": "records_consent_bb",
     "path": "footer[0]",
     "at": "",
+    "source": "rule",
+    "labels": [
+      "Chosen",
+      "Nothing chosen"
+    ],
+    "decide": "rec.consent.medicare"
+  },
+  {
+    "screen": "records_consent_bb",
+    "path": "footer[0]",
+    "at": "cases[0].action",
     "source": "device",
     "labels": [
       "Approved",
@@ -393,6 +426,17 @@
     "screen": "records_consent_device",
     "path": "footer[0]",
     "at": "",
+    "source": "rule",
+    "labels": [
+      "Chosen",
+      "Nothing chosen"
+    ],
+    "decide": "rec.consent.device"
+  },
+  {
+    "screen": "records_consent_device",
+    "path": "footer[0]",
+    "at": "cases[0].action",
     "source": "device",
     "labels": [
       "Allowed",
@@ -405,6 +449,28 @@
       "denied": "Not allowed",
       "unavailable": "Not allowed"
     }
+  },
+  {
+    "screen": "records_review",
+    "path": "footer[0]",
+    "at": "",
+    "source": "rule",
+    "labels": [
+      "Chosen",
+      "Nothing chosen"
+    ],
+    "decide": "rec.review"
+  },
+  {
+    "screen": "records_conflict",
+    "path": "footer[0]",
+    "at": "",
+    "source": "rule",
+    "labels": [
+      "Chosen",
+      "Nothing chosen"
+    ],
+    "decide": "rec.conflict"
   },
   {
     "screen": "records_manual",

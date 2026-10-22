@@ -27,7 +27,7 @@ tether_ui/
 │   ├── screens.json, screens/<id>.json   ← every screen: route, kind, state, inputs (keys), actions, API
 │   ├── flows.json · programs.json · app.json (entries, tabs, routes, action types)
 │   ├── rules.json            ← decision rules (BP, glucose, zones, self-harm, manual values) with thresholds
-│   ├── scenarios.json        ← 75 end-to-end scenarios with simulated data
+│   ├── scenarios.json        ← 81 end-to-end scenarios with simulated data
 │   ├── actions.json/.csv     ← flat button → action → target map
 │   ├── develop_mapping.json  ← develop-branch file for each screen + logic to keep
 │   └── validation.md         ← spec validator output

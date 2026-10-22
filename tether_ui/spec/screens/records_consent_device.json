@@ -33,17 +33,14 @@
       "t": "checklist",
       "items": [
         {
-          "label": "Blood pressure",
-          "done": true
+          "label": "Blood pressure"
         },
         {
-          "label": "Blood glucose",
-          "done": true
+          "label": "Blood glucose"
         },
         {
           "label": "Clinical records (iPhone)",
-          "sub": "Labs, immunizations, conditions",
-          "done": true
+          "sub": "Labs, immunizations, conditions"
         },
         {
           "label": "Steps and sleep",
@@ -60,32 +57,50 @@
       "label": "Continue",
       "action": {
         "type": "branch",
-        "question": "System permission result",
+        "question": "Anything selected?",
         "on": null,
-        "decide": null,
+        "decide": "rec.consent.device",
         "cases": [
           {
-            "label": "Allowed",
+            "label": "Chosen",
             "action": {
-              "type": "push",
-              "to": "records_importing"
+              "type": "branch",
+              "question": "System permission result",
+              "on": null,
+              "decide": null,
+              "cases": [
+                {
+                  "label": "Allowed",
+                  "action": {
+                    "type": "push",
+                    "to": "records_importing"
+                  }
+                },
+                {
+                  "label": "Not allowed",
+                  "action": {
+                    "type": "push",
+                    "to": "records_error"
+                  }
+                }
+              ],
+              "id": "records.device.health_records_request",
+              "ask": "healthRecordsRequest",
+              "when": {
+                "granted": "Allowed",
+                "denied": "Not allowed",
+                "unavailable": "Not allowed"
+              }
             }
           },
           {
-            "label": "Not allowed",
+            "label": "Nothing chosen",
             "action": {
-              "type": "push",
-              "to": "records_error"
+              "type": "toast",
+              "value": "Select at least one item to continue."
             }
           }
-        ],
-        "id": "records.device.health_records_request",
-        "ask": "healthRecordsRequest",
-        "when": {
-          "granted": "Allowed",
-          "denied": "Not allowed",
-          "unavailable": "Not allowed"
-        }
+        ]
       },
       "variant": "primary",
       "arrow": true
@@ -117,34 +132,52 @@
       "path": "footer[0]",
       "action": {
         "type": "branch",
-        "question": "System permission result",
+        "question": "Anything selected?",
         "on": null,
-        "decide": null,
+        "decide": "rec.consent.device",
         "cases": [
           {
-            "label": "Allowed",
+            "label": "Chosen",
             "action": {
-              "type": "push",
-              "to": "records_importing"
+              "type": "branch",
+              "question": "System permission result",
+              "on": null,
+              "decide": null,
+              "cases": [
+                {
+                  "label": "Allowed",
+                  "action": {
+                    "type": "push",
+                    "to": "records_importing"
+                  }
+                },
+                {
+                  "label": "Not allowed",
+                  "action": {
+                    "type": "push",
+                    "to": "records_error"
+                  }
+                }
+              ],
+              "id": "records.device.health_records_request",
+              "ask": "healthRecordsRequest",
+              "when": {
+                "granted": "Allowed",
+                "denied": "Not allowed",
+                "unavailable": "Not allowed"
+              }
             }
           },
           {
-            "label": "Not allowed",
+            "label": "Nothing chosen",
             "action": {
-              "type": "push",
-              "to": "records_error"
+              "type": "toast",
+              "value": "Select at least one item to continue."
             }
           }
-        ],
-        "id": "records.device.health_records_request",
-        "ask": "healthRecordsRequest",
-        "when": {
-          "granted": "Allowed",
-          "denied": "Not allowed",
-          "unavailable": "Not allowed"
-        }
+        ]
       },
-      "summary": "branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error"
+      "summary": "decide rec.consent.device: Anything selected? → Chosen: branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error | Nothing chosen: toast “Select at least one item to continue.”"
     },
     {
       "element": "Not now",

@@ -2487,9 +2487,9 @@
     "screen_name": "Add a supporter",
     "element": "Save supporter",
     "path": "footer[0]",
-    "type": "submit",
+    "type": "branch",
     "targets": [],
-    "summary": "POST /v1/care/supporters then toast “Jordan added” then back"
+    "summary": "decide sup.programs: Anything selected? → Chosen: POST /v1/care/supporters then toast “Jordan added” then back | Nothing chosen: toast “Select at least one program.”"
   },
   {
     "screen": "support_connect",
@@ -7719,7 +7719,7 @@
       "records_importing",
       "records_error"
     ],
-    "summary": "branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error"
+    "summary": "decide rec.consent.epic: Anything selected? → Chosen: branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error | Nothing chosen: toast “Select at least one item to continue.”"
   },
   {
     "screen": "records_consent",
@@ -7749,7 +7749,7 @@
       "records_importing",
       "records_error"
     ],
-    "summary": "branch: Medicare sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error"
+    "summary": "decide rec.consent.medicare: Anything selected? → Chosen: branch: Medicare sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error | Nothing chosen: toast “Select at least one item to continue.”"
   },
   {
     "screen": "records_consent_bb",
@@ -7779,7 +7779,7 @@
       "records_importing",
       "records_error"
     ],
-    "summary": "branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error"
+    "summary": "decide rec.consent.device: Anything selected? → Chosen: branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error | Nothing chosen: toast “Select at least one item to continue.”"
   },
   {
     "screen": "records_consent_device",
@@ -7844,13 +7844,13 @@
   {
     "screen": "records_review",
     "screen_name": "Review imported data",
-    "element": "Add 21 items to my programs",
+    "element": "Add selected items to my programs",
     "path": "footer[0]",
-    "type": "submit",
+    "type": "branch",
     "targets": [
       "records_hub"
     ],
-    "summary": "POST /v1/records/fhir/accept then toast “Added to Heartwise, Steady, Checkup, BreatheFree and Renew” then popto → records_hub"
+    "summary": "decide rec.review: Anything selected? → Chosen: POST /v1/records/fhir/accept then toast “Added to your programs” then popto → records_hub | Nothing chosen: toast “Select the items you want to add.”"
   },
   {
     "screen": "records_review",
@@ -7877,9 +7877,9 @@
     "screen_name": "Resolve conflicts",
     "element": "Save choices",
     "path": "footer[0]",
-    "type": "submit",
+    "type": "branch",
     "targets": [],
-    "summary": "POST /v1/records/fhir/conflicts then toast “Saved” then back"
+    "summary": "decide rec.conflict: Anything selected? → Chosen: POST /v1/records/fhir/conflicts then toast “Saved” then back | Nothing chosen: toast “Choose an option for at least one item.”"
   },
   {
     "screen": "records_error",

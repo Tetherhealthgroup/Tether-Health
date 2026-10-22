@@ -46,7 +46,7 @@ flowchart LR
   records_importing -->|"Review imported data"| records_review
   records_importing -->|"Cancel import"| records_hub
   records_review -->|"Review"| records_conflict
-  records_review -->|"Add 21 items to my programs"| records_hub
+  records_review -->|"Add selected items to my pro"| records_hub
   records_error -->|"Choose another source"| records_add
   records_error -->|"Enter manually instead"| records_manual
   records_source -->|"What we read"| records_consent
@@ -122,23 +122,23 @@ flowchart LR
 | Other FHIR server | Back | `back` |
 | Other FHIR server | Check and continue | `branch: Server check → SMART on FHIR R4 supported: push → records_consent | Not a FHIR R4 server: push → records_error` |
 | Consent: Epic | Back | `back` |
-| Consent: Epic | Continue to MyChart | `branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error` |
+| Consent: Epic | Continue to MyChart | `decide rec.consent.epic: Anything selected? → Chosen: branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error | Nothing chosen: toast “Select at least one item to continue.”` |
 | Consent: Epic | Not now | `back` |
 | Consent: Medicare | Back | `back` |
-| Consent: Medicare | Continue to Medicare.gov | `branch: Medicare sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error` |
+| Consent: Medicare | Continue to Medicare.gov | `decide rec.consent.medicare: Anything selected? → Chosen: branch: Medicare sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error | Nothing chosen: toast “Select at least one item to continue.”` |
 | Consent: Medicare | Not now | `back` |
 | Consent: phone health data | Back | `back` |
-| Consent: phone health data | Continue | `branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error` |
+| Consent: phone health data | Continue | `decide rec.consent.device: Anything selected? → Chosen: branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error | Nothing chosen: toast “Select at least one item to continue.”` |
 | Consent: phone health data | Not now | `back` |
 | Importing | Close | `close` |
 | Importing | Review imported data | `replace → records_review` |
 | Importing | Cancel import | `popto → records_hub` |
 | Review imported data | Close | `close` |
 | Review imported data | Review | `push → records_conflict` |
-| Review imported data | Add 21 items to my programs | `POST /v1/records/fhir/accept then toast “Added to Heartwise, Steady, Checkup, BreatheFree and Renew” then popto → records_hub` |
+| Review imported data | Add selected items to my programs | `decide rec.review: Anything selected? → Chosen: POST /v1/records/fhir/accept then toast “Added to your programs” then popto → records_hub | Nothing chosen: toast “Select the items you want to add.”` |
 | Review imported data | Review conflicts first | `push → records_conflict` |
 | Resolve conflicts | Back | `back` |
-| Resolve conflicts | Save choices | `POST /v1/records/fhir/conflicts then toast “Saved” then back` |
+| Resolve conflicts | Save choices | `decide rec.conflict: Anything selected? → Chosen: POST /v1/records/fhir/conflicts then toast “Saved” then back | Nothing chosen: toast “Choose an option for at least one item.”` |
 | Connection problem | Back | `back` |
 | Connection problem | Try again | `back` |
 | Connection problem | Choose another source | `replace → records_add` |

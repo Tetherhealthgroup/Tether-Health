@@ -41,7 +41,7 @@
               "sub": "Your clinician’s value is used in summaries"
             }
           ],
-          "selected": 0,
+          "selected": -1,
           "key": "a1c"
         }
       ]
@@ -68,7 +68,7 @@
               "sub": "Sends a question with the original value"
             }
           ],
-          "selected": 1,
+          "selected": -1,
           "key": "bp"
         }
       ]
@@ -79,15 +79,33 @@
       "t": "button",
       "label": "Save choices",
       "action": {
-        "type": "submit",
-        "api": "POST /v1/records/fhir/conflicts",
-        "then": {
-          "type": "toast",
-          "value": "Saved",
-          "then": {
-            "type": "back"
+        "type": "branch",
+        "question": "Anything selected?",
+        "on": null,
+        "decide": "rec.conflict",
+        "cases": [
+          {
+            "label": "Chosen",
+            "action": {
+              "type": "submit",
+              "api": "POST /v1/records/fhir/conflicts",
+              "then": {
+                "type": "toast",
+                "value": "Saved",
+                "then": {
+                  "type": "back"
+                }
+              }
+            }
+          },
+          {
+            "label": "Nothing chosen",
+            "action": {
+              "type": "toast",
+              "value": "Choose an option for at least one item."
+            }
           }
-        }
+        ]
       },
       "variant": "primary",
       "arrow": true
@@ -109,17 +127,35 @@
       "element": "Save choices",
       "path": "footer[0]",
       "action": {
-        "type": "submit",
-        "api": "POST /v1/records/fhir/conflicts",
-        "then": {
-          "type": "toast",
-          "value": "Saved",
-          "then": {
-            "type": "back"
+        "type": "branch",
+        "question": "Anything selected?",
+        "on": null,
+        "decide": "rec.conflict",
+        "cases": [
+          {
+            "label": "Chosen",
+            "action": {
+              "type": "submit",
+              "api": "POST /v1/records/fhir/conflicts",
+              "then": {
+                "type": "toast",
+                "value": "Saved",
+                "then": {
+                  "type": "back"
+                }
+              }
+            }
+          },
+          {
+            "label": "Nothing chosen",
+            "action": {
+              "type": "toast",
+              "value": "Choose an option for at least one item."
+            }
           }
-        }
+        ]
       },
-      "summary": "POST /v1/records/fhir/conflicts then toast “Saved” then back"
+      "summary": "decide rec.conflict: Anything selected? → Chosen: POST /v1/records/fhir/conflicts then toast “Saved” then back | Nothing chosen: toast “Choose an option for at least one item.”"
     }
   ]
 }

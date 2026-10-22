@@ -291,6 +291,14 @@
         "Patel Family Medicine"
       ],
       [
+        "tap",
+        "Vital signs"
+      ],
+      [
+        "tap",
+        "Lab results"
+      ],
+      [
         "choose",
         "Approved"
       ],
@@ -328,7 +336,15 @@
       ],
       [
         "tap",
-        "Add 21 items to my programs"
+        "12 blood pressure readings"
+      ],
+      [
+        "tap",
+        "eGFR 58"
+      ],
+      [
+        "tap",
+        "Add selected items to my programs"
       ]
     ],
     "expect": "records_hub"
@@ -343,6 +359,10 @@
       [
         "tap",
         "Medicare · Blue Button 2.0"
+      ],
+      [
+        "tap",
+        "Conditions"
       ],
       [
         "choose",
@@ -360,6 +380,102 @@
     "expect": "records_review"
   },
   {
+    "id": "fhir-nothing-read",
+    "program": null,
+    "function": "Health records",
+    "title": "Nothing selected to read: Continue stays and connects nothing",
+    "start": "records_consent",
+    "steps": [
+      [
+        "tap",
+        "Continue to MyChart"
+      ]
+    ],
+    "expect": "records_consent"
+  },
+  {
+    "id": "fhir-device-nothing",
+    "program": null,
+    "function": "Health records",
+    "title": "Phone health data with nothing selected stays",
+    "start": "records_consent_device",
+    "steps": [
+      [
+        "tap",
+        "Continue"
+      ]
+    ],
+    "expect": "records_consent_device"
+  },
+  {
+    "id": "fhir-review-nothing",
+    "program": null,
+    "function": "Health records",
+    "title": "Review with nothing kept: nothing is added",
+    "start": "records_review",
+    "steps": [
+      [
+        "tap",
+        "Add selected items to my programs"
+      ]
+    ],
+    "expect": "records_review"
+  },
+  {
+    "id": "support-add",
+    "program": "bf",
+    "function": "Support",
+    "title": "Add a supporter for one program",
+    "start": "bf_support",
+    "steps": [
+      [
+        "tap",
+        "Add a supporter"
+      ],
+      [
+        "expect",
+        "support_add_person"
+      ],
+      [
+        "tap",
+        "BreatheFree"
+      ],
+      [
+        "tap",
+        "Save supporter"
+      ]
+    ],
+    "expect": "bf_support"
+  },
+  {
+    "id": "support-add-nothing",
+    "program": null,
+    "function": "Support",
+    "title": "Add a supporter with no program selected: nothing is saved",
+    "start": "support_add_person",
+    "steps": [
+      [
+        "tap",
+        "Save supporter"
+      ]
+    ],
+    "expect": "support_add_person"
+  },
+  {
+    "id": "fhir-conflict-nothing",
+    "program": null,
+    "function": "Health records",
+    "title": "Conflicts with no choice: nothing is saved",
+    "start": "records_conflict",
+    "steps": [
+      [
+        "tap",
+        "Save choices"
+      ]
+    ],
+    "expect": "records_conflict"
+  },
+  {
     "id": "fhir-denied",
     "program": null,
     "function": "Health records",
@@ -373,6 +489,10 @@
       [
         "tap",
         "Patel Family Medicine"
+      ],
+      [
+        "tap",
+        "Conditions"
       ],
       [
         "choose",

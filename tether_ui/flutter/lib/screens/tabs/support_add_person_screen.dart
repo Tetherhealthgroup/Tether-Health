@@ -10,7 +10,7 @@ import '../../ui/ui.dart';
 ///
 /// Actions (generated from spec/screens/support_add_person.json):
 ///   • Back → back
-///   • Save supporter → POST /v1/care/supporters then toast “Jordan added” then back
+///   • Save supporter → decide sup.programs: Anything selected? → Chosen: POST /v1/care/supporters then toast “Jordan added” then back | Nothing chosen: toast “Select at least one program.”
 /// API: —
 class SupportAddPersonScreen extends StatelessWidget {
   const SupportAddPersonScreen({super.key});
@@ -23,12 +23,12 @@ class SupportAddPersonScreen extends StatelessWidget {
         TTitle('Who can you count on?'),
         TField(fieldKey: 'support_add_person.name', label: 'Name', placeholder: 'Jordan'),
         TField(fieldKey: 'support_add_person.phone', label: 'Phone', placeholder: '(555) 010-4421', kind: TFieldKind.phone),
-        TChips(fieldKey: 'support_add_person.which_programs', options: ['BreatheFree', 'ScrollFree'], selected: ['BreatheFree'], label: 'Which programs?'),
+        TChips(fieldKey: 'support_add_person.which_programs', options: ['BreatheFree', 'ScrollFree'], label: 'Which programs?'),
         TField(fieldKey: 'support_add_person.help_phrase', label: 'Help phrase', placeholder: 'Can you stay with me for the next 10 minutes?', kind: TFieldKind.multiline),
         TBody('Nothing is sent until you preview and tap Send.', tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save supporter', onPressed: () => TNav.submit(context, 'POST /v1/care/supporters', screenId: 'support_add_person', then: () => TNav.toast(context, 'Jordan added', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: 'Save supporter', onPressed: () => TNav.branch(context, 'Anything selected?', <String, VoidCallback>{'Chosen': () => TNav.submit(context, 'POST /v1/care/supporters', screenId: 'support_add_person', then: () => TNav.toast(context, 'Jordan added', then: () => TNav.back(context))), 'Nothing chosen': () => TNav.toast(context, 'Select at least one program.')}, decide: 'sup.programs'), arrow: true),
       ],
     );
   }

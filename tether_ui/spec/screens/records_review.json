@@ -49,15 +49,14 @@
           "items": [
             {
               "label": "12 blood pressure readings",
-              "sub": "Jun – Oct 2026",
-              "done": true
+              "sub": "Jun – Oct 2026"
             },
             {
               "label": "Lipid panel",
-              "sub": "LDL 138 · Sep 30",
-              "done": true
+              "sub": "LDL 138 · Sep 30"
             }
-          ]
+          ],
+          "key": "keep_hw"
         }
       ]
     },
@@ -73,7 +72,8 @@
               "label": "A1C 7.6%",
               "sub": "Oct 1 · differs from your entry (7.4%)"
             }
-          ]
+          ],
+          "key": "keep_st"
         }
       ]
     },
@@ -87,15 +87,14 @@
           "items": [
             {
               "label": "Flu vaccine",
-              "sub": "Oct 12, 2025",
-              "done": true
+              "sub": "Oct 12, 2025"
             },
             {
               "label": "Tdap",
-              "sub": "2019",
-              "done": true
+              "sub": "2019"
             }
-          ]
+          ],
+          "key": "keep_ck"
         }
       ]
     },
@@ -109,10 +108,10 @@
           "items": [
             {
               "label": "Smoking status: every day smoker",
-              "sub": "Aug 2026 · sets your baseline",
-              "done": true
+              "sub": "Aug 2026 · sets your baseline"
             }
-          ]
+          ],
+          "key": "keep_bf"
         }
       ]
     },
@@ -126,10 +125,10 @@
           "items": [
             {
               "label": "eGFR 58",
-              "sub": "Oct 3",
-              "done": true
+              "sub": "Oct 3"
             }
-          ]
+          ],
+          "key": "keep_re"
         }
       ]
     },
@@ -162,18 +161,36 @@
   "footer": [
     {
       "t": "button",
-      "label": "Add 21 items to my programs",
+      "label": "Add selected items to my programs",
       "action": {
-        "type": "submit",
-        "api": "POST /v1/records/fhir/accept",
-        "then": {
-          "type": "toast",
-          "value": "Added to Heartwise, Steady, Checkup, BreatheFree and Renew",
-          "then": {
-            "type": "popto",
-            "to": "records_hub"
+        "type": "branch",
+        "question": "Anything selected?",
+        "on": null,
+        "decide": "rec.review",
+        "cases": [
+          {
+            "label": "Chosen",
+            "action": {
+              "type": "submit",
+              "api": "POST /v1/records/fhir/accept",
+              "then": {
+                "type": "toast",
+                "value": "Added to your programs",
+                "then": {
+                  "type": "popto",
+                  "to": "records_hub"
+                }
+              }
+            }
+          },
+          {
+            "label": "Nothing chosen",
+            "action": {
+              "type": "toast",
+              "value": "Select the items you want to add."
+            }
           }
-        }
+        ]
       },
       "variant": "primary",
       "arrow": true
@@ -210,21 +227,39 @@
       "summary": "push → records_conflict"
     },
     {
-      "element": "Add 21 items to my programs",
+      "element": "Add selected items to my programs",
       "path": "footer[0]",
       "action": {
-        "type": "submit",
-        "api": "POST /v1/records/fhir/accept",
-        "then": {
-          "type": "toast",
-          "value": "Added to Heartwise, Steady, Checkup, BreatheFree and Renew",
-          "then": {
-            "type": "popto",
-            "to": "records_hub"
+        "type": "branch",
+        "question": "Anything selected?",
+        "on": null,
+        "decide": "rec.review",
+        "cases": [
+          {
+            "label": "Chosen",
+            "action": {
+              "type": "submit",
+              "api": "POST /v1/records/fhir/accept",
+              "then": {
+                "type": "toast",
+                "value": "Added to your programs",
+                "then": {
+                  "type": "popto",
+                  "to": "records_hub"
+                }
+              }
+            }
+          },
+          {
+            "label": "Nothing chosen",
+            "action": {
+              "type": "toast",
+              "value": "Select the items you want to add."
+            }
           }
-        }
+        ]
       },
-      "summary": "POST /v1/records/fhir/accept then toast “Added to Heartwise, Steady, Checkup, BreatheFree and Renew” then popto → records_hub"
+      "summary": "decide rec.review: Anything selected? → Chosen: POST /v1/records/fhir/accept then toast “Added to your programs” then popto → records_hub | Nothing chosen: toast “Select the items you want to add.”"
     },
     {
       "element": "Review conflicts first",

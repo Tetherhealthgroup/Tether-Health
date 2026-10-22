@@ -50,33 +50,27 @@
       "items": [
         {
           "label": "Conditions",
-          "sub": "Condition",
-          "done": true
+          "sub": "Condition"
         },
         {
           "label": "Vital signs",
-          "sub": "Observation · blood pressure, weight",
-          "done": true
+          "sub": "Observation · blood pressure, weight"
         },
         {
           "label": "Lab results",
-          "sub": "Observation · A1C, lipids, eGFR",
-          "done": true
+          "sub": "Observation · A1C, lipids, eGFR"
         },
         {
           "label": "Medications",
-          "sub": "MedicationRequest",
-          "done": true
+          "sub": "MedicationRequest"
         },
         {
           "label": "Immunizations",
-          "sub": "Immunization",
-          "done": true
+          "sub": "Immunization"
         },
         {
           "label": "Smoking status",
-          "sub": "Observation · LOINC 72166-2",
-          "done": true
+          "sub": "Observation · LOINC 72166-2"
         },
         {
           "label": "Clinical notes",
@@ -99,39 +93,57 @@
       "label": "Continue to MyChart",
       "action": {
         "type": "branch",
-        "question": "MyChart sign-in result",
+        "question": "Anything selected?",
         "on": null,
-        "decide": null,
+        "decide": "rec.consent.epic",
         "cases": [
           {
-            "label": "Approved",
+            "label": "Chosen",
             "action": {
-              "type": "push",
-              "to": "records_importing"
+              "type": "branch",
+              "question": "MyChart sign-in result",
+              "on": null,
+              "decide": null,
+              "cases": [
+                {
+                  "label": "Approved",
+                  "action": {
+                    "type": "push",
+                    "to": "records_importing"
+                  }
+                },
+                {
+                  "label": "Cancelled",
+                  "action": {
+                    "type": "toast",
+                    "value": "Connection cancelled. Nothing was imported."
+                  }
+                },
+                {
+                  "label": "Denied or error",
+                  "action": {
+                    "type": "push",
+                    "to": "records_error"
+                  }
+                }
+              ],
+              "id": "records.connect.mychart",
+              "ask": "smartConnect",
+              "when": {
+                "approved": "Approved",
+                "cancelled": "Cancelled",
+                "failed": "Denied or error"
+              }
             }
           },
           {
-            "label": "Cancelled",
+            "label": "Nothing chosen",
             "action": {
               "type": "toast",
-              "value": "Connection cancelled. Nothing was imported."
-            }
-          },
-          {
-            "label": "Denied or error",
-            "action": {
-              "type": "push",
-              "to": "records_error"
+              "value": "Select at least one item to continue."
             }
           }
-        ],
-        "id": "records.connect.mychart",
-        "ask": "smartConnect",
-        "when": {
-          "approved": "Approved",
-          "cancelled": "Cancelled",
-          "failed": "Denied or error"
-        }
+        ]
       },
       "variant": "primary",
       "arrow": true
@@ -166,41 +178,59 @@
       "path": "footer[0]",
       "action": {
         "type": "branch",
-        "question": "MyChart sign-in result",
+        "question": "Anything selected?",
         "on": null,
-        "decide": null,
+        "decide": "rec.consent.epic",
         "cases": [
           {
-            "label": "Approved",
+            "label": "Chosen",
             "action": {
-              "type": "push",
-              "to": "records_importing"
+              "type": "branch",
+              "question": "MyChart sign-in result",
+              "on": null,
+              "decide": null,
+              "cases": [
+                {
+                  "label": "Approved",
+                  "action": {
+                    "type": "push",
+                    "to": "records_importing"
+                  }
+                },
+                {
+                  "label": "Cancelled",
+                  "action": {
+                    "type": "toast",
+                    "value": "Connection cancelled. Nothing was imported."
+                  }
+                },
+                {
+                  "label": "Denied or error",
+                  "action": {
+                    "type": "push",
+                    "to": "records_error"
+                  }
+                }
+              ],
+              "id": "records.connect.mychart",
+              "ask": "smartConnect",
+              "when": {
+                "approved": "Approved",
+                "cancelled": "Cancelled",
+                "failed": "Denied or error"
+              }
             }
           },
           {
-            "label": "Cancelled",
+            "label": "Nothing chosen",
             "action": {
               "type": "toast",
-              "value": "Connection cancelled. Nothing was imported."
-            }
-          },
-          {
-            "label": "Denied or error",
-            "action": {
-              "type": "push",
-              "to": "records_error"
+              "value": "Select at least one item to continue."
             }
           }
-        ],
-        "id": "records.connect.mychart",
-        "ask": "smartConnect",
-        "when": {
-          "approved": "Approved",
-          "cancelled": "Cancelled",
-          "failed": "Denied or error"
-        }
+        ]
       },
-      "summary": "branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error"
+      "summary": "decide rec.consent.epic: Anything selected? → Chosen: branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error | Nothing chosen: toast “Select at least one item to continue.”"
     },
     {
       "element": "Not now",

@@ -43,9 +43,7 @@
         "BreatheFree",
         "ScrollFree"
       ],
-      "selected": [
-        "BreatheFree"
-      ],
+      "selected": [],
       "multi": true,
       "label": "Which programs?",
       "key": "which_programs"
@@ -68,15 +66,33 @@
       "t": "button",
       "label": "Save supporter",
       "action": {
-        "type": "submit",
-        "api": "POST /v1/care/supporters",
-        "then": {
-          "type": "toast",
-          "value": "Jordan added",
-          "then": {
-            "type": "back"
+        "type": "branch",
+        "question": "Anything selected?",
+        "on": null,
+        "decide": "sup.programs",
+        "cases": [
+          {
+            "label": "Chosen",
+            "action": {
+              "type": "submit",
+              "api": "POST /v1/care/supporters",
+              "then": {
+                "type": "toast",
+                "value": "Jordan added",
+                "then": {
+                  "type": "back"
+                }
+              }
+            }
+          },
+          {
+            "label": "Nothing chosen",
+            "action": {
+              "type": "toast",
+              "value": "Select at least one program."
+            }
           }
-        }
+        ]
       },
       "variant": "primary",
       "arrow": true
@@ -98,17 +114,35 @@
       "element": "Save supporter",
       "path": "footer[0]",
       "action": {
-        "type": "submit",
-        "api": "POST /v1/care/supporters",
-        "then": {
-          "type": "toast",
-          "value": "Jordan added",
-          "then": {
-            "type": "back"
+        "type": "branch",
+        "question": "Anything selected?",
+        "on": null,
+        "decide": "sup.programs",
+        "cases": [
+          {
+            "label": "Chosen",
+            "action": {
+              "type": "submit",
+              "api": "POST /v1/care/supporters",
+              "then": {
+                "type": "toast",
+                "value": "Jordan added",
+                "then": {
+                  "type": "back"
+                }
+              }
+            }
+          },
+          {
+            "label": "Nothing chosen",
+            "action": {
+              "type": "toast",
+              "value": "Select at least one program."
+            }
           }
-        }
+        ]
       },
-      "summary": "POST /v1/care/supporters then toast “Jordan added” then back"
+      "summary": "decide sup.programs: Anything selected? → Chosen: POST /v1/care/supporters then toast “Jordan added” then back | Nothing chosen: toast “Select at least one program.”"
     }
   ]
 }

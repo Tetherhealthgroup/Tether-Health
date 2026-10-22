@@ -1,6 +1,7 @@
 import json
 from dsl import *
 from render_html import render_screen, CSS, e
+from rules import CHOSEN_RULES
 
 PROTO_JS = r"""
 const M = META, F = FLOWS, SC = SCENARIOS, EXP = EXPECT;
@@ -39,6 +40,8 @@ const RULES = {
  'sf.unplug.sum': ()=>{ const P=RULESPEC['sf.unplug.sum'].params; return num(SESSION.get('sf_unplug_gate_sum.answer'))===P.a+P.b?'Step done':'Step not done' },
  'ob.age': ()=> list(SESSION.get('ob_account.age_18_or_older')).includes(RULESPEC['ob.age'].params.item)?'Age confirmed':'Age not confirmed',
 };
+/* "chosen" rules (P-78, P-79): chosen when any of the rule's own inputs holds a selection */
+for(const id of CHOSEN_RULES) RULES[id]=()=> RULESPEC[id].inputs.some(k=>{const v=SESSION.get(k); return Array.isArray(v)?v.length>0:(v!=null&&String(v).trim()!=='')})?'Chosen':'Nothing chosen';
 function decide(d){ if(!d) return null; if(d.startsWith('choice:')) return SESSION.get(d.slice(7)); return RULES[d]?RULES[d]():null }
 function match(sel, labels){ if(sel==null) return null; const s=String(sel).toLowerCase(); const L=labels.map(l=>l.toLowerCase());
   let i=L.indexOf(s); if(i<0) i=L.findIndex(l=>s.startsWith(l)||l.startsWith(s)); if(i<0) i=L.findIndex(l=>l.includes(s)||s.includes(l.split(' ')[0])); return i>=0?labels[i]:null }
@@ -266,4 +269,4 @@ def build_prototype(m, expect, scenarios, rules):
 <h4>States</h4><div id="svars"></div><h4>Actions on this screen</h4><table id="sacts"></table><h4>API</h4><div id="sapi" class="muted"></div></section>
 <div id="chooser"><section><h4></h4><p></p><div></div></section></div>
 {tpls}
-<script>const META={json.dumps(m, ensure_ascii=False)};const FLOWS={json.dumps(flows, ensure_ascii=False)};const SCENARIOS={json.dumps(scenarios, ensure_ascii=False)};const EXPECT={json.dumps(expect, ensure_ascii=False)};const RULESPEC={json.dumps(rules, ensure_ascii=False)};const START="welcome";{PROTO_JS}</script></body></html>'''
+<script>const META={json.dumps(m, ensure_ascii=False)};const FLOWS={json.dumps(flows, ensure_ascii=False)};const SCENARIOS={json.dumps(scenarios, ensure_ascii=False)};const EXPECT={json.dumps(expect, ensure_ascii=False)};const RULESPEC={json.dumps(rules, ensure_ascii=False)};const CHOSEN_RULES={json.dumps(list(CHOSEN_RULES))};const START="welcome";{PROTO_JS}</script></body></html>'''

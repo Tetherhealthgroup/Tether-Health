@@ -108,6 +108,16 @@ Future<void> _settle(WidgetTester tester) async {
   }
 }
 
+/// Opens records_consent_device with "Blood pressure" selected, so Continue
+/// reaches the permission request (P-78: nothing starts selected).
+Future<void> _openDeviceConsent(WidgetTester tester) async {
+  await _open(tester, Routes.recordsConsentDevice);
+  final item = find.text('Blood pressure');
+  await tester.ensureVisible(item);
+  await tester.tap(item);
+  await _settle(tester);
+}
+
 Future<void> _open(WidgetTester tester, String route, {List<NavigatorObserver> observers = const []}) async {
   tester.view.physicalSize = const Size(1170, 2532);
   tester.view.devicePixelRatio = 3;
@@ -274,7 +284,7 @@ void main() {
         asked.add(question);
         return null;
       };
-      await _open(tester, Routes.recordsConsentDevice);
+      await _openDeviceConsent(tester);
       await _tapKey(tester, 'footer[0]'); // later branch with the same label: must not take it
       expect(asked, ['System permission result']);
       expect(find.byType(RecordsImportingScreen), findsNothing);
@@ -287,7 +297,7 @@ void main() {
     });
 
     testWidgets('preview default shows the "Preview: …" chooser', (tester) async {
-      await _open(tester, Routes.recordsConsentDevice);
+      await _openDeviceConsent(tester);
       await _tapKey(tester, 'footer[0]');
       expect(find.text('Preview: System permission result'), findsOneWidget);
       await tester.tap(find.widgetWithText(OutlinedButton, 'Allowed'));
@@ -299,7 +309,7 @@ void main() {
       final codes = <String>[];
       final resolver = TFailClosedResolver(onCode: codes.add);
       TNav.branchResolver = resolver.resolve;
-      await _open(tester, Routes.recordsConsentDevice);
+      await _openDeviceConsent(tester);
       await _tapKey(tester, 'footer[0]');
       expect(find.textContaining('Preview:'), findsNothing);
       expect(find.text('Real logic decides this in production.'), findsNothing);
@@ -315,7 +325,7 @@ void main() {
     testWidgets('fail-closed: the code carries no question or outcome text', (tester) async {
       final codes = <String>[];
       TNav.branchResolver = TFailClosedResolver(onCode: codes.add).resolve;
-      await _open(tester, Routes.recordsConsentDevice);
+      await _openDeviceConsent(tester);
       await _tapKey(tester, 'footer[0]');
       expect(codes, hasLength(1));
       for (final word in ['System', 'permission', 'Allowed', 'Not allowed']) {
@@ -327,7 +337,7 @@ void main() {
     testWidgets('fail-closed: the app can show its own error', (tester) async {
       var shown = 0;
       TNav.branchResolver = TFailClosedResolver(showError: (_) => shown++).resolve;
-      await _open(tester, Routes.recordsConsentDevice);
+      await _openDeviceConsent(tester);
       await _tapKey(tester, 'footer[0]');
       expect(shown, 1);
       expect(find.text(TFailClosedResolver.message), findsNothing);
@@ -491,7 +501,7 @@ void main() {
 
     testWidgets('release defaults: an undecided branch never shows the preview chooser', (tester) async {
       TDefaults.forRelease();
-      await _open(tester, Routes.recordsConsentDevice);
+      await _openDeviceConsent(tester);
       await _tapKey(tester, 'footer[0]');
       expect(find.textContaining('Preview:'), findsNothing);
       expect(find.text(TFailClosedResolver.message), findsOneWidget);
