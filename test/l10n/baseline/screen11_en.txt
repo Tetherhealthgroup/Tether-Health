@@ -1,10 +1,10 @@
-# baseline 97d81ce · screen11 · en
+# baseline TH-1015b · screen11 · en
 T BreatheFree
 T <weekday>, <month> <day>
 T <greeting>.
 T YOUR QUIT DAY
 T 7 days
-T <weekday>, <month> <day> · Pacific Time
+T <weekday>, <month> <day>
 T DAY 1
 T QUIT DAY
 T TODAY’S NEXT STEP
@@ -41,7 +41,7 @@ SL <weekday>, <month> <day>
 SL <greeting>.
 SL YOUR QUIT DAY
 SL 7 days
-SL <weekday>, <month> <day> · Pacific Time
+SL <weekday>, <month> <day>
 SL DAY 1
 SL QUIT DAY
 SL TODAY’S NEXT STEP

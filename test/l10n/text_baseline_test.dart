@@ -37,13 +37,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../tether_ui/approved_parity.dart' show sha256Hex;
 
-/// The commit whose app the dumps were taken from.
-const baselineCommit = '97d81ce';
+/// The baseline label: the ticket ID of the change that last re-recorded
+/// the dumps (the app's text as of that change's landing).
+const baselineCommit = 'TH-1015b';
 
 /// sha256 of every file in test/l10n/baseline/, in name order, each as
 /// `<name>\n<content>`.
 const baselineDigest =
-    '0b0f3e17d7f183194eacea32aa19643f258133d333d915d85c464c8486e6625a';
+    'dbe30607f2482780bf921d59c133d3546a2fa5c2c0271c286749cf02dc065841';
 
 const baselineDir = 'test/l10n/baseline';
 

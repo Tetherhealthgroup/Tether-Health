@@ -1,4 +1,4 @@
-# baseline 97d81ce · program_steady · en
+# baseline TH-1015b · program_steady · en
 T Works offline — your information stays on this device.
 T Today's focus
 T No readings yet. Log a reading whenever you check — there is no schedule to keep up with.

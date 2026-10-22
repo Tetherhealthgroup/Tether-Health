@@ -1,4 +1,4 @@
-# baseline 97d81ce · screen23 · es
+# baseline TH-1015b · screen23 · es
 T Centro de medicamentos
 T i
 T Educación y seguimiento—sin recetar
@@ -30,7 +30,7 @@ T Obtener ayuda ›
 T ¿Pregunta sobre resurtido?
 T Contactar farmacia o equipo de atención ›
 T Agregar o actualizar el plan registrado
-T El plan sigue disponible sin conexión · Última sincronización 9:12 AM
+T El plan sigue disponible sin conexión
 T Aprobado ago 2026
 T Inicio
 T Plan
@@ -56,7 +56,7 @@ SL ¿Omitiste o no estás seguro de algo?\nRevisa las instrucciones aprobadas o 
 SL Efecto secundario o síntoma preocupante\nAbre la ruta de seguridad aprobada; la app no diagnostica.\nObtener ayuda ›
 SL ¿Pregunta sobre resurtido?\nContactar farmacia o equipo de atención ›
 SL Agregar o actualizar el plan registrado
-SL El plan sigue disponible sin conexión · Última sincronización 9:12 AM
+SL El plan sigue disponible sin conexión
 SL Aprobado ago 2026
 SL Inicio
 SL Plan

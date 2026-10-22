@@ -1,4 +1,4 @@
-# baseline 97d81ce · screen23 · en
+# baseline TH-1015b · screen23 · en
 T Medication center
 T i
 T Education and tracking—not prescribing
@@ -30,7 +30,7 @@ T Get help ›
 T Refill question?
 T Contact pharmacy or care team ›
 T Add or update recorded plan
-T Plan remains available offline · Last synced 9:12 AM
+T Plan remains available offline
 T Approved Aug 2026
 T Home
 T Plan
@@ -56,7 +56,7 @@ SL Missed or unsure about an item?\nReview approved instructions or contact a cl
 SL Side effect or concerning symptom\nOpen the approved safety route; the app does not diagnose.\nGet help ›
 SL Refill question?\nContact pharmacy or care team ›
 SL Add or update recorded plan
-SL Plan remains available offline · Last synced 9:12 AM
+SL Plan remains available offline
 SL Approved Aug 2026
 SL Home
 SL Plan

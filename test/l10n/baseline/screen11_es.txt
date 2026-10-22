@@ -1,10 +1,10 @@
-# baseline 97d81ce · screen11 · es
+# baseline TH-1015b · screen11 · es
 T BreatheFree
 T <weekday>, <day> DE <month>
 T <greeting>.
 T TU DÍA PARA DEJARLO
 T 7 días
-T <weekday>, <day> de <month> · Hora del Pacífico
+T <weekday>, <day> de <month>
 T DÍA 1
 T DÍA DE DEJARLO
 T PRÓXIMO PASO DE HOY
@@ -41,7 +41,7 @@ SL <weekday>, <day> DE <month>
 SL <greeting>.
 SL TU DÍA PARA DEJARLO
 SL 7 días
-SL <weekday>, <day> de <month> · Hora del Pacífico
+SL <weekday>, <day> de <month>
 SL DÍA 1
 SL DÍA DE DEJARLO
 SL PRÓXIMO PASO DE HOY
