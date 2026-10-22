@@ -353,7 +353,8 @@ In the app a bound control shows the stored value. While the value is not
 loaded it shows its empty state (off, nothing selected) and writes nothing.
 When the member has nothing stored, controls on the sharing and
 notification screens (`account_notifications`, `account_privacy`,
-`program_settings`, `sd_caregiver`, `sf_buddy`) stay off, and plan and
+`program_settings`, `program_settings_sf`, `sd_caregiver`, `sf_buddy`) stay
+off, and plan and
 profile screens show their designed starting value. That comes from the
 shared input components, not from `spec/screens`.
 

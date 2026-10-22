@@ -42,13 +42,16 @@ abstract class TData {
 
   /// [bindKey] for a screen opened for [program]: a `:program` segment is
   /// replaced by the programme id. Null when the key needs a programme and
-  /// [program] is null; the control then has no value (not loaded).
+  /// [program] is null or not a programme id (two lower-case letters, for
+  /// example `bf`); the control then has no value (not loaded).
   static String? resolve(String bindKey, String? program) {
     final parts = bindKey.split('.');
     if (!parts.contains(':program')) return bindKey;
-    if (program == null || program.isEmpty) return null;
+    if (program == null || !_programId.hasMatch(program)) return null;
     return [for (final p in parts) p == ':program' ? program : p].join('.');
   }
+
+  static final RegExp _programId = RegExp(r'^[a-z]{2}$');
 
   /// The current value for [bindKey]. Null means there is no value yet.
   ValueListenable<Object?> watch(String bindKey);

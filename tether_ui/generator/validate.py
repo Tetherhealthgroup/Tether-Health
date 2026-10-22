@@ -99,6 +99,8 @@ def validate():
     # Settings binding and first-run consents (P-71, P-52).
     errors += check_settings(SCREENS)
     errors += check_program_context(SCREENS)
+    errors += check_endpoint_classes(SCREENS)
+    errors += check_plan_controls(SCREENS)
     errors += check_consent_starts(SCREENS)
     # tab roots
     for t in TABS:
@@ -452,25 +454,150 @@ BIND_EXEMPT = {
 # opened for (a route with ":program"); without one the control shows
 # nothing and writes nothing.
 PROGRAM_SEGMENT = ':program'
+# A per-programme screen that stands for one programme only: whatever opens
+# it must pass that programme. No route opens program_settings_sf today (it
+# is a state of program_settings); without a programme its controls show
+# nothing and write nothing.
+PROGRAM_FIXED = {'program_settings_sf': 'sf'}
 
 # Consent starting states (P-52 made mechanical, extended to every screen
-# that creates a consent). On a screen that submits to CONSENT_CREATING, or
-# carries a consent checklist (CONSENT_CHECKLISTS), an optional consent,
-# sharing or import selection starts off: no toggle on, no item ticked, no
-# chip or tile selected. Bound controls are exempt (the consent class above
-# governs them). FIRST_RUN_ON is the permanent allowlist; CONSENT_START_PENDING
-# lists screens whose designed selection waits for an owner decision, and
-# those screens must not be mapped to their endpoints until it is made.
-CONSENT_CREATING = ('POST /v1/enrolments/consents', 'PATCH /v1/enrolments/consents', 'POST /v1/care/caregivers', 'POST /v1/care/supporters',
-                    'POST /v1/care/connections', 'POST /v1/care/summaries')
-FIRST_RUN_ON = {('ob_consent', 'essential_app_data'): 'Essential app data: required for the app to work, not optional'}
+# that creates a consent). On a screen that submits to a consent-creating
+# endpoint (is_consent_creating), or carries a consent checklist
+# (CONSENT_CHECKLISTS), an optional consent, sharing or import selection
+# starts off: no toggle on, no item ticked, no chip, tile, radio item,
+# segment or select value chosen. Bound controls are exempt (the consent
+# class above governs them). CONSENT_START_ON is the permanent allowlist;
+# CONSENT_START_PENDING lists selections that wait for an owner decision,
+# and those screens must not be mapped to their endpoints until it is made.
+# An allowlist entry is (screen, key), or (screen, path) for a control
+# without a key.
+#
+# Endpoints are classified fail-closed: a write is consent-creating when it
+# matches CONSENT_PATTERNS or is in CONSENT_CREATING_ALSO; every other submit
+# endpoint must be in NOT_CONSENT_CREATING with a reason.
+CONSENT_PATTERNS = (
+    ('consent writes', lambda m, path: '/consents' in path),
+    ('care writes', lambda m, path: path.startswith('/v1/care/')),
+    ('records import and accept', lambda m, path: m == 'POST' and path.startswith('/v1/records/fhir/')),
+)
+CONSENT_CREATING_ALSO = {
+    'PATCH /v1/enrolments/:id': 'sets care-team sharing and research for a programme',
+    'PUT /v1/program-data/sf/plan': 'carries what the ScrollFree buddy may see',
+}
+_OWN = 'saves the member\'s own entry; shares nothing'
+_PLAN = 'saves the member\'s own plan or profile; shares nothing'
+_DEVICE = 'runs on the phone only; sends nothing'
+_AUTH = 'account sign-in or recovery; creates no consent or share'
+NOT_CONSENT_CREATING = {
+    'CALL device:unplug/endSession': _DEVICE,
+    'CALL device:unplug/liftShield+purgeLocalData': _DEVICE,
+    'CALL device:unplug/setThresholds+applyShield': _DEVICE,
+    'CALL device:unplug/startSession': _DEVICE,
+    'PUT device:encrypted/ea/safety-plan': _DEVICE,
+    'DELETE /v1/account/data': 'deletes the member\'s data; ends every share',
+    'DELETE /v1/enrolments/:id': 'leaves a programme; ends its shares',
+    'DELETE /v1/records/fhir/sources/:id': 'disconnects a records source; ends the import',
+    'PATCH /v1/notifications/preferences': 'notification switches on this account; shares nothing',
+    'POST /v1/account/export': 'sends the member a copy of their own data',
+    'POST /v1/quit-plan/guest-import': 'moves the member\'s own guest plan into their account',
+    'POST /v1/records/check-ins': _OWN, 'POST /v1/records/lapses': _OWN, 'POST /v1/records/lessons': _OWN,
+    'POST /v1/records/manual': _OWN, 'POST /v1/records/rescues': _OWN,
+    'POST /v1/program-data/be/diary': _OWN, 'POST /v1/program-data/be/survivorship': _OWN, 'POST /v1/program-data/ca/symptoms': _OWN,
+    'POST /v1/program-data/ca/zone-checks': _OWN, 'POST /v1/program-data/ck/done': _OWN, 'POST /v1/program-data/ea/check-backs': _OWN,
+    'POST /v1/program-data/ea/moods': _OWN, 'POST /v1/program-data/hw/lipids': _OWN, 'POST /v1/program-data/hw/readings': _OWN,
+    'POST /v1/program-data/re/labs': _OWN, 'POST /v1/program-data/sd/falls': _OWN, 'POST /v1/program-data/sd/sessions': _OWN,
+    'POST /v1/program-data/sf/pauses': _OWN, 'POST /v1/program-data/st/a1c': _OWN, 'POST /v1/program-data/st/readings': _OWN,
+    'PUT /v1/program-data/be/profile': _PLAN, 'PUT /v1/program-data/bf/meds': _PLAN, 'PUT /v1/program-data/ca/plan': _PLAN,
+    'PUT /v1/program-data/ck/profile': _PLAN, 'PUT /v1/program-data/hw/targets': _PLAN, 'PUT /v1/program-data/nu/habit': _PLAN,
+    'PUT /v1/program-data/re/plan': _PLAN, 'PUT /v1/program-data/sd/plan': _PLAN, 'PUT /v1/program-data/sd/safety': _PLAN,
+    'PUT /v1/program-data/st/range': _PLAN, 'PUT /v1/quit-plan': _PLAN,
+    'POST supabase /auth/v1/recover': _AUTH, 'POST supabase /auth/v1/signup': _AUTH, 'POST supabase /auth/v1/token': _AUTH,
+    'POST supabase /auth/v1/user/identities (linkIdentity)': _AUTH, 'PUT supabase /auth/v1/user': _AUTH,
+}
+CONSENT_START_ON = {
+    ('ob_consent', 'essential_app_data'): 'Essential app data: required for the app to work, not optional',
+    ('sf_unplug_off', 'scope'): 'action choice: either option only turns something off (BIND_EXEMPT)',
+}
 _PENDING = 'pending owner decision on starting selections; not mapped until then'
 CONSENT_START_PENDING = {
     ('records_consent', 'resources'): _PENDING,
     ('records_consent_bb', 'resources'): _PENDING,
     ('records_consent_device', 'data_types'): _PENDING,
     ('support_add_person', 'which_programs'): _PENDING,
+    ('records_review', 'body[3].children[0]'): _PENDING,
+    ('records_review', 'body[5].children[0]'): _PENDING,
+    ('records_review', 'body[6].children[0]'): _PENDING,
+    ('records_review', 'body[7].children[0]'): _PENDING,
+    ('records_conflict', 'a1c'): _PENDING,
+    ('records_conflict', 'bp'): _PENDING,
 }
+# Plan-class controls must not look like consents: a key, label or option
+# with one of these words fails unless PLAN_CONSENT_WORDS_ALLOWED lists it
+# ((screen, key), or (screen, path) for a control without a key).
+PLAN_CONSENT_WORDS = re.compile(r'(?i)\b(shar(e|es|ed|ing)|research|caregivers?|consents?|care[ _]team|supporters?|buddy|clinician sees)\b')
+PLAN_CONSENT_WORDS_ALLOWED = {
+    ('sd_plan', 'body[2].children[0]'): 'to-do list without a key: writes nothing to the session and is never submitted; caregiver alerts are set on sd_caregiver',
+}
+
+def endpoint_parts(endpoint):
+    """(method, path) of a submit endpoint ('supabase' and 'device:' paths too)."""
+    method, _, rest = endpoint.partition(' ')
+    if rest.startswith('supabase '): rest = rest[len('supabase '):]
+    return method, rest.split(' ')[0]
+
+def consent_category(endpoint, also=None):
+    """The consent-creating category of `endpoint`, or None."""
+    also = CONSENT_CREATING_ALSO if also is None else also
+    if endpoint in also: return 'listed'
+    method, path = endpoint_parts(endpoint)
+    if method not in ('POST', 'PUT', 'PATCH', 'DELETE'): return None
+    return next((name for name, match in CONSENT_PATTERNS if match(method, path)), None)
+
+def is_consent_creating(endpoint, also=None): return consent_category(endpoint, also) is not None
+
+def check_endpoint_classes(screens, not_creating=None, also=None):
+    """Every submit endpoint is consent-creating (pattern or
+    CONSENT_CREATING_ALSO) or listed in NOT_CONSENT_CREATING; no endpoint is
+    both; every list entry is submitted somewhere."""
+    not_creating = NOT_CONSENT_CREATING if not_creating is None else not_creating
+    also = CONSENT_CREATING_ALSO if also is None else also
+    errors, used = [], submit_endpoints(screens)
+    for e in sorted(used):
+        creating = is_consent_creating(e, also)
+        if creating and e in not_creating:
+            errors.append(f'endpoint {e!r} is consent-creating ({consent_category(e, also)}) but validate.NOT_CONSENT_CREATING lists it.')
+        if not creating and e not in not_creating:
+            errors.append(f'endpoint {e!r} is not classified: list it in validate.NOT_CONSENT_CREATING with a reason, or in CONSENT_CREATING_ALSO.')
+    for e in sorted(set(not_creating) | set(also)):
+        if e not in used: errors.append(f'endpoint {e!r} is classified in validate.py but no screen submits it: remove it.')
+    return errors
+
+def check_plan_controls(screens, plan=PLAN_SCREENS, allowed=None, also=None):
+    """A plan-class screen submits to no consent-creating endpoint, and no
+    plan control's key, label or option reads like a consent, share,
+    research or caregiver choice (unless PLAN_CONSENT_WORDS_ALLOWED lists it)."""
+    allowed = PLAN_CONSENT_WORDS_ALLOWED if allowed is None else allowed
+    errors, used = [], set()
+    for sid in plan:
+        s = screens.get(sid)
+        if s is None: continue
+        for e in submits_of(s):
+            if is_consent_creating(e, also):
+                errors.append(f'{sid}: plan-class screen submits to consent-creating {e!r}; move it to validate.CONSENT_SCREENS.')
+        for part in ('body', 'footer'):
+            for n, p in walk(s[part], part):
+                if n['t'] not in INPUTS + KEYED: continue
+                texts = [n.get('key'), n.get('label'), n.get('sub')] + list(n.get('options') or [])
+                texts += [x for i in n.get('items') or [] for x in (i.get('label'), i.get('sub'))]
+                hits = sorted({m.group(0) for t in texts if t for m in [PLAN_CONSENT_WORDS.search(str(t).replace('_', ' '))] if m})
+                if not hits: continue
+                k = next((k for k in ((sid, n.get('key')), (sid, p)) if k in allowed and k[1] is not None), None)
+                if k:
+                    used.add(k); continue
+                errors.append(f'{sid}: plan-class {n["t"]} {n.get("key")!r} at {p} reads like a consent ({", ".join(hits)}); make the screen consent-class or list it in validate.PLAN_CONSENT_WORDS_ALLOWED.')
+    for k in allowed:
+        if k not in used: errors.append(f'validate.PLAN_CONSENT_WORDS_ALLOWED entry {k} matches no plan control: remove it.')
+    return errors
 
 def _submits(a, out):
     if not a: return
@@ -572,9 +699,11 @@ def element_programs(s):
                 out.append((p, n['action'], s.get('program')))
     return out
 
-def check_program_context(screens):
+def check_program_context(screens, fixed=None):
     """A screen opened per programme (route with :program) is only pushed,
-    from an element whose programme is known, so the kit can pass it on."""
+    from an element whose programme is known, so the kit can pass it on; a
+    screen in PROGRAM_FIXED is opened only with its own programme."""
+    fixed = PROGRAM_FIXED if fixed is None else fixed
     errors = []
     per = {sid for sid, s in screens.items() if PROGRAM_SEGMENT in s.get('route', '')}
     def visit(sid, p, a, prog):
@@ -582,23 +711,24 @@ def check_program_context(screens):
         if a.get('to') in per or any(v in per for v in (a.get('context') or {}).values()):
             if a['type'] != 'push': errors.append(f'{sid}: {p} opens {a.get("to")} with {a["type"]}; a per-programme screen is opened with a push only.')
             elif not prog: errors.append(f'{sid}: {p} opens {a["to"]} but no programme is known there (row lead, tile programme or screen programme).')
+            elif a['to'] in fixed and prog != fixed[a['to']]: errors.append(f'{sid}: {p} opens {a["to"]} for programme {prog!r}; it stands for {fixed[a["to"]]!r} only (validate.PROGRAM_FIXED).')
         for c in a.get('cases', []): visit(sid, p, c['action'], prog)
         visit(sid, p, a.get('then'), prog)
     for sid, s in screens.items():
         for p, a, prog in element_programs(s): visit(sid, p, a, prog)
     return errors
 
-def check_consent_starts(screens, allowed=None, checklists=None, plan=PLAN_SCREENS):
+def check_consent_starts(screens, allowed=None, checklists=None, plan=PLAN_SCREENS, also=None):
     """P-52, extended: an optional consent, sharing or import selection on a
     consent-creating screen starts off, except the entries of `allowed`
-    (FIRST_RUN_ON and CONSENT_START_PENDING). Bound controls and plan-class
-    screens are not checked. Every `allowed` entry must be used."""
-    allowed = {**FIRST_RUN_ON, **CONSENT_START_PENDING} if allowed is None else allowed
+    (CONSENT_START_ON and CONSENT_START_PENDING). Bound controls and
+    plan-class screens are not checked. Every `allowed` entry must be used."""
+    allowed = {**CONSENT_START_ON, **CONSENT_START_PENDING} if allowed is None else allowed
     checklists = CONSENT_CHECKLISTS if checklists is None else checklists
     errors, used = [], set()
     for sid, s in screens.items():
         if sid in plan: continue
-        creating = any(e in CONSENT_CREATING for e in submits_of(s))
+        creating = any(is_consent_creating(e, also) for e in submits_of(s))
         for part in ('body', 'footer'):
             for n, p in walk(s[part], part):
                 if n.get('bind') is not None: continue
@@ -607,14 +737,18 @@ def check_consent_starts(screens, allowed=None, checklists=None, plan=PLAN_SCREE
                 elif t == 'checklist' and (creating or (n.get('key') is not None and checklists.get(sid) == n.get('key'))): on = any(i.get('done') for i in n['items'])
                 elif t == 'chips' and creating: on = bool(n.get('selected'))
                 elif t == 'tiles' and creating and n.get('key'): on = any(i.get('selected') for i in n['items'] if not i.get('action'))
+                elif t == 'radio' and creating: on = isinstance(n.get('selected'), int) and 0 <= n['selected'] < len(n['items'])
+                elif t == 'segmented' and creating: on = n.get('selected') is not None
+                elif t == 'field' and n.get('kind') == 'select' and creating: on = n.get('value') is not None
                 else: continue
                 if not on: continue
-                if (sid, n.get('key')) in allowed:
-                    used.add((sid, n.get('key'))); continue
-                errors.append(f'{sid}: optional consent {t} {n.get("key")!r} at {p} starts on. P-52: the member turns it on; a starting value is never a consent (allowlists: validate.FIRST_RUN_ON, CONSENT_START_PENDING).')
+                k = next((k for k in ((sid, n.get('key')), (sid, p)) if k in allowed and k[1] is not None), None)
+                if k:
+                    used.add(k); continue
+                errors.append(f'{sid}: optional consent {t} {n.get("key")!r} at {p} starts on. P-52: the member chooses it; a starting value is never a consent (allowlists: validate.CONSENT_START_ON, CONSENT_START_PENDING).')
     for k in allowed:
         if k not in used:
-            errors.append(f'consent allowlist entry {k} matches no consent control that starts on: remove it from validate.FIRST_RUN_ON or CONSENT_START_PENDING.')
+            errors.append(f'consent allowlist entry {k} matches no consent control that starts on: remove it from validate.CONSENT_START_ON or CONSENT_START_PENDING.')
     return errors
 
 
@@ -786,6 +920,43 @@ def _settings_self_test():
     _expect(any('starts on' in e for e in run5(good5, allowed={}, plan=('pl',))), 'the required control is not reported without its allowlist entry')
     pend = dict(good5, sup=sc('sup', [chips(['A', 'B'], ['A'], key='progs')], 'POST /v1/care/supporters'))
     _expect(run5(pend, allowed=dict(allow, **{}) | {('sup', 'progs'): 'pending owner decision'}, plan=('pl',)) == [], 'a pending allowlist entry does not pass its screen')
+    # Starting states of radio, segmented and select controls on consent-creating screens.
+    has5(dict(good5, r=sc('r', [radio(['Share', 'Do not share'], 0, key='who')], 'POST /v1/care/connections')), "r: optional consent radio 'who'", 'preselected radio on a connections screen', plan=('pl',))
+    has5(dict(good5, r=sc('r', [seg(['Weekly', 'Daily'], 'Weekly', key='freq')], 'POST /v1/care/caregivers')), "r: optional consent segmented 'freq'", 'preselected segment on a caregiver screen', plan=('pl',))
+    has5(dict(good5, r=sc('r', [dict(field('Topic', kind='select', key='topic'), value='Plan')], 'POST /v1/care/messages')), "r: optional consent field 'topic'", 'preselected select on a care message screen', plan=('pl',))
+    has5(dict(good5, r=sc('r', [radio(['Keep', 'Drop'], 0, key='keep')], 'POST /v1/records/fhir/conflicts')), "r: optional consent radio 'keep'", 'preselected radio on a records import screen', plan=('pl',))
+    _expect(run5(dict(good5, r=sc('r', [radio(['Keep', 'Drop'], -1, key='keep')], 'POST /v1/records/fhir/conflicts')), checklists={'acct': 'age'}, plan=('pl',)) == [], 'an unselected radio is reported')
+    _expect(run5(dict(good5, r=sc('r', [checklist([ci('Labs', done=True)])], 'POST /v1/records/fhir/accept')), allowed=dict(allow) | {('r', 'body[0]'): 'x'}, checklists={'acct': 'age'}, plan=('pl',)) == [], 'a path allowlist entry for a keyless control does not pass')
+    # Endpoint classes: each pattern category, the extra list, and fail-closed.
+    for e, cat in (('POST /v1/enrolments/consents', 'consent writes'), ('PATCH /v1/enrolments/consents', 'consent writes'), ('POST /v1/care/caregivers', 'care writes'),
+                   ('POST /v1/care/connections', 'care writes'), ('POST /v1/care/messages', 'care writes'), ('DELETE /v1/care/supporters/:id', 'care writes'),
+                   ('POST /v1/records/fhir/accept', 'records import and accept'), ('POST /v1/records/fhir/sources/:id/sync', 'records import and accept')):
+        _expect(consent_category(e, {}) == cat, f'{e} is {consent_category(e, {})}, not {cat}')
+    for e in ('GET /v1/care/messages', 'DELETE /v1/records/fhir/sources/:id', 'POST /v1/records/manual', 'PUT /v1/program-data/st/range', 'CALL device:unplug/startSession'):
+        _expect(consent_category(e, {}) is None, f'{e} is consent-creating')
+    _expect(consent_category('PATCH /v1/x', {'PATCH /v1/x': 'shares'}) == 'listed', 'CONSENT_CREATING_ALSO not used')
+    ec = lambda screens, nc=None, also=None: check_endpoint_classes(screens, nc or {}, also or {})
+    one = lambda e: {'s': sc('s', [], e)}
+    _expect(ec(one('POST /v1/care/connections')) == [], 'a care write needs listing')
+    _expect(any('is not classified' in x for x in ec(one('POST /v1/new/thing'))), 'an unclassified write not reported')
+    _expect(any('is not classified' in x for x in ec(one('CALL device:x'))), 'an unclassified device call not reported')
+    _expect(ec(one('POST /v1/new/thing'), {'POST /v1/new/thing': 'own entry'}) == [], 'a listed write is reported')
+    _expect(any('but validate.NOT_CONSENT_CREATING lists it' in x for x in ec(one('POST /v1/care/caregivers'), {'POST /v1/care/caregivers': 'x'})), 'a consent write listed as not consent-creating not reported')
+    _expect(any('no screen submits it' in x for x in ec(one('POST /v1/care/caregivers'), {'POST /v1/gone': 'x'})), 'a stale not-consent entry not reported')
+    _expect(any('no screen submits it' in x for x in ec(one('POST /v1/care/caregivers'), None, {'PATCH /v1/gone': 'x'})), 'a stale extra entry not reported')
+    # Plan-class controls.
+    pcs = lambda screens, allowed=None: check_plan_controls(screens, ('pl',), allowed or {}, {})
+    _expect(pcs({'pl': sc('pl', [toggle('Private reminder', key='r', bind='p.r')], 'PUT /v1/p')}) == [], 'a plain plan control is reported')
+    _expect(any('plan-class screen submits to consent-creating' in x for x in pcs({'pl': sc('pl', [], 'POST /v1/care/caregivers')})), 'a plan screen with a care write not reported')
+    for label, key in (('Share with my care team', 'share'), ('De-identified research', 'r'), ('Caregiver alerts', 'c'), ('Reminder', 'consent_x'), ('Tell my buddy', 'b')):
+        _expect(any('reads like a consent' in x for x in pcs({'pl': sc('pl', [toggle(label, on=True, key=key, bind='p.x')], 'PUT /v1/p')})), f'plan control {label!r} not reported')
+    _expect(any('reads like a consent' in x for x in pcs({'pl': sc('pl', [checklist([ci('Walk'), ci('Share my steps')])], 'PUT /v1/p')})), 'a plan checklist item not reported')
+    _expect(pcs({'pl': sc('pl', [checklist([ci('Share my steps')])], 'PUT /v1/p')}, {('pl', 'body[0]'): 'to-do'}) == [], 'an allowlisted plan control is reported')
+    _expect(any('matches no plan control' in x for x in pcs({'pl': sc('pl', [], 'PUT /v1/p')}, {('pl', 'gone'): 'x'})), 'a stale plan allowlist entry not reported')
+    # A fixed-programme screen opens only with its programme.
+    fx = {'ps': sc('ps', [], route='/p/:program/sf')}
+    _expect(check_program_context(dict(fx, h=sc('h', [button('S', go('ps'))], program='sf')), {'ps': 'sf'}) == [], 'the fixed programme is reported')
+    _expect(any("it stands for 'sf' only" in x for x in check_program_context(dict(fx, h=sc('h', [button('S', go('ps'))], program='bf')), {'ps': 'sf'})), 'a fixed screen opened for another programme not reported')
 
 def _age_gate_self_test(scr):
     """check_age_gate fails closed: an account-creating or unknown auth submit

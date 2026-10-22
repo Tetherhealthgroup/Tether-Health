@@ -27,6 +27,24 @@ import 'package:tether_ui/ui/ui.dart';
 const _consent = <String>{'account_notifications', 'account_privacy', 'program_settings', 'program_settings_sf', 'sd_caregiver', 'sf_buddy'};
 const _plan = <String>{'be_q2', 'bf_meds_edit', 'bf_review', 'ca_plan', 'ck_q1', 'ea_plan', 'hw_targets', 'nu_habit', 're_result', 'sd_plan', 'sd_safety', 'st_range'};
 
+/// Every input control on a plan-class screen: (type, session key, bind).
+/// Pinned so that a new plan control, or a changed key or bind, is reviewed
+/// (a plan control must never be a consent, share or caregiver choice).
+const _planInventory = <String, List<(String, String?, String?)>>{
+  'be_q2': [('chips', 'value', 'be.profile.family_cancers'), ('field', 'relative_s_age_at_diagnosis_if_k', null)],
+  'bf_meds_edit': [('field', 'medicine', 'bf.meds.medicine'), ('field', 'strength', null), ('field', 'when', 'bf.meds.when'), ('toggle', 'private_reminder', 'bf.meds.private_reminder')],
+  'bf_review': [],
+  'ca_plan': [('field', 'green_from', null), ('field', 'daily_medicine', null), ('field', 'peak_flow', null), ('field', 'red_below', null)],
+  'ck_q1': [('field', 'age', null), ('segmented', 'sex_assigned_at_birth', 'ck.profile.sex_assigned_at_birth'), ('chips', 'any_of_these', 'ck.profile.any_of_these')],
+  'ea_plan': [('field', 'my_warning_signs', null), ('field', 'things_that_help_me', null), ('field', 'people_i_can_reach', null)],
+  'hw_targets': [('field', 'top_below', null), ('field', 'bottom_below', null), ('radio', 'value', 'hw.targets.no_target_yet'), ('chips', 'when_should_we_remind_you', 'hw.targets.reminder_time')],
+  'nu_habit': [('radio', 'value', 'nu.habit.habit'), ('toggle', 'track_weight', 'nu.habit.track_weight')],
+  're_result': [('checklist', null, null)],
+  'sd_plan': [('checklist', null, null)],
+  'sd_safety': [('checklist', null, null)],
+  'st_range': [('segmented', 'value', 'st.range.unit'), ('field', 'before_meals_from', null), ('field', 'to', null), ('field', '2_h_after_meals_below', null), ('field', 'low', null), ('field', 'my_low_steps', null)],
+};
+
 /// Settings screens that are not bound (validate.NOT_BOUND_SCREENS).
 const _notBound = <String>{'auth_newpass', 'sf_unplug_off'};
 
@@ -200,6 +218,19 @@ void main() {
       expect(_boundKeys(screens, 'sf_unplug_off'), isEmpty);
       for (final sid in _consent) {
         expect(_boundKeys(screens, sid), isNotEmpty, reason: sid);
+      }
+    });
+
+    test('the plan-screen control inventory is pinned', () {
+      final screens = _screens();
+      const inputs = {'field', 'chips', 'segmented', 'radio', 'toggle', 'slider', 'checklist', 'tiles'};
+      expect(_planInventory.keys.toSet(), _plan);
+      for (final MapEntry(key: sid, value: want) in _planInventory.entries) {
+        final got = [
+          for (final n in _controls(screens[sid] as Map<String, dynamic>))
+            if (inputs.contains(n['t'])) (n['t'] as String, n['key'] as String?, n['bind'] as String?)
+        ];
+        expect(got, want, reason: sid);
       }
     });
 
@@ -580,6 +611,23 @@ void main() {
       expect(TData.resolve('enrolment.:program.status', null), isNull);
       expect(TData.resolve('enrolment.:program.status', ''), isNull);
       expect(TData.resolve('consents.de_identified_research', null), 'consents.de_identified_research');
+    });
+
+    test('TData.resolve rejects anything but a two-letter programme id', () {
+      for (final bad in ['BF', 'b', 'bff', 'b1', 'bf.status', 'sf.x', '../bf', ' bf', 'bf ', '*', ':program', 'bf\n']) {
+        expect(TData.resolve('enrolment.:program.status', bad), isNull, reason: bad);
+      }
+      expect(TData.resolve('enrolment.:program.status', 'sf'), 'enrolment.sf.status');
+    });
+
+    testWidgets('a malformed programme in the route arguments shows nothing and writes nothing', (tester) async {
+      TData.instance = _MapData({'enrolment.bf.x.status': 'Pause', 'enrolment.bf.status': 'Pause'});
+      await _open(tester, Routes.programSettings, program: 'bf.x');
+      for (final label in ['Focus', 'Learn only', 'Pause']) {
+        expect(_marked(tester, TRadioList, label), isFalse, reason: label);
+      }
+      expect(_keysOf('program_settings'), isEmpty);
+      await _drain(tester);
     });
   });
 
