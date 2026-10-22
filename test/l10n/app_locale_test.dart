@@ -208,6 +208,10 @@ void main() {
         '{"choice":"es-MX","deviceLocale":"en-US"}',
         // Longer than the code cap.
         '{"choice":"es","deviceLocale":"en-aaaaaaaa-bbbbbbbb-cccccccc-dddddd"}',
+        // Valid codes, but the raw value is padded past the 140-character cap.
+        '{"choice":"es",                                                     '
+            '                                                                     '
+            '"deviceLocale":"en-US"}',
       ]) {
         FlutterSecureStorage.setMockInitialValues({_key: bad});
         final locale =

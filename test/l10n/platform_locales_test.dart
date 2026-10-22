@@ -39,10 +39,14 @@ List<String>? androidLocales(String xml) {
           .firstMatch(_withoutComments(xml))
           ?.group(1);
   if (body == null) return null;
-  return RegExp(r'<locale\s+android:name\s*=\s*"([^"]*)"\s*/>')
+  final names = RegExp(r'<locale\s+android:name\s*=\s*"([^"]*)"\s*/>')
       .allMatches(body)
       .map((m) => m.group(1)!)
       .toList();
+  // Every <locale> element must be one parsed above; any other form (such
+  // as an open/close pair) makes the file malformed for this check.
+  final elements = RegExp(r'<locale(?=[\s/>])').allMatches(body).length;
+  return elements == names.length ? names : null;
 }
 
 /// The android:localeConfig attribute of the `<application>` tag, or null.
@@ -112,6 +116,11 @@ void main() {
         ['en'],
       );
       expect(androidLocales('<resources/>'), isNull);
+      expect(
+        androidLocales('<locale-config><locale android:name="en"/>'
+            '<locale android:name="fr"></locale></locale-config>'),
+        isNull,
+      );
       expect(
         applicationLocaleConfig('<manifest><application '
             'android:label="x"><!-- android:localeConfig="@xml/a" -->'
