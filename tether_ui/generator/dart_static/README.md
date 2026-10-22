@@ -15,7 +15,8 @@ flutter run                                # gallery
 flutter run --dart-define=START=/welcome   # real first run
 flutter analyze                            # no issues
 flutter test                               # every screen at 100% + 130% text, plus end-to-end journeys
-                                           # footer_text_scale_test: every screen at 100/200/310% on 375×667
+                                           # footer_text_scale_test: every screen at 100/200/310% on 375×667 and 320×568
+                                           # large_text_rows_test: rows that wrap with large text, left-to-right and right-to-left
 ```
 
 Regenerate after spec changes: `cd ../generator && python3 build_all.py`. Generated files are overwritten; move a screen out of `lib/screens/` if you want to own it by hand.

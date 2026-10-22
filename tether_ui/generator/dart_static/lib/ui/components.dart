@@ -96,7 +96,7 @@ class _TScreenState extends State<TScreen> with _FooterPlacement<TScreen> {
                           Expanded(
                             child: SingleChildScrollView(
                               padding: const EdgeInsetsDirectional.fromSTEB(TSpace.screen, 6, TSpace.screen, 20),
-                              child: Column(key: _bodyKey, crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (inBody && footer.isNotEmpty) ...[const SizedBox(height: 16), fit]]),
+                              child: _OnResize(onResize: _scheduleCheck, child: Column(key: _bodyKey, crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (inBody && footer.isNotEmpty) ...[const SizedBox(height: 16), fit]])),
                             ),
                           ),
                           if (!inBody && footer.isNotEmpty)
@@ -162,7 +162,7 @@ class _TSheetState extends State<TSheet> with _FooterPlacement<TSheet> {
                 Flexible(
                   child: SingleChildScrollView(
                     padding: const EdgeInsetsDirectional.fromSTEB(TSpace.screen, 6, TSpace.screen, 12),
-                    child: Column(key: _bodyKey, crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (inBody && footer.isNotEmpty) ...[const SizedBox(height: 16), fit]]),
+                    child: _OnResize(onResize: _scheduleCheck, child: Column(key: _bodyKey, crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (inBody && footer.isNotEmpty) ...[const SizedBox(height: 16), fit]])),
                   ),
                 ),
                 if (!inBody && footer.isNotEmpty)
@@ -202,7 +202,7 @@ const double _footerShare = 0.4;
 
 /// Pins the footer of a [TScreen] or [TSheet] or moves it into the body
 /// (see [TScreen]). Checked after each frame in which the screen was built
-/// or the footer changed height.
+/// or the body or the footer changed size.
 mixin _FooterPlacement<T extends StatefulWidget> on State<T> {
   GlobalKey get _footerKey;
 
@@ -326,6 +326,199 @@ class _RenderFooterFit extends RenderProxyBox {
   void visitChildrenForSemantics(RenderObjectVisitor visitor) {
     if (!_hidden) super.visitChildrenForSemantics(visitor);
   }
+}
+
+/// Calls [onResize] after a layout in which its child changed size, so the
+/// footer placement is checked again when the body grows or shrinks without
+/// the screen being rebuilt (a text that changes on its own, a section that
+/// expands).
+class _OnResize extends SingleChildRenderObjectWidget {
+  const _OnResize({required this.onResize, required super.child});
+  final VoidCallback onResize;
+
+  @override
+  _RenderOnResize createRenderObject(BuildContext context) => _RenderOnResize(onResize);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderOnResize renderObject) => renderObject.onResize = onResize;
+}
+
+class _RenderOnResize extends RenderProxyBox {
+  _RenderOnResize(this.onResize);
+  VoidCallback onResize;
+  Size? _last;
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    if (size != _last) {
+      _last = size;
+      onResize();
+    }
+  }
+}
+
+/// [main] with [aside] beside it, laid out exactly like
+/// `Row(children: [Expanded(child: main), SizedBox(width: gap), aside])`
+/// (with [aside] first when [asideFirst]) while [aside] fits: at the default
+/// text size, while the row does not overflow; with larger text, while
+/// [main] keeps room for its longest word. Otherwise (large text on a
+/// narrow phone) they stack in the same order, both at the start, 4 apart,
+/// so nothing is cut off, overflows or breaks inside a word. At the default
+/// text size no row in the generated screens overflows, so nothing moves.
+class _Beside extends MultiChildRenderObjectWidget {
+  _Beside({required Widget main, required Widget aside, this.asideFirst = false, this.gap = 8, this.center = true}) : super(children: asideFirst ? [aside, main] : [main, aside]);
+  final bool asideFirst;
+  final double gap;
+
+  /// Centered across the row like a [Row]; otherwise aligned at the top.
+  final bool center;
+
+  @override
+  _RenderBeside createRenderObject(BuildContext context) => _RenderBeside(asideFirst: asideFirst, gap: gap, center: center, textDirection: Directionality.of(context), largeText: _largeText(context));
+
+  /// Measured at body text size: Android 14 and later enlarge small text
+  /// more than large text and leave 100 px text unscaled.
+  static bool _largeText(BuildContext context) => MediaQuery.textScalerOf(context).scale(14) > 14;
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderBeside renderObject) => renderObject
+    ..asideFirst = asideFirst
+    ..gap = gap
+    ..center = center
+    ..textDirection = Directionality.of(context)
+    ..largeText = _largeText(context);
+}
+
+class _BesideParentData extends ContainerBoxParentData<RenderBox> {}
+
+class _RenderBeside extends RenderBox with ContainerRenderObjectMixin<RenderBox, _BesideParentData>, RenderBoxContainerDefaultsMixin<RenderBox, _BesideParentData> {
+  _RenderBeside({required bool asideFirst, required double gap, required bool center, required TextDirection textDirection, required bool largeText})
+      : _asideFirst = asideFirst,
+        _gap = gap,
+        _center = center,
+        _textDirection = textDirection,
+        _largeText = largeText;
+
+  bool _asideFirst;
+  set asideFirst(bool v) {
+    if (v == _asideFirst) return;
+    _asideFirst = v;
+    markNeedsLayout();
+  }
+
+  double _gap;
+  set gap(double v) {
+    if (v == _gap) return;
+    _gap = v;
+    markNeedsLayout();
+  }
+
+  /// Space between the stacked children.
+  static const double _runGap = 4;
+
+  bool _center;
+  set center(bool v) {
+    if (v == _center) return;
+    _center = v;
+    markNeedsLayout();
+  }
+
+  TextDirection _textDirection;
+  set textDirection(TextDirection v) {
+    if (v == _textDirection) return;
+    _textDirection = v;
+    markNeedsLayout();
+  }
+
+  /// Text is larger than the default size.
+  bool _largeText;
+  set largeText(bool v) {
+    if (v == _largeText) return;
+    _largeText = v;
+    markNeedsLayout();
+  }
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! _BesideParentData) child.parentData = _BesideParentData();
+  }
+
+  RenderBox get _main => _asideFirst ? lastChild! : firstChild!;
+  RenderBox get _aside => _asideFirst ? firstChild! : lastChild!;
+
+  /// Whether [_aside] goes beside [_main] in [width].
+  bool _fits(double width) => !width.isFinite || _aside.getMaxIntrinsicWidth(double.infinity) + _gap + (_largeText ? _main.getMinIntrinsicWidth(double.infinity) : 0) <= width;
+
+  @override
+  double computeMinIntrinsicWidth(double height) {
+    final a = _aside.getMinIntrinsicWidth(double.infinity), m = _main.getMinIntrinsicWidth(double.infinity);
+    return a > m ? a : m;
+  }
+
+  @override
+  double computeMaxIntrinsicWidth(double height) => _main.getMaxIntrinsicWidth(double.infinity) + _gap + _aside.getMaxIntrinsicWidth(double.infinity);
+
+  double _height(double width) {
+    if (_fits(width)) {
+      final a = _aside.getMaxIntrinsicWidth(double.infinity);
+      final mh = _main.getMinIntrinsicHeight(width.isFinite ? (width - _gap - a).clamp(0.0, double.infinity) : double.infinity);
+      final ah = _aside.getMinIntrinsicHeight(double.infinity);
+      return mh > ah ? mh : ah;
+    }
+    return _main.getMinIntrinsicHeight(width) + _runGap + _aside.getMinIntrinsicHeight(width);
+  }
+
+  @override
+  double computeMinIntrinsicHeight(double width) => _height(width);
+
+  @override
+  double computeMaxIntrinsicHeight(double width) => _height(width);
+
+  @override
+  double? computeDistanceToActualBaseline(TextBaseline baseline) => defaultComputeDistanceToHighestActualBaseline(baseline);
+
+  /// Lays both children out with [layout] and returns this box's size and
+  /// the children's offsets (first child, second child).
+  (Size, Offset, Offset) _layout(BoxConstraints constraints, ChildLayouter layout) {
+    final width = constraints.maxWidth;
+    final first = firstChild!, second = lastChild!;
+    if (_fits(width)) {
+      // A Row: the aside at its natural width, the main child takes the rest.
+      final aside = layout(_aside, BoxConstraints(maxHeight: constraints.maxHeight));
+      assert(!width.isFinite || aside.width + _gap <= width + precisionErrorTolerance, 'The item beside the text is wider than the row: ${aside.width} + $_gap > $width.');
+      final rest = width.isFinite ? (width - _gap - aside.width).clamp(0.0, double.infinity) : double.infinity;
+      final main = layout(_main, BoxConstraints(minWidth: rest.isFinite ? rest : 0, maxWidth: rest, maxHeight: constraints.maxHeight));
+      final (f, s) = _asideFirst ? (aside, main) : (main, aside);
+      final size = constraints.constrain(Size(width.isFinite ? width : f.width + _gap + s.width, f.height > s.height ? f.height : s.height));
+      double x(double start, Size child) => _textDirection == TextDirection.ltr ? start : size.width - start - child.width;
+      double y(Size child) => _center ? (size.height - child.height) / 2.0 : 0;
+      return (size, Offset(x(0, f), y(f)), Offset(x(f.width + _gap, s), y(s)));
+    }
+    // Stacked: the main child takes the full width, the aside its natural width.
+    Size lay(RenderBox child) => layout(child, identical(child, _main) ? BoxConstraints.tightFor(width: width) : BoxConstraints(maxWidth: width));
+    final f = lay(first), s = lay(second);
+    final size = constraints.constrain(Size(width, f.height + _runGap + s.height));
+    double x(Size child) => _textDirection == TextDirection.ltr ? 0 : size.width - child.width;
+    return (size, Offset(x(f), 0), Offset(x(s), f.height + _runGap));
+  }
+
+  @override
+  Size computeDryLayout(covariant BoxConstraints constraints) => _layout(constraints, ChildLayoutHelper.dryLayoutChild).$1;
+
+  @override
+  void performLayout() {
+    final (size, first, second) = _layout(constraints, ChildLayoutHelper.layoutChild);
+    this.size = size;
+    (firstChild!.parentData! as _BesideParentData).offset = first;
+    (lastChild!.parentData! as _BesideParentData).offset = second;
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) => defaultPaint(context, offset);
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) => defaultHitTestChildren(result, position: position);
 }
 
 List<Widget> _gap(List<Widget> items, [double gap = TSpace.gap]) {
@@ -1031,13 +1224,7 @@ class _TRadioListState extends State<TRadioList> with _TInput<TRadioList, int> {
                   child: Row(children: [
                     Container(width: 20, height: 20, decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: i == _sel ? TColors.teal : TColors.line, width: i == _sel ? 6 : 2))),
                     const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(widget.items[i].label, style: TText.optionLabel),
-                        if (widget.items[i].sub != null) Text(widget.items[i].sub!, style: TText.sub),
-                      ]),
-                    ),
-                    if (widget.items[i].badge != null) ...[const SizedBox(width: 8), TPill(widget.items[i].badge!)],
+                    Expanded(child: _withBadge(widget.items[i])),
                   ]),
                 ),
               ),
@@ -1045,6 +1232,16 @@ class _TRadioListState extends State<TRadioList> with _TInput<TRadioList, int> {
           ]
         ]),
       );
+}
+
+/// The label and sub text of [item], with its badge beside them (or below
+/// them when it does not fit, see [_Beside]).
+Widget _withBadge(TRadioItem item) {
+  final text = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    Text(item.label, style: TText.optionLabel),
+    if (item.sub != null) Text(item.sub!, style: TText.sub),
+  ]);
+  return item.badge == null ? text : _Beside(main: text, aside: TPill(item.badge!));
 }
 
 class TCheckItem {
@@ -1513,10 +1710,8 @@ class _TSliderFieldState extends State<TSliderField> {
 
   @override
   Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Row(children: [
-          Expanded(child: Text(widget.label, style: TText.label)),
-          Text('${_v.round()}${widget.suffix}', style: TText.titleM.copyWith(fontSize: 22)),
-        ]),
+        // The value goes below the label when it does not fit beside it.
+        _Beside(gap: 0, main: Text(widget.label, style: TText.label), aside: Text('${_v.round()}${widget.suffix}', style: TText.titleM.copyWith(fontSize: 22))),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(activeTrackColor: widget.color, inactiveTrackColor: TColors.line2, thumbColor: widget.color, trackHeight: 6, overlayColor: widget.color.withValues(alpha: 0.12)),
           child: Slider(
@@ -1533,7 +1728,8 @@ class _TSliderFieldState extends State<TSliderField> {
             },
           ),
         ),
-        Row(children: [Text(widget.minLabel ?? '${widget.min.round()}', style: TText.small), const Spacer(), Text(widget.maxLabel ?? '${widget.max.round()}', style: TText.small)]),
+        // The end label wraps to its own line when both do not fit.
+        Wrap(alignment: WrapAlignment.spaceBetween, children: [Text(widget.minLabel ?? '${widget.min.round()}', style: TText.small), Text(widget.maxLabel ?? '${widget.max.round()}', style: TText.small)]),
       ]);
 }
 
@@ -1631,6 +1827,8 @@ class TBanner extends StatelessWidget {
       TBannerKind.info => (const Color(0xFFEAF1EC), TColors.teal, TColors.teal, Icons.info_outline_rounded),
       TBannerKind.urgent => (TColors.error, Colors.white, Colors.white, Icons.priority_high_rounded),
     };
+    final message = Text(text, style: TText.label.copyWith(color: fg, fontWeight: FontWeight.w600, height: 1.4));
+    // The action goes below the message when it does not fit beside it.
     return Semantics(
       liveRegion: kind == TBannerKind.error || kind == TBannerKind.urgent,
       child: Container(
@@ -1639,8 +1837,7 @@ class TBanner extends StatelessWidget {
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Icon(icon, size: 20, color: dot),
           const SizedBox(width: 10),
-          Expanded(child: Text(text, style: TText.label.copyWith(color: fg, fontWeight: FontWeight.w600, height: 1.4))),
-          if (actionLabel != null) TextButton(key: actionKey, onPressed: onAction, child: Text(actionLabel!, style: TText.label.copyWith(color: fg, decoration: TextDecoration.underline))),
+          Expanded(child: actionLabel == null ? message : _Beside(gap: 0, center: false, main: message, aside: TextButton(key: actionKey, onPressed: onAction, child: Text(actionLabel!, style: TText.label.copyWith(color: fg, decoration: TextDecoration.underline))))),
         ]),
       ),
     );
@@ -1753,6 +1950,15 @@ class TListRow extends StatelessWidget {
   final bool first;
   @override
   Widget build(BuildContext context) {
+    final text = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(label, style: TText.optionLabel.copyWith(color: danger ? TColors.error : null)),
+      if (sub != null) Text(sub!, style: TText.sub),
+    ]);
+    // The value and pill go below the label when they do not fit beside it.
+    final aside = [
+      if (value != null) Text(value!, style: TText.sub.copyWith(color: TColors.teal, fontWeight: FontWeight.w700)),
+      if (pill != null) TPill(pill!),
+    ];
     final row = Container(
       constraints: const BoxConstraints(minHeight: 58),
       padding: const EdgeInsets.symmetric(vertical: 9),
@@ -1760,14 +1966,7 @@ class TListRow extends StatelessWidget {
         if (lead?.program != null) ...[TProgramBadge(lead!.program!), const SizedBox(width: 12)],
         if (lead?.avatar != null) ...[TAvatar(lead!.avatar!), const SizedBox(width: 12)],
         if (lead?.icon != null) ...[TAvatar(lead!.icon!, icon: true), const SizedBox(width: 12)],
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(label, style: TText.optionLabel.copyWith(color: danger ? TColors.error : null)),
-            if (sub != null) Text(sub!, style: TText.sub),
-          ]),
-        ),
-        if (value != null) ...[const SizedBox(width: 8), Text(value!, style: TText.sub.copyWith(color: TColors.teal, fontWeight: FontWeight.w700))],
-        if (pill != null) ...[const SizedBox(width: 8), TPill(pill!)],
+        Expanded(child: aside.isEmpty ? text : _Beside(main: text, aside: aside.length == 1 ? aside.single : Row(mainAxisSize: MainAxisSize.min, children: [aside.first, const SizedBox(width: 8), aside.last]))),
         if (onTap != null) ...[const SizedBox(width: 4), const Icon(Icons.chevron_right_rounded, size: 26, color: TColors.muted)],
       ]),
     );
@@ -1950,15 +2149,18 @@ class _ChartCard extends StatelessWidget {
   final VoidCallback? onTap;
   final Widget chart;
   @override
-  Widget build(BuildContext context) => TCard(onTap: onTap, children: [
-        Row(children: [
-          if (tag != null) ...[TProgramTag(program: tag!), const SizedBox(width: 8)],
-          Expanded(child: Text(title ?? '', style: TText.label)),
-          if (unit != null) Flexible(child: Text(unit!, textAlign: TextAlign.end, style: TText.sub)),
-        ]),
-        chart,
-        if (caption != null) Text(caption!, style: TText.cardText),
-      ]);
+  Widget build(BuildContext context) {
+    final titleRow = Row(children: [
+      Expanded(child: Text(title ?? '', style: TText.label)),
+      if (unit != null) Flexible(child: Text(unit!, textAlign: TextAlign.end, style: TText.sub)),
+    ]);
+    return TCard(onTap: onTap, children: [
+      // The program tag goes above the title when both do not fit.
+      if (tag == null) titleRow else _Beside(asideFirst: true, aside: TProgramTag(program: tag!), main: titleRow),
+      chart,
+      if (caption != null) Text(caption!, style: TText.cardText),
+    ]);
+  }
 }
 
 class TBarChart extends StatelessWidget {

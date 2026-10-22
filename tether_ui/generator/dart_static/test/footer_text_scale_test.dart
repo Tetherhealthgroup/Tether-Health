@@ -1,15 +1,18 @@
 // Large text and the footer. Every screen and state on a 375×667 phone
-// (iPhone SE) at 100%, 200% and 310% text (310% is about the largest iOS
-// accessibility size). For each one:
-//   - no layout overflow or other exception (see _knownOverflow);
+// (iPhone SE) and a 320×568 one (iPhone SE, first generation) at 100%, 200%
+// and 310% text (310% is about the largest iOS accessibility size). For
+// each one:
+//   - no layout overflow or other error (see _knownOverflow);
 //   - every body text lies inside the scrolling body, can be scrolled into
 //     view and never touches the footer; a text that would fit on screen
 //     below the header is shown whole, so a pinned footer never hides part
 //     of it;
-//   - the footer's first action can be scrolled to and receives taps;
+//   - the footer's first action can be scrolled to and receives taps, and
+//     once the footer is in the body it is read after the body text;
 //   - at 100% the footer stays pinned below the body, as designed.
-// Two kit tests check when TScreen and TSheet move a tall footer into the
-// body and pin it again.
+// Kit tests check when TScreen and TSheet move a tall footer into the body
+// and pin it again: at 40% of the room, and when the body grows or shrinks
+// without a rebuild.
 // Text is measured with Roboto from the Flutter SDK (on the kit's font
 // fallback list) because the test font draws every glyph 1 em wide, about
 // twice as wide as real text, which would wrap far more than on a phone.
@@ -23,34 +26,71 @@ import 'package:tether_ui/router/app_router.dart';
 import 'package:tether_ui/ui/ui.dart';
 
 const _screen = Size(375, 667);
+const _small = Size(320, 568);
 
-/// Screens with a component that is still too wide at 310% text, unrelated
-/// to the footer and needing its own fix. Listed screens must still
-/// overflow, so a fix forces this list to shrink; every other check still
-/// runs on them.
-const _knownOverflow = <String, String>{
-  'rescue_tools': 'TRadioList option badge "Helped before"',
-  'bf_path': 'TRadioList option badge "Recommended"',
-  'bf_slip': 'TRadioList option badge "Recommended"',
-  'sf_slip': 'TRadioList option badge "Recommended"',
-  'progress': 'chart card title row with a program tag',
-};
+/// Layout errors at 310% text on 375×667 that are unrelated to the footer
+/// and need their own fix: screen → one entry per expected error, each a
+/// part of that error's text (its widget chain, such as
+/// 'AnimatedContainer'). Every listed error must still occur and no other
+/// error may, so a fix forces the list to shrink and a new error is never
+/// hidden behind a listed one. Every other check still runs on them.
+const _knownOverflow = <String, List<String>>{};
 
-Future<void> _pump(WidgetTester tester, String route, double scale) async {
-  tester.view.physicalSize = _screen * 2;
+/// The errors in [errors] not matched one-to-one by [known], and each
+/// entry of [known] that matched none.
+List<String> _unexpectedErrors(List<FlutterErrorDetails> errors, List<String> known) {
+  final left = [...known];
+  final out = <String>[];
+  for (final e in errors) {
+    final text = e.toString();
+    final i = left.indexWhere(text.contains);
+    if (i < 0) {
+      out.add(e.exceptionAsString().split('\n').first);
+    } else {
+      left.removeAt(i);
+    }
+  }
+  return [...out, for (final k in left) 'listed error no longer occurs: $k'];
+}
+
+/// Pumps [route] and returns every error reported while laying it out.
+Future<List<FlutterErrorDetails>> _pump(WidgetTester tester, String route, double scale, {Size screen = _screen}) async {
+  tester.view.physicalSize = screen * 2;
   tester.view.devicePixelRatio = 2;
   addTearDown(tester.view.reset);
   final builder = AppRouter.screens[route]!;
   final sheet = AppRouter.sheets.contains(route);
-  await tester.pumpWidget(MaterialApp(
-    theme: tetherTheme(),
-    onGenerateRoute: AppRouter.onGenerateRoute,
-    builder: (c, child) => MediaQuery(data: MediaQuery.of(c).copyWith(textScaler: TextScaler.linear(scale)), child: child!),
-    home: Builder(builder: (c) => sheet ? TSheetPreview(child: builder(c)) : builder(c)),
-  ));
-  await tester.pump(const Duration(milliseconds: 50));
-  await tester.pump();
+  final errors = <FlutterErrorDetails>[];
+  final report = FlutterError.onError;
+  FlutterError.onError = errors.add;
+  try {
+    await tester.pumpWidget(MaterialApp(
+      theme: tetherTheme(),
+      onGenerateRoute: AppRouter.onGenerateRoute,
+      builder: (c, child) => MediaQuery(data: MediaQuery.of(c).copyWith(textScaler: TextScaler.linear(scale)), child: child!),
+      home: Builder(builder: (c) => sheet ? TSheetPreview(child: builder(c)) : builder(c)),
+    ));
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump();
+  } finally {
+    FlutterError.onError = report;
+  }
+  return errors;
 }
+
+/// Semantics nodes in the order a screen reader reads them.
+List<SemanticsNode> _readingOrder(WidgetTester tester) {
+  final out = <SemanticsNode>[];
+  void visit(SemanticsNode n) {
+    out.add(n);
+    n.debugListChildrenInOrder(DebugSemanticsDumpOrder.traversalOrder).forEach(visit);
+  }
+
+  visit(tester.binding.renderViews.first.owner!.semanticsOwner!.rootSemanticsNode!);
+  return out;
+}
+
+List<String> _labels(WidgetTester tester) => [for (final n in _readingOrder(tester)) if (n.label.isNotEmpty) n.label];
 
 Rect _rect(RenderBox box) => MatrixUtils.transformRect(box.getTransformTo(null), Offset.zero & box.size);
 
@@ -128,6 +168,7 @@ void main() {
   ];
 
   testWidgets('TScreen footer moves into the body only while it is too tall to pin', (tester) async {
+    final semantics = tester.ensureSemantics();
     final (scale, keyboard) = await _pumpKit(tester, TScreen(header: const THeader(title: 'Title'), children: const [TBody('Body text')], footer: footer));
     await _settle(tester);
     expect(_footerInBody(tester), isFalse, reason: '100%: pinned');
@@ -138,6 +179,8 @@ void main() {
     await _settle(tester);
     expect(_footerInBody(tester), isTrue, reason: '310%: too tall, scrolls with the body');
     expect(find.byKey(const ValueKey('a:footer[0]')).hitTestable(), findsOneWidget);
+    expect(_labels(tester), containsAllInOrder(['Body text', 'Save and continue', 'Not now']), reason: 'the footer is read after the body');
+    semantics.dispose();
     // The keyboard is up: the footer stays in the body even though it fits.
     keyboard.value = 300;
     scale.value = 1.0;
@@ -153,28 +196,86 @@ void main() {
   });
 
   testWidgets('TSheet footer moves into the body only while it is too tall to pin', (tester) async {
+    final semantics = tester.ensureSemantics();
     final (scale, _) = await _pumpKit(tester, TSheet(children: const [TBody('Body text')], footer: footer), sheet: true);
     await _settle(tester);
     expect(_footerInBody(tester), isFalse, reason: '100%: pinned');
     scale.value = 3.1;
     await _settle(tester);
     expect(_footerInBody(tester), isTrue, reason: '310%: too tall, scrolls with the body');
+    expect(_labels(tester), containsAllInOrder(['Body text', 'Save and continue', 'Not now']), reason: 'the footer is read after the body');
+    semantics.dispose();
     scale.value = 1.0;
     await _settle(tester);
     expect(_footerInBody(tester), isFalse, reason: 'pinned again');
   });
 
+  testWidgets('a pinned footer takes at most 40% of the room', (tester) async {
+    // No header: the room is the whole 667 px screen, the pinned footer's
+    // padding is 22, so a footer up to 244.8 px stays pinned.
+    final height = ValueNotifier(243.0);
+    addTearDown(height.dispose);
+    await _pumpKit(tester, TScreen(children: const [TBody('Body text')], footer: [ValueListenableBuilder(valueListenable: height, builder: (_, h, __) => SizedBox(height: h))]));
+    await _settle(tester);
+    expect(_footerInBody(tester), isFalse, reason: '265 of 667 px: pinned');
+    height.value = 247;
+    await _settle(tester);
+    expect(_footerInBody(tester), isTrue, reason: '269 of 667 px: more than 40%');
+    height.value = 243;
+    await _settle(tester);
+    expect(_footerInBody(tester), isFalse, reason: 'pinned again');
+  });
+
+  testWidgets('a sheet footer takes at most 40% of the room', (tester) async {
+    // The room is 86% of 667 px less the 20 px handle: 553.6 px; the pinned
+    // footer's padding is 20, so a footer up to 201.4 px stays pinned.
+    final height = ValueNotifier(200.0);
+    addTearDown(height.dispose);
+    await _pumpKit(tester, TSheet(children: const [TBody('Body text')], footer: [ValueListenableBuilder(valueListenable: height, builder: (_, h, __) => SizedBox(height: h))]), sheet: true);
+    await _settle(tester);
+    expect(_footerInBody(tester), isFalse, reason: '220 of 553.6 px: pinned');
+    height.value = 203;
+    await _settle(tester);
+    expect(_footerInBody(tester), isTrue, reason: '223 of 553.6 px: more than 40%');
+  });
+
+  for (final sheet in [false, true]) {
+    testWidgets('${sheet ? 'TSheet' : 'TScreen'} footer placement follows a body that grows without a rebuild', (tester) async {
+      final words = ValueNotifier(3);
+      addTearDown(words.dispose);
+      final children = [ValueListenableBuilder(valueListenable: words, builder: (_, n, __) => TBody(List.filled(n, 'word').join(' ')))];
+      await _pumpKit(tester, sheet ? TSheet(children: children, footer: footer) : TScreen(header: const THeader(title: 'Title'), children: children, footer: footer), sheet: sheet);
+      await _settle(tester);
+      expect(_footerInBody(tester), isFalse, reason: 'short body: pinned');
+      // A paragraph taller than the room above the pinned footer.
+      words.value = 600;
+      await _settle(tester);
+      expect(_footerInBody(tester), isTrue, reason: 'a paragraph too tall to show whole above the footer');
+      words.value = 3;
+      await _settle(tester);
+      expect(_footerInBody(tester), isFalse, reason: 'pinned again once the paragraph is short');
+    });
+  }
+
+  test('a listed layout error matches only itself', () {
+    FlutterErrorDetails overflow(String chain) => FlutterErrorDetails(exception: FlutterError('A RenderFlex overflowed by 9 pixels on the right.'), informationCollector: () => [ErrorDescription(chain)]);
+    final radio = overflow('Row ← Padding ← AnimatedContainer'), chart = overflow('Row ← Column ← Expanded ← Row ← TDark');
+    expect(_unexpectedErrors([radio], ['AnimatedContainer']), isEmpty);
+    expect(_unexpectedErrors([radio, chart], ['AnimatedContainer']), hasLength(1), reason: 'a second, new error is reported');
+    expect(_unexpectedErrors([chart], ['AnimatedContainer']), hasLength(2), reason: 'a different error is not the listed one');
+    expect(_unexpectedErrors([radio], ['AnimatedContainer', 'AnimatedContainer']), ['listed error no longer occurs: AnimatedContainer']);
+    expect(_unexpectedErrors([], []), isEmpty);
+  });
+
+  for (final screen in [_screen, _small]) {
   for (final scale in [1.0, 2.0, 3.1]) {
-    group('text ${(scale * 100).round()}% on 375×667', () {
+    group('text ${(scale * 100).round()}% on ${screen.width.round()}×${screen.height.round()}', () {
       for (final s in AppRouter.catalog) {
         testWidgets('${s.$1} body clear of footer', (tester) async {
-          await _pump(tester, s.$4, scale);
-          final known = scale > 3 ? _knownOverflow[s.$1] : null;
-          if (known == null) {
-            expect(tester.takeException(), isNull, reason: 'exception on first layout');
-          } else {
-            expect('${tester.takeException()}', contains('overflowed'), reason: 'fixed? remove ${s.$1} from _knownOverflow ($known)');
-          }
+          final errors = await _pump(tester, s.$4, scale, screen: screen);
+          final known = scale > 3 && screen == _screen ? _knownOverflow[s.$1] ?? const <String>[] : const <String>[];
+          expect(_unexpectedErrors(errors, known), isEmpty, reason: 'errors on first layout of ${s.$1}');
+          expect(tester.takeException(), isNull, reason: 'exception on first layout');
 
           final scrollEl = _bodyScrollable(tester);
           final state = (scrollEl as StatefulElement).state as ScrollableState;
@@ -255,13 +356,30 @@ void main() {
               await tester.ensureVisible(primary);
               await tester.pump();
               final r = tester.getRect(primary);
-              expect(r.top >= -0.5 && r.bottom <= _screen.height + 0.5, isTrue, reason: 'footer action off screen: $r');
+              expect(r.top >= -0.5 && r.bottom <= screen.height + 0.5, isTrue, reason: 'footer action off screen: $r');
               expect(primary.hitTestable(), findsOneWidget, reason: 'footer action does not receive taps');
+              // In the body, the footer is read after the body text.
+              if (footerScrolls) {
+                final semantics = tester.ensureSemantics();
+                await tester.pump();
+                final order = _readingOrder(tester);
+                // The node of the action's label (its last text; an icon
+                // letter before it may be excluded).
+                final labelText = find.descendant(of: primary, matching: find.byType(Text)).last;
+                final action = tester.getSemantics(labelText);
+                expect(action.label, contains(tester.widget<Text>(labelText).data ?? ''), reason: 'footer action has no semantics node of its own');
+                if (texts.isNotEmpty) {
+                  final last = tester.getSemantics(find.byElementPredicate((e) => identical(e, texts.last)));
+                  expect(order.indexOf(action), greaterThan(order.indexOf(last)), reason: 'footer action read before the body text ${label(texts.last)}');
+                }
+                semantics.dispose();
+              }
             }
           }
           expect(tester.takeException(), isNull);
         });
       }
     });
+  }
   }
 }
