@@ -761,7 +761,6 @@ records_error,Connection problem,Choose another source,replace,records_add,repla
 records_error,Connection problem,Enter manually instead,replace,records_manual,replace → records_manual
 records_source,Source details,Back,back,,back
 records_source,Source details,Sync now,submit,,POST /v1/records/fhir/sources/:id/sync then toast “Synced · 2 new results”
-records_source,Source details,What we read,push,records_consent,push → records_consent
 records_source,Source details,Disconnect,sheet,records_disconnect,sheet → records_disconnect
 records_disconnect,Disconnect source,Disconnect source,submit,records_hub,DELETE /v1/records/fhir/sources/:id then toast “Disconnected” then popto → records_hub
 records_disconnect,Disconnect source,Cancel,close,,close

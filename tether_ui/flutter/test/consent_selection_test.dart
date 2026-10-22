@@ -8,6 +8,13 @@
 // records_review each item's keep/skip choice reaches the accept call under
 // its programme's key, and only kept items are in it.
 //
+// An item marked "Not requested" (Clinical notes, Steps and sleep) is a
+// read-only row outside the checklist: it is never a choice, never counts for
+// the rule and is never sent. records_source lists the categories it reads
+// read-only under "What we read" instead of opening the unticked consent
+// checklist. The "chosen" rule inputs in lib/logic/rules.dart equal
+// spec/rules.json (CHOSEN_RULES in the generator).
+//
 // The payload checks read the submitting screen's own session keys at the
 // moment of the submit, which is what the app's endpoint registry hands its
 // handler (lib/integration/registry.dart: the keys under "<screenId>.").
@@ -29,9 +36,9 @@ const _conflictNone = 'Choose an option for at least one item.';
 /// Each pinned control: screen → (key, control type, item or option labels).
 const _controls = <String, List<(String, String, List<String>)>>{
   'support_add_person': [('which_programs', 'chips', ['BreatheFree', 'ScrollFree'])],
-  'records_consent': [('resources', 'checklist', ['Conditions', 'Vital signs', 'Lab results', 'Medications', 'Immunizations', 'Smoking status', 'Clinical notes'])],
-  'records_consent_bb': [('resources', 'checklist', ['Conditions', 'Vital signs', 'Lab results', 'Medications', 'Immunizations', 'Smoking status', 'Clinical notes'])],
-  'records_consent_device': [('data_types', 'checklist', ['Blood pressure', 'Blood glucose', 'Clinical records (iPhone)', 'Steps and sleep'])],
+  'records_consent': [('resources', 'checklist', ['Conditions', 'Vital signs', 'Lab results', 'Medications', 'Immunizations', 'Smoking status'])],
+  'records_consent_bb': [('resources', 'checklist', ['Conditions', 'Vital signs', 'Lab results', 'Medications', 'Immunizations', 'Smoking status'])],
+  'records_consent_device': [('data_types', 'checklist', ['Blood pressure', 'Blood glucose', 'Clinical records (iPhone)'])],
   'records_review': [
     ('keep_hw', 'checklist', ['12 blood pressure readings', 'Lipid panel']),
     ('keep_st', 'checklist', ['A1C 7.6%']),
@@ -43,6 +50,13 @@ const _controls = <String, List<(String, String, List<String>)>>{
     ('a1c', 'radio', ['From Patel Family Medicine (Epic): 7.6%', 'Entered by you: 7.4%', 'Keep both']),
     ('bp', 'radio', ['Discard', 'Keep as 129/80', 'Ask my care team']),
   ],
+};
+
+/// Items marked "Not requested", shown as read-only rows: screen → labels.
+const _notRequested = <String, List<String>>{
+  'records_consent': ['Clinical notes'],
+  'records_consent_bb': ['Clinical notes'],
+  'records_consent_device': ['Steps and sleep'],
 };
 
 /// Each screen's primary action: screen → (element label, rule, message,
@@ -221,6 +235,59 @@ void main() {
         expect(r['outcomes'], {'chosen': 'Chosen', 'none': 'Nothing chosen'}, reason: rule);
       }
     });
+
+    test('TRules.chosenInputs equals every chosen rule in rules.json (no hand-copy drift)', () {
+      final rules = jsonDecode(File('../spec/rules.json').readAsStringSync()) as Map<String, dynamic>;
+      final spec = {
+        for (final MapEntry(:key, :value) in rules.entries)
+          if ((value as Map<String, dynamic>)['outcomes'] case {'chosen': 'Chosen', 'none': 'Nothing chosen'}) key: (value['inputs'] as List).cast<String>(),
+      };
+      expect(spec.keys, unorderedEquals([for (final (_, rule, _, _) in _gates.values) rule]));
+      expect(TRules.chosenInputs, spec);
+      for (final MapEntry(key: rule, value: keys) in spec.entries) {
+        expect(TRules.decide(rule, const {}), 'Nothing chosen', reason: rule);
+        for (final k in keys) {
+          expect(TRules.decide(rule, {k: ['x']}), 'Chosen', reason: '$rule: $k');
+        }
+      }
+    });
+
+    for (final MapEntry(key: screen, value: labels) in _notRequested.entries) {
+      test('$screen: ${labels.join(', ')} is a read-only row, not a choice', () {
+        final spec = _spec(screen);
+        final nodes = [..._nodes([spec['body'], spec['footer']])];
+        final choices = {
+          for (final n in nodes)
+            if (n['t'] == 'checklist' || n['t'] == 'radio') ...(n['items'] as List).map((i) => (i as Map)['label']),
+          for (final n in nodes)
+            if (n['t'] == 'chips') ...(n['options'] as List),
+        };
+        for (final label in labels) {
+          expect(choices, isNot(contains(label)), reason: '$screen: "$label" is selectable');
+          final rows = [
+            for (final n in nodes)
+              if (n['t'] == 'list') ...(n['rows'] as List).cast<Map<String, dynamic>>().where((r) => r['label'] == label),
+          ];
+          expect(rows, hasLength(1), reason: '$screen: "$label" row');
+          expect(rows.single['sub'], 'Not requested');
+          expect(rows.single['action'], isNull, reason: '$screen: "$label" does nothing when tapped');
+        }
+      });
+    }
+
+    test('records_source: "What we read" lists the categories read-only and opens no consent checklist', () {
+      final spec = _spec('records_source');
+      final actions = (spec['actions'] as List).cast<Map<String, dynamic>>();
+      expect(actions.map((a) => a['element']), isNot(contains('What we read')));
+      expect(jsonEncode(actions), isNot(contains('records_consent')), reason: 'no action opens a consent checklist');
+      final lists = [for (final n in _nodes(spec['body'])) if (n['t'] == 'list' && n['title'] == 'What we read') n];
+      expect(lists, hasLength(1));
+      final rows = (lists.single['rows'] as List).cast<Map<String, dynamic>>();
+      expect(rows.where((r) => r['action'] != null), isEmpty, reason: 'read-only rows');
+      expect(rows.map((r) => r['label']), _controls['records_consent']!.single.$3, reason: 'the categories the consent screens offer');
+      final access = [for (final n in _nodes(spec['body'])) if (n['t'] == 'kv') ...(n['rows'] as List).where((r) => (r as List).first == 'Access')];
+      expect(access.single, ['Access', 'Read-only · ${rows.length} categories']);
+    });
   });
 
   group('rules', () {
@@ -286,6 +353,36 @@ void main() {
         await _drain(tester);
       });
     }
+
+    for (final MapEntry(key: screen, value: labels) in _notRequested.entries) {
+      testWidgets('$screen: tapping ${labels.join(', ')} selects nothing and sends nothing', (tester) async {
+        final key = screen == 'records_consent_device' ? '$screen.data_types' : '$screen.resources';
+        await _open(tester, screen);
+        for (final label in labels) {
+          await _tapText(tester, label);
+        }
+        expect(_selected(TSession.values[key]), isFalse, reason: key);
+        expect(find.byIcon(Icons.check_rounded), findsNothing);
+        await _tapPrimary(tester);
+        expect(find.text(_gates[screen]!.$3), findsOneWidget, reason: 'still nothing chosen');
+        expect(device.asked, isEmpty);
+        expect(api.calls, isEmpty);
+        await _drain(tester);
+      });
+    }
+
+    testWidgets('records_source: "What we read" shows the categories and goes nowhere', (tester) async {
+      await _open(tester, 'records_source');
+      for (final label in _controls['records_consent']!.single.$3) {
+        expect(find.text(label), findsOneWidget, reason: label);
+      }
+      await _tapText(tester, 'WHAT WE READ');
+      await _tapText(tester, 'Lab results');
+      expect(find.text('Disconnect'), findsOneWidget, reason: 'stays on records_source');
+      expect(find.text('What Tether will read'), findsNothing, reason: 'no consent checklist opened');
+      expect(api.calls, isEmpty);
+      await _drain(tester);
+    });
 
     testWidgets('records_review: only kept items reach POST /v1/records/fhir/accept', (tester) async {
       await _open(tester, 'records_review');

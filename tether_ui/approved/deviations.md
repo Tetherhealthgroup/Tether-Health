@@ -408,8 +408,32 @@ Draft wording, all needing clinical/legal copy review (kept together in
 | `records_conflict` | `body[0].children[0]` radio `a1c`, `body[1].children[0]` radio `bp` | `selected` 0 and 1 → -1 (no option chosen). |
 | `records_conflict` | `footer[0]` "Save choices" | the `POST /v1/records/fhir/conflicts` submit is wrapped in a `rec.conflict` branch. |
 
-`records_source` "What we read" still opens `records_consent`, which now
-shows no category ticked rather than the connected source's categories.
+`records_source` "What we read" opened `records_consent`, which then showed
+no category ticked rather than the connected source's categories; TH-1008d
+(below) replaces it.
+
+## As P-78: "Not requested" items and "What we read" (TH-1008d)
+
+An item marked "Not requested" could be ticked: it counted as a selection
+for the screen's "chosen" rule and was sent with the selection. It is now a
+read-only list row (the kit's list row with no action) right below the
+checklist, so it cannot be ticked, never counts for the rule and is never
+sent. `validate.py` fails any selectable item (checklist, radio, chip or
+selection tile) labelled or marked "Not requested".
+
+`records_source` no longer opens the consent checklist from "What we read":
+that checklist starts unticked (P-78) and under-reported what the source
+reads. The screen lists the six categories the source reads as read-only
+rows under "What we read", matching its "Read-only · 6 categories". They are
+the consent checklist's categories and subtitles, from one list in
+`generator/screens_records.py`. No new wording.
+
+| Screen | Node | Change |
+|---|---|---|
+| `records_consent` | `body[2]` checklist "What Tether will read" (key `resources`), new `body[3]` | "Clinical notes" ("Not requested") leaves the checklist and becomes a flat read-only list row at `body[3]`; the card moves to `body[4]`. |
+| `records_consent_bb` | `body[2]` checklist, new `body[3]` | as `records_consent`. |
+| `records_consent_device` | `body[2]` checklist "What Tether will ask for" (key `data_types`), new `body[3]` | "Steps and sleep" ("Not requested") leaves the checklist and becomes a flat read-only list row at `body[3]`. |
+| `records_source` | `body[1]` list, new `body[2]` | the "What we read" row (push to `records_consent`) is removed; a new list titled "What we read" shows Conditions, Vital signs, Lab results, Medications, Immunizations and Smoking status as rows with no action. |
 
 ## Rendering changes with no spec change (TH-907)
 

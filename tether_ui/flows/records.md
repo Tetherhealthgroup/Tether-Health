@@ -49,7 +49,6 @@ flowchart LR
   records_review -->|"Add selected items to my pro"| records_hub
   records_error -->|"Choose another source"| records_add
   records_error -->|"Enter manually instead"| records_manual
-  records_source -->|"What we read"| records_consent
   records_source -->|"Disconnect"| records_disconnect
   records_disconnect -->|"Disconnect source"| records_hub
   records_manual -->|"Save"| records_hub
@@ -145,7 +144,6 @@ flowchart LR
 | Connection problem | Enter manually instead | `replace → records_manual` |
 | Source details | Back | `back` |
 | Source details | Sync now | `POST /v1/records/fhir/sources/:id/sync then toast “Synced · 2 new results”` |
-| Source details | What we read | `push → records_consent` |
 | Source details | Disconnect | `sheet → records_disconnect` |
 | Disconnect source | Disconnect source | `DELETE /v1/records/fhir/sources/:id then toast “Disconnected” then popto → records_hub` |
 | Disconnect source | Cancel | `close` |

@@ -24,7 +24,8 @@ class RecordsConsentBbScreen extends StatelessWidget {
       children: [
         TTitle('Connect Medicare?'),
         TKeyValue(rows: [('Source', 'CMS Blue Button 2.0 · FHIR R4 (claims)'), ('Access', 'Read-only'), ('Refresh', 'Daily while connected'), ('Stop', 'Disconnect anytime')]),
-        TChecklist(fieldKey: 'records_consent_bb.resources', items: [TCheckItem('Conditions', sub: 'Condition'), TCheckItem('Vital signs', sub: 'Observation · blood pressure, weight'), TCheckItem('Lab results', sub: 'Observation · A1C, lipids, eGFR'), TCheckItem('Medications', sub: 'MedicationRequest'), TCheckItem('Immunizations', sub: 'Immunization'), TCheckItem('Smoking status', sub: 'Observation · LOINC 72166-2'), TCheckItem('Clinical notes', sub: 'Not requested')], label: 'What Tether will read'),
+        TChecklist(fieldKey: 'records_consent_bb.resources', items: [TCheckItem('Conditions', sub: 'Condition'), TCheckItem('Vital signs', sub: 'Observation · blood pressure, weight'), TCheckItem('Lab results', sub: 'Observation · A1C, lipids, eGFR'), TCheckItem('Medications', sub: 'MedicationRequest'), TCheckItem('Immunizations', sub: 'Immunization'), TCheckItem('Smoking status', sub: 'Observation · LOINC 72166-2')], label: 'What Tether will read'),
+        TListGroup(flat: true, rows: [TListRow(label: 'Clinical notes', sub: 'Not requested')]),
         TCard(variant: TCardVariant.mint, title: 'Only the programs you joined get data', text: 'Heartwise ← blood pressure, lipids · Steady ← A1C, glucose · Renew ← eGFR · Checkup ← immunizations · BreatheFree ← smoking status. Ease and ScrollFree get nothing.'),
       ],
       footer: [

@@ -7942,17 +7942,6 @@
   {
     "screen": "records_source",
     "screen_name": "Source details",
-    "element": "What we read",
-    "path": "body[1].rows[1]",
-    "type": "push",
-    "targets": [
-      "records_consent"
-    ],
-    "summary": "push → records_consent"
-  },
-  {
-    "screen": "records_source",
-    "screen_name": "Source details",
     "element": "Disconnect",
     "path": "footer[0]",
     "type": "sheet",
