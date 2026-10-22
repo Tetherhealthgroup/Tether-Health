@@ -149,6 +149,8 @@ const forbiddenPackages = <String>[
 /// "review pending" is only acceptable while the package is absent.
 const allowedRuntimePackages = <String, String>{
   'flutter': 'The Flutter SDK itself.',
+  'flutter_localizations':
+      'Flutter SDK translations for Material/Cupertino widgets; no network.',
   'flutter_secure_storage':
       'Keeps the session token in the Keychain / Android Keystore, not in '
           'shared preferences.',
@@ -160,6 +162,9 @@ const allowedRuntimePackages = <String, String>{
   'image_picker':
       'Picks a profile avatar from the camera or photo library; on-device '
           'only, the upload goes to our own Supabase storage.',
+  'intl':
+      'Date/number/plural formatting; required by flutter_localizations and '
+          'by generated localization code. Pure Dart, no network.',
   'supabase_flutter':
       'Our Supabase project (vendor/processor; BAA/DPA status to confirm).',
   'tether_ui':

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../auth/account_controller.dart';
+import '../l10n/app_locale.dart';
 import '../models/screen_spec.dart';
 import '../models/tap_target.dart';
 import '../quit_plan/quit_plan.dart';
@@ -64,6 +65,7 @@ class ApprovedScreenPlayer extends StatefulWidget {
     this.onSessionReset,
     this.onOpenPrograms,
     this.onAccountDataDeleted,
+    this.appLocale,
     super.key,
   });
 
@@ -78,6 +80,9 @@ class ApprovedScreenPlayer extends StatefulWidget {
   final VoidCallback? onOpenPrograms;
   final Future<void> Function(String accountId)? onAccountDataDeleted;
 
+  /// The app language. When null the player keeps the choice in memory only.
+  final AppLocale? appLocale;
+
   @override
   State<ApprovedScreenPlayer> createState() => _ApprovedScreenPlayerState();
 }
@@ -87,8 +92,11 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   late final bool _ownsAccountController;
   late final QuitPlanController _quitPlanController;
   late final bool _ownsQuitPlanController;
+  late final AppLocale _appLocale;
+  late final bool _ownsAppLocale;
   bool _showHotspots = false;
-  WelcomeLanguage _language = WelcomeLanguage.english;
+  WelcomeLanguage get _language =>
+      _appLocale.isSpanish ? WelcomeLanguage.spanish : WelcomeLanguage.english;
   bool _helpfulReminders = true;
   bool _shareWithCareTeam = false;
   bool _helpImproveBreatheFree = false;
@@ -179,13 +187,22 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     _ownsQuitPlanController = widget.quitPlanController == null;
     _quitPlanController =
         widget.quitPlanController ?? QuitPlanController.disabled();
+    _ownsAppLocale = widget.appLocale == null;
+    _appLocale = widget.appLocale ?? AppLocale(store: MemoryAppLocaleStore());
+    _appLocale.addListener(_onLocaleChanged);
     final restoredPlan = _quitPlanController.plan;
     if (restoredPlan != null) _applyQuitPlan(restoredPlan);
     _configureSystemUi();
   }
 
+  void _onLocaleChanged() {
+    if (mounted) setState(() {});
+  }
+
   @override
   void dispose() {
+    _appLocale.removeListener(_onLocaleChanged);
+    if (_ownsAppLocale) _appLocale.dispose();
     if (_ownsAccountController) _accountController.dispose();
     if (_ownsQuitPlanController) _quitPlanController.dispose();
     super.dispose();
@@ -727,6 +744,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
         } catch (error) {
           cleanupError ??= error;
         }
+        await _appLocale.clearSavedChoice();
         if (cleanupError != null) throw cleanupError;
       },
     );
@@ -827,7 +845,11 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             return WelcomeScreen(
               language: _language,
               onLanguageSelected: (language) {
-                setState(() => _language = language);
+                unawaited(_appLocale.choose(
+                  language == WelcomeLanguage.spanish
+                      ? const Locale('es')
+                      : const Locale('en'),
+                ));
               },
               onGetStarted: widget.onNext,
               onSignIn: _showSignIn,

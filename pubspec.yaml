@@ -9,12 +9,18 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # Flutter SDK translations for Material and Cupertino widgets.
+  flutter_localizations:
+    sdk: flutter
   flutter_secure_storage: ^11.2.0
   # Vendored from 4.2.5 with upstream SwiftPM and Built-in Kotlin fixes.
   flutter_tts:
     path: third_party/flutter_tts
   http: ^1.6.0
   image_picker: ^1.2.0
+  # Exactly the version flutter_localizations resolves on the pinned Flutter
+  # SDK; generated localization code (lib/l10n/) imports it.
+  intl: 0.20.3
   supabase_flutter: ^2.17.2
   # First-party UI package in this repository (generated screens and kit).
   tether_ui:
@@ -31,6 +37,8 @@ dev_dependencies:
   pigeon: ^28.1.0
 
 flutter:
+  # Runs gen-l10n (l10n.yaml) on pub get and build.
+  generate: true
   uses-material-design: true
   assets:
     - assets/screens/

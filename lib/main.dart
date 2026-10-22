@@ -18,6 +18,8 @@ import 'auth/password_recovery_screen.dart';
 import 'config/app_config.dart';
 import 'config/misconfigured_build_app.dart';
 import 'error/privacy_safe_error_reporter.dart';
+import 'l10n/app_locale.dart';
+import 'l10n/app_localizations.dart';
 import 'models/screen_spec.dart';
 import 'models/tap_target.dart';
 import 'profile/profile_api_client.dart';
@@ -116,12 +118,17 @@ Future<void> _bootstrap() async {
     programStore = SecureProgramStore();
   }
 
+  // Local only: the saved language choice, read before the first frame.
+  final appLocale = AppLocale();
+  await appLocale.load();
+
   // Debug builds started with --dart-define=TETHER_UI=true only; every
   // profile and release build runs the app below.
   if (selectAppUi() == AppUi.tetherUi) {
     await runTetherUi(
       account: account ?? AccountController.disabled(),
       guestStore: guestStore,
+      appLocale: appLocale,
     );
     return;
   }
@@ -130,6 +137,7 @@ Future<void> _bootstrap() async {
     accountController: account,
     quitPlanController: quitPlan,
     programStore: programStore,
+    appLocale: appLocale,
   ));
 }
 
@@ -139,6 +147,7 @@ class BreatheFreeApp extends StatefulWidget {
     this.accountController,
     this.quitPlanController,
     this.programStore,
+    this.appLocale,
     super.key,
   });
 
@@ -146,6 +155,10 @@ class BreatheFreeApp extends StatefulWidget {
   final AccountController? accountController;
   final QuitPlanController? quitPlanController;
   final SecureProgramStore? programStore;
+
+  /// The app language; when null the app creates one and restores the saved
+  /// choice itself.
+  final AppLocale? appLocale;
 
   @override
   State<BreatheFreeApp> createState() => _BreatheFreeAppState();
@@ -170,11 +183,17 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   ProgramId? _activeProgram;
   bool _showProgramPicker = false;
   late final SecureProgramStore _programStore;
+  late final AppLocale _appLocale;
+  late final bool _ownsAppLocale;
   final _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
     super.initState();
+    _ownsAppLocale = widget.appLocale == null;
+    _appLocale = widget.appLocale ?? AppLocale();
+    if (_ownsAppLocale) unawaited(_appLocale.load());
+    WidgetsBinding.instance.addObserver(_appLocale);
     _ownsAccountController = widget.accountController == null;
     _accountController =
         widget.accountController ?? AccountController.disabled();
@@ -192,6 +211,8 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(_appLocale);
+    if (_ownsAppLocale) _appLocale.dispose();
     if (_ownsAccountController) _accountController.dispose();
     if (_ownsQuitPlanController) _quitPlanController.dispose();
     super.dispose();
@@ -412,6 +433,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
     } catch (error) {
       cleanupError ??= error;
     }
+    await _appLocale.clearSavedChoice();
     if (cleanupError != null) throw cleanupError;
   }
 
@@ -514,12 +536,15 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _accountController,
+      animation: Listenable.merge([_accountController, _appLocale]),
       builder: (context, _) => MaterialApp(
         navigatorKey: _navigatorKey,
         title: 'Tether Health',
         debugShowCheckedModeBanner: false,
         restorationScopeId: 'breathefree',
+        locale: _appLocale.locale,
+        supportedLocales: releaseLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
         theme: AppTheme.light(),
         home: _accountController.passwordRecoveryPending
             ? PasswordRecoveryScreen(account: _accountController)
@@ -554,6 +579,7 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
                             key: ValueKey(_journeyEpoch),
                             accountController: _accountController,
                             quitPlanController: _quitPlanController,
+                            appLocale: _appLocale,
                             currentIndex: _currentIndex,
                             onSelectScreen: _goTo,
                             onPrevious: _goBack,
