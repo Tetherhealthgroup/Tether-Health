@@ -356,10 +356,14 @@ class _ResourceBottomNavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = selected ? AppColors.deepTeal : AppColors.mutedTeal;
 
+    // The child's own tap is excluded from semantics with the rest of it,
+    // so the item states that it is enabled and carries the tap itself.
     return Semantics(
       button: true,
+      enabled: true,
       selected: selected,
       label: label,
+      onTap: onTap,
       excludeSemantics: true,
       child: InkWell(
         onTap: onTap,

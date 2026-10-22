@@ -29,6 +29,7 @@ class QuitDayHomeScreen extends StatefulWidget {
     required this.onOpenSupport,
     required this.onNotifications,
     required this.onOpenProfile,
+    this.onOpenHome,
     this.profileIdentity = const ProfileIdentity(),
     super.key,
   });
@@ -50,6 +51,9 @@ class QuitDayHomeScreen extends StatefulWidget {
   final VoidCallback onOpenSupport;
   final VoidCallback onNotifications;
   final VoidCallback onOpenProfile;
+
+  /// Opens the Home that fits the quit date; this screen may not be it.
+  final VoidCallback? onOpenHome;
   final ProfileIdentity profileIdentity;
 
   @override
@@ -294,7 +298,10 @@ class _QuitDayHomeScreenState extends State<QuitDayHomeScreen> {
                       title: widget.isSpanish
                           ? 'Lo esencial de hoy'
                           : "Today's essentials",
-                      count: widget.isSpanish ? '2 elementos' : '2 items',
+                      // Counts only the rows shown; one row needs no count.
+                      count: widget.treatmentSupport
+                          ? (widget.isSpanish ? '2 elementos' : '2 items')
+                          : null,
                     ),
                     const SizedBox(height: 6),
                     _EssentialsCard(
@@ -324,7 +331,7 @@ class _QuitDayHomeScreenState extends State<QuitDayHomeScreen> {
             ),
             _BottomNavigation(
               isSpanish: widget.isSpanish,
-              onHome: () {},
+              onHome: widget.onOpenHome ?? () {},
               onPlan: widget.onOpenPlan,
               onProgress: widget.onOpenProgress,
               onLearn: widget.onOpenLearn,
@@ -533,8 +540,8 @@ class _QuitDayHero extends StatelessWidget {
                       const SizedBox(height: 5),
                       Text(
                         isSpanish
-                            ? 'Comenzaste a las $startedAt · Hora del Pacífico'
-                            : 'Started at $startedAt · Pacific Time',
+                            ? 'Comenzaste a las $startedAt'
+                            : 'Started at $startedAt',
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 11.5,
@@ -858,7 +865,7 @@ class _NextBestStepCard extends StatelessWidget {
                 Text(
                   isSpanish
                       ? 'Haz tu acción de la mañana'
-                      : 'Take your planned morning action',
+                      : 'Take your morning action',
                   style: const TextStyle(
                     color: AppColors.deepTeal,
                     fontSize: 16,
@@ -927,10 +934,11 @@ class _SectionHeader extends StatelessWidget {
   });
 
   final String title;
-  final String count;
+  final String? count;
 
   @override
   Widget build(BuildContext context) {
+    final count = this.count;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -945,13 +953,14 @@ class _SectionHeader extends StatelessWidget {
             ),
           ),
         ),
-        Text(
-          count,
-          style: const TextStyle(
-            color: AppColors.mutedTeal,
-            fontSize: 9,
+        if (count != null)
+          Text(
+            count,
+            style: const TextStyle(
+              color: AppColors.mutedTeal,
+              fontSize: 9,
+            ),
           ),
-        ),
       ],
     );
   }
@@ -998,28 +1007,32 @@ class _EssentialsCard extends StatelessWidget {
             action: isSpanish ? 'Registrar' : 'Check in',
             onTap: onCheckIn,
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Divider(
-              height: 1,
-              color: AppColors.mutedTeal.withValues(alpha: .16),
+          // The treatment row only appears when the member chose treatment
+          // support in their plan.
+          if (treatmentSupport) ...[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              child: Divider(
+                height: 1,
+                color: AppColors.mutedTeal.withValues(alpha: .16),
+              ),
             ),
-          ),
-          _EssentialRow(
-            icon: Icons.medication_outlined,
-            iconBackground: AppColors.coralLight,
-            label: isSpanish
-                ? 'PLAN DE TRATAMIENTO REGISTRADO'
-                : 'RECORDED TREATMENT PLAN',
-            title: isSpanish
-                ? 'Confirma el estado de tu plan matutino'
-                : 'Confirm your morning plan status',
-            subtitle: isSpanish
-                ? 'Sigue solo el plan registrado contigo o con tu equipo de atención.'
-                : 'Follow only the plan recorded with you or your care team.',
-            action: isSpanish ? 'Revisar estado' : 'Review status',
-            onTap: onTreatmentPlan,
-          ),
+            _EssentialRow(
+              icon: Icons.medication_outlined,
+              iconBackground: AppColors.coralLight,
+              label: isSpanish
+                  ? 'PLAN DE TRATAMIENTO REGISTRADO'
+                  : 'RECORDED TREATMENT PLAN',
+              title: isSpanish
+                  ? 'Confirma el estado de tu plan matutino'
+                  : 'Confirm your morning plan status',
+              subtitle: isSpanish
+                  ? 'Sigue solo el plan registrado contigo o con tu equipo de atención.'
+                  : 'Follow only the plan recorded with you or your care team.',
+              action: isSpanish ? 'Revisar estado' : 'Review status',
+              onTap: onTreatmentPlan,
+            ),
+          ],
         ],
       ),
     );

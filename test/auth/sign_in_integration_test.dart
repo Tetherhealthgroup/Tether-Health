@@ -6,10 +6,12 @@ import 'package:breathefree_patient/main.dart';
 import 'package:breathefree_patient/profile/profile_api_client.dart';
 import 'package:breathefree_patient/profile/profile_repository.dart';
 import 'package:breathefree_patient/profile/user_profile.dart';
+import 'package:breathefree_patient/quit_plan/guest_quit_plan_store.dart';
 import 'package:breathefree_patient/quit_plan/quit_plan.dart';
 import 'package:breathefree_patient/quit_plan/quit_plan_api_client.dart';
 import 'package:breathefree_patient/quit_plan/quit_plan_controller.dart';
 import 'package:breathefree_patient/quit_plan/quit_plan_repository.dart';
+import 'package:breathefree_patient/screens/approved_screen_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -154,7 +156,9 @@ void main() {
 
   testWidgets('restored completed account loads its plan and opens home',
       (tester) async {
-    tester.view.physicalSize = const Size(430, 932);
+    // The quit-day Home is laid out for phone widths with real fonts; the
+    // test font is wider, so this restore check uses a wider view.
+    tester.view.physicalSize = const Size(800, 1800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -182,8 +186,13 @@ void main() {
 
     expect(
         find.byKey(const ValueKey('account-connection-screen')), findsNothing);
+    // Home follows the plan's quit date (2026-10-01): the countdown Home
+    // before it, the quit-day Home from that date on.
+    final onQuitDay = homeScreenFor(quitPlan.plan!.quitDate) == 21;
+    expect(find.text('SINCE YOUR PLANNED QUIT TIME'),
+        onQuitDay ? findsOneWidget : findsNothing);
     expect(find.byKey(const ValueKey('functional-home-preparation-screen')),
-        findsOneWidget);
+        onQuitDay ? findsNothing : findsOneWidget);
     expect(quitPlan.plan?.topQuitReason, 'family');
   });
 
@@ -254,6 +263,135 @@ void main() {
         findsOneWidget);
     expect(account.isSignedIn, isFalse);
     expect(quitPlan.plan, isNull);
+  });
+
+  testWidgets(
+      'sign-in with a plan on or after its quit date opens quit-day Home',
+      (tester) async {
+    tester.view.physicalSize = const Size(800, 1800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    // The saved plan's quit date (2026-10-01) has passed.
+    expect(homeScreenFor(DateTime(2026, 10, 1)), 21);
+
+    final auth = _SuccessfulAuth();
+    final account = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(
+        auth: auth,
+        api: _ProfileApi(onboardingCompleted: true),
+      ),
+    );
+    final quitPlan = QuitPlanController(
+      auth: auth,
+      repository: QuitPlanRepository(auth: auth, api: _PlanApi()),
+    );
+    addTearDown(account.dispose);
+    addTearDown(quitPlan.dispose);
+
+    await tester.pumpWidget(BreatheFreeApp(
+      accountController: account,
+      quitPlanController: quitPlan,
+    ));
+    await tester.pumpAndSettle();
+    await _signInThroughDialog(tester, 'welcome-sign-in');
+
+    expect(find.text('SINCE YOUR PLANNED QUIT TIME'), findsOneWidget);
+    expect(find.byKey(const ValueKey('functional-home-preparation-screen')),
+        findsNothing);
+  });
+
+  testWidgets(
+      'sign-out to a started device plan on its quit day opens quit-day Home',
+      (tester) async {
+    tester.view.physicalSize = const Size(800, 1800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final auth = _SuccessfulAuth(signedIn: true);
+    final account = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(auth: auth, api: _ProfileApi()),
+    );
+    final devicePlan = await _PlanApi().getQuitPlan('fake-access-token');
+    final quitPlan = QuitPlanController(
+      auth: auth,
+      repository: QuitPlanRepository(auth: auth, api: _PlanApi()),
+      guestStore: _MemoryGuestStore(GuestQuitPlanSnapshot(
+        plan: QuitPlan.fromJson({
+          ...devicePlan.toLocalJson(),
+          'quitDate': DateUtils.dateOnly(DateTime.now()).toIso8601String(),
+        }),
+        stage: GuestPlanStage.active,
+        savedAt: DateTime.utc(2026, 10, 1),
+      )),
+    );
+    addTearDown(account.dispose);
+    addTearDown(quitPlan.dispose);
+
+    await tester.pumpWidget(BreatheFreeApp(
+      initialScreen: 27,
+      accountController: account,
+      quitPlanController: quitPlan,
+    ));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const ValueKey('settings-sign-out')));
+    await tester.tap(find.byKey(const ValueKey('settings-sign-out')));
+    await tester.pumpAndSettle();
+
+    expect(account.isSignedIn, isFalse);
+    expect(find.text('SINCE YOUR PLANNED QUIT TIME'), findsOneWidget);
+    expect(find.byKey(const ValueKey('functional-home-preparation-screen')),
+        findsNothing);
+  });
+
+  testWidgets('signing in clears a Rescue result rated before sign-in',
+      (tester) async {
+    tester.view.physicalSize = const Size(800, 1800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final auth = _SuccessfulAuth();
+    final account = AccountController(
+      auth: auth,
+      profiles: ProfileRepository(
+        auth: auth,
+        api: _ProfileApi(onboardingCompleted: true),
+      ),
+    );
+    addTearDown(account.dispose);
+
+    await tester.pumpWidget(BreatheFreeApp(
+      initialScreen: 19,
+      accountController: account,
+    ));
+    await tester.pumpAndSettle();
+    for (final key in const [
+      'craving-recheck-number-2',
+      'craving-recheck-helpful-yes',
+      'craving-recheck-save',
+      'screen-21-back-to-today',
+      'preparation-open-rescue',
+      'rescue-start-continue',
+    ]) {
+      await _tapKey(tester, key);
+    }
+    expect(
+        find.byKey(const ValueKey('rescue-tool-last-result')), findsOneWidget);
+
+    await _tapKey(tester, 'rescue-tool-back');
+    await _tapKey(tester, 'preparation-profile');
+    await _signInThroughDialog(tester, 'settings-sign-out');
+    expect(find.byKey(const ValueKey('functional-home-preparation-screen')),
+        findsOneWidget);
+
+    await _tapKey(tester, 'preparation-open-rescue');
+    await _tapKey(tester, 'rescue-start-continue');
+    expect(find.byKey(const ValueKey('rescue-tool-last-result')), findsNothing);
+    expect(find.text('Start with what helped before.'), findsNothing);
   });
 
   testWidgets('sign-in displays the specific safe authentication error',
@@ -454,3 +592,39 @@ UserProfile _profile({bool onboardingCompleted = false}) => UserProfile(
       createdAt: DateTime.utc(2026),
       updatedAt: DateTime.utc(2026),
     );
+
+Future<void> _tapKey(WidgetTester tester, String key) async {
+  final finder = find.byKey(ValueKey(key));
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
+Future<void> _signInThroughDialog(WidgetTester tester, String opener) async {
+  await _tapKey(tester, opener);
+  await tester.enterText(
+      find.byKey(const ValueKey('sign-in-email')), 'person@example.test');
+  await tester.enterText(
+      find.byKey(const ValueKey('sign-in-password')), 'local-password');
+  await tester.tap(find.byKey(const ValueKey('sign-in-submit')));
+  await tester.pumpAndSettle();
+}
+
+class _MemoryGuestStore implements GuestQuitPlanStore {
+  _MemoryGuestStore(this.snapshot);
+
+  GuestQuitPlanSnapshot? snapshot;
+
+  @override
+  bool get isPersistent => true;
+
+  @override
+  Future<GuestQuitPlanSnapshot?> load() async => snapshot;
+
+  @override
+  Future<void> save(GuestQuitPlanSnapshot value) async => snapshot = value;
+
+  @override
+  Future<void> clear() async => snapshot = null;
+}

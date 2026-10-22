@@ -35,7 +35,7 @@ class _MedicationPlanDraft {
   });
 
   final _RecordedMedicine medicine;
-  final _RecordedTiming timing;
+  final _RecordedTiming? timing;
   final String note;
 }
 
@@ -74,7 +74,8 @@ class MedicationCenterScreen extends StatefulWidget {
 class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
   // No medicine is shown as the member's until they record one.
   _RecordedMedicine? _recordedMedicine;
-  _RecordedTiming _recordedTiming = _RecordedTiming.morning;
+  // Timing is part of what the member records; nothing is assumed.
+  _RecordedTiming? _recordedTiming;
   String _recordedNote = '';
   DateTime? _takenRecordedAt;
   bool _restoredTakenRecordedAt = false;
@@ -134,10 +135,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
 
   String? get statusSubtitle => switch (widget.todayStatus) {
         null => null,
-        MedicationTodayStatus.taken => t(
-            'Next reminder: Tomorrow at 8:00 AM',
-            'Próximo recordatorio: mañana a las 8:00 AM',
-          ),
+        // No reminder is scheduled by the app, so none is announced.
+        MedicationTodayStatus.taken => null,
         MedicationTodayStatus.notYet => t(
             'Follow only your recorded plan.',
             'Sigue únicamente tu plan registrado.',
@@ -167,8 +166,16 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
       };
 
   String get _planInstruction {
-    final timing = _timingLabel(_recordedTiming);
+    final recordedTiming = _recordedTiming;
     final note = _recordedNote.trim();
+    if (recordedTiming == null) {
+      if (note.isNotEmpty) return note;
+      return t(
+        'Follow the instructions in your recorded plan',
+        'Sigue las instrucciones de tu plan registrado',
+      );
+    }
+    final timing = _timingLabel(recordedTiming);
     if (note.isNotEmpty) return '$timing · $note';
     return t(
       '$timing · Follow the instructions in your recorded plan',
@@ -2276,9 +2283,10 @@ class _OfflineNote extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
+              // Nothing is synced for this plan, so no sync time is shown.
               isSpanish
-                  ? 'El plan sigue disponible sin conexión · Última sincronización 9:12 AM'
-                  : 'Plan remains available offline · Last synced 9:12 AM',
+                  ? 'El plan sigue disponible sin conexión'
+                  : 'Plan remains available offline',
               style: const TextStyle(
                 fontFamily: 'Arial',
                 color: AppColors.mutedTeal,

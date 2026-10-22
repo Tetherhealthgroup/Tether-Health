@@ -53,6 +53,15 @@ enum _GuestUploadChoice { notNow, upload }
 
 enum _GuestPlanCloudSaveResolution { proceed, alreadySaved, cancelled }
 
+/// The Home for a plan's quit date: the preparation Home (screen 11) with its
+/// countdown before that date, and the quit-day Home (screen 21), which counts
+/// time since the quit date, from that date on.
+int homeScreenFor(DateTime quitDate, {DateTime? today}) {
+  final quitDay = DateUtils.dateOnly(quitDate.toLocal());
+  final now = DateUtils.dateOnly(today ?? DateTime.now());
+  return quitDay.isAfter(now) ? 11 : 21;
+}
+
 class ApprovedScreenPlayer extends StatefulWidget {
   const ApprovedScreenPlayer({
     required this.currentIndex,
@@ -152,6 +161,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   RescueHelpfulChoice? _rescueHelpfulChoice;
   Set<RescueContext> _rescueContexts = <RescueContext>{};
   RescueTool _rescueTool = RescueTool.slowBreathing;
+  // The member's last rated Rescue this session; none until they rate one.
+  RescueLastResult? _lastRescueResult;
   int? _rescueReturnScreen;
   int _activeRescueElapsedSeconds = 0;
   bool _activeRescuePaused = false;
@@ -417,7 +428,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     final stageSaved = profileSaved && await _quitPlanController.markStarted();
     if (!mounted) return;
     if (stageSaved) {
-      widget.onNext();
+      _openHome();
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
@@ -444,6 +455,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       builder: (context) => SignInDialog(account: _accountController),
     );
     if (!mounted || signedIn != true) return;
+    // A Rescue rated before signing in is not shown as this account's.
+    setState(() => _lastRescueResult = null);
 
     var message = 'Signed in successfully.';
     var destination =
@@ -508,8 +521,9 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       final restoredPlan = _quitPlanController.plan;
       if (restoredPlan != null) {
         setState(() => _applyQuitPlan(restoredPlan));
-        destination =
-            _accountController.profile?.onboardingCompleted == true ? 11 : 10;
+        destination = _accountController.profile?.onboardingCompleted == true
+            ? homeScreenFor(restoredPlan.quitDate)
+            : 10;
       }
     }
 
@@ -680,7 +694,9 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
         ? 27
         : guestPlan == null
             ? 0
-            : (_quitPlanController.guestPlanStarted ? 11 : 10);
+            : (_quitPlanController.guestPlanStarted
+                ? homeScreenFor(guestPlan.quitDate)
+                : 10);
     final reset = widget.onSessionReset;
     if (reset != null) {
       reset(destination);
@@ -862,12 +878,9 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   /// Plan, Learn, Progress and Support in the bottom navigation.
   static const _mainTabScreens = <int>{10, 24, 25, 26};
 
-  bool get _quitDateIsAhead => (_quitDate ?? _defaultQuitDate())
-      .isAfter(DateUtils.dateOnly(DateTime.now()));
-
-  /// The quit-day Home counts time since the quit date, so before that date
-  /// Home is the preparation Home with its countdown.
-  void _openHome() => widget.onSelectScreen(_quitDateIsAhead ? 11 : 21);
+  /// Opens the Home for the plan's quit date (see [homeScreenFor]).
+  void _openHome() =>
+      widget.onSelectScreen(homeScreenFor(_quitDate ?? _defaultQuitDate()));
 
   String? get _firstSupporterName {
     for (final person in _supportPeople) {
@@ -1145,6 +1158,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               onOpenReasons: () => widget.onSelectScreen(8),
               onOpenPreparation: () => widget.onSelectScreen(9),
               onOpenDailyCheckIn: () => widget.onSelectScreen(12),
+              onOpenHome: _openHome,
               profileIdentity: _profileIdentity,
             );
           }
@@ -1362,6 +1376,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             final isSpanish = _language == WelcomeLanguage.spanish;
             return RecommendedRescueToolScreen(
               isSpanish: isSpanish,
+              lastResult: _lastRescueResult,
               intensity: _rescueIntensity,
               stressSelected: _rescueContexts.contains(RescueContext.stress),
               supportName: _rescueSupportName(isSpanish),
@@ -1432,7 +1447,20 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
                 setState(() => _rescueHelpfulChoice = value);
               },
               onBack: _backActionFor(19),
-              onSaveAndSeeResult: () => widget.onSelectScreen(20),
+              onSaveAndSeeResult: () {
+                final after = _rescueRecheckIntensity;
+                if (after != null) {
+                  setState(() {
+                    _lastRescueResult = RescueLastResult(
+                      tool: _rescueTool,
+                      before: _rescueBeforeIntensity,
+                      after: after,
+                      helpful: _rescueHelpfulChoice == RescueHelpfulChoice.yes,
+                    );
+                  });
+                }
+                widget.onSelectScreen(20);
+              },
               onRepeatRescue: () {
                 setState(() {
                   _activeRescueElapsedSeconds = 0;
@@ -1514,6 +1542,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               onOpenSupport: () => widget.onSelectScreen(26),
               onNotifications: () {},
               onOpenProfile: () => widget.onSelectScreen(27),
+              onOpenHome: _openHome,
               profileIdentity: _profileIdentity,
             );
           }

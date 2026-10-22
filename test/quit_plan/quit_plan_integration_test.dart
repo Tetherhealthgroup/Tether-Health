@@ -54,7 +54,9 @@ void main() {
 
   testWidgets('started guest plan restores to home after app restart',
       (tester) async {
-    tester.view.physicalSize = const Size(430, 932);
+    // The quit-day Home is laid out for phone widths with real fonts; the
+    // test font is wider, so this restore check uses a wider view.
+    tester.view.physicalSize = const Size(800, 1800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -84,8 +86,11 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
+    // The saved quit date (2026-10-01) has passed, so the started plan
+    // restores to the quit-day Home rather than the countdown Home.
+    expect(find.text('SINCE YOUR PLANNED QUIT TIME'), findsOneWidget);
     expect(find.byKey(const ValueKey('functional-home-preparation-screen')),
-        findsOneWidget);
+        findsNothing);
   });
 
   testWidgets('signed-in guest import requires explicit upload consent',
@@ -187,9 +192,11 @@ void main() {
         currentIndex: 10,
         accountController: account,
         quitPlanController: quitPlan,
-        onSelectScreen: (_) {},
+        // Start opens Home: the preparation Home or, from the quit date
+        // on, the quit-day Home.
+        onSelectScreen: (index) => advanced = index == 11 || index == 21,
         onPrevious: () {},
-        onNext: () => advanced = true,
+        onNext: () {},
         onTarget: (AppTapTarget _) {},
       ),
     ));
@@ -233,9 +240,11 @@ void main() {
         currentIndex: 10,
         accountController: account,
         quitPlanController: quitPlan,
-        onSelectScreen: (_) {},
+        // Start opens Home: the preparation Home or, from the quit date
+        // on, the quit-day Home.
+        onSelectScreen: (index) => advanced = index == 11 || index == 21,
         onPrevious: () {},
-        onNext: () => advanced = true,
+        onNext: () {},
         onTarget: (AppTapTarget _) {},
       ),
     ));
@@ -279,9 +288,11 @@ void main() {
         currentIndex: 10,
         accountController: account,
         quitPlanController: quitPlan,
-        onSelectScreen: (_) {},
+        // Start opens Home: the preparation Home or, from the quit date
+        // on, the quit-day Home.
+        onSelectScreen: (index) => advanced = index == 11 || index == 21,
         onPrevious: () {},
-        onNext: () => advanced = true,
+        onNext: () {},
         onTarget: (AppTapTarget _) {},
       ),
     ));

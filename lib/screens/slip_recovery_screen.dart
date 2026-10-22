@@ -37,11 +37,12 @@ class SlipRecoveryScreen extends StatefulWidget {
 }
 
 class _SlipRecoveryScreenState extends State<SlipRecoveryScreen> {
-  String _whatHappened = 'One cigarette';
-  String _whenChoice = 'Just now';
+  // Nothing is answered for the member: each question starts unanswered.
+  String? _whatHappened;
+  String? _whenChoice;
   // No trigger is chosen for the member.
   final Set<String> _triggers = <String>{};
-  String _recoveryChoice = 'Continue from this moment';
+  String? _recoveryChoice;
   late bool _saved;
 
   @override
@@ -596,8 +597,8 @@ class _WhatHappenedCard extends StatelessWidget {
 
   final double sx;
   final bool isSpanish;
-  final String selectedWhatHappened;
-  final String selectedWhen;
+  final String? selectedWhatHappened;
+  final String? selectedWhen;
   final String Function(String) whatHappenedLabel;
   final String Function(String) whenLabel;
   final ValueChanged<String> onWhatHappenedChanged;
@@ -1041,7 +1042,7 @@ class _RecoveryChoiceCard extends StatelessWidget {
 
   final double sx;
   final bool isSpanish;
-  final String selected;
+  final String? selected;
   final String Function(String) label;
   final ValueChanged<String> onChanged;
 
@@ -1310,21 +1311,6 @@ class _NextStepCard extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   height: 1,
                 ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 12 * sx,
-            top: 68,
-            child: Text(
-              isSpanish
-                  ? 'Según el desencadenante y lo que te ayudó antes.'
-                  : 'Based on the stress trigger and what helped before.',
-              style: const TextStyle(
-                fontFamily: 'Arial',
-                color: Color(0xFFBFD5CD),
-                fontSize: 12.5,
-                height: 1.1,
               ),
             ),
           ),

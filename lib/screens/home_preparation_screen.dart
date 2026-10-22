@@ -29,6 +29,7 @@ class HomePreparationScreen extends StatelessWidget {
     required this.onOpenLearn,
     required this.onOpenSupport,
     required this.onOpenProfile,
+    this.onOpenHome,
     required this.onOpenReasons,
     required this.onOpenPreparation,
     required this.onOpenDailyCheckIn,
@@ -55,6 +56,9 @@ class HomePreparationScreen extends StatelessWidget {
   final VoidCallback onOpenLearn;
   final VoidCallback onOpenSupport;
   final VoidCallback onOpenProfile;
+
+  /// Opens the Home that fits the quit date; this screen may not be it.
+  final VoidCallback? onOpenHome;
   final VoidCallback onOpenReasons;
   final VoidCallback onOpenPreparation;
   final VoidCallback onOpenDailyCheckIn;
@@ -454,7 +458,7 @@ class HomePreparationScreen extends StatelessWidget {
                 _PreparationBottomNavigation(
                   isSpanish: isSpanish,
                   compact: compact,
-                  onHome: () {},
+                  onHome: onOpenHome ?? () {},
                   onPlan: onOpenPlan,
                   onProgress: onOpenProgress,
                   onLearn: onOpenLearn,
@@ -631,7 +635,7 @@ class _QuitCountdownCard extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           Text(
-            '$quitDateLabel · ${isSpanish ? 'Hora del Pacífico' : 'Pacific Time'}',
+            quitDateLabel,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(

@@ -253,7 +253,9 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
         final restoredPlan = _quitPlanController.plan;
         _currentIndex = restoredPlan == null
             ? 0
-            : (_quitPlanController.guestPlanStarted ? 11 : 10);
+            : (_quitPlanController.guestPlanStarted
+                ? homeScreenFor(restoredPlan.quitDate)
+                : 10);
       });
       return;
     }
@@ -288,7 +290,9 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
           final restoredPlan = _quitPlanController.plan;
           destination = restoredPlan == null
               ? 1
-              : (_accountController.profile!.onboardingCompleted ? 11 : 10);
+              : (_accountController.profile!.onboardingCompleted
+                  ? homeScreenFor(restoredPlan.quitDate)
+                  : 10);
         }
         setState(() {
           _restoringAccount = false;
@@ -331,7 +335,9 @@ class _BreatheFreeAppState extends State<BreatheFreeApp> {
       _journeyEpoch++;
       _currentIndex = guestPlan == null
           ? 0
-          : (_quitPlanController.guestPlanStarted ? 11 : 10);
+          : (_quitPlanController.guestPlanStarted
+              ? homeScreenFor(guestPlan.quitDate)
+              : 10);
     });
   }
 

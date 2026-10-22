@@ -3638,12 +3638,14 @@ void main() {
     expect(find.text('Craving Rescue'), findsOneWidget);
     expect(find.text('2 OF 5'), findsOneWidget);
     expect(find.text('40%'), findsOneWidget);
-    expect(find.text('Start with what helped before.'), findsOneWidget);
+    // No Rescue has been rated yet, so no past result is described.
+    expect(find.text('What feels possible right now?'), findsOneWidget);
+    expect(find.text('Start with what helped before.'), findsNothing);
     expect(find.text('Slow breathing'), findsOneWidget);
     expect(find.text('2:00'), findsOneWidget);
     expect(
       find.text('Slow breathing was selected as most helpful.'),
-      findsOneWidget,
+      findsNothing,
     );
     expect(find.text('Start 2-minute breathing'), findsOneWidget);
     expect(find.text('Move for 3 minutes'), findsOneWidget);

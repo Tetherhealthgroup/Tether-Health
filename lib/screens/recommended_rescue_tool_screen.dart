@@ -6,6 +6,24 @@ enum RescueTool {
   changeScene,
 }
 
+/// A Rescue the member finished and rated earlier in this session.
+@immutable
+class RescueLastResult {
+  const RescueLastResult({
+    required this.tool,
+    required this.before,
+    required this.after,
+    required this.helpful,
+  });
+
+  final RescueTool tool;
+  final int before;
+  final int after;
+
+  /// The member answered that the tool helped.
+  final bool helpful;
+}
+
 class RecommendedRescueToolScreen extends StatelessWidget {
   const RecommendedRescueToolScreen({
     required this.isSpanish,
@@ -17,6 +35,7 @@ class RecommendedRescueToolScreen extends StatelessWidget {
     required this.onBack,
     required this.onStart,
     required this.onViewSupport,
+    this.lastResult,
     super.key,
   });
 
@@ -29,6 +48,10 @@ class RecommendedRescueToolScreen extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onStart;
   final VoidCallback onViewSupport;
+
+  /// The member's last rated Rescue, or null when there is none. Only a real
+  /// result is described; nothing is claimed without one.
+  final RescueLastResult? lastResult;
 
   static const _cream = Color(0xFFF8F4EA);
   static const _deepTeal = Color(0xFF0D4B43);
@@ -45,9 +68,20 @@ class RecommendedRescueToolScreen extends StatelessWidget {
 
   String _t(String english, String spanish) => isSpanish ? spanish : english;
 
-  String get _primaryContext => stressSelected
-      ? _t('Stress selected', 'Estrés seleccionado')
-      : _t('Personalized match', 'Recomendación personalizada');
+  /// The last result, when it was the slow breathing this card recommends.
+  RescueLastResult? get _breathingResult =>
+      lastResult?.tool == RescueTool.slowBreathing ? lastResult : null;
+
+  /// Slow breathing helped the member before.
+  bool get _helpedBefore => _breathingResult?.helpful == true;
+
+  String? get _primaryContext {
+    if (stressSelected) return _t('Stress selected', 'Estrés seleccionado');
+    if (_helpedBefore) {
+      return _t('Personalized match', 'Recomendación personalizada');
+    }
+    return null;
+  }
 
   String get _startLabel => switch (selectedTool) {
         RescueTool.slowBreathing => _t(
@@ -96,10 +130,15 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          _t(
-                            'Start with what helped before.',
-                            'Empieza con lo que te ayudó antes.',
-                          ),
+                          _helpedBefore
+                              ? _t(
+                                  'Start with what helped before.',
+                                  'Empieza con lo que te ayudó antes.',
+                                )
+                              : _t(
+                                  'What feels possible right now?',
+                                  '¿Qué te parece posible ahora mismo?',
+                                ),
                           style: const TextStyle(
                             color: _deepTeal,
                             fontSize: 31,
@@ -110,10 +149,15 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          _t(
-                            'One recommended action, based on this craving and your results.',
-                            'Una acción recomendada según este antojo y tus resultados.',
-                          ),
+                          lastResult == null
+                              ? _t(
+                                  'One recommended action, based on this craving.',
+                                  'Una acción recomendada según este antojo.',
+                                )
+                              : _t(
+                                  'One recommended action, based on this craving and your results.',
+                                  'Una acción recomendada según este antojo y tus resultados.',
+                                ),
                           style: const TextStyle(
                             color: _teal,
                             fontSize: 16,
@@ -125,6 +169,7 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                           isSpanish: isSpanish,
                           selected: selectedTool == RescueTool.slowBreathing,
                           contextLabel: _primaryContext,
+                          lastResult: _breathingResult,
                           onSelect: () =>
                               onToolChanged(RescueTool.slowBreathing),
                           onStart: () {
@@ -137,6 +182,7 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                           isSpanish: isSpanish,
                           intensity: intensity,
                           stressSelected: stressSelected,
+                          helpedBefore: _helpedBefore,
                           onTap: () => _showWhyMatch(context),
                         ),
                         const SizedBox(height: 22),
@@ -367,10 +413,15 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  _t(
-                    '$triggerText + craving $intensity/10 + a previously helpful breathing result make slow breathing a practical first step.',
-                    '$triggerText + antojo $intensity/10 + un resultado previo útil con respiración hacen que la respiración lenta sea un buen primer paso.',
-                  ),
+                  _helpedBefore
+                      ? _t(
+                          '$triggerText + craving $intensity/10 + a previously helpful breathing result make slow breathing a practical first step.',
+                          '$triggerText + antojo $intensity/10 + un resultado previo útil con respiración hacen que la respiración lenta sea un buen primer paso.',
+                        )
+                      : _t(
+                          '$triggerText + craving $intensity/10 make slow breathing a practical first step.',
+                          '$triggerText + antojo $intensity/10 hacen que la respiración lenta sea un buen primer paso.',
+                        ),
                   style: const TextStyle(
                     color: _teal,
                     fontSize: 15,
@@ -515,13 +566,15 @@ class _RecommendedCard extends StatelessWidget {
     required this.isSpanish,
     required this.selected,
     required this.contextLabel,
+    required this.lastResult,
     required this.onSelect,
     required this.onStart,
   });
 
   final bool isSpanish;
   final bool selected;
-  final String contextLabel;
+  final String? contextLabel;
+  final RescueLastResult? lastResult;
   final VoidCallback onSelect;
   final VoidCallback onStart;
 
@@ -640,92 +693,85 @@ class _RecommendedCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 18),
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF20594F),
-                    borderRadius: BorderRadius.circular(17),
+                if (lastResult case final result?) ...[
+                  const SizedBox(height: 18),
+                  Container(
+                    key: const ValueKey('rescue-tool-last-result'),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF20594F),
+                      borderRadius: BorderRadius.circular(17),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isSpanish
+                                    ? 'TU ÚLTIMO RESULTADO'
+                                    : 'YOUR LAST RESULT',
+                                style: const TextStyle(
+                                  color: Color(0xFFBFD4CD),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                isSpanish
+                                    ? 'El antojo cambió de ${result.before} a ${result.after} después del ejercicio.'
+                                    : 'Craving changed from ${result.before} to ${result.after} after the exercise.',
+                                style: const TextStyle(
+                                  color: Color(0xFFC7DAD4),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: RecommendedRescueToolScreen._lime,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                '${result.before} → ${result.after}',
+                                style: const TextStyle(
+                                  color: RecommendedRescueToolScreen._deepTeal,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              const Text(
+                                'LAST TIME',
+                                style: TextStyle(
+                                  color: RecommendedRescueToolScreen._teal,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isSpanish
-                                  ? 'TU ÚLTIMO RESULTADO'
-                                  : 'YOUR LAST RESULT',
-                              style: const TextStyle(
-                                color: Color(0xFFBFD4CD),
-                                fontSize: 10,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              isSpanish
-                                  ? 'La respiración lenta fue la más útil.'
-                                  : 'Slow breathing was selected as most helpful.',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              isSpanish
-                                  ? 'El antojo cambió de 6 a 3 después del ejercicio.'
-                                  : 'Craving changed from 6 to 3 after the exercise.',
-                              style: const TextStyle(
-                                color: Color(0xFFC7DAD4),
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: RecommendedRescueToolScreen._lime,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Column(
-                          children: [
-                            Text(
-                              '6 → 3',
-                              style: TextStyle(
-                                color: RecommendedRescueToolScreen._deepTeal,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            Text(
-                              'LAST TIME',
-                              style: TextStyle(
-                                color: RecommendedRescueToolScreen._teal,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                ],
                 const SizedBox(height: 14),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _Pill(text: contextLabel, icon: Icons.circle, accent: true),
+                    if (contextLabel case final label?)
+                      _Pill(text: label, icon: Icons.circle, accent: true),
                     _Pill(
                       text:
                           isSpanish ? 'Funciona sin conexión' : 'Works offline',
@@ -823,13 +869,32 @@ class _WhyMatchCard extends StatelessWidget {
     required this.isSpanish,
     required this.intensity,
     required this.stressSelected,
+    required this.helpedBefore,
     required this.onTap,
   });
 
   final bool isSpanish;
   final int intensity;
   final bool stressSelected;
+  final bool helpedBefore;
   final VoidCallback onTap;
+
+  String get _reason {
+    if (helpedBefore) {
+      return stressSelected
+          ? (isSpanish
+              ? 'Estrés + antojo $intensity/10 + tu resultado útil anterior.'
+              : 'Stress trigger + craving $intensity/10 + your previous helpful result.')
+          : (isSpanish
+              ? 'Antojo $intensity/10 + tu resultado útil anterior.'
+              : 'Craving $intensity/10 + your previous helpful result.');
+    }
+    return stressSelected
+        ? (isSpanish
+            ? 'Estrés + antojo $intensity/10.'
+            : 'Stress trigger + craving $intensity/10.')
+        : (isSpanish ? 'Antojo $intensity/10.' : 'Craving $intensity/10.');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -871,13 +936,7 @@ class _WhyMatchCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      stressSelected
-                          ? (isSpanish
-                              ? 'Estrés + antojo $intensity/10 + tu resultado útil anterior.'
-                              : 'Stress trigger + craving $intensity/10 + your previous helpful result.')
-                          : (isSpanish
-                              ? 'Antojo $intensity/10 + tu resultado útil anterior.'
-                              : 'Craving $intensity/10 + your previous helpful result.'),
+                      _reason,
                       style: const TextStyle(
                         color: RecommendedRescueToolScreen._teal,
                         fontSize: 13,
