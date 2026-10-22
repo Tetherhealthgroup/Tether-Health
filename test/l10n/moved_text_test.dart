@@ -78,9 +78,35 @@ List<String> textRuns(String raw) {
   ];
 }
 
+/// Whether [text] is a whole message of [messages], or a whole case of a
+/// `select`/`plural` in one.
+bool isWholeMessage(String text, List<String> messages) {
+  final asCase =
+      RegExp('(?:^|[\\s,])(?:=\\d+|[A-Za-z]\\w*)\\{${RegExp.escape(text)}\\}');
+  return messages.any((m) => m == text || asCase.hasMatch(m));
+}
+
+/// Whether [run] (text between interpolations) appears in one of
+/// [messages] with a placeholder, a case brace or the message start/end on
+/// each side: so "No" is not found inside "No te juzgamos".
+bool isBoundedRun(String run, List<String> messages) {
+  for (final m in messages) {
+    for (var i = m.indexOf(run); i >= 0; i = m.indexOf(run, i + 1)) {
+      final end = i + run.length;
+      final left = i == 0 || m[i - 1] == '{' || m[i - 1] == '}';
+      final right = end == m.length || m[end] == '{' || m[end] == '}';
+      if (left && right) return true;
+    }
+  }
+  return false;
+}
+
 /// Every en/es literal of the files in [moved] (paths) from [inventory] that
 /// is neither in [messages] (language → message texts) nor still in the
-/// file's [source].
+/// file's [source]. Literals Dart joins (`'a' 'b'`) are checked as one text.
+/// A text without interpolation must be a whole message (or a whole case of
+/// one); the runs of an interpolated text must each sit between
+/// placeholders, case braces or the message's ends.
 List<MissingText> missingText({
   required Map<String, Object?> inventory,
   required Set<String> moved,
@@ -90,24 +116,50 @@ List<MissingText> missingText({
   final out = <MissingText>[];
   final files = inventory['files']! as Map<String, Object?>;
   for (final path in moved) {
-    final rows = (files[path] as List?) ?? const [];
+    final rows =
+        ((files[path] as List?) ?? const []).cast<Map<String, Object?>>();
     final src = source(path);
-    for (final r in rows.cast<Map<String, Object?>>()) {
-      final branch = r['branch']! as String;
-      if (branch == 'none' ||
-          r['match'] == true ||
-          r['key'] == true ||
-          r['directive'] == true) {
-        continue;
+    // Group each literal with the ones Dart joins to it.
+    final groups = <List<Map<String, Object?>>>[];
+    for (final r in rows) {
+      if (r['joined'] == true && groups.isNotEmpty) {
+        groups.last.add(r);
+      } else {
+        groups.add([r]);
       }
-      final raw = r['text']! as String;
-      if (src.contains("'$raw'") || src.contains('"$raw"')) continue;
+    }
+    for (final group in groups) {
+      final shown = [
+        for (final r in group)
+          if (r['branch'] != 'none' &&
+              r['match'] != true &&
+              r['key'] != true &&
+              r['directive'] != true)
+            r
+      ];
+      if (shown.isEmpty) continue;
+      final branch = shown.first['branch']! as String;
+      bool inSource(Map<String, Object?> r) {
+        final raw = r['text']! as String;
+        return src.contains("'$raw'") || src.contains('"$raw"');
+      }
+
+      if (shown.every(inSource)) continue;
+      final raw = [for (final r in group) r['text']! as String].join();
       final texts = messages[branch] ?? const [];
-      final ok =
-          textRuns(raw).every((run) => texts.any((m) => m.contains(run)));
+      final runs = textRuns(raw);
+      final interpolated = group.any((r) => r['interpolated'] == true) ||
+          RegExp(r'(?<!\\)\$').hasMatch(raw);
+      final ok = interpolated
+          ? runs.every((run) => isBoundedRun(run, texts))
+          : runs.isEmpty || isWholeMessage(runs.single, texts);
       if (!ok) {
-        out.add(
-            (file: path, line: r['line']! as int, branch: branch, text: raw));
+        out.add((
+          file: path,
+          line: shown.first['line']! as int,
+          branch: branch,
+          text: raw
+        ));
       }
     }
   }
@@ -187,5 +239,45 @@ void main() {
         [2]);
     expect(
         textRuns(r'Hola ${name.trim()}, ¿qué tal?'), ['Hola ', ', ¿qué tal?']);
+
+    // The probe: short strings are not found inside longer messages.
+    final probe = {
+      'files': {
+        'lib/y.dart': [
+          {'line': 1, 'branch': 'es', 'text': 'No'},
+          {'line': 2, 'branch': 'en', 'text': 'Off'},
+          {'line': 3, 'branch': 'es', 'text': 'Sí'},
+          {'line': 4, 'branch': 'en', 'text': 'Part one, '},
+          {'line': 4, 'branch': 'en', 'text': 'part two', 'joined': true},
+          {'line': 5, 'branch': 'es', 'text': 'situación'},
+        ],
+      },
+    };
+    List<int> lines(List<String> en, List<String> es) => missingText(
+          inventory: probe,
+          moved: {'lib/y.dart'},
+          messages: {'en': en, 'es': es},
+          source: (_) => '',
+        ).map((m) => m.line).toList();
+    expect(
+        lines([
+          'Office',
+          'Part one, part two'
+        ], [
+          'No te juzgamos',
+          'Sí, claro',
+          '{n, plural, =1{situación} other{situaciones}}'
+        ]),
+        [1, 2, 3]);
+    expect(
+        lines(['Off', 'Part one, part two'],
+            ['No', 'Sí', '{n, plural, =1{situación} other{situaciones}}']),
+        isEmpty);
+    expect(lines(['Off', 'Part one, '], ['No', 'Sí', 'situación']), [4]);
+    expect(
+        isBoundedRun(' razones elegidas · ',
+            ['{count} razones elegidas · {top, select, true{a} other{b}}']),
+        isTrue);
+    expect(isBoundedRun('No', ['No te juzgamos']), isFalse);
   });
 }
