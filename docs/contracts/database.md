@@ -11,8 +11,9 @@ Migration sources of truth include `supabase/migrations/202609110001_profiles.sq
 `supabase/migrations/202610180006_service_role_least_privilege.sql`,
 `supabase/migrations/202610180007_sync_truncate_guards.sql`,
 `supabase/migrations/202610180008_delete_my_account.sql`,
-`supabase/migrations/202610180011_care.sql` and
-`supabase/migrations/202610180012_enrolment_delete_now.sql`.
+`supabase/migrations/202610180011_care.sql`,
+`supabase/migrations/202610180012_enrolment_delete_now.sql` and
+`supabase/migrations/202610180013_programme_records.sql`.
 
 Every migration file is named `YYYYMMDDNNNN_name.sql`: a 12-digit version (date
 plus a four-digit sequence), then lowercase letters, digits and underscores.
@@ -61,8 +62,9 @@ sync after offline saves. Program payloads are prohibited from logs.
 
 Migration sources of truth: `supabase/migrations/202610170002_enrolments.sql`,
 `supabase/migrations/202610180003_enrolment_consent_followups.sql`,
-`supabase/migrations/202610180005_consent_truncate_guards.sql` and
-`supabase/migrations/202610180012_enrolment_delete_now.sql`.
+`supabase/migrations/202610180005_consent_truncate_guards.sql`,
+`supabase/migrations/202610180012_enrolment_delete_now.sql` and
+`supabase/migrations/202610180013_programme_records.sql`.
 Programme health data hangs off an enrolment, never off the account, and
 consent is recorded per enrolment, purpose and recipient. Every table below
 has row-level security enabled and forced; `anon` has no access.
@@ -97,7 +99,7 @@ deletes the account; nothing is purged automatically.
 
 | Column | Contract |
 |---|---|
-| `id` | UUID; programme data references it with `on delete cascade` |
+| `id` | UUID; programme data references it with `on delete cascade`. The programme record tables reference `(id, user_id, programme_code)` through the unique key `enrolments_id_user_programme_key` |
 | `user_id` | `auth.users(id)`, cascading |
 | `programme_code` | `programmes(code)` |
 | `status` | `focus` (default), `learn_only`, `paused` or `left` |
@@ -116,17 +118,21 @@ the app uses holds `DELETE` on `enrolments`, and there is no delete policy.
 "Delete now" is `delete_enrolment_now(p_enrolment_id, p_confirmation)`. It
 deletes one of the caller's enrolments and that programme's data: care share
 access rows, care messages tied to the programme or to its shares, care
-shares, caregiver events, caregivers, sync lapses, answers and area,
-programme consents, the quit plan (BreatheFree only), the program data
-snapshot whose `program_id` is the programme's `slug` (Heartwise, Steady and
-ClearAir only) and the enrolment. Every delete is limited to the caller's
-rows. It returns counts only, one per table, named as in the account deletion
-receipt: `quit_plans`, `program_data`, `enrolments`, `programme_consents`,
-`sync_answers`, `sync_lapses`, `sync_areas`, `care_share_access`,
-`care_messages`, `care_shares`, `caregiver_events` and `caregivers`.
+shares, caregiver events, caregivers, the enrolment's observations, programme
+entries, rescue events, lesson progress and reminder time, sync lapses,
+answers and area, programme consents, the quit plan (BreatheFree only), the
+program data snapshot whose `program_id` is the programme's `slug`
+(Heartwise, Steady and ClearAir only) and the enrolment. Every delete is
+limited to the caller's rows. It returns counts only, one per table, named as
+in the account deletion receipt: `quit_plans`, `program_data`, `enrolments`,
+`programme_consents`, `sync_answers`, `sync_lapses`, `sync_areas`,
+`care_share_access`, `care_messages`, `care_shares`, `caregiver_events`,
+`caregivers`, `observations`, `programme_entries`, `rescue_events`,
+`lesson_progress` and `programme_reminders`.
 Connections, supporters (which only lose the programme's code), account
-consents, messages tied to no programme and the profile are account data and
-are kept. Only `authenticated` may execute it; it runs as its owner. It
+consents, messages tied to no programme, rescue events tied to no
+programme, notification preferences, the wellbeing baseline and the profile
+are account data and are kept. Only `authenticated` may execute it; it runs as its owner. It
 refuses, in this order: no caller (`42501`); a sync service session
 (`TH010`); a confirmation other than `DELETE` (`23514`); a sign-in that is not
 recent (`TH017`), by the same rule as account deletion; a function owner that
@@ -503,8 +509,9 @@ session the same way, and any later write policy carries the condition;
 `supabase/tests/verify_service_session_guard.sh` checks both.
 
 **Leaving and deletion.** Leaving a programme keeps its sync rows, read-only.
-"Delete now" deletes the enrolment, which cascades to its `sync_area`, answers
-and lapses. Account deletion goes through the API only: `delete_my_app_data`
+"Delete now" (`delete_enrolment_now`) deletes the programme's `sync_area`,
+answers and lapses together with the enrolment and returns a count for each;
+the foreign-key cascade from the enrolment remains the backstop. Account deletion goes through the API only: `delete_my_app_data`
 deletes the caller's sync rows, returns a count for each sync table, and
 refuses to run in a `thsync` session (`TH009`), as does
 `begin_account_deletion`.
@@ -655,6 +662,90 @@ Rules:
 - When the migration ran, every live sharing consent stored before it was
   revoked: none could name a connection or caregiver.
 
+## Programme records
+
+Migration source of truth: `supabase/migrations/202610180013_programme_records.sql`.
+`supabase/tests/verify_programme_records_migration.sh` checks this section.
+
+Seven tables. Row-level security is enabled and forced on all of them;
+`anon`, `service_role`, `thsync` and `PUBLIC` hold nothing on them. Every
+table has `user_id` referencing `auth.users(id) on delete cascade`. The five
+programme tables also hold `programme_code` and reference their enrolment
+through one foreign key `(enrolment_id, user_id, programme_code)` →
+`enrolments (id, user_id, programme_code) on delete cascade`, so a row's member
+and programme always match its enrolment, whoever writes it. No table here
+references the consent, consent document, sync or care tables, and no foreign
+key sets null or a default. `submission_id` groups the rows one request
+created; a replay of the same submission is refused by the unique keys
+(`23505`).
+
+| Table | Contents | `authenticated` may |
+|---|---|---|
+| `observations` | A measurement: `enrolment_id`, `programme_code`, `submission_id`, `metric`, `value` (0–10000, three decimals), `unit_ucum`, `effective_at` (from 1900 to one day after the row was stored), `attributes` (JSON object, at most 2 KiB). Unique `(enrolment_id, submission_id, metric)` | read own; insert own |
+| `programme_entries` | A check-in or programme event: `enrolment_id`, `programme_code`, `submission_id`, `kind`, `occurred_at` (from 2000 to five minutes after the row was stored), `payload` (JSON object, at most 4 KiB). Unique `(enrolment_id, submission_id)` | read own; insert own |
+| `rescue_events` | A rescue tool opened: `enrolment_id` and `programme_code` (both null for a shared tool, otherwise a BreatheFree enrolment), `submission_id`, `tool` (code), `opened_at`, `intensity_before` and `intensity_after` (0–10), `helped` (`yes`, `a_little`, `no`), `escalated`. Unique `(user_id, submission_id)` | read own; insert own |
+| `lesson_progress` | A completed lesson: `enrolment_id`, `programme_code`, `lesson_id`, `completed_at`. Primary key `(enrolment_id, lesson_id)` | read own; insert own |
+| `programme_reminders` | A programme's reminder time: `enrolment_id` (primary key), `programme_code`, `remind_at`, `updated_at`. Storing a time sends nothing; whether a reminder fires stays governed by the programme's `reminders` consent | read own; insert own; change `remind_at` |
+| `notification_preferences` | Account-level switches: `user_id` (primary key), `reminders_enabled`, `sensitive_details`, `quiet_hours_enabled`, `updated_at` | read, insert and update own |
+| `wellbeing_baseline` | Account-level onboarding answers, never shared: `user_id` (primary key), `age_range` (two digits, `_`, then two digits or `plus`), `sleep_band` (`lt5`, `5_6`, `7_8`, `9plus`), `stress_band` (`low`, `some`, `high`), `updated_at` | read, insert and update own |
+
+`observations.metric` is an internal key with one fixed UCUM unit and one
+programme: `bp_systolic`, `bp_diastolic` (`mm[Hg]`), `heart_rate` (`/min`),
+`chol_total`, `chol_ldl`, `chol_hdl`, `triglycerides` (`mg/dL`) for `hw`;
+`glucose` (`mg/dL`) and `a1c` (`%`) for `st`; `egfr` (`mL/min/{1.73_m2}`),
+`urine_acr` (`mg/g`) and `alt` (`U/L`) for `re`; `peak_flow` (`L/min`) for
+`ca`. Any other combination is refused (`23514`). Plausibility and clinical
+ranges are the API's.
+
+`programme_entries.kind` is `checkin` (any programme) or one of
+`ca.zone_check`, `ca.symptom`, `ea.mood`, `ea.check_back`, `sd.session`,
+`sd.fall`, `sf.pause`, `ck.done`, `be.diary` and `be.survivorship`, whose
+prefix must equal the row's `programme_code` (`23514`).
+
+Payload and attribute keys are checked on insert by the invoker triggers
+`programme_entries_check_payload` and `observations_check_attributes`. A key
+outside the list, a missing required key (bold) or a value of the wrong type
+is refused with `23514` ('Programme entry payload is not valid for its kind',
+'Observation attributes are not valid for this metric'). Types: *code* matches
+`^[a-z0-9_]{1,40}$`; *codes* is an array of 0–12 distinct codes; *score* is an
+integer 0–10; *text* is a trimmed string of 1–500 characters; *date* is a valid
+`YYYY-MM-DD`. Which option values are allowed is the API's contract with the
+spec, not the database's.
+
+| Kind or metric | Keys |
+|---|---|
+| `checkin` | `feel`, `stress`, `answer` (codes; at least one present) |
+| `ca.zone_check` | **`zone`** code, `symptoms` codes |
+| `ca.symptom` | **`symptoms`** codes, `severity` code, `triggers` codes, `note` text |
+| `ea.mood` | **`mood`** code, `topics` codes |
+| `ea.check_back` | **`change`** code, `reached_out` code |
+| `sd.session` | `settings` codes |
+| `sd.fall` | none |
+| `sf.pause` | **`reason`** code |
+| `ck.done` | **`item`** code, **`done_on`** date, `place` text |
+| `be.diary` | **`fatigue`** score, `symptoms` codes |
+| `be.survivorship` | **`feeling`** code |
+| observation `glucose` | `timing` code, `feelings` codes, `note` text |
+| every other metric | none |
+
+Rules:
+
+- Every insert and update policy refuses a sync service session (top-level
+  `and not public.sync_writer_session()`); select policies do not. Every
+  insert policy requires `deletion_barrier_open()`. Inserts on the programme
+  tables also require `has_consent(enrolment_id, 'core')` (the caller's own
+  enrolment, not left, deletion not started, live core consent); a rescue
+  event with no enrolment needs no consent. `learn_only` and `paused`
+  enrolments may still record.
+- Members cannot delete any of these rows directly. They are deleted with
+  their enrolment ("Delete now") or with the account.
+- Observations, programme entries, rescue events and lesson progress never
+  change: any update, whatever the role, raises `TH026`. A trigger refuses
+  `TRUNCATE` on those four tables for every role, in every session mode
+  (`TH027`); `TRUNCATE` is not granted on them to `PUBLIC`, `anon`,
+  `authenticated` or `thsync`. The reminder time and the two settings tables
+  can be updated and have no truncate guard.
+
 ## Account-data deletion
 
 Migration sources of truth:
@@ -665,18 +756,23 @@ Migration sources of truth:
 `supabase/migrations/202610180002_service_session_guard.sql`,
 `supabase/migrations/202610180008_delete_my_account.sql`,
 `supabase/migrations/202610180009_begin_deletion_recent_sign_in.sql`,
-`supabase/migrations/202610180010_app_data_deletion_owner_only.sql` and
-`supabase/migrations/202610180011_care.sql`.
+`supabase/migrations/202610180010_app_data_deletion_owner_only.sql`,
+`supabase/migrations/202610180011_care.sql` and
+`supabase/migrations/202610180013_programme_records.sql`.
 
 `delete_my_app_data` deletes the caller's sync lapses, answers, areas and sync
 account, care share access rows, care messages, care shares, caregiver events,
-caregivers, care connections, supporters, programme consents, enrolments (and
+caregivers, care connections, supporters, observations, programme entries,
+rescue events, lesson progress, programme reminders, notification
+preferences, wellbeing baseline, programme consents, enrolments (and
 everything that cascades from them), account consents, program data, quit plan
 and profile. It returns counts only, one for each table it deletes from:
 `profiles`, `quit_plans`, `program_data`, `enrolments`, `programme_consents`,
 `account_consents`, `sync_answers`, `sync_lapses`, `sync_areas`,
 `sync_accounts`, `care_share_access`, `care_messages`, `care_shares`,
-`caregiver_events`, `caregivers`, `care_connections` and `supporters`.
+`caregiver_events`, `caregivers`, `care_connections`, `supporters`,
+`observations`, `programme_entries`, `rescue_events`, `lesson_progress`,
+`programme_reminders`, `notification_preferences` and `wellbeing_baseline`.
 Clinics and invite codes are not member data and are not deleted.
 Consent history is deleted with the account; nothing records what was deleted.
 It and `begin_account_deletion` refuse to run in a sync service (`thsync`)
@@ -786,9 +882,11 @@ function": every later function that writes and refuses a sync session raises
 | `TH023` | `care_record_immutable` | `care_revoke_only` (update trigger on `care_connections`, `care_shares` and `caregivers`); `care_append_only` (update trigger on `care_share_access`, `care_messages` and `caregiver_events`) | Care records can only be revoked |
 | `TH024` | `care_rows_delete_only` | `care_truncate_guard` (truncate trigger on `care_connections`, `care_shares`, `care_share_access`, `care_messages`, `caregivers` and `caregiver_events`: a truncate, whatever the role) | Care rows are removed only with their programme or account |
 | `TH025` | `care_invite_invalid` | `redeem_care_invite`: the code is malformed or unknown, its clinic is not verified or is disabled, or it is expired or used up (for a member not already connected to that clinic) | Invite code is not valid |
+| `TH026` | `programme_records_append_only` | `programme_records_append_only` (update trigger on `observations`, `programme_entries`, `rescue_events` and `lesson_progress`: any update, whatever the role) | Programme records are append-only |
+| `TH027` | `programme_rows_delete_only` | `programme_records_truncate_guard` (truncate trigger on `observations`, `programme_entries`, `rescue_events` and `lesson_progress`: a truncate, whatever the role, including a cascade into them when no other table's guard fires first) | Programme records are removed only with their programme or account |
 
 Standard SQLSTATEs are kept where PostgreSQL defines the condition:
 `42501` for row-level security and privilege refusals and for
-"Authentication required" (no caller); `23514` for check constraints and for
-the deletion functions' "Explicit confirmation required" and "Account deletion
-was not started"; `23505` for unique keys; `23503` for foreign keys.
+"Authentication required" (no caller); `23514` for check constraints, for the programme record payload and attribute
+checks, and for the deletion functions' "Explicit confirmation required" and
+"Account deletion was not started"; `23505` for unique keys; `23503` for foreign keys.

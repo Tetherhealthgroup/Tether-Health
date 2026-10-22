@@ -668,7 +668,21 @@ select set_config('th944.a_counts', jsonb_build_object(
   'care_connections', (select count(*) from public.care_connections
                        where user_id = '00000000-0000-4000-8000-000000944001'),
   'supporters', (select count(*) from public.supporters
-                 where user_id = '00000000-0000-4000-8000-000000944001')
+                 where user_id = '00000000-0000-4000-8000-000000944001'),
+  'observations', (select count(*) from public.observations
+                   where user_id = '00000000-0000-4000-8000-000000944001'),
+  'programme_entries', (select count(*) from public.programme_entries
+                        where user_id = '00000000-0000-4000-8000-000000944001'),
+  'rescue_events', (select count(*) from public.rescue_events
+                    where user_id = '00000000-0000-4000-8000-000000944001'),
+  'lesson_progress', (select count(*) from public.lesson_progress
+                      where user_id = '00000000-0000-4000-8000-000000944001'),
+  'programme_reminders', (select count(*) from public.programme_reminders
+                          where user_id = '00000000-0000-4000-8000-000000944001'),
+  'notification_preferences', (select count(*) from public.notification_preferences
+                               where user_id = '00000000-0000-4000-8000-000000944001'),
+  'wellbeing_baseline', (select count(*) from public.wellbeing_baseline
+                         where user_id = '00000000-0000-4000-8000-000000944001')
 )::text, true);
 select th944_test.ok(
   current_setting('th944.a_counts')::jsonb @> '{"enrolments": 2, "programme_consents": 2,

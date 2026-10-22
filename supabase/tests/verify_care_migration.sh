@@ -226,7 +226,14 @@ returns jsonb language sql stable set search_path = '' as $f$
     'caregiver_events', (select count(*) from public.caregiver_events where user_id = p_user),
     'caregivers', (select count(*) from public.caregivers where user_id = p_user),
     'care_connections', (select count(*) from public.care_connections where user_id = p_user),
-    'supporters', (select count(*) from public.supporters where user_id = p_user))
+    'supporters', (select count(*) from public.supporters where user_id = p_user),
+    'observations', (select count(*) from public.observations where user_id = p_user),
+    'programme_entries', (select count(*) from public.programme_entries where user_id = p_user),
+    'rescue_events', (select count(*) from public.rescue_events where user_id = p_user),
+    'lesson_progress', (select count(*) from public.lesson_progress where user_id = p_user),
+    'programme_reminders', (select count(*) from public.programme_reminders where user_id = p_user),
+    'notification_preferences', (select count(*) from public.notification_preferences where user_id = p_user),
+    'wellbeing_baseline', (select count(*) from public.wellbeing_baseline where user_id = p_user))
 $f$;
 
 -- Member rows plus the identity and whether account deletion was started.
@@ -1299,17 +1306,20 @@ select set_config('th955.b_before', th955_test.state('00000000-0000-4000-8000-00
 select set_config('th955.clinics', (
   select count(*) || ':' || sum(uses) from public.care_invites) || ':' || (select count(*) from public.care_orgs), true);
 select th955_test.ok(
-  (select count(*) = 17 and bool_and(value::text::integer >= 1)
+  (select count(*) = 24
+     and bool_and(value::text::integer >= 1
+                  or key in ('observations', 'programme_entries', 'rescue_events', 'lesson_progress',
+                             'programme_reminders', 'notification_preferences', 'wellbeing_baseline'))
    from jsonb_each(th955_test.v('a_before')::jsonb)),
-  'deletion setup: A holds rows in every member table, the seven care tables included');
+  'deletion setup: A holds rows in every member table older than the programme records, the seven care tables included');
 select th955_test.act_as('authenticator', th955_test.claims('00000000-0000-4000-8000-0000009550a1'));
 select th955_test.ok(public.begin_account_deletion('DELETE'), 'A: begin_account_deletion sets the barrier');
 select set_config('th955.a_receipt', public.delete_my_account('DELETE')::text, true);
 select th955_test.act_as(current_setting('th955.superuser'), null);
 select th955_test.ok(
   th955_test.v('a_receipt')::jsonb = th955_test.v('a_before')::jsonb
-  and (select count(*) from jsonb_object_keys(th955_test.v('a_receipt')::jsonb)) = 17,
-  'deletion: delete_my_account returns the 17 counts of the rows A held');
+  and (select count(*) from jsonb_object_keys(th955_test.v('a_receipt')::jsonb)) = 24,
+  'deletion: delete_my_account returns the 24 counts of the rows A held');
 select th955_test.ok(
   (select bool_and(value in ('0'::jsonb, 'null'::jsonb))
    from jsonb_each(th955_test.state('00000000-0000-4000-8000-0000009550a1'))),
@@ -1323,9 +1333,9 @@ select th955_test.act_as('authenticator', th955_test.claims('00000000-0000-4000-
 select set_config('th955.a_repeat', public.delete_my_account('DELETE')::text, true);
 select th955_test.act_as(current_setting('th955.superuser'), null);
 select th955_test.ok(
-  (select count(*) = 17 and bool_and(value = '0'::jsonb)
+  (select count(*) = 24 and bool_and(value = '0'::jsonb)
    from jsonb_each(th955_test.v('a_repeat')::jsonb)),
-  'deletion: a repeat returns 17 zero counts');
+  'deletion: a repeat returns 24 zero counts');
 select th955_test.ok(
   not pg_catalog.has_function_privilege('authenticated', 'public.delete_my_app_data(text)', 'EXECUTE')
   and pg_catalog.obj_description('public.delete_my_app_data(text)'::regprocedure, 'pg_proc')
