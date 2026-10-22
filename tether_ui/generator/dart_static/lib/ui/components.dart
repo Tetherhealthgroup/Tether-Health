@@ -377,7 +377,9 @@ class _Beside extends MultiChildRenderObjectWidget {
   @override
   _RenderBeside createRenderObject(BuildContext context) => _RenderBeside(asideFirst: asideFirst, gap: gap, center: center, textDirection: Directionality.of(context), largeText: _largeText(context));
 
-  static bool _largeText(BuildContext context) => MediaQuery.textScalerOf(context).scale(100) > 100;
+  /// Measured at body text size: Android 14 and later enlarge small text
+  /// more than large text and leave 100 px text unscaled.
+  static bool _largeText(BuildContext context) => MediaQuery.textScalerOf(context).scale(14) > 14;
 
   @override
   void updateRenderObject(BuildContext context, _RenderBeside renderObject) => renderObject
