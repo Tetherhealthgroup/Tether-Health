@@ -162,6 +162,7 @@ List<MissingText> missingText({
   required Set<String> moved,
   required Map<String, Map<String, Object?>> movedKeys,
   required Map<String, Map<String, String>> messages,
+  required Map<String, String> keyFiles,
   required String Function(String path) source,
 }) {
   final out = <MissingText>[];
@@ -203,6 +204,11 @@ List<MissingText> missingText({
         continue;
       }
       final parts = target.split('#');
+      if (keyFiles[parts.first] != path) {
+        out.add(miss(
+            '${parts.first} belongs to ${keyFiles[parts.first] ?? 'no file'}, not $path'));
+        continue;
+      }
       final message = messages[branch]?[parts.first];
       if (message == null) {
         out.add(miss('${parts.first} is not in app_$branch.arb'));
@@ -226,6 +232,16 @@ List<MissingText> missingText({
   }
   return out;
 }
+
+/// Key → the source file its English description names (`lib/…dart: …`).
+Map<String, String> keyFilesOf(Map<String, Object?> englishArb) => {
+      for (final e in englishArb.entries)
+        if (e.key.startsWith('@') && e.key != '@@locale')
+          e.key.substring(1):
+              (((e.value as Map)['description'] as String?) ?? '')
+                  .split(':')
+                  .first
+    };
 
 Map<String, String> _messages(String path) {
   final arb = jsonDecode(File(path).readAsStringSync()) as Map<String, Object?>;
@@ -264,6 +280,9 @@ void main() {
         'en': _messages('lib/l10n/app_en.arb'),
         'es': _messages('lib/l10n/app_es.arb')
       },
+      keyFiles: keyFilesOf(
+          jsonDecode(File('lib/l10n/app_en.arb').readAsStringSync())
+              as Map<String, Object?>),
       source: (p) => File(p).existsSync() ? File(p).readAsStringSync() : '',
     );
     expect(missing, isEmpty,
@@ -320,14 +339,20 @@ void main() {
         'no': 'No',
       },
     };
+    final ownFiles = {
+      for (final k in ['chose', 'fine', 'parts', 'count', 'no', 'other'])
+        k: k == 'other' ? 'lib/y.dart' : 'lib/x.dart'
+    };
     List<int> lines(Map<String, Map<String, String>> messages,
             {Map<String, Object?> recorded = keys,
-            String src = "'Stays in code'"}) =>
+            String src = "'Stays in code'",
+            Map<String, String>? keyFiles}) =>
         missingText(
           inventory: inventory,
           moved: {'lib/x.dart'},
           movedKeys: {'lib/x.dart': recorded},
           messages: messages,
+          keyFiles: keyFiles ?? ownFiles,
           source: (_) => src,
         ).map((m) => m.line).toList();
     Map<String, Map<String, String>> edit(
@@ -348,6 +373,13 @@ void main() {
     expect(lines(edit('en', 'parts', 'Part one, part 2')), [8]);
     expect(lines(good, src: ''), [3]);
     expect(lines(good, recorded: {...keys}..remove('6')), [7]);
+    // A key from another screen with the same text is not accepted.
+    final borrowed = {
+      'en': {...good['en']!},
+      'es': {...good['es']!, 'other': 'No'},
+    };
+    expect(lines(borrowed, recorded: {...keys, '6': 'other'}), [7]);
+    expect(lines(good, keyFiles: {...ownFiles, 'no': 'lib/y.dart'}), [7]);
     expect(
         textRuns(r'Hola ${name.trim()}, ¿qué tal?'), ['Hola ', ', ¿qué tal?']);
     expect(messageRuns('{a} y {n, plural, one{x} other{y}} más'),
