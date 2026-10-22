@@ -4,19 +4,23 @@ T COMPLETO
 T Le diste tiempo a la sensación para cambiar.
 T Tómate un momento para notar qué es diferente ahora.
 T TIEMPO
+T 0:00
 T PASOS
-T <n> de <n>
+T 3 de 3
 T ESTADO
 T Guardado
 T ¿Qué tan fuerte es el antojo ahora?
 T Elige el número que se sienta más cercano.
-T <n> · Moderado
+T 6 · Moderado
 T Sin antojo
 T Más fuerte
 T No hay una puntuación “buena”; las respuestas honestas mejoran tu apoyo.
 T RESULTADO DE HOY
 T ANTES
+T 6 / 10
 T AHORA
+T 6 / 10
+T — 0
 T PUNTOS
 T Un resultado, no una promesa; los patrones se aclaran con el tiempo.
 T ¿Qué ayudó más?
@@ -38,19 +42,25 @@ SL COMPLETO
 SL Le diste tiempo a la sensación para cambiar.
 SL Tómate un momento para notar qué es diferente ahora.
 SL TIEMPO
+SL 0:00
 SL PASOS
-SL <n> de <n>
+SL 3 de 3
 SL ESTADO
 SL Guardado
 SL ¿Qué tan fuerte es el antojo ahora?
 SL Elige el número que se sienta más cercano.
-SL <n> · Moderado
+SL 6 · Moderado
+SL 6
+SV 60%
 SL Sin antojo
 SL Más fuerte
 SL No hay una puntuación “buena”; las respuestas honestas mejoran tu apoyo.
 SL RESULTADO DE HOY
 SL ANTES
+SL 6 / 10
 SL AHORA
+SL 6 / 10
+SL — 0
 SL PUNTOS
 SL Un resultado, no una promesa; los patrones se aclaran con el tiempo.
 SL ¿Qué ayudó más?

@@ -11,11 +11,15 @@
 // never edited to make this test pass, and [baselineDigest] pins all of
 // them.
 //
-// Dates and times come from the phone's clock, so before comparing, month
-// and weekday names become <month> and <weekday>, numbers become <n>, the
-// time-of-day greeting becomes <greeting>, lines that are only numbers (a
-// calendar's days) are dropped, and repeated lines are kept once. Month and
-// weekday tables are therefore checked by their own tests, not here.
+// Dates come from the phone's clock, so before comparing, only what the
+// clock decides is normalised: month and weekday names become <month> and
+// <weekday>, the day and year next to them <day> and <year>, numeric dates
+// <date>, time since quitting <elapsed>, the time-of-day greeting
+// <greeting>, and a calendar's run of day numbers one line. Phone numbers
+// and every other number stay as shown. Repeated lines are kept once. A date
+// written as a literal (such as a review date) is normalised too; its words
+// are still compared here, and its exact text by moved_text_test.dart. Month
+// and weekday tables are checked by their own old-vs-new tests.
 //
 // To regenerate the dumps at a new baseline (a reviewed decision, never in a
 // ticket that moves text), run with TEXT_BASELINE_WRITE=1, then update
@@ -39,7 +43,7 @@ const baselineCommit = '97d81ce';
 /// sha256 of every file in test/l10n/baseline/, in name order, each as
 /// `<name>\n<content>`.
 const baselineDigest =
-    '2d2a012d49e0139ff9b1aa3617f1521b4ec78f34b07a77d7da0987e6fd66bad6';
+    '0b0f3e17d7f183194eacea32aa19643f258133d333d915d85c464c8486e6625a';
 
 const baselineDir = 'test/l10n/baseline';
 
@@ -89,28 +93,57 @@ const locales = <String, Locale>{
   'es': Locale('es', 'US')
 };
 
-final _months = RegExp(
-  r'\b(January|February|March|April|May|June|July|August|September|October|November|December'
-  r'|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec'
-  r'|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)\b',
-  caseSensitive: false,
-);
-final _weekdays = RegExp(
-  r'(?<![\p{L}])(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Mon|Tue|Tues|Wed|Thu|Thur|Thurs|Fri|Sat|Sun'
-  r'|lunes|martes|miércoles|jueves|viernes|sábado|domingo|lun|mié|jue|vie|sáb|dom)(?![\p{L}])',
-  caseSensitive: false,
-  unicode: true,
-);
+// Month and weekday names, as the app writes them: English capitalised or
+// upper case, Spanish lower case, capitalised or upper case. Words that are
+// also ordinary words ("May", "Mar", "Sun"...) and short forms count only
+// next to a day number.
+const _monthNames =
+    'January|February|March|April|June|July|August|September|October|November|December'
+    '|JANUARY|FEBRUARY|MARCH|APRIL|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER'
+    '|enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre'
+    '|Enero|Febrero|Marzo|Abril|Mayo|Junio|Julio|Agosto|Septiembre|Octubre|Noviembre|Diciembre'
+    '|ENERO|FEBRERO|MARZO|ABRIL|MAYO|JUNIO|JULIO|AGOSTO|SEPTIEMBRE|OCTUBRE|NOVIEMBRE|DICIEMBRE';
+const _monthShort = 'May|MAY|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec'
+    '|ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic';
+const _weekdayNames = 'Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday'
+    '|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY'
+    '|lunes|martes|miércoles|jueves|viernes|sábado|domingo'
+    '|Lunes|Martes|Miércoles|Jueves|Viernes|Sábado|Domingo'
+    '|LUNES|MARTES|MIÉRCOLES|JUEVES|VIERNES|SÁBADO|DOMINGO';
+
 final _greeting = RegExp(
     r'Good (morning|afternoon|evening)|Buenos días|Buenas (tardes|noches)');
-final _number = RegExp(r'\d+');
+final _month = RegExp('(?<![\\p{L}])($_monthNames)(?![\\p{L}])', unicode: true);
+final _monthNearDay = RegExp(
+    '(?<![\\p{L}])($_monthShort)(?![\\p{L}])(?=\\.? \\d{1,2}(?!\\d))|(?<=\\d{1,2} )($_monthShort)(?![\\p{L}])',
+    unicode: true);
+final _weekday =
+    RegExp('(?<![\\p{L}])($_weekdayNames)(?![\\p{L}])', unicode: true);
+final _dayAfterMonth = RegExp(r'<month>(\.?) (\d{1,2})(?!\d)');
+final _dayBeforeMonth = RegExp(r'(?<!\d)(\d{1,2}) ((?:de|DE) )?<month>');
+final _dayRange = RegExp(r'<day>–(\d{1,2})(?!\d)');
+final _year = RegExp(
+    r'(<month> <day>, |de <month> de |DE <month> DE |<day> <month> |<month> )(\d{4})(?!\d)');
+final _slashDate = RegExp(r'(?<!\d)\d{1,2}/\d{1,2}/\d{4}(?!\d)');
+final _elapsed = RegExp(r'(?<!\d)\d+h \d+m(?![\p{L}])', unicode: true);
 
-/// The comparable form of one dumped line (see the file comment).
+/// The comparable form of one dumped line (see the file comment): only
+/// clock-derived parts change; phone numbers and every other number stay.
 String normalize(String line) => line
     .replaceAll(_greeting, '<greeting>')
-    .replaceAll(_months, '<month>')
-    .replaceAll(_weekdays, '<weekday>')
-    .replaceAll(_number, '<n>');
+    .replaceAll(_month, '<month>')
+    .replaceAll(_monthNearDay, '<month>')
+    .replaceAll(_weekday, '<weekday>')
+    .replaceAllMapped(_dayAfterMonth, (m) => '<month>${m[1]} <day>')
+    .replaceAllMapped(_dayBeforeMonth, (m) => '<day> ${m[2] ?? ''}<month>')
+    .replaceAll(_dayRange, '<day>–<day>')
+    .replaceAllMapped(_year, (m) => '${m[1]}<year>')
+    .replaceAll(_slashDate, '<date>')
+    .replaceAll(RegExp(r'(?<=<date>\n)\d{1,2}$'), '<day>')
+    .replaceAll(_elapsed, '<elapsed>');
+
+/// A calendar grid: seven or more lines in a row that are each a day number.
+final _dayNumber = RegExp(r'^T ([1-9]|[12]\d|3[01])$');
 
 String _esc(String s) => s.replaceAll('\\', '\\\\').replaceAll('\n', '\\n');
 
@@ -146,16 +179,35 @@ List<String> dumpLines(WidgetTester tester) {
     final root = view.owner?.semanticsOwner?.rootSemanticsNode;
     if (root != null) sem(root);
   }
-  final out = <String>[];
+  final lines = <String>[];
   for (final line in raw) {
-    final n = _esc(normalize(line));
+    final n = normalize(line);
     final body = n.substring(n.indexOf(' ') + 1);
-    // Blank lines, icons (private-use glyphs), and lines of only numbers and
-    // punctuation (a calendar's days, a running timer) carry no text.
-    final text = body
-        .replaceAll('<n>', '')
-        .replaceAll(RegExp(r'[\s\p{P}\p{S}\p{Co}\p{Cf}]', unicode: true), '');
+    // Blank lines and icons (private-use glyphs) carry no text.
+    final text = body.replaceAll(
+        RegExp(r'[\s\p{P}\p{S}\p{Co}\p{Cf}]', unicode: true), '');
     if (text.isEmpty) continue;
+    lines.add(n);
+  }
+  // A calendar shows the current month: its run of day numbers becomes one
+  // line. Any other number line stays.
+  final calendar = <String>[];
+  for (var i = 0; i < lines.length;) {
+    var j = i;
+    while (j < lines.length && _dayNumber.hasMatch(lines[j])) {
+      j++;
+    }
+    if (j - i >= 7) {
+      calendar.add('T <calendar days>');
+      i = j;
+    } else {
+      calendar.add(lines[i]);
+      i++;
+    }
+  }
+  final out = <String>[];
+  for (final line in calendar) {
+    final n = _esc(line);
     if (out.isNotEmpty && out.last == n) continue;
     out.add(n);
   }
@@ -278,14 +330,29 @@ void main() {
   });
 
   test('normalizing hides only the clock', () {
-    expect(normalize('T TODAY · OCTOBER 22'), 'T TODAY · <month> <n>');
-    expect(normalize('T HOY · 22 DE OCTUBRE'), 'T HOY · <n> DE <month>');
+    expect(normalize('T TODAY · OCTOBER 22'), 'T TODAY · <month> <day>');
+    expect(normalize('T HOY · 22 DE OCTUBRE'), 'T HOY · <day> DE <month>');
     expect(normalize('T miércoles, 22 de octubre de 2026'),
-        'T <weekday>, <n> de <month> de <n>');
+        'T <weekday>, <day> de <month> de <year>');
+    expect(normalize('T Thursday, October 22, 2026'),
+        'T <weekday>, <month> <day>, <year>');
+    expect(normalize('T October 2026'), 'T <month> <year>');
+    expect(normalize('T Oct 22–29'), 'T <month> <day>–<day>');
+    expect(normalize('T Oct 29 – Nov 3'), 'T <month> <day> – <month> <day>');
+    expect(normalize('SL 10/22/2026\n22'), 'SL <date>\n<day>');
+    expect(normalize('T 3h 12m'), 'T <elapsed>');
+    expect(normalize('T revisadas el 22 ago 2026'),
+        'T revisadas el <day> <month> <year>');
     expect(normalize('T Good evening, Alex.'), 'T <greeting>, Alex.');
     expect(normalize('T Buenos días.'), 'T <greeting>.');
-    expect(
-        normalize('T Monitoring your progress'), 'T Monitoring your progress');
+    // Not the clock: ordinary words, phone numbers and other numbers stay.
+    expect(normalize('T Hours may vary'), 'T Hours may vary');
+    expect(normalize('T May I help?'), 'T May I help?');
+    expect(normalize('T Call 1-800-784-8669 or 988'),
+        'T Call 1-800-784-8669 or 988');
+    expect(normalize('T STEP 2 OF 5'), 'T STEP 2 OF 5');
+    expect(normalize('T About 5 minutes'), 'T About 5 minutes');
     expect(normalize('T Sundays only'), 'T Sundays only');
+    expect(normalize('T 7:00 AM'), 'T 7:00 AM');
   });
 }

@@ -1,6 +1,6 @@
 # baseline 97d81ce · screen02 · en
 T BreatheFree
-T <n> OF <n>
+T 2 OF 3
 T YOUR PRIVACY
 T Your story stays yours.
 T Choose how your information is used. Required items keep the app working; optional choices can change anytime.
@@ -23,7 +23,7 @@ T No ads. No tobacco-industry funding.
 T We never sell patient health information.
 T Agree and continue
 T You can change optional choices anytime in Settings.
-SL BreatheFree\n<n> OF <n>\nYou can change optional choices anytime in Settings.
+SL BreatheFree\n2 OF 3\nYou can change optional choices anytime in Settings.
 ST Back
 SL YOUR PRIVACY
 SL Your story stays yours.

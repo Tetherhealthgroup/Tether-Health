@@ -5,6 +5,7 @@ T Cambiar ubicación
 T GRATIS Y CONFIDENCIAL
 T Habla con un consejero de la línea para dejar de fumar
 T Te conecta con la línea de tu estado. Los servicios y horarios pueden variar.
+T 1-800-784-8669
 T Llamar ahora
 T Pedir una llamada
 T Vista previa del consentimiento antes de referir
@@ -33,7 +34,7 @@ SL Elige una persona o servicio que te parezca adecuado.
 SL Guest profile
 ST Configuración y privacidad
 SL Cambiar ubicación
-SL GRATIS Y CONFIDENCIAL\nHabla con un consejero de la línea para dejar de fumar\nTe conecta con la línea de tu estado. Los servicios y horarios pueden variar.\nNúmero de la línea <n>-<n>-<n>-<n>\n<n>-<n>-<n>-<n>\nVista previa del consentimiento antes de referir
+SL GRATIS Y CONFIDENCIAL\nHabla con un consejero de la línea para dejar de fumar\nTe conecta con la línea de tu estado. Los servicios y horarios pueden variar.\nNúmero de la línea 1-800-784-8669\n1-800-784-8669\nVista previa del consentimiento antes de referir
 SL Llamar ahora
 SL Pedir una llamada
 SL Tus personas

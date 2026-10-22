@@ -1,15 +1,15 @@
 # baseline 97d81ce · screen11 · en
 T BreatheFree
-T <weekday>, <month> <n>
+T <weekday>, <month> <day>
 T <greeting>.
 T YOUR QUIT DAY
-T <n> days
-T <weekday>, <month> <n> · Pacific Time
-T DAY <n>
+T 7 days
+T <weekday>, <month> <day> · Pacific Time
+T DAY 1
 T QUIT DAY
 T TODAY’S NEXT STEP
 T Remove cigarettes, lighters and ashtrays
-T About <n> minutes
+T About 3 minutes
 T Mark complete
 T One small action is enough for today.
 T Craving now?
@@ -19,9 +19,10 @@ T Your preparation
 T View progress
 T Plan ready
 T Activated today
+T 0/3
 T Space ready
-T <n> tasks left
-T <n> supporters
+T 3 tasks left
+T 0 supporters
 T Add support
 T YOUR TOP REASON
 T “My reason to quit.”
@@ -36,16 +37,16 @@ T Support
 SL BreatheFree
 ST Notifications
 SL Guest profile
-SL <weekday>, <month> <n>
+SL <weekday>, <month> <day>
 SL <greeting>.
 SL YOUR QUIT DAY
-SL <n> days
-SL <weekday>, <month> <n> · Pacific Time
-SL DAY <n>
+SL 7 days
+SL <weekday>, <month> <day> · Pacific Time
+SL DAY 1
 SL QUIT DAY
 SL TODAY’S NEXT STEP
 SL Remove cigarettes, lighters and ashtrays
-SL About <n> minutes
+SL About 3 minutes
 SL Mark complete
 SL One small action is enough for today.
 SL Craving now?
@@ -54,8 +55,8 @@ SL Open Rescue
 SL Your preparation
 SL View progress
 SL Plan ready\nActivated today
-SL <n>/<n>\nSpace ready\n<n> tasks left
-SL <n> supporters\nAdd support
+SL 0/3\nSpace ready\n3 tasks left
+SL 0 supporters\nAdd support
 SL YOUR TOP REASON\n“My reason to quit.”
 SL Coming up
 SL No reminders are scheduled. You can add them from your plan.

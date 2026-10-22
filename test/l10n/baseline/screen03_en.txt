@@ -1,28 +1,32 @@
 # baseline 97d81ce · screen03 · en
 T About your smoking
-T <n> OF <n>
+T 1 OF 2
 T ASSESSMENT
-T QUESTION <n>
+T 50%
+T QUESTION 1
 T On a typical day, how many cigarettes do you smoke?
 T Choose the answer closest to your usual day.
 T I don’t smoke every day
-T <n> or fewer cigarettes
-T <n>–<n> cigarettes
-T <n> or more cigarettes
+T 10 or fewer cigarettes
+T 11–20 cigarettes
+T 21–30 cigarettes
+T 31 or more cigarettes
 T Why we ask
 T This helps tailor your plan and estimate money saved.
 T It is not a diagnosis or a judgment.
 T Next
 T Your answer is saved automatically.
-SL About your smoking\n<n> OF <n>\nASSESSMENT\n<n>%\nYour answer is saved automatically.
+SL About your smoking\n1 OF 2\nASSESSMENT\n50%\nYour answer is saved automatically.
+SV 50
 ST Back
-SL QUESTION <n>
+SL QUESTION 1
 SL On a typical day, how many cigarettes do you smoke?
 SL Choose the answer closest to your usual day.
 SL I don’t smoke every day\nI don’t smoke every day
-SL <n> or fewer cigarettes\n<n> or fewer cigarettes
-SL <n>–<n> cigarettes\n<n>–<n> cigarettes
-SL <n> or more cigarettes\n<n> or more cigarettes
+SL 10 or fewer cigarettes\n10 or fewer cigarettes
+SL 11–20 cigarettes\n11–20 cigarettes
+SL 21–30 cigarettes\n21–30 cigarettes
+SL 31 or more cigarettes\n31 or more cigarettes
 SL Why we ask
 SL This helps tailor your plan and estimate money saved.
 SL It is not a diagnosis or a judgment.

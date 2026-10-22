@@ -1,11 +1,11 @@
 # baseline 97d81ce · screen21 · es
 T BreatheFree
-T DÍA DE DEJARLO · <month> <n>
+T DÍA DE DEJARLO · OCT 22
 T <greeting>.
 T Mantén el día sencillo. Una elección a la vez.
 T DESDE TU HORA PLANIFICADA PARA DEJARLO
-T <n>h <n>m
-T Comenzaste a las <n>:<n> AM · Hora del Pacífico
+T <elapsed>
+T Comenzaste a las 12:00 AM · Hora del Pacífico
 T Tengo un antojo
 T Abre apoyo rápido para los próximos minutos.
 T Abrir Rescate
@@ -14,10 +14,10 @@ T Tu progreso no se borrará
 T SIGUIENTE PASO
 T Haz tu acción de la mañana
 T Bebe agua y camina cinco minutos en un lugar sin humo.
-T Unos <n> minutos
+T Unos 5 minutos
 T Completar
 T Lo esencial de hoy
-T <n> elementos
+T 2 elementos
 T REGISTRO DE LA MAÑANA
 T ¿Cómo va tu primera mañana?
 T Registrar
@@ -41,21 +41,21 @@ T Apoyo
 SL BreatheFree
 ST Notifications
 SL Guest profile
-SL DÍA DE DEJARLO · <month> <n>
+SL DÍA DE DEJARLO · OCT 22
 SL <greeting>.
 SL Mantén el día sencillo. Una elección a la vez.
 SL DESDE TU HORA PLANIFICADA PARA DEJARLO
-SL <n>h <n>m
-SL Comenzaste a las <n>:<n> AM · Hora del Pacífico
+SL <elapsed>
+SL Comenzaste a las 12:00 AM · Hora del Pacífico
 SL Tengo un antojo\nAbre apoyo rápido para los próximos minutos.\nAbrir Rescate
 SL Fumé o tuve un desliz\nTu progreso no se borrará
 SL SIGUIENTE PASO
 SL Haz tu acción de la mañana
 SL Bebe agua y camina cinco minutos en un lugar sin humo.
-SL Unos <n> minutos
+SL Unos 5 minutos
 SL Completar
 SL Lo esencial de hoy
-SL <n> elementos
+SL 2 elementos
 SL REGISTRO DE LA MAÑANA\n¿Cómo va tu primera mañana?\nRegistrar
 SL PLAN DE TRATAMIENTO REGISTRADO\nConfirma el estado de tu plan matutino\nSigue solo el plan registrado contigo o con tu equipo de atención.\nRevisar estado
 SL TU RAZÓN HOY

@@ -6,6 +6,7 @@ T Superemos este momento.
 T Empieza con lo que sientes ahora. No necesitas escribir.
 T INTENSIDAD DEL ANTOJO
 T ¿Qué tan fuerte es ahora?
+T 6
 T MODERADO
 T Leve
 T Más fuerte
@@ -40,7 +41,10 @@ SL Superemos este momento.
 SL Empieza con lo que sientes ahora. No necesitas escribir.
 SL INTENSIDAD DEL ANTOJO
 SL ¿Qué tan fuerte es ahora?
+SL 6
 SL MODERADO
+SL 6
+SV 56%
 SL Leve
 SL Más fuerte
 SL Solo necesitas elegir un número.

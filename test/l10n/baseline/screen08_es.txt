@@ -1,12 +1,13 @@
 # baseline 97d81ce · screen08 · es
 T Mis razones
-T <n> DE <n>
+T 3 DE 5
 T PLAN PARA DEJARLO
+T 60%
 T TU MOTIVACIÓN
 T ¿Por qué quieres dejar de fumar?
 T Elige todo lo que te importe. Toca la estrella para elegir tu razón principal.
 T ELIGE TODAS LAS QUE TE IMPORTEN
-T <n> ELEGIDAS
+T 0 ELEGIDAS
 T Proteger a mi familia
 T Respirar mejor
 T Mejorar mi salud
@@ -21,14 +22,15 @@ T Elige una razón para crear tu recordatorio personal.
 T Elige una razón principal en cualquier momento
 T Tus razones son privadas y solo personalizan tu apoyo para dejar de fumar.
 T Guardar mis razones
-T <n> razones elegidas · sin razón principal
-SL Mis razones\n<n> DE <n>\nPLAN PARA DEJARLO\n<n>%\n<n> razones elegidas · sin razón principal
+T 0 razones elegidas · sin razón principal
+SL Mis razones\n3 DE 5\nPLAN PARA DEJARLO\n60%\n0 razones elegidas · sin razón principal
+SV 60
 ST Atrás
 SL TU MOTIVACIÓN
 SL ¿Por qué quieres dejar de fumar?
 SL Elige todo lo que te importe. Toca la estrella para elegir tu razón principal.
 SL ELIGE TODAS LAS QUE TE IMPORTEN
-SL <n> ELEGIDAS
+SL 0 ELEGIDAS
 SL Proteger a mi familia\nProteger a mi familia
 SL Respirar mejor\nRespirar mejor
 SL Mejorar mi salud\nMejorar mi salud

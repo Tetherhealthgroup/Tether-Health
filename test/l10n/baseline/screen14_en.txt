@@ -1,11 +1,12 @@
 # baseline 97d81ce · screen14 · en
 T Stress reset
 T VOICE ON
-T STEP <n> OF <n> · BREATHE
-T <n>:<n> LEFT
+T STEP 1 OF 3 · BREATHE
+T 3:00 LEFT
 T SLOW BREATHING
-T Breath <n> of <n>
+T Breath 1 of 10
 T BREATHE IN
+T 4
 T SECONDS
 T Slowly breathe in through your nose.
 T Follow the circle, listen, or use the countdown.
@@ -28,11 +29,13 @@ T Partial completion is saved · Works offline
 ST Close
 SL Stress reset
 SL Voice guidance\nVOICE ON
-SL STEP <n> OF <n> · BREATHE
-SL <n>:<n> LEFT
+SL STEP 1 OF 3 · BREATHE
+SL 3:00 LEFT
+SV 0
 SL SLOW BREATHING
-SL Breath <n> of <n>
+SL Breath 1 of 10
 SL BREATHE IN
+SL 4
 SL SECONDS
 SL Slowly breathe in through your nose.
 SL Follow the circle, listen, or use the countdown.

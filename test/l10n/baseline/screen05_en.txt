@@ -2,6 +2,7 @@
 T Your starting point
 T Complete
 T ASSESSMENT
+T 100%
 T YOUR REFLECTION
 T You’re ready to prepare—at your own pace.
 T Here is what we heard from your answers.
@@ -13,7 +14,7 @@ T STARTING POINT
 T You can start small and add details later
 T RECOMMENDED
 T Prepare
-T Practice coping tools and choose a quit date in the next <n>–<n> days. We’ll guide one small step each day.
+T Practice coping tools and choose a quit date in the next 7–14 days. We’ll guide one small step each day.
 T Why this fits your answers
 T YOU CAN CHOOSE A DIFFERENT PATH
 T Explore first
@@ -22,7 +23,8 @@ T Connect
 T Talk with a coach or care team
 T Build my preparation plan
 T You’re in control. Change your path anytime.
-SL Your starting point\nComplete\nASSESSMENT\n<n>%\nYou’re in control. Change your path anytime.
+SL Your starting point\nComplete\nASSESSMENT\n100%\nYou’re in control. Change your path anytime.
+SV 100
 ST Back
 SL YOUR REFLECTION
 SL You’re ready to prepare—at your own pace.
@@ -33,7 +35,7 @@ SL TRIGGERS
 SL You can identify triggers anytime
 SL STARTING POINT
 SL You can start small and add details later
-SL RECOMMENDED\nPrepare\nPractice coping tools and choose a quit date in the next <n>–<n> days. We’ll guide one small step each day.
+SL RECOMMENDED\nPrepare\nPractice coping tools and choose a quit date in the next 7–14 days. We’ll guide one small step each day.
 SL Why this fits your answers
 SL YOU CAN CHOOSE A DIFFERENT PATH
 SL Explore first\nLearn without setting a date

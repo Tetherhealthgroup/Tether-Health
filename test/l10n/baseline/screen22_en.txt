@@ -35,7 +35,7 @@ T Today or another date
 T Help me decide
 T Review options without pressure
 T YOUR NEXT STEP
-T Move cigarettes out of reach, then use a <n>-minute Rescue.
+T Move cigarettes out of reach, then use a 2-minute Rescue.
 T Based on the stress trigger and what helped before.
 T You can switch tools or contact support at any time.
 T Open after saving
@@ -44,7 +44,7 @@ T No one is notified unless you choose.
 T View support
 T Save and start recovery
 T Saves offline and syncs once. You can delete this event later.
-T Content v<n>.<n>
+T Content v1.0
 T Skip for now and return Home
 SL Slip recovery
 SL PRIVATE
@@ -78,7 +78,7 @@ SL Continue from this moment\nKeep the current quit plan and update support for 
 SL Choose a new quit time\nToday or another date
 SL Help me decide\nReview options without pressure
 SL YOUR NEXT STEP
-SL Move cigarettes out of reach, then use a <n>-minute Rescue.
+SL Move cigarettes out of reach, then use a 2-minute Rescue.
 SL Based on the stress trigger and what helped before.
 SL You can switch tools or contact support at any time.
 SL Open after saving
@@ -86,5 +86,5 @@ SL Talk with a quitline counselor\nNo one is notified unless you choose.
 SL View support
 SL Save and start recovery
 SL Saves offline and syncs once. You can delete this event later.
-SL Content v<n>.<n>
+SL Content v1.0
 SL Skip for now and return Home

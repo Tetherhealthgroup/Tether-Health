@@ -1,15 +1,17 @@
 # baseline 97d81ce · screen10 · en
 T Review your plan
-T <n> OF <n>
+T 5 OF 5
 T QUIT PLAN
+T 100%
 T YOUR QUIT PLAN
 T Your plan is ready.
 T Take one final look. You can edit any part now or later.
 T QUIT DATE
-T <month>
-T <weekday>
-T <weekday>, <month> <n>
-T <n> days to prepare · Pacific Time
+T OCT
+T 29
+T THU
+T <weekday>, <month> <day>
+T 7 days to prepare · Pacific Time
 T RECOMMENDED WINDOW
 T TODAY
 T QUIT DAY
@@ -22,7 +24,7 @@ T No reason selected
 T SUPPORT CHECK-IN
 T No active supporter
 T PREPARE YOUR SPACE
-T <n> of <n> tasks complete
+T 0 of 3 tasks complete
 T TREATMENT SUPPORT
 T Not included
 T Starting activates your preparation tasks and reminders.
@@ -30,19 +32,20 @@ T Support messages still require your approval before sending.
 T Start my quit plan
 T Save and finish later
 T Saved automatically · You can edit your plan at any time
-SL Review your plan\n<n> OF <n>\nQUIT PLAN\n<n>%\nSaved automatically · You can edit your plan at any time
+SL Review your plan\n5 OF 5\nQUIT PLAN\n100%\nSaved automatically · You can edit your plan at any time
+SV 100
 ST Back
 SL YOUR QUIT PLAN
 SL Your plan is ready.
 SL Take one final look. You can edit any part now or later.
-SL QUIT DATE\n<month>\n<n>\n<weekday>\n<weekday>, <month> <n>\n<n> days to prepare · Pacific Time\nRECOMMENDED WINDOW\nTODAY\nQUIT DAY
+SL QUIT DATE\nOCT\n29\nTHU\n<weekday>, <month> <day>\n7 days to prepare · Pacific Time\nRECOMMENDED WINDOW\nTODAY\nQUIT DAY
 ST Edit date
 SL PLAN DETAILS
 SL Tap any item to edit
 SL QUIT APPROACH\nSet a quit date
 SL TOP REASON\nNo reason selected
 SL SUPPORT CHECK-IN\nNo active supporter
-SL PREPARE YOUR SPACE\n<n> of <n> tasks complete
+SL PREPARE YOUR SPACE\n0 of 3 tasks complete
 SL TREATMENT SUPPORT\nNot included
 SL Starting activates your preparation tasks and reminders.
 SL Support messages still require your approval before sending.

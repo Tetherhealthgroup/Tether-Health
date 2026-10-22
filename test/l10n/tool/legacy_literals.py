@@ -14,7 +14,11 @@ ticket that moves text. Branch rules, innermost first:
   helper: the first argument is `en`, the second `es`;
 - `if (isSpanish) X` (or `if (!isSpanish) X`): X is `es` (`en`); its `else`,
   or when there is none the rest of the enclosing block, is the other one;
-- a `const english` / `const spanish` list or string: `en` / `es`;
+- a `const english` / `const spanish` list or string, or a constant named
+  `*English` / `*Spanish` (such as `unavailableSpanish`): `en` / `es`;
+
+Literals inside `${...}` interpolations are scanned too, with the same
+rules, so `'${isSpanish ? 'a' : 'b'}'` tags `a` es and `b` en.
 - anything else is `none` (shown in every language, or not shown).
 
 Flags: `interpolated` (has `$`), `joined` (adjacent to the previous literal,
@@ -28,8 +32,18 @@ import json, os, re, sys
 
 COND = re.compile(r'(?:\bwidget\.|\b_|\b)isSpanish\s*\?(?![?.\[])|_language\s*==\s*WelcomeLanguage\.spanish\s*\?(?![?.\[])')
 IF = re.compile(r'\bif\s*\(\s*(!?)\s*(?:widget\.|_)?isSpanish\s*\)')
-HELPER_DEF = re.compile(r'String\s+(_?t)\s*\(\s*String\s+english\s*,\s*String\s+spanish\s*\)')
-TABLE = re.compile(r'\b(?:const|final)\s+(english|spanish)\s*=')
+# A helper whose parameters include `String english` and `String spanish`
+# (`t(english, spanish)`, `localized(isSpanish, english, spanish)`).
+HELPER_DEF = re.compile(r'String\s+(\w+)\s*\(([^)]*\bString\s+english\b[^)]*)\)')
+HELPERS = {}  # name -> (english arg index, spanish arg index), from every file
+
+
+def find_helpers(src):
+    for d in HELPER_DEF.finditer(src):
+        params = [p.strip().split()[-1] for p in d.group(2).split(',') if p.strip()]
+        if 'english' in params and 'spanish' in params:
+            HELPERS[d.group(1)] = (params.index('english'), params.index('spanish'))
+TABLE = re.compile(r'\b(?:const|final)\s+(?:String\s+|List<String>\s+)?(english|spanish|\w*English|\w*Spanish)\s*=')
 
 
 def scan(src):
@@ -54,13 +68,18 @@ def scan(src):
         i += len(delim)
         body_start = i
         interp = False
+        code = []  # ${...} regions: kept in the masked text, so a ternary in them is seen
         while i < n:
             if not raw and src[i] == '\\':
                 i += 2
                 continue
             if src.startswith(delim, i):
                 lits.append((start, i + len(delim), src[body_start:i], interp))
-                blank(body_start, i)
+                pos = body_start
+                for a, b in code:
+                    blank(pos, a)
+                    pos = b
+                blank(pos, i)
                 return i + len(delim)
             if not raw and src[i] == '$':
                 interp = True
@@ -74,6 +93,7 @@ def scan(src):
                         if c == '{': depth += 1
                         elif c == '}': depth -= 1
                         j += 1
+                    code.append((i + 2, j - 1))
                     i = j
                     continue
             if not triple and src[i] == '\n':
@@ -172,16 +192,18 @@ def spans(m):
         a_end = then_end(m, a)
         b_end = expr_end(m, a_end + 1)
         out += [(a, a_end, 'es'), (a_end + 1, b_end, 'en')]
-    helpers = {d.group(1) for d in HELPER_DEF.finditer(m)}
-    for h in helpers:
+    for h, (ei, si) in HELPERS.items():
         for call in re.finditer(r'(?<![\w.])' + re.escape(h) + r'\s*\(', m):
-            if HELPER_DEF.match(m, max(0, call.start() - 7)) or m[max(0, call.start() - 7):call.start()].strip() == 'String':
-                continue
-            a = call.end()
-            mid = expr_end(m, a)
-            if mid < len(m) and m[mid] == ',':
-                end = expr_end(m, mid + 1)
-                out += [(a, mid, 'en'), (mid + 1, end, 'es')]
+            if m[max(0, call.start() - 7):call.start()].strip() == 'String':
+                continue  # the definition
+            args, pos = [], call.end()
+            while pos < len(m):
+                end = expr_end(m, pos)
+                args.append((pos, end))
+                if end >= len(m) or m[end] != ',': break
+                pos = end + 1
+            if len(args) > max(ei, si):
+                out += [(args[ei][0], args[ei][1], 'en'), (args[si][0], args[si][1], 'es')]
     for f in IF.finditer(m):
         first = 'en' if f.group(1) else 'es'
         other = 'es' if first == 'en' else 'en'
@@ -194,7 +216,7 @@ def spans(m):
         else:
             out.append((s_end, enclosing_block_end(m, s_end), other))
     for t in TABLE.finditer(m):
-        out.append((t.end(), expr_end(m, t.end(), ';'), 'en' if t.group(1) == 'english' else 'es'))
+        out.append((t.end(), expr_end(m, t.end(), ';'), 'en' if t.group(1).lower().endswith('english') else 'es'))
     return out
 
 
@@ -220,6 +242,10 @@ def inventory(path):
 
 def main():
     commit = sys.argv[1]
+    for root, _, names in os.walk('lib'):
+        for name in names:
+            if name.endswith('.dart'):
+                find_helpers(scan(open(os.path.join(root, name), encoding='utf-8').read())[1])
     files = {}
     for root, _, names in os.walk('lib'):
         for name in sorted(names):

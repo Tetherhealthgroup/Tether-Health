@@ -1,20 +1,23 @@
 # baseline 97d81ce · screen20 · en
 T Craving Rescue
-T <n> OF <n>
+T 5 OF 5
 T RESULT SAVED
+T 100%
 T RESCUE SAVED
 T Your craving stayed about the same.
 T That is okay. Practicing a tool can help you move through this moment without acting on the craving.
 T BEFORE
+T 6
 T Moderate
 T NOW
+T 6
 T Moderate
-T <n> points
+T 0 points
 T NO CHANGE
 T Your rating, not a diagnosis
 T Every result can be different. Checking in helps you learn what works.
 T What this adds to your plan
-T Today · <n>:<n> AM
+T Today · 9:41 AM
 T TRIGGER
 T Craving
 T Selected before rescue
@@ -22,11 +25,11 @@ T TOOL
 T Breathing
 T Marked helpful
 T PRACTICE
-T <n> minutes
+T 2 minutes
 T Completed offline
 T Slow breathing will be offered first for similar stress cravings.
 T NEXT BEST STEP
-T Protect the next <n> minutes.
+T Protect the next 10 minutes.
 T Stay in a smoke-free place and take a few sips of water.
 T Craving Rescue stays one tap away from Home.
 T No timer needed
@@ -40,25 +43,29 @@ T Get human support
 T Supporter or quitline
 T Back to Today
 T Saved privately. Offline results sync once when connected.
-T Content v<n>.<n>
+T Content v1.0
 T View progress details
 T You can delete this result from your history
 SL Craving Rescue
-SL <n> OF <n>
+SL 5 OF 5
 SL RESULT SAVED
+SL 100%
+SV 100
 SL RESCUE SAVED
 SL Your craving stayed about the same.
 SL That is okay. Practicing a tool can help you move through this moment without acting on the craving.
 SL BEFORE
+SL 6
 SL Moderate
 SL NOW
+SL 6
 SL Moderate
-SL <n> points
+SL 0 points
 SL NO CHANGE
 SL Your rating, not a diagnosis
 SL Every result can be different. Checking in helps you learn what works.
 SL What this adds to your plan
-SL Today · <n>:<n> AM
+SL Today · 9:41 AM
 SL TRIGGER
 SL Craving
 SL Selected before rescue
@@ -66,11 +73,11 @@ SL TOOL
 SL Breathing
 SL Marked helpful
 SL PRACTICE
-SL <n> minutes
+SL 2 minutes
 SL Completed offline
 SL Slow breathing will be offered first for similar stress cravings.
 SL NEXT BEST STEP
-SL Protect the next <n> minutes.
+SL Protect the next 10 minutes.
 SL Stay in a smoke-free place and take a few sips of water.
 SL Craving Rescue stays one tap away from Home.
 SL No timer needed
@@ -82,6 +89,6 @@ SL Repeat rescue\nUse breathing again
 SL Get human support\nSupporter or quitline
 SL Back to Today
 SL Saved privately. Offline results sync once when connected.
-SL Content v<n>.<n>
+SL Content v1.0
 SL View progress details
 SL You can delete this result from your history

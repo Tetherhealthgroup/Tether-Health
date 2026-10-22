@@ -4,7 +4,7 @@ T Your account, choices and data.
 T PRIVATE BY DEFAULT
 T Your choices stay in your hands
 T No ads. We never sell your health data.
-T Privacy choices last reviewed <month> <n>, <n>
+T Privacy choices last reviewed <month> <day>, <year>
 T Account
 T Not signed in
 T Sign in to sync your profile.
@@ -16,7 +16,7 @@ T Helpful prompts based on your plan
 T Show sensitive details
 T Quit status and medication stay hidden when off
 T Quiet hours
-T <n>:<n> PM–<n>:<n> AM · urgent safety alerts still appear
+T 9:00 PM–7:00 AM · urgent safety alerts still appear
 T Change
 T Lock-screen preview: “You have a BreatheFree reminder.”
 T Privacy & permissions
@@ -47,7 +47,7 @@ T System
 T Reduce motion
 T Uses gentle transitions without celebration effects
 T Privacy policy, terms and help
-T BreatheFree version <n>.<n>.<n> (<n>)
+T BreatheFree version 1.0.0 (100)
 T Open
 T Sign in
 T Changes save automatically and sync securely.
@@ -55,12 +55,12 @@ SL Go back
 SL Settings & privacy
 SL Your account, choices and data.
 SL Guest profile
-SL PRIVATE BY DEFAULT\nYour choices stay in your hands\nNo ads. We never sell your health data.\nPrivacy choices last reviewed <month> <n>, <n>
+SL PRIVATE BY DEFAULT\nYour choices stay in your hands\nNo ads. We never sell your health data.\nPrivacy choices last reviewed <month> <day>, <year>
 SL Account
 SL Not signed in\nSign in to sync your profile.
 SL Health programs\nChoose BreatheFree, Heartwise, Steady, or ClearAir.
 SL Notifications
-SL Quiet hours. <n>:<n> PM–<n>:<n> AM · urgent safety alerts still appear. Change\nLock-screen preview: “You have a BreatheFree reminder.”
+SL Quiet hours. 9:00 PM–7:00 AM · urgent safety alerts still appear. Change\nLock-screen preview: “You have a BreatheFree reminder.”
 SL Check-ins and plan reminders\nHelpful prompts based on your plan
 SL Show sensitive details\nQuit status and medication stay hidden when off
 SL Privacy & permissions
@@ -75,6 +75,6 @@ SL Delete account and data\nPermanent deletion requires review and confirmation
 SL Accessibility & app
 SL Text size and contrast. Follows your device settings. System
 SL Reduce motion\nUses gentle transitions without celebration effects
-SL Privacy policy, terms and help. BreatheFree version <n>.<n>.<n> (<n>). Open
+SL Privacy policy, terms and help. BreatheFree version 1.0.0 (100). Open
 SL Sign in
 SL Changes save automatically and sync securely.

@@ -1,15 +1,17 @@
 # baseline 97d81ce · screen10 · es
 T Revisa tu plan
-T <n> DE <n>
+T 5 DE 5
 T PLAN PARA DEJARLO
+T 100%
 T TU PLAN PARA DEJARLO
 T Tu plan está listo.
 T Dale una última mirada. Puedes editar cualquier parte ahora o más adelante.
 T FECHA PARA DEJARLO
-T <month>
-T <weekday>
-T <weekday>, <n> de <month>
-T <n> días para prepararte · Hora del Pacífico
+T OCT
+T 29
+T JUE
+T <weekday>, <day> de <month>
+T 7 días para prepararte · Hora del Pacífico
 T VENTANA RECOMENDADA
 T HOY
 T DÍA DE DEJARLO
@@ -22,7 +24,7 @@ T Ninguna razón seleccionada
 T CONTACTO DE APOYO
 T Ninguna persona de apoyo activa
 T PREPARA TU ESPACIO
-T <n> de <n> tareas completadas
+T 0 de 3 tareas completadas
 T APOYO DE TRATAMIENTO
 T No incluido
 T Al comenzar se activan tus tareas y recordatorios.
@@ -30,19 +32,20 @@ T Los mensajes de apoyo aún necesitan tu aprobación antes de enviarse.
 T Comenzar mi plan para dejarlo
 T Guardar y terminar después
 T Guardado automáticamente · Puedes editar tu plan en cualquier momento
-SL Revisa tu plan\n<n> DE <n>\nPLAN PARA DEJARLO\n<n>%\nGuardado automáticamente · Puedes editar tu plan en cualquier momento
+SL Revisa tu plan\n5 DE 5\nPLAN PARA DEJARLO\n100%\nGuardado automáticamente · Puedes editar tu plan en cualquier momento
+SV 100
 ST Atrás
 SL TU PLAN PARA DEJARLO
 SL Tu plan está listo.
 SL Dale una última mirada. Puedes editar cualquier parte ahora o más adelante.
-SL FECHA PARA DEJARLO\n<month>\n<n>\n<weekday>\n<weekday>, <n> de <month>\n<n> días para prepararte · Hora del Pacífico\nVENTANA RECOMENDADA\nHOY\nDÍA DE DEJARLO
+SL FECHA PARA DEJARLO\nOCT\n29\nJUE\n<weekday>, <day> de <month>\n7 días para prepararte · Hora del Pacífico\nVENTANA RECOMENDADA\nHOY\nDÍA DE DEJARLO
 ST Editar fecha
 SL DETALLES DEL PLAN
 SL Toca para editar
 SL ENFOQUE\nElegir una fecha
 SL RAZÓN PRINCIPAL\nNinguna razón seleccionada
 SL CONTACTO DE APOYO\nNinguna persona de apoyo activa
-SL PREPARA TU ESPACIO\n<n> de <n> tareas completadas
+SL PREPARA TU ESPACIO\n0 de 3 tareas completadas
 SL APOYO DE TRATAMIENTO\nNo incluido
 SL Al comenzar se activan tus tareas y recordatorios.
 SL Los mensajes de apoyo aún necesitan tu aprobación antes de enviarse.

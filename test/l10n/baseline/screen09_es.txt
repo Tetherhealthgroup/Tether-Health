@@ -1,16 +1,17 @@
 # baseline 97d81ce · screen09 · es
 T Apoyo y preparación
-T <n> DE <n>
+T 4 DE 5
 T PLAN PARA DEJARLO
+T 80%
 T PREPÁRATE PARA TENER ÉXITO
 T No tienes que hacer esto a solas.
 T Elige el apoyo que deseas. Tú controlas a quién se contacta y qué se comparte.
 T TU CÍRCULO DE APOYO
-T <n> PERSONAS AGREGADAS
+T 0 PERSONAS AGREGADAS
 T Todavía no agregaste a nadie. Puedes guardar este plan sin contactar a una persona.
 T Agregar otra persona de apoyo
 T PREPARA TU ESPACIO
-T <n> DE <n>
+T 0 DE 3
 T Retirar cigarrillos, encendedores y ceniceros
 T Hacer que mi casa y auto estén libres de humo
 T Tener chicle, agua o refrigerios saludables
@@ -21,18 +22,19 @@ T Solo educación: esta aplicación no receta ni cambia medicamentos.
 T Conocer las opciones de tratamiento
 T Nada se comparte ni se envía sin tu acción.
 T Guardar mi plan de apoyo
-T <n> personas de apoyo · <n> tareas completadas
-SL Apoyo y preparación\n<n> DE <n>\nPLAN PARA DEJARLO\n<n>%\n<n> personas de apoyo · <n> tareas completadas
+T 0 personas de apoyo · 0 tareas completadas
+SL Apoyo y preparación\n4 DE 5\nPLAN PARA DEJARLO\n80%\n0 personas de apoyo · 0 tareas completadas
+SV 80
 ST Atrás
 SL PREPÁRATE PARA TENER ÉXITO
 SL No tienes que hacer esto a solas.
 SL Elige el apoyo que deseas. Tú controlas a quién se contacta y qué se comparte.
 SL TU CÍRCULO DE APOYO
-SL <n> PERSONAS AGREGADAS
+SL 0 PERSONAS AGREGADAS
 SL Todavía no agregaste a nadie. Puedes guardar este plan sin contactar a una persona.
 SL Agregar otra persona de apoyo
 SL PREPARA TU ESPACIO
-SL <n> DE <n>
+SL 0 DE 3
 SL Retirar cigarrillos, encendedores y ceniceros
 SL Hacer que mi casa y auto estén libres de humo
 SL Tener chicle, agua o refrigerios saludables

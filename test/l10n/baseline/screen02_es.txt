@@ -1,6 +1,6 @@
 # baseline 97d81ce · screen02 · es
 T BreatheFree
-T <n> OF <n>
+T 2 OF 3
 T TU PRIVACIDAD
 T Tu historia sigue siendo tuya.
 T Elige cómo se usa tu información. Los elementos obligatorios mantienen la aplicación funcionando; las opciones se pueden cambiar en cualquier momento.
@@ -23,7 +23,7 @@ T Sin anuncios. Sin financiación de la industria tabacalera.
 T Nunca vendemos información de salud del paciente.
 T Aceptar y continuar
 T Puedes cambiar las opciones en Configuración.
-SL BreatheFree\n<n> OF <n>\nPuedes cambiar las opciones en Configuración.
+SL BreatheFree\n2 OF 3\nPuedes cambiar las opciones en Configuración.
 ST Atrás
 SL TU PRIVACIDAD
 SL Tu historia sigue siendo tuya.

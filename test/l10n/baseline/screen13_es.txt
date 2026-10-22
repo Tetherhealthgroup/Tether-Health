@@ -2,33 +2,37 @@
 T Tu próximo paso
 T PERSONAL
 T REGISTRO GUARDADO
-T Prueba un reinicio del estrés de <n> minutos.
+T Prueba un reinicio del estrés de 3 minutos.
 T Hoy reportaste estrés moderado y un antojo moderado. Aquí tienes un paso pequeño basado en tu registro.
 T RECOMENDADO PARA TI
 T Reinicio del estrés
 T Respira. Bebe. Cambia.
+T 3:00
 T MINUTOS
 T Estrés · Moderado
-T Antojo · <n>/<n>
-T Confianza · <n>
+T Antojo · 5/10
+T Confianza · 5
 T Disponible sin conexión cuando lo necesites
-T Tu plan de <n> minutos
+T Tu plan de 3 minutos
 T Sigue el orden
-T Haz <n> respiraciones lentas
+T 1
+T Haz 10 respiraciones lentas
 T Inhala por la nariz y exhala por la boca.
-T <n> S
+T 60 S
+T 2
 T Bebe un vaso de agua
 T Bebe despacio y nota la temperatura.
-T <n> S
+T 30 S
+T 3
 T Cambia lo que estás haciendo
 T Camina, pon música o empieza una tarea breve.
-T <n> S
+T 90 S
 T ¿Todavía sientes el impulso?
 T Abre apoyo para una persona de apoyo o Rescate de antojo.
 T Los antojos cambian. Sigue probando estrategias hasta encontrar lo que te ayuda.
 T Por qué se recomendó esto
-T Ánimo regular, estrés moderado, sin síntomas opcionales y un antojo de <n>/<n>. Omitiste la pregunta sobre fumar.
-T Basado solo en el registro de hoy · Versión <n>.<n>
+T Ánimo regular, estrés moderado, sin síntomas opcionales y un antojo de 5/10. Omitiste la pregunta sobre fumar.
+T Basado solo en el registro de hoy · Versión 1.0
 T ¿No te parece adecuado? Elige otra estrategia
 T Practicar ahora
 T Agregar a mi plan de afrontamiento
@@ -37,30 +41,34 @@ ST Atrás
 SL Tu próximo paso
 SL PERSONAL
 SL REGISTRO GUARDADO
-SL Prueba un reinicio del estrés de <n> minutos.
+SL Prueba un reinicio del estrés de 3 minutos.
 SL Hoy reportaste estrés moderado y un antojo moderado. Aquí tienes un paso pequeño basado en tu registro.
 SL RECOMENDADO PARA TI
 SL Reinicio del estrés
 SL Respira. Bebe. Cambia.
+SL 3:00
 SL MINUTOS
 SL Estrés · Moderado
-SL Antojo · <n>/<n>
-SL Confianza · <n>
+SL Antojo · 5/10
+SL Confianza · 5
 SL Disponible sin conexión cuando lo necesites
-SL Tu plan de <n> minutos
+SL Tu plan de 3 minutos
 SL Sigue el orden
-SL Haz <n> respiraciones lentas
+SL 1
+SL Haz 10 respiraciones lentas
 SL Inhala por la nariz y exhala por la boca.
-SL <n> S
+SL 60 S
+SL 2
 SL Bebe un vaso de agua
 SL Bebe despacio y nota la temperatura.
-SL <n> S
+SL 30 S
+SL 3
 SL Cambia lo que estás haciendo
 SL Camina, pon música o empieza una tarea breve.
-SL <n> S
+SL 90 S
 SL ¿Todavía sientes el impulso?\nAbre apoyo para una persona de apoyo o Rescate de antojo.
 SL Los antojos cambian. Sigue probando estrategias hasta encontrar lo que te ayuda.
-SL Por qué se recomendó esto\nÁnimo regular, estrés moderado, sin síntomas opcionales y un antojo de <n>/<n>. Omitiste la pregunta sobre fumar.\nBasado solo en el registro de hoy · Versión <n>.<n>
+SL Por qué se recomendó esto\nÁnimo regular, estrés moderado, sin síntomas opcionales y un antojo de 5/10. Omitiste la pregunta sobre fumar.\nBasado solo en el registro de hoy · Versión 1.0
 SL ¿No te parece adecuado? Elige otra estrategia
 SL Practicar ahora
 SL Agregar a mi plan de afrontamiento

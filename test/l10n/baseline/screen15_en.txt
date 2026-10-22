@@ -4,19 +4,23 @@ T COMPLETE
 T You gave the feeling time to change.
 T Take a moment to notice what is different now.
 T TIME
+T 0:00
 T STEPS
-T <n> of <n>
+T 3 of 3
 T STATUS
 T Saved
 T How strong is the craving now?
 T Choose the number that feels closest.
-T <n> · Moderate
+T 6 · Moderate
 T No craving
 T Strongest
 T There is no “good” score—honest answers improve your support.
 T TODAY’S RESULT
 T BEFORE
+T 6 / 10
 T NOW
+T 6 / 10
+T — 0
 T POINTS
 T One result, not a promise—patterns become clearer over time.
 T What helped most?
@@ -38,19 +42,25 @@ SL COMPLETE
 SL You gave the feeling time to change.
 SL Take a moment to notice what is different now.
 SL TIME
+SL 0:00
 SL STEPS
-SL <n> of <n>
+SL 3 of 3
 SL STATUS
 SL Saved
 SL How strong is the craving now?
 SL Choose the number that feels closest.
-SL <n> · Moderate
+SL 6 · Moderate
+SL 6
+SV 60%
 SL No craving
 SL Strongest
 SL There is no “good” score—honest answers improve your support.
 SL TODAY’S RESULT
 SL BEFORE
+SL 6 / 10
 SL NOW
+SL 6 / 10
+SL — 0
 SL POINTS
 SL One result, not a promise—patterns become clearer over time.
 SL What helped most?

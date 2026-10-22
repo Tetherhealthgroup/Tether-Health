@@ -1,8 +1,9 @@
 # baseline 97d81ce · screen04 · es
 T Tus desencadenantes
-T <n> OF <n>
+T 2 OF 2
 T EVALUACIÓN
-T PREGUNTA <n> · ELIGE TODAS LAS QUE CORRESPONDAN
+T 100%
+T PREGUNTA 2 · ELIGE TODAS LAS QUE CORRESPONDAN
 T ¿Cuándo es más probable que quieras fumar?
 T Elige cada situación que sea cierta para ti.
 T Estrés
@@ -21,10 +22,11 @@ T Se usa para prepararte, no para vigilarte
 T Tus elecciones adaptan las herramientas y los recordatorios.
 T BreatheFree no rastrea tu ubicación en segundo plano.
 T Continuar
-T <n> desencadenantes elegidos · Guardado automáticamente
-SL Tus desencadenantes\n<n> OF <n>\nEVALUACIÓN\n<n>%\n<n> desencadenantes elegidos · Guardado automáticamente
+T 0 desencadenantes elegidos · Guardado automáticamente
+SL Tus desencadenantes\n2 OF 2\nEVALUACIÓN\n100%\n0 desencadenantes elegidos · Guardado automáticamente
+SV 100
 ST Atrás
-SL PREGUNTA <n> · ELIGE TODAS LAS QUE CORRESPONDAN
+SL PREGUNTA 2 · ELIGE TODAS LAS QUE CORRESPONDAN
 SL ¿Cuándo es más probable que quieras fumar?
 SL Elige cada situación que sea cierta para ti.
 SL Estrés\nEstrés

@@ -1,17 +1,19 @@
 # baseline 97d81ce · screen18 · es
 T Craving Rescue
-T <n> DE <n>
+T 3 DE 5
 T HERRAMIENTA ACTIVA
+T 60%
 T Quédate con este momento.
 T Sigue el círculo o respira lentamente a tu manera.
 T RESPIRACIÓN LENTA
-T <n>:<n> REST.
+T 2:00 REST.
 T INHALA
 T Lentamente
+T 4
 T SEGUNDOS
 T Deja que el aire entre suavemente.
 T ESTA RESPIRACIÓN
-T In <n> · Out <n>
+T In 4 · Out 6
 T Inhala suavemente
 T Exhala lentamente
 T Pausar
@@ -27,22 +29,26 @@ T Puedes cambiar de herramienta sin perder este registro.
 T Cambiar herramienta
 T Obtener apoyo de una persona
 T Terminar ejercicio
-T No se envían ni comparten datos durante este ejercicio.\nContenido v<n>.<n>
-T Después de <n> minutos, volverás a calificar el antojo
+T No se envían ni comparten datos durante este ejercicio.\nContenido v1.0
+T Después de 2 minutos, volverás a calificar el antojo
 ST Cerrar
 SL Craving Rescue
-SL <n> DE <n>
+SL 3 DE 5
 SL HERRAMIENTA ACTIVA
+SL 60%
+SV 60
 SL Quédate con este momento.
 SL Sigue el círculo o respira lentamente a tu manera.
 SL RESPIRACIÓN LENTA
-SL <n>:<n> REST.
+SL 2:00 REST.
 SL INHALA
 SL Lentamente
+SL 4
 SL SEGUNDOS
 SL Deja que el aire entre suavemente.
 SL ESTA RESPIRACIÓN
-SL In <n> · Out <n>
+SL In 4 · Out 6
+SV 0
 SL Inhala suavemente
 SL Exhala lentamente
 SL Pausar
@@ -50,6 +56,7 @@ SL Voz\nSí
 SL Hápticos\nSí
 SL Movimiento reducido sigue la configuración del teléfono
 SL Sin conexión
+SV 0
 SL El antojo es una ola.
 SL Puedes dejar que suba y pase sin fumar.
 SL Solo necesitas quedarte con esta respiración, no resolver todo el día.
@@ -58,5 +65,5 @@ SL Puedes cambiar de herramienta sin perder este registro.
 SL Cambiar herramienta
 SL Obtener apoyo de una persona
 SL Terminar ejercicio
-SL No se envían ni comparten datos durante este ejercicio.\nContenido v<n>.<n>
-SL Después de <n> minutos, volverás a calificar el antojo
+SL No se envían ni comparten datos durante este ejercicio.\nContenido v1.0
+SL Después de 2 minutos, volverás a calificar el antojo

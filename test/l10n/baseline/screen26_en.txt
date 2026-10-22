@@ -4,7 +4,8 @@ T Choose a person or service that feels right.
 T Change location
 T FREE & CONFIDENTIAL
 T Talk with a quitline counselor
-T Routes you to your state’s quitline. Services and hours <month> vary.
+T Routes you to your state’s quitline. Services and hours may vary.
+T 1-800-784-8669
 T Call now
 T Request a call-back
 T Consent preview before referral
@@ -33,7 +34,7 @@ SL Choose a person or service that feels right.
 SL Guest profile
 ST Settings and privacy
 SL Change location
-SL FREE & CONFIDENTIAL\nTalk with a quitline counselor\nRoutes you to your state’s quitline. Services and hours <month> vary.\nQuitline phone number <n>-<n>-<n>-<n>\n<n>-<n>-<n>-<n>\nConsent preview before referral
+SL FREE & CONFIDENTIAL\nTalk with a quitline counselor\nRoutes you to your state’s quitline. Services and hours may vary.\nQuitline phone number 1-800-784-8669\n1-800-784-8669\nConsent preview before referral
 SL Call now
 SL Request a call-back
 SL Your people

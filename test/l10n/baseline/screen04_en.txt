@@ -1,8 +1,9 @@
 # baseline 97d81ce · screen04 · en
 T Your triggers
-T <n> OF <n>
+T 2 OF 2
 T ASSESSMENT
-T QUESTION <n> · CHOOSE ALL THAT APPLY
+T 100%
+T QUESTION 2 · CHOOSE ALL THAT APPLY
 T When are you most likely to want a cigarette?
 T Choose every situation that feels true for you.
 T Stress
@@ -21,10 +22,11 @@ T Used to prepare, not to monitor
 T Your choices shape coping tools and reminder timing.
 T BreatheFree does not track your location in the background.
 T Continue
-T <n> triggers selected · Saved automatically
-SL Your triggers\n<n> OF <n>\nASSESSMENT\n<n>%\n<n> triggers selected · Saved automatically
+T 0 triggers selected · Saved automatically
+SL Your triggers\n2 OF 2\nASSESSMENT\n100%\n0 triggers selected · Saved automatically
+SV 100
 ST Back
-SL QUESTION <n> · CHOOSE ALL THAT APPLY
+SL QUESTION 2 · CHOOSE ALL THAT APPLY
 SL When are you most likely to want a cigarette?
 SL Choose every situation that feels true for you.
 SL Stress\nStress

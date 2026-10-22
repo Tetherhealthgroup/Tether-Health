@@ -1,7 +1,7 @@
 # baseline 97d81ce · screen12 · es
 T Registro diario
-T APROX. <n> S
-T HOY · <n> DE <month>
+T APROX. 60 S
+T HOY · <day> DE <month>
 T CASI LISTO
 T ¿Cómo estás hoy?
 T No hay respuestas correctas. Esto nos ayuda a ofrecerte el apoyo que necesitas.
@@ -21,12 +21,13 @@ T Una calada
 T Uno o más
 T Omitir
 T Antojo más fuerte de hoy
-T <n> · Moderado
-T <n> · Ninguno
-T <n> · Más fuerte
-T Confianza para las próximas <n> horas
-T <n> · Baja
-T <n> · Alta
+T 5 · Moderado
+T 0 · Ninguno
+T 10 · Más fuerte
+T Confianza para las próximas 24 horas
+T 5 / 10
+T 0 · Baja
+T 10 · Alta
 T ¿Algo te está afectando hoy?
 T Opcional
 T Inquietud
@@ -41,9 +42,10 @@ T Guardar registro
 T Privado · Funciona sin conexión · Se sincroniza de forma segura
 ST Cerrar
 SL Registro diario
-SL APROX. <n> S
-SL HOY · <n> DE <month>
+SL APROX. 60 S
+SL HOY · <day> DE <month>
 SL CASI LISTO
+SV 84
 SL ¿Cómo estás hoy?
 SL No hay respuestas correctas. Esto nos ayuda a ofrecerte el apoyo que necesitas.
 SL ¿Cómo te sientes?
@@ -55,6 +57,7 @@ SL Bien
 SL Muy bien
 SL Estrés hoy
 SL Moderado
+SV 50%
 SL Desde tu último registro, ¿fumaste?
 SL Antes del día para dejarlo, esto es esperado; no es un retroceso.
 SL No
@@ -62,12 +65,17 @@ SL Una calada
 SL Uno o más
 SL Omitir
 SL Antojo más fuerte de hoy
-SL <n> · Moderado
-SL <n> · Ninguno
-SL <n> · Más fuerte
-SL Confianza para las próximas <n> horas
-SL <n> · Baja
-SL <n> · Alta
+SL 5 · Moderado
+SL 5
+SV 50%
+SL 0 · Ninguno
+SL 10 · Más fuerte
+SL Confianza para las próximas 24 horas
+SL 5 / 10
+SL 5
+SV 50%
+SL 0 · Baja
+SL 10 · Alta
 SL ¿Algo te está afectando hoy?
 SL Opcional
 SL Inquietud

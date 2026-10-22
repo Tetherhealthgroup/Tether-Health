@@ -1,11 +1,12 @@
 # baseline 97d81ce · screen14 · es
 T Reinicio del estrés
 T VOZ SÍ
-T PASO <n> DE <n> · RESPIRA
-T <n>:<n> RESTANTES
+T PASO 1 DE 3 · RESPIRA
+T 3:00 RESTANTES
 T RESPIRACIÓN LENTA
-T Respiración <n> de <n>
+T Respiración 1 de 10
 T INHALA
+T 4
 T SEGUNDOS
 T Inhala lentamente por la nariz.
 T Sigue el círculo, escucha o usa la cuenta regresiva.
@@ -28,11 +29,13 @@ T El progreso parcial se guarda · Funciona sin conexión
 ST Cerrar
 SL Reinicio del estrés
 SL Guía de voz\nVOZ SÍ
-SL PASO <n> DE <n> · RESPIRA
-SL <n>:<n> RESTANTES
+SL PASO 1 DE 3 · RESPIRA
+SL 3:00 RESTANTES
+SV 0
 SL RESPIRACIÓN LENTA
-SL Respiración <n> de <n>
+SL Respiración 1 de 10
 SL INHALA
+SL 4
 SL SEGUNDOS
 SL Inhala lentamente por la nariz.
 SL Sigue el círculo, escucha o usa la cuenta regresiva.

@@ -3,6 +3,7 @@
 // from [isSpanishFiles] in the same change; the list only ever shrinks, and
 // the last ticket empties it. The language mapping itself
 // (lib/l10n/app_locale.dart) is not text selection and stays.
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -68,6 +69,21 @@ void main() {
     expect(stale, isEmpty,
         reason:
             'remove these from isSpanishFiles: they no longer use isSpanish');
+  });
+
+  test(
+      'the list only shrinks: every listed file had en/es text at the baseline',
+      () {
+    final inventory = jsonDecode(
+            File('test/l10n/baseline/legacy_literals.json').readAsStringSync())
+        as Map<String, Object?>;
+    final files = (inventory['files']! as Map<String, Object?>).entries.where(
+        (e) => (e.value! as List).any((r) => const {'en', 'es'}
+            .contains((r as Map<String, Object?>)['branch'])));
+    final withText = {for (final e in files) e.key};
+    expect(isSpanishFiles.difference(withText), isEmpty,
+        reason: 'a file that had no English/Spanish branches at the baseline '
+            'cannot be added to the list');
   });
 
   test('the language mapping is still where the app reads the language', () {

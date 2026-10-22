@@ -6,6 +6,7 @@ T Let’s get through this moment.
 T Start with what you feel now. No typing is required.
 T CRAVING INTENSITY
 T How strong is it right now?
+T 6
 T MODERATE
 T Mild
 T Strongest
@@ -40,7 +41,10 @@ SL Let’s get through this moment.
 SL Start with what you feel now. No typing is required.
 SL CRAVING INTENSITY
 SL How strong is it right now?
+SL 6
 SL MODERATE
+SL 6
+SV 56%
 SL Mild
 SL Strongest
 SL You only need to choose a number.

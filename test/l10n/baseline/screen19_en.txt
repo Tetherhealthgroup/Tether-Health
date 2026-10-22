@@ -1,20 +1,26 @@
 # baseline 97d81ce · screen19 · en
 T Craving Rescue
-T <n> OF <n>
+T 4 OF 5
 T RECHECK CRAVING
-T <n>-MINUTE RESCUE COMPLETE
+T 80%
+T 2-MINUTE RESCUE COMPLETE
 T You stayed with the urge.
 T Now notice what is true—not what you think should be true.
+T 2:00
 T BREATHING
 T How strong is the craving now?
 T Tap a number or drag the slider.
+T 0
+T <calendar days>
 T No craving
 T Strongest
 T Any answer is useful. The app responds to what you choose.
 T Required
 T THIS RESCUE
 T BEFORE
+T 6 / 10
 T NOW
+T — / 10
 T Choose a rating to compare this rescue.
 T Not a medical measurement
 T Was slow breathing helpful?
@@ -25,25 +31,42 @@ T A little
 T Not this time
 T Save and see result
 T Saved privately on this device while offline.
-T Repeat <n>-minute breathing
+T Repeat 2-minute breathing
 T Any answer is useful. The app responds to what you choose.
 ST Back
 SL Craving Rescue
-SL <n> OF <n>
+SL 4 OF 5
 SL RECHECK CRAVING
-SL <n>-MINUTE RESCUE COMPLETE
+SL 80%
+SV 80
+SL 2-MINUTE RESCUE COMPLETE
 SL You stayed with the urge.
 SL Now notice what is true—not what you think should be true.
+SL 2:00
 SL BREATHING
 SL How strong is the craving now?
 SL Tap a number or drag the slider.
+SV 0%
+SL 0
+SL 1
+SL 2
+SL 3
+SL 4
+SL 5
+SL 6
+SL 7
+SL 8
+SL 9
+SL 10
 SL No craving
 SL Strongest
 SL Any answer is useful. The app responds to what you choose.
 SL Required
 SL THIS RESCUE
 SL BEFORE
+SL 6 / 10
 SL NOW
+SL — / 10
 SL Choose a rating to compare this rescue.
 SL Not a medical measurement
 SL Was slow breathing helpful?
@@ -54,5 +77,5 @@ SL A little
 SL Not this time
 SL Save and see result
 SL Saved privately on this device while offline.
-SL Repeat <n>-minute breathing
+SL Repeat 2-minute breathing
 SL Any answer is useful. The app responds to what you choose.

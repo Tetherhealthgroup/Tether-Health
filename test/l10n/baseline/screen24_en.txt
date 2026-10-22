@@ -4,25 +4,25 @@ T Short, reviewed lessons for where you are today.
 T Search cravings, sleep, medicines, support…
 T EN · ES
 T For you
-T <n>–<n> min
+T 2–5 min
 T Audio
 T Offline
 T Saved
 T FOR YOUR QUIT DAY
 T Cravings: what to expect today
 T Recognize common urges and choose a plan before they build.
-T <n> min read
-T <n>:<n> audio
+T 4 min read
+T 3:12 audio
 T Plain language
 T Start lesson
 T Transcript included
 T Continue learning
-T TRIGGERS · <n> OF <n>
+T TRIGGERS · 2 OF 4
 T Know your stress triggers
 T Resume
 T Browse topics
 T Cravings
-T <n> short lessons
+T 8 short lessons
 T Withdrawal
 T What to expect
 T Medicines
@@ -33,7 +33,7 @@ T Stress & mood
 T Coping skills
 T Support
 T People & quitlines
-T <n> lessons saved offline\nAudio, text and transcripts remain available.
+T 3 lessons saved offline\nAudio, text and transcripts remain available.
 T Home
 T Plan
 T Progress
@@ -47,21 +47,22 @@ ST Settings and privacy
 SL EN · ES
 SL Search cravings, sleep, medicines, support…
 SL For you
-SL <n>–<n> min
+SL 2–5 min
 SL Audio
 SL Offline
 SL Saved
-SL Start featured lesson\nFOR YOUR QUIT DAY\nCravings: what to expect today\nRecognize common urges and choose a plan before they build.\n<n> min read\n<n>:<n> audio\nPlain language\nStart lesson\nTranscript included
+SL Start featured lesson\nFOR YOUR QUIT DAY\nCravings: what to expect today\nRecognize common urges and choose a plan before they build.\n4 min read\n3:12 audio\nPlain language\nStart lesson\nTranscript included
 SL Continue learning
-SL TRIGGERS · <n> OF <n>\nKnow your stress triggers\nResume
+SL TRIGGERS · 2 OF 4\nKnow your stress triggers\nResume
+SV 60
 SL Browse topics
-SL Cravings\n<n> short lessons
+SL Cravings\n8 short lessons
 SL Withdrawal\nWhat to expect
 SL Medicines\nEducation only
 SL Slip recovery\nReturn without blame
 SL Stress & mood\nCoping skills
 SL Support\nPeople & quitlines
-SL <n> lessons saved offline\nAudio, text and transcripts remain available.
+SL 3 lessons saved offline\nAudio, text and transcripts remain available.
 SL Home
 SL Plan
 SL Progress

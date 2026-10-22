@@ -1,27 +1,30 @@
 # baseline 97d81ce · screen17 · en
 T Craving Rescue
-T <n> OF <n>
+T 2 OF 5
 T CHOOSE SUPPORT
+T 40%
 T BEST MATCH
 T Start with what helped before.
 T One recommended action, based on this craving and your results.
 T RECOMMENDED
 T Slow breathing
 T Let the urge rise and fall while you follow a calm breathing cue.
+T 2:00
 T MINUTES
 T YOUR LAST RESULT
 T Slow breathing was selected as most helpful.
-T Craving changed from <n> to <n> after the exercise.
+T Craving changed from 6 to 3 after the exercise.
+T 6 → 3
 T LAST TIME
 T Personalized match
 T Works offline
 T Voice optional
-T Start <n>-minute breathing
+T Start 2-minute breathing
 T Why this match?
-T Craving <n>/<n> + your previous helpful result.
+T Craving 6/10 + your previous helpful result.
 T Or choose another action
 T Your choice
-T Move for <n> minutes
+T Move for 3 minutes
 T Walk or stretch
 T Offline · No equipment
 T Change the scene
@@ -32,28 +35,30 @@ T Contact your support person or a trained quitline counselor.
 T View support
 T Nothing is sent or shared unless you choose it.
 T Recommendation uses your data only for personalized support.
-T Content v<n>.<n>
+T Content v1.0
 T You can switch tools at any time
 T Start recommended tool
 ST Go back
 SL Craving Rescue
-SL <n> OF <n>
+SL 2 OF 5
 SL CHOOSE SUPPORT
+SL 40%
+SV 40
 SL BEST MATCH
 SL Start with what helped before.
 SL One recommended action, based on this craving and your results.
-SL RECOMMENDED\nSlow breathing\nLet the urge rise and fall while you follow a calm breathing cue.\n<n>:<n>\nMINUTES\nYOUR LAST RESULT\nSlow breathing was selected as most helpful.\nCraving changed from <n> to <n> after the exercise.\n<n> → <n>\nLAST TIME\nPersonalized match\nWorks offline\nVoice optional
-SL Start <n>-minute breathing
-SL Why this match?\nCraving <n>/<n> + your previous helpful result.
+SL RECOMMENDED\nSlow breathing\nLet the urge rise and fall while you follow a calm breathing cue.\n2:00\nMINUTES\nYOUR LAST RESULT\nSlow breathing was selected as most helpful.\nCraving changed from 6 to 3 after the exercise.\n6 → 3\nLAST TIME\nPersonalized match\nWorks offline\nVoice optional
+SL Start 2-minute breathing
+SL Why this match?\nCraving 6/10 + your previous helpful result.
 SL Or choose another action
 SL Your choice
-SL Move for <n> minutes\nWalk or stretch\nOffline · No equipment
+SL Move for 3 minutes\nWalk or stretch\nOffline · No equipment
 SL Change the scene\nGo somewhere smoke-free\nQuick environment shift
 SL Want a person instead?
 SL Contact your support person or a trained quitline counselor.
 SL View support
 SL Nothing is sent or shared unless you choose it.
 SL Recommendation uses your data only for personalized support.
-SL Content v<n>.<n>
+SL Content v1.0
 SL You can switch tools at any time
 SL Start recommended tool

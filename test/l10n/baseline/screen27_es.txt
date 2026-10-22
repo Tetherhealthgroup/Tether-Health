@@ -4,7 +4,7 @@ T Tu cuenta, tus decisiones y tus datos.
 T PRIVADO DE FORMA PREDETERMINADA
 T Tus decisiones permanecen en tus manos
 T Sin anuncios. Nunca vendemos tus datos de salud.
-T Opciones de privacidad revisadas el <n> ago <n>
+T Opciones de privacidad revisadas el <day> <month> <year>
 T Cuenta
 T Sesión no iniciada
 T Inicia sesión para sincronizar tu perfil.
@@ -16,7 +16,7 @@ T Avisos útiles basados en tu plan
 T Mostrar detalles sensibles
 T El estado y medicamentos quedan ocultos al desactivar
 T Horario silencioso
-T <n>:<n> PM–<n>:<n> AM · las alertas urgentes aún aparecen
+T 9:00 PM–7:00 AM · las alertas urgentes aún aparecen
 T Cambiar
 T Vista previa: “Tienes un recordatorio de BreatheFree”.
 T Privacidad y permisos
@@ -47,7 +47,7 @@ T Sistema
 T Reducir movimiento
 T Usa transiciones suaves sin efectos de celebración
 T Política de privacidad, términos y ayuda
-T BreatheFree version <n>.<n>.<n> (<n>)
+T BreatheFree version 1.0.0 (100)
 T Abrir
 T Iniciar sesión
 T Los cambios se guardan automáticamente y se sincronizan de forma segura.
@@ -55,12 +55,12 @@ SL Volver
 SL Configuración y privacidad
 SL Tu cuenta, tus decisiones y tus datos.
 SL Guest profile
-SL PRIVADO DE FORMA PREDETERMINADA\nTus decisiones permanecen en tus manos\nSin anuncios. Nunca vendemos tus datos de salud.\nOpciones de privacidad revisadas el <n> ago <n>
+SL PRIVADO DE FORMA PREDETERMINADA\nTus decisiones permanecen en tus manos\nSin anuncios. Nunca vendemos tus datos de salud.\nOpciones de privacidad revisadas el <day> <month> <year>
 SL Cuenta
 SL Sesión no iniciada\nInicia sesión para sincronizar tu perfil.
 SL Programas de salud\nElige BreatheFree, Heartwise, Steady o ClearAir.
 SL Notificaciones
-SL Horario silencioso. <n>:<n> PM–<n>:<n> AM · las alertas urgentes aún aparecen. Cambiar\nVista previa: “Tienes un recordatorio de BreatheFree”.
+SL Horario silencioso. 9:00 PM–7:00 AM · las alertas urgentes aún aparecen. Cambiar\nVista previa: “Tienes un recordatorio de BreatheFree”.
 SL Registros y recordatorios del plan\nAvisos útiles basados en tu plan
 SL Mostrar detalles sensibles\nEl estado y medicamentos quedan ocultos al desactivar
 SL Privacidad y permisos
@@ -75,6 +75,6 @@ SL Eliminar cuenta y datos\nLa eliminación permanente requiere revisión y conf
 SL Accesibilidad y aplicación
 SL Tamaño y contraste del texto. Sigue la configuración de tu dispositivo. Sistema
 SL Reducir movimiento\nUsa transiciones suaves sin efectos de celebración
-SL Política de privacidad, términos y ayuda. BreatheFree version <n>.<n>.<n> (<n>). Abrir
+SL Política de privacidad, términos y ayuda. BreatheFree version 1.0.0 (100). Abrir
 SL Iniciar sesión
 SL Los cambios se guardan automáticamente y se sincronizan de forma segura.

@@ -35,7 +35,7 @@ T Hoy u otra fecha
 T Ayúdame a decidir
 T Revisar opciones sin presión
 T TU SIGUIENTE PASO
-T Aleja los cigarrillos, luego usa un Rescate de <n> minutos.
+T Aleja los cigarrillos, luego usa un Rescate de 2 minutos.
 T Según el desencadenante y lo que te ayudó antes.
 T Puedes cambiar de herramienta o contactar con apoyo en cualquier momento.
 T Abrir después de guardar
@@ -44,7 +44,7 @@ T Nadie recibe una notificación a menos que tú lo elijas.
 T Ver apoyo
 T Guardar y comenzar la recuperación
 T Se guarda sin conexión y se sincroniza después. Puedes eliminar este evento más tarde.
-T Content v<n>.<n>
+T Content v1.0
 T Omitir por ahora y volver a Inicio
 SL Recuperación tras un desliz
 SL PRIVADO
@@ -78,7 +78,7 @@ SL Continuar desde este momento\nMantén el plan actual y actualiza el apoyo de 
 SL Elegir una nueva hora para dejarlo\nHoy u otra fecha
 SL Ayúdame a decidir\nRevisar opciones sin presión
 SL TU SIGUIENTE PASO
-SL Aleja los cigarrillos, luego usa un Rescate de <n> minutos.
+SL Aleja los cigarrillos, luego usa un Rescate de 2 minutos.
 SL Según el desencadenante y lo que te ayudó antes.
 SL Puedes cambiar de herramienta o contactar con apoyo en cualquier momento.
 SL Abrir después de guardar
@@ -86,5 +86,5 @@ SL Habla con un consejero de la línea para dejar de fumar\nNadie recibe una not
 SL Ver apoyo
 SL Guardar y comenzar la recuperación
 SL Se guarda sin conexión y se sincroniza después. Puedes eliminar este evento más tarde.
-SL Content v<n>.<n>
+SL Content v1.0
 SL Omitir por ahora y volver a Inicio
