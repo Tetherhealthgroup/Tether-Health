@@ -13,6 +13,8 @@ import { QuitPlanController } from "./quit-plan/quit-plan.controller";
 import { QuitPlanService } from "./quit-plan/quit-plan.service";
 import { ProgramDataController } from "./program-data/program-data.controller";
 import { ProgramDataService } from "./program-data/program-data.service";
+import { ProgrammeDataController } from "./programme-data/programme-data.controller";
+import { ProgrammeDataService } from "./programme-data/programme-data.service";
 import { CatalogueController } from "./catalogue/catalogue.controller";
 import { CatalogueService } from "./catalogue/catalogue.service";
 import { ConsentsController } from "./enrolments/consents.controller";
@@ -33,6 +35,7 @@ import { UserSupabaseClientFactory } from "./enrolments/user-supabase-client";
     QuitPlanController,
     AccountController,
     ProgramDataController,
+    ProgrammeDataController,
     EnrolmentsController,
     ConsentsController,
     CatalogueController,
@@ -43,6 +46,7 @@ import { UserSupabaseClientFactory } from "./enrolments/user-supabase-client";
     QuitPlanService,
     AccountService,
     ProgramDataService,
+    ProgrammeDataService,
     UserSupabaseClientFactory,
     EnrolmentsService,
     CatalogueService,

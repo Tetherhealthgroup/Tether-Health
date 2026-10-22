@@ -1,11 +1,19 @@
 openapi: 3.1.0
 info:
   title: Tether Health API
-  version: 1.6.2
+  version: 1.7.0
   description: >-
     Development contract for authenticated profiles and bounded program data.
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
+    Added in 1.7.0: the fifteen programme event routes
+    `POST /v1/program-data/{code}/{kind}` (Heartwise readings and lipids,
+    Steady readings and A1C, Renew labs, ClearAir zone checks and symptoms,
+    Ease moods and check-backs, Stride sessions and falls, ScrollFree
+    pauses, Checkup done items, Beacon diary and survivorship), each for app
+    use, each requiring an `Idempotency-Key`, with their own coded error
+    body `ProgrammeDataRequestRejected`. Any other code/kind pair answers
+    404. The legacy `/v1/program-data/{programId}` routes are unchanged.
     Changed in 1.6.2: `DELETE /v1/enrolments/{enrolmentId}` ("Delete now")
     is for app use; it deletes the programme's data in one database call
     and also answers 401 `recent_authentication_required` when the database
@@ -579,11 +587,563 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
         '502': {description: Consent storage is temporarily unavailable}
+  /v1/program-data/hw/readings:
+    post:
+      operationId: recordBloodPressure
+      summary: Blood pressure reading (Heartwise)
+      description: >-
+        Writes observations `bp_systolic`, `bp_diastolic` (mm[Hg]) and `heart_rate` (/min) when `pulse` is given, into the caller's own hw enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitHwReadings'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`value_out_of_range` (a value outside its spec rule''s range) or `invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/hw/lipids:
+    post:
+      operationId: recordLipids
+      summary: Lipid panel (Heartwise)
+      description: >-
+        Writes observations `chol_total`, `chol_ldl`, `chol_hdl`, `triglycerides` (mg/dL) for the values given; at least one value, into the caller's own hw enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitHwLipids'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/st/readings:
+    post:
+      operationId: recordGlucose
+      summary: Glucose reading (Steady)
+      description: >-
+        Writes observation `glucose` (mg/dL) with attributes `timing` (from `when`), `feelings` and `note`, into the caller's own st enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitStReadings'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`value_out_of_range` (a value outside its spec rule''s range) or `invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/st/a1c:
+    post:
+      operationId: recordA1c
+      summary: A1C result (Steady)
+      description: >-
+        Writes observation `a1c` (%), into the caller's own st enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitStA1c'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/re/labs:
+    post:
+      operationId: recordKidneyLiverLabs
+      summary: Kidney and liver labs (Renew)
+      description: >-
+        Writes observations `egfr` (mL/min/{1.73_m2}), `urine_acr` (mg/g), `alt` (U/L) for the values given; at least one value, into the caller's own re enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitReLabs'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/ca/zone-checks:
+    post:
+      operationId: recordZoneCheck
+      summary: Zone check (ClearAir)
+      description: >-
+        Writes entry `ca.zone_check` (`zone`, `symptoms`), then observation `peak_flow` (L/min) when `peakFlow` is given, both under the same submission. The zone is decided on the device from the member's own plan; the API never computes it. If the entry conflicts (409) nothing is written; an entry stored without its peak flow is completed by a retry, into the caller's own ca enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitCaZoneChecks'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`value_out_of_range` (a value outside its spec rule''s range) or `invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/ca/symptoms:
+    post:
+      operationId: recordRespiratorySymptoms
+      summary: Symptoms (ClearAir)
+      description: >-
+        Writes entry `ca.symptom`, into the caller's own ca enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitCaSymptoms'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/ea/moods:
+    post:
+      operationId: recordMood
+      summary: Mood check-in (Ease)
+      description: >-
+        Writes entry `ea.mood`. The API decides no safety outcome; the app's rule-decided branch stays the safety path, into the caller's own ea enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitEaMoods'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/ea/check-backs:
+    post:
+      operationId: recordCheckBack
+      summary: Check-back (Ease)
+      description: >-
+        Writes entry `ea.check_back` (`reachedOut` stored as `reached_out`), into the caller's own ea enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitEaCheckBacks'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/sd/sessions:
+    post:
+      operationId: recordSession
+      summary: Session (Stride)
+      description: >-
+        Writes entry `sd.session`, into the caller's own sd enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitSdSessions'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/sd/falls:
+    post:
+      operationId: recordFall
+      summary: Fall (Stride)
+      description: >-
+        Writes entry `sd.fall` (empty payload), into the caller's own sd enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitSdFalls'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/sf/pauses:
+    post:
+      operationId: recordPause
+      summary: Pause (ScrollFree)
+      description: >-
+        Writes entry `sf.pause`, into the caller's own sf enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitSfPauses'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/ck/done:
+    post:
+      operationId: recordCheckupDone
+      summary: Done item (Checkup)
+      description: >-
+        Writes entry `ck.done` (`doneOn` stored as `done_on`), into the caller's own ck enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitCkDone'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/be/diary:
+    post:
+      operationId: recordDiary
+      summary: Symptom diary (Beacon)
+      description: >-
+        Writes entry `be.diary`, into the caller's own be enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitBeDiary'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
+  /v1/program-data/be/survivorship:
+    post:
+      operationId: recordSurvivorship
+      summary: Survivorship check-in (Beacon)
+      description: >-
+        Writes entry `be.survivorship`, into the caller's own be enrolment (the
+        programme is the path's, never the body's).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {$ref: '#/components/parameters/IdempotencyKey'}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/SubmitBeSurvivorship'}
+      responses:
+        '201': {$ref: '#/components/responses/ProgrammeRecordCreated'}
+        '200': {$ref: '#/components/responses/ProgrammeRecordReplayed'}
+        '400': {$ref: '#/components/responses/ProgrammeRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
+        '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
+        '422':
+          description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+        '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
 components:
   securitySchemes:
     supabaseJwt: {type: http, scheme: bearer, bearerFormat: JWT}
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: >-
+        Required. 32 lowercase hex characters (the app's form) or a canonical
+        UUID; the same 128-bit value becomes the submission id. A repeat with
+        the same key and the same content answers 200 `replayed` and writes
+        nothing; times (`occurredAt`, `measuredAt`, `checkedAt`, `labDate`)
+        are not compared, so the first stored time wins. The same key with
+        other content answers 409 `idempotency_key_conflict`. Missing: 400
+        `idempotency_key_required`; any other form: 400
+        `idempotency_key_invalid`. Checked after authentication and before
+        the body.
+      schema:
+        type: string
+        pattern: '^([0-9a-f]{32}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$'
   responses:
     Unauthorized: {description: Missing or invalid Supabase access token}
+    ProgrammeRecordCreated:
+      description: The submission was written (at least one of its rows is new)
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ProgrammeRecordCreated'}
+    ProgrammeRecordReplayed:
+      description: A repeat of a stored submission with the same content; nothing was written
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ProgrammeRecordReplayed'}
+    ProgrammeRecordBadRequest:
+      description: >-
+        `idempotency_key_required`, `idempotency_key_invalid`, or
+        `invalid_request` (an unknown key, including `constructor` and
+        `prototype`, a missing required field, a value of the wrong type, an
+        option not in the list, more than 3 decimal places, a fraction in an
+        integer field, a time more than 5 minutes ahead, or a date outside
+        its bounds). The key is checked before the body. A body the JSON
+        parser refuses before the route runs (malformed JSON, or a
+        `__proto__` key or `constructor.prototype` anywhere in it) gets the
+        generic body without a code (`RequestRejected`). Nothing was written.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+              - {$ref: '#/components/schemas/RequestRejected'}
+    ProgrammeRecordTooLarge:
+      description: The body is larger than the server's request body limit (generic body, no code); nothing was written
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/RequestRejected'}
+    ProgrammeRecordUnsupportedMediaType:
+      description: The body is not `application/json` (generic body, no code); nothing was written
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/RequestRejected'}
+    ProgrammeRecordRateLimited:
+      description: Too many requests from this client (generic body, no code); nothing was written
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/RequestRejected'}
+    ProgrammeRecordNotEnrolled:
+      description: '`enrolment_not_found`: the caller has no enrolment in this programme (also when it was deleted meanwhile); nothing was written'
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+    ProgrammeRecordConflict:
+      description: '`account_deletion_in_progress`, `enrolment_left`, `core_consent_required` (no live core consent), `idempotency_key_conflict` (the key was used with other content), or `record_not_allowed` (the enrolment was left, its consent revoked or account deletion started while the request ran). Nothing was written, except that a zone check whose entry was written before its peak flow conflicted keeps the entry.'
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+    ProgrammeRecordUnavailable:
+      description: Record storage is temporarily unavailable, or the database refused the record for a reason the caller cannot fix
   schemas:
     Health:
       type: object
@@ -962,3 +1522,186 @@ components:
         enrolments:
           type: array
           items: {$ref: '#/components/schemas/Enrolment'}
+    ProgrammeRecordCreated:
+      description: The submission was written.
+      type: object
+      additionalProperties: false
+      required: [submissionId]
+      properties:
+        submissionId: {type: string, format: uuid, description: 'The Idempotency-Key as a UUID'}
+    ProgrammeRecordReplayed:
+      description: Every row of the submission was already stored with the same content; nothing new was written.
+      type: object
+      additionalProperties: false
+      required: [submissionId, replayed]
+      properties:
+        submissionId: {type: string, format: uuid}
+        replayed: {const: true}
+    ProgrammeDataRequestRejected:
+      description: Error body of the programme event routes, with a stable code naming the refused rule. Never contains submitted values, field contents or identifiers.
+      type: object
+      additionalProperties: false
+      required: [statusCode, error, code, requestId]
+      properties:
+        statusCode: {type: integer}
+        error: {const: Request rejected}
+        code:
+          type: string
+          enum:
+            - invalid_request
+            - idempotency_key_required
+            - idempotency_key_invalid
+            - idempotency_key_conflict
+            - value_out_of_range
+            - invalid_record
+            - enrolment_not_found
+            - enrolment_left
+            - core_consent_required
+            - account_deletion_in_progress
+            - record_not_allowed
+        requestId: {type: string}
+    ProgrammeEventTime:
+      type: string
+      format: date-time
+      description: RFC 3339 with an offset, at most 5 minutes in the future (otherwise 400 `invalid_request`). Optional; the default is the server's time of the request.
+    ProgrammeRecordDate:
+      type: string
+      format: date
+      description: A YYYY-MM-DD date from 1900-01-01 up to tomorrow's UTC date (otherwise 400 `invalid_request`). A lab date is stored as that date at 00:00:00Z.
+    ProgrammeMeasurement:
+      type: number
+      minimum: 0
+      maximum: 10000
+      multipleOf: 0.001
+      description: At most 3 decimal places (more is 400 `invalid_request`, never rounded). Outside 0 to 10000 the record is refused with 422 `invalid_record`.
+    SubmitHwReadings:
+      type: object
+      additionalProperties: false
+      required: [systolic, diastolic]
+      properties:
+        systolic: {type: integer, minimum: 70, maximum: 250, description: 'Spec rule hw.bp; outside answers 422 value_out_of_range'}
+        diastolic: {type: integer, minimum: 40, maximum: 150, description: 'Spec rule hw.bp; outside answers 422 value_out_of_range'}
+        pulse: {type: integer, minimum: 0, maximum: 10000}
+        measuredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+    SubmitHwLipids:
+      type: object
+      additionalProperties: false
+      required: [labDate]
+      anyOf:
+        - {required: [total], properties: {total: true}}
+        - {required: [ldl], properties: {ldl: true}}
+        - {required: [hdl], properties: {hdl: true}}
+        - {required: [triglycerides], properties: {triglycerides: true}}
+      properties:
+        total: {$ref: '#/components/schemas/ProgrammeMeasurement'}
+        ldl: {$ref: '#/components/schemas/ProgrammeMeasurement'}
+        hdl: {$ref: '#/components/schemas/ProgrammeMeasurement'}
+        triglycerides: {$ref: '#/components/schemas/ProgrammeMeasurement'}
+        labDate: {$ref: '#/components/schemas/ProgrammeRecordDate'}
+    SubmitStReadings:
+      type: object
+      additionalProperties: false
+      required: [reading]
+      properties:
+        reading: {type: number, minimum: 20, maximum: 600, multipleOf: 0.001, description: 'Spec rule st.glucose; outside answers 422 value_out_of_range. At most 3 decimal places'}
+        when: {enum: [fasting, before_meal, 2_h_after_meal, bedtime, other]}
+        feelings: {type: array, maxItems: 12, uniqueItems: true, items: {enum: [fine, shaky, sweaty, tired, thirsty]}}
+        note: {type: string, minLength: 1, maxLength: 500, description: Trimmed text}
+        measuredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+    SubmitStA1c:
+      type: object
+      additionalProperties: false
+      required: [a1c, labDate]
+      properties:
+        a1c: {$ref: '#/components/schemas/ProgrammeMeasurement'}
+        labDate: {$ref: '#/components/schemas/ProgrammeRecordDate'}
+    SubmitReLabs:
+      type: object
+      additionalProperties: false
+      required: [labDate]
+      anyOf:
+        - {required: [egfr], properties: {egfr: true}}
+        - {required: [urineAcr], properties: {urineAcr: true}}
+        - {required: [alt], properties: {alt: true}}
+      properties:
+        egfr: {$ref: '#/components/schemas/ProgrammeMeasurement'}
+        urineAcr: {$ref: '#/components/schemas/ProgrammeMeasurement'}
+        alt: {$ref: '#/components/schemas/ProgrammeMeasurement'}
+        labDate: {$ref: '#/components/schemas/ProgrammeRecordDate'}
+    SubmitCaZoneChecks:
+      type: object
+      additionalProperties: false
+      required: [zone]
+      properties:
+        zone: {enum: [green, yellow, red]}
+        symptoms: {type: array, maxItems: 12, uniqueItems: true, items: {enum: [coughing, wheezing, short_of_breath, chest_tightness, woke_at_night, can_t_speak_in_full_sentences]}}
+        peakFlow: {type: number, minimum: 50, maximum: 900, multipleOf: 0.001, description: 'Spec rule ca.zone; outside answers 422 value_out_of_range. At most 3 decimal places'}
+        checkedAt: {allOf: [{$ref: '#/components/schemas/ProgrammeEventTime'}], description: 'The time of the check, for both rows'}
+    SubmitCaSymptoms:
+      type: object
+      additionalProperties: false
+      required: [symptoms]
+      properties:
+        symptoms: {type: array, minItems: 1, maxItems: 12, uniqueItems: true, items: {enum: [coughing, wheezing, short_of_breath, chest_tightness, woke_at_night]}}
+        severity: {enum: [mild, moderate, severe]}
+        triggers: {type: array, maxItems: 12, uniqueItems: true, items: {enum: [cold_air, smoke, pollen, exercise, not_sure]}}
+        note: {type: string, minLength: 1, maxLength: 500, description: Trimmed text}
+        occurredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+    SubmitEaMoods:
+      type: object
+      additionalProperties: false
+      required: [mood]
+      properties:
+        mood: {enum: [very_low, low, okay, good, great]}
+        topics: {type: array, maxItems: 12, uniqueItems: true, items: {enum: [work, money, family, health, lonely, sleep, thoughts_of_harming_myself, not_sure]}}
+        occurredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+    SubmitEaCheckBacks:
+      type: object
+      additionalProperties: false
+      required: [change]
+      properties:
+        change: {enum: [worse, same, better]}
+        reachedOut: {enum: [yes_i_have_an_appointment, not_yet, i_don_t_want_to]}
+        occurredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+    SubmitSdSessions:
+      type: object
+      additionalProperties: false
+      properties:
+        settings: {type: array, maxItems: 12, uniqueItems: true, items: {enum: [audio_on, large_text, captions]}}
+        occurredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+    SubmitSdFalls:
+      type: object
+      additionalProperties: false
+      properties:
+        occurredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+    SubmitSfPauses:
+      type: object
+      additionalProperties: false
+      required: [reason]
+      properties:
+        reason: {enum: [message_someone, bored, avoiding_something, can_t_sleep]}
+        occurredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+    SubmitCkDone:
+      type: object
+      additionalProperties: false
+      required: [item, doneOn]
+      properties:
+        item: {type: string, pattern: '^[a-z0-9_]{1,40}$', description: 'A code; the spec has no option list yet'}
+        doneOn: {$ref: '#/components/schemas/ProgrammeRecordDate'}
+        place: {type: string, minLength: 1, maxLength: 500, description: Trimmed text}
+        occurredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+    SubmitBeDiary:
+      type: object
+      additionalProperties: false
+      required: [fatigue]
+      properties:
+        fatigue: {type: integer, minimum: 0, maximum: 10}
+        symptoms: {type: array, maxItems: 12, uniqueItems: true, items: {enum: [nausea, pain, mouth_sores, numbness, low_mood]}}
+        occurredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}
+    SubmitBeSurvivorship:
+      type: object
+      additionalProperties: false
+      required: [feeling]
+      properties:
+        feeling: {enum: [hard, mixed, good]}
+        occurredAt: {$ref: '#/components/schemas/ProgrammeEventTime'}

@@ -1,5 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { databaseError, type DatabaseErrorHint } from "./database-errors";
+import {
+  attributesTriggerFails,
+  entryCheckFails,
+  observationCheckFails,
+  payloadTriggerFails,
+} from "./fake-programme-records";
 
 /**
  * In-memory stand-in for PostgREST over the TH-913 schema
@@ -62,6 +68,24 @@ import { databaseError, type DatabaseErrorHint } from "./database-errors";
  *   remove, limited to objects in the caller's own folder like the avatar
  *   select and delete policies; an object outside it is neither listed nor
  *   removed (a short batch). failNextStorage makes the next call fail;
+ * - programme records (supabase/migrations/202610180013_programme_records.sql):
+ *   observations and programme_entries with their column grants (insert
+ *   only: no update or delete, so either is refused with 42501, before the
+ *   append-only trigger could run), the select policy (own rows) and the
+ *   insert policy (own user_id, has_consent(enrolment_id, 'core') — the
+ *   member's own enrolment, not left, live core consent, deletion not
+ *   started — and the deletion barrier). A bulk insert is one statement:
+ *   per row, in Postgres executor order, the before-insert payload or
+ *   attribute trigger (23514), the RLS check (42501), NOT NULL (23502), the
+ *   CHECK constraints (23514) and the submission unique key (23505, also
+ *   against earlier rows of the same statement); then, at the end of the
+ *   statement, the composite foreign key to the enrolment (23503). Values
+ *   are rounded to numeric(9,3) and overflow past it (22003). created_at is
+ *   the real clock (the API's default times are real time too), not the
+ *   fake's. Removing an enrolment or a member removes its rows (on delete
+ *   cascade). The sync writer session guard is not emulated (no sync
+ *   session exists here), and the account and "Delete now" receipts keep
+ *   their earlier keys (the new tables' counts are not returned);
  * - error bodies: standard SQLSTATEs for constraints and RLS, and the
  *   database's own `TH` codes with the registry's exact message and hint
  *   (test/support/database-errors.ts), answered as HTTP 400 the way
@@ -85,6 +109,8 @@ interface State {
   /** Not exposed through the REST tables; written by account deletion. */
   quit_plans: Row[];
   program_data: Row[];
+  observations: Row[];
+  programme_entries: Row[];
   /** Stand-in for auth.users (id only). */
   auth_users: Row[];
   /** Stand-in for storage.objects (bucket_id, name). */
@@ -196,7 +222,29 @@ const INSERT_GRANTS: Record<string, string[]> = {
     "consent_version",
     "locale",
   ],
+  observations: [
+    "user_id",
+    "enrolment_id",
+    "programme_code",
+    "submission_id",
+    "metric",
+    "value",
+    "unit_ucum",
+    "effective_at",
+    "attributes",
+  ],
+  programme_entries: [
+    "user_id",
+    "enrolment_id",
+    "programme_code",
+    "submission_id",
+    "kind",
+    "occurred_at",
+    "payload",
+  ],
 };
+/** observations and programme_entries (202610180013). */
+const RECORD_TABLES = ["observations", "programme_entries"];
 const UPDATE_GRANTS: Record<string, string[]> = {
   enrolments: ["status", "mode"],
   programme_consents: ["revoked_at", "superseded_by"],
@@ -280,7 +328,10 @@ const raise = (hint: DatabaseErrorHint, messageIndex = 0): never => {
   throw new PgFailure(registryError(hint, messageIndex));
 };
 const checkViolation = (name: string) => {
-  const table = /^(enrolments|programme_consents)_\w+_check$/.exec(name)?.[1];
+  const table =
+    /^(enrolments|programme_consents|observations|programme_entries)_\w+_check$/.exec(
+      name,
+    )?.[1];
   return fail(
     400,
     "23514",
@@ -322,6 +373,8 @@ export class FakePostgrest {
     consent_documents: CONSENT_DOCUMENTS.map((row) => ({ ...row })),
     quit_plans: [],
     program_data: [],
+    observations: [],
+    programme_entries: [],
     auth_users: [],
     storage_objects: [],
   };
@@ -608,6 +661,7 @@ export class FakePostgrest {
         "enrolments",
         "programme_consents",
         "consent_documents",
+        ...RECORD_TABLES,
       ].includes(path)
     ) {
       return fail(404, "PGRST205", "Table not found");
@@ -619,7 +673,9 @@ export class FakePostgrest {
       rows = this.filter(this.visible(uid, table), url);
     } else if (method === "POST") {
       const values = Array.isArray(body) ? (body as Row[]) : [body as Row];
-      rows = values.map((value) => this.insert(uid, table, value));
+      rows = RECORD_TABLES.includes(table)
+        ? this.insertRecords(uid, table, values)
+        : values.map((value) => this.insert(uid, table, value));
       status = 201;
     } else if (method === "PATCH") {
       rows = this.update(uid, table, url, body as Row);
@@ -777,6 +833,11 @@ export class FakePostgrest {
       quit_plans: removeWhere("quit_plans", (row) => row.user_id === uid),
       profiles: removeWhere("profiles", (row) => row.id === uid),
     };
+    // Programme records go with the account (their counts are not part of
+    // this fake's receipt).
+    for (const table of RECORD_TABLES) {
+      removeWhere(table as keyof State, (row) => row.user_id === uid);
+    }
     removeWhere("auth_users", (row) => row.id === uid);
     return counts;
   }
@@ -832,6 +893,13 @@ export class FakePostgrest {
         (row) => row.id === enrolment.id && row.user_id === uid,
       ),
     };
+    // The programme's records go with its enrolment (counts not returned).
+    for (const table of RECORD_TABLES) {
+      removeWhere(
+        table as keyof State,
+        (row) => row.enrolment_id === enrolment.id,
+      );
+    }
     return {
       quit_plans: counts.quit_plans,
       program_data: counts.program_data,
@@ -1066,6 +1134,9 @@ export class FakePostgrest {
     if (table === "enrolments") {
       return this.state.enrolments.filter((row) => row.user_id === uid);
     }
+    if (RECORD_TABLES.includes(table)) {
+      return this.state[table].filter((row) => row.user_id === uid);
+    }
     if (table === "programme_consents") {
       return this.state.programme_consents.filter((row) =>
         this.state.enrolments.some(
@@ -1212,6 +1283,122 @@ export class FakePostgrest {
     }
     this.state.programme_consents.push(row);
     return row;
+  }
+
+  /**
+   * A bulk insert into observations or programme_entries: one statement,
+   * in Postgres executor order (see the class comment).
+   */
+  private insertRecords(uid: string, table: string, values: Row[]): Row[] {
+    const granted = INSERT_GRANTS[table] ?? [];
+    const lower = (value: unknown) =>
+      typeof value === "string" ? value.toLowerCase() : value;
+    const createdAt = new Date().toISOString();
+    const inserted: Row[] = [];
+    for (const value of values) {
+      if (Object.keys(value).some((column) => !granted.includes(column))) {
+        fail(403, "42501", `permission denied for table ${table}`);
+      }
+      const row: Row =
+        table === "observations"
+          ? {
+              id: randomUUID(),
+              user_id: lower(value.user_id) ?? null,
+              enrolment_id: lower(value.enrolment_id) ?? null,
+              programme_code: value.programme_code ?? null,
+              submission_id: lower(value.submission_id) ?? null,
+              metric: value.metric ?? null,
+              value: value.value ?? null,
+              unit_ucum: value.unit_ucum ?? null,
+              effective_at: value.effective_at ?? null,
+              attributes: value.attributes ?? {},
+              created_at: createdAt,
+            }
+          : {
+              id: randomUUID(),
+              user_id: lower(value.user_id) ?? null,
+              enrolment_id: lower(value.enrolment_id) ?? null,
+              programme_code: value.programme_code ?? null,
+              submission_id: lower(value.submission_id) ?? null,
+              kind: value.kind ?? null,
+              occurred_at: value.occurred_at ?? null,
+              payload: value.payload ?? null,
+              created_at: createdAt,
+            };
+      // numeric(9,3): input is rounded to the scale; past the precision it
+      // overflows before any trigger or check runs.
+      if (table === "observations" && typeof row.value === "number") {
+        if (Math.abs(row.value) >= 1e6) {
+          fail(400, "22003", "numeric field overflow");
+        }
+        row.value = Number(row.value.toFixed(3));
+      }
+      // Before-insert row trigger.
+      const triggerFails =
+        table === "observations"
+          ? attributesTriggerFails(row.metric, row.attributes)
+          : payloadTriggerFails(row.kind, row.payload);
+      if (triggerFails) {
+        fail(
+          400,
+          "23514",
+          table === "observations"
+            ? "Observation attributes are not valid for this metric"
+            : "Programme entry payload is not valid for its kind",
+        );
+      }
+      // RLS WITH CHECK.
+      if (
+        row.user_id !== uid ||
+        typeof row.enrolment_id !== "string" ||
+        !this.hasConsent(uid, row.enrolment_id, "core") ||
+        !this.barrierOpen(uid)
+      ) {
+        rlsViolation(table);
+      }
+      const notNull = Object.entries(row).find(([, cell]) => cell === null);
+      if (notNull) {
+        fail(400, "23502", `null value in column "${notNull[0]}"`);
+      }
+      const failed =
+        table === "observations"
+          ? observationCheckFails(row)
+          : entryCheckFails(row);
+      if (failed) checkViolation(failed);
+      const sameKey = (other: Row) =>
+        other.enrolment_id === row.enrolment_id &&
+        other.submission_id === row.submission_id &&
+        (table !== "observations" || other.metric === row.metric);
+      if (
+        this.state[table as keyof State].some(sameKey) ||
+        inserted.some(sameKey)
+      ) {
+        fail(
+          409,
+          "23505",
+          `duplicate key value violates unique constraint "${table}_submission_key"`,
+        );
+      }
+      inserted.push(row);
+    }
+    // The composite foreign key, checked at the end of the statement.
+    for (const row of inserted) {
+      const enrolment = this.state.enrolments.find(
+        (other) =>
+          other.id === row.enrolment_id &&
+          other.user_id === row.user_id &&
+          other.programme_code === row.programme_code,
+      );
+      if (!enrolment) {
+        fail(
+          409,
+          "23503",
+          `insert or update on table "${table}" violates foreign key constraint "${table}_enrolment_fkey"`,
+        );
+      }
+    }
+    this.state[table as keyof State].push(...inserted);
+    return inserted;
   }
 
   private update(
