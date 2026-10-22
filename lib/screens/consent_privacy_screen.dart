@@ -4,6 +4,11 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+/// Above 140% text (the iOS accessibility sizes; Android tops out at 135%)
+/// side-by-side pieces of the consent cards are stacked so text can grow.
+bool _usesLargeTextLayout(BuildContext context) =>
+    MediaQuery.textScalerOf(context).scale(10) > 14;
+
 class ConsentPrivacyScreen extends StatelessWidget {
   const ConsentPrivacyScreen({
     required this.isSpanish,
@@ -245,8 +250,9 @@ class _ConsentHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
+    // A minimum height: large text grows the header instead of clipping it.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
       child: Row(
         children: [
           IconButton.outlined(
@@ -265,15 +271,19 @@ class _ConsentHeader extends StatelessWidget {
               children: [
                 Icon(Icons.eco_rounded, color: AppColors.coral, size: 23),
                 SizedBox(width: 7),
+                // One word: at the largest sizes it scales down to the
+                // space left instead of being cut to "B…".
                 Flexible(
-                  child: Text(
-                    'BreatheFree',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: AppColors.deepTeal,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      'BreatheFree',
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: AppColors.deepTeal,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                 ),
@@ -281,7 +291,7 @@ class _ConsentHeader extends StatelessWidget {
             ),
           ),
           Container(
-            height: 30,
+            constraints: const BoxConstraints(minHeight: 30),
             padding: const EdgeInsets.symmetric(horizontal: 10),
             alignment: Alignment.center,
             decoration: BoxDecoration(
@@ -658,37 +668,46 @@ class _CardSectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final heading = Text(
+      title,
+      style: const TextStyle(
+        color: AppColors.mutedTeal,
+        fontSize: 10,
+        height: 1.25,
+        letterSpacing: 1.7,
+        fontWeight: FontWeight.w800,
+      ),
+    );
+    final badgeChip = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+      decoration: BoxDecoration(
+        color: lightBadge ? AppColors.paper : AppColors.mint,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Text(
+        badge,
+        style: const TextStyle(
+          color: AppColors.deepTeal,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+
+    // Beside the badge, the heading's longest word no longer fits at
+    // accessibility text sizes.
+    if (_usesLargeTextLayout(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [heading, const SizedBox(height: 8), badgeChip],
+      );
+    }
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.mutedTeal,
-              fontSize: 10,
-              height: 1.25,
-              letterSpacing: 1.7,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
+        Expanded(child: heading),
         const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
-          decoration: BoxDecoration(
-            color: lightBadge ? AppColors.paper : AppColors.mint,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Text(
-            badge,
-            style: const TextStyle(
-              color: AppColors.deepTeal,
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
+        badgeChip,
       ],
     );
   }
@@ -773,6 +792,51 @@ class _ConsentSwitchRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            color: AppColors.deepTeal,
+            fontSize: 13.5,
+            height: 1.2,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          subtitle,
+          style: const TextStyle(
+            color: AppColors.tealSecondary,
+            fontSize: 11,
+            height: 1.3,
+          ),
+        ),
+      ],
+    );
+    final toggle = Switch(
+      key: switchKey,
+      value: value,
+      onChanged: onChanged,
+      activeThumbColor: Colors.white,
+      activeTrackColor: AppColors.deepTeal,
+      inactiveThumbColor: Colors.white,
+      inactiveTrackColor: AppColors.border,
+    );
+
+    // Between the icon and the switch, words split mid-way at accessibility
+    // text sizes. The text takes the full width and the switch follows it.
+    if (_usesLargeTextLayout(context)) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 9),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [text, const SizedBox(height: 6), toggle],
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 9),
       child: Row(
@@ -787,41 +851,9 @@ class _ConsentSwitchRow extends StatelessWidget {
             child: Icon(icon, color: AppColors.deepTeal, size: 21),
           ),
           const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: AppColors.deepTeal,
-                    fontSize: 13.5,
-                    height: 1.2,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: AppColors.tealSecondary,
-                    fontSize: 11,
-                    height: 1.3,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          Expanded(child: text),
           const SizedBox(width: 8),
-          Switch(
-            key: switchKey,
-            value: value,
-            onChanged: onChanged,
-            activeThumbColor: Colors.white,
-            activeTrackColor: AppColors.deepTeal,
-            inactiveThumbColor: Colors.white,
-            inactiveTrackColor: AppColors.border,
-          ),
+          toggle,
         ],
       ),
     );
@@ -918,41 +950,44 @@ class _ConsentBottomAction extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: compact ? 50 : 54,
-                  child: FilledButton(
-                    key: const ValueKey('consent-agree-continue'),
-                    onPressed: onContinue,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.deepTeal,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                FilledButton(
+                  key: const ValueKey('consent-agree-continue'),
+                  onPressed: onContinue,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.deepTeal,
+                    foregroundColor: Colors.white,
+                    // A minimum, not a fixed height: large text wraps and
+                    // grows the button instead of shrinking back to fit.
+                    minimumSize: Size.fromHeight(compact ? 50 : 54),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
                     ),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            isSpanish
-                                ? 'Aceptar y continuar'
-                                : 'Agree and continue',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          const Icon(
-                            Icons.arrow_forward_rounded,
-                            color: AppColors.lime,
-                          ),
-                        ],
-                      ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
                     ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          isSpanish
+                              ? 'Aceptar y continuar'
+                              : 'Agree and continue',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: AppColors.lime,
+                      ),
+                    ],
                   ),
                 ),
                 if (!compact) ...[
@@ -961,8 +996,7 @@ class _ConsentBottomAction extends StatelessWidget {
                     isSpanish
                         ? 'Puedes cambiar las opciones en Configuración.'
                         : 'You can change optional choices anytime in Settings.',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: AppColors.mutedTeal,
                       fontSize: 10,

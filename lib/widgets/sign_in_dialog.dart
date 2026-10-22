@@ -123,6 +123,16 @@ class _SignInDialogState extends State<SignInDialog> {
   @override
   Widget build(BuildContext context) {
     final confirmationEmail = _confirmationEmail;
+    final content = confirmationEmail == null
+        ? _buildAccountForm(context)
+        : _buildConfirmation(context, confirmationEmail);
+    final actions = confirmationEmail == null
+        ? _buildFormActions()
+        : _buildConfirmationActions();
+    // AlertDialog keeps its actions below the scrolling content. At
+    // accessibility text sizes the stacked buttons alone can be taller than
+    // the screen, so they scroll with the content instead.
+    final scrollActions = MediaQuery.textScalerOf(context).scale(10) > 14;
     return AlertDialog(
       key: const ValueKey('account-dialog'),
       scrollable: true,
@@ -132,13 +142,27 @@ class _SignInDialogState extends State<SignInDialog> {
             : _creatingAccount
                 ? 'Create your BreatheFree account'
                 : 'Sign in to BreatheFree',
+        // Past 200% "BreatheFree" no longer fits the dialog's width.
+        textScaler: MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 2),
       ),
-      content: confirmationEmail == null
-          ? _buildAccountForm(context)
-          : _buildConfirmation(context, confirmationEmail),
-      actions: confirmationEmail == null
-          ? _buildFormActions()
-          : _buildConfirmationActions(),
+      content: scrollActions
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                content,
+                const SizedBox(height: 16),
+                OverflowBar(
+                  alignment: MainAxisAlignment.end,
+                  overflowAlignment: OverflowBarAlignment.end,
+                  spacing: 8,
+                  overflowSpacing: 8,
+                  children: actions,
+                ),
+              ],
+            )
+          : content,
+      actions: scrollActions ? null : actions,
     );
   }
 
@@ -160,7 +184,10 @@ class _SignInDialogState extends State<SignInDialog> {
               keyboardType: TextInputType.emailAddress,
               autofillHints: const [AutofillHints.email],
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(
+                label: Text('Email'),
+                errorMaxLines: 4,
+              ),
               validator: (value) => value != null &&
                       value.trim().contains('@') &&
                       value.trim().contains('.')
@@ -180,9 +207,11 @@ class _SignInDialogState extends State<SignInDialog> {
                   ? TextInputAction.next
                   : TextInputAction.done,
               decoration: InputDecoration(
-                labelText: _creatingAccount ? 'Create password' : 'Password',
+                label: Text(_creatingAccount ? 'Create password' : 'Password'),
                 helperText:
                     _creatingAccount ? 'Use at least 8 characters.' : null,
+                helperMaxLines: 4,
+                errorMaxLines: 4,
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -223,8 +252,10 @@ class _SignInDialogState extends State<SignInDialog> {
                 obscureText: true,
                 autofillHints: const [AutofillHints.newPassword],
                 textInputAction: TextInputAction.done,
-                decoration:
-                    const InputDecoration(labelText: 'Confirm password'),
+                decoration: const InputDecoration(
+                  label: Text('Confirm password'),
+                  errorMaxLines: 4,
+                ),
                 validator: (value) =>
                     value == _password.text ? null : 'Passwords do not match.',
                 onFieldSubmitted: (_) => _submit(),
