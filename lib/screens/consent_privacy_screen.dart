@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
-/// Above 140% text (the iOS accessibility sizes; Android tops out at 135%)
-/// side-by-side pieces of the consent cards are stacked so text can grow.
+/// Above 140% text (the iOS accessibility sizes, and Android 14's largest
+/// font sizes, which go up to 200% with non-linear scaling) side-by-side
+/// pieces of the consent cards are stacked so text can grow.
 bool _usesLargeTextLayout(BuildContext context) =>
     MediaQuery.textScalerOf(context).scale(10) > 14;
 
@@ -815,14 +816,18 @@ class _ConsentSwitchRow extends StatelessWidget {
         ),
       ],
     );
-    final toggle = Switch(
-      key: switchKey,
-      value: value,
-      onChanged: onChanged,
-      activeThumbColor: Colors.white,
-      activeTrackColor: AppColors.deepTeal,
-      inactiveThumbColor: Colors.white,
-      inactiveTrackColor: AppColors.border,
+    // The switch is announced with its visible title.
+    final toggle = Semantics(
+      label: title,
+      child: Switch(
+        key: switchKey,
+        value: value,
+        onChanged: onChanged,
+        activeThumbColor: Colors.white,
+        activeTrackColor: AppColors.deepTeal,
+        inactiveThumbColor: Colors.white,
+        inactiveTrackColor: AppColors.border,
+      ),
     );
 
     // Between the icon and the switch, words split mid-way at accessibility

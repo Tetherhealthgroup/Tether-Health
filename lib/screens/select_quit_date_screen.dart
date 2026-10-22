@@ -3,6 +3,46 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import 'choose_quit_path_screen.dart';
 
+/// Above 140% text (the iOS accessibility sizes and Android 14's largest
+/// font sizes) side-by-side pieces are stacked so text can grow.
+bool _usesLargeTextLayout(BuildContext context) =>
+    MediaQuery.textScalerOf(context).scale(10) > 14;
+
+/// The text scale for [text] in [style], lowered only as far as needed for
+/// its longest word to fit [width]: a word too long for a whole line scales
+/// down instead of splitting.
+TextScaler _wordFitScaler(
+  BuildContext context,
+  String text,
+  TextStyle style,
+  double width,
+) {
+  final scaler = MediaQuery.textScalerOf(context);
+  final painter = TextPainter(
+    text: TextSpan(
+      text: text,
+      style: DefaultTextStyle.of(context).style.merge(style),
+    ),
+    textDirection: Directionality.of(context),
+  );
+  try {
+    var fitted = scaler;
+    for (var attempt = 0; attempt < 4; attempt++) {
+      painter
+        ..textScaler = fitted
+        ..layout();
+      final longestWord = painter.minIntrinsicWidth;
+      if (longestWord <= width) return fitted;
+      final fontSize = style.fontSize ?? 14;
+      final factor = fitted.scale(fontSize) / fontSize * width / longestWord;
+      fitted = scaler.clamp(maxScaleFactor: factor * 0.99);
+    }
+    return fitted;
+  } finally {
+    painter.dispose();
+  }
+}
+
 DateTime _addCalendarDays(DateTime date, int days) {
   return DateTime(date.year, date.month, date.day + days);
 }
@@ -318,32 +358,50 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
             builder: (context, constraints) {
               final narrow = constraints.maxWidth < 380;
               final compact = constraints.maxHeight < 760;
-              final horizontalPadding = narrow ? 18.0 : 22.0;
+              // Above 140% text the side margins narrow so long words fit, and
+              // the header, progress and main action scroll with the content
+              // so they never squeeze the questions out of view.
+              final largeText = _usesLargeTextLayout(context);
+              final horizontalPadding =
+                  largeText ? 12.0 : (narrow ? 18.0 : 22.0);
+
+              final footer = _DateBottomAction(
+                isSpanish: widget.isSpanish,
+                label: _continueLabel,
+                onContinue: () => widget.onContinue(_effectiveDate),
+                horizontalPadding: largeText ? 0 : horizontalPadding,
+                compact: compact,
+              );
+
+              final header = _DateHeader(
+                isSpanish: widget.isSpanish,
+                title: _headerTitle,
+                onBack: widget.onBack,
+              );
+              final progress = _DateProgress(isSpanish: widget.isSpanish);
 
               return Column(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 9,
-                      horizontalPadding,
-                      0,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 9,
+                        horizontalPadding,
+                        0,
+                      ),
+                      child: header,
                     ),
-                    child: _DateHeader(
-                      isSpanish: widget.isSpanish,
-                      title: _headerTitle,
-                      onBack: widget.onBack,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 8,
+                        horizontalPadding,
+                        compact ? 7 : 10,
+                      ),
+                      child: progress,
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 8,
-                      horizontalPadding,
-                      compact ? 7 : 10,
-                    ),
-                    child: _DateProgress(isSpanish: widget.isSpanish),
-                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       key: const ValueKey('quit-date-content-scroll'),
@@ -359,6 +417,12 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              if (largeText) ...[
+                                header,
+                                const SizedBox(height: 10),
+                                progress,
+                                const SizedBox(height: 18),
+                              ],
                               Text(
                                 widget.isSpanish ? 'TU FECHA' : 'YOUR DATE',
                                 style: const TextStyle(
@@ -371,6 +435,10 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
                               const SizedBox(height: 8),
                               Text(
                                 _title,
+                                // Already the largest text on screen; past
+                                // 180% its longest words no longer fit.
+                                textScaler: MediaQuery.textScalerOf(context)
+                                    .clamp(maxScaleFactor: 1.8),
                                 style: Theme.of(context)
                                     .textTheme
                                     .displayLarge
@@ -406,6 +474,7 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
                                 onNextMonth: () => _changeMonth(1),
                                 monthLabel:
                                     '${_monthName(_visibleMonth.month)} ${_visibleMonth.year}',
+                                weekdayName: _weekdayName,
                               ),
                               const SizedBox(height: 12),
                               _SelectedDateCard(
@@ -427,19 +496,17 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
                               ),
                               const SizedBox(height: 13),
                               _FlexibleDateNote(isSpanish: widget.isSpanish),
+                              if (largeText) ...[
+                                const SizedBox(height: 18),
+                                footer,
+                              ],
                             ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                  _DateBottomAction(
-                    isSpanish: widget.isSpanish,
-                    label: _continueLabel,
-                    onContinue: () => widget.onContinue(_effectiveDate),
-                    horizontalPadding: horizontalPadding,
-                    compact: compact,
-                  ),
+                  if (!largeText) footer,
                 ],
               );
             },
@@ -463,52 +530,85 @@ class _DateHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
+    final back = IconButton.outlined(
+      key: const ValueKey('quit-date-back'),
+      tooltip: isSpanish ? 'Atrás' : 'Back',
+      onPressed: onBack,
+      style: IconButton.styleFrom(
+        foregroundColor: AppColors.deepTeal,
+        side: const BorderSide(color: AppColors.border),
+      ),
+      icon: const Icon(Icons.arrow_back_rounded),
+    );
+    const style = TextStyle(
+      color: AppColors.deepTeal,
+      fontSize: 15,
+      fontWeight: FontWeight.w800,
+    );
+    // The title wraps instead of ending in "…"; a word too long for the
+    // line scales down instead of splitting.
+    final heading = LayoutBuilder(
+      builder: (context, constraints) => Text(
+        title,
+        textAlign: TextAlign.center,
+        textScaler: _wordFitScaler(
+          context,
+          title,
+          style,
+          constraints.maxWidth,
+        ),
+        style: style,
+      ),
+    );
+    final step = Container(
+      constraints: const BoxConstraints(minHeight: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppColors.mint,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        isSpanish ? '2 DE 5' : '2 OF 5',
+        style: const TextStyle(
+          color: AppColors.tealSecondary,
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+
+    // Between the back button and the step, the title's words split at
+    // accessibility text sizes, so it takes a line of its own.
+    if (_usesLargeTextLayout(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [back, step],
+            ),
+          ),
+          const SizedBox(height: 6),
+          heading,
+        ],
+      );
+    }
+    // A minimum height: larger text grows the header instead of clipping it.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
       child: Row(
         children: [
-          IconButton.outlined(
-            key: const ValueKey('quit-date-back'),
-            tooltip: isSpanish ? 'Atrás' : 'Back',
-            onPressed: onBack,
-            style: IconButton.styleFrom(
-              foregroundColor: AppColors.deepTeal,
-              side: const BorderSide(color: AppColors.border),
-            ),
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
+          back,
           const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.deepTeal,
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+          Expanded(child: heading),
           const SizedBox(width: 8),
-          Container(
-            height: 32,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: AppColors.mint,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              isSpanish ? '2 DE 5' : '2 OF 5',
-              style: const TextStyle(
-                color: AppColors.tealSecondary,
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+          step,
         ],
       ),
     );
@@ -525,17 +625,20 @@ class _DateProgress extends StatelessWidget {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
-              style: const TextStyle(
-                color: AppColors.mutedTeal,
-                fontSize: 10,
-                letterSpacing: 1.6,
-                fontWeight: FontWeight.w800,
+            Flexible(
+              child: Text(
+                isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 10,
+                  letterSpacing: 1.6,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: 8),
             const Text(
               '40%',
               style: TextStyle(
@@ -576,6 +679,7 @@ class _QuitCalendar extends StatelessWidget {
     required this.onPreviousMonth,
     required this.onNextMonth,
     required this.monthLabel,
+    required this.weekdayName,
   });
 
   final bool isSpanish;
@@ -590,11 +694,70 @@ class _QuitCalendar extends StatelessWidget {
   final VoidCallback onPreviousMonth;
   final VoidCallback onNextMonth;
   final String monthLabel;
+  final String Function(int weekday) weekdayName;
 
   String _dateKey(DateTime date) {
     final month = date.month.toString().padLeft(2, '0');
     final day = date.day.toString().padLeft(2, '0');
     return 'quit-date-day-${date.year}-$month-$day';
+  }
+
+  /// One selectable day in the list shown at accessibility text sizes.
+  Widget _dayRow(DateTime date) {
+    final selected = DateUtils.isSameDay(date, selectedDate);
+    final isToday = DateUtils.isSameDay(date, today);
+    final color = selected ? Colors.white : AppColors.deepTeal;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Semantics(
+        selected: selected,
+        label: '${date.month}/${date.day}/${date.year}',
+        child: Material(
+          color: selected ? AppColors.coral : Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+            side: !selected && isToday
+                ? const BorderSide(color: AppColors.deepTeal, width: 1.3)
+                : BorderSide.none,
+          ),
+          child: InkWell(
+            key: ValueKey(_dateKey(date)),
+            onTap: () => onDateSelected(date),
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              key: selected ? const ValueKey('quit-date-selected') : null,
+              constraints: const BoxConstraints(minHeight: 48),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              child: Row(
+                children: [
+                  Text(
+                    '${date.day}',
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      weekdayName(date.weekday),
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 12,
+                        fontWeight: selected || isToday
+                            ? FontWeight.w800
+                            : FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -609,6 +772,44 @@ class _QuitCalendar extends StatelessWidget {
     final weekdays = isSpanish
         ? const ['D', 'L', 'M', 'M', 'J', 'V', 'S']
         : const ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    final largeText = _usesLargeTextLayout(context);
+    final previous = IconButton.filledTonal(
+      key: const ValueKey('quit-date-previous-month'),
+      onPressed: canGoBack ? onPreviousMonth : null,
+      style: IconButton.styleFrom(
+        backgroundColor: AppColors.mint.withValues(alpha: 0.65),
+        foregroundColor: AppColors.deepTeal,
+      ),
+      icon: const Icon(Icons.chevron_left_rounded),
+    );
+    final next = IconButton.filledTonal(
+      key: const ValueKey('quit-date-next-month'),
+      onPressed: canGoForward ? onNextMonth : null,
+      style: IconButton.styleFrom(
+        backgroundColor: AppColors.mint.withValues(alpha: 0.65),
+        foregroundColor: AppColors.deepTeal,
+      ),
+      icon: const Icon(Icons.chevron_right_rounded),
+    );
+    const monthStyle = TextStyle(
+      color: AppColors.deepTeal,
+      fontSize: 17,
+      fontWeight: FontWeight.w800,
+    );
+    // A word too long for the line scales down instead of splitting.
+    final month = LayoutBuilder(
+      builder: (context, constraints) => Text(
+        monthLabel,
+        textAlign: TextAlign.center,
+        textScaler: _wordFitScaler(
+          context,
+          monthLabel,
+          monthStyle,
+          constraints.maxWidth,
+        ),
+        style: monthStyle,
+      ),
+    );
 
     return Container(
       key: const ValueKey('quit-date-calendar'),
@@ -626,129 +827,119 @@ class _QuitCalendar extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Row(
-            children: [
-              IconButton.filledTonal(
-                key: const ValueKey('quit-date-previous-month'),
-                onPressed: canGoBack ? onPreviousMonth : null,
-                style: IconButton.styleFrom(
-                  backgroundColor: AppColors.mint.withValues(alpha: 0.65),
-                  foregroundColor: AppColors.deepTeal,
-                ),
-                icon: const Icon(Icons.chevron_left_rounded),
-              ),
-              Expanded(
-                child: Text(
-                  monthLabel,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: AppColors.deepTeal,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-              IconButton.filledTonal(
-                key: const ValueKey('quit-date-next-month'),
-                onPressed: canGoForward ? onNextMonth : null,
-                style: IconButton.styleFrom(
-                  backgroundColor: AppColors.mint.withValues(alpha: 0.65),
-                  foregroundColor: AppColors.deepTeal,
-                ),
-                icon: const Icon(Icons.chevron_right_rounded),
-              ),
-            ],
-          ),
-          const SizedBox(height: 7),
-          Row(
-            children: [
-              for (final day in weekdays)
-                Expanded(
-                  child: Text(
-                    day,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: AppColors.mutedTeal,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
+          // At accessibility text sizes the month takes a line of its own
+          // and the days are listed instead of drawn as a grid, so day
+          // numbers keep their full size.
+          if (largeText) ...[
+            Row(children: [previous, const Spacer(), next]),
+            const SizedBox(height: 6),
+            month,
+            const SizedBox(height: 10),
+            for (var day = 1;
+                day <= DateUtils.getDaysInMonth(first.year, first.month);
+                day++)
+              if (isSelectable(DateTime(first.year, first.month, day)))
+                _dayRow(DateTime(first.year, first.month, day)),
+          ] else ...[
+            Row(
+              children: [
+                previous,
+                Expanded(child: month),
+                next,
+              ],
+            ),
+            const SizedBox(height: 7),
+            Row(
+              children: [
+                for (final day in weekdays)
+                  Expanded(
+                    child: Text(
+                      day,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: AppColors.mutedTeal,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          const Divider(height: 1, color: Color(0x334A6B65)),
-          const SizedBox(height: 5),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              childAspectRatio: 1.05,
+              ],
             ),
-            itemCount: 42,
-            itemBuilder: (context, index) {
-              // Calendar dates must advance by date components. Adding
-              // 24-hour durations can duplicate or skip a date at daylight
-              // saving time boundaries.
-              final date = DateTime(
-                firstCell.year,
-                firstCell.month,
-                firstCell.day + index,
-              );
-              final inMonth = date.month == visibleMonth.month;
-              final selectable = inMonth && isSelectable(date);
-              final selected =
-                  inMonth && DateUtils.isSameDay(date, selectedDate);
-              final isToday = DateUtils.isSameDay(date, today);
+            const SizedBox(height: 6),
+            const Divider(height: 1, color: Color(0x334A6B65)),
+            const SizedBox(height: 5),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 7,
+                childAspectRatio: 1.05,
+              ),
+              itemCount: 42,
+              itemBuilder: (context, index) {
+                // Calendar dates must advance by date components. Adding
+                // 24-hour durations can duplicate or skip a date at daylight
+                // saving time boundaries.
+                final date = DateTime(
+                  firstCell.year,
+                  firstCell.month,
+                  firstCell.day + index,
+                );
+                final inMonth = date.month == visibleMonth.month;
+                final selectable = inMonth && isSelectable(date);
+                final selected =
+                    inMonth && DateUtils.isSameDay(date, selectedDate);
+                final isToday = DateUtils.isSameDay(date, today);
 
-              return Center(
-                child: Semantics(
-                  selected: selected,
-                  enabled: selectable,
-                  label: '${date.month}/${date.day}/${date.year}',
-                  child: InkWell(
-                    key: inMonth ? ValueKey(_dateKey(date)) : null,
-                    onTap: selectable ? () => onDateSelected(date) : null,
-                    borderRadius: BorderRadius.circular(20),
-                    child: AnimatedContainer(
-                      key: selected
-                          ? const ValueKey('quit-date-selected')
-                          : null,
-                      duration: const Duration(milliseconds: 140),
-                      width: 34,
-                      height: 34,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: selected ? AppColors.coral : Colors.transparent,
-                        shape: BoxShape.circle,
-                        border: !selected && isToday
-                            ? Border.all(
-                                color: AppColors.deepTeal,
-                                width: 1.3,
-                              )
+                return Center(
+                  child: Semantics(
+                    selected: selected,
+                    enabled: selectable,
+                    label: '${date.month}/${date.day}/${date.year}',
+                    child: InkWell(
+                      key: inMonth ? ValueKey(_dateKey(date)) : null,
+                      onTap: selectable ? () => onDateSelected(date) : null,
+                      borderRadius: BorderRadius.circular(20),
+                      child: AnimatedContainer(
+                        key: selected
+                            ? const ValueKey('quit-date-selected')
                             : null,
-                      ),
-                      child: Text(
-                        inMonth ? '${date.day}' : '',
-                        style: TextStyle(
-                          color: selected
-                              ? Colors.white
-                              : selectable
-                                  ? AppColors.deepTeal
-                                  : AppColors.border,
-                          fontSize: 12,
-                          fontWeight: selected || isToday
-                              ? FontWeight.w800
-                              : FontWeight.w500,
+                        duration: const Duration(milliseconds: 140),
+                        width: 34,
+                        height: 34,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color:
+                              selected ? AppColors.coral : Colors.transparent,
+                          shape: BoxShape.circle,
+                          border: !selected && isToday
+                              ? Border.all(
+                                  color: AppColors.deepTeal,
+                                  width: 1.3,
+                                )
+                              : null,
+                        ),
+                        child: Text(
+                          inMonth ? '${date.day}' : '',
+                          style: TextStyle(
+                            color: selected
+                                ? Colors.white
+                                : selectable
+                                    ? AppColors.deepTeal
+                                    : AppColors.border,
+                            fontSize: 12,
+                            fontWeight: selected || isToday
+                                ? FontWeight.w800
+                                : FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              );
-            },
-          ),
+                );
+              },
+            ),
+          ],
           const Divider(height: 13, color: Color(0x334A6B65)),
           Container(
             width: double.infinity,
@@ -807,6 +998,108 @@ class _SelectedDateCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final largeText = _usesLargeTextLayout(context);
+    final tileContent = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          color: AppColors.coral,
+          child: Text(
+            monthLabel.toUpperCase(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 9,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+        Text(
+          '${date.day}',
+          style: const TextStyle(
+            color: AppColors.deepTeal,
+            fontSize: 24,
+            height: 1.1,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Text(
+            weekdayLabel.substring(0, 3).toUpperCase(),
+            style: const TextStyle(
+              color: AppColors.mutedTeal,
+              fontSize: 7.5,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+      ],
+    );
+    // At accessibility text sizes the date tile grows with its text
+    // instead of clipping the day number.
+    final tile = Container(
+      width: largeText ? null : 58,
+      constraints: const BoxConstraints(minWidth: 58),
+      decoration: BoxDecoration(
+        color: AppColors.paper,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: largeText ? IntrinsicWidth(child: tileContent) : tileContent,
+    );
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.mutedTeal,
+            fontSize: 9,
+            letterSpacing: 1.4,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          longDate,
+          style: const TextStyle(
+            color: AppColors.deepTeal,
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          timingLabel,
+          style: const TextStyle(
+            color: AppColors.tealSecondary,
+            fontSize: 11,
+          ),
+        ),
+      ],
+    );
+    final badge = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.deepTeal,
+        borderRadius: BorderRadius.circular(13),
+      ),
+      child: Text(
+        isSpanish ? 'RECOMENDADO' : 'RECOMMENDED',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 7.5,
+          letterSpacing: 0.6,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+    final narrowPhone = MediaQuery.sizeOf(context).width < 360;
+    final stacked = largeText ||
+        (narrowPhone && MediaQuery.textScalerOf(context).scale(10) > 10);
     return Container(
       key: const ValueKey('quit-date-summary'),
       width: double.infinity,
@@ -816,109 +1109,35 @@ class _SelectedDateCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.mintStrong),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 58,
-            decoration: BoxDecoration(
-              color: AppColors.paper,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 4),
-                  color: AppColors.coral,
-                  child: Text(
-                    monthLabel.toUpperCase(),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-                Text(
-                  '${date.day}',
-                  style: const TextStyle(
-                    color: AppColors.deepTeal,
-                    fontSize: 24,
-                    height: 1.1,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    weekdayLabel.substring(0, 3).toUpperCase(),
-                    style: const TextStyle(
-                      color: AppColors.mutedTeal,
-                      fontSize: 7.5,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
+      // At accessibility text sizes, and on the narrowest phones once text
+      // is enlarged, the date details take the card's full width under the
+      // tile and badge.
+      child: stacked
+          ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: AppColors.mutedTeal,
-                    fontSize: 9,
-                    letterSpacing: 1.4,
-                    fontWeight: FontWeight.w800,
+                SizedBox(
+                  width: double.infinity,
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [tile, if (recommended) badge],
                   ),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  longDate,
-                  style: const TextStyle(
-                    color: AppColors.deepTeal,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  timingLabel,
-                  style: const TextStyle(
-                    color: AppColors.tealSecondary,
-                    fontSize: 11,
-                  ),
-                ),
+                const SizedBox(height: 10),
+                text,
+              ],
+            )
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                tile,
+                const SizedBox(width: 12),
+                Expanded(child: text),
+                if (recommended) badge,
               ],
             ),
-          ),
-          if (recommended)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-              decoration: BoxDecoration(
-                color: AppColors.deepTeal,
-                borderRadius: BorderRadius.circular(13),
-              ),
-              child: Text(
-                isSpanish ? 'RECOMENDADO' : 'RECOMMENDED',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 7.5,
-                  letterSpacing: 0.6,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-        ],
-      ),
     );
   }
 }
@@ -936,6 +1155,45 @@ class _CheckInCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final largeText = _usesLargeTextLayout(context);
+    const icon = CircleAvatar(
+      radius: 18,
+      backgroundColor: AppColors.coralLight,
+      child: Icon(
+        Icons.schedule_rounded,
+        color: AppColors.coral,
+        size: 22,
+      ),
+    );
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isSpanish ? 'Registro del día de dejarlo' : 'Quit-day check-in',
+          style: const TextStyle(
+            color: AppColors.deepTeal,
+            fontSize: 14,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        Text(
+          isSpanish
+              ? '7:00 a. m. · Notificación privada'
+              : '7:00 AM · Private notification',
+          style: const TextStyle(
+            color: AppColors.tealSecondary,
+            fontSize: 11,
+          ),
+        ),
+      ],
+    );
+    final toggle = Switch(
+      key: const ValueKey('quit-date-check-in'),
+      value: enabled,
+      activeThumbColor: Colors.white,
+      activeTrackColor: AppColors.deepTeal,
+      onChanged: onChanged,
+    );
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(13, 12, 13, 10),
@@ -945,54 +1203,24 @@ class _CheckInCard extends StatelessWidget {
         border: Border.all(color: AppColors.border),
       ),
       child: Column(
+        crossAxisAlignment:
+            largeText ? CrossAxisAlignment.start : CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 18,
-                backgroundColor: AppColors.coralLight,
-                child: Icon(
-                  Icons.schedule_rounded,
-                  color: AppColors.coral,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isSpanish
-                          ? 'Registro del día de dejarlo'
-                          : 'Quit-day check-in',
-                      style: const TextStyle(
-                        color: AppColors.deepTeal,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    Text(
-                      isSpanish
-                          ? '7:00 a. m. · Notificación privada'
-                          : '7:00 AM · Private notification',
-                      style: const TextStyle(
-                        color: AppColors.tealSecondary,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Switch(
-                key: const ValueKey('quit-date-check-in'),
-                value: enabled,
-                activeThumbColor: Colors.white,
-                activeTrackColor: AppColors.deepTeal,
-                onChanged: onChanged,
-              ),
-            ],
-          ),
+          // At accessibility text sizes the text takes the card's full width
+          // and the switch moves to the row above it.
+          if (largeText) ...[
+            Row(children: [icon, const Spacer(), toggle]),
+            const SizedBox(height: 8),
+            text,
+          ] else
+            Row(
+              children: [
+                icon,
+                const SizedBox(width: 10),
+                Expanded(child: text),
+                toggle,
+              ],
+            ),
           const Divider(height: 15, color: Color(0x334A6B65)),
           Row(
             children: [
@@ -1088,41 +1316,42 @@ class _DateBottomAction extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: compact ? 54 : 58,
-                  child: FilledButton(
-                    key: const ValueKey('quit-date-confirm'),
-                    onPressed: onContinue,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.deepTeal,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                FilledButton(
+                  key: const ValueKey('quit-date-confirm'),
+                  onPressed: onContinue,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.deepTeal,
+                    foregroundColor: Colors.white,
+                    // A minimum, not a fixed height: large text wraps and
+                    // grows the button instead of being clipped.
+                    minimumSize: Size.fromHeight(compact ? 54 : 58),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                            ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          label,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        const Icon(
-                          Icons.arrow_forward_rounded,
-                          color: AppColors.lime,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: AppColors.lime,
+                      ),
+                    ],
                   ),
                 ),
                 if (!compact) ...[

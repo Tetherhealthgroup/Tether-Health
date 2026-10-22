@@ -2,6 +2,46 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
+/// Above 140% text (the iOS accessibility sizes and Android 14's largest
+/// font sizes) side-by-side pieces are stacked so text can grow.
+bool _usesLargeTextLayout(BuildContext context) =>
+    MediaQuery.textScalerOf(context).scale(10) > 14;
+
+/// The text scale for [text] in [style], lowered only as far as needed for
+/// its longest word to fit [width]: a word too long for a whole line scales
+/// down instead of splitting.
+TextScaler _wordFitScaler(
+  BuildContext context,
+  String text,
+  TextStyle style,
+  double width,
+) {
+  final scaler = MediaQuery.textScalerOf(context);
+  final painter = TextPainter(
+    text: TextSpan(
+      text: text,
+      style: DefaultTextStyle.of(context).style.merge(style),
+    ),
+    textDirection: Directionality.of(context),
+  );
+  try {
+    var fitted = scaler;
+    for (var attempt = 0; attempt < 4; attempt++) {
+      painter
+        ..textScaler = fitted
+        ..layout();
+      final longestWord = painter.minIntrinsicWidth;
+      if (longestWord <= width) return fitted;
+      final fontSize = style.fontSize ?? 14;
+      final factor = fitted.scale(fontSize) / fontSize * width / longestWord;
+      fitted = scaler.clamp(maxScaleFactor: factor * 0.99);
+    }
+    return fitted;
+  } finally {
+    painter.dispose();
+  }
+}
+
 enum SupportChannel { text, call }
 
 enum PreparationTask { removeSupplies, smokeFreeSpaces, stockAlternatives }
@@ -205,31 +245,50 @@ class SupportPreparationScreen extends StatelessWidget {
             builder: (context, constraints) {
               final narrow = constraints.maxWidth < 380;
               final compact = constraints.maxHeight < 760;
-              final horizontalPadding = narrow ? 18.0 : 22.0;
+              // Above 140% text the side margins narrow so long words fit, and
+              // the header, progress and main action scroll with the content
+              // so they never squeeze the questions out of view.
+              final largeText = _usesLargeTextLayout(context);
+              final horizontalPadding =
+                  largeText ? 12.0 : (narrow ? 18.0 : 22.0);
+
+              final footer = _SupportBottomAction(
+                isSpanish: isSpanish,
+                supporterCount: _activeSupporters,
+                taskCount: completedTasks.length,
+                onContinue: onContinue,
+                horizontalPadding: largeText ? 0 : horizontalPadding,
+                compact: compact,
+              );
+
+              final header = _SupportHeader(
+                isSpanish: isSpanish,
+                onBack: onBack,
+              );
+              final progress = _SupportProgress(isSpanish: isSpanish);
 
               return Column(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 9,
-                      horizontalPadding,
-                      0,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 9,
+                        horizontalPadding,
+                        0,
+                      ),
+                      child: header,
                     ),
-                    child: _SupportHeader(
-                      isSpanish: isSpanish,
-                      onBack: onBack,
+                  if (!largeText)
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        horizontalPadding,
+                        compact ? 5 : 8,
+                        horizontalPadding,
+                        compact ? 7 : 10,
+                      ),
+                      child: progress,
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(
-                      horizontalPadding,
-                      compact ? 5 : 8,
-                      horizontalPadding,
-                      compact ? 7 : 10,
-                    ),
-                    child: _SupportProgress(isSpanish: isSpanish),
-                  ),
                   Expanded(
                     child: SingleChildScrollView(
                       key: const ValueKey('support-content-scroll'),
@@ -245,6 +304,12 @@ class SupportPreparationScreen extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              if (largeText) ...[
+                                header,
+                                const SizedBox(height: 10),
+                                progress,
+                                const SizedBox(height: 18),
+                              ],
                               Text(
                                 isSpanish
                                     ? 'PREPÁRATE PARA TENER ÉXITO'
@@ -383,20 +448,17 @@ class SupportPreparationScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
+                              if (largeText) ...[
+                                const SizedBox(height: 18),
+                                footer,
+                              ],
                             ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                  _SupportBottomAction(
-                    isSpanish: isSpanish,
-                    supporterCount: _activeSupporters,
-                    taskCount: completedTasks.length,
-                    onContinue: onContinue,
-                    horizontalPadding: horizontalPadding,
-                    compact: compact,
-                  ),
+                  if (!largeText) footer,
                 ],
               );
             },
@@ -415,52 +477,86 @@ class _SupportHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
+    final back = IconButton.outlined(
+      key: const ValueKey('support-back'),
+      tooltip: isSpanish ? 'Atrás' : 'Back',
+      onPressed: onBack,
+      style: IconButton.styleFrom(
+        foregroundColor: AppColors.deepTeal,
+        side: const BorderSide(color: AppColors.border),
+      ),
+      icon: const Icon(Icons.arrow_back_rounded),
+    );
+    final label = isSpanish ? 'Apoyo y preparación' : 'Support & preparation';
+    const style = TextStyle(
+      color: AppColors.deepTeal,
+      fontSize: 15.5,
+      fontWeight: FontWeight.w800,
+    );
+    // The title wraps instead of ending in "…"; a word too long for the
+    // line scales down instead of splitting.
+    final title = LayoutBuilder(
+      builder: (context, constraints) => Text(
+        label,
+        textAlign: TextAlign.center,
+        textScaler: _wordFitScaler(
+          context,
+          label,
+          style,
+          constraints.maxWidth,
+        ),
+        style: style,
+      ),
+    );
+    final step = Container(
+      constraints: const BoxConstraints(minHeight: 32),
+      padding: const EdgeInsets.symmetric(horizontal: 11),
+      decoration: BoxDecoration(
+        color: AppColors.mint,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        isSpanish ? '4 DE 5' : '4 OF 5',
+        style: const TextStyle(
+          color: AppColors.tealSecondary,
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+
+    // Between the back button and the step, the title's words split at
+    // accessibility text sizes, so it takes a line of its own.
+    if (_usesLargeTextLayout(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [back, step],
+            ),
+          ),
+          const SizedBox(height: 6),
+          title,
+        ],
+      );
+    }
+    // A minimum height: larger text grows the header instead of clipping it.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
       child: Row(
         children: [
-          IconButton.outlined(
-            key: const ValueKey('support-back'),
-            tooltip: isSpanish ? 'Atrás' : 'Back',
-            onPressed: onBack,
-            style: IconButton.styleFrom(
-              foregroundColor: AppColors.deepTeal,
-              side: const BorderSide(color: AppColors.border),
-            ),
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
+          back,
           const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              isSpanish ? 'Apoyo y preparación' : 'Support & preparation',
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.deepTeal,
-                fontSize: 15.5,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+          Expanded(child: title),
           const SizedBox(width: 8),
-          Container(
-            height: 32,
-            padding: const EdgeInsets.symmetric(horizontal: 11),
-            decoration: BoxDecoration(
-              color: AppColors.mint,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              isSpanish ? '4 DE 5' : '4 OF 5',
-              style: const TextStyle(
-                color: AppColors.tealSecondary,
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+          step,
         ],
       ),
     );
@@ -477,17 +573,20 @@ class _SupportProgress extends StatelessWidget {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
-              style: const TextStyle(
-                color: AppColors.mutedTeal,
-                fontSize: 10,
-                letterSpacing: 1.6,
-                fontWeight: FontWeight.w800,
+            Flexible(
+              child: Text(
+                isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
+                style: const TextStyle(
+                  color: AppColors.mutedTeal,
+                  fontSize: 10,
+                  letterSpacing: 1.6,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: 8),
             const Text(
               '80%',
               style: TextStyle(
@@ -527,36 +626,45 @@ class _SectionHeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final heading = Text(
+      title,
+      style: const TextStyle(
+        color: AppColors.mutedTeal,
+        fontSize: 10.5,
+        letterSpacing: 1.8,
+        fontWeight: FontWeight.w800,
+      ),
+    );
+    final count = Container(
+      key: trailingKey,
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.mint,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Text(
+        trailing,
+        style: const TextStyle(
+          color: AppColors.deepTeal,
+          fontSize: 9,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+
+    // Beside the count, the heading's words split at accessibility text
+    // sizes.
+    if (_usesLargeTextLayout(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [heading, const SizedBox(height: 6), count],
+      );
+    }
     return Row(
       children: [
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.mutedTeal,
-              fontSize: 10.5,
-              letterSpacing: 1.8,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
+        Expanded(child: heading),
         const SizedBox(width: 8),
-        Container(
-          key: trailingKey,
-          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-          decoration: BoxDecoration(
-            color: AppColors.mint,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Text(
-            trailing,
-            style: const TextStyle(
-              color: AppColors.deepTeal,
-              fontSize: 9,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
+        count,
       ],
     );
   }
@@ -583,6 +691,78 @@ class _SupportPersonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Name, relationship and check-in wrap instead of ending in "…". At
+    // accessibility text sizes they take the card's full width, with the
+    // switch and edit button on their own rows.
+    final largeText = _usesLargeTextLayout(context);
+    final avatar = CircleAvatar(
+      radius: 25,
+      backgroundColor: AppColors.mint,
+      child: Text(
+        person.name.trim().isEmpty ? '?' : person.name.trim()[0].toUpperCase(),
+        style: const TextStyle(
+          color: AppColors.deepTeal,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+    final details = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          person.name,
+          style: const TextStyle(
+            color: AppColors.deepTeal,
+            fontSize: 17,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          '$relationshipLabel · $channelLabel',
+          style: const TextStyle(
+            color: AppColors.mutedTeal,
+            fontSize: 12,
+          ),
+        ),
+      ],
+    );
+    final toggle = Switch(
+      key: ValueKey('support-person-toggle-${person.id}'),
+      value: person.enabled,
+      onChanged: onEnabledChanged,
+      activeThumbColor: Colors.white,
+      activeTrackColor: AppColors.deepTeal,
+    );
+    const checkInIcon = CircleAvatar(
+      radius: 15,
+      backgroundColor: AppColors.mint,
+      child: Icon(
+        Icons.schedule_rounded,
+        color: AppColors.deepTeal,
+        size: 17,
+      ),
+    );
+    final checkIn = Text(
+      checkInLabel,
+      style: const TextStyle(
+        color: AppColors.deepTeal,
+        fontSize: 12.5,
+        fontWeight: FontWeight.w700,
+      ),
+    );
+    final edit = IconButton(
+      key: ValueKey('support-person-edit-${person.id}'),
+      tooltip: isSpanish ? 'Editar' : 'Edit',
+      onPressed: onEdit,
+      icon: const Icon(
+        Icons.edit_outlined,
+        color: AppColors.deepTeal,
+        size: 21,
+      ),
+    );
+
     return AnimatedContainer(
       key: ValueKey('support-person-${person.id}'),
       duration: const Duration(milliseconds: 150),
@@ -602,96 +782,33 @@ class _SupportPersonCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 25,
-                backgroundColor: AppColors.mint,
-                child: Text(
-                  person.name.trim().isEmpty
-                      ? '?'
-                      : person.name.trim()[0].toUpperCase(),
-                  style: const TextStyle(
-                    color: AppColors.deepTeal,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      person.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.deepTeal,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '$relationshipLabel · $channelLabel',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: AppColors.mutedTeal,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Switch(
-                key: ValueKey('support-person-toggle-${person.id}'),
-                value: person.enabled,
-                onChanged: onEnabledChanged,
-                activeThumbColor: Colors.white,
-                activeTrackColor: AppColors.deepTeal,
-              ),
-            ],
-          ),
+          if (largeText) ...[
+            Row(children: [avatar, const Spacer(), toggle]),
+            const SizedBox(height: 8),
+            Align(alignment: Alignment.centerLeft, child: details),
+          ] else
+            Row(
+              children: [
+                avatar,
+                const SizedBox(width: 11),
+                Expanded(child: details),
+                toggle,
+              ],
+            ),
           const Divider(height: 20),
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 15,
-                backgroundColor: AppColors.mint,
-                child: Icon(
-                  Icons.schedule_rounded,
-                  color: AppColors.deepTeal,
-                  size: 17,
-                ),
-              ),
-              const SizedBox(width: 9),
-              Expanded(
-                child: Text(
-                  checkInLabel,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: AppColors.deepTeal,
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              IconButton(
-                key: ValueKey('support-person-edit-${person.id}'),
-                tooltip: isSpanish ? 'Editar' : 'Edit',
-                onPressed: onEdit,
-                icon: const Icon(
-                  Icons.edit_outlined,
-                  color: AppColors.deepTeal,
-                  size: 21,
-                ),
-              ),
-            ],
-          ),
+          if (largeText) ...[
+            Row(children: [checkInIcon, const Spacer(), edit]),
+            Align(alignment: Alignment.centerLeft, child: checkIn),
+            const SizedBox(height: 8),
+          ] else
+            Row(
+              children: [
+                checkInIcon,
+                const SizedBox(width: 9),
+                Expanded(child: checkIn),
+                edit,
+              ],
+            ),
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
@@ -911,6 +1028,49 @@ class _TreatmentSupportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const icon = CircleAvatar(
+      radius: 23,
+      backgroundColor: AppColors.paper,
+      child: Icon(
+        Icons.medication_outlined,
+        color: AppColors.coral,
+      ),
+    );
+    final text = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isSpanish
+              ? 'Explorar medicamentos para dejar de fumar'
+              : 'Explore quit-smoking medicines',
+          style: const TextStyle(
+            color: AppColors.deepTeal,
+            fontSize: 15,
+            height: 1.18,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          isSpanish
+              ? 'Un profesional puede ayudarte a elegir una opción segura.'
+              : 'A clinician or pharmacist can help you choose what is safe.',
+          style: const TextStyle(
+            color: AppColors.tealSecondary,
+            fontSize: 11.5,
+            height: 1.3,
+          ),
+        ),
+      ],
+    );
+    final toggle = Switch(
+      key: const ValueKey('support-treatment-toggle'),
+      value: enabled,
+      onChanged: onEnabledChanged,
+      activeThumbColor: Colors.white,
+      activeTrackColor: AppColors.deepTeal,
+    );
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       width: double.infinity,
@@ -924,55 +1084,21 @@ class _TreatmentSupportCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 23,
-                backgroundColor: AppColors.paper,
-                child: Icon(
-                  Icons.medication_outlined,
-                  color: AppColors.coral,
-                ),
-              ),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      isSpanish
-                          ? 'Explorar medicamentos para dejar de fumar'
-                          : 'Explore quit-smoking medicines',
-                      style: const TextStyle(
-                        color: AppColors.deepTeal,
-                        fontSize: 15,
-                        height: 1.18,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      isSpanish
-                          ? 'Un profesional puede ayudarte a elegir una opción segura.'
-                          : 'A clinician or pharmacist can help you choose what is safe.',
-                      style: const TextStyle(
-                        color: AppColors.tealSecondary,
-                        fontSize: 11.5,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Switch(
-                key: const ValueKey('support-treatment-toggle'),
-                value: enabled,
-                onChanged: onEnabledChanged,
-                activeThumbColor: Colors.white,
-                activeTrackColor: AppColors.deepTeal,
-              ),
-            ],
-          ),
+          // At accessibility text sizes the text takes the card's full width
+          // and the switch moves to the row above it.
+          if (_usesLargeTextLayout(context)) ...[
+            Row(children: [icon, const Spacer(), toggle]),
+            const SizedBox(height: 8),
+            text,
+          ] else
+            Row(
+              children: [
+                icon,
+                const SizedBox(width: 11),
+                Expanded(child: text),
+                toggle,
+              ],
+            ),
           if (enabled) ...[
             const Divider(height: 20),
             InkWell(
@@ -1086,7 +1212,10 @@ class _SupportBottomAction extends StatelessWidget {
             key: const ValueKey('support-save'),
             onPressed: onContinue,
             style: FilledButton.styleFrom(
+              // A minimum height: large text wraps the label and grows the
+              // button instead of cutting the label off.
               minimumSize: Size.fromHeight(compact ? 52 : 58),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               backgroundColor: AppColors.deepTeal,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
@@ -1101,7 +1230,7 @@ class _SupportBottomAction extends StatelessWidget {
                     isSpanish
                         ? 'Guardar mi plan de apoyo'
                         : 'Save my support plan',
-                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
