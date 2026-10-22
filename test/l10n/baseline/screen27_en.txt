@@ -1,0 +1,80 @@
+# baseline 97d81ce · screen27 · en
+T Settings & privacy
+T Your account, choices and data.
+T PRIVATE BY DEFAULT
+T Your choices stay in your hands
+T No ads. We never sell your health data.
+T Privacy choices last reviewed <month> <n>, <n>
+T Account
+T Not signed in
+T Sign in to sync your profile.
+T Health programs
+T Choose BreatheFree, Heartwise, Steady, or ClearAir.
+T Notifications
+T Check-ins and plan reminders
+T Helpful prompts based on your plan
+T Show sensitive details
+T Quit status and medication stay hidden when off
+T Quiet hours
+T <n>:<n> PM–<n>:<n> AM · urgent safety alerts still appear
+T Change
+T Lock-screen preview: “You have a BreatheFree reminder.”
+T Privacy & permissions
+T Consent and permissions
+T Review coaching, research and communication choices
+T Review
+T Care-team sharing
+T Nothing sends until you preview and confirm it
+T Manual only
+T Connected apps and devices
+T No active connections
+T Manage
+T Anonymous app diagnostics
+T Optional technical data with no health entries
+T Your data
+T Download a copy
+T Your profile and saved plan · JSON
+T Request
+T Export a care summary
+T Choose dates and preview every detail before sharing
+T Create
+T Delete account and data
+T Permanent deletion requires review and confirmation
+T Accessibility & app
+T Text size and contrast
+T Follows your device settings
+T System
+T Reduce motion
+T Uses gentle transitions without celebration effects
+T Privacy policy, terms and help
+T BreatheFree version <n>.<n>.<n> (<n>)
+T Open
+T Sign in
+T Changes save automatically and sync securely.
+SL Go back
+SL Settings & privacy
+SL Your account, choices and data.
+SL Guest profile
+SL PRIVATE BY DEFAULT\nYour choices stay in your hands\nNo ads. We never sell your health data.\nPrivacy choices last reviewed <month> <n>, <n>
+SL Account
+SL Not signed in\nSign in to sync your profile.
+SL Health programs\nChoose BreatheFree, Heartwise, Steady, or ClearAir.
+SL Notifications
+SL Quiet hours. <n>:<n> PM–<n>:<n> AM · urgent safety alerts still appear. Change\nLock-screen preview: “You have a BreatheFree reminder.”
+SL Check-ins and plan reminders\nHelpful prompts based on your plan
+SL Show sensitive details\nQuit status and medication stay hidden when off
+SL Privacy & permissions
+SL Consent and permissions. Review coaching, research and communication choices. Review
+SL Care-team sharing. Nothing sends until you preview and confirm it. Manual only
+SL Connected apps and devices. No active connections. Manage
+SL Anonymous app diagnostics\nOptional technical data with no health entries
+SL Your data
+SL Download a copy. Your profile and saved plan · JSON. Request
+SL Export a care summary. Choose dates and preview every detail before sharing. Create
+SL Delete account and data\nPermanent deletion requires review and confirmation
+SL Accessibility & app
+SL Text size and contrast. Follows your device settings. System
+SL Reduce motion\nUses gentle transitions without celebration effects
+SL Privacy policy, terms and help. BreatheFree version <n>.<n>.<n> (<n>). Open
+SL Sign in
+SL Changes save automatically and sync securely.

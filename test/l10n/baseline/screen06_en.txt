@@ -1,0 +1,28 @@
+# baseline 97d81ce · screen06 · en
+T Build your plan
+T <n> OF <n>
+T QUIT PLAN
+T CHOOSE YOUR PATH
+T What feels possible right now?
+T There is no wrong place to start. Choose what fits you.
+T Set a quit date
+T RECOMMENDED
+T Prepare for <n>–<n> days, then stop completely on the date you choose. We’ll guide one small step each day.
+T Matches your preparation preference
+T Quit today
+T Begin your smoke-free time now and get extra support through the first day.
+T Reduce gradually
+T Follow a step-down schedule and work toward stopping completely on a future date.
+T Your path is flexible. You can adjust it at any time.
+T Continue with this path
+T Set a quit date selected · Saved automatically
+SL Build your plan\n<n> OF <n>\nQUIT PLAN\n<n>%\nSet a quit date selected · Saved automatically
+ST Back
+SL CHOOSE YOUR PATH
+SL What feels possible right now?
+SL There is no wrong place to start. Choose what fits you.
+SL Set a quit date\nRECOMMENDED\nPrepare for <n>–<n> days, then stop completely on the date you choose. We’ll guide one small step each day.\nMatches your preparation preference
+SL Quit today\nBegin your smoke-free time now and get extra support through the first day.
+SL Reduce gradually\nFollow a step-down schedule and work toward stopping completely on a future date.
+SL Your path is flexible. You can adjust it at any time.
+SL Continue with this path

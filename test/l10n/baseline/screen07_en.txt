@@ -1,0 +1,54 @@
+# baseline 97d81ce · screen07 · en
+T Choose your quit date
+T <n> OF <n>
+T QUIT PLAN
+T YOUR DATE
+T Choose a day to begin.
+T A date <n>–<n> days away gives you time to prepare without losing momentum.
+T <month> <n>
+T S
+T M
+T T
+T W
+T T
+T F
+T S
+T Recommended preparation window: <month> <n> – <month> <n>
+T <month>
+T <weekday>
+T YOUR QUIT DATE
+T <weekday>, <month> <n>, <n>
+T <n> days to prepare
+T RECOMMENDED
+T Quit-day check-in
+T <n>:<n> AM · Private notification
+T Lock screen only shows: “You have a check-in.”
+T You can change this date later without losing progress.
+T Confirm this date
+T Date saved automatically
+SL Choose your quit date\n<n> OF <n>\nQUIT PLAN\n<n>%\nDate saved automatically
+ST Back
+SL YOUR DATE
+SL Choose a day to begin.
+SL A date <n>–<n> days away gives you time to prepare without losing momentum.
+SL <month> <n>
+SL S
+SL M
+SL T
+SL W
+SL T
+SL F
+SL S
+SL <n>/<n>/<n>\n<n>
+SL Recommended preparation window: <month> <n> – <month> <n>
+SL <month>
+SL <weekday>
+SL YOUR QUIT DATE
+SL <weekday>, <month> <n>, <n>
+SL <n> days to prepare
+SL RECOMMENDED
+SL Quit-day check-in
+SL <n>:<n> AM · Private notification
+SL Lock screen only shows: “You have a check-in.”
+SL You can change this date later without losing progress.
+SL Confirm this date

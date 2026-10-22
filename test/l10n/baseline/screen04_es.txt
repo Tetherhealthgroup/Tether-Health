@@ -1,0 +1,44 @@
+# baseline 97d81ce · screen04 · es
+T Tus desencadenantes
+T <n> OF <n>
+T EVALUACIÓN
+T PREGUNTA <n> · ELIGE TODAS LAS QUE CORRESPONDAN
+T ¿Cuándo es más probable que quieras fumar?
+T Elige cada situación que sea cierta para ti.
+T Estrés
+T Después de comer
+T Al conducir
+T Con café
+T Entornos sociales
+T Descansos laborales
+T Alcohol
+T Aburrimiento
+T Por la mañana
+T Antes de dormir
+T AÑADE TU DESENCADENANTE
+T Escribe otra situación…
+T Se usa para prepararte, no para vigilarte
+T Tus elecciones adaptan las herramientas y los recordatorios.
+T BreatheFree no rastrea tu ubicación en segundo plano.
+T Continuar
+T <n> desencadenantes elegidos · Guardado automáticamente
+SL Tus desencadenantes\n<n> OF <n>\nEVALUACIÓN\n<n>%\n<n> desencadenantes elegidos · Guardado automáticamente
+ST Atrás
+SL PREGUNTA <n> · ELIGE TODAS LAS QUE CORRESPONDAN
+SL ¿Cuándo es más probable que quieras fumar?
+SL Elige cada situación que sea cierta para ti.
+SL Estrés\nEstrés
+SL Después de comer\nDespués de comer
+SL Al conducir\nAl conducir
+SL Con café\nCon café
+SL Entornos sociales\nEntornos sociales
+SL Descansos laborales\nDescansos laborales
+SL Alcohol\nAlcohol
+SL Aburrimiento\nAburrimiento
+SL Por la mañana\nPor la mañana
+SL Antes de dormir\nAntes de dormir
+SL AÑADE TU DESENCADENANTE\nEscribe otra situación…
+SL Se usa para prepararte, no para vigilarte
+SL Tus elecciones adaptan las herramientas y los recordatorios.
+SL BreatheFree no rastrea tu ubicación en segundo plano.
+SL Continuar

@@ -1,0 +1,83 @@
+# baseline 97d81ce · screen20 · es
+T Rescate de antojo
+T <n> DE <n>
+T RESULTADO GUARDADO
+T RESCATE GUARDADO
+T Tu antojo se mantuvo igual.
+T Eso está bien. Practicar una herramienta puede ayudarte a atravesar este momento sin actuar sobre el antojo.
+T ANTES
+T Moderado
+T AHORA
+T Moderado
+T <n> puntos
+T SIN CAMBIO
+T Tu calificación, no un diagnóstico
+T Cada resultado puede ser diferente. Registrarlo te ayuda a aprender qué funciona.
+T Lo que esto agrega a tu plan
+T Today · <n>:<n> AM
+T DISPARADOR
+T Craving
+T Seleccionado antes del rescate
+T HERRAMIENTA
+T Respiración lenta
+T Marcado como útil
+T PRÁCTICA
+T <n> minutes
+T Completado sin conexión
+T La respiración lenta se ofrecerá primero para antojos de estrés similares.
+T SIGUIENTE MEJOR PASO
+T Protege los próximos <n> minutos.
+T Quédate en un lugar sin humo y toma unos sorbos de agua.
+T Rescate de antojo sigue a un toque de distancia de Inicio.
+T Sin temporizador
+T MI RAZÓN
+T “Mi razón para dejarlo.”
+T Guardado en Mi Plan
+T Si necesitas más
+T Repetir rescate
+T Usar respiración de nuevo
+T Obtener apoyo humano
+T Persona de apoyo o línea de ayuda
+T Volver a Hoy
+T Guardado de forma privada. Los resultados sin conexión se sincronizan una vez conectado.
+T Content v<n>.<n>
+T Ver detalles del progreso
+T Puedes eliminar este resultado de tu historial
+SL Rescate de antojo
+SL <n> DE <n>
+SL RESULTADO GUARDADO
+SL RESCATE GUARDADO
+SL Tu antojo se mantuvo igual.
+SL Eso está bien. Practicar una herramienta puede ayudarte a atravesar este momento sin actuar sobre el antojo.
+SL <n> puntos
+SL SIN CAMBIO
+SL Tu calificación, no un diagnóstico
+SL Cada resultado puede ser diferente. Registrarlo te ayuda a aprender qué funciona.
+SL Lo que esto agrega a tu plan
+SL Today · <n>:<n> AM
+SL DISPARADOR
+SL Craving
+SL Seleccionado antes del rescate
+SL HERRAMIENTA
+SL Respiración lenta
+SL Marcado como útil
+SL PRÁCTICA
+SL <n> minutes
+SL Completado sin conexión
+SL La respiración lenta se ofrecerá primero para antojos de estrés similares.
+SL SIGUIENTE MEJOR PASO
+SL Protege los próximos <n> minutos.
+SL Quédate en un lugar sin humo y toma unos sorbos de agua.
+SL Rescate de antojo sigue a un toque de distancia de Inicio.
+SL Sin temporizador
+SL MI RAZÓN
+SL “Mi razón para dejarlo.”
+SL Guardado en Mi Plan
+SL Si necesitas más
+SL Repetir rescate\nUsar respiración de nuevo
+SL Obtener apoyo humano\nPersona de apoyo o línea de ayuda
+SL Volver a Hoy
+SL Guardado de forma privada. Los resultados sin conexión se sincronizan una vez conectado.
+SL Content v<n>.<n>
+SL Ver detalles del progreso
+SL Puedes eliminar este resultado de tu historial

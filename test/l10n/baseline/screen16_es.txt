@@ -1,0 +1,68 @@
+# baseline 97d81ce · screen16 · es
+T Rescate del antojo
+T SIN CONEXIÓN
+T AHORA MISMO
+T Superemos este momento.
+T Empieza con lo que sientes ahora. No necesitas escribir.
+T INTENSIDAD DEL ANTOJO
+T ¿Qué tan fuerte es ahora?
+T MODERADO
+T Leve
+T Más fuerte
+T Solo necesitas elegir un número.
+T La siguiente pantalla ofrece una acción recomendada.
+T ¿Qué puede estar detrás?
+T Opcional
+T Estrés
+T Después de comer
+T Cerca de alguien que fuma
+T Al conducir
+T Alcohol
+T Aburrimiento
+T No estoy seguro
+T Se usa para personalizar el apoyo, nunca para vigilarte.\nSin rastreo de ubicación ni conversaciones.
+T TU RAZÓN PRINCIPAL
+T “Mi razón para dejarlo.”
+T Este momento puede pasar sin cambiar tu meta.
+T ¿Prefieres hablar con alguien?
+T Contacta a tu persona de apoyo o a un consejero capacitado.
+T Ver apoyo
+T Los mensajes y llamadas solo ocurren cuando tú los eliges.
+T Muéstrame qué hacer
+T Privado · Funciona sin conexión
+T ¿Emergencia médica?
+T Los detalles son opcionales y nunca bloquean Rescate.
+ST Volver
+SL Rescate del antojo
+SL SIN CONEXIÓN
+SL AHORA MISMO
+SL Superemos este momento.
+SL Empieza con lo que sientes ahora. No necesitas escribir.
+SL INTENSIDAD DEL ANTOJO
+SL ¿Qué tan fuerte es ahora?
+SL MODERADO
+SL Leve
+SL Más fuerte
+SL Solo necesitas elegir un número.
+SL La siguiente pantalla ofrece una acción recomendada.
+SL ¿Qué puede estar detrás?
+SL Opcional
+SL Estrés
+SL Después de comer
+SL Cerca de alguien que fuma
+SL Al conducir
+SL Alcohol
+SL Aburrimiento
+SL No estoy seguro
+SL Se usa para personalizar el apoyo, nunca para vigilarte.\nSin rastreo de ubicación ni conversaciones.
+SL TU RAZÓN PRINCIPAL
+SL “Mi razón para dejarlo.”
+SL Este momento puede pasar sin cambiar tu meta.
+SL ¿Prefieres hablar con alguien?
+SL Contacta a tu persona de apoyo o a un consejero capacitado.
+SL Ver apoyo
+SL Los mensajes y llamadas solo ocurren cuando tú los eliges.
+SL Muéstrame qué hacer
+SL Privado · Funciona sin conexión
+SL ¿Emergencia médica?
+SL Los detalles son opcionales y nunca bloquean Rescate.

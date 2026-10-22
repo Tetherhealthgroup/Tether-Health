@@ -1,0 +1,29 @@
+# baseline 97d81ce · screen03 · es
+T Sobre tu consumo
+T <n> OF <n>
+T EVALUACIÓN
+T PREGUNTA <n>
+T En un día habitual, ¿cuántos cigarrillos fumas?
+T Elige la respuesta más cercana a tu día habitual.
+T No fumo todos los días
+T <n> cigarrillos o menos
+T <n>–<n> cigarrillos
+T <n> cigarrillos o más
+T Por qué preguntamos
+T Esto ayuda a adaptar tu plan y calcular el dinero ahorrado.
+T No es un diagnóstico ni un juicio.
+T Siguiente
+T Tu respuesta se guarda automáticamente.
+SL Sobre tu consumo\n<n> OF <n>\nEVALUACIÓN\n<n>%\nTu respuesta se guarda automáticamente.
+ST Atrás
+SL PREGUNTA <n>
+SL En un día habitual, ¿cuántos cigarrillos fumas?
+SL Elige la respuesta más cercana a tu día habitual.
+SL No fumo todos los días\nNo fumo todos los días
+SL <n> cigarrillos o menos\n<n> cigarrillos o menos
+SL <n>–<n> cigarrillos\n<n>–<n> cigarrillos
+SL <n> cigarrillos o más\n<n> cigarrillos o más
+SL Por qué preguntamos
+SL Esto ayuda a adaptar tu plan y calcular el dinero ahorrado.
+SL No es un diagnóstico ni un juicio.
+SL Siguiente

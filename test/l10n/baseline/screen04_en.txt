@@ -1,0 +1,44 @@
+# baseline 97d81ce · screen04 · en
+T Your triggers
+T <n> OF <n>
+T ASSESSMENT
+T QUESTION <n> · CHOOSE ALL THAT APPLY
+T When are you most likely to want a cigarette?
+T Choose every situation that feels true for you.
+T Stress
+T After meals
+T Driving
+T With coffee
+T Social settings
+T Work breaks
+T Alcohol
+T Boredom
+T Morning
+T Before bed
+T ADD YOUR OWN TRIGGER
+T Type another situation…
+T Used to prepare, not to monitor
+T Your choices shape coping tools and reminder timing.
+T BreatheFree does not track your location in the background.
+T Continue
+T <n> triggers selected · Saved automatically
+SL Your triggers\n<n> OF <n>\nASSESSMENT\n<n>%\n<n> triggers selected · Saved automatically
+ST Back
+SL QUESTION <n> · CHOOSE ALL THAT APPLY
+SL When are you most likely to want a cigarette?
+SL Choose every situation that feels true for you.
+SL Stress\nStress
+SL After meals\nAfter meals
+SL Driving\nDriving
+SL With coffee\nWith coffee
+SL Social settings\nSocial settings
+SL Work breaks\nWork breaks
+SL Alcohol\nAlcohol
+SL Boredom\nBoredom
+SL Morning\nMorning
+SL Before bed\nBefore bed
+SL ADD YOUR OWN TRIGGER\nType another situation…
+SL Used to prepare, not to monitor
+SL Your choices shape coping tools and reminder timing.
+SL BreatheFree does not track your location in the background.
+SL Continue

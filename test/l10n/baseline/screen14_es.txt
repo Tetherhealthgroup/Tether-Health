@@ -1,0 +1,53 @@
+# baseline 97d81ce · screen14 · es
+T Reinicio del estrés
+T VOZ SÍ
+T PASO <n> DE <n> · RESPIRA
+T <n>:<n> RESTANTES
+T RESPIRACIÓN LENTA
+T Respiración <n> de <n>
+T INHALA
+T SEGUNDOS
+T Inhala lentamente por la nariz.
+T Sigue el círculo, escucha o usa la cuenta regresiva.
+T Guía de voz activa
+T Movimiento reducido activo
+T Pausar
+T Omitir paso
+T Secuencia del ejercicio
+T Respira
+T AHORA
+T Agua
+T SIGUE
+T Cambia
+T SIGUE
+T El temporizador se pausa automáticamente al salir.
+T ¿El antojo está aumentando?
+T Abrir Rescate
+T Terminar ejercicio
+T El progreso parcial se guarda · Funciona sin conexión
+ST Cerrar
+SL Reinicio del estrés
+SL Guía de voz\nVOZ SÍ
+SL PASO <n> DE <n> · RESPIRA
+SL <n>:<n> RESTANTES
+SL RESPIRACIÓN LENTA
+SL Respiración <n> de <n>
+SL INHALA
+SL SEGUNDOS
+SL Inhala lentamente por la nariz.
+SL Sigue el círculo, escucha o usa la cuenta regresiva.
+SL Guía de voz activa
+SL Movimiento reducido activo
+SL Pausar
+SL Omitir paso
+SL Secuencia del ejercicio
+SL Respira
+SL AHORA
+SL Agua
+SL SIGUE
+SL Cambia
+SL SIGUE
+SL El temporizador se pausa automáticamente al salir.
+SL ¿El antojo está aumentando?\nAbrir Rescate
+SL Terminar ejercicio
+SL El progreso parcial se guarda · Funciona sin conexión

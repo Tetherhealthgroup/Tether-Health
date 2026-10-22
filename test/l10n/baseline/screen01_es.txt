@@ -1,0 +1,22 @@
+# baseline 97d81ce · screen01 · es
+T BreatheFree
+T <n> OF <n>
+T UNA MEJOR FORMA DE DEJARLO
+T Apoyo para los momentos más importantes.
+T BreatheFree responde a lo que necesitas ahora y te ayuda a proteger el progreso que ya has logrado.
+T Cuando llega un antojo
+T Abre una herramienta calmante con un toque, incluso sin conexión.
+T Mientras tu cuerpo se recupera
+T Consulta el tiempo sin fumar, el dinero ahorrado y tu recuperación.
+T Si ocurre un desliz
+T Conserva tu progreso. Aprende, ajusta y continúa.
+T Continuar
+SL BreatheFree\n<n> OF <n>
+ST Atrás
+SL UNA MEJOR FORMA DE DEJARLO
+SL Apoyo para los momentos más importantes.
+SL BreatheFree responde a lo que necesitas ahora y te ayuda a proteger el progreso que ya has logrado.
+SL Cuando llega un antojo\nAbre una herramienta calmante con un toque, incluso sin conexión.
+SL Mientras tu cuerpo se recupera\nConsulta el tiempo sin fumar, el dinero ahorrado y tu recuperación.
+SL Si ocurre un desliz\nConserva tu progreso. Aprende, ajusta y continúa.
+SL Continuar

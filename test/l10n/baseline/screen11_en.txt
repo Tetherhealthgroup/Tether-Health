@@ -1,0 +1,67 @@
+# baseline 97d81ce · screen11 · en
+T BreatheFree
+T <weekday>, <month> <n>
+T <greeting>.
+T YOUR QUIT DAY
+T <n> days
+T <weekday>, <month> <n> · Pacific Time
+T DAY <n>
+T QUIT DAY
+T TODAY’S NEXT STEP
+T Remove cigarettes, lighters and ashtrays
+T About <n> minutes
+T Mark complete
+T One small action is enough for today.
+T Craving now?
+T Get support for the next few minutes.
+T Open Rescue
+T Your preparation
+T View progress
+T Plan ready
+T Activated today
+T Space ready
+T <n> tasks left
+T <n> supporters
+T Add support
+T YOUR TOP REASON
+T “My reason to quit.”
+T Coming up
+T No reminders are scheduled. You can add them from your plan.
+T Your plan and Rescue tools remain available offline.
+T Home
+T Plan
+T Progress
+T Learn
+T Support
+SL BreatheFree
+ST Notifications
+SL Guest profile
+SL <weekday>, <month> <n>
+SL <greeting>.
+SL YOUR QUIT DAY
+SL <n> days
+SL <weekday>, <month> <n> · Pacific Time
+SL DAY <n>
+SL QUIT DAY
+SL TODAY’S NEXT STEP
+SL Remove cigarettes, lighters and ashtrays
+SL About <n> minutes
+SL Mark complete
+SL One small action is enough for today.
+SL Craving now?
+SL Get support for the next few minutes.
+SL Open Rescue
+SL Your preparation
+SL View progress
+SL Plan ready\nActivated today
+SL <n>/<n>\nSpace ready\n<n> tasks left
+SL <n> supporters\nAdd support
+SL YOUR TOP REASON\n“My reason to quit.”
+SL Coming up
+SL No reminders are scheduled. You can add them from your plan.
+SL Your plan and Rescue tools remain available offline.
+SL Home
+SL Plan
+SL Progress
+SL Learn
+SL Support

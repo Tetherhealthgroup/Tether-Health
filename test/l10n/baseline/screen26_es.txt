@@ -1,0 +1,51 @@
+# baseline 97d81ce · screen26 · es
+T Apoyo
+T Elige una persona o servicio que te parezca adecuado.
+T Cambiar ubicación
+T GRATIS Y CONFIDENCIAL
+T Habla con un consejero de la línea para dejar de fumar
+T Te conecta con la línea de tu estado. Los servicios y horarios pueden variar.
+T Llamar ahora
+T Pedir una llamada
+T Vista previa del consentimiento antes de referir
+T Tus personas
+T Vista previa antes de enviar
+T Todavía no agregaste a nadie.
+T Equipo de atención y farmacia
+T Profesional clínico
+T Preguntas sobre plan o síntomas
+T Contactar al equipo
+T Farmacéutico
+T Preguntas sobre resurtido o uso
+T Llamar a farmacia
+T Nada se comparte de forma predeterminada
+T Revisa el mensaje o resumen exacto antes de enviarlo.
+T ¿Peligro inmediato o síntomas graves?
+T Abrir ayuda
+T Inicio
+T Plan
+T Progreso
+T Aprender
+T Apoyo
+SL Volver
+SL Apoyo
+SL Elige una persona o servicio que te parezca adecuado.
+SL Guest profile
+ST Configuración y privacidad
+SL Cambiar ubicación
+SL GRATIS Y CONFIDENCIAL\nHabla con un consejero de la línea para dejar de fumar\nTe conecta con la línea de tu estado. Los servicios y horarios pueden variar.\nNúmero de la línea <n>-<n>-<n>-<n>\n<n>-<n>-<n>-<n>\nVista previa del consentimiento antes de referir
+SL Llamar ahora
+SL Pedir una llamada
+SL Tus personas
+SL Vista previa antes de enviar
+SL Todavía no agregaste a nadie.
+SL Equipo de atención y farmacia
+SL Profesional clínico\nPreguntas sobre plan o síntomas\nContactar al equipo
+SL Farmacéutico\nPreguntas sobre resurtido o uso\nLlamar a farmacia
+SL Nada se comparte de forma predeterminada\nRevisa el mensaje o resumen exacto antes de enviarlo.
+SL !\n¿Peligro inmediato o síntomas graves?\nAbrir ayuda
+SL Inicio
+SL Plan
+SL Progreso
+SL Aprender
+SL Apoyo

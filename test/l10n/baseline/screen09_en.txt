@@ -1,0 +1,45 @@
+# baseline 97d81ce · screen09 · en
+T Support & preparation
+T <n> OF <n>
+T QUIT PLAN
+T SET UP FOR SUCCESS
+T You don’t have to do this alone.
+T Choose the support you want. You stay in control of who is contacted and what is shared.
+T YOUR SUPPORT CIRCLE
+T <n> PEOPLE ADDED
+T No one has been added yet. You can save this plan without contacting anyone.
+T Add another support person
+T PREPARE YOUR SPACE
+T <n> OF <n>
+T Remove cigarettes, lighters and ashtrays
+T Make my home and car smoke-free
+T Stock gum, water or healthy snacks
+T TREATMENT SUPPORT
+T Explore quit-smoking medicines
+T A clinician or pharmacist can help you choose what is safe.
+T Education only — this app does not prescribe or change medicines.
+T Learn about treatment options
+T Nothing is shared or sent without your action.
+T Save my support plan
+T <n> supporters · <n> preparation tasks complete
+SL Support & preparation\n<n> OF <n>\nQUIT PLAN\n<n>%\n<n> supporters · <n> preparation tasks complete
+ST Back
+SL SET UP FOR SUCCESS
+SL You don’t have to do this alone.
+SL Choose the support you want. You stay in control of who is contacted and what is shared.
+SL YOUR SUPPORT CIRCLE
+SL <n> PEOPLE ADDED
+SL No one has been added yet. You can save this plan without contacting anyone.
+SL Add another support person
+SL PREPARE YOUR SPACE
+SL <n> OF <n>
+SL Remove cigarettes, lighters and ashtrays
+SL Make my home and car smoke-free
+SL Stock gum, water or healthy snacks
+SL TREATMENT SUPPORT
+SL Explore quit-smoking medicines
+SL A clinician or pharmacist can help you choose what is safe.
+SL Education only — this app does not prescribe or change medicines.
+SL Learn about treatment options
+SL Nothing is shared or sent without your action.
+SL Save my support plan

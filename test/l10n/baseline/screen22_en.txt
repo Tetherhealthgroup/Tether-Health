@@ -1,0 +1,90 @@
+# baseline 97d81ce · screen22 · en
+T Slip recovery
+T PRIVATE
+T YOUR PROGRESS IS STILL HERE
+T A slip is information—not the end.
+T Share only what feels useful. We’ll help with the next choice.
+T Nothing below changes or deletes your earlier progress.
+T What happened?
+T Choose one
+T A puff or two
+T One cigarette
+T More than one
+T Prefer not to answer
+T WHEN?
+T Just now
+T Earlier today
+T Another day
+T What was happening?
+T Optional
+T Choose any that fit. This helps update your trigger plan.
+T Stress
+T Around smokers
+T Routine
+T Alcohol
+T After a meal
+T Not sure
+T Something else
+T What feels right now?
+T You stay in control of the plan.
+T Continue from this moment
+T Keep the current quit plan and update support for today.
+T RECOMMENDED
+T Choose a new quit time
+T Today or another date
+T Help me decide
+T Review options without pressure
+T YOUR NEXT STEP
+T Move cigarettes out of reach, then use a <n>-minute Rescue.
+T Based on the stress trigger and what helped before.
+T You can switch tools or contact support at any time.
+T Open after saving
+T Talk with a quitline counselor
+T No one is notified unless you choose.
+T View support
+T Save and start recovery
+T Saves offline and syncs once. You can delete this event later.
+T Content v<n>.<n>
+T Skip for now and return Home
+SL Slip recovery
+SL PRIVATE
+SL YOUR PROGRESS IS STILL HERE
+SL A slip is information—not the end.
+SL Share only what feels useful. We’ll help with the next choice.
+SL Nothing below changes or deletes your earlier progress.
+SL What happened?
+SL Choose one
+SL A puff or two
+SL One cigarette
+SL More than one
+SL Prefer not to answer
+SL WHEN?
+SL Just now
+SL Earlier today
+SL Another day
+SL What was happening?
+SL Optional
+SL Choose any that fit. This helps update your trigger plan.
+SL Stress
+SL Around smokers
+SL Routine
+SL Alcohol
+SL After a meal
+SL Not sure
+SL Something else
+SL What feels right now?
+SL You stay in control of the plan.
+SL Continue from this moment\nKeep the current quit plan and update support for today.\nRECOMMENDED
+SL Choose a new quit time\nToday or another date
+SL Help me decide\nReview options without pressure
+SL YOUR NEXT STEP
+SL Move cigarettes out of reach, then use a <n>-minute Rescue.
+SL Based on the stress trigger and what helped before.
+SL You can switch tools or contact support at any time.
+SL Open after saving
+SL Talk with a quitline counselor\nNo one is notified unless you choose.
+SL View support
+SL Save and start recovery
+SL Saves offline and syncs once. You can delete this event later.
+SL Content v<n>.<n>
+SL Skip for now and return Home

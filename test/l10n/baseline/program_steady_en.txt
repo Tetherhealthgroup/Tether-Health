@@ -1,0 +1,25 @@
+# baseline 97d81ce · program_steady · en
+T Works offline — your information stays on this device.
+T Today's focus
+T No readings yet. Log a reading whenever you check — there is no schedule to keep up with.
+T Readings are information, not a grade. A high reading is not a failure.
+T Logging streak: <n> days
+T Logging is information — there are no grades here.
+T Target range
+T No target range recorded yet. Your clinician sets this — the app never invents one.
+T Record target range
+T Your target range is set by your clinician. This app never invents one.
+T Log a reading
+T Energy reset
+T Nothing is sent unless you choose it. Works offline.
+T Tether does not diagnose or treat any condition and does not replace professional care.
+T Steady
+SL Works offline — your information stays on this device.
+SL Today's focus\nNo readings yet. Log a reading whenever you check — there is no schedule to keep up with.\nReadings are information, not a grade. A high reading is not a failure.
+SL Logging streak, <n> days\nLogging is information — there are no grades here.
+SL Target range\nNo target range recorded yet. Your clinician sets this — the app never invents one.\nRecord target range\nYour target range is set by your clinician. This app never invents one.
+SL Log a glucose reading
+SL Open energy reset
+SL Privacy. Nothing is sent unless you choose it. Works offline.\nMedical disclaimer. Tether does not diagnose or treat any condition and does not replace professional care.
+SL Steady
+ST Choose program

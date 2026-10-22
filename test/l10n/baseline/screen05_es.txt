@@ -1,0 +1,41 @@
+# baseline 97d81ce · screen05 · es
+T Tu punto de partida
+T Completo
+T EVALUACIÓN
+T TU REFLEXIÓN
+T Estás listo para prepararte—a tu propio ritmo.
+T Esto es lo que entendimos de tus respuestas.
+T TU PATRÓN
+T Puedes añadir tu patrón de consumo cuando quieras
+T DESENCADENANTES
+T Puedes identificar desencadenantes cuando quieras
+T PUNTO DE PARTIDA
+T Puedes empezar con un paso pequeño y añadir detalles después
+T RECOMENDADO
+T Prepararte
+T Practica herramientas y elige una fecha para dejar de fumar en los próximos <n>–<n> días. Te guiaremos con un paso pequeño cada día.
+T Por qué encaja contigo
+T PUEDES ELEGIR OTRA RUTA
+T Explorar primero
+T Aprende sin fijar una fecha
+T Conectar
+T Habla con un asesor o equipo de atención
+T Crear mi plan de preparación
+T Tú tienes el control. Cambia tu ruta cuando quieras.
+SL Tu punto de partida\nCompleto\nEVALUACIÓN\n<n>%\nTú tienes el control. Cambia tu ruta cuando quieras.
+ST Atrás
+SL TU REFLEXIÓN
+SL Estás listo para prepararte—a tu propio ritmo.
+SL Esto es lo que entendimos de tus respuestas.
+SL TU PATRÓN
+SL Puedes añadir tu patrón de consumo cuando quieras
+SL DESENCADENANTES
+SL Puedes identificar desencadenantes cuando quieras
+SL PUNTO DE PARTIDA
+SL Puedes empezar con un paso pequeño y añadir detalles después
+SL RECOMENDADO\nPrepararte\nPractica herramientas y elige una fecha para dejar de fumar en los próximos <n>–<n> días. Te guiaremos con un paso pequeño cada día.
+SL Por qué encaja contigo
+SL PUEDES ELEGIR OTRA RUTA
+SL Explorar primero\nAprende sin fijar una fecha
+SL Conectar\nHabla con un asesor o equipo de atención
+SL Crear mi plan de preparación

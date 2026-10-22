@@ -1,0 +1,48 @@
+# baseline 97d81ce · screen02 · en
+T BreatheFree
+T <n> OF <n>
+T YOUR PRIVACY
+T Your story stays yours.
+T Choose how your information is used. Required items keep the app working; optional choices can change anytime.
+T REQUIRED TO USE BREATHEFREE
+T Required
+T Essential app data
+T Save your account, quit plan, and progress securely.
+T Health information
+T Personalize your plan, support tools, and recovery insights.
+T Review Terms and Privacy Notice
+T YOUR CHOICES
+T Optional
+T Helpful reminders
+T Receive private check-ins and plan reminders.
+T Share with my care team
+T Allow a connected clinician to view progress summaries.
+T Help improve BreatheFree
+T Contribute de-identified information to approved research.
+T No ads. No tobacco-industry funding.
+T We never sell patient health information.
+T Agree and continue
+T You can change optional choices anytime in Settings.
+SL BreatheFree\n<n> OF <n>\nYou can change optional choices anytime in Settings.
+ST Back
+SL YOUR PRIVACY
+SL Your story stays yours.
+SL Choose how your information is used. Required items keep the app working; optional choices can change anytime.
+SL REQUIRED TO USE BREATHEFREE
+SL Required
+SL Essential app data
+SL Save your account, quit plan, and progress securely.
+SL Health information
+SL Personalize your plan, support tools, and recovery insights.
+SL Review Terms and Privacy Notice
+SL YOUR CHOICES
+SL Optional
+SL Helpful reminders
+SH Receive private check-ins and plan reminders.
+SL Share with my care team
+SH Allow a connected clinician to view progress summaries.
+SL Help improve BreatheFree
+SH Contribute de-identified information to approved research.
+SL No ads. No tobacco-industry funding.
+SL We never sell patient health information.
+SL Agree and continue

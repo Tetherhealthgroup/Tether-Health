@@ -1,0 +1,28 @@
+# baseline 97d81ce · screen06 · es
+T Crea tu plan
+T <n> DE <n>
+T PLAN PARA DEJARLO
+T ELIGE TU CAMINO
+T ¿Qué te parece posible ahora mismo?
+T No hay un lugar incorrecto para empezar. Elige lo que se adapte a ti.
+T Elegir una fecha
+T RECOMENDADO
+T Prepárate durante <n>–<n> días y luego deja de fumar por completo en la fecha que elijas. Te guiaremos con un paso pequeño cada día.
+T Coincide con tu preferencia de preparación
+T Dejar de fumar hoy
+T Empieza ahora tu tiempo sin fumar y recibe apoyo adicional durante el primer día.
+T Reducir gradualmente
+T Sigue un programa de reducción gradual y avanza hacia dejar de fumar por completo en una fecha futura.
+T Tu camino es flexible. Puedes ajustarlo en cualquier momento.
+T Continuar con este camino
+T Elegir una fecha seleccionado · Guardado automáticamente
+SL Crea tu plan\n<n> DE <n>\nPLAN PARA DEJARLO\n<n>%\nElegir una fecha seleccionado · Guardado automáticamente
+ST Atrás
+SL ELIGE TU CAMINO
+SL ¿Qué te parece posible ahora mismo?
+SL No hay un lugar incorrecto para empezar. Elige lo que se adapte a ti.
+SL Elegir una fecha\nRECOMENDADO\nPrepárate durante <n>–<n> días y luego deja de fumar por completo en la fecha que elijas. Te guiaremos con un paso pequeño cada día.\nCoincide con tu preferencia de preparación
+SL Dejar de fumar hoy\nEmpieza ahora tu tiempo sin fumar y recibe apoyo adicional durante el primer día.
+SL Reducir gradualmente\nSigue un programa de reducción gradual y avanza hacia dejar de fumar por completo en una fecha futura.
+SL Tu camino es flexible. Puedes ajustarlo en cualquier momento.
+SL Continuar con este camino

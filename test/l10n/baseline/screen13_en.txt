@@ -1,0 +1,67 @@
+# baseline 97d81ce · screen13 · en
+T Your next step
+T PERSONALIZED
+T CHECK-IN SAVED
+T Try a <n>-minute stress reset.
+T You reported moderate stress and a moderate craving today. Here is one small step based on your check-in.
+T RECOMMENDED FOR YOU
+T Stress reset
+T Breathe. Sip. Switch.
+T MINUTES
+T Stress · Moderate
+T Craving · <n>/<n>
+T Confidence · <n>
+T Available offline whenever you need it
+T Your <n>-minute plan
+T Follow in order
+T Take <n> slow breaths
+T In through your nose, out through your mouth.
+T <n> SEC
+T Drink a glass of water
+T Sip slowly and notice the temperature.
+T <n> SEC
+T Switch what you are doing
+T Walk, play music, or start one quick task.
+T <n> SEC
+T Still feeling the urge?
+T Open support for a support person or Craving Rescue.
+T Cravings change. Keep trying strategies until you find what helps.
+T Why this was recommended
+T okay mood, moderate stress, no optional symptoms and a craving of <n>/<n>. You skipped the smoking question.
+T Based only on today’s check-in · Recommendation version <n>.<n>
+T Not a good fit? Choose another strategy
+T Practice this now
+T Add to my coping plan
+T Educational support · You remain in control
+ST Back
+SL Your next step
+SL PERSONALIZED
+SL CHECK-IN SAVED
+SL Try a <n>-minute stress reset.
+SL You reported moderate stress and a moderate craving today. Here is one small step based on your check-in.
+SL RECOMMENDED FOR YOU
+SL Stress reset
+SL Breathe. Sip. Switch.
+SL MINUTES
+SL Stress · Moderate
+SL Craving · <n>/<n>
+SL Confidence · <n>
+SL Available offline whenever you need it
+SL Your <n>-minute plan
+SL Follow in order
+SL Take <n> slow breaths
+SL In through your nose, out through your mouth.
+SL <n> SEC
+SL Drink a glass of water
+SL Sip slowly and notice the temperature.
+SL <n> SEC
+SL Switch what you are doing
+SL Walk, play music, or start one quick task.
+SL <n> SEC
+SL Still feeling the urge?\nOpen support for a support person or Craving Rescue.
+SL Cravings change. Keep trying strategies until you find what helps.
+SL Why this was recommended\nokay mood, moderate stress, no optional symptoms and a craving of <n>/<n>. You skipped the smoking question.\nBased only on today’s check-in · Recommendation version <n>.<n>
+SL Not a good fit? Choose another strategy
+SL Practice this now
+SL Add to my coping plan
+SL Educational support · You remain in control

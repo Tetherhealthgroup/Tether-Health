@@ -1,0 +1,59 @@
+# baseline 97d81ce · screen17 · es
+T Craving Rescue
+T <n> DE <n>
+T ELIGE APOYO
+T MEJOR OPCIÓN
+T Empieza con lo que te ayudó antes.
+T Una acción recomendada según este antojo y tus resultados.
+T RECOMENDADO
+T Respiración lenta
+T Deja que el antojo suba y baje mientras sigues una guía de respiración tranquila.
+T MINUTES
+T TU ÚLTIMO RESULTADO
+T La respiración lenta fue la más útil.
+T El antojo cambió de <n> a <n> después del ejercicio.
+T LAST TIME
+T Recomendación personalizada
+T Funciona sin conexión
+T Voz opcional
+T Iniciar respiración de <n> minutos
+T ¿Por qué esta opción?
+T Antojo <n>/<n> + tu resultado útil anterior.
+T O elige otra acción
+T Tu elección
+T Muévete por <n> minutos
+T Camina o estírate
+T Sin conexión · Sin equipo
+T Cambia de entorno
+T Ve a un lugar sin humo
+T Cambio rápido de ambiente
+T ¿Prefieres apoyo de una persona?
+T Contacta a tu persona de apoyo o a un consejero capacitado de la línea para dejar de fumar.
+T Ver apoyo
+T No se envía ni comparte nada a menos que tú lo elijas.
+T La recomendación usa tus datos solo para apoyo personalizado.
+T Content v<n>.<n>
+T Puedes cambiar de herramienta en cualquier momento
+T Iniciar herramienta recomendada
+ST Volver
+SL Craving Rescue
+SL <n> DE <n>
+SL ELIGE APOYO
+SL MEJOR OPCIÓN
+SL Empieza con lo que te ayudó antes.
+SL Una acción recomendada según este antojo y tus resultados.
+SL RECOMENDADO\nRespiración lenta\nDeja que el antojo suba y baje mientras sigues una guía de respiración tranquila.\n<n>:<n>\nMINUTES\nTU ÚLTIMO RESULTADO\nLa respiración lenta fue la más útil.\nEl antojo cambió de <n> a <n> después del ejercicio.\n<n> → <n>\nLAST TIME\nRecomendación personalizada\nFunciona sin conexión\nVoz opcional
+SL Iniciar respiración de <n> minutos
+SL ¿Por qué esta opción?\nAntojo <n>/<n> + tu resultado útil anterior.
+SL O elige otra acción
+SL Tu elección
+SL Muévete por <n> minutos\nCamina o estírate\nSin conexión · Sin equipo
+SL Cambia de entorno\nVe a un lugar sin humo\nCambio rápido de ambiente
+SL ¿Prefieres apoyo de una persona?
+SL Contacta a tu persona de apoyo o a un consejero capacitado de la línea para dejar de fumar.
+SL Ver apoyo
+SL No se envía ni comparte nada a menos que tú lo elijas.
+SL La recomendación usa tus datos solo para apoyo personalizado.
+SL Content v<n>.<n>
+SL Puedes cambiar de herramienta en cualquier momento
+SL Iniciar herramienta recomendada

@@ -1,0 +1,67 @@
+# baseline 97d81ce · screen15 · es
+T Reinicio del estrés
+T COMPLETO
+T Le diste tiempo a la sensación para cambiar.
+T Tómate un momento para notar qué es diferente ahora.
+T TIEMPO
+T PASOS
+T <n> de <n>
+T ESTADO
+T Guardado
+T ¿Qué tan fuerte es el antojo ahora?
+T Elige el número que se sienta más cercano.
+T <n> · Moderado
+T Sin antojo
+T Más fuerte
+T No hay una puntuación “buena”; las respuestas honestas mejoran tu apoyo.
+T RESULTADO DE HOY
+T ANTES
+T AHORA
+T PUNTOS
+T Un resultado, no una promesa; los patrones se aclaran con el tiempo.
+T ¿Qué ayudó más?
+T Opcional
+T Respirar despacio
+T Agua
+T Cambiar de actividad
+T Aún no sé
+T Puedes decirnos qué ayudó cuando estés listo.
+T Puedes cambiar esta preferencia en cualquier momento.
+T ¿Todavía necesitas más apoyo?
+T Abrir Rescate
+T El resultado se guarda sin conexión y se sincroniza de forma segura.
+T Guardar resultado
+T Repetir ejercicio
+ST Cerrar
+SL Reinicio del estrés
+SL COMPLETO
+SL Le diste tiempo a la sensación para cambiar.
+SL Tómate un momento para notar qué es diferente ahora.
+SL TIEMPO
+SL PASOS
+SL <n> de <n>
+SL ESTADO
+SL Guardado
+SL ¿Qué tan fuerte es el antojo ahora?
+SL Elige el número que se sienta más cercano.
+SL <n> · Moderado
+SL Sin antojo
+SL Más fuerte
+SL No hay una puntuación “buena”; las respuestas honestas mejoran tu apoyo.
+SL RESULTADO DE HOY
+SL ANTES
+SL AHORA
+SL PUNTOS
+SL Un resultado, no una promesa; los patrones se aclaran con el tiempo.
+SL ¿Qué ayudó más?
+SL Opcional
+SL Respirar despacio
+SL Agua
+SL Cambiar de actividad
+SL Aún no sé
+SL Puedes decirnos qué ayudó cuando estés listo.
+SL Puedes cambiar esta preferencia en cualquier momento.
+SL ¿Todavía necesitas más apoyo?\nAbrir Rescate
+SL El resultado se guarda sin conexión y se sincroniza de forma segura.
+SL Guardar resultado
+SL Repetir ejercicio

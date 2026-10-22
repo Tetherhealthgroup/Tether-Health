@@ -1,0 +1,65 @@
+# baseline 97d81ce · screen23 · en
+T Medication center
+T i
+T Education and tracking—not prescribing
+T The app never selects a medicine or changes a dose.
+T Clinical content v<n>.<n>
+T Recorded medication plan
+T Record a plan you already use with your clinician or care team. BreatheFree does not prescribe or change a dose.
+T Private reminder previews
+T Lock screen shows “You have a BreatheFree reminder.”
+T ON
+T Learn about quit-smoking medicines
+T Clinically reviewed
+T Nicotine replacement
+T Patch, gum, lozenge and more
+T Benefits · use · precautions
+T Prescription options
+T Varenicline · bupropion SR
+T Requires a prescriber
+T Pregnant, breastfeeding or under <n>?
+T Talk with a doctor before using quit-smoking medicines.
+T Contact care team ›
+T Plan help
+T Missed or unsure about an item?
+T Review approved instructions or contact a clinician or pharmacist.
+T Review ›
+T Side effect or concerning symptom
+T Open the approved safety route; the app does not diagnose.
+T Get help ›
+T Refill question?
+T Contact pharmacy or care team ›
+T Add or update recorded plan
+T Plan remains available offline · Last synced <n>:<n> AM
+T Approved <month> <n>
+T Home
+T Plan
+T Progress
+T Learn
+T Support
+SL Medication center
+SL i
+SL Education and tracking—not prescribing
+SL The app never selects a medicine or changes a dose.
+SL Clinical content v<n>.<n>
+SL Recorded medication plan\nRecord a plan you already use with your clinician or care team. BreatheFree does not prescribe or change a dose.
+SL Private reminder previews
+SL Lock screen shows “You have a BreatheFree reminder.”
+SL ON
+SL Learn about quit-smoking medicines
+SL Clinically reviewed
+SL Nicotine replacement\nPatch, gum, lozenge and more\nBenefits · use · precautions
+SL Prescription options\nVarenicline · bupropion SR\nRequires a prescriber
+SL Pregnant, breastfeeding or under <n>?\nTalk with a doctor before using quit-smoking medicines.\nContact care team ›
+SL Plan help
+SL Missed or unsure about an item?\nReview approved instructions or contact a clinician or pharmacist.\nReview ›
+SL Side effect or concerning symptom\nOpen the approved safety route; the app does not diagnose.\nGet help ›
+SL Refill question?\nContact pharmacy or care team ›
+SL Add or update recorded plan
+SL Plan remains available offline · Last synced <n>:<n> AM
+SL Approved <month> <n>
+SL Home
+SL Plan
+SL Progress
+SL Learn
+SL Support

@@ -1,0 +1,24 @@
+# baseline 97d81ce · screen25 · es
+T Progreso
+T Patrones, práctica y progreso, sin castigos.
+T Nothing to show yet
+T Progress here comes only from what you record. No numbers or charts are shown until there is something of yours to report.
+T Los beneficios crecen con el tiempo
+T Consulta una cronología general, no un resultado personal.
+T Inicio
+T Plan
+T Progreso
+T Aprender
+T Apoyo
+SL Volver
+SL Progreso
+SL Patrones, práctica y progreso, sin castigos.
+SL Guest profile
+ST Configuración y privacidad
+SL Nothing to show yet\nProgress here comes only from what you record. No numbers or charts are shown until there is something of yours to report.
+SL Los beneficios crecen con el tiempo\nConsulta una cronología general, no un resultado personal.
+SL Inicio
+SL Plan
+SL Progreso
+SL Aprender
+SL Apoyo
