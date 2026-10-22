@@ -13,6 +13,8 @@ import 'package:tether_ui/ui/ui.dart';
 import '../auth/account_controller.dart';
 import '../integration/registry.dart';
 import '../integration/session_lifecycle.dart';
+import '../l10n/app_locale.dart';
+import '../l10n/app_localizations.dart';
 import '../quit_plan/guest_quit_plan_store.dart';
 import 'entry.dart';
 import 'native_slots.dart';
@@ -98,11 +100,15 @@ class TetherUiShell extends StatefulWidget {
     required this.account,
     required this.instances,
     this.afterFirstFrame,
+    this.appLocale,
   });
 
   final EntryNavigator entry;
   final AccountController account;
   final ScreenInstances instances;
+
+  /// The app language; when null the shell follows the phone's language.
+  final AppLocale? appLocale;
 
   /// Runs once after the first frame (loading the profile).
   final Future<void> Function()? afterFirstFrame;
@@ -112,9 +118,15 @@ class TetherUiShell extends StatefulWidget {
 }
 
 class _TetherUiShellState extends State<TetherUiShell> {
+  late final AppLocale _appLocale;
+  late final bool _ownsAppLocale;
+
   @override
   void initState() {
     super.initState();
+    _ownsAppLocale = widget.appLocale == null;
+    _appLocale = widget.appLocale ?? AppLocale(store: MemoryAppLocaleStore());
+    WidgetsBinding.instance.addObserver(_appLocale);
     widget.account.addListener(_onAccountChanged);
     final after = widget.afterFirstFrame;
     if (after != null) {
@@ -127,6 +139,8 @@ class _TetherUiShellState extends State<TetherUiShell> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(_appLocale);
+    if (_ownsAppLocale) _appLocale.dispose();
     widget.account.removeListener(_onAccountChanged);
     super.dispose();
   }
@@ -134,14 +148,20 @@ class _TetherUiShellState extends State<TetherUiShell> {
   void _onAccountChanged() => widget.entry.reresolveIfOnEntry();
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        navigatorKey: widget.entry.navigatorKey,
-        title: 'Tether Health',
-        debugShowCheckedModeBanner: false,
-        theme: tetherTheme(),
-        onGenerateRoute: widget.entry.route,
-        onGenerateInitialRoutes: (_) => widget.entry.initialRoutes(),
-        navigatorObservers: [widget.instances],
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: _appLocale,
+        builder: (context, _) => MaterialApp(
+          navigatorKey: widget.entry.navigatorKey,
+          title: 'Tether Health',
+          debugShowCheckedModeBanner: false,
+          theme: tetherTheme(),
+          locale: _appLocale.locale,
+          supportedLocales: releaseLocales,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          onGenerateRoute: widget.entry.route,
+          onGenerateInitialRoutes: (_) => widget.entry.initialRoutes(),
+          navigatorObservers: [widget.instances],
+        ),
       );
 }
 
@@ -170,6 +190,7 @@ Future<TetherUiRuntime> runTetherUi({
   bool release = kReleaseMode,
   void Function(Widget app) run = runApp,
   TargetPlatform? platform,
+  AppLocale? appLocale,
 }) async {
   // Local inputs only: the restored session is already in [account].
   await account.restorePendingAccountDeletion();
@@ -213,6 +234,7 @@ Future<TetherUiRuntime> runTetherUi({
     entry: entry,
     account: account,
     instances: instances,
+    appLocale: appLocale,
     afterFirstFrame: () async {
       if (account.isSignedIn) await account.initialize();
     },
