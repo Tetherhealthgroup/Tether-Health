@@ -145,11 +145,11 @@ void main() {
         expect(quitDateShortMonth(en, date.month), _shortEn[date.month - 1]);
         expect(quitDateShortMonth(es, date.month), _shortEs[date.month - 1]);
         expect(
-            en.selectQuitDateMonthYear(
+            en.selectQuitDateCalendarMonthHeading(
                 quitDateMonthName(en, date.month), date.year),
             '${_monthsEn[date.month - 1]} ${date.year}');
         expect(
-            es.selectQuitDateMonthYear(
+            es.selectQuitDateCalendarMonthHeading(
                 quitDateMonthName(es, date.month), date.year),
             '${_monthsEs[date.month - 1]} ${date.year}');
         for (final span in [7, 14, 30]) {
@@ -189,9 +189,9 @@ void main() {
           '$n ${n == 1 ? 'trigger selected' : 'triggers selected'} · Saved automatically');
       expect(es.triggerMapSelectionCount(n),
           '$n ${n == 1 ? 'desencadenante elegido' : 'desencadenantes elegidos'} · Guardado automáticamente');
-      expect(en.readinessResultSituationCount(n),
+      expect(en.readinessResultStartingPointCount(n),
           'You identified $n ${n == 1 ? 'situation' : 'situations'} to prepare for');
-      expect(es.readinessResultSituationCount(n),
+      expect(es.readinessResultStartingPointCount(n),
           'Ya identificaste $n ${n == 1 ? 'situación' : 'situaciones'} para preparar');
       for (final top in [true, false]) {
         expect(en.myReasonsSelectionSummary(n, top.toString()),

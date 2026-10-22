@@ -59,8 +59,7 @@ class ConsentPrivacyScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                AppLocalizations.of(context)
-                    .consentPrivacyShowPrivacyReviewText,
+                AppLocalizations.of(context).consentPrivacyTermsSheetTitle,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: AppColors.deepTeal,
                       fontWeight: FontWeight.w800,
@@ -68,8 +67,7 @@ class ConsentPrivacyScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                AppLocalizations.of(context)
-                    .consentPrivacyShowPrivacyReviewText2,
+                AppLocalizations.of(context).consentPrivacyTermsSheetBody,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppColors.tealSecondary,
                       height: 1.45,
@@ -77,8 +75,7 @@ class ConsentPrivacyScreen extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               Text(
-                AppLocalizations.of(context)
-                    .consentPrivacyShowPrivacyReviewText3,
+                AppLocalizations.of(context).consentPrivacyTermsSheetNote,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.tealSecondary,
                       height: 1.45,
@@ -94,8 +91,8 @@ class ConsentPrivacyScreen extends StatelessWidget {
                     backgroundColor: AppColors.deepTeal,
                     foregroundColor: Colors.white,
                   ),
-                  child: Text(
-                      AppLocalizations.of(context).consentPrivacySheetDoneText),
+                  child: Text(AppLocalizations.of(context)
+                      .consentPrivacyTermsSheetDoneButton),
                 ),
               ),
             ],
@@ -163,7 +160,8 @@ class ConsentPrivacyScreen extends StatelessWidget {
                               _ConsentHero(compact: compact),
                               SizedBox(height: compact ? 8 : 14),
                               Text(
-                                AppLocalizations.of(context).consentPrivacyText,
+                                AppLocalizations.of(context)
+                                    .consentPrivacyEyebrow,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 12,
@@ -175,7 +173,7 @@ class ConsentPrivacyScreen extends StatelessWidget {
                               const SizedBox(height: 9),
                               Text(
                                 AppLocalizations.of(context)
-                                    .consentPrivacyText2,
+                                    .consentPrivacyTitle,
                                 style: Theme.of(context)
                                     .textTheme
                                     .displayLarge
@@ -187,7 +185,7 @@ class ConsentPrivacyScreen extends StatelessWidget {
                               const SizedBox(height: 12),
                               Text(
                                 AppLocalizations.of(context)
-                                    .consentPrivacyText3,
+                                    .consentPrivacyIntro,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -260,8 +258,7 @@ class _ConsentHeader extends StatelessWidget {
         children: [
           IconButton.outlined(
             key: const ValueKey('consent-back'),
-            tooltip: AppLocalizations.of(context)
-                .consentPrivacyConsentHeaderBackTooltip,
+            tooltip: AppLocalizations.of(context).consentPrivacyBackTooltip,
             onPressed: onBack,
             style: IconButton.styleFrom(
               foregroundColor: AppColors.deepTeal,
@@ -515,20 +512,19 @@ class _RequiredConsentCard extends StatelessWidget {
       child: Column(
         children: [
           _CardSectionHeader(
-            title: AppLocalizations.of(context)
-                .consentPrivacyRequiredConsentCardTitle,
-            badge: AppLocalizations.of(context)
-                .consentPrivacyRequiredConsentCardBadge,
+            title:
+                AppLocalizations.of(context).consentPrivacyRequiredSectionTitle,
+            badge: AppLocalizations.of(context).consentPrivacyRequiredBadge,
           ),
           const SizedBox(height: 10),
           _ConsentInfoRow(
             icon: Icons.check_rounded,
             iconBackground: AppColors.deepTeal,
             iconColor: Colors.white,
-            title: AppLocalizations.of(context)
-                .consentPrivacyRequiredConsentCardTitle2,
+            title:
+                AppLocalizations.of(context).consentPrivacyEssentialDataTitle,
             subtitle: AppLocalizations.of(context)
-                .consentPrivacyRequiredConsentCardSubtitle,
+                .consentPrivacyEssentialDataDescription,
           ),
           const Divider(height: 18),
           _ConsentInfoRow(
@@ -536,9 +532,9 @@ class _RequiredConsentCard extends StatelessWidget {
             iconBackground: AppColors.deepTeal,
             iconColor: Colors.white,
             title: AppLocalizations.of(context)
-                .consentPrivacyRequiredConsentCardTitle3,
+                .consentPrivacyHealthInformationTitle,
             subtitle: AppLocalizations.of(context)
-                .consentPrivacyRequiredConsentCardSubtitle2,
+                .consentPrivacyHealthInformationDescription,
           ),
           const SizedBox(height: 8),
           Align(
@@ -557,7 +553,7 @@ class _RequiredConsentCard extends StatelessWidget {
                       Flexible(
                         child: Text(
                           AppLocalizations.of(context)
-                              .consentPrivacyRequiredConsentCardReviewPrivacyText,
+                              .consentPrivacyReviewTermsLink,
                           style: const TextStyle(
                             color: AppColors.deepTeal,
                             fontSize: 12,
@@ -616,20 +612,18 @@ class _OptionalConsentCard extends StatelessWidget {
       child: Column(
         children: [
           _CardSectionHeader(
-            title: AppLocalizations.of(context)
-                .consentPrivacyOptionalConsentCardTitle,
-            badge: AppLocalizations.of(context)
-                .consentPrivacyOptionalConsentCardBadge,
+            title:
+                AppLocalizations.of(context).consentPrivacyOptionalSectionTitle,
+            badge: AppLocalizations.of(context).consentPrivacyOptionalBadge,
             lightBadge: true,
           ),
           const SizedBox(height: 7),
           _ConsentSwitchRow(
             switchKey: const ValueKey('consent-helpful-reminders'),
             icon: Icons.chat_bubble_outline_rounded,
-            title: AppLocalizations.of(context)
-                .consentPrivacyOptionalConsentCardHelpfulRemindersTitle,
-            subtitle: AppLocalizations.of(context)
-                .consentPrivacyOptionalConsentCardHelpfulRemindersSubtitle,
+            title: AppLocalizations.of(context).consentPrivacyRemindersTitle,
+            subtitle:
+                AppLocalizations.of(context).consentPrivacyRemindersDescription,
             value: helpfulReminders,
             onChanged: onHelpfulRemindersChanged,
           ),
@@ -637,10 +631,10 @@ class _OptionalConsentCard extends StatelessWidget {
           _ConsentSwitchRow(
             switchKey: const ValueKey('consent-share-care-team'),
             icon: Icons.person_outline_rounded,
-            title: AppLocalizations.of(context)
-                .consentPrivacyOptionalConsentCardShareCareTeamTitle,
+            title:
+                AppLocalizations.of(context).consentPrivacyShareCareTeamTitle,
             subtitle: AppLocalizations.of(context)
-                .consentPrivacyOptionalConsentCardShareCareTeamSubtitle,
+                .consentPrivacyShareCareTeamDescription,
             value: shareWithCareTeam,
             onChanged: onShareWithCareTeamChanged,
           ),
@@ -648,10 +642,9 @@ class _OptionalConsentCard extends StatelessWidget {
           _ConsentSwitchRow(
             switchKey: const ValueKey('consent-help-improve'),
             icon: Icons.show_chart_rounded,
-            title: AppLocalizations.of(context)
-                .consentPrivacyOptionalConsentCardHelpImproveTitle,
+            title: AppLocalizations.of(context).consentPrivacyHelpImproveTitle,
             subtitle: AppLocalizations.of(context)
-                .consentPrivacyOptionalConsentCardHelpImproveSubtitle,
+                .consentPrivacyHelpImproveDescription,
             value: helpImproveBreatheFree,
             onChanged: onHelpImproveBreatheFreeChanged,
           ),
@@ -908,7 +901,7 @@ class _TrustNote extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                AppLocalizations.of(context).consentPrivacyTrustNoteText,
+                AppLocalizations.of(context).consentPrivacyTrustNoteFunding,
                 style: const TextStyle(
                   color: AppColors.deepTeal,
                   fontSize: 12,
@@ -917,7 +910,7 @@ class _TrustNote extends StatelessWidget {
                 ),
               ),
               Text(
-                AppLocalizations.of(context).consentPrivacyTrustNoteText2,
+                AppLocalizations.of(context).consentPrivacyTrustNoteNoSale,
                 style: const TextStyle(
                   color: AppColors.tealSecondary,
                   fontSize: 11,
@@ -988,7 +981,7 @@ class _ConsentBottomAction extends StatelessWidget {
                       Flexible(
                         child: Text(
                           AppLocalizations.of(context)
-                              .consentPrivacyConsentBottomActionText,
+                              .consentPrivacyAgreeButton,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 16,
@@ -1007,8 +1000,7 @@ class _ConsentBottomAction extends StatelessWidget {
                 if (!compact) ...[
                   const SizedBox(height: 6),
                   Text(
-                    AppLocalizations.of(context)
-                        .consentPrivacyConsentBottomActionText2,
+                    AppLocalizations.of(context).consentPrivacyChangeLaterNote,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: AppColors.mutedTeal,

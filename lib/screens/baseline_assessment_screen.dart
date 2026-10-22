@@ -32,15 +32,15 @@ class BaselineAssessmentScreen extends StatelessWidget {
   String _choiceLabel(BuildContext context, DailyCigaretteUse choice) {
     return switch (choice) {
       DailyCigaretteUse.notEveryDay =>
-        AppLocalizations.of(context).baselineAssessmentChoiceLabel,
+        AppLocalizations.of(context).baselineAssessmentChoiceNotEveryDay,
       DailyCigaretteUse.tenOrFewer =>
-        AppLocalizations.of(context).baselineAssessmentChoiceLabel2,
+        AppLocalizations.of(context).baselineAssessmentChoiceTenOrFewer,
       DailyCigaretteUse.elevenToTwenty =>
-        AppLocalizations.of(context).baselineAssessmentChoiceLabel3,
+        AppLocalizations.of(context).baselineAssessmentChoiceElevenToTwenty,
       DailyCigaretteUse.twentyOneToThirty =>
-        AppLocalizations.of(context).baselineAssessmentChoiceLabel4,
+        AppLocalizations.of(context).baselineAssessmentChoiceTwentyOneToThirty,
       DailyCigaretteUse.thirtyOneOrMore =>
-        AppLocalizations.of(context).baselineAssessmentChoiceLabel5,
+        AppLocalizations.of(context).baselineAssessmentChoiceThirtyOneOrMore,
     };
   }
 
@@ -136,7 +136,7 @@ class BaselineAssessmentScreen extends StatelessWidget {
                               SizedBox(height: compact ? 12 : 22),
                               Text(
                                 AppLocalizations.of(context)
-                                    .baselineAssessmentText,
+                                    .baselineAssessmentQuestionLabel,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 12,
@@ -148,7 +148,7 @@ class BaselineAssessmentScreen extends StatelessWidget {
                               const SizedBox(height: 9),
                               Text(
                                 AppLocalizations.of(context)
-                                    .baselineAssessmentText2,
+                                    .baselineAssessmentQuestion,
                                 // Already the largest text on screen; past
                                 // 180% its longest words no longer fit.
                                 textScaler: MediaQuery.textScalerOf(context)
@@ -164,7 +164,7 @@ class BaselineAssessmentScreen extends StatelessWidget {
                               SizedBox(height: compact ? 9 : 13),
                               Text(
                                 AppLocalizations.of(context)
-                                    .baselineAssessmentText3,
+                                    .baselineAssessmentQuestionHint,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -224,8 +224,7 @@ class _AssessmentHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final back = IconButton.outlined(
       key: const ValueKey('baseline-back'),
-      tooltip: AppLocalizations.of(context)
-          .baselineAssessmentAssessmentHeaderBackTooltip,
+      tooltip: AppLocalizations.of(context).baselineAssessmentBackTooltip,
       onPressed: onBack,
       style: IconButton.styleFrom(
         foregroundColor: AppColors.deepTeal,
@@ -233,8 +232,7 @@ class _AssessmentHeader extends StatelessWidget {
       ),
       icon: const Icon(Icons.arrow_back_rounded),
     );
-    final label = AppLocalizations.of(context)
-        .baselineAssessmentAssessmentHeaderBackLabel;
+    final label = AppLocalizations.of(context).baselineAssessmentHeaderTitle;
     const style = TextStyle(
       color: AppColors.deepTeal,
       fontSize: 16,
@@ -317,8 +315,7 @@ class _AssessmentProgress extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                AppLocalizations.of(context)
-                    .baselineAssessmentAssessmentProgressText,
+                AppLocalizations.of(context).baselineAssessmentProgressLabel,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -432,7 +429,7 @@ class _AssessmentChoice extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
       ),
       child: Text(
-        AppLocalizations.of(context).baselineAssessmentAssessmentChoiceText,
+        AppLocalizations.of(context).baselineAssessmentChoiceSelectedBadge,
         style: const TextStyle(
           color: AppColors.coral,
           fontSize: 10,
@@ -545,7 +542,7 @@ class _WhyWeAskCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          AppLocalizations.of(context).baselineAssessmentWhyWeAskCardText,
+          AppLocalizations.of(context).baselineAssessmentWhyWeAskTitle,
           style: const TextStyle(
             color: AppColors.deepTeal,
             fontSize: 13,
@@ -554,7 +551,7 @@ class _WhyWeAskCard extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          AppLocalizations.of(context).baselineAssessmentWhyWeAskCardText2,
+          AppLocalizations.of(context).baselineAssessmentWhyWeAskBody,
           style: const TextStyle(
             color: AppColors.tealSecondary,
             fontSize: 11,
@@ -563,7 +560,7 @@ class _WhyWeAskCard extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          AppLocalizations.of(context).baselineAssessmentWhyWeAskCardText3,
+          AppLocalizations.of(context).baselineAssessmentWhyWeAskNote,
           style: const TextStyle(
             color: AppColors.mutedTeal,
             fontSize: 10,
@@ -660,7 +657,7 @@ class _AssessmentBottomAction extends StatelessWidget {
                       Flexible(
                         child: Text(
                           AppLocalizations.of(context)
-                              .baselineAssessmentAssessmentBottomActionText,
+                              .baselineAssessmentNextButton,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 16,
@@ -680,8 +677,7 @@ class _AssessmentBottomAction extends StatelessWidget {
                 if (!compact) ...[
                   const SizedBox(height: 7),
                   Text(
-                    AppLocalizations.of(context)
-                        .baselineAssessmentAssessmentBottomActionText2,
+                    AppLocalizations.of(context).baselineAssessmentSavedNote,
                     style: const TextStyle(
                       color: AppColors.mutedTeal,
                       fontSize: 10,

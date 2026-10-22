@@ -47,24 +47,26 @@ class TriggerMapScreen extends StatelessWidget {
 
   String _labelFor(BuildContext context, SmokingTrigger trigger) {
     return switch (trigger) {
-      SmokingTrigger.stress => AppLocalizations.of(context).triggerMapLabelFor,
+      SmokingTrigger.stress =>
+        AppLocalizations.of(context).triggerMapOptionStress,
       SmokingTrigger.afterMeals =>
-        AppLocalizations.of(context).triggerMapLabelFor2,
+        AppLocalizations.of(context).triggerMapOptionAfterMeals,
       SmokingTrigger.driving =>
-        AppLocalizations.of(context).triggerMapLabelFor3,
-      SmokingTrigger.coffee => AppLocalizations.of(context).triggerMapLabelFor4,
+        AppLocalizations.of(context).triggerMapOptionDriving,
+      SmokingTrigger.coffee =>
+        AppLocalizations.of(context).triggerMapOptionCoffee,
       SmokingTrigger.socialSettings =>
-        AppLocalizations.of(context).triggerMapLabelFor5,
+        AppLocalizations.of(context).triggerMapOptionSocialSettings,
       SmokingTrigger.workBreaks =>
-        AppLocalizations.of(context).triggerMapLabelFor6,
+        AppLocalizations.of(context).triggerMapOptionWorkBreaks,
       SmokingTrigger.alcohol =>
-        AppLocalizations.of(context).triggerMapLabelFor7,
+        AppLocalizations.of(context).triggerMapOptionAlcohol,
       SmokingTrigger.boredom =>
-        AppLocalizations.of(context).triggerMapLabelFor8,
+        AppLocalizations.of(context).triggerMapOptionBoredom,
       SmokingTrigger.morning =>
-        AppLocalizations.of(context).triggerMapLabelFor9,
+        AppLocalizations.of(context).triggerMapOptionMorning,
       SmokingTrigger.beforeBed =>
-        AppLocalizations.of(context).triggerMapLabelFor10,
+        AppLocalizations.of(context).triggerMapOptionBeforeBed,
     };
   }
 
@@ -213,7 +215,7 @@ class TriggerMapScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                AppLocalizations.of(context).triggerMapText2,
+                                AppLocalizations.of(context).triggerMapQuestion,
                                 // Already the largest text on screen; past
                                 // 180% its longest words no longer fit.
                                 textScaler: MediaQuery.textScalerOf(context)
@@ -228,7 +230,8 @@ class TriggerMapScreen extends StatelessWidget {
                               ),
                               SizedBox(height: compact ? 9 : 13),
                               Text(
-                                AppLocalizations.of(context).triggerMapText3,
+                                AppLocalizations.of(context)
+                                    .triggerMapQuestionHint,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -372,8 +375,7 @@ class _CustomTriggerEditorSheetState extends State<_CustomTriggerEditorSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppLocalizations.of(context)
-                  .triggerMapCustomTriggerEditorSheetStateText,
+              AppLocalizations.of(context).triggerMapCustomSheetTitle,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     color: AppColors.deepTeal,
                     fontWeight: FontWeight.w800,
@@ -381,8 +383,7 @@ class _CustomTriggerEditorSheetState extends State<_CustomTriggerEditorSheet> {
             ),
             const SizedBox(height: 8),
             Text(
-              AppLocalizations.of(context)
-                  .triggerMapCustomTriggerEditorSheetStateText2,
+              AppLocalizations.of(context).triggerMapCustomSheetIntro,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppColors.tealSecondary,
                     height: 1.4,
@@ -397,9 +398,9 @@ class _CustomTriggerEditorSheetState extends State<_CustomTriggerEditorSheet> {
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
                 labelText: AppLocalizations.of(context)
-                    .triggerMapCustomTriggerEditorSheetStateCustomInputLabelText,
-                hintText: AppLocalizations.of(context)
-                    .triggerMapCustomTriggerEditorSheetStateCustomInputHintText,
+                    .triggerMapCustomSheetFieldLabel,
+                hintText:
+                    AppLocalizations.of(context).triggerMapCustomSheetHint,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -421,7 +422,7 @@ class _CustomTriggerEditorSheetState extends State<_CustomTriggerEditorSheet> {
                     ),
                     child: Text(
                       AppLocalizations.of(context)
-                          .triggerMapCustomTriggerEditorSheetStateCustomSaveText,
+                          .triggerMapCustomSheetSaveButton,
                     ),
                   );
                 },
@@ -444,7 +445,7 @@ class _TriggerHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final back = IconButton.outlined(
       key: const ValueKey('trigger-back'),
-      tooltip: AppLocalizations.of(context).triggerMapTriggerHeaderBackTooltip,
+      tooltip: AppLocalizations.of(context).triggerMapBackTooltip,
       onPressed: onBack,
       style: IconButton.styleFrom(
         foregroundColor: AppColors.deepTeal,
@@ -452,7 +453,7 @@ class _TriggerHeader extends StatelessWidget {
       ),
       icon: const Icon(Icons.arrow_back_rounded),
     );
-    final label = AppLocalizations.of(context).triggerMapTriggerHeaderBackLabel;
+    final label = AppLocalizations.of(context).triggerMapHeaderTitle;
     const style = TextStyle(
       color: AppColors.deepTeal,
       fontSize: 16,
@@ -541,7 +542,7 @@ class _TriggerProgress extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                AppLocalizations.of(context).triggerMapTriggerProgressText,
+                AppLocalizations.of(context).triggerMapProgressLabel,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -696,8 +697,8 @@ class _CustomTriggerCard extends StatelessWidget {
       children: [
         Text(
           hasValue
-              ? (AppLocalizations.of(context).triggerMapCustomTriggerCard)
-              : (AppLocalizations.of(context).triggerMapCustomTriggerCard2),
+              ? (AppLocalizations.of(context).triggerMapCustomCardLabelFilled)
+              : (AppLocalizations.of(context).triggerMapCustomCardLabelEmpty),
           style: const TextStyle(
             color: AppColors.mutedTeal,
             fontSize: 10,
@@ -709,7 +710,7 @@ class _CustomTriggerCard extends StatelessWidget {
         Text(
           hasValue
               ? customTrigger!
-              : (AppLocalizations.of(context).triggerMapCustomTriggerCard3),
+              : (AppLocalizations.of(context).triggerMapCustomCardPlaceholder),
           style: TextStyle(
             color: AppColors.deepTeal,
             fontSize: hasValue ? 13.5 : 12,
@@ -720,8 +721,7 @@ class _CustomTriggerCard extends StatelessWidget {
     );
     final remove = IconButton(
       key: const ValueKey('trigger-custom-remove'),
-      tooltip: AppLocalizations.of(context)
-          .triggerMapCustomTriggerCardCustomRemoveTooltip,
+      tooltip: AppLocalizations.of(context).triggerMapCustomRemoveTooltip,
       onPressed: onRemove,
       icon: const Icon(
         Icons.close_rounded,
@@ -798,7 +798,7 @@ class _TriggerPrivacyNote extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          AppLocalizations.of(context).triggerMapTriggerPrivacyNoteText,
+          AppLocalizations.of(context).triggerMapPrivacyNoteTitle,
           style: const TextStyle(
             color: AppColors.deepTeal,
             fontSize: 13,
@@ -807,7 +807,7 @@ class _TriggerPrivacyNote extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          AppLocalizations.of(context).triggerMapTriggerPrivacyNoteText2,
+          AppLocalizations.of(context).triggerMapPrivacyNoteBody,
           style: const TextStyle(
             color: AppColors.tealSecondary,
             fontSize: 11,
@@ -816,7 +816,7 @@ class _TriggerPrivacyNote extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          AppLocalizations.of(context).triggerMapTriggerPrivacyNoteText3,
+          AppLocalizations.of(context).triggerMapPrivacyNoteLocation,
           style: const TextStyle(
             color: AppColors.mutedTeal,
             fontSize: 10,
@@ -917,8 +917,7 @@ class _TriggerBottomAction extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          AppLocalizations.of(context)
-                              .triggerMapTriggerBottomActionText,
+                          AppLocalizations.of(context).triggerMapContinueButton,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 16,

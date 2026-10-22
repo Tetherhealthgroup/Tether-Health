@@ -55,17 +55,18 @@ class MyReasonsScreen extends StatelessWidget {
 
   String _labelFor(BuildContext context, QuitReason reason) {
     return switch (reason) {
-      QuitReason.family => AppLocalizations.of(context).myReasonsLabelFor,
+      QuitReason.family => AppLocalizations.of(context).myReasonsOptionFamily,
       QuitReason.breatheEasier =>
-        AppLocalizations.of(context).myReasonsLabelFor2,
+        AppLocalizations.of(context).myReasonsOptionBreatheEasier,
       QuitReason.improveHealth =>
-        AppLocalizations.of(context).myReasonsLabelFor3,
-      QuitReason.saveMoney => AppLocalizations.of(context).myReasonsLabelFor4,
-      QuitReason.control => AppLocalizations.of(context).myReasonsLabelFor5,
-      QuitReason.future => AppLocalizations.of(context).myReasonsLabelFor6,
+        AppLocalizations.of(context).myReasonsOptionImproveHealth,
+      QuitReason.saveMoney =>
+        AppLocalizations.of(context).myReasonsOptionSaveMoney,
+      QuitReason.control => AppLocalizations.of(context).myReasonsOptionControl,
+      QuitReason.future => AppLocalizations.of(context).myReasonsOptionFuture,
       QuitReason.custom => customReason?.trim().isNotEmpty == true
           ? customReason!.trim()
-          : (AppLocalizations.of(context).myReasonsLabelFor7),
+          : (AppLocalizations.of(context).myReasonsOptionCustom),
     };
   }
 
@@ -150,21 +151,23 @@ class MyReasonsScreen extends StatelessWidget {
 
   String _previewFor(BuildContext context, QuitReason? reason) {
     if (reason == null) {
-      return AppLocalizations.of(context).myReasonsPreviewFor;
+      return AppLocalizations.of(context).myReasonsPreviewNone;
     }
     if (reason == QuitReason.custom) {
       final value = customReason?.trim() ?? '';
-      return AppLocalizations.of(context).myReasonsPreviewFor2(value);
+      return AppLocalizations.of(context).myReasonsPreviewCustom(value);
     }
     return switch (reason) {
-      QuitReason.family => AppLocalizations.of(context).myReasonsPreviewFor3,
+      QuitReason.family => AppLocalizations.of(context).myReasonsPreviewFamily,
       QuitReason.breatheEasier =>
-        AppLocalizations.of(context).myReasonsPreviewFor4,
+        AppLocalizations.of(context).myReasonsPreviewBreatheEasier,
       QuitReason.improveHealth =>
-        AppLocalizations.of(context).myReasonsPreviewFor5,
-      QuitReason.saveMoney => AppLocalizations.of(context).myReasonsPreviewFor6,
-      QuitReason.control => AppLocalizations.of(context).myReasonsPreviewFor7,
-      QuitReason.future => AppLocalizations.of(context).myReasonsPreviewFor8,
+        AppLocalizations.of(context).myReasonsPreviewImproveHealth,
+      QuitReason.saveMoney =>
+        AppLocalizations.of(context).myReasonsPreviewSaveMoney,
+      QuitReason.control =>
+        AppLocalizations.of(context).myReasonsPreviewControl,
+      QuitReason.future => AppLocalizations.of(context).myReasonsPreviewFuture,
       QuitReason.custom => '',
     };
   }
@@ -202,7 +205,7 @@ class MyReasonsScreen extends StatelessWidget {
                   largeText ? 12.0 : (narrow ? 18.0 : 22.0);
 
               final selectAll = Text(
-                AppLocalizations.of(context).myReasonsText,
+                AppLocalizations.of(context).myReasonsListLabel,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -222,7 +225,7 @@ class MyReasonsScreen extends StatelessWidget {
                 ),
                 child: Text(
                   AppLocalizations.of(context)
-                      .myReasonsSelectedCountText(selectionCount),
+                      .myReasonsSelectedCount(selectionCount),
                   style: const TextStyle(
                     color: AppColors.deepTeal,
                     fontSize: 9,
@@ -291,7 +294,7 @@ class MyReasonsScreen extends StatelessWidget {
                                 const SizedBox(height: 18),
                               ],
                               Text(
-                                AppLocalizations.of(context).myReasonsText2,
+                                AppLocalizations.of(context).myReasonsEyebrow,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 11,
@@ -301,7 +304,7 @@ class MyReasonsScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                AppLocalizations.of(context).myReasonsText3,
+                                AppLocalizations.of(context).myReasonsTitle,
                                 // Already the largest text on screen; past
                                 // 180% its longest words no longer fit.
                                 textScaler: MediaQuery.textScalerOf(context)
@@ -316,7 +319,7 @@ class MyReasonsScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                AppLocalizations.of(context).myReasonsText4,
+                                AppLocalizations.of(context).myReasonsIntro,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -443,7 +446,7 @@ class _ReasonsHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final back = IconButton.outlined(
       key: const ValueKey('reasons-back'),
-      tooltip: AppLocalizations.of(context).myReasonsReasonsHeaderBackTooltip,
+      tooltip: AppLocalizations.of(context).myReasonsBackTooltip,
       onPressed: onBack,
       style: IconButton.styleFrom(
         foregroundColor: AppColors.deepTeal,
@@ -451,7 +454,7 @@ class _ReasonsHeader extends StatelessWidget {
       ),
       icon: const Icon(Icons.arrow_back_rounded),
     );
-    final label = AppLocalizations.of(context).myReasonsReasonsHeaderBackLabel;
+    final label = AppLocalizations.of(context).myReasonsHeaderTitle;
     const style = TextStyle(
       color: AppColors.deepTeal,
       fontSize: 16,
@@ -481,7 +484,7 @@ class _ReasonsHeader extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: Text(
-        AppLocalizations.of(context).myReasonsReasonsHeaderText,
+        AppLocalizations.of(context).myReasonsStepCounter,
         style: const TextStyle(
           color: AppColors.tealSecondary,
           fontSize: 10,
@@ -541,7 +544,7 @@ class _ReasonsProgress extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                AppLocalizations.of(context).myReasonsReasonsProgressText,
+                AppLocalizations.of(context).myReasonsProgressLabel,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -733,9 +736,9 @@ class _CustomReasonCard extends StatelessWidget {
                     Text(
                       hasValue
                           ? (AppLocalizations.of(context)
-                              .myReasonsCustomReasonCard)
+                              .myReasonsCustomCardLabelFilled)
                           : (AppLocalizations.of(context)
-                              .myReasonsCustomReasonCard2),
+                              .myReasonsCustomCardLabelEmpty),
                       style: const TextStyle(
                         color: AppColors.mutedTeal,
                         fontSize: 10,
@@ -748,7 +751,7 @@ class _CustomReasonCard extends StatelessWidget {
                       hasValue
                           ? customReason!.trim()
                           : (AppLocalizations.of(context)
-                              .myReasonsCustomReasonCard3),
+                              .myReasonsCustomCardPlaceholder),
                       style: TextStyle(
                         color: hasValue
                             ? AppColors.deepTeal
@@ -764,8 +767,8 @@ class _CustomReasonCard extends StatelessWidget {
               if (hasValue) ...[
                 IconButton(
                   key: const ValueKey('reason-top-custom'),
-                  tooltip: AppLocalizations.of(context)
-                      .myReasonsCustomReasonCardReasonTopCustomTooltip,
+                  tooltip:
+                      AppLocalizations.of(context).myReasonsTopReasonTooltip,
                   onPressed: onMakeTop,
                   icon: Icon(
                     isTop ? Icons.star_rounded : Icons.star_border_rounded,
@@ -774,8 +777,8 @@ class _CustomReasonCard extends StatelessWidget {
                 ),
                 IconButton(
                   key: const ValueKey('reason-custom-remove'),
-                  tooltip: AppLocalizations.of(context)
-                      .myReasonsCustomReasonCardReasonCustomRemoveTooltip,
+                  tooltip:
+                      AppLocalizations.of(context).myReasonsCustomRemoveTooltip,
                   onPressed: onRemove,
                   icon: const Icon(Icons.close_rounded, color: AppColors.coral),
                 ),
@@ -827,8 +830,7 @@ class _MotivationPreview extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  AppLocalizations.of(context)
-                      .myReasonsMotivationPreviewReasonPreviewText,
+                  AppLocalizations.of(context).myReasonsPreviewTitle,
                   style: const TextStyle(
                     color: AppColors.mintStrong,
                     fontSize: 9.5,
@@ -847,7 +849,7 @@ class _MotivationPreview extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            AppLocalizations.of(context).myReasonsMotivationPreviewText,
+            AppLocalizations.of(context).myReasonsPreviewMoment,
             style: const TextStyle(
               color: AppColors.lime,
               fontSize: 9,
@@ -871,9 +873,9 @@ class _MotivationPreview extends StatelessWidget {
           const SizedBox(height: 7),
           Text(
             topLabel == null
-                ? (AppLocalizations.of(context).myReasonsMotivationPreview)
+                ? (AppLocalizations.of(context).myReasonsPreviewTopReasonNone)
                 : (AppLocalizations.of(context)
-                    .myReasonsMotivationPreview2(topLabel!)),
+                    .myReasonsPreviewTopReason(topLabel!)),
             style: const TextStyle(
               color: AppColors.mintStrong,
               fontSize: 9.5,
@@ -906,7 +908,7 @@ class _ReasonsPrivacyNote extends StatelessWidget {
           const SizedBox(width: 9),
           Expanded(
             child: Text(
-              AppLocalizations.of(context).myReasonsReasonsPrivacyNoteText,
+              AppLocalizations.of(context).myReasonsPrivacyNote,
               style: const TextStyle(
                 color: AppColors.mutedTeal,
                 fontSize: 10.5,
@@ -982,8 +984,7 @@ class _ReasonsBottomAction extends StatelessWidget {
                   children: [
                     Flexible(
                       child: Text(
-                        AppLocalizations.of(context)
-                            .myReasonsReasonsBottomActionText,
+                        AppLocalizations.of(context).myReasonsSaveButton,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 17,
@@ -1062,8 +1063,7 @@ class _CustomReasonEditorSheetState extends State<_CustomReasonEditorSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppLocalizations.of(context)
-                .myReasonsCustomReasonEditorSheetStateText,
+            AppLocalizations.of(context).myReasonsCustomSheetTitle,
             style: const TextStyle(
               color: AppColors.deepTeal,
               fontSize: 22,
@@ -1072,8 +1072,7 @@ class _CustomReasonEditorSheetState extends State<_CustomReasonEditorSheet> {
           ),
           const SizedBox(height: 7),
           Text(
-            AppLocalizations.of(context)
-                .myReasonsCustomReasonEditorSheetStateText2,
+            AppLocalizations.of(context).myReasonsCustomSheetIntro,
             style:
                 const TextStyle(color: AppColors.tealSecondary, fontSize: 14),
           ),
@@ -1087,8 +1086,7 @@ class _CustomReasonEditorSheetState extends State<_CustomReasonEditorSheet> {
             maxLines: 3,
             textCapitalization: TextCapitalization.sentences,
             decoration: InputDecoration(
-              hintText: AppLocalizations.of(context)
-                  .myReasonsCustomReasonEditorSheetStateReasonCustomTextFieldHintText,
+              hintText: AppLocalizations.of(context).myReasonsCustomSheetHint,
               filled: true,
               fillColor: AppColors.cream,
               border: OutlineInputBorder(
@@ -1105,8 +1103,7 @@ class _CustomReasonEditorSheetState extends State<_CustomReasonEditorSheet> {
             activeThumbColor: Colors.white,
             activeTrackColor: AppColors.deepTeal,
             title: Text(
-              AppLocalizations.of(context)
-                  .myReasonsCustomReasonEditorSheetStateReasonCustomMakeTopText,
+              AppLocalizations.of(context).myReasonsCustomSheetMakeTop,
               style: const TextStyle(
                 color: AppColors.deepTeal,
                 fontSize: 14,
@@ -1131,8 +1128,7 @@ class _CustomReasonEditorSheetState extends State<_CustomReasonEditorSheet> {
                 ),
               ),
               child: Text(
-                AppLocalizations.of(context)
-                    .myReasonsCustomReasonEditorSheetStateReasonCustomSaveText,
+                AppLocalizations.of(context).myReasonsCustomSheetSaveButton,
                 style: const TextStyle(fontWeight: FontWeight.w800),
               ),
             ),

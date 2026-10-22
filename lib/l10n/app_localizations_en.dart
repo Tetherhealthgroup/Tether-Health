@@ -9,348 +9,341 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get baselineAssessmentAssessmentBottomActionText => 'Next';
+  String get baselineAssessmentBackTooltip => 'Back';
 
   @override
-  String get baselineAssessmentAssessmentBottomActionText2 =>
-      'Your answer is saved automatically.';
+  String get baselineAssessmentChoiceElevenToTwenty => '11–20 cigarettes';
 
   @override
-  String get baselineAssessmentAssessmentChoiceText => 'Selected';
+  String get baselineAssessmentChoiceNotEveryDay => 'I don’t smoke every day';
 
   @override
-  String get baselineAssessmentAssessmentHeaderBackLabel =>
-      'About your smoking';
+  String get baselineAssessmentChoiceSelectedBadge => 'Selected';
 
   @override
-  String get baselineAssessmentAssessmentHeaderBackTooltip => 'Back';
+  String get baselineAssessmentChoiceTenOrFewer => '10 or fewer cigarettes';
 
   @override
-  String get baselineAssessmentAssessmentProgressText => 'ASSESSMENT';
+  String get baselineAssessmentChoiceThirtyOneOrMore => '31 or more cigarettes';
 
   @override
-  String get baselineAssessmentChoiceLabel => 'I don’t smoke every day';
+  String get baselineAssessmentChoiceTwentyOneToThirty => '21–30 cigarettes';
 
   @override
-  String get baselineAssessmentChoiceLabel2 => '10 or fewer cigarettes';
+  String get baselineAssessmentHeaderTitle => 'About your smoking';
 
   @override
-  String get baselineAssessmentChoiceLabel3 => '11–20 cigarettes';
+  String get baselineAssessmentNextButton => 'Next';
 
   @override
-  String get baselineAssessmentChoiceLabel4 => '21–30 cigarettes';
+  String get baselineAssessmentProgressLabel => 'ASSESSMENT';
 
   @override
-  String get baselineAssessmentChoiceLabel5 => '31 or more cigarettes';
-
-  @override
-  String get baselineAssessmentText => 'QUESTION 1';
-
-  @override
-  String get baselineAssessmentText2 =>
+  String get baselineAssessmentQuestion =>
       'On a typical day, how many cigarettes do you smoke?';
 
   @override
-  String get baselineAssessmentText3 =>
+  String get baselineAssessmentQuestionHint =>
       'Choose the answer closest to your usual day.';
 
   @override
-  String get baselineAssessmentWhyWeAskCardText => 'Why we ask';
+  String get baselineAssessmentQuestionLabel => 'QUESTION 1';
 
   @override
-  String get baselineAssessmentWhyWeAskCardText2 =>
+  String get baselineAssessmentSavedNote =>
+      'Your answer is saved automatically.';
+
+  @override
+  String get baselineAssessmentWhyWeAskBody =>
       'This helps tailor your plan and estimate money saved.';
 
   @override
-  String get baselineAssessmentWhyWeAskCardText3 =>
+  String get baselineAssessmentWhyWeAskNote =>
       'It is not a diagnosis or a judgment.';
 
   @override
-  String get chooseQuitPathDescription =>
-      'Prepare for 7–14 days, then stop completely on the date you choose. We’ll guide one small step each day.';
+  String get baselineAssessmentWhyWeAskTitle => 'Why we ask';
 
   @override
-  String get chooseQuitPathDescription2 =>
-      'Begin your smoke-free time now and get extra support through the first day.';
+  String get chooseQuitPathBackTooltip => 'Back';
 
   @override
-  String get chooseQuitPathDescription3 =>
-      'Follow a step-down schedule and work toward stopping completely on a future date.';
+  String get chooseQuitPathContinueButton => 'Continue with this path';
 
   @override
-  String get chooseQuitPathFlexiblePathNoteText =>
+  String get chooseQuitPathEyebrow => 'CHOOSE YOUR PATH';
+
+  @override
+  String get chooseQuitPathFlexibleNote =>
       'Your path is flexible. You can adjust it at any time.';
 
   @override
-  String get chooseQuitPathPathLabel => 'Set a quit date';
+  String get chooseQuitPathHeaderTitle => 'Build your plan';
 
   @override
-  String get chooseQuitPathPathLabel2 => 'Quit today';
+  String get chooseQuitPathIntro =>
+      'There is no wrong place to start. Choose what fits you.';
 
   @override
-  String get chooseQuitPathPathLabel3 => 'Reduce gradually';
+  String get chooseQuitPathOptionQuitToday => 'Quit today';
 
   @override
-  String get chooseQuitPathQuitPathBottomActionText =>
-      'Continue with this path';
+  String get chooseQuitPathOptionQuitTodayDescription =>
+      'Begin your smoke-free time now and get extra support through the first day.';
 
   @override
-  String get chooseQuitPathQuitPathHeaderBackLabel => 'Build your plan';
+  String get chooseQuitPathOptionReduceGradually => 'Reduce gradually';
 
   @override
-  String get chooseQuitPathQuitPathHeaderBackTooltip => 'Back';
+  String get chooseQuitPathOptionReduceGraduallyDescription =>
+      'Follow a step-down schedule and work toward stopping completely on a future date.';
 
   @override
-  String get chooseQuitPathQuitPathHeaderText => '1 OF 5';
+  String get chooseQuitPathOptionSetQuitDate => 'Set a quit date';
 
   @override
-  String get chooseQuitPathQuitPlanProgressText => 'QUIT PLAN';
+  String get chooseQuitPathOptionSetQuitDateDescription =>
+      'Prepare for 7–14 days, then stop completely on the date you choose. We’ll guide one small step each day.';
 
   @override
-  String get chooseQuitPathRecommendedLabel => 'RECOMMENDED';
+  String get chooseQuitPathOptionSetQuitDateMatch =>
+      'Matches your preparation preference';
 
   @override
-  String chooseQuitPathSavedMessage(Object path) {
+  String get chooseQuitPathProgressLabel => 'QUIT PLAN';
+
+  @override
+  String get chooseQuitPathRecommendedBadge => 'RECOMMENDED';
+
+  @override
+  String chooseQuitPathSavedStatus(Object path) {
     return '$path selected · Saved automatically';
   }
 
   @override
-  String get chooseQuitPathSupportingText =>
-      'Matches your preparation preference';
+  String get chooseQuitPathStepCounter => '1 OF 5';
 
   @override
-  String get chooseQuitPathText => 'CHOOSE YOUR PATH';
+  String get chooseQuitPathTitle => 'What feels possible right now?';
 
   @override
-  String get chooseQuitPathText2 => 'What feels possible right now?';
+  String get consentPrivacyAgreeButton => 'Agree and continue';
 
   @override
-  String get chooseQuitPathText3 =>
-      'There is no wrong place to start. Choose what fits you.';
+  String get consentPrivacyBackTooltip => 'Back';
 
   @override
-  String get consentPrivacyConsentBottomActionText => 'Agree and continue';
-
-  @override
-  String get consentPrivacyConsentBottomActionText2 =>
+  String get consentPrivacyChangeLaterNote =>
       'You can change optional choices anytime in Settings.';
 
   @override
-  String get consentPrivacyConsentHeaderBackTooltip => 'Back';
-
-  @override
-  String get consentPrivacyOptionalConsentCardBadge => 'Optional';
-
-  @override
-  String get consentPrivacyOptionalConsentCardHelpImproveSubtitle =>
-      'Contribute de-identified information to approved research.';
-
-  @override
-  String get consentPrivacyOptionalConsentCardHelpImproveTitle =>
-      'Help improve BreatheFree';
-
-  @override
-  String get consentPrivacyOptionalConsentCardHelpfulRemindersSubtitle =>
-      'Receive private check-ins and plan reminders.';
-
-  @override
-  String get consentPrivacyOptionalConsentCardHelpfulRemindersTitle =>
-      'Helpful reminders';
-
-  @override
-  String get consentPrivacyOptionalConsentCardShareCareTeamSubtitle =>
-      'Allow a connected clinician to view progress summaries.';
-
-  @override
-  String get consentPrivacyOptionalConsentCardShareCareTeamTitle =>
-      'Share with my care team';
-
-  @override
-  String get consentPrivacyOptionalConsentCardTitle => 'YOUR CHOICES';
-
-  @override
-  String get consentPrivacyRequiredConsentCardBadge => 'Required';
-
-  @override
-  String get consentPrivacyRequiredConsentCardReviewPrivacyText =>
-      'Review Terms and Privacy Notice';
-
-  @override
-  String get consentPrivacyRequiredConsentCardSubtitle =>
+  String get consentPrivacyEssentialDataDescription =>
       'Save your account, quit plan, and progress securely.';
 
   @override
-  String get consentPrivacyRequiredConsentCardSubtitle2 =>
+  String get consentPrivacyEssentialDataTitle => 'Essential app data';
+
+  @override
+  String get consentPrivacyEyebrow => 'YOUR PRIVACY';
+
+  @override
+  String get consentPrivacyHealthInformationDescription =>
       'Personalize your plan, support tools, and recovery insights.';
 
   @override
-  String get consentPrivacyRequiredConsentCardTitle =>
-      'REQUIRED TO USE BREATHEFREE';
+  String get consentPrivacyHealthInformationTitle => 'Health information';
 
   @override
-  String get consentPrivacyRequiredConsentCardTitle2 => 'Essential app data';
+  String get consentPrivacyHelpImproveDescription =>
+      'Contribute de-identified information to approved research.';
 
   @override
-  String get consentPrivacyRequiredConsentCardTitle3 => 'Health information';
+  String get consentPrivacyHelpImproveTitle => 'Help improve BreatheFree';
 
   @override
-  String get consentPrivacySheetDoneText => 'Done';
-
-  @override
-  String get consentPrivacyShowPrivacyReviewText => 'Terms and Privacy Notice';
-
-  @override
-  String get consentPrivacyShowPrivacyReviewText2 =>
-      'This development build demonstrates how the legal documents will be presented. Before release, the complete Terms of Use and Privacy Notice will appear here, including data practices, retention periods, and your rights.';
-
-  @override
-  String get consentPrivacyShowPrivacyReviewText3 =>
-      'Optional controls can be changed later in Settings. Required processing will be limited to what is necessary to provide and secure the service.';
-
-  @override
-  String get consentPrivacyText => 'YOUR PRIVACY';
-
-  @override
-  String get consentPrivacyText2 => 'Your story stays yours.';
-
-  @override
-  String get consentPrivacyText3 =>
+  String get consentPrivacyIntro =>
       'Choose how your information is used. Required items keep the app working; optional choices can change anytime.';
 
   @override
-  String get consentPrivacyTrustNoteText =>
+  String get consentPrivacyOptionalBadge => 'Optional';
+
+  @override
+  String get consentPrivacyOptionalSectionTitle => 'YOUR CHOICES';
+
+  @override
+  String get consentPrivacyRemindersDescription =>
+      'Receive private check-ins and plan reminders.';
+
+  @override
+  String get consentPrivacyRemindersTitle => 'Helpful reminders';
+
+  @override
+  String get consentPrivacyRequiredBadge => 'Required';
+
+  @override
+  String get consentPrivacyRequiredSectionTitle =>
+      'REQUIRED TO USE BREATHEFREE';
+
+  @override
+  String get consentPrivacyReviewTermsLink => 'Review Terms and Privacy Notice';
+
+  @override
+  String get consentPrivacyShareCareTeamDescription =>
+      'Allow a connected clinician to view progress summaries.';
+
+  @override
+  String get consentPrivacyShareCareTeamTitle => 'Share with my care team';
+
+  @override
+  String get consentPrivacyTermsSheetBody =>
+      'This development build demonstrates how the legal documents will be presented. Before release, the complete Terms of Use and Privacy Notice will appear here, including data practices, retention periods, and your rights.';
+
+  @override
+  String get consentPrivacyTermsSheetDoneButton => 'Done';
+
+  @override
+  String get consentPrivacyTermsSheetNote =>
+      'Optional controls can be changed later in Settings. Required processing will be limited to what is necessary to provide and secure the service.';
+
+  @override
+  String get consentPrivacyTermsSheetTitle => 'Terms and Privacy Notice';
+
+  @override
+  String get consentPrivacyTitle => 'Your story stays yours.';
+
+  @override
+  String get consentPrivacyTrustNoteFunding =>
       'No ads. No tobacco-industry funding.';
 
   @override
-  String get consentPrivacyTrustNoteText2 =>
+  String get consentPrivacyTrustNoteNoSale =>
       'We never sell patient health information.';
 
   @override
-  String get myReasonsCustomReasonCard => 'YOUR OWN REASON';
+  String get myReasonsBackTooltip => 'Back';
 
   @override
-  String get myReasonsCustomReasonCard2 => 'ADD YOUR OWN REASON';
+  String get myReasonsCustomCardLabelEmpty => 'ADD YOUR OWN REASON';
 
   @override
-  String get myReasonsCustomReasonCard3 =>
+  String get myReasonsCustomCardLabelFilled => 'YOUR OWN REASON';
+
+  @override
+  String get myReasonsCustomCardPlaceholder =>
       'Write what matters most in your own words';
 
   @override
-  String get myReasonsCustomReasonCardReasonCustomRemoveTooltip => 'Remove';
+  String get myReasonsCustomRemoveTooltip => 'Remove';
 
   @override
-  String get myReasonsCustomReasonCardReasonTopCustomTooltip => 'Top reason';
+  String get myReasonsCustomSheetHint => 'For example: I want more energy';
 
   @override
-  String get myReasonsCustomReasonEditorSheetStateReasonCustomMakeTopText =>
-      'Make this my top reason';
-
-  @override
-  String get myReasonsCustomReasonEditorSheetStateReasonCustomSaveText =>
-      'Save reason';
-
-  @override
-  String
-      get myReasonsCustomReasonEditorSheetStateReasonCustomTextFieldHintText =>
-          'For example: I want more energy';
-
-  @override
-  String get myReasonsCustomReasonEditorSheetStateText => 'Add your own reason';
-
-  @override
-  String get myReasonsCustomReasonEditorSheetStateText2 =>
+  String get myReasonsCustomSheetIntro =>
       'Write something you want to remember when a craving hits.';
 
   @override
-  String get myReasonsLabelFor => 'Protect my family';
+  String get myReasonsCustomSheetMakeTop => 'Make this my top reason';
 
   @override
-  String get myReasonsLabelFor2 => 'Breathe easier';
+  String get myReasonsCustomSheetSaveButton => 'Save reason';
 
   @override
-  String get myReasonsLabelFor3 => 'Improve my health';
+  String get myReasonsCustomSheetTitle => 'Add your own reason';
 
   @override
-  String get myReasonsLabelFor4 => 'Save money';
+  String get myReasonsEyebrow => 'YOUR MOTIVATION';
 
   @override
-  String get myReasonsLabelFor5 => 'Feel more in control';
+  String get myReasonsHeaderTitle => 'My reasons';
 
   @override
-  String get myReasonsLabelFor6 => 'Be there for my future';
+  String get myReasonsIntro =>
+      'Choose everything that matters to you. Tap the star to make one your top reason.';
 
   @override
-  String get myReasonsLabelFor7 => 'My own reason';
+  String get myReasonsListLabel => 'SELECT ALL THAT MATTER';
 
   @override
-  String get myReasonsMotivationPreview => 'Choose a top reason anytime';
+  String get myReasonsOptionBreatheEasier => 'Breathe easier';
 
   @override
-  String myReasonsMotivationPreview2(Object topLabel) {
-    return 'Based on your top reason: $topLabel';
-  }
+  String get myReasonsOptionControl => 'Feel more in control';
 
   @override
-  String get myReasonsMotivationPreviewReasonPreviewText =>
-      'MOTIVATION PREVIEW';
+  String get myReasonsOptionCustom => 'My own reason';
 
   @override
-  String get myReasonsMotivationPreviewText => 'WHEN A CRAVING HITS';
+  String get myReasonsOptionFamily => 'Protect my family';
 
   @override
-  String get myReasonsPreviewFor =>
-      'Choose a reason to create your personal reminder.';
+  String get myReasonsOptionFuture => 'Be there for my future';
 
   @override
-  String myReasonsPreviewFor2(Object value) {
+  String get myReasonsOptionImproveHealth => 'Improve my health';
+
+  @override
+  String get myReasonsOptionSaveMoney => 'Save money';
+
+  @override
+  String get myReasonsPreviewBreatheEasier =>
+      '“You chose this to breathe easier. This feeling will pass.”';
+
+  @override
+  String get myReasonsPreviewControl =>
+      '“You chose this to feel in control. This feeling will pass.”';
+
+  @override
+  String myReasonsPreviewCustom(Object value) {
     return '“You chose this because ‘$value.’ This feeling will pass.”';
   }
 
   @override
-  String get myReasonsPreviewFor3 =>
+  String get myReasonsPreviewFamily =>
       '“You chose this for your family. This feeling will pass.”';
 
   @override
-  String get myReasonsPreviewFor4 =>
-      '“You chose this to breathe easier. This feeling will pass.”';
-
-  @override
-  String get myReasonsPreviewFor5 =>
-      '“You chose this for your health. This feeling will pass.”';
-
-  @override
-  String get myReasonsPreviewFor6 =>
-      '“You chose this to save money. This feeling will pass.”';
-
-  @override
-  String get myReasonsPreviewFor7 =>
-      '“You chose this to feel in control. This feeling will pass.”';
-
-  @override
-  String get myReasonsPreviewFor8 =>
+  String get myReasonsPreviewFuture =>
       '“You chose this for your future. This feeling will pass.”';
 
   @override
-  String get myReasonsReasonsBottomActionText => 'Save my reasons';
+  String get myReasonsPreviewImproveHealth =>
+      '“You chose this for your health. This feeling will pass.”';
 
   @override
-  String get myReasonsReasonsHeaderBackLabel => 'My reasons';
+  String get myReasonsPreviewMoment => 'WHEN A CRAVING HITS';
 
   @override
-  String get myReasonsReasonsHeaderBackTooltip => 'Back';
+  String get myReasonsPreviewNone =>
+      'Choose a reason to create your personal reminder.';
 
   @override
-  String get myReasonsReasonsHeaderText => '3 OF 5';
+  String get myReasonsPreviewSaveMoney =>
+      '“You chose this to save money. This feeling will pass.”';
 
   @override
-  String get myReasonsReasonsPrivacyNoteText =>
+  String get myReasonsPreviewTitle => 'MOTIVATION PREVIEW';
+
+  @override
+  String myReasonsPreviewTopReason(Object topLabel) {
+    return 'Based on your top reason: $topLabel';
+  }
+
+  @override
+  String get myReasonsPreviewTopReasonNone => 'Choose a top reason anytime';
+
+  @override
+  String get myReasonsPrivacyNote =>
       'Your reasons stay private and only personalize your quit support.';
 
   @override
-  String get myReasonsReasonsProgressText => 'QUIT PLAN';
+  String get myReasonsProgressLabel => 'QUIT PLAN';
 
   @override
-  String myReasonsSelectedCountText(Object selectionCount) {
+  String get myReasonsSaveButton => 'Save my reasons';
+
+  @override
+  String myReasonsSelectedCount(Object selectionCount) {
     return '$selectionCount SELECTED';
   }
 
@@ -367,96 +360,103 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get myReasonsText => 'SELECT ALL THAT MATTER';
+  String get myReasonsStepCounter => '3 OF 5';
 
   @override
-  String get myReasonsText2 => 'YOUR MOTIVATION';
+  String get myReasonsTitle => 'What are you quitting for?';
 
   @override
-  String get myReasonsText3 => 'What are you quitting for?';
+  String get myReasonsTopReasonTooltip => 'Top reason';
 
   @override
-  String get myReasonsText4 =>
-      'Choose everything that matters to you. Tap the star to make one your top reason.';
+  String get readinessResultBackTooltip => 'Back';
 
   @override
-  String get readinessResultActionLabel => 'Build my preparation plan';
+  String get readinessResultCompleteBadge => 'Complete';
 
   @override
-  String get readinessResultActionLabel2 => 'Explore without setting a date';
+  String get readinessResultContinueConnectButton => 'Find support options';
 
   @override
-  String get readinessResultActionLabel3 => 'Find support options';
+  String get readinessResultContinueExploreButton =>
+      'Explore without setting a date';
 
   @override
-  String get readinessResultAlternativePathsPathConnectSubtitle =>
-      'Talk with a coach or care team';
+  String get readinessResultContinuePrepareButton =>
+      'Build my preparation plan';
 
   @override
-  String get readinessResultAlternativePathsPathConnectTitle => 'Connect';
+  String get readinessResultEyebrow => 'YOUR REFLECTION';
 
   @override
-  String get readinessResultAlternativePathsPathExploreSubtitle =>
-      'Learn without setting a date';
+  String get readinessResultHeaderTitle => 'Your starting point';
 
   @override
-  String get readinessResultAlternativePathsPathExploreTitle => 'Explore first';
-
-  @override
-  String get readinessResultDoneText => 'Done';
-
-  @override
-  String get readinessResultReadinessBottomActionText =>
+  String get readinessResultInControlNote =>
       'You’re in control. Change your path anytime.';
 
   @override
-  String get readinessResultReadinessHeaderBackLabel => 'Your starting point';
+  String get readinessResultIntro => 'Here is what we heard from your answers.';
 
   @override
-  String get readinessResultReadinessHeaderBackTooltip => 'Back';
+  String get readinessResultOtherPathsLabel =>
+      'YOU CAN CHOOSE A DIFFERENT PATH';
 
   @override
-  String get readinessResultReadinessHeaderText => 'Complete';
+  String get readinessResultPathConnectDescription =>
+      'Talk with a coach or care team';
 
   @override
-  String get readinessResultReadinessProgressText => 'ASSESSMENT';
+  String get readinessResultPathConnectName => 'Connect';
 
   @override
-  String get readinessResultRecommendationCardFitText =>
-      'Why this fits your answers';
+  String get readinessResultPathExploreDescription =>
+      'Learn without setting a date';
 
   @override
-  String get readinessResultRecommendationCardText => 'RECOMMENDED';
+  String get readinessResultPathExploreName => 'Explore first';
 
   @override
-  String get readinessResultRecommendationCardText2 =>
+  String get readinessResultPatternElevenToTwenty =>
+      '11–20 cigarettes on a typical day';
+
+  @override
+  String get readinessResultPatternLabel => 'YOUR PATTERN';
+
+  @override
+  String get readinessResultPatternNone =>
+      'You can add your smoking pattern anytime';
+
+  @override
+  String get readinessResultPatternNotEveryDay => 'You do not smoke every day';
+
+  @override
+  String get readinessResultPatternTenOrFewer =>
+      '10 or fewer cigarettes on a typical day';
+
+  @override
+  String get readinessResultPatternThirtyOneOrMore =>
+      '31 or more cigarettes on a typical day';
+
+  @override
+  String get readinessResultPatternTwentyOneToThirty =>
+      '21–30 cigarettes on a typical day';
+
+  @override
+  String get readinessResultProgressLabel => 'ASSESSMENT';
+
+  @override
+  String get readinessResultRecommendedBadge => 'RECOMMENDED';
+
+  @override
+  String get readinessResultRecommendedPathDescription =>
       'Practice coping tools and choose a quit date in the next 7–14 days. We’ll guide one small step each day.';
 
   @override
-  String get readinessResultRecommendationCardTitle => 'Prepare';
+  String get readinessResultRecommendedPathName => 'Prepare';
 
   @override
-  String get readinessResultReflectionCardLabel => 'YOUR PATTERN';
-
-  @override
-  String get readinessResultReflectionCardLabel2 => 'TRIGGERS';
-
-  @override
-  String get readinessResultReflectionCardLabel3 => 'STARTING POINT';
-
-  @override
-  String get readinessResultShowWhyThisFitsText => 'Why preparation may fit';
-
-  @override
-  String get readinessResultShowWhyThisFitsText2 =>
-      'You identified your smoking pattern and situations that may bring on an urge. Practicing coping tools before choosing a date can make the next step feel more manageable.';
-
-  @override
-  String get readinessResultShowWhyThisFitsText3 =>
-      'This is a flexible recommendation, not a medical assessment. You can choose another path now or change it later.';
-
-  @override
-  String readinessResultSituationCount(int count) {
+  String readinessResultStartingPointCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
@@ -467,157 +467,150 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get readinessResultStartingPointSummary =>
+  String get readinessResultStartingPointLabel => 'STARTING POINT';
+
+  @override
+  String get readinessResultStartingPointNone =>
       'You can start small and add details later';
 
   @override
-  String get readinessResultText => 'YOUR REFLECTION';
-
-  @override
-  String get readinessResultText2 =>
+  String get readinessResultTitle =>
       'You’re ready to prepare—at your own pace.';
 
   @override
-  String get readinessResultText3 => 'Here is what we heard from your answers.';
+  String get readinessResultTriggerAfterMeals => 'after meals';
 
   @override
-  String get readinessResultText4 => 'YOU CAN CHOOSE A DIFFERENT PATH';
+  String get readinessResultTriggerAlcohol => 'alcohol';
 
   @override
-  String get readinessResultTriggerLabel => 'stress';
+  String get readinessResultTriggerBeforeBed => 'before bed';
 
   @override
-  String get readinessResultTriggerLabel10 => 'before bed';
+  String get readinessResultTriggerBoredom => 'boredom';
 
   @override
-  String get readinessResultTriggerLabel2 => 'after meals';
+  String get readinessResultTriggerCoffee => 'coffee';
 
   @override
-  String get readinessResultTriggerLabel3 => 'driving';
+  String get readinessResultTriggerDriving => 'driving';
 
   @override
-  String get readinessResultTriggerLabel4 => 'coffee';
+  String get readinessResultTriggerMorning => 'mornings';
 
   @override
-  String get readinessResultTriggerLabel5 => 'social settings';
+  String get readinessResultTriggerSocialSettings => 'social settings';
 
   @override
-  String get readinessResultTriggerLabel6 => 'work breaks';
+  String get readinessResultTriggerStress => 'stress';
 
   @override
-  String get readinessResultTriggerLabel7 => 'alcohol';
+  String get readinessResultTriggerWorkBreaks => 'work breaks';
 
   @override
-  String get readinessResultTriggerLabel8 => 'boredom';
+  String get readinessResultTriggersLabel => 'TRIGGERS';
 
   @override
-  String get readinessResultTriggerLabel9 => 'mornings';
-
-  @override
-  String get readinessResultTriggerSummary =>
-      'You can identify triggers anytime';
-
-  @override
-  String readinessResultTriggerSummary2(Object first) {
-    return 'You want support for $first';
-  }
-
-  @override
-  String readinessResultTriggerSummary3(Object first, Object last) {
-    return 'You want support for $first and $last';
-  }
-
-  @override
-  String readinessResultTriggerSummary4(
+  String readinessResultTriggersMany(
       Object value, Object value2, Object remaining) {
     return '$value, $value2, and $remaining more';
   }
 
   @override
-  String get readinessResultUsageLabel => 'You do not smoke every day';
+  String get readinessResultTriggersNone => 'You can identify triggers anytime';
 
   @override
-  String get readinessResultUsageLabel2 =>
-      '10 or fewer cigarettes on a typical day';
+  String readinessResultTriggersOne(Object first) {
+    return 'You want support for $first';
+  }
 
   @override
-  String get readinessResultUsageLabel3 => '11–20 cigarettes on a typical day';
+  String readinessResultTriggersTwo(Object first, Object last) {
+    return 'You want support for $first and $last';
+  }
 
   @override
-  String get readinessResultUsageLabel4 => '21–30 cigarettes on a typical day';
+  String get readinessResultWhyThisFitsLink => 'Why this fits your answers';
 
   @override
-  String get readinessResultUsageLabel5 =>
-      '31 or more cigarettes on a typical day';
+  String get readinessResultWhyThisFitsSheetBody =>
+      'You identified your smoking pattern and situations that may bring on an urge. Practicing coping tools before choosing a date can make the next step feel more manageable.';
 
   @override
-  String get readinessResultUsageLabel6 =>
-      'You can add your smoking pattern anytime';
+  String get readinessResultWhyThisFitsSheetDoneButton => 'Done';
 
   @override
-  String get selectQuitDateCheckInCardText => 'Quit-day check-in';
+  String get readinessResultWhyThisFitsSheetNote =>
+      'This is a flexible recommendation, not a medical assessment. You can choose another path now or change it later.';
 
   @override
-  String get selectQuitDateCheckInCardText2 => '7:00 AM · Private notification';
+  String get readinessResultWhyThisFitsSheetTitle => 'Why preparation may fit';
 
   @override
-  String get selectQuitDateCheckInCardText3 =>
+  String get selectQuitDateBackTooltip => 'Back';
+
+  @override
+  String selectQuitDateCalendarMonthHeading(Object month, Object year) {
+    return '$month $year';
+  }
+
+  @override
+  String get selectQuitDateCardLabelQuitToday => 'YOUR QUIT DATE IS TODAY';
+
+  @override
+  String get selectQuitDateCardLabelReduceGradually => 'YOUR TARGET DATE';
+
+  @override
+  String get selectQuitDateCardLabelSetQuitDate => 'YOUR QUIT DATE';
+
+  @override
+  String get selectQuitDateCheckInLockScreen =>
       'Lock screen only shows: “You have a check-in.”';
 
   @override
-  String get selectQuitDateContinueLabel => 'Confirm this date';
+  String get selectQuitDateCheckInTime => '7:00 AM · Private notification';
 
   @override
-  String get selectQuitDateContinueLabel2 => 'Start my quit today';
+  String get selectQuitDateCheckInTitle => 'Quit-day check-in';
 
   @override
-  String get selectQuitDateContinueLabel3 => 'Confirm target date';
+  String get selectQuitDateConfirmButtonQuitToday => 'Start my quit today';
 
   @override
-  String get selectQuitDateDateBottomActionText => 'Date saved automatically';
+  String get selectQuitDateConfirmButtonReduceGradually =>
+      'Confirm target date';
 
   @override
-  String get selectQuitDateDateHeaderBackTooltip => 'Back';
+  String get selectQuitDateConfirmButtonSetQuitDate => 'Confirm this date';
 
   @override
-  String get selectQuitDateDateHeaderText => '2 OF 5';
+  String get selectQuitDateEyebrow => 'YOUR DATE';
 
   @override
-  String get selectQuitDateDateLabel => 'YOUR QUIT DATE';
-
-  @override
-  String get selectQuitDateDateLabel2 => 'YOUR QUIT DATE IS TODAY';
-
-  @override
-  String get selectQuitDateDateLabel3 => 'YOUR TARGET DATE';
-
-  @override
-  String get selectQuitDateDateProgressText => 'QUIT PLAN';
-
-  @override
-  String get selectQuitDateDescription =>
-      'A date 7–14 days away gives you time to prepare without losing momentum.';
-
-  @override
-  String get selectQuitDateDescription2 =>
-      'Your smoke-free time begins today. We’ll add extra support through your first day.';
-
-  @override
-  String get selectQuitDateDescription3 =>
-      'A target 14–30 days away gives you time to reduce gradually with a clear goal.';
-
-  @override
-  String get selectQuitDateFlexibleDateNoteText =>
+  String get selectQuitDateFlexibleNote =>
       'You can change this date later without losing progress.';
 
   @override
-  String get selectQuitDateHeaderTitle => 'Choose your quit date';
+  String get selectQuitDateHeaderTitleQuitToday => 'Start your quit today';
 
   @override
-  String get selectQuitDateHeaderTitle2 => 'Start your quit today';
+  String get selectQuitDateHeaderTitleReduceGradually =>
+      'Choose your target date';
 
   @override
-  String get selectQuitDateHeaderTitle3 => 'Choose your target date';
+  String get selectQuitDateHeaderTitleSetQuitDate => 'Choose your quit date';
+
+  @override
+  String get selectQuitDateIntroQuitToday =>
+      'Your smoke-free time begins today. We’ll add extra support through your first day.';
+
+  @override
+  String get selectQuitDateIntroReduceGradually =>
+      'A target 14–30 days away gives you time to reduce gradually with a clear goal.';
+
+  @override
+  String get selectQuitDateIntroSetQuitDate =>
+      'A date 7–14 days away gives you time to prepare without losing momentum.';
 
   @override
   String selectQuitDateLongDate(
@@ -672,9 +665,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String selectQuitDateMonthYear(Object month, Object year) {
-    return '$month $year';
-  }
+  String get selectQuitDateProgressLabel => 'QUIT PLAN';
 
   @override
   String selectQuitDateRange(
@@ -688,32 +679,36 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get selectQuitDateSelectedDateCardUnavailableText => 'RECOMMENDED';
+  String get selectQuitDateRecommendedBadge => 'RECOMMENDED';
 
   @override
-  String get selectQuitDateText => 'YOUR DATE';
+  String get selectQuitDateSavedNote => 'Date saved automatically';
 
   @override
-  String get selectQuitDateTimingLabel => 'Starting today';
+  String get selectQuitDateStepCounter => '2 OF 5';
 
   @override
-  String selectQuitDateTimingLabel2(Object days) {
-    return '$days days to reduce gradually';
-  }
-
-  @override
-  String selectQuitDateTimingLabel3(Object days) {
+  String selectQuitDateTimingPrepare(Object days) {
     return '$days days to prepare';
   }
 
   @override
-  String get selectQuitDateTitle => 'Choose a day to begin.';
+  String selectQuitDateTimingReduce(Object days) {
+    return '$days days to reduce gradually';
+  }
 
   @override
-  String get selectQuitDateTitle2 => 'Today is your starting point.';
+  String get selectQuitDateTimingToday => 'Starting today';
 
   @override
-  String get selectQuitDateTitle3 => 'Choose the day to become smoke-free.';
+  String get selectQuitDateTitleQuitToday => 'Today is your starting point.';
+
+  @override
+  String get selectQuitDateTitleReduceGradually =>
+      'Choose the day to become smoke-free.';
+
+  @override
+  String get selectQuitDateTitleSetQuitDate => 'Choose a day to begin.';
 
   @override
   String get selectQuitDateUnavailableMessage =>
@@ -756,80 +751,107 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get selectQuitDateWindowMessage =>
+  String get selectQuitDateWindowQuitToday =>
       'Today is selected based on your path';
 
   @override
-  String selectQuitDateWindowMessage2(Object range) {
-    return 'Recommended preparation window: $range';
-  }
-
-  @override
-  String selectQuitDateWindowMessage3(Object range) {
+  String selectQuitDateWindowReduceGradually(Object range) {
     return 'Recommended reduction window: $range';
   }
 
   @override
-  String get triggerMapCustomTriggerCard => 'YOUR TRIGGER';
+  String selectQuitDateWindowSetQuitDate(Object range) {
+    return 'Recommended preparation window: $range';
+  }
 
   @override
-  String get triggerMapCustomTriggerCard2 => 'ADD YOUR OWN TRIGGER';
+  String get triggerMapBackTooltip => 'Back';
 
   @override
-  String get triggerMapCustomTriggerCard3 => 'Type another situation…';
+  String get triggerMapContinueButton => 'Continue';
 
   @override
-  String get triggerMapCustomTriggerCardCustomRemoveTooltip => 'Remove';
+  String get triggerMapCustomCardLabelEmpty => 'ADD YOUR OWN TRIGGER';
 
   @override
-  String get triggerMapCustomTriggerEditorSheetStateCustomInputHintText =>
-      'For example, phone calls';
+  String get triggerMapCustomCardLabelFilled => 'YOUR TRIGGER';
 
   @override
-  String get triggerMapCustomTriggerEditorSheetStateCustomInputLabelText =>
-      'My trigger';
+  String get triggerMapCustomCardPlaceholder => 'Type another situation…';
 
   @override
-  String get triggerMapCustomTriggerEditorSheetStateCustomSaveText =>
-      'Save trigger';
+  String get triggerMapCustomRemoveTooltip => 'Remove';
 
   @override
-  String get triggerMapCustomTriggerEditorSheetStateText =>
-      'Add your own trigger';
+  String get triggerMapCustomSheetFieldLabel => 'My trigger';
 
   @override
-  String get triggerMapCustomTriggerEditorSheetStateText2 =>
+  String get triggerMapCustomSheetHint => 'For example, phone calls';
+
+  @override
+  String get triggerMapCustomSheetIntro =>
       'Enter a situation, feeling, or routine that makes you want to smoke.';
 
   @override
-  String get triggerMapLabelFor => 'Stress';
+  String get triggerMapCustomSheetSaveButton => 'Save trigger';
 
   @override
-  String get triggerMapLabelFor10 => 'Before bed';
+  String get triggerMapCustomSheetTitle => 'Add your own trigger';
 
   @override
-  String get triggerMapLabelFor2 => 'After meals';
+  String get triggerMapHeaderTitle => 'Your triggers';
 
   @override
-  String get triggerMapLabelFor3 => 'Driving';
+  String get triggerMapOptionAfterMeals => 'After meals';
 
   @override
-  String get triggerMapLabelFor4 => 'With coffee';
+  String get triggerMapOptionAlcohol => 'Alcohol';
 
   @override
-  String get triggerMapLabelFor5 => 'Social settings';
+  String get triggerMapOptionBeforeBed => 'Before bed';
 
   @override
-  String get triggerMapLabelFor6 => 'Work breaks';
+  String get triggerMapOptionBoredom => 'Boredom';
 
   @override
-  String get triggerMapLabelFor7 => 'Alcohol';
+  String get triggerMapOptionCoffee => 'With coffee';
 
   @override
-  String get triggerMapLabelFor8 => 'Boredom';
+  String get triggerMapOptionDriving => 'Driving';
 
   @override
-  String get triggerMapLabelFor9 => 'Morning';
+  String get triggerMapOptionMorning => 'Morning';
+
+  @override
+  String get triggerMapOptionSocialSettings => 'Social settings';
+
+  @override
+  String get triggerMapOptionStress => 'Stress';
+
+  @override
+  String get triggerMapOptionWorkBreaks => 'Work breaks';
+
+  @override
+  String get triggerMapPrivacyNoteBody =>
+      'Your choices shape coping tools and reminder timing.';
+
+  @override
+  String get triggerMapPrivacyNoteLocation =>
+      'BreatheFree does not track your location in the background.';
+
+  @override
+  String get triggerMapPrivacyNoteTitle => 'Used to prepare, not to monitor';
+
+  @override
+  String get triggerMapProgressLabel => 'ASSESSMENT';
+
+  @override
+  String get triggerMapQuestion =>
+      'When are you most likely to want a cigarette?';
+
+  @override
+  String get triggerMapQuestionHint =>
+      'Choose every situation that feels true for you.';
 
   @override
   String get triggerMapQuestionLabel => 'QUESTION 2 · CHOOSE ALL THAT APPLY';
@@ -846,146 +868,117 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get triggerMapText2 => 'When are you most likely to want a cigarette?';
+  String get welcomeBenefitCravingsDescription =>
+      'Quick tools that work anywhere';
 
   @override
-  String get triggerMapText3 =>
-      'Choose every situation that feels true for you.';
+  String get welcomeBenefitCravingsTitle => 'Help when cravings hit';
 
   @override
-  String get triggerMapTriggerBottomActionText => 'Continue';
+  String get welcomeBenefitProgressDescription =>
+      'A slip never erases your wins';
 
   @override
-  String get triggerMapTriggerHeaderBackLabel => 'Your triggers';
+  String get welcomeBenefitProgressTitle => 'Progress that stays';
 
   @override
-  String get triggerMapTriggerHeaderBackTooltip => 'Back';
+  String get welcomeEyebrow => 'WELCOME TO BREATHEFREE';
 
   @override
-  String get triggerMapTriggerPrivacyNoteText =>
-      'Used to prepare, not to monitor';
-
-  @override
-  String get triggerMapTriggerPrivacyNoteText2 =>
-      'Your choices shape coping tools and reminder timing.';
-
-  @override
-  String get triggerMapTriggerPrivacyNoteText3 =>
-      'BreatheFree does not track your location in the background.';
-
-  @override
-  String get triggerMapTriggerProgressText => 'ASSESSMENT';
-
-  @override
-  String get welcomeBenefitsSubtitle => 'Quick tools that work anywhere';
-
-  @override
-  String get welcomeBenefitsSubtitle2 => 'A slip never erases your wins';
-
-  @override
-  String get welcomeBenefitsTitle => 'Help when cravings hit';
-
-  @override
-  String get welcomeBenefitsTitle2 => 'Progress that stays';
+  String get welcomeGetStartedButton => 'Get started';
 
   @override
   String get welcomeHeadline => 'Your next breath can be different.';
 
   @override
-  String get welcomeLegalText => 'By continuing, you agree to the ';
-
-  @override
-  String get welcomeLegalText2 => 'Terms';
-
-  @override
-  String get welcomeLegalText3 => ' and acknowledge the ';
-
-  @override
-  String get welcomeLegalText4 => 'Privacy Notice.';
-
-  @override
-  String get welcomeMessage =>
-      'The final Terms of Use will be published before production distribution.';
-
-  @override
-  String get welcomeMessage2 =>
-      'BreatheFree will clearly explain what data is collected, why it is needed, and how to delete it.';
-
-  @override
-  String get welcomeShowInformationSheetText => 'Done';
-
-  @override
-  String get welcomeSignInText => 'I already have an account';
-
-  @override
-  String get welcomeText => 'WELCOME TO BREATHEFREE';
-
-  @override
-  String get welcomeText2 =>
+  String get welcomeIntro =>
       'Small steps, practical support, and no judgment—whenever you are ready.';
 
   @override
-  String get welcomeText3 => 'Get started';
+  String get welcomeLegalMiddle => ' and acknowledge the ';
 
   @override
-  String get welcomeText4 => 'Continuar en español';
+  String get welcomeLegalPrefix => 'By continuing, you agree to the ';
 
   @override
-  String get welcomeTitle => 'Terms of Use';
+  String get welcomeOtherLanguageButton => 'Continuar en español';
 
   @override
-  String get welcomeTitle2 => 'Privacy Notice';
+  String get welcomePrivacyNoticeLink => 'Privacy Notice.';
 
   @override
-  String get whyBreatheFreeBottomActionText => 'Continue';
+  String get welcomePrivacySheetBody =>
+      'BreatheFree will clearly explain what data is collected, why it is needed, and how to delete it.';
 
   @override
-  String get whyBreatheFreeCardCravingSubtitle =>
+  String get welcomePrivacySheetTitle => 'Privacy Notice';
+
+  @override
+  String get welcomeSheetDoneButton => 'Done';
+
+  @override
+  String get welcomeSignInButton => 'I already have an account';
+
+  @override
+  String get welcomeTermsLink => 'Terms';
+
+  @override
+  String get welcomeTermsSheetBody =>
+      'The final Terms of Use will be published before production distribution.';
+
+  @override
+  String get welcomeTermsSheetTitle => 'Terms of Use';
+
+  @override
+  String get whyBreatheFreeBackTooltip => 'Back';
+
+  @override
+  String get whyBreatheFreeContinueButton => 'Continue';
+
+  @override
+  String get whyBreatheFreeCravingDetail =>
+      'Use guided breathing, a brief distraction, or your top reason for quitting. Essential tools will remain available offline.';
+
+  @override
+  String get whyBreatheFreeCravingSummary =>
       'Open a calming tool in one tap—available offline.';
 
   @override
-  String get whyBreatheFreeCardCravingTitle => 'When a craving hits';
+  String get whyBreatheFreeCravingTitle => 'When a craving hits';
 
   @override
-  String get whyBreatheFreeCardHealingSubtitle =>
-      'See smoke-free time, money saved, and recovery.';
-
-  @override
-  String get whyBreatheFreeCardHealingTitle => 'As your body heals';
-
-  @override
-  String get whyBreatheFreeCardSlipSubtitle =>
-      'Keep your progress. Learn, adjust, and continue.';
-
-  @override
-  String get whyBreatheFreeCardSlipTitle => 'If a slip happens';
-
-  @override
-  String get whyBreatheFreeHeaderBackTooltip => 'Back';
+  String get whyBreatheFreeEyebrow => 'A BETTER WAY TO QUIT';
 
   @override
   String get whyBreatheFreeHeadline =>
       'Support for the moments that matter most.';
 
   @override
-  String get whyBreatheFreeMessage =>
-      'Use guided breathing, a brief distraction, or your top reason for quitting. Essential tools will remain available offline.';
-
-  @override
-  String get whyBreatheFreeMessage2 =>
+  String get whyBreatheFreeHealingDetail =>
       'Track your smoke-free time and the money you chose not to spend on tobacco. Recovery milestones will be educational and will not replace medical advice.';
 
   @override
-  String get whyBreatheFreeMessage3 =>
+  String get whyBreatheFreeHealingSummary =>
+      'See smoke-free time, money saved, and recovery.';
+
+  @override
+  String get whyBreatheFreeHealingTitle => 'As your body heals';
+
+  @override
+  String get whyBreatheFreeIntro =>
+      'BreatheFree responds to what you need now—and helps you protect the progress you have already made.';
+
+  @override
+  String get whyBreatheFreeSheetDoneButton => 'Done';
+
+  @override
+  String get whyBreatheFreeSlipDetail =>
       'A slip does not erase the work you have already done. BreatheFree will help you record what happened without judgment and choose your next step.';
 
   @override
-  String get whyBreatheFreeSheetDoneText => 'Done';
+  String get whyBreatheFreeSlipSummary =>
+      'Keep your progress. Learn, adjust, and continue.';
 
   @override
-  String get whyBreatheFreeText => 'A BETTER WAY TO QUIT';
-
-  @override
-  String get whyBreatheFreeText2 =>
-      'BreatheFree responds to what you need now—and helps you protect the progress you have already made.';
+  String get whyBreatheFreeSlipTitle => 'If a slip happens';
 }

@@ -210,73 +210,73 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
 
   String get _headerTitle => switch (widget.quitPath) {
         QuitPlanPath.setQuitDate =>
-          AppLocalizations.of(context).selectQuitDateHeaderTitle,
+          AppLocalizations.of(context).selectQuitDateHeaderTitleSetQuitDate,
         QuitPlanPath.quitToday =>
-          AppLocalizations.of(context).selectQuitDateHeaderTitle2,
+          AppLocalizations.of(context).selectQuitDateHeaderTitleQuitToday,
         QuitPlanPath.reduceGradually =>
-          AppLocalizations.of(context).selectQuitDateHeaderTitle3,
+          AppLocalizations.of(context).selectQuitDateHeaderTitleReduceGradually,
       };
 
   String get _title => switch (widget.quitPath) {
         QuitPlanPath.setQuitDate =>
-          AppLocalizations.of(context).selectQuitDateTitle,
+          AppLocalizations.of(context).selectQuitDateTitleSetQuitDate,
         QuitPlanPath.quitToday =>
-          AppLocalizations.of(context).selectQuitDateTitle2,
+          AppLocalizations.of(context).selectQuitDateTitleQuitToday,
         QuitPlanPath.reduceGradually =>
-          AppLocalizations.of(context).selectQuitDateTitle3,
+          AppLocalizations.of(context).selectQuitDateTitleReduceGradually,
       };
 
   String get _description => switch (widget.quitPath) {
         QuitPlanPath.setQuitDate =>
-          AppLocalizations.of(context).selectQuitDateDescription,
+          AppLocalizations.of(context).selectQuitDateIntroSetQuitDate,
         QuitPlanPath.quitToday =>
-          AppLocalizations.of(context).selectQuitDateDescription2,
+          AppLocalizations.of(context).selectQuitDateIntroQuitToday,
         QuitPlanPath.reduceGradually =>
-          AppLocalizations.of(context).selectQuitDateDescription3,
+          AppLocalizations.of(context).selectQuitDateIntroReduceGradually,
       };
 
   String get _windowMessage {
     if (widget.quitPath == QuitPlanPath.quitToday) {
-      return AppLocalizations.of(context).selectQuitDateWindowMessage;
+      return AppLocalizations.of(context).selectQuitDateWindowQuitToday;
     }
     final range = _formatShortRange(_recommendedStart, _recommendedEnd);
     return switch (widget.quitPath) {
       QuitPlanPath.setQuitDate =>
-        AppLocalizations.of(context).selectQuitDateWindowMessage2(range),
+        AppLocalizations.of(context).selectQuitDateWindowSetQuitDate(range),
       QuitPlanPath.reduceGradually =>
-        AppLocalizations.of(context).selectQuitDateWindowMessage3(range),
+        AppLocalizations.of(context).selectQuitDateWindowReduceGradually(range),
       QuitPlanPath.quitToday => '',
     };
   }
 
   String get _dateLabel => switch (widget.quitPath) {
         QuitPlanPath.setQuitDate =>
-          AppLocalizations.of(context).selectQuitDateDateLabel,
+          AppLocalizations.of(context).selectQuitDateCardLabelSetQuitDate,
         QuitPlanPath.quitToday =>
-          AppLocalizations.of(context).selectQuitDateDateLabel2,
+          AppLocalizations.of(context).selectQuitDateCardLabelQuitToday,
         QuitPlanPath.reduceGradually =>
-          AppLocalizations.of(context).selectQuitDateDateLabel3,
+          AppLocalizations.of(context).selectQuitDateCardLabelReduceGradually,
       };
 
   String get _timingLabel {
     final days = _calendarDayDifference(_effectiveDate, _today);
     if (days == 0) {
-      return AppLocalizations.of(context).selectQuitDateTimingLabel;
+      return AppLocalizations.of(context).selectQuitDateTimingToday;
     }
     return switch (widget.quitPath) {
       QuitPlanPath.reduceGradually =>
-        AppLocalizations.of(context).selectQuitDateTimingLabel2(days),
-      _ => AppLocalizations.of(context).selectQuitDateTimingLabel3(days),
+        AppLocalizations.of(context).selectQuitDateTimingReduce(days),
+      _ => AppLocalizations.of(context).selectQuitDateTimingPrepare(days),
     };
   }
 
   String get _continueLabel => switch (widget.quitPath) {
         QuitPlanPath.setQuitDate =>
-          AppLocalizations.of(context).selectQuitDateContinueLabel,
+          AppLocalizations.of(context).selectQuitDateConfirmButtonSetQuitDate,
         QuitPlanPath.quitToday =>
-          AppLocalizations.of(context).selectQuitDateContinueLabel2,
-        QuitPlanPath.reduceGradually =>
-          AppLocalizations.of(context).selectQuitDateContinueLabel3,
+          AppLocalizations.of(context).selectQuitDateConfirmButtonQuitToday,
+        QuitPlanPath.reduceGradually => AppLocalizations.of(context)
+            .selectQuitDateConfirmButtonReduceGradually,
       };
 
   String _formatShortRange(DateTime start, DateTime end) {
@@ -398,7 +398,8 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
                                 const SizedBox(height: 18),
                               ],
                               Text(
-                                AppLocalizations.of(context).selectQuitDateText,
+                                AppLocalizations.of(context)
+                                    .selectQuitDateEyebrow,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 11,
@@ -460,7 +461,7 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
                                 onPreviousMonth: () => _changeMonth(-1),
                                 onNextMonth: () => _changeMonth(1),
                                 monthLabel: AppLocalizations.of(context)
-                                    .selectQuitDateMonthYear(
+                                    .selectQuitDateCalendarMonthHeading(
                                         _monthName(shownMonth.month),
                                         shownMonth.year),
                                 weekdayName: _weekdayName,
@@ -524,7 +525,7 @@ class _DateHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final back = IconButton.outlined(
       key: const ValueKey('quit-date-back'),
-      tooltip: AppLocalizations.of(context).selectQuitDateDateHeaderBackTooltip,
+      tooltip: AppLocalizations.of(context).selectQuitDateBackTooltip,
       onPressed: onBack,
       style: IconButton.styleFrom(
         foregroundColor: AppColors.deepTeal,
@@ -561,7 +562,7 @@ class _DateHeader extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: Text(
-        AppLocalizations.of(context).selectQuitDateDateHeaderText,
+        AppLocalizations.of(context).selectQuitDateStepCounter,
         style: const TextStyle(
           color: AppColors.tealSecondary,
           fontSize: 10,
@@ -621,7 +622,7 @@ class _DateProgress extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                AppLocalizations.of(context).selectQuitDateDateProgressText,
+                AppLocalizations.of(context).selectQuitDateProgressLabel,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -1092,8 +1093,7 @@ class _SelectedDateCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(13),
       ),
       child: Text(
-        AppLocalizations.of(context)
-            .selectQuitDateSelectedDateCardUnavailableText,
+        AppLocalizations.of(context).selectQuitDateRecommendedBadge,
         style: const TextStyle(
           color: Colors.white,
           fontSize: 7.5,
@@ -1174,7 +1174,7 @@ class _CheckInCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          AppLocalizations.of(context).selectQuitDateCheckInCardText,
+          AppLocalizations.of(context).selectQuitDateCheckInTitle,
           style: const TextStyle(
             color: AppColors.deepTeal,
             fontSize: 14,
@@ -1182,7 +1182,7 @@ class _CheckInCard extends StatelessWidget {
           ),
         ),
         Text(
-          AppLocalizations.of(context).selectQuitDateCheckInCardText2,
+          AppLocalizations.of(context).selectQuitDateCheckInTime,
           style: const TextStyle(
             color: AppColors.tealSecondary,
             fontSize: 11,
@@ -1235,7 +1235,7 @@ class _CheckInCard extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  AppLocalizations.of(context).selectQuitDateCheckInCardText3,
+                  AppLocalizations.of(context).selectQuitDateCheckInLockScreen,
                   style: const TextStyle(
                     color: AppColors.mutedTeal,
                     fontSize: 10,
@@ -1267,7 +1267,7 @@ class _FlexibleDateNote extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: Text(
-            AppLocalizations.of(context).selectQuitDateFlexibleDateNoteText,
+            AppLocalizations.of(context).selectQuitDateFlexibleNote,
             style: const TextStyle(
               color: AppColors.tealSecondary,
               fontSize: 11,
@@ -1370,8 +1370,7 @@ class _DateBottomAction extends StatelessWidget {
                 if (!compact) ...[
                   const SizedBox(height: 6),
                   Text(
-                    AppLocalizations.of(context)
-                        .selectQuitDateDateBottomActionText,
+                    AppLocalizations.of(context).selectQuitDateSavedNote,
                     style: const TextStyle(
                       color: AppColors.mutedTeal,
                       fontSize: 10,

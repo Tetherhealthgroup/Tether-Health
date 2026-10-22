@@ -63,8 +63,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text(AppLocalizations.of(context)
-                      .welcomeShowInformationSheetText),
+                  child:
+                      Text(AppLocalizations.of(context).welcomeSheetDoneButton),
                 ),
               ),
             ],
@@ -116,7 +116,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         _WelcomeHero(compact: compactHeight),
                         SizedBox(height: compactHeight ? 12 : 24),
                         Text(
-                          AppLocalizations.of(context).welcomeText,
+                          AppLocalizations.of(context).welcomeEyebrow,
                           style: const TextStyle(
                             color: AppColors.mutedTeal,
                             fontSize: 12,
@@ -158,7 +158,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                         SizedBox(height: compactHeight ? 10 : 18),
                         Text(
-                          AppLocalizations.of(context).welcomeText2,
+                          AppLocalizations.of(context).welcomeIntro,
                           style:
                               Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     fontSize: compactHeight ? 16 : 17,
@@ -191,7 +191,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             children: [
                               Flexible(
                                 child: Text(
-                                  AppLocalizations.of(context).welcomeText3,
+                                  AppLocalizations.of(context)
+                                      .welcomeGetStartedButton,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontSize: 17,
@@ -213,7 +214,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             key: const ValueKey('welcome-sign-in'),
                             onPressed: widget.onSignIn,
                             child: Text(
-                              AppLocalizations.of(context).welcomeSignInText,
+                              AppLocalizations.of(context).welcomeSignInButton,
                               style: const TextStyle(
                                 color: AppColors.deepTeal,
                                 decoration: TextDecoration.underline,
@@ -247,7 +248,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             ),
                           ),
                           child: Text(
-                            AppLocalizations.of(context).welcomeText4,
+                            AppLocalizations.of(context)
+                                .welcomeOtherLanguageButton,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 16,
@@ -259,14 +261,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         _WelcomeLegalText(
                           isSpanish: _isSpanish,
                           onTerms: () => _showInformationSheet(
-                            title: AppLocalizations.of(context).welcomeTitle,
-                            message:
-                                AppLocalizations.of(context).welcomeMessage,
+                            title: AppLocalizations.of(context)
+                                .welcomeTermsSheetTitle,
+                            message: AppLocalizations.of(context)
+                                .welcomeTermsSheetBody,
                           ),
                           onPrivacy: () => _showInformationSheet(
-                            title: AppLocalizations.of(context).welcomeTitle2,
-                            message:
-                                AppLocalizations.of(context).welcomeMessage2,
+                            title: AppLocalizations.of(context)
+                                .welcomePrivacySheetTitle,
+                            message: AppLocalizations.of(context)
+                                .welcomePrivacySheetBody,
                           ),
                         ),
                       ],
@@ -672,15 +676,15 @@ class _WelcomeBenefits extends StatelessWidget {
       icon: Icons.add_rounded,
       iconBackground: AppColors.mint,
       iconColor: AppColors.deepTeal,
-      title: AppLocalizations.of(context).welcomeBenefitsTitle,
-      subtitle: AppLocalizations.of(context).welcomeBenefitsSubtitle,
+      title: AppLocalizations.of(context).welcomeBenefitCravingsTitle,
+      subtitle: AppLocalizations.of(context).welcomeBenefitCravingsDescription,
     );
     final progress = _WelcomeBenefit(
       icon: Icons.check_rounded,
       iconBackground: AppColors.coralLight,
       iconColor: AppColors.coral,
-      title: AppLocalizations.of(context).welcomeBenefitsTitle2,
-      subtitle: AppLocalizations.of(context).welcomeBenefitsSubtitle2,
+      title: AppLocalizations.of(context).welcomeBenefitProgressTitle,
+      subtitle: AppLocalizations.of(context).welcomeBenefitProgressDescription,
     );
 
     // Two half-width columns split words mid-way at large text sizes.
@@ -777,7 +781,7 @@ class _WelcomeLegalText extends StatelessWidget {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
-          AppLocalizations.of(context).welcomeLegalText,
+          AppLocalizations.of(context).welcomeLegalPrefix,
           style: const TextStyle(
             color: AppColors.mutedTeal,
             fontSize: 11,
@@ -790,10 +794,10 @@ class _WelcomeLegalText extends StatelessWidget {
             minimumSize: const Size(0, 28),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          child: Text(AppLocalizations.of(context).welcomeLegalText2),
+          child: Text(AppLocalizations.of(context).welcomeTermsLink),
         ),
         Text(
-          AppLocalizations.of(context).welcomeLegalText3,
+          AppLocalizations.of(context).welcomeLegalMiddle,
           style: const TextStyle(
             color: AppColors.mutedTeal,
             fontSize: 11,
@@ -806,7 +810,7 @@ class _WelcomeLegalText extends StatelessWidget {
             minimumSize: const Size(0, 28),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          child: Text(AppLocalizations.of(context).welcomeLegalText4),
+          child: Text(AppLocalizations.of(context).welcomePrivacyNoticeLink),
         ),
       ],
     );

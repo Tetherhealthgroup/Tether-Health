@@ -73,8 +73,8 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                     backgroundColor: AppColors.deepTeal,
                     foregroundColor: Colors.white,
                   ),
-                  child: Text(
-                      AppLocalizations.of(context).whyBreatheFreeSheetDoneText),
+                  child: Text(AppLocalizations.of(context)
+                      .whyBreatheFreeSheetDoneButton),
                 ),
               ),
             ],
@@ -142,7 +142,8 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                               _WhyHero(compact: compact),
                               SizedBox(height: compact ? 8 : 14),
                               Text(
-                                AppLocalizations.of(context).whyBreatheFreeText,
+                                AppLocalizations.of(context)
+                                    .whyBreatheFreeEyebrow,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 12,
@@ -185,7 +186,7 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                               const SizedBox(height: 12),
                               Text(
                                 AppLocalizations.of(context)
-                                    .whyBreatheFreeText2,
+                                    .whyBreatheFreeIntro,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -202,15 +203,15 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                                 iconColor: AppColors.coral,
                                 iconBackground: AppColors.coralLight,
                                 title: AppLocalizations.of(context)
-                                    .whyBreatheFreeCardCravingTitle,
+                                    .whyBreatheFreeCravingTitle,
                                 subtitle: AppLocalizations.of(context)
-                                    .whyBreatheFreeCardCravingSubtitle,
+                                    .whyBreatheFreeCravingSummary,
                                 onTap: () => _showCardDetails(
                                   context,
                                   title: AppLocalizations.of(context)
-                                      .whyBreatheFreeCardCravingTitle,
+                                      .whyBreatheFreeCravingTitle,
                                   message: AppLocalizations.of(context)
-                                      .whyBreatheFreeMessage,
+                                      .whyBreatheFreeCravingDetail,
                                   icon: Icons.air_rounded,
                                   iconColor: AppColors.coral,
                                   iconBackground: AppColors.coralLight,
@@ -223,15 +224,15 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                                 iconColor: AppColors.deepTeal,
                                 iconBackground: AppColors.mint,
                                 title: AppLocalizations.of(context)
-                                    .whyBreatheFreeCardHealingTitle,
+                                    .whyBreatheFreeHealingTitle,
                                 subtitle: AppLocalizations.of(context)
-                                    .whyBreatheFreeCardHealingSubtitle,
+                                    .whyBreatheFreeHealingSummary,
                                 onTap: () => _showCardDetails(
                                   context,
                                   title: AppLocalizations.of(context)
-                                      .whyBreatheFreeCardHealingTitle,
+                                      .whyBreatheFreeHealingTitle,
                                   message: AppLocalizations.of(context)
-                                      .whyBreatheFreeMessage2,
+                                      .whyBreatheFreeHealingDetail,
                                   icon: Icons.bar_chart_rounded,
                                   iconColor: AppColors.deepTeal,
                                   iconBackground: AppColors.mint,
@@ -245,15 +246,15 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                                 iconBackground: AppColors.paper,
                                 emphasized: true,
                                 title: AppLocalizations.of(context)
-                                    .whyBreatheFreeCardSlipTitle,
+                                    .whyBreatheFreeSlipTitle,
                                 subtitle: AppLocalizations.of(context)
-                                    .whyBreatheFreeCardSlipSubtitle,
+                                    .whyBreatheFreeSlipSummary,
                                 onTap: () => _showCardDetails(
                                   context,
                                   title: AppLocalizations.of(context)
-                                      .whyBreatheFreeCardSlipTitle,
+                                      .whyBreatheFreeSlipTitle,
                                   message: AppLocalizations.of(context)
-                                      .whyBreatheFreeMessage3,
+                                      .whyBreatheFreeSlipDetail,
                                   icon: Icons.check_rounded,
                                   iconColor: AppColors.deepTeal,
                                   iconBackground: AppColors.mint,
@@ -302,8 +303,7 @@ class _WhyHeader extends StatelessWidget {
         children: [
           IconButton.outlined(
             key: const ValueKey('why-back'),
-            tooltip:
-                AppLocalizations.of(context).whyBreatheFreeHeaderBackTooltip,
+            tooltip: AppLocalizations.of(context).whyBreatheFreeBackTooltip,
             onPressed: onBack,
             style: IconButton.styleFrom(
               foregroundColor: AppColors.deepTeal,
@@ -687,7 +687,7 @@ class _WhyBottomAction extends StatelessWidget {
                       Flexible(
                         child: Text(
                           AppLocalizations.of(context)
-                              .whyBreatheFreeBottomActionText,
+                              .whyBreatheFreeContinueButton,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 17,

@@ -26,17 +26,17 @@ class ChooseQuitPathScreen extends StatelessWidget {
   String _pathLabel(BuildContext context, QuitPlanPath path) {
     return switch (path) {
       QuitPlanPath.setQuitDate =>
-        AppLocalizations.of(context).chooseQuitPathPathLabel,
+        AppLocalizations.of(context).chooseQuitPathOptionSetQuitDate,
       QuitPlanPath.quitToday =>
-        AppLocalizations.of(context).chooseQuitPathPathLabel2,
+        AppLocalizations.of(context).chooseQuitPathOptionQuitToday,
       QuitPlanPath.reduceGradually =>
-        AppLocalizations.of(context).chooseQuitPathPathLabel3,
+        AppLocalizations.of(context).chooseQuitPathOptionReduceGradually,
     };
   }
 
   String _savedMessage(BuildContext context) {
     final path = _pathLabel(context, selectedPath);
-    return AppLocalizations.of(context).chooseQuitPathSavedMessage(path);
+    return AppLocalizations.of(context).chooseQuitPathSavedStatus(path);
   }
 
   @override
@@ -129,7 +129,8 @@ class ChooseQuitPathScreen extends StatelessWidget {
                               _PathIllustration(compact: compact),
                               SizedBox(height: compact ? 12 : 20),
                               Text(
-                                AppLocalizations.of(context).chooseQuitPathText,
+                                AppLocalizations.of(context)
+                                    .chooseQuitPathEyebrow,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 11,
@@ -140,7 +141,7 @@ class ChooseQuitPathScreen extends StatelessWidget {
                               const SizedBox(height: 9),
                               Text(
                                 AppLocalizations.of(context)
-                                    .chooseQuitPathText2,
+                                    .chooseQuitPathTitle,
                                 // Already the largest text on screen; past
                                 // 180% its longest words no longer fit.
                                 textScaler: MediaQuery.textScalerOf(context)
@@ -156,7 +157,7 @@ class ChooseQuitPathScreen extends StatelessWidget {
                               SizedBox(height: compact ? 9 : 13),
                               Text(
                                 AppLocalizations.of(context)
-                                    .chooseQuitPathText3,
+                                    .chooseQuitPathIntro,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -177,15 +178,15 @@ class ChooseQuitPathScreen extends StatelessWidget {
                                 title: _pathLabel(
                                     context, QuitPlanPath.setQuitDate),
                                 description: AppLocalizations.of(context)
-                                    .chooseQuitPathDescription,
+                                    .chooseQuitPathOptionSetQuitDateDescription,
                                 supportingText: AppLocalizations.of(context)
-                                    .chooseQuitPathSupportingText,
+                                    .chooseQuitPathOptionSetQuitDateMatch,
                                 icon: Icons.event_available_rounded,
                                 iconColor: AppColors.coral,
                                 iconBackground: AppColors.coralLight,
                                 recommended: true,
                                 recommendedLabel: AppLocalizations.of(context)
-                                    .chooseQuitPathRecommendedLabel,
+                                    .chooseQuitPathRecommendedBadge,
                                 selected:
                                     selectedPath == QuitPlanPath.setQuitDate,
                                 onTap: () => onPathChanged(
@@ -203,7 +204,7 @@ class ChooseQuitPathScreen extends StatelessWidget {
                                 title:
                                     _pathLabel(context, QuitPlanPath.quitToday),
                                 description: AppLocalizations.of(context)
-                                    .chooseQuitPathDescription2,
+                                    .chooseQuitPathOptionQuitTodayDescription,
                                 icon: Icons.schedule_rounded,
                                 iconColor: AppColors.coral,
                                 iconBackground: AppColors.coralLight,
@@ -224,7 +225,7 @@ class ChooseQuitPathScreen extends StatelessWidget {
                                 title: _pathLabel(
                                     context, QuitPlanPath.reduceGradually),
                                 description: AppLocalizations.of(context)
-                                    .chooseQuitPathDescription3,
+                                    .chooseQuitPathOptionReduceGraduallyDescription,
                                 icon: Icons.format_align_center_rounded,
                                 iconColor: AppColors.deepTeal,
                                 iconBackground: AppColors.mint,
@@ -267,8 +268,7 @@ class _QuitPathHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final back = IconButton.outlined(
       key: const ValueKey('quit-path-back'),
-      tooltip:
-          AppLocalizations.of(context).chooseQuitPathQuitPathHeaderBackTooltip,
+      tooltip: AppLocalizations.of(context).chooseQuitPathBackTooltip,
       onPressed: onBack,
       style: IconButton.styleFrom(
         foregroundColor: AppColors.deepTeal,
@@ -276,8 +276,7 @@ class _QuitPathHeader extends StatelessWidget {
       ),
       icon: const Icon(Icons.arrow_back_rounded),
     );
-    final label =
-        AppLocalizations.of(context).chooseQuitPathQuitPathHeaderBackLabel;
+    final label = AppLocalizations.of(context).chooseQuitPathHeaderTitle;
     const style = TextStyle(
       color: AppColors.deepTeal,
       fontSize: 16,
@@ -307,7 +306,7 @@ class _QuitPathHeader extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: Text(
-        AppLocalizations.of(context).chooseQuitPathQuitPathHeaderText,
+        AppLocalizations.of(context).chooseQuitPathStepCounter,
         style: const TextStyle(
           color: AppColors.tealSecondary,
           fontSize: 10,
@@ -365,7 +364,7 @@ class _QuitPlanProgress extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                AppLocalizations.of(context).chooseQuitPathQuitPlanProgressText,
+                AppLocalizations.of(context).chooseQuitPathProgressLabel,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -688,7 +687,7 @@ class _FlexiblePathNote extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: Text(
-            AppLocalizations.of(context).chooseQuitPathFlexiblePathNoteText,
+            AppLocalizations.of(context).chooseQuitPathFlexibleNote,
             style: const TextStyle(
               color: AppColors.tealSecondary,
               fontSize: 12,
@@ -759,7 +758,7 @@ class _QuitPathBottomAction extends StatelessWidget {
                       Flexible(
                         child: Text(
                           AppLocalizations.of(context)
-                              .chooseQuitPathQuitPathBottomActionText,
+                              .chooseQuitPathContinueButton,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 15,

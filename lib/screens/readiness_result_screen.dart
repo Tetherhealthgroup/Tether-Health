@@ -34,41 +34,41 @@ class ReadinessResultScreen extends StatelessWidget {
   String _usageLabel(BuildContext context) {
     return switch (dailyCigaretteUse) {
       DailyCigaretteUse.notEveryDay =>
-        AppLocalizations.of(context).readinessResultUsageLabel,
+        AppLocalizations.of(context).readinessResultPatternNotEveryDay,
       DailyCigaretteUse.tenOrFewer =>
-        AppLocalizations.of(context).readinessResultUsageLabel2,
+        AppLocalizations.of(context).readinessResultPatternTenOrFewer,
       DailyCigaretteUse.elevenToTwenty =>
-        AppLocalizations.of(context).readinessResultUsageLabel3,
+        AppLocalizations.of(context).readinessResultPatternElevenToTwenty,
       DailyCigaretteUse.twentyOneToThirty =>
-        AppLocalizations.of(context).readinessResultUsageLabel4,
+        AppLocalizations.of(context).readinessResultPatternTwentyOneToThirty,
       DailyCigaretteUse.thirtyOneOrMore =>
-        AppLocalizations.of(context).readinessResultUsageLabel5,
-      null => AppLocalizations.of(context).readinessResultUsageLabel6,
+        AppLocalizations.of(context).readinessResultPatternThirtyOneOrMore,
+      null => AppLocalizations.of(context).readinessResultPatternNone,
     };
   }
 
   String _triggerLabel(BuildContext context, SmokingTrigger trigger) {
     return switch (trigger) {
       SmokingTrigger.stress =>
-        AppLocalizations.of(context).readinessResultTriggerLabel,
+        AppLocalizations.of(context).readinessResultTriggerStress,
       SmokingTrigger.afterMeals =>
-        AppLocalizations.of(context).readinessResultTriggerLabel2,
+        AppLocalizations.of(context).readinessResultTriggerAfterMeals,
       SmokingTrigger.driving =>
-        AppLocalizations.of(context).readinessResultTriggerLabel3,
+        AppLocalizations.of(context).readinessResultTriggerDriving,
       SmokingTrigger.coffee =>
-        AppLocalizations.of(context).readinessResultTriggerLabel4,
+        AppLocalizations.of(context).readinessResultTriggerCoffee,
       SmokingTrigger.socialSettings =>
-        AppLocalizations.of(context).readinessResultTriggerLabel5,
+        AppLocalizations.of(context).readinessResultTriggerSocialSettings,
       SmokingTrigger.workBreaks =>
-        AppLocalizations.of(context).readinessResultTriggerLabel6,
+        AppLocalizations.of(context).readinessResultTriggerWorkBreaks,
       SmokingTrigger.alcohol =>
-        AppLocalizations.of(context).readinessResultTriggerLabel7,
+        AppLocalizations.of(context).readinessResultTriggerAlcohol,
       SmokingTrigger.boredom =>
-        AppLocalizations.of(context).readinessResultTriggerLabel8,
+        AppLocalizations.of(context).readinessResultTriggerBoredom,
       SmokingTrigger.morning =>
-        AppLocalizations.of(context).readinessResultTriggerLabel9,
+        AppLocalizations.of(context).readinessResultTriggerMorning,
       SmokingTrigger.beforeBed =>
-        AppLocalizations.of(context).readinessResultTriggerLabel10,
+        AppLocalizations.of(context).readinessResultTriggerBeforeBed,
     };
   }
 
@@ -85,37 +85,38 @@ class ReadinessResultScreen extends StatelessWidget {
   String _triggerSummary(BuildContext context) {
     final labels = _allTriggerLabels(context);
     if (labels.isEmpty) {
-      return AppLocalizations.of(context).readinessResultTriggerSummary;
+      return AppLocalizations.of(context).readinessResultTriggersNone;
     }
     if (labels.length == 1) {
       return AppLocalizations.of(context)
-          .readinessResultTriggerSummary2(labels.first);
+          .readinessResultTriggersOne(labels.first);
     }
     if (labels.length == 2) {
       return AppLocalizations.of(context)
-          .readinessResultTriggerSummary3(labels.first, labels.last);
+          .readinessResultTriggersTwo(labels.first, labels.last);
     }
     final remaining = labels.length - 2;
     return AppLocalizations.of(context)
-        .readinessResultTriggerSummary4(labels[0], labels[1], remaining);
+        .readinessResultTriggersMany(labels[0], labels[1], remaining);
   }
 
   String _startingPointSummary(BuildContext context) {
     final count = _allTriggerLabels(context).length;
     if (count == 0) {
-      return AppLocalizations.of(context).readinessResultStartingPointSummary;
+      return AppLocalizations.of(context).readinessResultStartingPointNone;
     }
-    return AppLocalizations.of(context).readinessResultSituationCount(count);
+    return AppLocalizations.of(context)
+        .readinessResultStartingPointCount(count);
   }
 
   String _actionLabel(BuildContext context) {
     return switch (selectedPath) {
       ReadinessPath.prepare =>
-        AppLocalizations.of(context).readinessResultActionLabel,
+        AppLocalizations.of(context).readinessResultContinuePrepareButton,
       ReadinessPath.explore =>
-        AppLocalizations.of(context).readinessResultActionLabel2,
+        AppLocalizations.of(context).readinessResultContinueExploreButton,
       ReadinessPath.connect =>
-        AppLocalizations.of(context).readinessResultActionLabel3,
+        AppLocalizations.of(context).readinessResultContinueConnectButton,
     };
   }
 
@@ -134,7 +135,8 @@ class ReadinessResultScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                AppLocalizations.of(context).readinessResultShowWhyThisFitsText,
+                AppLocalizations.of(context)
+                    .readinessResultWhyThisFitsSheetTitle,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       color: AppColors.deepTeal,
                       fontWeight: FontWeight.w800,
@@ -143,7 +145,7 @@ class ReadinessResultScreen extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 AppLocalizations.of(context)
-                    .readinessResultShowWhyThisFitsText2,
+                    .readinessResultWhyThisFitsSheetBody,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppColors.tealSecondary,
                       height: 1.45,
@@ -152,7 +154,7 @@ class ReadinessResultScreen extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 AppLocalizations.of(context)
-                    .readinessResultShowWhyThisFitsText3,
+                    .readinessResultWhyThisFitsSheetNote,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.mutedTeal,
                       height: 1.4,
@@ -168,8 +170,8 @@ class ReadinessResultScreen extends StatelessWidget {
                     backgroundColor: AppColors.deepTeal,
                     foregroundColor: Colors.white,
                   ),
-                  child: Text(
-                      AppLocalizations.of(context).readinessResultDoneText),
+                  child: Text(AppLocalizations.of(context)
+                      .readinessResultWhyThisFitsSheetDoneButton),
                 ),
               ),
             ],
@@ -270,7 +272,7 @@ class ReadinessResultScreen extends StatelessWidget {
                               SizedBox(height: compact ? 12 : 20),
                               Text(
                                 AppLocalizations.of(context)
-                                    .readinessResultText,
+                                    .readinessResultEyebrow,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 11,
@@ -281,7 +283,7 @@ class ReadinessResultScreen extends StatelessWidget {
                               const SizedBox(height: 9),
                               Text(
                                 AppLocalizations.of(context)
-                                    .readinessResultText2,
+                                    .readinessResultTitle,
                                 // Already the largest text on screen; past
                                 // 180% its longest words no longer fit.
                                 textScaler: MediaQuery.textScalerOf(context)
@@ -297,7 +299,7 @@ class ReadinessResultScreen extends StatelessWidget {
                               SizedBox(height: compact ? 9 : 13),
                               Text(
                                 AppLocalizations.of(context)
-                                    .readinessResultText3,
+                                    .readinessResultIntro,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -325,7 +327,7 @@ class ReadinessResultScreen extends StatelessWidget {
                               const SizedBox(height: 18),
                               Text(
                                 AppLocalizations.of(context)
-                                    .readinessResultText4,
+                                    .readinessResultOtherPathsLabel,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 10,
@@ -371,8 +373,7 @@ class _ReadinessHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final back = IconButton.outlined(
       key: const ValueKey('readiness-back'),
-      tooltip: AppLocalizations.of(context)
-          .readinessResultReadinessHeaderBackTooltip,
+      tooltip: AppLocalizations.of(context).readinessResultBackTooltip,
       onPressed: onBack,
       style: IconButton.styleFrom(
         foregroundColor: AppColors.deepTeal,
@@ -380,8 +381,7 @@ class _ReadinessHeader extends StatelessWidget {
       ),
       icon: const Icon(Icons.arrow_back_rounded),
     );
-    final label =
-        AppLocalizations.of(context).readinessResultReadinessHeaderBackLabel;
+    final label = AppLocalizations.of(context).readinessResultHeaderTitle;
     const style = TextStyle(
       color: AppColors.deepTeal,
       fontSize: 16,
@@ -419,7 +419,7 @@ class _ReadinessHeader extends StatelessWidget {
           ),
           const SizedBox(width: 5),
           Text(
-            AppLocalizations.of(context).readinessResultReadinessHeaderText,
+            AppLocalizations.of(context).readinessResultCompleteBadge,
             style: const TextStyle(
               color: AppColors.tealSecondary,
               fontSize: 10,
@@ -479,8 +479,7 @@ class _ReadinessProgress extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                AppLocalizations.of(context)
-                    .readinessResultReadinessProgressText,
+                AppLocalizations.of(context).readinessResultProgressLabel,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -632,8 +631,7 @@ class _ReflectionCard extends StatelessWidget {
             icon: Icons.smoke_free_rounded,
             iconColor: AppColors.coral,
             iconBackground: AppColors.coralLight,
-            label:
-                AppLocalizations.of(context).readinessResultReflectionCardLabel,
+            label: AppLocalizations.of(context).readinessResultPatternLabel,
             value: usage,
           ),
           const Divider(height: 1, color: AppColors.border),
@@ -641,8 +639,7 @@ class _ReflectionCard extends StatelessWidget {
             icon: Icons.route_rounded,
             iconColor: AppColors.deepTeal,
             iconBackground: AppColors.mint,
-            label: AppLocalizations.of(context)
-                .readinessResultReflectionCardLabel2,
+            label: AppLocalizations.of(context).readinessResultTriggersLabel,
             value: triggers,
           ),
           const Divider(height: 1, color: AppColors.border),
@@ -650,8 +647,8 @@ class _ReflectionCard extends StatelessWidget {
             icon: Icons.tune_rounded,
             iconColor: AppColors.deepTeal,
             iconBackground: const Color(0xFFF1F8C7),
-            label: AppLocalizations.of(context)
-                .readinessResultReflectionCardLabel3,
+            label:
+                AppLocalizations.of(context).readinessResultStartingPointLabel,
             value: startingPoint,
           ),
         ],
@@ -747,7 +744,7 @@ class _RecommendationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title =
-        AppLocalizations.of(context).readinessResultRecommendationCardTitle;
+        AppLocalizations.of(context).readinessResultRecommendedPathName;
     const titleStyle = TextStyle(
       color: AppColors.deepTeal,
       fontSize: 20,
@@ -792,7 +789,7 @@ class _RecommendationCard extends StatelessWidget {
                       ),
                       child: Text(
                         AppLocalizations.of(context)
-                            .readinessResultRecommendationCardText,
+                            .readinessResultRecommendedBadge,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 9,
@@ -830,7 +827,7 @@ class _RecommendationCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 AppLocalizations.of(context)
-                    .readinessResultRecommendationCardText2,
+                    .readinessResultRecommendedPathDescription,
                 style: const TextStyle(
                   color: AppColors.tealSecondary,
                   fontSize: 13,
@@ -848,8 +845,7 @@ class _RecommendationCard extends StatelessWidget {
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
                 label: Text(
-                  AppLocalizations.of(context)
-                      .readinessResultRecommendationCardFitText,
+                  AppLocalizations.of(context).readinessResultWhyThisFitsLink,
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
@@ -886,10 +882,9 @@ class _AlternativePaths extends StatelessWidget {
       icon: Icons.add_rounded,
       iconColor: AppColors.deepTeal,
       iconBackground: AppColors.mint,
-      title: AppLocalizations.of(context)
-          .readinessResultAlternativePathsPathExploreTitle,
-      subtitle: AppLocalizations.of(context)
-          .readinessResultAlternativePathsPathExploreSubtitle,
+      title: AppLocalizations.of(context).readinessResultPathExploreName,
+      subtitle:
+          AppLocalizations.of(context).readinessResultPathExploreDescription,
       selected: selectedPath == ReadinessPath.explore,
       onTap: () => onPathChanged(ReadinessPath.explore),
     );
@@ -898,10 +893,9 @@ class _AlternativePaths extends StatelessWidget {
       icon: Icons.support_agent_rounded,
       iconColor: AppColors.coral,
       iconBackground: AppColors.coralLight,
-      title: AppLocalizations.of(context)
-          .readinessResultAlternativePathsPathConnectTitle,
-      subtitle: AppLocalizations.of(context)
-          .readinessResultAlternativePathsPathConnectSubtitle,
+      title: AppLocalizations.of(context).readinessResultPathConnectName,
+      subtitle:
+          AppLocalizations.of(context).readinessResultPathConnectDescription,
       selected: selectedPath == ReadinessPath.connect,
       onTap: () => onPathChanged(ReadinessPath.connect),
     );
@@ -1092,8 +1086,7 @@ class _ReadinessBottomAction extends StatelessWidget {
                 if (!compact) ...[
                   const SizedBox(height: 7),
                   Text(
-                    AppLocalizations.of(context)
-                        .readinessResultReadinessBottomActionText,
+                    AppLocalizations.of(context).readinessResultInControlNote,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: AppColors.mutedTeal,
