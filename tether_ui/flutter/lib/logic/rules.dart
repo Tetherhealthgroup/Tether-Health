@@ -125,6 +125,24 @@ Object? _latest(Map<String, Object?> v, List<String> keys) {
   return out;
 }
 
+/// Inputs of each "chosen" rule (P-78, P-79), as in spec/rules.json: a
+/// primary action on a consent, share or import screen runs only once the
+/// member has selected something there. Each rule reads only its own
+/// screen's keys.
+const _chosenInputs = <String, List<String>>{
+  'sup.programs': ['support_add_person.which_programs'],
+  'rec.consent.epic': ['records_consent.resources'],
+  'rec.consent.medicare': ['records_consent_bb.resources'],
+  'rec.consent.device': ['records_consent_device.data_types'],
+  'rec.review': ['records_review.keep_hw', 'records_review.keep_st', 'records_review.keep_ck', 'records_review.keep_bf', 'records_review.keep_re'],
+  'rec.conflict': ['records_conflict.a1c', 'records_conflict.bp'],
+};
+
+/// Whether a session value holds a selection: a non-empty list (chips,
+/// checklist) or a chosen item (radio). Null, an empty list and blank text
+/// are not.
+bool _chosen(Object? v) => v is Iterable ? v.isNotEmpty : (v != null && v.toString().trim().isNotEmpty);
+
 List<String> _list(Object? v) => v is List ? v.map((e) => e.toString()).toList() : (v == null ? const [] : [v.toString()]);
 
 abstract final class TRules {
@@ -144,6 +162,8 @@ abstract final class TRules {
       final sel = v[rule.substring(7)];
       return sel?.toString();
     }
+    final chosenKeys = _chosenInputs[rule];
+    if (chosenKeys != null) return chosenKeys.any((k) => _chosen(v[k])) ? 'Chosen' : 'Nothing chosen';
     switch (rule) {
       case 'hw.bp':
         final readings = <(double, double)>[];

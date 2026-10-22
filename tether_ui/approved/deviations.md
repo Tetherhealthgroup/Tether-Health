@@ -46,6 +46,12 @@ the current file:
 - TH-1008a rows (P-71) add only `bind` to input controls on settings
   screens. With `bind` removed, each file equals its earlier state: no label,
   starting value, layout or action changes.
+- TH-1008c rows (P-78, P-79) change starting selections, add session keys to
+  the `records_review` checklists, and wrap each screen's primary action in a
+  branch decided by a "chosen" rule. With the starting selections and keys
+  restored and each branch replaced by its "Chosen" action, each file equals
+  its earlier state, except the `records_review` button label and toast and
+  the generated action summaries.
 
 All replacement copy still needs clinical/legal review before release.
 
@@ -357,6 +363,53 @@ notification screens (`account_notifications`, `account_privacy`,
 off, and plan and
 profile screens show their designed starting value. That comes from the
 shared input components, not from `spec/screens`.
+
+## P-78 / P-79: consent-creating selections start unselected (TH-1008c)
+
+P-78: a selection that creates a consent, share or import starts unselected,
+so the screen shows exactly what will be sent. P-79: on `records_review`
+each item's keep/skip choice reaches `POST /v1/records/fhir/accept`, and only
+kept items are added. Each screen's primary action is wrapped in a branch
+decided by an on-device "chosen" rule (`spec/rules.json`; chosen when any of
+the screen's own selection keys holds a selection), built the way the
+sign-up age check is (P-72): "Chosen" runs the action exactly as before;
+"Nothing chosen" shows a short message and sends nothing. The kit has no
+disabled-until-selected button, so the buttons keep their normal look.
+
+`records_conflict` has no owner decision of its own. It follows P-78 (no
+option starts chosen) until the owner decides otherwise; a conflict left
+unanswered is sent as null.
+
+Draft wording, all needing clinical/legal copy review (kept together in
+`generator/screens_shared.py`, `SELECTION_COPY`):
+
+- "Select at least one program." (`support_add_person`)
+- "Select at least one item to continue." (`records_consent`,
+  `records_consent_bb`, `records_consent_device`)
+- "Select the items you want to add." (`records_review`)
+- "Add selected items to my programs" (`records_review` button, was "Add 21
+  items to my programs") and "Added to your programs" (its toast, was "Added
+  to Heartwise, Steady, Checkup, BreatheFree and Renew"): the count and the
+  programme list would no longer match what is sent.
+- "Choose an option for at least one item." (`records_conflict`)
+
+| Screen | Node | Change |
+|---|---|---|
+| `support_add_person` | `body[3]` chips "Which programs?" (key `which_programs`) | "BreatheFree" no longer starts selected. Also P-31 (TH-907). |
+| `support_add_person` | `footer[0]` "Save supporter" | the `POST /v1/care/supporters` submit is wrapped in a `sup.programs` branch. |
+| `records_consent` | `body[2]` checklist "What Tether will read" (key `resources`) | Conditions, Vital signs, Lab results, Medications, Immunizations and Smoking status no longer start ticked. Also TH-902 (TH-907, TH-986a). |
+| `records_consent` | `footer[0]` "Continue to MyChart" | the MyChart sign-in branch (`records.connect.mychart`) is wrapped in a `rec.consent.epic` branch. |
+| `records_consent_bb` | `body[2]` checklist "What Tether will read" (key `resources`) | as `records_consent`. |
+| `records_consent_bb` | `footer[0]` "Continue to Medicare.gov" | the Medicare sign-in branch (`records.connect.medicare`) is wrapped in a `rec.consent.medicare` branch. |
+| `records_consent_device` | `body[2]` checklist "What Tether will ask for" (key `data_types`) | Blood pressure, Blood glucose and Clinical records (iPhone) no longer start ticked. |
+| `records_consent_device` | `footer[0]` "Continue" | the permission branch (`records.device.health_records_request`) is wrapped in a `rec.consent.device` branch. |
+| `records_review` | `body[3]`–`body[7]` card checklists | get keys `keep_hw`, `keep_st`, `keep_ck`, `keep_bf`, `keep_re`; no item starts ticked (A1C 7.6% already did not). |
+| `records_review` | `footer[0]` | label and toast as above; the `POST /v1/records/fhir/accept` submit is wrapped in a `rec.review` branch. |
+| `records_conflict` | `body[0].children[0]` radio `a1c`, `body[1].children[0]` radio `bp` | `selected` 0 and 1 → -1 (no option chosen). |
+| `records_conflict` | `footer[0]` "Save choices" | the `POST /v1/records/fhir/conflicts` submit is wrapped in a `rec.conflict` branch. |
+
+`records_source` "What we read" still opens `records_consent`, which now
+shows no category ticked rather than the connected source's categories.
 
 ## Rendering changes with no spec change (TH-907)
 

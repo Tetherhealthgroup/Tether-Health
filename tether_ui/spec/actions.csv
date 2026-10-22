@@ -234,7 +234,7 @@ support_message_care,Message care team,Call or text 988,push,crisis,push → cri
 support_message_care,Message care team,Call 911,call,,call 911
 support_message_care,Message care team,Send message,submit,,POST /v1/care/messages then toast “Message sent” then back
 support_add_person,Add a supporter,Back,back,,back
-support_add_person,Add a supporter,Save supporter,submit,,POST /v1/care/supporters then toast “Jordan added” then back
+support_add_person,Add a supporter,Save supporter,branch,,decide sup.programs: Anything selected? → Chosen: POST /v1/care/supporters then toast “Jordan added” then back | Nothing chosen: toast “Select at least one program.”
 support_connect,Connect a clinic,Back,back,,back
 support_connect,Connect a clinic,Connect,submit,,POST /v1/care/connections then toast “Connected to Dr. Patel’s clinic” then back
 account,Account,Close,close,,close
@@ -738,23 +738,23 @@ records_search,Find your provider,Can’t find it? Enter a FHIR address,push,rec
 records_fhir_url,Other FHIR server,Back,back,,back
 records_fhir_url,Other FHIR server,Check and continue,branch,records_consent records_error,branch: Server check → SMART on FHIR R4 supported: push → records_consent | Not a FHIR R4 server: push → records_error
 records_consent,Consent: Epic,Back,back,,back
-records_consent,Consent: Epic,Continue to MyChart,branch,records_importing records_error,branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error
+records_consent,Consent: Epic,Continue to MyChart,branch,records_importing records_error,decide rec.consent.epic: Anything selected? → Chosen: branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error | Nothing chosen: toast “Select at least one item to continue.”
 records_consent,Consent: Epic,Not now,back,,back
 records_consent_bb,Consent: Medicare,Back,back,,back
-records_consent_bb,Consent: Medicare,Continue to Medicare.gov,branch,records_importing records_error,branch: Medicare sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error
+records_consent_bb,Consent: Medicare,Continue to Medicare.gov,branch,records_importing records_error,decide rec.consent.medicare: Anything selected? → Chosen: branch: Medicare sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error | Nothing chosen: toast “Select at least one item to continue.”
 records_consent_bb,Consent: Medicare,Not now,back,,back
 records_consent_device,Consent: phone health data,Back,back,,back
-records_consent_device,Consent: phone health data,Continue,branch,records_importing records_error,branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error
+records_consent_device,Consent: phone health data,Continue,branch,records_importing records_error,decide rec.consent.device: Anything selected? → Chosen: branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error | Nothing chosen: toast “Select at least one item to continue.”
 records_consent_device,Consent: phone health data,Not now,back,,back
 records_importing,Importing,Close,close,,close
 records_importing,Importing,Review imported data,replace,records_review,replace → records_review
 records_importing,Importing,Cancel import,popto,records_hub,popto → records_hub
 records_review,Review imported data,Close,close,,close
 records_review,Review imported data,Review,push,records_conflict,push → records_conflict
-records_review,Review imported data,Add 21 items to my programs,submit,records_hub,"POST /v1/records/fhir/accept then toast “Added to Heartwise, Steady, Checkup, BreatheFree and Renew” then popto → records_hub"
+records_review,Review imported data,Add selected items to my programs,branch,records_hub,decide rec.review: Anything selected? → Chosen: POST /v1/records/fhir/accept then toast “Added to your programs” then popto → records_hub | Nothing chosen: toast “Select the items you want to add.”
 records_review,Review imported data,Review conflicts first,push,records_conflict,push → records_conflict
 records_conflict,Resolve conflicts,Back,back,,back
-records_conflict,Resolve conflicts,Save choices,submit,,POST /v1/records/fhir/conflicts then toast “Saved” then back
+records_conflict,Resolve conflicts,Save choices,branch,,decide rec.conflict: Anything selected? → Chosen: POST /v1/records/fhir/conflicts then toast “Saved” then back | Nothing chosen: toast “Choose an option for at least one item.”
 records_error,Connection problem,Back,back,,back
 records_error,Connection problem,Try again,back,,back
 records_error,Connection problem,Choose another source,replace,records_add,replace → records_add

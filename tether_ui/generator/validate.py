@@ -102,6 +102,7 @@ def validate():
     errors += check_endpoint_classes(SCREENS)
     errors += check_plan_controls(SCREENS)
     errors += check_consent_starts(SCREENS)
+    errors += check_unselected(SCREENS)
     # tab roots
     for t in TABS:
         if t not in SCREENS: errors.append(f'tab root {t} missing')
@@ -518,18 +519,25 @@ CONSENT_START_ON = {
     ('ob_consent', 'essential_app_data'): 'Essential app data: required for the app to work, not optional',
     ('sf_unplug_off', 'scope'): 'action choice: either option only turns something off (BIND_EXEMPT)',
 }
-_PENDING = 'pending owner decision on starting selections; not mapped until then'
-CONSENT_START_PENDING = {
-    ('records_consent', 'resources'): _PENDING,
-    ('records_consent_bb', 'resources'): _PENDING,
-    ('records_consent_device', 'data_types'): _PENDING,
-    ('support_add_person', 'which_programs'): _PENDING,
-    ('records_review', 'body[3].children[0]'): _PENDING,
-    ('records_review', 'body[5].children[0]'): _PENDING,
-    ('records_review', 'body[6].children[0]'): _PENDING,
-    ('records_review', 'body[7].children[0]'): _PENDING,
-    ('records_conflict', 'a1c'): _PENDING,
-    ('records_conflict', 'bp'): _PENDING,
+# Empty: P-78 and P-79 decided the starting selections it used to list.
+CONSENT_START_PENDING = {}
+# Selections pinned unselected (P-78, P-79): each must exist under this key
+# on its screen, unbound, on a screen that submits to a consent-creating
+# endpoint, and start off. The general rule above already fails a control
+# that starts on; the pin also fails a renamed key, a dropped key or a
+# screen whose submit is no longer classified as consent-creating.
+CONSENT_START_UNSELECTED = {
+    ('support_add_person', 'which_programs'): 'P-78',
+    ('records_consent', 'resources'): 'P-78',
+    ('records_consent_bb', 'resources'): 'P-78',
+    ('records_consent_device', 'data_types'): 'P-78',
+    ('records_review', 'keep_hw'): 'P-78, P-79',
+    ('records_review', 'keep_st'): 'P-78, P-79',
+    ('records_review', 'keep_ck'): 'P-78, P-79',
+    ('records_review', 'keep_bf'): 'P-78, P-79',
+    ('records_review', 'keep_re'): 'P-78, P-79',
+    ('records_conflict', 'a1c'): 'as P-78',
+    ('records_conflict', 'bp'): 'as P-78',
 }
 # Plan-class controls must not look like consents: a key, label or option
 # with one of these words fails unless PLAN_CONSENT_WORDS_ALLOWED lists it
@@ -716,6 +724,46 @@ def check_program_context(screens, fixed=None):
         visit(sid, p, a.get('then'), prog)
     for sid, s in screens.items():
         for p, a, prog in element_programs(s): visit(sid, p, a, prog)
+    return errors
+
+def starts_on(n):
+    """Whether selection control `n` starts with something selected."""
+    t = n['t']
+    if t == 'toggle': return bool(n.get('on'))
+    if t == 'checklist': return any(i.get('done') for i in n['items'])
+    if t == 'chips': return bool(n.get('selected'))
+    if t == 'tiles': return any(i.get('selected') for i in n['items'] if not i.get('action'))
+    if t == 'radio': return isinstance(n.get('selected'), int) and 0 <= n['selected'] < len(n['items'])
+    if t == 'segmented': return n.get('selected') is not None
+    if t == 'field' and n.get('kind') == 'select': return n.get('value') is not None
+    return False
+
+def check_unselected(screens, pinned=None, also=None, checklists=None):
+    """Each CONSENT_START_UNSELECTED control exists under its key, is not
+    bound, starts off, and its screen submits to a consent-creating endpoint
+    or carries it as its consent checklist (CONSENT_CHECKLISTS).
+    On a consent-creating screen, every checklist has a key, so each ticked
+    item reaches the submit (P-79); a keyless one would show a choice that is
+    never sent."""
+    pinned = CONSENT_START_UNSELECTED if pinned is None else pinned
+    checklists = CONSENT_CHECKLISTS if checklists is None else checklists
+    errors = []
+    for (sid, key), why in pinned.items():
+        s = screens.get(sid)
+        found = [n for part in ('body', 'footer') for n, p in walk(s[part], part) if n.get('key') == key] if s else []
+        if len(found) != 1:
+            errors.append(f'{sid}: pinned unselected control {key!r} ({why}) not found once (found {len(found)}); validate.CONSENT_START_UNSELECTED.'); continue
+        n = found[0]
+        if n.get('bind') is not None: errors.append(f'{sid}: pinned unselected control {key!r} ({why}) is bound; a bound control is not checked by its starting value.')
+        if starts_on(n): errors.append(f'{sid}: {n["t"]} {key!r} starts selected ({why}): consent-creating selections start unselected, so the screen shows exactly what will be sent.')
+        if not any(is_consent_creating(e, also) for e in submits_of(s)) and checklists.get(sid) != key:
+            errors.append(f'{sid}: pinned unselected control {key!r} ({why}) but the screen submits to no consent-creating endpoint and it is not the screen\'s consent checklist.')
+    for sid, s in screens.items():
+        if not any(is_consent_creating(e, also) for e in submits_of(s)): continue
+        for part in ('body', 'footer'):
+            for n, p in walk(s[part], part):
+                if n['t'] == 'checklist' and not n.get('key') and n.get('bind') is None:
+                    errors.append(f'{sid}: checklist at {p} has no key= on a consent-creating screen, so the member\'s choices never reach the submit (P-79).')
     return errors
 
 def check_consent_starts(screens, allowed=None, checklists=None, plan=PLAN_SCREENS, also=None):
@@ -927,6 +975,19 @@ def _settings_self_test():
     has5(dict(good5, r=sc('r', [radio(['Keep', 'Drop'], 0, key='keep')], 'POST /v1/records/fhir/conflicts')), "r: optional consent radio 'keep'", 'preselected radio on a records import screen', plan=('pl',))
     _expect(run5(dict(good5, r=sc('r', [radio(['Keep', 'Drop'], -1, key='keep')], 'POST /v1/records/fhir/conflicts')), checklists={'acct': 'age'}, plan=('pl',)) == [], 'an unselected radio is reported')
     _expect(run5(dict(good5, r=sc('r', [checklist([ci('Labs', done=True)])], 'POST /v1/records/fhir/accept')), allowed=dict(allow) | {('r', 'body[0]'): 'x'}, checklists={'acct': 'age'}, plan=('pl',)) == [], 'a path allowlist entry for a keyless control does not pass')
+    # Pinned unselected controls (P-78, P-79) and keyed checklists on consent-creating screens.
+    cu = lambda screens, pinned, checklists=None: check_unselected(screens, pinned, {}, checklists or {})
+    sup = lambda *body: {'sup': sc('sup', list(body), 'POST /v1/care/supporters')}
+    pin = {('sup', 'progs'): 'P-78'}
+    _expect(cu(sup(chips(['A', 'B'], key='progs')), pin) == [], 'an unselected pinned control is reported')
+    _expect(any("chips 'progs' starts selected" in x for x in cu(sup(chips(['A', 'B'], ['A'], key='progs')), pin)), 'a pinned control starting selected not reported')
+    _expect(any('not found once' in x for x in cu(sup(chips(['A', 'B'], key='programs')), pin)), 'a renamed pinned key not reported')
+    _expect(any('is bound' in x for x in cu(sup(chips(['A', 'B'], key='progs', bind='x.p')), pin)), 'a bound pinned control not reported')
+    _expect(any('submits to no consent-creating endpoint' in x for x in cu({'sup': sc('sup', [chips(['A'], key='progs')], 'PUT /v1/program-data/x')}, pin)), 'a pinned control off a consent screen not reported')
+    _expect(cu({'rc': sc('rc', [checklist(['Labs'], key='res')], None)}, {('rc', 'res'): 'P-78'}, {'rc': 'res'}) == [], 'a pinned consent checklist without a submit is reported')
+    _expect(any('starts selected' in x for x in cu({'r': sc('r', [radio(['Keep', 'Drop'], 1, key='keep')], 'POST /v1/records/fhir/conflicts')}, {('r', 'keep'): 'x'})), 'a pinned radio starting on a choice not reported')
+    _expect(any('has no key= on a consent-creating screen' in x for x in cu({'r': sc('r', [checklist([ci('Labs')])], 'POST /v1/records/fhir/accept')}, {})), 'a keyless checklist on a consent-creating screen not reported')
+    _expect(cu({'r': sc('r', [checklist([ci('Labs')])], 'PUT /v1/program-data/x')}, {}) == [], 'a keyless checklist off consent screens is reported')
     # Endpoint classes: each pattern category, the extra list, and fail-closed.
     for e, cat in (('POST /v1/enrolments/consents', 'consent writes'), ('PATCH /v1/enrolments/consents', 'consent writes'), ('POST /v1/care/caregivers', 'care writes'),
                    ('POST /v1/care/connections', 'care writes'), ('POST /v1/care/messages', 'care writes'), ('DELETE /v1/care/supporters/:id', 'care writes'),
@@ -997,6 +1058,23 @@ def _age_gate_self_test(scr):
     var = {'w': sc('w', back()), 'v': dict(sc('v', submit('POST supabase /auth/v1/signup', back())), variantOf='w')}
     _expect(any(e.startswith('age gate: v ') for e in check_age_gate(var, ['w'], None, allow)), 'variant of a reached screen not walked')
 
+def _spec_self_test(screens):
+    """On the real spec: each CONSENT_START_UNSELECTED control set back to
+    a starting selection fails both the general starting-state rule and the
+    pin. Uses no assert, so it survives `python -O`."""
+    import copy
+    for (sid, key) in CONSENT_START_UNSELECTED:
+        spec = copy.deepcopy(screens)
+        n = next((n for part in ('body', 'footer') for n, p in walk(spec[sid][part], part) if n.get('key') == key), None)
+        if n is None: continue  # check_unselected reports the missing key
+        if n['t'] == 'checklist': n['items'][0]['done'] = True
+        elif n['t'] == 'chips': n['selected'] = [n['options'][0]]
+        elif n['t'] == 'radio': n['selected'] = 0
+        else: raise ValueError(f'{sid}.{key}: no mutation for {n["t"]}')
+        _expect(any(f'{sid}: optional consent' in x and repr(key) in x for x in check_consent_starts(spec)), f'{sid}.{key} starting selected passes check_consent_starts')
+        _expect(any(f'{sid}: ' in x and 'starts selected' in x for x in check_unselected(spec)), f'{sid}.{key} starting selected passes check_unselected')
+    print('validate spec self-test: ok')
+
 if __name__ == '__main__':
     _self_test()
     e, w, edges = validate()
@@ -1004,4 +1082,5 @@ if __name__ == '__main__':
     print(len(SCREENS), 'screens', len(edges), 'edges', len(e), 'errors', len(w), 'warnings')
     for x in e: print('ERR', x)
     for x in w: print('WARN', x)
+    _spec_self_test(SCREENS)
     raise SystemExit(1 if e else 0)

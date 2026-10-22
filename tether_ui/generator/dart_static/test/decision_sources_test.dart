@@ -53,9 +53,9 @@ final Map<String, String> _routeOf = {for (final s in AppRouter.catalog) s.$1: s
 const _mapping = <String, (String, String, Map<String, Object>?)>{
   'ob_reminders footer[0]': ('onboarding.reminders.notifications_request', 'notificationsRequest', {'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'}),
   'records_fhir_url footer[0]': ('records.fhir_url.server_check', 'fhirServerCheck', {'supported': 'SMART on FHIR R4 supported', 'unsupported': 'Not a FHIR R4 server'}),
-  'records_consent footer[0]': ('records.connect.mychart', 'smartConnect', {'approved': 'Approved', 'cancelled': 'Cancelled', 'failed': 'Denied or error'}),
-  'records_consent_bb footer[0]': ('records.connect.medicare', 'smartConnect', {'approved': 'Approved', 'cancelled': 'Cancelled', 'failed': 'Denied or error'}),
-  'records_consent_device footer[0]': ('records.device.health_records_request', 'healthRecordsRequest', {'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'}),
+  'records_consent footer[0] cases[0].action': ('records.connect.mychart', 'smartConnect', {'approved': 'Approved', 'cancelled': 'Cancelled', 'failed': 'Denied or error'}),
+  'records_consent_bb footer[0] cases[0].action': ('records.connect.medicare', 'smartConnect', {'approved': 'Approved', 'cancelled': 'Cancelled', 'failed': 'Denied or error'}),
+  'records_consent_device footer[0] cases[0].action': ('records.device.health_records_request', 'healthRecordsRequest', {'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'}),
   'sf_screentime footer[0]': ('sf.screentime.ios_request', 'screenTimeRequest', {'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'}),
   'sf_screentime_android footer[0]': ('sf.screentime.android_usage_access', 'usageAccessSettings', {'granted': 'Allowed', 'denied': 'Not allowed'}),
   'sf_unplug_intro footer[0]': ('unplug.intro.platform', 'platform', {'ios': 'iPhone', 'android': 'Android'}),
@@ -85,17 +85,17 @@ const _opens = <String, Map<String, (String, String, String?, String?)>>{
     'supported': ('SMART on FHIR R4 supported', 'route', '/records/consent', null),
     'unsupported': ('Not a FHIR R4 server', 'route', '/records/error', null),
   },
-  'records_consent footer[0]': {
+  'records_consent footer[0] cases[0].action': {
     'approved': ('Approved', 'route', '/records/importing', null),
     'cancelled': ('Cancelled', 'toast', null, 'Connection cancelled. Nothing was imported.'),
     'failed': ('Denied or error', 'route', '/records/error', null),
   },
-  'records_consent_bb footer[0]': {
+  'records_consent_bb footer[0] cases[0].action': {
     'approved': ('Approved', 'route', '/records/importing', null),
     'cancelled': ('Cancelled', 'toast', null, 'Connection cancelled. Nothing was imported.'),
     'failed': ('Denied or error', 'route', '/records/error', null),
   },
-  'records_consent_device footer[0]': {
+  'records_consent_device footer[0] cases[0].action': {
     'granted': ('Allowed', 'route', '/records/importing', null),
     'denied': ('Not allowed', 'route', '/records/error', null),
     'unavailable': ('Not allowed', 'route', '/records/error', null),
@@ -158,6 +158,15 @@ const _opens = <String, Map<String, (String, String, String?, String?)>>{
 const _ticks = <String, String>{
   'ob_account body[2].items[0] cases[0].action': 'I’m 18 or older',
   'ob_account body[2].items[1] cases[0].action': 'I’m 18 or older',
+};
+
+/// Device branches that sit inside a rule branch (P-78: a records consent
+/// screen continues only once something is selected), keyed by where: the
+/// item to tick so the rule lets the device question run.
+const _deviceTicks = <String, String>{
+  'records_consent footer[0] cases[0].action': 'Conditions',
+  'records_consent_bb footer[0] cases[0].action': 'Conditions',
+  'records_consent_device footer[0] cases[0].action': 'Blood pressure',
 };
 
 String _where(Map<String, dynamic> r) => '${r['screen']} ${r['path']}${(r['at'] as String).isEmpty ? '' : ' ${r['at']}'}';
@@ -250,6 +259,21 @@ Future<void> _open(WidgetTester tester, String route, {List<NavigatorObserver> o
     ],
   ));
   await _settle(tester);
+}
+
+/// Taps the item labelled [label] (a checklist item to select).
+Future<void> _tick(WidgetTester tester, String label) async {
+  final item = find.text(label);
+  await tester.ensureVisible(item);
+  await tester.tap(item);
+  await _settle(tester);
+}
+
+/// Opens records_consent_device with "Blood pressure" selected, so Continue
+/// reaches the permission request (P-78: nothing starts selected).
+Future<void> _openDeviceConsent(WidgetTester tester, {List<NavigatorObserver> observers = const []}) async {
+  await _open(tester, Routes.recordsConsentDevice, observers: observers);
+  await _tick(tester, 'Blood pressure');
 }
 
 Future<void> _tapKey(WidgetTester tester, String path) async {
@@ -432,6 +456,8 @@ void main() {
           TDevice.instance = device;
           final stack = _Stack();
           await _open(tester, _routeOf[screen]!, observers: [stack]);
+          final tick = _deviceTicks[where];
+          if (tick != null) await _tick(tester, tick);
           await _tapKey(tester, path);
           expect(resolver.recorded, isEmpty, reason: 'the device answer decides the branch');
           expect(device.asked.first, TBranchRef(id, ask, screen));
@@ -468,6 +494,9 @@ void main() {
         });
       }
     }
+    test('a device branch sits inside another branch only where the pinned tick lets it run', () {
+      expect({for (final r in cat) if (r['source'] == 'device' && (r['at'] as String).isNotEmpty) _where(r)}, _deviceTicks.keys.toSet());
+    });
     test('a sign-in branch sits inside another branch only where the pinned tick lets it run', () {
       expect({for (final r in cat) if (r['source'] == 'auth' && (r['at'] as String).isNotEmpty) _where(r)}, _ticks.keys.toSet());
     });
@@ -669,7 +698,7 @@ void main() {
         return g.future;
       });
       TDevice.instance = device;
-      await _open(tester, Routes.recordsConsentDevice);
+      await _openDeviceConsent(tester);
       final button = find.byKey(const ValueKey('a:footer[0]'));
       await tester.ensureVisible(button);
       await tester.pump(const Duration(milliseconds: 50));
@@ -739,7 +768,7 @@ void main() {
         got.add(q);
         return null;
       };
-      await _open(tester, Routes.recordsConsentDevice);
+      await _openDeviceConsent(tester);
       await _tapKey(tester, 'footer[0]');
       await _hostPage(tester);
       await TNav.branch(_hostContext, 'Sign-in result', {'A': () {}, 'B': () {}});
@@ -756,7 +785,7 @@ void main() {
         got.add(q);
         return null;
       };
-      await _open(tester, Routes.recordsConsentDevice);
+      await _openDeviceConsent(tester);
       await _tapKey(tester, 'footer[0]');
       expect(got, ['System permission result']);
     });
@@ -920,7 +949,7 @@ void main() {
       final arrivals = _Arrivals();
       final gate = Completer<TAnswer?>();
       TDevice.instance = _ScriptedDevice((_) => gate.future);
-      await _open(tester, Routes.recordsConsentDevice, observers: [arrivals]);
+      await _openDeviceConsent(tester, observers: [arrivals]);
       await _tapKey(tester, 'footer[0]');
       final ctx = tester.element(find.byType(RecordsConsentDeviceScreen));
       unawaited(Navigator.of(ctx).pushNamed(Routes.crisis));
@@ -939,7 +968,7 @@ void main() {
       TNav.branchResolver = resolver.resolve;
       final gate = Completer<TAnswer?>();
       TDevice.instance = _ScriptedDevice((_) => gate.future);
-      await _open(tester, Routes.recordsConsentDevice);
+      await _openDeviceConsent(tester);
       await _tapKey(tester, 'footer[0]');
       unawaited(Navigator.of(tester.element(find.byType(RecordsConsentDeviceScreen))).pushNamed(Routes.crisis));
       await _settle(tester);
@@ -985,7 +1014,7 @@ void main() {
       final gate = Completer<TAnswer?>();
       final arrivals = _Arrivals();
       TDevice.instance = _ScriptedDevice((_) => gate.future);
-      await _open(tester, Routes.recordsConsentDevice, observers: [arrivals]);
+      await _openDeviceConsent(tester, observers: [arrivals]);
       await _tapKey(tester, 'footer[0]');
       Navigator.of(tester.element(find.byType(RecordsConsentDeviceScreen))).pop();
       await _settle(tester);

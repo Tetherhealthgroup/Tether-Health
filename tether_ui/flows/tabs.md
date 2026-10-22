@@ -153,6 +153,6 @@ flowchart LR
 | Message care team | Call 911 | `call 911` |
 | Message care team | Send message | `POST /v1/care/messages then toast “Message sent” then back` |
 | Add a supporter | Back | `back` |
-| Add a supporter | Save supporter | `POST /v1/care/supporters then toast “Jordan added” then back` |
+| Add a supporter | Save supporter | `decide sup.programs: Anything selected? → Chosen: POST /v1/care/supporters then toast “Jordan added” then back | Nothing chosen: toast “Select at least one program.”` |
 | Connect a clinic | Back | `back` |
 | Connect a clinic | Connect | `POST /v1/care/connections then toast “Connected to Dr. Patel’s clinic” then back` |

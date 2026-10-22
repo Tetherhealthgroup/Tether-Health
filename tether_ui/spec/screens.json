@@ -7818,9 +7818,7 @@
           "BreatheFree",
           "ScrollFree"
         ],
-        "selected": [
-          "BreatheFree"
-        ],
+        "selected": [],
         "multi": true,
         "label": "Which programs?",
         "key": "which_programs"
@@ -7843,15 +7841,33 @@
         "t": "button",
         "label": "Save supporter",
         "action": {
-          "type": "submit",
-          "api": "POST /v1/care/supporters",
-          "then": {
-            "type": "toast",
-            "value": "Jordan added",
-            "then": {
-              "type": "back"
+          "type": "branch",
+          "question": "Anything selected?",
+          "on": null,
+          "decide": "sup.programs",
+          "cases": [
+            {
+              "label": "Chosen",
+              "action": {
+                "type": "submit",
+                "api": "POST /v1/care/supporters",
+                "then": {
+                  "type": "toast",
+                  "value": "Jordan added",
+                  "then": {
+                    "type": "back"
+                  }
+                }
+              }
+            },
+            {
+              "label": "Nothing chosen",
+              "action": {
+                "type": "toast",
+                "value": "Select at least one program."
+              }
             }
-          }
+          ]
         },
         "variant": "primary",
         "arrow": true
@@ -7873,17 +7889,35 @@
         "element": "Save supporter",
         "path": "footer[0]",
         "action": {
-          "type": "submit",
-          "api": "POST /v1/care/supporters",
-          "then": {
-            "type": "toast",
-            "value": "Jordan added",
-            "then": {
-              "type": "back"
+          "type": "branch",
+          "question": "Anything selected?",
+          "on": null,
+          "decide": "sup.programs",
+          "cases": [
+            {
+              "label": "Chosen",
+              "action": {
+                "type": "submit",
+                "api": "POST /v1/care/supporters",
+                "then": {
+                  "type": "toast",
+                  "value": "Jordan added",
+                  "then": {
+                    "type": "back"
+                  }
+                }
+              }
+            },
+            {
+              "label": "Nothing chosen",
+              "action": {
+                "type": "toast",
+                "value": "Select at least one program."
+              }
             }
-          }
+          ]
         },
-        "summary": "POST /v1/care/supporters then toast “Jordan added” then back"
+        "summary": "decide sup.programs: Anything selected? → Chosen: POST /v1/care/supporters then toast “Jordan added” then back | Nothing chosen: toast “Select at least one program.”"
       }
     ]
   },
@@ -24583,33 +24617,27 @@
         "items": [
           {
             "label": "Conditions",
-            "sub": "Condition",
-            "done": true
+            "sub": "Condition"
           },
           {
             "label": "Vital signs",
-            "sub": "Observation · blood pressure, weight",
-            "done": true
+            "sub": "Observation · blood pressure, weight"
           },
           {
             "label": "Lab results",
-            "sub": "Observation · A1C, lipids, eGFR",
-            "done": true
+            "sub": "Observation · A1C, lipids, eGFR"
           },
           {
             "label": "Medications",
-            "sub": "MedicationRequest",
-            "done": true
+            "sub": "MedicationRequest"
           },
           {
             "label": "Immunizations",
-            "sub": "Immunization",
-            "done": true
+            "sub": "Immunization"
           },
           {
             "label": "Smoking status",
-            "sub": "Observation · LOINC 72166-2",
-            "done": true
+            "sub": "Observation · LOINC 72166-2"
           },
           {
             "label": "Clinical notes",
@@ -24632,39 +24660,57 @@
         "label": "Continue to MyChart",
         "action": {
           "type": "branch",
-          "question": "MyChart sign-in result",
+          "question": "Anything selected?",
           "on": null,
-          "decide": null,
+          "decide": "rec.consent.epic",
           "cases": [
             {
-              "label": "Approved",
+              "label": "Chosen",
               "action": {
-                "type": "push",
-                "to": "records_importing"
+                "type": "branch",
+                "question": "MyChart sign-in result",
+                "on": null,
+                "decide": null,
+                "cases": [
+                  {
+                    "label": "Approved",
+                    "action": {
+                      "type": "push",
+                      "to": "records_importing"
+                    }
+                  },
+                  {
+                    "label": "Cancelled",
+                    "action": {
+                      "type": "toast",
+                      "value": "Connection cancelled. Nothing was imported."
+                    }
+                  },
+                  {
+                    "label": "Denied or error",
+                    "action": {
+                      "type": "push",
+                      "to": "records_error"
+                    }
+                  }
+                ],
+                "id": "records.connect.mychart",
+                "ask": "smartConnect",
+                "when": {
+                  "approved": "Approved",
+                  "cancelled": "Cancelled",
+                  "failed": "Denied or error"
+                }
               }
             },
             {
-              "label": "Cancelled",
+              "label": "Nothing chosen",
               "action": {
                 "type": "toast",
-                "value": "Connection cancelled. Nothing was imported."
-              }
-            },
-            {
-              "label": "Denied or error",
-              "action": {
-                "type": "push",
-                "to": "records_error"
+                "value": "Select at least one item to continue."
               }
             }
-          ],
-          "id": "records.connect.mychart",
-          "ask": "smartConnect",
-          "when": {
-            "approved": "Approved",
-            "cancelled": "Cancelled",
-            "failed": "Denied or error"
-          }
+          ]
         },
         "variant": "primary",
         "arrow": true
@@ -24699,41 +24745,59 @@
         "path": "footer[0]",
         "action": {
           "type": "branch",
-          "question": "MyChart sign-in result",
+          "question": "Anything selected?",
           "on": null,
-          "decide": null,
+          "decide": "rec.consent.epic",
           "cases": [
             {
-              "label": "Approved",
+              "label": "Chosen",
               "action": {
-                "type": "push",
-                "to": "records_importing"
+                "type": "branch",
+                "question": "MyChart sign-in result",
+                "on": null,
+                "decide": null,
+                "cases": [
+                  {
+                    "label": "Approved",
+                    "action": {
+                      "type": "push",
+                      "to": "records_importing"
+                    }
+                  },
+                  {
+                    "label": "Cancelled",
+                    "action": {
+                      "type": "toast",
+                      "value": "Connection cancelled. Nothing was imported."
+                    }
+                  },
+                  {
+                    "label": "Denied or error",
+                    "action": {
+                      "type": "push",
+                      "to": "records_error"
+                    }
+                  }
+                ],
+                "id": "records.connect.mychart",
+                "ask": "smartConnect",
+                "when": {
+                  "approved": "Approved",
+                  "cancelled": "Cancelled",
+                  "failed": "Denied or error"
+                }
               }
             },
             {
-              "label": "Cancelled",
+              "label": "Nothing chosen",
               "action": {
                 "type": "toast",
-                "value": "Connection cancelled. Nothing was imported."
-              }
-            },
-            {
-              "label": "Denied or error",
-              "action": {
-                "type": "push",
-                "to": "records_error"
+                "value": "Select at least one item to continue."
               }
             }
-          ],
-          "id": "records.connect.mychart",
-          "ask": "smartConnect",
-          "when": {
-            "approved": "Approved",
-            "cancelled": "Cancelled",
-            "failed": "Denied or error"
-          }
+          ]
         },
-        "summary": "branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error"
+        "summary": "decide rec.consent.epic: Anything selected? → Chosen: branch: MyChart sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error | Nothing chosen: toast “Select at least one item to continue.”"
       },
       {
         "element": "Not now",
@@ -24797,33 +24861,27 @@
         "items": [
           {
             "label": "Conditions",
-            "sub": "Condition",
-            "done": true
+            "sub": "Condition"
           },
           {
             "label": "Vital signs",
-            "sub": "Observation · blood pressure, weight",
-            "done": true
+            "sub": "Observation · blood pressure, weight"
           },
           {
             "label": "Lab results",
-            "sub": "Observation · A1C, lipids, eGFR",
-            "done": true
+            "sub": "Observation · A1C, lipids, eGFR"
           },
           {
             "label": "Medications",
-            "sub": "MedicationRequest",
-            "done": true
+            "sub": "MedicationRequest"
           },
           {
             "label": "Immunizations",
-            "sub": "Immunization",
-            "done": true
+            "sub": "Immunization"
           },
           {
             "label": "Smoking status",
-            "sub": "Observation · LOINC 72166-2",
-            "done": true
+            "sub": "Observation · LOINC 72166-2"
           },
           {
             "label": "Clinical notes",
@@ -24846,39 +24904,57 @@
         "label": "Continue to Medicare.gov",
         "action": {
           "type": "branch",
-          "question": "Medicare sign-in result",
+          "question": "Anything selected?",
           "on": null,
-          "decide": null,
+          "decide": "rec.consent.medicare",
           "cases": [
             {
-              "label": "Approved",
+              "label": "Chosen",
               "action": {
-                "type": "push",
-                "to": "records_importing"
+                "type": "branch",
+                "question": "Medicare sign-in result",
+                "on": null,
+                "decide": null,
+                "cases": [
+                  {
+                    "label": "Approved",
+                    "action": {
+                      "type": "push",
+                      "to": "records_importing"
+                    }
+                  },
+                  {
+                    "label": "Cancelled",
+                    "action": {
+                      "type": "toast",
+                      "value": "Connection cancelled. Nothing was imported."
+                    }
+                  },
+                  {
+                    "label": "Denied or error",
+                    "action": {
+                      "type": "push",
+                      "to": "records_error"
+                    }
+                  }
+                ],
+                "id": "records.connect.medicare",
+                "ask": "smartConnect",
+                "when": {
+                  "approved": "Approved",
+                  "cancelled": "Cancelled",
+                  "failed": "Denied or error"
+                }
               }
             },
             {
-              "label": "Cancelled",
+              "label": "Nothing chosen",
               "action": {
                 "type": "toast",
-                "value": "Connection cancelled. Nothing was imported."
-              }
-            },
-            {
-              "label": "Denied or error",
-              "action": {
-                "type": "push",
-                "to": "records_error"
+                "value": "Select at least one item to continue."
               }
             }
-          ],
-          "id": "records.connect.medicare",
-          "ask": "smartConnect",
-          "when": {
-            "approved": "Approved",
-            "cancelled": "Cancelled",
-            "failed": "Denied or error"
-          }
+          ]
         },
         "variant": "primary",
         "arrow": true
@@ -24910,41 +24986,59 @@
         "path": "footer[0]",
         "action": {
           "type": "branch",
-          "question": "Medicare sign-in result",
+          "question": "Anything selected?",
           "on": null,
-          "decide": null,
+          "decide": "rec.consent.medicare",
           "cases": [
             {
-              "label": "Approved",
+              "label": "Chosen",
               "action": {
-                "type": "push",
-                "to": "records_importing"
+                "type": "branch",
+                "question": "Medicare sign-in result",
+                "on": null,
+                "decide": null,
+                "cases": [
+                  {
+                    "label": "Approved",
+                    "action": {
+                      "type": "push",
+                      "to": "records_importing"
+                    }
+                  },
+                  {
+                    "label": "Cancelled",
+                    "action": {
+                      "type": "toast",
+                      "value": "Connection cancelled. Nothing was imported."
+                    }
+                  },
+                  {
+                    "label": "Denied or error",
+                    "action": {
+                      "type": "push",
+                      "to": "records_error"
+                    }
+                  }
+                ],
+                "id": "records.connect.medicare",
+                "ask": "smartConnect",
+                "when": {
+                  "approved": "Approved",
+                  "cancelled": "Cancelled",
+                  "failed": "Denied or error"
+                }
               }
             },
             {
-              "label": "Cancelled",
+              "label": "Nothing chosen",
               "action": {
                 "type": "toast",
-                "value": "Connection cancelled. Nothing was imported."
-              }
-            },
-            {
-              "label": "Denied or error",
-              "action": {
-                "type": "push",
-                "to": "records_error"
+                "value": "Select at least one item to continue."
               }
             }
-          ],
-          "id": "records.connect.medicare",
-          "ask": "smartConnect",
-          "when": {
-            "approved": "Approved",
-            "cancelled": "Cancelled",
-            "failed": "Denied or error"
-          }
+          ]
         },
-        "summary": "branch: Medicare sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error"
+        "summary": "decide rec.consent.medicare: Anything selected? → Chosen: branch: Medicare sign-in result → Approved: push → records_importing | Cancelled: toast “Connection cancelled. Nothing was imported.” | Denied or error: push → records_error | Nothing chosen: toast “Select at least one item to continue.”"
       },
       {
         "element": "Not now",
@@ -24991,17 +25085,14 @@
         "t": "checklist",
         "items": [
           {
-            "label": "Blood pressure",
-            "done": true
+            "label": "Blood pressure"
           },
           {
-            "label": "Blood glucose",
-            "done": true
+            "label": "Blood glucose"
           },
           {
             "label": "Clinical records (iPhone)",
-            "sub": "Labs, immunizations, conditions",
-            "done": true
+            "sub": "Labs, immunizations, conditions"
           },
           {
             "label": "Steps and sleep",
@@ -25018,32 +25109,50 @@
         "label": "Continue",
         "action": {
           "type": "branch",
-          "question": "System permission result",
+          "question": "Anything selected?",
           "on": null,
-          "decide": null,
+          "decide": "rec.consent.device",
           "cases": [
             {
-              "label": "Allowed",
+              "label": "Chosen",
               "action": {
-                "type": "push",
-                "to": "records_importing"
+                "type": "branch",
+                "question": "System permission result",
+                "on": null,
+                "decide": null,
+                "cases": [
+                  {
+                    "label": "Allowed",
+                    "action": {
+                      "type": "push",
+                      "to": "records_importing"
+                    }
+                  },
+                  {
+                    "label": "Not allowed",
+                    "action": {
+                      "type": "push",
+                      "to": "records_error"
+                    }
+                  }
+                ],
+                "id": "records.device.health_records_request",
+                "ask": "healthRecordsRequest",
+                "when": {
+                  "granted": "Allowed",
+                  "denied": "Not allowed",
+                  "unavailable": "Not allowed"
+                }
               }
             },
             {
-              "label": "Not allowed",
+              "label": "Nothing chosen",
               "action": {
-                "type": "push",
-                "to": "records_error"
+                "type": "toast",
+                "value": "Select at least one item to continue."
               }
             }
-          ],
-          "id": "records.device.health_records_request",
-          "ask": "healthRecordsRequest",
-          "when": {
-            "granted": "Allowed",
-            "denied": "Not allowed",
-            "unavailable": "Not allowed"
-          }
+          ]
         },
         "variant": "primary",
         "arrow": true
@@ -25075,34 +25184,52 @@
         "path": "footer[0]",
         "action": {
           "type": "branch",
-          "question": "System permission result",
+          "question": "Anything selected?",
           "on": null,
-          "decide": null,
+          "decide": "rec.consent.device",
           "cases": [
             {
-              "label": "Allowed",
+              "label": "Chosen",
               "action": {
-                "type": "push",
-                "to": "records_importing"
+                "type": "branch",
+                "question": "System permission result",
+                "on": null,
+                "decide": null,
+                "cases": [
+                  {
+                    "label": "Allowed",
+                    "action": {
+                      "type": "push",
+                      "to": "records_importing"
+                    }
+                  },
+                  {
+                    "label": "Not allowed",
+                    "action": {
+                      "type": "push",
+                      "to": "records_error"
+                    }
+                  }
+                ],
+                "id": "records.device.health_records_request",
+                "ask": "healthRecordsRequest",
+                "when": {
+                  "granted": "Allowed",
+                  "denied": "Not allowed",
+                  "unavailable": "Not allowed"
+                }
               }
             },
             {
-              "label": "Not allowed",
+              "label": "Nothing chosen",
               "action": {
-                "type": "push",
-                "to": "records_error"
+                "type": "toast",
+                "value": "Select at least one item to continue."
               }
             }
-          ],
-          "id": "records.device.health_records_request",
-          "ask": "healthRecordsRequest",
-          "when": {
-            "granted": "Allowed",
-            "denied": "Not allowed",
-            "unavailable": "Not allowed"
-          }
+          ]
         },
-        "summary": "branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error"
+        "summary": "decide rec.consent.device: Anything selected? → Chosen: branch: System permission result → Allowed: push → records_importing | Not allowed: push → records_error | Nothing chosen: toast “Select at least one item to continue.”"
       },
       {
         "element": "Not now",
@@ -25289,15 +25416,14 @@
             "items": [
               {
                 "label": "12 blood pressure readings",
-                "sub": "Jun – Oct 2026",
-                "done": true
+                "sub": "Jun – Oct 2026"
               },
               {
                 "label": "Lipid panel",
-                "sub": "LDL 138 · Sep 30",
-                "done": true
+                "sub": "LDL 138 · Sep 30"
               }
-            ]
+            ],
+            "key": "keep_hw"
           }
         ]
       },
@@ -25313,7 +25439,8 @@
                 "label": "A1C 7.6%",
                 "sub": "Oct 1 · differs from your entry (7.4%)"
               }
-            ]
+            ],
+            "key": "keep_st"
           }
         ]
       },
@@ -25327,15 +25454,14 @@
             "items": [
               {
                 "label": "Flu vaccine",
-                "sub": "Oct 12, 2025",
-                "done": true
+                "sub": "Oct 12, 2025"
               },
               {
                 "label": "Tdap",
-                "sub": "2019",
-                "done": true
+                "sub": "2019"
               }
-            ]
+            ],
+            "key": "keep_ck"
           }
         ]
       },
@@ -25349,10 +25475,10 @@
             "items": [
               {
                 "label": "Smoking status: every day smoker",
-                "sub": "Aug 2026 · sets your baseline",
-                "done": true
+                "sub": "Aug 2026 · sets your baseline"
               }
-            ]
+            ],
+            "key": "keep_bf"
           }
         ]
       },
@@ -25366,10 +25492,10 @@
             "items": [
               {
                 "label": "eGFR 58",
-                "sub": "Oct 3",
-                "done": true
+                "sub": "Oct 3"
               }
-            ]
+            ],
+            "key": "keep_re"
           }
         ]
       },
@@ -25402,18 +25528,36 @@
     "footer": [
       {
         "t": "button",
-        "label": "Add 21 items to my programs",
+        "label": "Add selected items to my programs",
         "action": {
-          "type": "submit",
-          "api": "POST /v1/records/fhir/accept",
-          "then": {
-            "type": "toast",
-            "value": "Added to Heartwise, Steady, Checkup, BreatheFree and Renew",
-            "then": {
-              "type": "popto",
-              "to": "records_hub"
+          "type": "branch",
+          "question": "Anything selected?",
+          "on": null,
+          "decide": "rec.review",
+          "cases": [
+            {
+              "label": "Chosen",
+              "action": {
+                "type": "submit",
+                "api": "POST /v1/records/fhir/accept",
+                "then": {
+                  "type": "toast",
+                  "value": "Added to your programs",
+                  "then": {
+                    "type": "popto",
+                    "to": "records_hub"
+                  }
+                }
+              }
+            },
+            {
+              "label": "Nothing chosen",
+              "action": {
+                "type": "toast",
+                "value": "Select the items you want to add."
+              }
             }
-          }
+          ]
         },
         "variant": "primary",
         "arrow": true
@@ -25450,21 +25594,39 @@
         "summary": "push → records_conflict"
       },
       {
-        "element": "Add 21 items to my programs",
+        "element": "Add selected items to my programs",
         "path": "footer[0]",
         "action": {
-          "type": "submit",
-          "api": "POST /v1/records/fhir/accept",
-          "then": {
-            "type": "toast",
-            "value": "Added to Heartwise, Steady, Checkup, BreatheFree and Renew",
-            "then": {
-              "type": "popto",
-              "to": "records_hub"
+          "type": "branch",
+          "question": "Anything selected?",
+          "on": null,
+          "decide": "rec.review",
+          "cases": [
+            {
+              "label": "Chosen",
+              "action": {
+                "type": "submit",
+                "api": "POST /v1/records/fhir/accept",
+                "then": {
+                  "type": "toast",
+                  "value": "Added to your programs",
+                  "then": {
+                    "type": "popto",
+                    "to": "records_hub"
+                  }
+                }
+              }
+            },
+            {
+              "label": "Nothing chosen",
+              "action": {
+                "type": "toast",
+                "value": "Select the items you want to add."
+              }
             }
-          }
+          ]
         },
-        "summary": "POST /v1/records/fhir/accept then toast “Added to Heartwise, Steady, Checkup, BreatheFree and Renew” then popto → records_hub"
+        "summary": "decide rec.review: Anything selected? → Chosen: POST /v1/records/fhir/accept then toast “Added to your programs” then popto → records_hub | Nothing chosen: toast “Select the items you want to add.”"
       },
       {
         "element": "Review conflicts first",
@@ -25520,7 +25682,7 @@
                 "sub": "Your clinician’s value is used in summaries"
               }
             ],
-            "selected": 0,
+            "selected": -1,
             "key": "a1c"
           }
         ]
@@ -25547,7 +25709,7 @@
                 "sub": "Sends a question with the original value"
               }
             ],
-            "selected": 1,
+            "selected": -1,
             "key": "bp"
           }
         ]
@@ -25558,15 +25720,33 @@
         "t": "button",
         "label": "Save choices",
         "action": {
-          "type": "submit",
-          "api": "POST /v1/records/fhir/conflicts",
-          "then": {
-            "type": "toast",
-            "value": "Saved",
-            "then": {
-              "type": "back"
+          "type": "branch",
+          "question": "Anything selected?",
+          "on": null,
+          "decide": "rec.conflict",
+          "cases": [
+            {
+              "label": "Chosen",
+              "action": {
+                "type": "submit",
+                "api": "POST /v1/records/fhir/conflicts",
+                "then": {
+                  "type": "toast",
+                  "value": "Saved",
+                  "then": {
+                    "type": "back"
+                  }
+                }
+              }
+            },
+            {
+              "label": "Nothing chosen",
+              "action": {
+                "type": "toast",
+                "value": "Choose an option for at least one item."
+              }
             }
-          }
+          ]
         },
         "variant": "primary",
         "arrow": true
@@ -25588,17 +25768,35 @@
         "element": "Save choices",
         "path": "footer[0]",
         "action": {
-          "type": "submit",
-          "api": "POST /v1/records/fhir/conflicts",
-          "then": {
-            "type": "toast",
-            "value": "Saved",
-            "then": {
-              "type": "back"
+          "type": "branch",
+          "question": "Anything selected?",
+          "on": null,
+          "decide": "rec.conflict",
+          "cases": [
+            {
+              "label": "Chosen",
+              "action": {
+                "type": "submit",
+                "api": "POST /v1/records/fhir/conflicts",
+                "then": {
+                  "type": "toast",
+                  "value": "Saved",
+                  "then": {
+                    "type": "back"
+                  }
+                }
+              }
+            },
+            {
+              "label": "Nothing chosen",
+              "action": {
+                "type": "toast",
+                "value": "Choose an option for at least one item."
+              }
             }
-          }
+          ]
         },
-        "summary": "POST /v1/records/fhir/conflicts then toast “Saved” then back"
+        "summary": "decide rec.conflict: Anything selected? → Chosen: POST /v1/records/fhir/conflicts then toast “Saved” then back | Nothing chosen: toast “Choose an option for at least one item.”"
       }
     ]
   },

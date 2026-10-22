@@ -463,40 +463,57 @@
       "change": "P-31 placeholders, fields start empty: body[0] \"eGFR\" example \"58\" -> placeholder; body[1] \"Urine ACR\" example \"42\" -> placeholder; body[3] \"Lab date\" example \"Oct 3, 2026\" -> placeholder"
     },
     {
+      "screen": "records_conflict",
+      "decisions": [
+        "P-78"
+      ],
+      "tickets": [
+        "TH-1008c"
+      ],
+      "sha256": "21fec21b5f3efff840a72f50721a3b73585d9fca557b2919395280583c94542f",
+      "change": "As P-78, no option starts chosen (owner decision for this screen pending): body[0].children[0] radio \"a1c\" \"selected\" 0 -> -1 (was \"From Patel Family Medicine (Epic): 7.6%\"); body[1].children[0] radio \"bp\" \"selected\" 1 -> -1 (was \"Keep as 129/80\") | footer[0] \"Save choices\" action wrapped in a branch decided by rule rec.conflict: \"Chosen\" runs the POST /v1/records/fhir/conflicts submit unchanged; \"Nothing chosen\" shows the toast \"Choose an option for at least one item.\" (draft copy, needs clinical/legal copy review); action summaries follow; a conflict left unanswered is sent as null"
+    },
+    {
       "screen": "records_consent",
       "decisions": [
-        "TH-902"
+        "TH-902",
+        "P-78"
       ],
       "tickets": [
         "TH-907",
-        "TH-986a"
+        "TH-986a",
+        "TH-1008c"
       ],
-      "sha256": "b1fe26df1593d88c28571ca3ab3157c8659fbaea627f8c2d7ff21328c314fcd1",
-      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.connect.mychart\", ask \"smartConnect\" and when {approved: Approved, cancelled: Cancelled, failed: Denied or error}"
+      "sha256": "e9b3fc7b73d2b5bcba846ae12eff8c051369a773b27bb2da86e3b01521b852c4",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.connect.mychart\", ask \"smartConnect\" and when {approved: Approved, cancelled: Cancelled, failed: Denied or error} | P-78, starts unticked: body[2] checklist \"What Tether will read\" items Conditions, Vital signs, Lab results, Medications, Immunizations and Smoking status no longer start ticked (\"done\": true removed); Clinical notes was already unticked | footer[0] \"Continue to MyChart\" action wrapped in a branch decided by rule rec.consent.epic: \"Chosen\" runs the MyChart sign-in branch (id records.connect.mychart) unchanged; \"Nothing chosen\" shows the toast \"Select at least one item to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow"
     },
     {
       "screen": "records_consent_bb",
       "decisions": [
-        "TH-902"
+        "TH-902",
+        "P-78"
       ],
       "tickets": [
         "TH-907",
-        "TH-986a"
+        "TH-986a",
+        "TH-1008c"
       ],
-      "sha256": "14a7a411640ac2ca2738e746af0b15bd654feec477ddd7c3cc66b8dd11a581cc",
-      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.connect.medicare\", ask \"smartConnect\" and when {approved: Approved, cancelled: Cancelled, failed: Denied or error}"
+      "sha256": "d93fde46370581db6d27e46a349a17380e92ce1365c769e8780e6978d2725bba",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.connect.medicare\", ask \"smartConnect\" and when {approved: Approved, cancelled: Cancelled, failed: Denied or error} | P-78, starts unticked: body[2] checklist \"What Tether will read\" items Conditions, Vital signs, Lab results, Medications, Immunizations and Smoking status no longer start ticked (\"done\": true removed); Clinical notes was already unticked | footer[0] \"Continue to Medicare.gov\" action wrapped in a branch decided by rule rec.consent.medicare: \"Chosen\" runs the Medicare sign-in branch (id records.connect.medicare) unchanged; \"Nothing chosen\" shows the toast \"Select at least one item to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow"
     },
     {
       "screen": "records_consent_device",
       "decisions": [
-        "TH-902"
+        "TH-902",
+        "P-78"
       ],
       "tickets": [
         "TH-907",
-        "TH-986a"
+        "TH-986a",
+        "TH-1008c"
       ],
-      "sha256": "5e2416a736e45fa22ca9d8a8427789c0c5a6bd594f04b39b0df26a446a615007",
-      "change": "Session key only, no visual change: body[2] checklist gets key \"data_types\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.device.health_records_request\", ask \"healthRecordsRequest\" and when {granted: Allowed, denied: Not allowed, unavailable: Not allowed}"
+      "sha256": "e7bc0f11a4e39eb196f902f7e02902757a773f7f284ef0c78f555689c556c5d3",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"data_types\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.device.health_records_request\", ask \"healthRecordsRequest\" and when {granted: Allowed, denied: Not allowed, unavailable: Not allowed} | P-78, starts unticked: body[2] checklist \"What Tether will ask for\" items Blood pressure, Blood glucose and Clinical records (iPhone) no longer start ticked (\"done\": true removed); Steps and sleep was already unticked | footer[0] \"Continue\" action wrapped in a branch decided by rule rec.consent.device: \"Chosen\" runs the system permission branch (id records.device.health_records_request) unchanged; \"Nothing chosen\" shows the toast \"Select at least one item to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow"
     },
     {
       "screen": "records_fhir_url",
@@ -532,6 +549,18 @@
       ],
       "sha256": "47331cf31f6af4e6e5ab298b5eab285c5bd85c344fffd8f28ae220b7874ec870",
       "change": "P-31 placeholders, fields start empty: body[1] \"Test\" example \"A1C\" -> placeholder; body[2] \"Value\" example \"74\" -> placeholder; body[3] \"Date\" example \"Oct 1, 2026\" -> placeholder"
+    },
+    {
+      "screen": "records_review",
+      "decisions": [
+        "P-78",
+        "P-79"
+      ],
+      "tickets": [
+        "TH-1008c"
+      ],
+      "sha256": "e9d6379602cd7bf95807b556431262175dd33500ea2fa9cdcbe973c67aeb6ce0",
+      "change": "P-79, each choice reaches the accept call: the five item checklists get session keys body[3].children[0] \"keep_hw\", body[4].children[0] \"keep_st\", body[5].children[0] \"keep_ck\", body[6].children[0] \"keep_bf\", body[7].children[0] \"keep_re\"; the ticked labels are submitted under them and skipped items are not | P-78, starts unticked: the items 12 blood pressure readings, Lipid panel, Flu vaccine, Tdap, Smoking status: every day smoker and eGFR 58 no longer start ticked (\"done\": true removed); A1C 7.6% was already unticked | footer[0] label \"Add 21 items to my programs\" -> \"Add selected items to my programs\" and its toast \"Added to Heartwise, Steady, Checkup, BreatheFree and Renew\" -> \"Added to your programs\" (draft copy, needs clinical/legal copy review), because the count and programme list no longer match what is sent | footer[0] action wrapped in a branch decided by rule rec.review: \"Chosen\" runs the POST /v1/records/fhir/accept submit unchanged; \"Nothing chosen\" shows the toast \"Select the items you want to add.\" (draft copy, needs clinical/legal copy review); action summaries follow"
     },
     {
       "screen": "records_search",
@@ -656,13 +685,15 @@
     {
       "screen": "support_add_person",
       "decisions": [
-        "P-31"
+        "P-31",
+        "P-78"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-1008c"
       ],
-      "sha256": "e7611768071e24a4024175b20cfba75d370c46561a38ce669708406664eeb9cd",
-      "change": "P-31 placeholders, fields start empty: body[1] \"Name\" example \"Jordan\" -> placeholder; body[2] \"Phone\" example \"(555) 010-4421\" -> placeholder; body[4] \"Help phrase\" example \"Can you stay with me for the next 10 minutes?\" -> placeholder"
+      "sha256": "e46c19a977805c37a61e508df8da82bb5b02279d499185f34004c75e1b0441cb",
+      "change": "P-31 placeholders, fields start empty: body[1] \"Name\" example \"Jordan\" -> placeholder; body[2] \"Phone\" example \"(555) 010-4421\" -> placeholder; body[4] \"Help phrase\" example \"Can you stay with me for the next 10 minutes?\" -> placeholder | P-78, starts unselected: body[3] chips \"Which programs?\" no longer starts with \"BreatheFree\" selected (\"selected\": [] ); the member chooses each programme | footer[0] \"Save supporter\" action wrapped in a branch decided by rule sup.programs: \"Chosen\" runs the POST /v1/care/supporters submit unchanged; \"Nothing chosen\" shows the toast \"Select at least one program.\" (draft copy, needs clinical/legal copy review); action summaries follow"
     },
     {
       "screen": "support_callback",

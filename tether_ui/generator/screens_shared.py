@@ -6,6 +6,26 @@ H = header
 # is unticked (P-72). Draft wording, pending legal/clinical copy review.
 AGE_GATE_MESSAGE = 'You need to be 18 or older to continue.'
 
+# P-78 / P-79: selections that create a consent, share or import start
+# unselected, so the screen shows exactly what will be sent. Each primary
+# action asks a "chosen" rule first (rules.py, CHOSEN_RULES), as the sign-up
+# age check does (P-72): with nothing selected it shows its message and goes
+# nowhere; otherwise it does what it did. All wording here is draft, pending
+# clinical/legal copy review, and kept in this one place.
+SELECTION_COPY = {
+    'supporter_none': 'Select at least one program.',
+    'records_read_none': 'Select at least one item to continue.',
+    'records_review_none': 'Select the items you want to add.',
+    'records_review_add': 'Add selected items to my programs',
+    'records_review_added': 'Added to your programs',
+    'records_conflict_none': 'Choose an option for at least one item.',
+}
+
+def chosen_gate(rule, action, message):
+    """`action` runs only when rule `rule` finds a selection; otherwise a
+    toast with `message`, and nothing else happens."""
+    return branch('Anything selected?', [('Chosen', action), ('Nothing chosen', toast(message))], decide=rule)
+
 def shared():
     # ================================================================ ONBOARDING
     flow('onboarding', 'First run', 'Welcome → choose programs → focus → consent → basics → set up each focus program → reminders → save progress → Today.')
@@ -331,9 +351,9 @@ def shared():
     ], footer=[button('Send message', submit('POST /v1/care/messages', toast('Message sent', back())))])
     S('support_add_person', 'Add a supporter', '/support/people/new', 'tabs', phase='resources', hdr=H('Add a supporter'), body=[
         title('Who can you count on?'), field('Name', 'Jordan', key='name'), field('Phone', '(555) 010-4421', kind='phone', key='phone'),
-        chips(['BreatheFree', 'ScrollFree'], ['BreatheFree'], label='Which programs?', key='which_programs'),
+        chips(['BreatheFree', 'ScrollFree'], label='Which programs?', key='which_programs'),
         field('Help phrase', 'Can you stay with me for the next 10 minutes?', kind='multiline', key='help_phrase'), text('Nothing is sent until you preview and tap Send.', 'small'),
-    ], footer=[button('Save supporter', submit('POST /v1/care/supporters', toast('Jordan added', back())))])
+    ], footer=[button('Save supporter', chosen_gate('sup.programs', submit('POST /v1/care/supporters', toast('Jordan added', back())), SELECTION_COPY['supporter_none']))])
     S('support_connect', 'Connect a clinic', '/support/connect', 'tabs', phase='resources', hdr=H('Connect a clinic'), body=[
         title('Enter your clinic’s invite code'), field('Invite code', 'PATEL-4821', key='invite_code'), text('Your clinic gave you this code. Connecting shares nothing until you approve a summary.', 'muted'),
     ], footer=[button('Connect', submit('POST /v1/care/connections', toast('Connected to Dr. Patel’s clinic', back())))])

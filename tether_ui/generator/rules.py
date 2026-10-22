@@ -73,6 +73,31 @@ RULES = {
     },
 }
 
+# "Chosen" rules (P-78, P-79): a primary action on a screen whose selection
+# creates a consent, share or import runs only once the member has selected
+# something there. Chosen when any input holds a value: a non-empty list
+# (chips, checklist) or a chosen radio item. Each rule reads only its own
+# screen's keys. Product rules, not clinical.
+CHOSEN_OUTCOMES = {'chosen': 'Chosen', 'none': 'Nothing chosen'}
+CHOSEN_RULES = {
+    'sup.programs': ('Add a supporter: a program selected', ['support_add_person.which_programs']),
+    'rec.consent.epic': ('Connect a health system: something to read selected', ['records_consent.resources']),
+    'rec.consent.medicare': ('Connect Medicare: something to read selected', ['records_consent_bb.resources']),
+    'rec.consent.device': ('Phone health data: something to ask for selected', ['records_consent_device.data_types']),
+    'rec.review': ('Review imported data: an item kept', ['records_review.keep_hw', 'records_review.keep_st', 'records_review.keep_ck', 'records_review.keep_bf', 'records_review.keep_re']),
+    'rec.conflict': ('Resolve conflicts: a choice made', ['records_conflict.a1c', 'records_conflict.bp']),
+}
+for _id, (_title, _inputs) in CHOSEN_RULES.items():
+    RULES[_id] = {
+        'title': _title,
+        'program': None,
+        'inputs': list(_inputs),
+        'params': None,
+        'outcomes': dict(CHOSEN_OUTCOMES),
+        'logic': 'Chosen when any input has a selection (a ticked item, a chip or a radio choice). With nothing chosen the action shows a message and goes nowhere; only the selected items are sent.',
+        'source': 'Owner decisions P-78 and P-79. Product rule, not clinical.',
+    }
+
 # Simulation scenarios: end-to-end setups and functions for every program.
 # Steps: ('tap', text) · ('enter', 'screen.key', value) · ('choose', outcome for the next external decision) · ('expect', screen)
 def sc(id, program, function, title, start, steps, expect):
@@ -104,13 +129,26 @@ SCENARIOS = [
         ('tap', 'I’m 18 or older'), ('tap', 'Continue on this phone only')], 'today'),
     # ---------------- health records (FHIR)
     sc('fhir-epic', None, 'Health records', 'Connect Epic MyChart, review, resolve conflict, add to programs', 'records_hub',
-       [('tap', 'Add a source'), ('tap', 'Hospital or clinic'), ('tap', 'Patel Family Medicine'), ('choose', 'Approved'), ('tap', 'Continue to MyChart'),
+       [('tap', 'Add a source'), ('tap', 'Hospital or clinic'), ('tap', 'Patel Family Medicine'), ('tap', 'Vital signs'), ('tap', 'Lab results'), ('choose', 'Approved'), ('tap', 'Continue to MyChart'),
         ('expect', 'records_importing'), ('tap', 'Review imported data'), ('expect', 'records_review'), ('tap', 'Review conflicts first'),
-        ('tap', 'From Patel Family Medicine (Epic): 7.6%'), ('tap', 'Save choices'), ('expect', 'records_review'), ('tap', 'Add 21 items to my programs')], 'records_hub'),
+        ('tap', 'From Patel Family Medicine (Epic): 7.6%'), ('tap', 'Save choices'), ('expect', 'records_review'), ('tap', '12 blood pressure readings'), ('tap', 'eGFR 58'),
+        ('tap', 'Add selected items to my programs')], 'records_hub'),
     sc('fhir-bluebutton', None, 'Health records', 'Connect Medicare Blue Button 2.0', 'records_add',
-       [('tap', 'Medicare · Blue Button 2.0'), ('choose', 'Approved'), ('tap', 'Continue to Medicare.gov'), ('tap', 'Review imported data')], 'records_review'),
+       [('tap', 'Medicare · Blue Button 2.0'), ('tap', 'Conditions'), ('choose', 'Approved'), ('tap', 'Continue to Medicare.gov'), ('tap', 'Review imported data')], 'records_review'),
+    sc('fhir-nothing-read', None, 'Health records', 'Nothing selected to read: Continue stays and connects nothing', 'records_consent',
+       [('tap', 'Continue to MyChart')], 'records_consent'),
+    sc('fhir-device-nothing', None, 'Health records', 'Phone health data with nothing selected stays', 'records_consent_device',
+       [('tap', 'Continue')], 'records_consent_device'),
+    sc('fhir-review-nothing', None, 'Health records', 'Review with nothing kept: nothing is added', 'records_review',
+       [('tap', 'Add selected items to my programs')], 'records_review'),
+    sc('support-add', 'bf', 'Support', 'Add a supporter for one program', 'bf_support',
+       [('tap', 'Add a supporter'), ('expect', 'support_add_person'), ('tap', 'BreatheFree'), ('tap', 'Save supporter')], 'bf_support'),
+    sc('support-add-nothing', None, 'Support', 'Add a supporter with no program selected: nothing is saved', 'support_add_person',
+       [('tap', 'Save supporter')], 'support_add_person'),
+    sc('fhir-conflict-nothing', None, 'Health records', 'Conflicts with no choice: nothing is saved', 'records_conflict',
+       [('tap', 'Save choices')], 'records_conflict'),
     sc('fhir-denied', None, 'Health records', 'Provider sign-in denied → error with options', 'records_add',
-       [('tap', 'Hospital or clinic'), ('tap', 'Patel Family Medicine'), ('choose', 'Denied or error'), ('tap', 'Continue to MyChart'), ('expect', 'records_error'), ('tap', 'Enter manually instead')], 'records_manual'),
+       [('tap', 'Hospital or clinic'), ('tap', 'Patel Family Medicine'), ('tap', 'Conditions'), ('choose', 'Denied or error'), ('tap', 'Continue to MyChart'), ('expect', 'records_error'), ('tap', 'Enter manually instead')], 'records_manual'),
     sc('fhir-custom', None, 'Health records', 'Other FHIR server: capability check fails', 'records_add',
        [('tap', 'Other FHIR server'), ('choose', 'Not a FHIR R4 server'), ('tap', 'Check and continue')], 'records_error'),
     sc('fhir-manual-ok', None, 'Health records', 'Manual A1C within range is saved', 'records_manual',

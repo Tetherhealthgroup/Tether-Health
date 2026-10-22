@@ -152,6 +152,95 @@
     "logic": "Confirmed when the item is ticked. Every sign-up route on ob_account (Apple, Google, Create account, Continue on this phone only) asks this first; unticked, it shows a message and goes nowhere.",
     "source": "Owner decisions P-68 and P-72. Product rule, not clinical."
   },
+  "sup.programs": {
+    "title": "Add a supporter: a program selected",
+    "program": null,
+    "inputs": [
+      "support_add_person.which_programs"
+    ],
+    "params": null,
+    "outcomes": {
+      "chosen": "Chosen",
+      "none": "Nothing chosen"
+    },
+    "logic": "Chosen when any input has a selection (a ticked item, a chip or a radio choice). With nothing chosen the action shows a message and goes nowhere; only the selected items are sent.",
+    "source": "Owner decisions P-78 and P-79. Product rule, not clinical."
+  },
+  "rec.consent.epic": {
+    "title": "Connect a health system: something to read selected",
+    "program": null,
+    "inputs": [
+      "records_consent.resources"
+    ],
+    "params": null,
+    "outcomes": {
+      "chosen": "Chosen",
+      "none": "Nothing chosen"
+    },
+    "logic": "Chosen when any input has a selection (a ticked item, a chip or a radio choice). With nothing chosen the action shows a message and goes nowhere; only the selected items are sent.",
+    "source": "Owner decisions P-78 and P-79. Product rule, not clinical."
+  },
+  "rec.consent.medicare": {
+    "title": "Connect Medicare: something to read selected",
+    "program": null,
+    "inputs": [
+      "records_consent_bb.resources"
+    ],
+    "params": null,
+    "outcomes": {
+      "chosen": "Chosen",
+      "none": "Nothing chosen"
+    },
+    "logic": "Chosen when any input has a selection (a ticked item, a chip or a radio choice). With nothing chosen the action shows a message and goes nowhere; only the selected items are sent.",
+    "source": "Owner decisions P-78 and P-79. Product rule, not clinical."
+  },
+  "rec.consent.device": {
+    "title": "Phone health data: something to ask for selected",
+    "program": null,
+    "inputs": [
+      "records_consent_device.data_types"
+    ],
+    "params": null,
+    "outcomes": {
+      "chosen": "Chosen",
+      "none": "Nothing chosen"
+    },
+    "logic": "Chosen when any input has a selection (a ticked item, a chip or a radio choice). With nothing chosen the action shows a message and goes nowhere; only the selected items are sent.",
+    "source": "Owner decisions P-78 and P-79. Product rule, not clinical."
+  },
+  "rec.review": {
+    "title": "Review imported data: an item kept",
+    "program": null,
+    "inputs": [
+      "records_review.keep_hw",
+      "records_review.keep_st",
+      "records_review.keep_ck",
+      "records_review.keep_bf",
+      "records_review.keep_re"
+    ],
+    "params": null,
+    "outcomes": {
+      "chosen": "Chosen",
+      "none": "Nothing chosen"
+    },
+    "logic": "Chosen when any input has a selection (a ticked item, a chip or a radio choice). With nothing chosen the action shows a message and goes nowhere; only the selected items are sent.",
+    "source": "Owner decisions P-78 and P-79. Product rule, not clinical."
+  },
+  "rec.conflict": {
+    "title": "Resolve conflicts: a choice made",
+    "program": null,
+    "inputs": [
+      "records_conflict.a1c",
+      "records_conflict.bp"
+    ],
+    "params": null,
+    "outcomes": {
+      "chosen": "Chosen",
+      "none": "Nothing chosen"
+    },
+    "logic": "Chosen when any input has a selection (a ticked item, a chip or a radio choice). With nothing chosen the action shows a message and goes nowhere; only the selected items are sent.",
+    "source": "Owner decisions P-78 and P-79. Product rule, not clinical."
+  },
   "sf.unplug.reason": {
     "title": "Strict session: reason before ending early",
     "program": "sf",

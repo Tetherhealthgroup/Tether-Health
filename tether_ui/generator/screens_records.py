@@ -1,4 +1,5 @@
 from dsl import *
+from screens_shared import SELECTION_COPY, chosen_gate
 
 H = header
 
@@ -52,27 +53,27 @@ def records():
     consent_body = lambda name, src: [
         title(f'Connect {name}?'),
         kv([('Source', src), ('Access', 'Read-only'), ('Refresh', 'Daily while connected'), ('Stop', 'Disconnect anytime')]),
-        checklist([ci('Conditions', 'Condition', True), ci('Vital signs', 'Observation · blood pressure, weight', True), ci('Lab results', 'Observation · A1C, lipids, eGFR', True),
-                   ci('Medications', 'MedicationRequest', True), ci('Immunizations', 'Immunization', True), ci('Smoking status', 'Observation · LOINC 72166-2', True), ci('Clinical notes', 'Not requested')], label='What Tether will read', key='resources'),
+        checklist([ci('Conditions', 'Condition'), ci('Vital signs', 'Observation · blood pressure, weight'), ci('Lab results', 'Observation · A1C, lipids, eGFR'),
+                   ci('Medications', 'MedicationRequest'), ci('Immunizations', 'Immunization'), ci('Smoking status', 'Observation · LOINC 72166-2'), ci('Clinical notes', 'Not requested')], label='What Tether will read', key='resources'),
         card(v='mint', title='Only the programs you joined get data', text='Heartwise ← blood pressure, lipids · Steady ← A1C, glucose · Renew ← eGFR · Checkup ← immunizations · BreatheFree ← smoking status. Ease and ScrollFree get nothing.'),
     ]
     S('records_consent', 'Consent: Epic', '/records/consent', 'records', phase='resources', hdr=H('Connect', pill='Read-only'), body=consent_body('Patel Family Medicine', 'Epic MyChart · SMART on FHIR R4'),
-      footer=[button('Continue to MyChart', branch('MyChart sign-in result', [('Approved', go('records_importing')), ('Cancelled', toast('Connection cancelled. Nothing was imported.')), ('Denied or error', go('records_error'))],
-                                                   id='records.connect.mychart', ask='smartConnect', when=SMART_WHEN)),
+      footer=[button('Continue to MyChart', chosen_gate('rec.consent.epic', branch('MyChart sign-in result', [('Approved', go('records_importing')), ('Cancelled', toast('Connection cancelled. Nothing was imported.')), ('Denied or error', go('records_error'))],
+                                                   id='records.connect.mychart', ask='smartConnect', when=SMART_WHEN), SELECTION_COPY['records_read_none'])),
               button('Not now', back(), v='secondary')],
       api=['GET /v1/records/fhir/authorize (PKCE) → system browser', 'POST /v1/records/fhir/callback (code exchange on server)'],
       desc='Authorization code + PKCE in ASWebAuthenticationSession / Custom Tabs. The code is exchanged by records-service; refresh tokens are stored encrypted server-side, never on the phone.')
     S('records_consent_bb', 'Consent: Medicare', '/records/consent?source=medicare', 'records', phase='resources', variant_of='records_consent', state='Medicare', hdr=H('Connect', pill='Read-only'),
       body=consent_body('Medicare', 'CMS Blue Button 2.0 · FHIR R4 (claims)'),
-      footer=[button('Continue to Medicare.gov', branch('Medicare sign-in result', [('Approved', go('records_importing')), ('Cancelled', toast('Connection cancelled. Nothing was imported.')), ('Denied or error', go('records_error'))],
-                                                       id='records.connect.medicare', ask='smartConnect', when=SMART_WHEN)),
+      footer=[button('Continue to Medicare.gov', chosen_gate('rec.consent.medicare', branch('Medicare sign-in result', [('Approved', go('records_importing')), ('Cancelled', toast('Connection cancelled. Nothing was imported.')), ('Denied or error', go('records_error'))],
+                                                       id='records.connect.medicare', ask='smartConnect', when=SMART_WHEN), SELECTION_COPY['records_read_none'])),
               button('Not now', back(), v='secondary')])
     S('records_consent_device', 'Consent: phone health data', '/records/consent?source=device', 'records', phase='resources', variant_of='records_consent', state='Apple Health / Health Connect', hdr=H('Connect', pill='Read-only'),
       body=[title('Use health data on this phone?'), text('iPhone: Apple Health Records (FHIR) and readings. Android: Health Connect readings. You choose each type in the system screen next.', 'muted'),
-            checklist([ci('Blood pressure', None, True), ci('Blood glucose', None, True), ci('Clinical records (iPhone)', 'Labs, immunizations, conditions', True), ci('Steps and sleep', 'Not requested')], label='What Tether will ask for', key='data_types')],
-      footer=[button('Continue', branch('System permission result', [('Allowed', go('records_importing')), ('Not allowed', go('records_error'))],
+            checklist([ci('Blood pressure'), ci('Blood glucose'), ci('Clinical records (iPhone)', 'Labs, immunizations, conditions'), ci('Steps and sleep', 'Not requested')], label='What Tether will ask for', key='data_types')],
+      footer=[button('Continue', chosen_gate('rec.consent.device', branch('System permission result', [('Allowed', go('records_importing')), ('Not allowed', go('records_error'))],
                                          id='records.device.health_records_request', ask='healthRecordsRequest',
-                                         when={'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'})), button('Not now', back(), v='secondary')],
+                                         when={'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'}), SELECTION_COPY['records_read_none'])), button('Not now', back(), v='secondary')],
       desc='HealthKit clinical records (HKClinicalType) on iOS; Health Connect permissions on Android. Data stays on the device until you review it.')
 
     S('records_importing', 'Importing', '/records/importing', 'records', phase='resources', state='loading', hdr=H('Importing', left='close'), body=[
@@ -84,22 +85,25 @@ def records():
     S('records_review', 'Review imported data', '/records/review', 'records', phase='resources', hdr=H('Review', left='close', pill='Not added yet'), body=[
         title('Review before adding'), text('Nothing reaches your programs until you confirm.', 'muted'),
         banner('offline', '2 items need your review.', go('records_conflict'), 'Review'),
-        card(checklist([ci('12 blood pressure readings', 'Jun – Oct 2026', True), ci('Lipid panel', 'LDL 138 · Sep 30', True)]), tag='hw'),
-        card(checklist([ci('A1C 7.6%', 'Oct 1 · differs from your entry (7.4%)')]), tag='st'),
-        card(checklist([ci('Flu vaccine', 'Oct 12, 2025', True), ci('Tdap', '2019', True)]), tag='ck'),
-        card(checklist([ci('Smoking status: every day smoker', 'Aug 2026 · sets your baseline', True)]), tag='bf'),
-        card(checklist([ci('eGFR 58', 'Oct 3', True)]), tag='re'),
+        # P-79: each item the member keeps reaches the accept call under its
+        # programme's key; skipped items are not sent. P-78: nothing starts kept.
+        card(checklist([ci('12 blood pressure readings', 'Jun – Oct 2026'), ci('Lipid panel', 'LDL 138 · Sep 30')], key='keep_hw'), tag='hw'),
+        card(checklist([ci('A1C 7.6%', 'Oct 1 · differs from your entry (7.4%)')], key='keep_st'), tag='st'),
+        card(checklist([ci('Flu vaccine', 'Oct 12, 2025'), ci('Tdap', '2019')], key='keep_ck'), tag='ck'),
+        card(checklist([ci('Smoking status: every day smoker', 'Aug 2026 · sets your baseline')], key='keep_bf'), tag='bf'),
+        card(checklist([ci('eGFR 58', 'Oct 3')], key='keep_re'), tag='re'),
         eyebrow('Checked automatically'),
         kv([('Units converted', '2 glucose results · mmol/L → mg/dL'), ('Duplicates skipped', '3 readings you already entered'), ('Held as likely typo', '1 · BP 1290/80'), ('Future dates rejected', '0')]),
-    ], footer=[button('Add 21 items to my programs', submit('POST /v1/records/fhir/accept', toast('Added to Heartwise, Steady, Checkup, BreatheFree and Renew', popto('records_hub')))),
+    ], footer=[button(SELECTION_COPY['records_review_add'], chosen_gate('rec.review', submit('POST /v1/records/fhir/accept', toast(SELECTION_COPY['records_review_added'], popto('records_hub'))), SELECTION_COPY['records_review_none'])),
                link('Review conflicts first', go('records_conflict'))],
        desc='Validation pipeline: FHIR R4 schema → code mapping (LOINC, SNOMED CT, CVX, RxNorm) → unit normalisation (UCUM) → plausibility ranges → duplicate detection (code + date + value) → conflict with manual entries → member review.')
+    # As P-78: neither conflict starts on a choice; Save sends only what the member chose.
     S('records_conflict', 'Resolve conflicts', '/records/conflicts', 'records', phase='resources', hdr=H('Needs review', pill='2 items'), body=[
-        card(radio([ri('From Patel Family Medicine (Epic): 7.6%', 'Lab result · final · LOINC 4548-4'), ri('Entered by you: 7.4%', 'Oct 1, 2026'), ri('Keep both', 'Your clinician’s value is used in summaries')], 0, key='a1c'),
+        card(radio([ri('From Patel Family Medicine (Epic): 7.6%', 'Lab result · final · LOINC 4548-4'), ri('Entered by you: 7.4%', 'Oct 1, 2026'), ri('Keep both', 'Your clinician’s value is used in summaries')], -1, key='a1c'),
              eyebrow='A1C · Oct 1, 2026', title='Two values for the same test'),
-        card(radio([ri('Discard', 'Likely a typo in the source'), ri('Keep as 129/80', 'Corrected by you, marked as edited'), ri('Ask my care team', 'Sends a question with the original value')], 1, key='bp'),
+        card(radio([ri('Discard', 'Likely a typo in the source'), ri('Keep as 129/80', 'Corrected by you, marked as edited'), ri('Ask my care team', 'Sends a question with the original value')], -1, key='bp'),
              eyebrow='Blood pressure · Aug 4, 2026', title='1290/80 is outside the possible range'),
-    ], footer=[button('Save choices', submit('POST /v1/records/fhir/conflicts', toast('Saved', back())))])
+    ], footer=[button('Save choices', chosen_gate('rec.conflict', submit('POST /v1/records/fhir/conflicts', toast('Saved', back())), SELECTION_COPY['records_conflict_none']))])
     S('records_error', 'Connection problem', '/records/error', 'records', phase='resources', state='error', hdr=H('Connect'), body=[
         illus('!', 'error'), title('Couldn’t connect', 'l', align='center'),
         text('Sign-in was cancelled, denied, or the server isn’t a SMART on FHIR R4 server. Nothing was imported.', 'muted', align='center'),

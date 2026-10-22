@@ -50,6 +50,9 @@ import 'package:tether_ui/screens/tabs/progress_screen.dart';
 import 'package:tether_ui/screens/re/re_history_screen.dart';
 import 'package:tether_ui/screens/re/re_home_screen.dart';
 import 'package:tether_ui/screens/records/records_add_screen.dart';
+import 'package:tether_ui/screens/records/records_conflict_screen.dart';
+import 'package:tether_ui/screens/records/records_consent_screen.dart';
+import 'package:tether_ui/screens/records/records_consent_device_screen.dart';
 import 'package:tether_ui/screens/records/records_error_screen.dart';
 import 'package:tether_ui/screens/records/records_hub_screen.dart';
 import 'package:tether_ui/screens/records/records_importing_screen.dart';
@@ -72,6 +75,7 @@ import 'package:tether_ui/screens/st/st_home_screen.dart';
 import 'package:tether_ui/screens/st/st_log_screen.dart';
 import 'package:tether_ui/screens/st/st_low_screen.dart';
 import 'package:tether_ui/screens/tabs/support_screen.dart';
+import 'package:tether_ui/screens/tabs/support_add_person_screen.dart';
 import 'package:tether_ui/screens/tabs/support_message_care_screen.dart';
 import 'package:tether_ui/screens/today/today_screen.dart';
 import 'package:tether_ui/screens/onboarding/welcome_screen.dart';
@@ -253,6 +257,8 @@ void main() {
         await _tap(tester, 'Add a source');
         await _tap(tester, 'Hospital or clinic');
         await _tap(tester, 'Patel Family Medicine');
+        await _tap(tester, 'Vital signs');
+        await _tap(tester, 'Lab results');
         TSim.queue.add('Approved');
         await _tap(tester, 'Continue to MyChart');
         expect(find.byType(RecordsImportingScreen), findsOneWidget, reason: 'expected records_importing');
@@ -262,7 +268,9 @@ void main() {
         await _tap(tester, 'From Patel Family Medicine (Epic): 7.6%');
         await _tap(tester, 'Save choices');
         expect(find.byType(RecordsReviewScreen), findsOneWidget, reason: 'expected records_review');
-        await _tap(tester, 'Add 21 items to my programs');
+        await _tap(tester, '12 blood pressure readings');
+        await _tap(tester, 'eGFR 58');
+        await _tap(tester, 'Add selected items to my programs');
         expect(find.byType(RecordsHubScreen), findsOneWidget, reason: 'expected records_hub');
         expect(tester.takeException(), isNull);
         await tester.pump(const Duration(seconds: 3));
@@ -274,10 +282,80 @@ void main() {
     await _start(tester, Routes.recordsAdd, ios: false);
     try {
         await _tap(tester, 'Medicare · Blue Button 2.0');
+        await _tap(tester, 'Conditions');
         TSim.queue.add('Approved');
         await _tap(tester, 'Continue to Medicare.gov');
         await _tap(tester, 'Review imported data');
         expect(find.byType(RecordsReviewScreen), findsOneWidget, reason: 'expected records_review');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario fhir-nothing-read · Nothing selected to read: Continue stays and connects nothing', (tester) async {
+    await _start(tester, Routes.recordsConsent, ios: false);
+    try {
+        await _tap(tester, 'Continue to MyChart');
+        expect(find.byType(RecordsConsentScreen), findsOneWidget, reason: 'expected records_consent');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario fhir-device-nothing · Phone health data with nothing selected stays', (tester) async {
+    await _start(tester, Routes.recordsConsentDevice, ios: false);
+    try {
+        await _tap(tester, 'Continue');
+        expect(find.byType(RecordsConsentDeviceScreen), findsOneWidget, reason: 'expected records_consent_device');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario fhir-review-nothing · Review with nothing kept: nothing is added', (tester) async {
+    await _start(tester, Routes.recordsReview, ios: false);
+    try {
+        await _tap(tester, 'Add selected items to my programs');
+        expect(find.byType(RecordsReviewScreen), findsOneWidget, reason: 'expected records_review');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario support-add · Add a supporter for one program', (tester) async {
+    await _start(tester, Routes.bfSupport, ios: false);
+    try {
+        await _tap(tester, 'Add a supporter');
+        expect(find.byType(SupportAddPersonScreen), findsOneWidget, reason: 'expected support_add_person');
+        await _tap(tester, 'BreatheFree');
+        await _tap(tester, 'Save supporter');
+        expect(find.byType(BfSupportScreen), findsOneWidget, reason: 'expected bf_support');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario support-add-nothing · Add a supporter with no program selected: nothing is saved', (tester) async {
+    await _start(tester, Routes.supportAddPerson, ios: false);
+    try {
+        await _tap(tester, 'Save supporter');
+        expect(find.byType(SupportAddPersonScreen), findsOneWidget, reason: 'expected support_add_person');
+        expect(tester.takeException(), isNull);
+        await tester.pump(const Duration(seconds: 3));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+  testWidgets('scenario fhir-conflict-nothing · Conflicts with no choice: nothing is saved', (tester) async {
+    await _start(tester, Routes.recordsConflict, ios: false);
+    try {
+        await _tap(tester, 'Save choices');
+        expect(find.byType(RecordsConflictScreen), findsOneWidget, reason: 'expected records_conflict');
         expect(tester.takeException(), isNull);
         await tester.pump(const Duration(seconds: 3));
     } finally {
@@ -289,6 +367,7 @@ void main() {
     try {
         await _tap(tester, 'Hospital or clinic');
         await _tap(tester, 'Patel Family Medicine');
+        await _tap(tester, 'Conditions');
         TSim.queue.add('Denied or error');
         await _tap(tester, 'Continue to MyChart');
         expect(find.byType(RecordsErrorScreen), findsOneWidget, reason: 'expected records_error');
