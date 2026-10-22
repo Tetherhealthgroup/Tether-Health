@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 
 import '../logic/rules.dart';
 import 'nav.dart';
@@ -29,6 +30,13 @@ class THeader {
 
 /// A full screen: status-bar safe area, header, scrollable body, pinned
 /// footer (primary actions) and optional tab bar.
+///
+/// Large text: the footer stays pinned while it takes at most
+/// [_footerShare] of the room below the header and every text in the body
+/// fits whole above it. Otherwise (big text sizes on a small phone) it moves
+/// to the end of the scrolling body, so no text is ever partly hidden behind
+/// the buttons and the buttons are never cut off. At the default text size
+/// every footer fits, so nothing moves.
 class TScreen extends StatefulWidget {
   const TScreen({super.key, this.header, this.children = const [], this.footer = const [], this.tab, this.background = TBackground.paper});
   final THeader? header;
@@ -43,9 +51,10 @@ class TScreen extends StatefulWidget {
   State<TScreen> createState() => _TScreenState();
 }
 
-class _TScreenState extends State<TScreen> {
+class _TScreenState extends State<TScreen> with _FooterPlacement<TScreen> {
   /// Keeps the footer's elements, state and focus nodes when it moves
   /// between the pinned area and the scrolling body.
+  @override
   final GlobalKey _footerKey = GlobalKey(debugLabel: 'TScreen footer');
 
   @override
@@ -58,35 +67,52 @@ class _TScreenState extends State<TScreen> {
     };
     // Lays out above the call fallback while it shows (TCallFallback); the
     // footer then scrolls with the body so nothing overflows.
-    return TFallbackInset(builder: (context, covered) => TDark(
-      dark: dark,
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: DecoratedBox(
-          decoration: decoration,
-          child: SafeArea(
-            bottom: tab == null,
-            child: Column(
-              children: [
-                if (header != null) _Header(spec: header, dark: dark),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(TSpace.screen, 6, TSpace.screen, 20),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (covered && footer.isNotEmpty) ...[const SizedBox(height: 16), _footerColumn(_footerKey, footer)]]),
+    return TFallbackInset(builder: (context, covered) {
+      // Read outside the Scaffold, which removes the keyboard from its body.
+      final keyboard = MediaQuery.viewInsetsOf(context).bottom;
+      final inBody = covered || _footerScrolls;
+      return TDark(
+        dark: dark,
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          body: DecoratedBox(
+            decoration: decoration,
+            child: SafeArea(
+              bottom: tab == null,
+              child: Column(
+                children: [
+                  if (header != null) _Header(spec: header, dark: dark),
+                  Expanded(
+                    child: LayoutBuilder(builder: (context, box) {
+                      // Room below the header with the keyboard down; 22 is
+                      // the pinned footer's padding.
+                      _place(box.maxHeight + keyboard, 22, keyboard > 0);
+                      final fit = _fit(inBody, _footerColumn(_footerKey, footer));
+                      return Column(
+                        children: [
+                          Expanded(
+                            child: SingleChildScrollView(
+                              padding: const EdgeInsets.fromLTRB(TSpace.screen, 6, TSpace.screen, 20),
+                              child: Column(key: _bodyKey, crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (inBody && footer.isNotEmpty) ...[const SizedBox(height: 16), fit]]),
+                            ),
+                          ),
+                          if (!inBody && footer.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(TSpace.screen, 10, TSpace.screen, 12),
+                              child: fit,
+                            ),
+                        ],
+                      );
+                    }),
                   ),
-                ),
-                if (!covered && footer.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(TSpace.screen, 10, TSpace.screen, 12),
-                    child: _footerColumn(_footerKey, footer),
-                  ),
-                if (tab != null) TTabBar(active: tab),
-              ],
+                  if (tab != null) TTabBar(active: tab),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    ));
+      );
+    });
   }
 }
 
@@ -100,9 +126,10 @@ class TSheet extends StatefulWidget {
   State<TSheet> createState() => _TSheetState();
 }
 
-class _TSheetState extends State<TSheet> {
+class _TSheetState extends State<TSheet> with _FooterPlacement<TSheet> {
   /// Keeps the footer's elements, state and focus nodes when it moves
   /// between the pinned area and the scrolling body.
+  @override
   final GlobalKey _footerKey = GlobalKey(debugLabel: 'TSheet footer');
 
   @override
@@ -111,34 +138,41 @@ class _TSheetState extends State<TSheet> {
     final maxH = MediaQuery.sizeOf(context).height * 0.86;
     // Lays out above the call fallback while it shows (TCallFallback); the
     // footer then scrolls with the body so nothing overflows.
-    return TFallbackInset(sheet: true, builder: (context, covered) => ConstrainedBox(
-      constraints: BoxConstraints(maxHeight: maxH),
-      child: Material(
-        color: TColors.paper,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(TRadius.sheet)),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(child: Container(width: 40, height: 5, margin: const EdgeInsets.fromLTRB(0, 9, 0, 6), decoration: BoxDecoration(color: TColors.line, borderRadius: BorderRadius.circular(3)))),
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.fromLTRB(TSpace.screen, 6, TSpace.screen, 12),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (covered && footer.isNotEmpty) ...[const SizedBox(height: 16), _footerColumn(_footerKey, footer)]]),
+    return TFallbackInset(sheet: true, builder: (context, covered) {
+      final inBody = covered || _footerScrolls;
+      // Room below the handle (20) and above the home indicator; 20 is the
+      // pinned footer's padding.
+      _place(maxH - 20 - MediaQuery.paddingOf(this.context).bottom, 20, MediaQuery.viewInsetsOf(context).bottom > 0);
+      final fit = _fit(inBody, _footerColumn(_footerKey, footer));
+      return ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxH),
+        child: Material(
+          color: TColors.paper,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(TRadius.sheet)),
+          child: SafeArea(
+            top: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Center(child: Container(width: 40, height: 5, margin: const EdgeInsets.fromLTRB(0, 9, 0, 6), decoration: BoxDecoration(color: TColors.line, borderRadius: BorderRadius.circular(3)))),
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(TSpace.screen, 6, TSpace.screen, 12),
+                    child: Column(key: _bodyKey, crossAxisAlignment: CrossAxisAlignment.stretch, children: [..._gap(children), if (inBody && footer.isNotEmpty) ...[const SizedBox(height: 16), fit]]),
+                  ),
                 ),
-              ),
-              if (!covered && footer.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(TSpace.screen, 8, TSpace.screen, 12),
-                  child: _footerColumn(_footerKey, footer),
-                ),
-            ],
+                if (!inBody && footer.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(TSpace.screen, 8, TSpace.screen, 12),
+                    child: fit,
+                  ),
+              ],
+            ),
           ),
         ),
-      ),
-    ));
+      );
+    });
   }
 }
 
@@ -157,6 +191,139 @@ class TSheetPreview extends StatelessWidget {
 /// [key] moves the same subtree between the two, so a focused footer button
 /// keeps its focus node and gets focus back when the call fallback closes.
 Widget _footerColumn(GlobalKey key, List<Widget> footer) => Column(key: key, crossAxisAlignment: CrossAxisAlignment.stretch, children: _gap(footer, 8));
+
+/// Largest share of the room a pinned footer may take (see [TScreen]).
+/// The tallest footer at the default text size on a 375×667 phone takes
+/// about a third.
+const double _footerShare = 0.4;
+
+/// Pins the footer of a [TScreen] or [TSheet] or moves it into the body
+/// (see [TScreen]). Checked after each frame in which the screen was built
+/// or the footer changed height.
+mixin _FooterPlacement<T extends StatefulWidget> on State<T> {
+  GlobalKey get _footerKey;
+
+  /// The body column, searched for the tallest text.
+  final GlobalKey _bodyKey = GlobalKey();
+
+  /// The footer scrolls with the body.
+  bool _footerScrolls = false;
+
+  double _room = double.infinity;
+  double _padding = 0;
+  bool _keyboard = false;
+  bool _checkScheduled = false;
+
+  /// Called while building: [room] for the body and the pinned footer with
+  /// the keyboard down, the pinned footer's [padding], and whether the
+  /// [keyboard] is up.
+  void _place(double room, double padding, bool keyboard) {
+    _room = room;
+    _padding = padding;
+    _keyboard = keyboard;
+    _scheduleCheck();
+  }
+
+  void _scheduleCheck() {
+    if (_checkScheduled) return;
+    _checkScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkScheduled = false;
+      if (mounted) _check();
+    });
+  }
+
+  void _check() {
+    final body = _bodyKey.currentContext?.findRenderObject();
+    final foot = _footerKey.currentContext?.findRenderObject();
+    if (body is! RenderBox || foot is! RenderBox || !body.hasSize || !foot.hasSize) return;
+    final block = foot.size.height + _padding;
+    var tallest = 0.0;
+    void visit(RenderObject o) {
+      if (identical(o, foot)) return;
+      if (o is RenderParagraph && o.hasSize && o.size.height > tallest) tallest = o.size.height;
+      o.visitChildren(visit);
+    }
+
+    body.visitChildren(visit);
+    final scrolls = block > _footerShare * _room || tallest > _room - block;
+    // Pin again only with the keyboard down, so it never jumps while typing.
+    if (scrolls != _footerScrolls && (scrolls || !_keyboard)) setState(() => _footerScrolls = scrolls);
+  }
+
+  Widget _fit(bool inBody, Widget footer) => _FooterFit(limit: _footerShare * _room - _padding, pinned: !inBody, onResize: _scheduleCheck, child: footer);
+}
+
+/// Lays the footer out at its natural height and calls [onResize] when that
+/// height changes. A [pinned] footer taller than [limit] takes no space and
+/// paints nothing until it moves into the body after the frame, so the
+/// screen never overflows.
+class _FooterFit extends SingleChildRenderObjectWidget {
+  const _FooterFit({required this.limit, required this.pinned, required this.onResize, required super.child});
+  final double limit;
+  final bool pinned;
+  final VoidCallback onResize;
+
+  @override
+  _RenderFooterFit createRenderObject(BuildContext context) => _RenderFooterFit(limit, pinned, onResize);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderFooterFit renderObject) => renderObject
+    ..limit = limit
+    ..pinned = pinned
+    ..onResize = onResize;
+}
+
+class _RenderFooterFit extends RenderProxyBox {
+  _RenderFooterFit(this._limit, this._pinned, this.onResize);
+
+  double _limit;
+  set limit(double v) {
+    if (v == _limit) return;
+    _limit = v;
+    markNeedsLayout();
+  }
+
+  bool _pinned;
+  set pinned(bool v) {
+    if (v == _pinned) return;
+    _pinned = v;
+    markNeedsLayout();
+  }
+
+  VoidCallback onResize;
+  double? _height;
+  bool _hidden = false;
+
+  @override
+  void performLayout() {
+    final child = this.child;
+    if (child == null) {
+      size = constraints.smallest;
+      return;
+    }
+    child.layout(BoxConstraints(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth), parentUsesSize: true);
+    if (child.size.height != _height) {
+      _height = child.size.height;
+      onResize();
+    }
+    _hidden = _pinned && child.size.height > _limit;
+    size = constraints.constrain(_hidden ? Size(child.size.width, 0) : child.size);
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    if (!_hidden) super.paint(context, offset);
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) => !_hidden && super.hitTestChildren(result, position: position);
+
+  @override
+  void visitChildrenForSemantics(RenderObjectVisitor visitor) {
+    if (!_hidden) super.visitChildrenForSemantics(visitor);
+  }
+}
 
 List<Widget> _gap(List<Widget> items, [double gap = TSpace.gap]) {
   final out = <Widget>[];
