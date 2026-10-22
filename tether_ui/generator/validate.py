@@ -103,6 +103,7 @@ def validate():
     errors += check_plan_controls(SCREENS)
     errors += check_consent_starts(SCREENS)
     errors += check_unselected(SCREENS)
+    errors += check_not_requested(SCREENS)
     # tab roots
     for t in TABS:
         if t not in SCREENS: errors.append(f'tab root {t} missing')
@@ -766,6 +767,28 @@ def check_unselected(screens, pinned=None, also=None, checklists=None):
                     errors.append(f'{sid}: checklist at {p} has no key= on a consent-creating screen, so the member\'s choices never reach the submit (P-79).')
     return errors
 
+# An item marked "Not requested" is information, not a choice: ticking it
+# would count as a selection for the screen's rule and put it in the
+# payload. It is shown as a read-only list row instead.
+NOT_REQUESTED = re.compile(r'(?i)\bnot requested\b')
+
+def check_not_requested(screens):
+    """No selectable item (checklist item, radio item, chip, selection
+    tile) is labelled or marked "Not requested"."""
+    errors = []
+    for sid, s in screens.items():
+        for part in ('body', 'footer'):
+            for n, p in walk(s[part], part):
+                t = n['t']
+                if t in ('checklist', 'radio'): items = [(i.get('label'), i.get('sub')) for i in n['items']]
+                elif t == 'chips': items = [(o, None) for o in n['options']]
+                elif t == 'tiles': items = [(i.get('label'), i.get('sub')) for i in n['items'] if not i.get('action')]
+                else: continue
+                for label, sub in items:
+                    if any(NOT_REQUESTED.search(x or '') for x in (label, sub)):
+                        errors.append(f'{sid}: {t} item {label!r} at {p} is marked "Not requested" but can be selected; show it as a read-only list row, outside the selection, so it never counts as a choice or reaches the payload.')
+    return errors
+
 def check_consent_starts(screens, allowed=None, checklists=None, plan=PLAN_SCREENS, also=None):
     """P-52, extended: an optional consent, sharing or import selection on a
     consent-creating screen starts off, except the entries of `allowed`
@@ -988,6 +1011,14 @@ def _settings_self_test():
     _expect(any('starts selected' in x for x in cu({'r': sc('r', [radio(['Keep', 'Drop'], 1, key='keep')], 'POST /v1/records/fhir/conflicts')}, {('r', 'keep'): 'x'})), 'a pinned radio starting on a choice not reported')
     _expect(any('has no key= on a consent-creating screen' in x for x in cu({'r': sc('r', [checklist([ci('Labs')])], 'POST /v1/records/fhir/accept')}, {})), 'a keyless checklist on a consent-creating screen not reported')
     _expect(cu({'r': sc('r', [checklist([ci('Labs')])], 'PUT /v1/program-data/x')}, {}) == [], 'a keyless checklist off consent screens is reported')
+    # "Not requested" items are never selectable.
+    nr = lambda *nodes: check_not_requested({'r': sc('r', list(nodes), None)})
+    _expect(nr(checklist([ci('Labs')], key='res'), rows([row('Notes', 'Not requested')])) == [], 'a read-only "Not requested" row is reported')
+    _expect(any("checklist item 'Notes'" in x for x in nr(checklist([ci('Labs'), ci('Notes', 'Not requested')], key='res'))), 'a "Not requested" checklist item (sub) not reported')
+    _expect(any("checklist item 'Not requested: notes'" in x for x in nr(checklist([ci('Not requested: notes')]))), 'a "Not requested" checklist item (label) not reported')
+    _expect(any("radio item 'Notes'" in x for x in nr(radio([ri('Notes', 'NOT REQUESTED')], -1, key='r'))), 'a "Not requested" radio item not reported')
+    _expect(any("chips item 'Not requested'" in x for x in nr(chips(['Not requested'], key='c'))), 'a "Not requested" chip not reported')
+    _expect(nr(tiles([tl('Notes', 'Not requested', action=back())])) == [], 'a navigation tile is reported')
     # Endpoint classes: each pattern category, the extra list, and fail-closed.
     for e, cat in (('POST /v1/enrolments/consents', 'consent writes'), ('PATCH /v1/enrolments/consents', 'consent writes'), ('POST /v1/care/caregivers', 'care writes'),
                    ('POST /v1/care/connections', 'care writes'), ('POST /v1/care/messages', 'care writes'), ('DELETE /v1/care/supporters/:id', 'care writes'),
@@ -1073,6 +1104,12 @@ def _spec_self_test(screens):
         else: raise ValueError(f'{sid}.{key}: no mutation for {n["t"]}')
         _expect(any(f'{sid}: optional consent' in x and repr(key) in x for x in check_consent_starts(spec)), f'{sid}.{key} starting selected passes check_consent_starts')
         _expect(any(f'{sid}: ' in x and 'starts selected' in x for x in check_unselected(spec)), f'{sid}.{key} starting selected passes check_unselected')
+    _expect(check_not_requested(screens) == [], 'the real spec has a selectable "Not requested" item')
+    for sid, key in (('records_consent', 'resources'), ('records_consent_bb', 'resources'), ('records_consent_device', 'data_types')):
+        spec = copy.deepcopy(screens)
+        n = next(n for part in ('body', 'footer') for n, p in walk(spec[sid][part], part) if n.get('key') == key)
+        n['items'].append(ci('Clinical notes', 'Not requested'))
+        _expect(any(x.startswith(f'{sid}: checklist item ') for x in check_not_requested(spec)), f'{sid}.{key}: a "Not requested" item back in the checklist passes check_not_requested')
     print('validate spec self-test: ok')
 
 if __name__ == '__main__':

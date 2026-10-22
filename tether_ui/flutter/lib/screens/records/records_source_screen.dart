@@ -12,7 +12,6 @@ import '../../ui/ui.dart';
 /// Actions (generated from spec/screens/records_source.json):
 ///   • Back → back
 ///   • Sync now → POST /v1/records/fhir/sources/:id/sync then toast “Synced · 2 new results”
-///   • What we read → push → records_consent
 ///   • Disconnect → sheet → records_disconnect
 /// API: —
 class RecordsSourceScreen extends StatelessWidget {
@@ -24,7 +23,8 @@ class RecordsSourceScreen extends StatelessWidget {
       header: THeader(title: 'Patel Family Medicine'),
       children: [
         TKeyValue(rows: [('Connection', 'Epic MyChart · SMART on FHIR R4'), ('Last sync', 'Today 7:02 AM'), ('Next sync', 'Tomorrow'), ('Access', 'Read-only · 6 categories'), ('Connected', 'Oct 3, 2026')]),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'Sync now', onTap: () => TNav.submit(context, 'POST /v1/records/fhir/sources/:id/sync', screenId: 'records_source', then: () => TNav.toast(context, 'Synced · 2 new results'))), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: 'What we read', onTap: () => TNav.push(context, Routes.recordsConsent))]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'Sync now', onTap: () => TNav.submit(context, 'POST /v1/records/fhir/sources/:id/sync', screenId: 'records_source', then: () => TNav.toast(context, 'Synced · 2 new results')))]),
+        TListGroup(title: 'What we read', rows: [TListRow(label: 'Conditions', sub: 'Condition'), TListRow(label: 'Vital signs', sub: 'Observation · blood pressure, weight'), TListRow(label: 'Lab results', sub: 'Observation · A1C, lipids, eGFR'), TListRow(label: 'Medications', sub: 'MedicationRequest'), TListRow(label: 'Immunizations', sub: 'Immunization'), TListRow(label: 'Smoking status', sub: 'Observation · LOINC 72166-2')]),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: 'Disconnect', onPressed: () => TNav.sheet(context, Routes.recordsDisconnect), variant: TButtonVariant.danger),

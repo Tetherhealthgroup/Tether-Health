@@ -1,7 +1,7 @@
 # Validation
 
 - Screens: 228
-- Actions (edges): 675
+- Actions (edges): 674
 - Errors (loose ends): **0**
 
 Checks: every interactive element has an action; every target exists; every screen can be reached from an entry point; every screen has a way out; routes are unique; branches have ≥2 outcomes; every branch has exactly one production decision source (V1–V6, spec/branches.json).

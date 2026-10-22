@@ -41,14 +41,20 @@
         {
           "label": "Clinical records (iPhone)",
           "sub": "Labs, immunizations, conditions"
-        },
+        }
+      ],
+      "label": "What Tether will ask for",
+      "key": "data_types"
+    },
+    {
+      "t": "list",
+      "rows": [
         {
           "label": "Steps and sleep",
           "sub": "Not requested"
         }
       ],
-      "label": "What Tether will ask for",
-      "key": "data_types"
+      "flat": true
     }
   ],
   "footer": [

@@ -877,7 +877,6 @@ const _cases = <(String, String, String, String, String?, bool, bool, (String, S
   ('records_error', Routes.recordsError, 'footer[2]', 'Enter manually instead', null, false, false, ('route', '/records/manual'), null),
   ('records_source', Routes.recordsSource, 'header.left', 'Back', null, false, false, ('pop', null), null),
   ('records_source', Routes.recordsSource, 'body[1].rows[0]', 'Sync now', null, false, false, ('toast', 'Synced · 2 new results'), null),
-  ('records_source', Routes.recordsSource, 'body[1].rows[1]', 'What we read', null, false, false, ('route', '/records/consent'), null),
   ('records_source', Routes.recordsSource, 'footer[0]', 'Disconnect', null, false, false, ('route', '/records/source/disconnect'), null),
   ('records_disconnect', Routes.recordsDisconnect, 'footer[0]', 'Disconnect source', null, false, false, ('route', '/records'), null),
   ('records_disconnect', Routes.recordsDisconnect, 'footer[1]', 'Cancel', null, false, false, ('pop', null), null),

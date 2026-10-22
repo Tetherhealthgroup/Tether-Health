@@ -48,13 +48,19 @@ def records():
                                                  when={'supported': 'SMART on FHIR R4 supported', 'unsupported': 'Not a FHIR R4 server'}))],
        api=['GET {base}/.well-known/smart-configuration', 'GET {base}/metadata'])
 
+    # The FHIR categories a records source reads. The consent screens offer
+    # them as the checklist; records_source lists them read-only under
+    # "What we read" (its "6 categories").
+    READ_CATEGORIES = [('Conditions', 'Condition'), ('Vital signs', 'Observation · blood pressure, weight'), ('Lab results', 'Observation · A1C, lipids, eGFR'),
+                       ('Medications', 'MedicationRequest'), ('Immunizations', 'Immunization'), ('Smoking status', 'Observation · LOINC 72166-2')]
     # SMART sign-in in the system browser (R-31: through the device hook, not a submit).
     SMART_WHEN = {'approved': 'Approved', 'cancelled': 'Cancelled', 'failed': 'Denied or error'}
     consent_body = lambda name, src: [
         title(f'Connect {name}?'),
         kv([('Source', src), ('Access', 'Read-only'), ('Refresh', 'Daily while connected'), ('Stop', 'Disconnect anytime')]),
-        checklist([ci('Conditions', 'Condition'), ci('Vital signs', 'Observation · blood pressure, weight'), ci('Lab results', 'Observation · A1C, lipids, eGFR'),
-                   ci('Medications', 'MedicationRequest'), ci('Immunizations', 'Immunization'), ci('Smoking status', 'Observation · LOINC 72166-2'), ci('Clinical notes', 'Not requested')], label='What Tether will read', key='resources'),
+        checklist([ci(label, sub) for label, sub in READ_CATEGORIES], label='What Tether will read', key='resources'),
+        # Not requested: shown for information, never selectable or sent.
+        rows([row('Clinical notes', 'Not requested')], flat=True),
         card(v='mint', title='Only the programs you joined get data', text='Heartwise ← blood pressure, lipids · Steady ← A1C, glucose · Renew ← eGFR · Checkup ← immunizations · BreatheFree ← smoking status. Ease and ScrollFree get nothing.'),
     ]
     S('records_consent', 'Consent: Epic', '/records/consent', 'records', phase='resources', hdr=H('Connect', pill='Read-only'), body=consent_body('Patel Family Medicine', 'Epic MyChart · SMART on FHIR R4'),
@@ -70,7 +76,8 @@ def records():
               button('Not now', back(), v='secondary')])
     S('records_consent_device', 'Consent: phone health data', '/records/consent?source=device', 'records', phase='resources', variant_of='records_consent', state='Apple Health / Health Connect', hdr=H('Connect', pill='Read-only'),
       body=[title('Use health data on this phone?'), text('iPhone: Apple Health Records (FHIR) and readings. Android: Health Connect readings. You choose each type in the system screen next.', 'muted'),
-            checklist([ci('Blood pressure'), ci('Blood glucose'), ci('Clinical records (iPhone)', 'Labs, immunizations, conditions'), ci('Steps and sleep', 'Not requested')], label='What Tether will ask for', key='data_types')],
+            checklist([ci('Blood pressure'), ci('Blood glucose'), ci('Clinical records (iPhone)', 'Labs, immunizations, conditions')], label='What Tether will ask for', key='data_types'),
+            rows([row('Steps and sleep', 'Not requested')], flat=True)],
       footer=[button('Continue', chosen_gate('rec.consent.device', branch('System permission result', [('Allowed', go('records_importing')), ('Not allowed', go('records_error'))],
                                          id='records.device.health_records_request', ask='healthRecordsRequest',
                                          when={'granted': 'Allowed', 'denied': 'Not allowed', 'unavailable': 'Not allowed'}), SELECTION_COPY['records_read_none'])), button('Not now', back(), v='secondary')],
@@ -110,7 +117,10 @@ def records():
     ], footer=[button('Try again', back()), button('Choose another source', rep('records_add'), v='secondary'), link('Enter manually instead', rep('records_manual'))])
     S('records_source', 'Source details', '/records/source', 'records', phase='resources', hdr=H('Patel Family Medicine'), body=[
         kv([('Connection', 'Epic MyChart · SMART on FHIR R4'), ('Last sync', 'Today 7:02 AM'), ('Next sync', 'Tomorrow'), ('Access', 'Read-only · 6 categories'), ('Connected', 'Oct 3, 2026')]),
-        rows([row('Sync now', None, action=submit('POST /v1/records/fhir/sources/:id/sync', toast('Synced · 2 new results'))), row('What we read', None, action=go('records_consent'))]),
+        rows([row('Sync now', None, action=submit('POST /v1/records/fhir/sources/:id/sync', toast('Synced · 2 new results')))]),
+        # Read-only: the categories this source reads. Not the consent
+        # checklist, which starts unticked (P-78) and would under-report.
+        rows([row(label, sub) for label, sub in READ_CATEGORIES], title='What we read'),
     ], footer=[button('Disconnect', sheet('records_disconnect'), v='danger')])
     S('records_disconnect', 'Disconnect source', '/records/source/disconnect', 'records', phase='resources', kind='sheet', over='Patel Family Medicine', body=[
         title('Disconnect Patel Family Medicine?'), text('Tether stops reading new records and revokes its access token.', 'muted'),

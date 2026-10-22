@@ -482,10 +482,11 @@
       "tickets": [
         "TH-907",
         "TH-986a",
-        "TH-1008c"
+        "TH-1008c",
+        "TH-1008d"
       ],
-      "sha256": "e9b3fc7b73d2b5bcba846ae12eff8c051369a773b27bb2da86e3b01521b852c4",
-      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.connect.mychart\", ask \"smartConnect\" and when {approved: Approved, cancelled: Cancelled, failed: Denied or error} | P-78, starts unticked: body[2] checklist \"What Tether will read\" items Conditions, Vital signs, Lab results, Medications, Immunizations and Smoking status no longer start ticked (\"done\": true removed); Clinical notes was already unticked | footer[0] \"Continue to MyChart\" action wrapped in a branch decided by rule rec.consent.epic: \"Chosen\" runs the MyChart sign-in branch (id records.connect.mychart) unchanged; \"Nothing chosen\" shows the toast \"Select at least one item to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow"
+      "sha256": "3467c7416deb8c7683c23d6bee28a4229cacca836161e3e54c14e9260a772f87",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.connect.mychart\", ask \"smartConnect\" and when {approved: Approved, cancelled: Cancelled, failed: Denied or error} | P-78, starts unticked: body[2] checklist \"What Tether will read\" items Conditions, Vital signs, Lab results, Medications, Immunizations and Smoking status no longer start ticked (\"done\": true removed); Clinical notes was already unticked | footer[0] \"Continue to MyChart\" action wrapped in a branch decided by rule rec.consent.epic: \"Chosen\" runs the MyChart sign-in branch (id records.connect.mychart) unchanged; \"Nothing chosen\" shows the toast \"Select at least one item to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow | TH-1008d, as P-78: \"Clinical notes\" (sub \"Not requested\") is removed from the body[2] checklist \"What Tether will read\" and shown as a read-only flat list row at body[3] (no action), so it can never be ticked, count as a selection for the rule or be sent; later body nodes move down one"
     },
     {
       "screen": "records_consent_bb",
@@ -496,10 +497,11 @@
       "tickets": [
         "TH-907",
         "TH-986a",
-        "TH-1008c"
+        "TH-1008c",
+        "TH-1008d"
       ],
-      "sha256": "d93fde46370581db6d27e46a349a17380e92ce1365c769e8780e6978d2725bba",
-      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.connect.medicare\", ask \"smartConnect\" and when {approved: Approved, cancelled: Cancelled, failed: Denied or error} | P-78, starts unticked: body[2] checklist \"What Tether will read\" items Conditions, Vital signs, Lab results, Medications, Immunizations and Smoking status no longer start ticked (\"done\": true removed); Clinical notes was already unticked | footer[0] \"Continue to Medicare.gov\" action wrapped in a branch decided by rule rec.consent.medicare: \"Chosen\" runs the Medicare sign-in branch (id records.connect.medicare) unchanged; \"Nothing chosen\" shows the toast \"Select at least one item to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow"
+      "sha256": "de394feb776cee089d9fe1cd06ac7baaad9ae5bd895cb168de8ea4c90c1005a9",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.connect.medicare\", ask \"smartConnect\" and when {approved: Approved, cancelled: Cancelled, failed: Denied or error} | P-78, starts unticked: body[2] checklist \"What Tether will read\" items Conditions, Vital signs, Lab results, Medications, Immunizations and Smoking status no longer start ticked (\"done\": true removed); Clinical notes was already unticked | footer[0] \"Continue to Medicare.gov\" action wrapped in a branch decided by rule rec.consent.medicare: \"Chosen\" runs the Medicare sign-in branch (id records.connect.medicare) unchanged; \"Nothing chosen\" shows the toast \"Select at least one item to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow | TH-1008d, as P-78: \"Clinical notes\" (sub \"Not requested\") is removed from the body[2] checklist \"What Tether will read\" and shown as a read-only flat list row at body[3] (no action), so it can never be ticked, count as a selection for the rule or be sent; later body nodes move down one"
     },
     {
       "screen": "records_consent_device",
@@ -510,10 +512,11 @@
       "tickets": [
         "TH-907",
         "TH-986a",
-        "TH-1008c"
+        "TH-1008c",
+        "TH-1008d"
       ],
-      "sha256": "e7bc0f11a4e39eb196f902f7e02902757a773f7f284ef0c78f555689c556c5d3",
-      "change": "Session key only, no visual change: body[2] checklist gets key \"data_types\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.device.health_records_request\", ask \"healthRecordsRequest\" and when {granted: Allowed, denied: Not allowed, unavailable: Not allowed} | P-78, starts unticked: body[2] checklist \"What Tether will ask for\" items Blood pressure, Blood glucose and Clinical records (iPhone) no longer start ticked (\"done\": true removed); Steps and sleep was already unticked | footer[0] \"Continue\" action wrapped in a branch decided by rule rec.consent.device: \"Chosen\" runs the system permission branch (id records.device.health_records_request) unchanged; \"Nothing chosen\" shows the toast \"Select at least one item to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow"
+      "sha256": "81e82201e5fd5f70e5fb1119ea14605ef0557ddddde2a33834a9c607aed36a1b",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"data_types\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.device.health_records_request\", ask \"healthRecordsRequest\" and when {granted: Allowed, denied: Not allowed, unavailable: Not allowed} | P-78, starts unticked: body[2] checklist \"What Tether will ask for\" items Blood pressure, Blood glucose and Clinical records (iPhone) no longer start ticked (\"done\": true removed); Steps and sleep was already unticked | footer[0] \"Continue\" action wrapped in a branch decided by rule rec.consent.device: \"Chosen\" runs the system permission branch (id records.device.health_records_request) unchanged; \"Nothing chosen\" shows the toast \"Select at least one item to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow | TH-1008d, as P-78: \"Steps and sleep\" (sub \"Not requested\") is removed from the body[2] checklist \"What Tether will ask for\" and shown as a read-only flat list row at body[3] (no action), so it can never be ticked, count as a selection for the rule or be sent; later body nodes move down one"
     },
     {
       "screen": "records_fhir_url",
@@ -572,6 +575,17 @@
       ],
       "sha256": "09e19b1942db1bf9c13f919b9af4899fa5dfac9314f9bfa175a080319e97df5c",
       "change": "P-31 placeholders, fields start empty: body[0] \"Search\" example \"Patel\" -> dropped; keeps its own placeholder \"Search hospital, clinic or doctor\""
+    },
+    {
+      "screen": "records_source",
+      "decisions": [
+        "P-78"
+      ],
+      "tickets": [
+        "TH-1008d"
+      ],
+      "sha256": "1a20aae5f6f50a971befe1c0c59f123d7ba835a53969fe6d38375db45920ea92",
+      "change": "TH-1008d, as P-78: body[1] row \"What we read\" (push to records_consent) is removed, because that checklist now starts unticked and would under-report what the source reads; a new body[2] list titled \"What we read\" shows the six categories the source reads (Conditions, Vital signs, Lab results, Medications, Immunizations, Smoking status, with the same subtitles as the consent checklist) as read-only rows with no action, matching \"Read-only · 6 categories\"; no new wording; action summaries follow"
     },
     {
       "screen": "rescue_pick",

@@ -56,13 +56,36 @@
               "value": "Synced · 2 new results"
             }
           }
+        }
+      ]
+    },
+    {
+      "t": "list",
+      "title": "What we read",
+      "rows": [
+        {
+          "label": "Conditions",
+          "sub": "Condition"
         },
         {
-          "label": "What we read",
-          "action": {
-            "type": "push",
-            "to": "records_consent"
-          }
+          "label": "Vital signs",
+          "sub": "Observation · blood pressure, weight"
+        },
+        {
+          "label": "Lab results",
+          "sub": "Observation · A1C, lipids, eGFR"
+        },
+        {
+          "label": "Medications",
+          "sub": "MedicationRequest"
+        },
+        {
+          "label": "Immunizations",
+          "sub": "Immunization"
+        },
+        {
+          "label": "Smoking status",
+          "sub": "Observation · LOINC 72166-2"
         }
       ]
     }
@@ -103,15 +126,6 @@
         }
       },
       "summary": "POST /v1/records/fhir/sources/:id/sync then toast “Synced · 2 new results”"
-    },
-    {
-      "element": "What we read",
-      "path": "body[1].rows[1]",
-      "action": {
-        "type": "push",
-        "to": "records_consent"
-      },
-      "summary": "push → records_consent"
     },
     {
       "element": "Disconnect",

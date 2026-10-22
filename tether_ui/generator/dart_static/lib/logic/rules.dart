@@ -156,6 +156,10 @@ abstract final class TRules {
   static const unplugSum = (a: 7, b: 5);
   static const ageItem = 'I’m 18 or older';
 
+  /// The inputs of each "chosen" rule, read-only, so a test can check them
+  /// against spec/rules.json (CHOSEN_RULES in the generator).
+  static Map<String, List<String>> get chosenInputs => _chosenInputs;
+
   /// Returns the outcome label for [rule], or null when inputs are missing.
   static String? decide(String rule, Map<String, Object?> v) {
     if (rule.startsWith('choice:')) {

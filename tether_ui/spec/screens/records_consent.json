@@ -71,14 +71,20 @@
         {
           "label": "Smoking status",
           "sub": "Observation · LOINC 72166-2"
-        },
+        }
+      ],
+      "label": "What Tether will read",
+      "key": "resources"
+    },
+    {
+      "t": "list",
+      "rows": [
         {
           "label": "Clinical notes",
           "sub": "Not requested"
         }
       ],
-      "label": "What Tether will read",
-      "key": "resources"
+      "flat": true
     },
     {
       "t": "card",
