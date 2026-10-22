@@ -96,6 +96,9 @@ def validate():
     # Decision sources (R-31): V1-V5 on the spec, V6 on the catalogues.
     errors += check_branches(SCREENS)
     errors += check_catalogues(SCREENS)
+    # Settings binding and first-run consents (P-71, P-52).
+    errors += check_settings(SCREENS)
+    errors += check_first_run_consents(SCREENS)
     # tab roots
     for t in TABS:
         if t not in SCREENS: errors.append(f'tab root {t} missing')
@@ -417,6 +420,113 @@ def check_emitted(spec_dir):
     return errors
 
 
+# ---------------------------------------------------------------- settings binding (P-71, P-52; TH-1008)
+# A settings screen is any screen whose submit updates existing state: a
+# PATCH or PUT, or a POST that changes an existing sharing grant
+# (SETTINGS_POSTS). ob_consent's POST creates the first consents during
+# onboarding; the first-run rule below governs it instead. The list is
+# pinned: a screen that starts or stops matching the rule fails until
+# SETTINGS_SCREENS is updated in the same change. The generator emits the
+# list for the app as `settingsScreens` (lib/router/settings_screens.dart).
+SETTINGS_POSTS = ('POST /v1/care/caregivers',)
+SETTINGS_SCREENS = (
+    'account_notifications', 'account_privacy', 'auth_newpass', 'be_q2', 'bf_meds_edit', 'bf_review', 'ca_plan', 'ck_q1',
+    'ea_plan', 'hw_targets', 'nu_habit', 'program_settings', 'program_settings_sf', 're_result', 'sd_caregiver', 'sd_plan',
+    'sd_safety', 'sf_buddy', 'sf_unplug_off', 'st_range',
+)
+# First-run consent rule (P-52 made mechanical): on a first-run screen (the
+# onboarding flow or phase) an optional consent or attestation control starts
+# off. Consent controls are the toggles and checklists on a screen that
+# submits to CONSENT_ENDPOINTS, and the consent checklists (CONSENT_CHECKLISTS).
+# FIRST_RUN_ON lists the only control allowed to start on, with the reason.
+CONSENT_ENDPOINTS = ('POST /v1/enrolments/consents', 'PATCH /v1/enrolments/consents')
+FIRST_RUN_ON = {('ob_consent', 'essential_app_data'): 'Essential app data: required for the app to work, not optional'}
+
+def _submits(a, out):
+    if not a: return
+    if a['type'] == 'submit': out.append(a['api'])
+    for c in a.get('cases', []): _submits(c['action'], out)
+    _submits(a.get('then'), out)
+
+def submits_of(s):
+    """Every submit endpoint on screen `s`, in order."""
+    out = []
+    for _, _, a in actions_of(s): _submits(a, out)
+    return out
+
+def is_settings(s):
+    return any(e.split(' ', 1)[0] in ('PATCH', 'PUT') or e in SETTINGS_POSTS for e in submits_of(s))
+
+def is_first_run(s): return s.get('flow') == 'onboarding' or s.get('phase') == 'onboarding'
+
+def needs_bind(n):
+    """True for a control that writes the session and so must be bound on a
+    settings screen: every keyed input except text-like fields (P-31 already
+    keeps them empty), keyed checklists and tiles, and select fields."""
+    t = n['t']
+    if not n.get('key'): return False
+    if t == 'field': return n.get('kind') == 'select'
+    return t in INPUTS or t in KEYED
+
+def bindings(screens):
+    """(screen id, path, session key, bind key) for every bound control."""
+    return [(sid, p, n.get('key'), n['bind']) for sid, s in screens.items() for part in ('body', 'footer') for n, p in walk(s[part], part) if n.get('bind') is not None]
+
+def check_settings(screens, pinned=SETTINGS_SCREENS):
+    """Every input control on a settings screen is bound (Rule 1) with a
+    well-formed bind key; bind appears only on bindable controls of settings
+    screens; and the settings screens equal the pinned list."""
+    errors = []
+    found = sorted(sid for sid, s in screens.items() if is_settings(s))
+    if pinned is not None and found != sorted(pinned):
+        add, gone = sorted(set(found) - set(pinned)), sorted(set(pinned) - set(found))
+        errors.append(f'settings screens changed: new {add}, no longer settings {gone}. Update validate.SETTINGS_SCREENS (and bind the new screens\' controls).')
+    for sid, s in screens.items():
+        settings, seen = is_settings(s), {}
+        for part in ('body', 'footer'):
+            for n, p in walk(s[part], part):
+                b = n.get('bind')
+                if settings and needs_bind(n) and b is None:
+                    errors.append(f'{sid}: {n["t"]} {n.get("key")!r} at {p} on a settings screen has no bind= (P-71: it must start from the member\'s stored state).')
+                if b is None: continue
+                if not settings:
+                    errors.append(f'{sid}: bind {b!r} at {p} is not on a settings screen (bound inputs are for settings screens only).')
+                if n['t'] not in BINDABLE or (n['t'] == 'field' and n.get('kind') != 'select'):
+                    errors.append(f'{sid}: bind {b!r} at {p} is on a {n["t"]}{" " + n.get("kind", "") if n["t"] == "field" else ""}; the kit binds only {", ".join(BINDABLE)} (select fields).')
+                if not n.get('key'):
+                    errors.append(f'{sid}: bind {b!r} at {p} is on a control with no key=.')
+                if not isinstance(b, str) or not BIND_KEY.match(b):
+                    errors.append(f'{sid}: bind {b!r} at {p} must be dot-separated lower-case segments (for example notifications.quiet_hours).')
+                elif b in seen:
+                    errors.append(f'{sid}: bind {b!r} at {p} is also used at {seen[b]}.')
+                else:
+                    seen[b] = p
+    return errors
+
+def check_first_run_consents(screens, allowed=FIRST_RUN_ON, checklists=None):
+    """P-52: an optional consent or attestation control on a first-run screen
+    starts off, except the entries of `allowed`. Settings screens are exempt
+    (check_settings governs them). Every `allowed` entry must be used."""
+    checklists = CONSENT_CHECKLISTS if checklists is None else checklists
+    errors, used = [], set()
+    for sid, s in screens.items():
+        if not is_first_run(s) or is_settings(s): continue
+        consent_screen = any(e in CONSENT_ENDPOINTS for e in submits_of(s))
+        for part in ('body', 'footer'):
+            for n, p in walk(s[part], part):
+                if n['t'] == 'toggle' and consent_screen: on = bool(n.get('on'))
+                elif n['t'] == 'checklist' and (consent_screen or checklists.get(sid) == n.get('key')): on = any(i.get('done') for i in n['items'])
+                else: continue
+                if not on: continue
+                if (sid, n.get('key')) in allowed:
+                    used.add((sid, n.get('key'))); continue
+                errors.append(f'{sid}: optional consent {n["t"]} {n.get("key")!r} at {p} starts on. P-52: on a first-run screen the member turns it on (allowlist: validate.FIRST_RUN_ON).')
+    for k in allowed:
+        if k not in used:
+            errors.append(f'first-run consent allowlist entry {k} matches no first-run consent control that starts on: remove it from validate.FIRST_RUN_ON.')
+    return errors
+
+
 def _expect(ok, message):
     """An explicit error, not an assert: `python -O` must not skip the check."""
     if not ok: raise AssertionError(message)
@@ -500,7 +610,61 @@ def _self_test():
         _expect(any('carries question text' in e for e in write(leaked, eps)), 'V6 question text not reported')
         _expect(any('cannot read' in e for e in check_emitted(os.path.join(d, 'missing'))), 'V6 missing catalogue not reported')
     _age_gate_self_test(scr)
+    _settings_self_test()
     print('validate self-test: ok')
+
+def _settings_self_test():
+    """check_settings and check_first_run_consents (P-71, P-52) report each
+    error on a synthetic spec, and a correct spec passes."""
+    def sc(sid, body, api=None, flow='account', phase='account'):
+        footer = [button('Save', submit(api, back()))] if api else [button('Done', back())]
+        return {'id': sid, 'flow': flow, 'phase': phase, 'header': None, 'body': body, 'footer': footer, 'tab': None}
+    def settings(*body, api='PATCH /v1/x'): return sc('set', list(body), api)
+    def run(screens, pinned=('set',)): return check_settings(screens, pinned)
+    def has(screens, text, why, pinned=('set',)):
+        got = run(screens, pinned)
+        _expect(any(text in e for e in got), f'{why} not reported; got {got}')
+    ok = {'set': settings(toggle('A', key='a', bind='x.a'), field('Name', key='name'), checklist(['One']), field('Pick', kind='select', key='pick', bind='x.pick')),
+          'other': sc('other', [toggle('B', on=True, key='b')], 'POST /v1/x')}
+    _expect(run(ok) == [], f'a correct spec reports {run(ok)}')
+    has({'set': settings(toggle('A', key='a'))}, "toggle 'a' at body[0] on a settings screen has no bind=", 'unbound toggle')
+    has({'set': settings(field('Pick', kind='select', key='pick'))}, "field 'pick'", 'unbound select field')
+    has({'set': settings(checklist(['One'], key='c'))}, "checklist 'c'", 'unbound keyed checklist')
+    has({'set': settings(chips(['A'], key='c'))}, "chips 'c'", 'unbound chips')
+    has({'set': settings(seg(['A', 'B'], 'A', key='c'))}, "segmented 'c'", 'unbound segmented')
+    has({'set': settings(radio(['A'], key='c'))}, "radio 'c'", 'unbound radio')
+    has({'set': settings(toggle('A', key='a', bind='x.a'), api='PUT /v1/x')} | {'set2': dict(settings(toggle('B', key='b')), id='set2')}, "set2: toggle 'b'", 'unbound control on a PUT screen', pinned=('set', 'set2'))
+    has({'set': sc('set', [toggle('A', key='a')], 'POST /v1/care/caregivers')}, "toggle 'a'", 'unbound control on a sharing POST screen')
+    has({'set': settings(toggle('A', key='a', bind='x.a')), 'other': sc('other', [toggle('B', key='b', bind='x.b')], 'POST /v1/x')}, "other: bind 'x.b' at body[0] is not on a settings screen", 'bind outside settings')
+    has({'set': settings(field('Name', key='name', bind='x.name'))}, 'is on a field text', 'bind on a text field')
+    has({'set': settings(dict(slider('S', 1, key='s'), bind='x.s'))}, 'is on a slider', 'bind on a slider')
+    has({'set': settings(slider('S', 1, key='s'))}, "slider 's'", 'unbound slider on a settings screen')
+    has({'set': settings(checklist(['One'], bind='x.c'))}, 'is on a control with no key=', 'bind without key')
+    has({'set': settings(toggle('A', key='a', bind='X.a'))}, 'must be dot-separated', 'bad bind format')
+    has({'set': settings(toggle('A', key='a', bind='single'))}, 'must be dot-separated', 'one-segment bind')
+    has({'set': settings(toggle('A', key='a', bind='x.a'), toggle('B', key='b', bind='x.a'))}, 'is also used at body[0]', 'duplicate bind')
+    has({'set': settings(toggle('A', key='a', bind='x.a')), 'new': dict(settings(), id='new')}, "new ['new']", 'unpinned settings screen')
+    has({'set': sc('set', [], 'POST /v1/x')}, "no longer settings ['set']", 'pinned screen that no longer matches')
+    # First-run consents.
+    def fr(sid, body, api='POST /v1/enrolments/consents', flow='onboarding', phase='onboarding'): return sc(sid, body, api, flow, phase)
+    allow = {('ob', 'req'): 'required'}
+    def run5(screens, allowed=allow, checklists=None): return check_first_run_consents(screens, allowed, checklists or {})
+    def has5(screens, text, why, allowed=allow, checklists=None):
+        got = run5(screens, allowed, checklists)
+        _expect(any(text in e for e in got), f'{why} not reported; got {got}')
+    good5 = {'ob': fr('ob', [toggle('Required', on=True, key='req'), toggle('Optional', key='opt')]),
+             'acct': sc('acct', [checklist(['Me'], key='age')], None, 'onboarding', 'account'),
+             'pref': fr('pref', [toggle('Quiet hours', on=True, key='quiet')], None),
+             'later': sc('later', [toggle('Share', on=True, key='share')], 'POST /v1/enrolments/consents'),
+             'set': fr('set', [toggle('Share', on=True, key='share', bind='x.share')], 'PATCH /v1/enrolments/consents')}
+    _expect(run5(good5, checklists={'acct': 'age'}) == [], f'a correct first-run spec reports {run5(good5, checklists={"acct": "age"})}')
+    has5(dict(good5, ob=fr('ob', [toggle('Required', on=True, key='req'), toggle('Optional', on=True, key='opt')])), "ob: optional consent toggle 'opt' at body[1] starts on", 'optional consent starting on')
+    has5(dict(good5, acct=sc('acct', [checklist([ci('Me', done=True)], key='age')], None, 'onboarding', 'account')), "acct: optional consent checklist 'age'", 'consent checklist ticked (onboarding flow)', checklists={'acct': 'age'})
+    has5(dict(good5, ob=fr('ob', [toggle('Required', on=True, key='req'), checklist([ci('One', done=True)], key='c')])), "checklist 'c'", 'ticked checklist on a consent screen')
+    has5(dict(good5, q=fr('q', [toggle('Share', on=True, key='share')], 'POST /v1/enrolments/consents', 'prog', 'onboarding')), "q: optional consent toggle 'share'", 'consent screen in the onboarding phase of another flow')
+    has5(dict(good5, ob=fr('ob', [toggle('Required', key='req'), toggle('Optional', key='opt')])), "('ob', 'req') matches no first-run consent control", 'stale allowlist entry')
+    has5(good5, "('ob', 'gone')", 'allowlist entry for a missing control', allowed=dict(allow, **{}) | {('ob', 'gone'): 'x'})
+    _expect(any('starts on' in e for e in run5(good5, allowed={})), 'the required control is not reported without its allowlist entry')
 
 def _age_gate_self_test(scr):
     """check_age_gate fails closed: an account-creating or unknown auth submit

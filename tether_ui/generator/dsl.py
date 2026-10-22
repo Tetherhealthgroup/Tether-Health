@@ -135,21 +135,21 @@ def steps(n, total): return N('steps', n=n, total=total)
 def eyebrow(text): return N('eyebrow', text=text)
 def title(text, size='m', align=None): return N('title', text=text, size=size, align=align)
 def text(t, tone='body', align=None): return N('text', text=t, tone=tone, align=align)
-def chips(options, selected=(), multi=True, dots=None, label=None, key=None): return N('chips', options=list(options), selected=list(selected), multi=multi, dots=dots, label=label, key=key)
-def seg(options, selected, label=None, key=None): return N('segmented', options=list(options), selected=selected, label=label, key=key)
-def radio(items, selected=0, label=None, key=None):
+def chips(options, selected=(), multi=True, dots=None, label=None, key=None, bind=None): return N('chips', options=list(options), selected=list(selected), multi=multi, dots=dots, label=label, key=key, bind=bind)
+def seg(options, selected, label=None, key=None, bind=None): return N('segmented', options=list(options), selected=selected, label=label, key=key, bind=bind)
+def radio(items, selected=0, label=None, key=None, bind=None):
     its = [i if isinstance(i, dict) else {'label': i} for i in items]
-    return N('radio', items=its, selected=selected, label=label, key=key)
+    return N('radio', items=its, selected=selected, label=label, key=key, bind=bind)
 def ri(label, sub=None, badge=None): return {k: v for k, v in {'label': label, 'sub': sub, 'badge': badge}.items() if v}
-def checklist(items, label=None, key=None): return N('checklist', items=[i if isinstance(i, dict) else {'label': i} for i in items], label=label, key=key)
+def checklist(items, label=None, key=None, bind=None): return N('checklist', items=[i if isinstance(i, dict) else {'label': i} for i in items], label=label, key=key, bind=bind)
 def ci(label, sub=None, done=False): return {k: v for k, v in {'label': label, 'sub': sub, 'done': done or None}.items() if v}
-def toggle(label, sub=None, on=False, key=None): return N('toggle', label=label, sub=sub, on=on, key=key)
-def field(label, example=None, unit=None, hint=None, error=None, placeholder=None, kind='text', key=None):
+def toggle(label, sub=None, on=False, key=None, bind=None): return N('toggle', label=label, sub=sub, on=on, key=key, bind=bind)
+def field(label, example=None, unit=None, hint=None, error=None, placeholder=None, kind='text', key=None, bind=None):
     """A text input. P-31: a field never starts with a value. The example
     renders as placeholder (hint) text, and the field writes null until the
     user types. If the field already has its own placeholder, the example is
     dropped."""
-    return N('field', label=label, unit=unit, hint=hint, error=error, placeholder=placeholder if placeholder is not None else example, kind=kind, key=key)
+    return N('field', label=label, unit=unit, hint=hint, error=error, placeholder=placeholder if placeholder is not None else example, kind=kind, key=key, bind=bind)
 def fieldrow(*fields): return N('fieldrow', fields=list(fields))
 def slider(label, value, mn=0, mx=10, lo=None, hi=None, color='coral', suffix='', key=None):
     return N('slider', label=label, value=value, min=mn, max=mx, minLabel=lo or str(mn), maxLabel=hi or str(mx), color=color, suffix=suffix or None, key=key)
@@ -251,6 +251,16 @@ INPUTS = ('field', 'chips', 'segmented', 'radio', 'toggle', 'slider')
 # auto-keyed.
 KEYED = ('checklist', 'tiles')
 AUTO_KEYS = []  # (screen id, path, key) of inputs without an explicit key
+# Settings binding (P-71, TH-1008). On a settings screen
+# (validate.SETTINGS_SCREENS) every input control that writes to the session
+# carries `bind=`: the TData key of the member's stored value. The kit shows
+# that value, writes nothing to the session while it is unknown (null), and
+# records which keys the member changed (TSession.touched). BINDABLE lists the
+# controls the kit can bind; among fields only kind 'select' is bound (text
+# fields already start empty, P-31). The bind key itself is never written to
+# the session.
+BINDABLE = ('toggle', 'checklist', 'chips', 'segmented', 'radio', 'field')
+BIND_KEY = re.compile(r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$')
 
 def walk(nodes, path='body'):
     for i, n in enumerate(nodes or []):

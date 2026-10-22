@@ -27,21 +27,24 @@
           "label": "Check-ins and plan reminders",
           "sub": "At most 2 a day",
           "on": true,
-          "key": "check_ins_and_plan_reminders"
+          "key": "check_ins_and_plan_reminders",
+          "bind": "notifications.check_ins_and_plan_reminders"
         },
         {
           "t": "toggle",
           "label": "Show sensitive details",
           "sub": "Off: program names and health data hidden",
           "on": false,
-          "key": "show_sensitive_details"
+          "key": "show_sensitive_details",
+          "bind": "notifications.show_sensitive_details"
         },
         {
           "t": "toggle",
           "label": "Quiet hours",
           "sub": "9:00 PM – 7:00 AM · safety alerts still come through",
           "on": true,
-          "key": "quiet_hours"
+          "key": "quiet_hours",
+          "bind": "notifications.quiet_hours"
         }
       ]
     },

@@ -49,7 +49,8 @@
       ],
       "selected": 0,
       "label": "Status",
-      "key": "status"
+      "key": "status",
+      "bind": "enrolment.status"
     },
     {
       "t": "card",
@@ -61,13 +62,15 @@
           "label": "Care team · Dr. Patel’s clinic",
           "sub": "Manual: you approve each summary",
           "on": true,
-          "key": "care_team_sharing"
+          "key": "care_team_sharing",
+          "bind": "enrolment.care_team_sharing"
         },
         {
           "t": "toggle",
           "label": "De-identified research",
           "on": false,
-          "key": "de_identified_research"
+          "key": "de_identified_research",
+          "bind": "enrolment.de_identified_research"
         }
       ]
     },

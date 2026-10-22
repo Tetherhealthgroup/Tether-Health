@@ -389,11 +389,13 @@ def placeholders_test(out_dir):
         keys = lst_d([dstr(k) for k, _ in fields])
         hints = lst_d([f"({dstr(k)}, {dstr(ph)})" for k, ph in fields if ph])
         rows.append(f"  ({dstr(sid)}, Routes.{camel(sid)}, {dstr(path)}, {dstr(label)}, {dstr(force)}, {'true' if must else 'false'}, {keys}, {hints}),")
+    bound = sorted(f"{sid}.{n['key']}" for sid, s in SCREENS.items() for part in ('body', 'footer') for n, p in walk(s[part], part) if n['t'] == 'field' and n.get('bind'))
     code = f"""// GENERATED — P-31: example values are placeholder (hint) text. Every
 // screen with text fields is opened and its Save / Continue elements are
 // tapped without typing. Each field must start empty, show its example only
-// as hint text and hold null in the session. Whatever is submitted must hold
-// null for these fields and never an example value.
+// as hint text and hold null in the session (a bound field on a settings
+// screen, P-71, writes nothing at all). Whatever is submitted must hold null
+// for these fields and never an example value.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tether_ui/router/app_router.dart';
@@ -410,6 +412,9 @@ class _RecordingApi implements TApi {{
 }}
 
 bool _holds(Object? value, String example) => value == example || (value is List && value.contains(example));
+
+/// Bound fields (spec `bind`, P-71): no session write until the member types.
+const _bound = <String>{{{', '.join(dstr(k) for k in bound)}}};
 
 const _cases = <(String, String, String, String, String?, bool, List<String>, List<(String, String)>)>[
 {chr(10).join(rows)}
@@ -443,7 +448,7 @@ void main() {{
           expect(field, findsOneWidget, reason: 'field $key');
           final editable = tester.widget<EditableText>(find.descendant(of: field, matching: find.byType(EditableText)));
           expect(editable.controller.text, isEmpty, reason: '$key must start empty');
-          expect(TSession.values.containsKey(key), isTrue, reason: '$key writes to the session');
+          expect(TSession.values.containsKey(key), !_bound.contains(key), reason: _bound.contains(key) ? '$key is bound: nothing is written until the member types' : '$key writes to the session');
           expect(TSession.values[key], isNull, reason: '$key must be null until the member types');
         }}
         for (final (key, hint) in c.$8) {{

@@ -46,7 +46,8 @@
         }
       ],
       "selected": 0,
-      "key": "value"
+      "key": "value",
+      "bind": "nu.habit.habit"
     },
     {
       "t": "card",
@@ -57,7 +58,8 @@
           "label": "Track weight",
           "sub": "Off by default · can stay off forever",
           "on": false,
-          "key": "track_weight"
+          "key": "track_weight",
+          "bind": "nu.habit.track_weight"
         }
       ]
     }

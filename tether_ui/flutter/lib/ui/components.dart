@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 
 import '../logic/rules.dart';
+import 'data.dart';
 import 'nav.dart';
 import 'tokens.dart';
 
@@ -613,9 +614,103 @@ class TSteps extends StatelessWidget {
 
 // ============================================================== inputs
 
+/// Same session value: lists (multi-select labels) compare as sets.
+bool _sameValue(Object? a, Object? b) {
+  if (a is List && b is List) return a.length == b.length && setEquals(a.toSet(), b.toSet());
+  return a == b;
+}
+
+/// The starting value of an input control and its settings binding (P-71).
+///
+/// Without a bind key the control starts from the spec's starting value and
+/// writes it to [TSession] when built.
+///
+/// With a bind key (spec `bind`, settings screens only) the control starts
+/// from the member's stored value, [TData.instance] `.watch(bindKey)`:
+/// - a valid value: the control shows it;
+/// - null, or a value the control cannot show: the control shows its empty
+///   state (off, nothing selected or ticked);
+/// - [TData.example] (preview data): the control shows the spec's value.
+///
+/// A bound control writes nothing to [TSession] until the member sets it,
+/// so neither an unknown value nor the spec's starting value is ever
+/// written. Until the member sets it, a new TData value replaces the shown
+/// one. Either way the control marks its key touched ([TSession.touched])
+/// while the member's value differs from the value it started from.
+mixin _TInput<W extends StatefulWidget, T> on State<W> {
+  String? get fieldKey;
+  String? get bindKey;
+
+  /// The spec's starting value.
+  T get designed;
+
+  /// The empty state, shown while a bound value is unknown.
+  T get empty;
+
+  /// [stored] as this control's value, or null if it cannot show it.
+  T? fromStored(Object stored);
+
+  /// [value] as written to the session.
+  Object? toSession(T value);
+
+  /// The value shown.
+  late T current;
+
+  ValueListenable<Object?>? _source;
+  bool _memberSet = false;
+
+  /// Session form of the value the control started from; null when unknown.
+  Object? _start;
+
+  void initInput() {
+    TSession.markTouched(fieldKey, false);
+    final bind = bindKey;
+    if (bind == null) {
+      current = designed;
+      _start = toSession(current);
+      TSession.set(fieldKey, _start);
+      return;
+    }
+    TSession.forget(fieldKey);
+    _source = TData.instance.watch(bind)..addListener(_onData);
+    _seed(_source!.value);
+  }
+
+  void _seed(Object? stored) {
+    if (identical(stored, TData.example)) {
+      current = designed;
+      _start = toSession(designed);
+      return;
+    }
+    final value = stored == null ? null : fromStored(stored);
+    current = value ?? empty;
+    _start = value == null ? null : toSession(value);
+  }
+
+  void _onData() {
+    if (_memberSet || !mounted) return;
+    setState(() => _seed(_source!.value));
+  }
+
+  void disposeInput() => _source?.removeListener(_onData);
+
+  /// The member set [value]: show it, write it, and mark the key touched
+  /// unless it is the starting value.
+  void memberSet(T value) {
+    _memberSet = true;
+    setState(() => current = value);
+    final v = toSession(value);
+    TSession.set(fieldKey, v);
+    TSession.markTouched(fieldKey, !_sameValue(v, _start));
+  }
+}
+
 class TChips extends StatefulWidget {
-  const TChips({super.key, required this.options, this.selected = const [], this.multi = true, this.dots = const {}, this.label, this.onChanged, this.fieldKey});
+  const TChips({super.key, required this.options, this.selected = const [], this.multi = true, this.dots = const {}, this.label, this.onChanged, this.fieldKey, this.bind});
   final String? fieldKey;
+
+  /// Settings binding (spec `bind`): the stored labels (see [_TInput]).
+  final String? bind;
   final List<String> options;
   final List<String> selected;
   final bool multi;
@@ -626,25 +721,50 @@ class TChips extends StatefulWidget {
   State<TChips> createState() => _TChipsState();
 }
 
-class _TChipsState extends State<TChips> {
-  late final Set<String> _sel = {...widget.selected};
+class _TChipsState extends State<TChips> with _TInput<TChips, Set<String>> {
+  @override
+  String? get fieldKey => widget.fieldKey;
+  @override
+  String? get bindKey => widget.bind;
+  @override
+  Set<String> get designed => {...widget.selected};
+  @override
+  Set<String> get empty => <String>{};
+  @override
+  Set<String>? fromStored(Object stored) {
+    final labels = stored is String ? [stored] : (stored is Iterable ? stored.whereType<String>().toList() : null);
+    if (labels == null) return null;
+    final known = {for (final o in widget.options) if (labels.contains(o)) o};
+    return widget.multi || known.length <= 1 ? known : {known.first};
+  }
+
+  @override
+  Object? toSession(Set<String> value) => value.toList();
+
+  Set<String> get _sel => current;
+
   @override
   void initState() {
     super.initState();
-    TSession.set(widget.fieldKey, _sel.toList());
+    initInput();
+  }
+
+  @override
+  void dispose() {
+    disposeInput();
+    super.dispose();
   }
 
   void _tap(String o) {
-    setState(() {
-      if (widget.multi) {
-        _sel.contains(o) ? _sel.remove(o) : _sel.add(o);
-      } else {
-        _sel
-          ..clear()
-          ..add(o);
-      }
-    });
-    TSession.set(widget.fieldKey, _sel.toList());
+    final next = {..._sel};
+    if (widget.multi) {
+      next.contains(o) ? next.remove(o) : next.add(o);
+    } else {
+      next
+        ..clear()
+        ..add(o);
+    }
+    memberSet(next);
     widget.onChanged?.call(_sel);
   }
 
@@ -683,8 +803,11 @@ class _TChipsState extends State<TChips> {
 }
 
 class TSegmented extends StatefulWidget {
-  const TSegmented({super.key, required this.options, required this.selected, this.label, this.onChanged, this.fieldKey});
+  const TSegmented({super.key, required this.options, required this.selected, this.label, this.onChanged, this.fieldKey, this.bind});
   final String? fieldKey;
+
+  /// Settings binding (spec `bind`): the stored option (see [_TInput]).
+  final String? bind;
   final List<String> options;
   final String selected;
   final String? label;
@@ -693,12 +816,32 @@ class TSegmented extends StatefulWidget {
   State<TSegmented> createState() => _TSegmentedState();
 }
 
-class _TSegmentedState extends State<TSegmented> {
-  late String _sel = widget.selected;
+class _TSegmentedState extends State<TSegmented> with _TInput<TSegmented, String?> {
+  @override
+  String? get fieldKey => widget.fieldKey;
+  @override
+  String? get bindKey => widget.bind;
+  @override
+  String? get designed => widget.selected;
+  @override
+  String? get empty => null;
+  @override
+  String? fromStored(Object stored) => stored is String && widget.options.contains(stored) ? stored : null;
+  @override
+  Object? toSession(String? value) => value;
+
+  String? get _sel => current;
+
   @override
   void initState() {
     super.initState();
-    TSession.set(widget.fieldKey, _sel);
+    initInput();
+  }
+
+  @override
+  void dispose() {
+    disposeInput();
+    super.dispose();
   }
 
   @override
@@ -715,8 +858,7 @@ class _TSegmentedState extends State<TSegmented> {
                   button: true,
                   child: GestureDetector(
                     onTap: () {
-                      setState(() => _sel = o);
-                      TSession.set(widget.fieldKey, o);
+                      memberSet(o);
                       widget.onChanged?.call(o);
                     },
                     child: AnimatedContainer(
@@ -747,8 +889,11 @@ class TRadioItem {
 }
 
 class TRadioList extends StatefulWidget {
-  const TRadioList({super.key, required this.items, this.selected = 0, this.label, this.onChanged, this.fieldKey});
+  const TRadioList({super.key, required this.items, this.selected = 0, this.label, this.onChanged, this.fieldKey, this.bind});
   final String? fieldKey;
+
+  /// Settings binding (spec `bind`): the stored item label (see [_TInput]).
+  final String? bind;
   final List<TRadioItem> items;
   final int selected;
   final String? label;
@@ -757,15 +902,37 @@ class TRadioList extends StatefulWidget {
   State<TRadioList> createState() => _TRadioListState();
 }
 
-class _TRadioListState extends State<TRadioList> {
-  late int _sel = widget.selected;
+class _TRadioListState extends State<TRadioList> with _TInput<TRadioList, int> {
+  @override
+  String? get fieldKey => widget.fieldKey;
+  @override
+  String? get bindKey => widget.bind;
+  @override
+  int get designed => widget.selected;
+  @override
+  int get empty => -1;
+  @override
+  int? fromStored(Object stored) {
+    final i = widget.items.indexWhere((item) => item.label == stored);
+    return i < 0 ? null : i;
+  }
+
+  @override
+  Object? toSession(int value) => value >= 0 && value < widget.items.length ? widget.items[value].label : null;
+
+  int get _sel => current;
+
   @override
   void initState() {
     super.initState();
-    _store();
+    initInput();
   }
 
-  void _store() => TSession.set(widget.fieldKey, _sel >= 0 && _sel < widget.items.length ? widget.items[_sel].label : null);
+  @override
+  void dispose() {
+    disposeInput();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => _labelled(
@@ -780,8 +947,7 @@ class _TRadioListState extends State<TRadioList> {
               child: InkWell(
                 borderRadius: BorderRadius.circular(TRadius.control),
                 onTap: () {
-                  setState(() => _sel = i);
-                  _store();
+                  memberSet(i);
                   widget.onChanged?.call(i);
                 },
                 child: AnimatedContainer(
@@ -820,7 +986,7 @@ class TCheckItem {
 }
 
 class TChecklist extends StatefulWidget {
-  const TChecklist({super.key, required this.items, this.label, this.onChanged, this.fieldKey});
+  const TChecklist({super.key, required this.items, this.label, this.onChanged, this.fieldKey, this.bind});
   final List<TCheckItem> items;
   final String? label;
   final void Function(int index, bool done)? onChanged;
@@ -828,21 +994,48 @@ class TChecklist extends StatefulWidget {
   /// Session key. When set, the labels of the ticked items are written to
   /// [TSession] (consent checklists).
   final String? fieldKey;
+
+  /// Settings binding (spec `bind`): the stored ticked labels (see
+  /// [_TInput]).
+  final String? bind;
   @override
   State<TChecklist> createState() => _TChecklistState();
 }
 
-class _TChecklistState extends State<TChecklist> {
-  late final List<bool> _done = [for (final i in widget.items) i.done];
-  void _store() => TSession.set(widget.fieldKey, [
+class _TChecklistState extends State<TChecklist> with _TInput<TChecklist, List<bool>> {
+  @override
+  String? get fieldKey => widget.fieldKey;
+  @override
+  String? get bindKey => widget.bind;
+  @override
+  List<bool> get designed => [for (final i in widget.items) i.done];
+  @override
+  List<bool> get empty => [for (final _ in widget.items) false];
+  @override
+  List<bool>? fromStored(Object stored) {
+    if (stored is! Iterable) return null;
+    final labels = stored.whereType<String>().toSet();
+    return [for (final i in widget.items) labels.contains(i.label)];
+  }
+
+  @override
+  Object? toSession(List<bool> value) => [
         for (var i = 0; i < widget.items.length; i++)
-          if (_done[i]) widget.items[i].label
-      ]);
+          if (value[i]) widget.items[i].label
+      ];
+
+  List<bool> get _done => current;
 
   @override
   void initState() {
     super.initState();
-    _store();
+    initInput();
+  }
+
+  @override
+  void dispose() {
+    disposeInput();
+    super.dispose();
   }
 
   @override
@@ -855,8 +1048,7 @@ class _TChecklistState extends State<TChecklist> {
               button: true,
               child: InkWell(
                 onTap: () {
-                  setState(() => _done[i] = !_done[i]);
-                  _store();
+                  memberSet([for (var j = 0; j < _done.length; j++) j == i ? !_done[j] : _done[j]]);
                   widget.onChanged?.call(i, _done[i]);
                 },
                 child: Container(
@@ -887,8 +1079,11 @@ class _TChecklistState extends State<TChecklist> {
 }
 
 class TToggleRow extends StatefulWidget {
-  const TToggleRow({super.key, required this.label, this.sub, this.value = false, this.onChanged, this.fieldKey});
+  const TToggleRow({super.key, required this.label, this.sub, this.value = false, this.onChanged, this.fieldKey, this.bind});
   final String? fieldKey;
+
+  /// Settings binding (spec `bind`): the stored on/off (see [_TInput]).
+  final String? bind;
   final String label;
   final String? sub;
   final bool value;
@@ -897,12 +1092,32 @@ class TToggleRow extends StatefulWidget {
   State<TToggleRow> createState() => _TToggleRowState();
 }
 
-class _TToggleRowState extends State<TToggleRow> {
-  late bool _on = widget.value;
+class _TToggleRowState extends State<TToggleRow> with _TInput<TToggleRow, bool> {
+  @override
+  String? get fieldKey => widget.fieldKey;
+  @override
+  String? get bindKey => widget.bind;
+  @override
+  bool get designed => widget.value;
+  @override
+  bool get empty => false;
+  @override
+  bool? fromStored(Object stored) => stored is bool ? stored : null;
+  @override
+  Object? toSession(bool value) => value;
+
+  bool get _on => current;
+
   @override
   void initState() {
     super.initState();
-    TSession.set(widget.fieldKey, _on);
+    initInput();
+  }
+
+  @override
+  void dispose() {
+    disposeInput();
+    super.dispose();
   }
 
   @override
@@ -922,8 +1137,7 @@ class _TToggleRowState extends State<TToggleRow> {
               activeTrackColor: TColors.teal,
               inactiveTrackColor: TColors.toggleOff,
               onChanged: (v) {
-                setState(() => _on = v);
-                TSession.set(widget.fieldKey, v);
+                memberSet(v);
                 widget.onChanged?.call(v);
               },
             ),
@@ -935,7 +1149,7 @@ class _TToggleRowState extends State<TToggleRow> {
 enum TFieldKind { text, number, email, password, phone, date, select, multiline, search }
 
 class TField extends StatefulWidget {
-  const TField({super.key, required this.label, this.value, this.unit, this.hint, this.error, this.placeholder, this.kind = TFieldKind.text, this.onChanged, this.fieldKey});
+  const TField({super.key, required this.label, this.value, this.unit, this.hint, this.error, this.placeholder, this.kind = TFieldKind.text, this.onChanged, this.fieldKey, this.bind});
   final String label;
   final String? value;
   final String? unit;
@@ -945,6 +1159,13 @@ class TField extends StatefulWidget {
   final TFieldKind kind;
   final ValueChanged<String>? onChanged;
   final String? fieldKey;
+
+  /// Settings binding (spec `bind`, select fields on settings screens): the
+  /// field shows the member's stored text from [TData.instance] and writes
+  /// nothing to [TSession] until the member types; null or a non-text value
+  /// leaves it empty (placeholder only), and [TData.example] shows [value]
+  /// (see [_TInput]).
+  final String? bind;
 
   @override
   State<TField> createState() => _TFieldState();
@@ -971,15 +1192,42 @@ class _TFieldState extends State<TField> {
   // last built, so its undo history may hold typed text.
   bool _hadKey = false;
 
+  // Settings binding: the stored value's source, and the value the field
+  // started from (touched while the typed value differs from it).
+  ValueListenable<Object?>? _source;
+  String? _start;
+
   @override
   void initState() {
     super.initState();
-    TSession.set(widget.fieldKey, widget.value);
+    TSession.markTouched(widget.fieldKey, false);
+    final bind = widget.bind;
+    if (bind == null) {
+      _start = widget.value;
+      TSession.set(widget.fieldKey, widget.value);
+    } else {
+      TSession.forget(widget.fieldKey);
+      _source = TData.instance.watch(bind)..addListener(_onData);
+      _seed(_source!.value);
+    }
     TSession.changes.addListener(_onSessionChange);
+  }
+
+  void _seed(Object? stored) {
+    final text = identical(stored, TData.example) ? widget.value : (stored is String && stored.isNotEmpty ? stored : null);
+    _start = text;
+    _controller.text = text ?? '';
+    _empty = (text ?? '').isEmpty;
+  }
+
+  void _onData() {
+    if (_hadKey || !mounted) return;
+    setState(() => _seed(_source!.value));
   }
 
   @override
   void dispose() {
+    _source?.removeListener(_onData);
     TSession.changes.removeListener(_onSessionChange);
     _controller.dispose();
     super.dispose();
@@ -987,7 +1235,9 @@ class _TFieldState extends State<TField> {
 
   void _onSessionChange() {
     final key = widget.fieldKey;
-    if (key == null || TSession.values.containsKey(key) || (_controller.text.isEmpty && !_hadKey)) return;
+    // A bound field's key is absent until the member types: only a scrub of
+    // what the member typed empties it.
+    if (key == null || TSession.values.containsKey(key) || (_controller.text.isEmpty && !_hadKey) || (widget.bind != null && !_hadKey)) return;
     _controller.clear();
     _hadKey = false;
     setState(() {
@@ -1014,6 +1264,7 @@ class _TFieldState extends State<TField> {
   void onChanged(String v) {
     _hadKey = widget.fieldKey != null;
     TSession.set(widget.fieldKey, v.isEmpty ? null : v);
+    TSession.markTouched(widget.fieldKey, (v.isEmpty ? null : v) != _start);
     if (v.isEmpty != _empty) setState(() => _empty = v.isEmpty);
     widget.onChanged?.call(v);
   }
@@ -1150,6 +1401,7 @@ class _TSliderFieldState extends State<TSliderField> {
   @override
   void initState() {
     super.initState();
+    TSession.markTouched(widget.fieldKey, false);
     TSession.set(widget.fieldKey, _v);
   }
 
@@ -1170,6 +1422,7 @@ class _TSliderFieldState extends State<TSliderField> {
             onChanged: (v) {
               setState(() => _v = v);
               TSession.set(widget.fieldKey, v);
+              TSession.markTouched(widget.fieldKey, v != widget.value);
               widget.onChanged?.call(v);
             },
           ),
@@ -1460,15 +1713,21 @@ class TTileGrid extends StatefulWidget {
 
 class _TTileGridState extends State<TTileGrid> {
   late final List<bool> _sel = [for (final t in widget.tiles) t.selected];
-  void _store() => TSession.set(widget.fieldKey, [
+  List<String> get _labels => [
         for (var i = 0; i < widget.tiles.length; i++)
           if (_sel[i] && widget.tiles[i].onTap == null) widget.tiles[i].label
-      ]);
+      ];
+  late final List<String> _start = _labels;
+  void _store() {
+    TSession.set(widget.fieldKey, _labels);
+    TSession.markTouched(widget.fieldKey, !_sameValue(_labels, _start));
+  }
 
   @override
   void initState() {
     super.initState();
-    _store();
+    TSession.markTouched(widget.fieldKey, false);
+    TSession.set(widget.fieldKey, _start);
   }
 
   @override

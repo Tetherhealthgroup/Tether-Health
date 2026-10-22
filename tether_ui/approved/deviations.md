@@ -43,6 +43,9 @@ the current file:
   submitting first, its `api` list empties
   and its `desc` says it is not routed. With those values restored, each file
   equals its earlier state, except the generated action summaries.
+- TH-1008a rows (P-71) add only `bind` to input controls on settings
+  screens. With `bind` removed, each file equals its earlier state: no label,
+  starting value, layout or action changes.
 
 All replacement copy still needs clinical/legal review before release.
 
@@ -320,6 +323,35 @@ password, linking an identity), and each account-creating submit must sit
 inside "Age confirmed" on its own screen. Every native sign-in branch outside
 "Age confirmed" must match a pinned list of branches and their exact outcome
 labels. A new-identity outcome must enter the normal sign-up at `ob_programs`.
+
+## P-71: settings controls start from the member's stored state (TH-1008a)
+
+The owner kept the designed starting states on the sharing screens (P-71)
+on the condition that a settings screen shows the member's stored state and
+never submits a starting value. Each input control on a settings screen now
+names the data key of that stored state (`bind`). This changes data only: in
+the preview and in screenshots the controls show the designed starting value,
+as before. `program_settings_sf` and `sf_unplug_off` gain the same keys; they
+are additions, which have no sha256 pin.
+
+| Screen | Field | `bind` |
+|---|---|---|
+| `account_notifications` | `body[0].children[0]` toggle, `body[0].children[1]` toggle, `body[0].children[2]` toggle | `notifications.check_ins_and_plan_reminders`, `notifications.show_sensitive_details`, `notifications.quiet_hours` |
+| `account_privacy` | `body[0].children[0]` toggle, `body[0].children[1]` toggle, `body[0].children[2]` toggle | `consents.cross_program_insights`, `consents.de_identified_research`, `consents.anonymous_app_diagnostics` |
+| `be_q2` | `body[2]` chips | `be.profile.family_cancers` |
+| `bf_meds_edit` | `body[1]` field, `body[3]` field, `body[4]` toggle | `bf.meds.medicine`, `bf.meds.when`, `bf.meds.private_reminder` |
+| `ck_q1` | `body[3]` segmented, `body[4]` chips | `ck.profile.sex_assigned_at_birth`, `ck.profile.any_of_these` |
+| `hw_targets` | `body[3]` radio, `body[4]` chips | `hw.targets.no_target_yet`, `hw.targets.reminder_time` |
+| `nu_habit` | `body[1]` radio, `body[2].children[0]` toggle | `nu.habit.habit`, `nu.habit.track_weight` |
+| `program_settings` | `body[1]` radio, `body[2].children[0]` toggle, `body[2].children[1]` toggle | `enrolment.status`, `enrolment.care_team_sharing`, `enrolment.de_identified_research` |
+| `sd_caregiver` | `body[3]` checklist | `sd.caregiver.can_see` |
+| `sf_buddy` | `body[3]` checklist | `sf.buddy.can_see` |
+| `st_range` | `body[2]` segmented | `st.range.unit` |
+
+In the app, a bound control shows the stored value; while it is unknown it
+shows its empty state (off, nothing selected), and it writes nothing until
+the member sets it. That comes from the shared input components, not from
+`spec/screens`.
 
 ## Rendering changes with no spec change (TH-907)
 

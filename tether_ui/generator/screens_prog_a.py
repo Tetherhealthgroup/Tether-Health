@@ -104,8 +104,8 @@ def programs_a():
         card(v='urgent', title='Side effect or worrying symptom?', text='Contact your care team or pharmacist. Emergency: 911.', action=go('support_message_care')),
     ], footer=[button('Add or update recorded plan', go('bf_meds_edit'), v='secondary')])
     S('bf_meds_edit', 'Edit recorded plan', '/p/bf/meds/edit', 'bf', program='bf', phase='resources', hdr=H('Recorded plan'), body=[
-        title('Record the plan from your clinician'), field('Medicine', 'Nicotine patch', kind='select', key='medicine'), field('Strength', '21 mg / 24 h', key='strength'), field('When', 'Every morning', kind='select', key='when'),
-        toggle('Private reminder', 'Lock screen hides the medicine name', True, key='private_reminder'), text('You’re recording, not changing, your plan. Ask your clinician about any change.', 'small'),
+        title('Record the plan from your clinician'), field('Medicine', 'Nicotine patch', kind='select', key='medicine', bind='bf.meds.medicine'), field('Strength', '21 mg / 24 h', key='strength'), field('When', 'Every morning', kind='select', key='when', bind='bf.meds.when'),
+        toggle('Private reminder', 'Lock screen hides the medicine name', True, key='private_reminder', bind='bf.meds.private_reminder'), text('You’re recording, not changing, your plan. Ask your clinician about any change.', 'small'),
     ], footer=[button('Save plan', submit('PUT /v1/program-data/bf/meds', toast('Plan saved', back())))])
     S('bf_progress', 'BreatheFree progress', '/p/bf/progress', 'bf', program='bf', phase='resources', hdr=H('Progress', pill='BreatheFree'), body=[
         seg(['7 days', '30 days', 'All'], '7 days', key='value'),
@@ -152,7 +152,7 @@ def programs_a():
     ], footer=[button('Continue with self-report', back()), button('Open phone settings', settings(), v='secondary')])
     S('sf_buddy', 'Accountability buddy', '/p/sf/plan/buddy', 'sf', program='sf', phase='plan', hdr=H('Buddy', pill='Optional'), body=[
         title('Want someone in your corner?'), text('Your buddy only sees what you choose to send.', 'muted'), field('Name', 'Sam', key='name'),
-        checklist([ci('A weekly “I hit my goal” message', done=True), ci('My minutes per day'), ci('Nothing automatic: I send each one', done=True)], label='They can see', key='buddy_can_see'),
+        checklist([ci('A weekly “I hit my goal” message', done=True), ci('My minutes per day'), ci('Nothing automatic: I send each one', done=True)], label='They can see', key='buddy_can_see', bind='sf.buddy.can_see'),
         card(v='mint', eyebrow='Preview', children=[quote('Phone-free nights this week: 5. Thanks for cheering me on!')]),
     ], footer=[button('Save and finish', submit('PUT /v1/program-data/sf/plan', onboarding_or('sf_home'))), link('Skip for now', onboarding_or('sf_home'))])
     S('sf_home', 'ScrollFree home', '/p/sf/home', 'sf', program='sf', phase='daily', tabname='plans', hdr=home_hdr('sf'), body=[
@@ -251,8 +251,8 @@ def programs_a():
     S('hw_targets', 'Clinician targets', '/p/hw/plan/targets', 'hw', program='hw', phase='plan', hdr=H('Your targets', pill='2 of 2'), body=[
         steps(2, 2), title('What target did your clinician give you?'),
         fieldrow(field('Top below', '130', unit='mmHg', kind='number', key='top_below'), field('Bottom below', '80', unit='mmHg', kind='number', key='bottom_below')),
-        radio([ri('I don’t have a target yet', 'Readings show without a target line')], -1, key='value'),
-        chips(['Morning', 'Evening', 'Both'], ['Both'], multi=False, label='When should we remind you?', key='when_should_we_remind_you'),
+        radio([ri('I don’t have a target yet', 'Readings show without a target line')], -1, key='value', bind='hw.targets.no_target_yet'),
+        chips(['Morning', 'Evening', 'Both'], ['Both'], multi=False, label='When should we remind you?', key='when_should_we_remind_you', bind='hw.targets.reminder_time'),
         text('Heartwise never sets or grades targets.', 'small'), link('Import from my health record', go('records_add')),
     ], footer=[button('Save targets', submit('PUT /v1/program-data/hw/targets', onboarding_or('hw_home')))])
     S('hw_home', 'Heartwise home', '/p/hw/home', 'hw', program='hw', phase='daily', tabname='plans', hdr=home_hdr('hw'), body=[

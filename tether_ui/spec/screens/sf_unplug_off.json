@@ -38,7 +38,8 @@
         }
       ],
       "selected": 0,
-      "key": "scope"
+      "key": "scope",
+      "bind": "sf.unplug_off.scope"
     }
   ],
   "footer": [

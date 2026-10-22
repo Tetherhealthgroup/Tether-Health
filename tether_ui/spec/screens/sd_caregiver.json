@@ -55,7 +55,8 @@
         }
       ],
       "label": "Rosa can see",
-      "key": "caregiver_can_see"
+      "key": "caregiver_can_see",
+      "bind": "sd.caregiver.can_see"
     }
   ],
   "footer": [

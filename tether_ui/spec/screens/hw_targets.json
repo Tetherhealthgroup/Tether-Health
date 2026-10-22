@@ -59,7 +59,8 @@
         }
       ],
       "selected": -1,
-      "key": "value"
+      "key": "value",
+      "bind": "hw.targets.no_target_yet"
     },
     {
       "t": "chips",
@@ -73,7 +74,8 @@
       ],
       "multi": false,
       "label": "When should we remind you?",
-      "key": "when_should_we_remind_you"
+      "key": "when_should_we_remind_you",
+      "bind": "hw.targets.reminder_time"
     },
     {
       "t": "text",

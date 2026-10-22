@@ -46,7 +46,8 @@
       ],
       "selected": "Female",
       "label": "Sex assigned at birth",
-      "key": "sex_assigned_at_birth"
+      "key": "sex_assigned_at_birth",
+      "bind": "ck.profile.sex_assigned_at_birth"
     },
     {
       "t": "chips",
@@ -62,7 +63,8 @@
       ],
       "multi": true,
       "label": "Any of these?",
-      "key": "any_of_these"
+      "key": "any_of_these",
+      "bind": "ck.profile.any_of_these"
     },
     {
       "t": "text",

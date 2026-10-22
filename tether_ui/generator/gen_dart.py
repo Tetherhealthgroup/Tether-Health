@@ -139,6 +139,9 @@ def K(path): return f"const ValueKey('a:{path}')"
 
 def FK(n): return dstr(f"{CUR['sid']}.{n['key']}") if n.get('key') else None
 
+# Settings binding (P-71): the TData key of the member's stored value.
+def BK(n): return dstr(n['bind']) if n.get('bind') else None
+
 def node(n, top=False, path=''):
     t = n['t']
     S_ = dstr
@@ -152,19 +155,19 @@ def node(n, top=False, path=''):
     if t == 'chips':
         dots = n.get('dots')
         d = '{' + ', '.join(f"{S_(k)}: {dcolor(v)}" for k, v in dots.items()) + '}' if dots else None
-        return f"TChips({args(fieldKey=FK(n), options=lst([S_(o) for o in n['options']]), selected=lst([S_(o) for o in n['selected']]) if n['selected'] else None, multi='false' if not n.get('multi') else None, dots=d, label=S_(n['label']) if n.get('label') else None)})"
+        return f"TChips({args(fieldKey=FK(n), options=lst([S_(o) for o in n['options']]), selected=lst([S_(o) for o in n['selected']]) if n['selected'] else None, multi='false' if not n.get('multi') else None, dots=d, label=S_(n['label']) if n.get('label') else None, bind=BK(n))})"
     if t == 'segmented':
-        return f"TSegmented({args(fieldKey=FK(n), options=lst([S_(o) for o in n['options']]), selected=S_(n['selected']), label=S_(n['label']) if n.get('label') else None)})"
+        return f"TSegmented({args(fieldKey=FK(n), options=lst([S_(o) for o in n['options']]), selected=S_(n['selected']), label=S_(n['label']) if n.get('label') else None, bind=BK(n))})"
     if t == 'radio':
         items = [f"TRadioItem({args(_=S_(i['label']), sub=S_(i['sub']) if i.get('sub') else None, badge=S_(i['badge']) if i.get('badge') else None)})" for i in n['items']]
-        return f"TRadioList({args(fieldKey=FK(n), items=lst(items), selected=str(n['selected']), label=S_(n['label']) if n.get('label') else None)})"
+        return f"TRadioList({args(fieldKey=FK(n), items=lst(items), selected=str(n['selected']), label=S_(n['label']) if n.get('label') else None, bind=BK(n))})"
     if t == 'checklist':
         items = [f"TCheckItem({args(_=S_(i['label']), sub=S_(i['sub']) if i.get('sub') else None, done='true' if i.get('done') else None)})" for i in n['items']]
-        return f"TChecklist({args(fieldKey=FK(n), items=lst(items), label=S_(n['label']) if n.get('label') else None)})"
-    if t == 'toggle': return f"TToggleRow({args(fieldKey=FK(n), label=S_(n['label']), sub=S_(n['sub']) if n.get('sub') else None, value='true' if n.get('on') else None)})"
+        return f"TChecklist({args(fieldKey=FK(n), items=lst(items), label=S_(n['label']) if n.get('label') else None, bind=BK(n))})"
+    if t == 'toggle': return f"TToggleRow({args(fieldKey=FK(n), label=S_(n['label']), sub=S_(n['sub']) if n.get('sub') else None, value='true' if n.get('on') else None, bind=BK(n))})"
     if t == 'field':
         kind = n.get('kind', 'text')
-        return f"TField({args(fieldKey=FK(n), label=S_(n['label']), value=S_(n.get('value')) if n.get('value') else None, unit=S_(n.get('unit')) if n.get('unit') else None, hint=S_(n.get('hint')) if n.get('hint') else None, error=S_(n.get('error')) if n.get('error') else None, placeholder=S_(n.get('placeholder')) if n.get('placeholder') else None, kind='TFieldKind.' + kind if kind != 'text' else None)})"
+        return f"TField({args(fieldKey=FK(n), label=S_(n['label']), value=S_(n.get('value')) if n.get('value') else None, unit=S_(n.get('unit')) if n.get('unit') else None, hint=S_(n.get('hint')) if n.get('hint') else None, error=S_(n.get('error')) if n.get('error') else None, placeholder=S_(n.get('placeholder')) if n.get('placeholder') else None, kind='TFieldKind.' + kind if kind != 'text' else None, bind=BK(n))})"
     if t == 'fieldrow': return f"TFieldRow(children: {lst([node(x, path=f'{path}.fields[{i}]') for i, x in enumerate(n['fields'])])})"
     if t == 'slider':
         return f"TSliderField({args(fieldKey=FK(n), label=S_(n['label']), value=str(float(n['value'])), min=str(float(n['min'])), max=str(float(n['max'])), minLabel=S_(n['minLabel']), maxLabel=S_(n['maxLabel']), color=dcolor(n.get('color', 'coral')), suffix=S_(n['suffix']) if n.get('suffix') else None)})"
@@ -280,6 +283,23 @@ class {cls} extends StatelessWidget {{
 }}
 """
 
+def settings_file():
+    """lib/router/settings_screens.dart: the pinned settings screens
+    (validate.SETTINGS_SCREENS, P-71). Their bound controls write only what
+    the member sets; a submit from them must carry only TSession.touched keys."""
+    from validate import SETTINGS_SCREENS
+    ids = '\n'.join(f'  {dstr(sid)},' for sid in sorted(SETTINGS_SCREENS))
+    return f"""// GENERATED — settings screens (P-71): screens whose submit updates
+// existing state. Every input control on them that writes the session is
+// bound to the member's stored value (spec `bind`), writes nothing while that
+// value is unknown, and records the keys the member changed in
+// TSession.touched. A submit from one of these screens must carry only
+// those keys, and nothing is sent when there are none.
+const Set<String> settingsScreens = <String>{{
+{ids}
+}};
+"""
+
 def generate(out_dir, describe, static_dir):
     lib = os.path.join(out_dir, 'lib')
     if os.path.exists(out_dir): shutil.rmtree(out_dir)
@@ -294,6 +314,7 @@ def generate(out_dir, describe, static_dir):
     lines.append('}')
     os.makedirs(os.path.join(lib, 'router'), exist_ok=True)
     open(os.path.join(lib, 'router', 'routes.dart'), 'w', newline='\n').write('\n'.join(lines) + '\n')
+    open(os.path.join(lib, 'router', 'settings_screens.dart'), 'w', newline='\n').write(settings_file())
     # screens
     imports = []
     for sid, s in SCREENS.items():
@@ -473,8 +494,24 @@ def _self_test():
         del RULES['selftest.rule']
         for k in added: del SCREENS[k]
     _device_self_test()
+    _bind_self_test()
     print('gen_dart self-test: ok')
 
+
+def _bind_self_test():
+    """Settings binding (P-71): a bound control is emitted with its bind key,
+    an unbound one without, and settings_screens.dart lists every pinned
+    settings screen."""
+    from validate import SETTINGS_SCREENS
+    CUR['sid'] = 'selftest'
+    for n in (toggle('A', key='a', bind='x.a'), chips(['A'], key='a', bind='x.a'), seg(['A'], 'A', key='a', bind='x.a'),
+              radio(['A'], key='a', bind='x.a'), checklist(['A'], key='a', bind='x.a'), field('A', kind='select', key='a', bind='x.a')):
+        code = node(n)
+        _expect("bind: 'x.a'" in code and "fieldKey: 'selftest.a'" in code, code)
+        n.pop('bind')
+        _expect('bind:' not in node(n), node(n))
+    text = settings_file()
+    _expect(all(f"  '{sid}'," in text for sid in SETTINGS_SCREENS) and text.count("',") == len(SETTINGS_SCREENS), text)
 
 def _device_self_test():
     """Device branches and non-queueable submits generate as R-31 says, and

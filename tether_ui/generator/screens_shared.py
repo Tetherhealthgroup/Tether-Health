@@ -266,8 +266,8 @@ def shared():
     ], footer=[button('Continue', branch('Chosen option', [('Learn only', toast('Heartwise added as Learn only', tab('plans'))), ('Swap', rep('hw_q1'))], on='radio', key='option')), button('Cancel', close(), v='secondary')])
     S('program_settings', 'Program settings', '/p/:program/settings', 'plans', phase='account', hdr=H('BreatheFree settings'), body=[
         rows([row('BreatheFree', 'Focus since Aug 14', lead=L_prog('bf'))], flat=True),
-        radio([ri('Focus', 'Daily steps and reminders'), ri('Learn only', 'Keep lessons, stop tracking'), ri('Pause', 'Stop reminders; keep everything')], 0, label='Status', key='status'),
-        card(toggle('Care team · Dr. Patel’s clinic', 'Manual: you approve each summary', True, key='care_team_sharing'), toggle('De-identified research', None, False, key='de_identified_research'), eyebrow='Sharing'),
+        radio([ri('Focus', 'Daily steps and reminders'), ri('Learn only', 'Keep lessons, stop tracking'), ri('Pause', 'Stop reminders; keep everything')], 0, label='Status', key='status', bind='enrolment.status'),
+        card(toggle('Care team · Dr. Patel’s clinic', 'Manual: you approve each summary', True, key='care_team_sharing', bind='enrolment.care_team_sharing'), toggle('De-identified research', None, False, key='de_identified_research', bind='enrolment.de_identified_research'), eyebrow='Sharing'),
         rows([row('Export BreatheFree data', 'PDF + JSON', action=toast('Export is being prepared. We’ll notify you.')), row('Leave BreatheFree', 'Keep your data or delete it now', action=sheet('account_leave'), danger=True)], title='Data'),
     ], footer=[button('Save changes', submit('PATCH /v1/enrolments/:id', toast('Saved', back())))], api=['PATCH /v1/enrolments/:id'],
        desc='Parameterized by program. Shown here with BreatheFree data.')
@@ -365,12 +365,12 @@ def shared():
         radio([ri('Keep my data', 'Kept until you delete it or delete your account. Rejoin anytime.', 'Default'), ri('Delete BreatheFree data now', '63 check-ins, 14 rescues, 1 plan')], key='value'),
     ], footer=[button('Leave BreatheFree', submit('DELETE /v1/enrolments/:id', toast('You left BreatheFree', reset('plans'))), v='danger'), button('Cancel', close(), v='secondary')])
     S('account_notifications', 'Notifications', '/account/notifications', 'account', phase='account', hdr=H('Notifications'), body=[
-        card(toggle('Check-ins and plan reminders', 'At most 2 a day', True, key='check_ins_and_plan_reminders'), toggle('Show sensitive details', 'Off: program names and health data hidden', False, key='show_sensitive_details'), toggle('Quiet hours', '9:00 PM – 7:00 AM · safety alerts still come through', True, key='quiet_hours')),
+        card(toggle('Check-ins and plan reminders', 'At most 2 a day', True, key='check_ins_and_plan_reminders', bind='notifications.check_ins_and_plan_reminders'), toggle('Show sensitive details', 'Off: program names and health data hidden', False, key='show_sensitive_details', bind='notifications.show_sensitive_details'), toggle('Quiet hours', '9:00 PM – 7:00 AM · safety alerts still come through', True, key='quiet_hours', bind='notifications.quiet_hours')),
         rows([row('BreatheFree', '8:00 AM check-in', lead=L_prog('bf'), action=toast('Reminder time saved')), row('ScrollFree', '9:30 PM wind-down', lead=L_prog('sf'), action=toast('Reminder time saved'))], title='Per program'),
         card(eyebrow='Lock screen preview', title='Tether Health', text='You have a Tether reminder.'),
     ], footer=[button('Save', submit('PATCH /v1/notifications/preferences', toast('Saved', back())))])
     S('account_privacy', 'Privacy & consent', '/account/privacy', 'account', phase='account', hdr=H('Privacy & consent'), body=[
-        card(toggle('Cross-program insights', 'Show connections between your programs', True, key='cross_program_insights'), toggle('De-identified research', 'Per program, off by default', False, key='de_identified_research'), toggle('Anonymous app diagnostics', 'No health entries', False, key='anonymous_app_diagnostics'), eyebrow='Choices'),
+        card(toggle('Cross-program insights', 'Show connections between your programs', True, key='cross_program_insights', bind='consents.cross_program_insights'), toggle('De-identified research', 'Per program, off by default', False, key='de_identified_research', bind='consents.de_identified_research'), toggle('Anonymous app diagnostics', 'No health entries', False, key='anonymous_app_diagnostics', bind='consents.anonymous_app_diagnostics'), eyebrow='Choices'),
         rows([row('Care-team sharing', 'Manual only · preview every share', action=go('account_programs')), row('Consent history', 'v3 · Aug 22, 2026', action=toast('Consent history opened')), row('Privacy Notice', None, action=ext('https://www.tetherhealthgroup.com/privacy/'))]),
         text('No ads. We never sell your health data.', 'small'),
     ], footer=[button('Save', submit('PATCH /v1/enrolments/consents', toast('Saved', back())))])
