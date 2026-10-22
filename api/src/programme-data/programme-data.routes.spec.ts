@@ -2,7 +2,12 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CODE_PATTERN, OPTION_CODES, slug } from "./option-codes";
 import { programmeRoute, PROGRAMME_ROUTES } from "./programme-data.routes";
-import { METRICS, type Draft } from "./programme-records";
+import {
+  ENTRY_COMPARED,
+  METRICS,
+  OBSERVATION_COMPARED,
+  type Draft,
+} from "./programme-records";
 
 const MIGRATION = readFileSync(
   join(
@@ -367,6 +372,47 @@ describe("programme event mapping", () => {
         expect(keys).toEqual(expect.arrayContaining(spec?.required ?? []));
       }
     });
+
+    /** The column names of `table` in the migration, in order. */
+    const columnsOf = (table: string) => {
+      const block = new RegExp(
+        `create table public\\.${table} \\(\\n([\\s\\S]*?)\\n\\);`,
+      ).exec(MIGRATION)?.[1];
+      expect(block).toBeDefined();
+      return (block ?? "")
+        .split("\n")
+        .map((line) => /^ {2}([a-z_]+) [a-z]/.exec(line)?.[1])
+        .filter(
+          (name): name is string => name !== undefined && name !== "constraint",
+        );
+    };
+
+    it.each([
+      ["programme_entries", ENTRY_COMPARED, ["occurred_at"]],
+      ["observations", OBSERVATION_COMPARED, ["effective_at"]],
+    ] as const)(
+      "%s: a replay compares every column except times, id and submission_id",
+      (table, compared, times) => {
+        const columns = columnsOf(table);
+        expect(columns).toEqual(
+          expect.arrayContaining([
+            "id",
+            "submission_id",
+            "created_at",
+            ...times,
+          ]),
+        );
+        const excluded = new Set<string>([
+          "id",
+          "submission_id",
+          "created_at",
+          ...times,
+        ]);
+        expect([...compared].sort()).toEqual(
+          columns.filter((column) => !excluded.has(column)).sort(),
+        );
+      },
+    );
 
     it("every option code matches the database's code pattern", () => {
       for (const codes of Object.values(OPTION_CODES)) {

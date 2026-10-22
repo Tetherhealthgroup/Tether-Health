@@ -128,7 +128,10 @@ export class ProgrammeDataService {
       : { status: 200, body: { submissionId, replayed: true } };
   }
 
-  /** The DTO (unknown keys refused), then at-least-one, then spec ranges. */
+  /**
+   * Unknown keys (on the raw body), the DTO, then at-least-one, then spec
+   * ranges.
+   */
   private async parseBody(
     route: ProgrammeRoute,
     rawBody: unknown,
@@ -137,6 +140,16 @@ export class ProgrammeDataService {
       rawBody === null ||
       typeof rawBody !== "object" ||
       Array.isArray(rawBody)
+    ) {
+      throw invalidRequest();
+    }
+    // Unknown keys are refused on the raw body's own keys, so that names
+    // the transform would skip or treat specially (`constructor`,
+    // `prototype`, `__proto__`) are refused too, never silently dropped.
+    if (
+      Reflect.ownKeys(rawBody).some(
+        (key) => typeof key !== "string" || !Object.hasOwn(route.fields, key),
+      )
     ) {
       throw invalidRequest();
     }

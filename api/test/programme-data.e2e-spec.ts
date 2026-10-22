@@ -10,6 +10,7 @@ import { getMetadataStorage } from "class-validator";
 import { AppModule } from "../src/app.module";
 import { TokenVerifier } from "../src/auth/token-verifier";
 import { configureApp } from "../src/configure-app";
+import { enrolmentErrorCodes } from "../src/enrolments/enrolment-errors";
 import { UserSupabaseClientFactory } from "../src/enrolments/user-supabase-client";
 import { programmeDataErrorCodes } from "../src/programme-data/programme-data-errors";
 import {
@@ -50,6 +51,9 @@ const asUuid = (key: string) =>
   `${key.slice(0, 8)}-${key.slice(8, 12)}-${key.slice(12, 16)}-${key.slice(16, 20)}-${key.slice(20)}`;
 const minutesFromNow = (minutes: number) =>
   new Date(Date.now() + minutes * 60_000).toISOString();
+/** The UTC date `days` from today, as YYYY-MM-DD. */
+const utcDate = (days: number) =>
+  new Date(Date.now() + days * 86_400_000).toISOString().slice(0, 10);
 
 /** A valid body per route (every field present where it can be). */
 const VALID: Record<string, Record<string, unknown>> = {
@@ -242,6 +246,42 @@ describe("Programme event routes (e2e)", () => {
       body,
       key === null ? {} : { "idempotency-key": key },
     );
+
+  /** A raw (unparsed) body, as a client could send it. */
+  const submitRaw = async (
+    caller: Caller,
+    name: string,
+    raw: string,
+    contentType = "application/json",
+  ) => {
+    const response = await app.inject({
+      method: "POST",
+      url: `/v1/program-data/${name}`,
+      remoteAddress: caller.address,
+      headers: {
+        authorization: `Bearer ${caller.token}`,
+        "idempotency-key": newKey(),
+        "content-type": contentType,
+      },
+      payload: raw,
+    });
+    expect(response.body).not.toContain(TOKEN_CANARY);
+    expect(response.body).not.toContain(NOTE_CANARY);
+    return response;
+  };
+
+  /** A generic (uncoded) rejection, as documented for parser refusals. */
+  const expectGeneric = (
+    response: { statusCode: number; json: () => unknown },
+    status: number,
+  ) => {
+    expect(response.statusCode).toBe(status);
+    const body = response.json() as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(
+      ["error", "requestId", "statusCode"].sort(),
+    );
+    expect(openApiErrors("RequestRejected", body)).toEqual([]);
+  };
 
   /** Enrols `caller` in `code` (learn_only: no focus cap) with live core. */
   const enrol = async (caller: Caller, code: string, core = true) => {
@@ -453,7 +493,7 @@ describe("Programme event routes (e2e)", () => {
     let a: Caller;
     beforeAll(async () => {
       a = newCaller();
-      for (const code of ["hw", "ca", "ck", "ea"]) await enrol(a, code);
+      for (const code of ["hw", "ca", "ck", "ea", "st"]) await enrol(a, code);
     });
 
     it("a repeat with the same key and body → 200 replayed, nothing written", async () => {
@@ -551,6 +591,37 @@ describe("Programme event routes (e2e)", () => {
         const before = countOf(a);
         expectCoded(
           await submit(a, "hw/readings", body, key),
+          409,
+          "idempotency_key_conflict",
+        );
+        expect(countOf(a)).toBe(before);
+      },
+    );
+
+    it.each([
+      ["note", { note: "Synthetic second" }],
+      ["timing", { when: "bedtime" }],
+      ["feelings", { feelings: ["fine", "shaky"] }],
+      ["no note", { note: undefined }],
+    ])(
+      "st/readings: the same key with different attributes (%s) → 409, nothing written",
+      async (_name, change) => {
+        const key = newKey();
+        const first = {
+          reading: 142,
+          when: "fasting",
+          feelings: ["fine"],
+          note: "Synthetic first",
+        };
+        expect((await submit(a, "st/readings", first, key)).statusCode).toBe(
+          201,
+        );
+        expect((await submit(a, "st/readings", first, key)).statusCode).toBe(
+          200,
+        );
+        const before = countOf(a);
+        expectCoded(
+          await submit(a, "st/readings", { ...first, ...change }, key),
           409,
           "idempotency_key_conflict",
         );
@@ -695,12 +766,12 @@ describe("Programme event routes (e2e)", () => {
 
     it("the key is checked before the pre-checks (not enrolled)", async () => {
       expectCoded(
-        await submit(a, "st/a1c", VALID["st/a1c"], null),
+        await submit(a, "be/survivorship", VALID["be/survivorship"], null),
         400,
         "idempotency_key_required",
       );
       expectCoded(
-        await submit(a, "st/a1c", VALID["st/a1c"]),
+        await submit(a, "be/survivorship", VALID["be/survivorship"]),
         404,
         "enrolment_not_found",
       );
@@ -781,6 +852,75 @@ describe("Programme event routes (e2e)", () => {
         "future reading",
       ],
       ["sf/pauses", [{ reason: "bored" }], "array body"],
+      // More than 3 decimal places is refused, never rounded.
+      ["st/readings", { reading: 142.0001 }, "reading: 4 decimals"],
+      [
+        "hw/lipids",
+        { total: 212.0001, labDate: LAB_DATE },
+        "total: 4 decimals",
+      ],
+      ["hw/lipids", { ldl: 138.0005, labDate: LAB_DATE }, "ldl: 4 decimals"],
+      ["hw/lipids", { hdl: 46.1234, labDate: LAB_DATE }, "hdl: 4 decimals"],
+      [
+        "hw/lipids",
+        { triglycerides: 150.0001, labDate: LAB_DATE },
+        "triglycerides: 4 decimals",
+      ],
+      ["re/labs", { egfr: 58.0001, labDate: LAB_DATE }, "egfr: 4 decimals"],
+      [
+        "re/labs",
+        { urineAcr: 42.0009, labDate: LAB_DATE },
+        "urineAcr: 4 decimals",
+      ],
+      ["re/labs", { alt: 31.2501, labDate: LAB_DATE }, "alt: 4 decimals"],
+      [
+        "ca/zone-checks",
+        { zone: "green", peakFlow: 310.0005 },
+        "peakFlow: 4 decimals",
+      ],
+      // Integer fields refuse fractions.
+      ["hw/readings", { systolic: 120, diastolic: 80.5 }, "diastolic fraction"],
+      [
+        "hw/readings",
+        { systolic: 120, diastolic: 80, pulse: 70.5 },
+        "pulse fraction",
+      ],
+      // labDate is required on every lab route; doneOn on ck/done.
+      ["hw/lipids", { hdl: 50 }, "lipids labDate missing"],
+      ["re/labs", { egfr: 58 }, "labs labDate missing"],
+      [
+        "hw/lipids",
+        { hdl: 50, labDate: utcDate(2) },
+        "lipids labDate after tomorrow",
+      ],
+      [
+        "re/labs",
+        { egfr: 58, labDate: utcDate(2) },
+        "labs labDate after tomorrow",
+      ],
+      [
+        "st/a1c",
+        { a1c: 6.5, labDate: utcDate(2) },
+        "a1c labDate after tomorrow",
+      ],
+      [
+        "ck/done",
+        { item: "flu_vaccine", doneOn: utcDate(2) },
+        "doneOn after tomorrow",
+      ],
+      [
+        "ck/done",
+        { item: "flu_vaccine", doneOn: "1899-12-31" },
+        "doneOn before 1900",
+      ],
+      // Unknown keys, including names the transform treats specially.
+      [
+        "sf/pauses",
+        { reason: "bored", constructor: { x: 1 } },
+        "constructor key",
+      ],
+      ["sf/pauses", { reason: "bored", prototype: { x: 1 } }, "prototype key"],
+      ["sf/pauses", { reason: "bored", toString: "x" }, "toString key"],
     ] as [string, unknown, string][])(
       "%s %j (%s) → 400, nothing written",
       async (name, body) => {
@@ -801,13 +941,90 @@ describe("Programme event routes (e2e)", () => {
       ).toBe(201);
     });
 
-    it("tomorrow's UTC date is an accepted lab date", async () => {
-      const tomorrow = new Date(Date.now() + 86_400_000)
-        .toISOString()
-        .slice(0, 10);
+    it.each([
+      ["st/a1c", (date: string) => ({ a1c: 6.1, labDate: date })],
+      ["hw/lipids", (date: string) => ({ hdl: 51, labDate: date })],
+      ["re/labs", (date: string) => ({ egfr: 61, labDate: date })],
+      ["ck/done", (date: string) => ({ item: "flu_vaccine", doneOn: date })],
+    ])(
+      "%s accepts tomorrow's UTC date (no 5-minute rule) and today",
+      async (name, body) => {
+        expect((await submit(a, name, body(utcDate(1)))).statusCode).toBe(201);
+        expect((await submit(a, name, body(utcDate(0)))).statusCode).toBe(201);
+        expect((await submit(a, name, body("1900-01-01"))).statusCode).toBe(
+          201,
+        );
+      },
+    );
+
+    it("tomorrow's lab date is stored as midnight UTC of that date", async () => {
+      const key = newKey();
+      const tomorrow = utcDate(1);
       expect(
-        (await submit(a, "st/a1c", { a1c: 6.1, labDate: tomorrow })).statusCode,
+        (await submit(a, "hw/lipids", { ldl: 99, labDate: tomorrow }, key))
+          .statusCode,
       ).toBe(201);
+      expect(
+        rowsOf(a).observations.find((row) => row.submission_id === asUuid(key))
+          ?.effective_at,
+      ).toBe(`${tomorrow}T00:00:00Z`);
+    });
+
+    it("exactly 3 decimal places are kept as sent", async () => {
+      const key = newKey();
+      expect(
+        (await submit(a, "re/labs", { egfr: 58.125, labDate: LAB_DATE }, key))
+          .statusCode,
+      ).toBe(201);
+      expect(
+        rowsOf(a).observations.find((row) => row.submission_id === asUuid(key))
+          ?.value,
+      ).toBe(58.125);
+    });
+
+    describe("bodies the JSON parser refuses (generic body, nothing written)", () => {
+      it.each([
+        ["malformed JSON", '{"reason":'],
+        ["__proto__ key", '{"reason":"bored","__proto__":{"x":1}}'],
+        [
+          "constructor.prototype",
+          '{"reason":"bored","constructor":{"prototype":{"x":1}}}',
+        ],
+      ])("%s → 400", async (_name, raw) => {
+        const before = countOf(a);
+        expectGeneric(await submitRaw(a, "sf/pauses", raw), 400);
+        expect(countOf(a)).toBe(before);
+      });
+
+      it("a body over the 64 KiB limit → 413", async () => {
+        const before = countOf(a);
+        expectGeneric(
+          await submitRaw(
+            a,
+            "ca/symptoms",
+            JSON.stringify({
+              symptoms: ["coughing"],
+              note: "x".repeat(70_000),
+            }),
+          ),
+          413,
+        );
+        expect(countOf(a)).toBe(before);
+      });
+
+      it("a body that is not JSON → 415", async () => {
+        const before = countOf(a);
+        expectGeneric(
+          await submitRaw(
+            a,
+            "sf/pauses",
+            "<reason>bored</reason>",
+            "application/xml",
+          ),
+          415,
+        );
+        expect(countOf(a)).toBe(before);
+      });
     });
 
     it.each([
@@ -901,6 +1118,16 @@ describe("Programme event routes (e2e)", () => {
         "account_deletion_in_progress",
       );
       expect(countOf(a)).toBe(0);
+    });
+
+    it("account deletion started and not enrolled → 409 (the barrier is checked first)", async () => {
+      const a = newCaller();
+      fake.startAccountDeletion(a.id);
+      expectCoded(
+        await submit(a, "hw/readings", VALID["hw/readings"]),
+        409,
+        "account_deletion_in_progress",
+      );
     });
 
     it("B cannot write into A's enrolment: B is not enrolled → 404 and A's rows are unchanged", async () => {
@@ -1101,7 +1328,19 @@ describe("Programme event routes (e2e)", () => {
           { $ref: "#/components/parameters/IdempotencyKey" },
         ]);
         expect(Object.keys(operation?.responses as object).sort()).toEqual(
-          ["200", "201", "400", "401", "404", "409", "422", "502"].sort(),
+          [
+            "200",
+            "201",
+            "400",
+            "401",
+            "404",
+            "409",
+            "413",
+            "415",
+            "422",
+            "429",
+            "502",
+          ].sort(),
         );
       }
       const others = Object.keys(document.paths).filter((path) =>
@@ -1151,6 +1390,49 @@ describe("Programme event routes (e2e)", () => {
         properties: { code: { enum: unknown } };
       };
       expect(schema.properties.code.enum).toEqual([...programmeDataErrorCodes]);
+      const enrolment = openApiSchema("CodedRequestRejected") as {
+        properties: { code: { enum: unknown } };
+      };
+      expect(enrolment.properties.code.enum).toEqual([...enrolmentErrorCodes]);
+      for (const code of programmeDataErrorCodes) {
+        if (!(enrolmentErrorCodes as readonly string[]).includes(code)) {
+          expect(enrolment.properties.code.enum).not.toContain(code);
+        }
+      }
+    });
+
+    it("a field is an integer in the contract exactly when the DTO uses @IsInt", () => {
+      for (const route of PROGRAMME_ROUTES) {
+        const schema = openApiSchema(schemaName(routeName(route))) as {
+          properties: Record<string, { type?: string }>;
+        };
+        const integers = new Set(
+          getMetadataStorage()
+            .getTargetValidationMetadatas(route.dto, "", true, false)
+            .filter((entry) => entry.name === "isInt")
+            .map((entry) => entry.propertyName),
+        );
+        for (const field of Object.keys(route.fields)) {
+          expect([field, schema.properties[field]?.type === "integer"]).toEqual(
+            [field, integers.has(field)],
+          );
+        }
+      }
+    });
+
+    it("more than 3 decimal places fails the documented measurement schemas", () => {
+      expect(openApiErrors("ProgrammeMeasurement", 7.4)).toEqual([]);
+      expect(openApiErrors("ProgrammeMeasurement", 58.125)).toEqual([]);
+      expect(openApiErrors("ProgrammeMeasurement", 7.4125)).not.toEqual([]);
+      expect(
+        openApiErrors("SubmitStReadings", { reading: 142.0001 }),
+      ).not.toEqual([]);
+      expect(
+        openApiErrors("SubmitCaZoneChecks", {
+          zone: "green",
+          peakFlow: 310.0005,
+        }),
+      ).not.toEqual([]);
     });
 
     it("an unknown key fails the documented request schema too", () => {

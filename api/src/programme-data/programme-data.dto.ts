@@ -60,6 +60,7 @@ export class HwLipidsDto {
   @IsDecimal3()
   triglycerides?: number;
 
+  /** Required; 1900-01-01 to tomorrow's UTC date, no 5-minute rule. */
   @IsRecordDate()
   labDate!: string;
 }
@@ -89,6 +90,7 @@ export class StA1cDto {
   @IsDecimal3()
   a1c!: number;
 
+  /** Required; 1900-01-01 to tomorrow's UTC date, no 5-minute rule. */
   @IsRecordDate()
   labDate!: string;
 }
@@ -106,6 +108,7 @@ export class ReLabsDto {
   @IsDecimal3()
   alt?: number;
 
+  /** Required; 1900-01-01 to tomorrow's UTC date, no 5-minute rule. */
   @IsRecordDate()
   labDate!: string;
 }
@@ -183,6 +186,7 @@ export class CkDoneDto extends EntryBody {
   @Matches(CODE_PATTERN)
   item!: string;
 
+  /** Required; a real date from 1900-01-01 to tomorrow's UTC date. */
   @IsRecordDate()
   doneOn!: string;
 

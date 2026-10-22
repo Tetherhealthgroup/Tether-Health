@@ -21,13 +21,17 @@ const isCodes = (value: unknown) =>
 /** jsonb number whose text is 0..10 (an integer score). */
 const isScore = (value: unknown) =>
   typeof value === "number" && /^([0-9]|10)$/.test(String(value));
+/** btrim(text) with no characters argument trims spaces only. */
+const btrim = (value: string) => value.replace(/^ +| +$/g, "");
 const isText = (value: unknown) =>
   typeof value === "string" &&
-  value === value.trim() &&
+  value === btrim(value) &&
   [...value].length >= 1 &&
   [...value].length <= 500;
 const isDate = (value: unknown) => {
   if (typeof value !== "string" || !DATE.test(value)) return false;
+  // Postgres has no year 0 (1 BC is year 0001 BC), so 0000-mm-dd fails the cast.
+  if (value.startsWith("0000")) return false;
   const date = new Date(`${value}T00:00:00Z`);
   return !Number.isNaN(date.getTime()) && date.toISOString().startsWith(value);
 };

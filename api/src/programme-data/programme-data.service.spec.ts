@@ -15,31 +15,42 @@ const user: AuthUser = {
   authenticatedAt: 1,
 };
 
-/** A chain that ignores filters and resolves to `result`. */
-const chain = (result: unknown) => {
+/** Every query-builder call, as [table, method, ...arguments]. */
+let queries: unknown[][] = [];
+
+/** A chain that records its calls and resolves to `result`. */
+const chain = (table: string, result: unknown) => {
   const node: Record<string, unknown> = {};
   for (const name of ["select", "eq", "is", "returns"]) {
-    node[name] = () => node;
+    node[name] = (...args: unknown[]) => {
+      queries.push([table, name, ...args]);
+      return node;
+    };
   }
   node.maybeSingle = () => Promise.resolve(result);
   node.then = (resolve: (value: unknown) => unknown) => resolve(result);
   return node;
 };
 
-function serviceWith(insertError: { code: string } | null, inserts: unknown[]) {
+function serviceWith(
+  insertError: { code: string } | null,
+  inserts: unknown[],
+  stored: unknown[] = [],
+) {
   const client = {
     rpc: () => Promise.resolve({ data: true, error: null }),
     from: (table: string) => {
       if (table === "enrolments") {
-        return chain({
+        return chain(table, {
           data: { id: ENROLMENT_ID, status: "focus" },
           error: null,
         });
       }
       if (table === "programme_consents") {
-        return chain({ data: { id: "consent" }, error: null });
+        return chain(table, { data: { id: "consent" }, error: null });
       }
       return {
+        ...chain(table, { data: stored, error: null, count: stored.length }),
         insert: (rows: unknown) => {
           inserts.push(rows);
           return Promise.resolve({ error: insertError });
@@ -59,6 +70,7 @@ describe("ProgrammeDataService", () => {
   let logged: string[];
 
   beforeEach(() => {
+    queries = [];
     logged = [];
     for (const level of ["log", "warn", "error", "debug", "verbose"] as const) {
       jest
@@ -173,5 +185,39 @@ describe("ProgrammeDataService", () => {
       ),
     ).rejects.toMatchObject({ code: "invalid_record" });
     expect(inserts).toEqual([]);
+  });
+
+  it("filters the enrolment and the replay read on the caller (owner filters)", async () => {
+    const inserts: unknown[] = [];
+    const computed = [
+      { metric: "bp_systolic", value: VALUE_CANARY, unit_ucum: "mm[Hg]" },
+      { metric: "bp_diastolic", value: 99, unit_ucum: "mm[Hg]" },
+      { metric: "heart_rate", value: 71, unit_ucum: "/min" },
+    ].map((row) => ({
+      ...row,
+      user_id: USER_ID,
+      enrolment_id: ENROLMENT_ID,
+      programme_code: "hw",
+      attributes: {},
+    }));
+    const result = await serviceWith(
+      { code: "23505" },
+      inserts,
+      computed,
+    ).submit(user, route, body, SUBMISSION_ID, "r");
+    expect(result.status).toBe(200);
+    const eqs = (table: string) =>
+      queries
+        .filter(([t, name]) => t === table && name === "eq")
+        .map((q) => q.slice(2));
+    expect(eqs("enrolments")).toEqual([
+      ["user_id", USER_ID],
+      ["programme_code", "hw"],
+    ]);
+    expect(eqs("observations")).toEqual([
+      ["user_id", USER_ID],
+      ["enrolment_id", ENROLMENT_ID],
+      ["submission_id", SUBMISSION_ID],
+    ]);
   });
 });

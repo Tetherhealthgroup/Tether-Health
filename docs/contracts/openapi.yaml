@@ -610,11 +610,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`value_out_of_range` (a value outside its spec rule''s range) or `invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/hw/lipids:
     post:
@@ -639,11 +642,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/st/readings:
     post:
@@ -668,11 +674,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`value_out_of_range` (a value outside its spec rule''s range) or `invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/st/a1c:
     post:
@@ -697,11 +706,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/re/labs:
     post:
@@ -726,11 +738,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/ca/zone-checks:
     post:
@@ -755,11 +770,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`value_out_of_range` (a value outside its spec rule''s range) or `invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/ca/symptoms:
     post:
@@ -784,11 +802,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/ea/moods:
     post:
@@ -813,11 +834,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/ea/check-backs:
     post:
@@ -842,11 +866,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/sd/sessions:
     post:
@@ -871,11 +898,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/sd/falls:
     post:
@@ -900,11 +930,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/sf/pauses:
     post:
@@ -929,11 +962,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/ck/done:
     post:
@@ -958,11 +994,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/be/diary:
     post:
@@ -987,11 +1026,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
   /v1/program-data/be/survivorship:
     post:
@@ -1016,11 +1058,14 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/ProgrammeRecordNotEnrolled'}
         '409': {$ref: '#/components/responses/ProgrammeRecordConflict'}
+        '413': {$ref: '#/components/responses/ProgrammeRecordTooLarge'}
+        '415': {$ref: '#/components/responses/ProgrammeRecordUnsupportedMediaType'}
         '422':
           description: '`invalid_record` (the database refused the record''s shape or bounds); nothing was written'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+        '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
         '502': {$ref: '#/components/responses/ProgrammeRecordUnavailable'}
 components:
   securitySchemes:
@@ -1056,10 +1101,37 @@ components:
         application/json:
           schema: {$ref: '#/components/schemas/ProgrammeRecordReplayed'}
     ProgrammeRecordBadRequest:
-      description: '`idempotency_key_required`, `idempotency_key_invalid`, or `invalid_request` (an unknown key, a missing required field, a value of the wrong type, an option not in the list, more than 3 decimal places, a fraction in an integer field, a time more than 5 minutes ahead, or a date outside its bounds). The key is checked before the body.'
+      description: >-
+        `idempotency_key_required`, `idempotency_key_invalid`, or
+        `invalid_request` (an unknown key, including `constructor` and
+        `prototype`, a missing required field, a value of the wrong type, an
+        option not in the list, more than 3 decimal places, a fraction in an
+        integer field, a time more than 5 minutes ahead, or a date outside
+        its bounds). The key is checked before the body. A body the JSON
+        parser refuses before the route runs (malformed JSON, or a
+        `__proto__` key or `constructor.prototype` anywhere in it) gets the
+        generic body without a code (`RequestRejected`). Nothing was written.
       content:
         application/json:
-          schema: {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+          schema:
+            oneOf:
+              - {$ref: '#/components/schemas/ProgrammeDataRequestRejected'}
+              - {$ref: '#/components/schemas/RequestRejected'}
+    ProgrammeRecordTooLarge:
+      description: The body is larger than the server's request body limit (generic body, no code); nothing was written
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/RequestRejected'}
+    ProgrammeRecordUnsupportedMediaType:
+      description: The body is not `application/json` (generic body, no code); nothing was written
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/RequestRejected'}
+    ProgrammeRecordRateLimited:
+      description: Too many requests from this client (generic body, no code); nothing was written
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/RequestRejected'}
     ProgrammeRecordNotEnrolled:
       description: '`enrolment_not_found`: the caller has no enrolment in this programme (also when it was deleted meanwhile); nothing was written'
       content:
@@ -1500,6 +1572,7 @@ components:
       type: number
       minimum: 0
       maximum: 10000
+      multipleOf: 0.001
       description: At most 3 decimal places (more is 400 `invalid_request`, never rounded). Outside 0 to 10000 the record is refused with 422 `invalid_record`.
     SubmitHwReadings:
       type: object
@@ -1530,7 +1603,7 @@ components:
       additionalProperties: false
       required: [reading]
       properties:
-        reading: {type: number, minimum: 20, maximum: 600, description: 'Spec rule st.glucose; outside answers 422 value_out_of_range. At most 3 decimal places'}
+        reading: {type: number, minimum: 20, maximum: 600, multipleOf: 0.001, description: 'Spec rule st.glucose; outside answers 422 value_out_of_range. At most 3 decimal places'}
         when: {enum: [fasting, before_meal, 2_h_after_meal, bedtime, other]}
         feelings: {type: array, maxItems: 12, uniqueItems: true, items: {enum: [fine, shaky, sweaty, tired, thirsty]}}
         note: {type: string, minLength: 1, maxLength: 500, description: Trimmed text}
@@ -1562,7 +1635,7 @@ components:
       properties:
         zone: {enum: [green, yellow, red]}
         symptoms: {type: array, maxItems: 12, uniqueItems: true, items: {enum: [coughing, wheezing, short_of_breath, chest_tightness, woke_at_night, can_t_speak_in_full_sentences]}}
-        peakFlow: {type: number, minimum: 50, maximum: 900, description: 'Spec rule ca.zone; outside answers 422 value_out_of_range. At most 3 decimal places'}
+        peakFlow: {type: number, minimum: 50, maximum: 900, multipleOf: 0.001, description: 'Spec rule ca.zone; outside answers 422 value_out_of_range. At most 3 decimal places'}
         checkedAt: {allOf: [{$ref: '#/components/schemas/ProgrammeEventTime'}], description: 'The time of the check, for both rows'}
     SubmitCaSymptoms:
       type: object

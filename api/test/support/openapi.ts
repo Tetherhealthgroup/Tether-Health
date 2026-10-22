@@ -36,7 +36,15 @@ const document = yaml.load(
 // Strict about unknown keywords and formats. strictTypes is off: the
 // contract's composites (allOf + unevaluatedProperties) carry no `type`,
 // which is valid JSON Schema that strictTypes would refuse.
-const ajv = new Ajv2020({ strict: true, strictTypes: false, allErrors: true });
+// multipleOfPrecision: a decimal step such as 0.001 is checked with a
+// tolerance, since 7.4 / 0.001 is not an exact integer in binary floating
+// point.
+const ajv = new Ajv2020({
+  strict: true,
+  strictTypes: false,
+  allErrors: true,
+  multipleOfPrecision: 9,
+});
 addFormats(ajv);
 // Only the schemas (paths and info are not JSON Schema), as $defs of one
 // schema so that their "#/components/schemas/<name>" references resolve.

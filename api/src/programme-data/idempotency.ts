@@ -12,6 +12,12 @@ const UUID_KEY =
  * key it is stored under includes the enrolment, so two members can never
  * collide. Missing → 400 `idempotency_key_required`; any other form (empty,
  * repeated header, wrong length or alphabet) → 400 `idempotency_key_invalid`.
+ *
+ * Keys are per route, as the app sends them (one key per screen instance,
+ * endpoint and content). Reusing one key on two routes of the same
+ * programme is not detected as a conflict where the routes write different
+ * rows (different entry kinds conflict on the entry key; different metrics
+ * do not).
  */
 export function submissionIdFrom(header: unknown): string {
   if (header === undefined) throw badRequest("idempotency_key_required");
