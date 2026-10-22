@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 import '../theme/app_colors.dart';
 import '../widgets/large_text.dart';
 
@@ -21,25 +23,30 @@ class ChooseQuitPathScreen extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onContinue;
 
-  String _pathLabel(QuitPlanPath path) {
+  String _pathLabel(BuildContext context, QuitPlanPath path) {
     return switch (path) {
       QuitPlanPath.setQuitDate =>
-        isSpanish ? 'Elegir una fecha' : 'Set a quit date',
-      QuitPlanPath.quitToday => isSpanish ? 'Dejar de fumar hoy' : 'Quit today',
+        AppLocalizations.of(context).chooseQuitPathOptionSetQuitDate,
+      QuitPlanPath.quitToday =>
+        AppLocalizations.of(context).chooseQuitPathOptionQuitToday,
       QuitPlanPath.reduceGradually =>
-        isSpanish ? 'Reducir gradualmente' : 'Reduce gradually',
+        AppLocalizations.of(context).chooseQuitPathOptionReduceGradually,
     };
   }
 
-  String _savedMessage() {
-    final path = _pathLabel(selectedPath);
-    return isSpanish
-        ? '$path seleccionado · Guardado automáticamente'
-        : '$path selected · Saved automatically';
+  String _savedMessage(BuildContext context) {
+    final path = _pathLabel(context, selectedPath);
+    return AppLocalizations.of(context).chooseQuitPathSavedStatus(path);
   }
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      isSpanish == (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     return Scaffold(
       key: const ValueKey('functional-choose-quit-path-screen'),
       backgroundColor: AppColors.cream,
@@ -64,7 +71,7 @@ class ChooseQuitPathScreen extends StatelessWidget {
 
               final footer = _QuitPathBottomAction(
                 isSpanish: isSpanish,
-                savedMessage: _savedMessage(),
+                savedMessage: _savedMessage(context),
                 onContinue: onContinue,
                 horizontalPadding: largeText ? 0 : horizontalPadding,
                 compact: compact,
@@ -122,9 +129,8 @@ class ChooseQuitPathScreen extends StatelessWidget {
                               _PathIllustration(compact: compact),
                               SizedBox(height: compact ? 12 : 20),
                               Text(
-                                isSpanish
-                                    ? 'ELIGE TU CAMINO'
-                                    : 'CHOOSE YOUR PATH',
+                                AppLocalizations.of(context)
+                                    .chooseQuitPathEyebrow,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 11,
@@ -134,9 +140,8 @@ class ChooseQuitPathScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 9),
                               Text(
-                                isSpanish
-                                    ? '¿Qué te parece posible ahora mismo?'
-                                    : 'What feels possible right now?',
+                                AppLocalizations.of(context)
+                                    .chooseQuitPathTitle,
                                 // Already the largest text on screen; past
                                 // 180% its longest words no longer fit.
                                 textScaler: MediaQuery.textScalerOf(context)
@@ -151,9 +156,8 @@ class ChooseQuitPathScreen extends StatelessWidget {
                               ),
                               SizedBox(height: compact ? 9 : 13),
                               Text(
-                                isSpanish
-                                    ? 'No hay un lugar incorrecto para empezar. Elige lo que se adapte a ti.'
-                                    : 'There is no wrong place to start. Choose what fits you.',
+                                AppLocalizations.of(context)
+                                    .chooseQuitPathIntro,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -171,19 +175,18 @@ class ChooseQuitPathScreen extends StatelessWidget {
                                 selectionKey: const ValueKey(
                                   'quit-path-selected-setQuitDate',
                                 ),
-                                title: _pathLabel(QuitPlanPath.setQuitDate),
-                                description: isSpanish
-                                    ? 'Prepárate durante 7–14 días y luego deja de fumar por completo en la fecha que elijas. Te guiaremos con un paso pequeño cada día.'
-                                    : 'Prepare for 7–14 days, then stop completely on the date you choose. We’ll guide one small step each day.',
-                                supportingText: isSpanish
-                                    ? 'Coincide con tu preferencia de preparación'
-                                    : 'Matches your preparation preference',
+                                title: _pathLabel(
+                                    context, QuitPlanPath.setQuitDate),
+                                description: AppLocalizations.of(context)
+                                    .chooseQuitPathOptionSetQuitDateDescription,
+                                supportingText: AppLocalizations.of(context)
+                                    .chooseQuitPathOptionSetQuitDateMatch,
                                 icon: Icons.event_available_rounded,
                                 iconColor: AppColors.coral,
                                 iconBackground: AppColors.coralLight,
                                 recommended: true,
-                                recommendedLabel:
-                                    isSpanish ? 'RECOMENDADO' : 'RECOMMENDED',
+                                recommendedLabel: AppLocalizations.of(context)
+                                    .chooseQuitPathRecommendedBadge,
                                 selected:
                                     selectedPath == QuitPlanPath.setQuitDate,
                                 onTap: () => onPathChanged(
@@ -198,10 +201,10 @@ class ChooseQuitPathScreen extends StatelessWidget {
                                 selectionKey: const ValueKey(
                                   'quit-path-selected-quitToday',
                                 ),
-                                title: _pathLabel(QuitPlanPath.quitToday),
-                                description: isSpanish
-                                    ? 'Empieza ahora tu tiempo sin fumar y recibe apoyo adicional durante el primer día.'
-                                    : 'Begin your smoke-free time now and get extra support through the first day.',
+                                title:
+                                    _pathLabel(context, QuitPlanPath.quitToday),
+                                description: AppLocalizations.of(context)
+                                    .chooseQuitPathOptionQuitTodayDescription,
                                 icon: Icons.schedule_rounded,
                                 iconColor: AppColors.coral,
                                 iconBackground: AppColors.coralLight,
@@ -219,10 +222,10 @@ class ChooseQuitPathScreen extends StatelessWidget {
                                 selectionKey: const ValueKey(
                                   'quit-path-selected-reduceGradually',
                                 ),
-                                title: _pathLabel(QuitPlanPath.reduceGradually),
-                                description: isSpanish
-                                    ? 'Sigue un programa de reducción gradual y avanza hacia dejar de fumar por completo en una fecha futura.'
-                                    : 'Follow a step-down schedule and work toward stopping completely on a future date.',
+                                title: _pathLabel(
+                                    context, QuitPlanPath.reduceGradually),
+                                description: AppLocalizations.of(context)
+                                    .chooseQuitPathOptionReduceGraduallyDescription,
                                 icon: Icons.format_align_center_rounded,
                                 iconColor: AppColors.deepTeal,
                                 iconBackground: AppColors.mint,
@@ -265,7 +268,7 @@ class _QuitPathHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final back = IconButton.outlined(
       key: const ValueKey('quit-path-back'),
-      tooltip: isSpanish ? 'Atrás' : 'Back',
+      tooltip: AppLocalizations.of(context).chooseQuitPathBackTooltip,
       onPressed: onBack,
       style: IconButton.styleFrom(
         foregroundColor: AppColors.deepTeal,
@@ -273,7 +276,7 @@ class _QuitPathHeader extends StatelessWidget {
       ),
       icon: const Icon(Icons.arrow_back_rounded),
     );
-    final label = isSpanish ? 'Crea tu plan' : 'Build your plan';
+    final label = AppLocalizations.of(context).chooseQuitPathHeaderTitle;
     const style = TextStyle(
       color: AppColors.deepTeal,
       fontSize: 16,
@@ -303,7 +306,7 @@ class _QuitPathHeader extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: Text(
-        isSpanish ? '1 DE 5' : '1 OF 5',
+        AppLocalizations.of(context).chooseQuitPathStepCounter,
         style: const TextStyle(
           color: AppColors.tealSecondary,
           fontSize: 10,
@@ -361,7 +364,7 @@ class _QuitPlanProgress extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
+                AppLocalizations.of(context).chooseQuitPathProgressLabel,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -684,9 +687,7 @@ class _FlexiblePathNote extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: Text(
-            isSpanish
-                ? 'Tu camino es flexible. Puedes ajustarlo en cualquier momento.'
-                : 'Your path is flexible. You can adjust it at any time.',
+            AppLocalizations.of(context).chooseQuitPathFlexibleNote,
             style: const TextStyle(
               color: AppColors.tealSecondary,
               fontSize: 12,
@@ -756,9 +757,8 @@ class _QuitPathBottomAction extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          isSpanish
-                              ? 'Continuar con este camino'
-                              : 'Continue with this path',
+                          AppLocalizations.of(context)
+                              .chooseQuitPathContinueButton,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 15,

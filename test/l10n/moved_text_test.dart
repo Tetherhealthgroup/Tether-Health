@@ -1,13 +1,15 @@
 // Backstop for moving text into the translation files: for every file that
 // has left the isSpanish list, each English and Spanish string the baseline
-// inventory (test/l10n/baseline/legacy_literals.json) found in it must now be
-// in lib/l10n/app_en.arb or app_es.arb byte for byte, or still be in that
-// file. A string that was reworded, dropped or retranslated on the way fails
-// here even if no dumped screen shows it.
+// inventory (test/l10n/baseline/legacy_literals.json) found in it is
+// recorded in test/l10n/moved_keys.json with the ARB key it moved to, and
+// must equal that key's English or Spanish value exactly (or the named case
+// of a select/plural). A string that was reworded, dropped or retranslated
+// on the way fails here even if no dumped screen shows it.
 //
-// A literal with interpolations (`'You chose $count'`) or joined to its
-// neighbours is checked piece by piece: each run of text between
-// interpolations must appear in some message of the language's file.
+// A literal with interpolations (`'You chose $count'`) must have exactly the
+// value's text between placeholders; literals Dart joins (`'a' 'b'`) are
+// checked as one text; a literal nested in another's interpolation is its
+// own text.
 import 'dart:convert';
 import 'dart:io';
 
@@ -15,12 +17,19 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'is_spanish_ratchet_test.dart' show isSpanishFiles, languageMapping;
 
-/// One inventoried literal that is missing: where and what.
-typedef MissingText = ({String file, int line, String branch, String text});
+/// One inventoried literal that is missing or changed: where and what.
+typedef MissingText = ({
+  String file,
+  int line,
+  String branch,
+  String text,
+  String problem
+});
 
 /// The text runs of the Dart literal body [raw]: escapes decoded, split at
-/// `$name` and `${...}` interpolations.
-List<String> textRuns(String raw) {
+/// `$name` and `${...}` interpolations. Only runs with letters, unless
+/// [all].
+List<String> textRuns(String raw, {bool all = false}) {
   final runs = <String>[];
   final buf = StringBuffer();
   var i = 0;
@@ -72,59 +81,163 @@ List<String> textRuns(String raw) {
     i++;
   }
   runs.add(buf.toString());
+  if (all) return runs;
   return [
     for (final r in runs)
       if (RegExp(r'\p{L}', unicode: true).hasMatch(r)) r
   ];
 }
 
-/// Every en/es literal of the files in [moved] (paths) from [inventory] that
-/// is neither in [messages] (language → message texts) nor still in the
-/// file's [source].
+/// The text of [message] outside its `{...}` placeholders and arguments.
+List<String> messageRuns(String message) {
+  final runs = <String>[];
+  final buf = StringBuffer();
+  var depth = 0;
+  for (final c in message.split('')) {
+    if (c == '{') {
+      if (depth == 0) {
+        runs.add(buf.toString());
+        buf.clear();
+      }
+      depth++;
+    } else if (c == '}') {
+      depth--;
+    } else if (depth == 0) {
+      buf.write(c);
+    }
+  }
+  runs.add(buf.toString());
+  return runs;
+}
+
+/// The body of case [selector] (`one`, `=1`, `january`...) of the first
+/// select/plural in [message], or null.
+String? caseBody(String message, String selector) {
+  final m =
+      RegExp('(?:^|[\\s,])${RegExp.escape(selector)}\\{').firstMatch(message);
+  if (m == null) return null;
+  var depth = 1;
+  var j = m.end;
+  while (j < message.length && depth > 0) {
+    if (message[j] == '{') depth++;
+    if (message[j] == '}') depth--;
+    j++;
+  }
+  return message.substring(m.end, j - 1);
+}
+
+/// The inventory rows of a file grouped as Dart reads them: a literal with
+/// the ones joined to it (`'a' 'b'`); a literal nested in another's
+/// interpolation starts its own group.
+List<List<int>> literalGroups(List<Map<String, Object?>> rows) {
+  final groups = <List<int>>[];
+  for (var i = 0; i < rows.length; i++) {
+    final text = rows[i]['text']! as String;
+    final nested = groups.isNotEmpty &&
+        groups.last.any((j) {
+          final outer = rows[j]['text']! as String;
+          return outer.contains("'$text'") || outer.contains('"$text"');
+        });
+    if (rows[i]['joined'] == true && groups.isNotEmpty && !nested) {
+      groups.last.add(i);
+    } else {
+      groups.add([i]);
+    }
+  }
+  return groups;
+}
+
+bool _shown(Map<String, Object?> r) =>
+    r['branch'] != 'none' &&
+    r['match'] != true &&
+    r['key'] != true &&
+    r['directive'] != true;
+
+/// Every en/es literal group of the files in [moved] whose recorded key
+/// ([movedKeys]: file → row → `key`, `key#case` or `=source`) is missing or
+/// whose value in [messages] (language → key → message) is not exactly its
+/// text.
 List<MissingText> missingText({
   required Map<String, Object?> inventory,
   required Set<String> moved,
-  required Map<String, List<String>> messages,
+  required Map<String, Map<String, Object?>> movedKeys,
+  required Map<String, Map<String, String>> messages,
   required String Function(String path) source,
 }) {
   final out = <MissingText>[];
   final files = inventory['files']! as Map<String, Object?>;
   for (final path in moved) {
-    final rows = (files[path] as List?) ?? const [];
+    final rows =
+        ((files[path] as List?) ?? const []).cast<Map<String, Object?>>();
+    final keys = movedKeys[path] ?? const {};
     final src = source(path);
-    for (final r in rows.cast<Map<String, Object?>>()) {
-      final branch = r['branch']! as String;
-      if (branch == 'none' ||
-          r['match'] == true ||
-          r['key'] == true ||
-          r['directive'] == true) {
+    for (final group in literalGroups(rows)) {
+      final shown = [
+        for (final i in group)
+          if (_shown(rows[i])) i
+      ];
+      if (shown.isEmpty) continue;
+      final first = rows[shown.first];
+      final branch = first['branch']! as String;
+      final raw = [for (final i in group) rows[i]['text']! as String].join();
+      MissingText miss(String problem) => (
+            file: path,
+            line: first['line']! as int,
+            branch: branch,
+            text: raw,
+            problem: problem
+          );
+      final target = keys['${group.first}'] as String?;
+      if (target == null) {
+        out.add(miss('no key recorded for row ${group.first}'));
         continue;
       }
-      final raw = r['text']! as String;
-      if (src.contains("'$raw'") || src.contains('"$raw"')) continue;
-      final texts = messages[branch] ?? const [];
-      final ok =
-          textRuns(raw).every((run) => texts.any((m) => m.contains(run)));
-      if (!ok) {
-        out.add(
-            (file: path, line: r['line']! as int, branch: branch, text: raw));
+      if (target == '=source') {
+        final kept = shown.every((i) {
+          final t = rows[i]['text']! as String;
+          return src.contains("'$t'") || src.contains('"$t"');
+        });
+        if (!kept) {
+          out.add(miss('recorded as kept in the file, but it is gone'));
+        }
+        continue;
+      }
+      final parts = target.split('#');
+      final message = messages[branch]?[parts.first];
+      if (message == null) {
+        out.add(miss('${parts.first} is not in app_$branch.arb'));
+        continue;
+      }
+      final value = parts.length > 1 ? caseBody(message, parts[1]) : message;
+      if (value == null) {
+        out.add(miss('$target has no such case'));
+        continue;
+      }
+      final interpolated = group.any((i) => rows[i]['interpolated'] == true) ||
+          RegExp(r'(?<!\\)\$').hasMatch(raw);
+      final want = textRuns(raw, all: true);
+      final got = interpolated ? messageRuns(value) : [value];
+      if (want.length != got.length ||
+          [for (var i = 0; i < want.length; i++) want[i] == got[i]]
+              .contains(false)) {
+        out.add(miss('$target is "$value"'));
       }
     }
   }
   return out;
 }
 
-List<String> _messages(String path) {
+Map<String, String> _messages(String path) {
   final arb = jsonDecode(File(path).readAsStringSync()) as Map<String, Object?>;
-  return [
+  return {
     for (final e in arb.entries)
-      if (!e.key.startsWith('@')) e.value! as String
-  ];
+      if (!e.key.startsWith('@')) e.key: e.value! as String
+  };
 }
 
 void main() {
   test(
-      'text from every file that left the isSpanish list is in the translation files',
+      'text from every file that left the isSpanish list equals its recorded key',
       () {
     final inventory = jsonDecode(
             File('test/l10n/baseline/legacy_literals.json').readAsStringSync())
@@ -137,9 +250,16 @@ void main() {
           e.key
     };
     final moved = withText.difference({...isSpanishFiles, ...languageMapping});
+    final recorded =
+        (jsonDecode(File('test/l10n/moved_keys.json').readAsStringSync())
+            as Map<String, Object?>)['files']! as Map<String, Object?>;
+    expect(recorded.keys.toSet(), moved,
+        reason: 'moved_keys.json lists exactly the files that left the list');
     final missing = missingText(
       inventory: inventory,
       moved: moved,
+      movedKeys:
+          recorded.map((k, v) => MapEntry(k, v! as Map<String, Object?>)),
       messages: {
         'en': _messages('lib/l10n/app_en.arb'),
         'es': _messages('lib/l10n/app_es.arb')
@@ -147,45 +267,90 @@ void main() {
       source: (p) => File(p).existsSync() ? File(p).readAsStringSync() : '',
     );
     expect(missing, isEmpty,
-        reason: 'reworded or dropped on the way to the translation files');
+        reason:
+            'reworded, dropped or unrecorded on the way to the translation files');
   });
 
-  test('the backstop finds a reworded, a dropped and a retranslated string',
+  test(
+      'the backstop finds a reworded, a dropped, a retranslated and an unrecorded string',
       () {
     final inventory = {
       'files': {
         'lib/x.dart': [
-          {'line': 1, 'branch': 'en', 'text': r'You chose $count reasons'},
-          {'line': 2, 'branch': 'es', 'text': r'Elegiste $count razones'},
+          {
+            'line': 1,
+            'branch': 'en',
+            'text': r'You chose $count reasons',
+            'interpolated': true
+          },
+          {
+            'line': 2,
+            'branch': 'es',
+            'text': r'Elegiste $count razones',
+            'interpolated': true
+          },
           {'line': 3, 'branch': 'en', 'text': 'Stays in code'},
           {'line': 4, 'branch': 'es', 'text': 'caso', 'match': true},
           {'line': 5, 'branch': 'en', 'text': "It\\'s fine"},
+          {'line': 6, 'branch': 'es', 'text': 'situación'},
+          {'line': 7, 'branch': 'es', 'text': 'No'},
+          {'line': 8, 'branch': 'en', 'text': 'Part one, '},
+          {'line': 8, 'branch': 'en', 'text': 'part two', 'joined': true},
         ],
       },
     };
-    List<MissingText> check(List<String> en, List<String> es) => missingText(
+    const keys = {
+      '0': 'chose',
+      '1': 'chose',
+      '2': '=source',
+      '4': 'fine',
+      '5': 'count#=1',
+      '6': 'no',
+      '7': 'parts',
+    };
+    final good = {
+      'en': {
+        'chose': 'You chose {count} reasons',
+        'fine': "It's fine",
+        'parts': 'Part one, part two'
+      },
+      'es': {
+        'chose': 'Elegiste {count} razones',
+        'count': '{n, plural, =1{situación} other{situaciones}}',
+        'no': 'No',
+      },
+    };
+    List<int> lines(Map<String, Map<String, String>> messages,
+            {Map<String, Object?> recorded = keys,
+            String src = "'Stays in code'"}) =>
+        missingText(
           inventory: inventory,
           moved: {'lib/x.dart'},
-          messages: {'en': en, 'es': es},
-          source: (_) => "const k = 'Stays in code';",
-        );
+          movedKeys: {'lib/x.dart': recorded},
+          messages: messages,
+          source: (_) => src,
+        ).map((m) => m.line).toList();
+    Map<String, Map<String, String>> edit(
+            String lang, String key, String value) =>
+        {
+          for (final e in good.entries)
+            e.key: {...e.value, if (e.key == lang) key: value}
+        };
+    expect(lines(good), isEmpty);
+    expect(lines(edit('en', 'chose', 'You picked {count} reasons')), [1]);
+    expect(lines(edit('es', 'chose', 'Escogiste {count} razones')), [2]);
+    expect(lines(edit('es', 'no', 'No.')), [7]);
+    expect(lines(edit('es', 'no', 'No te juzgamos')), [7]);
     expect(
-        check(['You chose {count} reasons', "It's fine"],
-            ['Elegiste {count} razones']),
-        isEmpty);
-    expect(
-        check(['You picked {count} reasons', "It's fine"],
-            ['Elegiste {count} razones']).map((m) => m.line),
-        [1]);
-    expect(
-        check(['You chose {count} reasons', "It's fine"], [])
-            .map((m) => m.line),
-        [2]);
-    expect(
-        check(['You chose {count} reasons', "It's fine"],
-            ['Escogiste {count} razones']).map((m) => m.line),
-        [2]);
+        lines(edit(
+            'es', 'count', '{n, plural, =1{situaciones} other{situaciones}}')),
+        [6]);
+    expect(lines(edit('en', 'parts', 'Part one, part 2')), [8]);
+    expect(lines(good, src: ''), [3]);
+    expect(lines(good, recorded: {...keys}..remove('6')), [7]);
     expect(
         textRuns(r'Hola ${name.trim()}, ¿qué tal?'), ['Hola ', ', ¿qué tal?']);
+    expect(messageRuns('{a} y {n, plural, one{x} other{y}} más'),
+        ['', ' y ', ' más']);
   });
 }

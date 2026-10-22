@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 import '../theme/app_colors.dart';
 import '../widgets/large_text.dart';
 import 'choose_quit_path_screen.dart';
@@ -23,6 +25,61 @@ abstract final class QuitDateCopy {
   static const String unavailableSpanish =
       'Esta fecha ya no está disponible. Elige una nueva fecha.';
 }
+
+const _monthKeys = <String>[
+  'january',
+  'february',
+  'march',
+  'april',
+  'may',
+  'june',
+  'july',
+  'august',
+  'september',
+  'october',
+  'november',
+  'december',
+];
+
+const _weekdayKeys = <String>[
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+];
+
+/// The full name of [month] (1–12) in the app language.
+String quitDateMonthName(AppLocalizations l10n, int month) =>
+    l10n.selectQuitDateMonthName(_monthKeys[month - 1]);
+
+/// The short name of [month] (1–12) in the app language.
+String quitDateShortMonth(AppLocalizations l10n, int month) =>
+    l10n.selectQuitDateMonthShort(_monthKeys[month - 1]);
+
+/// The name of [weekday] (DateTime.monday–DateTime.sunday).
+String quitDateWeekdayName(AppLocalizations l10n, int weekday) =>
+    l10n.selectQuitDateWeekdayName(_weekdayKeys[weekday - 1]);
+
+/// [date] as weekday, day, month and year in the app language.
+String quitDateLongDate(AppLocalizations l10n, DateTime date) =>
+    l10n.selectQuitDateLongDate(
+      quitDateWeekdayName(l10n, date.weekday),
+      quitDateMonthName(l10n, date.month),
+      date.day,
+      date.year,
+    );
+
+/// The calendar's weekday initials, Sunday first.
+List<String> quitDateWeekdayInitials(AppLocalizations l10n) => [
+      for (final weekday in const [
+        'sunday',
+        ..._weekdayKeys,
+      ].take(7))
+        l10n.selectQuitDateWeekdayInitial(weekday),
+    ];
 
 class SelectQuitDateScreen extends StatefulWidget {
   const SelectQuitDateScreen({
@@ -91,9 +148,8 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
   /// path's window stays saved, but must be replaced before Confirm.
   bool get _dateAvailable => _isSelectable(_effectiveDate);
 
-  String get _unavailableMessage => widget.isSpanish
-      ? QuitDateCopy.unavailableSpanish
-      : QuitDateCopy.unavailableEnglish;
+  String get _unavailableMessage =>
+      AppLocalizations.of(context).selectQuitDateUnavailableMessage;
 
   DateTime get _firstAllowedMonth =>
       DateTime(_minimumDate.year, _minimumDate.month);
@@ -153,195 +209,108 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
   }
 
   String get _headerTitle => switch (widget.quitPath) {
-        QuitPlanPath.setQuitDate => widget.isSpanish
-            ? 'Elige tu fecha para dejarlo'
-            : 'Choose your quit date',
+        QuitPlanPath.setQuitDate =>
+          AppLocalizations.of(context).selectQuitDateHeaderTitleSetQuitDate,
         QuitPlanPath.quitToday =>
-          widget.isSpanish ? 'Empieza hoy' : 'Start your quit today',
-        QuitPlanPath.reduceGradually => widget.isSpanish
-            ? 'Elige tu fecha objetivo'
-            : 'Choose your target date',
+          AppLocalizations.of(context).selectQuitDateHeaderTitleQuitToday,
+        QuitPlanPath.reduceGradually =>
+          AppLocalizations.of(context).selectQuitDateHeaderTitleReduceGradually,
       };
 
   String get _title => switch (widget.quitPath) {
-        QuitPlanPath.setQuitDate => widget.isSpanish
-            ? 'Elige un día para comenzar.'
-            : 'Choose a day to begin.',
-        QuitPlanPath.quitToday => widget.isSpanish
-            ? 'Hoy es tu punto de partida.'
-            : 'Today is your starting point.',
-        QuitPlanPath.reduceGradually => widget.isSpanish
-            ? 'Elige el día para dejarlo por completo.'
-            : 'Choose the day to become smoke-free.',
+        QuitPlanPath.setQuitDate =>
+          AppLocalizations.of(context).selectQuitDateTitleSetQuitDate,
+        QuitPlanPath.quitToday =>
+          AppLocalizations.of(context).selectQuitDateTitleQuitToday,
+        QuitPlanPath.reduceGradually =>
+          AppLocalizations.of(context).selectQuitDateTitleReduceGradually,
       };
 
   String get _description => switch (widget.quitPath) {
-        QuitPlanPath.setQuitDate => widget.isSpanish
-            ? 'Una fecha dentro de 7–14 días te da tiempo para prepararte sin perder el impulso.'
-            : 'A date 7–14 days away gives you time to prepare without losing momentum.',
-        QuitPlanPath.quitToday => widget.isSpanish
-            ? 'Tu tiempo sin fumar comienza hoy. Te daremos apoyo adicional durante el primer día.'
-            : 'Your smoke-free time begins today. We’ll add extra support through your first day.',
-        QuitPlanPath.reduceGradually => widget.isSpanish
-            ? 'Una fecha dentro de 14–30 días te da tiempo para reducir gradualmente con un objetivo claro.'
-            : 'A target 14–30 days away gives you time to reduce gradually with a clear goal.',
+        QuitPlanPath.setQuitDate =>
+          AppLocalizations.of(context).selectQuitDateIntroSetQuitDate,
+        QuitPlanPath.quitToday =>
+          AppLocalizations.of(context).selectQuitDateIntroQuitToday,
+        QuitPlanPath.reduceGradually =>
+          AppLocalizations.of(context).selectQuitDateIntroReduceGradually,
       };
 
   String get _windowMessage {
     if (widget.quitPath == QuitPlanPath.quitToday) {
-      return widget.isSpanish
-          ? 'Hoy está seleccionado según tu camino'
-          : 'Today is selected based on your path';
+      return AppLocalizations.of(context).selectQuitDateWindowQuitToday;
     }
     final range = _formatShortRange(_recommendedStart, _recommendedEnd);
     return switch (widget.quitPath) {
-      QuitPlanPath.setQuitDate => widget.isSpanish
-          ? 'Ventana de preparación recomendada: $range'
-          : 'Recommended preparation window: $range',
-      QuitPlanPath.reduceGradually => widget.isSpanish
-          ? 'Ventana de reducción recomendada: $range'
-          : 'Recommended reduction window: $range',
+      QuitPlanPath.setQuitDate =>
+        AppLocalizations.of(context).selectQuitDateWindowSetQuitDate(range),
+      QuitPlanPath.reduceGradually =>
+        AppLocalizations.of(context).selectQuitDateWindowReduceGradually(range),
       QuitPlanPath.quitToday => '',
     };
   }
 
   String get _dateLabel => switch (widget.quitPath) {
         QuitPlanPath.setQuitDate =>
-          widget.isSpanish ? 'TU FECHA PARA DEJARLO' : 'YOUR QUIT DATE',
+          AppLocalizations.of(context).selectQuitDateCardLabelSetQuitDate,
         QuitPlanPath.quitToday =>
-          widget.isSpanish ? 'TU FECHA ES HOY' : 'YOUR QUIT DATE IS TODAY',
+          AppLocalizations.of(context).selectQuitDateCardLabelQuitToday,
         QuitPlanPath.reduceGradually =>
-          widget.isSpanish ? 'TU FECHA OBJETIVO' : 'YOUR TARGET DATE',
+          AppLocalizations.of(context).selectQuitDateCardLabelReduceGradually,
       };
 
   String get _timingLabel {
     final days = _calendarDayDifference(_effectiveDate, _today);
     if (days == 0) {
-      return widget.isSpanish ? 'Comienza hoy' : 'Starting today';
+      return AppLocalizations.of(context).selectQuitDateTimingToday;
     }
     return switch (widget.quitPath) {
-      QuitPlanPath.reduceGradually => widget.isSpanish
-          ? '$days días para reducir gradualmente'
-          : '$days days to reduce gradually',
-      _ => widget.isSpanish
-          ? '$days días para prepararte'
-          : '$days days to prepare',
+      QuitPlanPath.reduceGradually =>
+        AppLocalizations.of(context).selectQuitDateTimingReduce(days),
+      _ => AppLocalizations.of(context).selectQuitDateTimingPrepare(days),
     };
   }
 
   String get _continueLabel => switch (widget.quitPath) {
         QuitPlanPath.setQuitDate =>
-          widget.isSpanish ? 'Confirmar esta fecha' : 'Confirm this date',
+          AppLocalizations.of(context).selectQuitDateConfirmButtonSetQuitDate,
         QuitPlanPath.quitToday =>
-          widget.isSpanish ? 'Comenzar hoy' : 'Start my quit today',
-        QuitPlanPath.reduceGradually =>
-          widget.isSpanish ? 'Confirmar fecha objetivo' : 'Confirm target date',
+          AppLocalizations.of(context).selectQuitDateConfirmButtonQuitToday,
+        QuitPlanPath.reduceGradually => AppLocalizations.of(context)
+            .selectQuitDateConfirmButtonReduceGradually,
       };
 
   String _formatShortRange(DateTime start, DateTime end) {
     final startMonth = _shortMonth(start.month);
     final endMonth = _shortMonth(end.month);
     if (start.year == end.year && start.month == end.month) {
-      return '$startMonth ${start.day}–${end.day}';
+      return AppLocalizations.of(context)
+          .selectQuitDateRangeSameMonth(startMonth, start.day, end.day);
     }
-    return '$startMonth ${start.day} – $endMonth ${end.day}';
+    return AppLocalizations.of(context)
+        .selectQuitDateRange(startMonth, start.day, endMonth, end.day);
   }
 
-  String _shortMonth(int month) {
-    const english = <String>[
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    const spanish = <String>[
-      'ene',
-      'feb',
-      'mar',
-      'abr',
-      'may',
-      'jun',
-      'jul',
-      'ago',
-      'sep',
-      'oct',
-      'nov',
-      'dic',
-    ];
-    return (widget.isSpanish ? spanish : english)[month - 1];
-  }
+  String _shortMonth(int month) =>
+      quitDateShortMonth(AppLocalizations.of(context), month);
 
-  String _monthName(int month) {
-    const english = <String>[
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    const spanish = <String>[
-      'enero',
-      'febrero',
-      'marzo',
-      'abril',
-      'mayo',
-      'junio',
-      'julio',
-      'agosto',
-      'septiembre',
-      'octubre',
-      'noviembre',
-      'diciembre',
-    ];
-    return (widget.isSpanish ? spanish : english)[month - 1];
-  }
+  String _monthName(int month) =>
+      quitDateMonthName(AppLocalizations.of(context), month);
 
-  String _weekdayName(int weekday) {
-    const english = <String>[
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ];
-    const spanish = <String>[
-      'lunes',
-      'martes',
-      'miércoles',
-      'jueves',
-      'viernes',
-      'sábado',
-      'domingo',
-    ];
-    return (widget.isSpanish ? spanish : english)[weekday - 1];
-  }
+  String _weekdayName(int weekday) =>
+      quitDateWeekdayName(AppLocalizations.of(context), weekday);
 
-  String _longDate(DateTime date) {
-    if (widget.isSpanish) {
-      return '${_weekdayName(date.weekday)}, ${date.day} de ${_monthName(date.month)} de ${date.year}';
-    }
-    return '${_weekdayName(date.weekday)}, ${_monthName(date.month)} ${date.day}, ${date.year}';
-  }
+  String _longDate(DateTime date) =>
+      quitDateLongDate(AppLocalizations.of(context), date);
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      widget.isSpanish ==
+          (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     return Scaffold(
       key: const ValueKey('functional-select-quit-date-screen'),
       backgroundColor: AppColors.cream,
@@ -429,7 +398,8 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
                                 const SizedBox(height: 18),
                               ],
                               Text(
-                                widget.isSpanish ? 'TU FECHA' : 'YOUR DATE',
+                                AppLocalizations.of(context)
+                                    .selectQuitDateEyebrow,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 11,
@@ -490,8 +460,10 @@ class _SelectQuitDateScreenState extends State<SelectQuitDateScreen> {
                                     shownMonth.isBefore(_lastAllowedMonth),
                                 onPreviousMonth: () => _changeMonth(-1),
                                 onNextMonth: () => _changeMonth(1),
-                                monthLabel:
-                                    '${_monthName(shownMonth.month)} ${shownMonth.year}',
+                                monthLabel: AppLocalizations.of(context)
+                                    .selectQuitDateCalendarMonthHeading(
+                                        _monthName(shownMonth.month),
+                                        shownMonth.year),
                                 weekdayName: _weekdayName,
                               ),
                               const SizedBox(height: 12),
@@ -553,7 +525,7 @@ class _DateHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final back = IconButton.outlined(
       key: const ValueKey('quit-date-back'),
-      tooltip: isSpanish ? 'Atrás' : 'Back',
+      tooltip: AppLocalizations.of(context).selectQuitDateBackTooltip,
       onPressed: onBack,
       style: IconButton.styleFrom(
         foregroundColor: AppColors.deepTeal,
@@ -590,7 +562,7 @@ class _DateHeader extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: Text(
-        isSpanish ? '2 DE 5' : '2 OF 5',
+        AppLocalizations.of(context).selectQuitDateStepCounter,
         style: const TextStyle(
           color: AppColors.tealSecondary,
           fontSize: 10,
@@ -650,7 +622,7 @@ class _DateProgress extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                isSpanish ? 'PLAN PARA DEJARLO' : 'QUIT PLAN',
+                AppLocalizations.of(context).selectQuitDateProgressLabel,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -787,9 +759,7 @@ class _QuitCalendar extends StatelessWidget {
     final first = DateTime(visibleMonth.year, visibleMonth.month, 1);
     final leading = first.weekday % 7;
     final firstCell = first.subtract(Duration(days: leading));
-    final weekdays = isSpanish
-        ? const ['D', 'L', 'M', 'M', 'J', 'V', 'S']
-        : const ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+    final weekdays = quitDateWeekdayInitials(AppLocalizations.of(context));
     final largeText = usesLargeTextLayout(context);
     final previous = IconButton.filledTonal(
       key: const ValueKey('quit-date-previous-month'),
@@ -1123,7 +1093,7 @@ class _SelectedDateCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(13),
       ),
       child: Text(
-        isSpanish ? 'RECOMENDADO' : 'RECOMMENDED',
+        AppLocalizations.of(context).selectQuitDateRecommendedBadge,
         style: const TextStyle(
           color: Colors.white,
           fontSize: 7.5,
@@ -1204,7 +1174,7 @@ class _CheckInCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          isSpanish ? 'Registro del día de dejarlo' : 'Quit-day check-in',
+          AppLocalizations.of(context).selectQuitDateCheckInTitle,
           style: const TextStyle(
             color: AppColors.deepTeal,
             fontSize: 14,
@@ -1212,9 +1182,7 @@ class _CheckInCard extends StatelessWidget {
           ),
         ),
         Text(
-          isSpanish
-              ? '7:00 a. m. · Notificación privada'
-              : '7:00 AM · Private notification',
+          AppLocalizations.of(context).selectQuitDateCheckInTime,
           style: const TextStyle(
             color: AppColors.tealSecondary,
             fontSize: 11,
@@ -1267,9 +1235,7 @@ class _CheckInCard extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  isSpanish
-                      ? 'La pantalla bloqueada solo muestra: “Tienes un registro”.'
-                      : 'Lock screen only shows: “You have a check-in.”',
+                  AppLocalizations.of(context).selectQuitDateCheckInLockScreen,
                   style: const TextStyle(
                     color: AppColors.mutedTeal,
                     fontSize: 10,
@@ -1301,9 +1267,7 @@ class _FlexibleDateNote extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: Text(
-            isSpanish
-                ? 'Puedes cambiar esta fecha después sin perder tu progreso.'
-                : 'You can change this date later without losing progress.',
+            AppLocalizations.of(context).selectQuitDateFlexibleNote,
             style: const TextStyle(
               color: AppColors.tealSecondary,
               fontSize: 11,
@@ -1406,9 +1370,7 @@ class _DateBottomAction extends StatelessWidget {
                 if (!compact) ...[
                   const SizedBox(height: 6),
                   Text(
-                    isSpanish
-                        ? 'Fecha guardada automáticamente'
-                        : 'Date saved automatically',
+                    AppLocalizations.of(context).selectQuitDateSavedNote,
                     style: const TextStyle(
                       color: AppColors.mutedTeal,
                       fontSize: 10,

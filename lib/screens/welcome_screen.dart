@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 import '../theme/app_colors.dart';
 import '../widgets/large_text.dart';
 
@@ -24,8 +26,6 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  bool get _isSpanish => widget.language == WelcomeLanguage.spanish;
-
   void _selectLanguage(WelcomeLanguage language) {
     widget.onLanguageSelected(language);
   }
@@ -61,7 +61,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text(_isSpanish ? 'Listo' : 'Done'),
+                  child:
+                      Text(AppLocalizations.of(context).welcomeSheetDoneButton),
                 ),
               ),
             ],
@@ -73,6 +74,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      (widget.language == WelcomeLanguage.spanish) ==
+          (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     return Scaffold(
       key: const ValueKey('functional-welcome-screen'),
       backgroundColor: AppColors.cream,
@@ -106,9 +114,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         _WelcomeHero(compact: compactHeight),
                         SizedBox(height: compactHeight ? 12 : 24),
                         Text(
-                          _isSpanish
-                              ? 'BIENVENIDO A BREATHEFREE'
-                              : 'WELCOME TO BREATHEFREE',
+                          AppLocalizations.of(context).welcomeEyebrow,
                           style: const TextStyle(
                             color: AppColors.mutedTeal,
                             fontSize: 12,
@@ -120,9 +126,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         SizedBox(height: compactHeight ? 8 : 14),
                         LayoutBuilder(
                           builder: (context, constraints) {
-                            final headline = _isSpanish
-                                ? 'Tu próxima respiración puede ser diferente.'
-                                : 'Your next breath can be different.';
+                            final headline =
+                                AppLocalizations.of(context).welcomeHeadline;
                             final style = Theme.of(context)
                                     .textTheme
                                     .displayLarge
@@ -151,9 +156,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                         SizedBox(height: compactHeight ? 10 : 18),
                         Text(
-                          _isSpanish
-                              ? 'Pequeños pasos, apoyo práctico y sin juicios—cuando estés listo.'
-                              : 'Small steps, practical support, and no judgment—whenever you are ready.',
+                          AppLocalizations.of(context).welcomeIntro,
                           style:
                               Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     fontSize: compactHeight ? 16 : 17,
@@ -161,7 +164,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   ),
                         ),
                         SizedBox(height: compactHeight ? 14 : 24),
-                        _WelcomeBenefits(isSpanish: _isSpanish),
+                        const _WelcomeBenefits(),
                         SizedBox(height: compactHeight ? 16 : 28),
                         FilledButton(
                           key: const ValueKey('welcome-get-started'),
@@ -186,7 +189,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             children: [
                               Flexible(
                                 child: Text(
-                                  _isSpanish ? 'Comenzar' : 'Get started',
+                                  AppLocalizations.of(context)
+                                      .welcomeGetStartedButton,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontSize: 17,
@@ -208,9 +212,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             key: const ValueKey('welcome-sign-in'),
                             onPressed: widget.onSignIn,
                             child: Text(
-                              _isSpanish
-                                  ? 'Ya tengo una cuenta'
-                                  : 'I already have an account',
+                              AppLocalizations.of(context).welcomeSignInButton,
                               style: const TextStyle(
                                 color: AppColors.deepTeal,
                                 decoration: TextDecoration.underline,
@@ -223,7 +225,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         OutlinedButton(
                           key: const ValueKey('welcome-spanish'),
                           onPressed: () => _selectLanguage(
-                            _isSpanish
+                            widget.language == WelcomeLanguage.spanish
                                 ? WelcomeLanguage.english
                                 : WelcomeLanguage.spanish,
                           ),
@@ -244,9 +246,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             ),
                           ),
                           child: Text(
-                            _isSpanish
-                                ? 'Continue in English'
-                                : 'Continuar en español',
+                            AppLocalizations.of(context)
+                                .welcomeOtherLanguageButton,
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 16,
@@ -256,21 +257,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                         SizedBox(height: compactHeight ? 6 : 12),
                         _WelcomeLegalText(
-                          isSpanish: _isSpanish,
                           onTerms: () => _showInformationSheet(
-                            title:
-                                _isSpanish ? 'Términos de uso' : 'Terms of Use',
-                            message: _isSpanish
-                                ? 'Los términos finales se publicarán antes de la distribución de producción.'
-                                : 'The final Terms of Use will be published before production distribution.',
+                            title: AppLocalizations.of(context)
+                                .welcomeTermsSheetTitle,
+                            message: AppLocalizations.of(context)
+                                .welcomeTermsSheetBody,
                           ),
                           onPrivacy: () => _showInformationSheet(
-                            title: _isSpanish
-                                ? 'Aviso de privacidad'
-                                : 'Privacy Notice',
-                            message: _isSpanish
-                                ? 'BreatheFree explicará claramente qué datos se recopilan, por qué se necesitan y cómo eliminarlos.'
-                                : 'BreatheFree will clearly explain what data is collected, why it is needed, and how to delete it.',
+                            title: AppLocalizations.of(context)
+                                .welcomePrivacySheetTitle,
+                            message: AppLocalizations.of(context)
+                                .welcomePrivacySheetBody,
                           ),
                         ),
                       ],
@@ -666,9 +663,7 @@ class _WelcomeHeroPainter extends CustomPainter {
 }
 
 class _WelcomeBenefits extends StatelessWidget {
-  const _WelcomeBenefits({required this.isSpanish});
-
-  final bool isSpanish;
+  const _WelcomeBenefits();
 
   @override
   Widget build(BuildContext context) {
@@ -676,19 +671,15 @@ class _WelcomeBenefits extends StatelessWidget {
       icon: Icons.add_rounded,
       iconBackground: AppColors.mint,
       iconColor: AppColors.deepTeal,
-      title: isSpanish ? 'Ayuda con los antojos' : 'Help when cravings hit',
-      subtitle: isSpanish
-          ? 'Herramientas rápidas en cualquier lugar'
-          : 'Quick tools that work anywhere',
+      title: AppLocalizations.of(context).welcomeBenefitCravingsTitle,
+      subtitle: AppLocalizations.of(context).welcomeBenefitCravingsDescription,
     );
     final progress = _WelcomeBenefit(
       icon: Icons.check_rounded,
       iconBackground: AppColors.coralLight,
       iconColor: AppColors.coral,
-      title: isSpanish ? 'Progreso que permanece' : 'Progress that stays',
-      subtitle: isSpanish
-          ? 'Un desliz no borra tus logros'
-          : 'A slip never erases your wins',
+      title: AppLocalizations.of(context).welcomeBenefitProgressTitle,
+      subtitle: AppLocalizations.of(context).welcomeBenefitProgressDescription,
     );
 
     // Two half-width columns split words mid-way at large text sizes.
@@ -769,12 +760,10 @@ class _WelcomeBenefit extends StatelessWidget {
 
 class _WelcomeLegalText extends StatelessWidget {
   const _WelcomeLegalText({
-    required this.isSpanish,
     required this.onTerms,
     required this.onPrivacy,
   });
 
-  final bool isSpanish;
   final VoidCallback onTerms;
   final VoidCallback onPrivacy;
 
@@ -785,9 +774,7 @@ class _WelcomeLegalText extends StatelessWidget {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(
-          isSpanish
-              ? 'Al continuar, aceptas los '
-              : 'By continuing, you agree to the ',
+          AppLocalizations.of(context).welcomeLegalPrefix,
           style: const TextStyle(
             color: AppColors.mutedTeal,
             fontSize: 11,
@@ -800,10 +787,10 @@ class _WelcomeLegalText extends StatelessWidget {
             minimumSize: const Size(0, 28),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          child: Text(isSpanish ? 'Términos' : 'Terms'),
+          child: Text(AppLocalizations.of(context).welcomeTermsLink),
         ),
         Text(
-          isSpanish ? ' y reconoces el ' : ' and acknowledge the ',
+          AppLocalizations.of(context).welcomeLegalMiddle,
           style: const TextStyle(
             color: AppColors.mutedTeal,
             fontSize: 11,
@@ -816,7 +803,7 @@ class _WelcomeLegalText extends StatelessWidget {
             minimumSize: const Size(0, 28),
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          child: Text(isSpanish ? 'Aviso de privacidad.' : 'Privacy Notice.'),
+          child: Text(AppLocalizations.of(context).welcomePrivacyNoticeLink),
         ),
       ],
     );

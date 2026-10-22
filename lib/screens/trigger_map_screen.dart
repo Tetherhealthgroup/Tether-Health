@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 import '../theme/app_colors.dart';
 import '../widgets/large_text.dart';
 
@@ -43,21 +45,28 @@ class TriggerMapScreen extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onContinue;
 
-  String _labelFor(SmokingTrigger trigger) {
+  String _labelFor(BuildContext context, SmokingTrigger trigger) {
     return switch (trigger) {
-      SmokingTrigger.stress => isSpanish ? 'Estrés' : 'Stress',
+      SmokingTrigger.stress =>
+        AppLocalizations.of(context).triggerMapOptionStress,
       SmokingTrigger.afterMeals =>
-        isSpanish ? 'Después de comer' : 'After meals',
-      SmokingTrigger.driving => isSpanish ? 'Al conducir' : 'Driving',
-      SmokingTrigger.coffee => isSpanish ? 'Con café' : 'With coffee',
+        AppLocalizations.of(context).triggerMapOptionAfterMeals,
+      SmokingTrigger.driving =>
+        AppLocalizations.of(context).triggerMapOptionDriving,
+      SmokingTrigger.coffee =>
+        AppLocalizations.of(context).triggerMapOptionCoffee,
       SmokingTrigger.socialSettings =>
-        isSpanish ? 'Entornos sociales' : 'Social settings',
+        AppLocalizations.of(context).triggerMapOptionSocialSettings,
       SmokingTrigger.workBreaks =>
-        isSpanish ? 'Descansos laborales' : 'Work breaks',
-      SmokingTrigger.alcohol => isSpanish ? 'Alcohol' : 'Alcohol',
-      SmokingTrigger.boredom => isSpanish ? 'Aburrimiento' : 'Boredom',
-      SmokingTrigger.morning => isSpanish ? 'Por la mañana' : 'Morning',
-      SmokingTrigger.beforeBed => isSpanish ? 'Antes de dormir' : 'Before bed',
+        AppLocalizations.of(context).triggerMapOptionWorkBreaks,
+      SmokingTrigger.alcohol =>
+        AppLocalizations.of(context).triggerMapOptionAlcohol,
+      SmokingTrigger.boredom =>
+        AppLocalizations.of(context).triggerMapOptionBoredom,
+      SmokingTrigger.morning =>
+        AppLocalizations.of(context).triggerMapOptionMorning,
+      SmokingTrigger.beforeBed =>
+        AppLocalizations.of(context).triggerMapOptionBeforeBed,
     };
   }
 
@@ -103,6 +112,12 @@ class TriggerMapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      isSpanish == (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     final hasCustomTrigger = customTrigger?.trim().isNotEmpty ?? false;
     final selectionCount = selectedTriggers.length + (hasCustomTrigger ? 1 : 0);
     final canContinue = selectionCount > 0;
@@ -188,9 +203,8 @@ class TriggerMapScreen extends StatelessWidget {
                                 const SizedBox(height: 18),
                               ],
                               Text(
-                                isSpanish
-                                    ? 'PREGUNTA 2 · ELIGE TODAS LAS QUE CORRESPONDAN'
-                                    : 'QUESTION 2 · CHOOSE ALL THAT APPLY',
+                                AppLocalizations.of(context)
+                                    .triggerMapQuestionLabel,
                                 style: const TextStyle(
                                   color: AppColors.mutedTeal,
                                   fontSize: 11,
@@ -201,9 +215,7 @@ class TriggerMapScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 10),
                               Text(
-                                isSpanish
-                                    ? '¿Cuándo es más probable que quieras fumar?'
-                                    : 'When are you most likely to want a cigarette?',
+                                AppLocalizations.of(context).triggerMapQuestion,
                                 // Already the largest text on screen; past
                                 // 180% its longest words no longer fit.
                                 textScaler: MediaQuery.textScalerOf(context)
@@ -218,9 +230,8 @@ class TriggerMapScreen extends StatelessWidget {
                               ),
                               SizedBox(height: compact ? 9 : 13),
                               Text(
-                                isSpanish
-                                    ? 'Elige cada situación que sea cierta para ti.'
-                                    : 'Choose every situation that feels true for you.',
+                                AppLocalizations.of(context)
+                                    .triggerMapQuestionHint,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -245,17 +256,16 @@ class TriggerMapScreen extends StatelessWidget {
                                         context,
                                       ).scale(10) >
                                       10;
-                                  final twoColumns =
-                                      gridConstraints.maxWidth >= 300 &&
-                                          (!enlarged ||
-                                              wordsFit(
-                                                context,
-                                                SmokingTrigger.values
-                                                    .map(_labelFor),
-                                                halfWidth -
-                                                    _TriggerChoice.chrome,
-                                                _choiceLabelStyle,
-                                              ));
+                                  final twoColumns = gridConstraints.maxWidth >=
+                                          300 &&
+                                      (!enlarged ||
+                                          wordsFit(
+                                            context,
+                                            SmokingTrigger.values.map(
+                                                (t) => _labelFor(context, t)),
+                                            halfWidth - _TriggerChoice.chrome,
+                                            _choiceLabelStyle,
+                                          ));
                                   final itemWidth = twoColumns
                                       ? halfWidth
                                       : gridConstraints.maxWidth;
@@ -269,7 +279,7 @@ class TriggerMapScreen extends StatelessWidget {
                                           width: itemWidth,
                                           child: _TriggerChoice(
                                             trigger: trigger,
-                                            label: _labelFor(trigger),
+                                            label: _labelFor(context, trigger),
                                             icon: _iconFor(trigger),
                                             selected: selectedTriggers
                                                 .contains(trigger),
@@ -365,9 +375,7 @@ class _CustomTriggerEditorSheetState extends State<_CustomTriggerEditorSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.isSpanish
-                  ? 'Añade tu desencadenante'
-                  : 'Add your own trigger',
+              AppLocalizations.of(context).triggerMapCustomSheetTitle,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     color: AppColors.deepTeal,
                     fontWeight: FontWeight.w800,
@@ -375,9 +383,7 @@ class _CustomTriggerEditorSheetState extends State<_CustomTriggerEditorSheet> {
             ),
             const SizedBox(height: 8),
             Text(
-              widget.isSpanish
-                  ? 'Escribe una situación, emoción o rutina que te provoque ganas de fumar.'
-                  : 'Enter a situation, feeling, or routine that makes you want to smoke.',
+              AppLocalizations.of(context).triggerMapCustomSheetIntro,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppColors.tealSecondary,
                     height: 1.4,
@@ -391,11 +397,10 @@ class _CustomTriggerEditorSheetState extends State<_CustomTriggerEditorSheet> {
               maxLength: 50,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
-                labelText:
-                    widget.isSpanish ? 'Mi desencadenante' : 'My trigger',
-                hintText: widget.isSpanish
-                    ? 'Por ejemplo, llamadas'
-                    : 'For example, phone calls',
+                labelText: AppLocalizations.of(context)
+                    .triggerMapCustomSheetFieldLabel,
+                hintText:
+                    AppLocalizations.of(context).triggerMapCustomSheetHint,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -416,7 +421,8 @@ class _CustomTriggerEditorSheetState extends State<_CustomTriggerEditorSheet> {
                       foregroundColor: Colors.white,
                     ),
                     child: Text(
-                      widget.isSpanish ? 'Guardar' : 'Save trigger',
+                      AppLocalizations.of(context)
+                          .triggerMapCustomSheetSaveButton,
                     ),
                   );
                 },
@@ -439,7 +445,7 @@ class _TriggerHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final back = IconButton.outlined(
       key: const ValueKey('trigger-back'),
-      tooltip: isSpanish ? 'Atrás' : 'Back',
+      tooltip: AppLocalizations.of(context).triggerMapBackTooltip,
       onPressed: onBack,
       style: IconButton.styleFrom(
         foregroundColor: AppColors.deepTeal,
@@ -447,7 +453,7 @@ class _TriggerHeader extends StatelessWidget {
       ),
       icon: const Icon(Icons.arrow_back_rounded),
     );
-    final label = isSpanish ? 'Tus desencadenantes' : 'Your triggers';
+    final label = AppLocalizations.of(context).triggerMapHeaderTitle;
     const style = TextStyle(
       color: AppColors.deepTeal,
       fontSize: 16,
@@ -536,7 +542,7 @@ class _TriggerProgress extends StatelessWidget {
           children: [
             Flexible(
               child: Text(
-                isSpanish ? 'EVALUACIÓN' : 'ASSESSMENT',
+                AppLocalizations.of(context).triggerMapProgressLabel,
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
                   fontSize: 10,
@@ -691,10 +697,8 @@ class _CustomTriggerCard extends StatelessWidget {
       children: [
         Text(
           hasValue
-              ? (isSpanish ? 'TU DESENCADENANTE' : 'YOUR TRIGGER')
-              : (isSpanish
-                  ? 'AÑADE TU DESENCADENANTE'
-                  : 'ADD YOUR OWN TRIGGER'),
+              ? (AppLocalizations.of(context).triggerMapCustomCardLabelFilled)
+              : (AppLocalizations.of(context).triggerMapCustomCardLabelEmpty),
           style: const TextStyle(
             color: AppColors.mutedTeal,
             fontSize: 10,
@@ -706,9 +710,7 @@ class _CustomTriggerCard extends StatelessWidget {
         Text(
           hasValue
               ? customTrigger!
-              : (isSpanish
-                  ? 'Escribe otra situación…'
-                  : 'Type another situation…'),
+              : (AppLocalizations.of(context).triggerMapCustomCardPlaceholder),
           style: TextStyle(
             color: AppColors.deepTeal,
             fontSize: hasValue ? 13.5 : 12,
@@ -719,7 +721,7 @@ class _CustomTriggerCard extends StatelessWidget {
     );
     final remove = IconButton(
       key: const ValueKey('trigger-custom-remove'),
-      tooltip: isSpanish ? 'Eliminar' : 'Remove',
+      tooltip: AppLocalizations.of(context).triggerMapCustomRemoveTooltip,
       onPressed: onRemove,
       icon: const Icon(
         Icons.close_rounded,
@@ -796,9 +798,7 @@ class _TriggerPrivacyNote extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          isSpanish
-              ? 'Se usa para prepararte, no para vigilarte'
-              : 'Used to prepare, not to monitor',
+          AppLocalizations.of(context).triggerMapPrivacyNoteTitle,
           style: const TextStyle(
             color: AppColors.deepTeal,
             fontSize: 13,
@@ -807,9 +807,7 @@ class _TriggerPrivacyNote extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          isSpanish
-              ? 'Tus elecciones adaptan las herramientas y los recordatorios.'
-              : 'Your choices shape coping tools and reminder timing.',
+          AppLocalizations.of(context).triggerMapPrivacyNoteBody,
           style: const TextStyle(
             color: AppColors.tealSecondary,
             fontSize: 11,
@@ -818,9 +816,7 @@ class _TriggerPrivacyNote extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          isSpanish
-              ? 'BreatheFree no rastrea tu ubicación en segundo plano.'
-              : 'BreatheFree does not track your location in the background.',
+          AppLocalizations.of(context).triggerMapPrivacyNoteLocation,
           style: const TextStyle(
             color: AppColors.mutedTeal,
             fontSize: 10,
@@ -876,9 +872,8 @@ class _TriggerBottomAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final countLabel = isSpanish
-        ? '$selectionCount ${selectionCount == 1 ? 'desencadenante elegido' : 'desencadenantes elegidos'} · Guardado automáticamente'
-        : '$selectionCount ${selectionCount == 1 ? 'trigger selected' : 'triggers selected'} · Saved automatically';
+    final countLabel =
+        AppLocalizations.of(context).triggerMapSelectionCount(selectionCount);
 
     return DecoratedBox(
       decoration: const BoxDecoration(
@@ -922,7 +917,7 @@ class _TriggerBottomAction extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          isSpanish ? 'Continuar' : 'Continue',
+                          AppLocalizations.of(context).triggerMapContinueButton,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 16,
