@@ -9,6 +9,231 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
+  String get activeCravingRescueBreathingInGuide =>
+      'Let the breath come in gently.';
+
+  @override
+  String get activeCravingRescueBreathingInLabel => 'BREATHE IN';
+
+  @override
+  String get activeCravingRescueBreathingOutGuide =>
+      'Let your shoulders soften as you exhale.';
+
+  @override
+  String get activeCravingRescueBreathingOutLabel => 'BREATHE OUT';
+
+  @override
+  String get activeCravingRescueBreathingPace => 'Slowly';
+
+  @override
+  String get activeCravingRescueBreathingSecondsUnit => 'SECONDS';
+
+  @override
+  String activeCravingRescueBreathingTimeLeft(Object time) {
+    return '$time LEFT';
+  }
+
+  @override
+  String get activeCravingRescueBreathingTitle => 'SLOW BREATHING';
+
+  @override
+  String get activeCravingRescueChangeSceneGuide =>
+      'Go somewhere smoke-free and change what you are doing.';
+
+  @override
+  String get activeCravingRescueChangeSceneHeadline =>
+      'CHANGE YOUR SURROUNDINGS';
+
+  @override
+  String get activeCravingRescueChangeSceneTitle => 'CHANGE THE SCENE';
+
+  @override
+  String get activeCravingRescueCloseTooltip => 'Close';
+
+  @override
+  String get activeCravingRescueControlOff => 'Off';
+
+  @override
+  String get activeCravingRescueControlOn => 'On';
+
+  @override
+  String get activeCravingRescueEncouragementBody =>
+      'You can let it rise and pass without smoking.';
+
+  @override
+  String get activeCravingRescueEncouragementNote =>
+      'You only need to stay with this breath—not solve the whole day.';
+
+  @override
+  String get activeCravingRescueEncouragementTitle => 'The urge is a wave.';
+
+  @override
+  String get activeCravingRescueEndButton => 'End exercise';
+
+  @override
+  String get activeCravingRescueEndDialogBody =>
+      'You can rate the craving again next.';
+
+  @override
+  String get activeCravingRescueEndDialogCancel => 'Keep practicing';
+
+  @override
+  String get activeCravingRescueEndDialogConfirm => 'End and recheck';
+
+  @override
+  String get activeCravingRescueEndDialogTitle => 'End the exercise now?';
+
+  @override
+  String activeCravingRescueHapticsControl(Object state) {
+    return 'Haptics\n$state';
+  }
+
+  @override
+  String get activeCravingRescueIntro =>
+      'Follow the circle—or breathe slowly in your own way.';
+
+  @override
+  String get activeCravingRescueLeaveDialogBody =>
+      'Your progress will be kept so you can return.';
+
+  @override
+  String get activeCravingRescueLeaveDialogLeave => 'Save and leave';
+
+  @override
+  String get activeCravingRescueLeaveDialogStay => 'Keep breathing';
+
+  @override
+  String get activeCravingRescueLeaveDialogTitle => 'Leave this exercise?';
+
+  @override
+  String get activeCravingRescueMovementGuide =>
+      'Walk, stretch, or move gently.';
+
+  @override
+  String get activeCravingRescueMovementHapticsOff => 'Haptics OFF';
+
+  @override
+  String get activeCravingRescueMovementHapticsOn => 'Haptics ON';
+
+  @override
+  String get activeCravingRescueMovementHeadline => 'KEEP MOVING';
+
+  @override
+  String get activeCravingRescueMovementTitle => 'MOVEMENT';
+
+  @override
+  String get activeCravingRescueMovementVoiceOff => 'Voice OFF';
+
+  @override
+  String get activeCravingRescueMovementVoiceOn => 'Voice ON';
+
+  @override
+  String get activeCravingRescueOfflineBadge => 'Works offline';
+
+  @override
+  String get activeCravingRescueOtherSupportBody =>
+      'You can change tools without losing this check-in.';
+
+  @override
+  String get activeCravingRescueOtherSupportTitle =>
+      'Need different support right now?';
+
+  @override
+  String get activeCravingRescuePauseButton => 'Pause';
+
+  @override
+  String get activeCravingRescuePersonSupportButton =>
+      'Get support from a person';
+
+  @override
+  String get activeCravingRescuePrivacyNote =>
+      'No data is being sent or shared during this exercise.\nContent v1.0';
+
+  @override
+  String get activeCravingRescueProgressLabel => 'ACTIVE TOOL';
+
+  @override
+  String get activeCravingRescueRecheckNote =>
+      'After 2 minutes, you’ll rate the craving again';
+
+  @override
+  String get activeCravingRescueReducedMotionNote =>
+      'Reduced motion follows your phone setting';
+
+  @override
+  String get activeCravingRescueResumeButton => 'Resume';
+
+  @override
+  String get activeCravingRescueSpokenBreatheIn => 'Breathe in slowly';
+
+  @override
+  String get activeCravingRescueSpokenBreatheOut => 'Breathe out slowly';
+
+  @override
+  String get activeCravingRescueSpokenKeepMoving => 'Keep moving';
+
+  @override
+  String get activeCravingRescueSpokenMovementDone =>
+      'Great job. You completed three minutes.';
+
+  @override
+  String get activeCravingRescueSpokenMovementStart => 'Start moving';
+
+  @override
+  String get activeCravingRescueSpokenOneMinuteLeft => 'One minute left';
+
+  @override
+  String get activeCravingRescueSpokenSceneDone =>
+      'Great job. You changed your surroundings.';
+
+  @override
+  String get activeCravingRescueSpokenSceneEncouragement =>
+      'Keep going. You are making a positive change.';
+
+  @override
+  String get activeCravingRescueSpokenSceneHalfway =>
+      'You are halfway there. Keep going.';
+
+  @override
+  String get activeCravingRescueSpokenSceneKeepGoing =>
+      'Keep moving to a smoke-free place.';
+
+  @override
+  String get activeCravingRescueSpokenTenSecondsLeft => 'Ten seconds left';
+
+  @override
+  String get activeCravingRescueSpokenThirtySecondsLeft =>
+      'Thirty seconds left';
+
+  @override
+  String get activeCravingRescueStepCounter => '3 OF 5';
+
+  @override
+  String get activeCravingRescueSwitchToolButton => 'Switch coping tool';
+
+  @override
+  String get activeCravingRescueThisBreathIn => 'Inhale gently';
+
+  @override
+  String get activeCravingRescueThisBreathLabel => 'THIS BREATH';
+
+  @override
+  String get activeCravingRescueThisBreathOut => 'Exhale slowly';
+
+  @override
+  String activeCravingRescueTimeLeft(Object time) {
+    return '$time LEFT';
+  }
+
+  @override
+  String get activeCravingRescueTitle => 'Stay with this moment.';
+
+  @override
+  String activeCravingRescueVoiceControl(Object state) {
+    return 'Voice\n$state';
+  }
+
+  @override
   String get baselineAssessmentBackTooltip => 'Back';
 
   @override
@@ -218,6 +443,323 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get consentPrivacyTrustNoteNoSale =>
       'We never sell patient health information.';
+
+  @override
+  String get cravingRescueStartBackTooltip => 'Go back';
+
+  @override
+  String get cravingRescueStartCallFailed => 'Could not open the Phone app.';
+
+  @override
+  String get cravingRescueStartContextAfterMeal => 'After a meal';
+
+  @override
+  String get cravingRescueStartContextAlcohol => 'Alcohol';
+
+  @override
+  String get cravingRescueStartContextAroundSmoking => 'Around someone smoking';
+
+  @override
+  String get cravingRescueStartContextBored => 'Bored';
+
+  @override
+  String get cravingRescueStartContextDriving => 'Driving';
+
+  @override
+  String get cravingRescueStartContextNotSure => 'Not sure';
+
+  @override
+  String get cravingRescueStartContextNote =>
+      'Trigger details are optional and never block Rescue.';
+
+  @override
+  String get cravingRescueStartContextOptional => 'Optional · Skip anytime';
+
+  @override
+  String get cravingRescueStartContextQuestion => 'What might be behind it?';
+
+  @override
+  String get cravingRescueStartContextStress => 'Stress';
+
+  @override
+  String get cravingRescueStartContinueButton => 'Show me what to do';
+
+  @override
+  String get cravingRescueStartEmergencyCallButton => 'Call 911';
+
+  @override
+  String get cravingRescueStartEmergencyCloseButton => 'Close';
+
+  @override
+  String get cravingRescueStartEmergencyLink => 'Medical emergency?';
+
+  @override
+  String get cravingRescueStartEmergencySheetBody =>
+      'If this is a medical emergency or you are in immediate danger, call 911 now.';
+
+  @override
+  String get cravingRescueStartEmergencySheetNote =>
+      'BreatheFree will only start a call when you tap “Call 911.”';
+
+  @override
+  String get cravingRescueStartEmergencySheetTitle => 'Medical emergency';
+
+  @override
+  String get cravingRescueStartEyebrow => 'RIGHT NOW';
+
+  @override
+  String get cravingRescueStartHeaderTitle => 'Craving Rescue';
+
+  @override
+  String get cravingRescueStartIntensityHint =>
+      'You only need to choose a number.';
+
+  @override
+  String get cravingRescueStartIntensityMaxLabel => 'Strongest';
+
+  @override
+  String get cravingRescueStartIntensityMild => 'Mild';
+
+  @override
+  String get cravingRescueStartIntensityModerate => 'Moderate';
+
+  @override
+  String get cravingRescueStartIntensityNext =>
+      'The next screen gives one recommended action.';
+
+  @override
+  String get cravingRescueStartIntensityQuestion =>
+      'How strong is it right now?';
+
+  @override
+  String get cravingRescueStartIntensityStrong => 'Strong';
+
+  @override
+  String get cravingRescueStartIntensityTitle => 'CRAVING INTENSITY';
+
+  @override
+  String get cravingRescueStartIntensityVeryStrong => 'Very strong';
+
+  @override
+  String get cravingRescueStartIntro =>
+      'Start with what you feel now. No typing is required.';
+
+  @override
+  String get cravingRescueStartOfflineBadge => 'OFFLINE READY';
+
+  @override
+  String get cravingRescueStartPrivacyNoteBody =>
+      'Used to personalize support — never to monitor you.\n';
+
+  @override
+  String get cravingRescueStartPrivacyNoteTracking =>
+      'No background location or conversation tracking.';
+
+  @override
+  String get cravingRescueStartPrivateOffline => 'Private · Works offline';
+
+  @override
+  String cravingRescueStartSupportBody(Object supportName) {
+    return 'Contact $supportName or a trained quitline counselor.';
+  }
+
+  @override
+  String get cravingRescueStartSupportButton => 'View support';
+
+  @override
+  String get cravingRescueStartSupportNote =>
+      'Messages and calls only happen when you choose them.';
+
+  @override
+  String get cravingRescueStartSupportTitle => 'Want a person instead?';
+
+  @override
+  String get cravingRescueStartTitle => 'Let’s get through this moment.';
+
+  @override
+  String get cravingRescueStartTopReasonLabel => 'YOUR TOP REASON';
+
+  @override
+  String get cravingRescueStartTopReasonNote =>
+      'This moment can pass without changing your goal.';
+
+  @override
+  String guidedStressResetBreathCount(Object number) {
+    return 'Breath $number of 10';
+  }
+
+  @override
+  String get guidedStressResetBreatheEyebrow => 'SLOW BREATHING';
+
+  @override
+  String get guidedStressResetBreatheInInstruction =>
+      'Slowly breathe in through your nose.';
+
+  @override
+  String get guidedStressResetBreatheOutInstruction =>
+      'Slowly breathe out through your mouth.';
+
+  @override
+  String get guidedStressResetCircleBreatheIn => 'BREATHE IN';
+
+  @override
+  String get guidedStressResetCircleBreatheOut => 'BREATHE OUT';
+
+  @override
+  String get guidedStressResetCircleDrinkWater => 'DRINK WATER';
+
+  @override
+  String get guidedStressResetCircleSecondsUnit => 'SECONDS';
+
+  @override
+  String get guidedStressResetCloseTooltip => 'Close';
+
+  @override
+  String get guidedStressResetEndButton => 'End exercise';
+
+  @override
+  String get guidedStressResetEndDialogBody =>
+      'Your time and completed steps will still be saved.';
+
+  @override
+  String get guidedStressResetEndDialogCancel => 'Keep practicing';
+
+  @override
+  String get guidedStressResetEndDialogConfirm => 'End and review';
+
+  @override
+  String get guidedStressResetEndDialogTitle => 'End the exercise now?';
+
+  @override
+  String get guidedStressResetFinishButton => 'Finish';
+
+  @override
+  String get guidedStressResetFollowHint =>
+      'Follow the circle, listen, or use the countdown.';
+
+  @override
+  String get guidedStressResetFullMotionOn => 'Full motion on';
+
+  @override
+  String get guidedStressResetHeaderTitle => 'Stress reset';
+
+  @override
+  String get guidedStressResetLeaveDialogBody =>
+      'Your partial progress will be saved so you can continue later.';
+
+  @override
+  String get guidedStressResetLeaveDialogLeave => 'Save and leave';
+
+  @override
+  String get guidedStressResetLeaveDialogStay => 'Continue exercise';
+
+  @override
+  String get guidedStressResetLeaveDialogTitle => 'Leave the exercise?';
+
+  @override
+  String get guidedStressResetPauseButton => 'Pause exercise';
+
+  @override
+  String get guidedStressResetReducedMotionOn => 'Reduced motion on';
+
+  @override
+  String get guidedStressResetRescueButton => 'Open Rescue';
+
+  @override
+  String get guidedStressResetRescueTitle => 'Craving getting stronger?';
+
+  @override
+  String get guidedStressResetResumeButton => 'Resume exercise';
+
+  @override
+  String get guidedStressResetSavedNote =>
+      'Partial completion is saved · Works offline';
+
+  @override
+  String get guidedStressResetSequenceBreathe => 'Breathe';
+
+  @override
+  String get guidedStressResetSequenceDone => 'DONE';
+
+  @override
+  String get guidedStressResetSequenceNext => 'NEXT';
+
+  @override
+  String get guidedStressResetSequenceNote =>
+      'The timer pauses automatically if you leave this screen.';
+
+  @override
+  String get guidedStressResetSequenceNow => 'NOW';
+
+  @override
+  String get guidedStressResetSequenceSwitch => 'Switch';
+
+  @override
+  String get guidedStressResetSequenceTitle => 'Exercise sequence';
+
+  @override
+  String get guidedStressResetSequenceWater => 'Water';
+
+  @override
+  String get guidedStressResetSkipButton => 'Skip step';
+
+  @override
+  String get guidedStressResetSpokenSwitch =>
+      'Switch what you are doing. Walk, play music, or start one quick task.';
+
+  @override
+  String guidedStressResetStepCounter(Object step, Object name) {
+    return 'STEP $step OF 3 · $name';
+  }
+
+  @override
+  String get guidedStressResetStepNameBreathe => 'BREATHE';
+
+  @override
+  String get guidedStressResetStepNameSwitch => 'SWITCH';
+
+  @override
+  String get guidedStressResetStepNameWater => 'WATER';
+
+  @override
+  String get guidedStressResetSwitchEyebrow => 'SWITCH ACTIVITIES';
+
+  @override
+  String get guidedStressResetSwitchInstruction =>
+      'Walk, play music, or start one quick task.';
+
+  @override
+  String get guidedStressResetSwitchTitle => 'Switch what you are doing';
+
+  @override
+  String guidedStressResetTimeLeft(Object time) {
+    return '$time LEFT';
+  }
+
+  @override
+  String get guidedStressResetVoiceGuidanceOff => 'Voice guidance off';
+
+  @override
+  String get guidedStressResetVoiceGuidanceOn => 'Voice guidance on';
+
+  @override
+  String get guidedStressResetVoiceToggleLabel => 'Voice guidance';
+
+  @override
+  String get guidedStressResetVoiceToggleOff => 'VOICE OFF';
+
+  @override
+  String get guidedStressResetVoiceToggleOn => 'VOICE ON';
+
+  @override
+  String get guidedStressResetWaterEyebrow => 'WATER BREAK';
+
+  @override
+  String get guidedStressResetWaterInstruction =>
+      'Sip slowly and notice the temperature.';
+
+  @override
+  String get guidedStressResetWaterTitle => 'Drink a glass of water';
 
   @override
   String get myReasonsBackTooltip => 'Back';
@@ -545,6 +1087,177 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get readinessResultWhyThisFitsSheetTitle => 'Why preparation may fit';
+
+  @override
+  String get recommendedRescueToolBackTooltip => 'Go back';
+
+  @override
+  String get recommendedRescueToolBreathingDescription =>
+      'Let the urge rise and fall while you follow a calm breathing cue.';
+
+  @override
+  String get recommendedRescueToolBreathingName => 'Slow breathing';
+
+  @override
+  String get recommendedRescueToolBreathingOffline => 'Works offline';
+
+  @override
+  String get recommendedRescueToolBreathingVoice => 'Voice optional';
+
+  @override
+  String get recommendedRescueToolContextPersonal => 'Personalized match';
+
+  @override
+  String get recommendedRescueToolContextStress => 'Stress selected';
+
+  @override
+  String get recommendedRescueToolDataNote =>
+      'Recommendation uses your data only for personalized support.';
+
+  @override
+  String get recommendedRescueToolEyebrow => 'BEST MATCH';
+
+  @override
+  String get recommendedRescueToolIntro =>
+      'One recommended action, based on this craving.';
+
+  @override
+  String get recommendedRescueToolIntroWithResult =>
+      'One recommended action, based on this craving and your results.';
+
+  @override
+  String recommendedRescueToolLastResult(Object before, Object after) {
+    return 'Craving changed from $before to $after after the exercise.';
+  }
+
+  @override
+  String get recommendedRescueToolLastResultLabel => 'YOUR LAST RESULT';
+
+  @override
+  String get recommendedRescueToolMoveDescription => 'Walk or stretch';
+
+  @override
+  String get recommendedRescueToolMoveFeatures => 'Offline · No equipment';
+
+  @override
+  String get recommendedRescueToolMoveName => 'Move for 3 minutes';
+
+  @override
+  String get recommendedRescueToolOtherActionsLabel =>
+      'Or choose another action';
+
+  @override
+  String get recommendedRescueToolProgressLabel => 'CHOOSE SUPPORT';
+
+  @override
+  String recommendedRescueToolReason(Object intensity) {
+    return 'Craving $intensity/10.';
+  }
+
+  @override
+  String recommendedRescueToolReasonHelped(Object intensity) {
+    return 'Craving $intensity/10 + your previous helpful result.';
+  }
+
+  @override
+  String recommendedRescueToolReasonStress(Object intensity) {
+    return 'Stress trigger + craving $intensity/10.';
+  }
+
+  @override
+  String recommendedRescueToolReasonStressHelped(Object intensity) {
+    return 'Stress trigger + craving $intensity/10 + your previous helpful result.';
+  }
+
+  @override
+  String get recommendedRescueToolRecommendedBadge => 'RECOMMENDED';
+
+  @override
+  String get recommendedRescueToolSceneDescription => 'Go somewhere smoke-free';
+
+  @override
+  String get recommendedRescueToolSceneFeatures => 'Quick environment shift';
+
+  @override
+  String get recommendedRescueToolSceneName => 'Change the scene';
+
+  @override
+  String get recommendedRescueToolStartBreathingButton =>
+      'Start 2-minute breathing';
+
+  @override
+  String get recommendedRescueToolStartMoveButton => 'Start 3-minute movement';
+
+  @override
+  String get recommendedRescueToolStartRecommendedButton =>
+      'Start recommended tool';
+
+  @override
+  String get recommendedRescueToolStartSceneButton => 'Start scene change';
+
+  @override
+  String get recommendedRescueToolStepCounter => '2 OF 5';
+
+  @override
+  String recommendedRescueToolSupportBody(Object supportName) {
+    return 'Contact $supportName or a trained quitline counselor.';
+  }
+
+  @override
+  String get recommendedRescueToolSupportButton => 'View support';
+
+  @override
+  String get recommendedRescueToolSupportNote =>
+      'Nothing is sent or shared unless you choose it.';
+
+  @override
+  String get recommendedRescueToolSupportTitle => 'Want a person instead?';
+
+  @override
+  String get recommendedRescueToolSupportTitleStrong =>
+      'Your craving is strong. Want a person?';
+
+  @override
+  String get recommendedRescueToolSwitchNote =>
+      'You can switch tools at any time';
+
+  @override
+  String get recommendedRescueToolTitle => 'What feels possible right now?';
+
+  @override
+  String get recommendedRescueToolTitleHelpedBefore =>
+      'Start with what helped before.';
+
+  @override
+  String get recommendedRescueToolWhyMatchLink => 'Why this match?';
+
+  @override
+  String recommendedRescueToolWhySheetBody(
+      Object triggerText, Object intensity) {
+    return '$triggerText + craving $intensity/10 make slow breathing a practical first step.';
+  }
+
+  @override
+  String recommendedRescueToolWhySheetBodyHelped(
+      Object triggerText, Object intensity) {
+    return '$triggerText + craving $intensity/10 + a previously helpful breathing result make slow breathing a practical first step.';
+  }
+
+  @override
+  String get recommendedRescueToolWhySheetDoneButton => 'Got it';
+
+  @override
+  String get recommendedRescueToolWhySheetNote =>
+      'You can choose another action now or change personalization later in Settings.';
+
+  @override
+  String get recommendedRescueToolWhySheetTitle => 'Your current context';
+
+  @override
+  String get recommendedRescueToolWhySheetTitleStress => 'Stress trigger';
+
+  @override
+  String get recommendedRescueToolYourChoiceBadge => 'Your choice';
 
   @override
   String get selectQuitDateBackTooltip => 'Back';

@@ -3,6 +3,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
+import '../l10n/app_localizations.dart';
+import 'active_craving_rescue_screen.dart' show rescueSpeechLanguage;
 import 'package:flutter_tts/flutter_tts.dart';
 
 import '../theme/app_colors.dart';
@@ -65,13 +68,12 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
   Timer? _timer;
   late final FlutterTts _speech;
 
-  bool get _isSpanish => widget.isSpanish;
+  String? _speechLanguage;
 
   @override
   void initState() {
     super.initState();
     _speech = FlutterTts();
-    unawaited(_configureSpeech(speakAfter: true));
     _syncTimer();
   }
 
@@ -81,8 +83,11 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
     if (oldWidget.isPaused != widget.isPaused) {
       _syncTimer();
     }
-    if (oldWidget.isSpanish != widget.isSpanish) {
-      unawaited(_configureSpeech(speakAfter: widget.voiceGuidanceEnabled));
+    final language = rescueSpeechLanguage(Localizations.localeOf(context));
+    if (language != _speechLanguage) {
+      _speechLanguage = language;
+      unawaited(_configureSpeech(
+          language: language, speakAfter: widget.voiceGuidanceEnabled));
       return;
     }
     if (oldWidget.voiceGuidanceEnabled != widget.voiceGuidanceEnabled) {
@@ -124,7 +129,19 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
     return oldWidget.stepElapsedSeconds ~/ 4 != widget.stepElapsedSeconds ~/ 4;
   }
 
-  Future<void> _configureSpeech({required bool speakAfter}) async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_speechLanguage != null) return;
+    final language = rescueSpeechLanguage(Localizations.localeOf(context));
+    _speechLanguage = language;
+    unawaited(_configureSpeech(language: language, speakAfter: true));
+  }
+
+  Future<void> _configureSpeech({
+    required String language,
+    required bool speakAfter,
+  }) async {
     try {
       if (defaultTargetPlatform == TargetPlatform.iOS) {
         await _speech.setSharedInstance(true);
@@ -140,7 +157,7 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
           IosTextToSpeechAudioMode.voicePrompt,
         );
       }
-      await _speech.setLanguage(widget.isSpanish ? 'es-US' : 'en-US');
+      await _speech.setLanguage(language);
       await _speech.setSpeechRate(0.42);
       await _speech.setPitch(1.0);
       await _speech.setVolume(1.0);
@@ -160,22 +177,14 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
     switch (widget.step) {
       case StressResetStep.breathe:
         final inhale = (widget.stepElapsedSeconds % 8) < 4;
-        if (widget.isSpanish) {
-          return inhale
-              ? 'Inhala lentamente por la nariz.'
-              : 'Exhala lentamente por la boca.';
-        }
         return inhale
-            ? 'Slowly breathe in through your nose.'
-            : 'Slowly breathe out through your mouth.';
+            ? AppLocalizations.of(context).guidedStressResetBreatheInInstruction
+            : AppLocalizations.of(context)
+                .guidedStressResetBreatheOutInstruction;
       case StressResetStep.water:
-        return widget.isSpanish
-            ? 'Bebe despacio y nota la temperatura.'
-            : 'Sip slowly and notice the temperature.';
+        return AppLocalizations.of(context).guidedStressResetWaterInstruction;
       case StressResetStep.switchActivity:
-        return widget.isSpanish
-            ? 'Cambia lo que estás haciendo. Camina, pon música o comienza una tarea breve.'
-            : 'Switch what you are doing. Walk, play music, or start one quick task.';
+        return AppLocalizations.of(context).guidedStressResetSpokenSwitch;
     }
   }
 
@@ -263,15 +272,21 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
   }
 
   String _stepName(StressResetStep step) => switch (step) {
-        StressResetStep.breathe => _isSpanish ? 'RESPIRA' : 'BREATHE',
-        StressResetStep.water => _isSpanish ? 'AGUA' : 'WATER',
-        StressResetStep.switchActivity => _isSpanish ? 'CAMBIA' : 'SWITCH',
+        StressResetStep.breathe =>
+          AppLocalizations.of(context).guidedStressResetStepNameBreathe,
+        StressResetStep.water =>
+          AppLocalizations.of(context).guidedStressResetStepNameWater,
+        StressResetStep.switchActivity =>
+          AppLocalizations.of(context).guidedStressResetStepNameSwitch,
       };
 
   String _stepLabel(StressResetStep step) => switch (step) {
-        StressResetStep.breathe => _isSpanish ? 'Respira' : 'Breathe',
-        StressResetStep.water => _isSpanish ? 'Agua' : 'Water',
-        StressResetStep.switchActivity => _isSpanish ? 'Cambia' : 'Switch',
+        StressResetStep.breathe =>
+          AppLocalizations.of(context).guidedStressResetSequenceBreathe,
+        StressResetStep.water =>
+          AppLocalizations.of(context).guidedStressResetSequenceWater,
+        StressResetStep.switchActivity =>
+          AppLocalizations.of(context).guidedStressResetSequenceSwitch,
       };
 
   IconData _stepIcon(StressResetStep step) => switch (step) {
@@ -309,7 +324,7 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _isSpanish ? '¿Salir del ejercicio?' : 'Leave the exercise?',
+                AppLocalizations.of(context).guidedStressResetLeaveDialogTitle,
                 style: const TextStyle(
                   color: AppColors.deepTeal,
                   fontSize: 23,
@@ -318,9 +333,7 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                _isSpanish
-                    ? 'Tu progreso parcial se guardará y podrás continuar después.'
-                    : 'Your partial progress will be saved so you can continue later.',
+                AppLocalizations.of(context).guidedStressResetLeaveDialogBody,
                 style: const TextStyle(
                   color: AppColors.tealSecondary,
                   height: 1.4,
@@ -333,7 +346,8 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
                   key: const ValueKey('stress-reset-exit-stay'),
                   onPressed: () => Navigator.pop(context, false),
                   child: Text(
-                    _isSpanish ? 'Continuar ejercicio' : 'Continue exercise',
+                    AppLocalizations.of(context)
+                        .guidedStressResetLeaveDialogStay,
                   ),
                 ),
               ),
@@ -344,7 +358,8 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
                   key: const ValueKey('stress-reset-exit-save'),
                   onPressed: () => Navigator.pop(context, true),
                   child: Text(
-                    _isSpanish ? 'Guardar y salir' : 'Save and leave',
+                    AppLocalizations.of(context)
+                        .guidedStressResetLeaveDialogLeave,
                   ),
                 ),
               ),
@@ -379,9 +394,7 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _isSpanish
-                    ? '¿Terminar el ejercicio ahora?'
-                    : 'End the exercise now?',
+                AppLocalizations.of(context).guidedStressResetEndDialogTitle,
                 style: const TextStyle(
                   color: AppColors.deepTeal,
                   fontSize: 23,
@@ -390,9 +403,7 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                _isSpanish
-                    ? 'El tiempo y los pasos completados se guardarán.'
-                    : 'Your time and completed steps will still be saved.',
+                AppLocalizations.of(context).guidedStressResetEndDialogBody,
                 style: const TextStyle(color: AppColors.tealSecondary),
               ),
               const SizedBox(height: 18),
@@ -402,7 +413,8 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
                   key: const ValueKey('stress-reset-end-confirm'),
                   onPressed: () => Navigator.pop(context, true),
                   child: Text(
-                    _isSpanish ? 'Terminar y revisar' : 'End and review',
+                    AppLocalizations.of(context)
+                        .guidedStressResetEndDialogConfirm,
                   ),
                 ),
               ),
@@ -413,7 +425,8 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
                   key: const ValueKey('stress-reset-end-cancel'),
                   onPressed: () => Navigator.pop(context, false),
                   child: Text(
-                    _isSpanish ? 'Seguir practicando' : 'Keep practicing',
+                    AppLocalizations.of(context)
+                        .guidedStressResetEndDialogCancel,
                   ),
                 ),
               ),
@@ -435,6 +448,13 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      widget.isSpanish ==
+          (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     final size = MediaQuery.sizeOf(context);
     final compact = size.height < 760;
     final horizontalPadding = size.width < 390 ? 16.0 : 20.0;
@@ -453,7 +473,7 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
                 6,
               ),
               child: _StressResetHeader(
-                isSpanish: _isSpanish,
+                isSpanish: widget.isSpanish,
                 voiceGuidanceEnabled: widget.voiceGuidanceEnabled,
                 onClose: _showExitConfirmation,
                 onVoiceChanged: widget.onVoiceGuidanceChanged,
@@ -466,7 +486,7 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
                 stepName: _stepName(widget.step),
                 remainingTime: _remainingTime,
                 progress: widget.totalElapsedSeconds / _totalDurationSeconds,
-                isSpanish: _isSpanish,
+                isSpanish: widget.isSpanish,
               ),
             ),
             const SizedBox(height: 10),
@@ -486,7 +506,7 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         _ActiveExerciseCard(
-                          isSpanish: _isSpanish,
+                          isSpanish: widget.isSpanish,
                           step: widget.step,
                           stepElapsedSeconds: widget.stepElapsedSeconds,
                           isPaused: widget.isPaused,
@@ -498,9 +518,8 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
                         ),
                         const SizedBox(height: 18),
                         Text(
-                          _isSpanish
-                              ? 'Secuencia del ejercicio'
-                              : 'Exercise sequence',
+                          AppLocalizations.of(context)
+                              .guidedStressResetSequenceTitle,
                           style: const TextStyle(
                             color: AppColors.deepTeal,
                             fontSize: 21,
@@ -509,14 +528,14 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
                         ),
                         const SizedBox(height: 9),
                         _ExerciseSequence(
-                          isSpanish: _isSpanish,
+                          isSpanish: widget.isSpanish,
                           currentStep: widget.step,
                           stepLabel: _stepLabel,
                           stepIcon: _stepIcon,
                         ),
                         const SizedBox(height: 16),
                         _RescueCard(
-                          isSpanish: _isSpanish,
+                          isSpanish: widget.isSpanish,
                           onTap: () {
                             widget.onPausedChanged(true);
                             widget.onOpenRescue();
@@ -536,17 +555,15 @@ class _GuidedStressResetScreenState extends State<GuidedStressResetScreen> {
                               ),
                             ),
                             child: Text(
-                              _isSpanish
-                                  ? 'Terminar ejercicio'
-                                  : 'End exercise',
+                              AppLocalizations.of(context)
+                                  .guidedStressResetEndButton,
                             ),
                           ),
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          _isSpanish
-                              ? 'El progreso parcial se guarda · Funciona sin conexión'
-                              : 'Partial completion is saved · Works offline',
+                          AppLocalizations.of(context)
+                              .guidedStressResetSavedNote,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: AppColors.mutedTeal,
@@ -596,7 +613,7 @@ class _StressResetHeader extends StatelessWidget {
         children: [
           IconButton.outlined(
             key: const ValueKey('stress-reset-close'),
-            tooltip: isSpanish ? 'Cerrar' : 'Close',
+            tooltip: AppLocalizations.of(context).guidedStressResetCloseTooltip,
             onPressed: onClose,
             style: IconButton.styleFrom(
               foregroundColor: AppColors.deepTeal,
@@ -607,7 +624,7 @@ class _StressResetHeader extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              isSpanish ? 'Reinicio del estrés' : 'Stress reset',
+              AppLocalizations.of(context).guidedStressResetHeaderTitle,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
@@ -622,7 +639,8 @@ class _StressResetHeader extends StatelessWidget {
           Semantics(
             button: true,
             toggled: voiceGuidanceEnabled,
-            label: isSpanish ? 'Guía de voz' : 'Voice guidance',
+            label:
+                AppLocalizations.of(context).guidedStressResetVoiceToggleLabel,
             child: InkWell(
               key: const ValueKey('stress-reset-voice'),
               borderRadius: BorderRadius.circular(99),
@@ -649,8 +667,10 @@ class _StressResetHeader extends StatelessWidget {
                     const SizedBox(width: 5),
                     Text(
                       voiceGuidanceEnabled
-                          ? (isSpanish ? 'VOZ SÍ' : 'VOICE ON')
-                          : (isSpanish ? 'VOZ NO' : 'VOICE OFF'),
+                          ? (AppLocalizations.of(context)
+                              .guidedStressResetVoiceToggleOn)
+                          : (AppLocalizations.of(context)
+                              .guidedStressResetVoiceToggleOff),
                       style: const TextStyle(
                         color: AppColors.deepTeal,
                         fontSize: 9.5,
@@ -691,7 +711,8 @@ class _ExerciseProgress extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                '${isSpanish ? 'PASO' : 'STEP'} $stepNumber ${isSpanish ? 'DE' : 'OF'} 3 · $stepName',
+                AppLocalizations.of(context)
+                    .guidedStressResetStepCounter(stepNumber, stepName),
                 key: const ValueKey('stress-reset-step-label'),
                 style: const TextStyle(
                   color: AppColors.mutedTeal,
@@ -702,7 +723,8 @@ class _ExerciseProgress extends StatelessWidget {
               ),
             ),
             Text(
-              '$remainingTime ${isSpanish ? 'RESTANTES' : 'LEFT'}',
+              AppLocalizations.of(context)
+                  .guidedStressResetTimeLeft(remainingTime),
               key: const ValueKey('stress-reset-time-left'),
               style: const TextStyle(
                 color: AppColors.mutedTeal,
@@ -768,38 +790,34 @@ class _ActiveExerciseCard extends StatelessWidget {
     return math.max(0, duration - stepElapsedSeconds).toInt();
   }
 
-  String get _eyebrow => switch (step) {
+  String _eyebrow(BuildContext context) => switch (step) {
         StressResetStep.breathe =>
-          isSpanish ? 'RESPIRACIÓN LENTA' : 'SLOW BREATHING',
-        StressResetStep.water => isSpanish ? 'PAUSA CON AGUA' : 'WATER BREAK',
-        StressResetStep.switchActivity =>
-          isSpanish ? 'CAMBIA LA ACTIVIDAD' : 'SWITCH ACTIVITIES',
-      };
-
-  String get _title => switch (step) {
-        StressResetStep.breathe =>
-          '${isSpanish ? 'Respiración' : 'Breath'} $_breathNumber ${isSpanish ? 'de' : 'of'} 10',
+          AppLocalizations.of(context).guidedStressResetBreatheEyebrow,
         StressResetStep.water =>
-          isSpanish ? 'Bebe un vaso de agua' : 'Drink a glass of water',
-        StressResetStep.switchActivity => isSpanish
-            ? 'Cambia lo que estás haciendo'
-            : 'Switch what you are doing',
+          AppLocalizations.of(context).guidedStressResetWaterEyebrow,
+        StressResetStep.switchActivity =>
+          AppLocalizations.of(context).guidedStressResetSwitchEyebrow,
       };
 
-  String get _instruction => switch (step) {
+  String _title(BuildContext context) => switch (step) {
+        StressResetStep.breathe => AppLocalizations.of(context)
+            .guidedStressResetBreathCount(_breathNumber),
+        StressResetStep.water =>
+          AppLocalizations.of(context).guidedStressResetWaterTitle,
+        StressResetStep.switchActivity =>
+          AppLocalizations.of(context).guidedStressResetSwitchTitle,
+      };
+
+  String _instruction(BuildContext context) => switch (step) {
         StressResetStep.breathe => _isInhale
-            ? (isSpanish
-                ? 'Inhala lentamente por la nariz.'
-                : 'Slowly breathe in through your nose.')
-            : (isSpanish
-                ? 'Exhala lentamente por la boca.'
-                : 'Slowly breathe out through your mouth.'),
-        StressResetStep.water => isSpanish
-            ? 'Bebe despacio y nota la temperatura.'
-            : 'Sip slowly and notice the temperature.',
-        StressResetStep.switchActivity => isSpanish
-            ? 'Camina, pon música o comienza una tarea breve.'
-            : 'Walk, play music, or start one quick task.',
+            ? (AppLocalizations.of(context)
+                .guidedStressResetBreatheInInstruction)
+            : (AppLocalizations.of(context)
+                .guidedStressResetBreatheOutInstruction),
+        StressResetStep.water =>
+          AppLocalizations.of(context).guidedStressResetWaterInstruction,
+        StressResetStep.switchActivity =>
+          AppLocalizations.of(context).guidedStressResetSwitchInstruction,
       };
 
   @override
@@ -820,7 +838,7 @@ class _ActiveExerciseCard extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            _eyebrow,
+            _eyebrow(context),
             style: const TextStyle(
               color: AppColors.mintStrong,
               fontSize: 10,
@@ -830,7 +848,7 @@ class _ActiveExerciseCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            _title,
+            _title(context),
             key: const ValueKey('stress-reset-active-title'),
             textAlign: TextAlign.center,
             style: const TextStyle(
@@ -851,7 +869,7 @@ class _ActiveExerciseCard extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           Text(
-            _instruction,
+            _instruction(context),
             key: const ValueKey('stress-reset-instruction'),
             textAlign: TextAlign.center,
             style: const TextStyle(
@@ -863,9 +881,7 @@ class _ActiveExerciseCard extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            isSpanish
-                ? 'Sigue el círculo, escucha o usa la cuenta regresiva.'
-                : 'Follow the circle, listen, or use the countdown.',
+            AppLocalizations.of(context).guidedStressResetFollowHint,
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: AppColors.mintStrong,
@@ -883,10 +899,10 @@ class _ActiveExerciseCard extends StatelessWidget {
                     ? Icons.volume_up_outlined
                     : Icons.volume_off_outlined,
                 label: voiceGuidanceEnabled
-                    ? (isSpanish ? 'Guía de voz activa' : 'Voice guidance on')
-                    : (isSpanish
-                        ? 'Guía de voz desactivada'
-                        : 'Voice guidance off'),
+                    ? (AppLocalizations.of(context)
+                        .guidedStressResetVoiceGuidanceOn)
+                    : (AppLocalizations.of(context)
+                        .guidedStressResetVoiceGuidanceOff),
               ),
               InkWell(
                 key: const ValueKey('stress-reset-motion'),
@@ -897,12 +913,10 @@ class _ActiveExerciseCard extends StatelessWidget {
                       ? Icons.check_rounded
                       : Icons.motion_photos_on_outlined,
                   label: reducedMotionEnabled
-                      ? (isSpanish
-                          ? 'Movimiento reducido activo'
-                          : 'Reduced motion on')
-                      : (isSpanish
-                          ? 'Movimiento completo activo'
-                          : 'Full motion on'),
+                      ? (AppLocalizations.of(context)
+                          .guidedStressResetReducedMotionOn)
+                      : (AppLocalizations.of(context)
+                          .guidedStressResetFullMotionOn),
                 ),
               ),
             ],
@@ -931,8 +945,10 @@ class _ActiveExerciseCard extends StatelessWidget {
                     ),
                     label: Text(
                       isPaused
-                          ? (isSpanish ? 'Reanudar' : 'Resume exercise')
-                          : (isSpanish ? 'Pausar' : 'Pause exercise'),
+                          ? (AppLocalizations.of(context)
+                              .guidedStressResetResumeButton)
+                          : (AppLocalizations.of(context)
+                              .guidedStressResetPauseButton),
                     ),
                   ),
                 ),
@@ -953,8 +969,10 @@ class _ActiveExerciseCard extends StatelessWidget {
                     ),
                     child: Text(
                       step == StressResetStep.switchActivity
-                          ? (isSpanish ? 'Finalizar' : 'Finish')
-                          : (isSpanish ? 'Omitir paso' : 'Skip step'),
+                          ? (AppLocalizations.of(context)
+                              .guidedStressResetFinishButton)
+                          : (AppLocalizations.of(context)
+                              .guidedStressResetSkipButton),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -993,10 +1011,12 @@ class _ExerciseVisual extends StatelessWidget {
     };
     final label = switch (step) {
       StressResetStep.breathe => isInhale
-          ? (isSpanish ? 'INHALA' : 'BREATHE IN')
-          : (isSpanish ? 'EXHALA' : 'BREATHE OUT'),
-      StressResetStep.water => isSpanish ? 'BEBE AGUA' : 'DRINK WATER',
-      StressResetStep.switchActivity => isSpanish ? 'CAMBIA' : 'SWITCH',
+          ? (AppLocalizations.of(context).guidedStressResetCircleBreatheIn)
+          : (AppLocalizations.of(context).guidedStressResetCircleBreatheOut),
+      StressResetStep.water =>
+        AppLocalizations.of(context).guidedStressResetCircleDrinkWater,
+      StressResetStep.switchActivity =>
+        AppLocalizations.of(context).guidedStressResetStepNameSwitch,
     };
 
     return AnimatedContainer(
@@ -1046,7 +1066,7 @@ class _ExerciseVisual extends StatelessWidget {
                 ),
               ),
               Text(
-                isSpanish ? 'SEGUNDOS' : 'SECONDS',
+                AppLocalizations.of(context).guidedStressResetCircleSecondsUnit,
                 style: const TextStyle(
                   color: AppColors.tealSecondary,
                   fontSize: 9,
@@ -1130,10 +1150,13 @@ class _ExerciseSequence extends StatelessWidget {
                     icon: stepIcon(step),
                     label: stepLabel(step),
                     status: step.index < currentStep.index
-                        ? (isSpanish ? 'HECHO' : 'DONE')
+                        ? (AppLocalizations.of(context)
+                            .guidedStressResetSequenceDone)
                         : step == currentStep
-                            ? (isSpanish ? 'AHORA' : 'NOW')
-                            : (isSpanish ? 'SIGUE' : 'NEXT'),
+                            ? (AppLocalizations.of(context)
+                                .guidedStressResetSequenceNow)
+                            : (AppLocalizations.of(context)
+                                .guidedStressResetSequenceNext),
                     active: step == currentStep,
                     completed: step.index < currentStep.index,
                   ),
@@ -1158,9 +1181,7 @@ class _ExerciseSequence extends StatelessWidget {
               borderRadius: BorderRadius.circular(99),
             ),
             child: Text(
-              isSpanish
-                  ? 'El temporizador se pausa automáticamente al salir.'
-                  : 'The timer pauses automatically if you leave this screen.',
+              AppLocalizations.of(context).guidedStressResetSequenceNote,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: AppColors.mutedTeal,
@@ -1257,9 +1278,7 @@ class _RescueCard extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                isSpanish
-                    ? '¿El antojo está aumentando?'
-                    : 'Craving getting stronger?',
+                AppLocalizations.of(context).guidedStressResetRescueTitle,
                 style: const TextStyle(
                   color: AppColors.deepTeal,
                   fontWeight: FontWeight.w800,
@@ -1267,7 +1286,7 @@ class _RescueCard extends StatelessWidget {
               ),
             ),
             Text(
-              isSpanish ? 'Abrir Rescate' : 'Open Rescue',
+              AppLocalizations.of(context).guidedStressResetRescueButton,
               style: const TextStyle(
                 color: AppColors.coral,
                 fontWeight: FontWeight.w800,

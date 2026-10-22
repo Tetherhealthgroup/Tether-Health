@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:breathefree_patient/l10n/app_localizations.dart';
 import 'package:breathefree_patient/screens/approved_screen_player.dart';
 import 'package:breathefree_patient/screens/craving_rescue_start_screen.dart';
 
@@ -111,6 +112,7 @@ class _NavigationHarnessState extends State<_NavigationHarness> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
       home: ApprovedScreenPlayer(
         currentIndex: currentIndex,
         onSelectScreen: goTo,

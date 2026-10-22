@@ -1,3 +1,4 @@
+import 'package:breathefree_patient/l10n/app_localizations.dart';
 import 'package:breathefree_patient/screens/active_craving_rescue_screen.dart';
 import 'package:breathefree_patient/screens/recommended_rescue_tool_screen.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ Widget _screen({
   required bool voiceEnabled,
 }) {
   return MaterialApp(
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
     home: ActiveCravingRescueScreen(
       isSpanish: false,
       tool: tool,

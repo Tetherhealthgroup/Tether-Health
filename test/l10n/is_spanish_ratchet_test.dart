@@ -15,20 +15,16 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 const isSpanishFiles = <String>{
-  'lib/screens/active_craving_rescue_screen.dart',
   'lib/screens/approved_screen_player.dart',
   'lib/screens/craving_recheck_screen.dart',
-  'lib/screens/craving_rescue_start_screen.dart',
   'lib/screens/daily_check_in_screen.dart',
   'lib/screens/exercise_complete_recheck_screen.dart',
-  'lib/screens/guided_stress_reset_screen.dart',
   'lib/screens/home_preparation_screen.dart',
   'lib/screens/learn_library_screen.dart',
   'lib/screens/medication_center_screen.dart',
   'lib/screens/personalized_next_step_screen.dart',
   'lib/screens/progress_dashboard_screen.dart',
   'lib/screens/quit_day_home_screen.dart',
-  'lib/screens/recommended_rescue_tool_screen.dart',
   'lib/screens/rescue_result_next_step_screen.dart',
   'lib/screens/resource_screen_widgets.dart',
   'lib/screens/review_quit_plan_screen.dart',
