@@ -28,21 +28,24 @@
           "label": "Cross-program insights",
           "sub": "Show connections between your programs",
           "on": true,
-          "key": "cross_program_insights"
+          "key": "cross_program_insights",
+          "bind": "consents.cross_program_insights"
         },
         {
           "t": "toggle",
           "label": "De-identified research",
           "sub": "Per program, off by default",
           "on": false,
-          "key": "de_identified_research"
+          "key": "de_identified_research",
+          "bind": "consents.de_identified_research"
         },
         {
           "t": "toggle",
           "label": "Anonymous app diagnostics",
           "sub": "No health entries",
           "on": false,
-          "key": "anonymous_app_diagnostics"
+          "key": "anonymous_app_diagnostics",
+          "bind": "consents.anonymous_app_diagnostics"
         }
       ]
     },

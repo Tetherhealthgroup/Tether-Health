@@ -35,7 +35,7 @@ class BeHomeScreen extends StatelessWidget {
         TTitle('Three steps that lower risk'),
         TListGroup(rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'Quitting smoking', sub: 'In progress with BreatheFree', lead: TLead.program('bf'), pill: 'Active', onTap: () => TNav.push(context, Routes.bfHome)), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: 'Monthly skin self-check', sub: 'Guide with photos', onTap: () => TNav.push(context, Routes.learnLesson)), TListRow(key: const ValueKey('a:body[1].rows[2]'), label: 'Ask about genetic counseling', sub: 'Because of family history', onTap: () => TNav.push(context, Routes.supportMessageCare))]),
         TCard(title: 'Screenings come from Checkup', text: 'Mammogram due · colorectal due', cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: 'Open Checkup', onPressed: () => TNav.push(context, Routes.ckList), variant: TButtonVariant.secondary, small: true)),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'Change my journey stage', onTap: () => TNav.push(context, Routes.beQ1)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: 'Program settings', sub: 'Status, sharing, export, leave', onTap: () => TNav.push(context, Routes.programSettings))]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'Change my journey stage', onTap: () => TNav.push(context, Routes.beQ1)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: 'Program settings', sub: 'Status, sharing, export, leave', onTap: () => TNav.push(context, Routes.programSettings, program: 'be'))]),
       ],
     );
   }

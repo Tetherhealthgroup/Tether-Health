@@ -14,7 +14,7 @@ def programs_b():
         seg(['Meter', 'CGM', 'Lab only'], 'Meter', label='How do you check?', key='how_do_you_check'),
     ], footer=[button('Next', go('st_range'))])
     S('st_range', 'Range & low plan', '/p/st/plan/range', 'st', program='st', phase='plan', hdr=H('Your range', pill='2 of 2'), body=[
-        steps(2, 2), title('Enter the range your clinician gave you.'), seg(['mg/dL', 'mmol/L'], 'mg/dL', key='value'),
+        steps(2, 2), title('Enter the range your clinician gave you.'), seg(['mg/dL', 'mmol/L'], 'mg/dL', key='value', bind='st.range.unit'),
         fieldrow(field('Before meals from', '80', unit='mg/dL', kind='number', key='before_meals_from'), field('to', '130', unit='mg/dL', kind='number', key='to')),
         field('2 h after meals below', '180', unit='mg/dL', kind='number', key='2_h_after_meals_below'),
         card(field('Low below', '70', unit='mg/dL', kind='number', key='low'), field('My low steps', '15 g fast sugar, re-check in 15 min', kind='multiline', key='my_low_steps'), eyebrow='Your low plan'),
@@ -99,8 +99,8 @@ def programs_b():
     ], footer=[button('Next', branch('Eating-history answer', [('No', go('nu_habit')), ('Yes / Prefer not to say', go('nu_protect'))], on='segmented', key='eating'))])
     S('nu_habit', 'Weekly habit', '/p/nu/plan', 'nu', program='nu', phase='plan', hdr=H('This week’s habit', pill='Plan'), body=[
         title('Pick one habit for this week.'),
-        radio([ri('Add a vegetable to dinner', '5 nights this week', 'Suggested'), ri('Water before each meal', 'Every day'), ri('Cook at home', '3 times this week'), ri('10-minute walk after a meal', '4 times')], key='value'),
-        card(toggle('Track weight', 'Off by default · can stay off forever', False, key='track_weight')),
+        radio([ri('Add a vegetable to dinner', '5 nights this week', 'Suggested'), ri('Water before each meal', 'Every day'), ri('Cook at home', '3 times this week'), ri('10-minute walk after a meal', '4 times')], key='value', bind='nu.habit.habit'),
+        card(toggle('Track weight', 'Off by default · can stay off forever', False, key='track_weight', bind='nu.habit.track_weight')),
     ], footer=[button('Start this habit', submit('PUT /v1/program-data/nu/habit', onboarding_or('nu_home')))])
     S('nu_home', 'Nourish home', '/p/nu/home', 'nu', program='nu', phase='daily', tabname='plans', hdr=home_hdr('nu'), body=[
         card(eyebrow='Habit · week 2', title='Add a vegetable to dinner', text='3 of 5 nights', children=[steps(3, 5)], cta=button('Done today', toast('Nice. 4 of 5 nights.'), small=True)),
@@ -159,7 +159,7 @@ def programs_b():
     ], footer=[button('Save', submit('PUT /v1/program-data/sd/safety', toast('Saved', back())))])
     S('sd_caregiver', 'Caregiver access', '/p/sd/caregiver', 'sd', program='sd', phase='account', hdr=H('Caregiver access', pill='Optional'), body=[
         title('Let someone help'), field('Name', 'Rosa', key='name'), field('Phone', '(555) 010-2244', kind='phone', key='phone'),
-        checklist([ci('When I finish a session', done=True), ci('If I log a fall', done=True), ci('My other programs', 'Never available to caregivers')], label='Rosa can see', key='caregiver_can_see'),
+        checklist([ci('When I finish a session', done=True), ci('If I log a fall', done=True), ci('My other programs', 'Never available to caregivers')], label='Rosa can see', key='caregiver_can_see', bind='sd.caregiver.can_see'),
     ], footer=[button('Send invite', submit('POST /v1/care/caregivers', toast('Invite sent to Rosa', back())))])
 
     # ================================================================ EASE
@@ -202,8 +202,8 @@ def programs_b():
     intro('ck', [('Personal list', 'USPSTF / CDC guidance'), ('Reminders', 'weekly, quiet'), ('Records', 'mark done, add dates')], '~1 min/week')
     S('ck_q1', 'About you', '/p/ck/onboarding/1', 'ck', program='ck', phase='onboarding', hdr=H('About you', pill='1 of 1'), body=[
         steps(1, 1), title('A few details to personalize'), field('Age', '52', kind='number', key='age'),
-        seg(['Female', 'Male', 'Intersex', 'Skip'], 'Female', label='Sex assigned at birth', key='sex_assigned_at_birth'),
-        chips(['Smoke or used to', 'Diabetes', 'Family history of cancer', 'Pregnant', 'None'], ['Smoke or used to'], label='Any of these?', key='any_of_these'),
+        seg(['Female', 'Male', 'Intersex', 'Skip'], 'Female', label='Sex assigned at birth', key='sex_assigned_at_birth', bind='ck.profile.sex_assigned_at_birth'),
+        chips(['Smoke or used to', 'Diabetes', 'Family history of cancer', 'Pregnant', 'None'], ['Smoke or used to'], label='Any of these?', key='any_of_these', bind='ck.profile.any_of_these'),
         text('Used only to build your list. Change anytime.', 'small'), link('Import vaccination history', go('records_add')),
     ], footer=[button('Build my list', submit('PUT /v1/program-data/ck/profile', onboarding_or('ck_list')))])
     S('ck_list', 'Due list', '/p/ck/home', 'ck', program='ck', phase='daily', tabname='plans', hdr=home_hdr('ck'), body=[
@@ -240,7 +240,7 @@ def programs_b():
     ], footer=[button('Next', branch('Journey stage', [('Lowering my risk', go('be_q2')), ('Going through treatment', onboarding_or('be_tx')), ('After treatment', onboarding_or('be_survivor')), ('Supporting someone', tab('learn'))], on='radio', key='stage'))])
     S('be_q2', 'Family history', '/p/be/onboarding/2', 'be', program='be', phase='onboarding', hdr=H('Family history', pill='2 of 2'), body=[
         steps(2, 2), title('Has a close relative had cancer?'),
-        chips(['Breast', 'Ovarian', 'Colorectal', 'Prostate', 'Pancreatic', 'Melanoma', 'None', 'Not sure'], ['Breast'], key='value'), field('Relative’s age at diagnosis (if known)', '44', kind='number', key='relative_s_age_at_diagnosis_if_k'),
+        chips(['Breast', 'Ovarian', 'Colorectal', 'Prostate', 'Pancreatic', 'Melanoma', 'None', 'Not sure'], ['Breast'], key='value', bind='be.profile.family_cancers'), field('Relative’s age at diagnosis (if known)', '44', kind='number', key='relative_s_age_at_diagnosis_if_k'),
         card(v='mint', text='A relative diagnosed before 50 may mean earlier screening or genetic counseling. We’ll add this to your visit list.'),
     ], footer=[button('See my plan', submit('PUT /v1/program-data/be/profile', onboarding_or('be_home')))])
     S('be_home', 'Beacon home', '/p/be/home', 'be', program='be', phase='daily', tabname='plans', hdr=home_hdr('be'), body=[

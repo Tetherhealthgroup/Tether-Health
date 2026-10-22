@@ -34,14 +34,52 @@ abstract class TData {
   /// fallback). Only [PreviewData] returns it.
   static const Object example = _Example();
 
+  /// Marker value meaning "loaded, and the member has no stored value".
+  /// Null keeps meaning "not loaded yet". A bound input control on a plan
+  /// screen shows the spec's starting value for it; one on a consent screen
+  /// shows its empty (off) state ([TBindClass]).
+  static const Object unset = _Unset();
+
+  /// [bindKey] for a screen opened for [program]: a `:program` segment is
+  /// replaced by the programme id. Null when the key needs a programme and
+  /// [program] is null or not a programme id (two lower-case letters, for
+  /// example `bf`); the control then has no value (not loaded).
+  static String? resolve(String bindKey, String? program) {
+    final parts = bindKey.split('.');
+    if (!parts.contains(':program')) return bindKey;
+    if (program == null || !_programId.hasMatch(program)) return null;
+    return [for (final p in parts) p == ':program' ? program : p].join('.');
+  }
+
+  static final RegExp _programId = RegExp(r'^[a-z]{2}$');
+
   /// The current value for [bindKey]. Null means there is no value yet.
   ValueListenable<Object?> watch(String bindKey);
+}
+
+/// How a bound input control on a settings screen starts (P-71).
+enum TBindClass {
+  /// A consent, share, alert or notification choice: only a stored value is
+  /// shown. [TData.unset] and null both show the empty (off) state and write
+  /// nothing; the member's changes are listed in `TSession.touched`.
+  consent,
+
+  /// A plan or profile value: a stored value is shown and written to the
+  /// session; [TData.unset] shows and writes the spec's starting value; null
+  /// writes nothing.
+  plan,
 }
 
 final class _Example {
   const _Example();
   @override
   String toString() => 'TData.example';
+}
+
+final class _Unset {
+  const _Unset();
+  @override
+  String toString() => 'TData.unset';
 }
 
 /// Preview data: the spec's example value for every key ([TData.example]),

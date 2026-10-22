@@ -22,6 +22,10 @@ def act(a):
         if a.get('context'):
             target = f"(TFlow.onboarding ? {rconst(a['context']['onboarding'])} : {target})"
         fn = {'push': 'push', 'replace': 'replace', 'tab': 'tab', 'sheet': 'sheet', 'reset': 'reset'}[t]
+        # A screen opened per programme (route with :program) gets the
+        # programme of the element that opens it (validate.check_program_context).
+        if t == 'push' and ':program' in SCREENS.get(a['to'], {}).get('route', '') and CUR.get('program'):
+            return f"TNav.push(context, {target}, program: {dstr(CUR['program'])})"
         return f'TNav.{fn}(context, {target})'
     if t == 'back': return 'TNav.back(context)'
     if t == 'close': return 'TNav.close(context)'
@@ -47,6 +51,15 @@ def act(a):
     raise ValueError(t)
 
 def cb(a): return f'() => {act(a)}' if a else 'null'
+
+def pcb(a, program):
+    """cb() for a list row or tile that names its own programme."""
+    prev = CUR.get('program')
+    CUR['program'] = program or prev
+    try:
+        return cb(a)
+    finally:
+        CUR['program'] = prev
 
 def device_args(a):
     """`, device: TBranchRef(...), when: {...}` for a branch decided by the
@@ -139,6 +152,14 @@ def K(path): return f"const ValueKey('a:{path}')"
 
 def FK(n): return dstr(f"{CUR['sid']}.{n['key']}") if n.get('key') else None
 
+# Settings binding (P-71): the TData key of the member's stored value, and
+# the control's class (consent is the kit default; plan screens say so).
+def BK(n): return dstr(n['bind']) if n.get('bind') else None
+
+def BC(n):
+    from validate import PLAN_SCREENS
+    return 'TBindClass.plan' if n.get('bind') and CUR['sid'] in PLAN_SCREENS else None
+
 def node(n, top=False, path=''):
     t = n['t']
     S_ = dstr
@@ -152,19 +173,19 @@ def node(n, top=False, path=''):
     if t == 'chips':
         dots = n.get('dots')
         d = '{' + ', '.join(f"{S_(k)}: {dcolor(v)}" for k, v in dots.items()) + '}' if dots else None
-        return f"TChips({args(fieldKey=FK(n), options=lst([S_(o) for o in n['options']]), selected=lst([S_(o) for o in n['selected']]) if n['selected'] else None, multi='false' if not n.get('multi') else None, dots=d, label=S_(n['label']) if n.get('label') else None)})"
+        return f"TChips({args(fieldKey=FK(n), options=lst([S_(o) for o in n['options']]), selected=lst([S_(o) for o in n['selected']]) if n['selected'] else None, multi='false' if not n.get('multi') else None, dots=d, label=S_(n['label']) if n.get('label') else None, bind=BK(n), bindClass=BC(n))})"
     if t == 'segmented':
-        return f"TSegmented({args(fieldKey=FK(n), options=lst([S_(o) for o in n['options']]), selected=S_(n['selected']), label=S_(n['label']) if n.get('label') else None)})"
+        return f"TSegmented({args(fieldKey=FK(n), options=lst([S_(o) for o in n['options']]), selected=S_(n['selected']), label=S_(n['label']) if n.get('label') else None, bind=BK(n), bindClass=BC(n))})"
     if t == 'radio':
         items = [f"TRadioItem({args(_=S_(i['label']), sub=S_(i['sub']) if i.get('sub') else None, badge=S_(i['badge']) if i.get('badge') else None)})" for i in n['items']]
-        return f"TRadioList({args(fieldKey=FK(n), items=lst(items), selected=str(n['selected']), label=S_(n['label']) if n.get('label') else None)})"
+        return f"TRadioList({args(fieldKey=FK(n), items=lst(items), selected=str(n['selected']), label=S_(n['label']) if n.get('label') else None, bind=BK(n), bindClass=BC(n))})"
     if t == 'checklist':
         items = [f"TCheckItem({args(_=S_(i['label']), sub=S_(i['sub']) if i.get('sub') else None, done='true' if i.get('done') else None)})" for i in n['items']]
-        return f"TChecklist({args(fieldKey=FK(n), items=lst(items), label=S_(n['label']) if n.get('label') else None)})"
-    if t == 'toggle': return f"TToggleRow({args(fieldKey=FK(n), label=S_(n['label']), sub=S_(n['sub']) if n.get('sub') else None, value='true' if n.get('on') else None)})"
+        return f"TChecklist({args(fieldKey=FK(n), items=lst(items), label=S_(n['label']) if n.get('label') else None, bind=BK(n), bindClass=BC(n))})"
+    if t == 'toggle': return f"TToggleRow({args(fieldKey=FK(n), label=S_(n['label']), sub=S_(n['sub']) if n.get('sub') else None, value='true' if n.get('on') else None, bind=BK(n), bindClass=BC(n))})"
     if t == 'field':
         kind = n.get('kind', 'text')
-        return f"TField({args(fieldKey=FK(n), label=S_(n['label']), value=S_(n.get('value')) if n.get('value') else None, unit=S_(n.get('unit')) if n.get('unit') else None, hint=S_(n.get('hint')) if n.get('hint') else None, error=S_(n.get('error')) if n.get('error') else None, placeholder=S_(n.get('placeholder')) if n.get('placeholder') else None, kind='TFieldKind.' + kind if kind != 'text' else None)})"
+        return f"TField({args(fieldKey=FK(n), label=S_(n['label']), value=S_(n.get('value')) if n.get('value') else None, unit=S_(n.get('unit')) if n.get('unit') else None, hint=S_(n.get('hint')) if n.get('hint') else None, error=S_(n.get('error')) if n.get('error') else None, placeholder=S_(n.get('placeholder')) if n.get('placeholder') else None, kind='TFieldKind.' + kind if kind != 'text' else None, bind=BK(n), bindClass=BC(n))})"
     if t == 'fieldrow': return f"TFieldRow(children: {lst([node(x, path=f'{path}.fields[{i}]') for i, x in enumerate(n['fields'])])})"
     if t == 'slider':
         return f"TSliderField({args(fieldKey=FK(n), label=S_(n['label']), value=str(float(n['value'])), min=str(float(n['min'])), max=str(float(n['max'])), minLabel=S_(n['minLabel']), maxLabel=S_(n['maxLabel']), color=dcolor(n.get('color', 'coral')), suffix=S_(n['suffix']) if n.get('suffix') else None)})"
@@ -182,10 +203,10 @@ def node(n, top=False, path=''):
             if 'program' in L: lead = f"TLead.program({S_(L['program'])})"
             elif 'avatar' in L: lead = f"TLead.avatar({S_(L['avatar'])})"
             elif 'icon' in L: lead = f"TLead.icon({S_(L['icon'])})"
-            rows.append(f"TListRow({args(key=K(f'{path}.rows[{j}]') if r.get('action') else None, label=S_(r['label']), sub=S_(r['sub']) if r.get('sub') else None, value=S_(r['value']) if r.get('value') else None, lead=lead, pill=S_(r['pill']) if r.get('pill') else None, danger='true' if r.get('danger') else None, onTap=cb(r['action']) if r.get('action') else None)})")
+            rows.append(f"TListRow({args(key=K(f'{path}.rows[{j}]') if r.get('action') else None, label=S_(r['label']), sub=S_(r['sub']) if r.get('sub') else None, value=S_(r['value']) if r.get('value') else None, lead=lead, pill=S_(r['pill']) if r.get('pill') else None, danger='true' if r.get('danger') else None, onTap=pcb(r['action'], L.get('program')) if r.get('action') else None)})")
         return f"TListGroup({args(title=S_(n['title']) if n.get('title') else None, flat='true' if n.get('flat') else None, rows=lst(rows))})"
     if t == 'tiles':
-        tiles = [f"TTile({args(key=K(f'{path}.items[{j}]') if i.get('action') else None, label=S_(i['label']), sub=S_(i['sub']) if i.get('sub') else None, program=S_(i['program']) if i.get('program') else None, glyph=S_(i['glyph']) if i.get('glyph') else None, selected='true' if i.get('selected') else None, onTap=cb(i['action']) if i.get('action') else None)})" for j, i in enumerate(n['items'])]
+        tiles = [f"TTile({args(key=K(f'{path}.items[{j}]') if i.get('action') else None, label=S_(i['label']), sub=S_(i['sub']) if i.get('sub') else None, program=S_(i['program']) if i.get('program') else None, glyph=S_(i['glyph']) if i.get('glyph') else None, selected='true' if i.get('selected') else None, onTap=pcb(i['action'], i.get('program')) if i.get('action') else None)})" for j, i in enumerate(n['items'])]
         return f"TTileGrid({args(fieldKey=FK(n), columns=str(n.get('cols', 2)) if n.get('cols', 2) != 2 else None, tiles=lst(tiles))})"
     if t == 'stats':
         st_ = [f"TStat({args(label=S_(i['label']), value=S_(i['value']), sub=S_(i['sub']) if i.get('sub') else None, program=S_(i['program']) if i.get('program') else None)})" for i in n['items']]
@@ -226,6 +247,7 @@ def ind(code, level=3):
 def screen_file(s, describe):
     cls = pascal(s['id']) + 'Screen'
     CUR['sid'] = s['id']
+    CUR['program'] = s['program']
     kids = ',\n        '.join(node(n, top=True, path=f'body[{i}]') for i, n in enumerate(s['body']))
     foot = ',\n        '.join(node(n, path=f'footer[{i}]') for i, n in enumerate(s['footer']))
     acts = '\n'.join(f'///   • {l} → {describe(a)}' for l, p, a in actions_of(s))
@@ -280,6 +302,31 @@ class {cls} extends StatelessWidget {{
 }}
 """
 
+def settings_file():
+    """lib/router/settings_screens.dart: the pinned consent- and plan-class
+    settings screens (validate.CONSENT_SCREENS, PLAN_SCREENS; P-71)."""
+    from validate import CONSENT_SCREENS, PLAN_SCREENS
+    def ids(xs): return '\n'.join(f'  {dstr(sid)},' for sid in sorted(xs))
+    return f"""// GENERATED — settings screens (P-71): screens whose submit updates
+// existing state, by the class of their bound controls (spec `bind`).
+//
+// Consent class: a control starts from the member's stored value only.
+// Nothing stored (TData.unset) and not loaded (null) both show it off and
+// write nothing; TSession.touched lists what the member changed, and a
+// submit must carry only those keys (nothing to send when there are none).
+const Set<String> consentSettingsScreens = <String>{{
+{ids(CONSENT_SCREENS)}
+}};
+
+// Plan class: a stored value seeds the control and is written to the
+// session; nothing stored (TData.unset) seeds the designed starting value;
+// not loaded (null) writes nothing. A submit carries the whole screen state,
+// and must not be sent while any bound control on the screen is not loaded.
+const Set<String> planSettingsScreens = <String>{{
+{ids(PLAN_SCREENS)}
+}};
+"""
+
 def generate(out_dir, describe, static_dir):
     lib = os.path.join(out_dir, 'lib')
     if os.path.exists(out_dir): shutil.rmtree(out_dir)
@@ -294,6 +341,7 @@ def generate(out_dir, describe, static_dir):
     lines.append('}')
     os.makedirs(os.path.join(lib, 'router'), exist_ok=True)
     open(os.path.join(lib, 'router', 'routes.dart'), 'w', newline='\n').write('\n'.join(lines) + '\n')
+    open(os.path.join(lib, 'router', 'settings_screens.dart'), 'w', newline='\n').write(settings_file())
     # screens
     imports = []
     for sid, s in SCREENS.items():
@@ -473,8 +521,40 @@ def _self_test():
         del RULES['selftest.rule']
         for k in added: del SCREENS[k]
     _device_self_test()
+    _bind_self_test()
     print('gen_dart self-test: ok')
 
+
+def _bind_self_test():
+    """Settings binding (P-71): a bound control is emitted with its bind key
+    and, on a plan screen, its class; an unbound one with neither; a push to
+    a per-programme screen carries the element's programme; and
+    settings_screens.dart lists both pinned classes."""
+    from validate import CONSENT_SCREENS, PLAN_SCREENS, load
+    load()
+    for sid, cls in ((CONSENT_SCREENS[0], None), (PLAN_SCREENS[0], 'TBindClass.plan')):
+        CUR['sid'] = sid
+        for n in (toggle('A', key='a', bind='x.a'), chips(['A'], key='a', bind='x.a'), seg(['A'], 'A', key='a', bind='x.a'),
+                  radio(['A'], key='a', bind='x.a'), checklist(['A'], key='a', bind='x.a'), field('A', kind='select', key='a', bind='x.a')):
+            code = node(n)
+            _expect("bind: 'x.a'" in code and f"fieldKey: '{sid}.a'" in code and (('bindClass: ' + cls) in code if cls else 'bindClass' not in code), code)
+            n.pop('bind')
+            _expect('bind:' not in node(n) and 'bindClass' not in node(n), node(n))
+    per = next(sid for sid, s in SCREENS.items() if ':program' in s['route'])
+    plain = next(sid for sid, s in SCREENS.items() if ':program' not in s['route'])
+    CUR['sid'], CUR['program'] = 'selftest', 'bf'
+    try:
+        _expect(act(go(per)) == f"TNav.push(context, {rconst(per)}, program: 'bf')", act(go(per)))
+        _expect(act(go(plain)) == f'TNav.push(context, {rconst(plain)})', act(go(plain)))
+        row_ = node(rows([row('Sf', lead=L_prog('sf'), action=go(per))]))
+        _expect("program: 'sf'" in row_, row_)
+        CUR['program'] = None
+        _expect(act(go(per)) == f'TNav.push(context, {rconst(per)})', act(go(per)))
+    finally:
+        CUR['program'] = None
+    text = settings_file()
+    _expect(all(f"  '{sid}'," in text for sid in CONSENT_SCREENS + PLAN_SCREENS) and text.count("',") == len(CONSENT_SCREENS) + len(PLAN_SCREENS), text)
+    _expect(text.index('consentSettingsScreens') < text.index(f"'{CONSENT_SCREENS[0]}'") < text.index('planSettingsScreens') < text.index(f"'{PLAN_SCREENS[0]}'"), text)
 
 def _device_self_test():
     """Device branches and non-queueable submits generate as R-31 says, and

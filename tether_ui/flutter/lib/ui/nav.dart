@@ -473,6 +473,22 @@ class TFailClosedResolver {
   }
 }
 
+/// Route arguments of a screen opened per programme ([TNav.push]).
+@immutable
+final class TRouteArgs {
+  const TRouteArgs({this.program});
+
+  /// Programme id (for example `bf`).
+  final String? program;
+
+  @override
+  bool operator ==(Object other) => other is TRouteArgs && other.program == program;
+  @override
+  int get hashCode => program.hashCode;
+  @override
+  String toString() => 'TRouteArgs(program: $program)';
+}
+
 abstract final class TNav {
   /// The preview chooser ("Preview: …" sheet). Never install it in release.
   static const TBranchResolver previewResolver = _askOutcome;
@@ -499,10 +515,21 @@ abstract final class TNav {
   /// Opens [route] on top. While a safety action runs ([submit]), a push
   /// opens nothing when the top route already is [route], so a safety screen
   /// is not stacked on itself; every other push always opens [route].
-  static Future<void> push(BuildContext context, String route) {
+  ///
+  /// [program] is passed to a screen opened per programme (route with
+  /// `:program`, for example program settings); it reads it with [programOf].
+  static Future<void> push(BuildContext context, String route, {String? program}) {
     final nav = Navigator.of(context);
     if (_runningSafety && _topRoute(nav)?.settings.name == route) return Future<void>.value();
-    return nav.pushNamed(route);
+    return nav.pushNamed(route, arguments: program == null ? null : TRouteArgs(program: program));
+  }
+
+  /// The programme the screen of [context] was opened for ([push] with
+  /// `program`), or null. Bound controls resolve `:program` in their bind
+  /// key with it ([TData.resolve]).
+  static String? programOf(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    return args is TRouteArgs ? args.program : null;
   }
 
   /// Replaces the calling screen (the route [context] belongs to) with

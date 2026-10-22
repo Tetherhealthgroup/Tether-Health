@@ -52,7 +52,8 @@
         }
       ],
       "label": "They can see",
-      "key": "buddy_can_see"
+      "key": "buddy_can_see",
+      "bind": "sf.buddy.can_see"
     },
     {
       "t": "card",

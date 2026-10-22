@@ -28,7 +28,8 @@
       "label": "Medicine",
       "placeholder": "Nicotine patch",
       "kind": "select",
-      "key": "medicine"
+      "key": "medicine",
+      "bind": "bf.meds.medicine"
     },
     {
       "t": "field",
@@ -42,14 +43,16 @@
       "label": "When",
       "placeholder": "Every morning",
       "kind": "select",
-      "key": "when"
+      "key": "when",
+      "bind": "bf.meds.when"
     },
     {
       "t": "toggle",
       "label": "Private reminder",
       "sub": "Lock screen hides the medicine name",
       "on": true,
-      "key": "private_reminder"
+      "key": "private_reminder",
+      "bind": "bf.meds.private_reminder"
     },
     {
       "t": "text",

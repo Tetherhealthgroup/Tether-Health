@@ -45,7 +45,8 @@
         "Breast"
       ],
       "multi": true,
-      "key": "value"
+      "key": "value",
+      "bind": "be.profile.family_cancers"
     },
     {
       "t": "field",

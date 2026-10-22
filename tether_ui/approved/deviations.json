@@ -24,6 +24,28 @@
       "change": "Leave sheet, option 1: \"Keep my data for 30 days\" / \"Rejoin anytime and pick up where you left off\" -> \"Keep my data\" / \"Kept until you delete it or delete your account. Rejoin anytime.\""
     },
     {
+      "screen": "account_notifications",
+      "decisions": [
+        "P-71"
+      ],
+      "tickets": [
+        "TH-1008a"
+      ],
+      "sha256": "6042f7d18512aaba2d1eeb81728f5b09e064d50a4c18ad8876f6a8704b2e8f2b",
+      "change": "P-71 settings binding, data only, no visual change: body[0].children[0] toggle \"check_ins_and_plan_reminders\" gets bind \"notifications.check_ins_and_plan_reminders\"; body[0].children[1] toggle \"show_sensitive_details\" gets bind \"notifications.show_sensitive_details\"; body[0].children[2] toggle \"quiet_hours\" gets bind \"notifications.quiet_hours\""
+    },
+    {
+      "screen": "account_privacy",
+      "decisions": [
+        "P-71"
+      ],
+      "tickets": [
+        "TH-1008a"
+      ],
+      "sha256": "a9899f0f6ba26bc40969f9bd5cda3025e15ecd64d1236621c4a63f14855d58a1",
+      "change": "P-71 settings binding, data only, no visual change: body[0].children[0] toggle \"cross_program_insights\" gets bind \"consents.cross_program_insights\"; body[0].children[1] toggle \"de_identified_research\" gets bind \"consents.de_identified_research\"; body[0].children[2] toggle \"anonymous_app_diagnostics\" gets bind \"consents.anonymous_app_diagnostics\""
+    },
+    {
       "screen": "auth_forgot",
       "decisions": [
         "P-31"
@@ -113,13 +135,15 @@
     {
       "screen": "be_q2",
       "decisions": [
-        "P-31"
+        "P-31",
+        "P-71"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-1008a"
       ],
-      "sha256": "0e18956f32109465739fbe7e3eaa4ff4ca1986e3fd934a49977ba2b20643ffe7",
-      "change": "P-31 placeholders, fields start empty: body[3] \"Relative’s age at diagnosis (if known)\" example \"44\" -> placeholder"
+      "sha256": "5db3b40612c1513a6006a84211f3acc9f6f6e5264ce4a62f318c3d9368f16f9e",
+      "change": "P-31 placeholders, fields start empty: body[3] \"Relative’s age at diagnosis (if known)\" example \"44\" -> placeholder | P-71 settings binding, data only, no visual change: body[2] chips \"value\" gets bind \"be.profile.family_cancers\""
     },
     {
       "screen": "bf_home",
@@ -157,13 +181,15 @@
     {
       "screen": "bf_meds_edit",
       "decisions": [
-        "P-31"
+        "P-31",
+        "P-71"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-1008a"
       ],
-      "sha256": "c9fb5619e371872043d0d2b23c6b282ec985491e9527fdd3fe92da81048a4258",
-      "change": "P-31 placeholders, fields start empty: body[1] \"Medicine\" example \"Nicotine patch\" -> placeholder; body[2] \"Strength\" example \"21 mg / 24 h\" -> placeholder; body[3] \"When\" example \"Every morning\" -> placeholder"
+      "sha256": "1645e3206b821d9617e8f27c6f59a10a0bf6386afa119fdac7391ea31dab9318",
+      "change": "P-31 placeholders, fields start empty: body[1] \"Medicine\" example \"Nicotine patch\" -> placeholder; body[2] \"Strength\" example \"21 mg / 24 h\" -> placeholder; body[3] \"When\" example \"Every morning\" -> placeholder | P-71 settings binding, data only, no visual change: body[1] field \"medicine\" gets bind \"bf.meds.medicine\"; body[3] field \"when\" gets bind \"bf.meds.when\"; body[4] toggle \"private_reminder\" gets bind \"bf.meds.private_reminder\""
     },
     {
       "screen": "ca_home",
@@ -245,13 +271,15 @@
     {
       "screen": "ck_q1",
       "decisions": [
-        "P-31"
+        "P-31",
+        "P-71"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-1008a"
       ],
-      "sha256": "ef8f8c789be17fa365878c8af15a72e2799df75a91fa6c99d8d5baad6306a75e",
-      "change": "P-31 placeholders, fields start empty: body[2] \"Age\" example \"52\" -> placeholder"
+      "sha256": "9f837eadba526280c8a02792de919dd749feecc586c991b0b40081211a0d482f",
+      "change": "P-31 placeholders, fields start empty: body[2] \"Age\" example \"52\" -> placeholder | P-71 settings binding, data only, no visual change: body[3] segmented \"sex_assigned_at_birth\" gets bind \"ck.profile.sex_assigned_at_birth\"; body[4] chips \"any_of_these\" gets bind \"ck.profile.any_of_these\""
     },
     {
       "screen": "crisis",
@@ -326,13 +354,26 @@
     {
       "screen": "hw_targets",
       "decisions": [
-        "P-31"
+        "P-31",
+        "P-71"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-1008a"
       ],
-      "sha256": "95683e0b15ab0cddbf2850f5fcf67fd8e16d3c33fff2672ac9b0f732c4e4a0ab",
-      "change": "P-31 placeholders, fields start empty: body[2].fields[0] \"Top below\" example \"130\" -> placeholder; body[2].fields[1] \"Bottom below\" example \"80\" -> placeholder"
+      "sha256": "c2ba8123dde3f7f950033fcf0072c3debdd7ed8e9421e99e8e02c3d956a9e47f",
+      "change": "P-31 placeholders, fields start empty: body[2].fields[0] \"Top below\" example \"130\" -> placeholder; body[2].fields[1] \"Bottom below\" example \"80\" -> placeholder | P-71 settings binding, data only, no visual change: body[3] radio \"value\" gets bind \"hw.targets.no_target_yet\"; body[4] chips \"when_should_we_remind_you\" gets bind \"hw.targets.reminder_time\""
+    },
+    {
+      "screen": "nu_habit",
+      "decisions": [
+        "P-71"
+      ],
+      "tickets": [
+        "TH-1008a"
+      ],
+      "sha256": "ed942b761cc533a9571227347913dfcae3480e26ae0abd2cc2c4baf7ad6a62da",
+      "change": "P-71 settings binding, data only, no visual change: body[1] radio \"value\" gets bind \"nu.habit.habit\"; body[2].children[0] toggle \"track_weight\" gets bind \"nu.habit.track_weight\""
     },
     {
       "screen": "ob_account",
@@ -399,14 +440,16 @@
       "screen": "program_settings",
       "decisions": [
         "P-08",
-        "TH-902"
+        "TH-902",
+        "P-71"
       ],
       "tickets": [
         "TH-942",
-        "TH-907"
+        "TH-907",
+        "TH-1008a"
       ],
-      "sha256": "4bedc41b8a8a0f6bf7d48de7b98738df2f50fd8c9334a5abfb921a0fa15c2935",
-      "change": "Leave row subtitle: \"Keep data 30 days or delete now\" -> \"Keep your data or delete it now\" | TH-907: Session key only, no visual change: body[2].children[0] toggle key \"care_team_dr_patel_s_clinic\" -> \"care_team_sharing\""
+      "sha256": "bdd53b64cb53b68468e4f6669ba8ad34da062d29cc34313c1528e1d089875183",
+      "change": "Leave row subtitle: \"Keep data 30 days or delete now\" -> \"Keep your data or delete it now\" | TH-907: Session key only, no visual change: body[2].children[0] toggle key \"care_team_dr_patel_s_clinic\" -> \"care_team_sharing\" | P-71 settings binding, data only, no visual change: body[1] radio \"status\" gets bind \"enrolment.:program.status\"; body[2].children[0] toggle \"care_team_sharing\" gets bind \"enrolment.:program.care_team_sharing\"; body[2].children[1] toggle \"de_identified_research\" gets bind \"enrolment.:program.de_identified_research\""
     },
     {
       "screen": "re_labs",
@@ -516,25 +559,29 @@
       "screen": "sd_caregiver",
       "decisions": [
         "P-31",
-        "TH-902"
+        "TH-902",
+        "P-71"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-1008a"
       ],
-      "sha256": "a7804abf3434b10235a979d2cb50d5eafbd8c1a9839d657c57304c7046554d5a",
-      "change": "P-31 placeholders, fields start empty: body[1] \"Name\" example \"Rosa\" -> placeholder; body[2] \"Phone\" example \"(555) 010-2244\" -> placeholder | Session key only, no visual change: body[3] checklist gets key \"caregiver_can_see\""
+      "sha256": "840d45f92c7d027710d66d214b7f54124ca03972e8575a191adf27fd7a2debbb",
+      "change": "P-31 placeholders, fields start empty: body[1] \"Name\" example \"Rosa\" -> placeholder; body[2] \"Phone\" example \"(555) 010-2244\" -> placeholder | Session key only, no visual change: body[3] checklist gets key \"caregiver_can_see\" | P-71 settings binding, data only, no visual change: body[3] checklist \"caregiver_can_see\" gets bind \"sd.caregiver.can_see\""
     },
     {
       "screen": "sf_buddy",
       "decisions": [
         "P-31",
-        "TH-902"
+        "TH-902",
+        "P-71"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-1008a"
       ],
-      "sha256": "55b41fe8a2782698daa756e2d5099ea4384e43cbfa945a4710e6e99fa815a214",
-      "change": "P-31 placeholders, fields start empty: body[2] \"Name\" example \"Sam\" -> placeholder | Session key only, no visual change: body[3] checklist gets key \"buddy_can_see\""
+      "sha256": "50211d3a2eb41e38280a5084de3563a20197412e71a2650e3a0ae14729fe6459",
+      "change": "P-31 placeholders, fields start empty: body[2] \"Name\" example \"Sam\" -> placeholder | Session key only, no visual change: body[3] checklist gets key \"buddy_can_see\" | P-71 settings binding, data only, no visual change: body[3] checklist \"buddy_can_see\" gets bind \"sf.buddy.can_see\""
     },
     {
       "screen": "sf_home",
@@ -596,13 +643,15 @@
     {
       "screen": "st_range",
       "decisions": [
-        "P-31"
+        "P-31",
+        "P-71"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-1008a"
       ],
-      "sha256": "e371503b640ea50b34b8593e9afcfbbd07f0ce4d8bca6e9fb64cc23fd37a1596",
-      "change": "P-31 placeholders, fields start empty: body[3].fields[0] \"Before meals from\" example \"80\" -> placeholder; body[3].fields[1] \"to\" example \"130\" -> placeholder; body[4] \"2 h after meals below\" example \"180\" -> placeholder; body[5].children[0] \"Low below\" example \"70\" -> placeholder; body[5].children[1] \"My low steps\" example \"15 g fast sugar, re-check in 15 min\" -> placeholder"
+      "sha256": "388d82ace41b616c8490f2c520c5748ba5dbd546fd02c5269bf98d3c6f91ebaa",
+      "change": "P-31 placeholders, fields start empty: body[3].fields[0] \"Before meals from\" example \"80\" -> placeholder; body[3].fields[1] \"to\" example \"130\" -> placeholder; body[4] \"2 h after meals below\" example \"180\" -> placeholder; body[5].children[0] \"Low below\" example \"70\" -> placeholder; body[5].children[1] \"My low steps\" example \"15 g fast sugar, re-check in 15 min\" -> placeholder | P-71 settings binding, data only, no visual change: body[2] segmented \"value\" gets bind \"st.range.unit\""
     },
     {
       "screen": "support_add_person",

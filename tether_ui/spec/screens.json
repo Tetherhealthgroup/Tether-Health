@@ -5954,7 +5954,8 @@
         ],
         "selected": 0,
         "label": "Status",
-        "key": "status"
+        "key": "status",
+        "bind": "enrolment.:program.status"
       },
       {
         "t": "card",
@@ -5966,13 +5967,15 @@
             "label": "Care team · Dr. Patel’s clinic",
             "sub": "Manual: you approve each summary",
             "on": true,
-            "key": "care_team_sharing"
+            "key": "care_team_sharing",
+            "bind": "enrolment.:program.care_team_sharing"
           },
           {
             "t": "toggle",
             "label": "De-identified research",
             "on": false,
-            "key": "de_identified_research"
+            "key": "de_identified_research",
+            "bind": "enrolment.:program.de_identified_research"
           }
         ]
       },
@@ -8657,21 +8660,24 @@
             "label": "Check-ins and plan reminders",
             "sub": "At most 2 a day",
             "on": true,
-            "key": "check_ins_and_plan_reminders"
+            "key": "check_ins_and_plan_reminders",
+            "bind": "notifications.check_ins_and_plan_reminders"
           },
           {
             "t": "toggle",
             "label": "Show sensitive details",
             "sub": "Off: program names and health data hidden",
             "on": false,
-            "key": "show_sensitive_details"
+            "key": "show_sensitive_details",
+            "bind": "notifications.show_sensitive_details"
           },
           {
             "t": "toggle",
             "label": "Quiet hours",
             "sub": "9:00 PM – 7:00 AM · safety alerts still come through",
             "on": true,
-            "key": "quiet_hours"
+            "key": "quiet_hours",
+            "bind": "notifications.quiet_hours"
           }
         ]
       },
@@ -8808,21 +8814,24 @@
             "label": "Cross-program insights",
             "sub": "Show connections between your programs",
             "on": true,
-            "key": "cross_program_insights"
+            "key": "cross_program_insights",
+            "bind": "consents.cross_program_insights"
           },
           {
             "t": "toggle",
             "label": "De-identified research",
             "sub": "Per program, off by default",
             "on": false,
-            "key": "de_identified_research"
+            "key": "de_identified_research",
+            "bind": "consents.de_identified_research"
           },
           {
             "t": "toggle",
             "label": "Anonymous app diagnostics",
             "sub": "No health entries",
             "on": false,
-            "key": "anonymous_app_diagnostics"
+            "key": "anonymous_app_diagnostics",
+            "bind": "consents.anonymous_app_diagnostics"
           }
         ]
       },
@@ -11561,7 +11570,8 @@
         "label": "Medicine",
         "placeholder": "Nicotine patch",
         "kind": "select",
-        "key": "medicine"
+        "key": "medicine",
+        "bind": "bf.meds.medicine"
       },
       {
         "t": "field",
@@ -11575,14 +11585,16 @@
         "label": "When",
         "placeholder": "Every morning",
         "kind": "select",
-        "key": "when"
+        "key": "when",
+        "bind": "bf.meds.when"
       },
       {
         "t": "toggle",
         "label": "Private reminder",
         "sub": "Lock screen hides the medicine name",
         "on": true,
-        "key": "private_reminder"
+        "key": "private_reminder",
+        "bind": "bf.meds.private_reminder"
       },
       {
         "t": "text",
@@ -12632,7 +12644,8 @@
           }
         ],
         "label": "They can see",
-        "key": "buddy_can_see"
+        "key": "buddy_can_see",
+        "bind": "sf.buddy.can_see"
       },
       {
         "t": "card",
@@ -15062,7 +15075,8 @@
           }
         ],
         "selected": -1,
-        "key": "value"
+        "key": "value",
+        "bind": "hw.targets.no_target_yet"
       },
       {
         "t": "chips",
@@ -15076,7 +15090,8 @@
         ],
         "multi": false,
         "label": "When should we remind you?",
-        "key": "when_should_we_remind_you"
+        "key": "when_should_we_remind_you",
+        "bind": "hw.targets.reminder_time"
       },
       {
         "t": "text",
@@ -16730,7 +16745,8 @@
           "mmol/L"
         ],
         "selected": "mg/dL",
-        "key": "value"
+        "key": "value",
+        "bind": "st.range.unit"
       },
       {
         "t": "fieldrow",
@@ -18800,7 +18816,8 @@
           }
         ],
         "selected": 0,
-        "key": "value"
+        "key": "value",
+        "bind": "nu.habit.habit"
       },
       {
         "t": "card",
@@ -18811,7 +18828,8 @@
             "label": "Track weight",
             "sub": "Off by default · can stay off forever",
             "on": false,
-            "key": "track_weight"
+            "key": "track_weight",
+            "bind": "nu.habit.track_weight"
           }
         ]
       }
@@ -20464,7 +20482,8 @@
           }
         ],
         "label": "Rosa can see",
-        "key": "caregiver_can_see"
+        "key": "caregiver_can_see",
+        "bind": "sd.caregiver.can_see"
       }
     ],
     "footer": [
@@ -21710,7 +21729,8 @@
         ],
         "selected": "Female",
         "label": "Sex assigned at birth",
-        "key": "sex_assigned_at_birth"
+        "key": "sex_assigned_at_birth",
+        "bind": "ck.profile.sex_assigned_at_birth"
       },
       {
         "t": "chips",
@@ -21726,7 +21746,8 @@
         ],
         "multi": true,
         "label": "Any of these?",
-        "key": "any_of_these"
+        "key": "any_of_these",
+        "bind": "ck.profile.any_of_these"
       },
       {
         "t": "text",
@@ -22811,7 +22832,8 @@
           "Breast"
         ],
         "multi": true,
-        "key": "value"
+        "key": "value",
+        "bind": "be.profile.family_cancers"
       },
       {
         "t": "field",
@@ -30977,7 +30999,8 @@
         ],
         "selected": 0,
         "label": "Status",
-        "key": "status"
+        "key": "status",
+        "bind": "enrolment.:program.status"
       },
       {
         "t": "card",
@@ -30989,13 +31012,15 @@
             "label": "Care team sharing",
             "sub": "Off · ScrollFree isn’t shared",
             "on": false,
-            "key": "care_team_sharing"
+            "key": "care_team_sharing",
+            "bind": "enrolment.:program.care_team_sharing"
           },
           {
             "t": "toggle",
             "label": "De-identified research",
             "on": false,
-            "key": "de_identified_research"
+            "key": "de_identified_research",
+            "bind": "enrolment.:program.de_identified_research"
           }
         ]
       },

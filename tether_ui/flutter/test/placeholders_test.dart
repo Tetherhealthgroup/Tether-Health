@@ -1,8 +1,9 @@
 // GENERATED — P-31: example values are placeholder (hint) text. Every
 // screen with text fields is opened and its Save / Continue elements are
 // tapped without typing. Each field must start empty, show its example only
-// as hint text and hold null in the session. Whatever is submitted must hold
-// null for these fields and never an example value.
+// as hint text and hold null in the session (a bound field on a settings
+// screen, P-71, writes nothing at all). Whatever is submitted must hold null
+// for these fields and never an example value.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tether_ui/router/app_router.dart';
@@ -19,6 +20,9 @@ class _RecordingApi implements TApi {
 }
 
 bool _holds(Object? value, String example) => value == example || (value is List && value.contains(example));
+
+/// Bound fields (spec `bind`, P-71): no session write until the member types.
+const _bound = <String>{'bf_meds_edit.medicine', 'bf_meds_edit.when'};
 
 const _cases = <(String, String, String, String, String?, bool, List<String>, List<(String, String)>)>[
   ('ob_basics', Routes.obBasics, 'footer[0]', 'Continue', null, false, ['ob_basics.what_should_we_call_you', 'ob_basics.age_range'], [('ob_basics.what_should_we_call_you', 'Alex'), ('ob_basics.age_range', '35–44')]),
@@ -112,7 +116,7 @@ void main() {
           expect(field, findsOneWidget, reason: 'field $key');
           final editable = tester.widget<EditableText>(find.descendant(of: field, matching: find.byType(EditableText)));
           expect(editable.controller.text, isEmpty, reason: '$key must start empty');
-          expect(TSession.values.containsKey(key), isTrue, reason: '$key writes to the session');
+          expect(TSession.values.containsKey(key), !_bound.contains(key), reason: _bound.contains(key) ? '$key is bound: nothing is written until the member types' : '$key writes to the session');
           expect(TSession.values[key], isNull, reason: '$key must be null until the member types');
         }
         for (final (key, hint) in c.$8) {

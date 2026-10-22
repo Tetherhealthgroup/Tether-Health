@@ -24,8 +24,8 @@ class ProgramSettingsScreen extends StatelessWidget {
       header: THeader(title: 'BreatheFree settings'),
       children: [
         TListGroup(flat: true, rows: [TListRow(label: 'BreatheFree', sub: 'Focus since Aug 14', lead: TLead.program('bf'))]),
-        TRadioList(fieldKey: 'program_settings.status', items: [TRadioItem('Focus', sub: 'Daily steps and reminders'), TRadioItem('Learn only', sub: 'Keep lessons, stop tracking'), TRadioItem('Pause', sub: 'Stop reminders; keep everything')], selected: 0, label: 'Status'),
-        TCard(eyebrow: 'Sharing', children: [TToggleRow(fieldKey: 'program_settings.care_team_sharing', label: 'Care team · Dr. Patel’s clinic', sub: 'Manual: you approve each summary', value: true), TToggleRow(fieldKey: 'program_settings.de_identified_research', label: 'De-identified research')]),
+        TRadioList(fieldKey: 'program_settings.status', items: [TRadioItem('Focus', sub: 'Daily steps and reminders'), TRadioItem('Learn only', sub: 'Keep lessons, stop tracking'), TRadioItem('Pause', sub: 'Stop reminders; keep everything')], selected: 0, label: 'Status', bind: 'enrolment.:program.status'),
+        TCard(eyebrow: 'Sharing', children: [TToggleRow(fieldKey: 'program_settings.care_team_sharing', label: 'Care team · Dr. Patel’s clinic', sub: 'Manual: you approve each summary', value: true, bind: 'enrolment.:program.care_team_sharing'), TToggleRow(fieldKey: 'program_settings.de_identified_research', label: 'De-identified research', bind: 'enrolment.:program.de_identified_research')]),
         TListGroup(title: 'Data', rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'Export BreatheFree data', sub: 'PDF + JSON', onTap: () => TNav.toast(context, 'Export is being prepared. We’ll notify you.')), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: 'Leave BreatheFree', sub: 'Keep your data or delete it now', danger: true, onTap: () => TNav.sheet(context, Routes.accountLeave))]),
       ],
       footer: [

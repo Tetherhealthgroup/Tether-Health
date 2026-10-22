@@ -36,7 +36,8 @@
         "mmol/L"
       ],
       "selected": "mg/dL",
-      "key": "value"
+      "key": "value",
+      "bind": "st.range.unit"
     },
     {
       "t": "fieldrow",

@@ -30,12 +30,47 @@ abstract final class TSession {
   static void scrub(Iterable<String> keys) {
     var removed = false;
     for (final key in keys.toList()) {
+      _touched.remove(key);
       if (values.containsKey(key)) {
         values.remove(key);
         removed = true;
       }
     }
     if (removed) changes.value++;
+  }
+
+  // Keys the member changed on the current instance of their screen (P-71).
+  static final Set<String> _touched = <String>{};
+
+  /// The keys of [screenId] ("<screenId>.<key>") that the member changed on
+  /// the screen now shown: set by a tap or by typing, and different from the
+  /// value the control started from (the stored value on a settings screen).
+  /// A control that the member sets back to its starting value is not
+  /// touched. Every input control resets its key when it is built, so keys
+  /// from an earlier visit to the screen are not included. For a
+  /// consent-class settings screen (`consentSettingsScreens`) a submit
+  /// carries only these keys; none means there is nothing to send.
+  static Set<String> touched(String screenId) => Set<String>.unmodifiable(_touched.where((k) => k.startsWith('$screenId.')));
+
+  /// Whether the member changed [key] on its screen (see [touched]).
+  static bool isTouched(String key) => _touched.contains(key);
+
+  /// Kit use: records whether the member has changed [key] from its
+  /// starting value. Does not notify [changes].
+  static void markTouched(String? key, bool touched) {
+    if (key == null) return;
+    touched ? _touched.add(key) : _touched.remove(key);
+  }
+
+  /// Kit use: a bound control (settings screen) is being built, or its
+  /// value is not loaded. Removes [key] and its touched mark without
+  /// notifying [changes], so a value from an earlier visit is neither shown
+  /// as current nor submitted. A consent-class control writes [key] only when
+  /// the member sets it; a plan-class one also writes its loaded value.
+  static void forget(String? key) {
+    if (key == null) return;
+    _touched.remove(key);
+    values.remove(key);
   }
 
   /// Password keys: `*.password` and every `auth_newpass.*` key.
@@ -52,6 +87,7 @@ abstract final class TSession {
   /// app-owned TData that caches values must drop them at the same points.
   static void clear() {
     values.clear();
+    _touched.clear();
     TSim.reset();
     _epoch++;
     changes.value++;
