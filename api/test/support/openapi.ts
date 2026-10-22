@@ -19,7 +19,11 @@ export type { ErrorObject };
 
 interface OpenApiDocument {
   info: { version: string };
-  components: { schemas: Record<string, object> };
+  paths: Record<string, Record<string, unknown>>;
+  components: {
+    schemas: Record<string, object>;
+    parameters?: Record<string, unknown>;
+  };
 }
 
 const document = yaml.load(
@@ -49,6 +53,9 @@ const asDefs = (value: unknown): unknown => {
   );
 };
 ajv.addSchema({ $defs: asDefs(document.components.schemas) }, "openapi");
+
+/** The whole contract as parsed (read-only copy), for path-level checks. */
+export const openApiDocument = (): OpenApiDocument => structuredClone(document);
 
 /** The names of every schema in components.schemas. */
 export const openApiSchemaNames = Object.keys(document.components.schemas);
