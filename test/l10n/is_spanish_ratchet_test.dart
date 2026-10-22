@@ -72,17 +72,103 @@ final _allowedForms = <RegExp>[
       r"assert\(\s*(?:widget\.)?isSpanish\s*==\s*\(\s*Localizations\.localeOf\(context\)\.languageCode\s*==\s*'es'\s*\)"),
 ];
 
-/// Every other occurrence of isSpanish (any identifier containing it) in
-/// [source], as `line: text`, comments ignored.
-List<String> otherIsSpanishUses(String source) {
-  var code = source.replaceAllMapped(
-      RegExp(r'//[^\n]*'), (m) => ' ' * m.group(0)!.length);
-  for (final form in _allowedForms) {
-    code = code.replaceAllMapped(form, (m) => ' ' * m.group(0)!.length);
+/// [source] with comments and the text of string literals replaced by
+/// spaces (same length and line breaks), keeping the code inside `${...}`
+/// interpolations: so `'a://b'` is not read as a comment and a word in a
+/// string is not read as code.
+String maskStringsAndComments(String source) {
+  final out = source.split('');
+  void blank(int from, int to) {
+    for (var k = from; k < to; k++) {
+      if (out[k] != '\n') out[k] = ' ';
+    }
   }
+
+  late int Function(int) code;
+
+  // A string literal starting at [i] (its prefix or quote); returns the
+  // index after it.
+  int string(int i) {
+    final raw = source[i] == 'r' || source[i] == 'R';
+    if (raw) i++;
+    final q = source[i];
+    final triple = source.startsWith(q * 3, i);
+    final delim = triple ? q * 3 : q;
+    i += delim.length;
+    var textFrom = i;
+    while (i < source.length) {
+      if (!raw && source[i] == r'\') {
+        i += 2;
+        continue;
+      }
+      if (source.startsWith(delim, i)) {
+        blank(textFrom, i);
+        return i + delim.length;
+      }
+      if (!raw && source.startsWith(r'${', i)) {
+        blank(textFrom, i);
+        i = code(i + 2);
+        textFrom = i;
+        continue;
+      }
+      i++;
+    }
+    blank(textFrom, i);
+    return i;
+  }
+
+  // Code from [i] up to an unmatched `}` (inside an interpolation) or the
+  // end; returns the index after that `}`.
+  code = (int i) {
+    var depth = 0;
+    while (i < source.length) {
+      final c = source[i];
+      if (source.startsWith('//', i)) {
+        final end = source.indexOf('\n', i);
+        final stop = end < 0 ? source.length : end;
+        blank(i, stop);
+        i = stop;
+      } else if (source.startsWith('/*', i)) {
+        final end = source.indexOf('*/', i + 2);
+        final stop = end < 0 ? source.length : end + 2;
+        blank(i, stop);
+        i = stop;
+      } else if (c == "'" || c == '"') {
+        i = string(i);
+      } else if ((c == 'r' || c == 'R') &&
+          i + 1 < source.length &&
+          (source[i + 1] == "'" || source[i + 1] == '"') &&
+          (i == 0 || !RegExp(r'\w').hasMatch(source[i - 1]))) {
+        i = string(i);
+      } else if (c == '{') {
+        depth++;
+        i++;
+      } else if (c == '}') {
+        if (depth == 0) return i + 1;
+        depth--;
+        i++;
+      } else {
+        i++;
+      }
+    }
+    return i;
+  };
+  code(0);
+  return out.join();
+}
+
+/// Every other occurrence of isSpanish (any identifier containing it) in
+/// [source], as `line: text`. Comments and string text are ignored.
+List<String> otherIsSpanishUses(String source) {
+  final masked = maskStringsAndComments(source);
+  final allowed = [
+    for (final form in _allowedForms)
+      for (final m in form.allMatches(source)) (m.start, m.end)
+  ];
   return [
-    for (final m in RegExp(r'\w*isSpanish\w*').allMatches(code))
-      '${'\n'.allMatches(code.substring(0, m.start)).length + 1}: ${m.group(0)}'
+    for (final m in RegExp(r'\w*isSpanish\w*').allMatches(masked))
+      if (!allowed.any((a) => a.$1 <= m.start && m.end <= a.$2))
+        '${'\n'.allMatches(masked.substring(0, m.start)).length + 1}: ${m.group(0)}'
   ];
 }
 
@@ -162,6 +248,11 @@ class A extends StatelessWidget {
 }
 """;
     expect(otherIsSpanishUses(allowed), isEmpty);
+    expect(
+        otherIsSpanishUses(
+            "final t = 'isSpanish in a string'; /* isSpanish */"),
+        isEmpty);
+    expect(maskStringsAndComments("a('x//y') // c\nb"), "a('    ')     \nb");
     for (final code in [
       "(isSpanish) ? 'a' : 'b'",
       "isSpanish == true ? 'a' : 'b'",
@@ -170,6 +261,11 @@ class A extends StatelessWidget {
       "const {true: 'a', false: 'b'}[isSpanish]!",
       'bool get _isSpanish => language == spanish;',
       'B(isSpanish: true)',
+      // A '//' inside a string is not a comment.
+      "String get c4 => Uri.parse('a://b').path + (isSpanish == true ? 'Hola' : 'Hi');",
+      "final u = 'https://x.test'; final t = isSpanish == true ? 'a' : 'b';",
+      "final u = 'a//b'; final t = (isSpanish) ? 'a' : 'b';",
+      "final t = '\${isSpanish ? 'a' : 'b'}';",
     ]) {
       expect(otherIsSpanishUses(code), isNotEmpty, reason: code);
     }
