@@ -1519,6 +1519,27 @@ describe("Records, Today, preferences, baseline and app config (e2e)", () => {
       expect(rows("programme_entries", a)).toHaveLength(1);
     });
 
+    it("check-in: replay after account deletion started → 200 with nothing new; a new key → 409", async () => {
+      const a = newCaller();
+      await enrol(a, "bf", { status: "focus" });
+      const key = newKey();
+      const body = { feel: "okay", answers: { bf: "no" } };
+      expect(
+        (await post(a, "/v1/records/check-ins", body, key)).statusCode,
+      ).toBe(201);
+      fake.startAccountDeletion(a.id);
+      const replay = await post(a, "/v1/records/check-ins", body, key);
+      expect(replay.statusCode).toBe(200);
+      expect(replay.json<{ replayed: boolean }>().replayed).toBe(true);
+      expect(rows("programme_entries", a)).toHaveLength(1);
+      expectCoded(
+        await post(a, "/v1/records/check-ins", body),
+        409,
+        "account_deletion_in_progress",
+      );
+      expect(rows("programme_entries", a)).toHaveLength(1);
+    });
+
     it("rescue: a bf rescue replayed after leaving bf → 200; other content → 409", async () => {
       const a = newCaller();
       const bf = await enrol(a, "bf");
