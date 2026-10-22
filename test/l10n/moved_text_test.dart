@@ -165,6 +165,8 @@ List<MissingText> missingText({
   required Map<String, String> keyFiles,
   required String Function(String path) source,
 }) {
+  bool quotedIn(String text, String code) =>
+      code.contains("'$text'") || code.contains('"$text"');
   final out = <MissingText>[];
   final files = inventory['files']! as Map<String, Object?>;
   for (final path in moved) {
@@ -189,21 +191,26 @@ List<MissingText> missingText({
             problem: problem
           );
       final target = keys['${group.first}'] as String?;
+      // A text that is only interpolations has nothing to compare unless a
+      // key was recorded for it.
+      if (target == null && textRuns(raw).isEmpty) continue;
       if (target == null) {
         out.add(miss('no key recorded for row ${group.first}'));
         continue;
       }
-      if (target == '=source') {
-        final kept = shown.every((i) {
-          final t = rows[i]['text']! as String;
-          return src.contains("'$t'") || src.contains('"$t"');
-        });
-        if (!kept) {
-          out.add(miss('recorded as kept in the file, but it is gone'));
+      if (target == '=source' || target.startsWith('=source:')) {
+        final where = target == '=source' ? path : target.substring(8);
+        final code = where == path ? src : source(where);
+        if (!shown.every((i) => quotedIn(rows[i]['text']! as String, code))) {
+          out.add(miss('recorded as kept in $where, but it is gone'));
         }
         continue;
       }
-      final parts = target.split('#');
+      // A word of a composed message: it must be a whole word of the key's
+      // value in its language.
+      final part = target.endsWith('^');
+      final parts =
+          (part ? target.substring(0, target.length - 1) : target).split('#');
       if (keyFiles[parts.first] != path) {
         out.add(miss(
             '${parts.first} belongs to ${keyFiles[parts.first] ?? 'no file'}, not $path'));
@@ -212,6 +219,15 @@ List<MissingText> missingText({
       final message = messages[branch]?[parts.first];
       if (message == null) {
         out.add(miss('${parts.first} is not in app_$branch.arb'));
+        continue;
+      }
+      if (part) {
+        final word = textRuns(raw, all: true).join();
+        final found = RegExp(
+                '(?<![\\p{L}\\p{N}_])${RegExp.escape(word)}(?![\\p{L}\\p{N}_])',
+                unicode: true)
+            .hasMatch(message);
+        if (!found) out.add(miss('${parts.first} does not contain "$word"'));
         continue;
       }
       final value = parts.length > 1 ? caseBody(message, parts[1]) : message;
@@ -380,6 +396,38 @@ void main() {
     };
     expect(lines(borrowed, recorded: {...keys, '6': 'other'}), [7]);
     expect(lines(good, keyFiles: {...ownFiles, 'no': 'lib/y.dart'}), [7]);
+
+    // A word of a composed message, and a literal kept in another file.
+    final composed = {
+      'files': {
+        'lib/x.dart': [
+          {'line': 1, 'branch': 'es', 'text': 'PASO'},
+          {'line': 1, 'branch': 'en', 'text': 'STEP'},
+          {'line': 2, 'branch': 'es', 'text': 'es-US'},
+        ],
+      },
+    };
+    List<int> composedLines(String es, {String other = "'es-US'"}) =>
+        missingText(
+          inventory: composed,
+          moved: {'lib/x.dart'},
+          movedKeys: {
+            'lib/x.dart': {
+              '0': 'step^',
+              '1': 'step^',
+              '2': '=source:lib/z.dart'
+            }
+          },
+          messages: {
+            'en': {'step': 'STEP {n} OF 3'},
+            'es': {'step': es},
+          },
+          keyFiles: {'step': 'lib/x.dart'},
+          source: (p) => p == 'lib/z.dart' ? other : '',
+        ).map((m) => m.line).toList();
+    expect(composedLines('PASO {n} DE 3'), isEmpty);
+    expect(composedLines('PASOS {n} DE 3'), [1]);
+    expect(composedLines('PASO {n} DE 3', other: ''), [2]);
     expect(
         textRuns(r'Hola ${name.trim()}, ¿qué tal?'), ['Hola ', ', ¿qué tal?']);
     expect(messageRuns('{a} y {n, plural, one{x} other{y}} más'),
