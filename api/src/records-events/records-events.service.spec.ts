@@ -6,6 +6,7 @@ import {
 } from "../../test/support/fake-member";
 import { ProgrammeDataException } from "../programme-data/programme-data-errors";
 import { NoFocusProgrammeException } from "./records-errors";
+import type { CheckInDto } from "./records-events.dto";
 import {
   RecordsEventsService,
   checkInReplayMatches,
@@ -88,44 +89,68 @@ describe("checkInRows (the split)", () => {
 });
 
 describe("checkInReplayMatches", () => {
-  const row = (enrolment: string, payload: object, at = NOW) => ({
-    user_id: "U",
+  const stored = (
+    enrolment: string,
+    programme: string,
+    payload: object,
+    at = NOW,
+  ) => ({
+    user_id: "u",
     enrolment_id: enrolment,
-    programme_code: "bf",
+    programme_code: programme,
     kind: "checkin",
     payload,
     occurred_at: at,
   });
+  const matches = (rows: Record<string, unknown>[], body: CheckInDto) =>
+    checkInReplayMatches(rows, body, "u", SUBMISSION);
 
-  it("equal compared fields match; times are not compared", () => {
+  it("the same body matches; times are not compared", () => {
     expect(
-      checkInReplayMatches(
-        [row("E1", { feel: "low" }, "2026-01-01T00:00:00Z")],
-        [row("e1", { feel: "low" })],
-      ),
+      matches([stored("e1", "bf", { feel: "low" }, "2026-01-01T00:00:00Z")], {
+        feel: "low",
+        occurredAt: NOW,
+      }),
     ).toBe(true);
   });
 
   it("other content does not match", () => {
     expect(
-      checkInReplayMatches(
-        [row("e1", { feel: "low" })],
-        [row("e1", { feel: "good" })],
+      matches([stored("e1", "bf", { feel: "low" })], { feel: "good" }),
+    ).toBe(false);
+  });
+
+  it("every stored row is compared, whether or not its enrolment still qualifies", () => {
+    expect(
+      matches(
+        [
+          stored("e1", "bf", { feel: "low", answer: "no" }),
+          stored("e2", "sf", { feel: "low" }),
+        ],
+        { feel: "low", answers: { bf: "no" } },
+      ),
+    ).toBe(true);
+    expect(
+      matches(
+        [
+          stored("e1", "bf", { feel: "low", answer: "no" }),
+          stored("e2", "sf", { feel: "low" }),
+        ],
+        { feel: "low" },
       ),
     ).toBe(false);
   });
 
-  it("stored rows of enrolments that no longer qualify are not compared", () => {
+  it("a stored row the new body would not write is a conflict (another card's answer)", () => {
     expect(
-      checkInReplayMatches(
-        [row("e1", { feel: "low" }), row("e2", { feel: "low" })],
-        [row("e2", { feel: "low" })],
-      ),
-    ).toBe(true);
+      matches([stored("e1", "bf", { answer: "no" })], {
+        answers: { sf: "same" },
+      }),
+    ).toBe(false);
   });
 
   it("no stored row (the key was used for another kind of row) does not match", () => {
-    expect(checkInReplayMatches([], [row("e1", { feel: "low" })])).toBe(false);
+    expect(matches([], { feel: "low" })).toBe(false);
   });
 });
 

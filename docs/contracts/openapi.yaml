@@ -1089,9 +1089,14 @@ paths:
         programme whose row would hold nothing gets no row. One bulk
         insert. A stored row under the key makes the request a repeat,
         detected right after the key and the body and before every other
-        check: the stored rows of enrolments that still qualify are compared
-        (200 `replayed` or 409 `idempotency_key_conflict`, never 409
-        `no_focus_programme` or 422) and nothing new is inserted.
+        check. Every stored row is compared (times excluded) with the row
+        the new body would write into that row's enrolment, whether or not
+        the enrolment still qualifies: all equal → 200 `replayed`; any
+        stored row whose expected row differs or would not be written → 409
+        `idempotency_key_conflict`. Enrolments that qualify now but hold no
+        stored row are ignored. A repeat is never answered 409
+        `no_focus_programme`, 409 `account_deletion_in_progress` or 422, and
+        nothing new is inserted.
       x-app-use: true
       security: [{supabaseJwt: []}]
       parameters:

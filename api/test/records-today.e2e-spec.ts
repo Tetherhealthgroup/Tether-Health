@@ -1540,6 +1540,97 @@ describe("Records, Today, preferences, baseline and app config (e2e)", () => {
       expect(rows("programme_entries", a)).toHaveLength(1);
     });
 
+    it("check-in: a stored row the new body would not write is a conflict (another card's answer)", async () => {
+      const a = newCaller();
+      await enrol(a, "bf", { status: "focus" });
+      await enrol(a, "sf", { status: "focus" });
+      const key = newKey();
+      expect(
+        (await post(a, "/v1/records/check-ins", { answers: { bf: "no" } }, key))
+          .statusCode,
+      ).toBe(201);
+      expect(rows("programme_entries", a)).toHaveLength(1);
+      expectCoded(
+        await post(
+          a,
+          "/v1/records/check-ins",
+          { answers: { sf: "same" } },
+          key,
+        ),
+        409,
+        "idempotency_key_conflict",
+      );
+      expect(rows("programme_entries", a)).toHaveLength(1);
+    });
+
+    it("check-in: other content when no stored enrolment still qualifies → 409; the same content → 200", async () => {
+      const a = newCaller();
+      const bf = await enrol(a, "bf", { status: "focus" });
+      const key = newKey();
+      expect(
+        (await post(a, "/v1/records/check-ins", { feel: "low" }, key))
+          .statusCode,
+      ).toBe(201);
+      await leave(a, bf);
+      expectCoded(
+        await post(a, "/v1/records/check-ins", { feel: "good" }, key),
+        409,
+        "idempotency_key_conflict",
+      );
+      expect(
+        (await post(a, "/v1/records/check-ins", { feel: "low" }, key))
+          .statusCode,
+      ).toBe(200);
+      expect(rows("programme_entries", a)).toHaveLength(1);
+    });
+
+    it.each([
+      ["a bf rescue", { tool: "walk", programme: "bf" }],
+      ["a shared rescue", { tool: "move" }],
+    ])(
+      "rescue: %s replayed after account deletion started → 200 with nothing new; a new key → 409",
+      async (_name, body) => {
+        const a = newCaller();
+        await enrol(a, "bf");
+        const key = newKey();
+        expect(
+          (await post(a, "/v1/records/rescues", body, key)).statusCode,
+        ).toBe(201);
+        fake.startAccountDeletion(a.id);
+        const replay = await post(a, "/v1/records/rescues", body, key);
+        expect(replay.statusCode).toBe(200);
+        expect(replay.json<{ replayed: boolean }>().replayed).toBe(true);
+        expectCoded(
+          await post(a, "/v1/records/rescues", body),
+          409,
+          "account_deletion_in_progress",
+        );
+        expect(rows("rescue_events", a)).toHaveLength(1);
+      },
+    );
+
+    it("lesson: replay after account deletion started → 200 with nothing new; a new lesson → 409", async () => {
+      const a = newCaller();
+      await enrol(a, "ck");
+      const lesson = { programme: "ck", lessonId: "ck.flu" };
+      expect((await post(a, "/v1/records/lessons", lesson)).statusCode).toBe(
+        201,
+      );
+      fake.startAccountDeletion(a.id);
+      expect((await post(a, "/v1/records/lessons", lesson)).statusCode).toBe(
+        200,
+      );
+      expectCoded(
+        await post(a, "/v1/records/lessons", {
+          programme: "ck",
+          lessonId: "ck.salt",
+        }),
+        409,
+        "account_deletion_in_progress",
+      );
+      expect(rows("lesson_progress", a)).toHaveLength(1);
+    });
+
     it("rescue: a bf rescue replayed after leaving bf → 200; other content → 409", async () => {
       const a = newCaller();
       const bf = await enrol(a, "bf");

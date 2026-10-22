@@ -106,30 +106,36 @@ export function checkInRows(
     }));
 }
 
-const lower = (value: unknown) =>
-  typeof value === "string" ? value.toLowerCase() : value;
-
 /**
- * The replay rule for a check-in whose submission already has rows: the
- * stored rows are compared with the computed rows of the same enrolments;
- * a stored row whose enrolment no longer qualifies is not compared, and
- * nothing new is inserted. True when every compared row is equal.
+ * The replay rule for a check-in whose submission already has rows: for
+ * EVERY stored row, the row the new body would write into that row's
+ * enrolment is computed (whether or not the enrolment still qualifies) and
+ * compared on the compared fields (times excluded). True only when every
+ * stored row has an equal expected row; an expected row that differs or
+ * is absent (the body would write nothing there) is a conflict. Enrolments
+ * that qualify now but hold no stored row are ignored; nothing new is
+ * inserted.
  */
 export function checkInReplayMatches(
   stored: readonly Row[],
-  computed: readonly Row[],
+  body: CheckInDto,
+  userId: string,
+  submissionId: string,
 ): boolean {
   if (stored.length === 0) return false;
-  const byEnrolment = new Map(
-    computed.map((row) => [lower(row.enrolment_id), row]),
+  const expected = checkInRows(
+    body,
+    stored.map((row) => ({
+      enrolmentId: String(row.enrolment_id),
+      programmeCode: String(row.programme_code),
+    })),
+    userId,
+    submissionId,
+    "",
   );
-  const pairs = stored.filter((row) =>
-    byEnrolment.has(lower(row.enrolment_id)),
-  );
-  return sameRows(
-    pairs,
-    pairs.map((row) => byEnrolment.get(lower(row.enrolment_id)) as Row),
-    ENTRY_COMPARED,
+  return (
+    expected.length === stored.length &&
+    sameRows(stored, expected, ENTRY_COMPARED)
   );
 }
 
@@ -174,15 +180,6 @@ export class RecordsEventsService {
       throw invalidRequest();
     }
     const client = this.clients.forUser(user);
-    const computed = async () =>
-      checkInRows(
-        body,
-        await this.focusWithCore(client, user.id),
-        user.id,
-        submissionId,
-        new Date().toISOString(),
-      );
-
     let stored = await this.storedCheckIns(
       client,
       user.id,
@@ -190,7 +187,7 @@ export class RecordsEventsService {
       requestId,
     );
     if (stored.length > 0) {
-      return this.checkInReplay(stored, await computed(), submissionId);
+      return this.checkInReplay(stored, body, user.id, submissionId);
     }
 
     await requireBarrierOpen(client);
@@ -229,15 +226,16 @@ export class RecordsEventsService {
       submissionId,
       requestId,
     );
-    return this.checkInReplay(stored, rows, submissionId);
+    return this.checkInReplay(stored, body, user.id, submissionId);
   }
 
   private checkInReplay(
     stored: Row[],
-    computed: Row[],
+    body: CheckInDto,
+    userId: string,
     submissionId: string,
   ): CheckInResult {
-    if (!checkInReplayMatches(stored, computed)) {
+    if (!checkInReplayMatches(stored, body, userId, submissionId)) {
       throw conflict("idempotency_key_conflict");
     }
     return {
