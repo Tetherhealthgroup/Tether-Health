@@ -122,7 +122,15 @@ List<MissingText> missingText({
     // Group each literal with the ones Dart joins to it.
     final groups = <List<Map<String, Object?>>>[];
     for (final r in rows) {
-      if (r['joined'] == true && groups.isNotEmpty) {
+      final text = r['text']! as String;
+      // A literal inside the previous one's interpolation (`'${a ? 'x' : 'y'}'`)
+      // is nested, not joined.
+      final nested = groups.isNotEmpty &&
+          groups.last.any((p) {
+            final outer = p['text']! as String;
+            return outer.contains("'$text'") || outer.contains('"$text"');
+          });
+      if (r['joined'] == true && groups.isNotEmpty && !nested) {
         groups.last.add(r);
       } else {
         groups.add([r]);
