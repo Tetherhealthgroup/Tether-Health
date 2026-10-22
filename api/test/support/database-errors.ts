@@ -167,6 +167,18 @@ export const DATABASE_ERRORS = [
     hint: "care_invite_invalid",
     messages: ["Invite code is not valid"] as readonly string[],
   },
+  {
+    code: "TH026",
+    hint: "programme_records_append_only",
+    messages: ["Programme records are append-only"] as readonly string[],
+  },
+  {
+    code: "TH027",
+    hint: "programme_rows_delete_only",
+    messages: [
+      "Programme records are removed only with their programme or account",
+    ] as readonly string[],
+  },
 ] as const satisfies readonly DatabaseErrorEntry[];
 
 export type DatabaseErrorHint = (typeof DATABASE_ERRORS)[number]["hint"];

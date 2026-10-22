@@ -160,7 +160,14 @@ returns jsonb language sql stable set search_path = '' as $f$
     'caregiver_events', (select count(*) from public.caregiver_events where user_id = p_user),
     'caregivers', (select count(*) from public.caregivers where user_id = p_user),
     'care_connections', (select count(*) from public.care_connections where user_id = p_user),
-    'supporters', (select count(*) from public.supporters where user_id = p_user))
+    'supporters', (select count(*) from public.supporters where user_id = p_user),
+    'observations', (select count(*) from public.observations where user_id = p_user),
+    'programme_entries', (select count(*) from public.programme_entries where user_id = p_user),
+    'rescue_events', (select count(*) from public.rescue_events where user_id = p_user),
+    'lesson_progress', (select count(*) from public.lesson_progress where user_id = p_user),
+    'programme_reminders', (select count(*) from public.programme_reminders where user_id = p_user),
+    'notification_preferences', (select count(*) from public.notification_preferences where user_id = p_user),
+    'wellbeing_baseline', (select count(*) from public.wellbeing_baseline where user_id = p_user))
 $f$;
 
 -- Everything a user holds: member rows, identity rows, avatar objects and
@@ -274,6 +281,8 @@ select th988b_test.ok(
     "sync_answers": 1, "sync_lapses": 1, "sync_areas": 1, "sync_accounts": 1,
     "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
     "caregivers": 0, "care_connections": 0, "supporters": 0,
+    "observations": 0, "programme_entries": 0, "rescue_events": 0, "lesson_progress": 0,
+    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0,
     "users": 1, "identities": 1, "sessions": 1, "avatars": 0, "deletion_started": false}'::jsonb
   and current_setting('th988b.b_seeded')::jsonb =
       current_setting('th988b.a_seeded')::jsonb || '{"avatars": 1}'::jsonb,
@@ -537,6 +546,8 @@ select th988b_test.ok(
     "sync_answers": 0, "sync_lapses": 0, "sync_areas": 0, "sync_accounts": 0,
     "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
     "caregivers": 0, "care_connections": 0, "supporters": 0,
+    "observations": 0, "programme_entries": 0, "rescue_events": 0, "lesson_progress": 0,
+    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0,
     "users": 0, "identities": 0, "sessions": 0, "avatars": 0, "deletion_started": null}'::jsonb,
   'A: no row of A is left in any member table, auth.users, auth.identities or auth.sessions');
 select th988b_test.ok(
@@ -559,7 +570,9 @@ select th988b_test.ok(
     "program_data": 0, "enrolments": 0, "programme_consents": 0, "account_consents": 0,
     "sync_answers": 0, "sync_lapses": 0, "sync_areas": 0, "sync_accounts": 0,
     "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
-    "caregivers": 0, "care_connections": 0, "supporters": 0}'::jsonb,
+    "caregivers": 0, "care_connections": 0, "supporters": 0,
+    "observations": 0, "programme_entries": 0, "rescue_events": 0, "lesson_progress": 0,
+    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0}'::jsonb,
   'A API: a repeat after the deletion succeeds with zero counts');
 select th988b_test.ok(
   th988b_test.state('00000000-0000-4000-8000-00000988b0b1') = current_setting('th988b.b_seeded')::jsonb,
@@ -795,6 +808,8 @@ select th988b_test.ok(
     "sync_answers": 0, "sync_lapses": 0, "sync_areas": 0, "sync_accounts": 0,
     "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
     "caregivers": 0, "care_connections": 0, "supporters": 0,
+    "observations": 0, "programme_entries": 0, "rescue_events": 0, "lesson_progress": 0,
+    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0,
     "users": 0, "identities": 0, "sessions": 0, "avatars": 0, "deletion_started": null}'::jsonb
   and not exists (select 1 from storage.objects where name like '00000000-0000-4000-8000-00000988b0d1%')
   and th988b_test.state('00000000-0000-4000-8000-00000988b0b1') = current_setting('th988b.b_seeded')::jsonb,

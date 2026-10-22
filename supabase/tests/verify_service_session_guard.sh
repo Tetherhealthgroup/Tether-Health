@@ -215,17 +215,27 @@ select th972_test.ok(
   'public.caregivers:caregivers_insert_own,public.caregivers:caregivers_update_own,'
   'public.enrolments:enrolments_insert_own,'
   'public.enrolments:enrolments_update_own,'
+  'public.lesson_progress:lesson_progress_insert_own,'
+  'public.notification_preferences:notification_preferences_insert_own,'
+  'public.notification_preferences:notification_preferences_update_own,'
+  'public.observations:observations_insert_own,'
   'public.profiles:profiles_update_own,'
   'public.program_data:program_data_delete_own,public.program_data:program_data_insert_own,'
   'public.program_data:program_data_update_own,'
   'public.programme_consents:programme_consents_insert_own,'
   'public.programme_consents:programme_consents_update_own,'
+  'public.programme_entries:programme_entries_insert_own,'
+  'public.programme_reminders:programme_reminders_insert_own,'
+  'public.programme_reminders:programme_reminders_update_own,'
   'public.quit_plans:quit_plans_insert_own,public.quit_plans:quit_plans_update_own,'
+  'public.rescue_events:rescue_events_insert_own,'
   'public.supporters:supporters_delete_own,public.supporters:supporters_insert_own,'
   'public.supporters:supporters_update_own,'
+  'public.wellbeing_baseline:wellbeing_baseline_insert_own,'
+  'public.wellbeing_baseline:wellbeing_baseline_update_own,'
   'storage.objects:avatars_delete_own,storage.objects:avatars_insert_own,'
   'storage.objects:avatars_update_own',
-  'the guarded write policies are exactly the 25 expected ones');
+  'the guarded write policies are exactly the 35 expected ones');
 select th972_test.ok(
   not exists (
     select 1 from pg_catalog.pg_policies
@@ -248,7 +258,9 @@ select th972_test.ok(
           or has_any_column_privilege('authenticated', c.oid, 'UPDATE')
           or has_table_privilege('authenticated', c.oid, 'DELETE'))) =
   'account_consents,care_connections,care_messages,care_shares,caregiver_events,caregivers,'
-  'enrolments,profiles,program_data,programme_consents,quit_plans,supporters',
+  'enrolments,lesson_progress,notification_preferences,observations,profiles,program_data,'
+  'programme_consents,programme_entries,programme_reminders,quit_plans,rescue_events,supporters,'
+  'wellbeing_baseline',
   'tables authenticated can write outside sync_* are exactly the reviewed set');
 select th972_test.ok(
   not exists (
@@ -684,14 +696,30 @@ select set_config('th972.b_counts', jsonb_build_object(
   'care_connections', (select count(*) from public.care_connections
                        where user_id = '00000000-0000-4000-8000-000000972002'),
   'supporters', (select count(*) from public.supporters
-                 where user_id = '00000000-0000-4000-8000-000000972002')
+                 where user_id = '00000000-0000-4000-8000-000000972002'),
+  'observations', (select count(*) from public.observations
+                   where user_id = '00000000-0000-4000-8000-000000972002'),
+  'programme_entries', (select count(*) from public.programme_entries
+                        where user_id = '00000000-0000-4000-8000-000000972002'),
+  'rescue_events', (select count(*) from public.rescue_events
+                    where user_id = '00000000-0000-4000-8000-000000972002'),
+  'lesson_progress', (select count(*) from public.lesson_progress
+                      where user_id = '00000000-0000-4000-8000-000000972002'),
+  'programme_reminders', (select count(*) from public.programme_reminders
+                          where user_id = '00000000-0000-4000-8000-000000972002'),
+  'notification_preferences', (select count(*) from public.notification_preferences
+                               where user_id = '00000000-0000-4000-8000-000000972002'),
+  'wellbeing_baseline', (select count(*) from public.wellbeing_baseline
+                         where user_id = '00000000-0000-4000-8000-000000972002')
 )::text, true);
 select th972_test.ok(
   current_setting('th972.b_counts')::jsonb = '{"profiles": 1, "quit_plans": 1,
     "program_data": 1, "enrolments": 2, "programme_consents": 3, "account_consents": 2,
     "sync_answers": 1, "sync_lapses": 1, "sync_areas": 1, "sync_accounts": 1,
     "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
-    "caregivers": 0, "care_connections": 0, "supporters": 0}'::jsonb,
+    "caregivers": 0, "care_connections": 0, "supporters": 0,
+    "observations": 0, "programme_entries": 0, "rescue_events": 0, "lesson_progress": 0,
+    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0}'::jsonb,
   'B has the expected rows before deletion');
 select th972_test.become('authenticator', '00000000-0000-4000-8000-000000972002');
 -- A recent sign-in, which begin_account_deletion requires.
@@ -954,7 +982,7 @@ registry=$(sed -nE 's/^\| `(TH[0-9]{3})` \| `([a-z_]+)` \|.*/\1 \2/p' "$contract
 [[ "$(cut -d' ' -f2 <<<"$registry" | sort | uniq -d)" == '' ]] || fail 'registry names must be unique'
 for code in TH001 TH002 TH003 TH004 TH005 TH006 TH007 TH008 TH009 TH010 \
   TH011 TH012 TH013 TH014 TH015 TH016 TH017 TH018 TH020 \
-  TH021 TH022 TH023 TH024 TH025; do
+  TH021 TH022 TH023 TH024 TH025 TH026 TH027; do
   grep -Eq "^$code " <<<"$registry" || fail "registry is missing $code"
 done
 

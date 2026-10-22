@@ -159,7 +159,12 @@ returns jsonb language sql stable set search_path = '' as $f$
     'care_shares', (select count(*) from public.care_shares where enrolment_id = p_enrolment),
     'caregiver_events', (select count(*) from public.caregiver_events
                          where caregiver_id in (select id from public.caregivers where enrolment_id = p_enrolment)),
-    'caregivers', (select count(*) from public.caregivers where enrolment_id = p_enrolment))
+    'caregivers', (select count(*) from public.caregivers where enrolment_id = p_enrolment),
+    'observations', (select count(*) from public.observations where enrolment_id = p_enrolment),
+    'programme_entries', (select count(*) from public.programme_entries where enrolment_id = p_enrolment),
+    'rescue_events', (select count(*) from public.rescue_events where enrolment_id = p_enrolment),
+    'lesson_progress', (select count(*) from public.lesson_progress where enrolment_id = p_enrolment),
+    'programme_reminders', (select count(*) from public.programme_reminders where enrolment_id = p_enrolment))
 $f$;
 
 -- True when every count in p_counts is zero.

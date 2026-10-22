@@ -178,7 +178,14 @@ returns jsonb language sql stable set search_path = '' as $f$
     'caregiver_events', (select count(*) from public.caregiver_events where user_id = p_user),
     'caregivers', (select count(*) from public.caregivers where user_id = p_user),
     'care_connections', (select count(*) from public.care_connections where user_id = p_user),
-    'supporters', (select count(*) from public.supporters where user_id = p_user))
+    'supporters', (select count(*) from public.supporters where user_id = p_user),
+    'observations', (select count(*) from public.observations where user_id = p_user),
+    'programme_entries', (select count(*) from public.programme_entries where user_id = p_user),
+    'rescue_events', (select count(*) from public.rescue_events where user_id = p_user),
+    'lesson_progress', (select count(*) from public.lesson_progress where user_id = p_user),
+    'programme_reminders', (select count(*) from public.programme_reminders where user_id = p_user),
+    'notification_preferences', (select count(*) from public.notification_preferences where user_id = p_user),
+    'wellbeing_baseline', (select count(*) from public.wellbeing_baseline where user_id = p_user))
 $f$;
 
 -- The consent release gate, exactly as documented in docs/contracts/database.md
@@ -585,7 +592,9 @@ select th988_test.ok(
     "program_data": 1, "enrolments": 2, "programme_consents": 3, "account_consents": 1,
     "sync_answers": 1, "sync_lapses": 1, "sync_areas": 1, "sync_accounts": 1,
     "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
-    "caregivers": 0, "care_connections": 0, "supporters": 0}'::jsonb
+    "caregivers": 0, "care_connections": 0, "supporters": 0,
+    "observations": 0, "programme_entries": 0, "rescue_events": 0, "lesson_progress": 0,
+    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0}'::jsonb
   and th988_test.counts('00000000-0000-4000-8000-0000009880b1') =
       th988_test.counts('00000000-0000-4000-8000-0000009880a1'),
   'setup: synthetic A and B each hold a row in every member table except the care tables, which verify_care_migration.sh covers');

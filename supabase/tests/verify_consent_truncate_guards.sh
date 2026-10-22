@@ -306,7 +306,9 @@ select th987_test.ok(
     "program_data": 0, "enrolments": 1, "programme_consents": 2, "account_consents": 1,
     "sync_answers": 0, "sync_lapses": 0, "sync_areas": 0, "sync_accounts": 0,
     "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
-    "caregivers": 0, "care_connections": 0, "supporters": 0}'::jsonb,
+    "caregivers": 0, "care_connections": 0, "supporters": 0,
+    "observations": 0, "programme_entries": 0, "rescue_events": 0, "lesson_progress": 0,
+    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0}'::jsonb,
   'A: delete_my_app_data deletes A''s consents (live and revoked) and returns the counts');
 select th987_test.ok(
   (select count(*) from public.profiles where id = '00000000-0000-4000-8000-0000009870a1') = 0
@@ -425,7 +427,7 @@ fi
 # removed and the text is joined into one lower-case line, so a statement
 # split over lines is matched as one. Trigger events ("truncate on") and
 # "execute function" in create trigger are not statements and are set aside.
-guards='programme_consents_truncate_guard|account_consents_truncate_guard|consent_documents_guard_truncate|sync_account_truncate_guard|sync_area_truncate_guard|sync_answer_truncate_guard|sync_lapse_truncate_guard|care_connections_truncate_guard|care_shares_truncate_guard|care_share_access_truncate_guard|care_messages_truncate_guard|caregivers_truncate_guard|caregiver_events_truncate_guard'
+guards='programme_consents_truncate_guard|account_consents_truncate_guard|consent_documents_guard_truncate|sync_account_truncate_guard|sync_area_truncate_guard|sync_answer_truncate_guard|sync_lapse_truncate_guard|care_connections_truncate_guard|care_shares_truncate_guard|care_share_access_truncate_guard|care_messages_truncate_guard|caregivers_truncate_guard|caregiver_events_truncate_guard|observations_truncate_guard|programme_entries_truncate_guard|rescue_events_truncate_guard|lesson_progress_truncate_guard'
 migration_problem() {
   local text change
   text=$(sed 's/--.*$//' | tr '\n\t' '  ' | tr '[:upper:]' '[:lower:]' |
