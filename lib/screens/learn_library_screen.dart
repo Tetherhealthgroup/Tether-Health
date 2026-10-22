@@ -346,82 +346,8 @@ class _LearnLibraryScreenState extends State<LearnLibraryScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 18),
-                    SectionTitle(t('Continue learning', 'Seguir aprendiendo')),
-                    const SizedBox(height: 8),
-                    ResourceCard(
-                      key: const ValueKey('learn-resume-lesson'),
-                      onTap: () => _openLesson(
-                        t(
-                          'Know your stress triggers',
-                          'Conoce tus desencadenantes de estrés',
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          const CircleAvatar(
-                            backgroundColor: AppColors.mint,
-                            radius: 28,
-                            child: Icon(
-                              Icons.auto_awesome_rounded,
-                              color: AppColors.deepTeal,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  t(
-                                    'TRIGGERS · 2 OF 4',
-                                    'DESENCADENANTES · 2 DE 4',
-                                  ),
-                                  style: const TextStyle(
-                                    color: AppColors.mutedTeal,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                                const SizedBox(height: 5),
-                                Text(
-                                  t(
-                                    'Know your stress triggers',
-                                    'Conoce tus desencadenantes de estrés',
-                                  ),
-                                  style: const TextStyle(
-                                    color: AppColors.deepTeal,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                const LinearProgressIndicator(
-                                  value: .6,
-                                  color: AppColors.coral,
-                                  backgroundColor: Color(0xFFDCE6E0),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          if (textScale > 1.3)
-                            const Icon(
-                              Icons.chevron_right_rounded,
-                              color: AppColors.deepTeal,
-                            )
-                          else
-                            Text(
-                              t('Resume', 'Continuar'),
-                              style: const TextStyle(
-                                color: AppColors.deepTeal,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+                    // No lesson progress is kept, so there is no "continue"
+                    // section and no count of saved lessons.
                     const SizedBox(height: 18),
                     SectionTitle(t('Browse topics', 'Explorar temas')),
                     const SizedBox(height: 8),
@@ -487,33 +413,6 @@ class _LearnLibraryScreenState extends State<LearnLibraryScreen> {
                           );
                         },
                       ),
-                    const SizedBox(height: 14),
-                    ResourceCard(
-                      color: AppColors.mint,
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.offline_pin_rounded,
-                            color: AppColors.deepTeal,
-                            size: 32,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              t(
-                                '3 lessons saved offline\nAudio, text and transcripts remain available.',
-                                '3 lecciones guardadas sin conexión\nAudio, texto y transcripciones disponibles.',
-                              ),
-                              style: const TextStyle(
-                                color: AppColors.deepTeal,
-                                height: 1.35,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),

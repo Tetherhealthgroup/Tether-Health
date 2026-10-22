@@ -738,7 +738,7 @@ class _QuitDateHero extends StatelessWidget {
         ),
         const SizedBox(height: 5),
         Text(
-          '$timingLabel · ${isSpanish ? 'Hora del Pacífico' : 'Pacific Time'}',
+          timingLabel,
           style: const TextStyle(
             color: AppColors.mintStrong,
             fontSize: 12,

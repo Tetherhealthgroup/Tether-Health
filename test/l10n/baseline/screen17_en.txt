@@ -1,27 +1,21 @@
-# baseline 97d81ce · screen17 · en
+# baseline TH-1015b · screen17 · en
 T Craving Rescue
 T 2 OF 5
 T CHOOSE SUPPORT
 T 40%
 T BEST MATCH
-T Start with what helped before.
-T One recommended action, based on this craving and your results.
+T What feels possible right now?
+T One recommended action, based on this craving.
 T RECOMMENDED
 T Slow breathing
 T Let the urge rise and fall while you follow a calm breathing cue.
 T 2:00
 T MINUTES
-T YOUR LAST RESULT
-T Slow breathing was selected as most helpful.
-T Craving changed from 6 to 3 after the exercise.
-T 6 → 3
-T LAST TIME
-T Personalized match
 T Works offline
 T Voice optional
 T Start 2-minute breathing
 T Why this match?
-T Craving 6/10 + your previous helpful result.
+T Craving 6/10.
 T Or choose another action
 T Your choice
 T Move for 3 minutes
@@ -45,11 +39,11 @@ SL CHOOSE SUPPORT
 SL 40%
 SV 40
 SL BEST MATCH
-SL Start with what helped before.
-SL One recommended action, based on this craving and your results.
-SL RECOMMENDED\nSlow breathing\nLet the urge rise and fall while you follow a calm breathing cue.\n2:00\nMINUTES\nYOUR LAST RESULT\nSlow breathing was selected as most helpful.\nCraving changed from 6 to 3 after the exercise.\n6 → 3\nLAST TIME\nPersonalized match\nWorks offline\nVoice optional
+SL What feels possible right now?
+SL One recommended action, based on this craving.
+SL RECOMMENDED\nSlow breathing\nLet the urge rise and fall while you follow a calm breathing cue.\n2:00\nMINUTES\nWorks offline\nVoice optional
 SL Start 2-minute breathing
-SL Why this match?\nCraving 6/10 + your previous helpful result.
+SL Why this match?\nCraving 6/10.
 SL Or choose another action
 SL Your choice
 SL Move for 3 minutes\nWalk or stretch\nOffline · No equipment

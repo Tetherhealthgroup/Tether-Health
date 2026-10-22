@@ -1,4 +1,4 @@
-# baseline 97d81ce · screen22 · en
+# baseline TH-1015b · screen22 · en
 T Slip recovery
 T PRIVATE
 T YOUR PROGRESS IS STILL HERE
@@ -36,7 +36,6 @@ T Help me decide
 T Review options without pressure
 T YOUR NEXT STEP
 T Move cigarettes out of reach, then use a 2-minute Rescue.
-T Based on the stress trigger and what helped before.
 T You can switch tools or contact support at any time.
 T Open after saving
 T Talk with a quitline counselor
@@ -79,7 +78,6 @@ SL Choose a new quit time\nToday or another date
 SL Help me decide\nReview options without pressure
 SL YOUR NEXT STEP
 SL Move cigarettes out of reach, then use a 2-minute Rescue.
-SL Based on the stress trigger and what helped before.
 SL You can switch tools or contact support at any time.
 SL Open after saving
 SL Talk with a quitline counselor\nNo one is notified unless you choose.

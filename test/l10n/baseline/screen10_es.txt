@@ -1,4 +1,4 @@
-# baseline 97d81ce · screen10 · es
+# baseline TH-1015b · screen10 · es
 T Revisa tu plan
 T 5 DE 5
 T PLAN PARA DEJARLO
@@ -11,7 +11,7 @@ T OCT
 T 29
 T JUE
 T <weekday>, <day> de <month>
-T 7 días para prepararte · Hora del Pacífico
+T 7 días para prepararte
 T VENTANA RECOMENDADA
 T HOY
 T DÍA DE DEJARLO
@@ -38,7 +38,7 @@ ST Atrás
 SL TU PLAN PARA DEJARLO
 SL Tu plan está listo.
 SL Dale una última mirada. Puedes editar cualquier parte ahora o más adelante.
-SL FECHA PARA DEJARLO\nOCT\n29\nJUE\n<weekday>, <day> de <month>\n7 días para prepararte · Hora del Pacífico\nVENTANA RECOMENDADA\nHOY\nDÍA DE DEJARLO
+SL FECHA PARA DEJARLO\nOCT\n29\nJUE\n<weekday>, <day> de <month>\n7 días para prepararte\nVENTANA RECOMENDADA\nHOY\nDÍA DE DEJARLO
 ST Editar fecha
 SL DETALLES DEL PLAN
 SL Toca para editar

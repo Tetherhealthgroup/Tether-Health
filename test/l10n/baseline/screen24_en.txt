@@ -1,4 +1,4 @@
-# baseline 97d81ce · screen24 · en
+# baseline TH-1015b · screen24 · en
 T Learn
 T Short, reviewed lessons for where you are today.
 T Search cravings, sleep, medicines, support…
@@ -16,10 +16,6 @@ T 3:12 audio
 T Plain language
 T Start lesson
 T Transcript included
-T Continue learning
-T TRIGGERS · 2 OF 4
-T Know your stress triggers
-T Resume
 T Browse topics
 T Cravings
 T 8 short lessons
@@ -33,7 +29,6 @@ T Stress & mood
 T Coping skills
 T Support
 T People & quitlines
-T 3 lessons saved offline\nAudio, text and transcripts remain available.
 T Home
 T Plan
 T Progress
@@ -52,9 +47,6 @@ SL Audio
 SL Offline
 SL Saved
 SL Start featured lesson\nFOR YOUR QUIT DAY\nCravings: what to expect today\nRecognize common urges and choose a plan before they build.\n4 min read\n3:12 audio\nPlain language\nStart lesson\nTranscript included
-SL Continue learning
-SL TRIGGERS · 2 OF 4\nKnow your stress triggers\nResume
-SV 60
 SL Browse topics
 SL Cravings\n8 short lessons
 SL Withdrawal\nWhat to expect
@@ -62,7 +54,6 @@ SL Medicines\nEducation only
 SL Slip recovery\nReturn without blame
 SL Stress & mood\nCoping skills
 SL Support\nPeople & quitlines
-SL 3 lessons saved offline\nAudio, text and transcripts remain available.
 SL Home
 SL Plan
 SL Progress
