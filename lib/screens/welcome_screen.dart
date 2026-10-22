@@ -4,6 +4,11 @@ import '../theme/app_colors.dart';
 
 enum WelcomeLanguage { english, spanish }
 
+/// Above 140% text (the iOS accessibility sizes; Android tops out at 135%)
+/// side-by-side pieces of the welcome screen are stacked so text can grow.
+bool _usesLargeTextLayout(BuildContext context) =>
+    MediaQuery.textScalerOf(context).scale(10) > 14;
+
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({
     required this.language,
@@ -121,6 +126,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           _isSpanish
                               ? 'Tu próxima respiración puede ser diferente.'
                               : 'Your next breath can be different.',
+                          // Already the largest text on screen; past 180% its
+                          // longest words no longer fit a phone-width line.
+                          textScaler: MediaQuery.textScalerOf(context)
+                              .clamp(maxScaleFactor: 1.8),
                           style: Theme.of(context)
                               .textTheme
                               .displayLarge
@@ -141,68 +150,45 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   ),
                         ),
                         SizedBox(height: compactHeight ? 14 : 24),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _WelcomeBenefit(
-                                icon: Icons.add_rounded,
-                                iconBackground: AppColors.mint,
-                                iconColor: AppColors.deepTeal,
-                                title: _isSpanish
-                                    ? 'Ayuda con los antojos'
-                                    : 'Help when cravings hit',
-                                subtitle: _isSpanish
-                                    ? 'Herramientas rápidas en cualquier lugar'
-                                    : 'Quick tools that work anywhere',
-                              ),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: _WelcomeBenefit(
-                                icon: Icons.check_rounded,
-                                iconBackground: AppColors.coralLight,
-                                iconColor: AppColors.coral,
-                                title: _isSpanish
-                                    ? 'Progreso que permanece'
-                                    : 'Progress that stays',
-                                subtitle: _isSpanish
-                                    ? 'Un desliz no borra tus logros'
-                                    : 'A slip never erases your wins',
-                              ),
-                            ),
-                          ],
-                        ),
+                        _WelcomeBenefits(isSpanish: _isSpanish),
                         SizedBox(height: compactHeight ? 16 : 28),
-                        SizedBox(
-                          width: double.infinity,
-                          height: compactHeight ? 54 : 58,
-                          child: FilledButton(
-                            key: const ValueKey('welcome-get-started'),
-                            onPressed: widget.onGetStarted,
-                            style: FilledButton.styleFrom(
-                              backgroundColor: AppColors.deepTeal,
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
+                        FilledButton(
+                          key: const ValueKey('welcome-get-started'),
+                          onPressed: widget.onGetStarted,
+                          style: FilledButton.styleFrom(
+                            backgroundColor: AppColors.deepTeal,
+                            foregroundColor: Colors.white,
+                            // A minimum, not a fixed height, so large text
+                            // grows the button instead of being clipped.
+                            minimumSize:
+                                Size.fromHeight(compactHeight ? 54 : 58),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
                             ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Text(
                                   _isSpanish ? 'Comenzar' : 'Get started',
+                                  textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontSize: 17,
                                     fontWeight: FontWeight.w800,
                                   ),
                                 ),
-                                const SizedBox(width: 12),
-                                const Icon(
-                                  Icons.arrow_forward_rounded,
-                                  color: AppColors.lime,
-                                ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(width: 12),
+                              const Icon(
+                                Icons.arrow_forward_rounded,
+                                color: AppColors.lime,
+                              ),
+                            ],
                           ),
                         ),
                         SizedBox(height: compactHeight ? 2 : 10),
@@ -223,34 +209,37 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           ),
                         ),
                         SizedBox(height: compactHeight ? 2 : 12),
-                        SizedBox(
-                          width: double.infinity,
-                          height: compactHeight ? 52 : 56,
-                          child: OutlinedButton(
-                            key: const ValueKey('welcome-spanish'),
-                            onPressed: () => _selectLanguage(
-                              _isSpanish
-                                  ? WelcomeLanguage.english
-                                  : WelcomeLanguage.spanish,
+                        OutlinedButton(
+                          key: const ValueKey('welcome-spanish'),
+                          onPressed: () => _selectLanguage(
+                            _isSpanish
+                                ? WelcomeLanguage.english
+                                : WelcomeLanguage.spanish,
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.deepTeal,
+                            minimumSize:
+                                Size.fromHeight(compactHeight ? 52 : 56),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
                             ),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AppColors.deepTeal,
-                              side: const BorderSide(
-                                color: AppColors.border,
-                                width: 1.5,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
+                            side: const BorderSide(
+                              color: AppColors.border,
+                              width: 1.5,
                             ),
-                            child: Text(
-                              _isSpanish
-                                  ? 'Continue in English'
-                                  : 'Continuar en español',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
-                              ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: Text(
+                            _isSpanish
+                                ? 'Continue in English'
+                                : 'Continuar en español',
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ),
@@ -297,88 +286,111 @@ class _WelcomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: AppColors.paper,
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.deepTeal, width: 2),
-          ),
-          child: const Icon(
-            Icons.eco_rounded,
-            size: 24,
-            color: AppColors.coral,
-          ),
-        ),
-        const SizedBox(width: 10),
-        const Expanded(
-          child: Text(
-            'BreatheFree',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: AppColors.deepTeal,
-              fontSize: 21,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ),
-        PopupMenuButton<WelcomeLanguage>(
-          key: const ValueKey('welcome-language-menu'),
-          initialValue: language,
-          onSelected: onLanguageSelected,
-          color: AppColors.paper,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-          itemBuilder: (context) => const [
-            PopupMenuItem(
-              value: WelcomeLanguage.english,
-              child: Text('English'),
-            ),
-            PopupMenuItem(
-              value: WelcomeLanguage.spanish,
-              child: Text('Español'),
-            ),
-          ],
-          child: Container(
-            height: 42,
-            padding: const EdgeInsets.symmetric(horizontal: 13),
-            decoration: BoxDecoration(
-              color: AppColors.paper,
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(
-                  Icons.language_rounded,
-                  size: 18,
-                  color: AppColors.deepTeal,
+    // A full-width Wrap rather than a Row: when large text leaves no room
+    // beside the brand, the language menu moves to its own line instead of
+    // squeezing the brand to an ellipsis.
+    return SizedBox(
+      width: double.infinity,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        runSpacing: 12,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.paper,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.deepTeal, width: 2),
                 ),
-                const SizedBox(width: 7),
-                Text(
-                  language == WelcomeLanguage.spanish ? 'Español' : 'English',
-                  style: const TextStyle(
-                    color: AppColors.deepTeal,
-                    fontWeight: FontWeight.w800,
+                child: const Icon(
+                  Icons.eco_rounded,
+                  size: 24,
+                  color: AppColors.coral,
+                ),
+              ),
+              const SizedBox(width: 10),
+              // The brand is a single word: at the largest sizes it scales
+              // down to the line instead of being cut to "B…".
+              const Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'BreatheFree',
+                    maxLines: 1,
+                    style: TextStyle(
+                      color: AppColors.deepTeal,
+                      fontSize: 21,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ),
-                const SizedBox(width: 4),
-                const Icon(
-                  Icons.keyboard_arrow_down_rounded,
-                  size: 20,
-                  color: AppColors.deepTeal,
-                ),
-              ],
+              ),
+            ],
+          ),
+          PopupMenuButton<WelcomeLanguage>(
+            key: const ValueKey('welcome-language-menu'),
+            initialValue: language,
+            onSelected: onLanguageSelected,
+            color: AppColors.paper,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: WelcomeLanguage.english,
+                child: Text('English'),
+              ),
+              PopupMenuItem(
+                value: WelcomeLanguage.spanish,
+                child: Text('Español'),
+              ),
+            ],
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 42),
+              padding: const EdgeInsets.symmetric(horizontal: 13),
+              decoration: BoxDecoration(
+                color: AppColors.paper,
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.language_rounded,
+                    size: 18,
+                    color: AppColors.deepTeal,
+                  ),
+                  const SizedBox(width: 7),
+                  Flexible(
+                    child: Text(
+                      language == WelcomeLanguage.spanish
+                          ? 'Español'
+                          : 'English',
+                      style: const TextStyle(
+                        color: AppColors.deepTeal,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    size: 20,
+                    color: AppColors.deepTeal,
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -388,8 +400,50 @@ class _WelcomeHero extends StatelessWidget {
 
   final bool compact;
 
+  static const _noJudgment = _HeroCallout(
+    icon: Icons.location_on_rounded,
+    iconColor: AppColors.coral,
+    iconBackground: AppColors.coralLight,
+    title: 'No judgment',
+    subtitle: 'just support',
+  );
+
+  static const _private = _HeroCallout(
+    icon: Icons.check_rounded,
+    iconColor: AppColors.deepTeal,
+    iconBackground: AppColors.mint,
+    title: 'Private',
+    subtitle: 'by design',
+  );
+
   @override
   Widget build(BuildContext context) {
+    final art = SizedBox(
+      height: compact ? 190 : 292,
+      child: const CustomPaint(
+        size: Size.infinite,
+        painter: _WelcomeHeroPainter(),
+      ),
+    );
+
+    // Large text makes the floating cards taller and wider than the space
+    // between them, so they would overlap each other and the art. List them
+    // under the art instead.
+    if (_usesLargeTextLayout(context)) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          art,
+          const SizedBox(height: 12),
+          const Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [_noJudgment, _private],
+          ),
+        ],
+      );
+    }
+
     return SizedBox(
       height: compact ? 190 : 292,
       child: Stack(
@@ -398,26 +452,24 @@ class _WelcomeHero extends StatelessWidget {
           const Positioned.fill(
             child: CustomPaint(painter: _WelcomeHeroPainter()),
           ),
+          // Spanning the width bounds each card, so its text wraps rather
+          // than overflowing on narrow screens.
           Positioned(
+            left: 0,
             right: 0,
             top: compact ? 26 : 48,
-            child: const _HeroCallout(
-              icon: Icons.location_on_rounded,
-              iconColor: AppColors.coral,
-              iconBackground: AppColors.coralLight,
-              title: 'No judgment',
-              subtitle: 'just support',
+            child: const Align(
+              alignment: Alignment.centerRight,
+              child: _noJudgment,
             ),
           ),
           Positioned(
             left: 0,
+            right: 0,
             bottom: compact ? 26 : 45,
-            child: const _HeroCallout(
-              icon: Icons.check_rounded,
-              iconColor: AppColors.deepTeal,
-              iconBackground: AppColors.mint,
-              title: 'Private',
-              subtitle: 'by design',
+            child: const Align(
+              alignment: Alignment.centerLeft,
+              child: _private,
             ),
           ),
         ],
@@ -469,25 +521,27 @@ class _HeroCallout extends StatelessWidget {
             child: Icon(icon, color: iconColor, size: 22),
           ),
           const SizedBox(width: 9),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: AppColors.deepTeal,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: AppColors.deepTeal,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
-              ),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  color: AppColors.mutedTeal,
-                  fontSize: 11,
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: AppColors.mutedTeal,
+                    fontSize: 11,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -598,6 +652,48 @@ class _WelcomeHeroPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _WelcomeHeroPainter oldDelegate) => false;
+}
+
+class _WelcomeBenefits extends StatelessWidget {
+  const _WelcomeBenefits({required this.isSpanish});
+
+  final bool isSpanish;
+
+  @override
+  Widget build(BuildContext context) {
+    final cravings = _WelcomeBenefit(
+      icon: Icons.add_rounded,
+      iconBackground: AppColors.mint,
+      iconColor: AppColors.deepTeal,
+      title: isSpanish ? 'Ayuda con los antojos' : 'Help when cravings hit',
+      subtitle: isSpanish
+          ? 'Herramientas rápidas en cualquier lugar'
+          : 'Quick tools that work anywhere',
+    );
+    final progress = _WelcomeBenefit(
+      icon: Icons.check_rounded,
+      iconBackground: AppColors.coralLight,
+      iconColor: AppColors.coral,
+      title: isSpanish ? 'Progreso que permanece' : 'Progress that stays',
+      subtitle: isSpanish
+          ? 'Un desliz no borra tus logros'
+          : 'A slip never erases your wins',
+    );
+
+    // Two half-width columns split words mid-way at large text sizes.
+    if (_usesLargeTextLayout(context)) {
+      return Column(
+        children: [cravings, const SizedBox(height: 14), progress],
+      );
+    }
+    return Row(
+      children: [
+        Expanded(child: cravings),
+        const SizedBox(width: 14),
+        Expanded(child: progress),
+      ],
+    );
+  }
 }
 
 class _WelcomeBenefit extends StatelessWidget {

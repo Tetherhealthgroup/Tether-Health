@@ -148,6 +148,10 @@ class WhyBreatheFreeScreen extends StatelessWidget {
                                 isSpanish
                                     ? 'Apoyo para los momentos más importantes.'
                                     : 'Support for the moments that matter most.',
+                                // Already the largest text on screen; past
+                                // 180% its longest words no longer fit.
+                                textScaler: MediaQuery.textScalerOf(context)
+                                    .clamp(maxScaleFactor: 1.8),
                                 style: Theme.of(context)
                                     .textTheme
                                     .displayLarge
@@ -279,8 +283,9 @@ class _WhyHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 48,
+    // A minimum height: large text grows the header instead of clipping it.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 48),
       child: Row(
         children: [
           IconButton.outlined(
@@ -299,15 +304,19 @@ class _WhyHeader extends StatelessWidget {
               children: [
                 Icon(Icons.eco_rounded, color: AppColors.coral, size: 23),
                 SizedBox(width: 7),
+                // One word: at the largest sizes it scales down to the
+                // space left instead of being cut to "B…".
                 Flexible(
-                  child: Text(
-                    'BreatheFree',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: AppColors.deepTeal,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      'BreatheFree',
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: AppColors.deepTeal,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                      ),
                     ),
                   ),
                 ),
@@ -315,7 +324,7 @@ class _WhyHeader extends StatelessWidget {
             ),
           ),
           Container(
-            height: 30,
+            constraints: const BoxConstraints(minHeight: 30),
             padding: const EdgeInsets.symmetric(horizontal: 10),
             alignment: Alignment.center,
             decoration: BoxDecoration(
@@ -635,36 +644,42 @@ class _WhyBottomAction extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: compact ? 50 : 54,
-                  child: FilledButton(
-                    key: const ValueKey('why-continue'),
-                    onPressed: onContinue,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.deepTeal,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
+                FilledButton(
+                  key: const ValueKey('why-continue'),
+                  onPressed: onContinue,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.deepTeal,
+                    foregroundColor: Colors.white,
+                    // A minimum, not a fixed height, so large text grows
+                    // the button instead of being clipped.
+                    minimumSize: Size.fromHeight(compact ? 50 : 54),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
                           isSpanish ? 'Continuar' : 'Continue',
+                          textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        const Icon(
-                          Icons.arrow_forward_rounded,
-                          color: AppColors.lime,
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Icon(
+                        Icons.arrow_forward_rounded,
+                        color: AppColors.lime,
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(height: 8),
