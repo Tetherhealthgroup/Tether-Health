@@ -7,7 +7,7 @@ void main() {
   Widget buildScreen({
     bool isSpanish = false,
     bool reminderPreviews = true,
-    MedicationTodayStatus todayStatus = MedicationTodayStatus.taken,
+    MedicationTodayStatus? todayStatus,
     ValueChanged<bool>? onReminderPreviewsChanged,
     ValueChanged<MedicationTodayStatus>? onTodayStatusChanged,
     VoidCallback? onBack,
@@ -66,6 +66,22 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  // Records a plan through the sheet, as the member would.
+  Future<void> recordPlan(WidgetTester tester, String medicine) async {
+    final addPlan = find.byKey(const ValueKey('medication-add-update-plan'));
+    await scrollTo(tester, addPlan);
+    await tester.tap(addPlan);
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(ValueKey('medication-plan-medicine-$medicine')),
+    );
+    await tester.pump();
+    await tapVisible(
+      tester,
+      find.byKey(const ValueKey('medication-plan-sheet-done')),
+    );
+  }
+
   String formatTime(DateTime value) {
     final hour12 = value.hour % 12 == 0 ? 12 : value.hour % 12;
     final minute = value.minute.toString().padLeft(2, '0');
@@ -81,8 +97,17 @@ void main() {
       findsOneWidget,
     );
     expect(find.text('Medication center'), findsOneWidget);
+    // Nothing is shown as recorded until the member records it.
+    expect(find.text('Nicotine patch'), findsNothing);
+    expect(find.text('Recorded as taken'), findsNothing);
+    expect(
+      find.byKey(const ValueKey('medication-no-recorded-plan')),
+      findsOneWidget,
+    );
+
+    await recordPlan(tester, 'nicotinePatch');
     expect(find.text('Nicotine patch'), findsOneWidget);
-    expect(find.text('Recorded as taken'), findsOneWidget);
+    expect(find.byKey(const ValueKey('medication-status-title')), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -116,6 +141,11 @@ void main() {
         onTodayStatusChanged: (value) => selectedStatus = value,
       ),
     );
+    await recordPlan(tester, 'nicotinePatch');
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('medication-update-status')),
+    );
+    await tester.pumpAndSettle();
 
     await tester.tap(
       find.byKey(const ValueKey('medication-update-status')),
@@ -160,6 +190,11 @@ void main() {
       ),
     );
 
+    await recordPlan(tester, 'nicotinePatch');
+    await tester.ensureVisible(
+      find.byKey(const ValueKey('medication-update-status')),
+    );
+    await tester.pumpAndSettle();
     final before = DateTime.now();
 
     await tester.tap(
@@ -307,7 +342,13 @@ void main() {
     await tester.tap(addPlan);
     await tester.pumpAndSettle();
 
-    expect(find.text('Recorded medication plan'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.text('Recorded medication plan'),
+      ),
+      findsOneWidget,
+    );
 
     await tester.tap(
       find.byKey(
@@ -348,7 +389,13 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Recorded medication plan'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(BottomSheet),
+        matching: find.text('Recorded medication plan'),
+      ),
+      findsOneWidget,
+    );
     expect(tester.takeException(), isNull);
   });
 }

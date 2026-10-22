@@ -96,6 +96,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   late final bool _ownsAppLocale;
   bool _showHotspots = false;
   bool _usingDesktopLayout = false;
+  // Set once the member reaches Home; from then on the main tabs act as tabs.
+  bool _reachedHome = false;
   WelcomeLanguage get _language =>
       _appLocale.isSpanish ? WelcomeLanguage.spanish : WelcomeLanguage.english;
   // Optional consents and reminders start off; the member turns them on.
@@ -159,7 +161,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   // How a reminder looks on the lock screen, not a consent: the generic,
   // private preview stays on.
   bool _medicationReminderPreviews = true;
-  MedicationTodayStatus _medicationTodayStatus = MedicationTodayStatus.taken;
+  // Nothing is recorded for today until the member records it.
+  MedicationTodayStatus? _medicationTodayStatus;
 
   ProfileIdentity get _profileIdentity => ProfileIdentity(
         signedIn: _accountController.isSignedIn,
@@ -182,6 +185,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     _appLocale.addListener(_onLocaleChanged);
     final restoredPlan = _quitPlanController.plan;
     if (restoredPlan != null) _applyQuitPlan(restoredPlan);
+    _reachedHome = _homeScreens.contains(widget.currentIndex);
     _configureSystemUi();
   }
 
@@ -202,6 +206,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   void didUpdateWidget(covariant ApprovedScreenPlayer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.currentIndex != widget.currentIndex) {
+      if (_homeScreens.contains(widget.currentIndex)) _reachedHome = true;
       _configureSystemUi();
     }
   }
@@ -818,6 +823,9 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
   /// What each screen's own back or close control does. Android system Back
   /// uses the same action; a screen without one goes to the previous screen.
   VoidCallback _backActionFor(int index) {
+    // Once a plan has started, the main tabs go back to Home rather than
+    // through onboarding.
+    if (_reachedHome && _mainTabScreens.contains(index)) return _openHome;
     switch (index) {
       case 6:
       case 7:
@@ -845,6 +853,29 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
       default:
         return widget.onPrevious;
     }
+  }
+
+  /// Home before the quit date (with its countdown) and Home from the quit
+  /// date on. Back leaves the app from either.
+  static const _homeScreens = <int>{11, 21};
+
+  /// Plan, Learn, Progress and Support in the bottom navigation.
+  static const _mainTabScreens = <int>{10, 24, 25, 26};
+
+  bool get _quitDateIsAhead => (_quitDate ?? _defaultQuitDate())
+      .isAfter(DateUtils.dateOnly(DateTime.now()));
+
+  /// The quit-day Home counts time since the quit date, so before that date
+  /// Home is the preparation Home with its countdown.
+  void _openHome() => widget.onSelectScreen(_quitDateIsAhead ? 11 : 21);
+
+  String? get _firstSupporterName {
+    for (final person in _supportPeople) {
+      if (person.enabled && person.name.trim().isNotEmpty) {
+        return person.name.trim();
+      }
+    }
+    return null;
   }
 
   /// Screens that confirm before closing handle system Back themselves, so
@@ -1071,7 +1102,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               completedTasks: _completedPreparationTasks,
               treatmentSupport: _treatmentSupport,
               careTeamReminder: _careTeamReminder,
-              onBack: widget.onPrevious,
+              onBack: _backActionFor(10),
               onEditQuitDate: () => _openPlanEditor(7),
               onEditApproach: () => _openPlanEditor(6),
               onEditReasons: () => _openPlanEditor(8),
@@ -1290,7 +1321,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
                   _stressResetResultSaved = true;
                   _dailyStrongestCraving = _stressResetRecheckCraving;
                 });
-                widget.onSelectScreen(11);
+                _openHome();
               },
               onRepeat: () {
                 setState(() {
@@ -1445,7 +1476,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               reasonText: _reasonLabel(isSpanish),
               practiceLabel:
                   _rescueTool == RescueTool.move ? '3 minutes' : '2 minutes',
-              onContinue: () => widget.onSelectScreen(21),
+              onContinue: _openHome,
               onRepeatRescue: () {
                 setState(() {
                   _activeRescueElapsedSeconds = 0;
@@ -1456,7 +1487,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
                 widget.onSelectScreen(18);
               },
               onHumanSupport: () => widget.onSelectScreen(26),
-              onBackToToday: () => widget.onSelectScreen(21),
+              onBackToToday: _openHome,
             );
           }
 
@@ -1492,6 +1523,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             return SlipRecoveryScreen(
               isSpanish: isSpanish,
               initiallySaved: _slipRecoverySaved,
+              supportName: _firstSupporterName,
               onClose: _backActionFor(22),
               onSave: () {
                 setState(() => _slipRecoverySaved = true);
@@ -1522,7 +1554,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               onBack: widget.onPrevious,
               onOpenLearn: () => widget.onSelectScreen(24),
               onOpenSupport: () => widget.onSelectScreen(26),
-              onOpenHome: () => widget.onSelectScreen(21),
+              onOpenHome: _openHome,
               onOpenProgress: () => widget.onSelectScreen(25),
             );
           }
@@ -1533,7 +1565,7 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             return LearnLibraryScreen(
               isSpanish: isSpanish,
               profileIdentity: _profileIdentity,
-              onOpenHome: () => widget.onSelectScreen(21),
+              onOpenHome: _openHome,
               onOpenPlan: () => widget.onSelectScreen(10),
               onOpenProgress: () => widget.onSelectScreen(25),
               onOpenSettings: () => widget.onSelectScreen(27),
@@ -1547,9 +1579,9 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
             return ProgressDashboardScreen(
               isSpanish: isSpanish,
               profileIdentity: _profileIdentity,
-              onBack: widget.onPrevious,
+              onBack: _backActionFor(25),
               onOpenSettings: () => widget.onSelectScreen(27),
-              onOpenHome: () => widget.onSelectScreen(21),
+              onOpenHome: _openHome,
               onOpenPlan: () => widget.onSelectScreen(10),
               onOpenLearn: () => widget.onSelectScreen(24),
               onOpenSupport: () => widget.onSelectScreen(26),
@@ -1563,10 +1595,10 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
               isSpanish: isSpanish,
               profileIdentity: _profileIdentity,
               supportPeople: _supportPeople,
-              onBack: widget.onPrevious,
+              onBack: _backActionFor(26),
               onOpenSettings: () => widget.onSelectScreen(27),
               onCallQuitline: () => unawaited(_callQuitline()),
-              onOpenHome: () => widget.onSelectScreen(21),
+              onOpenHome: _openHome,
               onOpenPlan: () => widget.onSelectScreen(10),
               onOpenProgress: () => widget.onSelectScreen(25),
               onOpenLearn: () => widget.onSelectScreen(24),
@@ -1633,7 +1665,8 @@ class _ApprovedScreenPlayerState extends State<ApprovedScreenPlayer> {
     // only leaves the app from the first screen; dialogs and sheets are routes
     // above this one, so they close first.
     return PopScope<Object?>(
-      canPop: widget.currentIndex == 0,
+      canPop: widget.currentIndex == 0 ||
+          _homeScreens.contains(widget.currentIndex),
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) _handleSystemBack();
       },

@@ -309,6 +309,150 @@ void main() {
     });
   });
 
+  group('no sample data on the remaining screens', () {
+    testWidgets('slip recovery offers the quitline when no one was added',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(const BreatheFreeApp(initialScreen: 22));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Jordan'), findsNothing);
+      expect(find.text('Talk with a quitline counselor'), findsOneWidget);
+      final selectedTriggers = find.byWidgetPredicate(
+        (widget) =>
+            widget.runtimeType.toString() == '_TriggerChoice' &&
+            (widget as dynamic).selected == true,
+      );
+      expect(selectedTriggers, findsNothing);
+    });
+
+    testWidgets('slip recovery names the member\'s own supporter',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(BreatheFreeApp(
+        initialScreen: 22,
+        quitPlanController: _restored(quitDate: _today()),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Want Synthetic Lee or a quitline counselor?'),
+        findsOneWidget,
+      );
+      expect(find.textContaining('Jordan'), findsNothing);
+    });
+
+    testWidgets('medication center shows no medicine or status until recorded',
+        (tester) async {
+      usePhone(tester);
+      await tester.pumpWidget(const BreatheFreeApp(initialScreen: 23));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Nicotine patch'), findsNothing);
+      expect(find.text('Recorded as taken'), findsNothing);
+      expect(find.text('YOUR RECORDED PLAN'), findsNothing);
+      expect(
+        find.byKey(const ValueKey('medication-no-recorded-plan')),
+        findsOneWidget,
+      );
+
+      // Recording a medicine does not record a status for today.
+      await tapKey(tester, 'medication-add-update-plan');
+      await tapKey(tester, 'medication-plan-medicine-nicotineGum');
+      await tapKey(tester, 'medication-plan-sheet-done');
+      expect(find.text('Nicotine gum'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('medication-status-title')),
+        findsNothing,
+      );
+    });
+
+    testWidgets('quit-day advice is not attributed to the member\'s triggers',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(BreatheFreeApp(
+        initialScreen: 21,
+        quitPlanController: _restored(quitDate: _today()),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('From your trigger plan'), findsNothing);
+      expect(find.text('About 5 minutes'), findsOneWidget);
+    });
+
+    testWidgets('Home before the quit date is the countdown Home',
+        (tester) async {
+      usePhone(tester);
+      await tester.pumpWidget(BreatheFreeApp(
+        initialScreen: 25,
+        quitPlanController: _restored(
+          quitDate: _today().add(const Duration(days: 3)),
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      await tapKey(tester, 'learn-nav-home');
+      expect(
+        find.byKey(const ValueKey('functional-home-preparation-screen')),
+        findsOneWidget,
+      );
+      expect(find.text('SINCE YOUR PLANNED QUIT TIME'), findsNothing);
+      expect(find.text('3 days'), findsOneWidget);
+    });
+
+    testWidgets('saving a stress reset opens the Home for the quit date',
+        (tester) async {
+      Future<void> saveFrom(DateTime quitDate) async {
+        await tester.pumpWidget(BreatheFreeApp(
+          key: ValueKey(quitDate),
+          initialScreen: 15,
+          quitPlanController: _restored(quitDate: quitDate),
+        ));
+        await tester.pumpAndSettle();
+        await tapKey(tester, 'exercise-recheck-save');
+      }
+
+      tester.view.physicalSize = const Size(800, 1800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await saveFrom(_today());
+      expect(find.text('SINCE YOUR PLANNED QUIT TIME'), findsOneWidget);
+
+      await saveFrom(_today().add(const Duration(days: 4)));
+      expect(
+        find.byKey(const ValueKey('functional-home-preparation-screen')),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('Home from the quit date on is the quit-day Home',
+        (tester) async {
+      tester.view.physicalSize = const Size(800, 1800);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(BreatheFreeApp(
+        initialScreen: 25,
+        quitPlanController: _restored(quitDate: _today()),
+      ));
+      await tester.pumpAndSettle();
+
+      await tapKey(tester, 'learn-nav-home');
+      expect(find.text('SINCE YOUR PLANNED QUIT TIME'), findsOneWidget);
+    });
+  });
+
   group('optional consents and reminders start off', () {
     testWidgets('privacy choices on the consent screen', (tester) async {
       usePhone(tester);
@@ -606,3 +750,34 @@ class _MemoryGuestStore implements GuestQuitPlanStore {
   @override
   Future<void> clear() async => snapshot = null;
 }
+
+DateTime _today() => DateUtils.dateOnly(DateTime.now());
+
+QuitPlanController _restored({required DateTime quitDate}) =>
+    QuitPlanController.disabled()
+      ..plan = QuitPlan(
+        userId: '',
+        dailyCigaretteUse: null,
+        smokingTriggers: const [],
+        customSmokingTrigger: null,
+        readinessPath: 'prepare',
+        quitPlanPath: 'setQuitDate',
+        quitDate: quitDate,
+        quitDayCheckIn: false,
+        quitReasons: const ['future'],
+        customQuitReason: null,
+        topQuitReason: 'future',
+        supportPeople: const [
+          QuitPlanSupportPerson(
+            id: 'synthetic-1',
+            name: 'Synthetic Lee',
+            relationship: 'Friend',
+            channel: 'text',
+            checkIn: '',
+            enabled: true,
+          ),
+        ],
+        preparationTasks: const [],
+        treatmentSupport: false,
+        careTeamReminder: false,
+      );

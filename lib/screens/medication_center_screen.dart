@@ -56,7 +56,9 @@ class MedicationCenterScreen extends StatefulWidget {
 
   final bool isSpanish;
   final bool reminderPreviews;
-  final MedicationTodayStatus todayStatus;
+
+  /// Today's status as the member recorded it; null until they record one.
+  final MedicationTodayStatus? todayStatus;
   final ValueChanged<bool> onReminderPreviewsChanged;
   final ValueChanged<MedicationTodayStatus> onTodayStatusChanged;
   final VoidCallback onBack;
@@ -70,7 +72,8 @@ class MedicationCenterScreen extends StatefulWidget {
 }
 
 class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
-  _RecordedMedicine _recordedMedicine = _RecordedMedicine.nicotinePatch;
+  // No medicine is shown as the member's until they record one.
+  _RecordedMedicine? _recordedMedicine;
   _RecordedTiming _recordedTiming = _RecordedTiming.morning;
   String _recordedNote = '';
   DateTime? _takenRecordedAt;
@@ -115,7 +118,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
     return '$hour12:$minute $period';
   }
 
-  String get statusTitle => switch (widget.todayStatus) {
+  String? get statusTitle => switch (widget.todayStatus) {
+        null => null,
         MedicationTodayStatus.taken => _takenRecordedAt == null
             ? t('Recorded as taken', 'Registrado como tomado')
             : t(
@@ -128,7 +132,8 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
           t('Recorded as missed', 'Registrado como omitido'),
       };
 
-  String get statusSubtitle => switch (widget.todayStatus) {
+  String? get statusSubtitle => switch (widget.todayStatus) {
+        null => null,
         MedicationTodayStatus.taken => t(
             'Next reminder: Tomorrow at 8:00 AM',
             'Próximo recordatorio: mañana a las 8:00 AM',
@@ -463,16 +468,19 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
                     height: 50,
                     child: FilledButton(
                       key: const ValueKey('medication-plan-sheet-done'),
-                      onPressed: () {
-                        Navigator.pop(
-                          sheetContext,
-                          _MedicationPlanDraft(
-                            medicine: draftMedicine,
-                            timing: draftTiming,
-                            note: noteController.text.trim(),
-                          ),
-                        );
-                      },
+                      // Done records the plan, so it waits for a medicine.
+                      onPressed: draftMedicine == null
+                          ? null
+                          : () {
+                              Navigator.pop(
+                                sheetContext,
+                                _MedicationPlanDraft(
+                                  medicine: draftMedicine!,
+                                  timing: draftTiming,
+                                  note: noteController.text.trim(),
+                                ),
+                              );
+                            },
                       style: FilledButton.styleFrom(
                         backgroundColor: AppColors.deepTeal,
                         foregroundColor: Colors.white,
@@ -774,16 +782,22 @@ class _MedicationCenterScreenState extends State<MedicationCenterScreen> {
                   children: [
                     _ClinicalNotice(isSpanish: isSpanish),
                     const SizedBox(height: 14),
-                    _RecordedPlanCard(
-                      isSpanish: isSpanish,
-                      planTitle: _medicineLabel(_recordedMedicine),
-                      planInstruction: _planInstruction,
-                      usePatchArtwork:
-                          _recordedMedicine == _RecordedMedicine.nicotinePatch,
-                      statusTitle: statusTitle,
-                      statusSubtitle: statusSubtitle,
-                      onUpdateStatus: () => _openStatusSheet(context),
-                    ),
+                    if (_recordedMedicine case final medicine?)
+                      _RecordedPlanCard(
+                        isSpanish: isSpanish,
+                        planTitle: _medicineLabel(medicine),
+                        planInstruction: _planInstruction,
+                        usePatchArtwork:
+                            medicine == _RecordedMedicine.nicotinePatch,
+                        statusTitle: statusTitle,
+                        statusSubtitle: statusSubtitle,
+                        onUpdateStatus: () => _openStatusSheet(context),
+                      )
+                    else
+                      _NoRecordedPlanCard(
+                        isSpanish: isSpanish,
+                        onTap: () => _openPlanSheet(context),
+                      ),
                     const SizedBox(height: 14),
                     _ReminderPreviewCard(
                       isSpanish: isSpanish,
@@ -1158,6 +1172,59 @@ class _ClinicalNotice extends StatelessWidget {
   }
 }
 
+/// Shown until the member records a medication plan. Uses the wording of
+/// the plan sheet it opens.
+class _NoRecordedPlanCard extends StatelessWidget {
+  const _NoRecordedPlanCard({required this.isSpanish, required this.onTap});
+
+  final bool isSpanish;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      key: const ValueKey('medication-no-recorded-plan'),
+      color: AppColors.paper,
+      borderRadius: BorderRadius.circular(18),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isSpanish
+                    ? 'Plan de medicamentos registrado'
+                    : 'Recorded medication plan',
+                style: const TextStyle(
+                  fontFamily: 'Arial',
+                  color: AppColors.deepTeal,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                isSpanish
+                    ? 'Registra un plan que ya usas con tu profesional clínico o equipo de atención. BreatheFree no receta ni cambia una dosis.'
+                    : 'Record a plan you already use with your clinician or care team. BreatheFree does not prescribe or change a dose.',
+                style: const TextStyle(
+                  fontFamily: 'Arial',
+                  color: AppColors.mutedTeal,
+                  fontSize: 13,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _RecordedPlanCard extends StatelessWidget {
   const _RecordedPlanCard({
     required this.isSpanish,
@@ -1173,8 +1240,8 @@ class _RecordedPlanCard extends StatelessWidget {
   final String planTitle;
   final String planInstruction;
   final bool usePatchArtwork;
-  final String statusTitle;
-  final String statusSubtitle;
+  final String? statusTitle;
+  final String? statusSubtitle;
   final VoidCallback onUpdateStatus;
 
   @override
@@ -1321,8 +1388,10 @@ class _RecordedPlanCard extends StatelessWidget {
                         color: AppColors.lime,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.check_rounded,
+                      child: Icon(
+                        statusTitle == null
+                            ? Icons.more_horiz_rounded
+                            : Icons.check_rounded,
                         color: AppColors.deepTeal,
                         size: 20,
                       ),
@@ -1343,30 +1412,32 @@ class _RecordedPlanCard extends StatelessWidget {
                               letterSpacing: .65,
                             ),
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            statusTitle,
-                            key: const ValueKey('medication-status-title'),
-                            maxLines: 2,
-                            style: const TextStyle(
-                              fontFamily: 'Arial',
-                              color: Colors.white,
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w700,
-                              height: 1.08,
+                          if (statusTitle case final title?) ...[
+                            const SizedBox(height: 3),
+                            Text(
+                              title,
+                              key: const ValueKey('medication-status-title'),
+                              maxLines: 2,
+                              style: const TextStyle(
+                                fontFamily: 'Arial',
+                                color: Colors.white,
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w700,
+                                height: 1.08,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            statusSubtitle,
-                            maxLines: 2,
-                            style: const TextStyle(
-                              fontFamily: 'Arial',
-                              color: Color(0xFFBFD5CD),
-                              fontSize: 9.5,
-                              height: 1.15,
+                            const SizedBox(height: 3),
+                            Text(
+                              statusSubtitle ?? '',
+                              maxLines: 2,
+                              style: const TextStyle(
+                                fontFamily: 'Arial',
+                                color: Color(0xFFBFD5CD),
+                                fontSize: 9.5,
+                                height: 1.15,
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ),

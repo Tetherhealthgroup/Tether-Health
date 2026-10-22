@@ -879,9 +879,9 @@ class _NextBestStepCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  isSpanish
-                      ? 'De tu plan de desencadenantes · Unos 5 minutos'
-                      : 'From your trigger plan · About 5 minutes',
+                  // General advice, not taken from the member's triggers, so
+                  // it is not attributed to their plan.
+                  isSpanish ? 'Unos 5 minutos' : 'About 5 minutes',
                   style: const TextStyle(
                     color: AppColors.mutedTeal,
                     fontSize: 8.5,

@@ -23,7 +23,8 @@ void main() {
     await tester.tap(
       find.byKey(const ValueKey('medication-nav-home')),
     );
-    expect(key.currentState!.currentIndex, 21);
+    // Before the quit date, Home is the preparation Home.
+    expect(key.currentState!.currentIndex, 11);
 
     key.currentState!.goTo(23);
     await tester.pumpAndSettle();

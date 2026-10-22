@@ -18,6 +18,7 @@ class SlipRecoveryScreen extends StatefulWidget {
     required this.onOpenNextStep,
     required this.onOpenSupport,
     this.initiallySaved = false,
+    this.supportName,
     super.key,
   });
 
@@ -28,6 +29,9 @@ class SlipRecoveryScreen extends StatefulWidget {
   final VoidCallback onOpenSupport;
   final bool initiallySaved;
 
+  /// The member's first support person, or null when they have added none.
+  final String? supportName;
+
   @override
   State<SlipRecoveryScreen> createState() => _SlipRecoveryScreenState();
 }
@@ -35,7 +39,8 @@ class SlipRecoveryScreen extends StatefulWidget {
 class _SlipRecoveryScreenState extends State<SlipRecoveryScreen> {
   String _whatHappened = 'One cigarette';
   String _whenChoice = 'Just now';
-  final Set<String> _triggers = <String>{'Stress'};
+  // No trigger is chosen for the member.
+  final Set<String> _triggers = <String>{};
   String _recoveryChoice = 'Continue from this moment';
   late bool _saved;
 
@@ -236,6 +241,7 @@ class _SlipRecoveryScreenState extends State<SlipRecoveryScreen> {
                             _SupportCard(
                               sx: sx,
                               isSpanish: widget.isSpanish,
+                              supportName: widget.supportName,
                               onTap: widget.onOpenSupport,
                             ),
                             const SizedBox(height: 14.7),
@@ -1388,12 +1394,26 @@ class _SupportCard extends StatelessWidget {
   const _SupportCard({
     required this.sx,
     required this.isSpanish,
+    required this.supportName,
     required this.onTap,
   });
 
   final double sx;
   final bool isSpanish;
+  final String? supportName;
   final VoidCallback onTap;
+
+  String get _title {
+    final name = supportName;
+    if (name == null) {
+      return isSpanish
+          ? 'Habla con un consejero de la línea para dejar de fumar'
+          : 'Talk with a quitline counselor';
+    }
+    return isSpanish
+        ? '¿Quieres a $name o a un consejero de la línea de ayuda?'
+        : 'Want $name or a quitline counselor?';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1439,9 +1459,8 @@ class _SupportCard extends StatelessWidget {
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        isSpanish
-                            ? '¿Quieres a Jordan o a un consejero de la línea de ayuda?'
-                            : 'Want Jordan or a quitline counselor?',
+                        _title,
+                        key: const ValueKey('slip-recovery-support-title'),
                         maxLines: 1,
                         style: const TextStyle(
                           fontFamily: 'Arial',

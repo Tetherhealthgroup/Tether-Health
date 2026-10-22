@@ -1,4 +1,5 @@
 import 'package:breathefree_patient/main.dart';
+import 'package:breathefree_patient/quit_plan/guest_quit_plan_store.dart';
 import 'package:breathefree_patient/quit_plan/quit_plan.dart';
 import 'package:breathefree_patient/quit_plan/quit_plan_controller.dart';
 import 'package:flutter/material.dart';
@@ -169,6 +170,152 @@ void main() {
     expect(systemNavigatorPops, isEmpty);
   });
 
+  testWidgets('a returning member restored onto Home leaves with one Back',
+      (tester) async {
+    usePhone(tester);
+    final store = _MemoryGuestStore()
+      ..snapshot = GuestQuitPlanSnapshot(
+        plan: _savedPlan().plan!,
+        stage: GuestPlanStage.active,
+        savedAt: DateTime.utc(2026, 10, 1),
+      );
+    await tester.pumpWidget(BreatheFreeApp(
+      quitPlanController: QuitPlanController.disabled(guestStore: store),
+    ));
+    await tester.pumpAndSettle();
+    expect(screen('functional-home-preparation-screen'), findsOneWidget);
+
+    await systemBack(tester);
+
+    expect(systemNavigatorPops, hasLength(1));
+    expect(screen('functional-home-preparation-screen'), findsOneWidget);
+  });
+
+  testWidgets('Back on the quit-day Home leaves the app', (tester) async {
+    usePhone(tester);
+    tester.view.physicalSize = const Size(800, 1800);
+    tester.view.devicePixelRatio = 1;
+    await tester.pumpWidget(BreatheFreeApp(
+      initialScreen: 21,
+      quitPlanController: _savedPlan(quitDate: _today()),
+    ));
+    await tester.pumpAndSettle();
+
+    await systemBack(tester);
+
+    expect(systemNavigatorPops, hasLength(1));
+  });
+
+  testWidgets('Back on any main tab goes to Home, not the previous tab',
+      (tester) async {
+    usePhone(tester);
+    await tester.pumpWidget(BreatheFreeApp(
+      initialScreen: 11,
+      quitPlanController: _savedPlan(),
+    ));
+    await tester.pumpAndSettle();
+
+    await tapKey(tester, 'preparation-nav-progress');
+    await tapKey(tester, 'learn-nav-support');
+    expect(screen('functional-support-hub-screen'), findsOneWidget);
+    await systemBack(tester);
+    expect(screen('functional-home-preparation-screen'), findsOneWidget);
+
+    await tapKey(tester, 'preparation-nav-learn');
+    expect(screen('learn-library-screen'), findsOneWidget);
+    await systemBack(tester);
+    expect(screen('functional-home-preparation-screen'), findsOneWidget);
+
+    // Plan is the review screen; after the plan has started it is a tab.
+    await tapKey(tester, 'preparation-nav-plan');
+    expect(screen('functional-review-quit-plan-screen'), findsOneWidget);
+    await systemBack(tester);
+    expect(screen('functional-home-preparation-screen'), findsOneWidget);
+
+    // The in-app back arrow on a tab does the same.
+    await tapKey(tester, 'preparation-nav-progress');
+    await tapKey(tester, 'learn-nav-support');
+    await tester.tap(find.bySemanticsLabel('Go back'));
+    await tester.pumpAndSettle();
+    expect(screen('functional-home-preparation-screen'), findsOneWidget);
+    expect(systemNavigatorPops, isEmpty);
+  });
+
+  testWidgets('after starting the plan, Back from a tab goes to Home',
+      (tester) async {
+    usePhone(tester);
+    await tester.pumpWidget(const BreatheFreeApp());
+    await tester.pumpAndSettle();
+    for (final key in const [
+      'welcome-get-started',
+      'why-continue',
+      'consent-agree-continue',
+      'baseline-choice-tenOrFewer',
+      'baseline-next',
+      'trigger-choice-stress',
+      'trigger-continue',
+      'readiness-continue',
+      'quit-path-continue',
+      'quit-date-confirm',
+      'reason-choice-future',
+      'reasons-save',
+      'support-save',
+      'review-start-plan',
+    ]) {
+      await tapKey(tester, key);
+    }
+    expect(screen('functional-home-preparation-screen'), findsOneWidget);
+
+    // Progress, then Plan: Back goes to Home, not to the previous tab.
+    await tapKey(tester, 'preparation-nav-progress');
+    await tapKey(tester, 'learn-nav-plan');
+    expect(screen('functional-review-quit-plan-screen'), findsOneWidget);
+    await systemBack(tester);
+    expect(screen('functional-home-preparation-screen'), findsOneWidget);
+
+    await systemBack(tester);
+    expect(systemNavigatorPops, hasLength(1));
+  });
+
+  testWidgets('Back inside a flow opened from a tab returns to that tab',
+      (tester) async {
+    usePhone(tester);
+    await tester.pumpWidget(BreatheFreeApp(
+      initialScreen: 11,
+      quitPlanController: _savedPlan(),
+    ));
+    await tester.pumpAndSettle();
+
+    await tapKey(tester, 'preparation-nav-support');
+    await tapKey(tester, 'support-open-settings');
+    expect(screen('functional-settings-privacy-screen'), findsOneWidget);
+    await systemBack(tester);
+    expect(screen('functional-support-hub-screen'), findsOneWidget);
+    await systemBack(tester);
+    expect(screen('functional-home-preparation-screen'), findsOneWidget);
+    expect(systemNavigatorPops, isEmpty);
+  });
+
+  testWidgets('before the plan starts, Back from the review steps back',
+      (tester) async {
+    usePhone(tester);
+    final store = _MemoryGuestStore()
+      ..snapshot = GuestQuitPlanSnapshot(
+        plan: _savedPlan().plan!,
+        stage: GuestPlanStage.draft,
+        savedAt: DateTime.utc(2026, 10, 1),
+      );
+    await tester.pumpWidget(BreatheFreeApp(
+      quitPlanController: QuitPlanController.disabled(guestStore: store),
+    ));
+    await tester.pumpAndSettle();
+    expect(screen('functional-review-quit-plan-screen'), findsOneWidget);
+
+    await systemBack(tester);
+    expect(screen('functional-support-preparation-screen'), findsOneWidget);
+    expect(systemNavigatorPops, isEmpty);
+  });
+
   testWidgets('Back in Rescue tool choice returns where Rescue was opened',
       (tester) async {
     usePhone(tester);
@@ -229,8 +376,10 @@ void main() {
   });
 }
 
-QuitPlanController _savedPlan() {
-  final today = DateUtils.dateOnly(DateTime.now());
+DateTime _today() => DateUtils.dateOnly(DateTime.now());
+
+QuitPlanController _savedPlan({DateTime? quitDate}) {
+  final today = _today();
   return QuitPlanController.disabled()
     ..plan = QuitPlan(
       userId: '',
@@ -239,7 +388,7 @@ QuitPlanController _savedPlan() {
       customSmokingTrigger: null,
       readinessPath: 'prepare',
       quitPlanPath: 'setQuitDate',
-      quitDate: today.add(const Duration(days: 7)),
+      quitDate: quitDate ?? today.add(const Duration(days: 7)),
       quitDayCheckIn: false,
       quitReasons: const ['future'],
       customQuitReason: null,
@@ -258,4 +407,20 @@ QuitPlanController _savedPlan() {
       treatmentSupport: false,
       careTeamReminder: false,
     );
+}
+
+class _MemoryGuestStore implements GuestQuitPlanStore {
+  GuestQuitPlanSnapshot? snapshot;
+
+  @override
+  bool get isPersistent => true;
+
+  @override
+  Future<GuestQuitPlanSnapshot?> load() async => snapshot;
+
+  @override
+  Future<void> save(GuestQuitPlanSnapshot value) async => snapshot = value;
+
+  @override
+  Future<void> clear() async => snapshot = null;
 }
