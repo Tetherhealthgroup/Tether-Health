@@ -30,14 +30,15 @@ class HwHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       header: THeader(title: 'Heartwise', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TCard(variant: TCardVariant.dark, eyebrow: 'Last reading · 7:52 AM', children: [TBigNumber(value: '128/82', unit: 'mmHg', caption: 'Average of 2 · target below 130/80')]),
-        TButton(key: const ValueKey('a:body[1]'), label: 'Log blood pressure', onPressed: () => TNav.push(context, Routes.hwLog), arrow: true),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: 'Trends', sub: '30-day average 132/82', onTap: () => TNav.push(context, Routes.hwTrends)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: 'Cholesterol panel', sub: 'LDL 138 · Sep 30', onTap: () => TNav.push(context, Routes.hwLipids)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: 'Visit summary', sub: 'Preview before sharing', onTap: () => TNav.push(context, Routes.hwSummary)), TListRow(key: const ValueKey('a:body[2].rows[3]'), label: 'From your health record', sub: '12 readings · Patel Family Medicine (Epic)', onTap: () => TNav.push(context, Routes.recordsItem)), TListRow(key: const ValueKey('a:body[2].rows[4]'), label: 'My targets', sub: '130/80 from Dr. Patel', onTap: () => TNav.push(context, Routes.hwTargets)), TListRow(key: const ValueKey('a:body[2].rows[5]'), label: 'Program settings', sub: 'Status, sharing, export, leave', onTap: () => TNav.push(context, Routes.programSettings, program: 'hw'))]),
-        TEmergencyCard(text: 'Chest pain, pressure or trouble breathing? Call 911 now.', actions: [TButton(key: const ValueKey('a:body[3].actions[0]'), label: 'Call 911', onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger, small: true)]),
+        TCard(variant: TCardVariant.dark, eyebrow: s.hwHomeBodyN0Eyebrow, children: [TBigNumber(value: '128/82', unit: 'mmHg', caption: s.hwHomeBodyN0ChildrenN0Caption)]),
+        TButton(key: const ValueKey('a:body[1]'), label: s.hwHomeBodyN1Label, onPressed: () => TNav.push(context, Routes.hwLog), arrow: true),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: s.hwHomeBodyN2RowsN0Label, sub: s.hwHomeBodyN2RowsN0Sub, onTap: () => TNav.push(context, Routes.hwTrends)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: s.hwHomeBodyN2RowsN1Label, sub: s.hwHomeBodyN2RowsN1Sub, onTap: () => TNav.push(context, Routes.hwLipids)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: s.hwHomeBodyN2RowsN2Label, sub: s.hwHomeBodyN2RowsN2Sub, onTap: () => TNav.push(context, Routes.hwSummary)), TListRow(key: const ValueKey('a:body[2].rows[3]'), label: s.hwHomeBodyN2RowsN3Label, sub: s.hwHomeBodyN2RowsN3Sub, onTap: () => TNav.push(context, Routes.recordsItem)), TListRow(key: const ValueKey('a:body[2].rows[4]'), label: s.hwHomeBodyN2RowsN4Label, sub: s.hwHomeBodyN2RowsN4Sub, onTap: () => TNav.push(context, Routes.hwTargets)), TListRow(key: const ValueKey('a:body[2].rows[5]'), label: s.hwHomeBodyN2RowsN5Label, sub: s.hwHomeBodyN2RowsN5Sub, onTap: () => TNav.push(context, Routes.programSettings, program: 'hw'))]),
+        TEmergencyCard(text: s.hwHomeBodyN3Text, actions: [TButton(key: const ValueKey('a:body[3].actions[0]'), label: s.hwHomeBodyN3ActionsN0Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger, small: true)]),
       ],
     );
   }

@@ -19,17 +19,18 @@ class RecordsImportingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Importing', left: THeaderLeft.close),
+      header: THeader(title: s.recordsImportingHeaderTitle, left: THeaderLeft.close),
       children: [
-        TTitle('Importing your records…'),
-        TBody('Usually under a minute. You can leave this screen.', tone: TTextTone.muted),
-        TCard(children: [TChecklist(items: [TCheckItem('Conditions', sub: '4 found', done: true), TCheckItem('Vital signs', sub: '12 blood pressure readings', done: true), TCheckItem('Lab results', sub: '9 results', done: true), TCheckItem('Immunizations', sub: 'Checking…'), TCheckItem('Smoking status', sub: 'Waiting')])]),
+        TTitle(s.recordsImportingBodyN0Text),
+        TBody(s.recordsImportingBodyN1Text, tone: TTextTone.muted),
+        TCard(children: [TChecklist(items: [TCheckItem(s.recordsImportingBodyN2ChildrenN0ItemsN0Label, value: 'Conditions', sub: s.recordsImportingBodyN2ChildrenN0ItemsN0Sub, done: true), TCheckItem(s.recordsImportingBodyN2ChildrenN0ItemsN1Label, value: 'Vital signs', sub: s.recordsImportingBodyN2ChildrenN0ItemsN1Sub, done: true), TCheckItem(s.recordsImportingBodyN2ChildrenN0ItemsN2Label, value: 'Lab results', sub: s.recordsImportingBodyN2ChildrenN0ItemsN2Sub, done: true), TCheckItem(s.recordsImportingBodyN2ChildrenN0ItemsN3Label, value: 'Immunizations', sub: s.recordsImportingBodyN2ChildrenN0ItemsN3Sub), TCheckItem(s.recordsImportingBodyN2ChildrenN0ItemsN4Label, value: 'Smoking status', sub: s.recordsImportingBodyN2ChildrenN0ItemsN4Sub)])]),
         TSkeleton(lines: 2),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Review imported data', onPressed: () => TNav.replace(context, Routes.recordsReview), arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Cancel import', onTap: () => TNav.popTo(context, Routes.recordsHub)),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.recordsImportingFooterN0Label, onPressed: () => TNav.replace(context, Routes.recordsReview), arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.recordsImportingFooterN1Label, onTap: () => TNav.popTo(context, Routes.recordsHub)),
       ],
     );
   }

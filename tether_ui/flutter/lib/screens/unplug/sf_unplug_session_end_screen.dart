@@ -18,16 +18,17 @@ class SfUnplugSessionEndScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TSheet(
       children: [
-        TTitle('End your session early?'),
-        TBody('This is a strict session. Choose or type a reason; it is kept with the session on this phone. Nothing resets.', tone: TTextTone.muted),
-        TChips(fieldKey: 'sf_unplug_session_end.reason', options: ['Need an app for work', 'Expecting a message', 'Changed my mind', 'Other'], multi: false, label: 'Reason'),
-        TField(fieldKey: 'sf_unplug_session_end.note', label: 'Anything to add?', placeholder: 'Optional', kind: TFieldKind.multiline),
+        TTitle(s.sfUnplugSessionEndBodyN0Text),
+        TBody(s.sfUnplugSessionEndBodyN1Text, tone: TTextTone.muted),
+        TChips(fieldKey: 'sf_unplug_session_end.reason', options: ['Need an app for work', 'Expecting a message', 'Changed my mind', 'Other'], labels: [s.sfUnplugSessionEndBodyN2OptionsN0, s.sfUnplugSessionEndBodyN2OptionsN1, s.sfUnplugSessionEndBodyN2OptionsN2, s.sfUnplugSessionEndBodyN2OptionsN3], multi: false, label: s.sfUnplugSessionEndBodyN2Label),
+        TField(fieldKey: 'sf_unplug_session_end.note', label: s.sfUnplugSessionEndBodyN3Label, placeholder: s.sfUnplugSessionEndBodyN3Placeholder, kind: TFieldKind.multiline),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'End session', onPressed: () => TNav.branch(context, 'Strict session: reason given?', <String, VoidCallback>{'Reason given': () => TNav.submit(context, 'CALL device:unplug/endSession', screenId: 'sf_unplug_session_end', then: () => TNav.replace(context, Routes.sfUnplugSessionDoneEarly)), 'No reason yet': () => TNav.toast(context, 'Choose or type a reason to end a strict session.')}, decide: 'sf.unplug.reason'), variant: TButtonVariant.danger),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Keep going', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugSessionEndFooterN0Label, onPressed: () => TNav.branch(context, 'Strict session: reason given?', <String, VoidCallback>{'Reason given': () => TNav.submit(context, 'CALL device:unplug/endSession', screenId: 'sf_unplug_session_end', then: () => TNav.replace(context, Routes.sfUnplugSessionDoneEarly)), 'No reason yet': () => TNav.toast(context, s.sfUnplugSessionEndFooterN0ActionCasesN1ActionValue)}, decide: 'sf.unplug.reason'), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfUnplugSessionEndFooterN1Label, onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );
   }

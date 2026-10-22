@@ -19,18 +19,19 @@ class ReLabsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Add lab results', pill: 'Lab'),
+      header: THeader(title: s.reLabsHeaderTitle, pill: s.reLabsHeaderPill),
       children: [
-        TField(fieldKey: 're_labs.egfr', label: 'eGFR', unit: 'mL/min/1.73m²', placeholder: '58', kind: TFieldKind.number),
-        TField(fieldKey: 're_labs.urine_acr', label: 'Urine ACR', unit: 'mg/g', placeholder: '42', kind: TFieldKind.number),
-        TField(fieldKey: 're_labs.alt_liver', label: 'ALT (liver)', unit: 'U/L', placeholder: 'Optional', kind: TFieldKind.number),
-        TField(fieldKey: 're_labs.lab_date', label: 'Lab date', placeholder: 'Oct 3, 2026', kind: TFieldKind.date),
-        TBody('Copy numbers exactly from your report. Renew shows trends; your clinician explains them.', tone: TTextTone.small),
-        TLink(key: const ValueKey('a:body[5]'), label: 'Import from my health record', onTap: () => TNav.push(context, Routes.recordsAdd)),
+        TField(fieldKey: 're_labs.egfr', label: s.reLabsBodyN0Label, unit: 'mL/min/1.73m²', placeholder: '58', kind: TFieldKind.number),
+        TField(fieldKey: 're_labs.urine_acr', label: s.reLabsBodyN1Label, unit: 'mg/g', placeholder: '42', kind: TFieldKind.number),
+        TField(fieldKey: 're_labs.alt_liver', label: s.reLabsBodyN2Label, unit: 'U/L', placeholder: s.reLabsBodyN2Placeholder, kind: TFieldKind.number),
+        TField(fieldKey: 're_labs.lab_date', label: s.reLabsBodyN3Label, placeholder: s.reLabsBodyN3Placeholder, kind: TFieldKind.date),
+        TBody(s.reLabsBodyN4Text, tone: TTextTone.small),
+        TLink(key: const ValueKey('a:body[5]'), label: s.reLabsBodyN5Label, onTap: () => TNav.push(context, Routes.recordsAdd)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save results', onPressed: () => TNav.submit(context, 'POST /v1/program-data/re/labs', screenId: 're_labs', then: () => TNav.toast(context, 'Saved', then: () => TNav.replace(context, Routes.reHistory))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.reLabsFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/re/labs', screenId: 're_labs', then: () => TNav.toast(context, s.reLabsFooterN0ActionThenValue, then: () => TNav.replace(context, Routes.reHistory))), arrow: true),
       ],
     );
   }

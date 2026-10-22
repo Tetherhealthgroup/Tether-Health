@@ -19,18 +19,19 @@ class EaQ1Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Optional check', pill: '1 of 4'),
+      header: THeader(title: s.eaQ1HeaderTitle, pill: s.eaQ1HeaderPill),
       children: [
         TSteps(n: 1, total: 4),
-        TBody('Over the last 2 weeks, how often have you been bothered by…', tone: TTextTone.small),
-        TTitle('Little interest or pleasure in doing things?'),
-        TRadioList(fieldKey: 'ea_q1.value', items: [TRadioItem('Not at all'), TRadioItem('Several days'), TRadioItem('More than half the days'), TRadioItem('Nearly every day')], selected: 1),
-        TBody('PHQ-2 / GAD-2 · validated questions · skippable', tone: TTextTone.small),
+        TBody(s.eaQ1BodyN1Text, tone: TTextTone.small),
+        TTitle(s.eaQ1BodyN2Text),
+        TRadioList(fieldKey: 'ea_q1.value', items: [TRadioItem(s.eaQ1BodyN3ItemsN0Label, value: 'Not at all'), TRadioItem(s.eaQ1BodyN3ItemsN1Label, value: 'Several days'), TRadioItem(s.eaQ1BodyN3ItemsN2Label, value: 'More than half the days'), TRadioItem(s.eaQ1BodyN3ItemsN3Label, value: 'Nearly every day')], selected: 1),
+        TBody(s.eaQ1BodyN4Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Next', onPressed: () => TNav.push(context, Routes.eaResult), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Skip the check', onPressed: () => TNav.push(context, Routes.eaPlan), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.eaQ1FooterN0Label, onPressed: () => TNav.push(context, Routes.eaResult), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.eaQ1FooterN1Label, onPressed: () => TNav.push(context, Routes.eaPlan), variant: TButtonVariant.secondary),
       ],
     );
   }

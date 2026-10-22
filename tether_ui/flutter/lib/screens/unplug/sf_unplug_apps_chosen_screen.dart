@@ -19,17 +19,18 @@ class SfUnplugAppsChosenScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Choose apps', pill: 'Step 2 of 3'),
+      header: THeader(title: s.sfUnplugAppsChosenHeaderTitle, pill: s.sfUnplugAppsChosenHeaderPill),
       children: [
-        TTitle('Name your groups'),
-        TBody('iPhone doesn’t tell Tether the app names, so give each group a name you’ll recognize. Group names stay on this phone.', tone: TTextTone.muted),
-        TListGroup(title: 'Your groups', rows: [TListRow(label: 'Video apps', sub: '3 apps'), TListRow(label: 'Feeds', sub: '2 apps')]),
-        TField(fieldKey: 'sf_unplug_apps_chosen.group_name', label: 'New group name', placeholder: 'e.g. Games'),
-        TButton(key: const ValueKey('a:body[4]'), label: 'Add another group', onPressed: () => TNav.sheet(context, Routes.sfUnplugPickerIos), variant: TButtonVariant.secondary, small: true),
+        TTitle(s.sfUnplugAppsChosenBodyN0Text),
+        TBody(s.sfUnplugAppsChosenBodyN1Text, tone: TTextTone.muted),
+        TListGroup(title: s.sfUnplugAppsChosenBodyN2Title, rows: [TListRow(label: s.sfUnplugAppsChosenBodyN2RowsN0Label, sub: s.sfUnplugAppsChosenBodyN2RowsN0Sub), TListRow(label: s.sfUnplugAppsChosenBodyN2RowsN1Label, sub: s.sfUnplugAppsChosenBodyN2RowsN1Sub)]),
+        TField(fieldKey: 'sf_unplug_apps_chosen.group_name', label: s.sfUnplugAppsChosenBodyN3Label, placeholder: s.sfUnplugAppsChosenBodyN3Placeholder),
+        TButton(key: const ValueKey('a:body[4]'), label: s.sfUnplugAppsChosenBodyN4Label, onPressed: () => TNav.sheet(context, Routes.sfUnplugPickerIos), variant: TButtonVariant.secondary, small: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Next: limits', onPressed: () => TNav.push(context, Routes.sfUnplugLimits), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugAppsChosenFooterN0Label, onPressed: () => TNav.push(context, Routes.sfUnplugLimits), arrow: true),
       ],
     );
   }

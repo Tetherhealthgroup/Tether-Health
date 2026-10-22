@@ -24,17 +24,18 @@ class TodayEmptyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Today', left: THeaderLeft.logo, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
+      header: THeader(title: s.todayEmptyHeaderTitle, left: THeaderLeft.logo, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'today',
       children: [
-        TTitle('Good evening, Alex.'),
+        TTitle(s.todayEmptyBodyN0Text),
         TIllustration(glyph: '+'),
-        TTitle('Nothing in focus right now', center: true),
-        TBody('Your programs are paused or in Learn only. Pick one for daily support, or keep exploring.', tone: TTextTone.muted, center: true),
-        TButton(key: const ValueKey('a:body[4]'), label: 'Choose a focus program', onPressed: () => TNav.push(context, Routes.accountPrograms), arrow: true),
-        TButton(key: const ValueKey('a:body[5]'), label: 'Browse lessons', onPressed: () => TNav.tab(context, Routes.learn), variant: TButtonVariant.secondary),
-        TCard(title: 'Need help now?', text: 'Rescue and Support still work', cta: TButton(key: const ValueKey('a:body[6].cta[0]'), label: 'Support', onPressed: () => TNav.tab(context, Routes.support), variant: TButtonVariant.secondary, small: true)),
+        TTitle(s.todayEmptyBodyN2Text, center: true),
+        TBody(s.todayEmptyBodyN3Text, tone: TTextTone.muted, center: true),
+        TButton(key: const ValueKey('a:body[4]'), label: s.todayEmptyBodyN4Label, onPressed: () => TNav.push(context, Routes.accountPrograms), arrow: true),
+        TButton(key: const ValueKey('a:body[5]'), label: s.todayEmptyBodyN5Label, onPressed: () => TNav.tab(context, Routes.learn), variant: TButtonVariant.secondary),
+        TCard(title: s.todayEmptyBodyN6Title, text: s.todayEmptyBodyN6Text, cta: TButton(key: const ValueKey('a:body[6].cta[0]'), label: s.todayEmptyBodyN6CtaN0Label, onPressed: () => TNav.tab(context, Routes.support), variant: TButtonVariant.secondary, small: true)),
       ],
     );
   }

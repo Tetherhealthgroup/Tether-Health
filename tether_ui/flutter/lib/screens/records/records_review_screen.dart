@@ -20,23 +20,24 @@ class RecordsReviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Review', left: THeaderLeft.close, pill: 'Not added yet'),
+      header: THeader(title: s.recordsReviewHeaderTitle, left: THeaderLeft.close, pill: s.recordsReviewHeaderPill),
       children: [
-        TTitle('Review before adding'),
-        TBody('Nothing reaches your programs until you confirm.', tone: TTextTone.muted),
-        TBanner(kind: TBannerKind.offline, text: '2 items need your review.', actionLabel: 'Review', onAction: () => TNav.push(context, Routes.recordsConflict), actionKey: const ValueKey('a:body[2]')),
-        TCard(tag: 'hw', children: [TChecklist(fieldKey: 'records_review.keep_hw', items: [TCheckItem('12 blood pressure readings', sub: 'Jun – Oct 2026'), TCheckItem('Lipid panel', sub: 'LDL 138 · Sep 30')])]),
-        TCard(tag: 'st', children: [TChecklist(fieldKey: 'records_review.keep_st', items: [TCheckItem('A1C 7.6%', sub: 'Oct 1 · differs from your entry (7.4%)')])]),
-        TCard(tag: 'ck', children: [TChecklist(fieldKey: 'records_review.keep_ck', items: [TCheckItem('Flu vaccine', sub: 'Oct 12, 2025'), TCheckItem('Tdap', sub: '2019')])]),
-        TCard(tag: 'bf', children: [TChecklist(fieldKey: 'records_review.keep_bf', items: [TCheckItem('Smoking status: every day smoker', sub: 'Aug 2026 · sets your baseline')])]),
-        TCard(tag: 're', children: [TChecklist(fieldKey: 'records_review.keep_re', items: [TCheckItem('eGFR 58', sub: 'Oct 3')])]),
-        TEyebrow('Checked automatically'),
-        TKeyValue(rows: [('Units converted', '2 glucose results · mmol/L → mg/dL'), ('Duplicates skipped', '3 readings you already entered'), ('Held as likely typo', '1 · BP 1290/80'), ('Future dates rejected', '0')]),
+        TTitle(s.recordsReviewBodyN0Text),
+        TBody(s.recordsReviewBodyN1Text, tone: TTextTone.muted),
+        TBanner(kind: TBannerKind.offline, text: s.recordsReviewBodyN2Text, actionLabel: s.recordsReviewBodyN2ActionLabel, onAction: () => TNav.push(context, Routes.recordsConflict), actionKey: const ValueKey('a:body[2]')),
+        TCard(tag: 'hw', children: [TChecklist(fieldKey: 'records_review.keep_hw', items: [TCheckItem(s.recordsReviewBodyN3ChildrenN0ItemsN0Label, value: '12 blood pressure readings', sub: s.recordsReviewBodyN3ChildrenN0ItemsN0Sub), TCheckItem(s.recordsReviewBodyN3ChildrenN0ItemsN1Label, value: 'Lipid panel', sub: s.recordsReviewBodyN3ChildrenN0ItemsN1Sub)])]),
+        TCard(tag: 'st', children: [TChecklist(fieldKey: 'records_review.keep_st', items: [TCheckItem(s.recordsReviewBodyN4ChildrenN0ItemsN0Label, value: 'A1C 7.6%', sub: s.recordsReviewBodyN4ChildrenN0ItemsN0Sub)])]),
+        TCard(tag: 'ck', children: [TChecklist(fieldKey: 'records_review.keep_ck', items: [TCheckItem(s.recordsReviewBodyN5ChildrenN0ItemsN0Label, value: 'Flu vaccine', sub: s.recordsReviewBodyN5ChildrenN0ItemsN0Sub), TCheckItem(s.recordsReviewBodyN5ChildrenN0ItemsN1Label, value: 'Tdap', sub: '2019')])]),
+        TCard(tag: 'bf', children: [TChecklist(fieldKey: 'records_review.keep_bf', items: [TCheckItem(s.recordsReviewBodyN6ChildrenN0ItemsN0Label, value: 'Smoking status: every day smoker', sub: s.recordsReviewBodyN6ChildrenN0ItemsN0Sub)])]),
+        TCard(tag: 're', children: [TChecklist(fieldKey: 'records_review.keep_re', items: [TCheckItem(s.recordsReviewBodyN7ChildrenN0ItemsN0Label, value: 'eGFR 58', sub: s.recordsReviewBodyN7ChildrenN0ItemsN0Sub)])]),
+        TEyebrow(s.recordsReviewBodyN8Text),
+        TKeyValue(rows: [(s.recordsReviewBodyN9RowsN0N0, s.recordsReviewBodyN9RowsN0N1), (s.recordsReviewBodyN9RowsN1N0, s.recordsReviewBodyN9RowsN1N1), (s.recordsReviewBodyN9RowsN2N0, s.recordsReviewBodyN9RowsN2N1), (s.recordsReviewBodyN9RowsN3N0, '0')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Add selected items to my programs', onPressed: () => TNav.branch(context, 'Anything selected?', <String, VoidCallback>{'Chosen': () => TNav.submit(context, 'POST /v1/records/fhir/accept', screenId: 'records_review', then: () => TNav.toast(context, 'Added to your programs', then: () => TNav.popTo(context, Routes.recordsHub))), 'Nothing chosen': () => TNav.toast(context, 'Select the items you want to add.')}, decide: 'rec.review'), arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Review conflicts first', onTap: () => TNav.push(context, Routes.recordsConflict)),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.recordsReviewFooterN0Label, onPressed: () => TNav.branch(context, 'Anything selected?', <String, VoidCallback>{'Chosen': () => TNav.submit(context, 'POST /v1/records/fhir/accept', screenId: 'records_review', then: () => TNav.toast(context, s.recordsReviewFooterN0ActionCasesN0ActionThenValue, then: () => TNav.popTo(context, Routes.recordsHub))), 'Nothing chosen': () => TNav.toast(context, s.recordsReviewFooterN0ActionCasesN1ActionValue)}, decide: 'rec.review'), arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.recordsReviewFooterN1Label, onTap: () => TNav.push(context, Routes.recordsConflict)),
       ],
     );
   }

@@ -29,16 +29,17 @@ class SfHomeUnplugScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       header: THeader(title: 'ScrollFree', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TNativeSlot(id: 'ios.deviceActivityReport.today', label: 'Screen Time today', caption: 'Shown by Apple’s Screen Time on this phone. Tether can’t read, store or share these minutes.', height: 132.0),
-        TCard(variant: TCardVariant.dark, eyebrow: 'Yesterday · your estimate', children: [TBigNumber(value: '2h 10m', caption: 'Goal 90 min · down from 3h')]),
-        TCard(variant: TCardVariant.coral, title: 'Urge to scroll?', text: 'Take 60 seconds first', cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: 'Pause 60', onPressed: () => TNav.push(context, Routes.sfPause), variant: TButtonVariant.rescue, small: true)),
-        TCard(key: const ValueKey('a:body[3]'), variant: TCardVariant.mint, title: 'Unplug is on', text: '2 groups · pause screen after 60 min', onTap: () => TNav.push(context, Routes.sfUnplugHome)),
-        TCard(eyebrow: 'Today’s step', children: [TChecklist(items: [TCheckItem('Charge your phone outside the bedroom', sub: 'Tonight · bedtime window 10 PM')])]),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[5].rows[0]'), label: 'This week', sub: '5 of 7 phone-free nights', onTap: () => TNav.push(context, Routes.sfWeek)), TListRow(key: const ValueKey('a:body[5].rows[1]'), label: 'Had a long scroll?', sub: 'Reflect, nothing resets', onTap: () => TNav.push(context, Routes.sfSlip)), TListRow(key: const ValueKey('a:body[5].rows[2]'), label: 'Goal & windows', sub: '90 min · bedtime', onTap: () => TNav.push(context, Routes.sfGoal)), TListRow(key: const ValueKey('a:body[5].rows[3]'), label: 'Buddy', sub: 'Sam · weekly message', onTap: () => TNav.push(context, Routes.sfBuddy)), TListRow(key: const ValueKey('a:body[5].rows[4]'), label: 'Program settings', sub: 'Status, sharing, export, leave', onTap: () => TNav.push(context, Routes.programSettings, program: 'sf'))]),
+        TNativeSlot(id: 'ios.deviceActivityReport.today', label: s.sfHomeUnplugBodyN0Label, caption: s.sfHomeUnplugBodyN0Caption, height: 132.0),
+        TCard(variant: TCardVariant.dark, eyebrow: s.sfHomeUnplugBodyN1Eyebrow, children: [TBigNumber(value: s.sfHomeUnplugBodyN1ChildrenN0Value, caption: s.sfHomeUnplugBodyN1ChildrenN0Caption)]),
+        TCard(variant: TCardVariant.coral, title: s.sfHomeUnplugBodyN2Title, text: s.sfHomeUnplugBodyN2Text, cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: s.sfHomeUnplugBodyN2CtaN0Label, onPressed: () => TNav.push(context, Routes.sfPause), variant: TButtonVariant.rescue, small: true)),
+        TCard(key: const ValueKey('a:body[3]'), variant: TCardVariant.mint, title: s.sfHomeUnplugBodyN3Title, text: s.sfHomeUnplugBodyN3Text, onTap: () => TNav.push(context, Routes.sfUnplugHome)),
+        TCard(eyebrow: s.sfHomeUnplugBodyN4Eyebrow, children: [TChecklist(items: [TCheckItem(s.sfHomeUnplugBodyN4ChildrenN0ItemsN0Label, value: 'Charge your phone outside the bedroom', sub: s.sfHomeUnplugBodyN4ChildrenN0ItemsN0Sub)])]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[5].rows[0]'), label: s.sfHomeUnplugBodyN5RowsN0Label, sub: s.sfHomeUnplugBodyN5RowsN0Sub, onTap: () => TNav.push(context, Routes.sfWeek)), TListRow(key: const ValueKey('a:body[5].rows[1]'), label: s.sfHomeUnplugBodyN5RowsN1Label, sub: s.sfHomeUnplugBodyN5RowsN1Sub, onTap: () => TNav.push(context, Routes.sfSlip)), TListRow(key: const ValueKey('a:body[5].rows[2]'), label: s.sfHomeUnplugBodyN5RowsN2Label, sub: s.sfHomeUnplugBodyN5RowsN2Sub, onTap: () => TNav.push(context, Routes.sfGoal)), TListRow(key: const ValueKey('a:body[5].rows[3]'), label: s.sfHomeUnplugBodyN5RowsN3Label, sub: s.sfHomeUnplugBodyN5RowsN3Sub, onTap: () => TNav.push(context, Routes.sfBuddy)), TListRow(key: const ValueKey('a:body[5].rows[4]'), label: s.sfHomeUnplugBodyN5RowsN4Label, sub: s.sfHomeUnplugBodyN5RowsN4Sub, onTap: () => TNav.push(context, Routes.programSettings, program: 'sf'))]),
       ],
     );
   }

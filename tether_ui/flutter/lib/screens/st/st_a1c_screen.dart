@@ -17,17 +17,18 @@ class StA1cScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'A1C lab', pill: 'Lab day'),
+      header: THeader(title: s.stA1cHeaderTitle, pill: s.stA1cHeaderPill),
       children: [
-        TTitle('Add your A1C'),
-        TField(fieldKey: 'st_a1c.a1c', label: 'A1C', unit: '%', placeholder: '7.4', kind: TFieldKind.number),
-        TField(fieldKey: 'st_a1c.lab_date', label: 'Lab date', placeholder: 'Oct 1, 2026', kind: TFieldKind.date),
-        TKeyValue(rows: [('Previous', '7.9% · Jul 2'), ('Change', '−0.5 points')]),
-        TBody('Your clinician sets your A1C goal. Steady shows history only.', tone: TTextTone.small),
+        TTitle(s.stA1cBodyN0Text),
+        TField(fieldKey: 'st_a1c.a1c', label: s.stA1cBodyN1Label, unit: '%', placeholder: '7.4', kind: TFieldKind.number),
+        TField(fieldKey: 'st_a1c.lab_date', label: s.stA1cBodyN2Label, placeholder: s.stA1cBodyN2Placeholder, kind: TFieldKind.date),
+        TKeyValue(rows: [(s.stA1cBodyN3RowsN0N0, s.stA1cBodyN3RowsN0N1), (s.stA1cBodyN3RowsN1N0, s.stA1cBodyN3RowsN1N1)]),
+        TBody(s.stA1cBodyN4Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/st/a1c', screenId: 'st_a1c', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.stA1cFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/st/a1c', screenId: 'st_a1c', then: () => TNav.toast(context, s.stA1cFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

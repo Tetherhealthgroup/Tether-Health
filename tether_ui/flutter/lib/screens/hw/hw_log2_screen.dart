@@ -18,17 +18,18 @@ class HwLog2Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Log blood pressure', pill: '2 of 2'),
+      header: THeader(title: s.hwLog2HeaderTitle, pill: s.hwLog2HeaderPill),
       children: [
-        TTitle('Second reading'),
-        TBody('Same arm, 1 minute later.', tone: TTextTone.muted),
-        TFieldRow(children: [TField(fieldKey: 'hw_log2.systolic', label: 'Top (systolic)', unit: 'mmHg', placeholder: '132', kind: TFieldKind.number), TField(fieldKey: 'hw_log2.diastolic', label: 'Bottom (diastolic)', unit: 'mmHg', placeholder: '84', kind: TFieldKind.number)]),
-        TField(fieldKey: 'hw_log2.pulse_optional', label: 'Pulse (optional)', unit: 'bpm', placeholder: '70', kind: TFieldKind.number),
-        TKeyValue(rows: [('Reading 1', '138/86'), ('Average so far', '135/85')]),
+        TTitle(s.hwLog2BodyN0Text),
+        TBody(s.hwLog2BodyN1Text, tone: TTextTone.muted),
+        TFieldRow(children: [TField(fieldKey: 'hw_log2.systolic', label: s.hwLog2BodyN2FieldsN0Label, unit: 'mmHg', placeholder: '132', kind: TFieldKind.number), TField(fieldKey: 'hw_log2.diastolic', label: s.hwLog2BodyN2FieldsN1Label, unit: 'mmHg', placeholder: '84', kind: TFieldKind.number)]),
+        TField(fieldKey: 'hw_log2.pulse_optional', label: s.hwLog2BodyN3Label, unit: 'bpm', placeholder: '70', kind: TFieldKind.number),
+        TKeyValue(rows: [(s.hwLog2BodyN4RowsN0N0, '138/86'), (s.hwLog2BodyN4RowsN1N0, '135/85')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save readings', onPressed: () => TNav.submit(context, 'POST /v1/program-data/hw/readings', screenId: 'hw_log2', then: () => TNav.branch(context, 'Validated average', <String, VoidCallback>{'Valid · below crisis range': () => TNav.replace(context, Routes.hwResult), 'Invalid value': () => TNav.replace(context, Routes.hwLogError), '≥180 top or ≥120 bottom': () => TNav.replace(context, Routes.hwCrisis)}, decide: 'hw.bp'), safety: TSafetyRoutes('hw.bp', <String, VoidCallback>{'≥180 top or ≥120 bottom': () => TNav.replace(context, Routes.hwCrisis)})), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.hwLog2FooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/hw/readings', screenId: 'hw_log2', then: () => TNav.branch(context, 'Validated average', <String, VoidCallback>{'Valid · below crisis range': () => TNav.replace(context, Routes.hwResult), 'Invalid value': () => TNav.replace(context, Routes.hwLogError), '≥180 top or ≥120 bottom': () => TNav.replace(context, Routes.hwCrisis)}, decide: 'hw.bp'), safety: TSafetyRoutes('hw.bp', <String, VoidCallback>{'≥180 top or ≥120 bottom': () => TNav.replace(context, Routes.hwCrisis)})), arrow: true),
       ],
     );
   }

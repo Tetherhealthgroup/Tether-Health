@@ -19,17 +19,18 @@ class SfUnplugAppsAndroidScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Choose apps', pill: 'Step 2 of 3'),
+      header: THeader(title: s.sfUnplugAppsAndroidHeaderTitle, pill: s.sfUnplugAppsAndroidHeaderPill),
       children: [
-        TTitle('Choose the apps to pause'),
-        TBody('This choice stays on this phone. Tether never receives it.', tone: TTextTone.muted),
-        TChecklist(items: [TCheckItem('Short-video app', done: true), TCheckItem('Photo feed app', done: true), TCheckItem('Video app', done: true), TCheckItem('News app'), TCheckItem('Games app'), TCheckItem('Shopping app')], label: 'Apps on this phone'),
-        TBody('Tether, the Phone app and emergency calling aren’t in this list. They can never be paused.', tone: TTextTone.small),
+        TTitle(s.sfUnplugAppsAndroidBodyN0Text),
+        TBody(s.sfUnplugAppsAndroidBodyN1Text, tone: TTextTone.muted),
+        TChecklist(items: [TCheckItem(s.sfUnplugAppsAndroidBodyN2ItemsN0Label, value: 'Short-video app', done: true), TCheckItem(s.sfUnplugAppsAndroidBodyN2ItemsN1Label, value: 'Photo feed app', done: true), TCheckItem(s.sfUnplugAppsAndroidBodyN2ItemsN2Label, value: 'Video app', done: true), TCheckItem(s.sfUnplugAppsAndroidBodyN2ItemsN3Label, value: 'News app'), TCheckItem(s.sfUnplugAppsAndroidBodyN2ItemsN4Label, value: 'Games app'), TCheckItem(s.sfUnplugAppsAndroidBodyN2ItemsN5Label, value: 'Shopping app')], label: s.sfUnplugAppsAndroidBodyN2Label),
+        TBody(s.sfUnplugAppsAndroidBodyN3Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Done · 3 apps', onPressed: () => TNav.replace(context, Routes.sfUnplugAppsChosen), arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Cancel', onTap: () => TNav.back(context)),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugAppsAndroidFooterN0Label, onPressed: () => TNav.replace(context, Routes.sfUnplugAppsChosen), arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.sfUnplugAppsAndroidFooterN1Label, onTap: () => TNav.back(context)),
       ],
     );
   }

@@ -18,18 +18,19 @@ class EaPlanScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Safety plan', pill: 'Private'),
+      header: THeader(title: s.eaPlanHeaderTitle, pill: s.eaPlanHeaderPill),
       children: [
-        TTitle('Make a plan for hard moments'),
-        TBody('Based on the Stanley-Brown safety plan. Only you can see this.', tone: TTextTone.small),
-        TField(fieldKey: 'ea_plan.my_warning_signs', label: 'My warning signs', placeholder: 'Not sleeping, pulling away from friends', kind: TFieldKind.multiline),
-        TField(fieldKey: 'ea_plan.things_that_help_me', label: 'Things that help me', placeholder: 'Walk the dog, shower, music'),
-        TField(fieldKey: 'ea_plan.people_i_can_reach', label: 'People I can reach', placeholder: 'Sam · (555) 010-3311'),
-        TKeyValue(rows: [('Crisis line', '988 · call or text'), ('Emergency', '911')]),
+        TTitle(s.eaPlanBodyN0Text),
+        TBody(s.eaPlanBodyN1Text, tone: TTextTone.small),
+        TField(fieldKey: 'ea_plan.my_warning_signs', label: s.eaPlanBodyN2Label, placeholder: s.eaPlanBodyN2Placeholder, kind: TFieldKind.multiline),
+        TField(fieldKey: 'ea_plan.things_that_help_me', label: s.eaPlanBodyN3Label, placeholder: s.eaPlanBodyN3Placeholder),
+        TField(fieldKey: 'ea_plan.people_i_can_reach', label: s.eaPlanBodyN4Label, placeholder: s.eaPlanBodyN4Placeholder),
+        TKeyValue(rows: [(s.eaPlanBodyN5RowsN0N0, s.eaPlanBodyN5RowsN0N1), (s.eaPlanBodyN5RowsN1N0, '911')]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save plan', onPressed: () => TNav.submit(context, 'PUT device:encrypted/ea/safety-plan', screenId: 'ea_plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.eaHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.eaPlanFooterN0Label, onPressed: () => TNav.submit(context, 'PUT device:encrypted/ea/safety-plan', screenId: 'ea_plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.eaHome))), arrow: true),
       ],
     );
   }

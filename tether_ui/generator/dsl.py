@@ -133,10 +133,23 @@ def header(title='', left='back', pill=None, avatar=None, dark=False, avatar_to=
     return N('header', title=title, left=left, pill=pill, avatar=avatar, dark=dark or None, avatarAction=a)
 def steps(n, total): return N('steps', n=n, total=total)
 def eyebrow(text): return N('eyebrow', text=text)
+def with_sid(node, sid):
+    """Gives `node` an explicit translation id: its strings are keyed
+    `<screen>.<sid>.<prop>` instead of by path, so moving the node keeps its
+    translations (l10n.py)."""
+    node['sid'] = sid
+    return node
 def title(text, size='m', align=None): return N('title', text=text, size=size, align=align)
 def text(t, tone='body', align=None): return N('text', text=t, tone=tone, align=align)
 def chips(options, selected=(), multi=True, dots=None, label=None, key=None, bind=None): return N('chips', options=list(options), selected=list(selected), multi=multi, dots=dots, label=label, key=key, bind=bind)
-def seg(options, selected, label=None, key=None, bind=None): return N('segmented', options=list(options), selected=selected, label=label, key=key, bind=bind)
+def seg(options, selected, label=None, key=None, bind=None, values=None):
+    """Segmented control. `options` are the shown labels (English source)
+    and `selected` names one of them. `values`, when given, are the stable
+    session values, one per option; otherwise the English labels are the
+    values."""
+    if values is not None and len(values) != len(options):
+        raise ValueError(f'segmented {options}: {len(values)} values for {len(options)} options')
+    return N('segmented', options=list(options), selected=selected, label=label, key=key, bind=bind, values=list(values) if values else None)
 def radio(items, selected=0, label=None, key=None, bind=None):
     its = [i if isinstance(i, dict) else {'label': i} for i in items]
     return N('radio', items=its, selected=selected, label=label, key=key, bind=bind)

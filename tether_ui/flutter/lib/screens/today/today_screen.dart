@@ -26,19 +26,20 @@ class TodayScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Today', left: THeaderLeft.logo, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
+      header: THeader(title: s.todayHeaderTitle, left: THeaderLeft.logo, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'today',
       children: [
-        TEyebrow('Friday, August 21'),
-        TTitle('Good morning, Alex.'),
-        TChips(fieldKey: 'today.value', options: ['All', 'BreatheFree', 'ScrollFree'], selected: ['All'], multi: false, dots: {'BreatheFree': TColors.program('bf'), 'ScrollFree': TColors.program('sf')}),
-        TCard(variant: TCardVariant.coral, title: 'Craving or urge to scroll?', text: 'Help for the next few minutes', cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: 'Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
-        TCard(eyebrow: 'Today · 2 small steps', children: [TChecklist(items: [TCheckItem('Stock gum, water or snacks', sub: 'BreatheFree · 3 min', done: true), TCheckItem('Charge your phone outside the bedroom', sub: 'ScrollFree · tonight')])]),
-        TCard(variant: TCardVariant.dark, eyebrow: 'Check-in · about 90 sec', title: 'Covers both programs', cta: TButton(key: const ValueKey('a:body[5].cta[0]'), label: 'Start', onPressed: () => TNav.sheet(context, Routes.checkin), variant: TButtonVariant.lime, small: true)),
-        TStatGrid(stats: [TStat(label: 'Quit day', value: '7 days', sub: 'Fri, Aug 28', program: 'bf'), TStat(label: 'Yesterday', value: '2h 10m', sub: 'goal 90 min', program: 'sf')]),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[7].rows[0]'), label: 'BreatheFree home', sub: 'Plan, medicines, progress', lead: TLead.program('bf'), onTap: () => TNav.push(context, Routes.bfHome)), TListRow(key: const ValueKey('a:body[7].rows[1]'), label: 'ScrollFree home', sub: 'Goal, Pause 60, week', lead: TLead.program('sf'), onTap: () => TNav.push(context, Routes.sfHome))]),
-        TCard(key: const ValueKey('a:body[8]'), variant: TCardVariant.mint, tag: 'ca', tagExtra: 'Learn only', title: 'How your lungs recover after you quit', text: '4 min read', onTap: () => TNav.push(context, Routes.learnLesson)),
+        TEyebrow(s.todayBodyN0Text),
+        TTitle(s.todayBodyN1Text),
+        TChips(fieldKey: 'today.value', options: ['All', 'BreatheFree', 'ScrollFree'], labels: [s.todayBodyN2OptionsN0, 'BreatheFree', 'ScrollFree'], selected: ['All'], multi: false, dots: {'BreatheFree': TColors.program('bf'), 'ScrollFree': TColors.program('sf')}),
+        TCard(variant: TCardVariant.coral, title: s.todayBodyN3Title, text: s.todayBodyN3Text, cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: s.todayBodyN3CtaN0Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
+        TCard(eyebrow: s.todayBodyN4Eyebrow, children: [TChecklist(items: [TCheckItem(s.todayBodyN4ChildrenN0ItemsN0Label, value: 'Stock gum, water or snacks', sub: s.todayBodyN4ChildrenN0ItemsN0Sub, done: true), TCheckItem(s.todayBodyN4ChildrenN0ItemsN1Label, value: 'Charge your phone outside the bedroom', sub: s.todayBodyN4ChildrenN0ItemsN1Sub)])]),
+        TCard(variant: TCardVariant.dark, eyebrow: s.todayBodyN5Eyebrow, title: s.todayBodyN5Title, cta: TButton(key: const ValueKey('a:body[5].cta[0]'), label: s.todayBodyN5CtaN0Label, onPressed: () => TNav.sheet(context, Routes.checkin), variant: TButtonVariant.lime, small: true)),
+        TStatGrid(stats: [TStat(label: s.todayBodyN6ItemsN0Label, value: s.todayBodyN6ItemsN0Value, sub: s.todayBodyN6ItemsN0Sub, program: 'bf'), TStat(label: s.todayBodyN6ItemsN1Label, value: s.todayBodyN6ItemsN1Value, sub: s.todayBodyN6ItemsN1Sub, program: 'sf')]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[7].rows[0]'), label: s.todayBodyN7RowsN0Label, sub: s.todayBodyN7RowsN0Sub, lead: TLead.program('bf'), onTap: () => TNav.push(context, Routes.bfHome)), TListRow(key: const ValueKey('a:body[7].rows[1]'), label: s.todayBodyN7RowsN1Label, sub: s.todayBodyN7RowsN1Sub, lead: TLead.program('sf'), onTap: () => TNav.push(context, Routes.sfHome))]),
+        TCard(key: const ValueKey('a:body[8]'), variant: TCardVariant.mint, tag: 'ca', tagExtra: s.todayBodyN8TagExtra, title: s.todayBodyN8Title, text: s.todayBodyN8Text, onTap: () => TNav.push(context, Routes.learnLesson)),
       ],
     );
   }

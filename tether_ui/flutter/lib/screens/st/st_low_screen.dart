@@ -19,16 +19,17 @@ class StLowScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Low reading', left: THeaderLeft.close),
+      header: THeader(title: s.stLowHeaderTitle, left: THeaderLeft.close),
       children: [
-        TBanner(kind: TBannerKind.urgent, text: '62 mg/dL is below your low of 70.'),
-        TCard(variant: TCardVariant.warn, eyebrow: 'Your low plan', children: [TChecklist(items: [TCheckItem('Take 15 g of fast sugar', sub: '4 glucose tablets or ½ cup juice', done: true), TCheckItem('Re-check in 15 minutes'), TCheckItem('Repeat if still below 70')])]),
-        TTimer(value: '14:52', label: 'until re-check'),
-        TCard(variant: TCardVariant.urgent, title: 'Confused, can’t swallow or passing out?', text: 'Someone should call 911 now.', children: [TButton(key: const ValueKey('a:body[3].children[0]'), label: 'Call 911', onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger)]),
+        TBanner(kind: TBannerKind.urgent, text: s.stLowBodyN0Text),
+        TCard(variant: TCardVariant.warn, eyebrow: s.stLowBodyN1Eyebrow, children: [TChecklist(items: [TCheckItem(s.stLowBodyN1ChildrenN0ItemsN0Label, value: 'Take 15 g of fast sugar', sub: s.stLowBodyN1ChildrenN0ItemsN0Sub, done: true), TCheckItem(s.stLowBodyN1ChildrenN0ItemsN1Label, value: 'Re-check in 15 minutes'), TCheckItem(s.stLowBodyN1ChildrenN0ItemsN2Label, value: 'Repeat if still below 70')])]),
+        TTimer(value: '14:52', label: s.stLowBodyN2Label),
+        TCard(variant: TCardVariant.urgent, title: s.stLowBodyN3Title, text: s.stLowBodyN3Text, children: [TButton(key: const ValueKey('a:body[3].children[0]'), label: s.stLowBodyN3ChildrenN0Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Re-check now', onPressed: () => TNav.replace(context, Routes.stLog), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.stLowFooterN0Label, onPressed: () => TNav.replace(context, Routes.stLog), arrow: true),
       ],
     );
   }

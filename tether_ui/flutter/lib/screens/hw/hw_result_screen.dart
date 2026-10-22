@@ -19,17 +19,18 @@ class HwResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Saved', left: THeaderLeft.close),
+      header: THeader(title: s.hwResultHeaderTitle, left: THeaderLeft.close),
       children: [
         TIllustration(glyph: '✓'),
-        TTitle('135/85 saved', size: TTitleSize.l, center: true),
-        TBody('Average of 2 readings. Your clinician’s target is below 130/80.', tone: TTextTone.muted, center: true),
-        TCard(variant: TCardVariant.mint, text: 'One reading is information, not a grade. Trends over weeks matter most.'),
+        TTitle(s.hwResultBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.hwResultBodyN2Text, tone: TTextTone.muted, center: true),
+        TCard(variant: TCardVariant.mint, text: s.hwResultBodyN3Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'See trends', onPressed: () => TNav.replace(context, Routes.hwTrends), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Back to Heartwise', onPressed: () => TNav.replace(context, Routes.hwHome), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.hwResultFooterN0Label, onPressed: () => TNav.replace(context, Routes.hwTrends), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.hwResultFooterN1Label, onPressed: () => TNav.replace(context, Routes.hwHome), variant: TButtonVariant.secondary),
       ],
     );
   }

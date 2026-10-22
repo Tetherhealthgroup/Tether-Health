@@ -19,10 +19,11 @@ class SurfaceShortcutsIosNamedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Siri & Shortcuts', left: THeaderLeft.close),
+      header: THeader(title: s.surfaceShortcutsIosNamedHeaderTitle, left: THeaderLeft.close),
       children: [
-        TListGroup(title: 'Tether Health · App Shortcuts', rows: [TListRow(key: const ValueKey('a:body[0].rows[0]'), label: 'Rescue', sub: '“Rescue in Tether” · opens Rescue', lead: TLead.icon('✚'), onTap: () => TNav.sheet(context, Routes.rescuePick)), TListRow(key: const ValueKey('a:body[0].rows[1]'), label: 'ClearAir red-zone plan', sub: '“Show my ClearAir plan in Tether”', lead: TLead.program('ca'), onTap: () => TNav.push(context, Routes.caRed))]),
+        TListGroup(title: s.surfaceShortcutsIosNamedBodyN0Title, rows: [TListRow(key: const ValueKey('a:body[0].rows[0]'), label: s.surfaceShortcutsIosNamedBodyN0RowsN0Label, sub: s.surfaceShortcutsIosNamedBodyN0RowsN0Sub, lead: TLead.icon('✚'), onTap: () => TNav.sheet(context, Routes.rescuePick)), TListRow(key: const ValueKey('a:body[0].rows[1]'), label: s.surfaceShortcutsIosNamedBodyN0RowsN1Label, sub: s.surfaceShortcutsIosNamedBodyN0RowsN1Sub, lead: TLead.program('ca'), onTap: () => TNav.push(context, Routes.caRed))]),
       ],
     );
   }

@@ -18,15 +18,16 @@ class NuResetScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Off track?', pill: 'Reset'),
+      header: THeader(title: s.nuResetHeaderTitle, pill: s.nuResetHeaderPill),
       children: [
-        TTitle('Busy week? That’s okay.'),
-        TBody('Missing days doesn’t undo the ones you did.', tone: TTextTone.muted),
-        TRadioList(fieldKey: 'nu_reset.option', items: [TRadioItem('Keep this habit, start fresh today'), TRadioItem('Make it smaller', sub: '3 nights instead of 5'), TRadioItem('Pick a different habit')], selected: 0),
+        TTitle(s.nuResetBodyN0Text),
+        TBody(s.nuResetBodyN1Text, tone: TTextTone.muted),
+        TRadioList(fieldKey: 'nu_reset.option', items: [TRadioItem(s.nuResetBodyN2ItemsN0Label, value: 'Keep this habit, start fresh today'), TRadioItem(s.nuResetBodyN2ItemsN1Label, value: 'Make it smaller', sub: s.nuResetBodyN2ItemsN1Sub), TRadioItem(s.nuResetBodyN2ItemsN2Label, value: 'Pick a different habit')], selected: 0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.branch(context, 'Selected option', <String, VoidCallback>{'Keep this habit': () => TNav.toast(context, 'Fresh start today', then: () => TNav.replace(context, Routes.nuHome)), 'Make it smaller': () => TNav.toast(context, 'Goal set to 3 nights', then: () => TNav.replace(context, Routes.nuHome)), 'Pick a different habit': () => TNav.replace(context, Routes.nuHabit)}, decide: 'choice:nu_reset.option'), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.nuResetFooterN0Label, onPressed: () => TNav.branch(context, 'Selected option', <String, VoidCallback>{'Keep this habit': () => TNav.toast(context, s.nuResetFooterN0ActionCasesN0ActionValue, then: () => TNav.replace(context, Routes.nuHome)), 'Make it smaller': () => TNav.toast(context, s.nuResetFooterN0ActionCasesN1ActionValue, then: () => TNav.replace(context, Routes.nuHome)), 'Pick a different habit': () => TNav.replace(context, Routes.nuHabit)}, decide: 'choice:nu_reset.option'), arrow: true),
       ],
     );
   }

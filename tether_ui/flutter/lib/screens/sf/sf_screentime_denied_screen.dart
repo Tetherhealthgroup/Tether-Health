@@ -18,16 +18,17 @@ class SfScreentimeDeniedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Screen Time', pill: 'Optional'),
+      header: THeader(title: s.sfScreentimeDeniedHeaderTitle, pill: s.sfScreentimeDeniedHeaderPill),
       children: [
-        TBanner(kind: TBannerKind.info, text: 'Screen Time access was not allowed.'),
-        TTitle('Self-report works just as well.'),
-        TBody('We’ll ask for a quick estimate in your evening check-in. You can connect later in Account → ScrollFree.', tone: TTextTone.muted),
+        TBanner(kind: TBannerKind.info, text: s.sfScreentimeDeniedBodyN0Text),
+        TTitle(s.sfScreentimeDeniedBodyN1Text),
+        TBody(s.sfScreentimeDeniedBodyN2Text, tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue with self-report', onPressed: () => TNav.back(context), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Open phone settings', onPressed: () => TNav.osSettings(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfScreentimeDeniedFooterN0Label, onPressed: () => TNav.back(context), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfScreentimeDeniedFooterN1Label, onPressed: () => TNav.osSettings(context), variant: TButtonVariant.secondary),
       ],
     );
   }

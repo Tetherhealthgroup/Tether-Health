@@ -19,15 +19,16 @@ class RecordsSourceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Patel Family Medicine'),
+      header: THeader(title: s.recordsSourceHeaderTitle),
       children: [
-        TKeyValue(rows: [('Connection', 'Epic MyChart · SMART on FHIR R4'), ('Last sync', 'Today 7:02 AM'), ('Next sync', 'Tomorrow'), ('Access', 'Read-only · 6 categories'), ('Connected', 'Oct 3, 2026')]),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'Sync now', onTap: () => TNav.submit(context, 'POST /v1/records/fhir/sources/:id/sync', screenId: 'records_source', then: () => TNav.toast(context, 'Synced · 2 new results')))]),
-        TListGroup(title: 'What we read', rows: [TListRow(label: 'Conditions', sub: 'Condition'), TListRow(label: 'Vital signs', sub: 'Observation · blood pressure, weight'), TListRow(label: 'Lab results', sub: 'Observation · A1C, lipids, eGFR'), TListRow(label: 'Medications', sub: 'MedicationRequest'), TListRow(label: 'Immunizations', sub: 'Immunization'), TListRow(label: 'Smoking status', sub: 'Observation · LOINC 72166-2')]),
+        TKeyValue(rows: [(s.recordsSourceBodyN0RowsN0N0, s.recordsSourceBodyN0RowsN0N1), (s.recordsSourceBodyN0RowsN1N0, s.recordsSourceBodyN0RowsN1N1), (s.recordsSourceBodyN0RowsN2N0, s.recordsSourceBodyN0RowsN2N1), (s.recordsSourceBodyN0RowsN3N0, s.recordsSourceBodyN0RowsN3N1), (s.recordsSourceBodyN0RowsN4N0, s.recordsSourceBodyN0RowsN4N1)]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: s.recordsSourceBodyN1RowsN0Label, onTap: () => TNav.submit(context, 'POST /v1/records/fhir/sources/:id/sync', screenId: 'records_source', then: () => TNav.toast(context, s.recordsSourceBodyN1RowsN0ActionThenValue)))]),
+        TListGroup(title: s.recordsSourceBodyN2Title, rows: [TListRow(label: s.recordsSourceBodyN2RowsN0Label, sub: s.recordsSourceBodyN2RowsN0Sub), TListRow(label: s.recordsSourceBodyN2RowsN1Label, sub: s.recordsSourceBodyN2RowsN1Sub), TListRow(label: s.recordsSourceBodyN2RowsN2Label, sub: s.recordsSourceBodyN2RowsN2Sub), TListRow(label: s.recordsSourceBodyN2RowsN3Label, sub: s.recordsSourceBodyN2RowsN3Sub), TListRow(label: s.recordsSourceBodyN2RowsN4Label, sub: s.recordsSourceBodyN2RowsN4Sub), TListRow(label: s.recordsSourceBodyN2RowsN5Label, sub: s.recordsSourceBodyN2RowsN5Sub)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Disconnect', onPressed: () => TNav.sheet(context, Routes.recordsDisconnect), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.recordsSourceFooterN0Label, onPressed: () => TNav.sheet(context, Routes.recordsDisconnect), variant: TButtonVariant.danger),
       ],
     );
   }

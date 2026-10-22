@@ -19,17 +19,18 @@ class SfIntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'ScrollFree', pill: '~1 min/day'),
+      header: THeader(title: 'ScrollFree', pill: s.sfIntroHeaderPill),
       children: [
-        TProgramTag(program: 'sf', extra: 'Social media use'),
-        TTitle('Your attention is yours.', size: TTitleSize.l),
-        TKeyValue(rows: [('Goal', 'minutes a day + app-free times'), ('Pause 60', 'intent check, not a lock'), ('Never', 'reads messages or feeds')]),
-        TBody('Notice what pulls you in, set a goal that feels doable, and pause for 60 seconds when the urge hits.', tone: TTextTone.muted),
+        TProgramTag(program: 'sf', extra: s.sfIntroBodyN0Extra),
+        TTitle(s.sfIntroBodyN1Text, size: TTitleSize.l),
+        TKeyValue(rows: [(s.sfIntroBodyN2RowsN0N0, s.sfIntroBodyN2RowsN0N1), (s.sfIntroBodyN2RowsN1N0, s.sfIntroBodyN2RowsN1N1), (s.sfIntroBodyN2RowsN2N0, s.sfIntroBodyN2RowsN2N1)]),
+        TBody(s.sfIntroBodyN3Text, tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Set up ScrollFree', onPressed: () => TNav.push(context, Routes.sfQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Add as Learn only', onPressed: () => TNav.toast(context, 'ScrollFree added as Learn only', then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.sfQ1), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfIntroFooterN1Label, onPressed: () => TNav.toast(context, s.sfIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
       ],
     );
   }

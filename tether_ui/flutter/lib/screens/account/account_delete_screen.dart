@@ -19,18 +19,19 @@ class AccountDeleteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Delete account'),
+      header: THeader(title: s.accountDeleteHeaderTitle),
       children: [
-        TTitle('Delete your account and all data?'),
-        TKeyValue(rows: [('Programs', '4'), ('Check-ins', '63'), ('Readings & logs', '118'), ('Shared with care team', '3 summaries (their copies stay with them)')]),
-        TBody('This can’t be undone. Download a copy first if you want one.', tone: TTextTone.small),
-        TButton(key: const ValueKey('a:body[3]'), label: 'Download a copy first', onPressed: () => TNav.push(context, Routes.accountData), variant: TButtonVariant.secondary),
-        TField(fieldKey: 'account_delete.type_delete_to_confirm', label: 'Type DELETE to confirm', placeholder: 'DELETE'),
-        TField(fieldKey: 'account_delete.password', label: 'Password', hint: 'We ask again to protect your account.', placeholder: '••••••••••••', kind: TFieldKind.password),
+        TTitle(s.accountDeleteBodyN0Text),
+        TKeyValue(rows: [(s.accountDeleteBodyN1RowsN0N0, '4'), (s.accountDeleteBodyN1RowsN1N0, '63'), (s.accountDeleteBodyN1RowsN2N0, '118'), (s.accountDeleteBodyN1RowsN3N0, s.accountDeleteBodyN1RowsN3N1)]),
+        TBody(s.accountDeleteBodyN2Text, tone: TTextTone.small),
+        TButton(key: const ValueKey('a:body[3]'), label: s.accountDeleteBodyN3Label, onPressed: () => TNav.push(context, Routes.accountData), variant: TButtonVariant.secondary),
+        TField(fieldKey: 'account_delete.type_delete_to_confirm', label: s.accountDeleteBodyN4Label, placeholder: s.accountDeleteBodyN4Placeholder),
+        TField(fieldKey: 'account_delete.password', label: s.accountDeleteBodyN5Label, hint: s.accountDeleteBodyN5Hint, placeholder: '••••••••••••', kind: TFieldKind.password),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Delete everything', onPressed: () => TNav.submit(context, 'DELETE /v1/account/data', screenId: 'account_delete', then: () => TNav.replace(context, Routes.accountDeleted)), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.accountDeleteFooterN0Label, onPressed: () => TNav.submit(context, 'DELETE /v1/account/data', screenId: 'account_delete', then: () => TNav.replace(context, Routes.accountDeleted)), variant: TButtonVariant.danger),
       ],
     );
   }

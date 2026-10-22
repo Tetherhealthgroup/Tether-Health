@@ -19,16 +19,17 @@ class ObRemindersDeniedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Reminders'),
+      header: THeader(title: s.obRemindersDeniedHeaderTitle),
       children: [
-        TBanner(kind: TBannerKind.info, text: 'Notifications are off in your phone settings.'),
-        TTitle('You can still use everything.'),
-        TBody('Today shows your steps when you open the app. To get reminders, allow notifications for Tether in Settings.', tone: TTextTone.muted),
+        TBanner(kind: TBannerKind.info, text: s.obRemindersDeniedBodyN0Text),
+        TTitle(s.obRemindersDeniedBodyN1Text),
+        TBody(s.obRemindersDeniedBodyN2Text, tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Open phone settings', onPressed: () => TNav.osSettings(context), variant: TButtonVariant.secondary),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Continue without reminders', onPressed: () => TNav.push(context, Routes.obAccount), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.obRemindersDeniedFooterN0Label, onPressed: () => TNav.osSettings(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.obRemindersDeniedFooterN1Label, onPressed: () => TNav.push(context, Routes.obAccount), arrow: true),
       ],
     );
   }

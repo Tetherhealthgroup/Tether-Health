@@ -27,17 +27,18 @@ class AccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Account', left: THeaderLeft.close),
+      header: THeader(title: s.accountHeaderTitle, left: THeaderLeft.close),
       children: [
-        TListGroup(flat: true, rows: [TListRow(label: 'Alex', sub: 'alex@example.com', lead: TLead.avatar('A'))]),
-        TListGroup(title: 'Your health data', rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'Health records', sub: '2 sources · Epic, Medicare', onTap: () => TNav.push(context, Routes.recordsHub)), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: 'Sign-in methods', sub: 'Apple · email', onTap: () => TNav.push(context, Routes.accountSigninMethods))]),
-        TListGroup(title: 'Settings', rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: 'Programs & sharing', sub: '2 focus · 1 learn · 1 paused', onTap: () => TNav.push(context, Routes.accountPrograms)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: 'Notifications', sub: 'On · quiet hours 9 PM–7 AM', onTap: () => TNav.push(context, Routes.accountNotifications)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: 'Privacy & consent', sub: 'Reviewed Aug 22, 2026', onTap: () => TNav.push(context, Routes.accountPrivacy)), TListRow(key: const ValueKey('a:body[2].rows[3]'), label: 'Your data', sub: 'Export or delete', onTap: () => TNav.push(context, Routes.accountData))]),
-        TListGroup(title: 'App', rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'Text size & contrast', sub: 'Follows your phone', onTap: () => TNav.osSettings(context)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: 'Language', sub: 'English', onTap: () => TNav.toast(context, 'Language set to English')), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: 'Help & legal', onTap: () => TNav.external(context, 'https://www.tetherhealthgroup.com/support/'))]),
-        TBody('Tether Health 1.0.0 (100)', tone: TTextTone.small, center: true),
+        TListGroup(flat: true, rows: [TListRow(label: s.accountBodyN0RowsN0Label, sub: s.accountBodyN0RowsN0Sub, lead: TLead.avatar('A'))]),
+        TListGroup(title: s.accountBodyN1Title, rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: s.accountBodyN1RowsN0Label, sub: s.accountBodyN1RowsN0Sub, onTap: () => TNav.push(context, Routes.recordsHub)), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: s.accountBodyN1RowsN1Label, sub: s.accountBodyN1RowsN1Sub, onTap: () => TNav.push(context, Routes.accountSigninMethods))]),
+        TListGroup(title: s.accountBodyN2Title, rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: s.accountBodyN2RowsN0Label, sub: s.accountBodyN2RowsN0Sub, onTap: () => TNav.push(context, Routes.accountPrograms)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: s.accountBodyN2RowsN1Label, sub: s.accountBodyN2RowsN1Sub, onTap: () => TNav.push(context, Routes.accountNotifications)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: s.accountBodyN2RowsN2Label, sub: s.accountBodyN2RowsN2Sub, onTap: () => TNav.push(context, Routes.accountPrivacy)), TListRow(key: const ValueKey('a:body[2].rows[3]'), label: s.accountBodyN2RowsN3Label, sub: s.accountBodyN2RowsN3Sub, onTap: () => TNav.push(context, Routes.accountData))]),
+        TListGroup(title: s.accountBodyN3Title, rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: s.accountBodyN3RowsN0Label, sub: s.accountBodyN3RowsN0Sub, onTap: () => TNav.osSettings(context)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: s.accountBodyN3RowsN1Label, sub: s.accountBodyN3RowsN1Sub, onTap: () => TNav.toast(context, s.accountBodyN3RowsN1ActionValue)), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: s.accountBodyN3RowsN2Label, onTap: () => TNav.external(context, 'https://www.tetherhealthgroup.com/support/'))]),
+        TBody(s.accountBodyN4Text, tone: TTextTone.small, center: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Sign out', onPressed: () => TNav.sheet(context, Routes.accountSignout), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.accountFooterN0Label, onPressed: () => TNav.sheet(context, Routes.accountSignout), variant: TButtonVariant.secondary),
       ],
     );
   }

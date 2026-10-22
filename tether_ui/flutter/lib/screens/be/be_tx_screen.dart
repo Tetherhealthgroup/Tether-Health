@@ -27,13 +27,14 @@ class BeTxScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       header: THeader(title: 'Beacon', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TCard(variant: TCardVariant.dark, eyebrow: 'Next appointment', title: 'Oct 22 · Oncology · 10:30 AM', cta: TButton(key: const ValueKey('a:body[0].cta[0]'), label: 'Questions', onPressed: () => TNav.push(context, Routes.beQuestions), variant: TButtonVariant.lime, small: true)),
-        TCard(variant: TCardVariant.urgent, title: 'Fever of 100.4°F (38°C) or higher during chemo?', text: 'Call your oncology team now, day or night.', cta: TButton(key: const ValueKey('a:body[1].cta[0]'), label: 'Call', onPressed: () => TNav.call(context, '(555) 010-7000', label: 'Call oncology team'), variant: TButtonVariant.danger, small: true)),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: 'Today’s side-effect diary', sub: 'About 1 minute', onTap: () => TNav.push(context, Routes.beDiary)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: 'Feeling worried?', sub: 'Tools in Ease', onTap: () => TNav.push(context, Routes.eaIntro)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: 'Program settings', sub: 'Status, sharing, export, leave', onTap: () => TNav.push(context, Routes.programSettings, program: 'be'))]),
+        TCard(variant: TCardVariant.dark, eyebrow: s.beTxBodyN0Eyebrow, title: s.beTxBodyN0Title, cta: TButton(key: const ValueKey('a:body[0].cta[0]'), label: s.beTxBodyN0CtaN0Label, onPressed: () => TNav.push(context, Routes.beQuestions), variant: TButtonVariant.lime, small: true)),
+        TCard(variant: TCardVariant.urgent, title: s.beTxBodyN1Title, text: s.beTxBodyN1Text, cta: TButton(key: const ValueKey('a:body[1].cta[0]'), label: s.beTxBodyN1CtaN0Label, onPressed: () => TNav.call(context, '(555) 010-7000', label: 'Call oncology team'), variant: TButtonVariant.danger, small: true)),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: s.beTxBodyN2RowsN0Label, sub: s.beTxBodyN2RowsN0Sub, onTap: () => TNav.push(context, Routes.beDiary)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: s.beTxBodyN2RowsN1Label, sub: s.beTxBodyN2RowsN1Sub, onTap: () => TNav.push(context, Routes.eaIntro)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: s.beTxBodyN2RowsN2Label, sub: s.beTxBodyN2RowsN2Sub, onTap: () => TNav.push(context, Routes.programSettings, program: 'be'))]),
       ],
     );
   }

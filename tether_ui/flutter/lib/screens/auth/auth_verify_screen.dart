@@ -20,18 +20,19 @@ class AuthVerifyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Check your email'),
+      header: THeader(title: s.authVerifyHeaderTitle),
       children: [
         TIllustration(glyph: '@'),
-        TTitle('Confirm your email', size: TTitleSize.l, center: true),
-        TBody('We sent a link to alex@example.com. Open it on this phone to finish.', center: true),
-        TCard(variant: TCardVariant.mint, text: 'Your plan is saved on this phone while you wait. Nothing is lost if you close the app.'),
+        TTitle(s.authVerifyBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.authVerifyBodyN2Text, center: true),
+        TCard(variant: TCardVariant.mint, text: s.authVerifyBodyN3Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Open email app', onPressed: () => TNav.external(context, 'message://'), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'I’ve confirmed my email', onPressed: () => TNav.push(context, Routes.authMerge), arrow: true),
-        TLink(key: const ValueKey('a:footer[2]'), label: 'Resend link (available in 0:42)', onTap: () => TNav.toast(context, 'Link sent again')),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.authVerifyFooterN0Label, onPressed: () => TNav.external(context, 'message://'), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.authVerifyFooterN1Label, onPressed: () => TNav.push(context, Routes.authMerge), arrow: true),
+        TLink(key: const ValueKey('a:footer[2]'), label: s.authVerifyFooterN2Label, onTap: () => TNav.toast(context, s.authVerifyFooterN2ActionValue)),
       ],
     );
   }

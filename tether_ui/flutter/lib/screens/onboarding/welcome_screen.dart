@@ -19,20 +19,21 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       header: THeader(title: '', left: THeaderLeft.logo),
       children: [
-        TSegmented(fieldKey: 'welcome.value', options: ['English', 'Español'], selected: 'English'),
+        TSegmented(fieldKey: 'welcome.value', options: ['en', 'es'], labels: ['English', 'Español'], selected: 'en'),
         TIllustration(glyph: '✿'),
-        TEyebrow('Welcome to Tether Health'),
-        TTitle('Care that meets you where you are.', size: TTitleSize.xl),
-        TBody('Small steps, practical support and no judgment, for the parts of your health you choose.'),
-        TKeyValue(rows: [('Private by design', 'No ads · never sold'), ('Help in one tap', 'No typing needed'), ('Your pace', 'Pause anytime')]),
+        TEyebrow(s.welcomeBodyN2Text),
+        TTitle(s.welcomeBodyN3Text, size: TTitleSize.xl),
+        TBody(s.welcomeBodyN4Text),
+        TKeyValue(rows: [(s.welcomeBodyN5RowsN0N0, s.welcomeBodyN5RowsN0N1), (s.welcomeBodyN5RowsN1N0, s.welcomeBodyN5RowsN1N1), (s.welcomeBodyN5RowsN2N0, s.welcomeBodyN5RowsN2N1)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Get started', onPressed: () => TNav.push(context, Routes.obPrograms), arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'I already have an account', onTap: () => TNav.sheet(context, Routes.authSignin)),
-        TLink(key: const ValueKey('a:footer[2]'), label: 'Terms and Privacy Notice', onTap: () => TNav.external(context, 'https://www.tetherhealthgroup.com/privacy/')),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.welcomeFooterN0Label, onPressed: () => TNav.push(context, Routes.obPrograms), arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.welcomeFooterN1Label, onTap: () => TNav.sheet(context, Routes.authSignin)),
+        TLink(key: const ValueKey('a:footer[2]'), label: s.welcomeFooterN2Label, onTap: () => TNav.external(context, 'https://www.tetherhealthgroup.com/privacy/')),
       ],
     );
   }

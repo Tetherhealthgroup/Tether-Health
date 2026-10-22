@@ -18,16 +18,17 @@ class StLogScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Log a reading'),
+      header: THeader(title: s.stLogHeaderTitle),
       children: [
-        TField(fieldKey: 'st_log.reading', label: 'Reading', unit: 'mg/dL', hint: 'From your meter or CGM · 20–600 mg/dL', placeholder: '142', kind: TFieldKind.number),
-        TChips(fieldKey: 'st_log.when', options: ['Fasting', 'Before meal', '2 h after meal', 'Bedtime', 'Other'], selected: ['2 h after meal'], multi: false, label: 'When?'),
-        TChips(fieldKey: 'st_log.how_do_you_feel', options: ['Fine', 'Shaky', 'Sweaty', 'Tired', 'Thirsty'], selected: ['Fine'], label: 'How do you feel?'),
-        TField(fieldKey: 'st_log.note_optional', label: 'Note (optional)', hint: 'Never shared unless you choose', placeholder: 'Pasta lunch'),
+        TField(fieldKey: 'st_log.reading', label: s.stLogBodyN0Label, unit: 'mg/dL', hint: s.stLogBodyN0Hint, placeholder: '142', kind: TFieldKind.number),
+        TChips(fieldKey: 'st_log.when', options: ['Fasting', 'Before meal', '2 h after meal', 'Bedtime', 'Other'], labels: [s.stLogBodyN1OptionsN0, s.stLogBodyN1OptionsN1, s.stLogBodyN1OptionsN2, s.stLogBodyN1OptionsN3, s.stLogBodyN1OptionsN4], selected: ['2 h after meal'], multi: false, label: s.stLogBodyN1Label),
+        TChips(fieldKey: 'st_log.how_do_you_feel', options: ['Fine', 'Shaky', 'Sweaty', 'Tired', 'Thirsty'], labels: [s.stLogBodyN2OptionsN0, s.stLogBodyN2OptionsN1, s.stLogBodyN2OptionsN2, s.stLogBodyN2OptionsN3, s.stLogBodyN2OptionsN4], selected: ['Fine'], label: s.stLogBodyN2Label),
+        TField(fieldKey: 'st_log.note_optional', label: s.stLogBodyN3Label, hint: s.stLogBodyN3Hint, placeholder: s.stLogBodyN3Placeholder),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save reading', onPressed: () => TNav.submit(context, 'POST /v1/program-data/st/readings', screenId: 'st_log', then: () => TNav.branch(context, 'Reading vs. your range', <String, VoidCallback>{'In or above range': () => TNav.toast(context, 'Saved', then: () => TNav.replace(context, Routes.stHome)), 'Below your low': () => TNav.replace(context, Routes.stLow), 'Invalid (outside 20–600)': () => TNav.toast(context, 'Check your meter reading')}, decide: 'st.glucose'), safety: TSafetyRoutes('st.glucose', <String, VoidCallback>{'Below your low': () => TNav.replace(context, Routes.stLow)})), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.stLogFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/st/readings', screenId: 'st_log', then: () => TNav.branch(context, 'Reading vs. your range', <String, VoidCallback>{'In or above range': () => TNav.toast(context, s.stLogFooterN0ActionThenCasesN0ActionValue, then: () => TNav.replace(context, Routes.stHome)), 'Below your low': () => TNav.replace(context, Routes.stLow), 'Invalid (outside 20–600)': () => TNav.toast(context, s.stLogFooterN0ActionThenCasesN2ActionValue)}, decide: 'st.glucose'), safety: TSafetyRoutes('st.glucose', <String, VoidCallback>{'Below your low': () => TNav.replace(context, Routes.stLow)})), arrow: true),
       ],
     );
   }

@@ -18,16 +18,17 @@ class SysUpdateAndroidScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Update needed', left: THeaderLeft.none),
+      header: THeader(title: s.sysUpdateAndroidHeaderTitle, left: THeaderLeft.none),
       children: [
         TIllustration(glyph: '↑', tone: TTone.warn),
-        TTitle('A safety update is ready', size: TTitleSize.l, center: true),
-        TBody('This version has important fixes. Rescue and Support still work until you update.', tone: TTextTone.muted, center: true),
+        TTitle(s.sysUpdateAndroidBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.sysUpdateAndroidBodyN2Text, tone: TTextTone.muted, center: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Update now', onPressed: () => TNav.external(context, 'https://play.google.com/store/apps/details?id=com.TetherHealthLLC.tetherhealth'), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Open Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sysUpdateAndroidFooterN0Label, onPressed: () => TNav.external(context, 'https://play.google.com/store/apps/details?id=com.TetherHealthLLC.tetherhealth'), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sysUpdateAndroidFooterN1Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue),
       ],
     );
   }

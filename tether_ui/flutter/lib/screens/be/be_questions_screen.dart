@@ -19,15 +19,16 @@ class BeQuestionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Questions for my visit', pill: 'Oct 22'),
+      header: THeader(title: s.beQuestionsHeaderTitle, pill: s.beQuestionsHeaderPill),
       children: [
-        TCard(children: [TChecklist(items: [TCheckItem('What side effects should I call about?', done: true), TCheckItem('Can I keep working during treatment?'), TCheckItem('Who do I call after hours?')])]),
-        TField(fieldKey: 'be_questions.add_a_question', label: 'Add a question', placeholder: 'Type a question…'),
+        TCard(children: [TChecklist(items: [TCheckItem(s.beQuestionsBodyN0ChildrenN0ItemsN0Label, value: 'What side effects should I call about?', done: true), TCheckItem(s.beQuestionsBodyN0ChildrenN0ItemsN1Label, value: 'Can I keep working during treatment?'), TCheckItem(s.beQuestionsBodyN0ChildrenN0ItemsN2Label, value: 'Who do I call after hours?')])]),
+        TField(fieldKey: 'be_questions.add_a_question', label: s.beQuestionsBodyN1Label, placeholder: s.beQuestionsBodyN1Placeholder),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Share with my care team', onPressed: () => TNav.push(context, Routes.supportMessageCare), variant: TButtonVariant.secondary),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Done', onPressed: () => TNav.back(context), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.beQuestionsFooterN0Label, onPressed: () => TNav.push(context, Routes.supportMessageCare), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.beQuestionsFooterN1Label, onPressed: () => TNav.back(context), arrow: true),
       ],
     );
   }

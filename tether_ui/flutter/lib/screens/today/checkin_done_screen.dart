@@ -20,18 +20,19 @@ class CheckinDoneScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Check-in saved', left: THeaderLeft.close),
+      header: THeader(title: s.checkinDoneHeaderTitle, left: THeaderLeft.close),
       children: [
         TIllustration(glyph: '✓'),
-        TTitle('Thanks, Alex.', size: TTitleSize.l, center: true),
-        TBody('One small step for each program today.', center: true),
-        TCard(tag: 'bf', title: 'Try a 3-minute stress reset', text: 'You reported high stress', cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: 'Start', onPressed: () => TNav.push(context, Routes.rescueActive), small: true)),
-        TCard(tag: 'sf', title: 'Set a 10 PM wind-down', text: 'You felt drained after scrolling', cta: TButton(key: const ValueKey('a:body[4].cta[0]'), label: 'Set it', onPressed: () => TNav.push(context, Routes.sfGoal), variant: TButtonVariant.secondary, small: true)),
-        TBody('Recommendations use only today’s answers · v1.0', tone: TTextTone.small),
+        TTitle(s.checkinDoneBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.checkinDoneBodyN2Text, center: true),
+        TCard(tag: 'bf', title: s.checkinDoneBodyN3Title, text: s.checkinDoneBodyN3Text, cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: s.checkinDoneBodyN3CtaN0Label, onPressed: () => TNav.push(context, Routes.rescueActive), small: true)),
+        TCard(tag: 'sf', title: s.checkinDoneBodyN4Title, text: s.checkinDoneBodyN4Text, cta: TButton(key: const ValueKey('a:body[4].cta[0]'), label: s.checkinDoneBodyN4CtaN0Label, onPressed: () => TNav.push(context, Routes.sfGoal), variant: TButtonVariant.secondary, small: true)),
+        TBody(s.checkinDoneBodyN5Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Back to Today', onPressed: () => TNav.reset(context, Routes.today), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.checkinDoneFooterN0Label, onPressed: () => TNav.reset(context, Routes.today), variant: TButtonVariant.secondary),
       ],
     );
   }

@@ -18,15 +18,16 @@ class AuthForgotScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Reset password'),
+      header: THeader(title: s.authForgotHeaderTitle),
       children: [
-        TTitle('Forgot your password?'),
-        TBody('Enter your email and we’ll send a reset link.', tone: TTextTone.muted),
-        TField(fieldKey: 'auth_forgot.email', label: 'Email', placeholder: 'alex@example.com', kind: TFieldKind.email),
+        TTitle(s.authForgotBodyN0Text),
+        TBody(s.authForgotBodyN1Text, tone: TTextTone.muted),
+        TField(fieldKey: 'auth_forgot.email', label: s.authForgotBodyN2Label, placeholder: s.authForgotBodyN2Placeholder, kind: TFieldKind.email),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Send reset link', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/recover', screenId: 'auth_forgot', queueable: false, then: () => TNav.replace(context, Routes.authForgotSent)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.authForgotFooterN0Label, onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/recover', screenId: 'auth_forgot', queueable: false, then: () => TNav.replace(context, Routes.authForgotSent)), arrow: true),
       ],
     );
   }

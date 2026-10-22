@@ -21,12 +21,13 @@ class RecordsSearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Find your provider'),
+      header: THeader(title: s.recordsSearchHeaderTitle),
       children: [
-        TField(fieldKey: 'records_search.query', label: 'Search', placeholder: 'Search hospital, clinic or doctor', kind: TFieldKind.search),
-        TListGroup(title: 'Results', rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'Patel Family Medicine', sub: 'Epic · San Jose, CA', lead: TLead.icon('E'), onTap: () => TNav.push(context, Routes.recordsConsent)), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: 'Patel Heart Institute', sub: 'Epic · Fremont, CA', lead: TLead.icon('E'), onTap: () => TNav.push(context, Routes.recordsConsent)), TListRow(key: const ValueKey('a:body[1].rows[2]'), label: 'Stanford Health Care', sub: 'Epic · Palo Alto, CA', lead: TLead.icon('E'), onTap: () => TNav.push(context, Routes.recordsConsent))]),
-        TLink(key: const ValueKey('a:body[2]'), label: 'Can’t find it? Enter a FHIR address', onTap: () => TNav.push(context, Routes.recordsFhirUrl)),
+        TField(fieldKey: 'records_search.query', label: s.recordsSearchBodyN0Label, placeholder: s.recordsSearchBodyN0Placeholder, kind: TFieldKind.search),
+        TListGroup(title: s.recordsSearchBodyN1Title, rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: s.recordsSearchBodyN1RowsN0Label, sub: s.recordsSearchBodyN1RowsN0Sub, lead: TLead.icon('E'), onTap: () => TNav.push(context, Routes.recordsConsent)), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: s.recordsSearchBodyN1RowsN1Label, sub: s.recordsSearchBodyN1RowsN1Sub, lead: TLead.icon('E'), onTap: () => TNav.push(context, Routes.recordsConsent)), TListRow(key: const ValueKey('a:body[1].rows[2]'), label: s.recordsSearchBodyN1RowsN2Label, sub: s.recordsSearchBodyN1RowsN2Sub, lead: TLead.icon('E'), onTap: () => TNav.push(context, Routes.recordsConsent))]),
+        TLink(key: const ValueKey('a:body[2]'), label: s.recordsSearchBodyN2Label, onTap: () => TNav.push(context, Routes.recordsFhirUrl)),
       ],
     );
   }

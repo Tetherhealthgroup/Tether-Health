@@ -22,13 +22,14 @@ class EaResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your answers', pill: 'Not a diagnosis'),
+      header: THeader(title: s.eaResultHeaderTitle, pill: s.eaResultHeaderPill),
       children: [
-        TTitle('Talking to someone could help.'),
-        TCard(variant: TCardVariant.mint, text: 'Your answers suggest you’ve been carrying a lot lately. A doctor, counselor or therapist can help figure out what would make the biggest difference.'),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: 'Find a therapist near me', sub: 'In-network filters', onTap: () => TNav.external(context, 'https://findtreatment.gov')), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: 'Talk to my primary care doctor', sub: 'We’ll help you prepare', onTap: () => TNav.push(context, Routes.supportMessageCare)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: 'Not now', sub: 'Keep using Ease tools', onTap: () => TNav.push(context, Routes.eaPlan))]),
-        TEmergencyCard(text: 'Thoughts of harming yourself? Call or text 988. Emergency: 911.', actions: [TButton(key: const ValueKey('a:body[3].actions[0]'), label: 'Call or text 988', onPressed: () => TNav.push(context, Routes.crisis), variant: TButtonVariant.danger, small: true), TButton(key: const ValueKey('a:body[3].actions[1]'), label: 'Call 911', onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.secondary, small: true)]),
+        TTitle(s.eaResultBodyN0Text),
+        TCard(variant: TCardVariant.mint, text: s.eaResultBodyN1Text),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: s.eaResultBodyN2RowsN0Label, sub: s.eaResultBodyN2RowsN0Sub, onTap: () => TNav.external(context, 'https://findtreatment.gov')), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: s.eaResultBodyN2RowsN1Label, sub: s.eaResultBodyN2RowsN1Sub, onTap: () => TNav.push(context, Routes.supportMessageCare)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: s.eaResultBodyN2RowsN2Label, sub: s.eaResultBodyN2RowsN2Sub, onTap: () => TNav.push(context, Routes.eaPlan))]),
+        TEmergencyCard(text: s.eaResultBodyN3Text, actions: [TButton(key: const ValueKey('a:body[3].actions[0]'), label: s.eaResultBodyN3ActionsN0Label, onPressed: () => TNav.push(context, Routes.crisis), variant: TButtonVariant.danger, small: true), TButton(key: const ValueKey('a:body[3].actions[1]'), label: s.eaResultBodyN3ActionsN1Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.secondary, small: true)]),
       ],
     );
   }

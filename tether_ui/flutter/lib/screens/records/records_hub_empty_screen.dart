@@ -19,17 +19,18 @@ class RecordsHubEmptyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Health records'),
+      header: THeader(title: s.recordsHubEmptyHeaderTitle),
       children: [
         TIllustration(glyph: '+'),
-        TTitle('No health records connected', size: TTitleSize.l, center: true),
-        TBody('Bring in readings, labs and vaccinations from your clinic or Medicare, or type them in. Your programs work either way.', tone: TTextTone.muted, center: true),
-        TKeyValue(rows: [('Epic MyChart', 'most US hospitals and clinics'), ('Medicare', 'Blue Button 2.0'), ('Other', 'any SMART on FHIR R4 server')]),
+        TTitle(s.recordsHubEmptyBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.recordsHubEmptyBodyN2Text, tone: TTextTone.muted, center: true),
+        TKeyValue(rows: [('Epic MyChart', s.recordsHubEmptyBodyN3RowsN0N1), ('Medicare', s.recordsHubEmptyBodyN3RowsN1N1), (s.recordsHubEmptyBodyN3RowsN2N0, s.recordsHubEmptyBodyN3RowsN2N1)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Connect a health system', onPressed: () => TNav.push(context, Routes.recordsAdd), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Enter a value manually', onPressed: () => TNav.push(context, Routes.recordsManual), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.recordsHubEmptyFooterN0Label, onPressed: () => TNav.push(context, Routes.recordsAdd), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.recordsHubEmptyFooterN1Label, onPressed: () => TNav.push(context, Routes.recordsManual), variant: TButtonVariant.secondary),
       ],
     );
   }

@@ -22,14 +22,15 @@ class ProgressEmptyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Progress', left: THeaderLeft.none, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
+      header: THeader(title: s.progressEmptyHeaderTitle, left: THeaderLeft.none, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'progress',
       children: [
         TIllustration(glyph: '0'),
-        TTitle('Your progress shows up here', center: true),
-        TBody('After your first check-in or reading, you’ll see patterns for each program.', tone: TTextTone.muted, center: true),
-        TButton(key: const ValueKey('a:body[3]'), label: 'Do a check-in', onPressed: () => TNav.sheet(context, Routes.checkin), arrow: true),
+        TTitle(s.progressEmptyBodyN1Text, center: true),
+        TBody(s.progressEmptyBodyN2Text, tone: TTextTone.muted, center: true),
+        TButton(key: const ValueKey('a:body[3]'), label: s.progressEmptyBodyN3Label, onPressed: () => TNav.sheet(context, Routes.checkin), arrow: true),
       ],
     );
   }

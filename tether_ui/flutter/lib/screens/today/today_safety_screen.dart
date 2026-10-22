@@ -23,14 +23,15 @@ class TodaySafetyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Today', left: THeaderLeft.logo, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
+      header: THeader(title: s.todaySafetyHeaderTitle, left: THeaderLeft.logo, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'today',
       children: [
-        TBanner(kind: TBannerKind.urgent, text: 'Your last blood pressure was in the crisis range.'),
-        TCard(variant: TCardVariant.urgent, title: 'Any chest pain, shortness of breath, weakness, vision change or trouble speaking?', text: 'Heartwise · from your 8:10 AM reading', children: [TButtonRow(children: [TButton(key: const ValueKey('a:body[1].children[0].items[0]'), label: 'Yes · call 911', onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger, small: true), TButton(key: const ValueKey('a:body[1].children[0].items[1]'), label: 'No symptoms', onPressed: () => TNav.push(context, Routes.hwRecheck), variant: TButtonVariant.secondary, small: true)])]),
-        TBody('Other steps are paused until you answer. Safety always comes first.', tone: TTextTone.small),
-        TCard(eyebrow: 'Today · paused', children: [TChecklist(items: [TCheckItem('Stock gum, water or snacks'), TCheckItem('Charge phone outside the bedroom')])]),
+        TBanner(kind: TBannerKind.urgent, text: s.todaySafetyBodyN0Text),
+        TCard(variant: TCardVariant.urgent, title: s.todaySafetyBodyN1Title, text: s.todaySafetyBodyN1Text, children: [TButtonRow(children: [TButton(key: const ValueKey('a:body[1].children[0].items[0]'), label: s.todaySafetyBodyN1ChildrenN0ItemsN0Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger, small: true), TButton(key: const ValueKey('a:body[1].children[0].items[1]'), label: s.todaySafetyBodyN1ChildrenN0ItemsN1Label, onPressed: () => TNav.push(context, Routes.hwRecheck), variant: TButtonVariant.secondary, small: true)])]),
+        TBody(s.todaySafetyBodyN2Text, tone: TTextTone.small),
+        TCard(eyebrow: s.todaySafetyBodyN3Eyebrow, children: [TChecklist(items: [TCheckItem(s.todaySafetyBodyN3ChildrenN0ItemsN0Label, value: 'Stock gum, water or snacks'), TCheckItem(s.todaySafetyBodyN3ChildrenN0ItemsN1Label, value: 'Charge phone outside the bedroom')])]),
       ],
     );
   }

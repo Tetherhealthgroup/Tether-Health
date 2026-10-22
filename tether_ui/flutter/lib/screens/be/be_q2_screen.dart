@@ -18,17 +18,18 @@ class BeQ2Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Family history', pill: '2 of 2'),
+      header: THeader(title: s.beQ2HeaderTitle, pill: s.beQ2HeaderPill),
       children: [
         TSteps(n: 2, total: 2),
-        TTitle('Has a close relative had cancer?'),
-        TChips(fieldKey: 'be_q2.value', options: ['Breast', 'Ovarian', 'Colorectal', 'Prostate', 'Pancreatic', 'Melanoma', 'None', 'Not sure'], selected: ['Breast'], bind: 'be.profile.family_cancers', bindClass: TBindClass.plan),
-        TField(fieldKey: 'be_q2.relative_s_age_at_diagnosis_if_k', label: 'Relative’s age at diagnosis (if known)', placeholder: '44', kind: TFieldKind.number),
-        TCard(variant: TCardVariant.mint, text: 'A relative diagnosed before 50 may mean earlier screening or genetic counseling. We’ll add this to your visit list.'),
+        TTitle(s.beQ2BodyN1Text),
+        TChips(fieldKey: 'be_q2.value', options: ['Breast', 'Ovarian', 'Colorectal', 'Prostate', 'Pancreatic', 'Melanoma', 'None', 'Not sure'], labels: [s.beQ2BodyN2OptionsN0, s.beQ2BodyN2OptionsN1, s.beQ2BodyN2OptionsN2, s.beQ2BodyN2OptionsN3, s.beQ2BodyN2OptionsN4, s.beQ2BodyN2OptionsN5, s.beQ2BodyN2OptionsN6, s.beQ2BodyN2OptionsN7], selected: ['Breast'], bind: 'be.profile.family_cancers', bindClass: TBindClass.plan),
+        TField(fieldKey: 'be_q2.relative_s_age_at_diagnosis_if_k', label: s.beQ2BodyN3Label, placeholder: '44', kind: TFieldKind.number),
+        TCard(variant: TCardVariant.mint, text: s.beQ2BodyN4Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'See my plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/be/profile', screenId: 'be_q2', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.beHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.beQ2FooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/program-data/be/profile', screenId: 'be_q2', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.beHome))), arrow: true),
       ],
     );
   }

@@ -17,15 +17,16 @@ class SupportConnectScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Connect a clinic'),
+      header: THeader(title: s.supportConnectHeaderTitle),
       children: [
-        TTitle('Enter your clinic’s invite code'),
-        TField(fieldKey: 'support_connect.invite_code', label: 'Invite code', placeholder: 'PATEL-4821'),
-        TBody('Your clinic gave you this code. Connecting shares nothing until you approve a summary.', tone: TTextTone.muted),
+        TTitle(s.supportConnectBodyN0Text),
+        TField(fieldKey: 'support_connect.invite_code', label: s.supportConnectBodyN1Label, placeholder: s.supportConnectBodyN1Placeholder),
+        TBody(s.supportConnectBodyN2Text, tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Connect', onPressed: () => TNav.submit(context, 'POST /v1/care/connections', screenId: 'support_connect', then: () => TNav.toast(context, 'Connected to Dr. Patel’s clinic', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.supportConnectFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/care/connections', screenId: 'support_connect', then: () => TNav.toast(context, s.supportConnectFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

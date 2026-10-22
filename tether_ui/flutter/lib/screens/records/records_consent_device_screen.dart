@@ -19,17 +19,18 @@ class RecordsConsentDeviceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Connect', pill: 'Read-only'),
+      header: THeader(title: s.recordsConsentDeviceHeaderTitle, pill: s.recordsConsentDeviceHeaderPill),
       children: [
-        TTitle('Use health data on this phone?'),
-        TBody('iPhone: Apple Health Records (FHIR) and readings. Android: Health Connect readings. You choose each type in the system screen next.', tone: TTextTone.muted),
-        TChecklist(fieldKey: 'records_consent_device.data_types', items: [TCheckItem('Blood pressure'), TCheckItem('Blood glucose'), TCheckItem('Clinical records (iPhone)', sub: 'Labs, immunizations, conditions')], label: 'What Tether will ask for'),
-        TListGroup(flat: true, rows: [TListRow(label: 'Steps and sleep', sub: 'Not requested')]),
+        TTitle(s.recordsConsentDeviceBodyN0Text),
+        TBody(s.recordsConsentDeviceBodyN1Text, tone: TTextTone.muted),
+        TChecklist(fieldKey: 'records_consent_device.data_types', items: [TCheckItem(s.recordsConsentDeviceBodyN2ItemsN0Label, value: 'Blood pressure'), TCheckItem(s.recordsConsentDeviceBodyN2ItemsN1Label, value: 'Blood glucose'), TCheckItem(s.recordsConsentDeviceBodyN2ItemsN2Label, value: 'Clinical records (iPhone)', sub: s.recordsConsentDeviceBodyN2ItemsN2Sub)], label: s.recordsConsentDeviceBodyN2Label),
+        TListGroup(flat: true, rows: [TListRow(label: s.recordsConsentDeviceBodyN3RowsN0Label, sub: s.recordsConsentDeviceBodyN3RowsN0Sub)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.branch(context, 'Anything selected?', <String, VoidCallback>{'Chosen': () => TNav.branch(context, 'System permission result', <String, VoidCallback>{'Allowed': () => TNav.push(context, Routes.recordsImporting), 'Not allowed': () => TNav.push(context, Routes.recordsError)}, device: const TBranchRef('records.device.health_records_request', TAsk.healthRecordsRequest, 'records_consent_device'), when: const <TAnswer, String>{TAnswer.granted: 'Allowed', TAnswer.denied: 'Not allowed', TAnswer.unavailable: 'Not allowed'}), 'Nothing chosen': () => TNav.toast(context, 'Select at least one item to continue.')}, decide: 'rec.consent.device'), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.recordsConsentDeviceFooterN0Label, onPressed: () => TNav.branch(context, 'Anything selected?', <String, VoidCallback>{'Chosen': () => TNav.branch(context, 'System permission result', <String, VoidCallback>{'Allowed': () => TNav.push(context, Routes.recordsImporting), 'Not allowed': () => TNav.push(context, Routes.recordsError)}, device: const TBranchRef('records.device.health_records_request', TAsk.healthRecordsRequest, 'records_consent_device'), when: const <TAnswer, String>{TAnswer.granted: 'Allowed', TAnswer.denied: 'Not allowed', TAnswer.unavailable: 'Not allowed'}), 'Nothing chosen': () => TNav.toast(context, s.recordsConsentDeviceFooterN0ActionCasesN1ActionValue)}, decide: 'rec.consent.device'), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.recordsConsentDeviceFooterN1Label, onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );
   }

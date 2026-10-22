@@ -20,18 +20,19 @@ class AuthLinkScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Link accounts'),
+      header: THeader(title: s.authLinkHeaderTitle),
       children: [
         TIllustration(glyph: '⇄'),
-        TTitle('You already have a Tether account', size: TTitleSize.l, center: true),
-        TBody('alex@example.com signed up with email and password. Enter your password once to link Google. After that, either sign-in works.', tone: TTextTone.muted, center: true),
-        TField(fieldKey: 'auth_link.password', label: 'Password', placeholder: '••••••••••••', kind: TFieldKind.password),
-        TLink(key: const ValueKey('a:body[4]'), label: 'Forgot password?', onTap: () => TNav.push(context, Routes.authForgot)),
+        TTitle(s.authLinkBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.authLinkBodyN2Text, tone: TTextTone.muted, center: true),
+        TField(fieldKey: 'auth_link.password', label: s.authLinkBodyN3Label, placeholder: '••••••••••••', kind: TFieldKind.password),
+        TLink(key: const ValueKey('a:body[4]'), label: s.authLinkBodyN4Label, onTap: () => TNav.push(context, Routes.authForgot)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Link and sign in', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/user/identities (linkIdentity)', screenId: 'auth_link', queueable: false, then: () => TNav.reset(context, Routes.today)), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.authLinkFooterN0Label, onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/user/identities (linkIdentity)', screenId: 'auth_link', queueable: false, then: () => TNav.reset(context, Routes.today)), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.authLinkFooterN1Label, onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );
   }

@@ -18,16 +18,17 @@ class CkDoneScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Mark as done'),
+      header: THeader(title: s.ckDoneHeaderTitle),
       children: [
-        TField(fieldKey: 'ck_done.what', label: 'What', placeholder: 'Flu vaccine', kind: TFieldKind.select),
-        TField(fieldKey: 'ck_done.date', label: 'Date', placeholder: 'Oct 12, 2026', kind: TFieldKind.date),
-        TField(fieldKey: 'ck_done.where_optional', label: 'Where (optional)', placeholder: 'Main St Pharmacy'),
-        TChecklist(items: [TCheckItem('Remind me next year', done: true)]),
+        TField(fieldKey: 'ck_done.what', label: s.ckDoneBodyN0Label, placeholder: s.ckDoneBodyN0Placeholder, kind: TFieldKind.select),
+        TField(fieldKey: 'ck_done.date', label: s.ckDoneBodyN1Label, placeholder: s.ckDoneBodyN1Placeholder, kind: TFieldKind.date),
+        TField(fieldKey: 'ck_done.where_optional', label: s.ckDoneBodyN2Label, placeholder: s.ckDoneBodyN2Placeholder),
+        TChecklist(items: [TCheckItem(s.ckDoneBodyN3ItemsN0Label, value: 'Remind me next year', done: true)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/program-data/ck/done', screenId: 'ck_done', then: () => TNav.toast(context, 'Saved · next due Sep 2027', then: () => TNav.replace(context, Routes.ckList))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.ckDoneFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/ck/done', screenId: 'ck_done', then: () => TNav.toast(context, s.ckDoneFooterN0ActionThenValue, then: () => TNav.replace(context, Routes.ckList))), arrow: true),
       ],
     );
   }

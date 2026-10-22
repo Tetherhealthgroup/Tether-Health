@@ -18,16 +18,17 @@ class SfUnplugHealthAndroidScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Tracking check'),
+      header: THeader(title: s.sfUnplugHealthAndroidHeaderTitle),
       children: [
-        TBanner(kind: TBannerKind.success, text: 'Unplug is working. All 4 checks pass.'),
-        TChecklist(items: [TCheckItem('Usage access', sub: 'On', done: true), TCheckItem('Display over other apps', sub: 'On', done: true), TCheckItem('Unplug running in the background', sub: 'Checked 12 s ago', done: true), TCheckItem('Notifications', sub: 'On · needed for the “Tether is running” notice', done: true)], label: 'Android checks'),
-        TBody('Some phones stop background apps to save battery. If Unplug keeps stopping, let Tether run in the background.', tone: TTextTone.small),
+        TBanner(kind: TBannerKind.success, text: s.sfUnplugHealthAndroidBodyN0Text),
+        TChecklist(items: [TCheckItem(s.sfUnplugHealthAndroidBodyN1ItemsN0Label, value: 'Usage access', sub: s.sfUnplugHealthAndroidBodyN1ItemsN0Sub, done: true), TCheckItem(s.sfUnplugHealthAndroidBodyN1ItemsN1Label, value: 'Display over other apps', sub: s.sfUnplugHealthAndroidBodyN1ItemsN1Sub, done: true), TCheckItem(s.sfUnplugHealthAndroidBodyN1ItemsN2Label, value: 'Unplug running in the background', sub: s.sfUnplugHealthAndroidBodyN1ItemsN2Sub, done: true), TCheckItem(s.sfUnplugHealthAndroidBodyN1ItemsN3Label, value: 'Notifications', sub: s.sfUnplugHealthAndroidBodyN1ItemsN3Sub, done: true)], label: s.sfUnplugHealthAndroidBodyN1Label),
+        TBody(s.sfUnplugHealthAndroidBodyN2Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Battery settings', onPressed: () => TNav.osSettings(context), variant: TButtonVariant.secondary),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Done', onPressed: () => TNav.back(context), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugHealthAndroidFooterN0Label, onPressed: () => TNav.osSettings(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfUnplugHealthAndroidFooterN1Label, onPressed: () => TNav.back(context), arrow: true),
       ],
     );
   }

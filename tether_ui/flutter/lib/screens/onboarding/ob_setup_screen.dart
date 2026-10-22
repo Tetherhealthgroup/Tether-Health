@@ -23,20 +23,21 @@ class ObSetupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TFlow.onboarding = true; // program setups now return here
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Set up', pill: '5 of 5'),
+      header: THeader(title: s.obSetupHeaderTitle, pill: s.obSetupHeaderPill),
       children: [
         TSteps(n: 5, total: 5),
-        TTitle('Let’s set up your programs.'),
-        TBody('Each takes about 3 minutes. You can stop and come back.', tone: TTextTone.muted),
-        TListGroup(title: 'Focus programs', rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'BreatheFree', sub: 'Quit plan · about 3 min', lead: TLead.program('bf'), pill: 'Start', onTap: () => TNav.push(context, Routes.bfQ1)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: 'ScrollFree', sub: 'Usage goal · about 2 min', lead: TLead.program('sf'), pill: 'Start', onTap: () => TNav.push(context, Routes.sfQ1))]),
-        TListGroup(title: 'Learn only', rows: [TListRow(label: 'ClearAir', sub: 'Learn only · nothing to set up', lead: TLead.program('ca'))]),
-        TListGroup(title: 'Your data', rows: [TListRow(key: const ValueKey('a:body[5].rows[0]'), label: 'Health records (optional)', sub: 'Import from Epic MyChart, Medicare or another FHIR source', lead: TLead.icon('+'), onTap: () => TNav.push(context, Routes.recordsAdd))]),
-        TCard(variant: TCardVariant.mint, title: 'Tip', text: 'Finishing a program setup brings you back here.'),
+        TTitle(s.obSetupBodyN1Text),
+        TBody(s.obSetupBodyN2Text, tone: TTextTone.muted),
+        TListGroup(title: s.obSetupBodyN3Title, rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'BreatheFree', sub: s.obSetupBodyN3RowsN0Sub, lead: TLead.program('bf'), pill: s.obSetupBodyN3RowsN0Pill, onTap: () => TNav.push(context, Routes.bfQ1)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: 'ScrollFree', sub: s.obSetupBodyN3RowsN1Sub, lead: TLead.program('sf'), pill: s.obSetupBodyN3RowsN1Pill, onTap: () => TNav.push(context, Routes.sfQ1))]),
+        TListGroup(title: s.obSetupBodyN4Title, rows: [TListRow(label: 'ClearAir', sub: s.obSetupBodyN4RowsN0Sub, lead: TLead.program('ca'))]),
+        TListGroup(title: s.obSetupBodyN5Title, rows: [TListRow(key: const ValueKey('a:body[5].rows[0]'), label: s.obSetupBodyN5RowsN0Label, sub: s.obSetupBodyN5RowsN0Sub, lead: TLead.icon('+'), onTap: () => TNav.push(context, Routes.recordsAdd))]),
+        TCard(variant: TCardVariant.mint, title: s.obSetupBodyN6Title, text: s.obSetupBodyN6Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.push(context, Routes.obReminders), arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Set up later', onTap: () => TNav.push(context, Routes.obReminders)),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.obSetupFooterN0Label, onPressed: () => TNav.push(context, Routes.obReminders), arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.obSetupFooterN1Label, onTap: () => TNav.push(context, Routes.obReminders)),
       ],
     );
   }

@@ -17,15 +17,16 @@ class SfUnplugHealthScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Tracking check'),
+      header: THeader(title: s.sfUnplugHealthHeaderTitle),
       children: [
-        TBanner(kind: TBannerKind.success, text: 'Unplug is working. All 4 checks pass.'),
-        TChecklist(items: [TCheckItem('Screen Time permission', sub: 'Allowed', done: true), TCheckItem('Daily schedule', sub: 'Running', done: true), TCheckItem('Settings shared with the pause screen', sub: 'Ready', done: true), TCheckItem('Notifications', sub: 'On · lets the pause screen open Tether for support', done: true)], label: 'iPhone checks'),
-        TBody('If a check fails, Unplug stops counting and pausing. We’ll tell you instead of letting you think it’s still on.', tone: TTextTone.small),
+        TBanner(kind: TBannerKind.success, text: s.sfUnplugHealthBodyN0Text),
+        TChecklist(items: [TCheckItem(s.sfUnplugHealthBodyN1ItemsN0Label, value: 'Screen Time permission', sub: s.sfUnplugHealthBodyN1ItemsN0Sub, done: true), TCheckItem(s.sfUnplugHealthBodyN1ItemsN1Label, value: 'Daily schedule', sub: s.sfUnplugHealthBodyN1ItemsN1Sub, done: true), TCheckItem(s.sfUnplugHealthBodyN1ItemsN2Label, value: 'Settings shared with the pause screen', sub: s.sfUnplugHealthBodyN1ItemsN2Sub, done: true), TCheckItem(s.sfUnplugHealthBodyN1ItemsN3Label, value: 'Notifications', sub: s.sfUnplugHealthBodyN1ItemsN3Sub, done: true)], label: s.sfUnplugHealthBodyN1Label),
+        TBody(s.sfUnplugHealthBodyN2Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Done', onPressed: () => TNav.back(context), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugHealthFooterN0Label, onPressed: () => TNav.back(context), arrow: true),
       ],
     );
   }

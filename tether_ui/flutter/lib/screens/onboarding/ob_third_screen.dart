@@ -17,15 +17,16 @@ class ObThirdScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TSheet(
       children: [
-        TEyebrow('Both focus slots are in use'),
-        TTitle('Add Heartwise as…'),
-        TRadioList(fieldKey: 'ob_third.value', items: [TRadioItem('Learn only for now', sub: 'Lessons, no reminders. Upgrade anytime.', badge: 'Suggested'), TRadioItem('Swap with ScrollFree', sub: 'ScrollFree pauses. Its data and progress are kept.'), TRadioItem('Swap with BreatheFree', sub: 'Not suggested during your quit week.')], selected: 0),
+        TEyebrow(s.obThirdBodyN0Text),
+        TTitle(s.obThirdBodyN1Text),
+        TRadioList(fieldKey: 'ob_third.value', items: [TRadioItem(s.obThirdBodyN2ItemsN0Label, value: 'Learn only for now', sub: s.obThirdBodyN2ItemsN0Sub, badge: s.obThirdBodyN2ItemsN0Badge), TRadioItem(s.obThirdBodyN2ItemsN1Label, value: 'Swap with ScrollFree', sub: s.obThirdBodyN2ItemsN1Sub), TRadioItem(s.obThirdBodyN2ItemsN2Label, value: 'Swap with BreatheFree', sub: s.obThirdBodyN2ItemsN2Sub)], selected: 0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.toast(context, 'Heartwise added as Learn only', then: () => TNav.close(context)), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.obThirdFooterN0Label, onPressed: () => TNav.toast(context, s.obThirdFooterN0ActionValue, then: () => TNav.close(context)), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.obThirdFooterN1Label, onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );
   }

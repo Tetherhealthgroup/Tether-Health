@@ -21,16 +21,17 @@ class CaNoplanScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'No action plan', pill: 'Learn'),
+      header: THeader(title: s.caNoplanHeaderTitle, pill: s.caNoplanHeaderPill),
       children: [
         TIllustration(glyph: 'i', tone: TTone.warn),
-        TTitle('Let’s get you a plan first', center: true),
-        TBody('Zone checks need a plan from your clinician. Until then you can learn, log symptoms and prepare questions.', tone: TTextTone.muted, center: true),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'Symptom diary', sub: 'Shareable with your clinician', onTap: () => TNav.push(context, Routes.caSymptoms)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: 'Questions for my next visit', onTap: () => TNav.push(context, Routes.learnLesson)), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: 'Message my care team', onTap: () => TNav.push(context, Routes.supportMessageCare))]),
+        TTitle(s.caNoplanBodyN1Text, center: true),
+        TBody(s.caNoplanBodyN2Text, tone: TTextTone.muted, center: true),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: s.caNoplanBodyN3RowsN0Label, sub: s.caNoplanBodyN3RowsN0Sub, onTap: () => TNav.push(context, Routes.caSymptoms)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: s.caNoplanBodyN3RowsN1Label, onTap: () => TNav.push(context, Routes.learnLesson)), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: s.caNoplanBodyN3RowsN2Label, onTap: () => TNav.push(context, Routes.supportMessageCare))]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue to ClearAir', onPressed: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.caHome)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.caNoplanFooterN0Label, onPressed: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.caHome)), arrow: true),
       ],
     );
   }

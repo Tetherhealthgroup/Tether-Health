@@ -21,18 +21,19 @@ class AuthSigninScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TSheet(
       children: [
-        TTitle('Welcome back'),
-        TAuthButtons(children: [TAuthButton(key: const ValueKey('a:body[1].items[0]'), provider: 'apple', label: 'Continue with Apple', onPressed: () => TNav.branch(context, 'Sign in with Apple result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Success · guest plan on phone': () => TNav.push(context, Routes.authMerge), 'New Apple ID, no Tether account': () => TNav.replace(context, Routes.obPrograms), 'Cancelled': () => TNav.toast(context, 'Sign-in cancelled'), 'Error': () => TNav.push(context, Routes.authSocialError)}, provider: 'apple'), platforms: ['ios']), TAuthButton(key: const ValueKey('a:body[1].items[1]'), provider: 'google', label: 'Continue with Google', onPressed: () => TNav.branch(context, 'Sign in with Google result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Success · guest plan on phone': () => TNav.push(context, Routes.authMerge), 'New Google account, no Tether account': () => TNav.replace(context, Routes.obPrograms), 'Cancelled': () => TNav.toast(context, 'Sign-in cancelled'), 'Error': () => TNav.push(context, Routes.authSocialError)}, provider: 'google'), platforms: ['ios', 'android'])]),
-        TEyebrow('Or with email'),
-        TField(fieldKey: 'auth_signin.email', label: 'Email', placeholder: 'alex@example.com', kind: TFieldKind.email),
-        TField(fieldKey: 'auth_signin.password', label: 'Password', placeholder: '••••••••', kind: TFieldKind.password),
-        TLink(key: const ValueKey('a:body[5]'), label: 'Forgot password?', onTap: () => TNav.push(context, Routes.authForgot), alignLeft: true),
+        TTitle(s.authSigninBodyN0Text),
+        TAuthButtons(children: [TAuthButton(key: const ValueKey('a:body[1].items[0]'), provider: 'apple', label: s.authSigninBodyN1ItemsN0Label, onPressed: () => TNav.branch(context, 'Sign in with Apple result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Success · guest plan on phone': () => TNav.push(context, Routes.authMerge), 'New Apple ID, no Tether account': () => TNav.replace(context, Routes.obPrograms), 'Cancelled': () => TNav.toast(context, s.authSigninBodyN1ItemsN0ActionCasesN3ActionValue), 'Error': () => TNav.push(context, Routes.authSocialError)}, provider: 'apple'), platforms: ['ios']), TAuthButton(key: const ValueKey('a:body[1].items[1]'), provider: 'google', label: s.authSigninBodyN1ItemsN1Label, onPressed: () => TNav.branch(context, 'Sign in with Google result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Success · guest plan on phone': () => TNav.push(context, Routes.authMerge), 'New Google account, no Tether account': () => TNav.replace(context, Routes.obPrograms), 'Cancelled': () => TNav.toast(context, s.authSigninBodyN1ItemsN1ActionCasesN3ActionValue), 'Error': () => TNav.push(context, Routes.authSocialError)}, provider: 'google'), platforms: ['ios', 'android'])]),
+        TEyebrow(s.authSigninBodyN2Text),
+        TField(fieldKey: 'auth_signin.email', label: s.authSigninBodyN3Label, placeholder: s.authSigninBodyN3Placeholder, kind: TFieldKind.email),
+        TField(fieldKey: 'auth_signin.password', label: s.authSigninBodyN4Label, placeholder: '••••••••', kind: TFieldKind.password),
+        TLink(key: const ValueKey('a:body[5]'), label: s.authSigninBodyN5Label, onTap: () => TNav.push(context, Routes.authForgot), alignLeft: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Sign in', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/token', screenId: 'auth_signin', queueable: false, then: () => TNav.branch(context, 'Sign-in result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Success · guest plan on phone': () => TNav.push(context, Routes.authMerge), 'Wrong password': () => TNav.push(context, Routes.authSigninError)})), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.authSigninFooterN0Label, onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/token', screenId: 'auth_signin', queueable: false, then: () => TNav.branch(context, 'Sign-in result', <String, VoidCallback>{'Success': () => TNav.reset(context, Routes.today), 'Success · guest plan on phone': () => TNav.push(context, Routes.authMerge), 'Wrong password': () => TNav.push(context, Routes.authSigninError)})), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.authSigninFooterN1Label, onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );
   }

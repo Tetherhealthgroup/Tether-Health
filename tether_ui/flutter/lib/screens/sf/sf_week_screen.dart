@@ -18,14 +18,15 @@ class SfWeekScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Week 2', pill: 'ScrollFree'),
+      header: THeader(title: s.sfWeekHeaderTitle, pill: 'ScrollFree'),
       children: [
-        TTitle('Your week, honestly.'),
-        TBarChart(values: [190.0, 160.0, 130.0, 0.0, 110.0, 95.0, 85.0], color: TColors.program('sf'), missing: [3], target: 90.0, labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'], title: 'Social minutes / day', caption: 'Thursday: no check-in · not counted as zero'),
-        TStatGrid(stats: [TStat(label: 'Phone-free nights', value: '5/7'), TStat(label: 'Urges paused', value: '11', sub: '7 put down')]),
-        TCard(variant: TCardVariant.mint, eyebrow: 'You said', text: '“Drained” was 4× less common on phone-free nights.', children: [TQuote('I feel drained after long scrolls.')]),
-        TCard(eyebrow: 'Next week', title: 'Step down to 75 min?', children: [TButtonRow(children: [TButton(key: const ValueKey('a:body[4].children[0].items[0]'), label: 'Yes', onPressed: () => TNav.toast(context, 'Goal set to 75 min', then: () => TNav.back(context)), small: true), TButton(key: const ValueKey('a:body[4].children[0].items[1]'), label: 'Stay at 90', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary, small: true)])]),
+        TTitle(s.sfWeekBodyN0Text),
+        TBarChart(values: [190.0, 160.0, 130.0, 0.0, 110.0, 95.0, 85.0], color: TColors.program('sf'), missing: [3], target: 90.0, labels: [s.sfWeekBodyN1LabelsN0, s.sfWeekBodyN1LabelsN1, s.sfWeekBodyN1LabelsN2, s.sfWeekBodyN1LabelsN3, s.sfWeekBodyN1LabelsN4, s.sfWeekBodyN1LabelsN5, s.sfWeekBodyN1LabelsN6], title: s.sfWeekBodyN1Title, caption: s.sfWeekBodyN1Caption),
+        TStatGrid(stats: [TStat(label: s.sfWeekBodyN2ItemsN0Label, value: '5/7'), TStat(label: s.sfWeekBodyN2ItemsN1Label, value: '11', sub: s.sfWeekBodyN2ItemsN1Sub)]),
+        TCard(variant: TCardVariant.mint, eyebrow: s.sfWeekBodyN3Eyebrow, text: s.sfWeekBodyN3Text, children: [TQuote(s.sfWeekBodyN3ChildrenN0Text)]),
+        TCard(eyebrow: s.sfWeekBodyN4Eyebrow, title: s.sfWeekBodyN4Title, children: [TButtonRow(children: [TButton(key: const ValueKey('a:body[4].children[0].items[0]'), label: s.sfWeekBodyN4ChildrenN0ItemsN0Label, onPressed: () => TNav.toast(context, s.sfWeekBodyN4ChildrenN0ItemsN0ActionValue, then: () => TNav.back(context)), small: true), TButton(key: const ValueKey('a:body[4].children[0].items[1]'), label: s.sfWeekBodyN4ChildrenN0ItemsN1Label, onPressed: () => TNav.back(context), variant: TButtonVariant.secondary, small: true)])]),
       ],
     );
   }

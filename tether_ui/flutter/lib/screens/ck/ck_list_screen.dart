@@ -28,13 +28,14 @@ class CkListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       header: THeader(title: 'Checkup', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TTitle('3 due, 1 to ask about'),
-        TCard(eyebrow: 'Due now', title: 'Flu vaccine', text: 'Every year · pharmacies offer walk-ins', children: [TButtonRow(children: [TButton(key: const ValueKey('a:body[1].children[0].items[0]'), label: 'Find a pharmacy', onPressed: () => TNav.external(context, 'https://www.vaccines.gov'), small: true), TButton(key: const ValueKey('a:body[1].children[0].items[1]'), label: 'I got it', onPressed: () => TNav.push(context, Routes.ckDone), variant: TButtonVariant.secondary, small: true)])]),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: 'Colorectal screening', sub: 'Ages 45–75 · several options', pill: 'Due', onTap: () => TNav.push(context, Routes.ckItem)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: 'Mammogram', sub: 'Every 2 years, ages 40–74', pill: 'Due', onTap: () => TNav.push(context, Routes.ckDay)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: 'Lung cancer screening', sub: 'Ages 50–80 with smoking history', pill: 'Ask', onTap: () => TNav.push(context, Routes.ckItem)), TListRow(key: const ValueKey('a:body[2].rows[3]'), label: 'Program settings', sub: 'Status, sharing, export, leave', onTap: () => TNav.push(context, Routes.programSettings, program: 'ck'))]),
+        TTitle(s.ckListBodyN0Text),
+        TCard(eyebrow: s.ckListBodyN1Eyebrow, title: s.ckListBodyN1Title, text: s.ckListBodyN1Text, children: [TButtonRow(children: [TButton(key: const ValueKey('a:body[1].children[0].items[0]'), label: s.ckListBodyN1ChildrenN0ItemsN0Label, onPressed: () => TNav.external(context, 'https://www.vaccines.gov'), small: true), TButton(key: const ValueKey('a:body[1].children[0].items[1]'), label: s.ckListBodyN1ChildrenN0ItemsN1Label, onPressed: () => TNav.push(context, Routes.ckDone), variant: TButtonVariant.secondary, small: true)])]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: s.ckListBodyN2RowsN0Label, sub: s.ckListBodyN2RowsN0Sub, pill: s.ckListBodyN2RowsN0Pill, onTap: () => TNav.push(context, Routes.ckItem)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: s.ckListBodyN2RowsN1Label, sub: s.ckListBodyN2RowsN1Sub, pill: s.ckListBodyN2RowsN1Pill, onTap: () => TNav.push(context, Routes.ckDay)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: s.ckListBodyN2RowsN2Label, sub: s.ckListBodyN2RowsN2Sub, pill: s.ckListBodyN2RowsN2Pill, onTap: () => TNav.push(context, Routes.ckItem)), TListRow(key: const ValueKey('a:body[2].rows[3]'), label: s.ckListBodyN2RowsN3Label, sub: s.ckListBodyN2RowsN3Sub, onTap: () => TNav.push(context, Routes.programSettings, program: 'ck'))]),
       ],
     );
   }

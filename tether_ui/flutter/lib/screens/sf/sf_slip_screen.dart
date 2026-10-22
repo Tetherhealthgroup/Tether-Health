@@ -18,16 +18,17 @@ class SfSlipScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Long scroll', pill: 'Private'),
+      header: THeader(title: s.sfSlipHeaderTitle, pill: s.sfSlipHeaderPill),
       children: [
-        TTitle('That happens. What pulled you in?'),
-        TBody('Nothing resets. Your phone-free nights still count.', tone: TTextTone.muted),
-        TChips(fieldKey: 'sf_slip.value', options: ['Couldn’t sleep', 'Bored', 'Stressed', 'Didn’t notice time'], selected: ['Couldn’t sleep']),
-        TRadioList(fieldKey: 'sf_slip.value_2', items: [TRadioItem('Keep my goal, try again tonight', badge: 'Recommended'), TRadioItem('Make tomorrow’s goal easier'), TRadioItem('Move bedtime window 30 min earlier')], selected: 0),
+        TTitle(s.sfSlipBodyN0Text),
+        TBody(s.sfSlipBodyN1Text, tone: TTextTone.muted),
+        TChips(fieldKey: 'sf_slip.value', options: ['Couldn’t sleep', 'Bored', 'Stressed', 'Didn’t notice time'], labels: [s.sfSlipBodyN2OptionsN0, s.sfSlipBodyN2OptionsN1, s.sfSlipBodyN2OptionsN2, s.sfSlipBodyN2OptionsN3], selected: ['Couldn’t sleep']),
+        TRadioList(fieldKey: 'sf_slip.value_2', items: [TRadioItem(s.sfSlipBodyN3ItemsN0Label, value: 'Keep my goal, try again tonight', badge: s.sfSlipBodyN3ItemsN0Badge), TRadioItem(s.sfSlipBodyN3ItemsN1Label, value: 'Make tomorrow’s goal easier'), TRadioItem(s.sfSlipBodyN3ItemsN2Label, value: 'Move bedtime window 30 min earlier')], selected: 0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/records/lapses', screenId: 'sf_slip', then: () => TNav.toast(context, 'Saved', then: () => TNav.replace(context, Routes.sfHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfSlipFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/records/lapses', screenId: 'sf_slip', then: () => TNav.toast(context, s.sfSlipFooterN0ActionThenValue, then: () => TNav.replace(context, Routes.sfHome))), arrow: true),
       ],
     );
   }

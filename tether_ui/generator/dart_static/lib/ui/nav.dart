@@ -15,10 +15,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
+import '../l10n/strings.g.dart';
 import '../logic/rules.dart';
 import '../router/app_router.dart';
 import 'components.dart';
 import 'data.dart';
+import 'strings.dart';
 import 'tokens.dart';
 
 /// Default hook implementations. Release builds ([kReleaseMode]) start with
@@ -445,7 +447,8 @@ class TFailClosedResolver {
   /// Error code recorded for an undecided branch.
   static const String code = 'ui_branch_undecided';
 
-  /// Generic message shown by default. Draft copy, for owner review.
+  /// Generic message shown by default, in English (the kit shows it in the
+  /// app language: `kit.generic_error`). Draft copy, for owner review.
   static const String message = 'Something went wrong. Please try again.';
 
   /// Receives [code] each time a branch is left undecided.
@@ -466,7 +469,7 @@ class TFailClosedResolver {
       if (show != null) {
         show(context);
       } else {
-        TNav.toast(context, message);
+        TNav.toast(context, TStrings.of(context).kitGenericError);
       }
     }
     return null;
@@ -733,7 +736,9 @@ abstract final class TNav {
     }
   }
 
-  static const String _saveError = 'Couldn’t save. Your entry is kept on this phone.';
+  /// The save failure message in English (shown in the app language:
+  /// `kit.save_error`).
+  static const String saveError = 'Couldn’t save. Your entry is kept on this phone.';
 
   /// Code of the [TFailed] result given for a [TQueued] result of a submit
   /// that must not be queued ([submit] with `queueable: false`).
@@ -839,6 +844,7 @@ abstract final class TNav {
     final flight = _Flight();
     _inFlight[key] = flight;
     final submitting = ModalRoute.of(context);
+    final strings = TStrings.of(context);
     try {
       final safetyNow = safety?.pick();
       if (safetyNow != null) {
@@ -849,7 +855,7 @@ abstract final class TNav {
       }
       var result = await safeSubmit(endpoint, screenId: screenId);
       if (!queueable && result is TQueued) result = const TResult.failed(notQueueableCode);
-      final failCopy = queueable ? _saveError : TFailClosedResolver.message;
+      final failCopy = queueable ? strings.kitSaveError : strings.kitGenericError;
       final onTop = _isTop(context, submitting);
       if (flight.safetyRan) {
         if (result is TFailed && context.mounted && (onTop || (flight.safetyRoute?.isCurrent ?? false))) toast(context, failCopy);
@@ -1052,7 +1058,7 @@ abstract final class TNav {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(TRadius.sheet))),
       builder: (c) => SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+          padding: const EdgeInsetsDirectional.fromSTEB(20, 16, 20, 12),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1098,8 +1104,11 @@ final class TUiError implements Exception {
 /// What a [TNav.call] or [TNav.sms] that could not be placed tried to do.
 enum TFallbackKind { call, sms }
 
-/// Every string [TCallFallback] shows or announces. Draft copy, pending
-/// owner and clinical approval: change the wording here only.
+/// Every string [TCallFallback] shows or announces, in English. The fallback
+/// shows them in the app language (`kit.call_fallback`, `kit.sms_fallback`,
+/// `kit.copy`, `kit.copied`, `kit.close`); the English source of those keys
+/// is generator/l10n.py KIT, which must match these. Draft copy, pending
+/// owner and clinical approval.
 abstract final class TCallFallbackCopy {
   /// Message for a call that could not be placed; [number] comes from the
   /// call action.
@@ -1289,7 +1298,13 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
     });
   }
 
-  String get _message => TCallFallbackCopy.message(widget.kind, widget.value);
+  String get _message {
+    final s = TStrings.of(context);
+    return switch (widget.kind) {
+      TFallbackKind.call => s.kitCallFallback(number: widget.value),
+      TFallbackKind.sms => s.kitSmsFallback(number: widget.value),
+    };
+  }
 
   @override
   void initState() {
@@ -1332,7 +1347,7 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
         if (mounted) setState(() => _copiedTimer = null);
       });
     });
-    _announce(TCallFallbackCopy.copied, Assertiveness.polite);
+    _announce(TStrings.of(context).kitCopied, Assertiveness.polite);
   }
 
   @override
@@ -1384,8 +1399,8 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
                             child: ExcludeSemantics(child: Text(_message, style: TText.cardTitle.copyWith(color: TColors.errorText))),
                           ),
                         ),
-                        if (_moreAbove) const Positioned(top: 0, left: 0, right: 0, child: _Fade(key: ValueKey('call_fallback.fade_top'), down: false)),
-                        if (_moreBelow) const Positioned(bottom: 0, left: 0, right: 0, child: _Fade(key: ValueKey('call_fallback.fade_bottom'), down: true)),
+                        if (_moreAbove) const PositionedDirectional(top: 0, start: 0, end: 0, child: _Fade(key: ValueKey('call_fallback.fade_top'), down: false)),
+                        if (_moreBelow) const PositionedDirectional(bottom: 0, start: 0, end: 0, child: _Fade(key: ValueKey('call_fallback.fade_bottom'), down: true)),
                       ]),
                     ),
                     ),
@@ -1396,7 +1411,7 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
                       container: true,
                       child: FittedBox(
                         fit: BoxFit.scaleDown, // the number stays whole on one line
-                        alignment: Alignment.centerLeft,
+                        alignment: AlignmentDirectional.centerStart,
                         child: Text(widget.value, key: const ValueKey('call_fallback.number'), maxLines: 1, softWrap: false, style: TText.stat.copyWith(color: TColors.errorText)),
                       ),
                     ),
@@ -1405,7 +1420,7 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
                     Expanded(
                       child: TButton(
                         key: const ValueKey('call_fallback.copy'),
-                        label: _copiedTimer == null ? TCallFallbackCopy.copy : TCallFallbackCopy.copied,
+                        label: _copiedTimer == null ? TStrings.of(context).kitCopy : TStrings.of(context).kitCopied,
                         small: true,
                         variant: TButtonVariant.secondary,
                         onPressed: _copy,
@@ -1413,7 +1428,7 @@ class _TCallFallbackCardState extends State<_TCallFallbackCard> {
                     ),
                     const SizedBox(width: TSpace.s),
                     Expanded(
-                      child: TButton(key: const ValueKey('call_fallback.close'), label: TCallFallbackCopy.close, small: true, variant: TButtonVariant.secondary, onPressed: TCallFallback.dismiss),
+                      child: TButton(key: const ValueKey('call_fallback.close'), label: TStrings.of(context).kitClose, small: true, variant: TButtonVariant.secondary, onPressed: TCallFallback.dismiss),
                     ),
                   ]),
                 ]),

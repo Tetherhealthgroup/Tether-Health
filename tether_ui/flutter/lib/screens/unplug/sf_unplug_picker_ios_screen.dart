@@ -18,13 +18,14 @@ class SfUnplugPickerIosScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TSheet(
       children: [
-        TNativeSlot(id: 'ios.familyActivityPicker', label: 'Apple’s app picker', height: 320.0),
+        TNativeSlot(id: 'ios.familyActivityPicker', label: s.sfUnplugPickerIosBodyN0Label, height: 320.0),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Done', onPressed: () => TNav.branch(context, 'System app picker result', <String, VoidCallback>{'Apps chosen': () => TNav.replace(context, Routes.sfUnplugAppsChosen), 'Cancelled': () => TNav.close(context)}, device: const TBranchRef('unplug.picker.ios', TAsk.reference, 'sf_unplug_picker_ios')), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugPickerIosFooterN0Label, onPressed: () => TNav.branch(context, 'System app picker result', <String, VoidCallback>{'Apps chosen': () => TNav.replace(context, Routes.sfUnplugAppsChosen), 'Cancelled': () => TNav.close(context)}, device: const TBranchRef('unplug.picker.ios', TAsk.reference, 'sf_unplug_picker_ios')), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfUnplugPickerIosFooterN1Label, onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );
   }

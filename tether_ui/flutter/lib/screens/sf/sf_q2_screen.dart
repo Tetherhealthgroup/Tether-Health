@@ -18,17 +18,18 @@ class SfQ2Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your triggers', pill: '2 of 2'),
+      header: THeader(title: s.sfQ2HeaderTitle, pill: s.sfQ2HeaderPill),
       children: [
         TSteps(n: 2, total: 2),
-        TTitle('When do you reach for it?'),
-        TChips(fieldKey: 'sf_q2.value', options: ['Bored', 'Lonely', 'In bed', 'Avoiding work', 'After conflict', 'Waiting', 'Can’t sleep', 'First thing'], selected: ['Bored', 'In bed', 'Avoiding work']),
-        TSegmented(fieldKey: 'sf_q2.how_do_you_usually_feel_after', options: ['Better', 'Same', 'Worse'], selected: 'Worse', label: 'How do you usually feel after?'),
-        TBody('Used for your plan only. ScrollFree never reads what you look at.', tone: TTextTone.small),
+        TTitle(s.sfQ2BodyN1Text),
+        TChips(fieldKey: 'sf_q2.value', options: ['Bored', 'Lonely', 'In bed', 'Avoiding work', 'After conflict', 'Waiting', 'Can’t sleep', 'First thing'], labels: [s.sfQ2BodyN2OptionsN0, s.sfQ2BodyN2OptionsN1, s.sfQ2BodyN2OptionsN2, s.sfQ2BodyN2OptionsN3, s.sfQ2BodyN2OptionsN4, s.sfQ2BodyN2OptionsN5, s.sfQ2BodyN2OptionsN6, s.sfQ2BodyN2OptionsN7], selected: ['Bored', 'In bed', 'Avoiding work']),
+        TSegmented(fieldKey: 'sf_q2.how_do_you_usually_feel_after', options: ['Better', 'Same', 'Worse'], labels: [s.sfQ2BodyN3OptionsN0, s.sfQ2BodyN3OptionsN1, s.sfQ2BodyN3OptionsN2], selected: 'Worse', label: s.sfQ2BodyN3Label),
+        TBody(s.sfQ2BodyN4Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Next', onPressed: () => TNav.push(context, Routes.sfGoal), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfQ2FooterN0Label, onPressed: () => TNav.push(context, Routes.sfGoal), arrow: true),
       ],
     );
   }

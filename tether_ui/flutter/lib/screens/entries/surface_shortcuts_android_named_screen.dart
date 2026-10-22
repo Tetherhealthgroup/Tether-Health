@@ -19,10 +19,11 @@ class SurfaceShortcutsAndroidNamedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'App shortcuts', left: THeaderLeft.close),
+      header: THeader(title: s.surfaceShortcutsAndroidNamedHeaderTitle, left: THeaderLeft.close),
       children: [
-        TListGroup(title: 'Tether Health', rows: [TListRow(key: const ValueKey('a:body[0].rows[0]'), label: 'Rescue', lead: TLead.icon('✚'), onTap: () => TNav.sheet(context, Routes.rescuePick)), TListRow(key: const ValueKey('a:body[0].rows[1]'), label: 'ClearAir red-zone plan', lead: TLead.program('ca'), onTap: () => TNav.push(context, Routes.caRed))]),
+        TListGroup(title: 'Tether Health', rows: [TListRow(key: const ValueKey('a:body[0].rows[0]'), label: s.surfaceShortcutsAndroidNamedBodyN0RowsN0Label, lead: TLead.icon('✚'), onTap: () => TNav.sheet(context, Routes.rescuePick)), TListRow(key: const ValueKey('a:body[0].rows[1]'), label: s.surfaceShortcutsAndroidNamedBodyN0RowsN1Label, lead: TLead.program('ca'), onTap: () => TNav.push(context, Routes.caRed))]),
       ],
     );
   }

@@ -19,18 +19,19 @@ class AuthSocialNewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Create account'),
+      header: THeader(title: s.authSocialNewHeaderTitle),
       children: [
         TIllustration(glyph: 'A'),
-        TTitle('Create your Tether account?', size: TTitleSize.l, center: true),
-        TBody('No Tether account uses this Apple ID or Google account yet.', tone: TTextTone.muted, center: true),
-        TKeyValue(rows: [('Name', 'Alex (shared by Apple)'), ('Email', 'Private relay · Hide My Email'), ('Password', 'None needed')]),
-        TBody('You can add email & password or another sign-in method later in Account → Sign-in methods.', tone: TTextTone.small),
+        TTitle(s.authSocialNewBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.authSocialNewBodyN2Text, tone: TTextTone.muted, center: true),
+        TKeyValue(rows: [(s.authSocialNewBodyN3RowsN0N0, s.authSocialNewBodyN3RowsN0N1), (s.authSocialNewBodyN3RowsN1N0, s.authSocialNewBodyN3RowsN1N1), (s.authSocialNewBodyN3RowsN2N0, s.authSocialNewBodyN3RowsN2N1)]),
+        TBody(s.authSocialNewBodyN4Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Create my account', onPressed: () => TNav.push(context, Routes.obPrograms), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Use a different account', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.authSocialNewFooterN0Label, onPressed: () => TNav.push(context, Routes.obPrograms), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.authSocialNewFooterN1Label, onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );
   }

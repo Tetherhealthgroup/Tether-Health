@@ -19,19 +19,20 @@ class SfUnplugOverlayScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       background: TBackground.dark,
       children: [
         SizedBox(height: 24.0),
-        TTitle('Paused for a moment', size: TTitleSize.l, center: true),
-        TBody('You asked to slow this one down. Video apps is on your list.', center: true),
+        TTitle(s.sfUnplugOverlayBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.sfUnplugOverlayBodyN2Text, center: true),
         TBreathRing(value: '30'),
-        TBody('Breathe with the circle. 2 of 3 “open anyway” left today.', tone: TTextTone.small, center: true),
+        TBody(s.sfUnplugOverlayBodyN4Text, tone: TTextTone.small, center: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Close the app', onPressed: () => TNav.toast(context, 'The app stays closed.', then: () => TNav.close(context)), variant: TButtonVariant.lime),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Get support', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue),
-        TLink(key: const ValueKey('a:footer[2]'), label: 'Open anyway', onTap: () => TNav.toast(context, 'Opened · 1 “open anyway” left today', then: () => TNav.close(context))),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugOverlayFooterN0Label, onPressed: () => TNav.toast(context, s.sfUnplugOverlayFooterN0ActionValue, then: () => TNav.close(context)), variant: TButtonVariant.lime),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfUnplugOverlayFooterN1Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue),
+        TLink(key: const ValueKey('a:footer[2]'), label: s.sfUnplugOverlayFooterN2Label, onTap: () => TNav.toast(context, s.sfUnplugOverlayFooterN2ActionValue, then: () => TNav.close(context))),
       ],
     );
   }

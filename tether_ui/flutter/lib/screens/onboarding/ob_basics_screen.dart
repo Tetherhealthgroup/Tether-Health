@@ -18,20 +18,21 @@ class ObBasicsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'About you', pill: '4 of 5'),
+      header: THeader(title: s.obBasicsHeaderTitle, pill: s.obBasicsHeaderPill),
       children: [
         TSteps(n: 4, total: 5),
-        TEyebrow('Shared · asked once for all programs'),
-        TTitle('A few basics'),
-        TField(fieldKey: 'ob_basics.what_should_we_call_you', label: 'What should we call you?', placeholder: 'Alex'),
-        TField(fieldKey: 'ob_basics.age_range', label: 'Age range', placeholder: '35–44', kind: TFieldKind.select),
-        TSegmented(fieldKey: 'ob_basics.sleep_on_a_typical_night', options: ['< 5 h', '5–6 h', '7–8 h', '9+ h'], selected: '5–6 h', label: 'Sleep on a typical night'),
-        TSegmented(fieldKey: 'ob_basics.usual_stress', options: ['Low', 'Some', 'High'], selected: 'High', label: 'Usual stress'),
-        TCard(variant: TCardVariant.mint, title: 'Why we ask', text: 'These answers are shared by your programs, so you’re never asked twice. Age range sets which lessons and screenings apply.'),
+        TEyebrow(s.obBasicsBodyN1Text),
+        TTitle(s.obBasicsBodyN2Text),
+        TField(fieldKey: 'ob_basics.what_should_we_call_you', label: s.obBasicsBodyN3Label, placeholder: s.obBasicsBodyN3Placeholder),
+        TField(fieldKey: 'ob_basics.age_range', label: s.obBasicsBodyN4Label, placeholder: '35–44', kind: TFieldKind.select),
+        TSegmented(fieldKey: 'ob_basics.sleep_on_a_typical_night', options: ['< 5 h', '5–6 h', '7–8 h', '9+ h'], labels: [s.obBasicsBodyN5OptionsN0, s.obBasicsBodyN5OptionsN1, s.obBasicsBodyN5OptionsN2, s.obBasicsBodyN5OptionsN3], selected: '5–6 h', label: s.obBasicsBodyN5Label),
+        TSegmented(fieldKey: 'ob_basics.usual_stress', options: ['Low', 'Some', 'High'], labels: [s.obBasicsBodyN6OptionsN0, s.obBasicsBodyN6OptionsN1, s.obBasicsBodyN6OptionsN2], selected: 'High', label: s.obBasicsBodyN6Label),
+        TCard(variant: TCardVariant.mint, title: s.obBasicsBodyN7Title, text: s.obBasicsBodyN7Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.push(context, Routes.obSetup), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.obBasicsFooterN0Label, onPressed: () => TNav.push(context, Routes.obSetup), arrow: true),
       ],
     );
   }

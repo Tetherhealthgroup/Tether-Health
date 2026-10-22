@@ -18,15 +18,16 @@ class AuthNewpassScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'New password', left: THeaderLeft.close),
+      header: THeader(title: s.authNewpassHeaderTitle, left: THeaderLeft.close),
       children: [
-        TTitle('Choose a new password'),
-        TField(fieldKey: 'auth_newpass.new_password', label: 'New password', hint: 'At least 12 characters.', placeholder: '••••••••••••', kind: TFieldKind.password),
-        TField(fieldKey: 'auth_newpass.confirm_password', label: 'Confirm password', placeholder: '••••••••••••', kind: TFieldKind.password),
+        TTitle(s.authNewpassBodyN0Text),
+        TField(fieldKey: 'auth_newpass.new_password', label: s.authNewpassBodyN1Label, hint: s.authNewpassBodyN1Hint, placeholder: '••••••••••••', kind: TFieldKind.password),
+        TField(fieldKey: 'auth_newpass.confirm_password', label: s.authNewpassBodyN2Label, placeholder: '••••••••••••', kind: TFieldKind.password),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save password', onPressed: () => TNav.submit(context, 'PUT supabase /auth/v1/user', screenId: 'auth_newpass', queueable: false, then: () => TNav.reset(context, Routes.today)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.authNewpassFooterN0Label, onPressed: () => TNav.submit(context, 'PUT supabase /auth/v1/user', screenId: 'auth_newpass', queueable: false, then: () => TNav.reset(context, Routes.today)), arrow: true),
       ],
     );
   }

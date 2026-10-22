@@ -19,19 +19,20 @@ class ObFocusScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your focus', pill: '2 of 5'),
+      header: THeader(title: s.obFocusHeaderTitle, pill: s.obFocusHeaderPill),
       children: [
         TSteps(n: 2, total: 5),
-        TTitle('Two at a time works best.'),
-        TBody('Focus programs get daily steps and reminders. Learn only gives you lessons, with no tracking.', tone: TTextTone.muted),
-        TListGroup(title: 'Focus · daily support', rows: [TListRow(label: 'BreatheFree', sub: 'About 3 min a day', lead: TLead.program('bf'), pill: 'Focus 1'), TListRow(label: 'ScrollFree', sub: 'About 1 min a day', lead: TLead.program('sf'), pill: 'Focus 2')]),
-        TListGroup(title: 'Learn only · no reminders', rows: [TListRow(label: 'ClearAir', sub: 'Lessons about lung recovery', lead: TLead.program('ca'), pill: 'Learn')]),
-        TCard(variant: TCardVariant.mint, title: 'Why two?', text: 'People keep going with fewer daily asks. Swap anytime in Account → Programs.'),
-        TLink(key: const ValueKey('a:body[6]'), label: 'Add a third program', onTap: () => TNav.sheet(context, Routes.obThird)),
+        TTitle(s.obFocusBodyN1Text),
+        TBody(s.obFocusBodyN2Text, tone: TTextTone.muted),
+        TListGroup(title: s.obFocusBodyN3Title, rows: [TListRow(label: 'BreatheFree', sub: s.obFocusBodyN3RowsN0Sub, lead: TLead.program('bf'), pill: s.obFocusBodyN3RowsN0Pill), TListRow(label: 'ScrollFree', sub: s.obFocusBodyN3RowsN1Sub, lead: TLead.program('sf'), pill: s.obFocusBodyN3RowsN1Pill)]),
+        TListGroup(title: s.obFocusBodyN4Title, rows: [TListRow(label: 'ClearAir', sub: s.obFocusBodyN4RowsN0Sub, lead: TLead.program('ca'), pill: s.obFocusBodyN4RowsN0Pill)]),
+        TCard(variant: TCardVariant.mint, title: s.obFocusBodyN5Title, text: s.obFocusBodyN5Text),
+        TLink(key: const ValueKey('a:body[6]'), label: s.obFocusBodyN6Label, onTap: () => TNav.sheet(context, Routes.obThird)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue', onPressed: () => TNav.push(context, Routes.obConsent), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.obFocusFooterN0Label, onPressed: () => TNav.push(context, Routes.obConsent), arrow: true),
       ],
     );
   }

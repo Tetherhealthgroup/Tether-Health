@@ -21,14 +21,15 @@ class CrisisScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'You’re not alone', left: THeaderLeft.close),
+      header: THeader(title: s.crisisHeaderTitle, left: THeaderLeft.close),
       children: [
-        TBanner(kind: TBannerKind.urgent, text: 'If you might act on thoughts of harming yourself, get help now.'),
-        TButton(key: const ValueKey('a:body[1]'), label: 'Call 988', onPressed: () => TNav.call(context, '988', label: '988'), variant: TButtonVariant.danger),
-        TButton(key: const ValueKey('a:body[2]'), label: 'Text 988', onPressed: () => TNav.sms(context, '988'), variant: TButtonVariant.secondary),
-        TButton(key: const ValueKey('a:body[3]'), label: 'Call 911', onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.secondary),
-        TCard(key: const ValueKey('a:body[4]'), eyebrow: 'Your safety plan', title: 'Things that help: walk the dog, shower, music', text: 'Reach out: Sam · (555) 010-3311', onTap: () => TNav.push(context, Routes.eaPlan)),
+        TBanner(kind: TBannerKind.urgent, text: s.crisisBodyN0Text),
+        TButton(key: const ValueKey('a:body[1]'), label: s.crisisBodyN1Label, onPressed: () => TNav.call(context, '988', label: '988'), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:body[2]'), label: s.crisisBodyN2Label, onPressed: () => TNav.sms(context, '988'), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:body[3]'), label: s.crisisBodyN3Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.secondary),
+        TCard(key: const ValueKey('a:body[4]'), eyebrow: s.crisisBodyN4Eyebrow, title: s.crisisBodyN4Title, text: s.crisisBodyN4Text, onTap: () => TNav.push(context, Routes.eaPlan)),
       ],
     );
   }

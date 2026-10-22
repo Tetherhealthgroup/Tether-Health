@@ -20,19 +20,20 @@ class LearnLessonScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Lesson', pill: '4 min'),
+      header: THeader(title: s.learnLessonHeaderTitle, pill: s.learnLessonHeaderPill),
       children: [
-        TProgramTag(program: 'bf', extra: 'For quit day'),
-        TTitle('Cravings: what to expect today', size: TTitleSize.l),
-        TCard(variant: TCardVariant.dark, eyebrow: 'Audio · 3:12', title: 'Listen instead', children: [TButtonRow(children: [TButton(key: const ValueKey('a:body[2].children[0].items[0]'), label: 'Play', onPressed: () => TNav.toast(context, 'Playing audio'), variant: TButtonVariant.lime, small: true), TButton(key: const ValueKey('a:body[2].children[0].items[1]'), label: 'Transcript', onPressed: () => TNav.toast(context, 'Transcript opened'), variant: TButtonVariant.ghostDark, small: true)])]),
-        TBody('Most cravings peak and fade within 3–5 minutes. Knowing that makes them easier to ride out. Today, plan what you’ll do in the first 5 minutes of each craving.'),
-        TQuote('This feeling will pass.', caption: 'From your plan'),
-        TBody('Clinically reviewed · content v3.2 · Aug 2026', tone: TTextTone.small),
+        TProgramTag(program: 'bf', extra: s.learnLessonBodyN0Extra),
+        TTitle(s.learnLessonBodyN1Text, size: TTitleSize.l),
+        TCard(variant: TCardVariant.dark, eyebrow: s.learnLessonBodyN2Eyebrow, title: s.learnLessonBodyN2Title, children: [TButtonRow(children: [TButton(key: const ValueKey('a:body[2].children[0].items[0]'), label: s.learnLessonBodyN2ChildrenN0ItemsN0Label, onPressed: () => TNav.toast(context, s.learnLessonBodyN2ChildrenN0ItemsN0ActionValue), variant: TButtonVariant.lime, small: true), TButton(key: const ValueKey('a:body[2].children[0].items[1]'), label: s.learnLessonBodyN2ChildrenN0ItemsN1Label, onPressed: () => TNav.toast(context, s.learnLessonBodyN2ChildrenN0ItemsN1ActionValue), variant: TButtonVariant.ghostDark, small: true)])]),
+        TBody(s.learnLessonBodyN3Text),
+        TQuote(s.learnLessonBodyN4Text, caption: s.learnLessonBodyN4Caption),
+        TBody(s.learnLessonBodyN5Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Mark complete', onPressed: () => TNav.submit(context, 'POST /v1/records/lessons', screenId: 'learn_lesson', then: () => TNav.toast(context, 'Lesson complete', then: () => TNav.back(context))), arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Save for offline', onTap: () => TNav.toast(context, 'Saved for offline')),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.learnLessonFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/records/lessons', screenId: 'learn_lesson', then: () => TNav.toast(context, s.learnLessonFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.learnLessonFooterN1Label, onTap: () => TNav.toast(context, s.learnLessonFooterN1ActionValue)),
       ],
     );
   }

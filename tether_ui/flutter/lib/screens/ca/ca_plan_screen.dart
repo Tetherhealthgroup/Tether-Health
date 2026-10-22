@@ -19,19 +19,20 @@ class CaPlanScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your action plan', pill: '2 of 2'),
+      header: THeader(title: s.caPlanHeaderTitle, pill: s.caPlanHeaderPill),
       children: [
         TSteps(n: 2, total: 2),
-        TTitle('Copy your plan from your clinician.'),
-        TBody('ClearAir never creates or changes zones.', tone: TTextTone.muted),
-        TCard(eyebrow: 'Green zone', children: [TField(fieldKey: 'ca_plan.green_from', label: 'Peak flow from', unit: 'L/min', placeholder: '400', kind: TFieldKind.number), TField(fieldKey: 'ca_plan.daily_medicine', label: 'Daily medicine', placeholder: 'Controller inhaler · 2 puffs AM/PM')]),
-        TCard(eyebrow: 'Yellow zone', children: [TField(fieldKey: 'ca_plan.peak_flow', label: 'Peak flow', unit: 'L/min', placeholder: '200–399')]),
-        TCard(eyebrow: 'Red zone', children: [TField(fieldKey: 'ca_plan.red_below', label: 'Below', unit: 'L/min', placeholder: '200', kind: TFieldKind.number)]),
-        TButton(key: const ValueKey('a:body[6]'), label: 'Add a photo of my plan', onPressed: () => TNav.toast(context, 'Camera opened'), variant: TButtonVariant.secondary),
+        TTitle(s.caPlanBodyN1Text),
+        TBody(s.caPlanBodyN2Text, tone: TTextTone.muted),
+        TCard(eyebrow: s.caPlanBodyN3Eyebrow, children: [TField(fieldKey: 'ca_plan.green_from', label: s.caPlanBodyN3ChildrenN0Label, unit: 'L/min', placeholder: '400', kind: TFieldKind.number), TField(fieldKey: 'ca_plan.daily_medicine', label: s.caPlanBodyN3ChildrenN1Label, placeholder: s.caPlanBodyN3ChildrenN1Placeholder)]),
+        TCard(eyebrow: s.caPlanBodyN4Eyebrow, children: [TField(fieldKey: 'ca_plan.peak_flow', label: s.caPlanBodyN4ChildrenN0Label, unit: 'L/min', placeholder: '200–399')]),
+        TCard(eyebrow: s.caPlanBodyN5Eyebrow, children: [TField(fieldKey: 'ca_plan.red_below', label: s.caPlanBodyN5ChildrenN0Label, unit: 'L/min', placeholder: '200', kind: TFieldKind.number)]),
+        TButton(key: const ValueKey('a:body[6]'), label: s.caPlanBodyN6Label, onPressed: () => TNav.toast(context, s.caPlanBodyN6ActionValue), variant: TButtonVariant.secondary),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/ca/plan', screenId: 'ca_plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.caHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.caPlanFooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/program-data/ca/plan', screenId: 'ca_plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.caHome))), arrow: true),
       ],
     );
   }

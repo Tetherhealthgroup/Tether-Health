@@ -19,20 +19,21 @@ class ObConsentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your privacy', pill: '3 of 5'),
+      header: THeader(title: s.obConsentHeaderTitle, pill: s.obConsentHeaderPill),
       children: [
         TSteps(n: 3, total: 5),
-        TTitle('Your story stays yours.'),
-        TBody('Each program keeps its own data. Optional choices start off.', tone: TTextTone.muted),
-        TCard(eyebrow: 'Account · required', children: [TToggleRow(fieldKey: 'ob_consent.essential_app_data', label: 'Essential app data', sub: 'Account, plans and progress, encrypted. Required.', value: true)]),
-        TCard(tag: 'bf', accent: 'bf', children: [TToggleRow(fieldKey: 'ob_consent.private_reminders', label: 'Private reminders', sub: 'Lock screen: “You have a Tether reminder.”'), TToggleRow(fieldKey: 'ob_consent.share_summaries_with_my_care_tea', label: 'Share summaries with my care team', sub: 'You preview every share')]),
-        TCard(tag: 'sf', accent: 'sf', children: [TToggleRow(fieldKey: 'ob_consent.connect_screen_time', label: 'Connect Screen Time', sub: 'Optional · totals only, never content'), TToggleRow(fieldKey: 'ob_consent.de_identified_research', label: 'De-identified research')]),
-        TBody('No ads. No tobacco-industry funding. We never sell health information.', tone: TTextTone.small),
-        TLink(key: const ValueKey('a:body[7]'), label: 'Read the Privacy Notice', onTap: () => TNav.external(context, 'https://www.tetherhealthgroup.com/privacy/'), alignLeft: true),
+        TTitle(s.obConsentBodyN1Text),
+        TBody(s.obConsentBodyN2Text, tone: TTextTone.muted),
+        TCard(eyebrow: s.obConsentBodyN3Eyebrow, children: [TToggleRow(fieldKey: 'ob_consent.essential_app_data', label: s.obConsentBodyN3ChildrenN0Label, sub: s.obConsentBodyN3ChildrenN0Sub, value: true)]),
+        TCard(tag: 'bf', accent: 'bf', children: [TToggleRow(fieldKey: 'ob_consent.private_reminders', label: s.obConsentBodyN4ChildrenN0Label, sub: s.obConsentBodyN4ChildrenN0Sub), TToggleRow(fieldKey: 'ob_consent.share_summaries_with_my_care_tea', label: s.obConsentBodyN4ChildrenN1Label, sub: s.obConsentBodyN4ChildrenN1Sub)]),
+        TCard(tag: 'sf', accent: 'sf', children: [TToggleRow(fieldKey: 'ob_consent.connect_screen_time', label: s.obConsentBodyN5ChildrenN0Label, sub: s.obConsentBodyN5ChildrenN0Sub), TToggleRow(fieldKey: 'ob_consent.de_identified_research', label: s.obConsentBodyN5ChildrenN1Label)]),
+        TBody(s.obConsentBodyN6Text, tone: TTextTone.small),
+        TLink(key: const ValueKey('a:body[7]'), label: s.obConsentBodyN7Label, onTap: () => TNav.external(context, 'https://www.tetherhealthgroup.com/privacy/'), alignLeft: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Agree and continue', onPressed: () => TNav.submit(context, 'POST /v1/enrolments/consents', screenId: 'ob_consent', then: () => TNav.push(context, Routes.obBasics)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.obConsentFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/enrolments/consents', screenId: 'ob_consent', then: () => TNav.push(context, Routes.obBasics)), arrow: true),
       ],
     );
   }

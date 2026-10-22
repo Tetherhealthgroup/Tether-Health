@@ -19,18 +19,19 @@ class ObRemindersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Reminders'),
+      header: THeader(title: s.obRemindersHeaderTitle),
       children: [
         TIllustration(glyph: '◔'),
-        TTitle('Quiet, private reminders', size: TTitleSize.l, center: true),
-        TBody('At most 2 a day, only for your focus programs.', center: true),
-        TCard(eyebrow: 'Lock screen preview', text: 'Program names and health details stay hidden unless you turn them on.', children: [TCard(variant: TCardVariant.flat, title: 'Tether Health', text: 'You have a Tether reminder.')]),
-        TToggleRow(fieldKey: 'ob_reminders.quiet_hours', label: 'Quiet hours', sub: '9:00 PM – 7:00 AM · safety alerts still come through', value: true),
+        TTitle(s.obRemindersBodyN1Text, size: TTitleSize.l, center: true),
+        TBody(s.obRemindersBodyN2Text, center: true),
+        TCard(eyebrow: s.obRemindersBodyN3Eyebrow, text: s.obRemindersBodyN3Text, children: [TCard(variant: TCardVariant.flat, title: 'Tether Health', text: s.obRemindersBodyN3ChildrenN0Text)]),
+        TToggleRow(fieldKey: 'ob_reminders.quiet_hours', label: s.obRemindersBodyN4Label, sub: s.obRemindersBodyN4Sub, value: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Turn on reminders', onPressed: () => TNav.branch(context, 'System permission prompt', <String, VoidCallback>{'Allowed': () => TNav.push(context, Routes.obAccount), 'Not allowed': () => TNav.push(context, Routes.obRemindersDenied)}, device: const TBranchRef('onboarding.reminders.notifications_request', TAsk.notificationsRequest, 'ob_reminders'), when: const <TAnswer, String>{TAnswer.granted: 'Allowed', TAnswer.denied: 'Not allowed', TAnswer.unavailable: 'Not allowed'}), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.push(context, Routes.obAccount), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.obRemindersFooterN0Label, onPressed: () => TNav.branch(context, 'System permission prompt', <String, VoidCallback>{'Allowed': () => TNav.push(context, Routes.obAccount), 'Not allowed': () => TNav.push(context, Routes.obRemindersDenied)}, device: const TBranchRef('onboarding.reminders.notifications_request', TAsk.notificationsRequest, 'ob_reminders'), when: const <TAnswer, String>{TAnswer.granted: 'Allowed', TAnswer.denied: 'Not allowed', TAnswer.unavailable: 'Not allowed'}), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.obRemindersFooterN1Label, onPressed: () => TNav.push(context, Routes.obAccount), variant: TButtonVariant.secondary),
       ],
     );
   }

@@ -27,16 +27,17 @@ class PlansScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'My plans', left: THeaderLeft.none, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
+      header: THeader(title: s.plansHeaderTitle, left: THeaderLeft.none, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TListGroup(title: 'Focus · 2 of 2', rows: [TListRow(key: const ValueKey('a:body[0].rows[0]'), label: 'BreatheFree', sub: 'Quit date · Fri, Aug 28', lead: TLead.program('bf'), pill: 'Focus', onTap: () => TNav.push(context, Routes.bfHome)), TListRow(key: const ValueKey('a:body[0].rows[1]'), label: 'ScrollFree', sub: '90 min/day · bedtime 10 PM–7 AM', lead: TLead.program('sf'), pill: 'Focus', onTap: () => TNav.push(context, Routes.sfHome))]),
-        TListGroup(title: 'Learn only', rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'ClearAir', sub: 'Learn only · no plan yet', lead: TLead.program('ca'), pill: 'Learn', onTap: () => TNav.push(context, Routes.caIntro))]),
-        TListGroup(title: 'Manage', rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: 'Medication center', sub: 'BreatheFree · nicotine patch', onTap: () => TNav.push(context, Routes.bfMeds)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: 'Programs & sharing', sub: 'Status, consent, data', onTap: () => TNav.push(context, Routes.accountPrograms))]),
+        TListGroup(title: s.plansBodyN0Title, rows: [TListRow(key: const ValueKey('a:body[0].rows[0]'), label: 'BreatheFree', sub: s.plansBodyN0RowsN0Sub, lead: TLead.program('bf'), pill: s.plansBodyN0RowsN0Pill, onTap: () => TNav.push(context, Routes.bfHome)), TListRow(key: const ValueKey('a:body[0].rows[1]'), label: 'ScrollFree', sub: s.plansBodyN0RowsN1Sub, lead: TLead.program('sf'), pill: s.plansBodyN0RowsN1Pill, onTap: () => TNav.push(context, Routes.sfHome))]),
+        TListGroup(title: s.plansBodyN1Title, rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: 'ClearAir', sub: s.plansBodyN1RowsN0Sub, lead: TLead.program('ca'), pill: s.plansBodyN1RowsN0Pill, onTap: () => TNav.push(context, Routes.caIntro))]),
+        TListGroup(title: s.plansBodyN2Title, rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: s.plansBodyN2RowsN0Label, sub: s.plansBodyN2RowsN0Sub, onTap: () => TNav.push(context, Routes.bfMeds)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: s.plansBodyN2RowsN1Label, sub: s.plansBodyN2RowsN1Sub, onTap: () => TNav.push(context, Routes.accountPrograms))]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Add a program', onPressed: () => TNav.push(context, Routes.catalog), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.plansFooterN0Label, onPressed: () => TNav.push(context, Routes.catalog), variant: TButtonVariant.secondary),
       ],
     );
   }

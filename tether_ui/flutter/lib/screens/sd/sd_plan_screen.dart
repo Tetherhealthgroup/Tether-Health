@@ -18,16 +18,17 @@ class SdPlanScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your movement plan', pill: 'Plan'),
+      header: THeader(title: s.sdPlanHeaderTitle, pill: s.sdPlanHeaderPill),
       children: [
-        TTitle('Three short sessions a week'),
-        TKeyValue(rows: [('Mon', 'Balance · 8 min'), ('Wed', 'Strength (chair) · 10 min'), ('Fri', 'Walk + balance · 12 min')]),
-        TCard(children: [TChecklist(items: [TCheckItem('Do sessions near a sturdy chair', done: true), TCheckItem('Tell my caregiver when I finish')])]),
-        TBody('Check with your clinician before starting a new exercise program.', tone: TTextTone.small),
+        TTitle(s.sdPlanBodyN0Text),
+        TKeyValue(rows: [(s.sdPlanBodyN1RowsN0N0, s.sdPlanBodyN1RowsN0N1), (s.sdPlanBodyN1RowsN1N0, s.sdPlanBodyN1RowsN1N1), (s.sdPlanBodyN1RowsN2N0, s.sdPlanBodyN1RowsN2N1)]),
+        TCard(children: [TChecklist(items: [TCheckItem(s.sdPlanBodyN2ChildrenN0ItemsN0Label, value: 'Do sessions near a sturdy chair', done: true), TCheckItem(s.sdPlanBodyN2ChildrenN0ItemsN1Label, value: 'Tell my caregiver when I finish')])]),
+        TBody(s.sdPlanBodyN3Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Start plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sd/plan', screenId: 'sd_plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.sdHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sdPlanFooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sd/plan', screenId: 'sd_plan', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.sdHome))), arrow: true),
       ],
     );
   }

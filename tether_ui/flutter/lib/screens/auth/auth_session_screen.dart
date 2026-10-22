@@ -17,15 +17,16 @@ class AuthSessionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TSheet(
       children: [
-        TTitle('Please sign in again'),
-        TBody('For your security, sessions end after 30 days.', tone: TTextTone.muted),
-        TField(fieldKey: 'auth_session.password', label: 'Password', placeholder: 'Password', kind: TFieldKind.password),
+        TTitle(s.authSessionBodyN0Text),
+        TBody(s.authSessionBodyN1Text, tone: TTextTone.muted),
+        TField(fieldKey: 'auth_session.password', label: s.authSessionBodyN2Label, placeholder: s.authSessionBodyN2Placeholder, kind: TFieldKind.password),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Sign in', onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/token', screenId: 'auth_session', queueable: false, then: () => TNav.close(context)), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Use Face ID', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.authSessionFooterN0Label, onPressed: () => TNav.submit(context, 'POST supabase /auth/v1/token', screenId: 'auth_session', queueable: false, then: () => TNav.close(context)), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.authSessionFooterN1Label, onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );
   }

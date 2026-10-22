@@ -18,13 +18,14 @@ class BfProgressScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Progress', pill: 'BreatheFree'),
+      header: THeader(title: s.bfProgressHeaderTitle, pill: 'BreatheFree'),
       children: [
-        TSegmented(fieldKey: 'bf_progress.value', options: ['7 days', '30 days', 'All'], selected: '7 days'),
-        TBarChart(values: [10.0, 7.0, 4.0, 3.0, 1.0, 1.0, 0.0], color: TColors.program('bf'), missing: [3], labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'], title: 'Cigarettes / day', caption: 'Thursday: no check-in · not counted as zero'),
-        TStatGrid(stats: [TStat(label: 'Est. avoided', value: '61', sub: 'cigarettes'), TStat(label: 'Est. saved', value: '\$42.70', sub: '\$14 per pack'), TStat(label: 'Cravings eased', value: '4 of 6', sub: 'after a tool'), TStat(label: 'Most helpful', value: 'Breathing', sub: '3 of 4 times')]),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'How estimates work', sub: '10/day · \$14/pack · 5 min each', onTap: () => TNav.sheet(context, Routes.bfEstimates))]),
+        TSegmented(fieldKey: 'bf_progress.value', options: ['7 days', '30 days', 'All'], labels: [s.bfProgressBodyN0OptionsN0, s.bfProgressBodyN0OptionsN1, s.bfProgressBodyN0OptionsN2], selected: '7 days'),
+        TBarChart(values: [10.0, 7.0, 4.0, 3.0, 1.0, 1.0, 0.0], color: TColors.program('bf'), missing: [3], labels: [s.bfProgressBodyN1LabelsN0, s.bfProgressBodyN1LabelsN1, s.bfProgressBodyN1LabelsN2, s.bfProgressBodyN1LabelsN3, s.bfProgressBodyN1LabelsN4, s.bfProgressBodyN1LabelsN5, s.bfProgressBodyN1LabelsN6], title: s.bfProgressBodyN1Title, caption: s.bfProgressBodyN1Caption),
+        TStatGrid(stats: [TStat(label: s.bfProgressBodyN2ItemsN0Label, value: '61', sub: s.bfProgressBodyN2ItemsN0Sub), TStat(label: s.bfProgressBodyN2ItemsN1Label, value: '\$42.70', sub: s.bfProgressBodyN2ItemsN1Sub), TStat(label: s.bfProgressBodyN2ItemsN2Label, value: s.bfProgressBodyN2ItemsN2Value, sub: s.bfProgressBodyN2ItemsN2Sub), TStat(label: s.bfProgressBodyN2ItemsN3Label, value: s.bfProgressBodyN2ItemsN3Value, sub: s.bfProgressBodyN2ItemsN3Sub)]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: s.bfProgressBodyN3RowsN0Label, sub: s.bfProgressBodyN3RowsN0Sub, onTap: () => TNav.sheet(context, Routes.bfEstimates))]),
       ],
     );
   }

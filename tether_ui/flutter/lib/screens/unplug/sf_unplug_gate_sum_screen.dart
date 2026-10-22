@@ -20,17 +20,18 @@ class SfUnplugGateSumScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Small step', left: THeaderLeft.close, pill: 'Unplug'),
+      header: THeader(title: s.sfUnplugGateSumHeaderTitle, left: THeaderLeft.close, pill: 'Unplug'),
       children: [
-        TTitle('A quick sum, then decide.', size: TTitleSize.l),
+        TTitle(s.sfUnplugGateSumBodyN0Text, size: TTitleSize.l),
         TBigNumber(value: '7 + 5', center: true),
-        TField(fieldKey: 'sf_unplug_gate_sum.answer', label: 'Answer', placeholder: '?', kind: TFieldKind.number),
-        TCard(variant: TCardVariant.coral, title: 'Need help right now?', text: 'Rescue opens in one tap.', cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: 'Get support', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
+        TField(fieldKey: 'sf_unplug_gate_sum.answer', label: s.sfUnplugGateSumBodyN2Label, placeholder: '?', kind: TFieldKind.number),
+        TCard(variant: TCardVariant.coral, title: s.sfUnplugGateSumBodyN3Title, text: s.sfUnplugGateSumBodyN3Text, cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: s.sfUnplugGateSumBodyN3CtaN0Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Keep it closed', onPressed: () => TNav.toast(context, 'Nice. The app stays closed.', then: () => TNav.reset(context, Routes.sfHome)), arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Open it for 10 minutes', onTap: () => TNav.branch(context, 'Small step done?', <String, VoidCallback>{'Step done': () => TNav.toast(context, 'Open for 10 minutes. The pause screen comes back after.', then: () => TNav.reset(context, Routes.sfHome)), 'Step not done': () => TNav.toast(context, 'Answer the sum first.')}, decide: 'sf.unplug.sum')),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugGateSumFooterN0Label, onPressed: () => TNav.toast(context, s.sfUnplugGateSumFooterN0ActionValue, then: () => TNav.reset(context, Routes.sfHome)), arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.sfUnplugGateSumFooterN1Label, onTap: () => TNav.branch(context, 'Small step done?', <String, VoidCallback>{'Step done': () => TNav.toast(context, s.sfUnplugGateSumFooterN1ActionCasesN0ActionValue, then: () => TNav.reset(context, Routes.sfHome)), 'Step not done': () => TNav.toast(context, s.sfUnplugGateSumFooterN1ActionCasesN1ActionValue)}, decide: 'sf.unplug.sum')),
       ],
     );
   }

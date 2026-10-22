@@ -18,16 +18,17 @@ class SfUnplugSessionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Focus session'),
+      header: THeader(title: s.sfUnplugSessionHeaderTitle),
       children: [
-        TTitle('Pause your apps for a while.'),
-        TChips(fieldKey: 'sf_unplug_session.duration', options: ['25 min', '45 min', '60 min', '90 min'], selected: ['45 min'], multi: false, label: 'How long'),
-        TRadioList(fieldKey: 'sf_unplug_session.scope', items: [TRadioItem('Only my chosen apps', sub: 'Video apps, Feeds'), TRadioItem('Everything except apps I allow', sub: 'Tether, phone calls and emergency calls always stay open')], selected: 0, label: 'What to pause'),
-        TCard(children: [TToggleRow(fieldKey: 'sf_unplug_session.strict', label: 'Strict', sub: 'Ending early asks for a reason, kept on this phone')]),
+        TTitle(s.sfUnplugSessionBodyN0Text),
+        TChips(fieldKey: 'sf_unplug_session.duration', options: ['25 min', '45 min', '60 min', '90 min'], labels: [s.sfUnplugSessionBodyN1OptionsN0, s.sfUnplugSessionBodyN1OptionsN1, s.sfUnplugSessionBodyN1OptionsN2, s.sfUnplugSessionBodyN1OptionsN3], selected: ['45 min'], multi: false, label: s.sfUnplugSessionBodyN1Label),
+        TRadioList(fieldKey: 'sf_unplug_session.scope', items: [TRadioItem(s.sfUnplugSessionBodyN2ItemsN0Label, value: 'Only my chosen apps', sub: s.sfUnplugSessionBodyN2ItemsN0Sub), TRadioItem(s.sfUnplugSessionBodyN2ItemsN1Label, value: 'Everything except apps I allow', sub: s.sfUnplugSessionBodyN2ItemsN1Sub)], selected: 0, label: s.sfUnplugSessionBodyN2Label),
+        TCard(children: [TToggleRow(fieldKey: 'sf_unplug_session.strict', label: s.sfUnplugSessionBodyN3ChildrenN0Label, sub: s.sfUnplugSessionBodyN3ChildrenN0Sub)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Start session', onPressed: () => TNav.submit(context, 'CALL device:unplug/startSession', screenId: 'sf_unplug_session', then: () => TNav.replace(context, Routes.sfUnplugSessionActive)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugSessionFooterN0Label, onPressed: () => TNav.submit(context, 'CALL device:unplug/startSession', screenId: 'sf_unplug_session', then: () => TNav.replace(context, Routes.sfUnplugSessionActive)), arrow: true),
       ],
     );
   }

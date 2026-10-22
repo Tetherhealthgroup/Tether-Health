@@ -19,19 +19,20 @@ class HwTargetsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your targets', pill: '2 of 2'),
+      header: THeader(title: s.hwTargetsHeaderTitle, pill: s.hwTargetsHeaderPill),
       children: [
         TSteps(n: 2, total: 2),
-        TTitle('What target did your clinician give you?'),
-        TFieldRow(children: [TField(fieldKey: 'hw_targets.top_below', label: 'Top below', unit: 'mmHg', placeholder: '130', kind: TFieldKind.number), TField(fieldKey: 'hw_targets.bottom_below', label: 'Bottom below', unit: 'mmHg', placeholder: '80', kind: TFieldKind.number)]),
-        TRadioList(fieldKey: 'hw_targets.value', items: [TRadioItem('I don’t have a target yet', sub: 'Readings show without a target line')], selected: -1, bind: 'hw.targets.no_target_yet', bindClass: TBindClass.plan),
-        TChips(fieldKey: 'hw_targets.when_should_we_remind_you', options: ['Morning', 'Evening', 'Both'], selected: ['Both'], multi: false, label: 'When should we remind you?', bind: 'hw.targets.reminder_time', bindClass: TBindClass.plan),
-        TBody('Heartwise never sets or grades targets.', tone: TTextTone.small),
-        TLink(key: const ValueKey('a:body[6]'), label: 'Import from my health record', onTap: () => TNav.push(context, Routes.recordsAdd)),
+        TTitle(s.hwTargetsBodyN1Text),
+        TFieldRow(children: [TField(fieldKey: 'hw_targets.top_below', label: s.hwTargetsBodyN2FieldsN0Label, unit: 'mmHg', placeholder: '130', kind: TFieldKind.number), TField(fieldKey: 'hw_targets.bottom_below', label: s.hwTargetsBodyN2FieldsN1Label, unit: 'mmHg', placeholder: '80', kind: TFieldKind.number)]),
+        TRadioList(fieldKey: 'hw_targets.value', items: [TRadioItem(s.hwTargetsBodyN3ItemsN0Label, value: 'I don’t have a target yet', sub: s.hwTargetsBodyN3ItemsN0Sub)], selected: -1, bind: 'hw.targets.no_target_yet', bindClass: TBindClass.plan),
+        TChips(fieldKey: 'hw_targets.when_should_we_remind_you', options: ['Morning', 'Evening', 'Both'], labels: [s.hwTargetsBodyN4OptionsN0, s.hwTargetsBodyN4OptionsN1, s.hwTargetsBodyN4OptionsN2], selected: ['Both'], multi: false, label: s.hwTargetsBodyN4Label, bind: 'hw.targets.reminder_time', bindClass: TBindClass.plan),
+        TBody(s.hwTargetsBodyN5Text, tone: TTextTone.small),
+        TLink(key: const ValueKey('a:body[6]'), label: s.hwTargetsBodyN6Label, onTap: () => TNav.push(context, Routes.recordsAdd)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save targets', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/hw/targets', screenId: 'hw_targets', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.hwHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.hwTargetsFooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/program-data/hw/targets', screenId: 'hw_targets', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.hwHome))), arrow: true),
       ],
     );
   }

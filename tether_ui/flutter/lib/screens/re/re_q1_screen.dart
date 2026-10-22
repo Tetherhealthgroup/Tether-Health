@@ -18,17 +18,18 @@ class ReQ1Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Risk check', pill: '1 of 1'),
+      header: THeader(title: s.reQ1HeaderTitle, pill: s.reQ1HeaderPill),
       children: [
         TSteps(n: 1, total: 1),
-        TTitle('Do any of these apply?'),
-        TBody('These raise the chance of kidney or liver problems.', tone: TTextTone.muted),
-        TChips(fieldKey: 're_q1.value', options: ['Diabetes', 'High blood pressure', 'Heart disease', 'Family history of kidney disease', 'Regular alcohol', 'Hepatitis B or C', 'None'], selected: ['Diabetes', 'High blood pressure']),
-        TSegmented(fieldKey: 're_q1.known_condition', options: ['Kidney', 'Liver', 'Both', 'No'], selected: 'No', label: 'Known condition?'),
+        TTitle(s.reQ1BodyN1Text),
+        TBody(s.reQ1BodyN2Text, tone: TTextTone.muted),
+        TChips(fieldKey: 're_q1.value', options: ['Diabetes', 'High blood pressure', 'Heart disease', 'Family history of kidney disease', 'Regular alcohol', 'Hepatitis B or C', 'None'], labels: [s.reQ1BodyN3OptionsN0, s.reQ1BodyN3OptionsN1, s.reQ1BodyN3OptionsN2, s.reQ1BodyN3OptionsN3, s.reQ1BodyN3OptionsN4, s.reQ1BodyN3OptionsN5, s.reQ1BodyN3OptionsN6], selected: ['Diabetes', 'High blood pressure']),
+        TSegmented(fieldKey: 're_q1.known_condition', options: ['Kidney', 'Liver', 'Both', 'No'], labels: [s.reQ1BodyN4OptionsN0, s.reQ1BodyN4OptionsN1, s.reQ1BodyN4OptionsN2, s.reQ1BodyN4OptionsN3], selected: 'No', label: s.reQ1BodyN4Label),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'See what this means', onPressed: () => TNav.push(context, Routes.reResult), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.reQ1FooterN0Label, onPressed: () => TNav.push(context, Routes.reResult), arrow: true),
       ],
     );
   }

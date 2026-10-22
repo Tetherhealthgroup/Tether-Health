@@ -26,22 +26,22 @@
   },
   "chips": {
     "widget": "TChips",
-    "props": "options, selected, multi, dots, label",
-    "behavior": "Single or multi select; local state + onChanged"
+    "props": "options (values), labels, selected, multi, dots, label",
+    "behavior": "Single or multi select; local state + onChanged; the session holds values, labels are translated"
   },
   "segmented": {
     "widget": "TSegmented",
-    "props": "options, selected, label",
-    "behavior": ""
+    "props": "options (values), labels, selected, label",
+    "behavior": "The session holds values, labels are translated"
   },
   "radio": {
     "widget": "TRadioList",
-    "props": "items(label, sub, badge), selected, label",
-    "behavior": "Drives radio-based branches"
+    "props": "items(label, value, sub, badge), selected, label",
+    "behavior": "Drives radio-based branches; the session holds the item value"
   },
   "checklist": {
     "widget": "TChecklist",
-    "props": "items(label, sub, done), label",
+    "props": "items(label, value, sub, done), label",
     "behavior": ""
   },
   "toggle": {
@@ -86,7 +86,7 @@
   },
   "tiles": {
     "widget": "TTileGrid / TTile",
-    "props": "columns, tiles(label, sub, program|glyph, selected, onTap)",
+    "props": "columns, tiles(label, value, sub, program|glyph, selected, onTap)",
     "behavior": "Selection grid or navigation tiles"
   },
   "stats": {

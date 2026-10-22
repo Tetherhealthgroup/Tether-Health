@@ -58,15 +58,15 @@ COMPONENTS = {
     'steps': ('TSteps', 'n, total', 'Announces “Step n of total”'),
     'eyebrow': ('TEyebrow', 'text', 'Caps label'), 'title': ('TTitle', 'text, size m|l|xl, center', 'Semantics header'),
     'text': ('TBody', 'text, tone body|muted|small, center', ''),
-    'chips': ('TChips', 'options, selected, multi, dots, label', 'Single or multi select; local state + onChanged'),
-    'segmented': ('TSegmented', 'options, selected, label', ''), 'radio': ('TRadioList', 'items(label, sub, badge), selected, label', 'Drives radio-based branches'),
-    'checklist': ('TChecklist', 'items(label, sub, done), label', ''), 'toggle': ('TToggleRow', 'label, sub, value', 'Switch.adaptive'),
+    'chips': ('TChips', 'options (values), labels, selected, multi, dots, label', 'Single or multi select; local state + onChanged; the session holds values, labels are translated'),
+    'segmented': ('TSegmented', 'options (values), labels, selected, label', 'The session holds values, labels are translated'), 'radio': ('TRadioList', 'items(label, value, sub, badge), selected, label', 'Drives radio-based branches; the session holds the item value'),
+    'checklist': ('TChecklist', 'items(label, value, sub, done), label', ''), 'toggle': ('TToggleRow', 'label, sub, value', 'Switch.adaptive'),
     'field': ('TField', 'label, value, unit, hint, error, placeholder, kind', 'Error text says how to fix; kinds: text number email password phone date select multiline search'),
     'fieldrow': ('TFieldRow', 'children', 'Two fields side by side'), 'slider': ('TSliderField', 'label, value, min, max, minLabel, maxLabel, color', ''),
     'banner': ('TBanner', 'kind offline|error|success|info|urgent, text, actionLabel, onAction', 'Live region for error/urgent'),
     'card': ('TCard', 'variant plain|dark|dark2|coral|mint|urgent|warn|flat, tag, eyebrow, title, text, accent, onTap, cta, children', 'Whole card tappable when onTap'),
     'kv': ('TKeyValue', 'rows [(key, value)]', ''), 'list': ('TListGroup / TListRow', 'title, rows(label, sub, value, lead, pill, danger, onTap)', 'Chevron shown only when tappable'),
-    'tiles': ('TTileGrid / TTile', 'columns, tiles(label, sub, program|glyph, selected, onTap)', 'Selection grid or navigation tiles'),
+    'tiles': ('TTileGrid / TTile', 'columns, tiles(label, value, sub, program|glyph, selected, onTap)', 'Selection grid or navigation tiles'),
     'stats': ('TStatGrid / TStat', 'columns, stats(label, value, sub, program)', ''),
     'chart': ('TBarChart / TLineChart', 'values, color, title, unit, missing, target, band, labels, caption, tag, onTap', 'Missing days drawn hatched, never zero'),
     'zone': ('TZoneSelector', 'selected green|yellow|red', 'Drives zone branch'), 'ring': ('TBreathRing', 'value, label, palette', 'Respects Reduce Motion'),
@@ -257,8 +257,15 @@ def main():
     if errs:
         print('\n'.join(errs)); sys.exit(1)
     describe = B.describe
-    for sub in ('spec', 'design', 'prototype'):
+    for sub in ('design', 'prototype'):
         shutil.rmtree(os.path.join(OUT, sub), ignore_errors=True)
+    # spec/ is regenerated, except spec/l10n/<locale>.arb: hand-maintained
+    # translations (en.arb in it is generated again).
+    spec_dir = os.path.join(OUT, 'spec')
+    for f in os.listdir(spec_dir) if os.path.isdir(spec_dir) else []:
+        p = os.path.join(spec_dir, f)
+        if f == 'l10n': continue
+        shutil.rmtree(p) if os.path.isdir(p) else os.remove(p)
     for f in os.listdir(os.path.join(OUT, 'flows')) if os.path.isdir(os.path.join(OUT, 'flows')) else []:
         if f.endswith('.md'): os.remove(os.path.join(OUT, 'flows', f))
     # design

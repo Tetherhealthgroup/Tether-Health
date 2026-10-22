@@ -17,17 +17,18 @@ class CheckinScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TSheet(
       children: [
-        TEyebrow('Shared · asked once'),
-        TSegmented(fieldKey: 'checkin.how_do_you_feel_today', options: ['Low', 'Not great', 'Okay', 'Good', 'Great'], selected: 'Okay', label: 'How do you feel today?'),
-        TSegmented(fieldKey: 'checkin.stress_today', options: ['Low', 'Some', 'High'], selected: 'High', label: 'Stress today'),
-        TCard(tag: 'bf', title: 'Since your last check-in, did you smoke?', text: 'Before quit day this is expected, not a setback.', accent: 'bf', children: [TChips(fieldKey: 'checkin.value', options: ['No', 'A puff', 'One or more', 'Skip'], selected: ['One or more'], multi: false)]),
-        TCard(tag: 'sf', title: 'How did you feel after scrolling yesterday?', accent: 'sf', children: [TChips(fieldKey: 'checkin.value_2', options: ['Better', 'Same', 'Drained', 'Skip'], selected: ['Drained'], multi: false)]),
+        TEyebrow(s.checkinBodyN0Text),
+        TSegmented(fieldKey: 'checkin.how_do_you_feel_today', options: ['Low', 'Not great', 'Okay', 'Good', 'Great'], labels: [s.checkinBodyN1OptionsN0, s.checkinBodyN1OptionsN1, s.checkinBodyN1OptionsN2, s.checkinBodyN1OptionsN3, s.checkinBodyN1OptionsN4], selected: 'Okay', label: s.checkinBodyN1Label),
+        TSegmented(fieldKey: 'checkin.stress_today', options: ['Low', 'Some', 'High'], labels: [s.checkinBodyN2OptionsN0, s.checkinBodyN2OptionsN1, s.checkinBodyN2OptionsN2], selected: 'High', label: s.checkinBodyN2Label),
+        TCard(tag: 'bf', title: s.checkinBodyN3Title, text: s.checkinBodyN3Text, accent: 'bf', children: [TChips(fieldKey: 'checkin.value', options: ['No', 'A puff', 'One or more', 'Skip'], labels: [s.checkinBodyN3ChildrenN0OptionsN0, s.checkinBodyN3ChildrenN0OptionsN1, s.checkinBodyN3ChildrenN0OptionsN2, s.checkinBodyN3ChildrenN0OptionsN3], selected: ['One or more'], multi: false)]),
+        TCard(tag: 'sf', title: s.checkinBodyN4Title, accent: 'sf', children: [TChips(fieldKey: 'checkin.value_2', options: ['Better', 'Same', 'Drained', 'Skip'], labels: [s.checkinBodyN4ChildrenN0OptionsN0, s.checkinBodyN4ChildrenN0OptionsN1, s.checkinBodyN4ChildrenN0OptionsN2, s.checkinBodyN4ChildrenN0OptionsN3], selected: ['Drained'], multi: false)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save check-in', onPressed: () => TNav.submit(context, 'POST /v1/records/check-ins', screenId: 'checkin', then: () => TNav.replace(context, Routes.checkinDone)), arrow: true),
-        TBody('Skip any program question', tone: TTextTone.small, center: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.checkinFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/records/check-ins', screenId: 'checkin', then: () => TNav.replace(context, Routes.checkinDone)), arrow: true),
+        TBody(s.checkinFooterN1Text, tone: TTextTone.small, center: true),
       ],
     );
   }

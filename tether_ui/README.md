@@ -30,11 +30,13 @@ tether_ui/
 │   ├── scenarios.json        ← 81 end-to-end scenarios with simulated data
 │   ├── actions.json/.csv     ← flat button → action → target map
 │   ├── develop_mapping.json  ← develop-branch file for each screen + logic to keep
+│   ├── l10n/                 ← en.arb (generated English catalog, one key per visible string) + <locale>.arb (hand-maintained translations)
 │   └── validation.md         ← spec validator output
 ├── flows/                    ← <flow>.md (Mermaid + button map) and png/ flow boards
 ├── screens/                  ← png/<flow>/<id>.png (1.5×), png/auth/android_*.png, sheets/<flow>.png
 ├── flutter/                  ← runnable package, zero third-party deps
-│   ├── lib/ui/               ← components.dart, tokens.dart, nav.dart (all actions; TPlatform/TApi/TAuth hooks)
+│   ├── lib/ui/               ← components.dart, tokens.dart, nav.dart (all actions; TPlatform/TApi/TAuth hooks), strings.dart (TStrings)
+│   ├── lib/l10n/             ← strings.g.dart: catalogs, release/draft locales, typed accessors (generated)
 │   ├── lib/logic/rules.dart  ← session values + decision rules (same as spec/rules.json)
 │   ├── lib/router/           ← Routes + AppRouter (generated)
 │   ├── lib/screens/<flow>/   ← one widget per screen (generated)

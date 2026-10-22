@@ -17,18 +17,19 @@ class BfMedsEditScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Recorded plan'),
+      header: THeader(title: s.bfMedsEditHeaderTitle),
       children: [
-        TTitle('Record the plan from your clinician'),
-        TField(fieldKey: 'bf_meds_edit.medicine', label: 'Medicine', placeholder: 'Nicotine patch', kind: TFieldKind.select, bind: 'bf.meds.medicine', bindClass: TBindClass.plan),
-        TField(fieldKey: 'bf_meds_edit.strength', label: 'Strength', placeholder: '21 mg / 24 h'),
-        TField(fieldKey: 'bf_meds_edit.when', label: 'When', placeholder: 'Every morning', kind: TFieldKind.select, bind: 'bf.meds.when', bindClass: TBindClass.plan),
-        TToggleRow(fieldKey: 'bf_meds_edit.private_reminder', label: 'Private reminder', sub: 'Lock screen hides the medicine name', value: true, bind: 'bf.meds.private_reminder', bindClass: TBindClass.plan),
-        TBody('You’re recording, not changing, your plan. Ask your clinician about any change.', tone: TTextTone.small),
+        TTitle(s.bfMedsEditBodyN0Text),
+        TField(fieldKey: 'bf_meds_edit.medicine', label: s.bfMedsEditBodyN1Label, placeholder: s.bfMedsEditBodyN1Placeholder, kind: TFieldKind.select, bind: 'bf.meds.medicine', bindClass: TBindClass.plan),
+        TField(fieldKey: 'bf_meds_edit.strength', label: s.bfMedsEditBodyN2Label, placeholder: s.bfMedsEditBodyN2Placeholder),
+        TField(fieldKey: 'bf_meds_edit.when', label: s.bfMedsEditBodyN3Label, placeholder: s.bfMedsEditBodyN3Placeholder, kind: TFieldKind.select, bind: 'bf.meds.when', bindClass: TBindClass.plan),
+        TToggleRow(fieldKey: 'bf_meds_edit.private_reminder', label: s.bfMedsEditBodyN4Label, sub: s.bfMedsEditBodyN4Sub, value: true, bind: 'bf.meds.private_reminder', bindClass: TBindClass.plan),
+        TBody(s.bfMedsEditBodyN5Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/bf/meds', screenId: 'bf_meds_edit', then: () => TNav.toast(context, 'Plan saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.bfMedsEditFooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/program-data/bf/meds', screenId: 'bf_meds_edit', then: () => TNav.toast(context, s.bfMedsEditFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

@@ -20,16 +20,17 @@ class CaYellowScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Yellow zone', pill: 'Your plan'),
+      header: THeader(title: s.caYellowHeaderTitle, pill: s.caYellowHeaderPill),
       children: [
-        TCard(variant: TCardVariant.warn, title: 'Follow your yellow-zone steps', text: 'From the plan you entered on Sep 3'),
-        TCard(children: [TChecklist(items: [TCheckItem('Reliever inhaler · 2–4 puffs', sub: 'As written in your plan', done: true), TCheckItem('Re-check in 20 minutes', sub: 'We’ll remind you'), TCheckItem('Tell your care team if no better', sub: 'As your plan directs')])]),
-        TCard(key: const ValueKey('a:body[2]'), variant: TCardVariant.urgent, title: 'Getting worse or can’t speak in full sentences?', text: 'Go to your red-zone plan', onTap: () => TNav.replace(context, Routes.caRed)),
+        TCard(variant: TCardVariant.warn, title: s.caYellowBodyN0Title, text: s.caYellowBodyN0Text),
+        TCard(children: [TChecklist(items: [TCheckItem(s.caYellowBodyN1ChildrenN0ItemsN0Label, value: 'Reliever inhaler · 2–4 puffs', sub: s.caYellowBodyN1ChildrenN0ItemsN0Sub, done: true), TCheckItem(s.caYellowBodyN1ChildrenN0ItemsN1Label, value: 'Re-check in 20 minutes', sub: s.caYellowBodyN1ChildrenN0ItemsN1Sub), TCheckItem(s.caYellowBodyN1ChildrenN0ItemsN2Label, value: 'Tell your care team if no better', sub: s.caYellowBodyN1ChildrenN0ItemsN2Sub)])]),
+        TCard(key: const ValueKey('a:body[2]'), variant: TCardVariant.urgent, title: s.caYellowBodyN2Title, text: s.caYellowBodyN2Text, onTap: () => TNav.replace(context, Routes.caRed)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Remind me in 20 min', onPressed: () => TNav.toast(context, 'Reminder set for 20 minutes', then: () => TNav.replace(context, Routes.caHome)), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Message care team', onPressed: () => TNav.push(context, Routes.supportMessageCare), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.caYellowFooterN0Label, onPressed: () => TNav.toast(context, s.caYellowFooterN0ActionValue, then: () => TNav.replace(context, Routes.caHome)), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.caYellowFooterN1Label, onPressed: () => TNav.push(context, Routes.supportMessageCare), variant: TButtonVariant.secondary),
       ],
     );
   }

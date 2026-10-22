@@ -18,17 +18,18 @@ class BfQ1Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'About your smoking', pill: '1 of 3'),
+      header: THeader(title: s.bfQ1HeaderTitle, pill: s.bfQ1HeaderPill),
       children: [
         TSteps(n: 1, total: 3),
-        TEyebrow('Question 1 of 3'),
-        TTitle('On a typical day, how many cigarettes?'),
-        TRadioList(fieldKey: 'bf_q1.value', items: [TRadioItem('I don’t smoke every day'), TRadioItem('10 or fewer'), TRadioItem('11–20'), TRadioItem('21–30'), TRadioItem('31 or more')], selected: 2),
-        TCard(variant: TCardVariant.mint, title: 'Why we ask', text: 'Tailors your plan and estimates money saved. Not a diagnosis.'),
+        TEyebrow(s.bfQ1BodyN1Text),
+        TTitle(s.bfQ1BodyN2Text),
+        TRadioList(fieldKey: 'bf_q1.value', items: [TRadioItem(s.bfQ1BodyN3ItemsN0Label, value: 'I don’t smoke every day'), TRadioItem(s.bfQ1BodyN3ItemsN1Label, value: '10 or fewer'), TRadioItem('11–20'), TRadioItem('21–30'), TRadioItem(s.bfQ1BodyN3ItemsN4Label, value: '31 or more')], selected: 2),
+        TCard(variant: TCardVariant.mint, title: s.bfQ1BodyN4Title, text: s.bfQ1BodyN4Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Next', onPressed: () => TNav.push(context, Routes.bfQ2), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.bfQ1FooterN0Label, onPressed: () => TNav.push(context, Routes.bfQ2), arrow: true),
       ],
     );
   }

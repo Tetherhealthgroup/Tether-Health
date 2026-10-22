@@ -17,16 +17,17 @@ class SdCaregiverScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Caregiver access', pill: 'Optional'),
+      header: THeader(title: s.sdCaregiverHeaderTitle, pill: s.sdCaregiverHeaderPill),
       children: [
-        TTitle('Let someone help'),
-        TField(fieldKey: 'sd_caregiver.name', label: 'Name', placeholder: 'Rosa'),
-        TField(fieldKey: 'sd_caregiver.phone', label: 'Phone', placeholder: '(555) 010-2244', kind: TFieldKind.phone),
-        TChecklist(fieldKey: 'sd_caregiver.caregiver_can_see', items: [TCheckItem('When I finish a session', done: true), TCheckItem('If I log a fall', done: true), TCheckItem('My other programs', sub: 'Never available to caregivers')], label: 'Rosa can see', bind: 'sd.caregiver.can_see'),
+        TTitle(s.sdCaregiverBodyN0Text),
+        TField(fieldKey: 'sd_caregiver.name', label: s.sdCaregiverBodyN1Label, placeholder: s.sdCaregiverBodyN1Placeholder),
+        TField(fieldKey: 'sd_caregiver.phone', label: s.sdCaregiverBodyN2Label, placeholder: '(555) 010-2244', kind: TFieldKind.phone),
+        TChecklist(fieldKey: 'sd_caregiver.caregiver_can_see', items: [TCheckItem(s.sdCaregiverBodyN3ItemsN0Label, value: 'When I finish a session', done: true), TCheckItem(s.sdCaregiverBodyN3ItemsN1Label, value: 'If I log a fall', done: true), TCheckItem(s.sdCaregiverBodyN3ItemsN2Label, value: 'My other programs', sub: s.sdCaregiverBodyN3ItemsN2Sub)], label: s.sdCaregiverBodyN3Label, bind: 'sd.caregiver.can_see'),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Send invite', onPressed: () => TNav.submit(context, 'POST /v1/care/caregivers', screenId: 'sd_caregiver', then: () => TNav.toast(context, 'Invite sent to Rosa', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sdCaregiverFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/care/caregivers', screenId: 'sd_caregiver', then: () => TNav.toast(context, s.sdCaregiverFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

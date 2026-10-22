@@ -19,16 +19,17 @@ class ReResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your result', pill: 'Not a diagnosis'),
+      header: THeader(title: s.reResultHeaderTitle, pill: s.reResultHeaderPill),
       children: [
-        TTitle('Worth asking about a kidney check.'),
-        TCard(variant: TCardVariant.mint, text: 'People with diabetes and high blood pressure are usually advised to have yearly kidney tests: a blood test (eGFR) and a urine test (ACR).'),
-        TCard(children: [TChecklist(items: [TCheckItem('Ask about eGFR and urine ACR at my next visit', done: true), TCheckItem('Remind me 1 week before my visit')])]),
-        TCard(key: const ValueKey('a:body[3]'), title: 'Also see Heartwise and Steady', text: 'Managing BP and glucose protects your kidneys.', onTap: () => TNav.push(context, Routes.catalog)),
+        TTitle(s.reResultBodyN0Text),
+        TCard(variant: TCardVariant.mint, text: s.reResultBodyN1Text),
+        TCard(children: [TChecklist(items: [TCheckItem(s.reResultBodyN2ChildrenN0ItemsN0Label, value: 'Ask about eGFR and urine ACR at my next visit', done: true), TCheckItem(s.reResultBodyN2ChildrenN0ItemsN1Label, value: 'Remind me 1 week before my visit')])]),
+        TCard(key: const ValueKey('a:body[3]'), title: s.reResultBodyN3Title, text: s.reResultBodyN3Text, onTap: () => TNav.push(context, Routes.catalog)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save my plan', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/re/plan', screenId: 're_result', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.reHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.reResultFooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/program-data/re/plan', screenId: 're_result', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.reHome))), arrow: true),
       ],
     );
   }

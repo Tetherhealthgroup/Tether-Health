@@ -26,7 +26,11 @@
           "Español"
         ],
         "selected": "English",
-        "key": "value"
+        "key": "value",
+        "values": [
+          "en",
+          "es"
+        ]
       },
       {
         "t": "illus",

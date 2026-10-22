@@ -24,17 +24,18 @@ class BfReviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Review your plan', pill: 'Ready'),
+      header: THeader(title: s.bfReviewHeaderTitle, pill: s.bfReviewHeaderPill),
       children: [
-        TTitle('Your plan is ready.'),
-        TBody('Tap any item to edit.', tone: TTextTone.muted),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: 'Quit approach', sub: 'Set a quit date', onTap: () => TNav.push(context, Routes.bfPath)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: 'Quit date', sub: 'Fri, Aug 28 · 7 days to prepare', onTap: () => TNav.push(context, Routes.bfDate)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: 'Top reason', sub: 'Protect my family', onTap: () => TNav.push(context, Routes.bfQ3)), TListRow(key: const ValueKey('a:body[2].rows[3]'), label: 'Support', sub: 'Jordan · evening before', onTap: () => TNav.push(context, Routes.bfSupport)), TListRow(key: const ValueKey('a:body[2].rows[4]'), label: 'Space', sub: '2 of 3 tasks done', onTap: () => TNav.push(context, Routes.bfSupport))]),
-        TBody('Starting turns on your preparation tasks and reminders. Support messages always need your approval.', tone: TTextTone.small),
+        TTitle(s.bfReviewBodyN0Text),
+        TBody(s.bfReviewBodyN1Text, tone: TTextTone.muted),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: s.bfReviewBodyN2RowsN0Label, sub: s.bfReviewBodyN2RowsN0Sub, onTap: () => TNav.push(context, Routes.bfPath)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: s.bfReviewBodyN2RowsN1Label, sub: s.bfReviewBodyN2RowsN1Sub, onTap: () => TNav.push(context, Routes.bfDate)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: s.bfReviewBodyN2RowsN2Label, sub: s.bfReviewBodyN2RowsN2Sub, onTap: () => TNav.push(context, Routes.bfQ3)), TListRow(key: const ValueKey('a:body[2].rows[3]'), label: s.bfReviewBodyN2RowsN3Label, sub: s.bfReviewBodyN2RowsN3Sub, onTap: () => TNav.push(context, Routes.bfSupport)), TListRow(key: const ValueKey('a:body[2].rows[4]'), label: s.bfReviewBodyN2RowsN4Label, sub: s.bfReviewBodyN2RowsN4Sub, onTap: () => TNav.push(context, Routes.bfSupport))]),
+        TBody(s.bfReviewBodyN3Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Start my plan', onPressed: () => TNav.submit(context, 'PUT /v1/quit-plan', screenId: 'bf_review', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.bfHome))), arrow: true),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Save and finish later', onTap: () => TNav.tab(context, Routes.plans)),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.bfReviewFooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/quit-plan', screenId: 'bf_review', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.bfHome))), arrow: true),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.bfReviewFooterN1Label, onTap: () => TNav.tab(context, Routes.plans)),
       ],
     );
   }

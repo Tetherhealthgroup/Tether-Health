@@ -18,17 +18,18 @@ class BfQ3Screen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your reasons', pill: '3 of 3'),
+      header: THeader(title: s.bfQ3HeaderTitle, pill: s.bfQ3HeaderPill),
       children: [
         TSteps(n: 3, total: 3),
-        TTitle('What are you quitting for?'),
-        TBody('Choose all that matter. Your top reason appears when a craving hits.', tone: TTextTone.muted),
-        TChips(fieldKey: 'bf_q3.value', options: ['Protect my family', 'Breathe easier', 'Save money', 'Feel in control', 'My health', 'Be there for my future'], selected: ['Protect my family', 'Breathe easier', 'Save money']),
-        TCard(variant: TCardVariant.mint, eyebrow: 'When a craving hits', children: [TQuote('You chose this for your family. This feeling will pass.')]),
+        TTitle(s.bfQ3BodyN1Text),
+        TBody(s.bfQ3BodyN2Text, tone: TTextTone.muted),
+        TChips(fieldKey: 'bf_q3.value', options: ['Protect my family', 'Breathe easier', 'Save money', 'Feel in control', 'My health', 'Be there for my future'], labels: [s.bfQ3BodyN3OptionsN0, s.bfQ3BodyN3OptionsN1, s.bfQ3BodyN3OptionsN2, s.bfQ3BodyN3OptionsN3, s.bfQ3BodyN3OptionsN4, s.bfQ3BodyN3OptionsN5], selected: ['Protect my family', 'Breathe easier', 'Save money']),
+        TCard(variant: TCardVariant.mint, eyebrow: s.bfQ3BodyN4Eyebrow, children: [TQuote(s.bfQ3BodyN4ChildrenN0Text)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save my reasons', onPressed: () => TNav.push(context, Routes.bfPath), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.bfQ3FooterN0Label, onPressed: () => TNav.push(context, Routes.bfPath), arrow: true),
       ],
     );
   }

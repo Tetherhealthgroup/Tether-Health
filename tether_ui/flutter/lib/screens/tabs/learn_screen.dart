@@ -24,16 +24,17 @@ class LearnScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Learn', left: THeaderLeft.none, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
+      header: THeader(title: s.learnHeaderTitle, left: THeaderLeft.none, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'learn',
       children: [
-        TField(fieldKey: 'learn.search', label: 'Search', placeholder: 'Search cravings, sleep, blood pressure…', kind: TFieldKind.search),
-        TChips(fieldKey: 'learn.value', options: ['For you', 'BreatheFree', 'ScrollFree', 'ClearAir'], selected: ['For you'], multi: false, dots: {'BreatheFree': TColors.program('bf'), 'ScrollFree': TColors.program('sf'), 'ClearAir': TColors.program('ca')}),
-        TCard(key: const ValueKey('a:body[2]'), variant: TCardVariant.dark, tag: 'bf', tagExtra: 'For quit day', title: 'Cravings: what to expect today', text: '4 min read · 3:12 audio · downloaded', onTap: () => TNav.push(context, Routes.learnLesson)),
-        TCard(key: const ValueKey('a:body[3]'), tag: 'sf', tagExtra: '2 min', title: 'Why “one more video” never feels like enough', onTap: () => TNav.push(context, Routes.learnLesson)),
-        TCard(key: const ValueKey('a:body[4]'), tag: 'ca', tagExtra: 'Learn only', title: 'How your lungs recover after you quit', onTap: () => TNav.push(context, Routes.learnLesson)),
-        TBody('Clinically reviewed · Library v4.1 · English and Spanish', tone: TTextTone.small),
+        TField(fieldKey: 'learn.search', label: s.learnBodyN0Label, placeholder: s.learnBodyN0Placeholder, kind: TFieldKind.search),
+        TChips(fieldKey: 'learn.value', options: ['For you', 'BreatheFree', 'ScrollFree', 'ClearAir'], labels: [s.learnBodyN1OptionsN0, 'BreatheFree', 'ScrollFree', 'ClearAir'], selected: ['For you'], multi: false, dots: {'BreatheFree': TColors.program('bf'), 'ScrollFree': TColors.program('sf'), 'ClearAir': TColors.program('ca')}),
+        TCard(key: const ValueKey('a:body[2]'), variant: TCardVariant.dark, tag: 'bf', tagExtra: s.learnBodyN2TagExtra, title: s.learnBodyN2Title, text: s.learnBodyN2Text, onTap: () => TNav.push(context, Routes.learnLesson)),
+        TCard(key: const ValueKey('a:body[3]'), tag: 'sf', tagExtra: s.learnBodyN3TagExtra, title: s.learnBodyN3Title, onTap: () => TNav.push(context, Routes.learnLesson)),
+        TCard(key: const ValueKey('a:body[4]'), tag: 'ca', tagExtra: s.learnBodyN4TagExtra, title: s.learnBodyN4Title, onTap: () => TNav.push(context, Routes.learnLesson)),
+        TBody(s.learnBodyN5Text, tone: TTextTone.small),
       ],
     );
   }

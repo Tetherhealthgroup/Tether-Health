@@ -21,16 +21,17 @@ class NuProtectScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Support', pill: 'Private'),
+      header: THeader(title: s.nuProtectHeaderTitle, pill: s.nuProtectHeaderPill),
       children: [
-        TTitle('Thanks for telling us.'),
-        TBody('Nourish has turned off weight, amount goals and before/after comparisons.', tone: TTextTone.muted),
-        TCard(title: 'Talking to someone can help', text: 'A clinician or eating-disorder specialist can support you. We can help you prepare what to say.', cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: 'Prepare', onPressed: () => TNav.push(context, Routes.supportMessageCare), small: true)),
-        TEmergencyCard(text: 'In crisis? Call or text 988 · Emergency 911', actions: [TButton(key: const ValueKey('a:body[3].actions[0]'), label: 'Call or text 988', onPressed: () => TNav.push(context, Routes.crisis), variant: TButtonVariant.danger, small: true), TButton(key: const ValueKey('a:body[3].actions[1]'), label: 'Call 911', onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.secondary, small: true)]),
+        TTitle(s.nuProtectBodyN0Text),
+        TBody(s.nuProtectBodyN1Text, tone: TTextTone.muted),
+        TCard(title: s.nuProtectBodyN2Title, text: s.nuProtectBodyN2Text, cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: s.nuProtectBodyN2CtaN0Label, onPressed: () => TNav.push(context, Routes.supportMessageCare), small: true)),
+        TEmergencyCard(text: s.nuProtectBodyN3Text, actions: [TButton(key: const ValueKey('a:body[3].actions[0]'), label: s.nuProtectBodyN3ActionsN0Label, onPressed: () => TNav.push(context, Routes.crisis), variant: TButtonVariant.danger, small: true), TButton(key: const ValueKey('a:body[3].actions[1]'), label: s.nuProtectBodyN3ActionsN1Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.secondary, small: true)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Continue with gentle habits', onPressed: () => TNav.replace(context, (TFlow.onboarding ? Routes.nuHabit : Routes.nuHabit)), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.nuProtectFooterN0Label, onPressed: () => TNav.replace(context, (TFlow.onboarding ? Routes.nuHabit : Routes.nuHabit)), arrow: true),
       ],
     );
   }

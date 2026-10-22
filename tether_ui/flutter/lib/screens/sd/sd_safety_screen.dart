@@ -17,15 +17,16 @@ class SdSafetyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Home safety', pill: 'Checklist'),
+      header: THeader(title: s.sdSafetyHeaderTitle, pill: s.sdSafetyHeaderPill),
       children: [
-        TTitle('Make your home safer'),
-        TCard(children: [TChecklist(items: [TCheckItem('Remove loose rugs', done: true), TCheckItem('Night lights in hallway and bathroom', done: true), TCheckItem('Grab bar in shower'), TCheckItem('Stair rails on both sides'), TCheckItem('Vision check this year')])]),
-        TBody('2 of 5 done', tone: TTextTone.small),
+        TTitle(s.sdSafetyBodyN0Text),
+        TCard(children: [TChecklist(items: [TCheckItem(s.sdSafetyBodyN1ChildrenN0ItemsN0Label, value: 'Remove loose rugs', done: true), TCheckItem(s.sdSafetyBodyN1ChildrenN0ItemsN1Label, value: 'Night lights in hallway and bathroom', done: true), TCheckItem(s.sdSafetyBodyN1ChildrenN0ItemsN2Label, value: 'Grab bar in shower'), TCheckItem(s.sdSafetyBodyN1ChildrenN0ItemsN3Label, value: 'Stair rails on both sides'), TCheckItem(s.sdSafetyBodyN1ChildrenN0ItemsN4Label, value: 'Vision check this year')])]),
+        TBody(s.sdSafetyBodyN2Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sd/safety', screenId: 'sd_safety', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sdSafetyFooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sd/safety', screenId: 'sd_safety', then: () => TNav.toast(context, s.sdSafetyFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

@@ -19,16 +19,17 @@ class BeIntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Beacon', pill: '~1 min/week'),
+      header: THeader(title: 'Beacon', pill: s.beIntroHeaderPill),
       children: [
-        TProgramTag(program: 'be', extra: 'Cancer'),
-        TTitle('Lower your risk. Know your options.', size: TTitleSize.l),
-        TKeyValue(rows: [('Risk steps', 'smoking, sun, alcohol, activity'), ('Screening', 'linked with Checkup'), ('Treatment support', 'questions, side-effect diary')]),
+        TProgramTag(program: 'be', extra: s.beIntroBodyN0Extra),
+        TTitle(s.beIntroBodyN1Text, size: TTitleSize.l),
+        TKeyValue(rows: [(s.beIntroBodyN2RowsN0N0, s.beIntroBodyN2RowsN0N1), (s.beIntroBodyN2RowsN1N0, s.beIntroBodyN2RowsN1N1), (s.beIntroBodyN2RowsN2N0, s.beIntroBodyN2RowsN2N1)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Set up Beacon', onPressed: () => TNav.push(context, Routes.beQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Add as Learn only', onPressed: () => TNav.toast(context, 'Beacon added as Learn only', then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.beIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.beQ1), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.beIntroFooterN1Label, onPressed: () => TNav.toast(context, s.beIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
       ],
     );
   }

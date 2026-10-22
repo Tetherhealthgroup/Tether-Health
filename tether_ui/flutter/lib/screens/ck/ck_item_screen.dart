@@ -19,18 +19,19 @@ class CkItemScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Colorectal screening'),
+      header: THeader(title: s.ckItemHeaderTitle),
       children: [
-        TTitle('Your options'),
-        TBody('All are recommended. Talk with your clinician about which fits.', tone: TTextTone.muted),
-        TKeyValue(rows: [('Stool test (FIT)', 'at home · yearly'), ('Stool DNA test', 'at home · every 1–3 yrs'), ('Colonoscopy', 'clinic · every 10 yrs')]),
-        TCard(variant: TCardVariant.mint, title: 'Cost', text: 'Screening is often covered with no cost-sharing. Check with your insurer.'),
-        TBody('Source: USPSTF 2021 · reviewed Aug 2026', tone: TTextTone.small),
+        TTitle(s.ckItemBodyN0Text),
+        TBody(s.ckItemBodyN1Text, tone: TTextTone.muted),
+        TKeyValue(rows: [(s.ckItemBodyN2RowsN0N0, s.ckItemBodyN2RowsN0N1), (s.ckItemBodyN2RowsN1N0, s.ckItemBodyN2RowsN1N1), (s.ckItemBodyN2RowsN2N0, s.ckItemBodyN2RowsN2N1)]),
+        TCard(variant: TCardVariant.mint, title: s.ckItemBodyN3Title, text: s.ckItemBodyN3Text),
+        TBody(s.ckItemBodyN4Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Message my care team', onPressed: () => TNav.push(context, Routes.supportMessageCare), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Mark as done', onPressed: () => TNav.push(context, Routes.ckDone), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.ckItemFooterN0Label, onPressed: () => TNav.push(context, Routes.supportMessageCare), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.ckItemFooterN1Label, onPressed: () => TNav.push(context, Routes.ckDone), variant: TButtonVariant.secondary),
       ],
     );
   }

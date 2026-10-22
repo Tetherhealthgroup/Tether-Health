@@ -19,16 +19,17 @@ class ReIntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Renew', pill: '~1 min/day'),
+      header: THeader(title: 'Renew', pill: s.reIntroHeaderPill),
       children: [
-        TProgramTag(program: 're', extra: 'Kidney & liver health'),
-        TTitle('Look after your kidneys and liver.', size: TTitleSize.l),
-        TKeyValue(rows: [('Risk check', 'diabetes, BP, alcohol, family'), ('Labs', 'eGFR, ACR, ALT tracking'), ('Reminders', 'checks from your clinician')]),
+        TProgramTag(program: 're', extra: s.reIntroBodyN0Extra),
+        TTitle(s.reIntroBodyN1Text, size: TTitleSize.l),
+        TKeyValue(rows: [(s.reIntroBodyN2RowsN0N0, s.reIntroBodyN2RowsN0N1), (s.reIntroBodyN2RowsN1N0, s.reIntroBodyN2RowsN1N1), (s.reIntroBodyN2RowsN2N0, s.reIntroBodyN2RowsN2N1)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Set up Renew', onPressed: () => TNav.push(context, Routes.reQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Add as Learn only', onPressed: () => TNav.toast(context, 'Renew added as Learn only', then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.reIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.reQ1), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.reIntroFooterN1Label, onPressed: () => TNav.toast(context, s.reIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
       ],
     );
   }

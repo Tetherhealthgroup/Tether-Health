@@ -18,17 +18,18 @@ class SfUnplugShieldFirmScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       background: TBackground.dark,
       children: [
         SizedBox(height: 60.0),
         TIllustration(glyph: 'T', tone: TTone.dark),
-        TTitle('Paused for a moment', size: TTitleSize.l, center: true),
-        TBody('You asked to slow this one down. Video apps is on your list. No “open anyway” left today. Open Tether for support.', center: true),
+        TTitle(s.sfUnplugShieldFirmBodyN2Text, size: TTitleSize.l, center: true),
+        TBody(s.sfUnplugShieldFirmBodyN3Text, center: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Close the app', onPressed: () => TNav.toast(context, 'The app stays closed.', then: () => TNav.close(context)), variant: TButtonVariant.lime),
-        TLink(key: const ValueKey('a:footer[1]'), label: 'Get support', onTap: () => TNav.toast(context, 'Notification: tap to open Rescue in Tether', then: () => TNav.sheet(context, Routes.rescuePick))),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugShieldFirmFooterN0Label, onPressed: () => TNav.toast(context, s.sfUnplugShieldFirmFooterN0ActionValue, then: () => TNav.close(context)), variant: TButtonVariant.lime),
+        TLink(key: const ValueKey('a:footer[1]'), label: s.sfUnplugShieldFirmFooterN1Label, onTap: () => TNav.toast(context, s.sfUnplugShieldFirmFooterN1ActionValue, then: () => TNav.sheet(context, Routes.rescuePick))),
       ],
     );
   }

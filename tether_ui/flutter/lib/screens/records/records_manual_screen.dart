@@ -18,18 +18,19 @@ class RecordsManualScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Enter a value'),
+      header: THeader(title: s.recordsManualHeaderTitle),
       children: [
-        TTitle('Add a health value'),
-        TChips(fieldKey: 'records_manual.type', options: ['Blood pressure', 'Glucose', 'Lab result', 'Vaccine', 'Medication', 'Condition'], selected: ['Lab result'], multi: false, label: 'Type'),
-        TField(fieldKey: 'records_manual.test', label: 'Test', placeholder: 'A1C', kind: TFieldKind.select),
-        TField(fieldKey: 'records_manual.value', label: 'Value', unit: '%', placeholder: '7.4', kind: TFieldKind.number),
-        TField(fieldKey: 'records_manual.date', label: 'Date', placeholder: 'Oct 1, 2026', kind: TFieldKind.date),
-        TBody('Checked against plausible ranges and your connected records. Manual values are labelled “Entered by you”.', tone: TTextTone.small),
+        TTitle(s.recordsManualBodyN0Text),
+        TChips(fieldKey: 'records_manual.type', options: ['Blood pressure', 'Glucose', 'Lab result', 'Vaccine', 'Medication', 'Condition'], labels: [s.recordsManualBodyN1OptionsN0, s.recordsManualBodyN1OptionsN1, s.recordsManualBodyN1OptionsN2, s.recordsManualBodyN1OptionsN3, s.recordsManualBodyN1OptionsN4, s.recordsManualBodyN1OptionsN5], selected: ['Lab result'], multi: false, label: s.recordsManualBodyN1Label),
+        TField(fieldKey: 'records_manual.test', label: s.recordsManualBodyN2Label, placeholder: s.recordsManualBodyN2Placeholder, kind: TFieldKind.select),
+        TField(fieldKey: 'records_manual.value', label: s.recordsManualBodyN3Label, unit: '%', placeholder: '7.4', kind: TFieldKind.number),
+        TField(fieldKey: 'records_manual.date', label: s.recordsManualBodyN4Label, placeholder: s.recordsManualBodyN4Placeholder, kind: TFieldKind.date),
+        TBody(s.recordsManualBodyN5Text, tone: TTextTone.small),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save', onPressed: () => TNav.submit(context, 'POST /v1/records/manual', screenId: 'records_manual', then: () => TNav.branch(context, 'Validation', <String, VoidCallback>{'Valid': () => TNav.toast(context, 'Saved · shared with Steady', then: () => TNav.popTo(context, Routes.recordsHub)), 'Outside expected range': () => TNav.replace(context, Routes.recordsManualError), 'Matches an imported value': () => TNav.toast(context, 'Already in your records from Epic. Not added twice.', then: () => TNav.back(context))}, decide: 'rec.manual')), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.recordsManualFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/records/manual', screenId: 'records_manual', then: () => TNav.branch(context, 'Validation', <String, VoidCallback>{'Valid': () => TNav.toast(context, s.recordsManualFooterN0ActionThenCasesN0ActionValue, then: () => TNav.popTo(context, Routes.recordsHub)), 'Outside expected range': () => TNav.replace(context, Routes.recordsManualError), 'Matches an imported value': () => TNav.toast(context, s.recordsManualFooterN0ActionThenCasesN2ActionValue, then: () => TNav.back(context))}, decide: 'rec.manual')), arrow: true),
       ],
     );
   }

@@ -19,17 +19,18 @@ class BfIntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'BreatheFree', pill: '~3 min/day'),
+      header: THeader(title: 'BreatheFree', pill: s.bfIntroHeaderPill),
       children: [
-        TProgramTag(program: 'bf', extra: 'Tobacco & nicotine'),
-        TTitle('Your next breath can be different.', size: TTitleSize.l),
-        TKeyValue(rows: [('Help when cravings hit', 'one tap, no typing'), ('Plan your way', 'date · today · reduce · explore'), ('Medicines', 'education only')]),
-        TBody('Plan, practice and get through cravings, with no judgment. A slip never erases your wins.', tone: TTextTone.muted),
+        TProgramTag(program: 'bf', extra: s.bfIntroBodyN0Extra),
+        TTitle(s.bfIntroBodyN1Text, size: TTitleSize.l),
+        TKeyValue(rows: [(s.bfIntroBodyN2RowsN0N0, s.bfIntroBodyN2RowsN0N1), (s.bfIntroBodyN2RowsN1N0, s.bfIntroBodyN2RowsN1N1), (s.bfIntroBodyN2RowsN2N0, s.bfIntroBodyN2RowsN2N1)]),
+        TBody(s.bfIntroBodyN3Text, tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Set up BreatheFree', onPressed: () => TNav.push(context, Routes.bfQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Add as Learn only', onPressed: () => TNav.toast(context, 'BreatheFree added as Learn only', then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.bfIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.bfQ1), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.bfIntroFooterN1Label, onPressed: () => TNav.toast(context, s.bfIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
       ],
     );
   }

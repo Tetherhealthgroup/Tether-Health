@@ -19,16 +19,17 @@ class CkIntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Checkup', pill: '~1 min/week'),
+      header: THeader(title: 'Checkup', pill: s.ckIntroHeaderPill),
       children: [
-        TProgramTag(program: 'ck', extra: 'Preventive health'),
-        TTitle('What’s due for you, in one place.', size: TTitleSize.l),
-        TKeyValue(rows: [('Personal list', 'USPSTF / CDC guidance'), ('Reminders', 'weekly, quiet'), ('Records', 'mark done, add dates')]),
+        TProgramTag(program: 'ck', extra: s.ckIntroBodyN0Extra),
+        TTitle(s.ckIntroBodyN1Text, size: TTitleSize.l),
+        TKeyValue(rows: [(s.ckIntroBodyN2RowsN0N0, s.ckIntroBodyN2RowsN0N1), (s.ckIntroBodyN2RowsN1N0, s.ckIntroBodyN2RowsN1N1), (s.ckIntroBodyN2RowsN2N0, s.ckIntroBodyN2RowsN2N1)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Set up Checkup', onPressed: () => TNav.push(context, Routes.ckQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Add as Learn only', onPressed: () => TNav.toast(context, 'Checkup added as Learn only', then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.ckIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.ckQ1), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.ckIntroFooterN1Label, onPressed: () => TNav.toast(context, s.ckIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
       ],
     );
   }

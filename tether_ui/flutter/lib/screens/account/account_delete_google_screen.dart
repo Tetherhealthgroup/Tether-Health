@@ -19,18 +19,19 @@ class AccountDeleteGoogleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Delete account'),
+      header: THeader(title: s.accountDeleteGoogleHeaderTitle),
       children: [
-        TTitle('Delete your account and all data?'),
-        TKeyValue(rows: [('Programs', '4'), ('Check-ins', '63'), ('Readings & logs', '118'), ('Shared with care team', '3 summaries (their copies stay with them)')]),
-        TBody('This can’t be undone. Download a copy first if you want one.', tone: TTextTone.small),
-        TButton(key: const ValueKey('a:body[3]'), label: 'Download a copy first', onPressed: () => TNav.push(context, Routes.accountData), variant: TButtonVariant.secondary),
-        TField(fieldKey: 'account_delete_google.type_delete_to_confirm', label: 'Type DELETE to confirm', placeholder: 'DELETE'),
-        TCard(variant: TCardVariant.mint, eyebrow: 'Confirm it’s you', title: 'Signed in with Google', text: 'When you tap Delete everything, Google asks you to confirm. Use the same Google account you signed in with.'),
+        TTitle(s.accountDeleteGoogleBodyN0Text),
+        TKeyValue(rows: [(s.accountDeleteGoogleBodyN1RowsN0N0, '4'), (s.accountDeleteGoogleBodyN1RowsN1N0, '63'), (s.accountDeleteGoogleBodyN1RowsN2N0, '118'), (s.accountDeleteGoogleBodyN1RowsN3N0, s.accountDeleteGoogleBodyN1RowsN3N1)]),
+        TBody(s.accountDeleteGoogleBodyN2Text, tone: TTextTone.small),
+        TButton(key: const ValueKey('a:body[3]'), label: s.accountDeleteGoogleBodyN3Label, onPressed: () => TNav.push(context, Routes.accountData), variant: TButtonVariant.secondary),
+        TField(fieldKey: 'account_delete_google.type_delete_to_confirm', label: s.accountDeleteGoogleBodyN4Label, placeholder: s.accountDeleteGoogleBodyN4Placeholder),
+        TCard(variant: TCardVariant.mint, eyebrow: s.accountDeleteGoogleBodyN5Eyebrow, title: s.accountDeleteGoogleBodyN5Title, text: s.accountDeleteGoogleBodyN5Text),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Delete everything', onPressed: () => TNav.branch(context, 'Sign in with Google result', <String, VoidCallback>{'Success': () => TNav.submit(context, 'DELETE /v1/account/data', screenId: 'account_delete_google', then: () => TNav.replace(context, Routes.accountDeleted)), 'Different account': () => TNav.toast(context, 'That’s a different Google account. Use the one you signed in with.'), 'Cancelled': () => TNav.toast(context, 'Nothing was deleted.'), 'Error': () => TNav.toast(context, 'Couldn’t reach Google. Nothing was deleted.')}, provider: 'google'), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.accountDeleteGoogleFooterN0Label, onPressed: () => TNav.branch(context, 'Sign in with Google result', <String, VoidCallback>{'Success': () => TNav.submit(context, 'DELETE /v1/account/data', screenId: 'account_delete_google', then: () => TNav.replace(context, Routes.accountDeleted)), 'Different account': () => TNav.toast(context, s.accountDeleteGoogleFooterN0ActionCasesN1ActionValue), 'Cancelled': () => TNav.toast(context, s.accountDeleteGoogleFooterN0ActionCasesN2ActionValue), 'Error': () => TNav.toast(context, s.accountDeleteGoogleFooterN0ActionCasesN3ActionValue)}, provider: 'google'), variant: TButtonVariant.danger),
       ],
     );
   }

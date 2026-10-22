@@ -22,15 +22,16 @@ class TodayLoadingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Today', left: THeaderLeft.logo, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
+      header: THeader(title: s.todayLoadingHeaderTitle, left: THeaderLeft.logo, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'today',
       children: [
         TSkeleton(lines: 1),
-        TCard(variant: TCardVariant.coral, title: 'Craving or urge?', text: 'One tap · no typing', cta: TButton(key: const ValueKey('a:body[1].cta[0]'), label: 'Rescue', onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
+        TCard(variant: TCardVariant.coral, title: s.todayLoadingBodyN1Title, text: s.todayLoadingBodyN1Text, cta: TButton(key: const ValueKey('a:body[1].cta[0]'), label: s.todayLoadingBodyN1CtaN0Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
         TSkeleton(lines: 3),
         TSkeleton(lines: 2),
-        TBody('The rest of Today is still loading.', tone: TTextTone.small),
+        TBody(s.todayLoadingBodyN4Text, tone: TTextTone.small),
       ],
     );
   }

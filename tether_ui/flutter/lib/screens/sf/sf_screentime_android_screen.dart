@@ -19,18 +19,19 @@ class SfScreentimeAndroidScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Screen Time', pill: 'Optional'),
+      header: THeader(title: s.sfScreentimeAndroidHeaderTitle, pill: s.sfScreentimeAndroidHeaderPill),
       children: [
         TIllustration(glyph: '◷'),
-        TTitle('See real totals, if you want.', center: true),
-        TBody('Tether reads daily totals by category only. Never apps’ content, messages or contacts.', tone: TTextTone.muted, center: true),
-        TKeyValue(rows: [('Reads', 'Minutes per category'), ('Never reads', 'Content, messages, contacts'), ('Turn off', 'Anytime in Account')]),
-        TChecklist(items: [TCheckItem('Tap Open settings'), TCheckItem('Find Tether Health'), TCheckItem('Turn on “Permit usage access”')], label: 'Android asks in Settings'),
+        TTitle(s.sfScreentimeAndroidBodyN1Text, center: true),
+        TBody(s.sfScreentimeAndroidBodyN2Text, tone: TTextTone.muted, center: true),
+        TKeyValue(rows: [(s.sfScreentimeAndroidBodyN3RowsN0N0, s.sfScreentimeAndroidBodyN3RowsN0N1), (s.sfScreentimeAndroidBodyN3RowsN1N0, s.sfScreentimeAndroidBodyN3RowsN1N1), (s.sfScreentimeAndroidBodyN3RowsN2N0, s.sfScreentimeAndroidBodyN3RowsN2N1)]),
+        TChecklist(items: [TCheckItem(s.sfScreentimeAndroidBodyN4ItemsN0Label, value: 'Tap Open settings'), TCheckItem(s.sfScreentimeAndroidBodyN4ItemsN1Label, value: 'Find Tether Health'), TCheckItem(s.sfScreentimeAndroidBodyN4ItemsN2Label, value: 'Turn on “Permit usage access”')], label: s.sfScreentimeAndroidBodyN4Label),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Open settings', onPressed: () => TNav.branch(context, 'Android usage access (checked on return)', <String, VoidCallback>{'Allowed': () => TNav.toast(context, 'Usage access on', then: () => TNav.back(context)), 'Not allowed': () => TNav.replace(context, Routes.sfScreentimeAndroidDenied)}, device: const TBranchRef('sf.screentime.android_usage_access', TAsk.usageAccessSettings, 'sf_screentime_android'), when: const <TAnswer, String>{TAnswer.granted: 'Allowed', TAnswer.denied: 'Not allowed'}), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Not now', onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.sfScreentimeAndroidFooterN0Label, onPressed: () => TNav.branch(context, 'Android usage access (checked on return)', <String, VoidCallback>{'Allowed': () => TNav.toast(context, s.sfScreentimeAndroidFooterN0ActionCasesN0ActionValue, then: () => TNav.back(context)), 'Not allowed': () => TNav.replace(context, Routes.sfScreentimeAndroidDenied)}, device: const TBranchRef('sf.screentime.android_usage_access', TAsk.usageAccessSettings, 'sf_screentime_android'), when: const <TAnswer, String>{TAnswer.granted: 'Allowed', TAnswer.denied: 'Not allowed'}), arrow: true),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfScreentimeAndroidFooterN1Label, onPressed: () => TNav.back(context), variant: TButtonVariant.secondary),
       ],
     );
   }

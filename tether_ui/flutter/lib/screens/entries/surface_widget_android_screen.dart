@@ -18,11 +18,12 @@ class SurfaceWidgetAndroidScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Android widget', left: THeaderLeft.close),
+      header: THeader(title: s.surfaceWidgetAndroidHeaderTitle, left: THeaderLeft.close),
       background: TBackground.dark,
       children: [
-        TCard(key: const ValueKey('a:body[0]'), variant: TCardVariant.coral, title: 'Rescue', text: 'Help for the next few minutes', onTap: () => TNav.sheet(context, Routes.rescuePick)),
+        TCard(key: const ValueKey('a:body[0]'), variant: TCardVariant.coral, title: s.surfaceWidgetAndroidBodyN0Title, text: s.surfaceWidgetAndroidBodyN0Text, onTap: () => TNav.sheet(context, Routes.rescuePick)),
       ],
     );
   }

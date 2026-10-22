@@ -22,15 +22,16 @@ class ProgressErrorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Progress', left: THeaderLeft.none, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
+      header: THeader(title: s.progressErrorHeaderTitle, left: THeaderLeft.none, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'progress',
       children: [
         TIllustration(glyph: '!', tone: TTone.error),
-        TTitle('Something went wrong on our side', center: true),
-        TBody('Your data is safe on this phone. Try again in a moment.', tone: TTextTone.muted, center: true),
-        TButton(key: const ValueKey('a:body[3]'), label: 'Try again', onPressed: () => TNav.replace(context, Routes.progress), arrow: true),
-        TBody('Reference 5xx-2F91 · reports never include health data', tone: TTextTone.small, center: true),
+        TTitle(s.progressErrorBodyN1Text, center: true),
+        TBody(s.progressErrorBodyN2Text, tone: TTextTone.muted, center: true),
+        TButton(key: const ValueKey('a:body[3]'), label: s.progressErrorBodyN3Label, onPressed: () => TNav.replace(context, Routes.progress), arrow: true),
+        TBody(s.progressErrorBodyN4Text, tone: TTextTone.small, center: true),
       ],
     );
   }

@@ -18,14 +18,15 @@ class AccountSignoutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TSheet(
       children: [
-        TTitle('Sign out of Tether?'),
-        TBody('Encrypted program data on this phone is removed. Your account data stays safe in the cloud.', tone: TTextTone.muted),
+        TTitle(s.accountSignoutBodyN0Text),
+        TBody(s.accountSignoutBodyN1Text, tone: TTextTone.muted),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Sign out', onPressed: () => TNav.reset(context, Routes.welcome), variant: TButtonVariant.danger),
-        TButton(key: const ValueKey('a:footer[1]'), label: 'Cancel', onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.accountSignoutFooterN0Label, onPressed: () => TNav.reset(context, Routes.welcome), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.accountSignoutFooterN1Label, onPressed: () => TNav.close(context), variant: TButtonVariant.secondary),
       ],
     );
   }

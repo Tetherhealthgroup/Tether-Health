@@ -1,6 +1,7 @@
-import os, shutil, json
+import os, re, shutil, json
 from dsl import *
 from rules import RULES
+import l10n
 
 def dstr(s):
     if s is None: return 'null'
@@ -13,8 +14,10 @@ def dcolor(c):
 
 def rconst(sid): return f'Routes.{camel(sid)}'
 
-def act(a):
-    """Dart expression performing action `a` (context in scope)."""
+def act(a, ap=None):
+    """Dart expression performing action `a` (context in scope). `ap` is the
+    action's path (`<element path>.action`, then `.then`, `.cases[i].action`):
+    member-visible text inside it (toasts) is keyed by that path."""
     t = a['type']
     if t == 'popto': return f"TNav.popTo(context, {rconst(a['to'])})"
     if t in ('push', 'replace', 'tab', 'sheet', 'reset'):
@@ -34,15 +37,15 @@ def act(a):
     if t == 'external': return f"TNav.external(context, {dstr(a['value'])})"
     if t == 'os_settings': return 'TNav.osSettings(context)'
     if t == 'toast':
-        then = f", then: () => {act(a['then'])}" if a.get('then') else ''
-        return f"TNav.toast(context, {dstr(a['value'])}{then})"
+        then = f", then: () => {act(a['then'], sub(ap, 'then'))}" if a.get('then') else ''
+        return f"TNav.toast(context, {T(a['value'], 'value', ap, 'action:toast')}{then})"
     if t == 'submit':
-        then = f", then: () => {act(a['then'])}" if a.get('then') else ''
+        then = f", then: () => {act(a['then'], sub(ap, 'then'))}" if a.get('then') else ''
         nq = '' if queueable(a['api']) else ', queueable: false'
-        return f"TNav.submit(context, {dstr(a['api'])}, screenId: {dstr(CUR['sid'])}{nq}{then}{safety_routes(a.get('then'))})"
+        return f"TNav.submit(context, {dstr(a['api'])}, screenId: {dstr(CUR['sid'])}{nq}{then}{safety_routes(a.get('then'), sub(ap, 'then'))})"
     if t == 'branch':
         safety_cases(a)  # raises if a safety outcome has no case
-        cases = ', '.join(f"{dstr(c['label'])}: () => {act(c['action'])}" for c in a['cases'])
+        cases = ', '.join(f"{dstr(c['label'])}: () => {act(c['action'], sub(ap, f'cases[{i}].action'))}" for i, c in enumerate(a['cases']))
         extra = ''
         if a.get('decide'): extra += f", decide: {dstr(a['decide'])}"
         if a.get('provider'): extra += f", provider: {dstr(a['provider'])}"
@@ -50,14 +53,16 @@ def act(a):
         return f"TNav.branch(context, {dstr(a['question'])}, <String, VoidCallback>{{{cases}}}{extra})"
     raise ValueError(t)
 
-def cb(a): return f'() => {act(a)}' if a else 'null'
+def sub(ap, part): return f'{ap}.{part}' if ap else None
 
-def pcb(a, program):
+def cb(a, ap=None): return f'() => {act(a, ap)}' if a else 'null'
+
+def pcb(a, program, ap=None):
     """cb() for a list row or tile that names its own programme."""
     prev = CUR.get('program')
     CUR['program'] = program or prev
     try:
-        return cb(a)
+        return cb(a, ap)
     finally:
         CUR['program'] = prev
 
@@ -124,17 +129,20 @@ def check_safety_action(rule_id, case):
         if t == sid or (here is not None and t in SCREENS and SCREENS[t]['route'] == here):
             raise ValueError(f"{where} must leave the screen: its {a['type']} target {t!r} is the screen itself")
 
-def safety_routes(then):
+def safety_routes(then, ap=None):
     """`, safety: TSafetyRoutes(...)` for a submit whose `then` (through toasts)
     is a branch decided by an on-device rule with safety outcomes; '' when the
     branch's rule has no safety outcome (or `then` has no rule-decided branch)."""
     a = then
-    while a and a['type'] == 'toast': a = a.get('then')
+    while a and a['type'] == 'toast':
+        a = a.get('then')
+        ap = sub(ap, 'then')
     if not a or a['type'] != 'branch': return ''
     cases = safety_cases(a)
     if not cases: return ''
     for c in cases: check_safety_action(a['decide'], c)
-    routes = ', '.join(f"{dstr(c['label'])}: () => {act(c['action'])}" for c in cases)
+    idx = {id(c): i for i, c in enumerate(a['cases'])}
+    routes = ', '.join(f"{dstr(c['label'])}: () => {act(c['action'], sub(ap, 'cases[%d].action' % idx[id(c)]))}" for c in cases)
     return f", safety: TSafetyRoutes({dstr(a['decide'])}, <String, VoidCallback>{{{routes}}})"
 
 def args(**kw):
@@ -148,6 +156,29 @@ def lst(items): return '[' + ', '.join(items) + ']'
 
 CUR = {'sid': ''}
 
+# The English catalog collected while generating (l10n.Catalog); reset by
+# generate().
+CAT = l10n.Catalog()
+
+def T(value, prop, path, owner, node_=None, options_with_values=False):
+    """Dart expression for a literal of `owner`.`prop` at `path`: a TStrings
+    accessor for member-visible text (keyed `<screen>.<path or sid>.<prop>`),
+    else the literal itself (l10n.classify)."""
+    if value is None: return 'null'
+    base = l10n.prop_class(owner, re.sub(r'\[\d+\]', '', prop).split('.')[-1])
+    if base is None: raise ValueError(f"{CUR['sid']}: {path} {owner}.{prop} has no literal class (l10n.PROPS)")
+    cls = l10n.content_class(value, base, options_with_values)
+    if cls != l10n.TEXT:
+        if cls in ('brand', 'unit', 'data', 'phone', 'url', 'autonym') and value: CAT.untranslated.add(value)
+        return dstr(value)
+    sid = CUR['sid']
+    where = node_.get('sid') if node_ and node_.get('sid') else path
+    key = f'{sid}.{where}.{prop}'
+    name = SCREENS.get(sid, {}).get('name', sid)
+    CAT.add(key, value, sid, where, prop, f"{name}: {owner.replace('action:', '')} {prop}")
+    CUR['uses_s'] = True
+    return f's.{l10n.accessor(key)}'
+
 def K(path): return f"const ValueKey('a:{path}')"
 
 def FK(n): return dstr(f"{CUR['sid']}.{n['key']}") if n.get('key') else None
@@ -160,41 +191,73 @@ def BC(n):
     from validate import PLAN_SCREENS
     return 'TBindClass.plan' if n.get('bind') and CUR['sid'] in PLAN_SCREENS else None
 
+def options(n, path):
+    """(values, labels) of a chips or segmented node: values are the stable
+    session values (spec `values`, else today's English options); labels the
+    shown text, or None when every label equals its value."""
+    vals = n.get('values') or n['options']
+    has_values = bool(n.get('values'))
+    labels = [T(o, f'options[{i}]', path, n['t'], n, options_with_values=has_values) for i, o in enumerate(n['options'])]
+    values = [dstr(v) for v in vals]
+    return values, (labels if labels != values else None)
+
+def value_of(n, label):
+    """The session value of option `label` of `n` (spec `values`, else the label)."""
+    if not n.get('values'): return label
+    return n['values'][n['options'].index(label)]
+
 def node(n, top=False, path=''):
     t = n['t']
     S_ = dstr
-    if t == 'eyebrow': return f"TEyebrow({S_(n['text'])})"
+    def X(prop, owner=None, item=None, ip=None):
+        """Member-visible prop `prop` of this node (or of list item `item` at
+        item path `ip`, e.g. 'items[2]')."""
+        src = item if item is not None else n
+        v = src.get(prop)
+        if v is None: return None
+        return T(v, f'{ip}.{prop}' if ip else prop, path, owner or t, n)
+    if t == 'eyebrow': return f"TEyebrow({X('text')})"
     if t == 'title':
-        return f"TTitle({args(_=S_(n['text']), size='TTitleSize.' + n.get('size', 'm') if n.get('size', 'm') != 'm' else None, center='true' if n.get('align') == 'center' else None)})"
+        return f"TTitle({args(_=X('text'), size='TTitleSize.' + n.get('size', 'm') if n.get('size', 'm') != 'm' else None, center='true' if n.get('align') == 'center' else None)})"
     if t == 'text':
         tone = n.get('tone', 'body')
-        return f"TBody({args(_=S_(n['text']), tone='TTextTone.' + tone if tone != 'body' else None, center='true' if n.get('align') == 'center' else None)})"
+        return f"TBody({args(_=X('text'), tone='TTextTone.' + tone if tone != 'body' else None, center='true' if n.get('align') == 'center' else None)})"
     if t == 'steps': return f"TSteps(n: {n['n']}, total: {n['total']})"
     if t == 'chips':
         dots = n.get('dots')
-        d = '{' + ', '.join(f"{S_(k)}: {dcolor(v)}" for k, v in dots.items()) + '}' if dots else None
-        return f"TChips({args(fieldKey=FK(n), options=lst([S_(o) for o in n['options']]), selected=lst([S_(o) for o in n['selected']]) if n['selected'] else None, multi='false' if not n.get('multi') else None, dots=d, label=S_(n['label']) if n.get('label') else None, bind=BK(n), bindClass=BC(n))})"
+        d = '{' + ', '.join(f"{S_(value_of(n, k))}: {dcolor(v)}" for k, v in dots.items()) + '}' if dots else None
+        values, labels = options(n, path)
+        return f"TChips({args(fieldKey=FK(n), options=lst(values), labels=lst(labels) if labels else None, selected=lst([S_(value_of(n, o)) for o in n['selected']]) if n['selected'] else None, multi='false' if not n.get('multi') else None, dots=d, label=X('label'), bind=BK(n), bindClass=BC(n))})"
     if t == 'segmented':
-        return f"TSegmented({args(fieldKey=FK(n), options=lst([S_(o) for o in n['options']]), selected=S_(n['selected']), label=S_(n['label']) if n.get('label') else None, bind=BK(n), bindClass=BC(n))})"
+        values, labels = options(n, path)
+        return f"TSegmented({args(fieldKey=FK(n), options=lst(values), labels=lst(labels) if labels else None, selected=S_(value_of(n, n['selected'])), label=X('label'), bind=BK(n), bindClass=BC(n))})"
     if t == 'radio':
-        items = [f"TRadioItem({args(_=S_(i['label']), sub=S_(i['sub']) if i.get('sub') else None, badge=S_(i['badge']) if i.get('badge') else None)})" for i in n['items']]
-        return f"TRadioList({args(fieldKey=FK(n), items=lst(items), selected=str(n['selected']), label=S_(n['label']) if n.get('label') else None, bind=BK(n), bindClass=BC(n))})"
+        items = []
+        for j, i in enumerate(n['items']):
+            lab = T(i['label'], f'items[{j}].label', path, 'radio.items', n)
+            items.append(f"TRadioItem({args(_=lab, value=S_(i['label']) if lab != S_(i['label']) else None, sub=X('sub', 'radio.items', i, f'items[{j}]'), badge=X('badge', 'radio.items', i, f'items[{j}]'))})")
+        return f"TRadioList({args(fieldKey=FK(n), items=lst(items), selected=str(n['selected']), label=X('label'), bind=BK(n), bindClass=BC(n))})"
     if t == 'checklist':
-        items = [f"TCheckItem({args(_=S_(i['label']), sub=S_(i['sub']) if i.get('sub') else None, done='true' if i.get('done') else None)})" for i in n['items']]
-        return f"TChecklist({args(fieldKey=FK(n), items=lst(items), label=S_(n['label']) if n.get('label') else None, bind=BK(n), bindClass=BC(n))})"
-    if t == 'toggle': return f"TToggleRow({args(fieldKey=FK(n), label=S_(n['label']), sub=S_(n['sub']) if n.get('sub') else None, value='true' if n.get('on') else None, bind=BK(n), bindClass=BC(n))})"
+        items = []
+        for j, i in enumerate(n['items']):
+            lab = T(i['label'], f'items[{j}].label', path, 'checklist.items', n)
+            items.append(f"TCheckItem({args(_=lab, value=S_(i['label']) if lab != S_(i['label']) else None, sub=X('sub', 'checklist.items', i, f'items[{j}]'), done='true' if i.get('done') else None)})")
+        return f"TChecklist({args(fieldKey=FK(n), items=lst(items), label=X('label'), bind=BK(n), bindClass=BC(n))})"
+    if t == 'toggle': return f"TToggleRow({args(fieldKey=FK(n), label=X('label'), sub=X('sub'), value='true' if n.get('on') else None, bind=BK(n), bindClass=BC(n))})"
     if t == 'field':
         kind = n.get('kind', 'text')
-        return f"TField({args(fieldKey=FK(n), label=S_(n['label']), value=S_(n.get('value')) if n.get('value') else None, unit=S_(n.get('unit')) if n.get('unit') else None, hint=S_(n.get('hint')) if n.get('hint') else None, error=S_(n.get('error')) if n.get('error') else None, placeholder=S_(n.get('placeholder')) if n.get('placeholder') else None, kind='TFieldKind.' + kind if kind != 'text' else None, bind=BK(n), bindClass=BC(n))})"
+        return f"TField({args(fieldKey=FK(n), label=X('label'), value=X('value') if n.get('value') else None, unit=X('unit') if n.get('unit') else None, hint=X('hint') if n.get('hint') else None, error=X('error') if n.get('error') else None, placeholder=X('placeholder') if n.get('placeholder') else None, kind='TFieldKind.' + kind if kind != 'text' else None, bind=BK(n), bindClass=BC(n))})"
     if t == 'fieldrow': return f"TFieldRow(children: {lst([node(x, path=f'{path}.fields[{i}]') for i, x in enumerate(n['fields'])])})"
     if t == 'slider':
-        return f"TSliderField({args(fieldKey=FK(n), label=S_(n['label']), value=str(float(n['value'])), min=str(float(n['min'])), max=str(float(n['max'])), minLabel=S_(n['minLabel']), maxLabel=S_(n['maxLabel']), color=dcolor(n.get('color', 'coral')), suffix=S_(n['suffix']) if n.get('suffix') else None)})"
+        return f"TSliderField({args(fieldKey=FK(n), label=X('label'), value=str(float(n['value'])), min=str(float(n['min'])), max=str(float(n['max'])), minLabel=X('minLabel'), maxLabel=X('maxLabel'), color=dcolor(n.get('color', 'coral')), suffix=X('suffix') if n.get('suffix') else None)})"
     if t == 'banner':
-        return f"TBanner({args(kind='TBannerKind.' + n['kind'], text=S_(n['text']), actionLabel=S_(n['actionLabel']) if n.get('actionLabel') else None, onAction=cb(n['action']) if n.get('action') else None, actionKey=K(path) if n.get('action') else None)})"
+        return f"TBanner({args(kind='TBannerKind.' + n['kind'], text=X('text'), actionLabel=X('actionLabel') if n.get('actionLabel') else None, onAction=cb(n['action'], path + '.action') if n.get('action') else None, actionKey=K(path) if n.get('action') else None)})"
     if t == 'card':
         v = n.get('variant', 'plain')
-        return f"TCard({args(key=K(path) if n.get('action') else None, variant='TCardVariant.' + v if v != 'plain' else None, tag=S_(n['tag']) if n.get('tag') else None, tagExtra=S_(n['tagExtra']) if n.get('tagExtra') else None, eyebrow=S_(n['eyebrow']) if n.get('eyebrow') else None, title=S_(n['title']) if n.get('title') else None, text=S_(n['text']) if n.get('text') else None, accent=S_(n['accent']) if n.get('accent') else None, onTap=cb(n['action']) if n.get('action') else None, cta=node(n['cta'], path=path + '.cta[0]') if n.get('cta') else None, children=lst([node(c, path=f'{path}.children[{i}]') for i, c in enumerate(n['children'])]) if n.get('children') else None)})"
-    if t == 'kv': return f"TKeyValue(rows: {lst([f'({S_(k)}, {S_(v)})' for k, v in n['rows']])})"
+        return f"TCard({args(key=K(path) if n.get('action') else None, variant='TCardVariant.' + v if v != 'plain' else None, tag=S_(n['tag']) if n.get('tag') else None, tagExtra=X('tagExtra') if n.get('tagExtra') else None, eyebrow=X('eyebrow') if n.get('eyebrow') else None, title=X('title') if n.get('title') else None, text=X('text') if n.get('text') else None, accent=S_(n['accent']) if n.get('accent') else None, onTap=cb(n['action'], path + '.action') if n.get('action') else None, cta=node(n['cta'], path=path + '.cta[0]') if n.get('cta') else None, children=lst([node(c, path=f'{path}.children[{i}]') for i, c in enumerate(n['children'])]) if n.get('children') else None)})"
+    if t == 'kv':
+        kvs = ['(%s, %s)' % (T(k, 'rows[%d][0]' % j, path, 'kv', n), T(v, 'rows[%d][1]' % j, path, 'kv', n)) for j, (k, v) in enumerate(n['rows'])]
+        return f"TKeyValue(rows: {lst(kvs)})"
     if t == 'list':
         rows = []
         for j, r in enumerate(n['rows']):
@@ -203,42 +266,47 @@ def node(n, top=False, path=''):
             if 'program' in L: lead = f"TLead.program({S_(L['program'])})"
             elif 'avatar' in L: lead = f"TLead.avatar({S_(L['avatar'])})"
             elif 'icon' in L: lead = f"TLead.icon({S_(L['icon'])})"
-            rows.append(f"TListRow({args(key=K(f'{path}.rows[{j}]') if r.get('action') else None, label=S_(r['label']), sub=S_(r['sub']) if r.get('sub') else None, value=S_(r['value']) if r.get('value') else None, lead=lead, pill=S_(r['pill']) if r.get('pill') else None, danger='true' if r.get('danger') else None, onTap=pcb(r['action'], L.get('program')) if r.get('action') else None)})")
-        return f"TListGroup({args(title=S_(n['title']) if n.get('title') else None, flat='true' if n.get('flat') else None, rows=lst(rows))})"
+            ip = f'rows[{j}]'
+            rows.append(f"TListRow({args(key=K(f'{path}.rows[{j}]') if r.get('action') else None, label=X('label', 'list.rows', r, ip), sub=X('sub', 'list.rows', r, ip) if r.get('sub') else None, value=X('value', 'list.rows', r, ip) if r.get('value') else None, lead=lead, pill=X('pill', 'list.rows', r, ip) if r.get('pill') else None, danger='true' if r.get('danger') else None, onTap=pcb(r['action'], L.get('program'), f'{path}.rows[{j}].action') if r.get('action') else None)})")
+        return f"TListGroup({args(title=X('title') if n.get('title') else None, flat='true' if n.get('flat') else None, rows=lst(rows))})"
     if t == 'tiles':
-        tiles = [f"TTile({args(key=K(f'{path}.items[{j}]') if i.get('action') else None, label=S_(i['label']), sub=S_(i['sub']) if i.get('sub') else None, program=S_(i['program']) if i.get('program') else None, glyph=S_(i['glyph']) if i.get('glyph') else None, selected='true' if i.get('selected') else None, onTap=pcb(i['action'], i.get('program')) if i.get('action') else None)})" for j, i in enumerate(n['items'])]
+        tiles = []
+        for j, i in enumerate(n['items']):
+            ip = f'items[{j}]'
+            lab = X('label', 'tiles.items', i, ip)
+            tiles.append(f"TTile({args(key=K(f'{path}.items[{j}]') if i.get('action') else None, label=lab, value=S_(i['label']) if lab != S_(i['label']) else None, sub=X('sub', 'tiles.items', i, ip) if i.get('sub') else None, program=S_(i['program']) if i.get('program') else None, glyph=S_(i['glyph']) if i.get('glyph') else None, selected='true' if i.get('selected') else None, onTap=pcb(i['action'], i.get('program'), f'{path}.items[{j}].action') if i.get('action') else None)})")
         return f"TTileGrid({args(fieldKey=FK(n), columns=str(n.get('cols', 2)) if n.get('cols', 2) != 2 else None, tiles=lst(tiles))})"
     if t == 'stats':
-        st_ = [f"TStat({args(label=S_(i['label']), value=S_(i['value']), sub=S_(i['sub']) if i.get('sub') else None, program=S_(i['program']) if i.get('program') else None)})" for i in n['items']]
+        st_ = [f"TStat({args(label=X('label', 'stats.items', i, f'items[{j}]'), value=X('value', 'stats.items', i, f'items[{j}]'), sub=X('sub', 'stats.items', i, f'items[{j}]') if i.get('sub') else None, program=S_(i['program']) if i.get('program') else None)})" for j, i in enumerate(n['items'])]
         return f"TStatGrid({args(columns=str(n.get('cols', 2)) if n.get('cols', 2) != 2 else None, stats=lst(st_))})"
     if t == 'chart':
-        common = dict(key=K(path) if n.get('action') else None, title=S_(n['title']) if n.get('title') else None, unit=S_(n['unit']) if n.get('unit') else None, caption=S_(n['caption']) if n.get('caption') else None, tag=S_(n['tag']) if n.get('tag') else None, onTap=cb(n['action']) if n.get('action') else None)
+        common = dict(key=K(path) if n.get('action') else None, title=X('title') if n.get('title') else None, unit=X('unit') if n.get('unit') else None, caption=X('caption') if n.get('caption') else None, tag=S_(n['tag']) if n.get('tag') else None, onTap=cb(n['action'], path + '.action') if n.get('action') else None)
         vals = lst([str(float(v)) for v in n['values']])
         if n['kind'] == 'bars':
-            return f"TBarChart({args(values=vals, color=dcolor(n['color']), missing=lst([str(m) for m in n['missing']]) if n.get('missing') else None, target=str(float(n['target'])) if n.get('target') else None, labels=lst([S_(l) for l in n['labels']]) if n.get('labels') else None, **common)})"
+            return f"TBarChart({args(values=vals, color=dcolor(n['color']), missing=lst([str(m) for m in n['missing']]) if n.get('missing') else None, target=str(float(n['target'])) if n.get('target') else None, labels=lst([T(l, f'labels[{j}]', path, 'chart', n) for j, l in enumerate(n['labels'])]) if n.get('labels') else None, **common)})"
         return f"TLineChart({args(values=vals, color=dcolor(n['color']), band=lst([str(float(b)) for b in n['band']]) if n.get('band') else None, **common)})"
     if t == 'zone': return f"TZoneSelector({args(selected=S_(n['selected']), rule=S_(n['rule']) if n.get('rule') else None)})"
-    if t == 'ring': return f"TBreathRing({args(value=S_(n['value']), label=S_(n['label']) if n.get('label') != 'SECONDS' else None, palette='TRingPalette.indigo' if n.get('palette') == 'indigo' else None)})"
-    if t == 'big': return f"TBigNumber({args(value=S_(n['value']), unit=S_(n['unit']) if n.get('unit') else None, caption=S_(n['caption']) if n.get('caption') else None, center='true' if top else None)})"
+    if t == 'ring': return f"TBreathRing({args(value=X('value'), label=X('label') if n.get('label') != 'SECONDS' else None, palette='TRingPalette.indigo' if n.get('palette') == 'indigo' else None)})"
+    if t == 'big': return f"TBigNumber({args(value=X('value'), unit=X('unit') if n.get('unit') else None, caption=X('caption') if n.get('caption') else None, center='true' if top else None)})"
     if t == 'button':
         v = {'ghostdark': 'ghostDark'}.get(n.get('variant', 'primary'), n.get('variant', 'primary'))
-        on = 'null' if n.get('state') == 'disabled' or not n.get('action') else cb(n['action'])
-        return f"TButton({args(key=K(path) if on != 'null' else None, label=S_(n['label']), onPressed=on, variant='TButtonVariant.' + v if v != 'primary' else None, small='true' if n.get('small') else None, arrow='true' if n.get('arrow') else None)})"
+        on = 'null' if n.get('state') == 'disabled' or not n.get('action') else cb(n['action'], path + '.action')
+        return f"TButton({args(key=K(path) if on != 'null' else None, label=X('label'), onPressed=on, variant='TButtonVariant.' + v if v != 'primary' else None, small='true' if n.get('small') else None, arrow='true' if n.get('arrow') else None)})"
     if t == 'buttons': return f"TButtonRow(children: {lst([node(b, path=f'{path}.items[{i}]') for i, b in enumerate(n['items'])])})"
     if t == 'authbuttons':
         return f"TAuthButtons(children: {lst([node(b, path=f'{path}.items[{i}]') for i, b in enumerate(n['items'])])})"
     if t == 'authbtn':
-        return f"TAuthButton({args(key=K(path), provider=S_(n['provider']), label=S_(n['label']), onPressed=cb(n['action']), platforms=lst([S_(p) for p in n['platforms']]))})"
-    if t == 'link': return f"TLink({args(key=K(path), label=S_(n['label']), onTap=cb(n['action']), alignLeft='true' if n.get('align') == 'left' else None)})"
-    if t == 'quote': return f"TQuote({args(_=S_(n['text']), caption=S_(n['caption']) if n.get('caption') else None)})"
+        return f"TAuthButton({args(key=K(path), provider=S_(n['provider']), label=X('label'), onPressed=cb(n['action'], path + '.action'), platforms=lst([S_(p) for p in n['platforms']]))})"
+    if t == 'link': return f"TLink({args(key=K(path), label=X('label'), onTap=cb(n['action'], path + '.action'), alignLeft='true' if n.get('align') == 'left' else None)})"
+    if t == 'quote': return f"TQuote({args(_=X('text'), caption=X('caption') if n.get('caption') else None)})"
     if t == 'illus': return f"TIllustration({args(glyph=S_(n['glyph']), tone='TTone.' + n.get('tone', 'mint') if n.get('tone', 'mint') != 'mint' else None)})"
-    if t == 'emergency': return f"TEmergencyCard(text: {S_(n['text'])}, actions: {lst([node(b, path=f'{path}.actions[{i}]') for i, b in enumerate(n['actions'])])})"
+    if t == 'emergency': return f"TEmergencyCard(text: {X('text')}, actions: {lst([node(b, path=f'{path}.actions[{i}]') for i, b in enumerate(n['actions'])])})"
     if t == 'skeleton': return f"TSkeleton(lines: {n['lines']})"
     if t == 'spacer': return f"SizedBox(height: {float(n['h'])})"
-    if t == 'progtag': return f"TProgramTag({args(program=S_(n['program']), extra=S_(n['extra']) if n.get('extra') else None)})"
-    if t == 'calendar': return f"TCalendar({args(month=S_(n['month']), selected=str(n['selected']), window=lst([str(w) for w in n['window']]), today=str(n['today']) if n.get('today') else None)})"
-    if t == 'timer': return f"TTimer(value: {S_(n['value'])}, label: {S_(n['label'])})"
-    if t == 'nativeslot': return f"TNativeSlot({args(id=S_(n['id']), label=S_(n['label']), caption=S_(n['caption']) if n.get('caption') else None, platform=S_(n['platform']) if n.get('platform', 'ios') != 'ios' else None, height=str(float(n['height'])) if n.get('height', 120) != 120 else None)})"
+    if t == 'progtag': return f"TProgramTag({args(program=S_(n['program']), extra=X('extra') if n.get('extra') else None)})"
+    if t == 'calendar': return f"TCalendar({args(month=X('month'), selected=str(n['selected']), window=lst([str(w) for w in n['window']]), today=str(n['today']) if n.get('today') else None)})"
+    if t == 'timer': return f"TTimer(value: {X('value')}, label: {X('label')})"
+    if t == 'nativeslot': return f"TNativeSlot({args(id=S_(n['id']), label=X('label'), caption=X('caption') if n.get('caption') else None, platform=S_(n['platform']) if n.get('platform', 'ios') != 'ios' else None, height=str(float(n['height'])) if n.get('height', 120) != 120 else None)})"
     raise ValueError(t)
 
 def ind(code, level=3):
@@ -248,6 +316,7 @@ def screen_file(s, describe):
     cls = pascal(s['id']) + 'Screen'
     CUR['sid'] = s['id']
     CUR['program'] = s['program']
+    CUR['uses_s'] = False
     kids = ',\n        '.join(node(n, top=True, path=f'body[{i}]') for i, n in enumerate(s['body']))
     foot = ',\n        '.join(node(n, path=f'footer[{i}]') for i, n in enumerate(s['footer']))
     acts = '\n'.join(f'///   • {l} → {describe(a)}' for l, p, a in actions_of(s))
@@ -272,7 +341,7 @@ def screen_file(s, describe):
         hdr = ''
         if h:
             left = {'back': 'THeaderLeft.back', 'close': 'THeaderLeft.close', 'none': 'THeaderLeft.none', 'logo': 'THeaderLeft.logo'}[h.get('left', 'back')]
-            hdr = f"      header: THeader({args(title=dstr(h.get('title') or ''), left=left if left != 'THeaderLeft.back' else None, pill=dstr(h['pill']) if h.get('pill') else None, avatar=dstr(h['avatar']) if h.get('avatar') else None, onAvatar=cb(h['avatarAction']) if h.get('avatarAction') else None)}),\n"
+            hdr = f"      header: THeader({args(title=T(h.get('title') or '', 'title', 'header', 'header'), left=left if left != 'THeaderLeft.back' else None, pill=T(h['pill'], 'pill', 'header', 'header') if h.get('pill') else None, avatar=dstr(h['avatar']) if h.get('avatar') else None, onAvatar=cb(h['avatarAction'], 'header.avatar.action') if h.get('avatarAction') else None)}),\n"
         bg = ''
         if s.get('bg') == 'indigo': bg = '      background: TBackground.indigo,\n'
         elif s['dark']: bg = '      background: TBackground.dark,\n'
@@ -285,6 +354,7 @@ def screen_file(s, describe):
 {footer}    );"""
     routes_imp = "import '../../router/routes.dart';\n" if 'Routes.' in body else ''
     hook = "    TFlow.onboarding = true; // program setups now return here\n" if s['id'] == 'ob_setup' else ''
+    if CUR['uses_s']: hook += '    final s = TStrings.of(context);\n'
     return f"""// GENERATED from spec/screens/{s['id']}.json — edit the spec and re-run the generator,
 // or move this file out of lib/screens/ to own it by hand.
 import 'package:flutter/material.dart';
@@ -328,11 +398,14 @@ const Set<String> planSettingsScreens = <String>{{
 """
 
 def generate(out_dir, describe, static_dir):
+    global CAT
+    CAT = l10n.Catalog()
+    l10n.add_kit(CAT)
     lib = os.path.join(out_dir, 'lib')
     if os.path.exists(out_dir): shutil.rmtree(out_dir)
     shutil.copytree(static_dir, out_dir)
     # barrel
-    open(os.path.join(lib, 'ui', 'ui.dart'), 'w', newline='\n').write("export '../logic/rules.dart';\nexport 'components.dart';\nexport 'data.dart';\nexport 'nav.dart';\nexport 'tokens.dart';\n")
+    open(os.path.join(lib, 'ui', 'ui.dart'), 'w', newline='\n').write("export '../l10n/strings.g.dart';\nexport '../logic/rules.dart';\nexport 'components.dart';\nexport 'data.dart';\nexport 'nav.dart';\nexport 'strings.dart';\nexport 'tokens.dart';\n")
     # routes
     lines = ['// GENERATED — route names for every screen and state in spec/screens.json.', 'abstract final class Routes {']
     for sid, s in SCREENS.items():
@@ -391,7 +464,23 @@ abstract final class AppRouter {{
 }}
 """
     open(os.path.join(lib, 'router', 'app_router.dart'), 'w', newline='\n').write(router)
+    # localized strings: spec/l10n/en.arb (generated) and lib/l10n/strings.g.dart
+    l10n_dir = os.path.join(os.path.dirname(os.path.abspath(out_dir)), 'spec', 'l10n')
+    LOCALES[:] = l10n.write_outputs(CAT, l10n_dir, lib, untranslated_dart(CAT))
     return len(SCREENS)
+
+
+# (locale, status, missing keys) of the hand-maintained translations, set by generate().
+LOCALES = []
+
+
+def untranslated_dart(cat):
+    """Member-visible literals the generated screens show as they are
+    (brands, units, numbers, phone numbers, autonyms): the pseudo-locale test
+    accepts them un-pseudo'd."""
+    vals = sorted(cat.untranslated)
+    return ('\n/// Member-visible literals shown as they are in every language (brands,\n/// units, numbers, phone numbers, language names).\n'
+            'const Set<String> tUntranslatedLiterals = <String>{\n' + ''.join(f'  {dstr(v)},\n' for v in vals) + '};\n')
 
 
 JOURNEYS = [
@@ -522,7 +611,46 @@ def _self_test():
         for k in added: del SCREENS[k]
     _device_self_test()
     _bind_self_test()
+    _l10n_self_test()
     print('gen_dart self-test: ok')
+
+
+def _l10n_self_test():
+    """Member-visible text is emitted as a TStrings accessor keyed by screen,
+    path (or sid) and property; identifiers, brands and numbers stay
+    literals; option values stay the English source; the catalog and the
+    generated Dart carry the release and draft locales."""
+    global CAT
+    saved = CAT
+    CAT = l10n.Catalog()
+    CUR['sid'], CUR['program'] = 'selftest', None
+    try:
+        code = node(title('Hello there'), path='body[0]')
+        _expect(code == 'TTitle(s.selftestBodyN0Text)' and CAT.entries['selftest.body[0].text']['text'] == 'Hello there', code)
+        _expect(node(title('BreatheFree'), path='body[1]') == "TTitle('BreatheFree')" and 'BreatheFree' in CAT.untranslated, 'a brand was translated')
+        _expect(node(with_sid(title('Moved'), 'headline'), path='body[9]') == 'TTitle(s.selftestHeadlineText)', 'sid did not key the string')
+        b = node(button('Save', toast('Saved', then=toast('Again'))), path='footer[0]')
+        _expect('TNav.toast(context, s.selftestFooterN0ActionValue, then: () => TNav.toast(context, s.selftestFooterN0ActionThenValue))' in b, b)
+        sg = node(seg(['English', 'Español'], 'English', values=['en', 'es'], key='l'), path='body[2]')
+        _expect("options: ['en', 'es'], labels: ['English', 'Español'], selected: 'en'" in sg, sg)
+        ch = node(chips(['Morning', 'Evening'], selected=['Evening'], key='c', dots={'Evening': 'bf'}), path='body[3]')
+        _expect("options: ['Morning', 'Evening'], labels: [s.selftestBodyN3OptionsN0, s.selftestBodyN3OptionsN1], selected: ['Evening']" in ch and "dots: {'Evening':" in ch, ch)
+        r = node(radio(['Yes', 'No'], key='r'), path='body[4]')
+        _expect("TRadioItem(s.selftestBodyN4ItemsN0Label, value: 'Yes')" in r, r)
+        try:
+            CAT.add('selftest.body[0].text', 'Different', 'selftest', 'body[0]', 'text', '')
+        except ValueError:
+            pass
+        else:
+            raise AssertionError('two English texts for one key did not raise')
+        dart = l10n.strings_dart(CAT, [('es', 'draft', {'selftest.body[0].text': 'Hola'}, 3, [])])
+        _expect("const List<String> tReleaseLocales = <String>['en'];" in dart and "const List<String> tDraftLocales = <String>['es'];" in dart, 'locale lists')
+        _expect("return release ? null : _es;" in dart and "return release ? null : _pseudo;" in dart and "return _en;" in dart, 'drafts and pseudo are debug only')
+        _expect('String get selftestBodyN0Text => get(' in dart, 'typed accessor')
+        dart = l10n.strings_dart(CAT, [('es', 'release', {k: 'x' for k in CAT.entries}, 0, [])])
+        _expect("tReleaseLocales = <String>['en', 'es'];" in dart and "      return _es;" in dart, 'a release locale is always offered')
+    finally:
+        CAT = saved
 
 
 def _bind_self_test():
@@ -593,4 +721,5 @@ if __name__ == '__main__':
     _self_test()
     import dsl, validate
     dsl._self_test()
+    l10n._self_test()
     validate._self_test()

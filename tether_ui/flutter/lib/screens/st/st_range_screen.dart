@@ -19,19 +19,20 @@ class StRangeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Your range', pill: '2 of 2'),
+      header: THeader(title: s.stRangeHeaderTitle, pill: s.stRangeHeaderPill),
       children: [
         TSteps(n: 2, total: 2),
-        TTitle('Enter the range your clinician gave you.'),
-        TSegmented(fieldKey: 'st_range.value', options: ['mg/dL', 'mmol/L'], selected: 'mg/dL', bind: 'st.range.unit', bindClass: TBindClass.plan),
-        TFieldRow(children: [TField(fieldKey: 'st_range.before_meals_from', label: 'Before meals from', unit: 'mg/dL', placeholder: '80', kind: TFieldKind.number), TField(fieldKey: 'st_range.to', label: 'to', unit: 'mg/dL', placeholder: '130', kind: TFieldKind.number)]),
-        TField(fieldKey: 'st_range.2_h_after_meals_below', label: '2 h after meals below', unit: 'mg/dL', placeholder: '180', kind: TFieldKind.number),
-        TCard(eyebrow: 'Your low plan', children: [TField(fieldKey: 'st_range.low', label: 'Low below', unit: 'mg/dL', placeholder: '70', kind: TFieldKind.number), TField(fieldKey: 'st_range.my_low_steps', label: 'My low steps', placeholder: '15 g fast sugar, re-check in 15 min', kind: TFieldKind.multiline)]),
-        TLink(key: const ValueKey('a:body[6]'), label: 'Import from my health record', onTap: () => TNav.push(context, Routes.recordsAdd)),
+        TTitle(s.stRangeBodyN1Text),
+        TSegmented(fieldKey: 'st_range.value', options: ['mg/dL', 'mmol/L'], labels: [s.stRangeBodyN2OptionsN0, s.stRangeBodyN2OptionsN1], selected: 'mg/dL', bind: 'st.range.unit', bindClass: TBindClass.plan),
+        TFieldRow(children: [TField(fieldKey: 'st_range.before_meals_from', label: s.stRangeBodyN3FieldsN0Label, unit: 'mg/dL', placeholder: '80', kind: TFieldKind.number), TField(fieldKey: 'st_range.to', label: s.stRangeBodyN3FieldsN1Label, unit: 'mg/dL', placeholder: '130', kind: TFieldKind.number)]),
+        TField(fieldKey: 'st_range.2_h_after_meals_below', label: s.stRangeBodyN4Label, unit: 'mg/dL', placeholder: '180', kind: TFieldKind.number),
+        TCard(eyebrow: s.stRangeBodyN5Eyebrow, children: [TField(fieldKey: 'st_range.low', label: s.stRangeBodyN5ChildrenN0Label, unit: 'mg/dL', placeholder: '70', kind: TFieldKind.number), TField(fieldKey: 'st_range.my_low_steps', label: s.stRangeBodyN5ChildrenN1Label, placeholder: s.stRangeBodyN5ChildrenN1Placeholder, kind: TFieldKind.multiline)]),
+        TLink(key: const ValueKey('a:body[6]'), label: s.stRangeBodyN6Label, onTap: () => TNav.push(context, Routes.recordsAdd)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save range', onPressed: () => TNav.submit(context, 'PUT /v1/program-data/st/range', screenId: 'st_range', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.stHome))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.stRangeFooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/program-data/st/range', screenId: 'st_range', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.stHome))), arrow: true),
       ],
     );
   }

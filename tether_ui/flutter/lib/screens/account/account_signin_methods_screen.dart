@@ -19,12 +19,13 @@ class AccountSigninMethodsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Sign-in methods'),
+      header: THeader(title: s.accountSigninMethodsHeaderTitle),
       children: [
-        TBody('Use any connected method to sign in. Keep at least one.', tone: TTextTone.muted),
-        TListGroup(rows: [TListRow(label: 'Apple', sub: 'Connected · Hide My Email', lead: TLead.icon(''), pill: 'Primary'), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: 'Google', sub: 'Not connected', lead: TLead.icon('G'), onTap: () => TNav.branch(context, 'Sign in with Google result', <String, VoidCallback>{'Success': () => TNav.toast(context, 'Google connected'), 'Email already has a Tether account': () => TNav.push(context, Routes.authLink), 'Cancelled': () => TNav.toast(context, 'Cancelled'), 'Error': () => TNav.push(context, Routes.authSocialError)}, provider: 'google')), TListRow(key: const ValueKey('a:body[1].rows[2]'), label: 'Email & password', sub: 'alex@example.com · set a password', lead: TLead.icon('@'), onTap: () => TNav.push(context, Routes.authNewpass))]),
-        TCard(variant: TCardVariant.mint, text: 'To remove Apple, add another method first. Removing a method never deletes your data.'),
+        TBody(s.accountSigninMethodsBodyN0Text, tone: TTextTone.muted),
+        TListGroup(rows: [TListRow(label: 'Apple', sub: s.accountSigninMethodsBodyN1RowsN0Sub, lead: TLead.icon(''), pill: s.accountSigninMethodsBodyN1RowsN0Pill), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: 'Google', sub: s.accountSigninMethodsBodyN1RowsN1Sub, lead: TLead.icon('G'), onTap: () => TNav.branch(context, 'Sign in with Google result', <String, VoidCallback>{'Success': () => TNav.toast(context, s.accountSigninMethodsBodyN1RowsN1ActionCasesN0ActionValue), 'Email already has a Tether account': () => TNav.push(context, Routes.authLink), 'Cancelled': () => TNav.toast(context, s.accountSigninMethodsBodyN1RowsN1ActionCasesN2ActionValue), 'Error': () => TNav.push(context, Routes.authSocialError)}, provider: 'google')), TListRow(key: const ValueKey('a:body[1].rows[2]'), label: s.accountSigninMethodsBodyN1RowsN2Label, sub: s.accountSigninMethodsBodyN1RowsN2Sub, lead: TLead.icon('@'), onTap: () => TNav.push(context, Routes.authNewpass))]),
+        TCard(variant: TCardVariant.mint, text: s.accountSigninMethodsBodyN2Text),
       ],
     );
   }

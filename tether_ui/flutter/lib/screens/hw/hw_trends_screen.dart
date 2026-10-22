@@ -18,15 +18,16 @@ class HwTrendsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Trends', pill: 'Heartwise'),
+      header: THeader(title: s.hwTrendsHeaderTitle, pill: 'Heartwise'),
       children: [
-        TSegmented(fieldKey: 'hw_trends.value', options: ['7 days', '30 days', '90 days'], selected: '30 days'),
-        TLineChart(values: [142.0, 140.0, 138.0, 139.0, 135.0, 133.0, 136.0, 131.0, 129.0, 130.0, 128.0, 127.0], color: TColors.program('hw'), band: [110.0, 130.0], title: 'Systolic · morning avg', unit: 'target < 130', caption: 'Shaded: your clinician’s target'),
-        TStatGrid(stats: [TStat(label: '30-day avg', value: '132/82'), TStat(label: 'Readings', value: '48', sub: '4 days missed')]),
+        TSegmented(fieldKey: 'hw_trends.value', options: ['7 days', '30 days', '90 days'], labels: [s.hwTrendsBodyN0OptionsN0, s.hwTrendsBodyN0OptionsN1, s.hwTrendsBodyN0OptionsN2], selected: '30 days'),
+        TLineChart(values: [142.0, 140.0, 138.0, 139.0, 135.0, 133.0, 136.0, 131.0, 129.0, 130.0, 128.0, 127.0], color: TColors.program('hw'), band: [110.0, 130.0], title: s.hwTrendsBodyN1Title, unit: 'target < 130', caption: s.hwTrendsBodyN1Caption),
+        TStatGrid(stats: [TStat(label: s.hwTrendsBodyN2ItemsN0Label, value: '132/82'), TStat(label: s.hwTrendsBodyN2ItemsN1Label, value: '48', sub: s.hwTrendsBodyN2ItemsN1Sub)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Create visit summary', onPressed: () => TNav.push(context, Routes.hwSummary), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.hwTrendsFooterN0Label, onPressed: () => TNav.push(context, Routes.hwSummary), variant: TButtonVariant.secondary),
       ],
     );
   }

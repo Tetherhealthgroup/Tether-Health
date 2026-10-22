@@ -28,14 +28,15 @@ class NuHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
       header: THeader(title: 'Nourish', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TCard(eyebrow: 'Habit · week 2', title: 'Add a vegetable to dinner', text: '3 of 5 nights', cta: TButton(key: const ValueKey('a:body[0].cta[0]'), label: 'Done today', onPressed: () => TNav.toast(context, 'Nice. 4 of 5 nights.'), small: true), children: [TSteps(n: 3, total: 5)]),
-        TCard(variant: TCardVariant.mint, eyebrow: 'Tip', title: 'Frozen vegetables count, and are often cheaper.'),
-        TCard(key: const ValueKey('a:body[2]'), eyebrow: 'Quick recipe · 15 min', title: 'Bean and veggie tacos', text: 'Under \$2 a serving', onTap: () => TNav.push(context, Routes.learnLesson)),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'Busy week?', sub: 'Reset without guilt', onTap: () => TNav.push(context, Routes.nuReset)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: 'Week 4 milestone', sub: 'In 2 weeks', onTap: () => TNav.push(context, Routes.nuWeek4)), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: 'Change habit', onTap: () => TNav.push(context, Routes.nuHabit)), TListRow(key: const ValueKey('a:body[3].rows[3]'), label: 'Program settings', sub: 'Status, sharing, export, leave', onTap: () => TNav.push(context, Routes.programSettings, program: 'nu'))]),
+        TCard(eyebrow: s.nuHomeBodyN0Eyebrow, title: s.nuHomeBodyN0Title, text: s.nuHomeBodyN0Text, cta: TButton(key: const ValueKey('a:body[0].cta[0]'), label: s.nuHomeBodyN0CtaN0Label, onPressed: () => TNav.toast(context, s.nuHomeBodyN0CtaN0ActionValue), small: true), children: [TSteps(n: 3, total: 5)]),
+        TCard(variant: TCardVariant.mint, eyebrow: s.nuHomeBodyN1Eyebrow, title: s.nuHomeBodyN1Title),
+        TCard(key: const ValueKey('a:body[2]'), eyebrow: s.nuHomeBodyN2Eyebrow, title: s.nuHomeBodyN2Title, text: s.nuHomeBodyN2Text, onTap: () => TNav.push(context, Routes.learnLesson)),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: s.nuHomeBodyN3RowsN0Label, sub: s.nuHomeBodyN3RowsN0Sub, onTap: () => TNav.push(context, Routes.nuReset)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: s.nuHomeBodyN3RowsN1Label, sub: s.nuHomeBodyN3RowsN1Sub, onTap: () => TNav.push(context, Routes.nuWeek4)), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: s.nuHomeBodyN3RowsN2Label, onTap: () => TNav.push(context, Routes.nuHabit)), TListRow(key: const ValueKey('a:body[3].rows[3]'), label: s.nuHomeBodyN3RowsN3Label, sub: s.nuHomeBodyN3RowsN3Sub, onTap: () => TNav.push(context, Routes.programSettings, program: 'nu'))]),
       ],
     );
   }

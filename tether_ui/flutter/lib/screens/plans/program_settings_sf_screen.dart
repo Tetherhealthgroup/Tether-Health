@@ -23,17 +23,18 @@ class ProgramSettingsSfScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'ScrollFree settings'),
+      header: THeader(title: s.programSettingsSfHeaderTitle),
       children: [
-        TListGroup(flat: true, rows: [TListRow(label: 'ScrollFree', sub: 'Focus since Aug 14', lead: TLead.program('sf'))]),
-        TRadioList(fieldKey: 'program_settings_sf.status', items: [TRadioItem('Focus', sub: 'Daily steps and reminders'), TRadioItem('Learn only', sub: 'Keep lessons, stop tracking'), TRadioItem('Pause', sub: 'Stop reminders; keep everything')], selected: 0, label: 'Status', bind: 'enrolment.:program.status'),
-        TCard(eyebrow: 'Sharing', children: [TToggleRow(fieldKey: 'program_settings_sf.care_team_sharing', label: 'Care team sharing', sub: 'Off · ScrollFree isn’t shared', bind: 'enrolment.:program.care_team_sharing'), TToggleRow(fieldKey: 'program_settings_sf.de_identified_research', label: 'De-identified research', bind: 'enrolment.:program.de_identified_research')]),
-        TListGroup(title: 'Screen Time & Unplug', rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'Unplug', sub: 'On · 2 groups · 60 min limit', onTap: () => TNav.push(context, Routes.sfUnplugHome)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: 'Screen Time access', sub: 'Connected · totals only', onTap: () => TNav.push(context, Routes.sfScreentime)), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: 'Turn off Unplug or Screen Time', sub: 'Anytime', danger: true, onTap: () => TNav.sheet(context, Routes.sfUnplugOff))]),
-        TListGroup(title: 'Data', rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: 'Export ScrollFree data', sub: 'PDF + JSON', onTap: () => TNav.toast(context, 'Export is being prepared. We’ll notify you.')), TListRow(key: const ValueKey('a:body[4].rows[1]'), label: 'Leave ScrollFree', sub: 'Keep your data or delete it now', danger: true, onTap: () => TNav.sheet(context, Routes.accountLeave))]),
+        TListGroup(flat: true, rows: [TListRow(label: 'ScrollFree', sub: s.programSettingsSfBodyN0RowsN0Sub, lead: TLead.program('sf'))]),
+        TRadioList(fieldKey: 'program_settings_sf.status', items: [TRadioItem(s.programSettingsSfBodyN1ItemsN0Label, value: 'Focus', sub: s.programSettingsSfBodyN1ItemsN0Sub), TRadioItem(s.programSettingsSfBodyN1ItemsN1Label, value: 'Learn only', sub: s.programSettingsSfBodyN1ItemsN1Sub), TRadioItem(s.programSettingsSfBodyN1ItemsN2Label, value: 'Pause', sub: s.programSettingsSfBodyN1ItemsN2Sub)], selected: 0, label: s.programSettingsSfBodyN1Label, bind: 'enrolment.:program.status'),
+        TCard(eyebrow: s.programSettingsSfBodyN2Eyebrow, children: [TToggleRow(fieldKey: 'program_settings_sf.care_team_sharing', label: s.programSettingsSfBodyN2ChildrenN0Label, sub: s.programSettingsSfBodyN2ChildrenN0Sub, bind: 'enrolment.:program.care_team_sharing'), TToggleRow(fieldKey: 'program_settings_sf.de_identified_research', label: s.programSettingsSfBodyN2ChildrenN1Label, bind: 'enrolment.:program.de_identified_research')]),
+        TListGroup(title: s.programSettingsSfBodyN3Title, rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: 'Unplug', sub: s.programSettingsSfBodyN3RowsN0Sub, onTap: () => TNav.push(context, Routes.sfUnplugHome)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: s.programSettingsSfBodyN3RowsN1Label, sub: s.programSettingsSfBodyN3RowsN1Sub, onTap: () => TNav.push(context, Routes.sfScreentime)), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: s.programSettingsSfBodyN3RowsN2Label, sub: s.programSettingsSfBodyN3RowsN2Sub, danger: true, onTap: () => TNav.sheet(context, Routes.sfUnplugOff))]),
+        TListGroup(title: s.programSettingsSfBodyN4Title, rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: s.programSettingsSfBodyN4RowsN0Label, sub: s.programSettingsSfBodyN4RowsN0Sub, onTap: () => TNav.toast(context, s.programSettingsSfBodyN4RowsN0ActionValue)), TListRow(key: const ValueKey('a:body[4].rows[1]'), label: s.programSettingsSfBodyN4RowsN1Label, sub: s.programSettingsSfBodyN4RowsN1Sub, danger: true, onTap: () => TNav.sheet(context, Routes.accountLeave))]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Save changes', onPressed: () => TNav.submit(context, 'PATCH /v1/enrolments/:id', screenId: 'program_settings_sf', then: () => TNav.toast(context, 'Saved', then: () => TNav.back(context))), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.programSettingsSfFooterN0Label, onPressed: () => TNav.submit(context, 'PATCH /v1/enrolments/:id', screenId: 'program_settings_sf', then: () => TNav.toast(context, s.programSettingsSfFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),
       ],
     );
   }

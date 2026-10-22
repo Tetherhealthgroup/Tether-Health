@@ -18,17 +18,18 @@ class BfDateScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = TStrings.of(context);
     return TScreen(
-      header: THeader(title: 'Quit date', pill: 'Plan 2 of 3'),
+      header: THeader(title: s.bfDateHeaderTitle, pill: s.bfDateHeaderPill),
       children: [
-        TTitle('Choose a day to begin.'),
-        TBody('7–14 days away gives you time to prepare without losing momentum.', tone: TTextTone.muted),
-        TCalendar(month: 'August 2026', selected: 28, window: [28, 29, 30, 31], today: 21),
-        TCard(variant: TCardVariant.dark, eyebrow: 'Your quit date', title: 'Friday, August 28, 2026', text: '7 days to prepare · Pacific Time'),
-        TToggleRow(fieldKey: 'bf_date.quit_day_check_in_at_7_00_am', label: 'Quit-day check-in at 7:00 AM', sub: 'Lock screen: “You have a Tether reminder.”', value: true),
+        TTitle(s.bfDateBodyN0Text),
+        TBody(s.bfDateBodyN1Text, tone: TTextTone.muted),
+        TCalendar(month: s.bfDateBodyN2Month, selected: 28, window: [28, 29, 30, 31], today: 21),
+        TCard(variant: TCardVariant.dark, eyebrow: s.bfDateBodyN3Eyebrow, title: s.bfDateBodyN3Title, text: s.bfDateBodyN3Text),
+        TToggleRow(fieldKey: 'bf_date.quit_day_check_in_at_7_00_am', label: s.bfDateBodyN4Label, sub: s.bfDateBodyN4Sub, value: true),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: 'Confirm this date', onPressed: () => TNav.push(context, Routes.bfSupport), arrow: true),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.bfDateFooterN0Label, onPressed: () => TNav.push(context, Routes.bfSupport), arrow: true),
       ],
     );
   }
