@@ -9,6 +9,7 @@
 >   `flutter build ipa`.
 > - Owner decisions (D2, D3) and baseline facts cited below come from the
 >   maintainers' records, which are not in this repository.
+> - For a local debug smoke check on the iOS Simulator, see [IOS_SIMULATOR.md](IOS_SIMULATOR.md).
 
 Bundle ID: `com.TetherHealthLLC.tetherhealth` (see section 1). This is the
 iOS counterpart to
