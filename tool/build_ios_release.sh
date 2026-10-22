@@ -2,7 +2,8 @@
 # Builds an iOS App Store IPA. Never signs with repo secrets, uploads or
 # submits anything. iOS counterpart of tool/build_play_release.sh.
 #
-# Usage: sh tool/build_ios_release.sh --dart-define-from-file=<path> [--check-only]
+# Usage: sh tool/build_ios_release.sh --dart-define-from-file=<path>
+#          [--build-number N] [--check-only]
 #        sh tool/build_ios_release.sh --inspect-ipa=<path>
 #
 # --dart-define-from-file=<path>
@@ -16,8 +17,18 @@
 #                   anon JWT (allowlist, TH-904); the rules live in
 #                   tool/release_define_check.sh, shared with the Play script.
 #                   No value from the file is ever printed.
+# --build-number N  Build number (CFBundleVersion) of the IPA, passed to
+#                   flutter build ipa; overrides the pubspec.yaml number. Each
+#                   TestFlight upload needs a higher number than the last. N
+#                   must be a positive integer (at most 2100000000, the Play
+#                   limit, so one number can serve both stores) and not below
+#                   the pubspec.yaml build number; either failure stops the
+#                   script before any build step. After the build, the IPA's
+#                   CFBundleVersion must equal N. Without it, the pubspec.yaml
+#                   number is used as before.
 # --check-only      Run every pre-build check (arguments, CocoaPods, define
-#                   file), then exit 0 if all pass or non-zero if any fails.
+#                   file, and with --build-number the build number, which it
+#                   prints), then exit 0 if all pass or non-zero if any fails.
 #                   Never runs flutter and never builds.
 # --inspect-ipa=<path>
 #                   Print CFBundleShortVersionString and CFBundleVersion of an
@@ -35,7 +46,8 @@
 # this script adds no certificate, provisioning profile or export options.
 #
 # Errors never print an argument value or a path given as an argument (it may
-# hold a pasted secret or terminal control bytes); they name the option.
+# hold a pasted secret or terminal control bytes); they name the option. Only
+# values validated as numbers are echoed.
 #
 # Exit codes: 0 success, 1 a check or build step failed, 2 usage error.
 set -eu
@@ -47,6 +59,9 @@ env_file_given=0
 check_only=0
 inspect_ipa=""
 inspect_ipa_given=0
+build_number=""
+build_number_given=0
+max_build_number=2100000000 # the Play limit (tool/build_play_release.sh)
 
 fail() {
   echo "build_ios_release: $1" >&2
@@ -68,13 +83,47 @@ unknown_argument() {
   fail "unknown argument (not shown; see the usage at the top of tool/build_ios_release.sh)" 2
 }
 
-for arg in "$@"; do
+# Prints $1 without leading zeros (0099 is 99, not octal); empty if all zeros.
+strip_zeros() {
+  printf '%s\n' "${1#"${1%%[!0]*}"}"
+}
+
+# Succeeds if $1 is a positive integer no larger than $max_build_number. Checks
+# the digit length first so a huge value never reaches shell arithmetic.
+is_valid_build_number() {
+  case "$1" in
+    "" | *[!0-9]*) return 1 ;;
+  esac
+  ivb_value="$(strip_zeros "$1")"
+  [ -n "$ivb_value" ] && [ "${#ivb_value}" -le 10 ] && [ "$ivb_value" -le "$max_build_number" ]
+}
+
+# Records the --build-number value; exits 2 if repeated, not a positive
+# integer or out of range. The value is never echoed here.
+set_build_number() {
+  [ "$build_number_given" -eq 0 ] || fail "--build-number given more than once" 2
+  build_number_given=1
+  case "$1" in
+    "" | *[!0-9]*) fail "--build-number must be a positive integer (value not shown)" 2 ;;
+  esac
+  is_valid_build_number "$1" || fail "--build-number must be between 1 and $max_build_number" 2
+  build_number="$(strip_zeros "$1")"
+}
+
+while [ "$#" -gt 0 ]; do
+  arg="$1"
   case "$arg" in
     --dart-define-from-file=*)
       [ "$env_file_given" -eq 0 ] || fail "--dart-define-from-file given more than once" 2
       env_file="${arg#--dart-define-from-file=}"
       env_file_given=1
       ;;
+    --build-number)
+      [ "$#" -ge 2 ] || fail "--build-number requires a value" 2
+      shift
+      set_build_number "$1"
+      ;;
+    --build-number=*) set_build_number "${arg#--build-number=}" ;;
     --check-only) check_only=1 ;;
     --inspect-ipa=*)
       inspect_ipa="${arg#--inspect-ipa=}"
@@ -82,6 +131,7 @@ for arg in "$@"; do
       ;;
     *) unknown_argument "$arg" ;;
   esac
+  shift
 done
 
 # Resolve file arguments against the caller's working directory, then make them
@@ -93,7 +143,7 @@ done
 # echoed in a tool's error message.
 
 if [ "$inspect_ipa_given" -eq 1 ]; then
-  if [ "$env_file_given" -eq 1 ] || [ "$check_only" -eq 1 ]; then
+  if [ "$env_file_given" -eq 1 ] || [ "$check_only" -eq 1 ] || [ "$build_number_given" -eq 1 ]; then
     fail "--inspect-ipa cannot be combined with other arguments" 2
   fi
   [ -n "$inspect_ipa" ] || fail "--inspect-ipa requires a path" 2
@@ -110,13 +160,15 @@ cd "$(dirname "$0")/.."
 
 # Prints CFBundleShortVersionString and CFBundleVersion from the app's own
 # Info.plist (Payload/<app>.app/Info.plist, not a framework's) inside an IPA.
-# Fails (exit 1) if the IPA or either value cannot be read.
+# Fails (exit 1) if the IPA or either value cannot be read, or if $2 is given
+# and CFBundleVersion is not exactly $2.
 print_ipa_version() {
-  python3 -I - "$1" <<'PY' || exit 1
+  python3 -I - "$@" <<'PY' || exit 1
 import plistlib, re, sys, zipfile
 import xml.parsers.expat
 
 path = sys.argv[1]
+expected = sys.argv[2] if len(sys.argv) > 2 else None
 try:
     with zipfile.ZipFile(path) as ipa:
         names = [n for n in ipa.namelist() if re.fullmatch(r"Payload/[^/]+\.app/Info\.plist", n)]
@@ -130,7 +182,31 @@ if not all(isinstance(v, str) and v.strip() for v in values):
     sys.exit("build_ios_release: CFBundleShortVersionString or CFBundleVersion missing in the IPA")
 print(f"CFBundleShortVersionString: {values[0]}")
 print(f"CFBundleVersion: {values[1]}")
+if expected is not None and values[1] != expected:
+    sys.exit(f"build_ios_release: the IPA's CFBundleVersion is not {expected} (the --build-number given); do not upload it")
 PY
+}
+
+# With --build-number, prints the build number (CFBundleVersion) the IPA will
+# get and fails (exit 1) unless pubspec.yaml has a +<build number> and the
+# given number is not below it. Without it, does nothing (output unchanged).
+check_build_number() {
+  [ -n "$build_number" ] || return 0
+  pubspec_build=""
+  if [ -f pubspec.yaml ]; then
+    pubspec_version="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -n 1 | tr -d '[:space:]')"
+    case "$pubspec_version" in
+      *+*) pubspec_build="${pubspec_version##*+}" ;;
+    esac
+  fi
+  if ! is_valid_build_number "$pubspec_build"; then
+    fail "pubspec.yaml version has no +<build number> between 1 and $max_build_number; cannot check --build-number against it."
+  fi
+  pubspec_build="$(strip_zeros "$pubspec_build")"
+  echo "CFBundleVersion: $build_number (from --build-number; overrides pubspec.yaml); minimum $pubspec_build (the pubspec.yaml build number)"
+  if [ "$build_number" -lt "$pubspec_build" ]; then
+    fail "--build-number $build_number is below the minimum $pubspec_build (the pubspec.yaml build number)."
+  fi
 }
 
 # Succeeds if file $2 matches extended regex $1, returns 1 if not, and fails
@@ -167,6 +243,7 @@ check_no_cocoapods
 # shellcheck source=tool/release_define_check.sh
 . tool/release_define_check.sh
 check_release_define_file build_ios_release "$env_file" || exit 1
+check_build_number
 
 if [ "$check_only" -eq 1 ]; then
   echo "All pre-build checks passed (no build was run)."
@@ -182,8 +259,13 @@ echo "== flutter test"
 flutter test
 ipa_dir="build/ios/ipa"
 rm -f "$ipa_dir"/*.ipa # never report a stale IPA from an earlier build
-echo "== flutter build ipa --release"
-flutter build ipa --release "--dart-define-from-file=$env_file"
+if [ -n "$build_number" ]; then
+  echo "== flutter build ipa --release --build-number $build_number"
+  flutter build ipa --release "--dart-define-from-file=$env_file" --build-number "$build_number"
+else
+  echo "== flutter build ipa --release"
+  flutter build ipa --release "--dart-define-from-file=$env_file"
+fi
 # The build itself can add CocoaPods noise; refuse to report success over it.
 check_no_cocoapods
 
@@ -193,4 +275,8 @@ if [ "$#" -ne 1 ] || [ ! -f "$1" ]; then
 fi
 echo
 echo "IPA: $(pwd)/$1"
-print_ipa_version "$1"
+if [ -n "$build_number" ]; then
+  print_ipa_version "$1" "$build_number"
+else
+  print_ipa_version "$1"
+fi

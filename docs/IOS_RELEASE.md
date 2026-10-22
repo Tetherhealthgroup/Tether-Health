@@ -349,12 +349,25 @@ None of these were started by any agent. Do them in roughly this order.
   production project's redirect URLs. Current setting Unknown.
 - **O-10 Build and upload.** On a Mac signed in to the LLC team, with the same
   release define file as Android (`docs/PLAY_RELEASE.md` section 3). Use
-  `tool/build_ios_release.sh` (TH-904), not a raw `flutter build ipa`. First
-  confirm the release define check passes:
-  `sh tool/build_ios_release.sh --dart-define-from-file=$HOME/secure/tether-health/release.json --check-only`.
-  Do not build if it fails. Do not paste the key into chat, tickets or logs.
-  Then run the same command without `--check-only`; it builds the IPA and
-  prints its path and version fields. Then, in a fresh terminal at the
+  `tool/build_ios_release.sh` (TH-904), not a raw `flutter build ipa`. Pick
+  the build number `N` for this upload: each TestFlight upload needs a higher
+  build number (`CFBundleVersion`) than the last one uploaded (Assumed,
+  confirm against App Store Connect's rejection of a reused number). The
+  script cannot see App Store Connect, so keep a note of the last number
+  uploaded. `N` must be a positive integer and not below the build number
+  after `+` in `pubspec.yaml`; the script refuses anything else before any
+  build step. First confirm the pre-build checks pass:
+  `sh tool/build_ios_release.sh --dart-define-from-file=$HOME/secure/tether-health/release.json --build-number N --check-only`.
+  It prints the `CFBundleVersion` the IPA will get. Do not build if it fails.
+  Do not paste the key into chat, tickets or logs. Then run the same command
+  without `--check-only`:
+  `sh tool/build_ios_release.sh --dart-define-from-file=$HOME/secure/tether-health/release.json --build-number N`.
+  It passes `--build-number N` to `flutter build ipa`, builds the IPA, prints
+  its path and version fields, and fails if the IPA's `CFBundleVersion` is
+  not `N`. Without `--build-number` the IPA gets the `pubspec.yaml` number.
+  To re-check an existing IPA:
+  `sh tool/build_ios_release.sh --inspect-ipa=build/ios/ipa/<name>.ipa`.
+  Then, in a fresh terminal at the
   repository root, upload the `.ipa` with `tool/upload_ios_testflight.sh` and
   the App Store Connect API key from O-5 (created in App Store Connect under
   Users and Access, Integrations; its key ID and the issuer ID are shown
@@ -382,8 +395,8 @@ None of these were started by any agent. Do them in roughly this order.
   build or run the upload script against App Store Connect (NOT RUN)**;
   signing behaviour on the build Mac is Unknown here. Discard any `Pods` noise
   a build creates (section 1, SPM).
-  Each upload needs a new `CFBundleVersion` (build number) for the same
-  version (Assumed).
+  Each upload needs a higher `CFBundleVersion` (build number) than the last
+  one uploaded, so pass a new `--build-number N` every time (Assumed).
 - **O-11 TestFlight.** Internal testers first; they must be App Store Connect
   users on the LLC team (Assumed). Give builds uploaded with
   `tool/upload_ios_testflight.sh` to internal testers only: the script sends
