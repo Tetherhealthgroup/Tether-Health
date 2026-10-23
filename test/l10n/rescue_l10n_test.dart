@@ -3,6 +3,7 @@
 // same localized message the screen shows.
 import 'package:breathefree_patient/l10n/app_localizations.dart';
 import 'package:breathefree_patient/screens/active_craving_rescue_screen.dart';
+import 'package:breathefree_patient/screens/craving_rescue_start_screen.dart';
 import 'package:breathefree_patient/screens/guided_stress_reset_screen.dart';
 import 'package:breathefree_patient/screens/recommended_rescue_tool_screen.dart';
 import 'package:flutter/material.dart';
@@ -121,4 +122,75 @@ void main() {
       await tester.pumpWidget(const SizedBox());
     });
   }
+
+  testWidgets(
+      'each rescue screen asserts that its language matches the app locale',
+      (tester) async {
+    _recordSpeech();
+    final screens = <String, Widget>{
+      'start': CravingRescueStartScreen(
+        isSpanish: true,
+        intensity: 6,
+        selectedContexts: const {},
+        topReason: 'Protect my family',
+        supportName: 'Jordan',
+        onIntensityChanged: (_) {},
+        onContextsChanged: (_) {},
+        onClose: () {},
+        onContinue: () {},
+        onViewSupport: () {},
+      ),
+      'recommended': RecommendedRescueToolScreen(
+        isSpanish: true,
+        intensity: 6,
+        stressSelected: false,
+        supportName: 'Jordan',
+        selectedTool: RescueTool.slowBreathing,
+        onToolChanged: (_) {},
+        onBack: () {},
+        onStart: () {},
+        onViewSupport: () {},
+      ),
+      'active': ActiveCravingRescueScreen(
+        isSpanish: true,
+        tool: RescueTool.slowBreathing,
+        elapsedSeconds: 0,
+        isPaused: true,
+        voiceEnabled: false,
+        hapticsEnabled: false,
+        onElapsedChanged: (_) {},
+        onPausedChanged: (_) {},
+        onVoiceChanged: (_) {},
+        onHapticsChanged: (_) {},
+        onClose: () {},
+        onComplete: () {},
+        onSwitchTool: () {},
+        onOpenSupport: () {},
+      ),
+      'stress reset': GuidedStressResetScreen(
+        isSpanish: true,
+        step: StressResetStep.breathe,
+        stepElapsedSeconds: 0,
+        totalElapsedSeconds: 0,
+        isPaused: true,
+        voiceGuidanceEnabled: false,
+        reducedMotionEnabled: true,
+        onProgressChanged: _ignoreProgress,
+        onPausedChanged: (_) {},
+        onVoiceGuidanceChanged: (_) {},
+        onReducedMotionChanged: (_) {},
+        onClose: () {},
+        onComplete: () {},
+        onOpenRescue: () {},
+      ),
+    };
+    for (final entry in screens.entries) {
+      await tester.pumpWidget(_app(const Locale('en'), entry.value));
+      final error = tester.takeException();
+      expect(
+          '$error', contains('the screen language must match the app locale'),
+          reason: entry.key);
+      await tester.pumpWidget(const SizedBox());
+    }
+  });
 }
