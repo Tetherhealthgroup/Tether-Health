@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tether Health mark: master artwork for every app icon and store graphic.
+  tool/brand/generate_icons.py reads the #disc and #leaf elements below and
+  regenerates all outputs from them; edit this file, then rerun the script.
+
+  Source: the logo in the tether_ui design (header "logo" on the Welcome and
+  Today screens, tether_ui/generator/render_html.py):
+    .logo i         32x32 circle, background var(teal) #123C37
+    .logo i::after  width 14px, height 9px, border 2.6px solid var(lime)
+                    #D5EF75, border-radius 14px 0 14px 0, rotate(-30deg),
+                    centred in the circle
+  Colours are tokens teal and lime in tether_ui/design/tokens.json.
+  The ::after box is content-box (the kit's border-box reset matches elements,
+  not pseudo-elements), so the leaf's outer edge is 19.2 x 14.2 with 14px
+  top-left and bottom-right radii, and its inner edge is 14 x 9 with 9px
+  radii. The path is that outline with the rotation already applied, in the
+  same 32-unit space as the circle.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 32 32">
+  <title>Tether Health</title>
+  <circle id="disc" cx="16" cy="16" r="16" fill="#123C37"/>
+  <path id="leaf" fill="#D5EF75" fill-rule="evenodd" d="M11.136 26.776 A14 14 0 0 1 16.261 7.651 L20.764 5.051 L20.864 5.224 A14 14 0 0 1 15.739 24.349 L11.236 26.949 Z M12.188 23.397 A9 9 0 0 1 15.482 11.103 L19.812 8.603 A9 9 0 0 1 16.518 20.897 Z"/>
+</svg>
