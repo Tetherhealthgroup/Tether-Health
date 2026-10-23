@@ -11,6 +11,9 @@ analyzer:
     # tether_ui/ is its own package, analyzed by the tether_ui CI job with its
     # own analysis_options.yaml; generator/dart_static is not a package.
     - tether_ui/generator/**
+    # Design archive copies kept for reference; not part of the app.
+    - code-develop/**
+    - code-unplug/**
     - tether_ui/flutter/**
 include: package:flutter_lints/flutter.yaml
 
