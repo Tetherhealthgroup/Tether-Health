@@ -41,6 +41,7 @@ abstract final class AuthCodes {
   static const String signInFailed = 'sign_in_failed';
   static const String invalidCredentials = 'invalid_credentials';
   static const String accountDeleted = 'account_deleted';
+  static const String signInBlocked = 'sign_in_blocked';
   static const String resetFailed = 'reset_failed';
   static const String recoveryExpired = 'recovery_expired';
   static const String linkExpired = 'link_expired';
@@ -151,6 +152,8 @@ Future<TResult> _token(SignInFlow flow, Snapshot s) async {
   switch (await flow.completeSignIn(isNewAccount: isNew)) {
     case SignedIn.deletionReissued:
       return const TResult.failed(AuthCodes.accountDeleted);
+    case SignedIn.blocked:
+      return const TResult.failed(AuthCodes.signInBlocked);
     case SignedIn.failed:
       return const TResult.failed(AuthCodes.signInFailed);
     case SignedIn.done:
@@ -188,15 +191,10 @@ Future<TResult> _recover(SignInFlow flow, Snapshot s) async {
   if (email == null || !email.contains('@')) {
     return const TResult.failed(AuthCodes.invalidInput);
   }
-  if (!await flow.account.requestPasswordReset(email: email)) {
-    return const TResult.failed(AuthCodes.resetFailed);
-  }
-  try {
-    await flow.openResetLink?.call(email);
-  } catch (_) {
-    // The answer stays the same: the member can ask for another link.
-  }
-  return const TResult.ok();
+  // The new-password screen opens only from the emailed link.
+  return await flow.account.requestPasswordReset(email: email)
+      ? const TResult.ok()
+      : const TResult.failed(AuthCodes.resetFailed);
 }
 
 /// `auth_newpass`, opened from the reset link.
@@ -220,6 +218,7 @@ Future<TResult> _updatePassword(SignInFlow flow, Snapshot s) async {
   }
   return switch (await flow.completeSignIn(isNewAccount: false)) {
     SignedIn.deletionReissued => const TResult.failed(AuthCodes.accountDeleted),
+    SignedIn.blocked => const TResult.failed(AuthCodes.signInBlocked),
     _ => const TResult.ok(),
   };
 }
@@ -253,6 +252,7 @@ Future<TResult> _link(SignInFlow flow, Snapshot s) async {
   }
   return switch (await flow.completeSignIn(isNewAccount: false)) {
     SignedIn.deletionReissued => const TResult.failed(AuthCodes.accountDeleted),
+    SignedIn.blocked => const TResult.failed(AuthCodes.signInBlocked),
     SignedIn.failed => const TResult.failed(AuthCodes.signInFailed),
     SignedIn.done => const TResult.ok(),
   };
