@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import '../config/app_config.dart';
 import 'backend.dart';
 import 'http/http_backend.dart';
-import 'stub_backend.dart';
+import 'sandbox/sandbox_backend.dart';
 
 /// The backend for [config]'s mode.
 ///
@@ -17,7 +17,7 @@ Backend createBackend(AppConfig config, {bool debug = kDebugMode}) {
     throw ArgumentError(config.backendModeProblem(debug: debug));
   }
   return switch (mode) {
-    BackendMode.sandbox => StubBackend(BackendMode.sandbox),
+    BackendMode.sandbox => SandboxBackend(),
     BackendMode.http => HttpBackend(config),
   };
 }
