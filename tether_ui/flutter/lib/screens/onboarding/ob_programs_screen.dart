@@ -30,7 +30,7 @@ class ObProgramsScreen extends StatelessWidget {
         TLink(key: const ValueKey('a:body[4]'), label: s.obProgramsBodyN4Label, onTap: () => TNav.push(context, Routes.catalog)),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: s.obProgramsFooterN0Label, onPressed: () => TNav.push(context, Routes.obFocus), arrow: true),
+        TGatedButton(key: const ValueKey('a:footer[0]'), fieldKey: 'ob_programs.programs', countLabel: (n) => s.obProgramsFooterN0CountLabel(n: n), emptyLabel: s.obProgramsFooterN0EmptyLabel, onPressed: () => TNav.push(context, Routes.obFocus), arrow: true),
       ],
     );
   }

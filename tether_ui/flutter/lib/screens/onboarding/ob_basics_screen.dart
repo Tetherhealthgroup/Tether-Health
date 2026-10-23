@@ -26,7 +26,7 @@ class ObBasicsScreen extends StatelessWidget {
         TEyebrow(s.obBasicsBodyN1Text),
         TTitle(s.obBasicsBodyN2Text),
         TField(fieldKey: 'ob_basics.what_should_we_call_you', label: s.obBasicsBodyN3Label, placeholder: s.obBasicsBodyN3Placeholder),
-        TField(fieldKey: 'ob_basics.age_range', label: s.obBasicsBodyN4Label, placeholder: '35–44', kind: TFieldKind.select),
+        TField(fieldKey: 'ob_basics.age_range', label: s.obBasicsBodyN4Label, options: ['18_24', '25_34', '35_44', '45_54', '55_64', '65_74', '75_plus'], optionLabels: ['18–24', '25–34', '35–44', '45–54', '55–64', '65–74', '75+'], placeholder: '35–44', kind: TFieldKind.select),
         TSegmented(fieldKey: 'ob_basics.sleep_on_a_typical_night', options: ['< 5 h', '5–6 h', '7–8 h', '9+ h'], labels: [s.obBasicsBodyN5OptionsN0, s.obBasicsBodyN5OptionsN1, s.obBasicsBodyN5OptionsN2, s.obBasicsBodyN5OptionsN3], selected: '5–6 h', label: s.obBasicsBodyN5Label),
         TSegmented(fieldKey: 'ob_basics.usual_stress', options: ['Low', 'Some', 'High'], labels: [s.obBasicsBodyN6OptionsN0, s.obBasicsBodyN6OptionsN1, s.obBasicsBodyN6OptionsN2], selected: 'High', label: s.obBasicsBodyN6Label),
         TCard(variant: TCardVariant.mint, title: s.obBasicsBodyN7Title, text: s.obBasicsBodyN7Text),

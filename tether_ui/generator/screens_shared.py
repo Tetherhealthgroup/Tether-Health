@@ -47,7 +47,7 @@ def shared():
         # they become enrolments and consents.
         tiles([tl(PROGRAMS[p][0], PROGRAMS[p][1], program=p) for p in ['bf', 'sf', 'ca', 'hw', 'st', 'ea', 'nu', 'sd']], key='programs'),
         link('See all 11 programs', go('catalog')),
-    ], footer=[button('Continue with 2 programs', go('ob_focus'))], desc='Multi-select. Continue is disabled with 0 selected ("Choose at least one program").')
+    ], footer=[button('Continue with 2 programs', go('ob_focus'), needs='programs', count_label='{n, plural, one{Continue with # program} other{Continue with # programs}}', empty_label='Choose at least one program')], desc='Multi-select. Continue is disabled with 0 selected ("Choose at least one program").')
 
     S('ob_focus', 'Focus slots', '/onboarding/focus', 'onboarding', phase='welcome', hdr=H('Your focus', pill='2 of 5'), body=[
         steps(2, 5), title('Two at a time works best.'), text('Focus programs get daily steps and reminders. Learn only gives you lessons, with no tracking.', 'muted'),
@@ -74,7 +74,9 @@ def shared():
 
     S('ob_basics', 'Shared basics', '/onboarding/basics', 'onboarding', phase='onboarding', hdr=H('About you', pill='4 of 5'), body=[
         steps(4, 5), eyebrow('Shared · asked once for all programs'), title('A few basics'),
-        field('What should we call you?', 'Alex', key='what_should_we_call_you'), field('Age range', '35–44', kind='select', key='age_range'),
+        field('What should we call you?', 'Alex', key='what_should_we_call_you'), field('Age range', '35–44', kind='select', key='age_range',
+              options=['18–24', '25–34', '35–44', '45–54', '55–64', '65–74', '75+'],
+              values=['18_24', '25_34', '35_44', '45_54', '55_64', '65_74', '75_plus']),
         seg(['< 5 h', '5–6 h', '7–8 h', '9+ h'], '5–6 h', label='Sleep on a typical night', key='sleep_on_a_typical_night'),
         seg(['Low', 'Some', 'High'], 'High', label='Usual stress', key='usual_stress'),
         card(v='mint', text='These answers are shared by your programs, so you’re never asked twice. Age range sets which lessons and screenings apply.', title='Why we ask'),

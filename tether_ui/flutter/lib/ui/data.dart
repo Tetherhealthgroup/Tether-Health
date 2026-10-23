@@ -36,6 +36,12 @@ import 'tokens.dart';
 abstract class TData {
   static TData instance = TDefaults.data();
 
+  /// Whether the kit shows the design as it is: [PreviewData] is installed,
+  /// as in debug builds and tests. Controls that would otherwise start from
+  /// the member's own state (a real calendar, say) then keep the design's
+  /// look. The app's own [TData] makes this false.
+  static bool get isPreview => instance is PreviewData;
+
   /// Marker value meaning "preview: show the spec's example value", with no
   /// Example tag. Only [PreviewData] returns it; a real TData never does.
   static const Object example = _Example();

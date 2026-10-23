@@ -234,7 +234,10 @@
           "to": "ob_focus"
         },
         "variant": "primary",
-        "arrow": true
+        "arrow": true,
+        "needs": "programs",
+        "countLabel": "{n, plural, one{Continue with # program} other{Continue with # programs}}",
+        "emptyLabel": "Choose at least one program"
       }
     ],
     "notes": [],
@@ -706,7 +709,25 @@
         "label": "Age range",
         "placeholder": "35–44",
         "kind": "select",
-        "key": "age_range"
+        "key": "age_range",
+        "options": [
+          "18–24",
+          "25–34",
+          "35–44",
+          "45–54",
+          "55–64",
+          "65–74",
+          "75+"
+        ],
+        "values": [
+          "18_24",
+          "25_34",
+          "35_44",
+          "45_54",
+          "55_64",
+          "65_74",
+          "75_plus"
+        ]
       },
       {
         "t": "segmented",
@@ -10238,14 +10259,17 @@
           30,
           31
         ],
-        "today": 21
+        "today": 21,
+        "key": "quit_date",
+        "ym": "2026-08"
       },
       {
         "t": "card",
         "variant": "dark",
         "eyebrow": "Your quit date",
         "title": "Friday, August 28, 2026",
-        "text": "7 days to prepare · Pacific Time"
+        "text": "7 days to prepare · Pacific Time",
+        "follows": "quit_date"
       },
       {
         "t": "toggle",
@@ -10264,7 +10288,8 @@
           "to": "bf_support"
         },
         "variant": "primary",
-        "arrow": true
+        "arrow": true,
+        "needs": "quit_date"
       }
     ],
     "notes": [],

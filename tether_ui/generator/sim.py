@@ -76,6 +76,15 @@ def placeholder_cases():
             out.append((sid, p, l, f, must, fields))
     return out
 
+def gate_seed(screen, node):
+    """The label of the selection tile to tap before tapping `node`, a button
+    that needs a chosen tile (its `needs` input); None when it needs nothing
+    or its input fills itself in the preview."""
+    if not node or not node.get('needs'): return None
+    for n, _ in walk(screen['body'], 'body'):
+        if n.get('key') == node['needs'] and n['t'] == 'tiles': return n['items'][0]['label']
+    return None
+
 def expectations():
     out = []
     for sid, s in SCREENS.items():
@@ -101,6 +110,8 @@ def expectations():
                         pass
                     row = {'screen': sid, 'element': label, 'path': path, 'force': f, 'onboarding': onb, 'platform': platform, 'expect': eff}
                     if q is not None: row['queue'] = q
+                    seed = gate_seed(s, node)
+                    if seed: row['seed'] = seed
                     out.append(row)
     return out
 
@@ -110,7 +121,7 @@ def dart_tests(out_dir):
     for x in exps:
         e = x['expect']
         exp = {'route': f"('route', {dstr(e.get('route'))})", 'pop': "('pop', null)", 'toast': f"('toast', {dstr(e.get('text'))})", 'platform': f"('platform', {dstr(e.get('value'))})"}[e['kind']]
-        rows.append(f"  ({dstr(x['screen'])}, Routes.{camel(x['screen'])}, {dstr(x['path'])}, {dstr(x['element'])}, {dstr(x['force'])}, {'true' if x['onboarding'] else 'false'}, {'true' if x['platform'] == 'ios' else 'false'}, {exp}, {dstr(x.get('queue'))}),")
+        rows.append(f"  ({dstr(x['screen'])}, Routes.{camel(x['screen'])}, {dstr(x['path'])}, {dstr(x['element'])}, {dstr(x['force'])}, {'true' if x['onboarding'] else 'false'}, {'true' if x['platform'] == 'ios' else 'false'}, {exp}, {dstr(x.get('queue'))}, {dstr(x.get('seed'))}),")
     sweep = f"""// GENERATED — button-flow sweep: taps every interactive element on every
 // screen (every branch outcome, with and without the onboarding context)
 // and checks it lands exactly where spec/actions.json says. A branch inside a
@@ -138,7 +149,7 @@ class _Obs extends NavigatorObserver {{
   String? get top => stack.isEmpty ? null : stack.last;
 }}
 
-const _cases = <(String, String, String, String, String?, bool, bool, (String, String?), String?)>[
+const _cases = <(String, String, String, String, String?, bool, bool, (String, String?), String?, String?)>[
 {chr(10).join(rows)}
 ];
 
@@ -168,6 +179,12 @@ void main() {{
         ));
         await tester.pump(const Duration(milliseconds: 400));
         TFlow.onboarding = c.$6; // screens such as the setup hub set this while building
+        if (c.$10 != null) {{
+          // The element needs a choice first (a program tile).
+          await tester.ensureVisible(find.text(c.$10!));
+          await tester.tap(find.text(c.$10!));
+          await tester.pump(const Duration(milliseconds: 100));
+        }}
         final finder = find.byKey(ValueKey('a:${{c.$3}}'));
         expect(finder, findsOneWidget, reason: 'element ${{c.$3}} on ${{c.$1}}');
         await tester.ensureVisible(finder);
