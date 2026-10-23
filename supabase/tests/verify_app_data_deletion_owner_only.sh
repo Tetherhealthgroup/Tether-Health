@@ -138,7 +138,11 @@ returns jsonb language sql stable set search_path = '' as $f$
     'lesson_progress', (select count(*) from public.lesson_progress where user_id = p_user),
     'programme_reminders', (select count(*) from public.programme_reminders where user_id = p_user),
     'notification_preferences', (select count(*) from public.notification_preferences where user_id = p_user),
-    'wellbeing_baseline', (select count(*) from public.wellbeing_baseline where user_id = p_user))
+    'wellbeing_baseline', (select count(*) from public.wellbeing_baseline where user_id = p_user),
+    'record_routes', (select count(*) from public.record_routes where user_id = p_user),
+    'record_items', (select count(*) from public.record_items where user_id = p_user),
+    'record_imports', (select count(*) from public.record_imports where user_id = p_user),
+    'record_sources', (select count(*) from public.record_sources where user_id = p_user))
 $f$;
 
 -- Member rows plus the identity and whether account deletion was started.
@@ -236,7 +240,8 @@ select th988f_test.ok(
     "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
     "caregivers": 0, "care_connections": 0, "supporters": 0,
     "observations": 0, "programme_entries": 0, "rescue_events": 0, "lesson_progress": 0,
-    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0}'::jsonb
+    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0,
+    "record_routes": 0, "record_items": 0, "record_imports": 0, "record_sources": 0}'::jsonb
   and th988f_test.counts('00000000-0000-4000-8000-00000988f0b1') =
     current_setting('th988f.a_seeded')::jsonb || '{"profiles": 0, "quit_plans": 0}'::jsonb,
   'setup: synthetic A holds a row in every member table except the care tables (verify_care_migration.sh covers them); B the same without a profile or quit plan');
@@ -291,6 +296,7 @@ select th988f_test.ok(
     "caregivers": 0, "care_connections": 0, "supporters": 0,
     "observations": 0, "programme_entries": 0, "rescue_events": 0, "lesson_progress": 0,
     "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0,
+    "record_routes": 0, "record_items": 0, "record_imports": 0, "record_sources": 0,
     "users": 0, "deletion_started": null}'::jsonb,
   'A: no member row and no identity of A is left');
 select th988f_test.ok(
