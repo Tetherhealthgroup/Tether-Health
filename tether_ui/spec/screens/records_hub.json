@@ -32,7 +32,8 @@
           "sub": "Epic MyChart · synced today 7:02 AM",
           "action": {
             "type": "push",
-            "to": "records_source"
+            "to": "records_source",
+            "arg": "source_1"
           },
           "lead": {
             "icon": "E"
@@ -43,7 +44,8 @@
           "sub": "Blue Button 2.0 · synced Oct 12",
           "action": {
             "type": "push",
-            "to": "records_source"
+            "to": "records_source",
+            "arg": "source_2"
           },
           "lead": {
             "icon": "M"
@@ -165,7 +167,8 @@
       "path": "body[1].rows[0]",
       "action": {
         "type": "push",
-        "to": "records_source"
+        "to": "records_source",
+        "arg": "source_1"
       },
       "summary": "push → records_source"
     },
@@ -174,7 +177,8 @@
       "path": "body[1].rows[1]",
       "action": {
         "type": "push",
-        "to": "records_source"
+        "to": "records_source",
+        "arg": "source_2"
       },
       "summary": "push → records_source"
     },

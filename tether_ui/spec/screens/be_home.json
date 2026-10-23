@@ -48,7 +48,8 @@
           "sub": "Guide with photos",
           "action": {
             "type": "push",
-            "to": "learn_lesson"
+            "to": "learn_lesson",
+            "arg": "be.skin-self-check"
           }
         },
         {
@@ -135,7 +136,8 @@
       "path": "body[1].rows[1]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "be.skin-self-check"
       },
       "summary": "push → learn_lesson"
     },

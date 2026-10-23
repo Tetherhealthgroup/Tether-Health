@@ -61,7 +61,8 @@
       "text": "Roll to your side, crawl to a sturdy chair, kneel, then rise slowly.",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "sd.get-up-safely"
       }
     }
   ],
@@ -122,7 +123,8 @@
       "path": "body[3]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "sd.get-up-safely"
       },
       "summary": "push → learn_lesson"
     },

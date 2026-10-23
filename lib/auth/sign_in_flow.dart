@@ -51,8 +51,13 @@ enum SignedIn {
   done,
 
   /// The account had a deletion the server never confirmed: it was sent
-  /// again and the member does not continue into the app.
+  /// again and confirmed; the account is gone.
   deletionReissued,
+
+  /// The account has a deletion the server never confirmed and sending it
+  /// again failed (for example offline): the member is signed out and does
+  /// not continue; the deletion is sent again at the next sign-in.
+  blocked,
 
   /// No session after all.
   failed,
@@ -126,11 +131,6 @@ class SignInFlow {
   /// (Apple or Google), else null. Set by native sign-in.
   IdTokenProvider? Function()? socialProvider;
 
-  /// Sandbox only: opens the password-reset link the sandbox would have
-  /// emailed to an address it knows (there is no email to open). Null for
-  /// the real services, where the member opens the email.
-  Future<void> Function(String email)? openResetLink;
-
   /// The identity waiting for `auth_link`, set by native sign-in.
   PendingLink? pendingLink;
 
@@ -185,14 +185,20 @@ class SignInFlow {
     if (pending) {
       await postAuthHooks
           .run(PostAuthEvent(accountId: id, isNewAccount: false));
+      var confirmed = false;
+      try {
+        confirmed = !await _deletionPending(id);
+      } catch (_) {
+        confirmed = false;
+      }
       _defer(() {
-        if (auth.currentIdentity == null) {
+        if (confirmed && auth.currentIdentity == null) {
           account.markAccountDeleted(id);
         } else {
           unawaited(account.signOut());
         }
       });
-      return SignedIn.deletionReissued;
+      return confirmed ? SignedIn.deletionReissued : SignedIn.blocked;
     }
     // A refused step keeps its data on the phone; it is sent again on the
     // next start. The member continues.

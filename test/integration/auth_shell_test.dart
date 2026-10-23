@@ -88,6 +88,17 @@ void main() {
         () => TApi.instance.submit(recoverEndpoint, screenId: 'auth_forgot'));
     await tester.pumpAndSettle();
     expect(result, const TResult.ok());
+    expect(runtime.account.passwordRecoveryPending, isFalse,
+        reason: 'only the emailed link opens the new-password screen');
+    expect(stack(runtime).last, isNot(Routes.authNewpass));
+    // Stands in for opening the email.
+    await tester.runAsync(() async {
+      final token =
+          await backend.auth.recoveryTokenFor('member-03@sandbox.invalid');
+      await backend.auth.completeRecovery(token!);
+      await Future<void>.delayed(Duration.zero);
+    });
+    await tester.pumpAndSettle();
     expect(runtime.account.passwordRecoveryPending, isTrue);
     expect(stack(runtime).last, Routes.authNewpass);
   });

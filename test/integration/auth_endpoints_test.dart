@@ -28,6 +28,7 @@ void main() {
   late List<void Function()> deferred;
   late bool guestData;
   late bool deletionPending;
+  late bool deletionConfirms;
   late SessionProbe probe;
   late List<String> opened;
   late List<String> entries;
@@ -40,16 +41,26 @@ void main() {
     deferred = [];
     guestData = false;
     deletionPending = false;
+    deletionConfirms = true;
     probe = SessionProbe.alive;
     opened = [];
     entries = [];
     expired = 0;
-    final hooks = PostAuthHooks()..register((event) async => events.add(event));
+    final hooks = PostAuthHooks()
+      ..register((event) async {
+        events.add(event);
+        // As the real re-issue: confirmed, the account's session ends.
+        if (deletionPending && deletionConfirms) {
+          deletionPending = false;
+          await h.backend.auth.signOut();
+        }
+      });
     flow = SignInFlow(
       account: account,
       auth: h.backend.auth,
       postAuthHooks: hooks,
       guestDataPresent: () async => guestData,
+      // The re-issue hook below clears it when the server confirms.
       deletionPending: (_) async => deletionPending,
       probeSession: () async => probe,
       defer: deferred.add,
@@ -58,10 +69,6 @@ void main() {
       ..showEntry = entries.add
       ..onSessionExpired = () async {
         expired++;
-      }
-      ..openResetLink = (email) async {
-        final token = await h.backend.auth.recoveryTokenFor(email);
-        if (token != null) await h.backend.auth.completeRecovery(token);
       };
     AuthEndpoints.flow = flow;
     api = AppApi(handlers: withSessionChecks(authHandlers()));
@@ -193,6 +200,19 @@ void main() {
           reason: 'the steps ran once, as a sign-in, to re-issue it');
       await settle();
       expect(account.isSignedIn, isFalse);
+      expect(account.pendingAccountDeletion, isNotNull);
+    });
+
+    test(
+        'when sending the deletion again fails, the member is signed out '
+        'with the generic error, not told the account is deleted', () async {
+      deletionPending = true;
+      deletionConfirms = false;
+      expect(await signIn(_email, _password),
+          const TResult.failed(AuthCodes.signInBlocked));
+      await settle();
+      expect(account.isSignedIn, isFalse);
+      expect(account.pendingAccountDeletion, isNull);
     });
   });
 
@@ -240,6 +260,13 @@ void main() {
         () async {
       expect(await submit(recoverEndpoint, 'auth_forgot', {'email': _email}),
           const TResult.ok());
+      await Future<void>.delayed(Duration.zero);
+      expect(account.passwordRecoveryPending, isFalse,
+          reason: 'nothing opens until the emailed link is used');
+      expect(h.backend.auth.currentIdentity, isNull);
+      // Stands in for opening the email.
+      final token = await h.backend.auth.recoveryTokenFor(_email);
+      expect(await h.backend.auth.completeRecovery(token!), isTrue);
       await Future<void>.delayed(Duration.zero);
       expect(account.passwordRecoveryPending, isTrue);
       expect(

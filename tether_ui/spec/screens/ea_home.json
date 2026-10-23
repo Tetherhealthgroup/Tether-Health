@@ -88,7 +88,8 @@
       "text": "5 min",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "ea.sleep-and-mood"
       }
     },
     {
@@ -193,7 +194,8 @@
       "path": "body[2]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "ea.sleep-and-mood"
       },
       "summary": "push → learn_lesson"
     },

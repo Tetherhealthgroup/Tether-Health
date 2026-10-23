@@ -27,8 +27,16 @@ def act(a, ap=None):
         fn = {'push': 'push', 'replace': 'replace', 'tab': 'tab', 'sheet': 'sheet', 'reset': 'reset'}[t]
         # A screen opened per programme (route with :program) gets the
         # programme of the element that opens it (validate.check_program_context).
-        if t == 'push' and ':program' in SCREENS.get(a['to'], {}).get('route', '') and CUR.get('program'):
+        per = t == 'push' and ':program' in SCREENS.get(a['to'], {}).get('route', '') and CUR.get('program')
+        # A screen opened for one item (a lesson, a records source) gets the
+        # item's identifier, which the app reads with TNav.argumentOf.
+        if t == 'push' and a.get('arg'):
+            return f"TNav.push(context, {target}, {'program: ' + dstr(CUR['program']) + ', ' if per else ''}argument: {dstr(a['arg'])})"
+        if per:
             return f"TNav.push(context, {target}, program: {dstr(CUR['program'])})"
+        # A sheet over an item screen acts on that screen's item.
+        if t == 'sheet' and a.get('argInherit'):
+            return f'TNav.sheet(context, {target}, argument: TNav.argumentOf(context))'
         return f'TNav.{fn}(context, {target})'
     if t == 'back': return 'TNav.back(context)'
     if t == 'close': return 'TNav.close(context)'

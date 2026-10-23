@@ -8,8 +8,8 @@ def records():
 
     S('records_hub', 'Health records', '/records', 'records', phase='resources', hdr=H('Health records'), body=[
         banner('info', 'Read-only. Tether never writes to your health record, and each program only gets the data it needs.'),
-        rows([row('Patel Family Medicine', 'Epic MyChart · synced today 7:02 AM', lead=L_icon('E'), action=go('records_source')),
-              row('Medicare', 'Blue Button 2.0 · synced Oct 12', lead=L_icon('M'), action=go('records_source'))], title='Connected sources'),
+        rows([row('Patel Family Medicine', 'Epic MyChart · synced today 7:02 AM', lead=L_icon('E'), action=go('records_source', arg='source_1')),
+              row('Medicare', 'Blue Button 2.0 · synced Oct 12', lead=L_icon('M'), action=go('records_source', arg='source_2'))], title='Connected sources'),
         rows([row('Blood pressure', '12 readings · Heartwise', action=go('records_item')), row('Lab results', 'A1C, lipids, eGFR · Steady, Heartwise, Renew', action=go('records_item')),
               row('Immunizations', '6 · Checkup', action=go('records_item')), row('Smoking status', 'Every day smoker (Aug 2026) · BreatheFree', action=go('records_item')),
               row('Medications & conditions', 'Shown for reference only', action=go('records_item'))], title='Imported data'),
@@ -121,7 +121,7 @@ def records():
         # Read-only: the categories this source reads. Not the consent
         # checklist, which starts unticked (P-78) and would under-report.
         rows([row(label, sub) for label, sub in READ_CATEGORIES], title='What we read'),
-    ], footer=[button('Disconnect', sheet('records_disconnect'), v='danger')])
+    ], footer=[button('Disconnect', sheet('records_disconnect', inherit_arg=True), v='danger')])
     S('records_disconnect', 'Disconnect source', '/records/source/disconnect', 'records', phase='resources', kind='sheet', over='Patel Family Medicine', body=[
         title('Disconnect Patel Family Medicine?'), text('Tether stops reading new records and revokes its access token.', 'muted'),
         radio([ri('Keep imported data', 'Marked “from Patel Family Medicine”'), ri('Delete data imported from this source', '21 items removed from your programs')], 0, key='keep'),

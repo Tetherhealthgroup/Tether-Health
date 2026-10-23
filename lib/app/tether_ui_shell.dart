@@ -19,7 +19,6 @@ import '../auth/backend_account.dart';
 import '../auth/sign_in_flow.dart';
 import '../backend/backend.dart';
 import '../backend/backend_factory.dart';
-import '../backend/sandbox/sandbox_backend.dart';
 import '../config/app_config.dart';
 import '../config/misconfigured_build_app.dart';
 import '../data/app_services.dart';
@@ -314,7 +313,7 @@ Future<TetherUiRuntime> runTetherUi({
     guestDataPresent: () async => await guestStore.load() != null,
     deletionPending: (id) => pendingServerDeletion(AppServices.of(built), id),
     probeSession: () => _probeSession(built),
-  )..openResetLink = built is SandboxBackend ? _sandboxResetLink(built) : null;
+  );
   AuthEndpoints.flow = signIn;
 
   final entry = EntryNavigator(
@@ -426,21 +425,15 @@ String? programOfScreen(ScreenInstances instances, String screenId) {
 }
 
 /// The argument (a lesson or record source id) the topmost open
-/// [screenId] was opened with, or null. The generated screens pass none
-/// yet.
+/// [screenId] was opened with (`TNav.push(..., argument:)`, read like
+/// `TNav.argumentOf`), or null.
 String? argumentOfScreen(ScreenInstances instances, String screenId) {
   final open = _fromScreen(instances, screenId);
   if (open.isEmpty) return null;
   final arguments = open.first.settings.arguments;
-  return arguments is String && arguments.isNotEmpty ? arguments : null;
+  final id = arguments is TRouteArgs ? arguments.argument : arguments;
+  return id is String && id.isNotEmpty ? id : null;
 }
-
-/// Opens the reset link the sandbox would have emailed (sandbox only).
-Future<void> Function(String email) _sandboxResetLink(SandboxBackend sandbox) =>
-    (email) async {
-      final token = await sandbox.auth.recoveryTokenFor(email);
-      if (token != null) await sandbox.auth.completeRecovery(token);
-    };
 
 /// Whether the server still accepts the current session: the profile
 /// needs a session but not a recent sign-in.

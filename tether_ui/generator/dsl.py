@@ -38,7 +38,7 @@ def rep(to, **kw): return dict({'type': 'replace', 'to': to}, **kw)
 def tab(to, **kw): return dict({'type': 'tab', 'to': to}, **kw)
 def back(): return {'type': 'back'}
 def close(): return {'type': 'close'}
-def sheet(to): return {'type': 'sheet', 'to': to}
+def sheet(to, inherit_arg=False): return dict({'type': 'sheet', 'to': to}, **({'argInherit': True} if inherit_arg else {}))
 def call(num, label=None): return {'type': 'call', 'value': num, 'label': label or num}
 def sms(num): return {'type': 'sms', 'value': num}
 def ext(url): return {'type': 'external', 'value': url}

@@ -629,3 +629,30 @@ sha256 guard cannot see them. They follow from P-31 (fields start empty).
 - **Validation report.** For this change, `validation/` was regenerated from
   the Flutter test run only. The prototype column still comes from the
   earlier browser run, before TH-907, and was not re-run in a browser.
+
+## Item arguments: which lesson or source a screen opens for (P-88, TH-1031f)
+
+An action that opens `learn_lesson` or `records_source` gains `arg`, the
+identifier of the item it opens (a lesson id `<programme>.<slug>`, or a records
+source id `source_1`, `source_2`). On `records_source`, the Disconnect sheet
+gains `argInherit`, so `records_disconnect` acts on the source that was opened.
+The kit passes the identifier as the route argument (`TNav.push(..., argument:)`,
+read with `TNav.argumentOf`), so a save on these screens knows which item it is
+for. Without it the app's handlers fail with `program_unknown`. This changes
+actions only: no label, starting value or layout in `spec/screens` changes. The decision is P-88 (every flow wired) and the ticket TH-1031f.
+
+| Screen | Action | Argument |
+|---|---|---|
+| `be_home` | `body[1].rows[1]` | `be.skin-self-check` |
+| `bf_home_explore` | `body[3]`, `body[4]` | `bf.cravings-what-to-expect`, `bf.quit-medicines` |
+| `bf_meds` | `body[2].rows[0]`, `body[2].rows[1]` | `bf.nicotine-replacement`, `bf.prescription-options` |
+| `ca_noplan` | `body[3].rows[1]` | `ca.questions-for-next-visit` |
+| `ea_checkback` | `body[3].cta[0]` | `ea.what-to-say` |
+| `ea_home` | `body[2]` | `ea.sleep-and-mood` |
+| `learn` | `body[2]`, `body[3]`, `body[4]` | `bf.cravings-today`, `sf.one-more-video`, `ca.lungs-recover` |
+| `learn_error` | `body[4]` | `bf.cravings-today` |
+| `nu_home` | `body[2]` | `nu.bean-veggie-tacos` |
+| `records_hub` | `body[1].rows[0]`, `body[1].rows[1]` | `source_1`, `source_2` |
+| `records_source` | `footer[0]` (Disconnect sheet) | `argInherit` (the source id it was opened with) |
+| `sd_fell` | `body[3]` | `sd.get-up-safely` |
+| `today` | `body[8]` | `ca.lungs-recover` |

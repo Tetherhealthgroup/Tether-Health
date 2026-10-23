@@ -103,7 +103,8 @@
       "label": "Disconnect",
       "action": {
         "type": "sheet",
-        "to": "records_disconnect"
+        "to": "records_disconnect",
+        "argInherit": true
       },
       "variant": "danger",
       "arrow": false
@@ -139,7 +140,8 @@
       "path": "footer[0]",
       "action": {
         "type": "sheet",
-        "to": "records_disconnect"
+        "to": "records_disconnect",
+        "argInherit": true
       },
       "summary": "sheet → records_disconnect"
     }
