@@ -26,4 +26,8 @@ export const DatabaseErrorCode = {
   focusSwapInvalid: "TH013",
   consentVersionUnchanged: "TH014",
   consentDocumentImmutable: "TH015",
+  consentRecipientInvalid: "TH021",
+  careConsentRequired: "TH022",
+  careRecordImmutable: "TH023",
+  careInviteInvalid: "TH025",
 } as const;

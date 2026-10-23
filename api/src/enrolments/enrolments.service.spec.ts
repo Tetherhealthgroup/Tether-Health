@@ -639,23 +639,76 @@ describe("EnrolmentsService", () => {
   });
 
   it.each(["share_care_team", "share_caregiver"] as const)(
-    "refuses %s before touching the database",
+    "refuses %s without a recipient before touching the database",
     async (purpose) => {
       const { service, calls } = setup();
-      expect(
-        await codeOf(
-          service.grantConsent(
-            user,
-            grantDto({
-              purpose,
-              recipientRef: "00000000-0000-4000-8000-0000000000c1",
-            }),
-          ),
-        ),
-      ).toEqual({ status: HttpStatus.CONFLICT, code: "sharing_not_available" });
+      await expect(
+        service.grantConsent(user, grantDto({ purpose })),
+      ).rejects.toThrow("recipientRef does not match purpose");
       expect(calls).toEqual([]);
     },
   );
+
+  it.each(["share_care_team", "share_caregiver"] as const)(
+    "inserts %s with its recipient in lower case",
+    async (purpose) => {
+      const recipient = "00000000-0000-4000-8000-0000000000C1";
+      const { service, calls } = setup(
+        { data: enrolmentRow(), error: null },
+        { data: consentRow(), error: null },
+        {
+          data: consentRow({
+            id: OTHER_ID,
+            purpose,
+            recipient_ref: recipient.toLowerCase(),
+          }),
+          error: null,
+        },
+      );
+      const result = await service.grantConsent(
+        user,
+        grantDto({ purpose, recipientRef: recipient }),
+      );
+      expect(result).toMatchObject({
+        purpose,
+        recipientRef: recipient.toLowerCase(),
+      });
+      const insert = calls.find(([name]) => name === "insert");
+      expect(JSON.parse(insert?.[1] ?? "{}")).toMatchObject({
+        purpose,
+        recipient_ref: recipient.toLowerCase(),
+      });
+    },
+  );
+
+  it("maps TH021 (recipient not a live connection or caregiver) to consent_recipient_invalid", async () => {
+    const { service } = setup(
+      { data: enrolmentRow(), error: null },
+      { data: consentRow(), error: null },
+      {
+        data: null,
+        error: {
+          code: "TH021",
+          message:
+            "A sharing consent must name a live connection or caregiver of the same member",
+        },
+      },
+    );
+    expect(
+      await codeOf(
+        service.grantConsent(
+          user,
+          grantDto({
+            purpose: "share_care_team",
+            recipientRef: "00000000-0000-4000-8000-0000000000c1",
+          }),
+        ),
+      ),
+    ).toEqual({
+      status: HttpStatus.CONFLICT,
+      code: "consent_recipient_invalid",
+    });
+  });
 
   it("inserts consents plainly (never upsert) and maps a duplicate", async () => {
     const { service, calls } = setup(

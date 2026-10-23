@@ -1,11 +1,25 @@
 openapi: 3.1.0
 info:
   title: Tether Health API
-  version: 1.9.0
+  version: 1.10.0
   description: >-
     Development contract for authenticated profiles and bounded program data.
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
+    Added in 1.10.0: the member's care team under `/v1/care` — clinic
+    connections (`POST` redeems an invite code, rate limited, one generic
+    `care_invite_invalid` for every refused code; `GET`; `DELETE` revokes),
+    `POST /v1/care/summaries` (stores the summary exactly as previewed,
+    under the programme's live care-team consent naming the connection),
+    `POST /v1/care/messages`, supporters (`POST`, `GET`, `DELETE`) and Stride
+    caregivers (`POST`, `GET`, `DELETE` revokes), with their own coded error
+    body `CareRequestRejected`. The server stores what the member shares and
+    sends nothing to a clinic, caregiver or supporter (`delivery: stored`).
+    Changed in 1.10.0: `POST /v1/enrolments/consents` accepts the share
+    purposes with a required `recipientRef` (a live connection, or a live
+    caregiver of the same enrolment) and answers
+    `consent_recipient_invalid` (409) otherwise; `sharing_not_available`
+    is no longer raised.
     Added in 1.9.0, each for app use: `POST /v1/account/export` (the same
     export as `GET`, which stays for older app versions), `PATCH
     /v1/enrolments/consents` (revoke the live consent of one purpose on one
@@ -527,8 +541,11 @@ paths:
         grantable document) also answers before
         `account_deletion_in_progress`.
 
-        The share purposes (share_care_team, share_caregiver) are refused
-        with `sharing_not_available` (409) until care connections exist.
+        The share purposes (share_care_team, share_caregiver) need
+        `recipientRef`: a live care connection of the member, or a live
+        caregiver of the same enrolment. Any other value is refused with
+        `consent_recipient_invalid` (409). A missing `recipientRef` on a
+        share purpose, or one on another purpose, is invalid (400).
       security: [{supabaseJwt: []}]
       requestBody:
         required: true
@@ -556,7 +573,8 @@ paths:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
         '409':
           description: >-
-            `sharing_not_available`, `enrolment_left`, `core_consent_required`,
+            `consent_recipient_invalid` (the share recipient is not a live
+            connection or caregiver of the member), `enrolment_left`, `core_consent_required`,
             `consent_already_granted`, `account_deletion_in_progress` (account
             deletion has started), `consent_not_permitted` (the database
             refused the row for another reason, for example the enrolment was
@@ -1423,6 +1441,269 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/AppConfig'}
         '429': {$ref: '#/components/responses/ProgrammeRecordRateLimited'}
+  /v1/care/connections:
+    post:
+      operationId: redeemCareInvite
+      summary: Connect to a clinic with its invite code
+      description: >-
+        Redeems a clinic invite code (spaces and hyphens are ignored, case
+        does not matter). Every refused code — malformed, unknown, expired,
+        used up, or a clinic that is not verified or is disabled — gets the
+        same `care_invite_invalid`. A member already connected to the code's
+        clinic gets that live connection back and no use of the code is
+        consumed. Rate limited per client address (10 a minute) below the
+        global limit. Connecting shares nothing: summaries need the
+        programme's care-team consent naming the connection.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/RedeemCareInvite'}
+      responses:
+        '201':
+          description: The connection (new, or the live one to the same clinic)
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CareConnection'}
+        '400': {$ref: '#/components/responses/CareBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '409': {$ref: '#/components/responses/CareConflict'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/CareUnavailable'}
+    get:
+      operationId: listCareConnections
+      summary: The caller's clinic connections
+      description: Live and revoked connections, oldest first, each with the clinic's name.
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: The caller's connections
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CareConnectionList'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/CareUnavailable'}
+  /v1/care/connections/{connectionId}:
+    parameters:
+      - {name: connectionId, in: path, required: true, schema: {type: string, format: uuid}}
+    delete:
+      operationId: revokeCareConnection
+      summary: Disconnect from a clinic
+      description: >-
+        Revokes a live connection. The database also revokes the care-team
+        consents that name it and every share made for it. A connection that
+        is not the caller's, unknown or already revoked is
+        `connection_not_found`.
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: The revoked connection
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CareConnection'}
+        '400': {$ref: '#/components/responses/CareBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/CareNotFound'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/CareUnavailable'}
+  /v1/care/summaries:
+    post:
+      operationId: createCareSummary
+      summary: Share a previewed summary with a connected clinic
+      description: >-
+        Stores the summary exactly as the member previewed it (`snapshot`,
+        at most 48 KiB of JSON; never recomputed) for one clinic connection
+        and one programme. It needs that programme's live
+        `share_care_team` consent naming the connection. Without
+        `connectionId`, the one live connection holding such a consent is
+        used; none is `care_consent_required`, several is
+        `connection_required`. A share expires 30 days after it is made and
+        only that programme's enrolment is linked. Nothing is sent from the
+        server (`delivery: stored`).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateCareSummary'}
+      responses:
+        '201':
+          description: The stored share
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CareShare'}
+        '400': {$ref: '#/components/responses/CareBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/CareNotFound'}
+        '409': {$ref: '#/components/responses/CareConflict'}
+        '413': {$ref: '#/components/responses/CareTooLarge'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/CareUnavailable'}
+  /v1/care/messages:
+    post:
+      operationId: createCareMessage
+      summary: Send a one-way message to a connected clinic
+      description: >-
+        Stores a one-way message (topic up to 80 characters, message up to
+        2000, both trimmed and non-empty) for a live clinic connection.
+        Without `connectionId` the caller's only live connection is used;
+        none or several is `connection_required`. With `programmeCode` the
+        message is about that programme and needs its live
+        `share_care_team` consent naming the connection. An `attachment`
+        (a summary the member previewed) needs `programmeCode` and is stored
+        as a share of kind `message_attachment`. Nothing is sent from the
+        server (`delivery: stored`). Not for emergencies: the app shows 911
+        and 988 on this screen.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateCareMessage'}
+      responses:
+        '201':
+          description: The stored message
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CareMessage'}
+        '400': {$ref: '#/components/responses/CareBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/CareNotFound'}
+        '409': {$ref: '#/components/responses/CareConflict'}
+        '413': {$ref: '#/components/responses/CareTooLarge'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/CareUnavailable'}
+  /v1/care/supporters:
+    post:
+      operationId: createSupporter
+      summary: Save a person the member may contact
+      description: >-
+        Stores a supporter: name, phone (as typed; stored in E.164, a number
+        without "+" is read as North American), the programmes they support
+        (`bf`, `sf`; each must be one of the caller's enrolments that is not
+        left, else `programme_not_enrolled`) and an optional help phrase.
+        Tether never contacts a supporter: the member messages them from
+        their own phone.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateSupporter'}
+      responses:
+        '201':
+          description: The stored supporter
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Supporter'}
+        '400': {$ref: '#/components/responses/CareBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '409': {$ref: '#/components/responses/CareConflict'}
+        '413': {$ref: '#/components/responses/CareTooLarge'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/CareUnavailable'}
+    get:
+      operationId: listSupporters
+      summary: The caller's supporters
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: The caller's supporters, oldest first
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SupporterList'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/CareUnavailable'}
+  /v1/care/supporters/{supporterId}:
+    parameters:
+      - {name: supporterId, in: path, required: true, schema: {type: string, format: uuid}}
+    delete:
+      operationId: deleteSupporter
+      summary: Remove a supporter
+      description: Deletes the caller's supporter. Any other id is `supporter_not_found`.
+      security: [{supabaseJwt: []}]
+      responses:
+        '204': {description: Deleted}
+        '400': {$ref: '#/components/responses/CareBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/CareNotFound'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/CareUnavailable'}
+  /v1/care/caregivers:
+    post:
+      operationId: createCaregiver
+      summary: Add a caregiver to the member's Stride programme
+      description: >-
+        Stores a caregiver on the caller's Stride (`sd`) enrolment, which must
+        exist and not be left. `scope` lists what they may see
+        (`sd.session_finished`, `sd.fall_logged`; both by default); other
+        programmes are never available to a caregiver. The invite stays
+        `pending`: the member sends it from their own phone and the server
+        contacts nobody. Sharing with the caregiver also needs a
+        `share_caregiver` consent naming them (`POST
+        /v1/enrolments/consents`).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateCaregiver'}
+      responses:
+        '201':
+          description: The stored caregiver
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Caregiver'}
+        '400': {$ref: '#/components/responses/CareBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/CareNotFound'}
+        '409': {$ref: '#/components/responses/CareConflict'}
+        '413': {$ref: '#/components/responses/CareTooLarge'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/CareUnavailable'}
+    get:
+      operationId: listCaregivers
+      summary: The caller's caregivers
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: The caller's caregivers (live and revoked), oldest first
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CaregiverList'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/CareUnavailable'}
+  /v1/care/caregivers/{caregiverId}:
+    parameters:
+      - {name: caregiverId, in: path, required: true, schema: {type: string, format: uuid}}
+    delete:
+      operationId: revokeCaregiver
+      summary: Remove a caregiver
+      description: >-
+        Revokes a live caregiver; the database also revokes the consent that
+        names them. Any other id, or one already revoked, is
+        `caregiver_not_found`.
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: The revoked caregiver
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Caregiver'}
+        '400': {$ref: '#/components/responses/CareBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/CareNotFound'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/CareUnavailable'}
 components:
   securitySchemes:
     supabaseJwt: {type: http, scheme: bearer, bearerFormat: JWT}
@@ -1446,6 +1727,51 @@ components:
         pattern: '^([0-9a-f]{32}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$'
   responses:
     Unauthorized: {description: Missing or invalid Supabase access token}
+    CareBadRequest:
+      description: >-
+        `invalid_request`: an unknown or missing field, a value of the wrong
+        type or length, a phone number that cannot be read, a snapshot over
+        48 KiB, an attachment without `programmeCode`, or a path id that is
+        not a UUID; or `care_invite_invalid` (redemption only). A body the
+        JSON parser refuses gets the generic body without a code. Nothing
+        was written.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - {$ref: '#/components/schemas/CareRequestRejected'}
+              - {$ref: '#/components/schemas/RequestRejected'}
+    CareNotFound:
+      description: >-
+        `connection_not_found`, `enrolment_not_found`, `caregiver_not_found`
+        or `supporter_not_found` (also for other members' rows). Nothing was
+        written.
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/CareRequestRejected'}
+    CareConflict:
+      description: >-
+        `account_deletion_in_progress`, `enrolment_left`,
+        `care_consent_required` (no live care-team consent on the programme
+        naming the connection, also when it was revoked meanwhile),
+        `connection_required` (no connection named and none or several
+        could be meant), or `programme_not_enrolled` (a supporter programme
+        the caller is not enrolled in). Nothing was written.
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/CareRequestRejected'}
+    CareTooLarge:
+      description: The body is larger than the server's request body limit (generic body, no code); nothing was written
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/RequestRejected'}
+    CareRateLimited:
+      description: Too many requests from this client (generic body, no code); nothing was written
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/RequestRejected'}
+    CareUnavailable:
+      description: Care storage is temporarily unavailable, or the database refused the request for a reason the caller cannot fix
     ProgrammeRecordCreated:
       description: The submission was written (at least one of its rows is new)
       content:
@@ -1736,6 +2062,7 @@ components:
             - consent_version_unchanged
             - consent_conflict_retry
             - consent_recipient_required
+            - consent_recipient_invalid
             - focus_swap_invalid
             - sharing_not_available
             - confirmation_required
@@ -1798,8 +2125,10 @@ components:
           type: string
           format: uuid
           description: >-
-            Care connection or caregiver id for share purposes only. Share
-            purposes are not accepted yet, so any value is currently refused.
+            Required for the share purposes and refused for the others: the
+            care connection (share_care_team) or the caregiver of the same
+            enrolment (share_caregiver) the consent names. It must be the
+            member's and live (`consent_recipient_invalid`).
         consentVersion:
           type: string
           pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$'
@@ -1807,6 +2136,173 @@ components:
         locale:
           $ref: '#/components/schemas/ConsentLocale'
           description: The locale of the consent document the app showed.
+    CareRequestRejected:
+      description: Error body of the care routes, with a stable code naming the refused rule. Never contains submitted values, names, phone numbers or messages.
+      type: object
+      additionalProperties: false
+      required: [statusCode, error, code, requestId]
+      properties:
+        statusCode: {type: integer}
+        error: {const: Request rejected}
+        code:
+          type: string
+          enum:
+            - invalid_request
+            - care_invite_invalid
+            - connection_not_found
+            - connection_required
+            - care_consent_required
+            - enrolment_not_found
+            - enrolment_left
+            - programme_not_enrolled
+            - caregiver_not_found
+            - supporter_not_found
+            - account_deletion_in_progress
+        requestId: {type: string}
+    RedeemCareInvite:
+      type: object
+      additionalProperties: false
+      required: [inviteCode]
+      properties:
+        inviteCode: {type: string, minLength: 1, maxLength: 80}
+    CareConnection:
+      type: object
+      additionalProperties: false
+      required: [id, clinicId, clinicName, connectedAt, revokedAt]
+      properties:
+        id: {type: string, format: uuid}
+        clinicId: {type: string, format: uuid}
+        clinicName: {type: [string, 'null']}
+        connectedAt: {type: string, format: date-time}
+        revokedAt: {type: [string, 'null'], format: date-time}
+    CareConnectionList:
+      type: object
+      additionalProperties: false
+      required: [connections]
+      properties:
+        connections:
+          type: array
+          items: {$ref: '#/components/schemas/CareConnection'}
+    CreateCareSummary:
+      type: object
+      additionalProperties: false
+      required: [programmeCode, snapshot]
+      properties:
+        programmeCode: {type: string, pattern: '^[a-z]{2}$'}
+        connectionId: {type: string, format: uuid}
+        snapshot:
+          type: object
+          description: Exactly what the member previewed (at most 48 KiB of JSON); stored as sent.
+    CareShare:
+      type: object
+      additionalProperties: false
+      required: [id, programmeCode, connectionId, kind, createdAt, expiresAt, delivery]
+      properties:
+        id: {type: string, format: uuid}
+        programmeCode: {type: string, pattern: '^[a-z]{2}$'}
+        connectionId: {type: string, format: uuid}
+        kind: {enum: [visit_summary, message_attachment]}
+        createdAt: {type: string, format: date-time}
+        expiresAt: {type: string, format: date-time}
+        delivery: {const: stored, description: The server stored the share; nothing was sent from the server.}
+    CreateCareMessage:
+      type: object
+      additionalProperties: false
+      required: [topic, message]
+      properties:
+        connectionId: {type: string, format: uuid}
+        topic: {type: string, minLength: 1, maxLength: 80}
+        message: {type: string, minLength: 1, maxLength: 2000}
+        programmeCode: {type: string, pattern: '^[a-z]{2}$'}
+        attachment:
+          type: object
+          additionalProperties: false
+          required: [snapshot]
+          properties:
+            snapshot: {type: object}
+    CareMessage:
+      type: object
+      additionalProperties: false
+      required: [id, connectionId, programmeCode, shareId, createdAt, delivery]
+      properties:
+        id: {type: string, format: uuid}
+        connectionId: {type: string, format: uuid}
+        programmeCode: {type: [string, 'null'], pattern: '^[a-z]{2}$'}
+        shareId: {type: [string, 'null'], format: uuid}
+        createdAt: {type: string, format: date-time}
+        delivery: {const: stored}
+    CreateSupporter:
+      type: object
+      additionalProperties: false
+      required: [name, phone, programmes]
+      properties:
+        name: {type: string, minLength: 1, maxLength: 80}
+        phone: {type: string, minLength: 1, maxLength: 32}
+        programmes:
+          type: array
+          minItems: 1
+          maxItems: 2
+          uniqueItems: true
+          items: {enum: [bf, sf]}
+        helpPhrase: {type: string, minLength: 1, maxLength: 200}
+    Supporter:
+      type: object
+      additionalProperties: false
+      required: [id, name, phone, programmes, helpPhrase, createdAt, updatedAt]
+      properties:
+        id: {type: string, format: uuid}
+        name: {type: string}
+        phone: {type: string, pattern: '^\+[1-9][0-9]{6,14}$'}
+        programmes:
+          type: array
+          items: {enum: [bf, sf]}
+        helpPhrase: {type: [string, 'null']}
+        createdAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
+    SupporterList:
+      type: object
+      additionalProperties: false
+      required: [supporters]
+      properties:
+        supporters:
+          type: array
+          items: {$ref: '#/components/schemas/Supporter'}
+    CreateCaregiver:
+      type: object
+      additionalProperties: false
+      required: [name, phone]
+      properties:
+        name: {type: string, minLength: 1, maxLength: 80}
+        phone: {type: string, minLength: 1, maxLength: 32}
+        scope:
+          type: array
+          minItems: 1
+          maxItems: 2
+          uniqueItems: true
+          items: {enum: [sd.session_finished, sd.fall_logged]}
+    Caregiver:
+      type: object
+      additionalProperties: false
+      required: [id, programmeCode, name, phone, scope, inviteStatus, createdAt, revokedAt]
+      properties:
+        id: {type: string, format: uuid}
+        programmeCode: {const: sd}
+        name: {type: string}
+        phone: {type: string, pattern: '^\+[1-9][0-9]{6,14}$'}
+        scope:
+          type: array
+          items: {enum: [sd.session_finished, sd.fall_logged]}
+        inviteStatus: {enum: [pending, sent]}
+        createdAt: {type: string, format: date-time}
+        revokedAt: {type: [string, 'null'], format: date-time}
+    CaregiverList:
+      type: object
+      additionalProperties: false
+      required: [caregivers]
+      properties:
+        caregivers:
+          type: array
+          items: {$ref: '#/components/schemas/Caregiver'}
     RevokeConsentByPurpose:
       type: object
       additionalProperties: false

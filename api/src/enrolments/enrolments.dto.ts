@@ -80,9 +80,10 @@ export class GrantConsentDto {
   purpose!: ConsentPurpose;
 
   /**
-   * A care connection or caregiver id (UUID) for share purposes only. Share
-   * purposes are refused until care connections exist, so today any value is
-   * refused; a value that is not a UUID is invalid input.
+   * Required for the share purposes and refused for the others: the care
+   * connection (share_care_team) or caregiver of the same enrolment
+   * (share_caregiver) the consent names. The database checks it is the
+   * member's and live (consent_recipient_invalid).
    */
   @ValidateIf((dto: GrantConsentDto) => dto.recipientRef !== undefined)
   @IsUUID()

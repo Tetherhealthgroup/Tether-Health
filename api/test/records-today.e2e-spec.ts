@@ -1838,7 +1838,7 @@ describe("Records, Today, preferences, baseline and app config (e2e)", () => {
     );
 
     it("the version is bumped once for these routes", () => {
-      expect(document.info.version).toBe("1.9.0");
+      expect(document.info.version).toBe("1.10.0");
     });
 
     it("the error enum is the programme event enum plus no_focus_programme", () => {

@@ -1347,7 +1347,7 @@ describe("Programme event routes (e2e)", () => {
         /^\/v1\/program-data\/[^/]+\/[^/]+$/.test(path),
       );
       expect(others).toHaveLength(15);
-      expect(document.info.version).toBe("1.9.0");
+      expect(document.info.version).toBe("1.10.0");
     });
 
     it("each request schema has the DTO's fields, required set and option codes", () => {

@@ -33,6 +33,8 @@ import { NotificationsService } from "./notifications/notifications.service";
 import { BaselineController } from "./baseline/baseline.controller";
 import { BaselineService } from "./baseline/baseline.service";
 import { AppConfigController } from "./app-config/app-config.controller";
+import { CareController } from "./care/care.controller";
+import { CareService } from "./care/care.service";
 
 @Module({
   imports: [
@@ -57,6 +59,7 @@ import { AppConfigController } from "./app-config/app-config.controller";
     NotificationsController,
     BaselineController,
     AppConfigController,
+    CareController,
   ],
   providers: [
     TokenVerifier,
@@ -72,6 +75,7 @@ import { AppConfigController } from "./app-config/app-config.controller";
     TodayService,
     NotificationsService,
     BaselineService,
+    CareService,
     { provide: APP_GUARD, useClass: AuthGuard },
   ],
 })

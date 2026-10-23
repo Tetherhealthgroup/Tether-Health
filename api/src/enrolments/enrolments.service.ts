@@ -93,6 +93,7 @@ const {
   consentAlreadyRevoked: CONSENT_ALREADY_REVOKED,
   consentImmutable: CONSENT_IMMUTABLE,
   enrolmentNotFound: ENROLMENT_NOT_FOUND,
+  consentRecipientInvalid: CONSENT_RECIPIENT_INVALID,
 } = DatabaseErrorCode;
 
 /**
@@ -337,14 +338,16 @@ export class EnrolmentsService {
     user: AuthUser,
     dto: GrantConsentDto,
   ): Promise<GrantConsentResponse> {
-    // Sharing needs a validated care connection or caregiver as recipient;
-    // until those exist, share purposes are not accepted.
-    if (sharePurposes.includes(dto.purpose)) {
-      throw conflict("sharing_not_available");
-    }
-    if (dto.recipientRef !== undefined) {
+    // A share consent names its recipient: a care connection
+    // (share_care_team) or a caregiver of the same enrolment
+    // (share_caregiver). The database checks that it is the member's and
+    // live (TH021). Other purposes never name one.
+    const share = sharePurposes.includes(dto.purpose);
+    if (share !== (dto.recipientRef !== undefined)) {
       throw new BadRequestException("recipientRef does not match purpose");
     }
+    // Recipients are stored by their lowercase id (TH021 compares so).
+    const recipientRef = dto.recipientRef?.toLowerCase() ?? null;
     const client = this.clients.forUser(user);
     const enrolment = await this.ownEnrolment(client, user, dto.enrolmentId);
     if (enrolment.status === "left") throw conflict("enrolment_left");
@@ -366,7 +369,7 @@ export class EnrolmentsService {
       .insert({
         enrolment_id: enrolment.id,
         purpose: dto.purpose,
-        recipient_ref: null,
+        recipient_ref: recipientRef,
         consent_version: dto.consentVersion,
         locale: dto.locale,
       })
@@ -391,6 +394,11 @@ export class EnrolmentsService {
       }
       if (error.code === CHECK_VIOLATION) {
         throw new BadRequestException("Consent rejected");
+      }
+      // care_check_consent_recipient: the share recipient is not a live
+      // connection or caregiver of the member (only a consent insert).
+      if (error.code === CONSENT_RECIPIENT_INVALID) {
+        throw conflict("consent_recipient_invalid");
       }
       throw (
         registryErrorFor(error.code) ??

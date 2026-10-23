@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { databaseError, type DatabaseErrorHint } from "./database-errors";
+import { CARE_TABLES, FakeCare, type CareTable } from "./fake-care";
 import {
   attributesTriggerFails,
   entryCheckFails,
@@ -114,6 +115,12 @@ import {
  * - filters gte and lt (timestamps compare as instants), offset, and HEAD
  *   with an exact count (the count ignores limit and offset, as PostgREST's
  *   does);
+ * - the care tables of 202610180011 (see fake-care.ts): their select,
+ *   insert, update and delete paths as the member sees them,
+ *   redeem_care_invite() (seed invites with care.addInvite), the consent
+ *   recipient check (TH021) and the revocation cascades. "Delete now" and
+ *   account deletion remove the care rows they cascade to (counts not
+ *   returned);
  * - error bodies: standard SQLSTATEs for constraints and RLS, and the
  *   database's own `TH` codes with the registry's exact message and hint
  *   (test/support/database-errors.ts), answered as HTTP 400 the way
@@ -146,6 +153,14 @@ interface State {
   wellbeing_baseline: Row[];
   /** Written by the sync writer only (addSyncLapse); members read. */
   sync_lapse: Row[];
+  /** Care tables (202610180011); see fake-care.ts. */
+  care_orgs: Row[];
+  care_invites: Row[];
+  care_connections: Row[];
+  care_shares: Row[];
+  care_messages: Row[];
+  caregivers: Row[];
+  supporters: Row[];
   /** Stand-in for auth.users (id only). */
   auth_users: Row[];
   /** Stand-in for storage.objects (bucket_id, name). */
@@ -501,9 +516,27 @@ export class FakePostgrest {
     notification_preferences: [],
     wellbeing_baseline: [],
     sync_lapse: [],
+    care_orgs: [],
+    care_invites: [],
+    care_connections: [],
+    care_shares: [],
+    care_messages: [],
+    caregivers: [],
+    supporters: [],
     auth_users: [],
     storage_objects: [],
   };
+  /** The care tables; tests seed clinics and invites with care.addInvite. */
+  readonly care = new FakeCare({
+    state: () => this.state,
+    barrierOpen: (uid) => this.barrierOpen(uid),
+    hasConsent: (uid, enrolmentId, purpose, recipient) =>
+      this.hasConsent(uid, enrolmentId, purpose, recipient),
+    now: () => this.now(),
+    clockMs: () => this.clock,
+    fail,
+    raise,
+  });
   /**
    * Seconds since the sign-in recorded in each token's amr claim (0 unless
    * set); null means the token has no usable amr entry.
@@ -824,6 +857,7 @@ export class FakePostgrest {
         ...MEMBER_TABLES,
         "sync_lapse",
         ...READ_ONLY_TABLES,
+        ...CARE_TABLES,
       ].includes(path)
     ) {
       return fail(404, "PGRST205", "Table not found");
@@ -838,7 +872,33 @@ export class FakePostgrest {
     }
     let rows: Row[];
     let status = 200;
-    if (method === "GET" || method === "HEAD") {
+    const careTable = (CARE_TABLES as readonly string[]).includes(table)
+      ? (table as CareTable)
+      : null;
+    if (careTable !== null) {
+      const values = Array.isArray(body) ? (body as Row[]) : [body as Row];
+      if (method === "GET" || method === "HEAD") {
+        rows = this.filter(this.care.visible(uid, careTable), url);
+      } else if (method === "POST") {
+        rows = values.map((value) => this.care.insert(uid, careTable, value));
+        status = 201;
+      } else if (method === "PATCH") {
+        rows = this.care.update(
+          uid,
+          careTable,
+          this.filter(this.care.visible(uid, careTable), url),
+          body as Row,
+        );
+      } else if (method === "DELETE") {
+        rows = this.care.remove(
+          uid,
+          careTable,
+          this.filter(this.care.visible(uid, careTable), url),
+        );
+      } else {
+        return fail(405, "PGRST117", "Unsupported method");
+      }
+    } else if (method === "GET" || method === "HEAD") {
       rows = this.filter(this.visible(uid, table), url);
     } else if (method === "POST") {
       const values = Array.isArray(body) ? (body as Row[]) : [body as Row];
@@ -943,6 +1003,10 @@ export class FakePostgrest {
     if (name === "delete_my_account" && method === "POST") {
       return { status: 200, body: this.deleteAccount(uid, token, args) };
     }
+    if (name === "redeem_care_invite" && method === "POST") {
+      const row = this.care.redeem(uid, args);
+      return { status: 200, body: this.project(row, url) };
+    }
     if (name === "delete_enrolment_now" && method === "POST") {
       return { status: 200, body: this.deleteEnrolmentNow(uid, token, args) };
     }
@@ -1017,6 +1081,7 @@ export class FakePostgrest {
     for (const table of MEMBER_ROW_TABLES) {
       removeWhere(table as keyof State, (row) => row.user_id === uid);
     }
+    this.care.dropMember(uid);
     removeWhere("auth_users", (row) => row.id === uid);
     return counts;
   }
@@ -1079,6 +1144,7 @@ export class FakePostgrest {
         (row) => row.enrolment_id === enrolment.id,
       );
     }
+    this.care.dropEnrolment(enrolment.id as string);
     const syncLapses = removeWhere(
       "sync_lapse",
       (row) => row.user_id === uid && row.programme_code === code,
@@ -1394,6 +1460,27 @@ export class FakePostgrest {
       }
       this.state.enrolments.push(row);
       return row;
+    }
+    // programme_consents_check_recipient (before insert, fires before
+    // programme_consents_fill_text): a share consent's recipient must be a
+    // live connection or caregiver of the enrolment's member. The trigger
+    // runs as the caller, so another member's enrolment has no member.
+    if (
+      SHARE.includes(value.purpose as string) &&
+      value.recipient_ref !== undefined &&
+      value.recipient_ref !== null
+    ) {
+      const own = this.state.enrolments.find(
+        (other) => other.id === value.enrolment_id && other.user_id === uid,
+      );
+      if (!own) raise("consent_recipient_invalid");
+      else {
+        this.care.checkConsentRecipient(
+          own,
+          value.purpose as string,
+          value.recipient_ref as string,
+        );
+      }
     }
     // consent_fill_text (before insert): the text comes from the document.
     const doc = this.grantable(
@@ -1904,6 +1991,7 @@ export class FakePostgrest {
    * the user whose rows the request wrote (the trigger counts that user's).
    */
   private deferredChecks(uid: string): void {
+    this.care.cascade();
     const focus = this.state.enrolments.filter(
       (row) => row.user_id === uid && row.status === "focus",
     );
@@ -1921,6 +2009,7 @@ export class FakePostgrest {
     uid: string,
     enrolmentId: string,
     purpose: string,
+    recipient: string | null = null,
   ): boolean {
     const enrolment = this.state.enrolments.find(
       (row) => row.id === enrolmentId,
@@ -1934,9 +2023,10 @@ export class FakePostgrest {
         (row) =>
           row.enrolment_id === enrolmentId &&
           row.purpose === purpose &&
-          row.recipient_ref === null &&
+          row.recipient_ref === recipient &&
           row.revoked_at === null,
-      )
+      ) &&
+      (purpose === "core" || this.hasConsent(uid, enrolmentId, "core"))
     );
   }
 
