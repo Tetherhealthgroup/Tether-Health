@@ -1,8 +1,8 @@
 // The endpoint handlers of the tether_ui screens and the production TData,
 // built from the app's backend.
 //
-// Every registered endpoint has a handler here except the Supabase Auth
-// submits, which the sign-in work provides.
+// Every registered endpoint has a handler here; the Supabase Auth submits
+// and the session check after each save come from auth_endpoints.dart.
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
@@ -17,6 +17,7 @@ import '../pending_onboarding.dart';
 import '../registry.dart';
 import '../settings_data.dart';
 import 'account_endpoints.dart';
+import 'auth_endpoints.dart';
 import 'care_records_endpoints.dart';
 import 'common.dart';
 import 'device_endpoints.dart';
@@ -42,7 +43,7 @@ Map<String, EndpointHandler> buildHandlers(HandlerContext context) {
   context.postAuthHooks.register(kit.pending.commitHook(services));
   ForegroundSync.install(services, context.data);
   unawaited(resumeUnfinished(kit));
-  return handlersFor(kit);
+  return withSessionChecks({...handlersFor(kit), ...authHandlers()});
 }
 
 /// Work left unfinished by an earlier run: a deletion whose local cleanup

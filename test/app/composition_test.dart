@@ -36,14 +36,13 @@ void main() {
     expect(composition.cleaners.length, 1);
   });
 
-  test('every registered endpoint has a handler, except sign-in submits',
+  test('every registered endpoint has a handler, sign-in submits included',
       () async {
     final composition =
         await compose(config: _none, backend: StubBackend(BackendMode.sandbox));
     for (final entry in endpointRegistry) {
       expect(composition.api.entryFor(entry.endpoint), isNotNull);
-      expect(composition.api.hasHandler(entry.endpoint),
-          entry.owner != OwnerService.supabaseAuth,
+      expect(composition.api.hasHandler(entry.endpoint), isTrue,
           reason: entry.endpoint);
     }
     expect(composition.postAuthHooks.length, 2,

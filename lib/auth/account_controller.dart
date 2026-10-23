@@ -90,6 +90,17 @@ class AccountController extends ChangeNotifier {
   bool _sessionInvalidated = false;
   PendingAccountDeletion? pendingAccountDeletion;
 
+  /// Why the last [signIn] failed, when the gateway said; null after a
+  /// success or a failure with no reason.
+  AuthFailureReason? lastSignInFailure;
+
+  /// The account listeners were last told about ([syncSession]).
+  late String? _announcedAccountId = accountId;
+
+  /// [pendingAccountDeletion] was set by [markAccountDeleted] (in memory
+  /// only), not restored from the receipt store.
+  bool _deletionNoticeOnly = false;
+
   bool get isSignedIn => !_sessionInvalidated && _auth.currentIdentity != null;
   String? get email => isSignedIn ? _auth.currentIdentity?.email : null;
   String? get accountId => isSignedIn ? _auth.currentIdentity?.id : null;
@@ -240,6 +251,7 @@ class AccountController extends ChangeNotifier {
   Future<bool> signIn({required String email, required String password}) async {
     busy = true;
     errorMessage = null;
+    lastSignInFailure = null;
     notifyListeners();
     var authenticated = false;
     try {
@@ -250,6 +262,7 @@ class AccountController extends ChangeNotifier {
       return true;
     } on AuthFailure catch (error) {
       await _discardFailedSignInSession();
+      lastSignInFailure = error.reason;
       errorMessage = _signInFailureMessage(error.reason);
       return false;
     } catch (_) {
@@ -543,6 +556,49 @@ class AccountController extends ChangeNotifier {
       busy = false;
       notifyListeners();
     }
+  }
+
+  /// Takes up a session started on the gateway without this controller (a
+  /// native sign-in, signing in again, an opened email link): the member
+  /// counts as signed in again, a deletion notice from [markAccountDeleted]
+  /// is dropped, and listeners are told. Does nothing when the gateway has
+  /// no session.
+  void adoptSession() {
+    if (_auth.currentIdentity == null) return;
+    _sessionInvalidated = false;
+    if (_deletionNoticeOnly) {
+      pendingAccountDeletion = null;
+      _deletionNoticeOnly = false;
+    }
+    notifyListeners();
+  }
+
+  /// Tells listeners when the signed-in account changed on the gateway
+  /// without this controller (for example a save handler that ended the
+  /// session).
+  void syncSession() {
+    if (accountId != _announcedAccountId) notifyListeners();
+  }
+
+  /// The account [accountId] was deleted by a save handler, which has ended
+  /// its session on the gateway. Recorded in memory so the session end
+  /// counts as a deletion and the entry screen shows the receipt; listeners
+  /// are told.
+  void markAccountDeleted(String accountId) {
+    if (pendingAccountDeletion == null) {
+      pendingAccountDeletion = PendingAccountDeletion(accountId: accountId);
+      _deletionNoticeOnly = true;
+    }
+    _sessionInvalidated = true;
+    profile = null;
+    _avatarRefreshTimer?.cancel();
+    notifyListeners();
+  }
+
+  @override
+  void notifyListeners() {
+    _announcedAccountId = accountId;
+    super.notifyListeners();
   }
 
   void clearError() {
