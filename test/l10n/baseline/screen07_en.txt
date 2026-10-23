@@ -16,9 +16,9 @@ T F
 T S
 T <calendar days>
 T Recommended preparation window: <month> <day> – <month> <day>
-T OCT
-T 29
-T THU
+T <month>
+T <day>
+T <weekday>
 T YOUR QUIT DATE
 T <weekday>, <month> <day>, <year>
 T 7 days to prepare
@@ -47,9 +47,9 @@ SL <date>
 SL <date>\n<day>
 SL <date>
 SL Recommended preparation window: <month> <day> – <month> <day>
-SL OCT
-SL 29
-SL THU
+SL <month>
+SL <day>
+SL <weekday>
 SL YOUR QUIT DATE
 SL <weekday>, <month> <day>, <year>
 SL 7 days to prepare

@@ -1,6 +1,6 @@
 # baseline TH-1015b · screen21 · es
 T BreatheFree
-T DÍA DE DEJARLO · OCT 22
+T DÍA DE DEJARLO · <month> <day>
 T <greeting>.
 T Mantén el día sencillo. Una elección a la vez.
 T DESDE TU HORA PLANIFICADA PARA DEJARLO
@@ -36,7 +36,7 @@ T Apoyo
 SL BreatheFree
 ST Notifications
 SL Guest profile
-SL DÍA DE DEJARLO · OCT 22
+SL DÍA DE DEJARLO · <month> <day>
 SL <greeting>.
 SL Mantén el día sencillo. Una elección a la vez.
 SL DESDE TU HORA PLANIFICADA PARA DEJARLO

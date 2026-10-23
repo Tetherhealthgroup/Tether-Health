@@ -7,9 +7,9 @@ T YOUR QUIT PLAN
 T Your plan is ready.
 T Take one final look. You can edit any part now or later.
 T QUIT DATE
-T OCT
-T 29
-T THU
+T <month>
+T <day>
+T <weekday>
 T <weekday>, <month> <day>
 T 7 days to prepare
 T RECOMMENDED WINDOW
@@ -38,7 +38,7 @@ ST Back
 SL YOUR QUIT PLAN
 SL Your plan is ready.
 SL Take one final look. You can edit any part now or later.
-SL QUIT DATE\nOCT\n29\nTHU\n<weekday>, <month> <day>\n7 days to prepare\nRECOMMENDED WINDOW\nTODAY\nQUIT DAY
+SL QUIT DATE\n<month>\n<day>\n<weekday>\n<weekday>, <month> <day>\n7 days to prepare\nRECOMMENDED WINDOW\nTODAY\nQUIT DAY
 ST Edit date
 SL PLAN DETAILS
 SL Tap any item to edit
