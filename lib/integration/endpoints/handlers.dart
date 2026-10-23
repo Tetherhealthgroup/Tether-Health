@@ -36,6 +36,9 @@ Map<String, EndpointHandler> buildHandlers(HandlerContext context) {
     pending: PendingOnboarding(services.local),
   );
   context.cleaners.register(services.wipeAccount);
+  // A deletion the server has not confirmed is re-issued first.
+  context.postAuthHooks
+      .register(deletionHook(services, context.cleaners, kit.pending));
   context.postAuthHooks.register(kit.pending.commitHook(services));
   ForegroundSync.install(services, context.data);
   unawaited(resumeUnfinished(kit));
@@ -47,8 +50,11 @@ Map<String, EndpointHandler> buildHandlers(HandlerContext context) {
 /// Nothing is dropped: a failure here is retried on the next start.
 Future<void> resumeUnfinished(HandlerKit kit) async {
   try {
-    await retryDeletions(kit.services, kit.cleaners, kit.pending);
-    if (kit.services.signedIn && (await kit.pending.read()).isNotEmpty) {
+    final reissued =
+        await retryDeletions(kit.services, kit.cleaners, kit.pending);
+    if (!reissued &&
+        kit.services.signedIn &&
+        (await kit.pending.read()).isNotEmpty) {
       await kit.pending.commit(kit.services);
     }
   } catch (_) {

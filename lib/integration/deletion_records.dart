@@ -9,6 +9,7 @@
 import 'dart:convert';
 
 import '../api/tether_api.dart';
+import '../backend/post_auth_hooks.dart';
 import '../data/app_services.dart';
 import '../sync/sync_store.dart';
 import 'data_adapter.dart';
@@ -83,45 +84,93 @@ Future<bool> cleanUpAccount(
   return ok;
 }
 
-/// Finishes deletions whose local cleanup did not complete. Call on start.
-Future<void> retryDeletions(
+/// Finishes deletions that did not complete. Call on start and right after
+/// a sign-in, before anything else. Only a server receipt makes a deletion
+/// server_done or complete.
+///
+/// - requested: the server's answer was never stored. Signed in to that
+///   account, the delete is asked again (safe to repeat). Signed out, or a
+///   session the server refuses: this phone's data of the account is wiped
+///   (the member asked for deletion) and the record becomes
+///   server_unconfirmed. An unreachable server keeps it as it is.
+/// - server_unconfirmed: when that account is signed in again, the delete
+///   is asked again; a receipt completes it.
+/// - server_done: the local cleanup is retried.
+///
+/// Returns true when a deletion of the signed-in account was re-issued (the
+/// caller stops other post-sign-in work: the account is being deleted).
+Future<bool> retryDeletions(
   AppServices services,
   DeletionCleaners cleaners,
   PendingOnboarding pending,
 ) async {
   final records = DeletionRecords(services.local);
+  var reissued = false;
   for (final MapEntry(key: id, value: record)
       in (await records.all()).entries) {
-    switch (record['state']) {
-      case 'requested':
-        // The server's answer was never recorded. The delete is safe to
-        // repeat: ask again. A session the server no longer accepts means
-        // the account is already gone. Anything else keeps the record for
-        // the next start; it is never dropped before the cleanup.
-        var done = !services.signedIn;
-        Map<String, Object?>? receipt;
-        if (!done) {
-          final answer = await services.api.account.deleteData();
-          receipt = answer.valueOrNull?.toJson();
-          done = receipt != null ||
-              answer.errorOrNull?.code == ApiProblemCode.unauthenticated;
-        }
-        if (!done) continue;
-        final next = {
-          'state': 'server_done',
-          if (receipt != null) 'receipt': receipt
-        };
-        await records.put(id, next);
-        if (await cleanUpAccount(services, cleaners, pending, id)) {
-          await records.put(id, {...next, 'state': 'complete'});
-        }
-      case 'server_done':
-        if (await cleanUpAccount(services, cleaners, pending, id)) {
-          await records.put(id, {...record, 'state': 'complete'});
-        }
+    final state = record['state'];
+    if (state == 'server_done') {
+      if (await cleanUpAccount(services, cleaners, pending, id)) {
+        await records.put(id, {...record, 'state': 'complete'});
+      }
+      continue;
+    }
+    if (state != 'requested' && state != 'server_unconfirmed') continue;
+    final mine = services.accountId == id;
+    if (!mine) {
+      if (state == 'requested') {
+        await cleanUpAccount(services, cleaners, pending, id);
+        await records.put(id, {'state': 'server_unconfirmed', 'accountId': id});
+      }
+      continue;
+    }
+    reissued = true;
+    final answer = await services.api.account.deleteData();
+    final receipt = answer.valueOrNull;
+    if (receipt != null) {
+      final done = {'state': 'server_done', 'receipt': receipt.toJson()};
+      await records.put(id, done);
+      if (await cleanUpAccount(services, cleaners, pending, id)) {
+        await records.put(id, {...done, 'state': 'complete'});
+      }
+      try {
+        await services.backend.wipeLocal();
+        await services.backend.auth.signOut();
+      } catch (_) {
+        // The account is gone on the server; the session ends with it.
+      }
+    } else if (answer.errorOrNull?.isAuthFailure ?? false) {
+      await cleanUpAccount(services, cleaners, pending, id);
+      await records.put(id, {'state': 'server_unconfirmed', 'accountId': id});
     }
   }
+  return reissued;
 }
+
+/// Whether [accountId] has a deletion the server has not confirmed yet (the
+/// sign-in work can show the generic message while it is pending).
+Future<bool> pendingServerDeletion(
+  AppServices services,
+  String accountId,
+) async {
+  final record = (await DeletionRecords(services.local).all())[accountId];
+  final state = record?['state'];
+  return state == 'requested' || state == 'server_unconfirmed';
+}
+
+/// The post-sign-in step that re-issues a pending deletion first. It stops
+/// the later steps when it did.
+PostAuthHook deletionHook(
+  AppServices services,
+  DeletionCleaners cleaners,
+  PendingOnboarding pending,
+) =>
+    (event) async {
+      if (await pendingServerDeletion(services, event.accountId) &&
+          await retryDeletions(services, cleaners, pending)) {
+        throw StateError('account deletion re-issued');
+      }
+    };
 
 /// The receipt shown after a deletion (`account.deletion.*`).
 class DeletionSource implements DataSource {

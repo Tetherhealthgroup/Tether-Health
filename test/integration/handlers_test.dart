@@ -632,4 +632,68 @@ void main() {
     final e = (await h.api.enrolments.list()).valueOrNull!.enrolments.single;
     expect(e.consents, isEmpty, reason: 'no consent in a guessed language');
   });
+
+  group('server-unconfirmed deletion', () {
+    Future<void> expectState(String id, String state) async =>
+        expect((await DeletionRecords(deviceStore).all())[id]!['state'], state);
+
+    test('signed out: local data wiped, never complete', () async {
+      await h.signUp();
+      final id = services.accountId!;
+      await deviceStore.write(safetyPlanScope(id), '{}');
+      await DeletionRecords(deviceStore).put(id, {'state': 'requested'});
+      await h.backend.auth.signOut();
+      await resumeUnfinished(kit);
+      await expectState(id, 'server_unconfirmed');
+      expect(deviceStore.documents.containsKey(safetyPlanScope(id)), isFalse);
+      expect(await pendingServerDeletion(services, id), isTrue);
+    });
+
+    test('an expired session never yields complete; the next sign-in does',
+        () async {
+      await h.signUp();
+      final id = services.accountId!;
+      await DeletionRecords(deviceStore).put(id, {'state': 'requested'});
+      await h.backend.auth.expireSession();
+      await resumeUnfinished(kit);
+      await expectState(id, 'server_unconfirmed');
+      // The same account signs in again: the delete is asked first.
+      await h.backend.auth
+          .signIn(email: 'member@sandbox.invalid', password: 'synthetic-pass');
+      final hook = deletionHook(services, kit.cleaners, kit.pending);
+      await expectLater(hook(PostAuthEvent(accountId: id, isNewAccount: false)),
+          throwsStateError);
+      await expectState(id, 'complete');
+      expect(await pendingServerDeletion(services, id), isFalse);
+      await expectLater(
+          h.backend.auth.signIn(
+              email: 'member@sandbox.invalid', password: 'synthetic-pass'),
+          throwsA(anything),
+          reason: 'the account is gone on the server');
+    });
+
+    test('a receipt completes it at once', () async {
+      await h.signUp();
+      final id = services.accountId!;
+      await DeletionRecords(deviceStore).put(id, {'state': 'requested'});
+      await resumeUnfinished(kit);
+      await expectState(id, 'complete');
+      final record = (await DeletionRecords(deviceStore).all())[id]!;
+      expect(record['receipt'], isNotNull);
+    });
+
+    test('another account\'s sign-in does not run the pending deletion',
+        () async {
+      await h.signUp();
+      final id = services.accountId!;
+      await DeletionRecords(deviceStore)
+          .put(id, {'state': 'server_unconfirmed', 'accountId': id});
+      await h.backend.auth.signOut();
+      await h.signUp('other@sandbox.invalid');
+      final hook = deletionHook(services, kit.cleaners, kit.pending);
+      await hook(
+          PostAuthEvent(accountId: services.accountId!, isNewAccount: true));
+      await expectState(id, 'server_unconfirmed');
+    });
+  });
 }

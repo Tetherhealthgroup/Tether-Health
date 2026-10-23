@@ -46,8 +46,8 @@ void main() {
           entry.owner != OwnerService.supabaseAuth,
           reason: entry.endpoint);
     }
-    expect(composition.postAuthHooks.length, 1,
-        reason: 'the onboarding commit runs after sign-up');
+    expect(composition.postAuthHooks.length, 2,
+        reason: 'a pending deletion, then the onboarding commit');
   });
 
   test('a given backend replaces the configured one, and is initialised',
