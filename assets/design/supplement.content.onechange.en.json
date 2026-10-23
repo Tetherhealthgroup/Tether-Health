@@ -1,0 +1,918 @@
+{
+  "product": "onechange",
+  "locale": "en",
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "$comment": "Every non-shell screen in supplement.product.nutrition.json. Shell screens SH1–SH6 are deliberately absent: they are identical in every programme and are not this file's to write. The person throughout is Rosa, 46, a school-bus driver on a split shift; her sister Ana is her supporter and Priya is her coach. Every string is unreviewed.",
+  "start": "S01",
+  "screens": {
+    "S01": {
+      "title": "",
+      "lead": "none",
+      "headline": "No counting. No weigh-ins. No before and after.",
+      "sub": "OneChange works on one change at a time — small enough to keep on a bad week, and chosen by you rather than handed to you.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "Nothing to log",
+          "body": "No calorie counting, no food diary, no daily number to hit. Those aren't left out to be kind. They're left out because for most people they don't hold, and what doesn't hold isn't support."
+        },
+        {
+          "t": "card",
+          "title": "There are no scales here",
+          "body": "The programme never asks your weight, never draws it as a line, and never sets you beside anybody else."
+        },
+        {
+          "t": "card",
+          "title": "A hard week stays in the record",
+          "body": "Nothing resets, nothing is taken back, and nobody is told. A hard stretch is a fact about a week, not a verdict on you."
+        }
+      ],
+      "actions": [
+        { "label": "Get started", "to": "S02" },
+        { "label": "I already have an account", "kind": "ghost", "to": "S10" }
+      ],
+      "footer": "Education and self-management support. Not a diagnosis or treatment."
+    },
+
+    "S02": {
+      "title": "What it does",
+      "badge": "1 of 3",
+      "headline": "Four moments this is built for.",
+      "sub": "Not four features. Four times this gets hard.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Moment one",
+          "title": "When you can't say where last week went",
+          "body": "Two weeks of noticing, before anything changes. Minutes you moved, and where the hard part of the day actually sits. Nothing is scored and nothing is blocked."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment two",
+          "title": "When you're at the counter at nine at night",
+          "body": "The one change you picked, in your own words, on the screen. Not a rule somebody else wrote for somebody else."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Moment three",
+          "title": "When the week goes badly",
+          "body": "It goes in as history. Nothing zeroes, nobody is notified, and you are never asked to make it up afterwards."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment four",
+          "title": "When you want one person to know",
+          "body": "One person you pick, who sees the small thing you decided to show them, on the day you send it."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What it isn't",
+          "body": "It doesn't count anything you eat, set you a daily amount, weigh you, photograph your plate, or rank you against anyone."
+        }
+      ],
+      "actions": [{ "label": "Continue", "to": "S03" }],
+      "footer": "Education and self-management support. Not a diagnosis or treatment."
+    },
+
+    "S03": {
+      "title": "Consent & privacy",
+      "badge": "2 of 3",
+      "progress": 66,
+      "headline": "What we hold, and what we don't.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Held on your phone",
+          "body": "The change you chose, your reasons, your notes, and the days you moved. These stay here."
+        },
+        {
+          "t": "card",
+          "title": "Shared with your care team",
+          "body": "Whether you're still going, and which changes you're holding. Never a note you wrote, never a photo, never anything about what you ate — because we never ask."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "You can leave",
+          "body": "Export or delete all of it at any point. Deletion is finished, not hidden, and it doesn't wait for anyone's approval."
+        },
+        {
+          "t": "options",
+          "items": [
+            { "title": "I understand and agree", "sel": true },
+            { "title": "Share my weekly summary with Priya" }
+          ]
+        }
+      ],
+      "actions": [
+        { "label": "Agree and continue", "to": "S04" },
+        { "label": "Read the full privacy notice", "kind": "ghost", "to": "S03" }
+      ],
+      "footer": "You can change either choice later in Settings."
+    },
+
+    "S04": {
+      "title": "First two weeks",
+      "badge": "Day 4 of 14",
+      "headline": "Just carry on as you are.",
+      "sub": "Nothing changes for two weeks. We're looking for where your day gets hard, and you're the one telling us — there is nothing to measure and nothing to submit.",
+      "blocks": [
+        { "t": "bars", "values": [30, 0, 55, 18, 0, 0, 0] },
+        {
+          "t": "stats",
+          "items": [
+            ["22 min", "Moving, typical day"],
+            ["3 of 4", "Dinners standing up"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Where it's getting hard",
+          "body": "Between nine and ten at night, after the afternoon run. Four days out of four so far."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "All of this is what you told us. OneChange measures nothing, reads nothing from your phone, and doesn't treat any of it as a clinical measurement."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "You don't have to wait two weeks",
+          "body": "Two weeks makes the picture better, not truer. Start your change now and we'll note the picture is partial.",
+          "to": "S05",
+          "pill": "Skip ahead"
+        }
+      ],
+      "actions": [{ "label": "Start my change now", "kind": "ghost", "to": "S05" }],
+      "footer": "Saves offline · Syncs when connected"
+    },
+
+    "S05": {
+      "title": "Choose your path",
+      "badge": "1 of 5",
+      "progress": 20,
+      "lead": "back",
+      "headline": "Change one thing, or change the shape of the day?",
+      "sub": "Neither is the better answer, and switching later costs you nothing.",
+      "blocks": [
+        {
+          "t": "options",
+          "items": [
+            {
+              "title": "Change one thing",
+              "body": "One change, held until it stops taking effort. Most people start here.",
+              "sel": true
+            },
+            {
+              "title": "Change the shape of the day",
+              "body": "Not what's on the plate — when and where you eat it. Sitting down, and stopping at the table."
+            },
+            {
+              "title": "Start with your feet",
+              "body": "Leave food alone for now and move a bit more first. Food changes tend to land better afterwards."
+            }
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Whichever you pick, OneChange sets you no daily amount, asks you to log no meals, and never asks you to make up for a bad day."
+        }
+      ],
+      "actions": [{ "label": "Continue", "to": "S06" }]
+    },
+
+    "S06": {
+      "title": "Your change",
+      "badge": "2 of 5",
+      "progress": 40,
+      "lead": "back",
+      "headline": "What's one thing you could hold on a bad week?",
+      "sub": "Not your best week. A bad one — a double shift, no sleep, Ana ill. That's the real test of a change.",
+      "blocks": [
+        {
+          "t": "options",
+          "items": [
+            {
+              "title": "Sit down to eat dinner",
+              "body": "At the table, plate down, not at the counter with the kettle going.",
+              "sel": true
+            },
+            {
+              "title": "Eat something before the afternoon run",
+              "body": "So nine o'clock isn't the first proper sit-down of the day."
+            },
+            {
+              "title": "Walk the long way back from the depot",
+              "body": "Ten minutes, the same route every time, no decision left to make."
+            }
+          ]
+        },
+        {
+          "t": "slider",
+          "title": "How often, honestly?",
+          "body": "Aim low. A change you keep four days a week beats one you abandon in a fortnight.",
+          "value": 62,
+          "left": "A couple of days",
+          "mid": "Four or five days a week",
+          "right": "Every day"
+        },
+        {
+          "t": "card",
+          "title": "When you'd want a nudge",
+          "body": "Optional. A nudge is a reminder, not a check-up — nothing is recorded if you ignore it.",
+          "chips": ["After the afternoon run", "At nine", "Sunday evening", "No nudges"],
+          "selected": [1]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "There is no number here on purpose",
+          "body": "No daily target, no amount, no allowance. What the programme keeps is whether the change held — nothing about what was on the plate when it did."
+        }
+      ],
+      "actions": [{ "label": "Continue", "to": "S07" }]
+    },
+
+    "S07": {
+      "title": "My reasons",
+      "badge": "3 of 5",
+      "progress": 60,
+      "lead": "back",
+      "headline": "Why does this matter to you?",
+      "sub": "We'll put these back in front of you on the evenings it's hard. Your words land better than ours.",
+      "blocks": [
+        {
+          "t": "input",
+          "title": "Your first reason",
+          "value": "I want to get up Ana's stairs without stopping at the top."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Others have written",
+          "chips": [
+            "My knees",
+            "Sleeping better",
+            "Getting through a shift",
+            "My grandson",
+            "Not thinking about it all day"
+          ]
+        }
+      ],
+      "actions": [{ "label": "Continue", "to": "S08" }],
+      "footer": "Kept on your phone. Not shared with anyone, including Priya."
+    },
+
+    "S08": {
+      "title": "Support",
+      "badge": "4 of 5",
+      "progress": 80,
+      "lead": "back",
+      "headline": "One person, and a sentence they'll understand.",
+      "sub": "Not a group. One person you'd actually text at nine at night.",
+      "blocks": [
+        {
+          "t": "options",
+          "items": [
+            { "title": "Ana", "body": "Your sister. Already in your phone.", "sel": true },
+            { "title": "Someone else", "body": "Pick from your contacts — we only read the one you tap." },
+            {
+              "title": "No one for now",
+              "body": "The rest of the plan works without this, and you can add someone any time."
+            }
+          ]
+        },
+        {
+          "t": "input",
+          "title": "What Ana would see",
+          "value": "Rough evening. Can you ring me?"
+        },
+        {
+          "t": "card",
+          "title": "When you'd want her",
+          "body": "Optional. Nothing here sends on its own — it only decides when we offer.",
+          "chips": ["On a hard evening", "After a hard week", "Sunday summary", "Only when I ask"],
+          "selected": [0]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Nothing is sent yet",
+          "body": "When the moment comes we show you the exact message first. You press send, or you don't. OneChange never texts Ana by itself."
+        },
+        {
+          "t": "card",
+          "title": "What Ana never gets",
+          "body": "Your weight, which we don't have. What you ate, which we don't ask. Your notes, your reasons, where you are, or any message telling her you had a bad week.",
+          "to": "SH5",
+          "pill": "Who sees what"
+        }
+      ],
+      "actions": [
+        { "label": "Continue", "to": "S09" },
+        { "label": "Skip — no one for now", "kind": "ghost", "to": "S09" }
+      ],
+      "footer": "Ana isn't told she's been picked until the first time you send her something."
+    },
+
+    "S09": {
+      "title": "Review your plan",
+      "badge": "5 of 5",
+      "progress": 100,
+      "lead": "back",
+      "headline": "Your plan is ready.",
+      "sub": "One last look. Any part of it can change now or later.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Starting point",
+          "title": "One change, four or five days a week",
+          "body": "We won't suggest a second one until the first has stopped taking effort — and you'll be the one who says when that is."
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["PATH", "Change one thing"],
+            ["THE CHANGE", "Sit down to eat dinner"],
+            ["HOW OFTEN", "Four or five days a week"],
+            ["NUDGE", "21:00, on the evenings you chose"],
+            ["TOP REASON", "Get up Ana's stairs without stopping"],
+            ["SUPPORTER", "Ana · on a hard evening"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Starting turns on your nine o'clock nudge and nothing else. No target is set, nothing begins counting, and no message reaches Ana without you pressing send."
+        }
+      ],
+      "actions": [
+        { "label": "Start my plan", "to": "S10" },
+        { "label": "Save and finish later", "kind": "ghost", "to": "S10" }
+      ]
+    },
+
+    "S10": {
+      "title": "Today",
+      "badge": "Private",
+      "lead": "none",
+      "headline": "Afternoon, Rosa.",
+      "sub": "Week 5. You sat down to dinner five evenings out of seven.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Get help now",
+          "body": "Reachable from every screen, in every program.",
+          "to": "SH6",
+          "pill": "Open"
+        },
+        {
+          "t": "metric",
+          "eyebrow": "Since you started",
+          "value": "2",
+          "unit": "changes held",
+          "pct": 66,
+          "foot": "Sitting down to dinner since week 1 · the long way back since week 3"
+        },
+        {
+          "t": "stats",
+          "items": [
+            ["94 min", "Moving this week"],
+            ["5 of 7", "Evenings you sat down"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Hard evening right now?",
+          "body": "This programme has no ninety-second trick for it. What it has is Ana, Priya, and a line that answers at any hour.",
+          "to": "S18",
+          "pill": "Find a person"
+        },
+        {
+          "t": "card",
+          "title": "Today's check-in",
+          "body": "Not done yet · about a minute"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Priya · your coach",
+          "body": "Thursday, 5:30 pm",
+          "to": "S18"
+        }
+      ],
+      "actions": [
+        { "label": "Start today's check-in", "to": "S11" },
+        { "label": "Your kitchen", "kind": "ghost", "to": "S15" },
+        { "label": "Your programs", "kind": "ghost", "to": "SH1" }
+      ],
+      "footer": "Works offline · Syncs securely when connected"
+    },
+
+    "S11": {
+      "title": "Daily check-in",
+      "badge": "About 60 sec",
+      "progress": 70,
+      "headline": "How's today been?",
+      "sub": "No right answers. This decides what we suggest next, and nothing else.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "How do you feel?",
+          "chips": ["Low", "Not great", "Okay", "Good", "Great"],
+          "selected": [1]
+        },
+        {
+          "t": "card",
+          "title": "Did the change happen today?",
+          "body": "Before a change settles, a no is expected. It isn't a setback and it doesn't cost you anything.",
+          "chips": ["Yes", "Partly", "No", "Skip"],
+          "selected": [1]
+        },
+        {
+          "t": "slider",
+          "title": "Strongest reach today",
+          "value": 70,
+          "left": "0 · None",
+          "mid": "7 · Strong",
+          "right": "10"
+        },
+        {
+          "t": "card",
+          "title": "Anything else going on?",
+          "body": "Optional. Tick anything that's true today — these change what we offer, and nothing else.",
+          "chips": [
+            "Long shift",
+            "Not sleeping",
+            "Food's taking up most of my thinking",
+            "I skipped meals to make up for yesterday",
+            "Knees sore",
+            "Nothing in particular"
+          ],
+          "selected": [0, 2, 3]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "We read those last two",
+          "body": "Two of the things you ticked are ones we take seriously. They aren't a test and they don't label you with anything. What they change is the next screen, which has fewer numbers on it rather than more.",
+          "to": "S13",
+          "pill": "See what changes"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "If a day is worse than hard",
+          "body": "Tell us and it doesn't stop with Priya. She's a coach, not a clinician, and anything like that is routed to someone qualified the same day.",
+          "to": "S18",
+          "pill": "See the routes"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "These are your words about your day. OneChange doesn't treat them as measurements, can't tell you what they mean, and nothing here is a diagnosis."
+        }
+      ],
+      "actions": [{ "label": "Save check-in", "to": "S12" }],
+      "footer": "Private · Works offline · You can edit today's answers later"
+    },
+
+    "S12": {
+      "title": "Your next step",
+      "badge": "1 step",
+      "headline": "One thing, not five.",
+      "sub": "Based on a long shift, a reach of 7, and dinner standing up.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Recommended",
+          "title": "Put a plate out before you leave for the afternoon run.",
+          "body": "The counter wins at nine because the plate is three cupboards away. Move the effort to four in the afternoon, when it's cheap.",
+          "pill": "Do it now · 1 min"
+        },
+        {
+          "t": "card",
+          "title": "Or pick another",
+          "chips": [
+            "Eat something at the depot",
+            "Text Ana",
+            "Walk the long way back",
+            "Sit down for ten minutes first"
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Skipping is fine. We'll offer it again in a few days, and we won't ask why."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "You ticked two harder ones today",
+          "body": "There's a version of this programme with the counting switched off. It's there now, and it stays there whether you use it today or not.",
+          "to": "S13",
+          "pill": "Fewer numbers"
+        }
+      ],
+      "actions": [
+        { "label": "Do it now", "to": "S10" },
+        { "label": "Not today", "kind": "ghost", "to": "S10" }
+      ]
+    },
+
+    "S13": {
+      "title": "Fewer numbers",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "We're taking things away, not adding them.",
+      "sub": "You said food is taking up most of your thinking, and that you skipped meals to make up for yesterday. When we see that, the right move is less measuring, not tighter measuring. So this screen only offers to remove things.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Recommended",
+          "title": "Turn the counts off for a fortnight.",
+          "body": "No minutes on your Today screen, no reach slider in the check-in, no weekly figures. The programme keeps running. You'll get one question a day — how was today — and that's the whole of it.",
+          "pill": "Turn them off"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["TURNS OFF", "Activity minutes, the reach slider, the weekly figures"],
+            ["STAYS ON", "Your reasons, your nudge, Ana, Priya, your record"],
+            ["WAS NEVER ON", "Your weight, calories, portions, or anything you ate"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Or take away less",
+          "chips": [
+            "Just the numbers on Today",
+            "Keep the check-in, drop the slider",
+            "Pause the programme, keep the record"
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "This one is worth saying out loud to a person",
+          "body": "Priya is a coach, not a clinician, so we don't leave it with her. She can put you in front of your care team this week, and 988 answers at any hour if tonight is a bad one.",
+          "to": "S18",
+          "pill": "See the routes"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Why this screen exists",
+          "body": "An app that answers this with a stricter plan, a tighter number or a longer streak makes things worse, and plenty do. Ours is built to get quieter. That's the whole design, and it isn't a punishment — nothing is being withheld from you, and you can turn any of it back on."
+        },
+        {
+          "t": "card",
+          "title": "Not now is a complete answer",
+          "body": "Nothing changes if you close this, nothing is recorded about it, and we won't ask why. The offer sits in Settings from now on."
+        }
+      ],
+      "actions": [
+        { "label": "Turn the counts off", "to": "S10" },
+        { "label": "Not now", "kind": "ghost", "to": "S10" }
+      ],
+      "footer": "Turning anything back on is one tap in Settings, whenever you want it."
+    },
+
+    "S14": {
+      "title": "A hard stretch",
+      "badge": "Private",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Nothing has been reset",
+          "title": "A hard week is a fact about a week.",
+          "body": "Both your changes are still held, week 5 is still week 5, and last week stays in the chart exactly as it happened. Nothing below deletes, rewinds or zeroes any of it."
+        },
+        {
+          "t": "options",
+          "items": [
+            { "title": "A couple of evenings got away from me", "sel": true },
+            { "title": "Most of the week" },
+            { "title": "I'd rather not say" }
+          ]
+        },
+        {
+          "t": "card",
+          "title": "What was going on?",
+          "body": "Optional. It moves what we suggest next, and nothing else.",
+          "chips": ["Long shifts", "Not sleeping", "Ana's been ill", "Nothing in particular"],
+          "selected": [0, 2]
+        },
+        {
+          "t": "card",
+          "title": "What now",
+          "body": "Nothing to make up. There's no deficit here to pay back, and we are not going to ask you to eat less this week because of last week."
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Your next step",
+          "title": "Start again at dinner tonight, not on Monday.",
+          "body": "The changes that come back the same evening are the ones that stay. Waiting for a clean start is what turns two evenings into three weeks.",
+          "pill": "Set tonight's nudge"
+        }
+      ],
+      "actions": [{ "label": "Save and continue", "to": "S10" }],
+      "footer": "Saves offline and syncs once · You can delete this event later"
+    },
+
+    "S15": {
+      "title": "Your kitchen",
+      "badge": "4 changes",
+      "lead": "back",
+      "headline": "Make the nine o'clock reach harder to do.",
+      "sub": "Each of these lowers how often the reach starts. None of them ask you to resist anything.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "The idea",
+          "title": "Fewer reaches beats more resisting.",
+          "body": "Most evenings don't begin with a decision. They begin with a cupboard at eye level and a plate three cupboards away. Move those two things and the decision never comes up."
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "From your check-ins",
+          "title": "Swap the eye-level shelf with the top one.",
+          "body": "Ten minutes, once. The honest cost: the things you actually cook with are now up high too, and you'll be cross about it for a week.",
+          "pill": "Do it tonight · 10 min"
+        },
+        {
+          "t": "card",
+          "title": "Put the plate out in the afternoon",
+          "body": "Before the run, not after it. Costs nothing at four and saves you the whole walk at nine."
+        },
+        {
+          "t": "card",
+          "title": "Do the Wednesday shop on the way back, not the way out",
+          "body": "After the afternoon run rather than before it. The cost is twenty minutes in a colder bus and no second trip if you forget something."
+        },
+        {
+          "t": "card",
+          "title": "Eat at the table, phone in the hall",
+          "body": "The hardest of the four, and the one people keep longest. The cost is real: you'll miss calls during dinner, including Ana's."
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WHAT WE DO", "Ask once, and remember what you said"],
+            ["WHAT WE DON'T", "Photograph, count or inspect anything in your kitchen"],
+            ["WHO DECIDES", "You. Ana sees none of this unless you send it."]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "All of it is yours to undo",
+          "body": "Every change here is one you make with your own hands in your own house. Putting the shelf back takes ten minutes and doesn't need us, or this app, or anyone's permission. If we ever couldn't hand something back, we wouldn't offer it."
+        }
+      ],
+      "actions": [
+        { "label": "Set these up", "to": "S10" },
+        { "label": "Read why cues matter", "kind": "ghost", "to": "S16" }
+      ],
+      "footer": "Nothing here is checked up on. We only ever know what you tell us."
+    },
+
+    "S16": {
+      "title": "Learn",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "Short, plain, and dated.",
+      "sub": "Seven pieces, none longer than a bus ride. Each one shows when it was last checked.",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": ["All", "Evenings", "Moving", "Hard weeks", "For supporters"],
+          "selected": [0]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "You've ticked “long shift” nine times",
+          "title": "Eating on a split shift",
+          "body": "6 min · reviewed June 2026"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WHY ONE CHANGE AT A TIME", "4 min · reviewed May 2026"],
+            ["WHAT A HARD WEEK ACTUALLY COSTS YOU", "5 min · reviewed August 2026"],
+            ["MOVING WHEN YOUR KNEES HURT", "6 min · reviewed July 2026"],
+            ["WHY THIS PROGRAMME DOESN'T COUNT ANYTHING", "4 min · reviewed August 2026"],
+            ["WHEN FOOD STARTS TAKING UP THE DAY", "5 min · reviewed August 2026"],
+            ["TELLING SOMEONE ABOUT THIS", "4 min · reviewed March 2026"],
+            ["WHAT NOBODY KNOWS YET", "2 min · reviewed August 2026"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Why the dates are on the front",
+          "body": "Anything that hasn't been checked in eighteen months comes down, rather than sitting here looking current."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What this library won't do",
+          "body": "These explain. They don't prescribe. Nothing here picks a diet, a medicine or a procedure for you, nothing here sets you a daily amount of anything, and nothing here has seen your history."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If you want that conversation",
+          "body": "It belongs with a qualified person. Priya replies within a day, and your care team can go further than she can.",
+          "to": "S18",
+          "pill": "View support"
+        }
+      ],
+      "actions": [{ "label": "Back to today", "kind": "ghost", "to": "S10" }],
+      "footer": "Reviewed before it goes up, and dated so you can see how old it is."
+    },
+
+    "S17": {
+      "title": "Progress",
+      "badge": "Week 5",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": ["7 days", "30 days", "All 5 weeks"],
+          "selected": [1]
+        },
+        { "t": "bars", "values": [40, 0, 65, 30, 55, 0, 48] },
+        {
+          "t": "metric",
+          "eyebrow": "Held so far",
+          "value": "2",
+          "unit": "changes, over five weeks",
+          "pct": 66,
+          "foot": "Sitting down to dinner since week 1 · the long way back since week 3"
+        },
+        {
+          "t": "stats",
+          "items": [
+            ["94 min", "Moving this week"],
+            ["18", "Evenings you sat down"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Week 4 was a hard one, and it's still here",
+          "title": "Two evenings, and the flat days are real.",
+          "body": "Nothing was reset. You're still on week 5, both changes are still counted as held, and week 4 is still in everything above. We'd rather show you an honest chart than a flattering one."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "Pattern",
+          "title": "It's still nine o'clock.",
+          "body": "Every evening that got away from you started in the same hour it did in your first two weeks. The difference is they end sooner now."
+        },
+        {
+          "t": "card",
+          "title": "There's no weight line on this screen",
+          "body": "There never will be. The programme doesn't ask your weight, so it has nothing to draw — and a line of it wouldn't tell you anything about this week that the week didn't already."
+        },
+        {
+          "t": "card",
+          "title": "Send this to Priya?",
+          "body": "You'd read the exact file first: changes held and minutes moving. No notes, no check-in answers, no flag for week 4. Nothing moves until you press send.",
+          "to": "SH5",
+          "pill": "See what's shared"
+        }
+      ],
+      "actions": [
+        { "label": "Preview what would be sent", "kind": "ghost", "to": "S18" },
+        { "label": "Back to today", "to": "S10" }
+      ],
+      "footer": "Nothing on this screen has been shared. It only leaves your phone if you ask it to."
+    },
+
+    "S18": {
+      "title": "Support",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "A route to a person.",
+      "sub": "Nothing is sent until you've read it and pressed send.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "In a crisis",
+          "body": "If you're in danger, or thinking about harming yourself, call 988 or your local emergency number now.",
+          "pill": "Call 988"
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "988 Suicide & Crisis Lifeline",
+          "body": "Call or text 988 · English and Spanish · 24 hours"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["ANA", "“Rough evening. Can you ring me?”"],
+            ["PRIYA · YOUR COACH", "Replies within a day"],
+            ["YOUR CARE TEAM", "Share this month's summary"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Eating disorder support",
+          "body": "There are national helplines for this, and we haven't printed a number here. We couldn't confirm today that the one we had is still the current one, and a wrong number in a bad hour is worse than no number. Priya, your care team, or 988 will get you to the right people, and we'll put the number here as soon as it's been checked."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Nothing here is automatic",
+          "body": "No one on this screen is told anything about your week unless you send it, and you read the exact contents first."
+        }
+      ],
+      "actions": [
+        { "label": "Back to today", "to": "S10" },
+        { "label": "Who sees what", "kind": "ghost", "to": "SH5" }
+      ],
+      "footer": "Crisis numbers route to United States services."
+    },
+
+    "S19": {
+      "title": "Settings & privacy",
+      "badge": "Private",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Notifications",
+          "body": "Detail is off. A reminder on your lock screen says “OneChange” and nothing else — not which programme, not your nudge, not why. Anyone who picks up your phone learns that an app reminded you. That's all.",
+          "chips": ["Generic — “OneChange”", "Show detail", "None at all"],
+          "selected": [0]
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["YOUR CHANGE", "Sit down to eat dinner · four or five days"],
+            ["SECOND CHANGE", "The long way back from the depot"],
+            ["NUDGE", "21:00, on the evenings you chose"],
+            ["NUMBERS ON TODAY", "On · you can switch these off at any time"],
+            ["TEXT SIZE", "Follows your phone"],
+            ["SHARING WITH PRIYA", "Changes held and minutes moving · notes off"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "The quieter version",
+          "body": "Minutes, sliders and weekly figures off, the rest of the programme on. No reason needed, nobody is told, and turning it back on is the same single tap.",
+          "to": "S13",
+          "pill": "Fewer numbers"
+        },
+        {
+          "t": "card",
+          "title": "Export everything",
+          "body": "A readable file and a structured one, including anything you've deleted from view but not from the record. It stays on your phone unless you send it.",
+          "to": "SH4",
+          "pill": "Export"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Delete everything",
+          "body": "Completed, not hidden — your phone, our servers, and anything queued to sync. It can't be undone, and it ends the programme.",
+          "to": "SH4",
+          "pill": "Delete"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Education and self-management support. It does not diagnose, treat or prescribe, it sets no daily amount for anything you eat, and it is not a substitute for advice from a qualified health professional."
+        }
+      ],
+      "actions": [
+        { "label": "Done", "to": "S10" },
+        { "label": "Who sees what", "kind": "ghost", "to": "SH5" },
+        { "label": "Your record across programs", "kind": "ghost", "to": "SH4" }
+      ],
+      "footer": "Switching a number off happens straight away. Switching one back on waits until the morning, so it isn't a thing you do at midnight."
+    }
+  }
+}

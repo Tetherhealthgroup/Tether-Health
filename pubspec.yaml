@@ -42,3 +42,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/screens/
+    # Unplug intercept copy and colours, read by the Dart preview and the
+    # native hosts (InterceptTokens.kt / InterceptTokens.swift).
+    - assets/unplug/

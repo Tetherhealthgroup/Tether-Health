@@ -1,0 +1,778 @@
+{
+  "product": "steadyair",
+  "locale": "en",
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "$comment": "Every non-shell screen in supplement.product.respiratory.json. Shell screens SH1–SH6 are not authored here; they are identical in every programme. The person throughout is Ray, 62, six weeks in, COPD diagnosed three years ago. Every string is unreviewed.",
+  "start": "S01",
+  "screens": {
+    "S01": {
+      "title": "",
+      "lead": "none",
+      "headline": "Some days are harder than others. It helps to know which.",
+      "sub": "SteadyAir keeps a short, honest record of how your breathing has been — the kind of thing that is very hard to remember accurately in a ten-minute appointment, and very easy to write down in twenty seconds a day.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "Twenty seconds, most days",
+          "body": "A number out of ten and how many times you reached for your reliever. That is the whole of it."
+        },
+        {
+          "t": "card",
+          "title": "It routes, it doesn't judge",
+          "body": "When your own numbers start moving, SteadyAir says so and points you at your nurse. It will never tell you what to take."
+        },
+        {
+          "t": "card",
+          "title": "Nothing leaves your phone on its own",
+          "body": "Not to your clinic, not to your family. You see the exact contents first, or it doesn't go."
+        },
+        {
+          "t": "chips",
+          "items": ["English"],
+          "selected": [0]
+        }
+      ],
+      "actions": [
+        { "label": "Get started", "to": "S02" },
+        { "label": "I already have an account", "kind": "ghost", "to": "S08" }
+      ],
+      "footer": "Education and self-management support. Not a diagnosis or treatment, and not a substitute for advice from a qualified health professional."
+    },
+
+    "S02": {
+      "title": "What it does",
+      "badge": "1 of 6",
+      "progress": 17,
+      "headline": "Four moments this is built for.",
+      "sub": "Not four features. Four points where living with a long-term chest condition is genuinely awkward.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Moment one",
+          "title": "When you're asked how it's been and you honestly can't say",
+          "body": "\"Up and down\" is the truest answer most people can give after six months. A fortnight of small daily notes turns that into something a nurse can actually work with."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment two",
+          "title": "When it keeps happening in the same place",
+          "body": "The cold walk to the bus. Hoovering the back room. One particular hill. Naming the exposure is the part you can do something about."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Moment three",
+          "title": "When you're reaching for the reliever more than you used to",
+          "body": "SteadyAir counts it and tells you when the count has moved. Then it points you at a person. It does not tell you to take anything, and it never will."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment four",
+          "title": "When you want the clinic to see it",
+          "body": "One tidy page of your own notes, previewed by you, sent by you, whenever you decide. Never automatically."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What it isn't",
+          "body": "It doesn't measure anything — no spirometry, no oxygen readings, nothing paired to your phone. It doesn't name a medicine or a dose. It doesn't decide whether you're having a flare-up. And it is not a way to get hold of someone quickly in an emergency."
+        }
+      ],
+      "actions": [
+        { "label": "Continue", "to": "S03" }
+      ],
+      "footer": "Education and self-management support. Not a diagnosis or treatment."
+    },
+
+    "S03": {
+      "title": "Consent & privacy",
+      "badge": "2 of 6",
+      "progress": 33,
+      "headline": "What we hold, and what we don't.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Held on your phone",
+          "body": "Your daily ratings, your reliever counts, your trigger list and anything you type. These stay here unless you send them."
+        },
+        {
+          "t": "card",
+          "title": "Shared with your clinic",
+          "body": "Nothing, by default. When you do send something, it is the summary you looked at and approved — never a live feed, and never an alert we raise on your behalf."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "You can leave",
+          "body": "Export the lot as a readable file, or delete it. Deletion is completed on your phone and on our servers, not hidden from view."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "One thing to be clear about",
+          "body": "Nobody is watching this. If your numbers move, SteadyAir tells you — it does not tell your clinic, and no one is going to call you because of something you typed here."
+        },
+        {
+          "t": "options",
+          "items": [
+            { "title": "I understand and agree", "sel": true },
+            { "title": "Let SteadyAir remind me when a summary is worth sending", "body": "Reminders only. It still doesn't send anything by itself." }
+          ]
+        }
+      ],
+      "actions": [
+        { "label": "Agree and continue", "to": "S04" },
+        { "label": "Read the full privacy notice", "kind": "ghost", "to": "S14" }
+      ],
+      "footer": "You can change either choice later in Settings."
+    },
+
+    "S04": {
+      "title": "Your first fortnight",
+      "badge": "3 of 6",
+      "progress": 50,
+      "headline": "Change nothing for two weeks.",
+      "sub": "Carry on exactly as you were. Without a starting picture, neither of us can tell later whether anything you tried made a difference.",
+      "blocks": [
+        { "t": "bars", "values": [30, 40, 30, 60, 50, 70, 40] },
+        {
+          "t": "stats",
+          "items": [
+            ["4.6", "Average, out of ten"],
+            ["9", "Reliever, this week"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Your two hardest mornings",
+          "body": "Thursday and Saturday, both under freezing, both days you walked to the bus. That's the only thing SteadyAir has spotted so far, and it may well be a coincidence."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "You don't have to wait out the fortnight",
+          "body": "If you'd rather get on with it, do. We'll mark the starting picture as partial and say so on every chart that uses it.",
+          "pill": "Skip ahead"
+        }
+      ],
+      "actions": [
+        { "label": "Continue", "to": "S05" },
+        { "label": "Skip the rest of the fortnight", "kind": "ghost", "to": "S06" }
+      ],
+      "footer": "These are your own ratings, in your own words. SteadyAir has not measured anything and does not treat them as measurements."
+    },
+
+    "S05": {
+      "title": "What sets it off",
+      "badge": "4 of 6",
+      "progress": 67,
+      "lead": "back",
+      "headline": "When does your chest get worse?",
+      "sub": "Tick what's true. Your fortnight already suggests a couple, so those start ticked — untick anything that's wrong, because your account beats our guess.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Where and when",
+          "chips": [
+            "Cold air",
+            "Hills or stairs",
+            "Dust or hoovering",
+            "Smoke",
+            "Damp rooms",
+            "Strong smells",
+            "Pollen",
+            "Hot, heavy air",
+            "After a cold"
+          ],
+          "selected": [0, 1, 2]
+        },
+        {
+          "t": "card",
+          "title": "How it starts",
+          "body": "Same words we'll offer you at check-in, so they'll look familiar later.",
+          "chips": [
+            "Tight across the chest",
+            "Wheeze",
+            "Coughing",
+            "Can't finish a sentence",
+            "Worse lying flat",
+            "Frightened with it"
+          ],
+          "selected": [0, 2]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "From your fortnight",
+          "title": "Cold mornings, four times out of five.",
+          "body": "Your four hardest days were all under freezing and all began with the walk to the bus stop. That is why Cold air and Hills or stairs are already ticked."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If smoking is on this list",
+          "body": "Your own, or somebody else's in the house. Stopping is the single biggest thing available here, and it has a whole programme of its own — BreatheFree. SteadyAir isn't going to do a worse version of it. Joining that one changes nothing here, and the two keep separate records.",
+          "to": "SH2",
+          "pill": "Look at BreatheFree"
+        },
+        {
+          "t": "card",
+          "body": "None of this is fixed. Every check-in nudges this list, and what SteadyAir suggests moves with it."
+        }
+      ],
+      "actions": [
+        { "label": "Continue", "to": "S06" }
+      ],
+      "footer": "Kept on your phone. Not shared with anyone."
+    },
+
+    "S06": {
+      "title": "What you'll try",
+      "badge": "5 of 6",
+      "progress": 83,
+      "lead": "back",
+      "headline": "Pick what you'll actually do.",
+      "sub": "Two small things beat five good intentions. You can change any of it later, and nothing here is graded.",
+      "blocks": [
+        {
+          "t": "slider",
+          "title": "Days a week you'll check in",
+          "body": "Five is plenty. Seven is not better, and missing one is not a failure.",
+          "value": 71,
+          "left": "1",
+          "mid": "5 days",
+          "right": "7"
+        },
+        {
+          "t": "options",
+          "items": [
+            {
+              "title": "Cover your mouth and nose on cold mornings",
+              "body": "A scarf on the walk to the bus. Cold air was in four of your five hardest days.",
+              "sel": true
+            },
+            {
+              "title": "Open the window before you hoover, and go slower",
+              "body": "The back room came up twice in your fortnight."
+            },
+            {
+              "title": "Ask about pulmonary rehab at your next appointment",
+              "body": "Not something SteadyAir can arrange or judge you on. It's a question to take in, and it sits on your appointment list until you tick it off.",
+              "sel": true
+            }
+          ]
+        },
+        {
+          "t": "card",
+          "title": "When we'll nudge you",
+          "body": "One reminder, and it says nothing on your lock screen beyond the word SteadyAir.",
+          "chips": ["Morning", "After lunch", "Evening", "No reminder"],
+          "selected": [2]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Nothing on this screen is a medical target",
+          "body": "SteadyAir does not set a dose, a distance, a number of steps or a number of puffs. It has no view on any of those. Everything above is a change to what you meet in a day, chosen by you."
+        }
+      ],
+      "actions": [
+        { "label": "Continue", "to": "S07" }
+      ],
+      "footer": "You can edit any of this from Settings, at any time, without explaining why."
+    },
+
+    "S07": {
+      "title": "Review your plan",
+      "badge": "6 of 6",
+      "progress": 100,
+      "lead": "back",
+      "headline": "That's the whole thing.",
+      "sub": "It is deliberately small. Have a look, then start it.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Starting level",
+          "title": "Light touch — one check-in and a running count",
+          "body": "No blocking, no scoring, no streak. If it ever starts feeling like homework, turn the reminder off and keep the log."
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["CHECK-INS", "5 days a week · evening reminder"],
+            ["TRYING", "Scarf on cold mornings"],
+            ["TRYING", "Ask about pulmonary rehab"],
+            ["TRIGGERS", "Cold air · Hills or stairs · Dust"],
+            ["WHO YOU'D TELL", "Nadia · and Nurse Pike at Elm Road"],
+            ["SHARING", "Nothing goes anywhere until you send it"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What starting actually switches on",
+          "body": "An evening reminder and the reliever count. That's it. Nothing is shared, nobody is notified, and your fortnight of notes is kept."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "The one thing SteadyAir will interrupt you about",
+          "body": "If your reliever count climbs, we'll say so and point you at Nurse Pike the same day. It is the only unprompted thing this app does.",
+          "to": "S10",
+          "pill": "See how that works"
+        }
+      ],
+      "actions": [
+        { "label": "Start my plan", "to": "S08" },
+        { "label": "Save and finish later", "kind": "ghost", "to": "S08" }
+      ]
+    },
+
+    "S08": {
+      "title": "Today",
+      "badge": "Private",
+      "lead": "none",
+      "headline": "Morning, Ray.",
+      "sub": "Week 6. It's been a cold one, and your log shows it.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If your breathing is worse right now",
+          "body": "Don't log it. Go straight here — emergency and clinic numbers, same on every screen.",
+          "to": "SH6",
+          "pill": "Get help now"
+        },
+        {
+          "t": "metric",
+          "eyebrow": "Yesterday",
+          "value": "6",
+          "unit": "out of ten",
+          "pct": 60,
+          "foot": "Your first fortnight averaged 4.6"
+        },
+        {
+          "t": "stats",
+          "items": [
+            ["6", "Reliever, this week so far"],
+            ["4", "All of last week"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Worth a phone call today",
+          "title": "Six by Tuesday. Four in the whole of last week.",
+          "body": "That's your own count, and it has gone up three days running. SteadyAir has no opinion on what that means — but a change of that shape is the sort of thing clinics ask people to bring in, and today beats next month.",
+          "to": "S13",
+          "pill": "Ring Elm Road"
+        },
+        {
+          "t": "card",
+          "title": "Today's check-in",
+          "body": "Not done yet · about twenty seconds"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Nurse Pike · Elm Road",
+          "body": "Review booked for 3 March, 9:40am",
+          "to": "S13"
+        }
+      ],
+      "actions": [
+        { "label": "Start today's check-in", "to": "S09" },
+        { "label": "Your readings", "kind": "ghost", "to": "S10" },
+        { "label": "Learn", "kind": "ghost", "to": "S11" },
+        { "label": "Your programs", "kind": "ghost", "to": "SH1" }
+      ],
+      "footer": "Works offline · Nothing here has been shared with anyone"
+    },
+
+    "S09": {
+      "title": "Daily check-in",
+      "badge": "About 20 sec",
+      "progress": 60,
+      "headline": "How's the chest been today?",
+      "sub": "No right answers, and no wrong ones. A rough guess is worth far more than a skipped day.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Overall, today",
+          "chips": ["Rough", "Not great", "Alright", "Good", "Better than usual"],
+          "selected": [1]
+        },
+        {
+          "t": "slider",
+          "title": "Worst your breathing got",
+          "body": "Ten is fighting for every breath. Zero is not noticing it at all.",
+          "value": 60,
+          "left": "0 · Not at all",
+          "mid": "6 · Hard work",
+          "right": "10",
+          "foot": "Yesterday you put 6"
+        },
+        {
+          "t": "card",
+          "title": "How many times did you reach for your reliever?",
+          "body": "Your best guess. We count it, we don't grade it.",
+          "chips": ["None", "1 or 2", "3 or 4", "5 or more", "Skip"],
+          "selected": [3]
+        },
+        {
+          "t": "card",
+          "title": "Anything else today?",
+          "chips": [
+            "Coughing more",
+            "More phlegm",
+            "Wheeze",
+            "Woke in the night",
+            "Tight chest",
+            "Ankles puffy",
+            "Went off my food"
+          ],
+          "selected": [0, 3]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If it's bad while you're reading this",
+          "body": "Struggling to get the words out, lips or fingertips gone dusky, or frightened by it — stop filling this in and call 911. A check-in is not the thing that helps in that minute.",
+          "to": "SH6",
+          "pill": "Get help now"
+        }
+      ],
+      "actions": [
+        { "label": "Save check-in", "to": "S10" },
+        { "label": "Back to today", "kind": "ghost", "to": "S08" }
+      ],
+      "footer": "This is how you felt, in your words. SteadyAir has measured nothing and does not treat these as clinical readings."
+    },
+
+    "S10": {
+      "title": "Your readings",
+      "badge": "Week 6",
+      "lead": "back",
+      "headline": "What you've written down.",
+      "sub": "Two numbers a day and the dates they happened on. That's all this page is.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Read this before the numbers",
+          "title": "If you are fighting for breath, call 911 now.",
+          "body": "Can't finish a sentence, lips or fingertips gone dusky, chest pain with it, or suddenly much worse than you have ever been — that is an emergency, and it is not something to log first. Logging can wait. It always can.",
+          "to": "SH6",
+          "pill": "Call 911"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Not an emergency, but not for next month either",
+          "title": "Your reliever count has gone up three days running.",
+          "body": "Eleven this week against four the week before. SteadyAir is not telling you what that means and is not going to — but a change of that shape is exactly what Nurse Pike asks people to come in about, and she has same-day slots for it. Ring Elm Road today rather than waiting for 3 March.",
+          "to": "S13",
+          "pill": "Ring Elm Road"
+        },
+        {
+          "t": "input",
+          "title": "Reliever, today",
+          "value": "5"
+        },
+        {
+          "t": "slider",
+          "title": "Breathing, today",
+          "value": 60,
+          "left": "0",
+          "mid": "6 out of ten",
+          "right": "10"
+        },
+        { "t": "bars", "values": [30, 40, 30, 40, 50, 60, 60] },
+        {
+          "t": "rows",
+          "items": [
+            ["TUE 24", "6 of ten · 5 reliever"],
+            ["MON 23", "6 of ten · 4 reliever"],
+            ["SUN 22", "5 of ten · 2 reliever"],
+            ["SAT 21", "4 of ten · 0 reliever"],
+            ["FRI 20", "3 of ten · 0 reliever"],
+            ["THU 19", "4 of ten · 0 reliever"],
+            ["WED 18", "3 of ten · 0 reliever"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "There is no good number on this page",
+          "body": "SteadyAir does not score these, does not colour them, and has no threshold it is quietly comparing you against. A six is not worse than a four in any sense the app understands — it is a different day, and only you know what was going on in it. What the pattern means belongs to Nurse Pike."
+        },
+        {
+          "t": "card",
+          "title": "Why the count matters more than the rating",
+          "body": "How breathless you felt is yours. How often you reached for the reliever is the bit clinics tend to act on, which is why that is the number SteadyAir watches for movement — and the only thing it ever does about it is tell you, and give you the phone number."
+        }
+      ],
+      "actions": [
+        { "label": "Save and go back", "to": "S08" },
+        { "label": "See the whole six weeks", "kind": "ghost", "to": "S12" }
+      ],
+      "footer": "Your own counts, typed by you. Nothing here was measured, and nothing here has been sent to anyone."
+    },
+
+    "S11": {
+      "title": "Learn",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "Short, plain, and dated.",
+      "sub": "Seven pieces. Each one shows when a clinician last checked it, because a health page with no date on it is asking you to trust it blind.",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": ["All", "Cold weather", "Infections", "Breathlessness", "Appointments"],
+          "selected": [0]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "You've ticked cold air five times this month",
+          "title": "Why cold air catches you, and what actually helps",
+          "body": "5 min · reviewed August 2026"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WHAT A BAD STRETCH IS, AND WHAT IT ISN'T", "4 min · reviewed August 2026"],
+            ["CHEST INFECTIONS: WHAT CLINICS ASK YOU TO WATCH FOR", "6 min · reviewed July 2026"],
+            ["BREATHLESSNESS AND FEAR ARE HARD TO TELL APART", "5 min · reviewed June 2026"],
+            ["PULMONARY REHAB: WHAT IT IS AND HOW TO ASK", "4 min · reviewed July 2026"],
+            ["GETTING A TEN-MINUTE APPOINTMENT TO COUNT", "3 min · reviewed August 2026"],
+            ["SMOKING AND LUNGS — THIS ONE LIVES IN BREATHEFREE", "Opens the tobacco programme"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Smoking has its own programme",
+          "body": "There is no short version of it worth reading, so SteadyAir doesn't write one. BreatheFree does that job properly, keeps its own separate record, and does not touch anything in here.",
+          "to": "SH2",
+          "pill": "Look at BreatheFree"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What this library will not do",
+          "body": "These explain. They don't prescribe. Nothing here names a medicine, a strength, a dose, or when to reach for one — that belongs to whoever prescribed it, and they know things about you that an app never will."
+        },
+        {
+          "t": "card",
+          "title": "Why the dates are on the front",
+          "body": "Anything not checked in eighteen months comes down rather than sitting here looking current."
+        }
+      ],
+      "actions": [
+        { "label": "Back to today", "kind": "ghost", "to": "S08" },
+        { "label": "Ask someone instead", "kind": "ghost", "to": "S13" }
+      ],
+      "footer": "Reviewed before it goes up, and dated so you can see how old it is."
+    },
+
+    "S12": {
+      "title": "Progress",
+      "badge": "Week 6",
+      "lead": "back",
+      "headline": "Six weeks, honestly drawn.",
+      "sub": "Including the bits that went badly, which are the bits worth showing someone.",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": ["7 days", "30 days", "All six weeks"],
+          "selected": [0]
+        },
+        { "t": "bars", "values": [30, 40, 30, 40, 50, 60, 60] },
+        {
+          "t": "metric",
+          "eyebrow": "This week",
+          "value": "4.4",
+          "unit": "average out of ten",
+          "pct": 44,
+          "foot": "Your starting fortnight averaged 4.6"
+        },
+        {
+          "t": "stats",
+          "items": [
+            ["11", "Reliever, this week"],
+            ["4", "Week before"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "The two numbers are not moving together",
+          "body": "Your ratings this week are close to where they started — 4.4 against 4.6. Your reliever count nearly tripled. That is the whole reason SteadyAir watches the count rather than the rating, and it is the pair of numbers worth putting in front of Nurse Pike."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "Pattern",
+          "title": "It's the cold, and it's the mornings.",
+          "body": "Four of your five hardest days this month began with the walk to the bus, and every one of them was under freezing. Weeks 3 and 4, when it was milder, were your two easiest — the scarf started in week 4, so we can't tell those two apart yet.",
+          "to": "S11",
+          "pill": "Read about cold air"
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Nothing here has been reset",
+          "title": "March is still in these charts.",
+          "body": "The five weeks after that chest infection were your worst, and they are in every average on this page. A bad stretch isn't a slip and it isn't a failure — nobody chooses a chest infection. SteadyAir keeps it as history because a chart that quietly drops your worst month is no use to Nurse Pike and no comfort to you."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Before you send anything",
+          "title": "This is exactly what would go to Elm Road.",
+          "body": "Read the two lists below. Nothing moves until you press send, and you can stop at that point."
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WOULD BE SENT", "Daily ratings out of ten, six weeks"],
+            ["WOULD BE SENT", "Reliever counts per day, six weeks"],
+            ["WOULD BE SENT", "Your trigger list and the dates of the March stretch"],
+            ["WOULD NOT BE SENT", "Anything you typed in a note box"],
+            ["WOULD NOT BE SENT", "Which other Tether programmes you're in"],
+            ["WOULD NOT BE SENT", "Your reminder settings, or how often you open the app"]
+          ]
+        }
+      ],
+      "actions": [
+        { "label": "Send this to Elm Road", "to": "S13" },
+        { "label": "Not now", "kind": "ghost", "to": "S08" }
+      ],
+      "footer": "Nothing on this screen has been shared. It leaves your phone only if you ask it to."
+    },
+
+    "S13": {
+      "title": "Support",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "A route to a person.",
+      "sub": "Nothing is sent until you have read it and pressed send yourself.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "In an emergency",
+          "body": "Fighting for breath, unable to finish a sentence, lips or fingertips gone dusky, or chest pain with it — call 911 or your local emergency number now. Do not wait for a call back and do not log it first.",
+          "to": "SH6",
+          "pill": "Call 911"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["ELM ROAD PRACTICE", "Same-day respiratory slots · ask for Nurse Pike"],
+            ["NURSE PIKE", "Your review is 3 March, 9:40am"],
+            ["NADIA", "\"Can you come over for a bit?\""]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "988 Suicide & Crisis Lifeline",
+          "body": "Call or text 988 · English and Spanish · 24 hours. Long-term breathlessness wears people down, and that is a real reason to ring."
+        },
+        {
+          "t": "card",
+          "title": "1-800-QUIT-NOW",
+          "body": "1-800-784-8669 · Español 1-855-335-3569. Free coaching to stop smoking, separate from anything in SteadyAir.",
+          "to": "SH2",
+          "pill": "Look at BreatheFree"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Before you send",
+          "title": "Exactly what Elm Road would receive.",
+          "body": "One page. You are looking at its contents now, not at a description of them."
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["INCLUDED", "Six weeks of daily ratings and reliever counts"],
+            ["INCLUDED", "Your trigger list, and the March stretch with its dates"],
+            ["NOT INCLUDED", "Notes you typed, in any screen"],
+            ["NOT INCLUDED", "Your other Tether programmes"],
+            ["NOT INCLUDED", "Anything at all about Nadia"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "There is one number missing from this screen",
+          "body": "The American Lung Association runs a free helpline staffed by respiratory clinicians. We have not printed the number because we could not confirm it was current at the time this screen was written, and a wrong number on a page like this is worse than no number. It goes in once somebody has checked it."
+        }
+      ],
+      "actions": [
+        { "label": "Send it to Elm Road", "to": "S08" },
+        { "label": "See the numbers that would go", "kind": "ghost", "to": "S12" },
+        { "label": "Cancel", "kind": "ghost", "to": "S08" }
+      ],
+      "footer": "Crisis numbers route to United States services."
+    },
+
+    "S14": {
+      "title": "Settings & privacy",
+      "badge": "Private",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Notifications",
+          "body": "Detail is off. A reminder on your lock screen says \"SteadyAir\" and nothing else — not your numbers, not your chest, not why. Anyone who picks up your phone learns that an app reminded you. That is all they learn.",
+          "chips": ["Generic — \"SteadyAir\"", "Show detail", "None at all"],
+          "selected": [0]
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["CHECK-INS", "5 days a week · evening"],
+            ["TRIGGERS", "Cold air · Hills or stairs · Dust"],
+            ["TRYING", "Scarf on cold mornings · Ask about rehab"],
+            ["RELIEVER COUNT", "On · tells you, never your clinic"],
+            ["TEXT SIZE", "Follows your phone"],
+            ["SHARING WITH ELM ROAD", "Nothing shared · you approve each send"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Export everything",
+          "body": "A readable file plus a structured one, covering all six weeks including the March stretch. It stays on your phone unless you send it.",
+          "to": "SH4",
+          "pill": "Export"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Delete everything",
+          "body": "Completed, not hidden — your phone, our servers, and anything queued to sync. It cannot be undone and it ends this programme.",
+          "to": "SH4",
+          "pill": "Delete"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Education and self-management support. SteadyAir does not diagnose, treat or prescribe, does not interpret what your numbers mean, and is not a substitute for advice from a qualified health professional."
+        }
+      ],
+      "actions": [
+        { "label": "Done", "to": "S08" },
+        { "label": "Who sees what", "kind": "ghost", "to": "SH5" },
+        { "label": "Your record across programs", "kind": "ghost", "to": "SH4" }
+      ],
+      "footer": "Turning the reliever count off also turns off the only thing that would prompt you to ring the clinic."
+    }
+  }
+}

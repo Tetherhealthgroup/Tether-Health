@@ -1,0 +1,698 @@
+{
+  "product": "lookup",
+  "locale": "en",
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "$comment": "The ten screens product.lookup.json lists that content.lookup.en.json does not author. Same shape as content.lookup.en.json. Merge over it; no key here collides with the 24 authored screens. Every string is unreviewed.",
+  "screens": {
+    "S02": {
+      "title": "What it does",
+      "badge": "2 of 5",
+      "headline": "Four moments this is built for.",
+      "sub": "Not four features. Four times a phone is hardest to put down.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Moment one",
+          "title": "When you don't know where the week went",
+          "body": "A week of honest numbers first. Nothing is blocked while we look — a starting line you didn't choose isn't worth much."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment two",
+          "title": "When your thumb is already on the icon",
+          "body": "A short pause on the apps you pick, with your own words on the screen instead of ours."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Moment three",
+          "title": "When the pull arrives at 11pm",
+          "body": "One tap, ninety seconds, works with no signal. Nothing is sent while you use it."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment four",
+          "title": "When you go over anyway",
+          "body": "It goes in as history. It never zeroes a number you've built, and nobody is told."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What it isn't",
+          "body": "It doesn't lock your phone, read your messages, see who you follow, or score you against anyone else."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Continue",
+          "to": "S03"
+        }
+      ],
+      "footer": "Education and self-management support. Not a diagnosis or treatment."
+    },
+    "S04": {
+      "title": "Your age",
+      "badge": "4 of 5",
+      "progress": 80,
+      "lead": "back",
+      "headline": "How old are you?",
+      "sub": "This sets a floor your limits can't drop below. It changes what LookUp is allowed to take away from you.",
+      "blocks": [
+        {
+          "t": "options",
+          "items": [
+            {
+              "title": "18 or over",
+              "body": "You set your own limits, as low as you want them."
+            },
+            {
+              "title": "13 to 17",
+              "body": "Same tools, with a floor underneath them.",
+              "sel": true
+            },
+            {
+              "title": "Under 13",
+              "body": "Chips instead of typing, and a grown-up on the account."
+            },
+            {
+              "title": "Prefer not to say",
+              "body": "We'll use the 13 to 17 settings. Nothing is unlocked by answering."
+            }
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What a floor means",
+          "body": "Under 18, LookUp keeps at least 30 minutes a day available. Being cut off from friends is its own harm."
+        },
+        {
+          "t": "card",
+          "title": "Under 13",
+          "body": "No typing anywhere in the app. You'll pick your reasons from a list instead of writing them, and there's no note box to fill in."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Optional",
+          "title": "Add a grown-up you trust",
+          "body": "They'd see that you're using LookUp and your weekly total. Never your apps, your messages, your location, or what you wrote.",
+          "to": "S10",
+          "pill": "Choose someone"
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "THEY CAN",
+              "See a weekly total, and that you're still here"
+            ],
+            [
+              "THEY CANNOT",
+              "Change your limits, or read anything you wrote"
+            ]
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "Continue",
+          "to": "S05"
+        },
+        {
+          "label": "Skip — use the safest settings",
+          "kind": "ghost",
+          "to": "S05"
+        }
+      ],
+      "footer": "We don't check this against anything. Saying you're older only removes a protection — it never adds a feature."
+    },
+    "S06": {
+      "title": "Trigger map",
+      "badge": "5 of 5",
+      "progress": 100,
+      "headline": "When does it usually happen?",
+      "sub": "Pick what's true. Your baseline week already knows some of it, so a few are ticked — untick anything that's wrong.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Where you are",
+          "chips": [
+            "In bed",
+            "After dinner",
+            "At my desk",
+            "Waiting somewhere",
+            "Alone in the evening",
+            "When the house is quiet"
+          ],
+          "selected": [
+            0,
+            1
+          ]
+        },
+        {
+          "t": "card",
+          "title": "What's usually underneath it",
+          "body": "Same words we'll offer you during a pull, so they'll look familiar later.",
+          "chips": [
+            "Bored",
+            "Anxious",
+            "Lonely",
+            "Tired",
+            "Habit",
+            "Avoiding something",
+            "Nothing in particular"
+          ],
+          "selected": [
+            0,
+            5
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "From your baseline week",
+          "title": "21:30 – 23:00, every night so far.",
+          "body": "78 opens a day, and the longest stretch starts once the house goes quiet. That's why In bed and After dinner are already ticked."
+        },
+        {
+          "t": "stats",
+          "items": [
+            [
+              "4h 12m",
+              "Average day"
+            ],
+            [
+              "21:30",
+              "Where it starts"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "body": "None of this is fixed. Every pull you log moves this map, and the tools we suggest move with it."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Continue",
+          "to": "S07"
+        }
+      ],
+      "footer": "Kept on your phone. Not shared with anyone."
+    },
+    "S10": {
+      "title": "Support",
+      "badge": "4 of 5",
+      "progress": 80,
+      "lead": "back",
+      "headline": "One person, and a sentence they'll understand.",
+      "sub": "Not a group. One person you'd actually text at 11pm.",
+      "blocks": [
+        {
+          "t": "options",
+          "items": [
+            {
+              "title": "Jordan",
+              "body": "Already in your phone",
+              "sel": true
+            },
+            {
+              "title": "Someone else",
+              "body": "Pick from your contacts — we only read the one you tap."
+            },
+            {
+              "title": "No one for now",
+              "body": "The rest of the plan works without this. You can add someone any time."
+            }
+          ]
+        },
+        {
+          "t": "input",
+          "title": "What Jordan would see",
+          "value": "Can you talk for ten minutes?"
+        },
+        {
+          "t": "card",
+          "title": "When you'd want them",
+          "body": "Optional. Nothing here sends on its own — it only decides when we offer.",
+          "chips": [
+            "During an urge",
+            "After going over",
+            "Weekly summary",
+            "Only when I ask"
+          ],
+          "selected": [
+            0
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Nothing is sent yet",
+          "body": "When a moment comes, we show you the exact message first. You press send, or you don't. LookUp never texts Jordan by itself."
+        },
+        {
+          "t": "card",
+          "title": "What Jordan never gets",
+          "body": "Your minutes, your apps, your notes, your location, or a notification that you slipped.",
+          "to": "SH5",
+          "pill": "Who sees what"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Continue",
+          "to": "S11"
+        },
+        {
+          "label": "Skip — no supporter for now",
+          "kind": "ghost",
+          "to": "S11"
+        }
+      ],
+      "footer": "Jordan isn't told they've been picked until the first time you send something."
+    },
+    "S15": {
+      "title": "Guided reset",
+      "badge": "1 of 2",
+      "progress": 50,
+      "headline": "Stay with this for three minutes.",
+      "sub": "Breathe out for a little longer than you breathe in. If that's too much to think about, just watch the number.",
+      "blocks": [
+        {
+          "t": "timer",
+          "seconds": 180,
+          "label": "BREATHE OUT SLOWLY",
+          "quote": "You said: “I want my evenings back.”"
+        },
+        {
+          "t": "card",
+          "title": "Don't want the animation?",
+          "body": "It can be a plain countdown, or numbers with no movement at all. Nothing here needs the ring to work.",
+          "to": "S28",
+          "pill": "Motion settings"
+        },
+        {
+          "t": "card",
+          "title": "Want something else right now?",
+          "body": "You won't lose this reset.",
+          "chips": [
+            "Switch tool",
+            "Message Jordan",
+            "Just sit quietly"
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "I'm done",
+          "kind": "ghost",
+          "to": "S16"
+        }
+      ],
+      "footer": "Works offline · Nothing is sent, and nothing leaves your phone while this runs."
+    },
+    "S16": {
+      "title": "How is it now?",
+      "badge": "2 of 2",
+      "headline": "How strong is it now?",
+      "sub": "Move the dot. “The same” and “worse” are real answers, and they're the useful ones.",
+      "blocks": [
+        {
+          "t": "slider",
+          "value": 60,
+          "left": "0 · None",
+          "mid": "6 · Moderate",
+          "right": "10",
+          "foot": "You started at 6 · Moderate"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "This is how you felt, in your words. LookUp doesn't treat it as a clinical measurement."
+        },
+        {
+          "t": "card",
+          "title": "Same, or stronger?",
+          "body": "Then this wasn't the right tool tonight. That's information about the tool, not about you — we'll rank it lower and offer you something else next time.",
+          "to": "S18",
+          "pill": "Try a different one"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Had enough of doing this alone?",
+          "body": "Jordan, Maya, or a line that answers at any hour. No one is notified unless you choose.",
+          "to": "S27",
+          "pill": "View support"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Save and continue",
+          "to": "S12"
+        },
+        {
+          "label": "Try a different tool",
+          "kind": "ghost",
+          "to": "S18"
+        }
+      ],
+      "footer": "Saves offline and syncs once · You can delete this event later"
+    },
+    "S24": {
+      "title": "Quiet phone",
+      "badge": "3 changes",
+      "lead": "back",
+      "headline": "Make it a duller phone.",
+      "sub": "Each of these lowers how often the pull starts. None of them ask you to resist anything.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "The idea",
+          "title": "Fewer starts beats more resisting.",
+          "body": "Most evenings don't begin with a decision. They begin with a coloured icon under your thumb. Move the icon and the decision never comes up."
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "From your check-in",
+          "title": "Move the apps off your home screen tonight.",
+          "body": "You open them most in bed. Three taps of distance is usually enough.",
+          "pill": "Do it now · 2 min"
+        },
+        {
+          "t": "card",
+          "title": "Take the colour out after 22:30",
+          "body": "Grey from your quiet hours until morning. Your photos and camera go grey too — that's the honest cost of it.",
+          "pill": "Match my quiet hours"
+        },
+        {
+          "t": "card",
+          "title": "Notifications in one batch",
+          "body": "No badges, no previews, one delivery at 18:00. Calls and texts from people in your contacts are untouched.",
+          "to": "S28",
+          "pill": "Open notification settings"
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "EMERGENCY CALLS",
+              "Never blocked, in any setting here"
+            ],
+            [
+              "MAPS AND CAMERA",
+              "Always available, grey or not"
+            ],
+            [
+              "YOUR MESSAGES",
+              "Never read, never counted"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "All of it is yours to undo",
+          "body": "Every change here can be reversed from your phone's own settings without opening LookUp. If we ever can't hand something back, we won't offer it."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Set these up",
+          "to": "S12"
+        },
+        {
+          "label": "Read why cues matter",
+          "kind": "ghost",
+          "to": "S25"
+        }
+      ],
+      "footer": "On iPhone, LookUp opens the right settings page — you make the change yourself."
+    },
+    "S25": {
+      "title": "Learn",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "Short, plain, and dated.",
+      "sub": "Six pieces, none longer than a bus ride. Each one shows when it was last checked.",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": [
+            "All",
+            "Evenings",
+            "Sleep",
+            "Slips",
+            "For supporters"
+          ],
+          "selected": [
+            0
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "You've tagged “bored” eleven times",
+          "title": "Boredom isn't a fault to fix",
+          "body": "6 min · reviewed July 2026"
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "WHY A PULL FADES IF YOU WAIT",
+              "4 min · reviewed June 2026"
+            ],
+            [
+              "THE LAST HOUR BEFORE SLEEP",
+              "6 min · reviewed May 2026"
+            ],
+            [
+              "COMPARISON, AND WHY FEEDS ARE GOOD AT IT",
+              "5 min · reviewed June 2026"
+            ],
+            [
+              "WHAT GOING OVER ACTUALLY MEANS",
+              "3 min · reviewed August 2026"
+            ],
+            [
+              "TELLING SOMEONE ABOUT THIS",
+              "4 min · reviewed April 2026"
+            ],
+            [
+              "WHAT NOBODY KNOWS YET",
+              "2 min · reviewed August 2026"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Why the dates are on the front",
+          "body": "Anything that hasn't been checked in eighteen months comes down rather than sitting here looking current."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What this library won't do",
+          "body": "These explain. They don't prescribe. Nothing here recommends a medicine, a therapy or a course of treatment, and nothing here knows your history."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If you want that conversation",
+          "body": "It belongs with a qualified person. Maya replies within a day, and 988 answers at any hour.",
+          "to": "S27",
+          "pill": "View support"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Back to today",
+          "kind": "ghost",
+          "to": "S12"
+        }
+      ],
+      "footer": "Reviewed before it goes up, and dated so you can see how old it is."
+    },
+    "S26": {
+      "title": "Progress",
+      "badge": "Day 19",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": [
+            "7 days",
+            "30 days",
+            "All 19 days"
+          ],
+          "selected": [
+            0
+          ]
+        },
+        {
+          "t": "bars",
+          "values": [
+            68,
+            54,
+            91,
+            47,
+            58,
+            44,
+            38
+          ]
+        },
+        {
+          "t": "metric",
+          "eyebrow": "This week",
+          "value": "2h 21m",
+          "unit": "average day",
+          "pct": 56,
+          "foot": "Your baseline was 4h 12m and 78 opens"
+        },
+        {
+          "t": "stats",
+          "items": [
+            [
+              "12",
+              "Pulls handled"
+            ],
+            [
+              "2",
+              "Evenings over"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Two evenings went over, and both are still here",
+          "title": "5 August and 19 August.",
+          "body": "Nothing was reset. You're still on day 19, both nights are in the average above, and the tall bar on Wednesday is one of them. We'd rather show you an honest chart than a flattering one."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "Pattern",
+          "title": "It's still the same stretch.",
+          "body": "Three of your four longest evenings started between 21:30 and 23:00 — the same window as your baseline week. The difference is they end sooner now."
+        },
+        {
+          "t": "card",
+          "title": "Send this to Maya?",
+          "body": "You'd read the exact file first: totals and adherence, no notes, no app names, no slip flags. Nothing moves until you press send.",
+          "to": "SH5",
+          "pill": "See what's shared"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Preview what would be sent",
+          "kind": "ghost",
+          "to": "S27"
+        },
+        {
+          "label": "Back to today",
+          "to": "S12"
+        }
+      ],
+      "footer": "Nothing on this screen has been shared. It only leaves your phone if you ask it to."
+    },
+    "S28": {
+      "title": "Settings & privacy",
+      "badge": "Private",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Notifications",
+          "body": "Detail is off. A reminder on your lock screen says “LookUp” and nothing else — not which program, not your minutes, not why. Anyone who picks up your phone learns that an app reminded you. That's all.",
+          "chips": [
+            "Generic — “LookUp”",
+            "Show detail",
+            "None at all"
+          ],
+          "selected": [
+            0
+          ]
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "DAILY LIMIT",
+              "2h 30m · 20 opens"
+            ],
+            [
+              "QUIET HOURS",
+              "22:30 – 06:30"
+            ],
+            [
+              "PAUSE LEVEL",
+              "Gentle — a pause before you open"
+            ],
+            [
+              "MOTION",
+              "Reduced · countdowns instead of animation"
+            ],
+            [
+              "TEXT SIZE",
+              "Follows your phone"
+            ],
+            [
+              "LANGUAGE",
+              "English · Español available"
+            ],
+            [
+              "SHARING WITH MAYA",
+              "Totals and adherence · notes off"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Export everything",
+          "body": "A readable file plus a structured one, including anything you've deleted from view but not from the record. It stays on your phone unless you send it.",
+          "to": "SH4",
+          "pill": "Export"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Delete everything",
+          "body": "Completed, not hidden — your phone, our servers, and anything queued to sync. It can't be undone, and it ends your active programs.",
+          "to": "SH4",
+          "pill": "Delete"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Education and self-management support. It does not diagnose, treat or prescribe, and is not a substitute for advice from a qualified health professional."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Done",
+          "to": "S12"
+        },
+        {
+          "label": "Who sees what",
+          "kind": "ghost",
+          "to": "SH5"
+        },
+        {
+          "label": "Your record across programs",
+          "kind": "ghost",
+          "to": "SH4"
+        }
+      ],
+      "footer": "Loosening a limit waits 24 hours. Tightening one takes effect straight away."
+    }
+  }
+}

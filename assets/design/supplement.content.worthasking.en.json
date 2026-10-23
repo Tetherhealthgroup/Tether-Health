@@ -1,0 +1,642 @@
+{
+  "product": "worthasking",
+  "locale": "en",
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "$comment": "The eight non-shell screens of supplement.product.cancer.json. SH1–SH6 are the host shell and are not authored here. The person throughout is Dev Raman, 54, who stopped smoking in March 2020, had a colonoscopy in March 2019, has written two notes for an appointment on 24 September 2026, and has a sister called Anita. Every string is unreviewed. The review dates in the learn library are illustrative: nothing in this repository has been through clinical review.",
+  "start": "S01",
+  "screens": {
+    "S01": {
+      "title": "",
+      "lead": "none",
+      "headline": "You noticed something. Write it down.",
+      "sub": "Worth Asking keeps the dates you were given and the things you meant to mention, so the ten minutes you get with a clinician are better spent. It does not examine you, and it will never tell you what anything means.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "It does not screen you",
+          "body": "No test, no score, no verdict. Nothing here looks at what you write and decides something about it."
+        },
+        {
+          "t": "card",
+          "title": "Private on your phone",
+          "body": "Your dates and your notes stay on this device. Nothing is sent anywhere unless you send it yourself."
+        },
+        {
+          "t": "card",
+          "title": "It ends with a person",
+          "body": "Every route out of this app goes to someone who can actually answer: your practice, a line that is open right now, or 911."
+        },
+        {
+          "t": "chips",
+          "items": [
+            "English"
+          ],
+          "selected": [
+            0
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "Get started",
+          "to": "S02"
+        },
+        {
+          "label": "I already have an account",
+          "kind": "ghost",
+          "to": "S04"
+        }
+      ],
+      "footer": "Education and awareness. Not a diagnosis, not a screening test, and not a substitute for a clinician. English only so far."
+    },
+    "S02": {
+      "title": "What it does",
+      "badge": "1 of 2",
+      "headline": "Four moments this is built for.",
+      "sub": "Not four features. Four ways a question gets lost.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Moment one",
+          "title": "When the letter goes in a drawer",
+          "body": "A clinic gives you a date, or an interval, and eighteen months later nobody can find the card. You type it in once, in your own words, and it is still here in 2029."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment two",
+          "title": "When you are not sure it is worth mentioning",
+          "body": "Write it down anyway. A note here is not a symptom report and nothing reads it — it is a sentence you will still have in front of you when someone asks “anything else?”"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Moment three",
+          "title": "When you are in the room and go blank",
+          "body": "One page: your dates and your notes, in the order you wrote them. Read it off your phone or print it on the way."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment four",
+          "title": "When treatment ends and everyone else moves on",
+          "body": "The years after are long and badly served. What is here for them is plain reading, and somewhere to keep the follow-up dates you were given."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What it isn't",
+          "body": "It does not screen, score, grade or estimate anything. It cannot tell you whether a check applies to you, whether a note matters, or what a result meant. Those are the same question wearing three coats, and the answer to all three is a clinician."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Continue",
+          "to": "S03"
+        }
+      ],
+      "footer": "Education and awareness. Not a diagnosis or a screening test."
+    },
+    "S03": {
+      "title": "Consent & privacy",
+      "badge": "2 of 2",
+      "progress": 100,
+      "headline": "What we hold, and what we don't.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Held on your phone",
+          "body": "The dates you enter, the notes you write, and which articles you opened. These stay on this device."
+        },
+        {
+          "t": "card",
+          "title": "Shared with a care team",
+          "body": "Nothing. There is no clinician wired into this programme, and no data leaves on its own. If you want your practice to have something, you export it and hand it over."
+        },
+        {
+          "t": "card",
+          "title": "Never asked for",
+          "body": "No diagnosis, no stage, no pathology report, no test results, no family history. Nothing here asks for them, and nothing here would know what to do with them if you gave them."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "You can leave",
+          "body": "Export or delete everything at any point. Deletion is completed on this phone and anywhere it synced — not hidden from the list."
+        },
+        {
+          "t": "options",
+          "items": [
+            {
+              "title": "I understand and agree",
+              "body": "Worth Asking records what I type. It does not screen me, and it does not assess anything I write.",
+              "sel": true
+            },
+            {
+              "title": "Also let Anita see the dates I enter",
+              "body": "Dates only, never notes. Off unless you tick it, and you can untick it without telling her."
+            }
+          ]
+        }
+      ],
+      "actions": [
+        {
+          "label": "Agree and continue",
+          "to": "S04"
+        },
+        {
+          "label": "See what leaving looks like first",
+          "kind": "ghost",
+          "to": "SH4"
+        }
+      ],
+      "footer": "The second choice is optional and reversible. The first is how the app works, and there is no version of it that shares more."
+    },
+    "S04": {
+      "title": "Today",
+      "badge": "Private",
+      "lead": "none",
+      "headline": "Good morning, Dev.",
+      "sub": "Nothing needs doing today. This screen exists for the days when something does.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Get help now",
+          "body": "Reachable from every screen, in every programme.",
+          "to": "SH6",
+          "pill": "Open"
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Next thing in your calendar",
+          "title": "Thursday 24 September, 9:10 am",
+          "body": "Dr Okonkwo, Ridgeway Family Medicine. You entered this on 2 September.",
+          "to": "S05",
+          "pill": "Open your notes"
+        },
+        {
+          "t": "stats",
+          "items": [
+            [
+              "24 Sep",
+              "Your next appointment"
+            ],
+            [
+              "2",
+              "Notes to take with you"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "eyebrow": "Why there is no number up there",
+          "body": "Other programmes put a figure at the top of this screen. This one has nothing honest to put there. A number would be a score, and a score about cancer worked out from what you typed into a phone is worse than no number at all."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Worried about something right now?",
+          "body": "This app cannot tell you whether something is serious. It can put you in front of someone who will talk it through, at any hour.",
+          "to": "S07",
+          "pill": "Find a person"
+        },
+        {
+          "t": "card",
+          "title": "Two notes waiting for Thursday",
+          "body": "Written on 12 and 30 August, in your words, unread by us.",
+          "to": "S05",
+          "pill": "Add another"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Ridgeway Family Medicine",
+          "body": "The number you entered, from the card you typed it off. They hold your history; we do not.",
+          "to": "S07"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Add what you were told",
+          "to": "S05"
+        },
+        {
+          "label": "Read what screening programmes exist",
+          "kind": "ghost",
+          "to": "S06"
+        },
+        {
+          "label": "Reminders & privacy",
+          "kind": "ghost",
+          "to": "S08"
+        },
+        {
+          "label": "Your programmes",
+          "kind": "ghost",
+          "to": "SH1"
+        }
+      ],
+      "footer": "Works offline · Nothing on this screen has left your phone"
+    },
+    "S05": {
+      "title": "Your dates and notes",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "Dates you entered, in one place.",
+      "sub": "Everything here came from you, or from a letter you copied out. None of it was worked out by this app.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Coming up",
+          "body": "What you typed, and where you got it from. If a row looks wrong, the row is wrong — change it."
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "APPOINTMENT · 24 SEP 2026",
+              "Dr Okonkwo, 9:10 am — you entered this on 2 September"
+            ],
+            [
+              "COLONOSCOPY · 2029",
+              "“Repeat in ten years” — from the clinic letter dated 12 March 2019"
+            ],
+            [
+              "SKIN CHECK",
+              "No date entered. Add one if you were given one."
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Already done"
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "COLONOSCOPY",
+              "12 March 2019 · from the clinic letter"
+            ],
+            [
+              "STOPPED SMOKING",
+              "March 2020 · you entered this"
+            ],
+            [
+              "CHEST X-RAY",
+              "No record. If you have had one, we have no way of knowing."
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Notes you have written",
+          "body": "Nothing reads these. They are here so that you have them in the room."
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "30 AUGUST",
+              "“Cough hasn't shifted since the middle of the month.”"
+            ],
+            [
+              "12 AUGUST",
+              "“Ask about the mole on my shoulder — Anita noticed it.”"
+            ]
+          ]
+        },
+        {
+          "t": "input",
+          "title": "Add a note for Thursday",
+          "value": "Cough — since mid-August. Worse lying flat?"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "A date is not a verdict",
+          "body": "Worth Asking does not work out whether a check applies to you, and it could not: it does not know your history, your family, or what a clinician has already ruled out. Nothing on this screen means a check is owed to you, and nothing on it means you are fine. Both of those are somebody else's sentence to say."
+        },
+        {
+          "t": "card",
+          "title": "What happens to a note",
+          "body": "Nothing happens to it. It is not read, scored, or matched against a list of symptoms. No part of this app decides what a note means. That is the design and not a feature we are still building."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Some things do not belong in a note",
+          "body": "Coughing up blood. Trouble breathing. A lump that has changed. Bleeding that is not usual for you. Weight coming off without trying. Those belong in front of a clinician now rather than in a box here. This list is the same for everybody who opens this screen — it is not about anything you have written.",
+          "to": "SH6",
+          "pill": "Get help now"
+        },
+        {
+          "t": "card",
+          "title": "Take it with you",
+          "body": "One page: your dates and your notes, in the order you wrote them. It stays on your phone unless you hand it over.",
+          "to": "SH4",
+          "pill": "Export"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Save",
+          "to": "S04"
+        },
+        {
+          "label": "Everything, across programmes",
+          "kind": "ghost",
+          "to": "SH4"
+        }
+      ],
+      "footer": "Saves offline · Every row is editable, and deletion is completed rather than hidden"
+    },
+    "S06": {
+      "title": "Learn",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "Short, plain, and dated.",
+      "sub": "Seven pieces and one table. Each shows when it was last checked, and who said it.",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": [
+            "All",
+            "Screening",
+            "Risk",
+            "Symptoms",
+            "After treatment",
+            "For someone helping"
+          ],
+          "selected": [
+            0
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Start here",
+          "title": "What “screening” actually means",
+          "body": "5 min · reviewed August 2026"
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "WHY A SCREENING PROGRAMME HAS AN AGE RANGE",
+              "6 min · reviewed August 2026"
+            ],
+            [
+              "WHAT CHANGES RISK, AND WHY NOBODY CAN PUT A FIGURE ON ONE PERSON",
+              "7 min · reviewed July 2026"
+            ],
+            [
+              "HOW TO RAISE SOMETHING IN A TEN-MINUTE APPOINTMENT",
+              "4 min · reviewed August 2026"
+            ],
+            [
+              "WHY A SYMPTOM IS WORTH A SAME-WEEK CALL",
+              "5 min · reviewed August 2026"
+            ],
+            [
+              "AFTER TREATMENT: THE PART NOBODY PREPARES YOU FOR",
+              "8 min · reviewed June 2026"
+            ],
+            [
+              "TELLING THE PEOPLE AROUND YOU",
+              "4 min · reviewed May 2026"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "Published guidance, quoted and not applied",
+          "title": "Who says what, and in which year",
+          "body": "Reproduced with the body that issued it and the year it was issued. Every line describes a population of thousands of people. Whether it describes you is a conversation with someone who has your history in front of them, and this app is not in that conversation."
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "COLORECTAL · USPSTF, 2021",
+              "Screening for adults aged 45 to 75"
+            ],
+            [
+              "LUNG · USPSTF, 2021",
+              "Yearly low-dose CT, ages 50 to 80, for people with a 20 pack-year history who smoke now or stopped within the last 15 years"
+            ],
+            [
+              "BREAST · USPSTF, 2024",
+              "Mammography every two years, ages 40 to 74"
+            ],
+            [
+              "CERVICAL · USPSTF, 2018",
+              "Ages 21 to 65, by one of several methods and intervals"
+            ],
+            [
+              "PROSTATE · USPSTF, 2018",
+              "Ages 55 to 69 — an individual decision to discuss, not a routine test"
+            ],
+            [
+              "COLORECTAL · AMERICAN CANCER SOCIETY, 2018",
+              "Start at 45, which is not the same as the USPSTF said in 2018, and the disagreement is real"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "We show all of them, not the ones that fit you",
+          "body": "Worth Asking could filter this table by an age and a history you typed in. It does not. Deciding which rows apply to a person is a screening judgment, and that is exactly the judgment this app has said it will not make. Read the lot, and take the questions to a clinician."
+        },
+        {
+          "t": "card",
+          "title": "Why the dates are on the front",
+          "body": "Guidance moves — the breast row changed in 2024 and the colorectal row changed in 2021. Anything here that has not been rechecked in eighteen months comes down instead of sitting there looking current."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If you want that conversation now",
+          "body": "There is a line that answers at any hour, in English and Spanish, staffed by people who do this all day.",
+          "to": "S07",
+          "pill": "View support"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Back to today",
+          "kind": "ghost",
+          "to": "S04"
+        }
+      ],
+      "footer": "Nothing here recommends a test, a medicine or a course of treatment, and nothing here knows your history."
+    },
+    "S07": {
+      "title": "Support",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "A route to a person.",
+      "sub": "Nothing is sent until you have read it and pressed send.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "In an emergency",
+          "body": "If you cannot breathe, you are coughing up blood, or you are in danger, call 911 or your local emergency number now.",
+          "pill": "Call 911"
+        },
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "988 Suicide & Crisis Lifeline",
+          "body": "Call or text 988 · English and Spanish · 24 hours. A cancer worry that has turned into something darker belongs here, and nobody on the line will think it doesn't."
+        },
+        {
+          "t": "card",
+          "title": "American Cancer Society",
+          "body": "24 hours, every day · English and Spanish. Free, and they will talk about the practical parts — transport, money, what to ask — as readily as the medical ones."
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "ANITA · YOUR SISTER",
+              "“Can you come with me on Thursday?”"
+            ],
+            [
+              "RIDGEWAY FAMILY MEDICINE",
+              "The number you entered · they hold your history, we don't"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "There is no coach in this programme",
+          "body": "Some Tether programmes have one. This one does not, and pretending otherwise would put a non-clinical person between you and a question only a clinician can answer."
+        },
+        {
+          "t": "card",
+          "title": "If you do send something",
+          "body": "You read the exact page first: your dates and your notes, nothing else, and no interpretation attached, because there is not one to attach.",
+          "to": "SH5",
+          "pill": "Who sees what"
+        }
+      ],
+      "actions": [
+        {
+          "label": "Back to today",
+          "to": "S04"
+        },
+        {
+          "label": "See what a share would contain",
+          "kind": "ghost",
+          "to": "SH5"
+        }
+      ],
+      "footer": "Crisis numbers route to United States services."
+    },
+    "S08": {
+      "title": "Settings & privacy",
+      "badge": "Private",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Notifications",
+          "body": "Detail is off, and this programme ships that way. A reminder on your lock screen says “Worth Asking” and nothing else — not which date, not which part of you, not the word cancer. Anyone who picks up your phone learns that an app reminded you about something. That is all they learn.",
+          "chips": [
+            "Generic — “Worth Asking”",
+            "Show detail",
+            "None at all"
+          ],
+          "selected": [
+            0
+          ]
+        },
+        {
+          "t": "card",
+          "title": "If even the name is too much",
+          "body": "Turn reminders off and the app never writes to your lock screen at all. You would then only see a date by opening it, which some people prefer, and we are not going to argue them out of it."
+        },
+        {
+          "t": "rows",
+          "items": [
+            [
+              "REMINDERS",
+              "Generic · nothing on the lock screen but the app name"
+            ],
+            [
+              "DATES YOU HAVE ENTERED",
+              "3 · every one editable, every one deletable"
+            ],
+            [
+              "NOTES",
+              "2 · never read, never analysed, never sent"
+            ],
+            [
+              "SHARING WITH ANITA",
+              "Dates only · notes off"
+            ],
+            [
+              "HIDDEN FROM YOUR HOME SCREEN",
+              "On · reachable only from Your programmes"
+            ],
+            [
+              "TEXT SIZE",
+              "Follows your phone"
+            ],
+            [
+              "LANGUAGE",
+              "English · Spanish is not written yet"
+            ]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Export everything",
+          "body": "A readable page and a structured file: your dates, your notes, and which articles you opened. It stays on your phone unless you send it.",
+          "to": "SH4",
+          "pill": "Export"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Delete everything",
+          "body": "Completed, not hidden — this phone, our servers, and anything queued to sync. It cannot be undone, and it ends this programme.",
+          "to": "SH4",
+          "pill": "Delete"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Education and awareness. Worth Asking does not screen, diagnose, treat or prescribe, it does not assess anything you write, and it is not a substitute for advice from a qualified health professional."
+        }
+      ],
+      "actions": [
+        {
+          "label": "Done",
+          "to": "S04"
+        },
+        {
+          "label": "Who sees what",
+          "kind": "ghost",
+          "to": "SH5"
+        },
+        {
+          "label": "Your record across programmes",
+          "kind": "ghost",
+          "to": "SH4"
+        }
+      ],
+      "footer": "Turning detail on takes effect straight away. So does turning it off."
+    }
+  }
+}

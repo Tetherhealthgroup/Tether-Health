@@ -42,7 +42,7 @@
     <circle cx="31" cy="31" r="29" fill="none" stroke="#123C37" stroke-width="3"/>
     <path d="M38 15c-18 5-23 20-12 33 16-1 25-14 20-30-2-4-4-5-8-3z" fill="#FF7D61"/>
     <path d="M27 48c5-11 11-19 20-26" fill="none" stroke="#FFFDF7" stroke-width="2.5" stroke-linecap="round"/>
-    <text x="76" y="42" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="38" letter-spacing="-1">BreatheFree</text>
+    <text x="76" y="42" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="38" letter-spacing="-1">Tether Health</text>
   </g>
   <g transform="translate(1055 149)">
     <rect width="163" height="64" rx="32" fill="#E6F1EA"/>
@@ -95,7 +95,7 @@
     <tspan x="72" dy="91">that matter most.</tspan>
   </text>
   <text x="72" y="1497" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="40">
-    <tspan x="72" dy="0">BreatheFree responds to what you need now—and helps</tspan>
+    <tspan x="72" dy="0">Tether Health responds to what you need now—and helps</tspan>
     <tspan x="72" dy="58">you protect the progress you have already made.</tspan>
   </text>
 

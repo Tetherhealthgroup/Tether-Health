@@ -1,0 +1,22 @@
+# iOS Appfile — Tether Health
+#
+# Values verified against ios/Runner.xcodeproj/project.pbxproj:
+#   Runner              com.TetherHealthLLC.tetherhealth
+#   UnplugMonitor       com.TetherHealthLLC.tetherhealth.unplugmonitor
+#   UnplugShield        com.TetherHealthLLC.tetherhealth.unplugshield
+#   UnplugShieldAction  com.TetherHealthLLC.tetherhealth.unplugshieldaction
+#
+# `app_identifier` here is the *host* app only — that is what pilot/deliver
+# address. The extensions are covered by the Matchfile, which lists all four.
+#
+# No apple_id / password is set on purpose. Every Apple-facing lane
+# authenticates with an App Store Connect API key (see docs/releasing.md);
+# Apple ID + password cannot survive 2FA in CI.
+
+app_identifier(ENV["TETHER_IOS_APP_IDENTIFIER"] || "com.TetherHealthLLC.tetherhealth")
+
+# Developer Portal team (the 10-character team id, e.g. ABCDE12345).
+team_id(ENV["FASTLANE_TEAM_ID"]) if ENV["FASTLANE_TEAM_ID"]
+
+# Only needed when the Apple ID belongs to more than one App Store Connect team.
+itc_team_id(ENV["FASTLANE_ITC_TEAM_ID"]) if ENV["FASTLANE_ITC_TEAM_ID"]

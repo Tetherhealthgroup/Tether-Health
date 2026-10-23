@@ -1,0 +1,466 @@
+{
+  "product": "longview",
+  "locale": "en",
+  "version": "1.0.0",
+  "$provenance": "AUTHORED IN THIS REPO. Not from tether-design.zip. Not clinically reviewed.",
+  "$comment": "Every non-shell screen in supplement.product.kidney_liver.json. Shell screens SH1–SH6 are not authored here; they are identical in every programme. The person throughout is Marisol, 54, told at a routine appointment that her kidney results would be watched, with a fatty liver noted on a scan done for something else entirely. Every string is unreviewed. No string on any screen states or implies what a result means.",
+  "start": "S01",
+  "screens": {
+    "S01": {
+      "title": "",
+      "lead": "none",
+      "headline": "Seven sheets of paper in a kitchen drawer.",
+      "sub": "Longview is somewhere to put them. Your results, in date order, in one place, for as long as you want them — so that the next appointment starts from the whole story instead of the most recent page.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "title": "Kept by you, for years",
+          "body": "Type a result in once and it's still there in 2031, whichever clinic you're with by then."
+        },
+        {
+          "t": "card",
+          "title": "No opinion. Ever.",
+          "body": "Longview will not tell you a result is fine, and it will not tell you it isn't. It doesn't know, it isn't allowed to guess, and pretending otherwise would be the most dangerous thing it could do."
+        },
+        {
+          "t": "card",
+          "title": "Yours to take away",
+          "body": "Export the whole file whenever you like, or delete it. Deletion is completed, not hidden from view."
+        },
+        {
+          "t": "chips",
+          "items": ["English"],
+          "selected": [0]
+        }
+      ],
+      "actions": [
+        { "label": "Get started", "to": "S02" },
+        { "label": "I already have an account", "kind": "ghost", "to": "S04" }
+      ],
+      "footer": "Education and record-keeping. Longview does not diagnose, treat, prescribe, or interpret test results."
+    },
+
+    "S02": {
+      "title": "What it does",
+      "badge": "1 of 2",
+      "progress": 50,
+      "headline": "Four moments this is built for.",
+      "sub": "Not four features. Four points where having results on paper, twice a year, quietly fails you.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mint",
+          "eyebrow": "Moment one",
+          "title": "When the printout goes in a drawer",
+          "body": "And the next one goes on top of it, and by the third you couldn't find the first. Two minutes of typing buys you a record that survives a house move."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment two",
+          "title": "When you can't remember what it was last time",
+          "body": "Same test, same units, in date order, going back as far as you've entered. Just the run of numbers."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment three",
+          "title": "When you want to ask a better question",
+          "body": "Walking in with four years of results and \"has this been doing anything?\" is a different appointment from walking in with one sheet. The question is still yours to ask — Longview only makes it easier to ask it."
+        },
+        {
+          "t": "card",
+          "eyebrow": "Moment four",
+          "title": "When someone else should see them",
+          "body": "A new clinic, a specialist, your brother. You read the exact page first, then you send it. Nothing goes on its own."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "What it isn't",
+          "body": "It does not read your results. It has no reference ranges, no flags, no colours, no ticks and no crosses. It will not say a number has gone the wrong way, because it does not know which way is the wrong way for you — only someone who knows your history can say that, and Longview knows none of it."
+        }
+      ],
+      "actions": [
+        { "label": "Continue", "to": "S03" }
+      ],
+      "footer": "Education and record-keeping. Not a diagnosis, and not an interpretation of anything."
+    },
+
+    "S03": {
+      "title": "Consent & privacy",
+      "badge": "2 of 2",
+      "progress": 100,
+      "headline": "What we hold, and what we don't.",
+      "blocks": [
+        {
+          "t": "card",
+          "title": "Held on your phone",
+          "body": "The test names, the values, the dates, where the blood was taken, and anything you type next to them. These stay here."
+        },
+        {
+          "t": "card",
+          "title": "Shared with your clinic",
+          "body": "Nothing. Not by default, not on a schedule, not when a number moves. Longview has no link to Riverside or to anyone else, and it cannot acquire one without you setting it up and pressing send yourself."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "You can leave",
+          "body": "Export everything as a readable file plus a structured one, or delete it. Deletion is completed on your phone and on our servers, not hidden from view."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "The thing most worth understanding",
+          "body": "This is a filing cabinet with a good index. It is not a second opinion, and nothing you enter here is checked by anybody. If you type 58 when the sheet says 85, Longview will store 58 and say nothing — because it has no idea what either number would mean."
+        },
+        {
+          "t": "options",
+          "items": [
+            { "title": "I understand and agree", "sel": true },
+            { "title": "Remind me when a blood draw is roughly due", "body": "A date you set yourself. Longview does not know your appointments and does not talk to your clinic." }
+          ]
+        }
+      ],
+      "actions": [
+        { "label": "Agree and continue", "to": "S04" },
+        { "label": "Read the full privacy notice", "kind": "ghost", "to": "S08" }
+      ],
+      "footer": "You can change either choice later in Settings."
+    },
+
+    "S04": {
+      "title": "Your file",
+      "badge": "Private",
+      "lead": "none",
+      "headline": "Hello, Marisol.",
+      "sub": "Nothing needs doing today. That is the usual state of this programme, and it is not a sign that anything has gone wrong.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If you feel unwell right now",
+          "body": "Not puzzled by a number — unwell. That's the clinic today, or 911 if it's bad, and it has nothing to do with anything written on this screen.",
+          "to": "SH6",
+          "pill": "Get help now"
+        },
+        {
+          "t": "metric",
+          "eyebrow": "Your file",
+          "value": "12",
+          "unit": "results saved",
+          "foot": "Across seven blood draws · the oldest is March 2023"
+        },
+        {
+          "t": "stats",
+          "items": [
+            ["14 Aug", "Last blood draw"],
+            ["February", "Next one, roughly"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "The one job here",
+          "title": "One line left on the August sheet",
+          "body": "It had three results on it and you typed two. The one still in the drawer is the AST. Two minutes with the paper in front of you and the sheet can go in the recycling.",
+          "to": "S05",
+          "pill": "Type it in"
+        },
+        {
+          "t": "card",
+          "title": "There is no daily check-in",
+          "body": "And there isn't going to be one. Longview asks you for something roughly twice a year, when results come back. Anything more frequent would be work invented to make the app look busy, and none of it would change what is in your blood."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Dr Shah · Riverside",
+          "body": "Every question that begins \"what does this mean\" belongs here rather than in the app.",
+          "to": "S07"
+        }
+      ],
+      "actions": [
+        { "label": "Open your results", "to": "S05" },
+        { "label": "Learn about the tests", "kind": "ghost", "to": "S06" },
+        { "label": "Your programs", "kind": "ghost", "to": "SH1" }
+      ],
+      "footer": "Works offline · Nothing here has been shared with anyone"
+    },
+
+    "S05": {
+      "title": "Your results",
+      "badge": "12 saved",
+      "lead": "back",
+      "headline": "What the sheets said, in date order.",
+      "sub": "Copied off the paper by you. That is the entire contents of this page.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Read this before the numbers",
+          "title": "Longview does not read your results.",
+          "body": "There is no verdict anywhere on this page — no colour, no arrow, no tick, no flag, and no reference range printed beside your number. A range shown next to a value is a verdict whether or not anyone calls it one, so Longview does not hold them at all. What these mean is Dr Shah's to say, and she has your whole history to say it from."
+        },
+        {
+          "t": "input",
+          "title": "What the test was called",
+          "value": "AST"
+        },
+        {
+          "t": "input",
+          "title": "What it said",
+          "value": "39"
+        },
+        {
+          "t": "card",
+          "title": "When and where",
+          "body": "Copy the date off the sheet, not the day you're typing it in.",
+          "chips": ["14 Aug 2026", "Riverside", "Add a note"],
+          "selected": [0, 1]
+        },
+        {
+          "t": "chips",
+          "items": ["eGFR", "ALT", "Urine ACR", "All"],
+          "selected": [0]
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["eGFR", "58 · 14 Aug 2026 · Riverside"],
+            ["eGFR", "61 · 2 Feb 2026 · Riverside"],
+            ["eGFR", "60 · 11 Aug 2025 · Riverside"],
+            ["eGFR", "62 · 19 Sep 2024 · Riverside"],
+            ["eGFR", "63 · 3 Mar 2024 · Northgate"],
+            ["eGFR", "64 · 12 Sep 2023 · Northgate"],
+            ["eGFR", "66 · 3 Mar 2023 · Northgate"]
+          ]
+        },
+        { "t": "bars", "values": [66, 64, 63, 62, 60, 61, 58] },
+        {
+          "t": "card",
+          "title": "About the chart, and about the units",
+          "body": "Seven eGFR results, oldest on the left, three and a half years apart end to end. It goes down, and in February it went up. Longview is not going to tell you which of those is which. The numbers are printed exactly as they were on your sheets and are never converted — if two clinics used different units, they are two different runs and you should say so to Dr Shah rather than expect the app to notice."
+        },
+        {
+          "t": "card",
+          "title": "Also in your file",
+          "body": "Three ALT results and two urine ACR results, on the same dates. Tap a chip above to bring up either run. Nothing is hidden — the list just gets hard to read with all twelve at once.",
+          "chips": ["ALT · 3", "Urine ACR · 2"]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "The only advice on this page",
+          "title": "Anything here you want explained — ring Riverside and ask.",
+          "body": "That is not Longview giving up. It is the only honest answer available: a number means something different depending on your age, your other conditions, what you were taking that week and what the last six looked like. Dr Shah has all of that. This app has twelve numbers and a date column.",
+          "to": "S07",
+          "pill": "Ring Riverside"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "If the clinic has asked you to come in",
+          "body": "Go. Nothing in Longview changes that, and Longview has no idea what they saw. It cannot reassure you and it is not trying to."
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Typos are yours to fix",
+          "body": "Every value here was typed by hand and nothing checked it. Tap any row to correct it — the old value stays in the export with the date you changed it, so the record is honest about having been edited."
+        }
+      ],
+      "actions": [
+        { "label": "Save this result", "to": "S04" },
+        { "label": "What is eGFR?", "kind": "ghost", "to": "S06" }
+      ],
+      "footer": "Typed in by you, off paper. Not received from a laboratory, not checked by anyone, and not interpreted."
+    },
+
+    "S06": {
+      "title": "Learn",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "What the tests are. Not what yours said.",
+      "sub": "Six pieces, each one about a test or an organ in general. None of them knows your numbers, and none of them is written as though it does.",
+      "blocks": [
+        {
+          "t": "chips",
+          "items": ["All", "Kidneys", "Liver", "Appointments"],
+          "selected": [0]
+        },
+        {
+          "t": "card",
+          "tone": "ink",
+          "eyebrow": "The one most people want first",
+          "title": "What eGFR is, and why it is an estimate",
+          "body": "5 min · reviewed August 2026. Explains the test and the word 'estimated'. It does not say anything about the value you entered."
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["WHAT KIDNEYS ACTUALLY DO ALL DAY", "4 min · reviewed July 2026"],
+            ["FATTY LIVER: WHAT THE PHRASE MEANS", "6 min · reviewed August 2026"],
+            ["ALT, AST AND WHY LIVER TESTS COME IN SETS", "5 min · reviewed June 2026"],
+            ["WHY THE SAME TEST MOVES BETWEEN DRAWS", "4 min · reviewed July 2026"],
+            ["ELEVEN QUESTIONS WORTH ASKING AT A REVIEW", "3 min · reviewed August 2026"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "The line these articles will not cross",
+          "body": "They describe the tests. None of them describes your results. An article can tell you what a laboratory is estimating when it reports an eGFR; it cannot tell you anything about the 58 on your sheet, and if one of them ever seems to, that is a defect and we want to hear about it."
+        },
+        {
+          "t": "card",
+          "title": "Blood pressure, weight and drinking",
+          "body": "All three come up constantly in kidney and liver care, and all three have their own Tether programmes with people who do it properly. Longview links out rather than writing a thin version.",
+          "to": "SH2",
+          "pill": "See the other areas"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "What this library will not do",
+          "body": "These explain. They don't prescribe. Nothing here names a medicine, a strength or a dose, and nothing here recommends a diet, a supplement or a course of treatment."
+        },
+        {
+          "t": "card",
+          "title": "Why the dates are on the front",
+          "body": "Anything not checked in eighteen months comes down rather than sitting here looking current."
+        }
+      ],
+      "actions": [
+        { "label": "Back to your file", "kind": "ghost", "to": "S04" },
+        { "label": "Ask a person instead", "kind": "ghost", "to": "S07" }
+      ],
+      "footer": "Reviewed before it goes up, and dated so you can see how old it is."
+    },
+
+    "S07": {
+      "title": "Support",
+      "badge": "Private",
+      "lead": "back",
+      "headline": "A route to a person.",
+      "sub": "Which, on this screen, is not a consolation prize. Everything Longview refuses to tell you is something a person on this list can.",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "In an emergency",
+          "body": "If you are seriously unwell — not worried about a number, but unwell — call 911 or your local emergency number now. Nothing in your file is relevant to that decision.",
+          "to": "SH6",
+          "pill": "Call 911"
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["RIVERSIDE CLINIC", "Reception takes result questions and rings you back"],
+            ["DR ARUNA SHAH", "Your review is 9 February"],
+            ["TOMÁS", "\"Can you come to this one with me?\""]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "988 Suicide & Crisis Lifeline",
+          "body": "Call or text 988 · English and Spanish · 24 hours. Waiting on results, or being told a long-term condition is being watched, is a heavy thing to carry quietly."
+        },
+        {
+          "t": "card",
+          "title": "Two numbers missing from this screen",
+          "body": "The National Kidney Foundation and the American Liver Foundation both run free patient helplines, and both belong here. We have not printed the numbers because we could not confirm they were current at the time this screen was written, and a wrong number on a page like this is worse than no number. They go in once somebody has checked them."
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "eyebrow": "Before you send",
+          "title": "Exactly what would go to Dr Shah.",
+          "body": "You are looking at the contents of the file itself, not a description of it. Nothing moves until you press send, and you can stop here."
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["INCLUDED", "All twelve results: test name, value, date, where taken"],
+            ["INCLUDED", "Which values you have edited, and when"],
+            ["NOT INCLUDED", "Notes you typed beside a result"],
+            ["NOT INCLUDED", "Any interpretation — because there isn't one to send"],
+            ["NOT INCLUDED", "Your other Tether programmes"],
+            ["NOT INCLUDED", "Anything about Tomás"]
+          ]
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Sending this is not a clinical alert",
+          "body": "It arrives as a document, not a flag. Nobody at Riverside is paged by it, nobody promises to read it by a particular day, and if something feels urgent to you then the phone is the right tool and this is not."
+        }
+      ],
+      "actions": [
+        { "label": "Send the file to Dr Shah", "to": "S04" },
+        { "label": "Look at what's in it again", "kind": "ghost", "to": "S05" },
+        { "label": "Cancel", "kind": "ghost", "to": "S04" }
+      ],
+      "footer": "Crisis numbers route to United States services."
+    },
+
+    "S08": {
+      "title": "Settings & privacy",
+      "badge": "Private",
+      "lead": "back",
+      "blocks": [
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "title": "Notifications",
+          "body": "Detail is off. A reminder on your lock screen says \"Longview\" and nothing else — not a test name, not a date, not a number. Anyone who picks up your phone learns that an app reminded you, and nothing else at all.",
+          "chips": ["Generic — \"Longview\"", "Show detail", "None at all"],
+          "selected": [0]
+        },
+        {
+          "t": "rows",
+          "items": [
+            ["BLOOD-DRAW REMINDER", "February · a date you set, not one we know"],
+            ["TESTS YOU TRACK", "eGFR · ALT · Urine ACR"],
+            ["UNITS", "Exactly as printed on your sheet · never converted"],
+            ["TEXT SIZE", "Follows your phone"],
+            ["INTERPRETATION", "Off, permanently · not a setting"],
+            ["SHARING WITH RIVERSIDE", "Nothing shared · you approve each send"]
+          ]
+        },
+        {
+          "t": "card",
+          "title": "Why one of those rows can't be switched on",
+          "body": "There is no setting that makes Longview tell you what a result means. It isn't hidden behind a toggle or reserved for a paid tier. It does not exist, and the row is there so you never go looking for it."
+        },
+        {
+          "t": "card",
+          "title": "Export everything",
+          "body": "A readable file plus a structured one: every result, every date, every edit and when you made it. It stays on your phone unless you send it.",
+          "to": "SH4",
+          "pill": "Export"
+        },
+        {
+          "t": "card",
+          "tone": "coral",
+          "title": "Delete everything",
+          "body": "Completed, not hidden — your phone, our servers, and anything queued to sync. It cannot be undone, and three and a half years of typing goes with it. Export first if there is any doubt.",
+          "to": "SH4",
+          "pill": "Delete"
+        },
+        {
+          "t": "card",
+          "tone": "mintPale",
+          "body": "Education and record-keeping. Longview does not diagnose, treat or prescribe, does not interpret test results, and is not a substitute for advice from a qualified health professional."
+        }
+      ],
+      "actions": [
+        { "label": "Done", "to": "S04" },
+        { "label": "Who sees what", "kind": "ghost", "to": "SH5" },
+        { "label": "Your record across programs", "kind": "ghost", "to": "SH4" }
+      ],
+      "footer": "Deleting Longview does not delete anything at your clinic. Your results still exist there."
+    }
+  }
+}

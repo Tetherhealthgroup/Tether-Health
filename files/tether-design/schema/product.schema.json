@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tether/product.schema.json",
+  "title": "Product instance",
+  "description": "One area's product. Composes shared archetypes and supplies the vocabulary that makes them area-specific.",
+  "type": "object",
+  "required": ["version", "id", "name", "areaId", "serviceLines", "status", "vocabulary", "screens"],
+  "properties": {
+    "version": { "type": "string" },
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "areaId": { "type": "string" },
+    "serviceLines": { "type": "array", "items": { "type": "string" } },
+    "status": { "enum": ["design", "in_development", "live", "retired"] },
+    "locales": { "type": "array", "items": { "type": "string" } },
+    "vocabulary": {
+      "type": "object",
+      "description": "The words that make a shared archetype read as this area's product. Changing these should be enough to reskin most screens.",
+      "required": ["behaviour", "urge", "lapse", "target", "primaryMetric"],
+      "properties": {
+        "behaviour": { "type": "string" },
+        "urge": { "type": "string" },
+        "lapse": { "type": "string" },
+        "target": { "type": "string" },
+        "primaryMetric": { "type": "string" }
+      }
+    },
+    "helplines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["locale", "name", "number"],
+        "properties": {
+          "locale": { "type": "string" },
+          "name": { "type": "string" },
+          "number": { "type": "string" }
+        }
+      }
+    },
+    "screens": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "archetype", "route", "phase"],
+        "properties": {
+          "id": { "type": "string" },
+          "archetype": { "type": "string" },
+          "route": { "type": "string", "pattern": "^/" },
+          "phase": { "type": "integer", "minimum": 1, "maximum": 8 }
+        }
+      }
+    },
+    "platformCapabilities": {
+      "type": "object",
+      "properties": {
+        "blocking": { "type": "boolean" },
+        "passiveTracking": { "type": "boolean" },
+        "offlineRescue": { "type": "boolean" }
+      }
+    },
+    "proposedArchetypes": {
+      "type": "array",
+      "description": "New machinery this product needs. Each must justify itself by naming which other areas could reuse it.",
+      "items": {
+        "type": "object",
+        "required": ["id", "reason"],
+        "properties": { "id": { "type": "string" }, "reason": { "type": "string" } }
+      }
+    }
+  }
+}
