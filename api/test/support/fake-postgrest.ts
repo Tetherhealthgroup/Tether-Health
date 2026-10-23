@@ -2,6 +2,12 @@ import { randomUUID } from "node:crypto";
 import { databaseError, type DatabaseErrorHint } from "./database-errors";
 import { CARE_TABLES, FakeCare, type CareTable } from "./fake-care";
 import {
+  FakeHealthRecords,
+  HEALTH_RECORD_TABLES,
+  RECORD_CATEGORIES,
+  type HealthRecordTable,
+} from "./fake-health-records";
+import {
   attributesTriggerFails,
   entryCheckFails,
   observationCheckFails,
@@ -121,6 +127,9 @@ import {
  *   recipient check (TH021) and the revocation cascades. "Delete now" and
  *   account deletion remove the care rows they cascade to (counts not
  *   returned);
+ * - the health record tables of 202610180015 (see fake-health-records.ts):
+ *   record_categories, record_sources, record_items and record_routes as
+ *   the member sees them (seed rows with records.seedSource/seedItem);
  * - error bodies: standard SQLSTATEs for constraints and RLS, and the
  *   database's own `TH` codes with the registry's exact message and hint
  *   (test/support/database-errors.ts), answered as HTTP 400 the way
@@ -161,6 +170,11 @@ interface State {
   care_messages: Row[];
   caregivers: Row[];
   supporters: Row[];
+  /** Health record tables (202610180015); see fake-health-records.ts. */
+  record_categories: Row[];
+  record_sources: Row[];
+  record_items: Row[];
+  record_routes: Row[];
   /** Stand-in for auth.users (id only). */
   auth_users: Row[];
   /** Stand-in for storage.objects (bucket_id, name). */
@@ -523,9 +537,22 @@ export class FakePostgrest {
     care_messages: [],
     caregivers: [],
     supporters: [],
+    record_categories: RECORD_CATEGORIES.map((category) => ({ category })),
+    record_sources: [],
+    record_items: [],
+    record_routes: [],
     auth_users: [],
     storage_objects: [],
   };
+  /** The health record tables; tests seed with records.seedSource/seedItem. */
+  readonly records = new FakeHealthRecords({
+    state: () => this.state,
+    barrierOpen: (uid) => this.barrierOpen(uid),
+    hasConsent: (uid, enrolmentId, purpose) =>
+      this.hasConsent(uid, enrolmentId, purpose),
+    now: () => this.now(),
+    fail,
+  });
   /** The care tables; tests seed clinics and invites with care.addInvite. */
   readonly care = new FakeCare({
     state: () => this.state,
@@ -858,6 +885,7 @@ export class FakePostgrest {
         "sync_lapse",
         ...READ_ONLY_TABLES,
         ...CARE_TABLES,
+        ...HEALTH_RECORD_TABLES,
       ].includes(path)
     ) {
       return fail(404, "PGRST205", "Table not found");
@@ -875,7 +903,31 @@ export class FakePostgrest {
     const careTable = (CARE_TABLES as readonly string[]).includes(table)
       ? (table as CareTable)
       : null;
-    if (careTable !== null) {
+    const recordTable = (HEALTH_RECORD_TABLES as readonly string[]).includes(
+      table,
+    )
+      ? (table as HealthRecordTable)
+      : null;
+    if (recordTable !== null) {
+      const values = Array.isArray(body) ? (body as Row[]) : [body as Row];
+      if (method === "GET" || method === "HEAD") {
+        rows = this.filter(this.records.visible(uid, recordTable), url);
+      } else if (method === "POST") {
+        rows = this.records.insert(uid, recordTable, values);
+        status = 201;
+      } else if (method === "PATCH") {
+        rows = this.records.update(
+          uid,
+          recordTable,
+          this.filter(this.records.visible(uid, recordTable), url),
+          body as Row,
+        );
+      } else if (method === "DELETE") {
+        rows = this.records.remove(recordTable);
+      } else {
+        return fail(405, "PGRST117", "Unsupported method");
+      }
+    } else if (careTable !== null) {
       const values = Array.isArray(body) ? (body as Row[]) : [body as Row];
       if (method === "GET" || method === "HEAD") {
         rows = this.filter(this.care.visible(uid, careTable), url);
@@ -1082,6 +1134,7 @@ export class FakePostgrest {
       removeWhere(table as keyof State, (row) => row.user_id === uid);
     }
     this.care.dropMember(uid);
+    this.records.dropMember(uid);
     removeWhere("auth_users", (row) => row.id === uid);
     return counts;
   }
@@ -1145,6 +1198,7 @@ export class FakePostgrest {
       );
     }
     this.care.dropEnrolment(enrolment.id as string);
+    this.records.dropEnrolment(enrolment.id as string);
     const syncLapses = removeWhere(
       "sync_lapse",
       (row) => row.user_id === uid && row.programme_code === code,

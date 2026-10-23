@@ -1,11 +1,21 @@
 openapi: 3.1.0
 info:
   title: Tether Health API
-  version: 1.10.0
+  version: 1.11.0
   description: >-
     Development contract for authenticated profiles and bounded program data.
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
+    Added in 1.11.0, each for app use: health records the member enters
+    and reviews — `POST /v1/records/manual` (a value from a paper report,
+    checked against plausibility ranges after unit conversion, stored as
+    entered by the member and given to the programmes that receive its
+    category and hold a records_import consent), `POST
+    /v1/records/fhir/accept` and `POST /v1/records/fhir/conflicts` (review
+    of imported items), and the reads `GET /v1/records/fhir/sources`,
+    `/items` and `/summary`, with their own coded error body
+    `HealthRecordRequestRejected`. Connecting a FHIR source and syncing it
+    are not in this version.
     Added in 1.10.0: the member's care team under `/v1/care` — clinic
     connections (`POST` redeems an invite code, rate limited, one generic
     `care_invite_invalid` for every refused code; `GET`; `DELETE` revokes),
@@ -1704,6 +1714,158 @@ paths:
         '404': {$ref: '#/components/responses/CareNotFound'}
         '429': {$ref: '#/components/responses/CareRateLimited'}
         '502': {$ref: '#/components/responses/CareUnavailable'}
+  /v1/records/manual:
+    post:
+      operationId: createManualRecord
+      summary: Enter a health value by hand
+      description: >-
+        Stores a value the member typed from a paper report, labelled as
+        entered by the member. `type` decides the fields: `blood_pressure`
+        (`systolic`, `diastolic`, mm[Hg]; stored as two readings),
+        `glucose` (`value`, `unit` mg/dL or mmol/L), `lab_result` (`test`
+        a1c, ldl, egfr or glucose, `value`, `unit`), `vaccine`,
+        `medication` or `condition` (`name`). Only the fields of the type may
+        be sent. Values are converted to their stored unit (glucose mmol/L ×
+        18.016, LDL mmol/L × 38.67, A1C mmol/mol to %) and then checked
+        against plausibility ranges (rules.json `rec.manual`; blood pressure
+        `hw.bp`): outside → `value_out_of_range` (422), nothing stored. The
+        same test, date and value already stored, entered or imported, →
+        `record_duplicate` (409). The value is given to every programme of
+        the member that is not left, receives its category and holds a live
+        records_import consent (`routedTo`); medications and conditions are
+        kept for reference only. The codes and ranges are plausibility
+        checks, not clinical targets, and await clinical sign-off.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ManualEntry'}
+      responses:
+        '201':
+          description: The stored items and where they went
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ManualEntryResult'}
+        '400': {$ref: '#/components/responses/HealthRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '409': {$ref: '#/components/responses/HealthRecordConflict'}
+        '422': {$ref: '#/components/responses/HealthRecordOutOfRange'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/HealthRecordUnavailable'}
+  /v1/records/fhir/accept:
+    post:
+      operationId: acceptRecordItems
+      summary: Add reviewed items to the member's programmes
+      description: >-
+        Accepts the caller's items that are waiting for review and gives each
+        to every programme that receives its category and holds a live
+        records_import consent. Every id must be the caller's
+        (`item_not_found`) and waiting for review (`item_not_reviewable`);
+        otherwise nothing changes. Items not sent stay waiting.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/AcceptRecordItems'}
+      responses:
+        '200':
+          description: How many were accepted and where they went
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AcceptResult'}
+        '400': {$ref: '#/components/responses/HealthRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/HealthRecordNotFound'}
+        '409': {$ref: '#/components/responses/HealthRecordConflict'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/HealthRecordUnavailable'}
+  /v1/records/fhir/conflicts:
+    post:
+      operationId: resolveRecordConflicts
+      summary: Resolve items in conflict
+      description: >-
+        One choice per item in conflict: `use_imported` (accept it and
+        reject the member's own entry for the same test and day),
+        `keep_both`, `keep_mine` or `discard` (reject it), or `correct`
+        with `correctedValue` (reject it and store the corrected value,
+        checked against the plausibility range, as the member's own entry).
+        Every id must be the caller's (`item_not_found`) and in conflict
+        (`item_not_reviewable`); a correction outside its range is
+        `value_out_of_range`. All checks run before anything is written.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ResolveRecordConflicts'}
+      responses:
+        '200':
+          description: The items accepted, rejected and created
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ConflictsResult'}
+        '400': {$ref: '#/components/responses/HealthRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/HealthRecordNotFound'}
+        '409': {$ref: '#/components/responses/HealthRecordConflict'}
+        '422': {$ref: '#/components/responses/HealthRecordOutOfRange'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/HealthRecordUnavailable'}
+  /v1/records/fhir/sources:
+    get:
+      operationId: listRecordSources
+      summary: The caller's record sources
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: The caller's sources, oldest first
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RecordSourceList'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/HealthRecordUnavailable'}
+  /v1/records/fhir/items:
+    get:
+      operationId: listRecordItems
+      summary: The caller's record items
+      description: Items in `status`, or by default those waiting for the member (pending_review and conflict). Only `status` is accepted.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      parameters:
+        - {name: status, in: query, required: false, schema: {enum: [pending_review, accepted, rejected, conflict]}}
+      responses:
+        '200':
+          description: The caller's items, newest first
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RecordItemList'}
+        '400': {$ref: '#/components/responses/HealthRecordBadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/HealthRecordUnavailable'}
+  /v1/records/fhir/summary:
+    get:
+      operationId: getRecordsHubSummary
+      summary: Counts for the health records hub
+      description: Sources that are not disconnected, items waiting for review, and accepted items per category with the programmes that received them.
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: The counts
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/HealthRecordsSummary'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '429': {$ref: '#/components/responses/CareRateLimited'}
+        '502': {$ref: '#/components/responses/HealthRecordUnavailable'}
 components:
   securitySchemes:
     supabaseJwt: {type: http, scheme: bearer, bearerFormat: JWT}
@@ -1727,6 +1889,36 @@ components:
         pattern: '^([0-9a-f]{32}|[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$'
   responses:
     Unauthorized: {description: Missing or invalid Supabase access token}
+    HealthRecordBadRequest:
+      description: >-
+        `invalid_request`: an unknown or missing field, a field of another
+        entry type, a value of the wrong type, an unknown unit or test, a
+        date that is not a real past date, a repeated item, or an unknown
+        query parameter. A body the JSON parser refuses gets the generic body
+        without a code. Nothing was written.
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - {$ref: '#/components/schemas/HealthRecordRequestRejected'}
+              - {$ref: '#/components/schemas/RequestRejected'}
+    HealthRecordNotFound:
+      description: '`item_not_found` (also for other members'' items). Nothing was written.'
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/HealthRecordRequestRejected'}
+    HealthRecordConflict:
+      description: '`record_duplicate`, `item_not_reviewable` or `account_deletion_in_progress`. Nothing was written.'
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/HealthRecordRequestRejected'}
+    HealthRecordOutOfRange:
+      description: '`value_out_of_range`: outside the plausibility range after unit conversion. Nothing was written.'
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/HealthRecordRequestRejected'}
+    HealthRecordUnavailable:
+      description: Health record storage is temporarily unavailable, or the database refused the request for a reason the caller cannot fix
     CareBadRequest:
       description: >-
         `invalid_request`: an unknown or missing field, a value of the wrong
@@ -2136,6 +2328,164 @@ components:
         locale:
           $ref: '#/components/schemas/ConsentLocale'
           description: The locale of the consent document the app showed.
+    HealthRecordRequestRejected:
+      description: Error body of the health record routes, with a stable code. Never contains values, codes, names or identifiers.
+      type: object
+      additionalProperties: false
+      required: [statusCode, error, code, requestId]
+      properties:
+        statusCode: {type: integer}
+        error: {const: Request rejected}
+        code:
+          type: string
+          enum:
+            - invalid_request
+            - value_out_of_range
+            - record_duplicate
+            - item_not_found
+            - item_not_reviewable
+            - account_deletion_in_progress
+        requestId: {type: string}
+    ManualEntry:
+      type: object
+      additionalProperties: false
+      required: [type, date]
+      properties:
+        type: {enum: [blood_pressure, glucose, lab_result, vaccine, medication, condition]}
+        test: {enum: [a1c, ldl, egfr, glucose]}
+        value: {type: number}
+        unit: {type: string, minLength: 1, maxLength: 32}
+        systolic: {type: integer}
+        diastolic: {type: integer}
+        name: {type: string, minLength: 1, maxLength: 200}
+        date: {type: string, pattern: '^\d{4}-\d{2}-\d{2}$'}
+    RecordItem:
+      type: object
+      additionalProperties: false
+      required: [id, sourceId, enteredByYou, resourceType, category, codeSystem, code, display, value, valueText, unit, effectiveAt, status]
+      properties:
+        id: {type: string, format: uuid}
+        sourceId: {type: string, format: uuid}
+        enteredByYou: {type: boolean}
+        resourceType: {enum: [Observation, Condition, MedicationRequest, Immunization]}
+        category: {type: [string, 'null']}
+        codeSystem: {type: string}
+        code: {type: string}
+        display: {type: string}
+        value: {type: [number, 'null']}
+        valueText: {type: [string, 'null']}
+        unit: {type: [string, 'null']}
+        effectiveAt: {type: [string, 'null'], format: date-time}
+        status: {enum: [pending_review, accepted, rejected, conflict]}
+    ProgrammeRouteCount:
+      type: object
+      additionalProperties: false
+      required: [programmeCode, items]
+      properties:
+        programmeCode: {type: string, pattern: '^[a-z]{2}$'}
+        items: {type: integer, minimum: 1}
+    ManualEntryResult:
+      type: object
+      additionalProperties: false
+      required: [items, routedTo]
+      properties:
+        items:
+          type: array
+          items: {$ref: '#/components/schemas/RecordItem'}
+        routedTo:
+          type: array
+          items: {$ref: '#/components/schemas/ProgrammeRouteCount'}
+    AcceptRecordItems:
+      type: object
+      additionalProperties: false
+      required: [itemIds]
+      properties:
+        itemIds:
+          type: array
+          minItems: 1
+          maxItems: 200
+          uniqueItems: true
+          items: {type: string, format: uuid}
+    AcceptResult:
+      type: object
+      additionalProperties: false
+      required: [accepted, routedTo]
+      properties:
+        accepted: {type: integer, minimum: 1}
+        routedTo:
+          type: array
+          items: {$ref: '#/components/schemas/ProgrammeRouteCount'}
+    ResolveRecordConflicts:
+      type: object
+      additionalProperties: false
+      required: [resolutions]
+      properties:
+        resolutions:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: object
+            additionalProperties: false
+            required: [itemId, choice]
+            properties:
+              itemId: {type: string, format: uuid}
+              choice: {enum: [use_imported, keep_both, keep_mine, discard, correct]}
+              correctedValue: {type: number, description: '`correct` only, in the item''s unit'}
+    ConflictsResult:
+      type: object
+      additionalProperties: false
+      required: [accepted, rejected, created, routedTo]
+      properties:
+        accepted: {type: array, items: {type: string, format: uuid}}
+        rejected: {type: array, items: {type: string, format: uuid}}
+        created: {type: array, items: {type: string, format: uuid}}
+        routedTo:
+          type: array
+          items: {$ref: '#/components/schemas/ProgrammeRouteCount'}
+    RecordSourceList:
+      type: object
+      additionalProperties: false
+      required: [sources]
+      properties:
+        sources:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, kind, displayName, status, lastSyncedAt, createdAt]
+            properties:
+              id: {type: string, format: uuid}
+              kind: {enum: [epic, oracle, bluebutton, smart, apple_health, health_connect, manual]}
+              displayName: {type: string}
+              status: {enum: [connected, needs_reauth, disconnected]}
+              lastSyncedAt: {type: [string, 'null'], format: date-time}
+              createdAt: {type: string, format: date-time}
+    RecordItemList:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: {$ref: '#/components/schemas/RecordItem'}
+    HealthRecordsSummary:
+      type: object
+      additionalProperties: false
+      required: [sources, needsReview, categories]
+      properties:
+        sources: {type: integer, minimum: 0}
+        needsReview: {type: integer, minimum: 0}
+        categories:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [category, items, programmes]
+            properties:
+              category: {type: string}
+              items: {type: integer, minimum: 1}
+              programmes: {type: array, items: {type: string, pattern: '^[a-z]{2}$'}}
     CareRequestRejected:
       description: Error body of the care routes, with a stable code naming the refused rule. Never contains submitted values, names, phone numbers or messages.
       type: object

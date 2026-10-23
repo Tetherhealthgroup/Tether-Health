@@ -1320,7 +1320,7 @@ describe("Care team (e2e)", () => {
     });
 
     it("the version is bumped for these routes", () => {
-      expect(document.info.version).toBe("1.10.0");
+      expect(document.info.version).toBe("1.11.0");
     });
   });
 
