@@ -84,41 +84,47 @@ class _ModeBanner extends StatelessWidget {
     final live = state.isLive;
     final failure = state.channelFailure;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
-      color: live && failure == null ? AppColors.mint : AppColors.coralLight,
-      child: Row(
-        children: [
-          Icon(
-            live && failure == null
-                ? Icons.sensors_rounded
-                : Icons.science_outlined,
-            size: 15,
-            color: live && failure == null
-                ? AppColors.deepTeal
-                : const Color(0xFF8C3A26),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              failure != null
-                  ? 'Channel error — $failure'
-                  : live
-                      ? 'Live — reading this device'
-                      : 'Simulated — no screen-time layer on this build',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: live && failure == null
-                    ? AppColors.deepTeal
-                    : const Color(0xFF8C3A26),
-                fontSize: 11.5,
-                fontWeight: FontWeight.w700,
+    // A live region: the banner flips between "live" and "simulated" and
+    // starts carrying channel errors. Each of those is something the person
+    // should be told about rather than have to notice.
+    return Semantics(
+      liveRegion: true,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
+        color: live && failure == null ? AppColors.mint : AppColors.coralLight,
+        child: Row(
+          children: [
+            Icon(
+              live && failure == null
+                  ? Icons.sensors_rounded
+                  : Icons.science_outlined,
+              size: 15,
+              color: live && failure == null
+                  ? AppColors.deepTeal
+                  : const Color(0xFF8C3A26),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                failure != null
+                    ? 'Channel error — $failure'
+                    : live
+                        ? 'Live — reading this device'
+                        : 'Simulated — no screen-time layer on this build',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: live && failure == null
+                      ? AppColors.deepTeal
+                      : const Color(0xFF8C3A26),
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

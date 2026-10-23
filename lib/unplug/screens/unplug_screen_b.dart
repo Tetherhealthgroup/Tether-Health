@@ -238,15 +238,17 @@ class _UnplugScreenBState extends State<UnplugScreenB> {
                           ),
                         ),
                         Expanded(
-                          child: Slider(
-                            value: _appCount.toDouble(),
-                            min: 1,
-                            max: 12,
-                            divisions: 11,
-                            label: '$_appCount',
-                            onChanged: (value) =>
-                                setState(() => _appCount = value.round()),
-                          ),
+                          child: Semantics(
+                              label: 'Number of apps in the group',
+                              child: Slider(
+                                value: _appCount.toDouble(),
+                                min: 1,
+                                max: 12,
+                                divisions: 11,
+                                label: '$_appCount',
+                                onChanged: (value) =>
+                                    setState(() => _appCount = value.round()),
+                              )),
                         ),
                         SizedBox(
                           width: 24,

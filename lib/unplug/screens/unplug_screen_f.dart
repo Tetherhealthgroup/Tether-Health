@@ -86,16 +86,19 @@ class _UnplugScreenFState extends State<UnplugScreenF> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Slider(
-                  value: candidate.toDouble(),
-                  min: state.tierFloor.toDouble(),
-                  max: state.tierCeiling.toDouble(),
-                  divisions: divisions == 0 ? null : divisions,
-                  label: 'Tier $candidate',
-                  onChanged: state.selfMayMoveTier
-                      ? (value) => setState(() => _candidate = value.round())
-                      : null,
-                ),
+                Semantics(
+                    label: 'Tier',
+                    child: Slider(
+                      value: candidate.toDouble(),
+                      min: state.tierFloor.toDouble(),
+                      max: state.tierCeiling.toDouble(),
+                      divisions: divisions == 0 ? null : divisions,
+                      label: 'Tier $candidate',
+                      onChanged: state.selfMayMoveTier
+                          ? (value) =>
+                              setState(() => _candidate = value.round())
+                          : null,
+                    )),
                 if (!state.selfMayMoveTier)
                   const Text(
                     'This template gives the guardian every limit. Nothing on '
@@ -170,14 +173,16 @@ class _UnplugScreenFState extends State<UnplugScreenF> {
                 Row(
                   children: [
                     Expanded(
-                      child: Slider(
-                        value: state.overrideAllowance.toDouble(),
-                        max: 6,
-                        divisions: 6,
-                        label: '${state.overrideAllowance}',
-                        onChanged: (value) =>
-                            state.setOverrideAllowance(value.round()),
-                      ),
+                      child: Semantics(
+                          label: 'Override allowance',
+                          child: Slider(
+                            value: state.overrideAllowance.toDouble(),
+                            max: 6,
+                            divisions: 6,
+                            label: '${state.overrideAllowance}',
+                            onChanged: (value) =>
+                                state.setOverrideAllowance(value.round()),
+                          )),
                     ),
                     TextButton(
                       onPressed: state.overridesUsed == 0

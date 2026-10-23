@@ -125,8 +125,8 @@ class _TetherHealthAppState extends State<TetherHealthApp> {
         (_accountController.isSignedIn ||
             _quitPlanController.guestPersistenceAvailable);
     unawaited(_initializeAccount());
-    _loadInterceptTokens();
-    _attachUnplugPlatform();
+    unawaited(_loadInterceptTokens());
+    unawaited(_attachUnplugPlatform());
   }
 
   /// Connects the Unplug module to the platform screen-time layer, when this
