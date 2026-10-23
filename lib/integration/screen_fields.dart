@@ -152,6 +152,7 @@ const Map<String, ScreenSpec> screenFields = {
         options: ['Hard', 'Mixed', 'Good']),
   ]),
   'bf_date': ScreenSpec('bf', [
+    ScreenField('quit_date', FieldType.date),
     ScreenField('quit_day_check_in_at_7_00_am', FieldType.toggle),
   ]),
   'bf_meds_edit': ScreenSpec('bf', [
