@@ -2,7 +2,8 @@
 // lifecycle around the generated screens.
 //
 // It runs only where selectAppUi picks it (a debug build started with
-// --dart-define=TETHER_UI=true). Every profile and release build runs the
+// --dart-define=TETHER_UI=true, or an internal test build made with the
+// release scripts' --internal-tether-ui flag). Every other build runs the
 // legacy app.
 import 'dart:async';
 

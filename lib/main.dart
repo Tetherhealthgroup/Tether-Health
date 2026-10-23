@@ -122,8 +122,9 @@ Future<void> _bootstrap() async {
   final appLocale = AppLocale();
   await appLocale.load();
 
-  // Debug builds started with --dart-define=TETHER_UI=true only; every
-  // profile and release build runs the app below.
+  // Debug builds started with --dart-define=TETHER_UI=true, and internal
+  // test builds made with the release scripts' --internal-tether-ui flag;
+  // every other profile and release build runs the app below.
   if (selectAppUi() == AppUi.tetherUi) {
     await runTetherUi(
       account: account ?? AccountController.disabled(),

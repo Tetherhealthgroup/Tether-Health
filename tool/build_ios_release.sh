@@ -3,7 +3,7 @@
 # submits anything. iOS counterpart of tool/build_play_release.sh.
 #
 # Usage: sh tool/build_ios_release.sh --dart-define-from-file=<path>
-#          [--build-number N] [--check-only]
+#          [--build-number N] [--check-only] [--internal-tether-ui]
 #        sh tool/build_ios_release.sh --inspect-ipa=<path>
 #
 # --dart-define-from-file=<path>
@@ -33,6 +33,37 @@
 # --inspect-ipa=<path>
 #                   Print CFBundleShortVersionString and CFBundleVersion of an
 #                   existing IPA, then exit. Never builds.
+# --internal-tether-ui
+#                   Internal test build running the tether_ui screens
+#                   (TestFlight internal testing only). The script adds
+#                   --dart-define=TETHER_UI_INTERNAL=true itself and checks the
+#                   define file with check_internal_define_file
+#                   (tool/release_define_check.sh: TETHER_BACKEND sandbox, or
+#                   http against STAGING_HOSTS only; a file holding
+#                   TETHER_UI_INTERNAL is refused). iOS version numbers must
+#                   stay numeric, so the version is unchanged; instead the
+#                   script prints a banner and, after a successful build,
+#                   writes the marker file build/ios/INTERNAL_TETHER_UI (every
+#                   build removes it first). After the build, whether it
+#                   succeeded or not, the script regenerates
+#                   ios/Flutter/Generated.xcconfig with no define
+#                   (flutter build ios --config-only --release) and checks that
+#                   its DART_DEFINES no longer carry TETHER_UI_INTERNAL, so a
+#                   later Xcode archive cannot pick the internal define up; it
+#                   fails if that check fails. With --check-only it runs the
+#                   internal checks. Not accepted with --inspect-ipa. Without
+#                   this flag the script builds exactly as before; nothing else
+#                   (no environment variable, no define file key) can turn it
+#                   on.
+#
+# Checklist (owner):
+# - Never submit an IPA built with --internal-tether-ui (the banner was printed
+#   and build/ios/INTERNAL_TETHER_UI exists) for App Store review or external
+#   testing. It runs the tether_ui screens, which stay off the public store
+#   until full acceptance.
+# - Always build a store IPA with this script (without the flag). Never use
+#   Xcode Product > Archive after an internal build: Xcode archives with the
+#   defines of the last flutter build.
 #
 # The project uses Swift Package Manager: the script refuses to run if
 # ios/Podfile exists or ios/Runner.xcodeproj/project.pbxproj or
@@ -62,6 +93,8 @@ inspect_ipa_given=0
 build_number=""
 build_number_given=0
 max_build_number=2100000000 # the Play limit (tool/build_play_release.sh)
+internal_ui=0
+internal_marker="build/ios/INTERNAL_TETHER_UI"
 
 fail() {
   echo "build_ios_release: $1" >&2
@@ -125,6 +158,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --build-number=*) set_build_number "${arg#--build-number=}" ;;
     --check-only) check_only=1 ;;
+    --internal-tether-ui) internal_ui=1 ;;
     --inspect-ipa=*)
       inspect_ipa="${arg#--inspect-ipa=}"
       inspect_ipa_given=1
@@ -143,7 +177,7 @@ done
 # echoed in a tool's error message.
 
 if [ "$inspect_ipa_given" -eq 1 ]; then
-  if [ "$env_file_given" -eq 1 ] || [ "$check_only" -eq 1 ] || [ "$build_number_given" -eq 1 ]; then
+  if [ "$env_file_given" -eq 1 ] || [ "$check_only" -eq 1 ] || [ "$build_number_given" -eq 1 ] || [ "$internal_ui" -eq 1 ]; then
     fail "--inspect-ipa cannot be combined with other arguments" 2
   fi
   [ -n "$inspect_ipa" ] || fail "--inspect-ipa requires a path" 2
@@ -234,6 +268,54 @@ check_no_cocoapods() {
   done
 }
 
+# Internal builds only. Regenerates ios/Flutter/Generated.xcconfig with no
+# define, then fails (exit 1) unless its DART_DEFINES (base64 entries) hold no
+# TETHER_UI_INTERNAL, so a later Xcode archive cannot build the tether_ui
+# screens by accident.
+clear_internal_ios_config() {
+  echo "== flutter build ios --config-only --release (removes the internal define from ios/Flutter/Generated.xcconfig)"
+  if ! flutter build ios --config-only --release; then
+    fail "could not regenerate ios/Flutter/Generated.xcconfig; it may still carry TETHER_UI_INTERNAL. Run the store build (this script without --internal-tether-ui) before any Xcode archive."
+  fi
+  python3 -I - ios/Flutter/Generated.xcconfig <<'PY' || fail "ios/Flutter/Generated.xcconfig still carries TETHER_UI_INTERNAL. Run the store build (this script without --internal-tether-ui) before any Xcode archive."
+import base64, binascii, sys
+
+try:
+    with open(sys.argv[1], encoding="utf-8") as fh:
+        text = fh.read()
+except FileNotFoundError:
+    sys.exit(0)
+except (OSError, ValueError):
+    sys.exit(1)
+if "TETHER_UI_INTERNAL" in text:
+    sys.exit(1)
+for line in text.splitlines():
+    name, _, value = line.partition("=")
+    if name.strip() != "DART_DEFINES":
+        continue
+    for item in value.strip().split(","):
+        if not item:
+            continue
+        try:
+            decoded = base64.b64decode(item, validate=True).decode("utf-8")
+        except (binascii.Error, ValueError):
+            sys.exit(1)
+        if decoded.split("=", 1)[0].strip() == "TETHER_UI_INTERNAL":
+            sys.exit(1)
+PY
+  echo "ios/Flutter/Generated.xcconfig carries no TETHER_UI_INTERNAL."
+}
+
+# Internal builds only: the warning printed before and after the build.
+internal_banner() {
+  echo
+  echo "=================================================================="
+  echo "INTERNAL TEST BUILD: runs the tether_ui screens (TETHER_UI_INTERNAL)."
+  echo "TestFlight internal testing only. Never submit it for App Store review."
+  echo "=================================================================="
+  echo
+}
+
 if [ "$inspect_ipa_given" -eq 1 ]; then
   print_ipa_version "$inspect_ipa"
   exit 0
@@ -242,10 +324,15 @@ fi
 check_no_cocoapods
 # shellcheck source=tool/release_define_check.sh
 . tool/release_define_check.sh
-check_release_define_file build_ios_release "$env_file" || exit 1
+if [ "$internal_ui" -eq 1 ]; then
+  check_internal_define_file build_ios_release "$env_file" || exit 1
+else
+  check_release_define_file build_ios_release "$env_file" || exit 1
+fi
 check_build_number
 
 if [ "$check_only" -eq 1 ]; then
+  [ "$internal_ui" -eq 0 ] || echo "Internal build checks (--internal-tether-ui) passed."
   echo "All pre-build checks passed (no build was run)."
   exit 0
 fi
@@ -259,7 +346,20 @@ echo "== flutter test"
 flutter test
 ipa_dir="build/ios/ipa"
 rm -f "$ipa_dir"/*.ipa # never report a stale IPA from an earlier build
-if [ -n "$build_number" ]; then
+rm -f "$internal_marker" # never leave an earlier internal build's marker
+if [ "$internal_ui" -eq 1 ]; then
+  internal_banner
+  build_status=0
+  if [ -n "$build_number" ]; then
+    echo "== flutter build ipa --release --build-number $build_number --dart-define=TETHER_UI_INTERNAL=true"
+    flutter build ipa --release "--dart-define-from-file=$env_file" --build-number "$build_number" --dart-define=TETHER_UI_INTERNAL=true || build_status=$?
+  else
+    echo "== flutter build ipa --release --dart-define=TETHER_UI_INTERNAL=true"
+    flutter build ipa --release "--dart-define-from-file=$env_file" --dart-define=TETHER_UI_INTERNAL=true || build_status=$?
+  fi
+  clear_internal_ios_config
+  [ "$build_status" -eq 0 ] || fail "flutter build ipa failed" "$build_status"
+elif [ -n "$build_number" ]; then
   echo "== flutter build ipa --release --build-number $build_number"
   flutter build ipa --release "--dart-define-from-file=$env_file" --build-number "$build_number"
 else
@@ -279,4 +379,13 @@ if [ -n "$build_number" ]; then
   print_ipa_version "$1" "$build_number"
 else
   print_ipa_version "$1"
+fi
+if [ "$internal_ui" -eq 1 ]; then
+  {
+    echo "Internal test build (--internal-tether-ui): runs the tether_ui screens."
+    echo "IPA: ${1##*/}"
+    echo "TestFlight internal testing only. Never submit it for App Store review."
+  } > "$internal_marker"
+  echo "Marker: $(pwd)/$internal_marker"
+  internal_banner
 fi

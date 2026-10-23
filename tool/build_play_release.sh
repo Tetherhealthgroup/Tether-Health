@@ -2,7 +2,7 @@
 # Builds a signed Google Play release bundle (AAB). Never uploads anything.
 #
 # Usage: bash tool/build_play_release.sh --dart-define-from-file=<path>
-#          [--min-version-code N] [--build-number N]
+#          [--min-version-code N] [--build-number N] [--internal-tether-ui]
 #        bash tool/build_play_release.sh --check-version-only
 #          [--min-version-code N] [--build-number N]
 #        bash tool/build_play_release.sh --verify-aab=<path>
@@ -20,6 +20,24 @@
 # --verify-aab=<path>   Run only the post-build checks (signing certificate,
 #                       package name, versionCode) on an existing AAB, then
 #                       exit. Never builds.
+# --internal-tether-ui  Internal test build running the tether_ui screens
+#                       (internal testing track only). The script adds
+#                       --dart-define=TETHER_UI_INTERNAL=true itself, checks
+#                       the define file with check_internal_define_file
+#                       (tool/release_define_check.sh: TETHER_BACKEND sandbox,
+#                       or http against STAGING_HOSTS only; a file holding
+#                       TETHER_UI_INTERNAL is refused), passes
+#                       --build-name=<pubspec version name>-internal-ui so Play
+#                       Console shows the suffix, and after the build requires
+#                       the AAB's versionName to carry it. Not accepted with
+#                       --check-version-only or --verify-aab. Without this
+#                       flag the script behaves exactly as before; nothing
+#                       else (no environment variable, no define file key)
+#                       can turn it on.
+#
+# Checklist (owner): never promote or roll out an AAB whose versionName ends in
+# -internal-ui to the production track. It runs the tether_ui screens, which
+# stay off the public store until full acceptance.
 #
 # The AAB's package must be com.TetherHealthLLC.tetherhealth (the Play app's
 # package, fixed at first upload); any other package fails the build.
@@ -48,6 +66,8 @@ build_number_given=0
 check_version_only=0
 verify_aab=""
 verify_aab_given=0
+internal_ui=0
+internal_suffix="-internal-ui"
 
 # Succeeds if $1 is a positive integer no larger than Play's limit. Checks the
 # digit length first so a huge value never reaches shell arithmetic.
@@ -124,6 +144,7 @@ while [ "$#" -gt 0 ]; do
       build_number_given=1
       ;;
     --check-version-only) check_version_only=1 ;;
+    --internal-tether-ui) internal_ui=1 ;;
     --verify-aab=*)
       verify_aab="${arg#--verify-aab=}"
       verify_aab_given=1
@@ -141,6 +162,10 @@ if [ "$build_number_given" -eq 1 ]; then
 fi
 if [ "$verify_aab_given" -eq 1 ] && [ "$check_version_only" -eq 1 ]; then
   echo "build_play_release: --verify-aab and --check-version-only are exclusive" >&2
+  exit 2
+fi
+if [ "$internal_ui" -eq 1 ] && { [ "$verify_aab_given" -eq 1 ] || [ "$check_version_only" -eq 1 ]; }; then
+  echo "build_play_release: --internal-tether-ui is for a build only; it cannot be combined with --verify-aab or --check-version-only" >&2
   exit 2
 fi
 
@@ -306,6 +331,64 @@ verify_aab_version_code() {
   fi
 }
 
+# Prints the versionName from the aapt2 manifest dump, or nothing on error.
+read_version_name_with_aapt2() {
+  dump_manifest_with_aapt2 "$1" |
+    sed -n 's/.*android:versionName([^)]*)="\([^"]*\)".*/\1/p' | head -n 1
+}
+
+# Internal builds only. Prints the version name for --build-name: the pubspec
+# version before "+", plus the internal suffix. Fails (exit 1) unless that name
+# is plain (digits, letters, dots and dashes).
+internal_build_name() {
+  local pubspec_version name
+  pubspec_version="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | head -n 1 | tr -d '[:space:]\r')"
+  name="${pubspec_version%%+*}"
+  local LC_ALL=C
+  case "$name" in
+    "" | *[!A-Za-z0-9.-]*)
+      echo "FAIL: pubspec.yaml version name is not plain; cannot build an internal version name." >&2
+      exit 1
+      ;;
+  esac
+  echo "$name$internal_suffix"
+}
+
+# Internal builds only. Reads versionName from the AAB with bundletool, else
+# aapt2, and fails (exit 1) unless it is exactly the internal name built.
+verify_aab_internal_version_name() {
+  local aab_path="$1" expected="$2" name=""
+  require_manifest_reader
+  if command -v bundletool >/dev/null 2>&1; then
+    name="$(bundletool dump manifest --bundle="$aab_path" --xpath=/manifest/@android:versionName 2>/dev/null)" || name=""
+  else
+    name="$(read_version_name_with_aapt2 "$aab_path")" || name=""
+  fi
+  name="${name%$'\r'}"
+  local LC_ALL=C
+  case "$name" in
+    "" | *[!A-Za-z0-9.-]*)
+      echo "FAIL: could not read a valid versionName from the AAB (path and tool output not shown)." >&2
+      exit 1
+      ;;
+  esac
+  echo "versionName: $name (read from the AAB); expected $expected"
+  if [ "$name" != "$expected" ]; then
+    echo "FAIL: AAB versionName $name is not $expected; this is not the internal build that was asked for." >&2
+    exit 1
+  fi
+}
+
+# Internal builds only: the warning printed before and after the build.
+internal_banner() {
+  echo
+  echo "=================================================================="
+  echo "INTERNAL TEST BUILD: runs the tether_ui screens (TETHER_UI_INTERNAL)."
+  echo "Internal testing track only. Never promote it to production."
+  echo "=================================================================="
+  echo
+}
+
 # Fails (exit 1) if keytool is missing, the bundle has no signing certificate,
 # or it is signed with the Android Debug certificate. keytool is never given the
 # caller's path: it echoes the path in its errors (FileNotFoundException), which
@@ -364,7 +447,13 @@ check_version_code
 # read-back modes keep working from a copy of this script alone.
 # shellcheck source=tool/release_define_check.sh
 . tool/release_define_check.sh
-check_release_define_file build_play_release "$env_file"
+if [ "$internal_ui" -eq 1 ]; then
+  check_internal_define_file build_play_release "$env_file"
+  internal_name="$(internal_build_name)"
+  internal_banner
+else
+  check_release_define_file build_play_release "$env_file"
+fi
 
 if [ ! -f android/key.properties ]; then
   echo "build_play_release: android/key.properties not found (see docs/PLAY_RELEASE.md)" >&2
@@ -386,6 +475,10 @@ build_args=(--release "--dart-define-from-file=$env_file")
 if [ -n "$build_number" ]; then
   build_args+=("--build-number=$build_number")
 fi
+if [ "$internal_ui" -eq 1 ]; then
+  build_args+=("--dart-define=TETHER_UI_INTERNAL=true" "--build-name=$internal_name")
+  echo "internal: --dart-define=TETHER_UI_INTERNAL=true --build-name=$internal_name"
+fi
 flutter build appbundle "${build_args[@]}"
 
 if [ ! -f "$aab" ]; then
@@ -401,3 +494,7 @@ check_signing_certificate "$aab"
 echo
 verify_aab_package "$aab"
 verify_aab_version_code "$aab"
+if [ "$internal_ui" -eq 1 ]; then
+  verify_aab_internal_version_name "$aab" "$internal_name"
+  internal_banner
+fi

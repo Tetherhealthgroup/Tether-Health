@@ -66,12 +66,54 @@
 #                            positions of the same object (duplicates)
 #   A flagged non-duplicate key under a top-level key is reported as that
 #   top-level key. Needs python3.
+#
+# check_internal_define_file <prefix> <path>
+#   The check used instead of check_release_define_file when a release script
+#   is given --internal-tether-ui (internal test builds only, never the store
+#   build). The same JSON, duplicate-key, privileged-value and position-label
+#   rules apply; the key allowlist and the URL rules are replaced by:
+#     - the top-level keys must be among TETHER_BACKEND, API_BASE_URL,
+#       SUPABASE_URL, SUPABASE_ANON_KEY, SYNC_BASE_URL, GOOGLE_WEB_CLIENT_ID,
+#       GOOGLE_IOS_CLIENT_ID and EPIC_SANDBOX_CLIENT_ID;
+#     - TETHER_UI_INTERNAL must not be in the file: the script adds it;
+#     - TETHER_BACKEND must be "sandbox" or "http";
+#     - sandbox: API_BASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY and
+#       SYNC_BASE_URL must all be absent;
+#     - http: all four are required; the three URLs follow the release URL
+#       rules (SYNC_BASE_URL like API_BASE_URL), SUPABASE_ANON_KEY the release
+#       allowlist, and every URL host must be in STAGING_HOSTS (below, in the
+#       Python). STAGING_HOSTS is empty until the owner creates the staging
+#       backend, so every http internal build is refused until then, and a
+#       production host can never be used by an internal build;
+#     - a provider ID, if present, is a non-empty public client identifier
+#       (letters, digits, ".", "_" and "-", at most 200 characters).
+#   Key names printed by name: the keys above, TETHER_UI_INTERNAL and
+#   SUPABASE_SERVICE_ROLE_KEY. Values are never printed.
+#
+# is_staging_host <prefix> <host>
+#   Succeeds if <host> (case-insensitive, one trailing dot ignored) is in
+#   STAGING_HOSTS; otherwise prints "<prefix>: ..." to stderr, without the
+#   host, and returns 1. Used by tool/staging_db.sh.
 check_release_define_file() {
-  python3 -I - "$1" "$2" <<'PY'
+  _release_define_python "$1" "$2" release
+}
+
+check_internal_define_file() {
+  _release_define_python "$1" "$2" internal
+}
+
+is_staging_host() {
+  _release_define_python "$1" "$2" staging-host
+}
+
+# _release_define_python <prefix> <path or host> <mode>
+_release_define_python() {
+  python3 -I - "$1" "$2" "$3" <<'PY'
 import base64, json, re, sys, unicodedata
 from urllib.parse import urlparse
 
 prefix = sys.argv[1]
+mode = sys.argv[3]
 ANON = "SUPABASE_ANON_KEY"
 # Reject unexpected keys: the only top-level keys a release define file may
 # hold are the three values AppConfig.fromEnvironment reads
@@ -102,6 +144,41 @@ KNOWN_KEYS = frozenset((
     "SUPABASE_ANON_KEY",
     "SUPABASE_SERVICE_ROLE_KEY",
 ))
+
+# Internal test builds (--internal-tether-ui only). The keys
+# lib/config/app_config.dart reads once the backend modes land, and the four
+# that a sandbox build must not set.
+INTERNAL_KEYS = (
+    "TETHER_BACKEND",
+    "API_BASE_URL",
+    "SUPABASE_URL",
+    ANON,
+    "SYNC_BASE_URL",
+    "GOOGLE_WEB_CLIENT_ID",
+    "GOOGLE_IOS_CLIENT_ID",
+    "EPIC_SANDBOX_CLIENT_ID",
+)
+SERVER_KEYS = ("API_BASE_URL", "SUPABASE_URL", ANON, "SYNC_BASE_URL")
+PROVIDER_KEYS = (
+    "GOOGLE_WEB_CLIENT_ID",
+    "GOOGLE_IOS_CLIENT_ID",
+    "EPIC_SANDBOX_CLIENT_ID",
+)
+PROVIDER_ID = re.compile(r"[A-Za-z0-9._-]{1,200}")
+# The script adds this define itself; a define file must never hold it.
+INTERNAL_FLAG_KEY = "TETHER_UI_INTERNAL"
+
+# Hosts of the staging backend (synthetic accounts only): the staging
+# Supabase project host (<ref>.supabase.co), the staging API host and the
+# staging sync host, lower case, without scheme, port or path. EMPTY until the owner has created the
+# staging projects; while it is empty every http internal build is refused.
+# Only the owner adds hosts here (docs/STAGING.md). Never add a production
+# host: this list is what keeps an internal build away from production data.
+STAGING_HOSTS = frozenset((
+))
+
+if mode == "internal":
+    KNOWN_KEYS = KNOWN_KEYS | frozenset(INTERNAL_KEYS) | {INTERNAL_FLAG_KEY}
 
 
 class Obj(dict):
@@ -338,6 +415,100 @@ def placeholder_host(parsed):
     return host == "invalid" or host.endswith(".invalid")
 
 
+def url_problems(key, value, bad, staging=False):
+    """The release URL rules for the URL define key; with staging, the host
+    must also be in STAGING_HOSTS (reported once by the caller if empty)."""
+    if not isinstance(value, str) or not value.strip():
+        bad.append(f"{key} is missing or empty")
+        return
+    parsed = urlparse(value.strip())
+    if parsed.scheme != "https" or not parsed.netloc:
+        bad.append(f"{key} must be an absolute https URL")
+    elif placeholder_host(parsed):
+        bad.append(f"{key} must not use a placeholder .invalid host")
+    if not parsed.netloc:
+        return  # Not absolute; reported above.
+    # Checked on the raw text: urlparse drops an empty query or fragment.
+    if "@" in parsed.netloc or "?" in value or "#" in value:
+        bad.append(f"{key} must not contain user info, a query or a fragment")
+    if key == "SUPABASE_URL" and parsed.path not in ("", "/"):
+        bad.append(f"{key} must be scheme and host only, without a path")
+    if staging and STAGING_HOSTS and not staging_host(parsed.hostname or ""):
+        bad.append(f"{key} host is not in STAGING_HOSTS (tool/release_define_check.sh)")
+
+
+def staging_host(host):
+    """True if host, lower case and without one trailing dot, is listed."""
+    host = host.lower()
+    if host.endswith("."):
+        host = host[:-1]
+    return host != "" and host in STAGING_HOSTS
+
+
+def anon_missing(data, bad):
+    key_value = data.get(ANON)
+    missing = not isinstance(key_value, str) or not key_value.strip()
+    if missing:
+        bad.append(f"{ANON} is missing or empty")
+    return missing
+
+
+def release_problems(data, bad):
+    """The release URL and key presence rules; returns whether the key is
+    missing."""
+    for key in ("SUPABASE_URL", "API_BASE_URL"):
+        url_problems(key, data.get(key), bad)
+    return anon_missing(data, bad)
+
+
+def internal_problems(data, bad):
+    """The internal-build mode rules; returns whether the key is missing (or
+    must be absent, so the allowlist below does not run on it)."""
+    if INTERNAL_FLAG_KEY in data:
+        bad.append(
+            f"{INTERNAL_FLAG_KEY} must not be in the define file "
+            "(--internal-tether-ui adds it)"
+        )
+    backend = data.get("TETHER_BACKEND")
+    if backend not in ("sandbox", "http"):
+        bad.append('TETHER_BACKEND must be "sandbox" or "http"')
+        return True
+    if backend == "sandbox":
+        for key in SERVER_KEYS:
+            if key in data:
+                bad.append(f"{key} must be absent in sandbox mode")
+        missing = True
+    else:
+        if not STAGING_HOSTS:
+            bad.append(
+                "http mode is refused: STAGING_HOSTS in "
+                "tool/release_define_check.sh is empty until the staging "
+                "backend exists"
+            )
+        for key in ("SUPABASE_URL", "API_BASE_URL", "SYNC_BASE_URL"):
+            url_problems(key, data.get(key), bad, staging=True)
+        missing = anon_missing(data, bad)
+    for key in PROVIDER_KEYS:
+        if key in data:
+            value = data[key]
+            if not isinstance(value, str) or not PROVIDER_ID.fullmatch(value):
+                bad.append(
+                    f"{key} must be a public client ID (letters, digits, "
+                    '".", "_" or "-", at most 200 characters)'
+                )
+    return missing
+
+
+def check_staging_host():
+    if not STAGING_HOSTS:
+        sys.exit(
+            f"{prefix}: STAGING_HOSTS in tool/release_define_check.sh is "
+            "empty; the staging backend does not exist yet"
+        )
+    if not staging_host(sys.argv[2]):
+        sys.exit(f"{prefix}: host is not in STAGING_HOSTS (host not shown)")
+
+
 def check():
     try:
         with open(sys.argv[2], encoding="utf-8") as fh:
@@ -352,27 +523,12 @@ def check():
     for text in duplicate_labels(data):
         bad.append(f"{text} appears more than once in the define file")
     top = positions(data)
-    for key in ("SUPABASE_URL", "API_BASE_URL"):
-        value = data.get(key)
-        if not isinstance(value, str) or not value.strip():
-            bad.append(f"{key} is missing or empty")
-            continue
-        parsed = urlparse(value.strip())
-        if parsed.scheme != "https" or not parsed.netloc:
-            bad.append(f"{key} must be an absolute https URL")
-        elif placeholder_host(parsed):
-            bad.append(f"{key} must not use a placeholder .invalid host")
-        if not parsed.netloc:
-            continue  # Not absolute; reported above.
-        # Checked on the raw text: urlparse drops an empty query or fragment.
-        if "@" in parsed.netloc or "?" in value or "#" in value:
-            bad.append(f"{key} must not contain user info, a query or a fragment")
-        if key == "SUPABASE_URL" and parsed.path not in ("", "/"):
-            bad.append(f"{key} must be scheme and host only, without a path")
-    key_value = data.get(ANON)
-    key_missing = not isinstance(key_value, str) or not key_value.strip()
-    if key_missing:
-        bad.append(f"{ANON} is missing or empty")
+    if mode == "internal":
+        allowed = INTERNAL_KEYS
+        key_missing = internal_problems(data, bad)
+    else:
+        allowed = ALLOWED_KEYS
+        key_missing = release_problems(data, bad)
     for key, value in data.items():
         is_anon = key == ANON
         privileged = role_bad = undecodable = False
@@ -405,10 +561,14 @@ def check():
                     f"{name} is not a publishable key (sb_publishable_...) "
                     "or an anon JWT"
                 )
-        if key not in ALLOWED_KEYS:
+        if key == INTERNAL_FLAG_KEY and mode == "internal":
+            continue  # Reported by internal_problems().
+        if key not in allowed:
             bad.append(
-                f"{name} is not an allowed define key (allowed: "
-                + ", ".join(ALLOWED_KEYS)
+                f"{name} is not an allowed define key "
+                + ("for an internal build " if mode == "internal" else "")
+                + "(allowed: "
+                + ", ".join(allowed)
                 + ")"
             )
     if bad:
@@ -416,7 +576,12 @@ def check():
 
 
 try:
-    check()
+    if mode == "staging-host":
+        check_staging_host()
+    elif mode in ("release", "internal"):
+        check()
+    else:
+        sys.exit(f"{prefix}: unknown define check mode")
 except Exception as exc:
     sys.exit(f"{prefix}: cannot check define file: {type(exc).__name__}")
 PY

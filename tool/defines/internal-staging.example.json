@@ -1,0 +1,7 @@
+{
+  "TETHER_BACKEND": "http",
+  "SUPABASE_URL": "https://staging-project-ref.invalid",
+  "API_BASE_URL": "https://tether-api-staging.invalid",
+  "SYNC_BASE_URL": "https://tether-thsync-staging.invalid",
+  "SUPABASE_ANON_KEY": "REPLACE_WITH_STAGING_PUBLISHABLE_KEY"
+}
