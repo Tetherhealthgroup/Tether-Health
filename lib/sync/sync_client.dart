@@ -68,7 +68,7 @@ const Map<String, String> syncEndpointAreas = {
 const String syncLapseEndpoint = 'POST /v1/records/lapses';
 
 /// The screen id a plan endpoint stores under (`PUT …/bf/meds` → `meds`).
-String? syncScreenOf(String endpoint) {
+String? syncScreenIdOf(String endpoint) {
   if (!syncEndpointAreas.containsKey(endpoint)) return null;
   return endpoint.substring(endpoint.lastIndexOf('/') + 1);
 }

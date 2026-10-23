@@ -130,6 +130,7 @@ final List<SandboxRoute> sandboxRoutes = [
   const SandboxRoute(_api, _post, '/v1/records/manual', api.addManualRecord,
       writes: true),
   const SandboxRoute(_api, _get, '/v1/records/fhir/sources', api.listSources),
+  const SandboxRoute(_api, _get, '/v1/records/fhir/items', api.listItems),
   SandboxRoute(
       _api, _post, '/v1/records/fhir/accept', api.storeRecords('accepted'),
       writes: true),

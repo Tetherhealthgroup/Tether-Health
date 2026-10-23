@@ -1,24 +1,52 @@
 // The endpoint handlers of the tether_ui screens and the production TData,
 // built from the app's backend.
+//
+// Every registered endpoint has a handler here except the Supabase Auth
+// submits, which the sign-in work provides.
 import 'package:flutter/widgets.dart';
 
 import '../../app/composition.dart' show HandlerContext;
 import '../../backend/backend.dart';
 import '../../data/app_services.dart';
 import '../../data/display_source.dart';
+import '../../sync/sync_store.dart';
 import '../data_adapter.dart';
+import '../pending_onboarding.dart';
 import '../registry.dart';
 import '../settings_data.dart';
+import 'account_endpoints.dart';
+import 'care_records_endpoints.dart';
+import 'common.dart';
+import 'device_endpoints.dart';
+import 'event_endpoints.dart';
+import 'sync_endpoints.dart';
 
 /// The handler of each endpoint, by its spec string. Also registers the
-/// local cleanup after an account deletion and the work done when the app
-/// comes back to the foreground.
+/// local cleanup after an account deletion, the onboarding commit after
+/// sign-up, and the work done when the app comes back to the foreground.
 Map<String, EndpointHandler> buildHandlers(HandlerContext context) {
   final services = AppServices.of(context.backend);
+  final kit = HandlerKit(
+    services: services,
+    data: context.data,
+    cleaners: context.cleaners,
+    postAuthHooks: context.postAuthHooks,
+    pending: PendingOnboarding(const SecureSyncDocumentStore()),
+  );
   context.cleaners.register(services.wipeAccount);
+  context.postAuthHooks.register(kit.pending.commitHook(services));
   ForegroundSync.install(services, context.data);
-  return const <String, EndpointHandler>{};
+  return handlersFor(kit);
 }
+
+/// Every handler, for [kit] (tests build their own kit).
+Map<String, EndpointHandler> handlersFor(HandlerKit kit) => {
+      ...accountHandlers(kit),
+      ...eventHandlers(kit),
+      ...syncHandlers(kit),
+      ...careRecordsHandlers(kit),
+      ...deviceHandlers(kit),
+    };
 
 /// The production TData for [backend].
 AppData buildAppData(Backend backend) {

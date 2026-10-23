@@ -162,7 +162,8 @@ const List<EndpointEntry> endpointRegistry = [
   EndpointEntry('PATCH /v1/enrolments/:id', OwnerService.api),
   EndpointEntry('PATCH /v1/enrolments/consents', OwnerService.api),
   EndpointEntry('POST /v1/enrolments', OwnerService.api, queueable: false),
-  EndpointEntry('POST /v1/enrolments/consents', OwnerService.api),
+  EndpointEntry('POST /v1/enrolments/consents', OwnerService.api,
+      extraKeys: {'ob_programs.programs', 'ob_third.value'}),
   EndpointEntry('PATCH /v1/notifications/preferences', OwnerService.api),
   // Health records.
   EndpointEntry('DELETE /v1/records/fhir/sources/:id', OwnerService.api),
@@ -172,7 +173,8 @@ const List<EndpointEntry> endpointRegistry = [
   EndpointEntry('POST /v1/records/manual', OwnerService.api),
   EndpointEntry('POST /v1/records/check-ins', OwnerService.api),
   EndpointEntry('POST /v1/records/lessons', OwnerService.api),
-  EndpointEntry('POST /v1/records/rescues', OwnerService.api),
+  EndpointEntry('POST /v1/records/rescues', OwnerService.api,
+      extraKeys: {'rescue_tools.value'}),
   // Care team.
   EndpointEntry('POST /v1/care/caregivers', OwnerService.api),
   EndpointEntry('POST /v1/care/connections', OwnerService.api,
@@ -182,7 +184,15 @@ const List<EndpointEntry> endpointRegistry = [
   EndpointEntry('POST /v1/care/summaries', OwnerService.api),
   EndpointEntry('POST /v1/care/supporters', OwnerService.api),
   // Quit plan.
-  EndpointEntry('PUT /v1/quit-plan', OwnerService.api),
+  EndpointEntry('PUT /v1/quit-plan', OwnerService.api, extraKeys: {
+    'bf_q1.value',
+    'bf_q2.value',
+    'bf_q2.add_your_own',
+    'bf_q3.value',
+    'bf_path.path',
+    'bf_date.quit_day_check_in_at_7_00_am',
+    'bf_support.remind_me_to_discuss_quit_medici',
+  }),
   EndpointEntry('POST /v1/quit-plan/guest-import', OwnerService.api),
   // Programme events.
   EndpointEntry('POST /v1/program-data/be/diary', OwnerService.api),
@@ -275,6 +285,9 @@ class AppApi implements TApi {
 
   /// The entry for [endpoint], or null when it is not registered.
   EndpointEntry? entryFor(String endpoint) => _entries[endpoint];
+
+  /// Whether [endpoint] has a handler.
+  bool hasHandler(String endpoint) => _handlers.containsKey(endpoint);
 
   @override
   Future<TResult> submit(String endpoint, {required String screenId}) async {

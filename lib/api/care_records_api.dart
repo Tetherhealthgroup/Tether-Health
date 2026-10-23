@@ -97,6 +97,10 @@ class CareRecordsApi {
   Future<ApiResult<Map<String, Object?>>> recordSources() =>
       _send(BackendMethod.get, '/v1/records/fhir/sources');
 
+  /// `GET /v1/records/fhir/items`: imported and entered items.
+  Future<ApiResult<Map<String, Object?>>> recordItems() =>
+      _send(BackendMethod.get, '/v1/records/fhir/items');
+
   /// `POST /v1/records/fhir/accept`: keeps the reviewed items.
   Future<ApiResult<Map<String, Object?>>> acceptRecords(
           Map<String, Object?> body) =>

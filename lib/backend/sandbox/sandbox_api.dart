@@ -1560,6 +1560,9 @@ SandboxAnswer addManualRecord(SandboxCall c) {
   return SandboxAnswer(201, {'submissionId': submissionId, 'id': row['id']});
 }
 
+SandboxAnswer listItems(SandboxCall c) =>
+    SandboxAnswer(200, {'items': _records(c)['items'] ?? <Object?>[]});
+
 SandboxAnswer listSources(SandboxCall c) =>
     SandboxAnswer(200, {'sources': _records(c)['sources'] ?? <Object?>[]});
 

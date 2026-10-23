@@ -225,6 +225,7 @@ void main() {
     await api.care
         .addManualRecord({'kind': 'allergy'}, idempotencyKey: h.key());
     await api.care.recordSources();
+    await api.care.recordItems();
     await api.care.acceptRecords({'items': <Object?>[]});
     await api.care.resolveRecordConflicts({'items': <Object?>[]});
     await api.care.syncRecordSource('5a4db0c0-0000-4000-8000-000000000999');

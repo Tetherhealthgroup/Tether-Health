@@ -126,6 +126,7 @@ Map<String, Future<Object?> Function(TetherApi)> clientCalls() => {
       'care.addManualRecord': (a) =>
           a.care.addManualRecord({}, idempotencyKey: 'k'),
       'care.recordSources': (a) => a.care.recordSources(),
+      'care.recordItems': (a) => a.care.recordItems(),
       'care.acceptRecords': (a) => a.care.acceptRecords({}),
       'care.resolveRecordConflicts': (a) => a.care.resolveRecordConflicts({}),
       'care.syncRecordSource': (a) => a.care.syncRecordSource(testId),
@@ -164,6 +165,7 @@ const notInContractYet = {
   'POST /v1/care/referrals',
   'POST /v1/records/manual',
   'GET /v1/records/fhir/sources',
+  'GET /v1/records/fhir/items',
   'POST /v1/records/fhir/accept',
   'POST /v1/records/fhir/conflicts',
   'POST /v1/records/fhir/sources/:id/sync',

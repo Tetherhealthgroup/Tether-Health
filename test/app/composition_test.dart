@@ -32,22 +32,22 @@ void main() {
     expect(composition.backend.mode, BackendMode.sandbox);
     expect(composition.config, same(_none));
     expect(composition.auth, isNull);
-    expect(composition.postAuthHooks.length, 0);
     // The local sync document and outbox are wiped after a deletion.
     expect(composition.cleaners.length, 1);
   });
 
-  test('every registered endpoint is routed, none handled yet', () async {
+  test('every registered endpoint has a handler, except sign-in submits',
+      () async {
     final composition =
         await compose(config: _none, backend: StubBackend(BackendMode.sandbox));
     for (final entry in endpointRegistry) {
       expect(composition.api.entryFor(entry.endpoint), isNotNull);
-      expect(
-        await composition.api.submit(entry.endpoint, screenId: 'checkin'),
-        const TResult.failed(RegistryCodes.notImplemented),
-        reason: entry.endpoint,
-      );
+      expect(composition.api.hasHandler(entry.endpoint),
+          entry.owner != OwnerService.supabaseAuth,
+          reason: entry.endpoint);
     }
+    expect(composition.postAuthHooks.length, 1,
+        reason: 'the onboarding commit runs after sign-up');
   });
 
   test('a given backend replaces the configured one, and is initialised',
