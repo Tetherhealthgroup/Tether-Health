@@ -1,0 +1,201 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="2796" viewBox="0 0 1290 2796">
+  <defs>
+    <linearGradient id="s21bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF8F0"/>
+      <stop offset="1" stop-color="#F5F2E8"/>
+    </linearGradient>
+    <linearGradient id="s21hero" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#123C37"/>
+      <stop offset="1" stop-color="#1D514A"/>
+    </linearGradient>
+    <linearGradient id="s21mint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E8F5ED"/>
+      <stop offset="1" stop-color="#C7E6D8"/>
+    </linearGradient>
+    <filter id="s21shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#123C37" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1290" height="2796" fill="url(#s21bg)"/>
+
+  <!-- iOS status bar -->
+  <g fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700">
+    <text x="74" y="76" font-size="36">9:41</text>
+    <g transform="translate(1056 43)">
+      <rect x="0" y="22" width="10" height="15" rx="3"/>
+      <rect x="16" y="17" width="10" height="20" rx="3"/>
+      <rect x="32" y="11" width="10" height="26" rx="3"/>
+      <rect x="48" y="5" width="10" height="32" rx="3"/>
+      <path d="M82 28c12-15 31-15 43 0l-7 7c-8-9-21-9-29 0zm10 10c6-7 16-7 22 0l-11 11z"/>
+      <rect x="143" y="9" width="61" height="32" rx="9" fill="none" stroke="#123C37" stroke-width="4"/>
+      <rect x="207" y="18" width="5" height="14" rx="2"/>
+      <rect x="149" y="15" width="45" height="20" rx="5"/>
+    </g>
+  </g>
+
+  <!-- Header -->
+  <g transform="translate(72 139)">
+    <circle cx="38" cy="38" r="36" fill="#FFFDF7" stroke="#C9D7D2" stroke-width="2"/>
+    <path d="M45 23L30 38l15 15" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="645" y="190" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="38">Craving Rescue</text>
+  <g transform="translate(1014 149)">
+    <rect width="204" height="64" rx="32" fill="#E6F1EA"/>
+    <text x="102" y="42" text-anchor="middle" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="23" letter-spacing="1.4">5 OF 5</text>
+  </g>
+
+  <!-- Rescue progress -->
+  <g transform="translate(72 278)">
+    <text x="0" y="0" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24" letter-spacing="3">RESULT SAVED</text>
+    <text x="1146" y="0" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24">100%</text>
+    <rect y="32" width="1146" height="14" rx="7" fill="#DCE6E0"/>
+    <rect y="32" width="1146" height="14" rx="7" fill="#FF7D61"/>
+  </g>
+
+  <!-- Result hero -->
+  <g transform="translate(72 371)" filter="url(#s21shadow)">
+    <rect width="1146" height="642" rx="47" fill="url(#s21hero)"/>
+    <circle cx="953" cy="149" r="205" fill="#285850" opacity="0.75"/>
+    <circle cx="953" cy="149" r="151" fill="none" stroke="#6C9088" stroke-width="3"/>
+    <circle cx="953" cy="149" r="103" fill="#D5EF75"/>
+    <path d="M907 148l30 30 62-77" fill="none" stroke="#123C37" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <g transform="translate(42 38)">
+      <rect width="226" height="57" rx="29" fill="#234E48"/>
+      <circle cx="30" cy="29" r="16" fill="#D5EF75"/>
+      <path d="M23 29l5 5 10-13" fill="none" stroke="#123C37" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="133" y="38" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="21" letter-spacing="1.2">RESCUE SAVED</text>
+    </g>
+    <text x="42" y="177" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="61" letter-spacing="-1.5">This craving eased.</text>
+    <text x="42" y="229" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="28">You gave the urge time to change before acting on it.</text>
+
+    <!-- Comparison -->
+    <g transform="translate(42 292)">
+      <rect width="1062" height="210" rx="35" fill="#234E48"/>
+      <g transform="translate(35 32)">
+        <text x="115" y="31" text-anchor="middle" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19" letter-spacing="2">BEFORE</text>
+        <text x="115" y="101" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="67">8</text>
+        <text x="115" y="135" text-anchor="middle" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Strong</text>
+        <path d="M266 76h142m-22-22 22 22-22 22" fill="none" stroke="#D5EF75" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="542" y="31" text-anchor="middle" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19" letter-spacing="2">NOW</text>
+        <text x="542" y="101" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="67">3</text>
+        <text x="542" y="135" text-anchor="middle" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Mild</text>
+        <g transform="translate(725 8)">
+          <rect width="270" height="136" rx="33" fill="#D5EF75"/>
+          <text x="135" y="55" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="39">5 points</text>
+          <text x="135" y="91" text-anchor="middle" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19" letter-spacing="1">LOWER THIS TIME</text>
+          <text x="135" y="118" text-anchor="middle" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="17">Your rating, not a diagnosis</text>
+        </g>
+      </g>
+    </g>
+    <text x="42" y="564" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Every result can be different. Checking in helps you learn what works.</text>
+  </g>
+
+  <!-- What the app learned -->
+  <g transform="translate(72 1056)" filter="url(#s21shadow)">
+    <rect width="1146" height="315" rx="40" fill="#FFFDF7"/>
+    <text x="36" y="64" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="34">What this adds to your plan</text>
+    <text x="1110" y="64" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="22">Today · 9:41 AM</text>
+
+    <g transform="translate(36 103)">
+      <g>
+        <rect width="330" height="142" rx="31" fill="#EFF5F1"/>
+        <circle cx="48" cy="48" r="24" fill="#FF7D61"/>
+        <text x="48" y="56" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24">!</text>
+        <text x="91" y="45" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="18" letter-spacing="1.5">TRIGGER</text>
+        <text x="91" y="78" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="27">Stress</text>
+        <text x="25" y="118" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Selected before rescue</text>
+      </g>
+      <g transform="translate(372 0)">
+        <rect width="330" height="142" rx="31" fill="#EFF5F1"/>
+        <circle cx="48" cy="48" r="24" fill="#123C37"/>
+        <path d="M37 49l8 8 15-19" fill="none" stroke="#D5EF75" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="91" y="45" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="18" letter-spacing="1.5">TOOL</text>
+        <text x="91" y="78" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="27">Breathing</text>
+        <text x="25" y="118" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Marked helpful</text>
+      </g>
+      <g transform="translate(744 0)">
+        <rect width="330" height="142" rx="31" fill="#EFF5F1"/>
+        <circle cx="48" cy="48" r="24" fill="#D5EF75"/>
+        <path d="M48 33v17l12 8" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        <text x="91" y="45" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="18" letter-spacing="1.5">PRACTICE</text>
+        <text x="91" y="78" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="27">2 minutes</text>
+        <text x="25" y="118" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Completed offline</text>
+      </g>
+    </g>
+    <text x="36" y="282" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">Slow breathing will be offered first for similar stress cravings.</text>
+  </g>
+
+  <!-- Next best action -->
+  <g transform="translate(72 1414)" filter="url(#s21shadow)">
+    <rect width="1146" height="353" rx="40" fill="url(#s21mint)" stroke="#B9DCCB" stroke-width="3"/>
+    <g transform="translate(36 33)">
+      <rect width="244" height="55" rx="27" fill="#123C37"/>
+      <circle cx="29" cy="28" r="14" fill="#D5EF75"/>
+      <path d="M24 28h10M29 23v10" stroke="#123C37" stroke-width="2" stroke-linecap="round"/>
+      <text x="143" y="36" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="19" letter-spacing="1">NEXT BEST STEP</text>
+    </g>
+    <text x="36" y="144" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="42">Protect the next 10 minutes.</text>
+    <text x="36" y="191" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="26">Stay in a smoke-free place and take a few sips of water.</text>
+    <g transform="translate(36 231)">
+      <rect width="1074" height="86" rx="29" fill="#FFFDF7"/>
+      <circle cx="48" cy="43" r="24" fill="#E6F1EA"/>
+      <path d="M39 42l7 7 13-17" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="88" y="53" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25">Craving Rescue stays one tap away from Home.</text>
+      <text x="1035" y="53" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">No timer needed</text>
+    </g>
+  </g>
+
+  <!-- Personal motivation -->
+  <g transform="translate(72 1810)" filter="url(#s21shadow)">
+    <rect width="1146" height="160" rx="35" fill="#FFFDF7"/>
+    <circle cx="73" cy="80" r="41" fill="#FFF0EB"/>
+    <path d="M73 101c-23-16-37-29-37-46 0-21 27-29 37-9 10-20 37-12 37 9 0 17-14 30-37 46z" fill="#FF7D61"/>
+    <text x="139" y="66" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="20" letter-spacing="2">YOUR REASON</text>
+    <text x="139" y="113" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="31">“I’m choosing this for my family.”</text>
+    <text x="1105" y="93" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Saved in My Plan</text>
+  </g>
+
+  <!-- Quick alternatives -->
+  <text x="72" y="2036" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="32">If you need more</text>
+  <g transform="translate(72 2071)">
+    <g filter="url(#s21shadow)">
+      <rect width="555" height="132" rx="34" fill="#FFFDF7"/>
+      <circle cx="61" cy="66" r="30" fill="#E6F1EA"/>
+      <path d="M50 66h22m-8-8 8 8-8 8" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="112" y="58" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="26">Repeat rescue</text>
+      <text x="112" y="91" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Use breathing again</text>
+      <path d="M501 56l13 13-13 13" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <g transform="translate(591 0)" filter="url(#s21shadow)">
+      <rect width="555" height="132" rx="34" fill="#FFF0EB" stroke="#FFC6B7" stroke-width="2"/>
+      <circle cx="61" cy="66" r="30" fill="#FF7D61"/>
+      <circle cx="61" cy="56" r="8" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+      <path d="M47 82c2-12 26-12 28 0" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+      <text x="112" y="58" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="26">Get human support</text>
+      <text x="112" y="91" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="20">Supporter or quitline</text>
+      <path d="M501 56l13 13-13 13" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- Primary action -->
+  <g transform="translate(72 2250)">
+    <rect width="1146" height="145" rx="31" fill="#123C37"/>
+    <text x="573" y="91" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="39">Back to Today</text>
+    <path d="M1054 73h29m-11-11 11 11-11 11" fill="none" stroke="#D5EF75" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <g transform="translate(72 2434)">
+    <rect width="1146" height="94" rx="28" fill="#EFF5F1"/>
+    <path d="M44 40h27v24H44zM50 40v-7c0-10 15-10 15 0v7" fill="none" stroke="#718A84" stroke-width="4" stroke-linecap="round"/>
+    <text x="92" y="58" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="22">Saved privately. Offline results sync once when connected.</text>
+    <text x="1095" y="58" text-anchor="end" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="20">Content v1.0</text>
+  </g>
+
+  <text x="645" y="2614" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="26">View progress details</text>
+  <text x="645" y="2658" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">You can delete this result from your history</text>
+
+  <!-- iOS home indicator -->
+  <rect x="468" y="2738" width="354" height="16" rx="8" fill="#123C37"/>
+</svg>

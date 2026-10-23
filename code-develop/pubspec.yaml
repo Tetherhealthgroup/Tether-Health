@@ -1,0 +1,28 @@
+name: breathefree_patient
+description: BreatheFree smoking-cessation patient application — complete approved 28-screen experience.
+publish_to: none
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_secure_storage: ^11.2.0
+  # Vendored from 4.2.5 with upstream SwiftPM and Built-in Kotlin fixes.
+  flutter_tts:
+    path: third_party/flutter_tts
+  http: ^1.6.0
+  supabase_flutter: ^2.17.2
+  url_launcher: ^6.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/screens/

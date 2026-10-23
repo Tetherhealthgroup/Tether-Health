@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1290" height="2796" viewBox="0 0 1290 2796">
+  <defs>
+    <linearGradient id="s11bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FBF8F0"/>
+      <stop offset="1" stop-color="#F5F2E8"/>
+    </linearGradient>
+    <linearGradient id="s11mint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#E8F5ED"/>
+      <stop offset="1" stop-color="#C7E6D8"/>
+    </linearGradient>
+    <filter id="s11shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="15" stdDeviation="24" flood-color="#123C37" flood-opacity="0.11"/>
+    </filter>
+  </defs>
+
+  <rect width="1290" height="2796" fill="url(#s11bg)"/>
+
+  <!-- iOS status bar -->
+  <g fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700">
+    <text x="74" y="76" font-size="36">9:41</text>
+    <g transform="translate(1056 43)">
+      <rect x="0" y="22" width="10" height="15" rx="3"/>
+      <rect x="16" y="17" width="10" height="20" rx="3"/>
+      <rect x="32" y="11" width="10" height="26" rx="3"/>
+      <rect x="48" y="5" width="10" height="32" rx="3"/>
+      <path d="M82 28c12-15 31-15 43 0l-7 7c-8-9-21-9-29 0zm10 10c6-7 16-7 22 0l-11 11z"/>
+      <rect x="143" y="9" width="61" height="32" rx="9" fill="none" stroke="#123C37" stroke-width="4"/>
+      <rect x="207" y="18" width="5" height="14" rx="2"/>
+      <rect x="149" y="15" width="45" height="20" rx="5"/>
+    </g>
+  </g>
+
+  <!-- Header -->
+  <g transform="translate(72 139)">
+    <circle cx="38" cy="38" r="36" fill="#FFFDF7" stroke="#C9D7D2" stroke-width="2"/>
+    <path d="M45 23L30 38l15 15" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="645" y="190" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="38">Review your plan</text>
+  <g transform="translate(1033 149)">
+    <rect width="185" height="64" rx="32" fill="#E6F1EA"/>
+    <text x="93" y="42" text-anchor="middle" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="1.5">5 OF 5</text>
+  </g>
+
+  <!-- Plan progress -->
+  <g transform="translate(72 278)">
+    <text x="0" y="0" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="3">QUIT PLAN</text>
+    <text x="1146" y="0" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="25">100%</text>
+    <rect y="32" width="1146" height="16" rx="8" fill="#DCE6E0"/>
+    <rect y="32" width="1146" height="16" rx="8" fill="#FF7D61"/>
+  </g>
+
+  <!-- Main copy -->
+  <text x="72" y="412" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="28" letter-spacing="5">YOUR QUIT PLAN</text>
+  <text x="72" y="507" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="74" letter-spacing="-3">Your plan is ready.</text>
+  <text x="72" y="583" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="34">Take one final look. You can edit any part now or later.</text>
+
+  <!-- Quit date hero -->
+  <g transform="translate(72 660)" filter="url(#s11shadow)">
+    <rect width="1146" height="392" rx="42" fill="#123C37"/>
+    <circle cx="1048" cy="68" r="37" fill="#234E48"/>
+    <path d="M1038 77l3-14 16-16 11 11-16 16z" fill="none" stroke="#D5EF75" stroke-width="4" stroke-linejoin="round"/>
+    <text x="42" y="61" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="23" letter-spacing="3">QUIT DATE</text>
+
+    <g transform="translate(42 92)">
+      <rect width="177" height="185" rx="28" fill="#FFFDF7"/>
+      <rect width="177" height="50" rx="25" fill="#FF7D61"/>
+      <rect y="24" width="177" height="27" fill="#FF7D61"/>
+      <text x="89" y="36" text-anchor="middle" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="23" letter-spacing="3">AUGUST</text>
+      <text x="89" y="129" text-anchor="middle" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="74">28</text>
+      <text x="89" y="166" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="20">FRIDAY</text>
+    </g>
+
+    <text x="264" y="146" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="47">Friday, August 28</text>
+    <text x="264" y="196" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="29">7 days to prepare · Pacific Time</text>
+    <g transform="translate(264 226)">
+      <rect width="305" height="58" rx="29" fill="#234E48"/>
+      <circle cx="30" cy="29" r="17" fill="#D5EF75"/>
+      <path d="M22 29l6 6 11-14" fill="none" stroke="#123C37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="61" y="39" fill="#FFFFFF" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24">Recommended window</text>
+    </g>
+
+    <!-- Seven-day preparation timeline -->
+    <line x1="42" y1="326" x2="1104" y2="326" stroke="#3F6660" stroke-width="3"/>
+    <g>
+      <circle cx="42" cy="326" r="12" fill="#D5EF75"/>
+      <circle cx="219" cy="326" r="9" fill="#6C8C85"/>
+      <circle cx="396" cy="326" r="9" fill="#6C8C85"/>
+      <circle cx="573" cy="326" r="9" fill="#6C8C85"/>
+      <circle cx="750" cy="326" r="9" fill="#6C8C85"/>
+      <circle cx="927" cy="326" r="9" fill="#6C8C85"/>
+      <circle cx="1104" cy="326" r="13" fill="#FF7D61"/>
+      <text x="42" y="369" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">TODAY</text>
+      <text x="1104" y="369" text-anchor="end" fill="#BFD5CD" font-family="Nimbus Sans, Arial, sans-serif" font-size="21">QUIT DAY</text>
+    </g>
+  </g>
+
+  <!-- Plan details -->
+  <text x="72" y="1127" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="24" letter-spacing="3">PLAN DETAILS</text>
+  <text x="1218" y="1127" text-anchor="end" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="23">Tap any item to edit</text>
+
+  <g transform="translate(72 1161)" filter="url(#s11shadow)">
+    <rect width="1146" height="778" rx="38" fill="#FFFDF7"/>
+
+    <!-- Approach -->
+    <g transform="translate(36 31)">
+      <circle cx="43" cy="43" r="40" fill="#E6F1EA"/>
+      <path d="M43 62V39M43 39c0-13-15-15-23-24M43 39c0-13 15-15 24-24" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="104" y="34" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="21" letter-spacing="2">QUIT APPROACH</text>
+      <text x="104" y="72" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="31">Set a quit date</text>
+      <path d="M1045 29l14 14-14 14" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <line x1="36" y1="150" x2="1110" y2="150" stroke="#E1E9E4" stroke-width="2"/>
+
+    <!-- Reason -->
+    <g transform="translate(36 180)">
+      <circle cx="43" cy="43" r="40" fill="#FFF0EB"/>
+      <path d="M43 62s-25-15-25-33c0-14 18-19 25-6 7-13 25-8 25 6 0 18-25 33-25 33z" fill="#FF7D61"/>
+      <text x="104" y="34" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="21" letter-spacing="2">TOP REASON</text>
+      <text x="104" y="72" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="31">Protect my family</text>
+      <path d="M1045 29l14 14-14 14" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <line x1="36" y1="299" x2="1110" y2="299" stroke="#E1E9E4" stroke-width="2"/>
+
+    <!-- Support -->
+    <g transform="translate(36 329)">
+      <circle cx="43" cy="43" r="40" fill="#E6F1EA"/>
+      <circle cx="43" cy="31" r="12" fill="none" stroke="#123C37" stroke-width="5"/>
+      <path d="M21 65c3-16 41-16 44 0" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round"/>
+      <text x="104" y="34" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="21" letter-spacing="2">SUPPORT CHECK-IN</text>
+      <text x="104" y="72" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="31">Jordan · Evening before</text>
+      <path d="M1045 29l14 14-14 14" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <line x1="36" y1="448" x2="1110" y2="448" stroke="#E1E9E4" stroke-width="2"/>
+
+    <!-- Preparation -->
+    <g transform="translate(36 478)">
+      <circle cx="43" cy="43" r="40" fill="#E6F1EA"/>
+      <path d="M25 43l12 12 25-31" fill="none" stroke="#123C37" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="104" y="34" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="21" letter-spacing="2">PREPARE YOUR SPACE</text>
+      <text x="104" y="72" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="31">2 of 3 tasks complete</text>
+      <path d="M1045 29l14 14-14 14" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <line x1="36" y1="597" x2="1110" y2="597" stroke="#E1E9E4" stroke-width="2"/>
+
+    <!-- Treatment -->
+    <g transform="translate(36 627)">
+      <circle cx="43" cy="43" r="40" fill="#FFF0EB"/>
+      <rect x="28" y="18" width="30" height="51" rx="15" fill="none" stroke="#FF7D61" stroke-width="5"/>
+      <line x1="29" y1="44" x2="57" y2="44" stroke="#FF7D61" stroke-width="4"/>
+      <text x="104" y="34" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="21" letter-spacing="2">TREATMENT SUPPORT</text>
+      <text x="104" y="72" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="31">Care-team discussion reminder on</text>
+      <path d="M1045 29l14 14-14 14" fill="none" stroke="#123C37" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- Activation note -->
+  <g transform="translate(72 1984)">
+    <rect width="1146" height="127" rx="29" fill="url(#s11mint)"/>
+    <circle cx="64" cy="64" r="31" fill="#123C37"/>
+    <path d="M64 48v19M64 79v1" fill="none" stroke="#D5EF75" stroke-width="5" stroke-linecap="round"/>
+    <text x="116" y="54" fill="#123C37" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="27">Starting activates your preparation tasks and reminders.</text>
+    <text x="116" y="91" fill="#536F69" font-family="Nimbus Sans, Arial, sans-serif" font-size="24">Support messages still require your approval before sending.</text>
+  </g>
+
+  <!-- Primary action -->
+  <g transform="translate(72 2161)">
+    <rect width="1146" height="146" rx="30" fill="#123C37"/>
+    <text x="573" y="91" fill="#FFFFFF" text-anchor="middle" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="39">Start my quit plan</text>
+    <path d="M1054 73h28m-11-11 11 11-11 11" fill="none" stroke="#D5EF75" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Secondary action -->
+  <g transform="translate(72 2343)">
+    <rect width="1146" height="104" rx="27" fill="#FFFDF7" stroke="#C9D7D2" stroke-width="3"/>
+    <text x="573" y="65" fill="#123C37" text-anchor="middle" font-family="Nimbus Sans, Arial, sans-serif" font-weight="700" font-size="29">Save and finish later</text>
+  </g>
+
+  <text x="645" y="2597" text-anchor="middle" fill="#718A84" font-family="Nimbus Sans, Arial, sans-serif" font-size="25">You can edit your active plan at any time</text>
+  <text x="645" y="2641" text-anchor="middle" fill="#8BA09A" font-family="Nimbus Sans, Arial, sans-serif" font-size="23">Saved automatically</text>
+
+  <!-- iOS home indicator -->
+  <rect x="468" y="2738" width="354" height="16" rx="8" fill="#123C37"/>
+</svg>
