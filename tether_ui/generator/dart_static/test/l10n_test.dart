@@ -227,7 +227,7 @@ void main() {
   test("the kit's English constants match the English catalog", () {
     final s = TStrings.english;
     expect(s.kitGenericError, TFailClosedResolver.message);
-    expect(s.kitSaveError, TNav.saveError);
+    expect(s.kitGenericError, TNav.saveFailed);
     expect(s.kitCallFallback(number: '988'), TCallFallbackCopy.callMessage('988'));
     expect(s.kitSmsFallback(number: '988'), TCallFallbackCopy.smsMessage('988'));
     expect([s.kitCopy, s.kitCopied, s.kitClose], [TCallFallbackCopy.copy, TCallFallbackCopy.copied, TCallFallbackCopy.close]);

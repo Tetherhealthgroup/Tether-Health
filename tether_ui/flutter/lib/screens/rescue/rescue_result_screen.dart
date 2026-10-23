@@ -25,7 +25,7 @@ class RescueResultScreen extends StatelessWidget {
       children: [
         TTitle(s.rescueResultBodyN0Text),
         TSliderField(fieldKey: 'rescue_result.how_strong_is_it_now', label: s.rescueResultBodyN1Label, value: 3.0, min: 0.0, max: 10.0, minLabel: '0', maxLabel: '10', color: TColors.coral),
-        TStatGrid(stats: [TStat(label: s.rescueResultBodyN2ItemsN0Label, value: '8'), TStat(label: s.rescueResultBodyN2ItemsN1Label, value: '3', sub: s.rescueResultBodyN2ItemsN1Sub)]),
+        TBoundValues(keys: const ['rescue.rating_before', 'rescue.rating_now'], builder: (context, v) => TStatGrid(stats: [TStat(label: s.rescueResultBodyN2ItemsN0Label, value: v.text('rescue.rating_before', '8')), TStat(label: s.rescueResultBodyN2ItemsN1Label, value: v.text('rescue.rating_now', '3'), sub: s.rescueResultBodyN2ItemsN1Sub)])),
         TChips(fieldKey: 'rescue_result.did_it_help', options: ['Yes', 'A little', 'Not this time'], labels: [s.rescueResultBodyN3OptionsN0, s.rescueResultBodyN3OptionsN1, s.rescueResultBodyN3OptionsN2], selected: ['Yes'], multi: false, label: s.rescueResultBodyN3Label),
         TCard(variant: TCardVariant.mint, eyebrow: s.rescueResultBodyN4Eyebrow, title: s.rescueResultBodyN4Title),
         TLink(key: const ValueKey('a:body[5]'), label: s.rescueResultBodyN5Label, onTap: () => TNav.push(context, Routes.rescueEscalate)),

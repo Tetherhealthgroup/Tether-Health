@@ -43,7 +43,9 @@ def shared():
 
     S('ob_programs', 'Choose programs', '/onboarding/programs', 'onboarding', phase='welcome', hdr=H('Choose programs', pill='1 of 5'), body=[
         steps(1, 5), title('What would you like support with?'), text('Choose any. You can add, pause or leave a program anytime.', 'muted'),
-        tiles([tl(PROGRAMS[p][0], PROGRAMS[p][1], program=p, selected=p in ('bf', 'sf')) for p in ['bf', 'sf', 'ca', 'hw', 'st', 'ea', 'nu', 'sd']], key='programs'),
+        # P-31, P-78 (O-m6): the programmes the member joins start unselected;
+        # they become enrolments and consents.
+        tiles([tl(PROGRAMS[p][0], PROGRAMS[p][1], program=p) for p in ['bf', 'sf', 'ca', 'hw', 'st', 'ea', 'nu', 'sd']], key='programs'),
         link('See all 11 programs', go('catalog')),
     ], footer=[button('Continue with 2 programs', go('ob_focus'))], desc='Multi-select. Continue is disabled with 0 selected ("Choose at least one program").')
 

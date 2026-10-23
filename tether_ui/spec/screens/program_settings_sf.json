@@ -29,7 +29,10 @@
           }
         }
       ],
-      "flat": true
+      "flat": true,
+      "data": {
+        "rows[0].sub": "enrolment.:program.since"
+      }
     },
     {
       "t": "radio",
@@ -103,7 +106,10 @@
           },
           "danger": true
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "enrolment.:program.unplug_summary"
+      }
     },
     {
       "t": "list",

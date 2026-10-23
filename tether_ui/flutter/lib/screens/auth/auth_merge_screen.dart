@@ -22,8 +22,8 @@ class AuthMergeScreen extends StatelessWidget {
       children: [
         TEyebrow(s.authMergeBodyN0Text),
         TTitle(s.authMergeBodyN1Text),
-        TListGroup(rows: [TListRow(label: s.authMergeBodyN2RowsN0Label, sub: s.authMergeBodyN2RowsN0Sub, lead: TLead.program('bf'))]),
-        TBody(s.authMergeBodyN3Text, tone: TTextTone.small),
+        TBoundValues(keys: const ['auth.merge.guest_plan'], builder: (context, v) => TListGroup(rows: [TListRow(label: s.authMergeBodyN2RowsN0Label, sub: v.text('auth.merge.guest_plan', s.authMergeBodyN2RowsN0Sub), lead: TLead.program('bf'))])),
+        TBoundValues(keys: const ['auth.merge.account_plan'], place: TExamplePlace.inline, builder: (context, v) => TBody(v.text('auth.merge.account_plan', s.authMergeBodyN3Text), tone: TTextTone.small)),
         TRadioList(fieldKey: 'auth_merge.value', items: [TRadioItem(s.authMergeBodyN4ItemsN0Label, value: 'Keep both, choose later', sub: s.authMergeBodyN4ItemsN0Sub, badge: s.authMergeBodyN4ItemsN0Badge), TRadioItem(s.authMergeBodyN4ItemsN1Label, value: 'Use this phone’s plan'), TRadioItem(s.authMergeBodyN4ItemsN2Label, value: 'Use the account’s plan')], selected: 0),
       ],
       footer: [

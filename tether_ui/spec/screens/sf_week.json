@@ -51,7 +51,10 @@
         "S",
         "S"
       ],
-      "caption": "Thursday: no check-in · not counted as zero"
+      "caption": "Thursday: no check-in · not counted as zero",
+      "data": {
+        "values": "sf.minutes_week"
+      }
     },
     {
       "t": "stats",
@@ -66,7 +69,12 @@
           "sub": "7 put down"
         }
       ],
-      "cols": 2
+      "cols": 2,
+      "data": {
+        "items[0].value": "sf.phone_free_nights",
+        "items[1].value": "sf.urges_paused",
+        "items[1].sub": "sf.urges_put_down"
+      }
     },
     {
       "t": "card",
@@ -76,9 +84,15 @@
       "children": [
         {
           "t": "quote",
-          "text": "I feel drained after long scrolls."
+          "text": "I feel drained after long scrolls.",
+          "data": {
+            "text": "sf.you_said"
+          }
         }
-      ]
+      ],
+      "data": {
+        "text": "sf.insight"
+      }
     },
     {
       "t": "card",
@@ -115,7 +129,10 @@
             }
           ]
         }
-      ]
+      ],
+      "data": {
+        "title": "sf.next_week_suggestion"
+      }
     }
   ],
   "footer": [],

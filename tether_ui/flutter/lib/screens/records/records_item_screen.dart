@@ -22,8 +22,8 @@ class RecordsItemScreen extends StatelessWidget {
     return TScreen(
       header: THeader(title: s.recordsItemHeaderTitle, pill: '12 + 36'),
       children: [
-        TLineChart(values: [142.0, 140.0, 138.0, 139.0, 135.0, 133.0, 136.0, 131.0, 129.0, 130.0, 128.0, 127.0], color: TColors.program('hw'), title: s.recordsItemBodyN0Title, unit: 'mmHg'),
-        TListGroup(title: s.recordsItemBodyN1Title, rows: [TListRow(label: s.recordsItemBodyN1RowsN0Label, sub: s.recordsItemBodyN1RowsN0Sub), TListRow(label: s.recordsItemBodyN1RowsN1Label, sub: s.recordsItemBodyN1RowsN1Sub), TListRow(label: s.recordsItemBodyN1RowsN2Label, sub: s.recordsItemBodyN1RowsN2Sub)]),
+        TBoundValues(keys: const ['records.item.series'], builder: (context, v) => TLineChart(values: v.series('records.item.series', const [142.0, 140.0, 138.0, 139.0, 135.0, 133.0, 136.0, 131.0, 129.0, 130.0, 128.0, 127.0]), color: TColors.program('hw'), title: s.recordsItemBodyN0Title, unit: 'mmHg')),
+        TBoundValues(keys: const ['records.item.latest_1', 'records.item.latest_1_source', 'records.item.latest_2', 'records.item.latest_2_source', 'records.item.latest_3', 'records.item.latest_3_source'], builder: (context, v) => TListGroup(title: s.recordsItemBodyN1Title, rows: [TListRow(label: v.text('records.item.latest_1', s.recordsItemBodyN1RowsN0Label), sub: v.text('records.item.latest_1_source', s.recordsItemBodyN1RowsN0Sub)), TListRow(label: v.text('records.item.latest_2', s.recordsItemBodyN1RowsN1Label), sub: v.text('records.item.latest_2_source', s.recordsItemBodyN1RowsN1Sub)), TListRow(label: v.text('records.item.latest_3', s.recordsItemBodyN1RowsN2Label), sub: v.text('records.item.latest_3_source', s.recordsItemBodyN1RowsN2Sub))])),
         TKeyValue(rows: [(s.recordsItemBodyN2RowsN0N0, s.recordsItemBodyN2RowsN0N1), (s.recordsItemBodyN2RowsN1N0, 'Heartwise')]),
       ],
       footer: [

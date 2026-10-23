@@ -33,12 +33,18 @@
             "program": "bf"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "auth.merge.guest_plan"
+      }
     },
     {
       "t": "text",
       "text": "Your account already has a BreatheFree plan from Aug 12.",
-      "tone": "small"
+      "tone": "small",
+      "data": {
+        "text": "auth.merge.account_plan"
+      }
     },
     {
       "t": "radio",

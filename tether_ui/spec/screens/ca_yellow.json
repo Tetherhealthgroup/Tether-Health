@@ -23,7 +23,10 @@
       "t": "card",
       "variant": "warn",
       "title": "Follow your yellow-zone steps",
-      "text": "From the plan you entered on Sep 3"
+      "text": "From the plan you entered on Sep 3",
+      "data": {
+        "text": "ca.plan_entered_line"
+      }
     },
     {
       "t": "card",

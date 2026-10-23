@@ -29,7 +29,11 @@
           }
         }
       ],
-      "flat": true
+      "flat": true,
+      "data": {
+        "rows[0].label": "profile.name",
+        "rows[0].sub": "profile.email"
+      }
     },
     {
       "t": "list",
@@ -51,7 +55,11 @@
             "to": "account_signin_methods"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "records.sources_summary",
+        "rows[1].sub": "account.signin_methods_summary"
+      }
     },
     {
       "t": "list",
@@ -89,7 +97,12 @@
             "to": "account_data"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "account.programs_summary",
+        "rows[1].sub": "notifications.summary",
+        "rows[2].sub": "consents.reviewed_summary"
+      }
     },
     {
       "t": "list",

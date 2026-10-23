@@ -27,7 +27,7 @@ class SfBuddyScreen extends StatelessWidget {
         TBody(s.sfBuddyBodyN1Text, tone: TTextTone.muted),
         TField(fieldKey: 'sf_buddy.name', label: s.sfBuddyBodyN2Label, placeholder: s.sfBuddyBodyN2Placeholder),
         TChecklist(fieldKey: 'sf_buddy.buddy_can_see', items: [TCheckItem(s.sfBuddyBodyN3ItemsN0Label, value: 'A weekly “I hit my goal” message', done: true), TCheckItem(s.sfBuddyBodyN3ItemsN1Label, value: 'My minutes per day'), TCheckItem(s.sfBuddyBodyN3ItemsN2Label, value: 'Nothing automatic: I send each one', done: true)], label: s.sfBuddyBodyN3Label, bind: 'sf.buddy.can_see'),
-        TCard(variant: TCardVariant.mint, eyebrow: s.sfBuddyBodyN4Eyebrow, children: [TQuote(s.sfBuddyBodyN4ChildrenN0Text)]),
+        TBoundValues(keys: const ['sf.buddy.preview_message'], builder: (context, v) => TCard(variant: TCardVariant.mint, eyebrow: s.sfBuddyBodyN4Eyebrow, children: [TQuote(v.text('sf.buddy.preview_message', s.sfBuddyBodyN4ChildrenN0Text))])),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.sfBuddyFooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sf/plan', screenId: 'sf_buddy', then: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.sfHome))), arrow: true),

@@ -38,7 +38,12 @@
           "Avoided",
           "baseline − reported"
         ]
-      ]
+      ],
+      "data": {
+        "rows[0][1]": "bf.estimates.baseline",
+        "rows[1][1]": "bf.estimates.price",
+        "rows[2][1]": "bf.estimates.time_per_cigarette"
+      }
     },
     {
       "t": "text",

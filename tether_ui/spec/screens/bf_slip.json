@@ -35,7 +35,10 @@
           "Smoke-free days so far",
           "6 of 7 · kept"
         ]
-      ]
+      ],
+      "data": {
+        "rows[0][1]": "bf.smoke_free_days"
+      }
     },
     {
       "t": "chips",

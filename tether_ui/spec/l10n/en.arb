@@ -263,13 +263,13 @@
     "prop": "generic_error",
     "sourceHash": "3ccd9d6586ef9143f1e1cc09831532fc2342c50ee76e5cb3c151190acbc50b51"
   },
-  "kit.save_error": "Couldn’t save. Your entry is kept on this phone.",
-  "@kit.save_error": {
-    "description": "Message when saving fails and the entry is kept on the phone",
+  "kit.example": "Example",
+  "@kit.example": {
+    "description": "Tag on a value that is a design example, not the member’s own data; read before the value",
     "screen": "kit",
     "path": "",
-    "prop": "save_error",
-    "sourceHash": "1932f46d3805386cb41ee94efba545f176d2fd3cb45f2aaefddb7d4ad822330d"
+    "prop": "example",
+    "sourceHash": "d029f87e3d80f8fd9b1be67c7426b4cc1ff47b4a9d0a8461c826a59d8c5eb6cd"
   },
   "kit.call_fallback": "Calling isn’t available here. Dial {number} now.",
   "@kit.call_fallback": {

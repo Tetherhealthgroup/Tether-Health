@@ -43,7 +43,10 @@
         400,
         450
       ],
-      "caption": "Shaded: your green zone, from your plan"
+      "caption": "Shaded: your green zone, from your plan",
+      "data": {
+        "values": "ca.peak_flow_series"
+      }
     },
     {
       "t": "stats",
@@ -61,14 +64,22 @@
           "value": "0"
         }
       ],
-      "cols": 3
+      "cols": 3,
+      "data": {
+        "items[0].value": "ca.days_green",
+        "items[1].value": "ca.days_yellow",
+        "items[2].value": "ca.days_red"
+      }
     },
     {
       "t": "card",
       "variant": "plain",
       "eyebrow": "Most common symptom",
       "title": "Wheezing at night (3×)",
-      "text": "Worth mentioning at your next visit."
+      "text": "Worth mentioning at your next visit.",
+      "data": {
+        "title": "ca.top_symptom"
+      }
     }
   ],
   "footer": [

@@ -26,7 +26,10 @@
     {
       "t": "title",
       "text": "3 due, 1 to ask about",
-      "size": "m"
+      "size": "m",
+      "data": {
+        "text": "ck.due_summary"
+      }
     },
     {
       "t": "card",

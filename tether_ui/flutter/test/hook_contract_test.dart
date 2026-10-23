@@ -228,7 +228,7 @@ void main() {
       TApi.instance = _ScriptedApi(const TResult.failed('synthetic_code_42'));
       await _open(tester, Routes.hwLipids);
       await _tapKey(tester, 'footer[0]');
-      expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsOneWidget);
+      expect(find.text('Something went wrong. Please try again.'), findsOneWidget);
       expect(find.text('Panel saved'), findsNothing);
       expect(find.textContaining('synthetic_code_42'), findsNothing);
       expect(find.byType(HwLipidsScreen), findsOneWidget);
@@ -429,7 +429,7 @@ void main() {
       await _tapKey(tester, 'footer[0]');
       expect(tester.takeException(), isNull);
       expect(find.byType(HwLipidsScreen), findsOneWidget);
-      expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsOneWidget);
+      expect(find.text('Something went wrong. Please try again.'), findsOneWidget);
       expect(find.text('Panel saved'), findsNothing);
       for (final t in _texts(tester)) {
         expect(t.contains('canary'), isFalse, reason: t);
@@ -537,14 +537,15 @@ void main() {
       await _open(tester, Routes.hwLipids);
       await _tapKey(tester, 'footer[0]');
       expect(find.byType(HwLipidsScreen), findsOneWidget);
-      expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsOneWidget);
+      expect(find.text('Something went wrong. Please try again.'), findsOneWidget);
       await tester.pump(const Duration(seconds: 3));
     });
 
-    testWidgets('release defaults: bound slots show no fallback', (tester) async {
+    testWidgets('release defaults: a bound slot shows its example with the Example tag (P-89)', (tester) async {
       TDefaults.forRelease();
       await tester.pumpWidget(MaterialApp(home: Scaffold(body: TBound.text('hw.last_bp', fallback: '128/82'))));
-      expect(find.text('128/82'), findsNothing);
+      expect(find.text('128/82'), findsOneWidget);
+      expect(find.byType(TExampleTag), findsOneWidget);
     });
 
     test('forPreview restores the preview defaults', () {
@@ -611,7 +612,7 @@ void main() {
           expect(TRules.decide({'ca_zone': 'ca.zone', 'ea_mood': 'ea.selfharm', 'hw_log2': 'hw.bp', 'st_log': 'st.glucose', 'records_manual': 'rec.manual'}[sid]!, TSession.values), result);
           await _tapKey(tester, 'footer[0]');
           expect(tester.takeException(), isNull);
-          expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsOneWidget);
+          expect(find.text('Something went wrong. Please try again.'), findsOneWidget);
           if (safetyType == null) {
             expect(find.byType(screenType), findsOneWidget);
             expect(find.text('Saved'), findsNothing);
@@ -633,7 +634,7 @@ void main() {
       await enter(tester, 'st_log.reading', '142');
       await _tapKey(tester, 'footer[0]');
       expect(find.byType(StLogScreen), findsNothing);
-      expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsNothing);
+      expect(find.text('Something went wrong. Please try again.'), findsNothing);
       await tester.pump(const Duration(seconds: 3));
     });
   });
@@ -696,7 +697,7 @@ void main() {
         await tester.pump(const Duration(seconds: 1));
         expect(find.byType(CrisisScreen), findsOneWidget);
         expect(arrivals.names.where((n) => n == Routes.crisis), hasLength(1));
-        expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsNothing);
+        expect(find.text('Something went wrong. Please try again.'), findsNothing);
         await tester.pump(const Duration(seconds: 3));
       });
     }
@@ -750,7 +751,7 @@ void main() {
   });
 
   group('in-flight guard', () {
-    const saveError = 'Couldn’t save. Your entry is kept on this phone.';
+    const saveError = 'Something went wrong. Please try again.';
 
     Future<void> selfHarm(WidgetTester tester) async {
       await tester.ensureVisible(find.text('Thoughts of harming myself'));
@@ -1130,10 +1131,10 @@ void main() {
       TApi.instance = _GatedApi();
       await _open(tester, Routes.hwLipids);
       await _tapKey(tester, 'footer[0]');
-      expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsNothing);
+      expect(find.text('Something went wrong. Please try again.'), findsNothing);
       await tester.pump(const Duration(seconds: 30));
       await tester.pump();
-      expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsOneWidget);
+      expect(find.text('Something went wrong. Please try again.'), findsOneWidget);
       expect(find.byType(HwLipidsScreen), findsOneWidget);
       await tester.pump(const Duration(seconds: 3));
     });

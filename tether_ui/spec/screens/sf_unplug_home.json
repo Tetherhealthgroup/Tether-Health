@@ -23,7 +23,10 @@
       "t": "card",
       "variant": "mint",
       "title": "Unplug is on",
-      "text": "5 apps in 2 groups · pause screen after 60 min or 20 opens"
+      "text": "5 apps in 2 groups · pause screen after 60 min or 20 opens",
+      "data": {
+        "text": "sf.unplug.summary"
+      }
     },
     {
       "t": "card",
@@ -103,7 +106,11 @@
             "to": "sf_unplug_health"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "sf.unplug.apps_summary",
+        "rows[1].sub": "sf.unplug.limits_summary"
+      }
     },
     {
       "t": "list",

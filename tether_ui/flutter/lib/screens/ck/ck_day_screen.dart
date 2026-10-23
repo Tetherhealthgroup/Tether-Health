@@ -24,7 +24,7 @@ class CkDayScreen extends StatelessWidget {
     return TScreen(
       header: THeader(title: s.ckDayHeaderTitle, pill: s.ckDayHeaderPill),
       children: [
-        TTitle(s.ckDayBodyN0Text),
+        TBoundValues(keys: const ['ck.appointment_title'], place: TExamplePlace.inline, builder: (context, v) => TTitle(v.text('ck.appointment_title', s.ckDayBodyN0Text))),
         TCard(children: [TChecklist(items: [TCheckItem(s.ckDayBodyN1ChildrenN0ItemsN0Label, value: 'Skip deodorant or powder', done: true), TCheckItem(s.ckDayBodyN1ChildrenN0ItemsN1Label, value: 'Wear a two-piece outfit'), TCheckItem(s.ckDayBodyN1ChildrenN0ItemsN2Label, value: 'Bring ID and insurance card')])]),
         TCard(variant: TCardVariant.mint, title: s.ckDayBodyN2Title, text: s.ckDayBodyN2Text, cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: s.ckDayBodyN2CtaN0Label, onPressed: () => TNav.push(context, Routes.rescueActive), small: true)),
       ],

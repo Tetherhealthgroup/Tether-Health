@@ -26,12 +26,18 @@
     {
       "t": "banner",
       "kind": "offline",
-      "text": "Offline · 3 entries will sync when you reconnect."
+      "text": "Offline · 3 entries will sync when you reconnect.",
+      "data": {
+        "text": "today.offline_banner"
+      }
     },
     {
       "t": "title",
       "text": "Good morning, Alex.",
-      "size": "m"
+      "size": "m",
+      "data": {
+        "text": "today.greeting"
+      }
     },
     {
       "t": "card",

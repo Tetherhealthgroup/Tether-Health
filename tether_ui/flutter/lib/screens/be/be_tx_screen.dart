@@ -32,7 +32,7 @@ class BeTxScreen extends StatelessWidget {
       header: THeader(title: 'Beacon', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TCard(variant: TCardVariant.dark, eyebrow: s.beTxBodyN0Eyebrow, title: s.beTxBodyN0Title, cta: TButton(key: const ValueKey('a:body[0].cta[0]'), label: s.beTxBodyN0CtaN0Label, onPressed: () => TNav.push(context, Routes.beQuestions), variant: TButtonVariant.lime, small: true)),
+        TBoundValues(keys: const ['be.next_appointment'], builder: (context, v) => TCard(variant: TCardVariant.dark, eyebrow: s.beTxBodyN0Eyebrow, title: v.text('be.next_appointment', s.beTxBodyN0Title), cta: TButton(key: const ValueKey('a:body[0].cta[0]'), label: s.beTxBodyN0CtaN0Label, onPressed: () => TNav.push(context, Routes.beQuestions), variant: TButtonVariant.lime, small: true))),
         TCard(variant: TCardVariant.urgent, title: s.beTxBodyN1Title, text: s.beTxBodyN1Text, cta: TButton(key: const ValueKey('a:body[1].cta[0]'), label: s.beTxBodyN1CtaN0Label, onPressed: () => TNav.call(context, '(555) 010-7000', label: 'Call oncology team'), variant: TButtonVariant.danger, small: true)),
         TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: s.beTxBodyN2RowsN0Label, sub: s.beTxBodyN2RowsN0Sub, onTap: () => TNav.push(context, Routes.beDiary)), TListRow(key: const ValueKey('a:body[2].rows[1]'), label: s.beTxBodyN2RowsN1Label, sub: s.beTxBodyN2RowsN1Sub, onTap: () => TNav.push(context, Routes.eaIntro)), TListRow(key: const ValueKey('a:body[2].rows[2]'), label: s.beTxBodyN2RowsN2Label, sub: s.beTxBodyN2RowsN2Sub, onTap: () => TNav.push(context, Routes.programSettings, program: 'be'))]),
       ],

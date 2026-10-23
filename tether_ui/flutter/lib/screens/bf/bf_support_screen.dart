@@ -25,7 +25,7 @@ class BfSupportScreen extends StatelessWidget {
       header: THeader(title: s.bfSupportHeaderTitle, pill: s.bfSupportHeaderPill),
       children: [
         TTitle(s.bfSupportBodyN0Text),
-        TListGroup(title: s.bfSupportBodyN1Title, rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: s.bfSupportBodyN1RowsN0Label, sub: s.bfSupportBodyN1RowsN0Sub, lead: TLead.avatar('J'), onTap: () => TNav.push(context, Routes.supportAddPerson)), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: s.bfSupportBodyN1RowsN1Label, lead: TLead.icon('+'), onTap: () => TNav.push(context, Routes.supportAddPerson))]),
+        TBoundValues(keys: const ['bf.supporter_name', 'bf.supporter_detail'], builder: (context, v) => TListGroup(title: s.bfSupportBodyN1Title, rows: [TListRow(key: const ValueKey('a:body[1].rows[0]'), label: v.text('bf.supporter_name', s.bfSupportBodyN1RowsN0Label), sub: v.text('bf.supporter_detail', s.bfSupportBodyN1RowsN0Sub), lead: TLead.avatar('J'), onTap: () => TNav.push(context, Routes.supportAddPerson)), TListRow(key: const ValueKey('a:body[1].rows[1]'), label: s.bfSupportBodyN1RowsN1Label, lead: TLead.icon('+'), onTap: () => TNav.push(context, Routes.supportAddPerson))])),
         TCard(eyebrow: s.bfSupportBodyN2Eyebrow, children: [TChecklist(items: [TCheckItem(s.bfSupportBodyN2ChildrenN0ItemsN0Label, value: 'Remove cigarettes, lighters, ashtrays', done: true), TCheckItem(s.bfSupportBodyN2ChildrenN0ItemsN1Label, value: 'Make home and car smoke-free', done: true), TCheckItem(s.bfSupportBodyN2ChildrenN0ItemsN2Label, value: 'Stock gum, water or snacks')])]),
         TToggleRow(fieldKey: 'bf_support.remind_me_to_discuss_quit_medici', label: s.bfSupportBodyN3Label, sub: s.bfSupportBodyN3Sub, value: true),
       ],

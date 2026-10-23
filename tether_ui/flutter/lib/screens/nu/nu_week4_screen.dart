@@ -24,7 +24,7 @@ class NuWeek4Screen extends StatelessWidget {
       children: [
         TIllustration(glyph: '4'),
         TTitle(s.nuWeek4BodyN1Text, size: TTitleSize.l, center: true),
-        TKeyValue(rows: [(s.nuWeek4BodyN2RowsN0N0, '4'), (s.nuWeek4BodyN2RowsN1N0, '19'), (s.nuWeek4BodyN2RowsN2N0, s.nuWeek4BodyN2RowsN2N1)]),
+        TBoundValues(keys: const ['nu.habits_tried', 'nu.days_done', 'nu.favorite_habit'], builder: (context, v) => TKeyValue(rows: [(s.nuWeek4BodyN2RowsN0N0, v.text('nu.habits_tried', '4')), (s.nuWeek4BodyN2RowsN1N0, v.text('nu.days_done', '19')), (s.nuWeek4BodyN2RowsN2N0, v.text('nu.favorite_habit', s.nuWeek4BodyN2RowsN2N1))])),
         TSegmented(fieldKey: 'nu_week4.how_do_you_feel_about_food_latel', options: ['Worse', 'Same', 'Better'], labels: [s.nuWeek4BodyN3OptionsN0, s.nuWeek4BodyN3OptionsN1, s.nuWeek4BodyN3OptionsN2], selected: 'Better', label: s.nuWeek4BodyN3Label),
       ],
       footer: [

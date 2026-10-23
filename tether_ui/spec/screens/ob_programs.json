@@ -40,14 +40,12 @@
         {
           "label": "BreatheFree",
           "sub": "Tobacco & nicotine",
-          "program": "bf",
-          "selected": true
+          "program": "bf"
         },
         {
           "label": "ScrollFree",
           "sub": "Social media use",
-          "program": "sf",
-          "selected": true
+          "program": "sf"
         },
         {
           "label": "ClearAir",

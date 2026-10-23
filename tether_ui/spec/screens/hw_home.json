@@ -32,9 +32,16 @@
           "t": "big",
           "value": "128/82",
           "unit": "mmHg",
-          "caption": "Average of 2 · target below 130/80"
+          "caption": "Average of 2 · target below 130/80",
+          "data": {
+            "value": "hw.last_bp",
+            "caption": "hw.last_bp_caption"
+          }
         }
-      ]
+      ],
+      "data": {
+        "eyebrow": "hw.last_reading_time"
+      }
     },
     {
       "t": "button",
@@ -97,7 +104,13 @@
             "to": "program_settings"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "hw.avg_30d_summary",
+        "rows[1].sub": "hw.lipids_summary",
+        "rows[3].sub": "hw.records_summary",
+        "rows[4].sub": "hw.targets_summary"
+      }
     },
     {
       "t": "emergency",

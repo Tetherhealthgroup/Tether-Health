@@ -20,8 +20,8 @@ class SupportMessageScreen extends StatelessWidget {
     final s = TStrings.of(context);
     return TSheet(
       children: [
-        TTitle(s.supportMessageBodyN0Text),
-        TCard(variant: TCardVariant.mint, eyebrow: s.supportMessageBodyN1Eyebrow, title: s.supportMessageBodyN1Title, text: s.supportMessageBodyN1Text),
+        TBoundValues(keys: const ['support.message_title'], place: TExamplePlace.inline, builder: (context, v) => TTitle(v.text('support.message_title', s.supportMessageBodyN0Text))),
+        TBoundValues(keys: const ['support.help_phrase_quoted'], builder: (context, v) => TCard(variant: TCardVariant.mint, eyebrow: s.supportMessageBodyN1Eyebrow, title: v.text('support.help_phrase_quoted', s.supportMessageBodyN1Title), text: s.supportMessageBodyN1Text)),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.supportMessageFooterN0Label, onPressed: () => TNav.sms(context, 'Jordan'), arrow: true),

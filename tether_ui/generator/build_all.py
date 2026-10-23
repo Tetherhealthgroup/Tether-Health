@@ -287,6 +287,9 @@ def main():
         allscreens[sid] = d
         wj(f'spec/screens/{sid}.json', d)
     wj('spec/screens.json', allscreens)
+    import bindings
+    wj('spec/bindings.json', bindings.catalogue())
+    w('spec/review_TH-909.md', bindings.review_markdown())
     rows = []
     for sid, s in SCREENS.items():
         for l, p, a in actions_of(s):

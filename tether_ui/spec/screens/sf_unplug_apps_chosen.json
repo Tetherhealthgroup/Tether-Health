@@ -41,7 +41,13 @@
           "label": "Feeds",
           "sub": "2 apps"
         }
-      ]
+      ],
+      "data": {
+        "rows[0].label": "sf.unplug.group_1_name",
+        "rows[0].sub": "sf.unplug.group_1_apps",
+        "rows[1].label": "sf.unplug.group_2_name",
+        "rows[1].sub": "sf.unplug.group_2_apps"
+      }
     },
     {
       "t": "field",

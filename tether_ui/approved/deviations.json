@@ -2,15 +2,39 @@
   "about": "Approved screens allowed to differ from manifest.json. sha256 is the reviewed current content of tether_ui/spec/screens/<screen>.json. See deviations.md.",
   "deviations": [
     {
-      "screen": "account_delete",
+      "screen": "account",
       "decisions": [
-        "P-31"
+        "P-89"
       ],
       "tickets": [
-        "TH-907"
+        "TH-909"
       ],
-      "sha256": "72639a4af84a4fd5426bd33ab89558e5dac99d31a833549a02e0eb5a9f2fb205",
-      "change": "P-31 placeholders, fields start empty: body[4] \"Type DELETE to confirm\" example \"DELETE\" -> placeholder; body[5] \"Password\" example \"••••••••••••\" -> placeholder"
+      "sha256": "9dfc9aa6c76fb266c25e73ed0558e130cf2317ce5a802a0769634dcea2cc8be7",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].rows[0].label -> profile.name; body[0].rows[0].sub -> profile.email; body[1].rows[0].sub -> records.sources_summary; body[1].rows[1].sub -> account.signin_methods_summary; body[2].rows[0].sub -> account.programs_summary; body[2].rows[1].sub -> notifications.summary; body[2].rows[2].sub -> consents.reviewed_summary (TH-909)"
+    },
+    {
+      "screen": "account_delete",
+      "decisions": [
+        "P-31",
+        "P-89"
+      ],
+      "tickets": [
+        "TH-907",
+        "TH-909"
+      ],
+      "sha256": "14bcbb587f0625ff01e940c84fe3f66d3291e6bee8927a290e8dc3d08aa1233f",
+      "change": "P-31 placeholders, fields start empty: body[4] \"Type DELETE to confirm\" example \"DELETE\" -> placeholder; body[5] \"Password\" example \"••••••••••••\" -> placeholder. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0][1] -> account.data.programs; body[1].rows[1][1] -> account.data.check_ins; body[1].rows[2][1] -> account.data.readings; body[1].rows[3][1] -> account.data.shared_summaries (TH-909)"
+    },
+    {
+      "screen": "account_deleted",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "a94730ff5f90ad741d9632c23af426113815ca44640c4d0bb30ca936861d4ab2",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].rows[0][1] -> account.deletion.receipt; body[2].rows[1][1] -> account.deletion.completed_at (TH-909)"
     },
     {
       "screen": "account_leave",
@@ -26,24 +50,39 @@
     {
       "screen": "account_notifications",
       "decisions": [
-        "P-71"
+        "P-71",
+        "P-89"
       ],
       "tickets": [
-        "TH-1008a"
+        "TH-1008a",
+        "TH-909"
       ],
-      "sha256": "6042f7d18512aaba2d1eeb81728f5b09e064d50a4c18ad8876f6a8704b2e8f2b",
-      "change": "P-71 settings binding, data only, no visual change: body[0].children[0] toggle \"check_ins_and_plan_reminders\" gets bind \"notifications.check_ins_and_plan_reminders\"; body[0].children[1] toggle \"show_sensitive_details\" gets bind \"notifications.show_sensitive_details\"; body[0].children[2] toggle \"quiet_hours\" gets bind \"notifications.quiet_hours\""
+      "sha256": "e3bbef328a81af617f76288019a10612527e5904fc3321b212d7a31f13c22d9d",
+      "change": "P-71 settings binding, data only, no visual change: body[0].children[0] toggle \"check_ins_and_plan_reminders\" gets bind \"notifications.check_ins_and_plan_reminders\"; body[0].children[1] toggle \"show_sensitive_details\" gets bind \"notifications.show_sensitive_details\"; body[0].children[2] toggle \"quiet_hours\" gets bind \"notifications.quiet_hours\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0].sub -> notifications.bf.summary; body[1].rows[1].sub -> notifications.sf.summary (TH-909)"
     },
     {
       "screen": "account_privacy",
       "decisions": [
-        "P-71"
+        "P-71",
+        "P-89"
       ],
       "tickets": [
-        "TH-1008a"
+        "TH-1008a",
+        "TH-909"
       ],
-      "sha256": "a9899f0f6ba26bc40969f9bd5cda3025e15ecd64d1236621c4a63f14855d58a1",
-      "change": "P-71 settings binding, data only, no visual change: body[0].children[0] toggle \"cross_program_insights\" gets bind \"consents.cross_program_insights\"; body[0].children[1] toggle \"de_identified_research\" gets bind \"consents.de_identified_research\"; body[0].children[2] toggle \"anonymous_app_diagnostics\" gets bind \"consents.anonymous_app_diagnostics\""
+      "sha256": "2efe01302de21485383dbf5bd3fe7cc53cfbc22991abbfc3063803cf30d04b79",
+      "change": "P-71 settings binding, data only, no visual change: body[0].children[0] toggle \"cross_program_insights\" gets bind \"consents.cross_program_insights\"; body[0].children[1] toggle \"de_identified_research\" gets bind \"consents.de_identified_research\"; body[0].children[2] toggle \"anonymous_app_diagnostics\" gets bind \"consents.anonymous_app_diagnostics\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[1].sub -> consents.history_summary (TH-909)"
+    },
+    {
+      "screen": "account_programs",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "9bde66748b0cdde80f57b38edb1737b41f8053f3e2ad19305069d23c9fc4fd02",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> account.focus_slots; body[1].rows[0].sub -> enrolment.bf.summary; body[1].rows[1].sub -> enrolment.sf.summary; body[1].rows[2].sub -> enrolment.ca.summary; body[1].rows[3].sub -> enrolment.hw.summary (TH-909)"
     },
     {
       "screen": "auth_forgot",
@@ -66,6 +105,17 @@
       ],
       "sha256": "2e66b3f57d5956ab210f322f041be1f4f83cd60ba43af4d4df32ee1a72f8f3ea",
       "change": "P-31 placeholders, fields start empty: body[3] \"Password\" example \"••••••••••••\" -> placeholder"
+    },
+    {
+      "screen": "auth_merge",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "a0c7b565fab7a3dc10704fd0ee8a165c50da5351e6dadc3151b7f776ffecd661",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].rows[0].sub -> auth.merge.guest_plan; body[3].text -> auth.merge.account_plan (TH-909)"
     },
     {
       "screen": "auth_newpass",
@@ -124,13 +174,15 @@
     {
       "screen": "auth_social_new",
       "decisions": [
-        "P-73"
+        "P-73",
+        "P-89"
       ],
       "tickets": [
-        "TH-907d"
+        "TH-907d",
+        "TH-909"
       ],
-      "sha256": "546f4c0512938f02b52ad81c271b47fa0b946b63e8e0074fcd11e8eb5666d50e",
-      "change": "P-73, not routed: no screen opens it any more (new Apple and Google accounts go through the normal sign-up from its start, ob_programs); it is kept as the approved design and listed as a reference entry point. footer[0] \"Create my account\": submit \"POST supabase /auth/v1/token?grant_type=id_token\" then push ob_programs -> push ob_programs, so it creates no account; api [that endpoint] -> []; desc rewritten to say so. No visible element changes"
+      "sha256": "59cdee8651454bf7d7ec2f6a79f9fb81b2bf6b7447d971c78174a4af42fad71b",
+      "change": "P-73, not routed: no screen opens it any more (new Apple and Google accounts go through the normal sign-up from its start, ob_programs); it is kept as the approved design and listed as a reference entry point. footer[0] \"Create my account\": submit \"POST supabase /auth/v1/token?grant_type=id_token\" then push ob_programs -> push ob_programs, so it creates no account; api [that endpoint] -> []; desc rewritten to say so. No visible element changes. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[3].rows[0][1] -> auth.social.name (TH-909)"
     },
     {
       "screen": "be_q2",
@@ -146,26 +198,63 @@
       "change": "P-31 placeholders, fields start empty: body[3] \"Relative’s age at diagnosis (if known)\" example \"44\" -> placeholder | P-71 settings binding, data only, no visual change: body[2] chips \"value\" gets bind \"be.profile.family_cancers\""
     },
     {
-      "screen": "bf_home",
+      "screen": "be_survivor",
       "decisions": [
-        "P-22"
+        "P-89"
       ],
       "tickets": [
-        "TH-942"
+        "TH-909"
       ],
-      "sha256": "f26a17f65071f015c743c5de4778c6b90ee28d000bc4ee429d0a259769f32acf",
-      "change": "Craving card: \"One tap · works offline\" -> \"One tap · no typing\""
+      "sha256": "82955c80076b7a1f28dc8528e8d6bd38ab906a4254897855e65dc82bcbad7cf2",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[3].rows[0][1] -> be.next_follow_up (TH-909)"
+    },
+    {
+      "screen": "be_tx",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "ef3f81f28eb40377ba90eb421f2bdc4fcf9f6aef7f42bd4622ed3f64aeb9c677",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].title -> be.next_appointment (TH-909)"
+    },
+    {
+      "screen": "bf_estimates",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "da0686f071efbe394c156c038645430bd69806ae226f80c340c2f0ecefdac665",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0][1] -> bf.estimates.baseline; body[1].rows[1][1] -> bf.estimates.price; body[1].rows[2][1] -> bf.estimates.time_per_cigarette (TH-909)"
+    },
+    {
+      "screen": "bf_home",
+      "decisions": [
+        "P-22",
+        "P-89"
+      ],
+      "tickets": [
+        "TH-942",
+        "TH-909"
+      ],
+      "sha256": "daf4fe139f455dc6592b078e1190bd3cf3b9b446ce489ac454d21da4a74bdb1b",
+      "change": "Craving card: \"One tap · works offline\" -> \"One tap · no typing\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].children[0].value -> bf.days_to_quit_day; body[0].children[0].caption -> bf.quit_date_caption; body[3].children[0].text -> bf.top_reason; body[4].rows[1].sub -> bf.meds.summary; body[4].rows[2].sub -> bf.saved_summary (TH-909)"
     },
     {
       "screen": "bf_home_quitday",
       "decisions": [
-        "P-22"
+        "P-22",
+        "P-89"
       ],
       "tickets": [
-        "TH-942"
+        "TH-942",
+        "TH-909"
       ],
-      "sha256": "74749816f93345176c7a63395e7921adf94d84ba167bf4e885f817e97b6ef7a8",
-      "change": "Craving card: \"One tap · no typing · offline\" -> \"One tap · no typing\""
+      "sha256": "2a7a0e04970a57cfc35658e8cce844bd5f32c0a907d3e8e71d6d07cf02fe258b",
+      "change": "Craving card: \"One tap · no typing · offline\" -> \"One tap · no typing\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> bf.quit_day_heading; body[2].children[0].value -> bf.time_since_quit; body[2].children[0].caption -> bf.quit_time_caption; body[6].rows[1].sub -> bf.meds.today_summary (TH-909)"
     },
     {
       "screen": "bf_intro",
@@ -177,6 +266,17 @@
       ],
       "sha256": "fee51a4e3b73a6c2be91d3be96ad55fd183c3608befdae5a01fa1cd794add6b7",
       "change": "Row value: \"one tap, offline\" -> \"one tap, no typing\""
+    },
+    {
+      "screen": "bf_meds",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "9c6312032c0cd12af2f9cd4ab3c1709922a447e83fb4613b82c73b1d1e4f7c8d",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].title -> bf.meds.recorded_plan (TH-909)"
     },
     {
       "screen": "bf_meds_edit",
@@ -192,15 +292,72 @@
       "change": "P-31 placeholders, fields start empty: body[1] \"Medicine\" example \"Nicotine patch\" -> placeholder; body[2] \"Strength\" example \"21 mg / 24 h\" -> placeholder; body[3] \"When\" example \"Every morning\" -> placeholder | P-71 settings binding, data only, no visual change: body[1] field \"medicine\" gets bind \"bf.meds.medicine\"; body[3] field \"when\" gets bind \"bf.meds.when\"; body[4] toggle \"private_reminder\" gets bind \"bf.meds.private_reminder\""
     },
     {
-      "screen": "ca_home",
+      "screen": "bf_progress",
       "decisions": [
-        "P-22"
+        "P-89"
       ],
       "tickets": [
-        "TH-942"
+        "TH-909"
       ],
-      "sha256": "88a0761af33bdc92c918a82dbbab61847f090306b0839704d54c6a4cf796d1bc",
-      "change": "Red-zone plan card: \"Open it fast, even offline\" -> \"Open it fast\""
+      "sha256": "dcb5ecd11188630b2ae9fd52ff65ec30a2cbee268b765d27dfeca49c6064007a",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].values -> bf.cigarettes_week; body[2].items[0].value -> bf.avoided; body[2].items[1].value -> bf.saved; body[2].items[1].sub -> bf.price_per_pack; body[2].items[2].value -> bf.cravings_eased; body[2].items[3].value -> bf.most_helpful_tool; body[2].items[3].sub -> bf.most_helpful_count; body[3].rows[0].sub -> bf.estimates_summary (TH-909)"
+    },
+    {
+      "screen": "bf_review",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "d18ddc5270cc2cb169fc4ccf452219fa92d0c8f1c8b22475d64e990945d24f27",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].rows[0].sub -> bf.review.approach; body[2].rows[1].sub -> bf.review.quit_date; body[2].rows[2].sub -> bf.review.top_reason; body[2].rows[3].sub -> bf.review.support; body[2].rows[4].sub -> bf.review.space (TH-909)"
+    },
+    {
+      "screen": "bf_slip",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "bd09f425f20d29f00e148b8f8111c131471ac5142c914582251b71f6d87a91ae",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].rows[0][1] -> bf.smoke_free_days (TH-909)"
+    },
+    {
+      "screen": "bf_stepdown",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "b4006e946efd8e3fe7568ef720dcbba67c51332cb1ce131e181cd531233ec1c5",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].text -> bf.stepdown.baseline_line; body[2].rows[0][1] -> bf.stepdown.week_1; body[2].rows[1][1] -> bf.stepdown.week_2; body[2].rows[2][1] -> bf.stepdown.week_3; body[2].rows[3][1] -> bf.stepdown.week_4; body[2].rows[4][0] -> bf.stepdown.quit_day_label (TH-909)"
+    },
+    {
+      "screen": "bf_support",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "985c05aaa9fe23d46f6cde166fe62f38523fe3fe0f136abd0b4a3ed921dc5f96",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0].label -> bf.supporter_name; body[1].rows[0].sub -> bf.supporter_detail (TH-909)"
+    },
+    {
+      "screen": "ca_home",
+      "decisions": [
+        "P-22",
+        "P-89"
+      ],
+      "tickets": [
+        "TH-942",
+        "TH-909"
+      ],
+      "sha256": "da53fbdb48e907cc2874f954491ce72e35fa14dfd67d22fd5b5de7c3a344e849",
+      "change": "Red-zone plan card: \"Open it fast, even offline\" -> \"Open it fast\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].title -> ca.zone_today; body[0].text -> ca.zone_checked; body[3].rows[1].sub -> ca.zone_counts; body[3].rows[2].sub -> ca.plan_entered (TH-909)"
     },
     {
       "screen": "ca_plan",
@@ -214,26 +371,52 @@
       "change": "P-31 placeholders, fields start empty: body[3].children[0] \"Peak flow from\" example \"400\" -> placeholder; body[3].children[1] \"Daily medicine\" example \"Controller inhaler · 2 puffs AM/PM\" -> placeholder; body[4].children[0] \"Peak flow\" example \"200–399\" -> placeholder; body[5].children[0] \"Below\" example \"200\" -> placeholder"
     },
     {
-      "screen": "ca_red",
+      "screen": "ca_progress",
       "decisions": [
-        "P-22"
+        "P-89"
       ],
       "tickets": [
-        "TH-942"
+        "TH-909"
       ],
-      "sha256": "320af76a59c9a8dac35d2be500114848957b3425e081df86039efacdfb16a485",
-      "change": "Note: drops \"Works offline.\""
+      "sha256": "f04305a017cdb62a377c242b8e8c42e1c150fdf43a928dda973c76d771a30897",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].values -> ca.peak_flow_series; body[1].items[0].value -> ca.days_green; body[1].items[1].value -> ca.days_yellow; body[1].items[2].value -> ca.days_red; body[2].title -> ca.top_symptom (TH-909)"
+    },
+    {
+      "screen": "ca_red",
+      "decisions": [
+        "P-22",
+        "P-89"
+      ],
+      "tickets": [
+        "TH-942",
+        "TH-909"
+      ],
+      "sha256": "46fc713f66fd67baa06b42728fee58d19a84cef8d4b1ac37633f510958c7433b",
+      "change": "Note: drops \"Works offline.\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[3].rows[0].label -> ca.emergency_contact_action (TH-909)"
+    },
+    {
+      "screen": "ca_yellow",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "6d39c35883b8b8ce205e707afd2e11d440ed97412bca5ba50fa5835df7f3b6ab",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> ca.plan_entered_line (TH-909)"
     },
     {
       "screen": "ca_zone",
       "decisions": [
-        "P-31"
+        "P-31",
+        "P-89"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-909"
       ],
-      "sha256": "c72c14b1d09ee1989c3499d5659b5ea5eeb5eb5278e9b14caa4b6e2dc707ed09",
-      "change": "P-31 placeholders, fields start empty: body[1] \"Peak flow (optional)\" example \"310\" -> placeholder"
+      "sha256": "5e0a0af07498582cbad0b1aa7b879ac627cb88c71ec7b19f6e7039daf2b93b5c",
+      "change": "P-31 placeholders, fields start empty: body[1] \"Peak flow (optional)\" example \"310\" -> placeholder. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[5].text -> ca.zone_thresholds_line (TH-909)"
     },
     {
       "screen": "catalog",
@@ -258,6 +441,28 @@
       "change": "Footer: \"Private · works offline · skip anything\" -> \"Skip any program question\""
     },
     {
+      "screen": "checkin_done",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "88783a5e7ebd7ce851210341bcabb8b3513e072e8ef6ea60a51ffef46edd0422",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].text -> checkin.thanks (TH-909)"
+    },
+    {
+      "screen": "ck_day",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "baad47399292f540856c534d169139f25538c79795f34b2021968379ab18ca36",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> ck.appointment_title (TH-909)"
+    },
+    {
       "screen": "ck_done",
       "decisions": [
         "P-31"
@@ -267,6 +472,17 @@
       ],
       "sha256": "6f7423c98c39597f472bdabbdebf4b1584b3a4d09a5b9923dfaee03a5efcfd12",
       "change": "P-31 placeholders, fields start empty: body[0] \"What\" example \"Flu vaccine\" -> placeholder; body[1] \"Date\" example \"Oct 12, 2026\" -> placeholder; body[2] \"Where (optional)\" example \"Main St Pharmacy\" -> placeholder"
+    },
+    {
+      "screen": "ck_list",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "76e59d4a13b493ab05edf57dfe28eac58a5327978b2967dd2cc5060687a997c7",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> ck.due_summary (TH-909)"
     },
     {
       "screen": "ck_q1",
@@ -282,17 +498,41 @@
       "change": "P-31 placeholders, fields start empty: body[2] \"Age\" example \"52\" -> placeholder | P-71 settings binding, data only, no visual change: body[3] segmented \"sex_assigned_at_birth\" gets bind \"ck.profile.sex_assigned_at_birth\"; body[4] chips \"any_of_these\" gets bind \"ck.profile.any_of_these\""
     },
     {
+      "screen": "ck_uptodate",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "660a481dd6959c153bd4daacacef5315b6b8e80b4b70333c3ea794e55eae8b24",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].text -> ck.next_due_line (TH-909)"
+    },
+    {
       "screen": "crisis",
       "decisions": [
         "P-22",
-        "P-58"
+        "P-58",
+        "P-89"
       ],
       "tickets": [
         "TH-942",
-        "TH-1001"
+        "TH-1001",
+        "TH-909"
       ],
-      "sha256": "eedbfd00ba32717362c9d0a13dd1c18fd549be07e89eccdc5e742c665bb53bca",
-      "change": "P-22: the note dropped \"Works offline.\" (TH-942). P-58: the designer note body[5] \"Shown whenever someone chooses … localize per region.\" is no longer rendered; its text moves to the screen's notes, which are not rendered (TH-1001)"
+      "sha256": "19b7529ac7402ff641a4c4212a40accfe125d03493770b5a8deec99b068a5292",
+      "change": "P-22: the note dropped \"Works offline.\" (TH-942). P-58: the designer note body[5] \"Shown whenever someone chooses … localize per region.\" is no longer rendered; its text moves to the screen's notes, which are not rendered (TH-1001). P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[4].title -> ea.plan.things_that_help_line; body[4].text -> ea.plan.reach_out_line (TH-909)"
+    },
+    {
+      "screen": "ea_home",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "4f605894838c28369e1847e41cb2555a7d8980e6364a52171eca8267b09e5939",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0].sub -> ea.plan_updated; body[1].rows[1].sub -> ea.check_back_due (TH-909)"
     },
     {
       "screen": "ea_plan",
@@ -306,6 +546,28 @@
       ],
       "sha256": "7fc3cdc725a27363d673b5e0695718e2e1bcd55b8c122e94dc5026b4accf57d9",
       "change": "Developer description: drops \"; available offline\" | TH-907: P-31 placeholders, fields start empty: body[2] \"My warning signs\" example \"Not sleeping, pulling away from friends\" -> placeholder; body[3] \"Things that help me\" example \"Walk the dog, shower, music\" -> placeholder; body[4] \"People I can reach\" example \"Sam · (555) 010-3311\" -> placeholder"
+    },
+    {
+      "screen": "hw_crisis",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "f4ae3bf0cde1aa0e50d9083d75e569650b377aa73cb38e267931b5817c4ee517",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> hw.crisis_banner (TH-909)"
+    },
+    {
+      "screen": "hw_home",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "aa33fa036f389b7598c004a539cb5f1b48becfe60d174b8341bacdbc93c3cc5b",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> hw.last_reading_time; body[0].children[0].value -> hw.last_bp; body[0].children[0].caption -> hw.last_bp_caption; body[2].rows[0].sub -> hw.avg_30d_summary; body[2].rows[1].sub -> hw.lipids_summary; body[2].rows[3].sub -> hw.records_summary; body[2].rows[4].sub -> hw.targets_summary (TH-909)"
     },
     {
       "screen": "hw_lipids",
@@ -332,13 +594,15 @@
     {
       "screen": "hw_log2",
       "decisions": [
-        "P-31"
+        "P-31",
+        "P-89"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-909"
       ],
-      "sha256": "83ea0eca6050806fc7ff1799f3bdf975a33580d04d7bc3afa9d54d0ef429be0e",
-      "change": "P-31 placeholders, fields start empty: body[2].fields[0] \"Top (systolic)\" example \"132\" -> placeholder; body[2].fields[1] \"Bottom (diastolic)\" example \"84\" -> placeholder; body[3] \"Pulse (optional)\" example \"70\" -> placeholder"
+      "sha256": "c898f31d8795664010278267959c6a37f649acc2cf3c05008c67ecf94e69ca18",
+      "change": "P-31 placeholders, fields start empty: body[2].fields[0] \"Top (systolic)\" example \"132\" -> placeholder; body[2].fields[1] \"Bottom (diastolic)\" example \"84\" -> placeholder; body[3] \"Pulse (optional)\" example \"70\" -> placeholder. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[4].rows[0][1] -> hw.log.reading_1; body[4].rows[1][1] -> hw.log.average (TH-909)"
     },
     {
       "screen": "hw_log_error",
@@ -350,6 +614,28 @@
       ],
       "sha256": "50c093c6ee762011e3ad8cd15c62f880f77721a62e0c685062f5f7831bbc8ccb",
       "change": "P-31 placeholders, fields start empty: body[1].fields[0] \"Top (systolic)\" example \"128\" -> placeholder; body[1].fields[1] \"Bottom (diastolic)\" example \"310\" -> placeholder"
+    },
+    {
+      "screen": "hw_result",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "824192bef33bc4f94ada7940ed769d0aa47251ba570aa8fed491ef3ddb863894",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].text -> hw.result_title; body[2].text -> hw.result_text (TH-909)"
+    },
+    {
+      "screen": "hw_summary",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "9c107b2d96ac14b71450ab4f9c55321ef99f7288af00708f55d50ec5776ae1c6",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> hw.summary.title; body[1].rows[0][1] -> hw.summary.dates; body[1].rows[1][1] -> hw.summary.bp_average; body[1].rows[2][1] -> hw.summary.highest; body[1].rows[3][1] -> hw.summary.latest_panel (TH-909)"
     },
     {
       "screen": "hw_targets",
@@ -365,6 +651,17 @@
       "change": "P-31 placeholders, fields start empty: body[2].fields[0] \"Top below\" example \"130\" -> placeholder; body[2].fields[1] \"Bottom below\" example \"80\" -> placeholder | P-71 settings binding, data only, no visual change: body[3] radio \"value\" gets bind \"hw.targets.no_target_yet\"; body[4] chips \"when_should_we_remind_you\" gets bind \"hw.targets.reminder_time\""
     },
     {
+      "screen": "hw_trends",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "3384c5b8b17a8b75c2d0518a097d493567adcd055189a1a5a27e56162ba02523",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].values -> hw.systolic_series; body[2].items[0].value -> hw.avg_30d; body[2].items[1].value -> hw.readings_30d; body[2].items[1].sub -> hw.days_missed_30d (TH-909)"
+    },
+    {
       "screen": "nu_habit",
       "decisions": [
         "P-71"
@@ -374,6 +671,28 @@
       ],
       "sha256": "ed942b761cc533a9571227347913dfcae3480e26ae0abd2cc2c4baf7ad6a62da",
       "change": "P-71 settings binding, data only, no visual change: body[1] radio \"value\" gets bind \"nu.habit.habit\"; body[2].children[0] toggle \"track_weight\" gets bind \"nu.habit.track_weight\""
+    },
+    {
+      "screen": "nu_home",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "fc32bc8b0de1eb1fe0af436c3bba459958bed3df6cc6543af79017fca6e9ce29",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> nu.habit_week; body[0].title -> nu.habit_name; body[0].text -> nu.habit_progress; body[3].rows[1].sub -> nu.milestone_due (TH-909)"
+    },
+    {
+      "screen": "nu_week4",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "32c5d5b7cf45b110809fe6df80dd9794ff185b91e2a698438777202be7d8a121",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].rows[0][1] -> nu.habits_tried; body[2].rows[1][1] -> nu.days_done; body[2].rows[2][1] -> nu.favorite_habit (TH-909)"
     },
     {
       "screen": "ob_account",
@@ -417,13 +736,16 @@
     {
       "screen": "ob_programs",
       "decisions": [
-        "TH-902"
+        "TH-902",
+        "P-31",
+        "P-78"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-1031h"
       ],
-      "sha256": "1d94cbd65da4011d19abe8f2606b15b28b40a733138d7ed25ad6359cfc6fd05f",
-      "change": "Session key only, no visual change: body[3] tiles gets key \"programs\""
+      "sha256": "f027ebb31935bd2d4910f8c1cfa9e8638d52f36b816e91451363f9147783ee99",
+      "change": "Session key only, no visual change: body[3] tiles gets key \"programs\". P-31, P-78: the program tiles start with nothing selected (BreatheFree and ScrollFree were selected) (TH-1031h)"
     },
     {
       "screen": "ob_reminders",
@@ -437,19 +759,65 @@
       "change": "Decision source only, no visual change: footer[0] branch gets id \"onboarding.reminders.notifications_request\", ask \"notificationsRequest\" and when {granted: Allowed, denied: Not allowed, unavailable: Not allowed}"
     },
     {
+      "screen": "plans",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "da77b59914e80b9be85dcd7aa725bb8f950b8ad3952e35355cc484bec32a57af",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].title -> plans.focus_heading; body[0].rows[0].sub -> bf.plan_summary; body[0].rows[1].sub -> sf.plan_summary; body[2].rows[0].sub -> plans.medication_summary (TH-909)"
+    },
+    {
       "screen": "program_settings",
       "decisions": [
         "P-08",
         "TH-902",
-        "P-71"
+        "P-71",
+        "P-89"
       ],
       "tickets": [
         "TH-942",
         "TH-907",
-        "TH-1008a"
+        "TH-1008a",
+        "TH-909"
       ],
-      "sha256": "bdd53b64cb53b68468e4f6669ba8ad34da062d29cc34313c1528e1d089875183",
-      "change": "Leave row subtitle: \"Keep data 30 days or delete now\" -> \"Keep your data or delete it now\" | TH-907: Session key only, no visual change: body[2].children[0] toggle key \"care_team_dr_patel_s_clinic\" -> \"care_team_sharing\" | P-71 settings binding, data only, no visual change: body[1] radio \"status\" gets bind \"enrolment.:program.status\"; body[2].children[0] toggle \"care_team_sharing\" gets bind \"enrolment.:program.care_team_sharing\"; body[2].children[1] toggle \"de_identified_research\" gets bind \"enrolment.:program.de_identified_research\""
+      "sha256": "638cd909f98d15aeaa41956386de3557583586543434510575e776467491eddd",
+      "change": "Leave row subtitle: \"Keep data 30 days or delete now\" -> \"Keep your data or delete it now\" | TH-907: Session key only, no visual change: body[2].children[0] toggle key \"care_team_dr_patel_s_clinic\" -> \"care_team_sharing\" | P-71 settings binding, data only, no visual change: body[1] radio \"status\" gets bind \"enrolment.:program.status\"; body[2].children[0] toggle \"care_team_sharing\" gets bind \"enrolment.:program.care_team_sharing\"; body[2].children[1] toggle \"de_identified_research\" gets bind \"enrolment.:program.de_identified_research\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].rows[0].sub -> enrolment.:program.since (TH-909)"
+    },
+    {
+      "screen": "progress",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "0a7188018b9ef5ceb37d71eb11123c9e4fd41742f1f2502af2beac0d9a52d8fb",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].values -> bf.cigarettes_week; body[2].caption -> bf.progress_caption; body[3].values -> sf.minutes_week; body[3].caption -> sf.progress_caption; body[4].title -> insights.cross_program (TH-909)"
+    },
+    {
+      "screen": "re_history",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "1cd396c82ade455b9541451383997674ad68ed3a641f2bc9514adfc9166386fd",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].values -> re.egfr_series; body[1].rows[0][1] -> re.egfr_latest_summary; body[1].rows[1][1] -> re.acr_latest; body[1].rows[2][1] -> re.next_check (TH-909)"
+    },
+    {
+      "screen": "re_home",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "fcd27290d58e0d9157a8c1421168a0bde2a0649a0e264ef2dc37ec7f24d3ddea",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> re.egfr_latest_date; body[0].children[0].value -> re.egfr_latest; body[0].children[0].caption -> re.next_check_caption; body[2].rows[1].sub -> re.history_span (TH-909)"
     },
     {
       "screen": "re_labs",
@@ -465,28 +833,32 @@
     {
       "screen": "records_conflict",
       "decisions": [
-        "P-78"
+        "P-78",
+        "P-89"
       ],
       "tickets": [
-        "TH-1008c"
+        "TH-1008c",
+        "TH-909"
       ],
-      "sha256": "21fec21b5f3efff840a72f50721a3b73585d9fca557b2919395280583c94542f",
-      "change": "As P-78, no option starts chosen (owner decision for this screen pending): body[0].children[0] radio \"a1c\" \"selected\" 0 -> -1 (was \"From Patel Family Medicine (Epic): 7.6%\"); body[1].children[0] radio \"bp\" \"selected\" 1 -> -1 (was \"Keep as 129/80\") | footer[0] \"Save choices\" action wrapped in a branch decided by rule rec.conflict: \"Chosen\" runs the POST /v1/records/fhir/conflicts submit unchanged; \"Nothing chosen\" shows the toast \"Choose an option for at least one item.\" (draft copy, needs clinical/legal copy review); action summaries follow; a conflict left unanswered is sent as null"
+      "sha256": "97610d3eb1ae59338737b89729712f1c314412265bfe3687ab0890d661dfc13b",
+      "change": "As P-78, no option starts chosen (owner decision for this screen pending): body[0].children[0] radio \"a1c\" \"selected\" 0 -> -1 (was \"From Patel Family Medicine (Epic): 7.6%\"); body[1].children[0] radio \"bp\" \"selected\" 1 -> -1 (was \"Keep as 129/80\") | footer[0] \"Save choices\" action wrapped in a branch decided by rule rec.conflict: \"Chosen\" runs the POST /v1/records/fhir/conflicts submit unchanged; \"Nothing chosen\" shows the toast \"Choose an option for at least one item.\" (draft copy, needs clinical/legal copy review); action summaries follow; a conflict left unanswered is sent as null. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> records.conflict_1.heading; body[1].eyebrow -> records.conflict_2.heading; body[1].title -> records.conflict_2.title (TH-909)"
     },
     {
       "screen": "records_consent",
       "decisions": [
         "TH-902",
-        "P-78"
+        "P-78",
+        "P-89"
       ],
       "tickets": [
         "TH-907",
         "TH-986a",
         "TH-1008c",
-        "TH-1008d"
+        "TH-1008d",
+        "TH-909"
       ],
-      "sha256": "3467c7416deb8c7683c23d6bee28a4229cacca836161e3e54c14e9260a772f87",
-      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.connect.mychart\", ask \"smartConnect\" and when {approved: Approved, cancelled: Cancelled, failed: Denied or error} | P-78, starts unticked: body[2] checklist \"What Tether will read\" items Conditions, Vital signs, Lab results, Medications, Immunizations and Smoking status no longer start ticked (\"done\": true removed); Clinical notes was already unticked | footer[0] \"Continue to MyChart\" action wrapped in a branch decided by rule rec.consent.epic: \"Chosen\" runs the MyChart sign-in branch (id records.connect.mychart) unchanged; \"Nothing chosen\" shows the toast \"Select at least one item to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow | TH-1008d, as P-78: \"Clinical notes\" (sub \"Not requested\") is removed from the body[2] checklist \"What Tether will read\" and shown as a read-only flat list row at body[3] (no action), so it can never be ticked, count as a selection for the rule or be sent; later body nodes move down one"
+      "sha256": "c8fe6b93ead1cc4735185a9b1d141f6ffd87213738d22c1e5b5b8f03e378cd38",
+      "change": "Session key only, no visual change: body[2] checklist gets key \"resources\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.connect.mychart\", ask \"smartConnect\" and when {approved: Approved, cancelled: Cancelled, failed: Denied or error} | P-78, starts unticked: body[2] checklist \"What Tether will read\" items Conditions, Vital signs, Lab results, Medications, Immunizations and Smoking status no longer start ticked (\"done\": true removed); Clinical notes was already unticked | footer[0] \"Continue to MyChart\" action wrapped in a branch decided by rule rec.consent.epic: \"Chosen\" runs the MyChart sign-in branch (id records.connect.mychart) unchanged; \"Nothing chosen\" shows the toast \"Select at least one item to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow | TH-1008d, as P-78: \"Clinical notes\" (sub \"Not requested\") is removed from the body[2] checklist \"What Tether will read\" and shown as a read-only flat list row at body[3] (no action), so it can never be ticked, count as a selection for the rule or be sent; later body nodes move down one. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> records.connect_title (TH-909)"
     },
     {
       "screen": "records_consent_bb",
@@ -519,6 +891,17 @@
       "change": "Session key only, no visual change: body[2] checklist gets key \"data_types\" | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.device.health_records_request\", ask \"healthRecordsRequest\" and when {granted: Allowed, denied: Not allowed, unavailable: Not allowed} | P-78, starts unticked: body[2] checklist \"What Tether will ask for\" items Blood pressure, Blood glucose and Clinical records (iPhone) no longer start ticked (\"done\": true removed); Steps and sleep was already unticked | footer[0] \"Continue\" action wrapped in a branch decided by rule rec.consent.device: \"Chosen\" runs the system permission branch (id records.device.health_records_request) unchanged; \"Nothing chosen\" shows the toast \"Select at least one item to continue.\" (draft copy, needs clinical/legal copy review); action summaries follow | TH-1008d, as P-78: \"Steps and sleep\" (sub \"Not requested\") is removed from the body[2] checklist \"What Tether will ask for\" and shown as a read-only flat list row at body[3] (no action), so it can never be ticked, count as a selection for the rule or be sent; later body nodes move down one"
     },
     {
+      "screen": "records_disconnect",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "4782a109376d97fdb702d8b1f3616a32f11b8e4c0e5609fbee01d4d0b1cee69d",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> records.disconnect_title (TH-909)"
+    },
+    {
       "screen": "records_fhir_url",
       "decisions": [
         "P-31",
@@ -530,6 +913,28 @@
       ],
       "sha256": "02ab281aa5dcd85887af52e3101963f23cfcbb90837d8fadbfd77c09a87701c1",
       "change": "P-31 placeholders, fields start empty: body[1] \"FHIR server address\" example \"https://fhir.example-health.org/r4\" -> placeholder | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"records.fhir_url.server_check\", ask \"fhirServerCheck\" and when {supported: SMART on FHIR R4 supported, unsupported: Not a FHIR R4 server}"
+    },
+    {
+      "screen": "records_hub",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "3e83a2a838c67fe09ce973ee1bb62c0e3769817755d62dc5e48ccab25ced9787",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0].label -> records.source_1.name; body[1].rows[0].sub -> records.source_1.status; body[1].rows[1].label -> records.source_2.name; body[1].rows[1].sub -> records.source_2.status; body[2].rows[0].sub -> records.imported.blood_pressure; body[2].rows[1].sub -> records.imported.labs; body[2].rows[2].sub -> records.imported.immunizations; body[2].rows[3].sub -> records.imported.smoking_status; body[3].title -> records.review_count (TH-909)"
+    },
+    {
+      "screen": "records_item",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "f8f1f53f21ec639a204b32310ba2ee70f963802406e383716a3a7669b3d789d8",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].values -> records.item.series; body[1].rows[0].label -> records.item.latest_1; body[1].rows[0].sub -> records.item.latest_1_source; body[1].rows[1].label -> records.item.latest_2; body[1].rows[1].sub -> records.item.latest_2_source; body[1].rows[2].label -> records.item.latest_3; body[1].rows[2].sub -> records.item.latest_3_source (TH-909)"
     },
     {
       "screen": "records_manual",
@@ -557,13 +962,15 @@
       "screen": "records_review",
       "decisions": [
         "P-78",
-        "P-79"
+        "P-79",
+        "P-89"
       ],
       "tickets": [
-        "TH-1008c"
+        "TH-1008c",
+        "TH-909"
       ],
-      "sha256": "e9d6379602cd7bf95807b556431262175dd33500ea2fa9cdcbe973c67aeb6ce0",
-      "change": "P-79, each choice reaches the accept call: the five item checklists get session keys body[3].children[0] \"keep_hw\", body[4].children[0] \"keep_st\", body[5].children[0] \"keep_ck\", body[6].children[0] \"keep_bf\", body[7].children[0] \"keep_re\"; the ticked labels are submitted under them and skipped items are not | P-78, starts unticked: the items 12 blood pressure readings, Lipid panel, Flu vaccine, Tdap, Smoking status: every day smoker and eGFR 58 no longer start ticked (\"done\": true removed); A1C 7.6% was already unticked | footer[0] label \"Add 21 items to my programs\" -> \"Add selected items to my programs\" and its toast \"Added to Heartwise, Steady, Checkup, BreatheFree and Renew\" -> \"Added to your programs\" (draft copy, needs clinical/legal copy review), because the count and programme list no longer match what is sent | footer[0] action wrapped in a branch decided by rule rec.review: \"Chosen\" runs the POST /v1/records/fhir/accept submit unchanged; \"Nothing chosen\" shows the toast \"Select the items you want to add.\" (draft copy, needs clinical/legal copy review); action summaries follow"
+      "sha256": "889e7470ff9d44b2d754d43be32041d079e83f3b6155861e239e971d2968d65a",
+      "change": "P-79, each choice reaches the accept call: the five item checklists get session keys body[3].children[0] \"keep_hw\", body[4].children[0] \"keep_st\", body[5].children[0] \"keep_ck\", body[6].children[0] \"keep_bf\", body[7].children[0] \"keep_re\"; the ticked labels are submitted under them and skipped items are not | P-78, starts unticked: the items 12 blood pressure readings, Lipid panel, Flu vaccine, Tdap, Smoking status: every day smoker and eGFR 58 no longer start ticked (\"done\": true removed); A1C 7.6% was already unticked | footer[0] label \"Add 21 items to my programs\" -> \"Add selected items to my programs\" and its toast \"Added to Heartwise, Steady, Checkup, BreatheFree and Renew\" -> \"Added to your programs\" (draft copy, needs clinical/legal copy review), because the count and programme list no longer match what is sent | footer[0] action wrapped in a branch decided by rule rec.review: \"Chosen\" runs the POST /v1/records/fhir/accept submit unchanged; \"Nothing chosen\" shows the toast \"Select the items you want to add.\" (draft copy, needs clinical/legal copy review); action summaries follow. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].text -> records.review_banner; body[9].rows[0][1] -> records.review.units_converted; body[9].rows[1][1] -> records.review.duplicates_skipped; body[9].rows[2][1] -> records.review.held_as_typo; body[9].rows[3][1] -> records.review.future_dates_rejected (TH-909)"
     },
     {
       "screen": "records_search",
@@ -579,24 +986,50 @@
     {
       "screen": "records_source",
       "decisions": [
-        "P-78"
+        "P-78",
+        "P-89"
       ],
       "tickets": [
-        "TH-1008d"
+        "TH-1008d",
+        "TH-909"
       ],
-      "sha256": "1a20aae5f6f50a971befe1c0c59f123d7ba835a53969fe6d38375db45920ea92",
-      "change": "TH-1008d, as P-78: body[1] row \"What we read\" (push to records_consent) is removed, because that checklist now starts unticked and would under-report what the source reads; a new body[2] list titled \"What we read\" shows the six categories the source reads (Conditions, Vital signs, Lab results, Medications, Immunizations, Smoking status, with the same subtitles as the consent checklist) as read-only rows with no action, matching \"Read-only · 6 categories\"; no new wording; action summaries follow"
+      "sha256": "b9544cd06099954a5e81395426227ac4dfd0706d4652ff7d22ba492651c2b832",
+      "change": "TH-1008d, as P-78: body[1] row \"What we read\" (push to records_consent) is removed, because that checklist now starts unticked and would under-report what the source reads; a new body[2] list titled \"What we read\" shows the six categories the source reads (Conditions, Vital signs, Lab results, Medications, Immunizations, Smoking status, with the same subtitles as the consent checklist) as read-only rows with no action, matching \"Read-only · 6 categories\"; no new wording; action summaries follow. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].rows[0][1] -> records.source.connection; body[0].rows[1][1] -> records.source.last_sync; body[0].rows[2][1] -> records.source.next_sync; body[0].rows[3][1] -> records.source.access; body[0].rows[4][1] -> records.source.connected_on (TH-909)"
+    },
+    {
+      "screen": "rescue_escalate",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "64eb2ab46cd4f94161ecf8daabbaf161626c679fbaf5cb6c3591404661d0f78e",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[3].rows[0].label -> support.contact_text_action; body[3].rows[0].sub -> support.help_phrase_short (TH-909)"
     },
     {
       "screen": "rescue_pick",
       "decisions": [
-        "P-22"
+        "P-22",
+        "P-89"
       ],
       "tickets": [
-        "TH-942"
+        "TH-942",
+        "TH-909"
       ],
-      "sha256": "7e895e9ef5adc34d917ae3be46bcff35bed5808fb7159ab3a441ee8af18782be",
-      "change": "Developer description: drops \"Works offline.\""
+      "sha256": "5a49474d8cb0f7b60cbb579648bcb34b7afad270458717e7899a6ef9d76ea34a",
+      "change": "Developer description: drops \"Works offline.\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[4].eyebrow -> rescue.last_helpful_result; body[4].title -> rescue.last_helpful_tool (TH-909)"
+    },
+    {
+      "screen": "rescue_result",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "5679fe4d41f0befdf1e692e41c16d4e98318faad418ba37bd172b122e3a6b676",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].items[0].value -> rescue.rating_before; body[2].items[1].value -> rescue.rating_now (TH-909)"
     },
     {
       "screen": "sd_caregiver",
@@ -613,29 +1046,88 @@
       "change": "P-31 placeholders, fields start empty: body[1] \"Name\" example \"Rosa\" -> placeholder; body[2] \"Phone\" example \"(555) 010-2244\" -> placeholder | Session key only, no visual change: body[3] checklist gets key \"caregiver_can_see\" | P-71 settings binding, data only, no visual change: body[3] checklist \"caregiver_can_see\" gets bind \"sd.caregiver.can_see\""
     },
     {
+      "screen": "sd_fell",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "ff0a0de04729c4528bc3bf83b0af4e8dfd690450e7a627e9358caa6c4ad6c47c",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].rows[0].label -> sd.caregiver_call_action (TH-909)"
+    },
+    {
+      "screen": "sd_home",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "b4bbcf38cdc5d12d15694363d3818417cc8ede49e4fc9203a5fff37e4cb70a67",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> sd.today_heading; body[0].title -> sd.today_session; body[2].rows[0].sub -> sd.safety_progress; body[2].rows[1].sub -> sd.caregiver_summary; body[2].rows[2].sub -> sd.plan_summary; body[3].items[0].value -> sd.sessions_this_week; body[3].items[1].value -> sd.falls_30d (TH-909)"
+    },
+    {
+      "screen": "sd_plan",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "852ee6db6a9f21a59b93b7cccec92ffd2fb8cf8eaac3ecb3b55a7c24bf4fffdf",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0][0] -> sd.plan.day_1; body[1].rows[0][1] -> sd.plan.session_1; body[1].rows[1][0] -> sd.plan.day_2; body[1].rows[1][1] -> sd.plan.session_2; body[1].rows[2][0] -> sd.plan.day_3; body[1].rows[2][1] -> sd.plan.session_3 (TH-909)"
+    },
+    {
+      "screen": "sd_safety",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "7b27706eef761827b169ec8178b5e81e638f71f886a2c2180159e09920ba0936",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].text -> sd.safety_progress (TH-909)"
+    },
+    {
       "screen": "sf_buddy",
       "decisions": [
         "P-31",
         "TH-902",
-        "P-71"
+        "P-71",
+        "P-89"
       ],
       "tickets": [
         "TH-907",
-        "TH-1008a"
+        "TH-1008a",
+        "TH-909"
       ],
-      "sha256": "50211d3a2eb41e38280a5084de3563a20197412e71a2650e3a0ae14729fe6459",
-      "change": "P-31 placeholders, fields start empty: body[2] \"Name\" example \"Sam\" -> placeholder | Session key only, no visual change: body[3] checklist gets key \"buddy_can_see\" | P-71 settings binding, data only, no visual change: body[3] checklist \"buddy_can_see\" gets bind \"sf.buddy.can_see\""
+      "sha256": "014d06b710ddc6d052cdc51d7f19d74184fcfb7a2734eac1056cf2c06f2e61f3",
+      "change": "P-31 placeholders, fields start empty: body[2] \"Name\" example \"Sam\" -> placeholder | Session key only, no visual change: body[3] checklist gets key \"buddy_can_see\" | P-71 settings binding, data only, no visual change: body[3] checklist \"buddy_can_see\" gets bind \"sf.buddy.can_see\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[4].children[0].text -> sf.buddy.preview_message (TH-909)"
+    },
+    {
+      "screen": "sf_goal",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "d0d47b217e0ccef46f42268c5add6e938a47d1d9ac61ad34e472cedbc97ecb59",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].text -> sf.baseline_line (TH-909)"
     },
     {
       "screen": "sf_home",
       "decisions": [
-        "P-47 decision 1"
+        "P-47 decision 1",
+        "P-89"
       ],
       "tickets": [
-        "TH-953"
+        "TH-953",
+        "TH-909"
       ],
-      "sha256": "356d34c7e5a4a33918a4781f32059a76dddba3a022e53b387c80e1977b78ec77",
-      "change": "New Unplug entry card (\"Want firmer limits?\", Set up -> sf_unplug_intro) between the Urge card and Today's step; one new action; later action paths shift from body[3] to body[4]"
+      "sha256": "bba874f05977a81266dcbc49d03496e6a6abe55118d3c36c2ea0ee07681a2edb",
+      "change": "New Unplug entry card (\"Want firmer limits?\", Set up -> sf_unplug_intro) between the Urge card and Today's step; one new action; later action paths shift from body[3] to body[4]. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].children[0].value -> sf.minutes_yesterday; body[0].children[0].caption -> sf.goal_caption; body[4].rows[0].sub -> sf.phone_free_nights_summary; body[4].rows[2].sub -> sf.goal_summary; body[4].rows[3].sub -> sf.buddy.summary (TH-909)"
     },
     {
       "screen": "sf_intro",
@@ -662,15 +1154,39 @@
       "change": "iPhone copy says Screen Time \"shows\" totals, not that Tether \"reads\" them (4 strings) | TH-986a: Decision source only, no visual change: footer[0] branch gets id \"sf.screentime.ios_request\", ask \"screenTimeRequest\" and when {granted: Allowed, denied: Not allowed, unavailable: Not allowed}"
     },
     {
-      "screen": "st_a1c",
+      "screen": "sf_week",
       "decisions": [
-        "P-31"
+        "P-89"
       ],
       "tickets": [
-        "TH-907"
+        "TH-909"
       ],
-      "sha256": "e9a1237ce7cb8c399e3bec485c5f6536a5118b3f02b1e5ea1bc23388f48ed099",
-      "change": "P-31 placeholders, fields start empty: body[1] \"A1C\" example \"7.4\" -> placeholder; body[2] \"Lab date\" example \"Oct 1, 2026\" -> placeholder"
+      "sha256": "8980262f6d90b0cfc8f2f917d49930dbe99fa684ede245892c41b70ef752cdc2",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].values -> sf.minutes_week; body[2].items[0].value -> sf.phone_free_nights; body[2].items[1].value -> sf.urges_paused; body[2].items[1].sub -> sf.urges_put_down; body[3].text -> sf.insight; body[3].children[0].text -> sf.you_said; body[4].title -> sf.next_week_suggestion (TH-909)"
+    },
+    {
+      "screen": "st_a1c",
+      "decisions": [
+        "P-31",
+        "P-89"
+      ],
+      "tickets": [
+        "TH-907",
+        "TH-909"
+      ],
+      "sha256": "baba41e9de657c7f93144aed1b6a9465de17b2eba0dddc39457331f88a575393",
+      "change": "P-31 placeholders, fields start empty: body[1] \"A1C\" example \"7.4\" -> placeholder; body[2] \"Lab date\" example \"Oct 1, 2026\" -> placeholder. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[3].rows[0][1] -> st.a1c_previous; body[3].rows[1][1] -> st.a1c_change (TH-909)"
+    },
+    {
+      "screen": "st_home",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "c45afa467e7bf8af3cdf25e5af35edb2d96231b134473c9bc88765af1325d8d3",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> st.last_reading_context; body[0].children[0].value -> st.last_glucose; body[0].children[0].caption -> st.last_glucose_caption; body[2].rows[1].sub -> st.in_range_summary; body[2].rows[2].sub -> st.a1c_latest (TH-909)"
     },
     {
       "screen": "st_log",
@@ -684,6 +1200,28 @@
       "change": "P-31 placeholders, fields start empty: body[0] \"Reading\" example \"142\" -> placeholder; body[3] \"Note (optional)\" example \"Pasta lunch\" -> placeholder"
     },
     {
+      "screen": "st_low",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "30b033be809ad56c672ea710a1a9b4aa1986f2ce076eba2b6d7fa2154e96f4ad",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> st.low_banner (TH-909)"
+    },
+    {
+      "screen": "st_patterns",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "00c9f3835ea82b37fdafaccc59f4580b3e1f73c5e1fe52763303f56c845e3d09",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].values -> st.after_meal_series; body[2].items[0].value -> st.in_range; body[2].items[0].sub -> st.in_range_count; body[2].items[1].value -> st.lows; body[2].items[1].sub -> st.last_low; body[3].title -> st.pattern_insight (TH-909)"
+    },
+    {
       "screen": "st_range",
       "decisions": [
         "P-31",
@@ -695,6 +1233,17 @@
       ],
       "sha256": "388d82ace41b616c8490f2c520c5748ba5dbd546fd02c5269bf98d3c6f91ebaa",
       "change": "P-31 placeholders, fields start empty: body[3].fields[0] \"Before meals from\" example \"80\" -> placeholder; body[3].fields[1] \"to\" example \"130\" -> placeholder; body[4] \"2 h after meals below\" example \"180\" -> placeholder; body[5].children[0] \"Low below\" example \"70\" -> placeholder; body[5].children[1] \"My low steps\" example \"15 g fast sugar, re-check in 15 min\" -> placeholder | P-71 settings binding, data only, no visual change: body[2] segmented \"value\" gets bind \"st.range.unit\""
+    },
+    {
+      "screen": "support",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "b16ca5f7de3851199c8151be72efaac4a93f666578156f996d9048ce6a575324",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0].label -> support.supporter_name; body[2].rows[0].label -> support.care_team_name; body[2].rows[0].sub -> support.care_team_programs (TH-909)"
     },
     {
       "screen": "support_add_person",
@@ -732,6 +1281,17 @@
       "change": "P-31 placeholders, fields start empty: body[1] \"Invite code\" example \"PATEL-4821\" -> placeholder"
     },
     {
+      "screen": "support_message",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "f67f2fc0d3a3732e8bc972d95863dad71906c5e383b8e2a4b3d1bdc52c34dc09",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> support.message_title; body[1].title -> support.help_phrase_quoted (TH-909)"
+    },
+    {
       "screen": "support_message_care",
       "decisions": [
         "P-31"
@@ -745,13 +1305,26 @@
     {
       "screen": "today",
       "decisions": [
-        "P-22"
+        "P-22",
+        "P-89"
       ],
       "tickets": [
-        "TH-942"
+        "TH-942",
+        "TH-909"
       ],
-      "sha256": "7a587f7cbc04c6ef3f2ee6ef9e94f554cedf871fc1157dd57d24a35a86be6b0f",
-      "change": "Craving card: drops \" · works offline\""
+      "sha256": "803e72dd410fb1a674cb458e9d3c3c06823a1e7297daa9a5019c6df871bd1307",
+      "change": "Craving card: drops \" · works offline\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> today.date; body[1].text -> today.greeting; body[4].eyebrow -> today.steps_heading; body[6].items[0].value -> bf.days_to_quit_day; body[6].items[0].sub -> bf.quit_date_short; body[6].items[1].value -> sf.minutes_yesterday; body[6].items[1].sub -> sf.goal_short (TH-909)"
+    },
+    {
+      "screen": "today_empty",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "9f1d7cc7cb93423f7b0f9b3f44cc4156fd9c08c8a8abca3225d17c5e8e1f9502",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> today.greeting (TH-909)"
     },
     {
       "screen": "today_loading",
@@ -767,13 +1340,26 @@
     {
       "screen": "today_offline",
       "decisions": [
-        "P-22"
+        "P-22",
+        "P-89"
       ],
       "tickets": [
-        "TH-942"
+        "TH-942",
+        "TH-909"
       ],
-      "sha256": "b22352326632984d6dbd6299f3def523863cb726b4a63b212b5a8e1d765154ff",
-      "change": "Craving card: \"Works offline\" -> \"One tap · no typing\""
+      "sha256": "2acb2fccb89d5fdb999e68893004e9698796c08708c8651422a4dc8176d1b7e0",
+      "change": "Craving card: \"Works offline\" -> \"One tap · no typing\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> today.offline_banner; body[1].text -> today.greeting (TH-909)"
+    },
+    {
+      "screen": "today_safety",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "86ae4acb4d86e43a54ef0bc70e8b4716505b3881b0a68c29071f298fca9b2457",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].text -> hw.crisis_reading_source (TH-909)"
     },
     {
       "screen": "welcome",

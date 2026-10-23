@@ -31,7 +31,12 @@ import 'package:tether_ui/ui/ui.dart';
 /// Synthetic payload that must never reach the UI or a recorded code.
 const _canary = 'canary-synthetic-user-01';
 
-const _saveError = 'Couldn’t save. Your entry is kept on this phone.';
+/// No failure message may say the entry was kept (no outbox keeps it).
+void _noKeptClaim(WidgetTester tester) {
+  for (final t in _texts(tester)) {
+    expect(t.toLowerCase().contains('kept'), isFalse, reason: t);
+  }
+}
 
 const _host = '/__host';
 
@@ -830,7 +835,7 @@ void main() {
     });
 
     for (final screen in [Routes.authSignin, Routes.authSigninError]) {
-      testWidgets('$screen: a queued result is a failure: nothing navigates, the generic error shows, never the save error', (tester) async {
+      testWidgets('$screen: a queued result is a failure: nothing navigates, the generic error shows', (tester) async {
         final arrivals = _Arrivals();
         TApi.instance = _ScriptedApi(const TResult.queued());
         await _open(tester, screen, observers: [arrivals]);
@@ -838,17 +843,17 @@ void main() {
         await _tapKey(tester, 'footer[0]');
         expect(arrivals.names, isEmpty);
         expect(find.text(TFailClosedResolver.message), findsOneWidget);
-        expect(find.text(_saveError), findsNothing);
+        _noKeptClaim(tester);
         expect(find.byType(screen == Routes.authSignin ? AuthSigninScreen : AuthSigninErrorScreen), findsOneWidget);
         await tester.pump(const Duration(seconds: 3));
       });
 
-      testWidgets('$screen: a failed sign-in shows the generic error, never the save error or the code', (tester) async {
+      testWidgets('$screen: a failed sign-in shows the generic error, never the code', (tester) async {
         TApi.instance = _ScriptedApi(const TResult.failed(_canary));
         await _open(tester, screen);
         await _tapKey(tester, 'footer[0]');
         expect(find.text(TFailClosedResolver.message), findsOneWidget);
-        expect(find.text(_saveError), findsNothing);
+        _noKeptClaim(tester);
         for (final t in _texts(tester)) {
           expect(t.contains('canary'), isFalse, reason: t);
         }
@@ -862,7 +867,7 @@ void main() {
       await _tapKey(tester, 'footer[0]');
       expect(find.byType(AuthSigninScreen), findsOneWidget);
       expect(find.text(TFailClosedResolver.message), findsOneWidget);
-      expect(find.text(_saveError), findsNothing);
+      _noKeptClaim(tester);
       await tester.pump(const Duration(seconds: 3));
     });
 
@@ -889,13 +894,14 @@ void main() {
       await tester.pump(const Duration(seconds: 3));
     });
 
-    testWidgets('a failed save that may be queued still shows the save error', (tester) async {
+    testWidgets('a failed save that may be queued shows the generic error, which never says the entry was kept', (tester) async {
       await _hostPage(tester);
       TApi.instance = _ScriptedApi(const TResult.failed('synthetic_code'));
       await TNav.submit(_hostContext, 'POST /v1/records/check-ins', screenId: 's');
       await tester.pump();
-      expect(find.text(_saveError), findsOneWidget);
-      expect(find.text(TFailClosedResolver.message), findsNothing);
+      expect(find.text(TNav.saveFailed), findsOneWidget);
+      expect(TNav.saveFailed, TFailClosedResolver.message);
+      _noKeptClaim(tester);
       await tester.pump(const Duration(seconds: 3));
     });
   });

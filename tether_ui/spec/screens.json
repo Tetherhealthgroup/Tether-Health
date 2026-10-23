@@ -174,14 +174,12 @@
           {
             "label": "BreatheFree",
             "sub": "Tobacco & nicotine",
-            "program": "bf",
-            "selected": true
+            "program": "bf"
           },
           {
             "label": "ScrollFree",
             "sub": "Social media use",
-            "program": "sf",
-            "selected": true
+            "program": "sf"
           },
           {
             "label": "ClearAir",
@@ -2582,7 +2580,10 @@
             "Password",
             "None needed"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "auth.social.name"
+        }
       },
       {
         "t": "text",
@@ -3180,12 +3181,18 @@
               "program": "bf"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "auth.merge.guest_plan"
+        }
       },
       {
         "t": "text",
         "text": "Your account already has a BreatheFree plan from Aug 12.",
-        "tone": "small"
+        "tone": "small",
+        "data": {
+          "text": "auth.merge.account_plan"
+        }
       },
       {
         "t": "radio",
@@ -3354,12 +3361,18 @@
     "body": [
       {
         "t": "eyebrow",
-        "text": "Friday, August 21"
+        "text": "Friday, August 21",
+        "data": {
+          "text": "today.date"
+        }
       },
       {
         "t": "title",
         "text": "Good morning, Alex.",
-        "size": "m"
+        "size": "m",
+        "data": {
+          "text": "today.greeting"
+        }
       },
       {
         "t": "chips",
@@ -3414,7 +3427,10 @@
               }
             ]
           }
-        ]
+        ],
+        "data": {
+          "eyebrow": "today.steps_heading"
+        }
       },
       {
         "t": "card",
@@ -3449,7 +3465,13 @@
             "program": "sf"
           }
         ],
-        "cols": 2
+        "cols": 2,
+        "data": {
+          "items[0].value": "bf.days_to_quit_day",
+          "items[0].sub": "bf.quit_date_short",
+          "items[1].value": "sf.minutes_yesterday",
+          "items[1].sub": "sf.goal_short"
+        }
       },
       {
         "t": "list",
@@ -3739,12 +3761,18 @@
       {
         "t": "banner",
         "kind": "offline",
-        "text": "Offline · 3 entries will sync when you reconnect."
+        "text": "Offline · 3 entries will sync when you reconnect.",
+        "data": {
+          "text": "today.offline_banner"
+        }
       },
       {
         "t": "title",
         "text": "Good morning, Alex.",
-        "size": "m"
+        "size": "m",
+        "data": {
+          "text": "today.greeting"
+        }
       },
       {
         "t": "card",
@@ -3875,7 +3903,10 @@
       {
         "t": "title",
         "text": "Good evening, Alex.",
-        "size": "m"
+        "size": "m",
+        "data": {
+          "text": "today.greeting"
+        }
       },
       {
         "t": "illus",
@@ -4075,7 +4106,10 @@
               }
             ]
           }
-        ]
+        ],
+        "data": {
+          "text": "hw.crisis_reading_source"
+        }
       },
       {
         "t": "text",
@@ -4336,7 +4370,10 @@
         "t": "title",
         "text": "Thanks, Alex.",
         "size": "l",
-        "align": "center"
+        "align": "center",
+        "data": {
+          "text": "checkin.thanks"
+        }
       },
       {
         "t": "text",
@@ -4526,6 +4563,10 @@
           "variant": "lime",
           "arrow": false,
           "small": true
+        },
+        "data": {
+          "eyebrow": "rescue.last_helpful_result",
+          "title": "rescue.last_helpful_tool"
         }
       },
       {
@@ -4907,7 +4948,11 @@
             "sub": "Your rating, not a diagnosis"
           }
         ],
-        "cols": 2
+        "cols": 2,
+        "data": {
+          "items[0].value": "rescue.rating_before",
+          "items[1].value": "rescue.rating_now"
+        }
       },
       {
         "t": "chips",
@@ -5056,7 +5101,11 @@
               "avatar": "J"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].label": "support.contact_text_action",
+          "rows[0].sub": "support.help_phrase_short"
+        }
       },
       {
         "t": "emergency",
@@ -5227,6 +5276,10 @@
         "action": {
           "type": "push",
           "to": "ea_plan"
+        },
+        "data": {
+          "title": "ea.plan.things_that_help_line",
+          "text": "ea.plan.reach_out_line"
         }
       }
     ],
@@ -5338,7 +5391,12 @@
             },
             "pill": "Focus"
           }
-        ]
+        ],
+        "data": {
+          "title": "plans.focus_heading",
+          "rows[0].sub": "bf.plan_summary",
+          "rows[1].sub": "sf.plan_summary"
+        }
       },
       {
         "t": "list",
@@ -5378,7 +5436,10 @@
               "to": "account_programs"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "plans.medication_summary"
+        }
       }
     ],
     "footer": [
@@ -5938,7 +5999,10 @@
             }
           }
         ],
-        "flat": true
+        "flat": true,
+        "data": {
+          "rows[0].sub": "enrolment.:program.since"
+        }
       },
       {
         "t": "radio",
@@ -6147,6 +6211,10 @@
         "action": {
           "type": "push",
           "to": "bf_progress"
+        },
+        "data": {
+          "values": "bf.cigarettes_week",
+          "caption": "bf.progress_caption"
         }
       },
       {
@@ -6178,6 +6246,10 @@
         "action": {
           "type": "push",
           "to": "sf_week"
+        },
+        "data": {
+          "values": "sf.minutes_week",
+          "caption": "sf.progress_caption"
         }
       },
       {
@@ -6196,6 +6268,9 @@
           "variant": "secondary",
           "arrow": false,
           "small": true
+        },
+        "data": {
+          "title": "insights.cross_program"
         }
       }
     ],
@@ -7073,7 +7148,10 @@
               "icon": "+"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].label": "support.supporter_name"
+        }
       },
       {
         "t": "list",
@@ -7090,7 +7168,11 @@
               "icon": "+"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].label": "support.care_team_name",
+          "rows[0].sub": "support.care_team_programs"
+        }
       },
       {
         "t": "emergency",
@@ -7579,14 +7661,20 @@
       {
         "t": "title",
         "text": "Send to Jordan?",
-        "size": "m"
+        "size": "m",
+        "data": {
+          "text": "support.message_title"
+        }
       },
       {
         "t": "card",
         "variant": "mint",
         "eyebrow": "Preview",
         "title": "“Can you stay with me for the next 10 minutes?”",
-        "text": "Sent from your phone’s Messages app. Tether never sends on its own."
+        "text": "Sent from your phone’s Messages app. Tether never sends on its own.",
+        "data": {
+          "title": "support.help_phrase_quoted"
+        }
       }
     ],
     "footer": [
@@ -8043,7 +8131,11 @@
             }
           }
         ],
-        "flat": true
+        "flat": true,
+        "data": {
+          "rows[0].label": "profile.name",
+          "rows[0].sub": "profile.email"
+        }
       },
       {
         "t": "list",
@@ -8065,7 +8157,11 @@
               "to": "account_signin_methods"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "records.sources_summary",
+          "rows[1].sub": "account.signin_methods_summary"
+        }
       },
       {
         "t": "list",
@@ -8103,7 +8199,12 @@
               "to": "account_data"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "account.programs_summary",
+          "rows[1].sub": "notifications.summary",
+          "rows[2].sub": "consents.reviewed_summary"
+        }
       },
       {
         "t": "list",
@@ -8443,7 +8544,10 @@
       {
         "t": "text",
         "text": "2 of 2 focus slots used",
-        "tone": "small"
+        "tone": "small",
+        "data": {
+          "text": "account.focus_slots"
+        }
       },
       {
         "t": "list",
@@ -8492,7 +8596,13 @@
               "program": "hw"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "enrolment.bf.summary",
+          "rows[1].sub": "enrolment.sf.summary",
+          "rows[2].sub": "enrolment.ca.summary",
+          "rows[3].sub": "enrolment.hw.summary"
+        }
       }
     ],
     "footer": [
@@ -8745,7 +8855,11 @@
               "program": "sf"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "notifications.bf.summary",
+          "rows[1].sub": "notifications.sf.summary"
+        }
       },
       {
         "t": "card",
@@ -8899,7 +9013,10 @@
               "value": "https://www.tetherhealthgroup.com/privacy/"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[1].sub": "consents.history_summary"
+        }
       },
       {
         "t": "text",
@@ -9135,7 +9252,13 @@
             "Shared with care team",
             "3 summaries (their copies stay with them)"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "account.data.programs",
+          "rows[1][1]": "account.data.check_ins",
+          "rows[2][1]": "account.data.readings",
+          "rows[3][1]": "account.data.shared_summaries"
+        }
       },
       {
         "t": "text",
@@ -9268,7 +9391,11 @@
             "Signed out on",
             "this phone"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "account.deletion.receipt",
+          "rows[1][1]": "account.deletion.completed_at"
+        }
       },
       {
         "t": "text",
@@ -10182,7 +10309,10 @@
       {
         "t": "text",
         "text": "From your baseline of 15 a day. Adjust any week.",
-        "tone": "muted"
+        "tone": "muted",
+        "data": {
+          "text": "bf.stepdown.baseline_line"
+        }
       },
       {
         "t": "kv",
@@ -10207,7 +10337,14 @@
             "Quit day · Sep 18",
             "0"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "bf.stepdown.week_1",
+          "rows[1][1]": "bf.stepdown.week_2",
+          "rows[2][1]": "bf.stepdown.week_3",
+          "rows[3][1]": "bf.stepdown.week_4",
+          "rows[4][0]": "bf.stepdown.quit_day_label"
+        }
       },
       {
         "t": "card",
@@ -10301,7 +10438,11 @@
               "icon": "+"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].label": "bf.supporter_name",
+          "rows[0].sub": "bf.supporter_detail"
+        }
       },
       {
         "t": "card",
@@ -10461,7 +10602,14 @@
               "to": "bf_support"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "bf.review.approach",
+          "rows[1].sub": "bf.review.quit_date",
+          "rows[2].sub": "bf.review.top_reason",
+          "rows[3].sub": "bf.review.support",
+          "rows[4].sub": "bf.review.space"
+        }
       },
       {
         "t": "text",
@@ -10616,7 +10764,11 @@
           {
             "t": "big",
             "value": "7 days",
-            "caption": "Friday, August 28 · Pacific Time"
+            "caption": "Friday, August 28 · Pacific Time",
+            "data": {
+              "value": "bf.days_to_quit_day",
+              "caption": "bf.quit_date_caption"
+            }
           }
         ]
       },
@@ -10660,7 +10812,10 @@
         "children": [
           {
             "t": "quote",
-            "text": "Protect my family."
+            "text": "Protect my family.",
+            "data": {
+              "text": "bf.top_reason"
+            }
           }
         ]
       },
@@ -10706,7 +10861,11 @@
               "to": "program_settings"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[1].sub": "bf.meds.summary",
+          "rows[2].sub": "bf.saved_summary"
+        }
       }
     ],
     "footer": [],
@@ -10850,7 +11009,10 @@
     "body": [
       {
         "t": "eyebrow",
-        "text": "Quit day · Aug 28"
+        "text": "Quit day · Aug 28",
+        "data": {
+          "text": "bf.quit_day_heading"
+        }
       },
       {
         "t": "title",
@@ -10865,7 +11027,11 @@
           {
             "t": "big",
             "value": "2h 41m",
-            "caption": "Started 7:00 AM · Pacific"
+            "caption": "Started 7:00 AM · Pacific",
+            "data": {
+              "value": "bf.time_since_quit",
+              "caption": "bf.quit_time_caption"
+            }
           }
         ]
       },
@@ -10930,7 +11096,10 @@
               "to": "bf_meds"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[1].sub": "bf.meds.today_summary"
+        }
       }
     ],
     "footer": [],
@@ -11253,7 +11422,10 @@
             "Smoke-free days so far",
             "6 of 7 · kept"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "bf.smoke_free_days"
+        }
       },
       {
         "t": "chips",
@@ -11457,7 +11629,10 @@
               }
             ]
           }
-        ]
+        ],
+        "data": {
+          "title": "bf.meds.recorded_plan"
+        }
       },
       {
         "t": "list",
@@ -11746,7 +11921,10 @@
           "S",
           "S"
         ],
-        "caption": "Thursday: no check-in · not counted as zero"
+        "caption": "Thursday: no check-in · not counted as zero",
+        "data": {
+          "values": "bf.cigarettes_week"
+        }
       },
       {
         "t": "stats",
@@ -11772,7 +11950,15 @@
             "sub": "3 of 4 times"
           }
         ],
-        "cols": 2
+        "cols": 2,
+        "data": {
+          "items[0].value": "bf.avoided",
+          "items[1].value": "bf.saved",
+          "items[1].sub": "bf.price_per_pack",
+          "items[2].value": "bf.cravings_eased",
+          "items[3].value": "bf.most_helpful_tool",
+          "items[3].sub": "bf.most_helpful_count"
+        }
       },
       {
         "t": "list",
@@ -11785,7 +11971,10 @@
               "to": "bf_estimates"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "bf.estimates_summary"
+        }
       }
     ],
     "footer": [],
@@ -11852,7 +12041,12 @@
             "Avoided",
             "baseline − reported"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "bf.estimates.baseline",
+          "rows[1][1]": "bf.estimates.price",
+          "rows[2][1]": "bf.estimates.time_per_cigarette"
+        }
       },
       {
         "t": "text",
@@ -12268,7 +12462,10 @@
       {
         "t": "text",
         "text": "From about 3 hours a day.",
-        "tone": "muted"
+        "tone": "muted",
+        "data": {
+          "text": "sf.baseline_line"
+        }
       },
       {
         "t": "card",
@@ -12692,7 +12889,10 @@
         "children": [
           {
             "t": "quote",
-            "text": "Phone-free nights this week: 5. Thanks for cheering me on!"
+            "text": "Phone-free nights this week: 5. Thanks for cheering me on!",
+            "data": {
+              "text": "sf.buddy.preview_message"
+            }
           }
         ]
       }
@@ -12803,7 +13003,11 @@
           {
             "t": "big",
             "value": "2h 10m",
-            "caption": "Goal 90 min · down from 3h"
+            "caption": "Goal 90 min · down from 3h",
+            "data": {
+              "value": "sf.minutes_yesterday",
+              "caption": "sf.goal_caption"
+            }
           }
         ]
       },
@@ -12900,7 +13104,12 @@
               "to": "program_settings"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "sf.phone_free_nights_summary",
+          "rows[2].sub": "sf.goal_summary",
+          "rows[3].sub": "sf.buddy.summary"
+        }
       }
     ],
     "footer": [],
@@ -13327,7 +13536,10 @@
           "S",
           "S"
         ],
-        "caption": "Thursday: no check-in · not counted as zero"
+        "caption": "Thursday: no check-in · not counted as zero",
+        "data": {
+          "values": "sf.minutes_week"
+        }
       },
       {
         "t": "stats",
@@ -13342,7 +13554,12 @@
             "sub": "7 put down"
           }
         ],
-        "cols": 2
+        "cols": 2,
+        "data": {
+          "items[0].value": "sf.phone_free_nights",
+          "items[1].value": "sf.urges_paused",
+          "items[1].sub": "sf.urges_put_down"
+        }
       },
       {
         "t": "card",
@@ -13352,9 +13569,15 @@
         "children": [
           {
             "t": "quote",
-            "text": "I feel drained after long scrolls."
+            "text": "I feel drained after long scrolls.",
+            "data": {
+              "text": "sf.you_said"
+            }
           }
-        ]
+        ],
+        "data": {
+          "text": "sf.insight"
+        }
       },
       {
         "t": "card",
@@ -13391,7 +13614,10 @@
               }
             ]
           }
-        ]
+        ],
+        "data": {
+          "title": "sf.next_week_suggestion"
+        }
       }
     ],
     "footer": [],
@@ -14004,7 +14230,11 @@
         "variant": "dark",
         "eyebrow": "Today’s zone",
         "title": "Green · 410 L/min",
-        "text": "Checked 7:40 AM · from your plan"
+        "text": "Checked 7:40 AM · from your plan",
+        "data": {
+          "title": "ca.zone_today",
+          "text": "ca.zone_checked"
+        }
       },
       {
         "t": "button",
@@ -14060,7 +14290,11 @@
               "to": "program_settings"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[1].sub": "ca.zone_counts",
+          "rows[2].sub": "ca.plan_entered"
+        }
       }
     ],
     "footer": [],
@@ -14241,7 +14475,10 @@
       {
         "t": "text",
         "text": "Worked out only from the plan you entered (green from 400, red below 200).",
-        "tone": "small"
+        "tone": "small",
+        "data": {
+          "text": "ca.zone_thresholds_line"
+        }
       }
     ],
     "footer": [
@@ -14384,7 +14621,10 @@
         "t": "card",
         "variant": "warn",
         "title": "Follow your yellow-zone steps",
-        "text": "From the plan you entered on Sep 3"
+        "text": "From the plan you entered on Sep 3",
+        "data": {
+          "text": "ca.plan_entered_line"
+        }
       },
       {
         "t": "card",
@@ -14563,7 +14803,10 @@
               "avatar": "M"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].label": "ca.emergency_contact_action"
+        }
       },
       {
         "t": "text",
@@ -14775,7 +15018,10 @@
           400,
           450
         ],
-        "caption": "Shaded: your green zone, from your plan"
+        "caption": "Shaded: your green zone, from your plan",
+        "data": {
+          "values": "ca.peak_flow_series"
+        }
       },
       {
         "t": "stats",
@@ -14793,14 +15039,22 @@
             "value": "0"
           }
         ],
-        "cols": 3
+        "cols": 3,
+        "data": {
+          "items[0].value": "ca.days_green",
+          "items[1].value": "ca.days_yellow",
+          "items[2].value": "ca.days_red"
+        }
       },
       {
         "t": "card",
         "variant": "plain",
         "eyebrow": "Most common symptom",
         "title": "Wheezing at night (3×)",
-        "text": "Worth mentioning at your next visit."
+        "text": "Worth mentioning at your next visit.",
+        "data": {
+          "title": "ca.top_symptom"
+        }
       }
     ],
     "footer": [
@@ -15238,9 +15492,16 @@
             "t": "big",
             "value": "128/82",
             "unit": "mmHg",
-            "caption": "Average of 2 · target below 130/80"
+            "caption": "Average of 2 · target below 130/80",
+            "data": {
+              "value": "hw.last_bp",
+              "caption": "hw.last_bp_caption"
+            }
           }
-        ]
+        ],
+        "data": {
+          "eyebrow": "hw.last_reading_time"
+        }
       },
       {
         "t": "button",
@@ -15303,7 +15564,13 @@
               "to": "program_settings"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "hw.avg_30d_summary",
+          "rows[1].sub": "hw.lipids_summary",
+          "rows[3].sub": "hw.records_summary",
+          "rows[4].sub": "hw.targets_summary"
+        }
       },
       {
         "t": "emergency",
@@ -15637,7 +15904,11 @@
             "Average so far",
             "135/85"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "hw.log.reading_1",
+          "rows[1][1]": "hw.log.average"
+        }
       }
     ],
     "footer": [
@@ -15863,13 +16134,19 @@
         "t": "title",
         "text": "135/85 saved",
         "size": "l",
-        "align": "center"
+        "align": "center",
+        "data": {
+          "text": "hw.result_title"
+        }
       },
       {
         "t": "text",
         "text": "Average of 2 readings. Your clinician’s target is below 130/80.",
         "tone": "muted",
-        "align": "center"
+        "align": "center",
+        "data": {
+          "text": "hw.result_text"
+        }
       },
       {
         "t": "card",
@@ -15954,7 +16231,10 @@
       {
         "t": "banner",
         "kind": "urgent",
-        "text": "186/122 is in a range that needs attention now."
+        "text": "186/122 is in a range that needs attention now.",
+        "data": {
+          "text": "hw.crisis_banner"
+        }
       },
       {
         "t": "card",
@@ -16212,7 +16492,10 @@
           110,
           130
         ],
-        "caption": "Shaded: your clinician’s target"
+        "caption": "Shaded: your clinician’s target",
+        "data": {
+          "values": "hw.systolic_series"
+        }
       },
       {
         "t": "stats",
@@ -16227,7 +16510,12 @@
             "sub": "4 days missed"
           }
         ],
-        "cols": 2
+        "cols": 2,
+        "data": {
+          "items[0].value": "hw.avg_30d",
+          "items[1].value": "hw.readings_30d",
+          "items[1].sub": "hw.days_missed_30d"
+        }
       }
     ],
     "footer": [
@@ -16419,7 +16707,10 @@
       {
         "t": "title",
         "text": "Share with Dr. Patel’s clinic?",
-        "size": "m"
+        "size": "m",
+        "data": {
+          "text": "hw.summary.title"
+        }
       },
       {
         "t": "kv",
@@ -16440,7 +16731,13 @@
             "Latest panel",
             "LDL 138 · Sep 30"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "hw.summary.dates",
+          "rows[1][1]": "hw.summary.bp_average",
+          "rows[2][1]": "hw.summary.highest",
+          "rows[3][1]": "hw.summary.latest_panel"
+        }
       },
       {
         "t": "text",
@@ -16939,9 +17236,16 @@
             "t": "big",
             "value": "142",
             "unit": "mg/dL",
-            "caption": "Within your after-meal range (below 180)"
+            "caption": "Within your after-meal range (below 180)",
+            "data": {
+              "value": "st.last_glucose",
+              "caption": "st.last_glucose_caption"
+            }
           }
-        ]
+        ],
+        "data": {
+          "eyebrow": "st.last_reading_context"
+        }
       },
       {
         "t": "button",
@@ -16995,7 +17299,11 @@
               "to": "program_settings"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[1].sub": "st.in_range_summary",
+          "rows[2].sub": "st.a1c_latest"
+        }
       },
       {
         "t": "card",
@@ -17311,7 +17619,10 @@
       {
         "t": "banner",
         "kind": "urgent",
-        "text": "62 mg/dL is below your low of 70."
+        "text": "62 mg/dL is below your low of 70.",
+        "data": {
+          "text": "st.low_banner"
+        }
       },
       {
         "t": "card",
@@ -17558,7 +17869,10 @@
         "band": [
           80,
           180
-        ]
+        ],
+        "data": {
+          "values": "st.after_meal_series"
+        }
       },
       {
         "t": "stats",
@@ -17574,13 +17888,22 @@
             "sub": "Oct 9 · treated"
           }
         ],
-        "cols": 2
+        "cols": 2,
+        "data": {
+          "items[0].value": "st.in_range",
+          "items[0].sub": "st.in_range_count",
+          "items[1].value": "st.lows",
+          "items[1].sub": "st.last_low"
+        }
       },
       {
         "t": "card",
         "variant": "mint",
         "eyebrow": "Pattern",
-        "title": "Readings were higher on nights with less than 6 h sleep."
+        "title": "Readings were higher on nights with less than 6 h sleep.",
+        "data": {
+          "title": "st.pattern_insight"
+        }
       }
     ],
     "footer": [],
@@ -17650,7 +17973,11 @@
             "Change",
             "−0.5 points"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "st.a1c_previous",
+          "rows[1][1]": "st.a1c_change"
+        }
       },
       {
         "t": "text",
@@ -18072,9 +18399,16 @@
             "t": "big",
             "value": "58",
             "unit": "mL/min",
-            "caption": "Next check Apr 2027 · from your clinician"
+            "caption": "Next check Apr 2027 · from your clinician",
+            "data": {
+              "value": "re.egfr_latest",
+              "caption": "re.next_check_caption"
+            }
           }
-        ]
+        ],
+        "data": {
+          "eyebrow": "re.egfr_latest_date"
+        }
       },
       {
         "t": "card",
@@ -18130,7 +18464,10 @@
               "to": "program_settings"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[1].sub": "re.history_span"
+        }
       },
       {
         "t": "card",
@@ -18397,7 +18734,10 @@
         "color": "re",
         "title": "eGFR · 2 years",
         "unit": "mL/min",
-        "caption": "Lower over time. Bring this to your next visit."
+        "caption": "Lower over time. Bring this to your next visit.",
+        "data": {
+          "values": "re.egfr_series"
+        }
       },
       {
         "t": "kv",
@@ -18414,7 +18754,12 @@
             "Next check",
             "Apr 2027 (from your clinician)"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "re.egfr_latest_summary",
+          "rows[1][1]": "re.acr_latest",
+          "rows[2][1]": "re.next_check"
+        }
       }
     ],
     "footer": [
@@ -18969,6 +19314,11 @@
           "variant": "primary",
           "arrow": false,
           "small": true
+        },
+        "data": {
+          "eyebrow": "nu.habit_week",
+          "title": "nu.habit_name",
+          "text": "nu.habit_progress"
         }
       },
       {
@@ -19022,7 +19372,10 @@
               "to": "program_settings"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[1].sub": "nu.milestone_due"
+        }
       }
     ],
     "footer": [],
@@ -19336,7 +19689,12 @@
             "Favorite",
             "Water before meals"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "nu.habits_tried",
+          "rows[1][1]": "nu.days_done",
+          "rows[2][1]": "nu.favorite_habit"
+        }
       },
       {
         "t": "segmented",
@@ -19784,7 +20142,15 @@
             "Fri",
             "Walk + balance · 12 min"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][0]": "sd.plan.day_1",
+          "rows[0][1]": "sd.plan.session_1",
+          "rows[1][0]": "sd.plan.day_2",
+          "rows[1][1]": "sd.plan.session_2",
+          "rows[2][0]": "sd.plan.day_3",
+          "rows[2][1]": "sd.plan.session_3"
+        }
       },
       {
         "t": "card",
@@ -19899,6 +20265,10 @@
           "variant": "lime",
           "arrow": false,
           "small": true
+        },
+        "data": {
+          "eyebrow": "sd.today_heading",
+          "title": "sd.today_session"
         }
       },
       {
@@ -19946,7 +20316,12 @@
               "to": "program_settings"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "sd.safety_progress",
+          "rows[1].sub": "sd.caregiver_summary",
+          "rows[2].sub": "sd.plan_summary"
+        }
       },
       {
         "t": "stats",
@@ -19962,7 +20337,11 @@
             "sub": "last 30 days"
           }
         ],
-        "cols": 2
+        "cols": 2,
+        "data": {
+          "items[0].value": "sd.sessions_this_week",
+          "items[1].value": "sd.falls_30d"
+        }
       }
     ],
     "footer": [],
@@ -20261,7 +20640,10 @@
               "avatar": "R"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].label": "sd.caregiver_call_action"
+        }
       },
       {
         "t": "card",
@@ -20411,7 +20793,10 @@
       {
         "t": "text",
         "text": "2 of 5 done",
-        "tone": "small"
+        "tone": "small",
+        "data": {
+          "text": "sd.safety_progress"
+        }
       }
     ],
     "footer": [
@@ -21141,7 +21526,11 @@
               "to": "program_settings"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "ea.plan_updated",
+          "rows[1].sub": "ea.check_back_due"
+        }
       },
       {
         "t": "card",
@@ -21888,7 +22277,10 @@
       {
         "t": "title",
         "text": "3 due, 1 to ask about",
-        "size": "m"
+        "size": "m",
+        "data": {
+          "text": "ck.due_summary"
+        }
       },
       {
         "t": "card",
@@ -22121,7 +22513,10 @@
         "t": "text",
         "text": "Next: flu vaccine in Sep 2027. We’ll remind you a month before.",
         "tone": "muted",
-        "align": "center"
+        "align": "center",
+        "data": {
+          "text": "ck.next_due_line"
+        }
       },
       {
         "t": "button",
@@ -22442,7 +22837,10 @@
       {
         "t": "title",
         "text": "Mammogram tomorrow at 9:30 AM",
-        "size": "m"
+        "size": "m",
+        "data": {
+          "text": "ck.appointment_title"
+        }
       },
       {
         "t": "card",
@@ -23190,6 +23588,9 @@
           "variant": "lime",
           "arrow": false,
           "small": true
+        },
+        "data": {
+          "title": "be.next_appointment"
         }
       },
       {
@@ -23643,7 +24044,10 @@
             "Next follow-up",
             "Jan 14, 2027"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "be.next_follow_up"
+        }
       },
       {
         "t": "list",
@@ -23815,7 +24219,13 @@
               "icon": "M"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].label": "records.source_1.name",
+          "rows[0].sub": "records.source_1.status",
+          "rows[1].label": "records.source_2.name",
+          "rows[1].sub": "records.source_2.status"
+        }
       },
       {
         "t": "list",
@@ -23861,7 +24271,13 @@
               "to": "records_item"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "records.imported.blood_pressure",
+          "rows[1].sub": "records.imported.labs",
+          "rows[2].sub": "records.imported.immunizations",
+          "rows[3].sub": "records.imported.smoking_status"
+        }
       },
       {
         "t": "card",
@@ -23871,6 +24287,9 @@
         "action": {
           "type": "push",
           "to": "records_conflict"
+        },
+        "data": {
+          "title": "records.review_count"
         }
       }
     ],
@@ -24593,7 +25012,10 @@
       {
         "t": "title",
         "text": "Connect Patel Family Medicine?",
-        "size": "m"
+        "size": "m",
+        "data": {
+          "text": "records.connect_title"
+        }
       },
       {
         "t": "kv",
@@ -25426,7 +25848,10 @@
           "type": "push",
           "to": "records_conflict"
         },
-        "actionLabel": "Review"
+        "actionLabel": "Review",
+        "data": {
+          "text": "records.review_banner"
+        }
       },
       {
         "t": "card",
@@ -25544,7 +25969,13 @@
             "Future dates rejected",
             "0"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "records.review.units_converted",
+          "rows[1][1]": "records.review.duplicates_skipped",
+          "rows[2][1]": "records.review.held_as_typo",
+          "rows[3][1]": "records.review.future_dates_rejected"
+        }
       }
     ],
     "footer": [
@@ -25707,7 +26138,10 @@
             "selected": -1,
             "key": "a1c"
           }
-        ]
+        ],
+        "data": {
+          "eyebrow": "records.conflict_1.heading"
+        }
       },
       {
         "t": "card",
@@ -25734,7 +26168,11 @@
             "selected": -1,
             "key": "bp"
           }
-        ]
+        ],
+        "data": {
+          "eyebrow": "records.conflict_2.heading",
+          "title": "records.conflict_2.title"
+        }
       }
     ],
     "footer": [
@@ -25973,7 +26411,14 @@
             "Connected",
             "Oct 3, 2026"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "records.source.connection",
+          "rows[1][1]": "records.source.last_sync",
+          "rows[2][1]": "records.source.next_sync",
+          "rows[3][1]": "records.source.access",
+          "rows[4][1]": "records.source.connected_on"
+        }
       },
       {
         "t": "list",
@@ -26089,7 +26534,10 @@
       {
         "t": "title",
         "text": "Disconnect Patel Family Medicine?",
-        "size": "m"
+        "size": "m",
+        "data": {
+          "text": "records.disconnect_title"
+        }
       },
       {
         "t": "text",
@@ -26543,7 +26991,10 @@
         ],
         "color": "hw",
         "title": "Systolic · all sources",
-        "unit": "mmHg"
+        "unit": "mmHg",
+        "data": {
+          "values": "records.item.series"
+        }
       },
       {
         "t": "list",
@@ -26561,7 +27012,15 @@
             "label": "131/80 · Oct 2",
             "sub": "Patel Family Medicine (Epic)"
           }
-        ]
+        ],
+        "data": {
+          "rows[0].label": "records.item.latest_1",
+          "rows[0].sub": "records.item.latest_1_source",
+          "rows[1].label": "records.item.latest_2",
+          "rows[1].sub": "records.item.latest_2_source",
+          "rows[2].label": "records.item.latest_3",
+          "rows[2].sub": "records.item.latest_3_source"
+        }
       },
       {
         "t": "kv",
@@ -27989,7 +28448,13 @@
             "label": "Feeds",
             "sub": "2 apps"
           }
-        ]
+        ],
+        "data": {
+          "rows[0].label": "sf.unplug.group_1_name",
+          "rows[0].sub": "sf.unplug.group_1_apps",
+          "rows[1].label": "sf.unplug.group_2_name",
+          "rows[1].sub": "sf.unplug.group_2_apps"
+        }
       },
       {
         "t": "field",
@@ -28259,7 +28724,10 @@
         "t": "card",
         "variant": "mint",
         "title": "Unplug is on",
-        "text": "5 apps in 2 groups · pause screen after 60 min or 20 opens"
+        "text": "5 apps in 2 groups · pause screen after 60 min or 20 opens",
+        "data": {
+          "text": "sf.unplug.summary"
+        }
       },
       {
         "t": "card",
@@ -28339,7 +28807,11 @@
               "to": "sf_unplug_health"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "sf.unplug.apps_summary",
+          "rows[1].sub": "sf.unplug.limits_summary"
+        }
       },
       {
         "t": "list",
@@ -28850,7 +29322,10 @@
         "t": "big",
         "value": "45",
         "unit": "min",
-        "caption": "Session complete · your apps are open again"
+        "caption": "Session complete · your apps are open again",
+        "data": {
+          "value": "sf.unplug.session_minutes"
+        }
       },
       {
         "t": "text",
@@ -28913,7 +29388,10 @@
         "t": "big",
         "value": "18",
         "unit": "min",
-        "caption": "Ended early · your apps are open again"
+        "caption": "Ended early · your apps are open again",
+        "data": {
+          "value": "sf.unplug.session_minutes"
+        }
       },
       {
         "t": "kv",
@@ -28926,12 +29404,18 @@
             "Kept",
             "On this phone only"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "sf.unplug.end_reason"
+        }
       },
       {
         "t": "text",
         "text": "Nothing resets. 18 focused minutes still count.",
-        "tone": "muted"
+        "tone": "muted",
+        "data": {
+          "text": "sf.unplug.early_end_line"
+        }
       }
     ],
     "footer": [
@@ -30524,7 +31008,11 @@
           {
             "t": "big",
             "value": "2h 10m",
-            "caption": "Goal 90 min · down from 3h"
+            "caption": "Goal 90 min · down from 3h",
+            "data": {
+              "value": "sf.minutes_yesterday",
+              "caption": "sf.goal_caption"
+            }
           }
         ]
       },
@@ -30553,6 +31041,9 @@
         "action": {
           "type": "push",
           "to": "sf_unplug_home"
+        },
+        "data": {
+          "text": "sf.unplug.status_line"
         }
       },
       {
@@ -30614,7 +31105,12 @@
               "to": "program_settings"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "sf.phone_free_nights_summary",
+          "rows[2].sub": "sf.goal_summary",
+          "rows[3].sub": "sf.buddy.summary"
+        }
       }
     ],
     "footer": [],
@@ -30776,7 +31272,11 @@
           {
             "t": "big",
             "value": "2h 10m",
-            "caption": "Goal 90 min · down from 3h"
+            "caption": "Goal 90 min · down from 3h",
+            "data": {
+              "value": "sf.minutes_yesterday",
+              "caption": "sf.goal_caption"
+            }
           }
         ]
       },
@@ -30794,7 +31294,11 @@
             "sub": "On this phone only · pause screen after 20"
           }
         ],
-        "cols": 2
+        "cols": 2,
+        "data": {
+          "items[0].value": "sf.minutes_today",
+          "items[1].value": "sf.opens_today"
+        }
       },
       {
         "t": "text",
@@ -30826,6 +31330,9 @@
         "action": {
           "type": "push",
           "to": "sf_unplug_home"
+        },
+        "data": {
+          "text": "sf.unplug.status_line"
         }
       },
       {
@@ -30887,7 +31394,12 @@
               "to": "program_settings"
             }
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "sf.phone_free_nights_summary",
+          "rows[2].sub": "sf.goal_summary",
+          "rows[3].sub": "sf.buddy.summary"
+        }
       }
     ],
     "footer": [],
@@ -31077,7 +31589,10 @@
           "S",
           "S"
         ],
-        "caption": "Thursday: no check-in · not counted as zero"
+        "caption": "Thursday: no check-in · not counted as zero",
+        "data": {
+          "values": "sf.minutes_week"
+        }
       },
       {
         "t": "stats",
@@ -31092,7 +31607,12 @@
             "sub": "7 put down"
           }
         ],
-        "cols": 2
+        "cols": 2,
+        "data": {
+          "items[0].value": "sf.phone_free_nights",
+          "items[1].value": "sf.urges_paused",
+          "items[1].sub": "sf.urges_put_down"
+        }
       },
       {
         "t": "card",
@@ -31102,9 +31622,15 @@
         "children": [
           {
             "t": "quote",
-            "text": "I feel drained after long scrolls."
+            "text": "I feel drained after long scrolls.",
+            "data": {
+              "text": "sf.you_said"
+            }
           }
-        ]
+        ],
+        "data": {
+          "text": "sf.insight"
+        }
       },
       {
         "t": "card",
@@ -31141,7 +31667,10 @@
               }
             ]
           }
-        ]
+        ],
+        "data": {
+          "title": "sf.next_week_suggestion"
+        }
       }
     ],
     "footer": [],
@@ -31213,7 +31742,10 @@
             }
           }
         ],
-        "flat": true
+        "flat": true,
+        "data": {
+          "rows[0].sub": "enrolment.:program.since"
+        }
       },
       {
         "t": "radio",
@@ -31287,7 +31819,10 @@
             },
             "danger": true
           }
-        ]
+        ],
+        "data": {
+          "rows[0].sub": "enrolment.:program.unplug_summary"
+        }
       },
       {
         "t": "list",
@@ -31456,7 +31991,13 @@
             "Shared with care team",
             "3 summaries (their copies stay with them)"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "account.data.programs",
+          "rows[1][1]": "account.data.check_ins",
+          "rows[2][1]": "account.data.readings",
+          "rows[3][1]": "account.data.shared_summaries"
+        }
       },
       {
         "t": "text",
@@ -31655,7 +32196,13 @@
             "Shared with care team",
             "3 summaries (their copies stay with them)"
           ]
-        ]
+        ],
+        "data": {
+          "rows[0][1]": "account.data.programs",
+          "rows[1][1]": "account.data.check_ins",
+          "rows[2][1]": "account.data.readings",
+          "rows[3][1]": "account.data.shared_summaries"
+        }
       },
       {
         "t": "text",

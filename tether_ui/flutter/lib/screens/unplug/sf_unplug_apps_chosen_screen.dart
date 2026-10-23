@@ -25,7 +25,7 @@ class SfUnplugAppsChosenScreen extends StatelessWidget {
       children: [
         TTitle(s.sfUnplugAppsChosenBodyN0Text),
         TBody(s.sfUnplugAppsChosenBodyN1Text, tone: TTextTone.muted),
-        TListGroup(title: s.sfUnplugAppsChosenBodyN2Title, rows: [TListRow(label: s.sfUnplugAppsChosenBodyN2RowsN0Label, sub: s.sfUnplugAppsChosenBodyN2RowsN0Sub), TListRow(label: s.sfUnplugAppsChosenBodyN2RowsN1Label, sub: s.sfUnplugAppsChosenBodyN2RowsN1Sub)]),
+        TBoundValues(keys: const ['sf.unplug.group_1_name', 'sf.unplug.group_1_apps', 'sf.unplug.group_2_name', 'sf.unplug.group_2_apps'], builder: (context, v) => TListGroup(title: s.sfUnplugAppsChosenBodyN2Title, rows: [TListRow(label: v.text('sf.unplug.group_1_name', s.sfUnplugAppsChosenBodyN2RowsN0Label), sub: v.text('sf.unplug.group_1_apps', s.sfUnplugAppsChosenBodyN2RowsN0Sub)), TListRow(label: v.text('sf.unplug.group_2_name', s.sfUnplugAppsChosenBodyN2RowsN1Label), sub: v.text('sf.unplug.group_2_apps', s.sfUnplugAppsChosenBodyN2RowsN1Sub))])),
         TField(fieldKey: 'sf_unplug_apps_chosen.group_name', label: s.sfUnplugAppsChosenBodyN3Label, placeholder: s.sfUnplugAppsChosenBodyN3Placeholder),
         TButton(key: const ValueKey('a:body[4]'), label: s.sfUnplugAppsChosenBodyN4Label, onPressed: () => TNav.sheet(context, Routes.sfUnplugPickerIos), variant: TButtonVariant.secondary, small: true),
       ],

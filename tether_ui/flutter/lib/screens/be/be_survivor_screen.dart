@@ -33,7 +33,7 @@ class BeSurvivorScreen extends StatelessWidget {
         TTitle(s.beSurvivorBodyN0Text),
         TSegmented(fieldKey: 'be_survivor.value', options: ['Hard', 'Mixed', 'Good'], labels: [s.beSurvivorBodyN1OptionsN0, s.beSurvivorBodyN1OptionsN1, s.beSurvivorBodyN1OptionsN2], selected: 'Mixed'),
         TCard(title: s.beSurvivorBodyN2Title, text: s.beSurvivorBodyN2Text, cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: s.beSurvivorBodyN2CtaN0Label, onPressed: () => TNav.push(context, Routes.eaIntro), variant: TButtonVariant.secondary, small: true)),
-        TKeyValue(rows: [(s.beSurvivorBodyN3RowsN0N0, s.beSurvivorBodyN3RowsN0N1)]),
+        TBoundValues(keys: const ['be.next_follow_up'], builder: (context, v) => TKeyValue(rows: [(s.beSurvivorBodyN3RowsN0N0, v.text('be.next_follow_up', s.beSurvivorBodyN3RowsN0N1))])),
         TListGroup(rows: [TListRow(key: const ValueKey('a:body[4].rows[0]'), label: s.beSurvivorBodyN4RowsN0Label, onTap: () => TNav.push(context, Routes.programSettings, program: 'be'))]),
       ],
       footer: [

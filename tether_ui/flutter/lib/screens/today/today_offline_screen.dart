@@ -27,8 +27,8 @@ class TodayOfflineScreen extends StatelessWidget {
       header: THeader(title: s.todayOfflineHeaderTitle, left: THeaderLeft.logo, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'today',
       children: [
-        TBanner(kind: TBannerKind.offline, text: s.todayOfflineBodyN0Text),
-        TTitle(s.todayOfflineBodyN1Text),
+        TBoundValues(keys: const ['today.offline_banner'], builder: (context, v) => TBanner(kind: TBannerKind.offline, text: v.text('today.offline_banner', s.todayOfflineBodyN0Text))),
+        TBoundValues(keys: const ['today.greeting'], place: TExamplePlace.inline, builder: (context, v) => TTitle(v.text('today.greeting', s.todayOfflineBodyN1Text))),
         TCard(variant: TCardVariant.coral, title: s.todayOfflineBodyN2Title, text: s.todayOfflineBodyN2Text, cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: s.todayOfflineBodyN2CtaN0Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
         TCard(eyebrow: s.todayOfflineBodyN3Eyebrow, children: [TChecklist(items: [TCheckItem(s.todayOfflineBodyN3ChildrenN0ItemsN0Label, value: 'Stock gum, water or snacks', sub: s.todayOfflineBodyN3ChildrenN0ItemsN0Sub, done: true)])]),
         TBody(s.todayOfflineBodyN4Text, tone: TTextTone.small),

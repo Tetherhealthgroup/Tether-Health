@@ -23,7 +23,7 @@ class SdSafetyScreen extends StatelessWidget {
       children: [
         TTitle(s.sdSafetyBodyN0Text),
         TCard(children: [TChecklist(items: [TCheckItem(s.sdSafetyBodyN1ChildrenN0ItemsN0Label, value: 'Remove loose rugs', done: true), TCheckItem(s.sdSafetyBodyN1ChildrenN0ItemsN1Label, value: 'Night lights in hallway and bathroom', done: true), TCheckItem(s.sdSafetyBodyN1ChildrenN0ItemsN2Label, value: 'Grab bar in shower'), TCheckItem(s.sdSafetyBodyN1ChildrenN0ItemsN3Label, value: 'Stair rails on both sides'), TCheckItem(s.sdSafetyBodyN1ChildrenN0ItemsN4Label, value: 'Vision check this year')])]),
-        TBody(s.sdSafetyBodyN2Text, tone: TTextTone.small),
+        TBoundValues(keys: const ['sd.safety_progress'], place: TExamplePlace.inline, builder: (context, v) => TBody(v.text('sd.safety_progress', s.sdSafetyBodyN2Text), tone: TTextTone.small)),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.sdSafetyFooterN0Label, onPressed: () => TNav.submit(context, 'PUT /v1/program-data/sd/safety', screenId: 'sd_safety', then: () => TNav.toast(context, s.sdSafetyFooterN0ActionThenValue, then: () => TNav.back(context))), arrow: true),

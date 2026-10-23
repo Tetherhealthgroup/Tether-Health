@@ -38,6 +38,10 @@
         "variant": "lime",
         "arrow": false,
         "small": true
+      },
+      "data": {
+        "eyebrow": "sd.today_heading",
+        "title": "sd.today_session"
       }
     },
     {
@@ -85,7 +89,12 @@
             "to": "program_settings"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "sd.safety_progress",
+        "rows[1].sub": "sd.caregiver_summary",
+        "rows[2].sub": "sd.plan_summary"
+      }
     },
     {
       "t": "stats",
@@ -101,7 +110,11 @@
           "sub": "last 30 days"
         }
       ],
-      "cols": 2
+      "cols": 2,
+      "data": {
+        "items[0].value": "sd.sessions_this_week",
+        "items[1].value": "sd.falls_30d"
+      }
     }
   ],
   "footer": [],

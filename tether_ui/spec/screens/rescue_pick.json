@@ -85,6 +85,10 @@
         "variant": "lime",
         "arrow": false,
         "small": true
+      },
+      "data": {
+        "eyebrow": "rescue.last_helpful_result",
+        "title": "rescue.last_helpful_tool"
       }
     },
     {

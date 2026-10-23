@@ -62,7 +62,10 @@
     {
       "t": "text",
       "text": "Worked out only from the plan you entered (green from 400, red below 200).",
-      "tone": "small"
+      "tone": "small",
+      "data": {
+        "text": "ca.zone_thresholds_line"
+      }
     }
   ],
   "footer": [

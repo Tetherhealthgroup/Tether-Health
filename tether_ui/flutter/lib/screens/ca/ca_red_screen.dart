@@ -26,7 +26,7 @@ class CaRedScreen extends StatelessWidget {
         TBanner(kind: TBannerKind.urgent, text: s.caRedBodyN0Text),
         TButton(key: const ValueKey('a:body[1]'), label: s.caRedBodyN1Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger),
         TCard(eyebrow: s.caRedBodyN2Eyebrow, children: [TChecklist(items: [TCheckItem(s.caRedBodyN2ChildrenN0ItemsN0Label, value: 'Reliever inhaler now, as written'), TCheckItem(s.caRedBodyN2ChildrenN0ItemsN1Label, value: 'Call your clinician or 911'), TCheckItem(s.caRedBodyN2ChildrenN0ItemsN2Label, value: 'Don’t drive yourself')])]),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: s.caRedBodyN3RowsN0Label, sub: s.caRedBodyN3RowsN0Sub, lead: TLead.avatar('M'), onTap: () => TNav.sheet(context, Routes.supportMessage))]),
+        TBoundValues(keys: const ['ca.emergency_contact_action'], builder: (context, v) => TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: v.text('ca.emergency_contact_action', s.caRedBodyN3RowsN0Label), sub: s.caRedBodyN3RowsN0Sub, lead: TLead.avatar('M'), onTap: () => TNav.sheet(context, Routes.supportMessage))])),
         TBody(s.caRedBodyN4Text, tone: TTextTone.small),
       ],
     );

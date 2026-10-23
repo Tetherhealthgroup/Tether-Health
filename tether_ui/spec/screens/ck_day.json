@@ -22,7 +22,10 @@
     {
       "t": "title",
       "text": "Mammogram tomorrow at 9:30 AM",
-      "size": "m"
+      "size": "m",
+      "data": {
+        "text": "ck.appointment_title"
+      }
     },
     {
       "t": "card",

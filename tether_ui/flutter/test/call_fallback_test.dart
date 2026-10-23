@@ -466,7 +466,7 @@ void main() {
       api.gates.single.complete(const TResult.failed('synthetic_code'));
       await tester.pump();
       await tester.pump();
-      const saveError = 'Couldn’t save. Your entry is kept on this phone.';
+      const saveError = 'Something went wrong. Please try again.';
       expect(find.text(saveError), findsOneWidget);
       expect(_paintIndex(tester, find.byKey(_fallback)), greaterThan(_paintIndex(tester, find.text(saveError))));
       _expectFallback(TFallbackKind.call, '911');
@@ -1014,7 +1014,7 @@ void main() {
       expect(await done, const TResult.failed('synthetic_code'));
       await tester.pump();
       expect(_codes, [TNav.safetyActionErrorCode, TNav.safetyActionErrorCode], reason: 'nothing opened, so the completion check ran the action again');
-      expect(find.text('Couldn’t save. Your entry is kept on this phone.'), findsOneWidget);
+      expect(find.text('Something went wrong. Please try again.'), findsOneWidget);
       expect(find.textContaining(_canary), findsNothing);
       await _drain(tester);
     });

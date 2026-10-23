@@ -50,7 +50,11 @@
           "Change",
           "−0.5 points"
         ]
-      ]
+      ],
+      "data": {
+        "rows[0][1]": "st.a1c_previous",
+        "rows[1][1]": "st.a1c_change"
+      }
     },
     {
       "t": "text",

@@ -27,13 +27,19 @@
       "t": "title",
       "text": "135/85 saved",
       "size": "l",
-      "align": "center"
+      "align": "center",
+      "data": {
+        "text": "hw.result_title"
+      }
     },
     {
       "t": "text",
       "text": "Average of 2 readings. Your clinician’s target is below 130/80.",
       "tone": "muted",
-      "align": "center"
+      "align": "center",
+      "data": {
+        "text": "hw.result_text"
+      }
     },
     {
       "t": "card",

@@ -21,9 +21,9 @@ class SfUnplugSessionDoneEarlyScreen extends StatelessWidget {
     return TScreen(
       header: THeader(title: s.sfUnplugSessionDoneEarlyHeaderTitle, left: THeaderLeft.none),
       children: [
-        TBigNumber(value: '18', unit: 'min', caption: s.sfUnplugSessionDoneEarlyBodyN0Caption, center: true),
-        TKeyValue(rows: [(s.sfUnplugSessionDoneEarlyBodyN1RowsN0N0, s.sfUnplugSessionDoneEarlyBodyN1RowsN0N1), (s.sfUnplugSessionDoneEarlyBodyN1RowsN1N0, s.sfUnplugSessionDoneEarlyBodyN1RowsN1N1)]),
-        TBody(s.sfUnplugSessionDoneEarlyBodyN2Text, tone: TTextTone.muted),
+        TBoundValues(keys: const ['sf.unplug.session_minutes'], place: TExamplePlace.inline, builder: (context, v) => TBigNumber(value: v.text('sf.unplug.session_minutes', '18'), unit: 'min', caption: s.sfUnplugSessionDoneEarlyBodyN0Caption, center: true)),
+        TBoundValues(keys: const ['sf.unplug.end_reason'], builder: (context, v) => TKeyValue(rows: [(s.sfUnplugSessionDoneEarlyBodyN1RowsN0N0, v.text('sf.unplug.end_reason', s.sfUnplugSessionDoneEarlyBodyN1RowsN0N1)), (s.sfUnplugSessionDoneEarlyBodyN1RowsN1N0, s.sfUnplugSessionDoneEarlyBodyN1RowsN1N1)])),
+        TBoundValues(keys: const ['sf.unplug.early_end_line'], place: TExamplePlace.inline, builder: (context, v) => TBody(v.text('sf.unplug.early_end_line', s.sfUnplugSessionDoneEarlyBodyN2Text), tone: TTextTone.muted)),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.sfUnplugSessionDoneEarlyFooterN0Label, onPressed: () => TNav.replace(context, Routes.sfUnplugHome), arrow: true),

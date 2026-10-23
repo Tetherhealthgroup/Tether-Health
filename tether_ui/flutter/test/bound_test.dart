@@ -5,8 +5,12 @@
 // is replaced by a bound slot that carries the same value, and the result
 // must be pixel-identical (and render-tree identical) to the generated
 // screen, both with PreviewData (fallback path) and with a real TData that
-// returns the same values (data path). The spec screens themselves are not
-// annotated here (that is TH-909); these are demo usages in tests only.
+// returns the same values (data path). The generated screens' own bound
+// elements (P-89, spec/bindings.json) render the same way: the member's
+// values equal to the examples are pixel-identical to the preview, and with
+// no values each bound element carries one Example tag.
+import 'dart:convert';
+import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -17,14 +21,30 @@ import 'package:tether_ui/router/app_router.dart';
 import 'package:tether_ui/router/routes.dart';
 import 'package:tether_ui/ui/ui.dart';
 
-/// A TData backed by fixed values, standing in for the app's real one.
+/// A TData backed by fixed values, standing in for the app's real one. With
+/// [previewOthers], keys it has no value for keep the preview answer
+/// ([TData.example]), so only the keys a test binds change.
 class _MapData implements TData {
-  _MapData(this.values);
+  _MapData(this.values, {this.previewOthers = false});
   final Map<String, Object?> values;
+  final bool previewOthers;
   final Map<String, ValueNotifier<Object?>> notifiers = {};
   @override
-  ValueListenable<Object?> watch(String bindKey) => notifiers.putIfAbsent(bindKey, () => ValueNotifier<Object?>(values[bindKey]));
+  ValueListenable<Object?> watch(String bindKey) =>
+      notifiers.putIfAbsent(bindKey, () => ValueNotifier<Object?>(values.containsKey(bindKey) || !previewOthers ? values[bindKey] : TData.example));
 }
+
+/// Every key answers [TData.unset]: loaded, and the member has no value.
+class _UnsetData implements TData {
+  @override
+  ValueListenable<Object?> watch(String bindKey) => ValueNotifier<Object?>(TData.unset);
+}
+
+/// spec/bindings.json rows of screen [sid].
+List<Map<String, Object?>> _bindings(String sid) => [
+      for (final r in (jsonDecode(File('../spec/bindings.json').readAsStringSync()) as Map<String, Object?>)['bindings']! as List<Object?>)
+        if ((r! as Map<Object?, Object?>)['screen'] == sid) (r as Map<Object?, Object?>).cast<String, Object?>(),
+    ];
 
 /// Replaces every bindable component in [w] by a bound slot carrying the
 /// same value, and records that value under its bind key in [values].
@@ -164,24 +184,36 @@ void main() {
       expect(find.text('119'), findsOneWidget);
     });
 
-    testWidgets('a real TData with no value never shows the fallback', (tester) async {
-      TData.instance = _MapData({});
-      await _pump(
-          tester,
-          Column(children: [
-            TBound.text('demo.bp', fallback: '128/82'),
-            TBound.series('demo.week', fallback: const [128, 131], builder: (c, v) => TBarChart(values: v, color: TColors.teal, title: 'Week')),
-            TBound.list<TListRow>('demo.rows', fallback: const [TListRow(label: 'Synthetic row')], builder: (c, v) => TListGroup(rows: v)),
-            TBound.text('demo.empty', fallback: '—', empty: (c) => const Text('No readings yet')),
-          ]));
-      expect(find.text('128/82'), findsNothing);
-      expect(find.text('Week'), findsNothing);
-      expect(find.text('Synthetic row'), findsNothing);
-      expect(find.text('—'), findsNothing);
-      expect(find.text('No readings yet'), findsOneWidget);
+    testWidgets('preview shows the fallback with no tag; a member value shows with no tag', (tester) async {
+      await _pump(tester, TBound.text('demo.bp', fallback: '128/82', builder: (c, v) => TBigNumber(value: v, unit: 'mmHg')));
+      expect(find.text('128/82'), findsOneWidget);
+      expect(find.byType(TExampleTag), findsNothing, reason: 'preview (TData.example) shows no tag');
+      TData.instance = _MapData({'demo.bp': '131/84'});
+      await _pump(tester, TBound.text('demo.bp', fallback: '128/82', builder: (c, v) => TBigNumber(value: v, unit: 'mmHg')));
+      expect(find.text('131/84'), findsOneWidget);
+      expect(find.byType(TExampleTag), findsNothing);
     });
 
-    testWidgets('a value of the wrong type counts as no value', (tester) async {
+    for (final (name, data) in [('not loaded (null)', _MapData({})), ('unset', _UnsetData())]) {
+      testWidgets('a real TData with no value ($name) shows the example with the Example tag', (tester) async {
+        TData.instance = data;
+        await _pump(
+            tester,
+            Column(children: [
+              TBound.text('demo.bp', fallback: '128/82'),
+              TBound.series('demo.week', fallback: const [128, 131], builder: (c, v) => TBarChart(values: v, color: TColors.teal, title: 'Week')),
+              TBound.list<TListRow>('demo.rows', fallback: const [TListRow(label: 'Synthetic row')], builder: (c, v) => TListGroup(rows: v)),
+            ]));
+        expect(find.text('128/82'), findsOneWidget);
+        expect(find.text('Week'), findsOneWidget);
+        expect(find.text('Synthetic row'), findsOneWidget);
+        expect(find.byType(TExampleTag), findsNWidgets(3));
+        expect(find.text('EXAMPLE'), findsNWidgets(3));
+        expect(find.bySemanticsLabel(RegExp('^Example')), findsNWidgets(3));
+      });
+    }
+
+    testWidgets('a value of the wrong type counts as no value: the example shows with the tag', (tester) async {
       TData.instance = _MapData({'demo.week': 'not a series', 'demo.rows': const ['not a row']});
       await _pump(
           tester,
@@ -189,9 +221,24 @@ void main() {
             TBound.series('demo.week', fallback: const [128, 131], builder: (c, v) => TBarChart(values: v, color: TColors.teal, title: 'Week')),
             TBound.list<TListRow>('demo.rows', fallback: const [TListRow(label: 'Synthetic row')], builder: (c, v) => TListGroup(rows: v)),
           ]));
-      expect(find.text('Week'), findsNothing);
-      expect(find.text('Synthetic row'), findsNothing);
+      expect(find.text('Week'), findsOneWidget);
+      expect(find.text('Synthetic row'), findsOneWidget);
+      expect(find.byType(TExampleTag), findsNWidgets(2));
       expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('an element already tagged adds no second tag inside it', (tester) async {
+      TData.instance = _UnsetData();
+      await _pump(tester, TBoundValues(keys: const ['demo.card'], builder: (c, v) => TCard(title: v.text('demo.card', 'Example card'), children: [TBound.text('demo.inner', fallback: 'Inner')])));
+      expect(find.byType(TExampleTag), findsOneWidget);
+    });
+
+    testWidgets('inline tag: one merged node read as "Example" then the value', (tester) async {
+      TData.instance = _UnsetData();
+      final handle = tester.ensureSemantics();
+      await _pump(tester, TBoundValues(keys: const ['demo.t'], place: TExamplePlace.inline, builder: (c, v) => TTitle(v.text('demo.t', 'Good morning, Alex.'))));
+      expect(find.bySemanticsLabel('Example\nGood morning, Alex.'), findsOneWidget);
+      handle.dispose();
     });
 
     testWidgets('default text builder is TBody', (tester) async {
@@ -213,11 +260,13 @@ void main() {
           final screen = tester.widget<TScreen>(find.byType(TScreen));
           final values = <String, Object?>{};
           final bound = _bind(screen, values, sid);
-          if (mode == 'real data') TData.instance = _MapData(values);
+          if (mode == 'real data') TData.instance = _MapData(values, previewOthers: true);
           TSession.clear();
           await _pump(tester, bound);
           expect(_slots(tester), values.length, reason: 'every bindable component became a slot');
-          expect(values, isNotEmpty);
+          // Generated bound elements (TBoundValues) stay as they are; the
+          // static components around them become demo slots.
+          expect(values.length + find.byType(TBoundValues, skipOffstage: false).evaluate().length, greaterThan(0));
           expect(_renderTree(tester), staticTree, reason: '$sid: render tree differs');
           await expectLater(find.byKey(_frame), matchesReferenceImage(staticImage));
           expect(tester.takeException(), isNull);
@@ -225,6 +274,38 @@ void main() {
           await tester.pump(const Duration(seconds: 3));
         });
       }
+    }
+
+    for (final (sid, route) in _screens) {
+      testWidgets('example tag · $sid: the member\'s values equal to the examples render exactly like the preview; with no values every bound element is tagged', (tester) async {
+        tester.view.physicalSize = const Size(1170, 2532);
+        tester.view.devicePixelRatio = 3;
+        addTearDown(tester.view.reset);
+        Widget screen() => Builder(builder: (c) => AppRouter.screens[route]!(c));
+        await _pump(tester, screen());
+        final previewTree = _renderTree(tester);
+        final previewImage = await _capture(tester);
+        expect(find.byType(TExampleTag, skipOffstage: false), findsNothing, reason: 'preview shows no tag');
+        final rows = _bindings(sid);
+        expect(rows, isNotEmpty, reason: '$sid has bound values');
+        // Untagged: the member's values, equal to the design's examples.
+        TData.instance = _MapData({for (final r in rows) r['bind']! as String: r['example']});
+        await tester.pumpWidget(const SizedBox()); // generated screens are const: start a new tree
+        await _pump(tester, screen());
+        expect(find.byType(TExampleTag, skipOffstage: false), findsNothing);
+        expect(_renderTree(tester), previewTree, reason: '$sid: member values render like the preview');
+        await expectLater(find.byKey(_frame), matchesReferenceImage(previewImage));
+        // Tagged: loaded, no values. One tag per bound element.
+        TData.instance = _UnsetData();
+        await tester.pumpWidget(const SizedBox());
+        await _pump(tester, screen());
+        final elements = find.byType(TBoundValues, skipOffstage: false).evaluate().length;
+        expect(find.byType(TExampleTag, skipOffstage: false), findsNWidgets(elements));
+        expect(_renderTree(tester), isNot(previewTree));
+        expect(tester.takeException(), isNull);
+        await tester.pumpWidget(const SizedBox());
+        await tester.pump(const Duration(seconds: 3));
+      });
     }
 
     testWidgets('the ten screens cover text, number, series and list slots', (tester) async {

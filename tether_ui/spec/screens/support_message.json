@@ -17,14 +17,20 @@
     {
       "t": "title",
       "text": "Send to Jordan?",
-      "size": "m"
+      "size": "m",
+      "data": {
+        "text": "support.message_title"
+      }
     },
     {
       "t": "card",
       "variant": "mint",
       "eyebrow": "Preview",
       "title": "“Can you stay with me for the next 10 minutes?”",
-      "text": "Sent from your phone’s Messages app. Tether never sends on its own."
+      "text": "Sent from your phone’s Messages app. Tether never sends on its own.",
+      "data": {
+        "title": "support.help_phrase_quoted"
+      }
     }
   ],
   "footer": [

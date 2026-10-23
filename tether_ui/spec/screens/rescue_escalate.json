@@ -61,7 +61,11 @@
             "avatar": "J"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].label": "support.contact_text_action",
+        "rows[0].sub": "support.help_phrase_short"
+      }
     },
     {
       "t": "emergency",

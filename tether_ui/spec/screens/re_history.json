@@ -33,7 +33,10 @@
       "color": "re",
       "title": "eGFR · 2 years",
       "unit": "mL/min",
-      "caption": "Lower over time. Bring this to your next visit."
+      "caption": "Lower over time. Bring this to your next visit.",
+      "data": {
+        "values": "re.egfr_series"
+      }
     },
     {
       "t": "kv",
@@ -50,7 +53,12 @@
           "Next check",
           "Apr 2027 (from your clinician)"
         ]
-      ]
+      ],
+      "data": {
+        "rows[0][1]": "re.egfr_latest_summary",
+        "rows[1][1]": "re.acr_latest",
+        "rows[2][1]": "re.next_check"
+      }
     }
   ],
   "footer": [

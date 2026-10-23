@@ -49,7 +49,10 @@
             "avatar": "R"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].label": "sd.caregiver_call_action"
+      }
     },
     {
       "t": "card",

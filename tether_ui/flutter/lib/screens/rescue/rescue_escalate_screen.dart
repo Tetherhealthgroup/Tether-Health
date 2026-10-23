@@ -29,7 +29,7 @@ class RescueEscalateScreen extends StatelessWidget {
         TTitle(s.rescueEscalateBodyN0Text),
         TBody(s.rescueEscalateBodyN1Text, tone: TTextTone.muted),
         TCard(variant: TCardVariant.dark, eyebrow: s.rescueEscalateBodyN2Eyebrow, title: s.rescueEscalateBodyN2Title, text: s.rescueEscalateBodyN2Text, cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: s.rescueEscalateBodyN2CtaN0Label, onPressed: () => TNav.call(context, '1-800-784-8669', label: 'Call 1-800-QUIT-NOW'), variant: TButtonVariant.lime, small: true)),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: s.rescueEscalateBodyN3RowsN0Label, sub: s.rescueEscalateBodyN3RowsN0Sub, lead: TLead.avatar('J'), onTap: () => TNav.sheet(context, Routes.supportMessage))]),
+        TBoundValues(keys: const ['support.contact_text_action', 'support.help_phrase_short'], builder: (context, v) => TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: v.text('support.contact_text_action', s.rescueEscalateBodyN3RowsN0Label), sub: v.text('support.help_phrase_short', s.rescueEscalateBodyN3RowsN0Sub), lead: TLead.avatar('J'), onTap: () => TNav.sheet(context, Routes.supportMessage))])),
         TEmergencyCard(text: s.rescueEscalateBodyN4Text, actions: [TButton(key: const ValueKey('a:body[4].actions[0]'), label: s.rescueEscalateBodyN4ActionsN0Label, onPressed: () => TNav.push(context, Routes.crisis), variant: TButtonVariant.danger, small: true), TButton(key: const ValueKey('a:body[4].actions[1]'), label: s.rescueEscalateBodyN4ActionsN1Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.secondary, small: true)]),
       ],
       footer: [

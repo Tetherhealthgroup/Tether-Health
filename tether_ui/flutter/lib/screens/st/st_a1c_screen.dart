@@ -24,7 +24,7 @@ class StA1cScreen extends StatelessWidget {
         TTitle(s.stA1cBodyN0Text),
         TField(fieldKey: 'st_a1c.a1c', label: s.stA1cBodyN1Label, unit: '%', placeholder: '7.4', kind: TFieldKind.number),
         TField(fieldKey: 'st_a1c.lab_date', label: s.stA1cBodyN2Label, placeholder: s.stA1cBodyN2Placeholder, kind: TFieldKind.date),
-        TKeyValue(rows: [(s.stA1cBodyN3RowsN0N0, s.stA1cBodyN3RowsN0N1), (s.stA1cBodyN3RowsN1N0, s.stA1cBodyN3RowsN1N1)]),
+        TBoundValues(keys: const ['st.a1c_previous', 'st.a1c_change'], builder: (context, v) => TKeyValue(rows: [(s.stA1cBodyN3RowsN0N0, v.text('st.a1c_previous', s.stA1cBodyN3RowsN0N1)), (s.stA1cBodyN3RowsN1N0, v.text('st.a1c_change', s.stA1cBodyN3RowsN1N1))])),
         TBody(s.stA1cBodyN4Text, tone: TTextTone.small),
       ],
       footer: [

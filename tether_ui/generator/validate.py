@@ -2,9 +2,10 @@ import json, os, re
 from dsl import *
 
 def load():
-    import screens_shared, screens_prog_a, screens_prog_b, screens_records, screens_additions
+    import screens_shared, screens_prog_a, screens_prog_b, screens_records, screens_additions, bindings
     if not SCREENS:
         screens_shared.shared(); screens_prog_a.programs_a(); screens_prog_b.programs_b(); screens_records.records(); screens_additions.additions()
+        bindings.apply()  # member-data bind keys (P-89), after every screen exists
     return SCREENS
 
 # Consent checklists and their session keys (TH-907). Each screen has exactly

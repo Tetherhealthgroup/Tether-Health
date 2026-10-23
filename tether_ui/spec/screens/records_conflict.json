@@ -44,7 +44,10 @@
           "selected": -1,
           "key": "a1c"
         }
-      ]
+      ],
+      "data": {
+        "eyebrow": "records.conflict_1.heading"
+      }
     },
     {
       "t": "card",
@@ -71,7 +74,11 @@
           "selected": -1,
           "key": "bp"
         }
-      ]
+      ],
+      "data": {
+        "eyebrow": "records.conflict_2.heading",
+        "title": "records.conflict_2.title"
+      }
     }
   ],
   "footer": [

@@ -22,7 +22,10 @@
       "t": "big",
       "value": "18",
       "unit": "min",
-      "caption": "Ended early · your apps are open again"
+      "caption": "Ended early · your apps are open again",
+      "data": {
+        "value": "sf.unplug.session_minutes"
+      }
     },
     {
       "t": "kv",
@@ -35,12 +38,18 @@
           "Kept",
           "On this phone only"
         ]
-      ]
+      ],
+      "data": {
+        "rows[0][1]": "sf.unplug.end_reason"
+      }
     },
     {
       "t": "text",
       "text": "Nothing resets. 18 focused minutes still count.",
-      "tone": "muted"
+      "tone": "muted",
+      "data": {
+        "text": "sf.unplug.early_end_line"
+      }
     }
   ],
   "footer": [

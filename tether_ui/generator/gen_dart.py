@@ -206,7 +206,54 @@ def value_of(n, label):
     if not n.get('values'): return label
     return n['values'][n['options'].index(label)]
 
+# Member-data binding (P-89, R-163, bindings.py): an element with `data`
+# ({property: bind key}) is built by TBoundValues from the member's values;
+# BV() reads a bound property from its TValues `v`, with the spec's example
+# as the fallback. A card and everything in it is one element (one tag at
+# most): its descendants read the card's `v`.
+BIND = {'data': {}, 'used': [], 'group': None}
+
+# Where an element's Example tag goes (R-163): after a text or number, at
+# the top trailing corner of a container.
+INLINE_TAG = ('eyebrow', 'title', 'text', 'quote', 'big')
+
+def BV(prop, expr, series=False):
+    """`expr` (the property's example), or a read of the member's value for
+    it when the element binds `prop`."""
+    key = BIND['data'].get(prop)
+    if key is None or expr in (None, 'null'): return expr
+    BIND['used'].append(prop)
+    BIND['group'].append(key)
+    return f"v.{'series' if series else 'text'}({dstr(key)}, {expr})"
+
+def bound_inside(n):
+    """Whether `n` or any node inside it binds a property."""
+    return any(x.get('data') for x, _ in walk([n]))
+
 def node(n, top=False, path=''):
+    """Dart expression for spec node `n`. An element with bound properties is
+    built by TBoundValues from the member's values (P-89)."""
+    saved = dict(BIND)
+    root = BIND['group'] is None and bound_inside(n)
+    BIND['data'], BIND['used'] = n.get('data') or {}, []
+    if root: BIND['group'] = []
+    try:
+        code = _node(n, top, path)
+        data, used, keys = BIND['data'], BIND['used'], BIND['group']
+    finally:
+        BIND.update(saved)
+    import bindings
+    unsupported = sorted(p for p in data if bindings._generic(p) not in bindings.BINDABLE_PROPS.get(n['t'], ()))
+    if unsupported:
+        raise ValueError(f"{CUR['sid']}: {path} binds {unsupported}, which the generator does not emit for a {n['t']}")
+    missing = sorted(set(data) - set(used))
+    if missing:
+        raise ValueError(f"{CUR['sid']}: {path} binds {missing}, which the generator does not emit for a {n['t']}")
+    if not root: return code
+    place = ', place: TExamplePlace.inline' if n['t'] in INLINE_TAG else ''
+    return f"TBoundValues(keys: const [{', '.join(dstr(k) for k in dict.fromkeys(keys))}]{place}, builder: (context, v) => {code})"
+
+def _node(n, top=False, path=''):
     t = n['t']
     S_ = dstr
     def X(prop, owner=None, item=None, ip=None):
@@ -215,7 +262,8 @@ def node(n, top=False, path=''):
         src = item if item is not None else n
         v = src.get(prop)
         if v is None: return None
-        return T(v, f'{ip}.{prop}' if ip else prop, path, owner or t, n)
+        pp = f'{ip}.{prop}' if ip else prop
+        return BV(pp, T(v, pp, path, owner or t, n))
     if t == 'eyebrow': return f"TEyebrow({X('text')})"
     if t == 'title':
         return f"TTitle({args(_=X('text'), size='TTitleSize.' + n.get('size', 'm') if n.get('size', 'm') != 'm' else None, center='true' if n.get('align') == 'center' else None)})"
@@ -256,7 +304,7 @@ def node(n, top=False, path=''):
         v = n.get('variant', 'plain')
         return f"TCard({args(key=K(path) if n.get('action') else None, variant='TCardVariant.' + v if v != 'plain' else None, tag=S_(n['tag']) if n.get('tag') else None, tagExtra=X('tagExtra') if n.get('tagExtra') else None, eyebrow=X('eyebrow') if n.get('eyebrow') else None, title=X('title') if n.get('title') else None, text=X('text') if n.get('text') else None, accent=S_(n['accent']) if n.get('accent') else None, onTap=cb(n['action'], path + '.action') if n.get('action') else None, cta=node(n['cta'], path=path + '.cta[0]') if n.get('cta') else None, children=lst([node(c, path=f'{path}.children[{i}]') for i, c in enumerate(n['children'])]) if n.get('children') else None)})"
     if t == 'kv':
-        kvs = ['(%s, %s)' % (T(k, 'rows[%d][0]' % j, path, 'kv', n), T(v, 'rows[%d][1]' % j, path, 'kv', n)) for j, (k, v) in enumerate(n['rows'])]
+        kvs = ['(%s, %s)' % (BV('rows[%d][0]' % j, T(k, 'rows[%d][0]' % j, path, 'kv', n)), BV('rows[%d][1]' % j, T(v, 'rows[%d][1]' % j, path, 'kv', n))) for j, (k, v) in enumerate(n['rows'])]
         return f"TKeyValue(rows: {lst(kvs)})"
     if t == 'list':
         rows = []
@@ -282,6 +330,7 @@ def node(n, top=False, path=''):
     if t == 'chart':
         common = dict(key=K(path) if n.get('action') else None, title=X('title') if n.get('title') else None, unit=X('unit') if n.get('unit') else None, caption=X('caption') if n.get('caption') else None, tag=S_(n['tag']) if n.get('tag') else None, onTap=cb(n['action'], path + '.action') if n.get('action') else None)
         vals = lst([str(float(v)) for v in n['values']])
+        if 'values' in BIND['data']: vals = BV('values', 'const ' + vals, series=True)
         if n['kind'] == 'bars':
             return f"TBarChart({args(values=vals, color=dcolor(n['color']), missing=lst([str(m) for m in n['missing']]) if n.get('missing') else None, target=str(float(n['target'])) if n.get('target') else None, labels=lst([T(l, f'labels[{j}]', path, 'chart', n) for j, l in enumerate(n['labels'])]) if n.get('labels') else None, **common)})"
         return f"TLineChart({args(values=vals, color=dcolor(n['color']), band=lst([str(float(b)) for b in n['band']]) if n.get('band') else None, **common)})"
@@ -464,6 +513,7 @@ abstract final class AppRouter {{
 }}
 """
     open(os.path.join(lib, 'router', 'app_router.dart'), 'w', newline='\n').write(router)
+    bindings_test(out_dir)
     # localized strings: spec/l10n/en.arb (generated) and lib/l10n/strings.g.dart
     l10n_dir = os.path.join(os.path.dirname(os.path.abspath(out_dir)), 'spec', 'l10n')
     LOCALES[:] = l10n.write_outputs(CAT, l10n_dir, lib, untranslated_dart(CAT))
@@ -481,6 +531,168 @@ def untranslated_dart(cat):
     vals = sorted(cat.untranslated)
     return ('\n/// Member-visible literals shown as they are in every language (brands,\n/// units, numbers, phone numbers, language names).\n'
             'const Set<String> tUntranslatedLiterals = <String>{\n' + ''.join(f'  {dstr(v)},\n' for v in vals) + '};\n')
+
+
+def bindings_test(out_dir):
+    """test/bindings_test.dart (P-89): spec/bindings.json lists every bound
+    element of every generated screen, an element without the member's value
+    shows its example with the Example tag, and one with the member's values
+    shows them without it."""
+    import bindings
+    rows = bindings.catalogue()['bindings']
+    by_screen = {}
+    for r in rows: by_screen.setdefault(r['screen'], []).append(r)
+    expected = '\n'.join(f"  ({dstr(r['screen'])}, {dstr(r['path'])}, {dstr(r['bind'])})," for r in rows)
+    screens = '\n'.join(f"  ({dstr(sid)}, Routes.{camel(sid)}, {dstr('bf') if ':program' in SCREENS[sid]['route'] else 'null'})," for sid in by_screen)
+    code = f"""// GENERATED — member-data bindings (P-89, R-163). spec/bindings.json lists
+// every bound value of the generated screens (generator/bindings.py). Every
+// screen is opened: the bound elements it renders must be exactly the ones
+// listed for it. Preview answers (TData.example) show the examples with no
+// tag; with every key unset (loaded, no member value) every bound element
+// shows its example with one Example tag; with the member's values none
+// does. Binding never writes to the session, so an example never reaches a
+// payload or a decision rule.
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:tether_ui/router/app_router.dart';
+import 'package:tether_ui/router/routes.dart';
+import 'package:tether_ui/ui/ui.dart';
+
+/// (screen, element path + property, bind key), as generated.
+const _expected = <(String, String, String)>[
+{expected}
+];
+
+/// Screens with bound values: (id, route, programme it is opened for).
+const _bound = <(String, String, String?)>[
+{screens}
+];
+
+List<Map<String, Object?>> _catalogue() {{
+  final json = jsonDecode(File('../spec/bindings.json').readAsStringSync()) as Map<String, Object?>;
+  return [for (final r in json['bindings']! as List<Object?>) (r! as Map<Object?, Object?>).cast<String, Object?>()];
+}}
+
+/// A TData for the display keys [display]: the given value per key, or
+/// [fallback] (null = not loaded, TData.unset = no member value,
+/// TData.example = preview). Every other key (settings controls, P-71)
+/// keeps the preview answer, so only the display values change.
+class _Data implements TData {{
+  _Data(this.values, {{this.display = const <String>{{}}, this.fallback}});
+  final Map<String, Object?> values;
+  final Set<String> display;
+  final Object? fallback;
+  @override
+  ValueListenable<Object?> watch(String bindKey) => ValueNotifier<Object?>(
+      values.containsKey(bindKey) ? values[bindKey] : (display.contains(bindKey) ? fallback : TData.example));
+}}
+
+Future<void> _open(WidgetTester tester, String route, String? program) async {{
+  tester.view.physicalSize = const Size(1170, 2532);
+  tester.view.devicePixelRatio = 3;
+  addTearDown(tester.view.reset);
+  TSession.clear();
+  final builder = AppRouter.screens[route]!;
+  final sheet = AppRouter.sheets.contains(route);
+  await tester.pumpWidget(MaterialApp(
+    key: UniqueKey(),
+    theme: tetherTheme(),
+    onGenerateRoute: AppRouter.onGenerateRoute,
+    onGenerateInitialRoutes: (_) => [
+      MaterialPageRoute<void>(
+        settings: RouteSettings(name: route, arguments: program == null ? null : TRouteArgs(program: program)),
+        builder: (c) => sheet ? TSheetPreview(child: builder(c)) : builder(c),
+      ),
+    ],
+  ));
+  await tester.pump(const Duration(milliseconds: 50));
+}}
+
+List<String> _renderedKeys(WidgetTester tester) => [
+      for (final w in tester.widgetList<TBoundValues>(find.byType(TBoundValues, skipOffstage: false))) ...w.keys,
+    ]..sort();
+
+Finder _tags() => find.byType(TExampleTag, skipOffstage: false);
+
+void main() {{
+  tearDown(() {{
+    TData.instance = PreviewData();
+    TSession.clear();
+  }});
+
+  test('spec/bindings.json lists exactly the generated bindings', () {{
+    final rows = _catalogue();
+    expect([for (final r in rows) (r['screen'], r['path'], r['bind'])], _expected);
+    for (final r in rows) {{
+      expect(r['example'], isNotNull, reason: '${{r['path']}}');
+      expect(['text', 'series'], contains(r['type']));
+      expect(r['kind'], isA<String>());
+    }}
+  }});
+
+  testWidgets('screens without bindings render no bound element and no tag', (tester) async {{
+    final bound = {{for (final b in _bound) b.$1}};
+    TData.instance = _Data({{}}, fallback: TData.unset);
+    for (final s in AppRouter.catalog) {{
+      if (bound.contains(s.$1)) continue;
+      await _open(tester, s.$4, null);
+      expect(_renderedKeys(tester), isEmpty, reason: '${{s.$1}} renders a bound element not in spec/bindings.json');
+      expect(_tags(), findsNothing, reason: s.$1);
+    }}
+  }});
+
+  for (final (sid, route, program) in _bound) {{
+    testWidgets('$sid: bound values are listed; unset values are tagged, member and preview values are not; the session is unchanged', (tester) async {{
+      final rows = [for (final r in _catalogue()) if (r['screen'] == sid) r];
+      final keys = [for (final r in rows) r['bind']! as String];
+      final display = {{for (final k in keys) TData.resolve(k, program)!}};
+
+      // Preview: the examples, no tag.
+      await _open(tester, route, program);
+      expect(_renderedKeys(tester), (keys.toSet().toList()..sort()), reason: 'bound keys on $sid');
+      expect(_tags(), findsNothing, reason: 'preview shows no tag');
+      final elements = find.byType(TBoundValues, skipOffstage: false).evaluate().length;
+      final session = Map<String, Object?>.of(TSession.values);
+
+      // Loaded, no member value: every bound element carries one tag.
+      for (final fallback in [TData.unset, null]) {{
+        TData.instance = _Data({{}}, display: display, fallback: fallback);
+        await _open(tester, route, program);
+        expect(_tags(), findsNWidgets(elements), reason: 'every bound element is tagged ($fallback)');
+        expect(TSession.values, session, reason: 'examples never enter the session');
+      }}
+
+      // The member's values: shown, no tag.
+      final values = <String, Object?>{{}};
+      final shown = <String>[];
+      for (final (i, r) in rows.indexed) {{
+        final key = TData.resolve(r['bind']! as String, program)!;
+        if (r['type'] == 'series') {{
+          values[key] = [1, 2, 3 + i];
+        }} else {{
+          // Upper case, so an eyebrow shows it unchanged; X ends it, so M1X
+          // never matches inside M11X.
+          values[key] = 'M${{i}}X';
+          shown.add('M${{i}}X');
+        }}
+      }}
+      TData.instance = _Data(values, display: display, fallback: TData.unset);
+      await _open(tester, route, program);
+      expect(_tags(), findsNothing, reason: 'member values carry no tag');
+      for (final t in shown) {{
+        expect(find.textContaining(t, skipOffstage: false), findsWidgets, reason: 'member value $t on $sid');
+      }}
+      expect(TSession.values, session, reason: 'member display values never enter the session');
+      expect(tester.takeException(), isNull);
+    }});
+  }}
+}}
+"""
+    open(os.path.join(out_dir, 'test', 'bindings_test.dart'), 'w', newline='\n').write(code)
 
 
 JOURNEYS = [
@@ -611,6 +823,7 @@ def _self_test():
         for k in added: del SCREENS[k]
     _device_self_test()
     _bind_self_test()
+    _data_self_test()
     _l10n_self_test()
     print('gen_dart self-test: ok')
 
@@ -684,6 +897,32 @@ def _bind_self_test():
     _expect(all(f"  '{sid}'," in text for sid in CONSENT_SCREENS + PLAN_SCREENS) and text.count("',") == len(CONSENT_SCREENS) + len(PLAN_SCREENS), text)
     _expect(text.index('consentSettingsScreens') < text.index(f"'{CONSENT_SCREENS[0]}'") < text.index('planSettingsScreens') < text.index(f"'{PLAN_SCREENS[0]}'"), text)
 
+def _data_self_test():
+    """Member-data binding (P-89): a bound property is read from TValues with
+    the example as fallback; an unbound element is unchanged; a binding the
+    generator cannot emit fails generation."""
+    CUR['sid'], CUR['program'] = 'selftest', None
+    plain = node(big('128/82', 'mmHg'), path='body[0]')
+    _expect('TBoundValues' not in plain, plain)
+    code = node(dict(big('128/82', 'mmHg', 'Average of 2'), data={'value': 'hw.last_bp'}), path='body[0]')
+    _expect(code.startswith("TBoundValues(keys: const ['hw.last_bp'], place: TExamplePlace.inline, builder: (context, v) => TBigNumber(") and "value: v.text('hw.last_bp', '128/82')" in code and 'v.text' not in code.split('caption:')[1], code)
+    kv_ = node(dict(kv([('Programs', '4'), ('Check-ins', '63')]), data={'rows[1][1]': 'account.data.check_ins'}), path='body[1]')
+    _expect("('63')" not in kv_ and "v.text('account.data.check_ins', '63')" in kv_ and "'4')" in kv_, kv_)
+    ch = node(dict(bars([1, 2], 'teal', title='Week'), data={'values': 'hw.week'}), path='body[2]')
+    _expect("values: v.series('hw.week', const [1.0, 2.0])" in ch, ch)
+    card_ = node(dict(card(dict(big('7 days'), data={'value': 'bf.days'}), eyebrow='Your quit day'), data={'eyebrow': 'bf.heading'}), path='body[3]')
+    _expect(card_.count('TBoundValues(') == 1 and card_.startswith("TBoundValues(keys: const ['bf.heading', 'bf.days'], builder: (context, v) => TCard(") and "v.text('bf.days', s." in card_, card_)
+    inner = node(card(dict(big('7 days'), data={'value': 'bf.days'}), eyebrow='Your quit day'), path='body[4]')
+    _expect(inner.startswith("TBoundValues(keys: const ['bf.days'], builder: (context, v) => TCard("), inner)
+    _expect("place:" not in kv_ and "place:" not in ch, 'containers carry the tag at the corner')
+    try:
+        node(dict(button('Go', back()), data={'label': 'x.y'}), path='footer[0]')
+    except ValueError as e:
+        _expect('does not emit' in str(e), str(e))
+    else:
+        raise AssertionError('an unsupported binding generated')
+
+
 def _device_self_test():
     """Device branches and non-queueable submits generate as R-31 says, and
     a branch the kit could not decide fails generation."""
@@ -723,3 +962,5 @@ if __name__ == '__main__':
     dsl._self_test()
     l10n._self_test()
     validate._self_test()
+    import bindings
+    bindings._self_test()

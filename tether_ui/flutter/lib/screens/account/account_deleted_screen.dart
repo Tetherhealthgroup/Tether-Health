@@ -23,7 +23,7 @@ class AccountDeletedScreen extends StatelessWidget {
       children: [
         TIllustration(glyph: '✓'),
         TTitle(s.accountDeletedBodyN1Text, size: TTitleSize.l, center: true),
-        TKeyValue(rows: [(s.accountDeletedBodyN2RowsN0N0, s.accountDeletedBodyN2RowsN0N1), (s.accountDeletedBodyN2RowsN1N0, s.accountDeletedBodyN2RowsN1N1), (s.accountDeletedBodyN2RowsN2N0, s.accountDeletedBodyN2RowsN2N1)]),
+        TBoundValues(keys: const ['account.deletion.receipt', 'account.deletion.completed_at'], builder: (context, v) => TKeyValue(rows: [(s.accountDeletedBodyN2RowsN0N0, v.text('account.deletion.receipt', s.accountDeletedBodyN2RowsN0N1)), (s.accountDeletedBodyN2RowsN1N0, v.text('account.deletion.completed_at', s.accountDeletedBodyN2RowsN1N1)), (s.accountDeletedBodyN2RowsN2N0, s.accountDeletedBodyN2RowsN2N1)])),
         TBody(s.accountDeletedBodyN3Text, tone: TTextTone.small),
       ],
       footer: [

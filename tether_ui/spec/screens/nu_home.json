@@ -46,6 +46,11 @@
         "variant": "primary",
         "arrow": false,
         "small": true
+      },
+      "data": {
+        "eyebrow": "nu.habit_week",
+        "title": "nu.habit_name",
+        "text": "nu.habit_progress"
       }
     },
     {
@@ -99,7 +104,10 @@
             "to": "program_settings"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[1].sub": "nu.milestone_due"
+      }
     }
   ],
   "footer": [],

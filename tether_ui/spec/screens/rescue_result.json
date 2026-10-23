@@ -48,7 +48,11 @@
           "sub": "Your rating, not a diagnosis"
         }
       ],
-      "cols": 2
+      "cols": 2,
+      "data": {
+        "items[0].value": "rescue.rating_before",
+        "items[1].value": "rescue.rating_now"
+      }
     },
     {
       "t": "chips",

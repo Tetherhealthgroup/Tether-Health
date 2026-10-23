@@ -31,7 +31,11 @@
         {
           "t": "big",
           "value": "7 days",
-          "caption": "Friday, August 28 · Pacific Time"
+          "caption": "Friday, August 28 · Pacific Time",
+          "data": {
+            "value": "bf.days_to_quit_day",
+            "caption": "bf.quit_date_caption"
+          }
         }
       ]
     },
@@ -75,7 +79,10 @@
       "children": [
         {
           "t": "quote",
-          "text": "Protect my family."
+          "text": "Protect my family.",
+          "data": {
+            "text": "bf.top_reason"
+          }
         }
       ]
     },
@@ -121,7 +128,11 @@
             "to": "program_settings"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[1].sub": "bf.meds.summary",
+        "rows[2].sub": "bf.saved_summary"
+      }
     }
   ],
   "footer": [],

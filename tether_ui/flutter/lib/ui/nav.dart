@@ -293,8 +293,12 @@ class TInertDevice implements TDevice {
 /// Result of a backend call.
 ///
 /// - [TOk]: saved; the flow continues.
-/// - [TQueued]: kept on the phone and sent later (outbox); the flow continues.
-/// - [TFailed]: not saved. [TFailed.code] is an error code, never content.
+/// - [TQueued]: kept on the phone and sent later (outbox); the flow continues
+///   as for [TOk], with no message. Return it only when the entry really is
+///   in an outbox that will send it.
+/// - [TFailed]: not saved and not kept. [TFailed.code] is an error code,
+///   never content. The member sees [TNav.saveFailed], which never says the
+///   entry was kept.
 /// - [TOutcome]: saved, and the server decided [TOutcome.label]. The branch
 ///   that runs next takes that label when no on-device rule decides it.
 sealed class TResult {
@@ -736,9 +740,11 @@ abstract final class TNav {
     }
   }
 
-  /// The save failure message in English (shown in the app language:
-  /// `kit.save_error`).
-  static const String saveError = 'Couldn’t save. Your entry is kept on this phone.';
+  /// Message for every failed save ([TFailed]), in English: the kit's
+  /// generic error (`kit.generic_error`, shown in the app language). A
+  /// failed save is never kept, so the message never says it was. A queued
+  /// save ([TQueued]) shows no message: the flow continues.
+  static const String saveFailed = TFailClosedResolver.message;
 
   /// Code of the [TFailed] result given for a [TQueued] result of a submit
   /// that must not be queued ([submit] with `queueable: false`).
@@ -769,7 +775,8 @@ abstract final class TNav {
   /// safety screen this submit opened is on top.
   ///
   /// Otherwise, after the save:
-  /// - ok / queued: runs [then] when the submitting screen is on top;
+  /// - ok / queued: runs [then] when the submitting screen is on top (a
+  ///   queued save shows no message);
   /// - outcome: runs [then] when the submitting screen is on top, and the
   ///   branch inside it may take the label;
   /// - ok / queued / outcome while the submitting screen is mounted but not
@@ -777,9 +784,9 @@ abstract final class TNav {
   ///   safety outcome, that outcome's action runs (on top, see below);
   /// - failed (including `not_configured`, `adapter_error` and `timeout`):
   ///   when [safety]'s rule now decides a safety outcome, runs that outcome's
-  ///   action whether or not the submitting screen is on top. Shows the save
-  ///   error when the submitting screen is on top or when that action opened
-  ///   a safety screen. Otherwise the member stays where they are.
+  ///   action whether or not the submitting screen is on top. Shows
+  ///   [saveFailed] when the submitting screen is on top or when that action
+  ///   opened a safety screen. Otherwise the member stays where they are.
   ///
   /// When the submitting screen is mounted but not on top (the member opened
   /// another screen, such as a crisis or breathing screen, while the save was
@@ -819,8 +826,7 @@ abstract final class TNav {
   /// Not queueable (`queueable: false`, generated for the sign-in and account
   /// endpoints in the generator's endpoint table, spec/endpoints.json): a
   /// [TQueued] result counts as `failed(notQueueableCode)`, and every failure
-  /// shows the generic [TFailClosedResolver.message] instead of the save
-  /// error, which would wrongly say the entry is kept on this phone.
+  /// shows [saveFailed], like every failure.
   static Future<TResult?> submit(BuildContext context, String endpoint, {required String screenId, bool queueable = true, VoidCallback? then, TSafetyRoutes? safety}) async {
     if (_inFlightEpoch != TSession.epoch) {
       _inFlight.clear();
@@ -855,7 +861,9 @@ abstract final class TNav {
       }
       var result = await safeSubmit(endpoint, screenId: screenId);
       if (!queueable && result is TQueued) result = const TResult.failed(notQueueableCode);
-      final failCopy = queueable ? strings.kitSaveError : strings.kitGenericError;
+      // A failed save is not kept: the message never says it was (generic
+      // error, `kit.generic_error`).
+      final failCopy = strings.kitGenericError;
       final onTop = _isTop(context, submitting);
       if (flight.safetyRan) {
         if (result is TFailed && context.mounted && (onTop || (flight.safetyRoute?.isCurrent ?? false))) toast(context, failCopy);

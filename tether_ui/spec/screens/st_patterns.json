@@ -52,7 +52,10 @@
       "band": [
         80,
         180
-      ]
+      ],
+      "data": {
+        "values": "st.after_meal_series"
+      }
     },
     {
       "t": "stats",
@@ -68,13 +71,22 @@
           "sub": "Oct 9 · treated"
         }
       ],
-      "cols": 2
+      "cols": 2,
+      "data": {
+        "items[0].value": "st.in_range",
+        "items[0].sub": "st.in_range_count",
+        "items[1].value": "st.lows",
+        "items[1].sub": "st.last_low"
+      }
     },
     {
       "t": "card",
       "variant": "mint",
       "eyebrow": "Pattern",
-      "title": "Readings were higher on nights with less than 6 h sleep."
+      "title": "Readings were higher on nights with less than 6 h sleep.",
+      "data": {
+        "title": "st.pattern_insight"
+      }
     }
   ],
   "footer": [],

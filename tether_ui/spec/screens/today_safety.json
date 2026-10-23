@@ -62,7 +62,10 @@
             }
           ]
         }
-      ]
+      ],
+      "data": {
+        "text": "hw.crisis_reading_source"
+      }
     },
     {
       "t": "text",

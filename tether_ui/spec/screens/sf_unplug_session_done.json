@@ -27,7 +27,10 @@
       "t": "big",
       "value": "45",
       "unit": "min",
-      "caption": "Session complete · your apps are open again"
+      "caption": "Session complete · your apps are open again",
+      "data": {
+        "value": "sf.unplug.session_minutes"
+      }
     },
     {
       "t": "text",

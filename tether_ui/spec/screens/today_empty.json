@@ -26,7 +26,10 @@
     {
       "t": "title",
       "text": "Good evening, Alex.",
-      "size": "m"
+      "size": "m",
+      "data": {
+        "text": "today.greeting"
+      }
     },
     {
       "t": "illus",

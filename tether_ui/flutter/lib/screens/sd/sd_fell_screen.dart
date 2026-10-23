@@ -27,7 +27,7 @@ class SdFellScreen extends StatelessWidget {
       children: [
         TTitle(s.sdFellBodyN0Text),
         TButton(key: const ValueKey('a:body[1]'), label: s.sdFellBodyN1Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: s.sdFellBodyN2RowsN0Label, sub: s.sdFellBodyN2RowsN0Sub, lead: TLead.avatar('R'), onTap: () => TNav.call(context, '(555) 010-2244', label: 'Call Rosa'))]),
+        TBoundValues(keys: const ['sd.caregiver_call_action'], builder: (context, v) => TListGroup(rows: [TListRow(key: const ValueKey('a:body[2].rows[0]'), label: v.text('sd.caregiver_call_action', s.sdFellBodyN2RowsN0Label), sub: s.sdFellBodyN2RowsN0Sub, lead: TLead.avatar('R'), onTap: () => TNav.call(context, '(555) 010-2244', label: 'Call Rosa'))])),
         TCard(key: const ValueKey('a:body[3]'), variant: TCardVariant.mint, title: s.sdFellBodyN3Title, text: s.sdFellBodyN3Text, onTap: () => TNav.push(context, Routes.learnLesson)),
       ],
       footer: [

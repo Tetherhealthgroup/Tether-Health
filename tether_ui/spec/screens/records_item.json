@@ -38,7 +38,10 @@
       ],
       "color": "hw",
       "title": "Systolic · all sources",
-      "unit": "mmHg"
+      "unit": "mmHg",
+      "data": {
+        "values": "records.item.series"
+      }
     },
     {
       "t": "list",
@@ -56,7 +59,15 @@
           "label": "131/80 · Oct 2",
           "sub": "Patel Family Medicine (Epic)"
         }
-      ]
+      ],
+      "data": {
+        "rows[0].label": "records.item.latest_1",
+        "rows[0].sub": "records.item.latest_1_source",
+        "rows[1].label": "records.item.latest_2",
+        "rows[1].sub": "records.item.latest_2_source",
+        "rows[2].label": "records.item.latest_3",
+        "rows[2].sub": "records.item.latest_3_source"
+      }
     },
     {
       "t": "kv",

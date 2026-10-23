@@ -61,7 +61,7 @@ extension TStringsKeys on TStrings {
   String get kitEmergencyHelp => get('kit.emergency_help');
   String get kitLoading => get('kit.loading');
   String get kitGenericError => get('kit.generic_error');
-  String get kitSaveError => get('kit.save_error');
+  String get kitExample => get('kit.example');
   String kitCallFallback({required Object number}) => format('kit.call_fallback', {'number': number});
   String kitSmsFallback({required Object number}) => format('kit.sms_fallback', {'number': number});
   String get kitCopy => get('kit.copy');
@@ -3077,7 +3077,7 @@ const Map<String, String> _en = <String, String>{
   'kit.emergency_help': 'Emergency help',
   'kit.loading': 'Loading',
   'kit.generic_error': 'Something went wrong. Please try again.',
-  'kit.save_error': 'Couldn’t save. Your entry is kept on this phone.',
+  'kit.example': 'Example',
   'kit.call_fallback': 'Calling isn’t available here. Dial {number} now.',
   'kit.sms_fallback': 'Texting isn’t available here. Text {number} now.',
   'kit.copy': 'Copy',
@@ -6093,7 +6093,7 @@ const Map<String, String> _pseudo = <String, String>{
   'kit.emergency_help': '⟦Éɱéŕĝéñçý ĥéļþ~~~~~~⟧',
   'kit.loading': '⟦Ļöàðîñĝ~~~⟧',
   'kit.generic_error': '⟦Šöɱéţĥîñĝ ŵéñţ ŵŕöñĝ. Þļéàšé ţŕý àĝàîñ.~~~~~~~~~~~~~⟧',
-  'kit.save_error': '⟦Çöûļðñ’ţ šàṽé. Ýöûŕ éñţŕý îš ķéþţ öñ ţĥîš þĥöñé.~~~~~~~~~~~~~~~⟧',
+  'kit.example': '⟦Éẋàɱþļé~~~⟧',
   'kit.call_fallback': '⟦Çàļļîñĝ îšñ’ţ àṽàîļàƀļé ĥéŕé. Ðîàļ ~~~~~~~~~~~~{number} ñöŵ.~~⟧',
   'kit.sms_fallback': '⟦Ţéẋţîñĝ îšñ’ţ àṽàîļàƀļé ĥéŕé. Ţéẋţ ~~~~~~~~~~~~{number} ñöŵ.~~⟧',
   'kit.copy': '⟦Çöþý~~⟧',

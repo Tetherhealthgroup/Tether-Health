@@ -62,7 +62,10 @@
           "Next follow-up",
           "Jan 14, 2027"
         ]
-      ]
+      ],
+      "data": {
+        "rows[0][1]": "be.next_follow_up"
+      }
     },
     {
       "t": "list",

@@ -69,6 +69,10 @@
       "action": {
         "type": "push",
         "to": "bf_progress"
+      },
+      "data": {
+        "values": "bf.cigarettes_week",
+        "caption": "bf.progress_caption"
       }
     },
     {
@@ -100,6 +104,10 @@
       "action": {
         "type": "push",
         "to": "sf_week"
+      },
+      "data": {
+        "values": "sf.minutes_week",
+        "caption": "sf.progress_caption"
       }
     },
     {
@@ -118,6 +126,9 @@
         "variant": "secondary",
         "arrow": false,
         "small": true
+      },
+      "data": {
+        "title": "insights.cross_program"
       }
     }
   ],

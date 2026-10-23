@@ -27,7 +27,10 @@
       "t": "title",
       "text": "Thanks, Alex.",
       "size": "l",
-      "align": "center"
+      "align": "center",
+      "data": {
+        "text": "checkin.thanks"
+      }
     },
     {
       "t": "text",

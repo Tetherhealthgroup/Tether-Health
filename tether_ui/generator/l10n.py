@@ -128,6 +128,7 @@ def content_class(value, prop_class, options_with_values=False):
 def prop_class(owner, prop):
     """The class for `prop` on `owner`, or None when the pair is unclassified."""
     if owner.startswith('action:branch.when.'): owner = 'action:branch.when'  # per-platform answer maps
+    if owner.endswith('.data'): return 'identifier'  # member-data bind keys ({property: key}, bindings.py)
     table = PROPS.get(owner, {})
     if prop in table: return table[prop]
     if '*' in table: return table['*']
@@ -554,7 +555,10 @@ KIT = {
     'kit.emergency_help': ('Emergency help', 'Accessibility label of the emergency card'),
     'kit.loading': ('Loading', 'Accessibility label of a loading placeholder'),
     'kit.generic_error': ('Something went wrong. Please try again.', 'Message when an action cannot be completed'),
-    'kit.save_error': ('Couldn’t save. Your entry is kept on this phone.', 'Message when saving fails and the entry is kept on the phone'),
+    # The tag on a design example value shown while the member has no value
+    # of their own (P-89; "Example" is the owner's word). Screen readers
+    # read it before the value.
+    'kit.example': ('Example', 'Tag on a value that is a design example, not the member’s own data; read before the value'),
     'kit.call_fallback': ('Calling isn’t available here. Dial {number} now.', 'Shown when the phone cannot place a call; {number} is the number to dial'),
     'kit.sms_fallback': ('Texting isn’t available here. Text {number} now.', 'Shown when the phone cannot open Messages; {number} is the number to text'),
     'kit.copy': ('Copy', 'Button that copies the number in the call fallback'),
