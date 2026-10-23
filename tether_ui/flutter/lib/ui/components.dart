@@ -555,7 +555,7 @@ class _Header extends StatelessWidget {
     Widget middle = const Spacer();
     switch (spec.left) {
       case THeaderLeft.logo:
-        left = Row(children: [const TLogoMark(), const SizedBox(width: 10), Text(spec.title, style: TText.headerTitle.copyWith(fontSize: 20, fontWeight: FontWeight.w800, color: fg))]);
+        left = Row(children: [const TLogoMark(), const SizedBox(width: 10), Text(spec.title.isEmpty ? 'Tether Health' : spec.title, style: TText.headerTitle.copyWith(fontSize: 20, fontWeight: FontWeight.w800, color: fg))]);
       case THeaderLeft.none:
         left = Padding(padding: const EdgeInsetsDirectional.only(start: 4), child: Text(spec.title, style: TText.largeTitle.copyWith(color: fg)));
       case THeaderLeft.back:
@@ -672,13 +672,7 @@ class _LogoMarkPainter extends CustomPainter {
 class TTabBar extends StatelessWidget {
   const TTabBar({super.key, required this.active});
   final String active;
-  static const _tabs = <(String, IconData)>[
-    ('today', Icons.home_outlined),
-    ('plans', Icons.list_alt_rounded),
-    ('progress', Icons.bar_chart_rounded),
-    ('learn', Icons.menu_book_outlined),
-    ('support', Icons.favorite_border_rounded),
-  ];
+  static const _tabs = <String>['today', 'plans', 'progress', 'learn', 'support'];
 
   static String _name(TStrings s, String tab) => switch (tab) {
         'today' => s.kitTabToday,
@@ -702,21 +696,22 @@ class TTabBar extends StatelessWidget {
               for (final t in _tabs)
                 Expanded(
                   child: Semantics(
-                    selected: t.$1 == active,
+                    selected: t == active,
                     button: true,
-                    label: s.kitTabSemantics(tab: _name(s, t.$1)),
+                    label: s.kitTabSemantics(tab: _name(s, t)),
                     child: InkWell(
-                      key: ValueKey('a:tabbar.${t.$1}'),
-                      onTap: t.$1 == active ? null : () => TNav.tab(context, TNav.tabRoute(t.$1)),
+                      key: ValueKey('a:tabbar.${t}'),
+                      onTap: t == active ? null : () => TNav.tab(context, TNav.tabRoute(t)),
                       child: Padding(padding: const EdgeInsets.symmetric(vertical: 6), child: Column(mainAxisSize: MainAxisSize.min, children: [
                         Container(
-                          width: 48,
+                          width: 44,
                           height: 28,
-                          decoration: BoxDecoration(color: t.$1 == active ? TColors.mint : Colors.transparent, borderRadius: BorderRadius.circular(14)),
-                          child: Icon(t.$2, size: 21, color: t.$1 == active ? TColors.teal : TColors.muted),
+                          decoration: BoxDecoration(color: t == active ? TColors.mint : Colors.transparent, borderRadius: BorderRadius.circular(14)),
+                          // The prototype's line icons (`.tab svg`): 24 x 22 pt inside the pill.
+                          child: ExcludeSemantics(child: CustomPaint(painter: _TabIconPainter(t, t == active ? TColors.teal : TColors.muted))),
                         ),
                         const SizedBox(height: 2),
-                        Text(_name(s, t.$1), maxLines: 1, overflow: TextOverflow.ellipsis, style: TText.tab.copyWith(color: t.$1 == active ? TColors.teal : TColors.muted, fontWeight: t.$1 == active ? FontWeight.w800 : FontWeight.w600)),
+                        Text(_name(s, t), maxLines: 1, overflow: TextOverflow.ellipsis, style: TText.tab.copyWith(color: t == active ? TColors.teal : TColors.muted, fontWeight: t == active ? FontWeight.w800 : FontWeight.w600)),
                       ])),
                     ),
                   ),
@@ -727,6 +722,93 @@ class TTabBar extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The tab bar's line icons, the paths of the prototype's SVGs (viewBox 24 x
+/// 24, stroke 1.8, round caps and joins), drawn without any package.
+class _TabIconPainter extends CustomPainter {
+  const _TabIconPainter(this.tab, this.color);
+  final String tab;
+  final Color color;
+
+  static Path pathOf(String tab) {
+    final p = Path();
+    switch (tab) {
+      case 'today':
+        p
+          ..moveTo(4, 11.5)
+          ..lineTo(12, 5)
+          ..lineTo(20, 11.5)
+          ..lineTo(20, 20)
+          ..arcToPoint(const Offset(19, 21), radius: const Radius.circular(1))
+          ..lineTo(14.5, 21)
+          ..lineTo(14.5, 15.5)
+          ..lineTo(9.5, 15.5)
+          ..lineTo(9.5, 21)
+          ..lineTo(5, 21)
+          ..arcToPoint(const Offset(4, 20), radius: const Radius.circular(1))
+          ..close();
+      case 'plans':
+        p
+          ..moveTo(5, 5)
+          ..lineTo(19, 5)
+          ..moveTo(5, 12)
+          ..lineTo(19, 12)
+          ..moveTo(5, 19)
+          ..lineTo(14, 19)
+          ..addOval(Rect.fromCircle(center: const Offset(19, 19), radius: 1.2));
+      case 'progress':
+        p
+          ..moveTo(5, 20)
+          ..lineTo(5, 12)
+          ..moveTo(10, 20)
+          ..lineTo(10, 6)
+          ..moveTo(15, 20)
+          ..lineTo(15, 11)
+          ..moveTo(20, 20)
+          ..lineTo(20, 9);
+      case 'learn':
+        p
+          ..moveTo(4, 5.5)
+          ..cubicTo(6.5, 4.5, 9.5, 4.5, 12, 6)
+          ..cubicTo(14.5, 4.5, 17.5, 4.5, 20, 5.5)
+          ..lineTo(20, 19)
+          ..cubicTo(17.5, 18, 14.5, 18, 12, 19.5)
+          ..cubicTo(9.5, 18, 6.5, 18, 4, 19)
+          ..close()
+          ..moveTo(12, 6)
+          ..lineTo(12, 19.5);
+      default:
+        p
+          ..moveTo(12, 20)
+          ..cubicTo(12, 20, 5, 15.6, 5, 10)
+          ..arcToPoint(const Offset(12, 7.4), radius: const Radius.circular(4))
+          ..arcToPoint(const Offset(19, 10), radius: const Radius.circular(4))
+          ..cubicTo(19, 15.6, 12, 20, 12, 20)
+          ..close();
+    }
+    return p;
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // 24 x 22 pt content box, the viewBox fitted inside it and centred.
+    final scale = 22 / 24;
+    canvas.translate((size.width - 24 * scale) / 2, (size.height - 22) / 2);
+    canvas.scale(scale);
+    canvas.drawPath(
+      pathOf(tab),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..color = color
+        ..strokeWidth = 1.8
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_TabIconPainter old) => old.tab != tab || old.color != color;
 }
 
 // ============================================================== typography
@@ -827,9 +909,13 @@ class TProgramBadge extends StatelessWidget {
 }
 
 class TProgramTag extends StatelessWidget {
-  const TProgramTag({super.key, required this.program, this.extra});
+  const TProgramTag({super.key, required this.program, this.extra, this.muted = false});
   final String program;
   final String? extra;
+
+  /// The text is grey at 12.5 pt, as the tag in a stat tile (`.stat span`
+  /// overrides `.tag`); the square keeps the programme colour.
+  final bool muted;
   static const names = {'bf': 'BreatheFree', 'sf': 'ScrollFree', 'ca': 'ClearAir', 'hw': 'Heartwise', 'st': 'Steady', 're': 'Renew', 'nu': 'Nourish', 'sd': 'Stride', 'ea': 'Ease', 'ck': 'Checkup', 'be': 'Beacon'};
   @override
   Widget build(BuildContext context) {
@@ -838,7 +924,7 @@ class TProgramTag extends StatelessWidget {
     return Row(mainAxisSize: MainAxisSize.min, children: [
       Container(width: 9, height: 9, decoration: BoxDecoration(color: c, borderRadius: BorderRadius.circular(3))),
       const SizedBox(width: 6),
-      Flexible(child: Text(text.toUpperCase(), style: TText.tag.copyWith(color: c))),
+      Flexible(child: Text(text.toUpperCase(), style: muted ? TText.tag.copyWith(color: TColors.muted, fontSize: 12.5) : TText.tag.copyWith(color: c))),
     ]);
   }
 }
@@ -1447,7 +1533,7 @@ class _TToggleRowState extends State<TToggleRow> with _TInput<TToggleRow, bool> 
   @override
   Widget build(BuildContext context) => MergeSemantics(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(children: [
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1933,13 +2019,15 @@ class TBanner extends StatelessWidget {
   final VoidCallback? onAction;
   @override
   Widget build(BuildContext context) {
-    final (bg, fg, dot, icon) = switch (kind) {
-      TBannerKind.offline => (TColors.warnFill, TColors.warnText, TColors.warn, Icons.cloud_off_rounded),
-      TBannerKind.error => (TColors.errorFill, TColors.errorText, TColors.error, Icons.error_outline_rounded),
-      TBannerKind.success => (TColors.okFill, TColors.okText, TColors.ok, Icons.check_rounded),
-      TBannerKind.info => (const Color(0xFFEAF1EC), TColors.teal, TColors.teal, Icons.info_outline_rounded),
-      TBannerKind.urgent => (TColors.error, Colors.white, Colors.white, Icons.priority_high_rounded),
+    // A filled 20 pt circle with a glyph, as in the prototype (`.bn>b`).
+    final (bg, fg, dot, glyph) = switch (kind) {
+      TBannerKind.offline => (TColors.warnFill, TColors.warnText, TColors.warn, '≈'),
+      TBannerKind.error => (TColors.errorFill, TColors.errorText, TColors.error, '!'),
+      TBannerKind.success => (TColors.okFill, TColors.okText, TColors.ok, '✓'),
+      TBannerKind.info => (const Color(0xFFEAF1EC), TColors.teal, TColors.teal, 'i'),
+      TBannerKind.urgent => (TColors.error, Colors.white, Colors.white, '!'),
     };
+    final glyphColor = kind == TBannerKind.urgent ? TColors.error : Colors.white;
     final message = Text(text, style: TText.label.copyWith(color: fg, fontWeight: FontWeight.w600, height: 1.4));
     // The action goes below the message when it does not fit beside it.
     return Semantics(
@@ -1948,7 +2036,7 @@ class TBanner extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(12)),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(icon, size: 20, color: dot),
+          ExcludeSemantics(child: Container(width: 20, height: 20, alignment: Alignment.center, decoration: BoxDecoration(color: dot, shape: BoxShape.circle), child: Text(glyph, style: TextStyle(fontSize: 12, height: 1, fontWeight: FontWeight.w700, color: glyphColor, fontFamilyFallback: const ['Roboto', 'sans-serif'])))),
           const SizedBox(width: 10),
           Expanded(child: actionLabel == null ? message : _Beside(gap: 0, center: false, main: message, aside: TextButton(key: actionKey, onPressed: onAction, child: Text(actionLabel!, style: TText.label.copyWith(color: fg, decoration: TextDecoration.underline))))),
         ]),
@@ -1992,15 +2080,23 @@ class TCard extends StatelessWidget {
       if (eyebrow != null) ...[TEyebrow(eyebrow!), const SizedBox(height: 4)],
       if (title != null) Text(title!, style: TText.cardTitle.copyWith(color: titleColor)),
       if (text != null) ...[const SizedBox(height: 3), Text(text!, style: TText.cardText.copyWith(color: textColor))],
-      for (final c in children) ...[const SizedBox(height: 8), c],
+      // Consecutive toggle rows are divided by a line (`.card .tgr+.tgr`).
+      for (var i = 0; i < children.length; i++) ...[
+        if (i > 0 && children[i] is TToggleRow && children[i - 1] is TToggleRow) ...[const SizedBox(height: 6), const Divider(height: 1, thickness: 1, color: TColors.line2)] else const SizedBox(height: 8),
+        children[i],
+      ],
     ]);
     Widget body = content;
     if (cta != null || onTap != null) {
-      body = Row(children: [
-        Expanded(child: content),
-        const SizedBox(width: 12),
-        if (cta != null) Flexible(child: cta!) else Icon(Icons.chevron_right_rounded, size: 26, color: dark ? TColors.onDarkMuted : TColors.muted),
-      ]);
+      // The call to action is as wide as its text (`.btn.sm{flex:none}`) and gives way
+      // only at very large text, where it takes at most 60% of the card.
+      body = LayoutBuilder(
+        builder: (context, c) => Row(children: [
+          Expanded(child: content),
+          const SizedBox(width: 12),
+          if (cta != null) ConstrainedBox(constraints: BoxConstraints(maxWidth: c.maxWidth * 0.6), child: cta!) else Icon(Icons.chevron_right_rounded, size: 26, color: dark ? TColors.onDarkMuted : TColors.muted),
+        ]),
+      );
     }
     final card = Container(
       padding: const EdgeInsetsDirectional.fromSTEB(16, 14, 16, 14),
@@ -2032,11 +2128,26 @@ class TKeyValue extends StatelessWidget {
           Container(
             padding: EdgeInsets.only(top: i == 0 ? 0 : 10),
             decoration: BoxDecoration(border: i == 0 ? null : const Border(top: BorderSide(color: TColors.line2))),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Expanded(child: Text(rows[i].$1, style: TText.cardText.copyWith(fontSize: 14))),
-              const SizedBox(width: 16),
-              Flexible(child: Text(rows[i].$2, textAlign: TextAlign.end, style: TText.cardText.copyWith(fontSize: 14, color: TColors.teal, fontWeight: FontWeight.w700))),
-            ]),
+            // Label at the start and value at the end (`.kv{justify-content:space-between}`),
+            // each as wide as its text; when both do not fit they shrink in proportion to
+            // their width, as flex items do.
+            child: LayoutBuilder(builder: (context, c) {
+              final labelStyle = TText.cardText.copyWith(fontSize: 14);
+              final valueStyle = TText.cardText.copyWith(fontSize: 14, color: TColors.teal, fontWeight: FontWeight.w700);
+              double width(String text, TextStyle style) => (TextPainter(
+                    text: TextSpan(text: text, style: style),
+                    textDirection: Directionality.of(context),
+                    textScaler: MediaQuery.textScalerOf(context),
+                    maxLines: 1,
+                  )..layout())
+                  .width;
+              final label = width(rows[i].$1, labelStyle), value = width(rows[i].$2, valueStyle);
+              return Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Flexible(flex: label.ceil() + 1, child: Text(rows[i].$1, style: labelStyle)),
+                const SizedBox(width: 16),
+                Flexible(flex: value.ceil() + 1, child: Text(rows[i].$2, textAlign: TextAlign.end, style: valueStyle)),
+              ]);
+            }),
           ),
       ]);
 }
@@ -2245,7 +2356,7 @@ class TStatGrid extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(color: TColors.paper, borderRadius: BorderRadius.circular(TRadius.tile), border: Border.all(color: TColors.line2)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          if (s.program != null) TProgramTag(program: s.program!, extra: s.label) else TEyebrow(s.label),
+          if (s.program != null) TProgramTag(program: s.program!, extra: s.label, muted: true) else TEyebrow(s.label),
           const SizedBox(height: 3),
           Text(s.value, style: TText.stat),
           if (s.sub != null) Text(s.sub!, style: TText.sub.copyWith(fontSize: 12.5)),
@@ -2491,10 +2602,14 @@ class TTimer extends StatelessWidget {
   Widget build(BuildContext context) => Semantics(
         liveRegion: true,
         label: TStrings.of(context).kitTimerSemantics(value: value, label: label),
-        child: Column(children: [
-          Text(value, style: TText.big.copyWith(fontSize: 56, fontFeatures: const [FontFeature.tabularFigures()])),
-          Text(label, style: TText.small),
-        ]),
+        // The prototype's line height is 1.45 for the value (56 pt) and for the label's line (15 pt).
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(children: [
+            Text(value, style: TText.big.copyWith(fontSize: 56, height: 1.45, fontFeatures: const [FontFeature.tabularFigures()])),
+            Text(label, style: TText.small, strutStyle: const StrutStyle(fontSize: 15, height: 1.45, forceStrutHeight: true)),
+          ]),
+        ),
       );
 }
 
@@ -2626,9 +2741,13 @@ class _TCalendarState extends State<TCalendar> {
           ),
         ),
     ];
+    final s = TStrings.of(context);
+    final abbreviations = s.kitMonthAbbreviations.split('|');
+    final monthName = widget.monthNumber != null ? abbreviations[widget.monthNumber! - 1] : month.split(' ').first;
     return TCard(children: [
       Row(children: [Expanded(child: Text(month, style: TText.label)), const Icon(Icons.chevron_left_rounded, color: TColors.muted), const Icon(Icons.chevron_right_rounded, color: TColors.muted)]),
       GridView.count(crossAxisCount: 7, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), mainAxisSpacing: 4, crossAxisSpacing: 4, childAspectRatio: 1.2, children: cells),
+      if (window.isNotEmpty) _windowCaption(s.kitDateShort(month: monthName, day: window.first), s.kitDateShort(month: monthName, day: window.last), s),
     ]);
   }
 
@@ -2653,8 +2772,14 @@ class _TCalendarState extends State<TCalendar> {
         IconButton(key: const ValueKey('calendar-next'), tooltip: s.kitCalendarNext, onPressed: canGoOn ? () => _move(1) : null, icon: const Icon(Icons.chevron_right_rounded), color: TColors.teal, disabledColor: TColors.line),
       ]),
       GridView.count(crossAxisCount: 7, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), childAspectRatio: 1, children: cells),
+      _windowCaption(_short(s, recommendedStart), _short(s, recommendedEnd), s),
     ]);
   }
+
+  String _short(TStrings s, DateTime date) => s.kitDateShort(month: s.kitMonthAbbreviations.split('|')[date.month - 1], day: date.day);
+
+  /// "Recommended window: Aug 28 – Aug 31" under the grid (the prototype's caption).
+  Widget _windowCaption(String start, String end, TStrings s) => Text(s.kitCalendarWindow(start: start, end: end), style: TText.cardText);
 
   Widget _day(TStrings s, DateTime date, DateTime today, DateTime recommendedStart, DateTime recommendedEnd) {
     final allowed = _allowed(date);
@@ -2803,7 +2928,9 @@ class TButton extends StatelessWidget {
             constraints: BoxConstraints(minHeight: small ? 40 : 52, minWidth: 44),
             width: small ? null : double.infinity,
             padding: EdgeInsets.symmetric(horizontal: small ? 14 : 18, vertical: 8),
-            alignment: arrow ? AlignmentDirectional.centerStart : Alignment.center,
+            // A small button is as wide as its text (`.btn.sm{width:auto;flex:none}`):
+            // an alignment would make the container fill the width it is given.
+            alignment: small ? null : (arrow ? AlignmentDirectional.centerStart : Alignment.center),
             child: child,
           ),
         ),
@@ -2863,19 +2990,18 @@ class TLink extends StatelessWidget {
   final VoidCallback onTap;
   final bool alignLeft;
   @override
-  Widget build(BuildContext context) => Align(
-        alignment: alignLeft ? AlignmentDirectional.centerStart : Alignment.center,
-        child: Semantics(
-          link: true,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(8),
-            child: Container(
-              constraints: const BoxConstraints(minHeight: 44),
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              alignment: Alignment.center,
-              child: Text(label, textAlign: TextAlign.center, style: TText.label.copyWith(fontSize: 15, color: TDark.of(context) ? Colors.white : TColors.teal, decoration: TextDecoration.underline)),
-            ),
+  Widget build(BuildContext context) => Semantics(
+        link: true,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 44),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            // The row is the tap target; the text sits at the start for alignLeft
+            // (`.lnk.left`) and in the middle otherwise.
+            alignment: alignLeft ? AlignmentDirectional.centerStart : Alignment.center,
+            child: Text(label, textAlign: alignLeft ? TextAlign.start : TextAlign.center, style: TText.label.copyWith(fontSize: 15, color: TDark.of(context) ? Colors.white : TColors.teal, decoration: TextDecoration.underline)),
           ),
         ),
       );

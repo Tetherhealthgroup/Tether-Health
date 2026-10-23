@@ -100,6 +100,7 @@ def validate():
     # Settings binding and first-run consents (P-71, P-52).
     errors += check_settings(SCREENS)
     errors += check_program_context(SCREENS)
+    errors += check_screen_arguments(SCREENS)
     errors += check_endpoint_classes(SCREENS)
     errors += check_plan_controls(SCREENS)
     errors += check_consent_starts(SCREENS)
@@ -817,6 +818,33 @@ def check_program_context(screens, fixed=None):
         for p, a, prog in element_programs(s): visit(sid, p, a, prog)
     return errors
 
+# Screens opened for one item. The app reads the item with TNav.argumentOf,
+# so a push to one carries `arg`, and the sheet over it passes it on. A lesson
+# id is `<programme>.<slug>` (api: lessonId starts with `<programme>.`).
+ARG_SCREENS = {'learn_lesson': r'[a-z]{2}\.[a-z0-9]+(-[a-z0-9]+)*', 'records_source': r'source_[0-9]+'}
+ARG_SHEETS = {'records_disconnect': 'records_source'}
+
+def check_screen_arguments(screens):
+    errors = []
+    def visit(sid, p, a):
+        if not a: return
+        to = a.get('to')
+        if a['type'] == 'push' and to in ARG_SCREENS:
+            if not isinstance(a.get('arg'), str) or not re.fullmatch(ARG_SCREENS[to], a['arg']):
+                errors.append(f'{sid}: {p} opens {to} with arg {a.get("arg")!r}; it needs an item id matching {ARG_SCREENS[to]} (the app reads it with TNav.argumentOf).')
+        elif a.get('arg') is not None:
+            errors.append(f'{sid}: {p} passes arg {a["arg"]!r} to {to}, which takes none.')
+        if to in ARG_SHEETS:
+            if a['type'] != 'sheet' or not a.get('argInherit') or sid != ARG_SHEETS[to]:
+                errors.append(f'{sid}: {p} must open {to} as a sheet over {ARG_SHEETS[to]} with argInherit, so the sheet acts on that screen\'s item.')
+        elif a.get('argInherit'):
+            errors.append(f'{sid}: {p} has argInherit on {to}, which takes none.')
+        for c in a.get('cases', []): visit(sid, p, c['action'])
+        visit(sid, p, a.get('then'))
+    for sid, s in screens.items():
+        for _, p, a in actions_of(s): visit(sid, p, a)
+    return errors
+
 def starts_on(n):
     """Whether selection control `n` starts with something selected."""
     t = n['t']
@@ -1171,6 +1199,16 @@ def _settings_self_test():
     fx = {'ps': sc('ps', [], route='/p/:program/sf')}
     _expect(check_program_context(dict(fx, h=sc('h', [button('S', go('ps'))], program='sf')), {'ps': 'sf'}) == [], 'the fixed programme is reported')
     _expect(any("it stands for 'sf' only" in x for x in check_program_context(dict(fx, h=sc('h', [button('S', go('ps'))], program='bf')), {'ps': 'sf'})), 'a fixed screen opened for another programme not reported')
+    # Item screens carry the item they were opened for.
+    sa = lambda *nodes, sid='h': check_screen_arguments({sid: sc(sid, list(nodes))})
+    _expect(sa(button('L', go('learn_lesson', arg='bf.cravings-today')), button('S', go('records_source', arg='source_1'))) == [], 'a correct item push is reported')
+    _expect(any('needs an item id' in x for x in sa(button('L', go('learn_lesson')))), 'a lesson push without arg not reported')
+    _expect(any('needs an item id' in x for x in sa(button('L', go('learn_lesson', arg='cravings')))), 'a lesson id without a programme prefix not reported')
+    _expect(any('needs an item id' in x for x in sa(button('S', go('records_source')))), 'a source push without arg not reported')
+    _expect(any('takes none' in x for x in sa(button('S', go('back_to', arg='x')))), 'an arg on another screen not reported')
+    _expect(sa(button('D', sheet('records_disconnect', inherit_arg=True)), sid='records_source') == [], 'the inheriting disconnect sheet is reported')
+    _expect(any('argInherit' in x for x in sa(button('D', sheet('records_disconnect')), sid='records_source')), 'a disconnect sheet without argInherit not reported')
+    _expect(any('argInherit' in x for x in sa(button('D', sheet('records_disconnect', inherit_arg=True)))), 'a disconnect sheet outside records_source not reported')
 
 def _age_gate_self_test(scr):
     """check_age_gate fails closed: an account-creating or unknown auth submit

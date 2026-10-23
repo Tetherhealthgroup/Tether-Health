@@ -480,20 +480,26 @@ class TFailClosedResolver {
   }
 }
 
-/// Route arguments of a screen opened per programme ([TNav.push]).
+/// Route arguments of a screen opened per programme or per item
+/// ([TNav.push], [TNav.sheet]).
 @immutable
 final class TRouteArgs {
-  const TRouteArgs({this.program});
+  const TRouteArgs({this.program, this.argument});
 
   /// Programme id (for example `bf`).
   final String? program;
 
+  /// Identifier of the item the screen was opened for (for example a lesson
+  /// id `bf.cravings-today` or a records source id). The app reads it with
+  /// [TNav.argumentOf].
+  final String? argument;
+
   @override
-  bool operator ==(Object other) => other is TRouteArgs && other.program == program;
+  bool operator ==(Object other) => other is TRouteArgs && other.program == program && other.argument == argument;
   @override
-  int get hashCode => program.hashCode;
+  int get hashCode => Object.hash(program, argument);
   @override
-  String toString() => 'TRouteArgs(program: $program)';
+  String toString() => 'TRouteArgs(program: $program, argument: $argument)';
 }
 
 abstract final class TNav {
@@ -525,10 +531,21 @@ abstract final class TNav {
   ///
   /// [program] is passed to a screen opened per programme (route with
   /// `:program`, for example program settings); it reads it with [programOf].
-  static Future<void> push(BuildContext context, String route, {String? program}) {
+  ///
+  /// [argument] identifies the item the screen is opened for (for example the
+  /// lesson of `learn_lesson`); the screen and the app read it with
+  /// [argumentOf].
+  static Future<void> push(BuildContext context, String route, {String? program, String? argument}) {
     final nav = Navigator.of(context);
     if (_runningSafety && _topRoute(nav)?.settings.name == route) return Future<void>.value();
-    return nav.pushNamed(route, arguments: program == null ? null : TRouteArgs(program: program));
+    return nav.pushNamed(route, arguments: program == null && argument == null ? null : TRouteArgs(program: program, argument: argument));
+  }
+
+  /// The item identifier the screen of [context] was opened for ([push] or
+  /// [sheet] with `argument`), or null.
+  static String? argumentOf(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments;
+    return args is TRouteArgs ? args.argument : null;
   }
 
   /// The programme the screen of [context] was opened for ([push] with
@@ -678,7 +695,10 @@ abstract final class TNav {
 
   static Future<void> close(BuildContext context) => Navigator.of(context).maybePop();
 
-  static Future<void> sheet(BuildContext context, String route) => Navigator.of(context).pushNamed(route);
+  /// Opens the sheet [route]. [argument] identifies the item it acts on; a
+  /// sheet over an item screen passes on that screen's [argumentOf].
+  static Future<void> sheet(BuildContext context, String route, {String? argument}) =>
+      Navigator.of(context).pushNamed(route, arguments: argument == null ? null : TRouteArgs(argument: argument));
 
   static OverlayEntry? _toast;
 

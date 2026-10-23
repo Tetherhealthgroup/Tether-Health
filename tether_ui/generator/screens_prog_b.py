@@ -105,7 +105,7 @@ def programs_b():
     S('nu_home', 'Nourish home', '/p/nu/home', 'nu', program='nu', phase='daily', tabname='plans', hdr=home_hdr('nu'), body=[
         card(eyebrow='Habit · week 2', title='Add a vegetable to dinner', text='3 of 5 nights', children=[steps(3, 5)], cta=button('Done today', toast('Nice. 4 of 5 nights.'), small=True)),
         card(v='mint', eyebrow='Tip', title='Frozen vegetables count, and are often cheaper.'),
-        card(eyebrow='Quick recipe · 15 min', title='Bean and veggie tacos', text='Under $2 a serving', action=go('learn_lesson')),
+        card(eyebrow='Quick recipe · 15 min', title='Bean and veggie tacos', text='Under $2 a serving', action=go('learn_lesson', arg='nu.bean-veggie-tacos')),
         rows([row('Busy week?', 'Reset without guilt', action=go('nu_reset')), row('Week 4 milestone', 'In 2 weeks', action=go('nu_week4')), row('Change habit', None, action=go('nu_habit')), settings_row('nu')]),
     ])
     S('nu_reset', 'Off-track reset', '/p/nu/reset', 'nu', program='nu', phase='rescue', hdr=H('Off track?', pill='Reset'), body=[
@@ -150,7 +150,7 @@ def programs_b():
     S('sd_fell', 'I fell', '/p/sd/fell', 'sd', program='sd', phase='rescue', kind='fullscreen', hdr=H('I fell', left='close'), body=[
         title('Are you hurt?'), button('I hit my head or can’t get up · Call 911', call('911'), v='danger', arrow=False),
         rows([row('Call Rosa', 'Caregiver', lead=L_av('R'), action=call('(555) 010-2244', 'Call Rosa'))]),
-        card(v='mint', title='How to get up safely', text='Roll to your side, crawl to a sturdy chair, kneel, then rise slowly.', action=go('learn_lesson')),
+        card(v='mint', title='How to get up safely', text='Roll to your side, crawl to a sturdy chair, kneel, then rise slowly.', action=go('learn_lesson', arg='sd.get-up-safely')),
     ], footer=[button('I’m okay, log this fall', submit('POST /v1/program-data/sd/falls', toast('Fall logged. Added to your visit list.', rep('sd_home'))), v='secondary')])
     S('sd_safety', 'Home safety', '/p/sd/safety', 'sd', program='sd', phase='resources', hdr=H('Home safety', pill='Checklist'), body=[
         title('Make your home safer'),
@@ -183,7 +183,7 @@ def programs_b():
     S('ea_home', 'Ease home', '/p/ea/home', 'ea', program='ea', phase='daily', tabname='plans', hdr=home_hdr('ea'), body=[
         card(v='dark', eyebrow='How are you right now?', title='30-second mood check-in', cta=button('Start', go('ea_mood'), v='lime', small=True)),
         rows([row('My safety plan', 'Updated Oct 2', action=go('ea_plan')), row('Check-back', 'In 6 days', action=go('ea_checkback')), row('Find a professional', None, action=go('ea_result')), settings_row('ea')]),
-        card(tag='ea', title='Sleep and mood: 3 small changes', text='5 min', action=go('learn_lesson')),
+        card(tag='ea', title='Sleep and mood: 3 small changes', text='5 min', action=go('learn_lesson', arg='ea.sleep-and-mood')),
         emergency(),
     ])
     S('ea_mood', 'Mood check-in', '/p/ea/mood', 'ea', program='ea', phase='daily', hdr=H('Mood check-in', pill='Ease'), body=[
@@ -194,7 +194,7 @@ def programs_b():
     S('ea_checkback', 'Check-back day', '/p/ea/check-back', 'ea', program='ea', phase='milestone', hdr=H('Check-back', pill='2 weeks'), body=[
         title('It’s been two weeks. How are things?'), seg(['Worse', 'Same', 'Better'], 'Same', key='value'),
         chips(['Yes, I have an appointment', 'Not yet', 'I don’t want to'], ['Not yet'], multi=False, label='Did you reach out to someone?', key='did_you_reach_out_to_someone'),
-        card(v='mint', text='That’s okay. Would a short list of what to say help?', cta=button('Show me', go('learn_lesson'), small=True)),
+        card(v='mint', text='That’s okay. Would a short list of what to say help?', cta=button('Show me', go('learn_lesson', arg='ea.what-to-say'), small=True)),
     ], footer=[button('Save', submit('POST /v1/program-data/ea/check-backs', toast('Saved', back())))])
 
     # ================================================================ CHECKUP
@@ -245,7 +245,7 @@ def programs_b():
     ], footer=[button('See my plan', submit('PUT /v1/program-data/be/profile', onboarding_or('be_home')))])
     S('be_home', 'Beacon home', '/p/be/home', 'be', program='be', phase='daily', tabname='plans', hdr=home_hdr('be'), body=[
         title('Three steps that lower risk'),
-        rows([row('Quitting smoking', 'In progress with BreatheFree', lead=L_prog('bf'), pill='Active', action=go('bf_home')), row('Monthly skin self-check', 'Guide with photos', action=go('learn_lesson')), row('Ask about genetic counseling', 'Because of family history', action=go('support_message_care'))]),
+        rows([row('Quitting smoking', 'In progress with BreatheFree', lead=L_prog('bf'), pill='Active', action=go('bf_home')), row('Monthly skin self-check', 'Guide with photos', action=go('learn_lesson', arg='be.skin-self-check')), row('Ask about genetic counseling', 'Because of family history', action=go('support_message_care'))]),
         card(title='Screenings come from Checkup', text='Mammogram due · colorectal due', cta=button('Open Checkup', go('ck_list'), v='secondary', small=True)),
         rows([row('Change my journey stage', None, action=go('be_q1')), settings_row('be')]),
     ])

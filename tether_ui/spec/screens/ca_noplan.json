@@ -51,7 +51,8 @@
           "label": "Questions for my next visit",
           "action": {
             "type": "push",
-            "to": "learn_lesson"
+            "to": "learn_lesson",
+            "arg": "ca.questions-for-next-visit"
           }
         },
         {
@@ -105,7 +106,8 @@
       "path": "body[3].rows[1]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "ca.questions-for-next-visit"
       },
       "summary": "push → learn_lesson"
     },

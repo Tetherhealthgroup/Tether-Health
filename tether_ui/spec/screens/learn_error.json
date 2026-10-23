@@ -55,7 +55,8 @@
       "label": "Open downloads",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "bf.cravings-today"
       },
       "variant": "secondary",
       "arrow": false
@@ -89,7 +90,8 @@
       "path": "body[4]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "bf.cravings-today"
       },
       "summary": "push → learn_lesson"
     },

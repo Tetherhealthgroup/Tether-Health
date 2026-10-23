@@ -39,7 +39,7 @@ class TodayScreen extends StatelessWidget {
         TCard(variant: TCardVariant.dark, eyebrow: s.todayBodyN5Eyebrow, title: s.todayBodyN5Title, cta: TButton(key: const ValueKey('a:body[5].cta[0]'), label: s.todayBodyN5CtaN0Label, onPressed: () => TNav.sheet(context, Routes.checkin), variant: TButtonVariant.lime, small: true)),
         TBoundValues(keys: const ['bf.days_to_quit_day', 'bf.quit_date_short', 'sf.minutes_yesterday', 'sf.goal_short'], builder: (context, v) => TStatGrid(stats: [TStat(label: s.todayBodyN6ItemsN0Label, value: v.text('bf.days_to_quit_day', s.todayBodyN6ItemsN0Value), sub: v.text('bf.quit_date_short', s.todayBodyN6ItemsN0Sub), program: 'bf'), TStat(label: s.todayBodyN6ItemsN1Label, value: v.text('sf.minutes_yesterday', s.todayBodyN6ItemsN1Value), sub: v.text('sf.goal_short', s.todayBodyN6ItemsN1Sub), program: 'sf')])),
         TListGroup(rows: [TListRow(key: const ValueKey('a:body[7].rows[0]'), label: s.todayBodyN7RowsN0Label, sub: s.todayBodyN7RowsN0Sub, lead: TLead.program('bf'), onTap: () => TNav.push(context, Routes.bfHome)), TListRow(key: const ValueKey('a:body[7].rows[1]'), label: s.todayBodyN7RowsN1Label, sub: s.todayBodyN7RowsN1Sub, lead: TLead.program('sf'), onTap: () => TNav.push(context, Routes.sfHome))]),
-        TCard(key: const ValueKey('a:body[8]'), variant: TCardVariant.mint, tag: 'ca', tagExtra: s.todayBodyN8TagExtra, title: s.todayBodyN8Title, text: s.todayBodyN8Text, onTap: () => TNav.push(context, Routes.learnLesson)),
+        TCard(key: const ValueKey('a:body[8]'), variant: TCardVariant.mint, tag: 'ca', tagExtra: s.todayBodyN8TagExtra, title: s.todayBodyN8Title, text: s.todayBodyN8Text, onTap: () => TNav.push(context, Routes.learnLesson, argument: 'ca.lungs-recover')),
       ],
     );
   }

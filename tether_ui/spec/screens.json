@@ -3530,7 +3530,8 @@
         "text": "4 min read",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "ca.lungs-recover"
         }
       }
     ],
@@ -3591,7 +3592,8 @@
         "path": "body[8]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "ca.lungs-recover"
         },
         "summary": "push → learn_lesson"
       },
@@ -6670,7 +6672,8 @@
         "text": "4 min read · 3:12 audio · downloaded",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "bf.cravings-today"
         }
       },
       {
@@ -6681,7 +6684,8 @@
         "title": "Why “one more video” never feels like enough",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "sf.one-more-video"
         }
       },
       {
@@ -6692,7 +6696,8 @@
         "title": "How your lungs recover after you quit",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "ca.lungs-recover"
         }
       },
       {
@@ -6722,7 +6727,8 @@
         "path": "body[2]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "bf.cravings-today"
         },
         "summary": "push → learn_lesson"
       },
@@ -6731,7 +6737,8 @@
         "path": "body[3]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "sf.one-more-video"
         },
         "summary": "push → learn_lesson"
       },
@@ -6740,7 +6747,8 @@
         "path": "body[4]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "ca.lungs-recover"
         },
         "summary": "push → learn_lesson"
       },
@@ -6839,7 +6847,8 @@
         "label": "Open downloads",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "bf.cravings-today"
         },
         "variant": "secondary",
         "arrow": false
@@ -6873,7 +6882,8 @@
         "path": "body[4]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "bf.cravings-today"
         },
         "summary": "push → learn_lesson"
       },
@@ -11292,7 +11302,8 @@
         "text": "4 min read",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "bf.cravings-what-to-expect"
         }
       },
       {
@@ -11303,7 +11314,8 @@
         "text": "Education only · 5 min",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "bf.quit-medicines"
         }
       },
       {
@@ -11360,7 +11372,8 @@
         "path": "body[3]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "bf.cravings-what-to-expect"
         },
         "summary": "push → learn_lesson"
       },
@@ -11369,7 +11382,8 @@
         "path": "body[4]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "bf.quit-medicines"
         },
         "summary": "push → learn_lesson"
       },
@@ -11678,7 +11692,8 @@
             "sub": "Patch, gum, lozenge",
             "action": {
               "type": "push",
-              "to": "learn_lesson"
+              "to": "learn_lesson",
+              "arg": "bf.nicotine-replacement"
             }
           },
           {
@@ -11686,7 +11701,8 @@
             "sub": "Varenicline · bupropion SR",
             "action": {
               "type": "push",
-              "to": "learn_lesson"
+              "to": "learn_lesson",
+              "arg": "bf.prescription-options"
             }
           }
         ]
@@ -11755,7 +11771,8 @@
         "path": "body[2].rows[0]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "bf.nicotine-replacement"
         },
         "summary": "push → learn_lesson"
       },
@@ -11764,7 +11781,8 @@
         "path": "body[2].rows[1]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "bf.prescription-options"
         },
         "summary": "push → learn_lesson"
       },
@@ -14174,7 +14192,8 @@
             "label": "Questions for my next visit",
             "action": {
               "type": "push",
-              "to": "learn_lesson"
+              "to": "learn_lesson",
+              "arg": "ca.questions-for-next-visit"
             }
           },
           {
@@ -14228,7 +14247,8 @@
         "path": "body[3].rows[1]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "ca.questions-for-next-visit"
         },
         "summary": "push → learn_lesson"
       },
@@ -19430,7 +19450,8 @@
         "text": "Under $2 a serving",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "nu.bean-veggie-tacos"
         }
       },
       {
@@ -19509,7 +19530,8 @@
         "path": "body[2]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "nu.bean-veggie-tacos"
         },
         "summary": "push → learn_lesson"
       },
@@ -20757,7 +20779,8 @@
         "text": "Roll to your side, crawl to a sturdy chair, kneel, then rise slowly.",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "sd.get-up-safely"
         }
       }
     ],
@@ -20818,7 +20841,8 @@
         "path": "body[3]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "sd.get-up-safely"
         },
         "summary": "push → learn_lesson"
       },
@@ -21655,7 +21679,8 @@
         "text": "5 min",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "ea.sleep-and-mood"
         }
       },
       {
@@ -21760,7 +21785,8 @@
         "path": "body[2]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "ea.sleep-and-mood"
         },
         "summary": "push → learn_lesson"
       },
@@ -22046,7 +22072,8 @@
           "label": "Show me",
           "action": {
             "type": "push",
-            "to": "learn_lesson"
+            "to": "learn_lesson",
+            "arg": "ea.what-to-say"
           },
           "variant": "primary",
           "arrow": false,
@@ -22090,7 +22117,8 @@
         "path": "body[3].cta[0]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "ea.what-to-say"
         },
         "summary": "push → learn_lesson"
       },
@@ -23518,7 +23546,8 @@
             "sub": "Guide with photos",
             "action": {
               "type": "push",
-              "to": "learn_lesson"
+              "to": "learn_lesson",
+              "arg": "be.skin-self-check"
             }
           },
           {
@@ -23605,7 +23634,8 @@
         "path": "body[1].rows[1]",
         "action": {
           "type": "push",
-          "to": "learn_lesson"
+          "to": "learn_lesson",
+          "arg": "be.skin-self-check"
         },
         "summary": "push → learn_lesson"
       },
@@ -24337,7 +24367,8 @@
             "sub": "Epic MyChart · synced today 7:02 AM",
             "action": {
               "type": "push",
-              "to": "records_source"
+              "to": "records_source",
+              "arg": "source_1"
             },
             "lead": {
               "icon": "E"
@@ -24348,7 +24379,8 @@
             "sub": "Blue Button 2.0 · synced Oct 12",
             "action": {
               "type": "push",
-              "to": "records_source"
+              "to": "records_source",
+              "arg": "source_2"
             },
             "lead": {
               "icon": "M"
@@ -24470,7 +24502,8 @@
         "path": "body[1].rows[0]",
         "action": {
           "type": "push",
-          "to": "records_source"
+          "to": "records_source",
+          "arg": "source_1"
         },
         "summary": "push → records_source"
       },
@@ -24479,7 +24512,8 @@
         "path": "body[1].rows[1]",
         "action": {
           "type": "push",
-          "to": "records_source"
+          "to": "records_source",
+          "arg": "source_2"
         },
         "summary": "push → records_source"
       },
@@ -26608,7 +26642,8 @@
         "label": "Disconnect",
         "action": {
           "type": "sheet",
-          "to": "records_disconnect"
+          "to": "records_disconnect",
+          "argInherit": true
         },
         "variant": "danger",
         "arrow": false
@@ -26644,7 +26679,8 @@
         "path": "footer[0]",
         "action": {
           "type": "sheet",
-          "to": "records_disconnect"
+          "to": "records_disconnect",
+          "argInherit": true
         },
         "summary": "sheet → records_disconnect"
       }

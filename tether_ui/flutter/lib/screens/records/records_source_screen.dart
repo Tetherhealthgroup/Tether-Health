@@ -28,7 +28,7 @@ class RecordsSourceScreen extends StatelessWidget {
         TListGroup(title: s.recordsSourceBodyN2Title, rows: [TListRow(label: s.recordsSourceBodyN2RowsN0Label, sub: s.recordsSourceBodyN2RowsN0Sub), TListRow(label: s.recordsSourceBodyN2RowsN1Label, sub: s.recordsSourceBodyN2RowsN1Sub), TListRow(label: s.recordsSourceBodyN2RowsN2Label, sub: s.recordsSourceBodyN2RowsN2Sub), TListRow(label: s.recordsSourceBodyN2RowsN3Label, sub: s.recordsSourceBodyN2RowsN3Sub), TListRow(label: s.recordsSourceBodyN2RowsN4Label, sub: s.recordsSourceBodyN2RowsN4Sub), TListRow(label: s.recordsSourceBodyN2RowsN5Label, sub: s.recordsSourceBodyN2RowsN5Sub)]),
       ],
       footer: [
-        TButton(key: const ValueKey('a:footer[0]'), label: s.recordsSourceFooterN0Label, onPressed: () => TNav.sheet(context, Routes.recordsDisconnect), variant: TButtonVariant.danger),
+        TButton(key: const ValueKey('a:footer[0]'), label: s.recordsSourceFooterN0Label, onPressed: () => TNav.sheet(context, Routes.recordsDisconnect, argument: TNav.argumentOf(context)), variant: TButtonVariant.danger),
       ],
     );
   }

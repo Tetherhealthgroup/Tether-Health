@@ -34,8 +34,8 @@ class BfHomeExploreScreen extends StatelessWidget {
         TEyebrow(s.bfHomeExploreBodyN0Text),
         TTitle(s.bfHomeExploreBodyN1Text),
         TCard(variant: TCardVariant.coral, title: s.bfHomeExploreBodyN2Title, text: s.bfHomeExploreBodyN2Text, cta: TButton(key: const ValueKey('a:body[2].cta[0]'), label: s.bfHomeExploreBodyN2CtaN0Label, onPressed: () => TNav.sheet(context, Routes.rescuePick), variant: TButtonVariant.rescue, small: true)),
-        TCard(key: const ValueKey('a:body[3]'), tag: 'bf', title: s.bfHomeExploreBodyN3Title, text: s.bfHomeExploreBodyN3Text, onTap: () => TNav.push(context, Routes.learnLesson)),
-        TCard(key: const ValueKey('a:body[4]'), tag: 'bf', title: s.bfHomeExploreBodyN4Title, text: s.bfHomeExploreBodyN4Text, onTap: () => TNav.push(context, Routes.learnLesson)),
+        TCard(key: const ValueKey('a:body[3]'), tag: 'bf', title: s.bfHomeExploreBodyN3Title, text: s.bfHomeExploreBodyN3Text, onTap: () => TNav.push(context, Routes.learnLesson, argument: 'bf.cravings-what-to-expect')),
+        TCard(key: const ValueKey('a:body[4]'), tag: 'bf', title: s.bfHomeExploreBodyN4Title, text: s.bfHomeExploreBodyN4Text, onTap: () => TNav.push(context, Routes.learnLesson, argument: 'bf.quit-medicines')),
         TCard(variant: TCardVariant.mint, title: s.bfHomeExploreBodyN5Title, text: s.bfHomeExploreBodyN5Text, cta: TButton(key: const ValueKey('a:body[5].cta[0]'), label: s.bfHomeExploreBodyN5CtaN0Label, onPressed: () => TNav.push(context, Routes.bfPath), small: true)),
       ],
     );

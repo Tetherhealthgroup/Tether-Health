@@ -67,7 +67,8 @@
       "text": "Under $2 a serving",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "nu.bean-veggie-tacos"
       }
     },
     {
@@ -146,7 +147,8 @@
       "path": "body[2]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "nu.bean-veggie-tacos"
       },
       "summary": "push → learn_lesson"
     },

@@ -196,7 +196,7 @@ def shared():
         card(v='dark', eyebrow='Check-in · about 90 sec', title='Covers both programs', cta=button('Start', sheet('checkin'), v='lime', small=True)),
         stats([st('Quit day', '7 days', 'Fri, Aug 28', 'bf'), st('Yesterday', '2h 10m', 'goal 90 min', 'sf')]),
         rows([row('BreatheFree home', 'Plan, medicines, progress', lead=L_prog('bf'), action=go('bf_home')), row('ScrollFree home', 'Goal, Pause 60, week', lead=L_prog('sf'), action=go('sf_home'))]),
-        card(v='mint', tag='ca', tagx='Learn only', title='How your lungs recover after you quit', text='4 min read', action=go('learn_lesson')),
+        card(v='mint', tag='ca', tagx='Learn only', title='How your lungs recover after you quit', text='4 min read', action=go('learn_lesson', arg='ca.lungs-recover')),
     ], api=['GET /v1/today'], desc='Composed from every Focus enrolment. If a program safety rule fires, its card is pinned first (see Safety state).')
     S('today_loading', 'Today · loading', '/today?state=loading', 'today', phase='daily', tabname='today', variant_of='today', state='loading', hdr=today_hdr, body=[
         skeleton(1), card(v='coral', title='Craving or urge?', text='One tap · no typing', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)), skeleton(3), skeleton(2),
@@ -313,14 +313,14 @@ def shared():
     S('learn', 'Learn', '/learn', 'tabs', phase='resources', tabname='learn', hdr=H('Learn', left='none', avatar='A'), body=[
         field('Search', None, placeholder='Search cravings, sleep, blood pressure…', kind='search', key='search'),
         chips(['For you', 'BreatheFree', 'ScrollFree', 'ClearAir'], ['For you'], multi=False, dots={'BreatheFree': 'bf', 'ScrollFree': 'sf', 'ClearAir': 'ca'}, key='value'),
-        card(v='dark', tag='bf', tagx='For quit day', title='Cravings: what to expect today', text='4 min read · 3:12 audio · downloaded', action=go('learn_lesson')),
-        card(tag='sf', tagx='2 min', title='Why “one more video” never feels like enough', action=go('learn_lesson')),
-        card(tag='ca', tagx='Learn only', title='How your lungs recover after you quit', action=go('learn_lesson')),
+        card(v='dark', tag='bf', tagx='For quit day', title='Cravings: what to expect today', text='4 min read · 3:12 audio · downloaded', action=go('learn_lesson', arg='bf.cravings-today')),
+        card(tag='sf', tagx='2 min', title='Why “one more video” never feels like enough', action=go('learn_lesson', arg='sf.one-more-video')),
+        card(tag='ca', tagx='Learn only', title='How your lungs recover after you quit', action=go('learn_lesson', arg='ca.lungs-recover')),
         text('Clinically reviewed · Library v4.1 · English and Spanish', 'small'),
     ], api=['GET /v1/catalogue/lessons?enrolled=true'])
     S('learn_error', 'Learn · error', '/learn?state=error', 'tabs', phase='resources', tabname='learn', variant_of='learn', state='error', hdr=H('Learn', left='none', avatar='A'), body=[
         illus('!', 'warn'), title('Can’t load lessons', align='center'), text('Check your connection. Downloaded lessons still work.', 'muted', align='center'),
-        button('Try again', rep('learn')), button('Open downloads', go('learn_lesson'), v='secondary')])
+        button('Try again', rep('learn')), button('Open downloads', go('learn_lesson', arg='bf.cravings-today'), v='secondary')])
     S('learn_lesson', 'Lesson', '/learn/:lesson', 'tabs', phase='resources', hdr=H('Lesson', pill='4 min'), body=[
         progtag('bf', 'For quit day'), title('Cravings: what to expect today', 'l'),
         card(v='dark', eyebrow='Audio · 3:12', title='Listen instead', children=[buttons(button('Play', toast('Playing audio'), v='lime', small=True), button('Transcript', toast('Transcript opened'), v='ghostdark', small=True))]),

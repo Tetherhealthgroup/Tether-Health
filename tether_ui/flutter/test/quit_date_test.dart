@@ -65,11 +65,24 @@ void main() {
     TSession.clear();
   });
 
+  group('caption', () {
+    testWidgets('the app names the recommended window, 7 to 14 days ahead', (tester) async {
+      await _open(tester);
+      expect(find.text('Recommended window: Oct 29 – Nov 5'), findsOneWidget);
+    });
+
+    testWidgets('it follows the clock across a month and a year end', (tester) async {
+      await _open(tester, now: DateTime(2026, 12, 28, 9));
+      expect(find.text('Recommended window: Jan 4 – Jan 11'), findsOneWidget);
+    });
+  });
+
   group('preview', () {
     testWidgets('keeps the design: August 2026, the 28th chosen, the design card', (tester) async {
       await _open(tester, app: false);
       expect(find.text('August 2026'), findsOneWidget);
       expect(find.text('Friday, August 28, 2026'), findsOneWidget);
+      expect(find.text('Recommended window: Aug 28 – Aug 31'), findsOneWidget, reason: 'the prototype caption under the calendar');
       expect(find.byKey(const ValueKey('calendar-next')), findsNothing);
       expect(TSession.values[_key], '2026-08-28');
       expect(_confirmEnabled(tester), isTrue);
