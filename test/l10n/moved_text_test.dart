@@ -259,6 +259,118 @@ Map<String, String> keyFilesOf(Map<String, Object?> englishArb) => {
                   .first
     };
 
+/// The interpolation expressions of the literal body [raw], in order, with
+/// string text inside them removed (so the two languages' versions of
+/// `x ? ('On') : ('Off')` compare equal) and spaces collapsed.
+List<String> interpolations(String raw) {
+  final out = <String>[];
+  for (var i = 0; i < raw.length; i++) {
+    if (raw[i] == r'\') {
+      i++;
+      continue;
+    }
+    if (raw[i] != r'$' || i + 1 >= raw.length) continue;
+    String expr;
+    if (raw[i + 1] == '{') {
+      var depth = 1;
+      var j = i + 2;
+      while (j < raw.length && depth > 0) {
+        if (raw[j] == '{') depth++;
+        if (raw[j] == '}') depth--;
+        j++;
+      }
+      expr = raw.substring(i + 2, j - 1);
+      i = j - 1;
+    } else {
+      final m = RegExp(r'[A-Za-z_]\w*').matchAsPrefix(raw, i + 1);
+      if (m == null) continue;
+      expr = m.group(0)!;
+      i = m.end - 1;
+    }
+    out.add(expr
+        .replaceAll(RegExp(r"'[^']*'"), "''")
+        .replaceAll(RegExp(r'"[^"]*"'), "''")
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim());
+  }
+  return out;
+}
+
+/// The names of the top-level placeholders and arguments of [message], in
+/// order of appearance.
+List<String> placeholderOrder(String message) {
+  final out = <String>[];
+  var depth = 0;
+  for (var i = 0; i < message.length; i++) {
+    if (message[i] == '{') {
+      if (depth == 0) {
+        out.add(RegExp(r'\s*(\w+)').matchAsPrefix(message, i + 1)!.group(1)!);
+      }
+      depth++;
+    } else if (message[i] == '}') {
+      depth--;
+    }
+  }
+  return out;
+}
+
+/// Problems with the composed messages in [composed] (file → key →
+/// language → the old joined literal): each message must keep the old text
+/// between its placeholders, its placeholders must stand where the old
+/// expressions stood, and the English placeholders must appear in their
+/// declared order ([declared], key → placeholder names), which is the order
+/// the code passes them in.
+List<String> composedProblems({
+  required Map<String, Object?> composed,
+  required Map<String, Map<String, String>> messages,
+  required Map<String, List<String>> declared,
+}) {
+  final out = <String>[];
+  for (final file in composed.values) {
+    for (final e in (file! as Map<String, Object?>).entries) {
+      final key = e.key;
+      final old = (e.value! as Map).cast<String, String>();
+      final en = messages['en']?[key];
+      final es = messages['es']?[key];
+      if (en == null || es == null) {
+        out.add('$key is missing from a language');
+        continue;
+      }
+      for (final (lang, value) in [('en', en), ('es', es)]) {
+        final want = textRuns(old[lang]!, all: true);
+        final got = messageRuns(value);
+        if (want.length != got.length ||
+            [for (var i = 0; i < want.length; i++) want[i] == got[i]]
+                .contains(false)) {
+          out.add('$key ($lang) "$value" no longer reads as "${old[lang]}"');
+        }
+      }
+      final enExprs = interpolations(old['en']!);
+      final enNames = placeholderOrder(en);
+      if (enExprs.length != enNames.length) {
+        out.add(
+            '$key (en) has ${enNames.length} placeholders for ${enExprs.length} values');
+        continue;
+      }
+      if (enNames.join(',') != (declared[key] ?? const []).join(',')) {
+        out.add(
+            '$key (en) placeholders $enNames are not in their declared order ${declared[key]}');
+      }
+      final name = {
+        for (var i = 0; i < enExprs.length; i++) enExprs[i]: enNames[i]
+      };
+      final esWant = [
+        for (final x in interpolations(old['es']!)) name[x] ?? '?$x'
+      ];
+      if (esWant.join(',') != placeholderOrder(es).join(',')) {
+        out.add(
+            '$key (es) placeholders ${placeholderOrder(es)} should be $esWant');
+      }
+    }
+  }
+  return out;
+}
+
 Map<String, String> _messages(String path) {
   final arb = jsonDecode(File(path).readAsStringSync()) as Map<String, Object?>;
   return {
@@ -304,6 +416,79 @@ void main() {
     expect(missing, isEmpty,
         reason:
             'reworded, dropped or unrecorded on the way to the translation files');
+  });
+
+  test('composed messages keep the old composition in both languages', () {
+    final recorded =
+        jsonDecode(File('test/l10n/moved_keys.json').readAsStringSync())
+            as Map<String, Object?>;
+    final english = jsonDecode(File('lib/l10n/app_en.arb').readAsStringSync())
+        as Map<String, Object?>;
+    final declared = {
+      for (final e in english.entries)
+        if (e.key.startsWith('@') && e.key != '@@locale')
+          e.key.substring(1): [
+            ...(((e.value as Map)['placeholders'] as Map?) ?? const {})
+                .keys
+                .cast<String>()
+          ]
+    };
+    expect(
+        composedProblems(
+          composed: recorded['composed']! as Map<String, Object?>,
+          messages: {
+            'en': _messages('lib/l10n/app_en.arb'),
+            'es': _messages('lib/l10n/app_es.arb')
+          },
+          declared: declared,
+        ),
+        isEmpty);
+  });
+
+  test('the composition check finds moved words and swapped placeholders', () {
+    final composed = {
+      'lib/x.dart': {
+        'left': {'en': r'$time LEFT', 'es': r'$time RESTANTE'},
+        'step': {'en': r'STEP $n OF 3 · $name', 'es': r'PASO $n DE 3 · $name'},
+        'voice': {
+          'en': r"Voice\n${on ? ('On') : ('Off')}",
+          'es': r"Voz\n${on ? ('Sí') : ('No')}"
+        },
+      },
+    };
+    const declared = {
+      'left': ['time'],
+      'step': ['n', 'name'],
+      'voice': ['state'],
+    };
+    final good = {
+      'en': {
+        'left': '{time} LEFT',
+        'step': 'STEP {n} OF 3 · {name}',
+        'voice': 'Voice\n{state}'
+      },
+      'es': {
+        'left': '{time} RESTANTE',
+        'step': 'PASO {n} DE 3 · {name}',
+        'voice': 'Voz\n{state}'
+      },
+    };
+    List<String> check(String lang, String key, String value) =>
+        composedProblems(
+          composed: composed,
+          messages: {
+            for (final e in good.entries)
+              e.key: {...e.value, if (e.key == lang) key: value}
+          },
+          declared: declared,
+        );
+    expect(check('en', 'left', '{time} LEFT'), isEmpty);
+    expect(check('en', 'left', 'LEFT {time}'), isNotEmpty);
+    expect(check('es', 'left', '{time} RESTANTES'), isNotEmpty);
+    expect(check('en', 'step', 'STEP {name} OF 3 · {n}'), isNotEmpty);
+    expect(check('es', 'step', 'PASO {name} DE 3 · {n}'), isNotEmpty);
+    expect(check('en', 'step', 'STEP {n} OF 4 · {name}'), isNotEmpty);
+    expect(check('es', 'voice', 'Voz: {state}'), isNotEmpty);
   });
 
   test(

@@ -70,7 +70,7 @@ final _allowedForms = <RegExp>[
 
 /// [source] with comments and the text of string literals replaced by
 /// spaces (same length and line breaks), keeping the code inside `${...}`
-/// interpolations: so `'a://b'` is not read as a comment and a word in a
+/// and `$name` interpolations: so `'a://b'` is not read as a comment and a word in a
 /// string is not read as code.
 String maskStringsAndComments(String source) {
   final out = source.split('');
@@ -104,6 +104,15 @@ String maskStringsAndComments(String source) {
       if (!raw && source.startsWith(r'${', i)) {
         blank(textFrom, i);
         i = code(i + 2);
+        textFrom = i;
+        continue;
+      }
+      // `$name` is code too: keep the identifier.
+      final name =
+          raw ? null : RegExp(r'\$([A-Za-z_]\w*)').matchAsPrefix(source, i);
+      if (name != null) {
+        blank(textFrom, i);
+        i = name.end;
         textFrom = i;
         continue;
       }
@@ -262,6 +271,10 @@ class A extends StatelessWidget {
       "final u = 'https://x.test'; final t = isSpanish == true ? 'a' : 'b';",
       "final u = 'a//b'; final t = (isSpanish) ? 'a' : 'b';",
       "final t = '\${isSpanish ? 'a' : 'b'}';",
+      // An unbraced interpolation is code as well.
+      "String get s1 => '\$isSpanish' == 'true' ? 'Hola' : 'Hi';",
+      'String get s2 => "\$isSpanish" == "true" ? "Hola" : "Hi";',
+      "String s3(L l10n) => l10n.greeting('\$isSpanish');",
     ]) {
       expect(otherIsSpanishUses(code), isNotEmpty, reason: code);
     }
