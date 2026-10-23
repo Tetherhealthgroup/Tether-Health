@@ -630,7 +630,7 @@ sha256 guard cannot see them. They follow from P-31 (fields start empty).
   the Flutter test run only. The prototype column still comes from the
   earlier browser run, before TH-907, and was not re-run in a browser.
 
-## Item arguments: which lesson or source a screen opens for (P-89, TH-909)
+## Item arguments: which lesson or source a screen opens for (P-88, TH-1031f)
 
 An action that opens `learn_lesson` or `records_source` gains `arg`, the
 identifier of the item it opens (a lesson id `<programme>.<slug>`, or a records
@@ -639,10 +639,7 @@ gains `argInherit`, so `records_disconnect` acts on the source that was opened.
 The kit passes the identifier as the route argument (`TNav.push(..., argument:)`,
 read with `TNav.argumentOf`), so a save on these screens knows which item it is
 for. Without it the app's handlers fail with `program_unknown`. This changes
-actions only: no label, starting value or layout in `spec/screens` changes. The
-registered decision and ticket are the nearest existing ones (P-89 member data,
-TH-909); the instruction for this change has no ID of its own, so the owner
-should confirm or replace them.
+actions only: no label, starting value or layout in `spec/screens` changes. The decision is P-88 (every flow wired) and the ticket TH-1031f.
 
 | Screen | Action | Argument |
 |---|---|---|

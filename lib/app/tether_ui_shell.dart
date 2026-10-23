@@ -425,13 +425,14 @@ String? programOfScreen(ScreenInstances instances, String screenId) {
 }
 
 /// The argument (a lesson or record source id) the topmost open
-/// [screenId] was opened with, or null. The generated screens pass none
-/// yet.
+/// [screenId] was opened with (`TNav.push(..., argument:)`, read like
+/// `TNav.argumentOf`), or null.
 String? argumentOfScreen(ScreenInstances instances, String screenId) {
   final open = _fromScreen(instances, screenId);
   if (open.isEmpty) return null;
   final arguments = open.first.settings.arguments;
-  return arguments is String && arguments.isNotEmpty ? arguments : null;
+  final id = arguments is TRouteArgs ? arguments.argument : arguments;
+  return id is String && id.isNotEmpty ? id : null;
 }
 
 /// Whether the server still accepts the current session: the profile
