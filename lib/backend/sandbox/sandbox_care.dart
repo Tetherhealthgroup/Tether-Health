@@ -43,6 +43,22 @@ Json? _liveConnection(SandboxCall c, Object? id) {
   return null;
 }
 
+/// Whether [code]'s enrolment holds a live share_care_team consent naming
+/// [connectionId].
+bool _sharesWith(SandboxCall c, String code, Object? connectionId) {
+  final enrolment = c
+      .list('enrolments')
+      .cast<Json>()
+      .where((e) => e['programmeCode'] == code && e['status'] != 'left')
+      .firstOrNull;
+  if (enrolment == null) return false;
+  return c.list('consents').cast<Json>().any((x) =>
+      x['enrolmentId'] == enrolment['id'] &&
+      x['purpose'] == 'share_care_team' &&
+      x['revokedAt'] == null &&
+      x['recipientRef'] == connectionId);
+}
+
 bool _enrolled(SandboxCall c, String code) => c.list('enrolments').any((e) =>
     (e! as Json)['programmeCode'] == code && (e as Json)['status'] != 'left');
 
@@ -80,9 +96,30 @@ SandboxAnswer createSummary(SandboxCall c) {
   if (!_enrolled(c, code)) {
     throw const SandboxProblem(404, 'enrolment_not_found');
   }
-  final connection = _liveConnection(c, body['connectionId']);
-  if (connection == null) {
-    throw const SandboxProblem(409, 'connection_required');
+  // The programme's live share_care_team consent must name the connection.
+  // Without connectionId: the one live connection holding such a consent.
+  final Json connection;
+  if (body['connectionId'] != null) {
+    final named = _liveConnection(c, body['connectionId']);
+    if (named == null) throw const SandboxProblem(404, 'connection_not_found');
+    if (!_sharesWith(c, code, named['id'])) {
+      throw const SandboxProblem(409, 'care_consent_required');
+    }
+    connection = named;
+  } else {
+    final holding = [
+      for (final r in _rows(_care(c), 'connections'))
+        if ((r! as Json)['revokedAt'] == null &&
+            _sharesWith(c, code, (r as Json)['id']))
+          r,
+    ];
+    if (holding.isEmpty) {
+      throw const SandboxProblem(409, 'care_consent_required');
+    }
+    if (holding.length > 1) {
+      throw const SandboxProblem(409, 'connection_required');
+    }
+    connection = holding.single;
   }
   final row = {
     'id': c.newId(),
@@ -105,9 +142,26 @@ SandboxAnswer createMessage(SandboxCall c) {
     'programmeCode': StrRule(pattern: _code),
     'attachment': const _ObjectRule(),
   });
-  final connection = _liveConnection(c, body['connectionId']);
-  if (connection == null) {
-    throw const SandboxProblem(409, 'connection_required');
+  final Json connection;
+  if (body['connectionId'] != null) {
+    final named = _liveConnection(c, body['connectionId']);
+    if (named == null) throw const SandboxProblem(409, 'connection_required');
+    connection = named;
+  } else {
+    final live = [
+      for (final r in _rows(_care(c), 'connections'))
+        if ((r! as Json)['revokedAt'] == null) r as Json,
+    ];
+    if (live.length != 1) {
+      throw const SandboxProblem(409, 'connection_required');
+    }
+    connection = live.single;
+  }
+  // About a programme: its live share_care_team consent must name the
+  // connection.
+  final code = body['programmeCode'] as String?;
+  if (code != null && !_sharesWith(c, code, connection['id'])) {
+    throw const SandboxProblem(409, 'care_consent_required');
   }
   final row = {
     'id': c.newId(),

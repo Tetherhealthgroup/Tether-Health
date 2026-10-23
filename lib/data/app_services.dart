@@ -88,9 +88,10 @@ class AppServices {
         await (source as ConsentDocuments).currentConsentVersions();
     if (versions == null) return null;
     final profile = await api.account.profile();
-    final locale = profile.valueOrNull?.locale == 'es'
-        ? ConsentLocale.es
-        : ConsentLocale.en;
+    final shown = profile.valueOrNull;
+    // Without the member's language the right document is unknown.
+    if (shown == null) return null;
+    final locale = shown.locale == 'es' ? ConsentLocale.es : ConsentLocale.en;
     final version = versions['${purpose.wire}/${locale.wire}'];
     return version == null ? null : (version, locale);
   }

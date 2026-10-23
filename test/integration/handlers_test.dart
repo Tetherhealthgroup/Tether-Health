@@ -29,6 +29,9 @@ class _Recorded implements Backend, ConsentDocuments {
   final List<String> calls = [];
   bool offline = false;
 
+  /// Paths that answer a server failure.
+  final Set<String> failing = {};
+
   /// Replaces the sandbox's document versions when set.
   Map<String, String>? versions;
 
@@ -60,6 +63,9 @@ class _Transport implements BackendTransport {
   @override
   Future<BackendResponse> send(BackendRequest request) async {
     if (owner.offline) return const BackendUnreachable();
+    if (owner.failing.contains(request.path)) {
+      return const BackendProblem(503, 'server_error');
+    }
     owner.calls.add('${request.method.wire} ${request.path}');
     return owner.inner.transport.send(request);
   }
@@ -94,6 +100,24 @@ void main() {
   });
 
   tearDown(TSession.clear);
+
+  /// Grants [code]'s share_care_team consent naming the live connection.
+  Future<void> shareWithClinic(String code) async {
+    final list =
+        (await h.api.care.connections()).valueOrNull!['connections']! as List;
+    final connection = (list.single as Map)['id'] as String;
+    final e = (await h.api.enrolments.list())
+        .valueOrNull!
+        .enrolments
+        .firstWhere((e) => e.programmeCode == code);
+    final granted = await h.api.enrolments.grantConsent(
+        enrolmentId: e.id,
+        purpose: ConsentPurpose.shareCareTeam,
+        consentVersion: 'sandbox-draft-1',
+        locale: ConsentLocale.en,
+        recipientRef: connection);
+    expect(granted.isSuccess, isTrue);
+  }
 
   Future<TResult> submit(
       String endpoint, String screen, Map<String, Object?> values,
@@ -504,6 +528,7 @@ void main() {
       await h.enrol('hw');
       await h.api.care
           .redeemConnection({'inviteCode': 'TETHER-SANDBOX-CLINIC'});
+      await shareWithClinic('hw');
       await h.api.events
           .hwReading(idempotencyKey: h.key(), systolic: 130, diastolic: 80);
       final data = AppData(sources: [SummarySource(services, 'hw')]);
@@ -550,5 +575,61 @@ void main() {
     final r = await submit('POST /v1/program-data/hw/lipids', 'hw_lipids',
         {'hw_lipids.ldl': '120'});
     expect(r, const TResult.failed(HandlerCodes.invalidInput));
+  });
+
+  test('a clinic share needs that programme\'s share consent', () async {
+    await h.signUp();
+    await h.enrol('hw');
+    await h.api.care.redeemConnection({'inviteCode': 'TETHER-SANDBOX-CLINIC'});
+    final refused = await h.api.care.sendSummary(
+        {'programmeCode': 'hw', 'snapshot': <String, Object?>{}},
+        idempotencyKey: h.key());
+    expect(refused.errorOrNull!.wire, 'care_consent_required');
+    final message = await h.api.care.sendMessage(
+        {'topic': 'Plan', 'message': 'synthetic', 'programmeCode': 'hw'},
+        idempotencyKey: h.key());
+    expect(message.errorOrNull!.wire, 'care_consent_required');
+    final general = await h.api.care.sendMessage(
+        {'topic': 'Plan', 'message': 'synthetic'},
+        idempotencyKey: h.key());
+    expect(general.isSuccess, isTrue);
+    await shareWithClinic('hw');
+    final shared = await h.api.care.sendSummary(
+        {'programmeCode': 'hw', 'snapshot': <String, Object?>{}},
+        idempotencyKey: h.key());
+    expect(shared.valueOrNull!['delivery'], 'stored');
+  });
+
+  test('a deletion interrupted before its answer was stored is finished',
+      () async {
+    await h.signUp();
+    final id = services.accountId!;
+    await deviceStore.write(safetyPlanScope(id), '{}');
+    await DeletionRecords(deviceStore).put(id, {'state': 'requested'});
+    backend.offline = true;
+    await resumeUnfinished(kit);
+    expect(
+        (await DeletionRecords(deviceStore).all())[id]!['state'], 'requested',
+        reason: 'never dropped before the cleanup');
+    expect(deviceStore.documents.containsKey(safetyPlanScope(id)), isTrue);
+    backend.offline = false;
+    await resumeUnfinished(kit);
+    expect(
+        (await DeletionRecords(deviceStore).all())[id]!['state'], 'complete');
+    expect(deviceStore.documents.containsKey(safetyPlanScope(id)), isFalse);
+  });
+
+  test('an unreadable profile fails the consent closed and keeps the record',
+      () async {
+    await submit('POST /v1/enrolments/consents', 'ob_consent', {
+      'ob_programs.programs': ['Heartwise'],
+      'ob_consent.essential_app_data': true,
+    });
+    await h.signUp();
+    backend.failing.add('/v1/profile');
+    await expectLater(kit.pending.commit(services), throwsStateError);
+    expect(await kit.pending.read(), isNotEmpty);
+    final e = (await h.api.enrolments.list()).valueOrNull!.enrolments.single;
+    expect(e.consents, isEmpty, reason: 'no consent in a guessed language');
   });
 }

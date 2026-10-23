@@ -94,9 +94,27 @@ Future<void> retryDeletions(
       in (await records.all()).entries) {
     switch (record['state']) {
       case 'requested':
-        // The server's answer was never recorded: nothing was wiped here.
-        // The member can delete again; the server's retry is safe.
-        await records.remove(id);
+        // The server's answer was never recorded. The delete is safe to
+        // repeat: ask again. A session the server no longer accepts means
+        // the account is already gone. Anything else keeps the record for
+        // the next start; it is never dropped before the cleanup.
+        var done = !services.signedIn;
+        Map<String, Object?>? receipt;
+        if (!done) {
+          final answer = await services.api.account.deleteData();
+          receipt = answer.valueOrNull?.toJson();
+          done = receipt != null ||
+              answer.errorOrNull?.code == ApiProblemCode.unauthenticated;
+        }
+        if (!done) continue;
+        final next = {
+          'state': 'server_done',
+          if (receipt != null) 'receipt': receipt
+        };
+        await records.put(id, next);
+        if (await cleanUpAccount(services, cleaners, pending, id)) {
+          await records.put(id, {...next, 'state': 'complete'});
+        }
       case 'server_done':
         if (await cleanUpAccount(services, cleaners, pending, id)) {
           await records.put(id, {...record, 'state': 'complete'});
