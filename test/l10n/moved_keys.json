@@ -1,5 +1,5 @@
 {
- "about": "For each file that left the isSpanish list: inventory row (index in test/l10n/baseline/legacy_literals.json) -> the ARB key its text moved to, key#case for a select/plural case, key^ for a part of a composed message (one word of it, in the same message as its other-language part), =source when the literal stays in the file, or =source:<path> when it moved to another moved file’s code.",
+ "about": "For each file that left the isSpanish list: inventory row (index in test/l10n/baseline/legacy_literals.json) -> the ARB key its text moved to, key#case for a select/plural case, key^ for a part of a composed message (one word of it, in the same message as its other-language part), =source when the literal stays in the file, or =source:<path> when it moved to another moved file’s code. composed: for each key^ key, the old joined literal per language, which the message must reproduce.",
  "files": {
   "lib/screens/welcome_screen.dart": {
    "3": "welcomeSheetDoneButton",
@@ -1086,6 +1086,40 @@
    "151": "guidedStressResetRescueTitle",
    "152": "guidedStressResetRescueButton",
    "153": "guidedStressResetRescueButton"
+  }
+ },
+ "composed": {
+  "lib/screens/active_craving_rescue_screen.dart": {
+   "activeCravingRescueBreathingTimeLeft": {
+    "en": "$remainingLabel LEFT",
+    "es": "$remainingLabel REST."
+   },
+   "activeCravingRescueVoiceControl": {
+    "en": "Voice\\n${voiceEnabled ? ('On') : ('Off')}",
+    "es": "Voz\\n${voiceEnabled ? ('Sí') : ('No')}"
+   },
+   "activeCravingRescueHapticsControl": {
+    "en": "Haptics\\n${hapticsEnabled ? ('On') : ('Off')}",
+    "es": "Hápticos\\n${hapticsEnabled ? ('Sí') : ('No')}"
+   },
+   "activeCravingRescueTimeLeft": {
+    "en": "$remainingLabel LEFT",
+    "es": "$remainingLabel RESTANTE"
+   }
+  },
+  "lib/screens/guided_stress_reset_screen.dart": {
+   "guidedStressResetStepCounter": {
+    "en": "STEP $stepNumber OF 3 · $stepName",
+    "es": "PASO $stepNumber DE 3 · $stepName"
+   },
+   "guidedStressResetTimeLeft": {
+    "en": "$remainingTime LEFT",
+    "es": "$remainingTime RESTANTES"
+   },
+   "guidedStressResetBreathCount": {
+    "en": "Breath $_breathNumber of 10",
+    "es": "Respiración $_breathNumber de 10"
+   }
   }
  }
 }
