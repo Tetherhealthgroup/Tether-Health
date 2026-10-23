@@ -3,7 +3,7 @@
 # submits anything. iOS counterpart of tool/build_play_release.sh.
 #
 # Usage: sh tool/build_ios_release.sh --dart-define-from-file=<path>
-#          [--build-number N] [--check-only]
+#          [--build-number N] [--check-only] [--internal-tether-ui]
 #        sh tool/build_ios_release.sh --inspect-ipa=<path>
 #
 # --dart-define-from-file=<path>
@@ -33,6 +33,26 @@
 # --inspect-ipa=<path>
 #                   Print CFBundleShortVersionString and CFBundleVersion of an
 #                   existing IPA, then exit. Never builds.
+# --internal-tether-ui
+#                   Internal test build running the tether_ui screens
+#                   (TestFlight internal testing only). The script adds
+#                   --dart-define=TETHER_UI_INTERNAL=true itself and checks the
+#                   define file with check_internal_define_file
+#                   (tool/release_define_check.sh: TETHER_BACKEND sandbox, or
+#                   http against STAGING_HOSTS only; a file holding
+#                   TETHER_UI_INTERNAL is refused). iOS version numbers must
+#                   stay numeric, so the version is unchanged; instead the
+#                   script prints a banner and, after a successful build,
+#                   writes the marker file build/ios/INTERNAL_TETHER_UI (removed
+#                   before the build). With --check-only it runs the internal
+#                   checks. Not accepted with --inspect-ipa. Without this flag
+#                   the script behaves exactly as before; nothing else (no
+#                   environment variable, no define file key) can turn it on.
+#
+# Checklist (owner): never submit an IPA built with --internal-tether-ui (the
+# banner was printed and build/ios/INTERNAL_TETHER_UI exists) for App Store
+# review or external testing. It runs the tether_ui screens, which stay off the
+# public store until full acceptance.
 #
 # The project uses Swift Package Manager: the script refuses to run if
 # ios/Podfile exists or ios/Runner.xcodeproj/project.pbxproj or
@@ -62,6 +82,8 @@ inspect_ipa_given=0
 build_number=""
 build_number_given=0
 max_build_number=2100000000 # the Play limit (tool/build_play_release.sh)
+internal_ui=0
+internal_marker="build/ios/INTERNAL_TETHER_UI"
 
 fail() {
   echo "build_ios_release: $1" >&2
@@ -125,6 +147,7 @@ while [ "$#" -gt 0 ]; do
       ;;
     --build-number=*) set_build_number "${arg#--build-number=}" ;;
     --check-only) check_only=1 ;;
+    --internal-tether-ui) internal_ui=1 ;;
     --inspect-ipa=*)
       inspect_ipa="${arg#--inspect-ipa=}"
       inspect_ipa_given=1
@@ -143,7 +166,7 @@ done
 # echoed in a tool's error message.
 
 if [ "$inspect_ipa_given" -eq 1 ]; then
-  if [ "$env_file_given" -eq 1 ] || [ "$check_only" -eq 1 ] || [ "$build_number_given" -eq 1 ]; then
+  if [ "$env_file_given" -eq 1 ] || [ "$check_only" -eq 1 ] || [ "$build_number_given" -eq 1 ] || [ "$internal_ui" -eq 1 ]; then
     fail "--inspect-ipa cannot be combined with other arguments" 2
   fi
   [ -n "$inspect_ipa" ] || fail "--inspect-ipa requires a path" 2
@@ -234,6 +257,16 @@ check_no_cocoapods() {
   done
 }
 
+# Internal builds only: the warning printed before and after the build.
+internal_banner() {
+  echo
+  echo "=================================================================="
+  echo "INTERNAL TEST BUILD: runs the tether_ui screens (TETHER_UI_INTERNAL)."
+  echo "TestFlight internal testing only. Never submit it for App Store review."
+  echo "=================================================================="
+  echo
+}
+
 if [ "$inspect_ipa_given" -eq 1 ]; then
   print_ipa_version "$inspect_ipa"
   exit 0
@@ -242,10 +275,15 @@ fi
 check_no_cocoapods
 # shellcheck source=tool/release_define_check.sh
 . tool/release_define_check.sh
-check_release_define_file build_ios_release "$env_file" || exit 1
+if [ "$internal_ui" -eq 1 ]; then
+  check_internal_define_file build_ios_release "$env_file" || exit 1
+else
+  check_release_define_file build_ios_release "$env_file" || exit 1
+fi
 check_build_number
 
 if [ "$check_only" -eq 1 ]; then
+  [ "$internal_ui" -eq 0 ] || echo "Internal build checks (--internal-tether-ui) passed."
   echo "All pre-build checks passed (no build was run)."
   exit 0
 fi
@@ -259,7 +297,17 @@ echo "== flutter test"
 flutter test
 ipa_dir="build/ios/ipa"
 rm -f "$ipa_dir"/*.ipa # never report a stale IPA from an earlier build
-if [ -n "$build_number" ]; then
+if [ "$internal_ui" -eq 1 ]; then
+  rm -f "$internal_marker"
+  internal_banner
+  if [ -n "$build_number" ]; then
+    echo "== flutter build ipa --release --build-number $build_number --dart-define=TETHER_UI_INTERNAL=true"
+    flutter build ipa --release "--dart-define-from-file=$env_file" --build-number "$build_number" --dart-define=TETHER_UI_INTERNAL=true
+  else
+    echo "== flutter build ipa --release --dart-define=TETHER_UI_INTERNAL=true"
+    flutter build ipa --release "--dart-define-from-file=$env_file" --dart-define=TETHER_UI_INTERNAL=true
+  fi
+elif [ -n "$build_number" ]; then
   echo "== flutter build ipa --release --build-number $build_number"
   flutter build ipa --release "--dart-define-from-file=$env_file" --build-number "$build_number"
 else
@@ -279,4 +327,13 @@ if [ -n "$build_number" ]; then
   print_ipa_version "$1" "$build_number"
 else
   print_ipa_version "$1"
+fi
+if [ "$internal_ui" -eq 1 ]; then
+  {
+    echo "Internal test build (--internal-tether-ui): runs the tether_ui screens."
+    echo "IPA: ${1##*/}"
+    echo "TestFlight internal testing only. Never submit it for App Store review."
+  } > "$internal_marker"
+  echo "Marker: $(pwd)/$internal_marker"
+  internal_banner
 fi

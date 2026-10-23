@@ -1,5 +1,7 @@
-// The tether_ui screens run only in debug builds that ask for them. Every
-// profile and release build runs the legacy app.
+// The tether_ui screens run in debug builds that ask for them and in internal
+// test builds (TETHER_UI_INTERNAL, added only by the release scripts'
+// --internal-tether-ui flag). Every other profile and release build runs the
+// legacy app.
 import 'dart:io';
 
 import 'package:breathefree_patient/app/ui_selection.dart';
@@ -26,9 +28,52 @@ void main() {
       expect(selectAppUi(debug: false, requested: false), AppUi.legacy);
     });
 
-    test('the defaults are kDebugMode and the TETHER_UI define', () {
-      // This test run has no TETHER_UI define, so the default is legacy.
+    group('internal test build', () {
+      test('a release build without the internal define runs legacy', () {
+        expect(
+          selectAppUi(debug: false, requested: false, internal: false),
+          AppUi.legacy,
+        );
+        expect(
+          selectAppUi(debug: false, requested: true, internal: false),
+          AppUi.legacy,
+        );
+      });
+
+      test('a release build with the internal define runs tether_ui', () {
+        expect(
+          selectAppUi(debug: false, requested: false, internal: true),
+          AppUi.tetherUi,
+        );
+        expect(
+          selectAppUi(debug: false, requested: true, internal: true),
+          AppUi.tetherUi,
+        );
+      });
+
+      test('a debug build with the internal define runs tether_ui', () {
+        expect(
+          selectAppUi(debug: true, requested: false, internal: true),
+          AppUi.tetherUi,
+        );
+        expect(
+          selectAppUi(debug: true, requested: true, internal: true),
+          AppUi.tetherUi,
+        );
+      });
+
+      test('a debug build without either define runs legacy', () {
+        expect(
+          selectAppUi(debug: true, requested: false, internal: false),
+          AppUi.legacy,
+        );
+      });
+    });
+
+    test('the defaults are kDebugMode and the two defines', () {
+      // This test run has neither define, so the default is legacy.
       expect(const bool.fromEnvironment('TETHER_UI'), isFalse);
+      expect(const bool.fromEnvironment('TETHER_UI_INTERNAL'), isFalse);
       expect(selectAppUi(), AppUi.legacy);
       expect(kDebugMode, isTrue);
       final code = stripped(
@@ -40,11 +85,21 @@ void main() {
         contains("bool requested = const bool.fromEnvironment('TETHER_UI'),"),
       );
       expect(
-          code, contains('debug && requested ? AppUi.tetherUi : AppUi.legacy'));
+        code,
+        contains(
+          "bool internal = const bool.fromEnvironment('TETHER_UI_INTERNAL'),",
+        ),
+      );
+      expect(
+        code,
+        contains(
+          '(debug && requested) || internal ? AppUi.tetherUi : AppUi.legacy',
+        ),
+      );
     });
   });
 
-  test('lib/ reads only the config defines and TETHER_UI', () {
+  test('lib/ reads only the config defines and the two UI defines', () {
     final found = <String>[];
     final call = RegExp(
       r'\b(?:String|bool|int)\s*\.\s*(?:fromEnvironment|hasEnvironment)\s*\(',
@@ -62,6 +117,7 @@ void main() {
     }
     expect(found..sort(), [
       'lib/app/ui_selection.dart:TETHER_UI',
+      'lib/app/ui_selection.dart:TETHER_UI_INTERNAL',
       'lib/config/app_config.dart:API_BASE_URL',
       'lib/config/app_config.dart:EPIC_SANDBOX_CLIENT_ID',
       'lib/config/app_config.dart:GOOGLE_IOS_CLIENT_ID',
@@ -83,7 +139,7 @@ void main() {
     ).firstMatch(code);
     expect(guard, isNotNull,
         reason: 'main.dart must branch on selectAppUi() with no arguments, '
-            'so the build mode and the define decide');
+            'so the build mode and the defines decide');
     final blockEnd = matchingBracket(code, guard!.end - 1);
 
     final starts = RegExp(r'\brunTetherUi\s*\(').allMatches(code).toList();
