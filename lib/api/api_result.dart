@@ -132,8 +132,16 @@ class ApiError {
       (status >= 500 && code != ApiProblemCode.sandboxFull) ||
       code == ApiProblemCode.backendNotReady;
 
-  /// The access token was missing, expired or refused.
-  bool get isAuthFailure => status == 401;
+  /// The access token was missing, expired or refused: the session is over.
+  /// Not for [needsRecentAuth], where the session is fine but the action
+  /// needs a fresh sign-in.
+  bool get isAuthFailure =>
+      status == 401 && code != ApiProblemCode.recentAuthenticationRequired;
+
+  /// The action needs a recent sign-in (ask for the password again; never
+  /// sign out).
+  bool get needsRecentAuth =>
+      code == ApiProblemCode.recentAuthenticationRequired;
 
   @override
   bool operator ==(Object other) =>

@@ -227,7 +227,12 @@ abstract interface class Backend {
 
   BackendTransport get transport;
 
-  /// Removes every local trace of the backend (the sandbox store, cached
-  /// tokens). Used after account deletion and by tests.
+  /// Reads what the backend keeps on the phone (the sandbox's stored
+  /// session). Called once by the composition root before sign-in state is
+  /// read; a no-op where nothing is kept.
+  Future<void> init();
+
+  /// Removes the current account's local traces (its sandbox data and
+  /// session). Used after account deletion and by tests.
   Future<void> wipeLocal();
 }

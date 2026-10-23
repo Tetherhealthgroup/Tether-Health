@@ -493,7 +493,9 @@ class AppConfig {
   void validate({bool production = kReleaseMode, bool? tetherUi}) {
     final forTetherUi = tetherUi ?? selectAppUi() == AppUi.tetherUi;
     if (forTetherUi) {
-      final problem = backendModeProblem(debug: !production && kDebugMode);
+      // Profile builds are checked like release builds.
+      production = production || !kDebugMode;
+      final problem = backendModeProblem(debug: !production);
       if (problem != null) {
         throw FormatException('This build is misconfigured. $problem');
       }

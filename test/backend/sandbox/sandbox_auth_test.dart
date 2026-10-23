@@ -48,7 +48,7 @@ void main() {
     expect(h.persistence.document, isNot(contains('pass123')));
   });
 
-  test('recovery opens the update step; the new password works', () async {
+  test('recovery needs its token step; it is never a recent sign-in', () async {
     await auth.signUp(email: 'c@sandbox.invalid', password: 'pass123');
     await auth.signOut();
     final events = <void>[];
@@ -56,7 +56,18 @@ void main() {
     await auth.requestPasswordReset(email: 'unknown@sandbox.invalid');
     await auth.requestPasswordReset(email: 'c@sandbox.invalid');
     await Future<void>.delayed(Duration.zero);
+    expect(events, isEmpty, reason: 'requesting a reset signs nobody in');
+    expect(auth.currentIdentity, isNull);
+    expect(await auth.recoveryTokenFor('unknown@sandbox.invalid'), isNull);
+    expect(await auth.completeRecovery('not-the-token'), isFalse);
+    final token = (await auth.recoveryTokenFor('c@sandbox.invalid'))!;
+    expect(await auth.completeRecovery(token), isTrue);
+    await Future<void>.delayed(Duration.zero);
     expect(events, hasLength(1));
+    expect(auth.currentIdentity, isNotNull);
+    expect((await h.api.account.export()).errorOrNull?.status, 401,
+        reason: 'a recovery session is not a recent sign-in');
+    expect(await auth.completeRecovery(token), isFalse, reason: 'one use');
     await auth.updatePassword(newPassword: 'newpass1');
     await auth.signOut();
     await auth.signIn(email: 'c@sandbox.invalid', password: 'newpass1');
@@ -120,6 +131,28 @@ void main() {
       expect(await auth.linkIdentity(IdTokenProvider.google, '2'),
           AuthOutcome.success);
     });
+  });
+
+  test('sign-in still works when the member\'s data fills the cap', () async {
+    final small = SandboxHarness(maxBytes: 2048);
+    await small.signUp('full@sandbox.invalid');
+    await small.enrol('ck');
+    for (var i = 0; i < 50; i++) {
+      final r = await small.api.events.ckDone(
+          idempotencyKey: small.key(),
+          item: 'walk',
+          doneOn: small.now,
+          place: 'x' * 300);
+      if (!r.isSuccess) break;
+    }
+    await small.backend.auth.signOut();
+    await small.backend.auth
+        .signIn(email: 'full@sandbox.invalid', password: 'synthetic-pass');
+    expect(small.backend.auth.currentIdentity, isNotNull);
+    expect(
+        await small.backend.auth
+            .signUp(email: 'new@sandbox.invalid', password: 'pass123'),
+        isA<AuthSignUpResult>());
   });
 
   test('the session survives a restart only after restore()', () async {

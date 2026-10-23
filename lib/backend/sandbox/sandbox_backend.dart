@@ -39,14 +39,30 @@ class SandboxBackend implements Backend {
   @override
   final SandboxServer transport;
 
-  /// Reads the stored session. Call before reading
-  /// [AuthBackend.currentIdentity] at startup; until then nobody is signed
-  /// in. Never touches storage before it is called or a request is sent.
+  /// Reads the stored session. Until it has run nobody is signed in; the
+  /// composition root runs it ([init]) before sign-in state is read.
   Future<void> restore() => auth.restore();
 
   @override
+  Future<void> init() => restore();
+
+  /// Removes the signed-in account's sandbox data, account and session.
+  /// Other synthetic accounts on the phone stay.
+  @override
   Future<void> wipeLocal() async {
-    await store.wipe();
+    final id = auth.currentIdentity?.id;
     auth.forgetSession();
+    await store.transact((state) {
+      state['session'] = null;
+      if (id == null) return;
+      (state['users']! as Json).remove(id);
+      (state['data']! as Json).remove(id);
+    }, capped: false);
+  }
+
+  /// Deletes the whole sandbox document: every synthetic account.
+  Future<void> wipeAll() async {
+    auth.forgetSession();
+    await store.wipe();
   }
 }

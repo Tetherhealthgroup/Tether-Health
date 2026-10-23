@@ -73,15 +73,19 @@ class Composition {
   final DeletionCleaners cleaners;
 }
 
-/// Builds the app's services for [config]. [backend] replaces the configured
-/// one (tests only). [screenInstance] identifies the submitting screen
-/// instance for idempotency keys.
-Composition compose({
+/// Builds the app's services for [config]: the backend first, which reads
+/// what it keeps on the phone ([Backend.init]) before anything reads the
+/// sign-in state. [backend] replaces the configured one (tests only).
+/// [screenInstance] identifies the submitting screen instance for
+/// idempotency keys. Throws [MisconfiguredBuildException] when the
+/// configuration names no backend mode.
+Future<Composition> compose({
   required AppConfig config,
   Backend? backend,
   ScreenInstanceLookup? screenInstance,
-}) {
+}) async {
   final built = backend ?? createBackend(config);
+  await built.init();
   final data = buildAppData(built);
   final postAuthHooks = PostAuthHooks();
   final cleaners = DeletionCleaners();

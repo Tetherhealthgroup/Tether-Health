@@ -14,7 +14,7 @@ class HttpBackend implements Backend {
   HttpBackend(
     AppConfig config, {
     SupabaseClient Function()? supabase,
-    bool release = kReleaseMode,
+    bool release = !kDebugMode,
   }) : this.withAuth(
           config,
           SupabaseAuthBackend(supabase ?? () => Supabase.instance.client),
@@ -25,7 +25,7 @@ class HttpBackend implements Backend {
   HttpBackend.withAuth(
     AppConfig config,
     this.auth, {
-    bool release = kReleaseMode,
+    bool release = !kDebugMode,
   }) : transport = HttpBackendTransport(
           apiBaseUrl: Uri.parse(config.apiBaseUrl),
           syncBaseUrl: Uri.parse(config.syncBaseUrl),
@@ -44,6 +44,9 @@ class HttpBackend implements Backend {
 
   /// Nothing of the http backend is stored on the phone: the session is the
   /// auth gateway's and is ended by signing out.
+  @override
+  Future<void> init() async {}
+
   @override
   Future<void> wipeLocal() async {}
 }

@@ -210,6 +210,19 @@ void main() {
           isTrue);
     });
 
+    test('a recent-sign-in refusal is not a session failure', () async {
+      final t = RecordingTransport(
+          const BackendProblem(401, 'recent_authentication_required'));
+      final error = (await TetherApi(t).enrolments.delete(testId)).errorOrNull!;
+      expect(error.needsRecentAuth, isTrue);
+      expect(error.isAuthFailure, isFalse,
+          reason: 'it asks for the password again; it never signs out');
+      t.answer = const BackendProblem(401, 'unauthenticated');
+      final expired = (await TetherApi(t).records.today()).errorOrNull!;
+      expect(expired.isAuthFailure, isTrue);
+      expect(expired.needsRecentAuth, isFalse);
+    });
+
     test('a 2xx body of the wrong shape is invalid_response', () async {
       final t =
           RecordingTransport(const BackendOk(200, ['not', 'an', 'object']));

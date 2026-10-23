@@ -193,11 +193,19 @@ class SandboxServer implements BackendTransport {
         break;
       }
     }
-    if (route == null) {
-      // An unrouted path or method, as the server answers it.
-      return const BackendProblem(404, 'not_found');
-    }
     final token = await _auth.accessToken();
+    if (route == null) {
+      // As the server: authentication first, then the unrouted path.
+      final signedIn = await _store.read((state) =>
+          SandboxAuthBackend.accountFor(state, token, _clock()) != null);
+      return signedIn
+          ? const BackendProblem(404, 'not_found')
+          : BackendProblem(
+              401,
+              request.service == BackendService.sync
+                  ? 'unauthenticated'
+                  : BackendCodes.unauthenticated);
+    }
     final now = _clock();
     final unauthenticated = request.service == BackendService.sync
         ? 'unauthenticated'

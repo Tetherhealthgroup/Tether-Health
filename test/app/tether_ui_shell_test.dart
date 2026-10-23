@@ -6,6 +6,8 @@ import 'dart:async';
 import 'package:breathefree_patient/account/account_deletion_receipt_store.dart';
 import 'package:breathefree_patient/app/tether_ui_shell.dart';
 import 'package:breathefree_patient/auth/account_controller.dart';
+import 'package:breathefree_patient/backend/stub_backend.dart';
+import 'package:breathefree_patient/config/app_config.dart' show BackendMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tether_ui/router/routes.dart';
@@ -26,6 +28,9 @@ Future<TetherUiRuntime> _start(
   addTearDown(tester.view.reset);
   late Widget app;
   final runtime = await runTetherUi(
+    // A stub backend: the sandbox reads secure storage, which never
+    // answers in a widget test.
+    backend: StubBackend(BackendMode.sandbox),
     account: account,
     guestStore: FakeGuestStore(hasPlan: guestPlan),
     platform: platform,

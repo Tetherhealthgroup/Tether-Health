@@ -12,7 +12,9 @@ import 'package:tether_ui/ui/ui.dart';
 
 import '../auth/account_controller.dart';
 import '../backend/backend.dart';
+import '../backend/backend_factory.dart';
 import '../config/app_config.dart';
+import '../config/misconfigured_build_app.dart';
 import '../integration/session_lifecycle.dart';
 import '../l10n/app_locale.dart';
 import '../l10n/app_localizations.dart';
@@ -210,11 +212,18 @@ Future<TetherUiRuntime> runTetherUi({
   }
 
   final instances = ScreenInstances();
-  final composition = compose(
-    config: config ?? AppConfig.fromEnvironment(),
-    backend: backend,
-    screenInstance: instances.instanceOf,
-  );
+  final Composition composition;
+  try {
+    composition = await compose(
+      config: config ?? AppConfig.fromEnvironment(),
+      backend: backend,
+      screenInstance: instances.instanceOf,
+    );
+  } on MisconfiguredBuildException catch (error) {
+    // Show the problem on screen rather than a blank app.
+    run(MisconfiguredBuildApp(message: error.message));
+    rethrow;
+  }
   final hooks = installProductionHooks(
     release: release,
     api: composition.api,

@@ -120,14 +120,16 @@ void main() {
     });
 
     test('refuses a configuration with no valid mode', () {
-      expect(() => createBackend(_none, debug: false), throwsArgumentError);
+      expect(() => createBackend(_none, debug: false),
+          throwsA(isA<MisconfiguredBuildException>()));
       const partial = AppConfig(
         apiBaseUrl: 'https://api.example.test',
         supabaseUrl: '',
         supabaseAnonKey: '',
         backend: 'http',
       );
-      expect(() => createBackend(partial, debug: true), throwsArgumentError);
+      expect(() => createBackend(partial, debug: true),
+          throwsA(isA<MisconfiguredBuildException>()));
     });
   });
 

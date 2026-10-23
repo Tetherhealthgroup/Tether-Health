@@ -118,12 +118,15 @@ class SandboxStore {
 
   /// Runs [change] on a copy of the document and stores the copy. When
   /// [change] throws, or the result is over the cap, nothing is kept.
-  Future<T> transact<T>(T Function(Json state) change) => _serial(() async {
+  /// [capped] false is for sign-in records (accounts and the session), which
+  /// are small and must work even when the member's data fills the cap.
+  Future<T> transact<T>(T Function(Json state) change, {bool capped = true}) =>
+      _serial(() async {
         final current = await _loaded();
         final copy = _deepCopy(current) as Json;
         final result = change(copy);
         final text = jsonEncode(copy);
-        if (utf8.encode(text).length > maxBytes) {
+        if (capped && utf8.encode(text).length > maxBytes) {
           throw const SandboxFullException();
         }
         await _persistence.write(text);

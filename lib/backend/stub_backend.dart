@@ -18,6 +18,9 @@ class StubBackend implements Backend {
   final BackendTransport transport = const StubTransport();
 
   @override
+  Future<void> init() async {}
+
+  @override
   Future<void> wipeLocal() async {}
 }
 

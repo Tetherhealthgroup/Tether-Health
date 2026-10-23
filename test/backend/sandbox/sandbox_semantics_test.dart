@@ -4,6 +4,9 @@
 import 'dart:convert';
 
 import 'package:breathefree_patient/api/tether_api.dart';
+import 'package:breathefree_patient/app/composition.dart';
+import 'package:breathefree_patient/auth/auth_gateway.dart';
+import 'package:breathefree_patient/config/app_config.dart';
 import 'package:breathefree_patient/backend/backend.dart';
 import 'package:breathefree_patient/backend/sandbox/sandbox_api.dart';
 import 'package:breathefree_patient/backend/sandbox/sandbox_store.dart';
@@ -60,6 +63,33 @@ void main() {
       final unknown = await h.api.enrolments
           .create(programmeCode: 'zz', status: EnrolmentStatus.paused);
       expect(_code(unknown), ApiProblemCode.programmeNotFound);
+    });
+
+    test('leaving revokes the optional consents; rejoining keeps them off',
+        () async {
+      final bf = await h.enrol('bf');
+      await h.api.enrolments.grantConsent(
+          enrolmentId: bf,
+          purpose: ConsentPurpose.reminders,
+          consentVersion: sandboxConsentVersion,
+          locale: ConsentLocale.en);
+      await h.api.enrolments.update(bf, status: EnrolmentStatus.left);
+      final left =
+          (await h.api.enrolments.list()).valueOrNull!.enrolments.single;
+      expect([for (final c in left.consents) c.purpose], [ConsentPurpose.core]);
+      await h.api.enrolments.update(bf, status: EnrolmentStatus.learnOnly);
+      final back =
+          (await h.api.enrolments.list()).valueOrNull!.enrolments.single;
+      expect(back.status, EnrolmentStatus.learnOnly);
+      expect([for (final c in back.consents) c.purpose], [ConsentPurpose.core]);
+    });
+
+    test('mode is checked before the programme, as on the server', () async {
+      final r = await h.api.enrolments.create(
+          programmeCode: 'zz',
+          status: EnrolmentStatus.paused,
+          mode: EnrolmentMode.quit);
+      expect(_code(r), ApiProblemCode.modeNotAllowed);
     });
 
     test('delete now needs its confirmation and removes the data', () async {
@@ -183,6 +213,14 @@ void main() {
           idempotencyKey: h.key(),
           body: {'systolic': 120, 'diastolic': 80, 'constructor': 1}));
       expect(unknown, const BackendProblem(400, 'invalid_request'));
+    });
+
+    test('a pulse outside 0–10000 is 422 invalid_record', () async {
+      await h.enrol('hw');
+      final r = await h.api.events.hwReading(
+          idempotencyKey: h.key(), systolic: 120, diastolic: 80, pulse: 20000);
+      expect(_status(r), 422);
+      expect(_code(r), ApiProblemCode.invalidRecord);
     });
 
     test('need an enrolment with live core consent', () async {
@@ -414,13 +452,56 @@ void main() {
       expect(list.enrolments.single.programmeCode, 'bf');
     });
 
-    test('wipeLocal empties it', () async {
+    test('wipeLocal removes only the signed-in account; wipeAll everything',
+        () async {
       await h.enrol('bf');
+      await h.backend.auth.signOut();
+      await h.signUp('second@sandbox.invalid');
+      await h.enrol('hw');
       await h.backend.wipeLocal();
-      expect(h.persistence.document, isNull);
       expect(h.backend.auth.currentIdentity, isNull);
       await h.restart();
       expect(h.backend.auth.currentIdentity, isNull);
+      await h.backend.auth
+          .signIn(email: 'member@sandbox.invalid', password: 'synthetic-pass');
+      expect(
+          (await h.api.enrolments.list())
+              .valueOrNull!
+              .enrolments
+              .single
+              .programmeCode,
+          'bf');
+      await expectLater(
+          h.backend.auth.signIn(
+              email: 'second@sandbox.invalid', password: 'synthetic-pass'),
+          throwsA(isA<AuthFailure>()));
+      await h.backend.wipeAll();
+      expect(h.persistence.document, isNull);
+      expect(h.backend.auth.currentIdentity, isNull);
+    });
+
+    test('the composition root restores the session at start', () async {
+      await h.enrol('bf');
+      final next = h.build();
+      expect(next.auth.currentIdentity, isNull);
+      await compose(
+          config: const AppConfig(
+              apiBaseUrl: '', supabaseUrl: '', supabaseAnonKey: ''),
+          backend: next);
+      expect(next.auth.currentIdentity, isNotNull);
+    });
+
+    test('an unrouted path asks for sign-in first, then is not found',
+        () async {
+      final request = BackendRequest(
+          service: BackendService.api,
+          method: BackendMethod.get,
+          path: '/v1/nowhere');
+      expect(await h.backend.transport.send(request),
+          const BackendProblem(404, 'not_found'));
+      await h.backend.auth.signOut();
+      expect(await h.backend.transport.send(request),
+          const BackendProblem(401, 'unauthenticated'));
     });
 
     test('the document is one entry under sandbox.v1', () {

@@ -101,8 +101,20 @@ class SandboxAuthBackend implements AuthBackend {
     return null;
   }
 
+  /// A sign-in write: not subject to the data cap; a storage failure is
+  /// the generic sign-in failure, never a crash.
+  Future<T> _write<T>(T Function(Json state) change) async {
+    try {
+      return await _store.transact(change, capped: false);
+    } on AuthFailure {
+      rethrow;
+    } catch (_) {
+      throw const AuthFailure(AuthFailureReason.serviceUnavailable);
+    }
+  }
+
   Future<void> _signInAs(String uid) async {
-    await _store.transact((state) {
+    await _write((state) {
       state['session'] = _newSession(uid);
       _cache(state);
     });
@@ -143,7 +155,7 @@ class SandboxAuthBackend implements AuthBackend {
     if (!normal.contains('@') || password.length < 6) {
       throw const AuthFailure(AuthFailureReason.unknown);
     }
-    final created = await _store.transact((state) {
+    final created = await _write((state) {
       if (_byEmail(state, normal) != null) return false;
       final uid = SandboxStore.nextId(state, normal);
       final salt = _token();
@@ -169,7 +181,7 @@ class SandboxAuthBackend implements AuthBackend {
 
   @override
   Future<void> signOut() async {
-    await _store.transact((state) {
+    await _write((state) {
       state['session'] = null;
       _cache(state);
     });
@@ -194,11 +206,47 @@ class SandboxAuthBackend implements AuthBackend {
   @override
   Future<void> requestPasswordReset({required String email}) async {
     final normal = _normal(email);
-    final uid = await _store.read((state) => _byEmail(state, normal)?.key);
-    // Unknown emails get the same answer and nothing happens.
-    if (uid == null) return;
-    await _signInAs(uid);
-    _recovery.add(null);
+    // Unknown emails get the same answer and nothing happens. A known one
+    // gets a one-time recovery token, as the emailed link would carry; it
+    // signs nobody in until it is used ([completeRecovery]).
+    await _write((state) {
+      final found = _byEmail(state, normal);
+      if (found == null) return;
+      (found.value! as Json)['recovery'] = {
+        'token': _token(),
+        'expiresAt':
+            _clock().toUtc().add(const Duration(hours: 1)).toIso8601String(),
+      };
+    });
+  }
+
+  /// The recovery token the sandbox would have emailed to [email], or null.
+  /// Sandbox only: stands in for opening the email.
+  Future<String?> recoveryTokenFor(String email) => _store.read((state) {
+        final user = _byEmail(state, _normal(email))?.value as Json?;
+        return (user?['recovery'] as Json?)?['token'] as String?;
+      });
+
+  /// Uses a recovery token: a recovery session that may set a new password
+  /// but does not count as a recent sign-in. False for an unknown, used or
+  /// expired token.
+  Future<bool> completeRecovery(String token) async {
+    final ok = await _write((state) {
+      for (final e in (state['users']! as Json).entries) {
+        final user = e.value! as Json;
+        final recovery = user['recovery'] as Json?;
+        if (recovery == null || recovery['token'] != token) continue;
+        user.remove('recovery');
+        final expires = DateTime.parse(recovery['expiresAt']! as String);
+        if (!_clock().toUtc().isBefore(expires)) return false;
+        state['session'] = _newSession(e.key)..['authAt'] = null;
+        _cache(state);
+        return true;
+      }
+      return false;
+    });
+    if (ok) _recovery.add(null);
+    return ok;
   }
 
   @override
@@ -210,7 +258,7 @@ class SandboxAuthBackend implements AuthBackend {
     if (newPassword.length < 6) {
       throw const AuthFailure(AuthFailureReason.unknown);
     }
-    await _store.transact((state) {
+    await _write((state) {
       final user = (state['users']! as Json)[session['uid']] as Json?;
       if (user == null) {
         throw const AuthFailure(AuthFailureReason.accountUnavailable);
@@ -243,7 +291,7 @@ class SandboxAuthBackend implements AuthBackend {
     if (idToken.isEmpty) return AuthOutcome.invalidCredentials;
     final email = simulatedEmail(provider, idToken);
     try {
-      return await _store.transact((state) {
+      return await _write((state) {
         final found = _byEmail(state, email);
         if (found != null) {
           final user = found.value! as Json;
@@ -267,7 +315,7 @@ class SandboxAuthBackend implements AuthBackend {
         _cache(state);
         return AuthOutcome.successNew;
       });
-    } on SandboxFullException {
+    } on AuthFailure {
       return AuthOutcome.error;
     }
   }
@@ -282,7 +330,7 @@ class SandboxAuthBackend implements AuthBackend {
     final session = _session;
     if (session == null) return AuthOutcome.error;
     final email = simulatedEmail(provider, idToken);
-    return _store.transact((state) {
+    return _write((state) {
       final other = _byEmail(state, email);
       if (other != null && other.key != session['uid']) {
         return AuthOutcome.emailTaken;
@@ -301,8 +349,17 @@ class SandboxAuthBackend implements AuthBackend {
     if (session == null) return null;
     final expires = DateTime.parse(session['expiresAt']! as String);
     if (_clock().toUtc().isBefore(expires)) return session['token']! as String;
-    // Renew, as a refresh token would, while the account exists.
-    return _store.transact((state) {
+    // Renew, as a refresh token would, while the account exists. A storage
+    // failure means no token ("sign in again"), never an exception.
+    try {
+      return await _renew(session);
+    } on AuthFailure {
+      return null;
+    }
+  }
+
+  Future<String?> _renew(Json session) {
+    return _write((state) {
       final stored = state['session'] as Json?;
       if (stored == null ||
           stored['token'] != session['token'] ||
@@ -321,7 +378,7 @@ class SandboxAuthBackend implements AuthBackend {
 
   /// Ends the session as the server would (expired and not renewable).
   Future<void> expireSession() async {
-    await _store.transact((state) {
+    await _write((state) {
       state['session'] = null;
     });
     // The phone still holds the old session until it next asks: as with a
@@ -342,8 +399,11 @@ class SandboxAuthBackend implements AuthBackend {
     }
     final uid = session['uid']! as String;
     if (!(state['users']! as Json).containsKey(uid)) return null;
-    final authAt = DateTime.parse(session['authAt']! as String);
-    return (uid, now.toUtc().difference(authAt) <= recentAuthWindow);
+    final authAt = session['authAt'] as String?;
+    // A recovery session is never a recent sign-in.
+    final recent = authAt != null &&
+        now.toUtc().difference(DateTime.parse(authAt)) <= recentAuthWindow;
+    return (uid, recent);
   }
 
   /// After the account is deleted: forget the session in memory too.

@@ -422,11 +422,11 @@ SandboxAnswer createEnrolment(SandboxCall c) {
       },
       c.now);
   final code = body['programmeCode']! as String;
-  if (!sandboxProgrammes.contains(code)) {
-    throw const SandboxProblem(404, 'programme_not_found');
-  }
   if (body['mode'] != null && code != 'bf' && code != 'sf') {
     throw const SandboxProblem(400, 'mode_not_allowed');
+  }
+  if (!sandboxProgrammes.contains(code)) {
+    throw const SandboxProblem(404, 'programme_not_found');
   }
   if (_enrolments(c).any((e) => e['programmeCode'] == code)) {
     throw const SandboxProblem(409, 'already_enrolled');
@@ -479,6 +479,17 @@ SandboxAnswer updateEnrolment(SandboxCall c) {
   if (body.containsKey('status')) {
     final status = body['status'];
     e['leftAt'] = status == 'left' ? (e['leftAt'] ?? c.nowText) : null;
+    if (status == 'left' && e['status'] != 'left') {
+      // Leaving switches off every optional consent; core stays live but
+      // grants nothing while the enrolment is left.
+      for (final x in _consents(c)) {
+        if (x['enrolmentId'] == id &&
+            x['purpose'] != 'core' &&
+            x['revokedAt'] == null) {
+          x['revokedAt'] = c.nowText;
+        }
+      }
+    }
     e['status'] = status;
   }
   if (body.containsKey('mode')) e['mode'] = body['mode'];
@@ -708,7 +719,8 @@ final Map<String, _EventRoute> _eventRoutes = {
     {
       'systolic': const IntRule(required: true),
       'diastolic': const IntRule(required: true),
-      'pulse': const IntRule(min: 0, max: 10000),
+      // Bounded as a measurement: outside 0–10000 is 422 invalid_record.
+      'pulse': const IntRule(),
       'measuredAt': _occurred,
     },
     (b) => (

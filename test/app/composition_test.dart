@@ -5,9 +5,12 @@ import 'dart:io';
 import 'package:breathefree_patient/app/composition.dart';
 import 'package:breathefree_patient/app/tether_ui_shell.dart';
 import 'package:breathefree_patient/auth/account_controller.dart';
+import 'package:breathefree_patient/backend/backend_factory.dart';
 import 'package:breathefree_patient/backend/stub_backend.dart';
 import 'package:breathefree_patient/config/app_config.dart';
+import 'package:breathefree_patient/config/misconfigured_build_app.dart';
 import 'package:breathefree_patient/integration/registry.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tether_ui/ui/ui.dart';
 
@@ -22,8 +25,10 @@ void main() {
     TSession.values.clear();
   });
 
-  test('a debug run with nothing configured composes the sandbox mode', () {
-    final composition = compose(config: _none);
+  test('a debug run with nothing configured composes the sandbox mode',
+      () async {
+    final composition =
+        await compose(config: _none, backend: StubBackend(BackendMode.sandbox));
     expect(composition.backend.mode, BackendMode.sandbox);
     expect(composition.config, same(_none));
     expect(composition.auth, isNull);
@@ -32,7 +37,8 @@ void main() {
   });
 
   test('every registered endpoint is routed, none handled yet', () async {
-    final composition = compose(config: _none);
+    final composition =
+        await compose(config: _none, backend: StubBackend(BackendMode.sandbox));
     for (final entry in endpointRegistry) {
       expect(composition.api.entryFor(entry.endpoint), isNotNull);
       expect(
@@ -43,9 +49,39 @@ void main() {
     }
   });
 
-  test('a given backend replaces the configured one', () {
-    final backend = StubBackend(BackendMode.http);
-    expect(compose(config: _none, backend: backend).backend, same(backend));
+  test('a given backend replaces the configured one, and is initialised',
+      () async {
+    final backend = _CountingBackend();
+    final composition = await compose(config: _none, backend: backend);
+    expect(composition.backend, same(backend));
+    expect(backend.inits, 1);
+  });
+
+  test('a configuration with no backend mode is a misconfigured build', () {
+    const partial = AppConfig(
+        apiBaseUrl: 'https://api.example.test',
+        supabaseUrl: '',
+        supabaseAnonKey: '',
+        backend: 'http');
+    expect(
+        compose(config: partial), throwsA(isA<MisconfiguredBuildException>()));
+  });
+
+  testWidgets('runTetherUi shows the misconfigured-build screen',
+      (tester) async {
+    const partial = AppConfig(
+        apiBaseUrl: '', supabaseUrl: '', supabaseAnonKey: '', backend: 'nope');
+    Widget? shown;
+    await expectLater(
+      runTetherUi(
+        account: AccountController.disabled(),
+        guestStore: FakeGuestStore(hasPlan: false),
+        config: partial,
+        run: (w) => shown = w,
+      ),
+      throwsA(isA<MisconfiguredBuildException>()),
+    );
+    expect(shown, isA<MisconfiguredBuildApp>());
   });
 
   testWidgets('runTetherUi installs the composed services', (tester) async {
@@ -83,4 +119,12 @@ void main() {
       contains('createBackend(config)'),
     );
   });
+}
+
+class _CountingBackend extends StubBackend {
+  _CountingBackend() : super(BackendMode.sandbox);
+  int inits = 0;
+
+  @override
+  Future<void> init() async => inits++;
 }
