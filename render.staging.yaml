@@ -1,0 +1,54 @@
+# Render Blueprint for the STAGING backend: synthetic accounts only, never
+# real member data. The owner creates it in Render (New > Blueprint, Blueprint
+# path render.staging.yaml); see docs/STAGING.md. Production stays in
+# render.yaml and is not changed by this file.
+#
+# Every secret and every project-specific value is `sync: false`: Render asks
+# for it when the Blueprint is created and it never lives in this repository.
+# There is no SUPABASE_SERVICE_ROLE_KEY (the API refuses to start while it is
+# set) and no THSYNC_JWT_SECRET (thsync refuses it in production mode).
+# Deploys are manual (autoDeployTrigger: off).
+services:
+  - type: web
+    name: tether-api-staging
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: api
+    buildCommand: npm ci --include=dev && npm run build && npm prune --omit=dev
+    startCommand: node dist/main.js
+    healthCheckPath: /health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_JWT_AUDIENCE
+        value: authenticated
+
+  - type: web
+    name: tether-thsync-staging
+    runtime: python
+    plan: free
+    region: oregon
+    rootDir: sync
+    buildCommand: pip install --require-hashes -r requirements-lock.txt
+    startCommand: uvicorn --factory thsync.app:create_app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /v1/health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.11
+      - key: THSYNC_ENVIRONMENT
+        value: production
+      - key: THSYNC_SUPABASE_URL
+        sync: false
+      # postgresql+psycopg://thsync:<password>@<staging host>:5432/postgres
+      # The non-privileged thsync login only; thsync refuses any other role.
+      - key: THSYNC_DATABASE_URL
+        sync: false
+      - key: THSYNC_JWT_AUDIENCE
+        value: authenticated
