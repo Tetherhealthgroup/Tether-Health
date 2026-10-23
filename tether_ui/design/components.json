@@ -51,8 +51,8 @@
   },
   "field": {
     "widget": "TField",
-    "props": "label, value, unit, hint, error, placeholder, kind",
-    "behavior": "Error text says how to fix; kinds: text number email password phone date select multiline search"
+    "props": "label, value, unit, hint, error, placeholder, kind, options, values",
+    "behavior": "Error text says how to fix; kinds: text number email password phone date select multiline search; a select with options opens a list and the session holds the value"
   },
   "fieldrow": {
     "widget": "TFieldRow",
@@ -116,8 +116,8 @@
   },
   "button": {
     "widget": "TButton",
-    "props": "label, onPressed, variant primary|rescue|secondary|danger|lime|white|ghostDark, small, arrow",
-    "behavior": "Disabled when onPressed is null"
+    "props": "label, onPressed, variant primary|rescue|secondary|danger|lime|white|ghostDark, small, arrow, needs, countLabel, emptyLabel",
+    "behavior": "Disabled when onPressed is null; with needs (TGatedButton) disabled until that input has a value, and the label can count a list"
   },
   "buttons": {
     "widget": "TButtonRow",
@@ -156,8 +156,8 @@
   },
   "calendar": {
     "widget": "TCalendar",
-    "props": "month, selected, window, today",
-    "behavior": ""
+    "props": "month, selected, window, today, key, ym",
+    "behavior": "With a key: a real month calendar in the app (current month, previous/next, tap to choose, accessible day labels), the chosen day is the session value yyyy-MM-dd; the design in the preview"
   },
   "timer": {
     "widget": "TTimer",

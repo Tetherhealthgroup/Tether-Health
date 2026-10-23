@@ -123,7 +123,7 @@ SCENARIOS = [
        [('tap', 'I already have an account'), ('choose', 'Wrong password'), ('tap', 'Sign in')], 'auth_signin_error'),
     # ---------------- first run
     sc('onboarding', None, 'Setup', 'First run: 2 programs, consent, BreatheFree plan, guest', 'welcome',
-       [('tap', 'Get started'), ('tap', 'Continue with 2 programs'), ('tap', 'Continue'), ('tap', 'Agree and continue'), ('tap', 'Continue'), ('expect', 'ob_setup'),
+       [('tap', 'Get started'), ('tap', 'BreatheFree'), ('tap', 'ScrollFree'), ('tap', 'Continue with 2 programs'), ('tap', 'Continue'), ('tap', 'Agree and continue'), ('tap', 'Continue'), ('expect', 'ob_setup'),
         ('tap', 'BreatheFree'), ('tap', 'Next'), ('tap', 'Next'), ('tap', 'Save my reasons'), ('tap', 'Continue with this path'), ('tap', 'Confirm this date'),
         ('tap', 'Review my plan'), ('tap', 'Start my plan'), ('expect', 'ob_setup'), ('tap', 'Continue'), ('choose', 'Allowed'), ('tap', 'Turn on reminders'),
         ('tap', 'I’m 18 or older'), ('tap', 'Continue on this phone only')], 'today'),

@@ -226,6 +226,110 @@
       }
     }
   },
+  "kit.month_names": "January|February|March|April|May|June|July|August|September|October|November|December",
+  "@kit.month_names": {
+    "description": "Calendar: names of the months, January first, separated by |",
+    "screen": "kit",
+    "path": "",
+    "prop": "month_names",
+    "sourceHash": "4749be882035d1eb4ee4cdc97e07a4c6d622256870f0b9c4d35aaadfb2077f96"
+  },
+  "kit.weekday_names": "Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday",
+  "@kit.weekday_names": {
+    "description": "Calendar: names of the days of the week, Sunday first, separated by |",
+    "screen": "kit",
+    "path": "",
+    "prop": "weekday_names",
+    "sourceHash": "aace7ada9b3ecd6a30523a1547bc97b843e323408b0858ed598023ee9a086eb1"
+  },
+  "kit.calendar_title": "{month} {year}",
+  "@kit.calendar_title": {
+    "description": "Heading of a calendar: the month name and the year",
+    "screen": "kit",
+    "path": "",
+    "prop": "calendar_title",
+    "sourceHash": "d2d73eec68ca8afd49cba80b297cbd5ca86552ba02affee67ebc4492f39057c7",
+    "placeholders": {
+      "month": {
+        "type": "Object"
+      },
+      "year": {
+        "type": "Object"
+      }
+    }
+  },
+  "kit.date_full": "{weekday}, {month} {day}, {year}",
+  "@kit.date_full": {
+    "description": "A date in full: weekday, month name, day and year; also the accessibility label of a calendar day",
+    "screen": "kit",
+    "path": "",
+    "prop": "date_full",
+    "sourceHash": "3948ccdd044bc100e9ab681f2b4c2f74e9d3cbcb7d1bcf78b4591336c5aed755",
+    "placeholders": {
+      "day": {
+        "type": "Object"
+      },
+      "month": {
+        "type": "Object"
+      },
+      "weekday": {
+        "type": "Object"
+      },
+      "year": {
+        "type": "Object"
+      }
+    }
+  },
+  "kit.calendar_prev": "Previous month",
+  "@kit.calendar_prev": {
+    "description": "Accessibility label of the calendar button that shows the previous month",
+    "screen": "kit",
+    "path": "",
+    "prop": "calendar_prev",
+    "sourceHash": "6a2769502a5dda78a083f84a659c0977c548508669688897a267a5ce53bd3c5e"
+  },
+  "kit.calendar_next": "Next month",
+  "@kit.calendar_next": {
+    "description": "Accessibility label of the calendar button that shows the next month",
+    "screen": "kit",
+    "path": "",
+    "prop": "calendar_next",
+    "sourceHash": "74e53211fef4b4d4d93f0cf221d0920174e216cb7e9343ff37dafa3278c1b034"
+  },
+  "kit.calendar_recommended": "Recommended",
+  "@kit.calendar_recommended": {
+    "description": "Accessibility hint of a calendar day inside the recommended window",
+    "screen": "kit",
+    "path": "",
+    "prop": "calendar_recommended",
+    "sourceHash": "d70604e8430461372849bbd123d85771e11423870a507e8fa4650a7e9a5a50ef"
+  },
+  "kit.days_to_prepare": "{n, plural, one{# day to prepare} other{# days to prepare}}",
+  "@kit.days_to_prepare": {
+    "description": "Under a chosen date: how many days are left to prepare; # is the number",
+    "screen": "kit",
+    "path": "",
+    "prop": "days_to_prepare",
+    "sourceHash": "356be6fd34939e0f85dd6b253c8d2470e7154d0f0054cab42c58f7961cca2965",
+    "placeholders": {
+      "n": {
+        "type": "num"
+      }
+    }
+  },
+  "kit.environment": "Environment: {name}",
+  "@kit.environment": {
+    "description": "Accessibility label of the environment badge (for example a test environment); {name} is the badge text",
+    "screen": "kit",
+    "path": "",
+    "prop": "environment",
+    "sourceHash": "a734cb4467411e45017004377f8014bc13d506140f7cb7d2d7f08b67cb9b3236",
+    "placeholders": {
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
   "kit.quote": "“{text}”",
   "@kit.quote": {
     "description": "A quotation, in the quotation marks of the language",
@@ -497,13 +601,26 @@
     "prop": "label",
     "sourceHash": "cccc912e9e953ecbe990a5e71b3ef4b74103dfc49c1fa75085d391da5b9f4cc2"
   },
-  "ob_programs.footer[0].label": "Continue with 2 programs",
-  "@ob_programs.footer[0].label": {
-    "description": "Choose programs: button label",
+  "ob_programs.footer[0].countLabel": "{n, plural, one{Continue with # program} other{Continue with # programs}}",
+  "@ob_programs.footer[0].countLabel": {
+    "description": "Choose programs: button countLabel",
     "screen": "ob_programs",
     "path": "footer[0]",
-    "prop": "label",
-    "sourceHash": "a02a6cd37bb59d85494408702314d663e21feb04c40b3318dadc39b4f3220705"
+    "prop": "countLabel",
+    "sourceHash": "e11a05abe9279df76eef80d18085283f22b7dc38ed2fc05f8cbff7e7478b5191",
+    "placeholders": {
+      "n": {
+        "type": "num"
+      }
+    }
+  },
+  "ob_programs.footer[0].emptyLabel": "Choose at least one program",
+  "@ob_programs.footer[0].emptyLabel": {
+    "description": "Choose programs: button emptyLabel",
+    "screen": "ob_programs",
+    "path": "footer[0]",
+    "prop": "emptyLabel",
+    "sourceHash": "fd87f2315417edbcddf9f98c27d073f2014ee1dbfed53f87ab7a63b08387be64"
   },
   "ob_programs.header.title": "Choose programs",
   "@ob_programs.header.title": {

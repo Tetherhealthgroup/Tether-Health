@@ -57,6 +57,15 @@ extension TStringsKeys on TStrings {
   String kitTimerSemantics({required Object label, required Object value}) => format('kit.timer_semantics', {'label': label, 'value': value});
   String get kitWeekdayInitials => get('kit.weekday_initials');
   String kitCalendarDay({required Object day, required Object month}) => format('kit.calendar_day', {'day': day, 'month': month});
+  String get kitMonthNames => get('kit.month_names');
+  String get kitWeekdayNames => get('kit.weekday_names');
+  String kitCalendarTitle({required Object month, required Object year}) => format('kit.calendar_title', {'month': month, 'year': year});
+  String kitDateFull({required Object day, required Object month, required Object weekday, required Object year}) => format('kit.date_full', {'day': day, 'month': month, 'weekday': weekday, 'year': year});
+  String get kitCalendarPrev => get('kit.calendar_prev');
+  String get kitCalendarNext => get('kit.calendar_next');
+  String get kitCalendarRecommended => get('kit.calendar_recommended');
+  String kitDaysToPrepare({required num n}) => format('kit.days_to_prepare', {'n': n});
+  String kitEnvironment({required Object name}) => format('kit.environment', {'name': name});
   String kitQuote({required Object text}) => format('kit.quote', {'text': text});
   String get kitEmergencyHelp => get('kit.emergency_help');
   String get kitLoading => get('kit.loading');
@@ -89,7 +98,8 @@ extension TStringsKeys on TStrings {
   String get obProgramsBodyN3ItemsN6Sub => get('ob_programs.body[3].items[6].sub');
   String get obProgramsBodyN3ItemsN7Sub => get('ob_programs.body[3].items[7].sub');
   String get obProgramsBodyN4Label => get('ob_programs.body[4].label');
-  String get obProgramsFooterN0Label => get('ob_programs.footer[0].label');
+  String obProgramsFooterN0CountLabel({required num n}) => format('ob_programs.footer[0].countLabel', {'n': n});
+  String get obProgramsFooterN0EmptyLabel => get('ob_programs.footer[0].emptyLabel');
   String get obProgramsHeaderTitle => get('ob_programs.header.title');
   String get obProgramsHeaderPill => get('ob_programs.header.pill');
   String get obFocusBodyN1Text => get('ob_focus.body[1].text');
@@ -3073,6 +3083,15 @@ const Map<String, String> _en = <String, String>{
   'kit.timer_semantics': '{value} {label}',
   'kit.weekday_initials': 'S M T W T F S',
   'kit.calendar_day': '{month} {day}',
+  'kit.month_names': 'January|February|March|April|May|June|July|August|September|October|November|December',
+  'kit.weekday_names': 'Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday',
+  'kit.calendar_title': '{month} {year}',
+  'kit.date_full': '{weekday}, {month} {day}, {year}',
+  'kit.calendar_prev': 'Previous month',
+  'kit.calendar_next': 'Next month',
+  'kit.calendar_recommended': 'Recommended',
+  'kit.days_to_prepare': '{n, plural, one{# day to prepare} other{# days to prepare}}',
+  'kit.environment': 'Environment: {name}',
   'kit.quote': '“{text}”',
   'kit.emergency_help': 'Emergency help',
   'kit.loading': 'Loading',
@@ -3105,7 +3124,8 @@ const Map<String, String> _en = <String, String>{
   'ob_programs.body[3].items[6].sub': 'Obesity & nutrition',
   'ob_programs.body[3].items[7].sub': 'Healthy aging',
   'ob_programs.body[4].label': 'See all 11 programs',
-  'ob_programs.footer[0].label': 'Continue with 2 programs',
+  'ob_programs.footer[0].countLabel': '{n, plural, one{Continue with # program} other{Continue with # programs}}',
+  'ob_programs.footer[0].emptyLabel': 'Choose at least one program',
   'ob_programs.header.title': 'Choose programs',
   'ob_programs.header.pill': '1 of 5',
   'ob_focus.body[1].text': 'Two at a time works best.',
@@ -6089,6 +6109,15 @@ const Map<String, String> _pseudo = <String, String>{
   'kit.timer_semantics': '⟦{value} {label}⟧',
   'kit.weekday_initials': '⟦Š Ṁ Ţ Ŵ Ţ Ƒ Š~~~⟧',
   'kit.calendar_day': '⟦{month} {day}⟧',
+  'kit.month_names': '⟦Ĵàñûàŕý|Ƒéƀŕûàŕý|Ṁàŕçĥ|Àþŕîļ|Ṁàý|Ĵûñé|Ĵûļý|Àûĝûšţ|Šéþţéɱƀéŕ|Öçţöƀéŕ|Ñöṽéɱƀéŕ|Ðéçéɱƀéŕ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~⟧',
+  'kit.weekday_names': '⟦Šûñðàý|Ṁöñðàý|Ţûéšðàý|Ŵéðñéšðàý|Ţĥûŕšðàý|Ƒŕîðàý|Šàţûŕðàý~~~~~~~~~~~~~~~~~~~~⟧',
+  'kit.calendar_title': '⟦{month} {year}⟧',
+  'kit.date_full': '⟦{weekday}, {month} {day}, {year}⟧',
+  'kit.calendar_prev': '⟦Þŕéṽîöûš ɱöñţĥ~~~~~~⟧',
+  'kit.calendar_next': '⟦Ñéẋţ ɱöñţĥ~~~~⟧',
+  'kit.calendar_recommended': '⟦Ŕéçöɱɱéñðéð~~~~~⟧',
+  'kit.days_to_prepare': '⟦{n, plural, one{# ðàý ţö þŕéþàŕé~~~~~} other{# ðàýš ţö þŕéþàŕé~~~~~~}}⟧',
+  'kit.environment': '⟦Éñṽîŕöñɱéñţ: ~~~~~{name}⟧',
   'kit.quote': '⟦“{text}”⟧',
   'kit.emergency_help': '⟦Éɱéŕĝéñçý ĥéļþ~~~~~~⟧',
   'kit.loading': '⟦Ļöàðîñĝ~~~⟧',
@@ -6121,7 +6150,8 @@ const Map<String, String> _pseudo = <String, String>{
   'ob_programs.body[3].items[6].sub': '⟦Öƀéšîţý & ñûţŕîţîöñ~~~~~~~⟧',
   'ob_programs.body[3].items[7].sub': '⟦Ĥéàļţĥý àĝîñĝ~~~~~⟧',
   'ob_programs.body[4].label': '⟦Šéé àļļ 11 þŕöĝŕàɱš~~~~~~⟧',
-  'ob_programs.footer[0].label': '⟦Çöñţîñûé ŵîţĥ 2 þŕöĝŕàɱš~~~~~~~~⟧',
+  'ob_programs.footer[0].countLabel': '⟦{n, plural, one{Çöñţîñûé ŵîţĥ ~~~~~# þŕöĝŕàɱ~~~} other{Çöñţîñûé ŵîţĥ ~~~~~# þŕöĝŕàɱš~~~~}}⟧',
+  'ob_programs.footer[0].emptyLabel': '⟦Çĥööšé àţ ļéàšţ öñé þŕöĝŕàɱ~~~~~~~~~~⟧',
   'ob_programs.header.title': '⟦Çĥööšé þŕöĝŕàɱš~~~~~~⟧',
   'ob_programs.header.pill': '⟦1 öƒ 5~⟧',
   'ob_focus.body[1].text': '⟦Ţŵö àţ à ţîɱé ŵöŕķš ƀéšţ.~~~~~~~~⟧',
@@ -9110,6 +9140,7 @@ const Set<String> tUntranslatedLiterals = <String>{
   '14:52',
   '18',
   '180',
+  '18–24',
   '19',
   '2',
   '200',
@@ -9117,6 +9148,7 @@ const Set<String> tUntranslatedLiterals = <String>{
   '2019',
   '212',
   '21–30',
+  '25–34',
   '3',
   '30',
   '310',
@@ -9127,16 +9159,19 @@ const Set<String> tUntranslatedLiterals = <String>{
   '42',
   '44',
   '45',
+  '45–54',
   '46',
   '48',
   '4:12',
   '5',
   '5/7',
   '52',
+  '55–64',
   '58',
   '60',
   '61',
   '63',
+  '65–74',
   '7',
   '7 + 5',
   '7.4',
@@ -9144,6 +9179,7 @@ const Set<String> tUntranslatedLiterals = <String>{
   '71%',
   '72',
   '74',
+  '75+',
   '8',
   '80',
   '84',

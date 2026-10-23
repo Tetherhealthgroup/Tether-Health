@@ -100,7 +100,10 @@
         "to": "ob_focus"
       },
       "variant": "primary",
-      "arrow": true
+      "arrow": true,
+      "needs": "programs",
+      "countLabel": "{n, plural, one{Continue with # program} other{Continue with # programs}}",
+      "emptyLabel": "Choose at least one program"
     }
   ],
   "notes": [],

@@ -45,10 +45,10 @@ def programs_a():
     ], footer=[button('Continue with this path', branch('Selected path', [('Set a quit date', go('bf_date')), ('Quit today', go('bf_support')), ('Reduce gradually', go('bf_stepdown')), ('Explore first', onboarding_or('bf_home_explore'))], on='radio', key='path'))])
     S('bf_date', 'Select quit date', '/p/bf/plan/date', 'bf', program='bf', phase='plan', hdr=H('Quit date', pill='Plan 2 of 3'), body=[
         title('Choose a day to begin.'), text('7–14 days away gives you time to prepare without losing momentum.', 'muted'),
-        calendar('August 2026', 28, [28, 29, 30, 31], today=21),
-        card(v='dark', eyebrow='Your quit date', title='Friday, August 28, 2026', text='7 days to prepare · Pacific Time'),
+        calendar('August 2026', 28, [28, 29, 30, 31], today=21, key='quit_date', ym='2026-08'),
+        follows(card(v='dark', eyebrow='Your quit date', title='Friday, August 28, 2026', text='7 days to prepare · Pacific Time'), 'quit_date'),
         toggle('Quit-day check-in at 7:00 AM', 'Lock screen: “You have a Tether reminder.”', True, key='quit_day_check_in_at_7_00_am'),
-    ], footer=[button('Confirm this date', go('bf_support'))])
+    ], footer=[button('Confirm this date', go('bf_support'), needs='quit_date')])
     S('bf_stepdown', 'Step-down schedule', '/p/bf/plan/reduce', 'bf', program='bf', phase='plan', hdr=H('Step-down schedule', pill='Plan 2 of 3'), body=[
         title('Cut back at your pace.'), text('From your baseline of 15 a day. Adjust any week.', 'muted'),
         kv([('This week', '15 → 12 a day'), ('Week 2', '9 a day'), ('Week 3', '5 a day'), ('Week 4', '2 a day'), ('Quit day · Sep 18', '0')]),

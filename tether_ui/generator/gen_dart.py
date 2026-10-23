@@ -294,12 +294,17 @@ def _node(n, top=False, path=''):
     if t == 'toggle': return f"TToggleRow({args(fieldKey=FK(n), label=X('label'), sub=X('sub'), value='true' if n.get('on') else None, bind=BK(n), bindClass=BC(n))})"
     if t == 'field':
         kind = n.get('kind', 'text')
-        return f"TField({args(fieldKey=FK(n), label=X('label'), value=X('value') if n.get('value') else None, unit=X('unit') if n.get('unit') else None, hint=X('hint') if n.get('hint') else None, error=X('error') if n.get('error') else None, placeholder=X('placeholder') if n.get('placeholder') else None, kind='TFieldKind.' + kind if kind != 'text' else None, bind=BK(n), bindClass=BC(n))})"
+        opts = labs = None
+        if n.get('options'): opts, labs = options(n, path)
+        return f"TField({args(fieldKey=FK(n), label=X('label'), options=lst(opts) if opts else None, optionLabels=lst(labs) if labs else None, value=X('value') if n.get('value') else None, unit=X('unit') if n.get('unit') else None, hint=X('hint') if n.get('hint') else None, error=X('error') if n.get('error') else None, placeholder=X('placeholder') if n.get('placeholder') else None, kind='TFieldKind.' + kind if kind != 'text' else None, bind=BK(n), bindClass=BC(n))})"
     if t == 'fieldrow': return f"TFieldRow(children: {lst([node(x, path=f'{path}.fields[{i}]') for i, x in enumerate(n['fields'])])})"
     if t == 'slider':
         return f"TSliderField({args(fieldKey=FK(n), label=X('label'), value=str(float(n['value'])), min=str(float(n['min'])), max=str(float(n['max'])), minLabel=X('minLabel'), maxLabel=X('maxLabel'), color=dcolor(n.get('color', 'coral')), suffix=X('suffix') if n.get('suffix') else None)})"
     if t == 'banner':
         return f"TBanner({args(kind='TBannerKind.' + n['kind'], text=X('text'), actionLabel=X('actionLabel') if n.get('actionLabel') else None, onAction=cb(n['action'], path + '.action') if n.get('action') else None, actionKey=K(path) if n.get('action') else None)})"
+    if t == 'card' and n.get('follows'):
+        design = _node(dict(n, follows=None), top, path)
+        return f"TDateSummary({args(fieldKey=FK({'key': n['follows']}), eyebrow=X('eyebrow') if n.get('eyebrow') else None, design=design)})"
     if t == 'card':
         v = n.get('variant', 'plain')
         return f"TCard({args(key=K(path) if n.get('action') else None, variant='TCardVariant.' + v if v != 'plain' else None, tag=S_(n['tag']) if n.get('tag') else None, tagExtra=X('tagExtra') if n.get('tagExtra') else None, eyebrow=X('eyebrow') if n.get('eyebrow') else None, title=X('title') if n.get('title') else None, text=X('text') if n.get('text') else None, accent=S_(n['accent']) if n.get('accent') else None, onTap=cb(n['action'], path + '.action') if n.get('action') else None, cta=node(n['cta'], path=path + '.cta[0]') if n.get('cta') else None, children=lst([node(c, path=f'{path}.children[{i}]') for i, c in enumerate(n['children'])]) if n.get('children') else None)})"
@@ -340,6 +345,12 @@ def _node(n, top=False, path=''):
     if t == 'button':
         v = {'ghostdark': 'ghostDark'}.get(n.get('variant', 'primary'), n.get('variant', 'primary'))
         on = 'null' if n.get('state') == 'disabled' or not n.get('action') else cb(n['action'], path + '.action')
+        if n.get('needs'):
+            # Ready when the screen's input `needs` holds a value; with a count
+            # label the design's own label is not used at all.
+            count = n.get('countLabel')
+            countfn = f"(n) => {T(count, 'countLabel', path, 'button', n)}(n: n)" if count else None
+            return f"TGatedButton({args(key=K(path), fieldKey=FK({'key': n['needs']}), label=X('label') if not count else None, countLabel=countfn, emptyLabel=X('emptyLabel') if n.get('emptyLabel') else None, onPressed=on, variant='TButtonVariant.' + v if v != 'primary' else None, small='true' if n.get('small') else None, arrow='true' if n.get('arrow') else None)})"
         return f"TButton({args(key=K(path) if on != 'null' else None, label=X('label'), onPressed=on, variant='TButtonVariant.' + v if v != 'primary' else None, small='true' if n.get('small') else None, arrow='true' if n.get('arrow') else None)})"
     if t == 'buttons': return f"TButtonRow(children: {lst([node(b, path=f'{path}.items[{i}]') for i, b in enumerate(n['items'])])})"
     if t == 'authbuttons':
@@ -353,7 +364,9 @@ def _node(n, top=False, path=''):
     if t == 'skeleton': return f"TSkeleton(lines: {n['lines']})"
     if t == 'spacer': return f"SizedBox(height: {float(n['h'])})"
     if t == 'progtag': return f"TProgramTag({args(program=S_(n['program']), extra=X('extra') if n.get('extra') else None)})"
-    if t == 'calendar': return f"TCalendar({args(month=X('month'), selected=str(n['selected']), window=lst([str(w) for w in n['window']]), today=str(n['today']) if n.get('today') else None)})"
+    if t == 'calendar':
+        year, month_ = (int(x) for x in n['ym'].split('-')) if n.get('ym') else (None, None)
+        return f"TCalendar({args(fieldKey=FK(n), month=X('month'), selected=str(n['selected']), window=lst([str(w) for w in n['window']]), today=str(n['today']) if n.get('today') else None, year=str(year) if year else None, monthNumber=str(month_) if month_ else None)})"
     if t == 'timer': return f"TTimer(value: {X('value')}, label: {X('label')})"
     if t == 'nativeslot': return f"TNativeSlot({args(id=S_(n['id']), label=X('label'), caption=X('caption') if n.get('caption') else None, platform=S_(n['platform']) if n.get('platform', 'ios') != 'ios' else None, height=str(float(n['height'])) if n.get('height', 120) != 120 else None)})"
     raise ValueError(t)
@@ -454,7 +467,7 @@ def generate(out_dir, describe, static_dir):
     if os.path.exists(out_dir): shutil.rmtree(out_dir)
     shutil.copytree(static_dir, out_dir)
     # barrel
-    open(os.path.join(lib, 'ui', 'ui.dart'), 'w', newline='\n').write("export '../l10n/strings.g.dart';\nexport '../logic/rules.dart';\nexport 'components.dart';\nexport 'data.dart';\nexport 'nav.dart';\nexport 'strings.dart';\nexport 'tokens.dart';\n")
+    open(os.path.join(lib, 'ui', 'ui.dart'), 'w', newline='\n').write("export '../l10n/strings.g.dart';\nexport '../logic/rules.dart';\nexport 'components.dart';\nexport 'data.dart';\nexport 'environment.dart';\nexport 'nav.dart';\nexport 'strings.dart';\nexport 'tokens.dart';\n")
     # routes
     lines = ['// GENERATED — route names for every screen and state in spec/screens.json.', 'abstract final class Routes {']
     for sid, s in SCREENS.items():
@@ -697,7 +710,7 @@ void main() {{
 
 JOURNEYS = [
     ('first run: choose programs, set up BreatheFree, continue as guest', 'welcome',
-     ['Get started', 'Continue with 2 programs', 'Continue', 'Agree and continue', 'Continue', 'BreatheFree', 'Next', 'Next', 'Save my reasons',
+     ['Get started', 'BreatheFree', 'ScrollFree', 'Continue with 2 programs', 'Continue', 'Agree and continue', 'Continue', 'BreatheFree', 'Next', 'Next', 'Save my reasons',
       'Continue with this path', 'Confirm this date', 'Review my plan', 'Start my plan', 'Continue', 'Not now', 'Continue on this phone only'], 'today'),
     ('craving rescue from Today', 'today', ['Rescue', 'A cigarette', 'I’m done', 'Back to Today'], 'today'),
     ('Heartwise: log two readings, see trends', 'hw_home', ['Log blood pressure', 'Next reading', 'Save readings', 'See trends'], 'hw_trends'),

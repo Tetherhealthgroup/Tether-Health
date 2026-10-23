@@ -577,9 +577,22 @@ endpoint. Label, layout and the other actions are unchanged. The
 | `ob_programs` | `body[3]` tiles (key `programs`) | BreatheFree and ScrollFree no longer start selected; nothing does. Also TH-902 (TH-907). |
 
 The member's choice becomes enrolments and consents, so nothing is chosen
-for them. The footer label "Continue with 2 programs" is unchanged and no
-longer matches a starting selection; binding it to the number chosen, and
-whether Continue needs a selection, are still open.
+for them. The footer label "Continue with 2 programs" no longer matched a
+starting selection; it now follows the number chosen (next section).
+
+## P-85: quit date, age range and program count are captured (TH-1031h)
+
+Screens that showed a choice the app never recorded. In the preview and the
+prototype each screen looks as designed; the changes below are what the app
+does with them.
+
+| Screen | Node | Change |
+|---|---|---|
+| `bf_date` | `body[2]` (calendar) | gets key `quit_date` and `ym` `2026-08` (the design's month). In the app it is a real month calendar: it opens on the current month, has previous and next month, a tap chooses a day, each day has an accessible label (weekday, month, day, year), and the chosen day is the session value `bf_date.quit_date` as `yyyy-MM-dd`. Days run from tomorrow to 90 days ahead (the earlier app's range); the 7th to 14th day ahead is marked recommended, as the screen's "7–14 days away" says. With preview data it draws the design (August 2026, the 28th) and writes that day to the session, as other controls write their starting values. |
+| `bf_date` | `body[3]` (card) | gets `follows` `quit_date`: in the app it shows the chosen date and the days left to prepare, and nothing until a day is chosen (the design's "Friday, August 28, 2026" and "Pacific Time" are an example, not the member's date). Unchanged in the preview. |
+| `bf_date` | `footer[0]` "Confirm this date" | gets `needs` `quit_date`: disabled until a day is chosen. |
+| `ob_basics` | `body[4]` Age range | gets `options` and `values`: the member picks a decade band from a list (P-74); the session holds the band (`18_24` … `75_plus`). The name and the sleep and stress bands already wrote their keys (`ob_basics.what_should_we_call_you`, `ob_basics.sleep_on_a_typical_night`, `ob_basics.usual_stress`). |
+| `ob_programs` | `footer[0]` "Continue with 2 programs" | gets `needs` `programs`, `countLabel` ("Continue with 1 program", "Continue with N programs") and `emptyLabel` ("Choose at least one program"): the label follows the number chosen and the button is disabled with none. The scenarios and journeys choose two programs before tapping it. |
 
 ## Kit messages with no spec change (TH-1030, TH-909)
 
@@ -590,6 +603,13 @@ whether Continue needs a selection, are still open.
   message. Safety screens still open before the save is awaited.
 - **"Example" tag (P-89).** New kit string `kit.example`, "Example", as
   described above.
+- **Environment badge (TH-1031h).** `TEnvironment.badge` (null by default) is
+  set by the app shell. When it has text, every screen and sheet shows it as a
+  small pill at the top trailing edge, read by screen readers as
+  "Environment: <text>"; with no badge nothing is drawn. The kit never chooses
+  the text. New kit strings: `kit.environment`, the calendar's month and
+  weekday names, title, previous and next month, recommended day and
+  full-date format, and `kit.days_to_prepare`.
 
 ## Rendering changes with no spec change (TH-907)
 

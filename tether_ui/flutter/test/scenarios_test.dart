@@ -225,6 +225,8 @@ void main() {
     await _start(tester, Routes.welcome, ios: false);
     try {
         await _tap(tester, 'Get started');
+        await _tap(tester, 'BreatheFree');
+        await _tap(tester, 'ScrollFree');
         await _tap(tester, 'Continue with 2 programs');
         await _tap(tester, 'Continue');
         await _tap(tester, 'Agree and continue');

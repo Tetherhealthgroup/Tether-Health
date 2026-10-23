@@ -158,12 +158,20 @@ def ri(label, sub=None, badge=None): return {k: v for k, v in {'label': label, '
 def checklist(items, label=None, key=None, bind=None): return N('checklist', items=[i if isinstance(i, dict) else {'label': i} for i in items], label=label, key=key, bind=bind)
 def ci(label, sub=None, done=False): return {k: v for k, v in {'label': label, 'sub': sub, 'done': done or None}.items() if v}
 def toggle(label, sub=None, on=False, key=None, bind=None): return N('toggle', label=label, sub=sub, on=on, key=key, bind=bind)
-def field(label, example=None, unit=None, hint=None, error=None, placeholder=None, kind='text', key=None, bind=None):
+def field(label, example=None, unit=None, hint=None, error=None, placeholder=None, kind='text', key=None, bind=None, options=None, values=None):
     """A text input. P-31: a field never starts with a value. The example
     renders as placeholder (hint) text, and the field writes null until the
     user types. If the field already has its own placeholder, the example is
-    dropped."""
-    return N('field', label=label, unit=unit, hint=hint, error=error, placeholder=placeholder if placeholder is not None else example, kind=kind, key=key, bind=bind)
+    dropped. A `select` field may list its `options` (the shown labels, in
+    English) and, optionally, the stable session `values`, one per option;
+    the member then picks one from a list and the session holds its value
+    (its label when there are no values)."""
+    if options is not None and kind != 'select':
+        raise ValueError(f'field {label!r}: options need kind select')
+    if values is not None and (options is None or len(values) != len(options)):
+        raise ValueError(f'field {label!r}: values must be one per option')
+    return N('field', label=label, unit=unit, hint=hint, error=error, placeholder=placeholder if placeholder is not None else example, kind=kind, key=key, bind=bind,
+             options=list(options) if options else None, values=list(values) if values else None)
 def fieldrow(*fields): return N('fieldrow', fields=list(fields))
 def slider(label, value, mn=0, mx=10, lo=None, hi=None, color='coral', suffix='', key=None):
     return N('slider', label=label, value=value, min=mn, max=mx, minLabel=lo or str(mn), maxLabel=hi or str(mx), color=color, suffix=suffix or None, key=key)
@@ -190,9 +198,17 @@ def line(values, color, title=None, unit=None, band=None, caption=None, tag=None
 def zone(selected, rule=None): return N('zone', selected=selected, rule=rule)
 def ring(value, label='SECONDS', palette='teal'): return N('ring', value=value, label=label, palette=palette)
 def big(value, unit=None, caption=None): return N('big', value=value, unit=unit, caption=caption)
-def button(label, action, v='primary', state=None, arrow=None, small=False):
+def button(label, action, v='primary', state=None, arrow=None, small=False, needs=None, count_label=None, empty_label=None):
+    """`needs` names an input of the same screen (its `key`) that must hold a
+    value before the button works: the button is disabled while the session
+    has nothing for it (an empty list counts as nothing). For a list, such as
+    the selected programs, `count_label` is the label with the number chosen
+    (a plural message with `{n}`) and `empty_label` the label while nothing is
+    chosen. `label` stays the design's label."""
     if arrow is None: arrow = v in ('primary', 'rescue', 'lime', 'white') and not small
-    return N('button', label=label, action=action, variant=v, state=state, arrow=arrow, small=small or None)
+    if (count_label or empty_label) and not needs:
+        raise ValueError(f'button {label!r}: count_label and empty_label need `needs`')
+    return N('button', label=label, action=action, variant=v, state=state, arrow=arrow, small=small or None, needs=needs, countLabel=count_label, emptyLabel=empty_label)
 def buttons(*bs): return N('buttons', items=list(bs))
 def link(label, action, align='center'): return N('link', label=label, action=action, align=align)
 def quote(t, caption=None): return N('quote', text=t, caption=caption)
@@ -203,7 +219,19 @@ def emergency(t='Thoughts of harming yourself? Call or text 988. Emergency: 911.
 def skeleton(lines=3): return N('skeleton', lines=lines)
 def spacer(h=8): return N('spacer', h=h)
 def progtag(pid, extra=None): return N('progtag', program=pid, extra=extra)
-def calendar(month, selected, window, today=None): return N('calendar', month=month, selected=selected, window=window, today=today)
+def calendar(month, selected, window, today=None, key=None, ym=None):
+    """The design shows `month` (year-month `ym`, `YYYY-MM`) with day
+    `selected`, the recommended `window` and `today`. With a `key`, the app
+    shows a real month calendar instead and the chosen day is the session
+    value `<screen>.<key>`, as `YYYY-MM-DD`."""
+    if key and not ym: raise ValueError('calendar: a keyed calendar needs ym')
+    return N('calendar', month=month, selected=selected, window=window, today=today, key=key, ym=ym)
+def follows(node, key):
+    """Marks a card as the summary of the date chosen in the calendar with `key`
+    on the same screen: the design's card in the preview, the chosen date in the
+    app (and nothing while no date is chosen)."""
+    node['follows'] = key
+    return node
 def timer(value, label): return N('timer', value=value, label=label)
 
 # ---------------------------------------------------------------- screens
@@ -263,7 +291,7 @@ INPUTS = ('field', 'chips', 'segmented', 'radio', 'toggle', 'slider')
 # Checklists and selection tiles write to the session only when they have an
 # explicit key (consent checklists, the program picker). They are never
 # auto-keyed.
-KEYED = ('checklist', 'tiles')
+KEYED = ('checklist', 'tiles', 'calendar')
 AUTO_KEYS = []  # (screen id, path, key) of inputs without an explicit key
 # Settings binding (P-71, TH-1008). On a consent- or plan-class settings
 # screen (validate.CONSENT_SCREENS, PLAN_SCREENS) every input control that

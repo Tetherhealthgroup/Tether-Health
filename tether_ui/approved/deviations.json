@@ -231,6 +231,17 @@
       "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].title -> be.next_appointment (TH-909)"
     },
     {
+      "screen": "bf_date",
+      "decisions": [
+        "P-85"
+      ],
+      "tickets": [
+        "TH-1031h"
+      ],
+      "sha256": "c3b6f9c9568ed23552bc52f2af0b8cac3f4cc07f1111b640e731e4e206b9d44a",
+      "change": "P-85: the quit date is captured. body[2] calendar gets key \"quit_date\" and ym \"2026-08\"; body[3] card gets follows \"quit_date\"; footer[0] \"Confirm this date\" gets needs \"quit_date\". No label, starting value, layout or action changes: the preview and the prototype show the design as before; in the app the calendar is a real month calendar, the chosen day is the session value bf_date.quit_date (yyyy-MM-dd), the card shows the chosen date, and Confirm waits for it (TH-1031h)"
+    },
+    {
       "screen": "bf_estimates",
       "decisions": [
         "P-89"
@@ -782,13 +793,16 @@
     {
       "screen": "ob_basics",
       "decisions": [
-        "P-31"
+        "P-31",
+        "P-74",
+        "P-85"
       ],
       "tickets": [
-        "TH-907"
+        "TH-907",
+        "TH-1031h"
       ],
-      "sha256": "845a86c8fd7e19c06307a15718049945565a0c2ca99c544a8e4cbfc1e9cfb7a6",
-      "change": "P-31 placeholders, fields start empty: body[3] \"What should we call you?\" example \"Alex\" -> placeholder; body[4] \"Age range\" example \"35–44\" -> placeholder"
+      "sha256": "01a1c16adeca4ca98a09f7c1c772003b0f77a57b20e66599dab4a4c258167bfc",
+      "change": "P-31 placeholders, fields start empty: body[3] \"What should we call you?\" example \"Alex\" -> placeholder; body[4] \"Age range\" example \"35–44\" -> placeholder. P-74, P-85: body[4] Age range lists its options so the member can pick one (18–24, 25–34, 35–44, 45–54, 55–64, 65–74, 75+), with the stored bands as values (18_24, 25_34, 35_44, 45_54, 55_64, 65_74, 75_plus); the example stays a placeholder (TH-1031h)"
     },
     {
       "screen": "ob_consent",
@@ -806,14 +820,15 @@
       "decisions": [
         "TH-902",
         "P-31",
-        "P-78"
+        "P-78",
+        "P-85"
       ],
       "tickets": [
         "TH-907",
         "TH-1031h"
       ],
-      "sha256": "f027ebb31935bd2d4910f8c1cfa9e8638d52f36b816e91451363f9147783ee99",
-      "change": "Session key only, no visual change: body[3] tiles gets key \"programs\". P-31, P-78: the program tiles start with nothing selected (BreatheFree and ScrollFree were selected) (TH-1031h)"
+      "sha256": "c8e0b242056e9838f0fd988b35393f56bbe64c3e3873b846b40da12d9a1b7cd3",
+      "change": "Session key only, no visual change: body[3] tiles gets key \"programs\". P-31, P-78: the program tiles start with nothing selected (BreatheFree and ScrollFree were selected) (TH-1031h). P-85: footer[0] \"Continue with 2 programs\" gets needs \"programs\", countLabel (Continue with 1 program / N programs) and emptyLabel \"Choose at least one program\": the button follows the number of programs chosen and is disabled with none, as the screen's own description says; the spec label is unchanged (TH-1031h)"
     },
     {
       "screen": "ob_reminders",

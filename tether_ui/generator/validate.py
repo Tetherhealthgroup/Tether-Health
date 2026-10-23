@@ -129,6 +129,7 @@ def validate():
     errors += check_age_gate(SCREENS, list(SCREENS), PRE_AGE_SIGN_IN)
     errors += check_l10n(SCREENS)
     errors += check_directional()
+    errors += check_session_gates(SCREENS)
     inbound = {}
     for f, l, ty, t in edges: inbound.setdefault(t, set()).add(f)
     for sid, s in SCREENS.items():
@@ -167,6 +168,44 @@ def check_l10n(screens):
                     v = n['values']
                     if n['t'] != 'segmented' or len(v) != len(n['options']) or len(set(v)) != len(v):
                         errors.append(f"{sid}: {p} values {v!r} must be unique, one per option of a segmented control")
+    return errors
+
+
+# Controls that depend on another control of the same screen: a button with
+# `needs`, a card that `follows` a calendar, a select field with options.
+GATE_TARGETS = ('field', 'chips', 'segmented', 'radio', 'toggle', 'slider', 'checklist', 'tiles', 'calendar')
+
+def check_session_gates(screens):
+    """A button's `needs` and a card's `follows` name a keyed control of the
+    same screen (a calendar, for `follows`); the count and empty labels of a
+    button need a list-valued control; a calendar with a key says its month; a
+    field with options is a select, and its values are unique, one per option."""
+    errors = []
+    for sid, s in screens.items():
+        nodes = [(n, p) for part in ('body', 'footer') for n, p in walk(s[part], part)]
+        keyed = {n['key']: n for n, _ in nodes if n.get('key') and n['t'] in GATE_TARGETS}
+        for n, p in nodes:
+            if n['t'] == 'button' and n.get('needs'):
+                t = keyed.get(n['needs'])
+                if t is None: errors.append(f"{sid}: {p} needs {n['needs']!r}, which is not a keyed control on this screen")
+                elif (n.get('countLabel') or n.get('emptyLabel')) and t['t'] not in ('tiles', 'checklist', 'chips'):
+                    errors.append(f"{sid}: {p} counts {n['needs']!r}, which does not hold a list")
+            elif n['t'] != 'button' and (n.get('needs') or n.get('countLabel') or n.get('emptyLabel')):
+                errors.append(f"{sid}: {p} is a {n['t']}, only a button can have needs, countLabel or emptyLabel")
+            if n.get('follows'):
+                t = keyed.get(n['follows'])
+                if n['t'] != 'card' or t is None or t['t'] != 'calendar':
+                    errors.append(f"{sid}: {p} follows {n['follows']!r}, which must be a keyed calendar on this screen (and the follower a card)")
+            if n['t'] == 'calendar' and n.get('key') and not re.fullmatch(r'\d{4}-(0[1-9]|1[0-2])', n.get('ym') or ''):
+                errors.append(f"{sid}: {p} calendar {n['key']!r} needs ym as YYYY-MM")
+            if n['t'] == 'field' and (n.get('options') is not None or n.get('values') is not None):
+                o, v = n.get('options'), n.get('values')
+                if n.get('kind') != 'select' or not o:
+                    errors.append(f'{sid}: {p} options and values are for a select field with options')
+                elif v is not None and (len(v) != len(o) or len(set(v)) != len(v)):
+                    errors.append(f"{sid}: {p} values {v!r} must be unique, one per option")
+                elif len(set(o)) != len(o):
+                    errors.append(f"{sid}: {p} options {o!r} must be unique")
     return errors
 
 
@@ -973,6 +1012,20 @@ def _l10n_self_test():
     _expect(check_l10n(scr(seg(['English', 'Español'], 'English', values=['en', 'es'], key='l'))) == [], 'valid values were reported')
     bad = seg(['A', 'B'], 'A', key='l'); bad['values'] = ['x', 'x']
     _expect(any('values' in e for e in check_l10n(scr(bad))), 'duplicate option values were not reported')
+    # session gates: needs, follows, calendar months, select options
+    tiles_ = tiles([tl('A', program='bf')], key='picked')
+    cal = calendar('August 2026', 28, [28], key='day', ym='2026-08')
+    sel = field('Age', kind='select', key='age', options=['A', 'B'], values=['a', 'b'])
+    _expect(check_session_gates(scr(tiles_, cal, sel, follows(card(title='x'), 'day'), button('Go', back(), needs='picked', count_label='{n}', empty_label='None'), button('Ok', back(), needs='day'))) == [], 'a valid gate was reported')
+    for bad_, why in ((button('Go', back(), needs='nope'), 'not a keyed control'),
+                      (button('Go', back(), needs='day', count_label='{n}'), 'does not hold a list'),
+                      (dict(title('x'), needs='day'), 'only a button'),
+                      (follows(card(title='x'), 'picked'), 'keyed calendar'),
+                      (follows(text('x'), 'day'), 'keyed calendar'),
+                      (dict(cal, ym='2026-13'), 'YYYY-MM'),
+                      (dict(sel, values=['a', 'a']), 'unique'),
+                      (dict(sel, kind='text'), 'select field')):
+        _expect(any(why in e for e in check_session_gates(scr(tiles_, cal, sel, bad_))), f'{why!r} was not reported')
     with tempfile.TemporaryDirectory() as d:
         open(os.path.join(d, 'a.dart'), 'w').write("x(alignment: Alignment.centerLeft); y(textAlign: TextAlign.right);\n// Alignment.centerRight in a comment\nz(padding: EdgeInsets.only(left: 4));\nw(EdgeInsetsDirectional.only(start: 4), AlignmentDirectional.centerStart, TextAlign.end);\nPositioned(top: 0, left: 0);\n")
         found = check_directional([d])

@@ -8,10 +8,12 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/scheduler.dart';
 
 import '../l10n/strings.g.dart';
 import '../logic/rules.dart';
 import 'data.dart';
+import 'environment.dart';
 import 'nav.dart';
 import 'strings.dart';
 import 'tokens.dart';
@@ -84,6 +86,7 @@ class _TScreenState extends State<TScreen> with _FooterPlacement<TScreen> {
               bottom: tab == null,
               child: Column(
                 children: [
+                  const TEnvironmentBadge(),
                   if (header != null) _Header(spec: header, dark: dark),
                   Expanded(
                     child: LayoutBuilder(builder: (context, box) {
@@ -159,6 +162,7 @@ class _TSheetState extends State<TSheet> with _FooterPlacement<TSheet> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Center(child: Container(width: 40, height: 5, margin: const EdgeInsetsDirectional.fromSTEB(0, 9, 0, 6), decoration: BoxDecoration(color: TColors.line, borderRadius: BorderRadius.circular(3)))),
+                const TEnvironmentBadge(),
                 Flexible(
                   child: SingleChildScrollView(
                     padding: const EdgeInsetsDirectional.fromSTEB(TSpace.screen, 6, TSpace.screen, 12),
@@ -1469,8 +1473,17 @@ class _TToggleRowState extends State<TToggleRow> with _TInput<TToggleRow, bool> 
 enum TFieldKind { text, number, email, password, phone, date, select, multiline, search }
 
 class TField extends StatefulWidget {
-  const TField({super.key, required this.label, this.value, this.unit, this.hint, this.error, this.placeholder, this.kind = TFieldKind.text, this.onChanged, this.fieldKey, this.bind, this.bindClass = TBindClass.consent});
+  const TField({super.key, required this.label, this.value, this.unit, this.hint, this.error, this.placeholder, this.kind = TFieldKind.text, this.onChanged, this.fieldKey, this.bind, this.bindClass = TBindClass.consent, this.options, this.optionLabels})
+      : assert(optionLabels == null || (options != null && optionLabels.length == options.length));
   final String label;
+
+  /// A [TFieldKind.select] field with options opens a list to pick from. The
+  /// session holds the picked option's value from [options] (stable across
+  /// languages); the field shows its label from [optionLabels], or the value
+  /// itself without labels. Without options a select field is read-only.
+  final List<String>? options;
+  final List<String>? optionLabels;
+
   final String? value;
   final String? unit;
   final String? hint;
@@ -1555,7 +1568,7 @@ class _TFieldState extends State<TField> {
       text = stored is String && stored.isNotEmpty ? stored : null;
     }
     _start = text;
-    _controller.text = text ?? '';
+    _controller.text = text == null ? '' : _labelOf(text) ?? text;
     _empty = (text ?? '').isEmpty;
     if (!plan) return;
     text == null ? TSession.forget(widget.fieldKey) : TSession.set(widget.fieldKey, text);
@@ -1601,6 +1614,65 @@ class _TFieldState extends State<TField> {
   String? get error => widget.error;
   String? get placeholder => widget.placeholder;
   TFieldKind get kind => widget.kind;
+
+  /// The shown label of option [value], or null when it is not an option.
+  String? _labelOf(String value) {
+    final options = widget.options;
+    final i = options?.indexOf(value) ?? -1;
+    return i < 0 ? null : (widget.optionLabels ?? options!)[i];
+  }
+
+  bool get _picks => kind == TFieldKind.select && (widget.options?.isNotEmpty ?? false);
+
+  /// Opens the list of options; the picked option is written to the session.
+  Future<void> _pick() async {
+    final options = widget.options!;
+    final labels = widget.optionLabels ?? options;
+    final current = TSession.values[widget.fieldKey];
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: TColors.paper,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(TRadius.sheet))),
+      builder: (context) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsetsDirectional.fromSTEB(TSpace.screen, 16, TSpace.screen, 12),
+          children: [
+            Semantics(header: true, child: Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(label, style: TText.cardTitle))),
+            for (var i = 0; i < options.length; i++)
+              Semantics(
+                button: true,
+                selected: options[i] == current,
+                excludeSemantics: true,
+                label: labels[i],
+                onTap: () => Navigator.of(context).pop(options[i]),
+                child: InkWell(
+                  key: ValueKey('option:${options[i]}'),
+                  borderRadius: BorderRadius.circular(TRadius.field),
+                  onTap: () => Navigator.of(context).pop(options[i]),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 48),
+                    child: Row(children: [
+                      Expanded(child: Padding(padding: const EdgeInsets.symmetric(vertical: 10), child: Text(labels[i], style: TText.optionLabel))),
+                      if (options[i] == current) const Icon(Icons.check_rounded, color: TColors.teal),
+                    ]),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (picked == null || !mounted) return;
+    _hadKey = widget.fieldKey != null;
+    _controller.text = _labelOf(picked) ?? picked;
+    TSession.set(widget.fieldKey, picked);
+    TSession.markTouched(widget.fieldKey, picked != _start);
+    setState(() => _empty = false);
+    widget.onChanged?.call(picked);
+  }
 
   void onChanged(String v) {
     _hadKey = widget.fieldKey != null;
@@ -1656,6 +1728,8 @@ class _TFieldState extends State<TField> {
         label: label,
         // A password's example is bullets: nothing useful to speak.
         hint: kind == TFieldKind.password ? null : placeholder,
+        // A field that picks from a list opens it for a screen reader's tap.
+        onTap: _picks ? _pick : null,
         // A new generation (after a scrub) is a new editable, with no undo
         // history.
         child: KeyedSubtree(
@@ -1666,6 +1740,7 @@ class _TFieldState extends State<TField> {
             obscureText: kind == TFieldKind.password,
             keyboardType: keyboard,
             readOnly: readOnly,
+            onTap: _picks ? _pick : null,
             minLines: kind == TFieldKind.multiline ? 2 : 1,
             maxLines: maxLines,
             style: TText.input,
@@ -2423,16 +2498,115 @@ class TTimer extends StatelessWidget {
       );
 }
 
-class TCalendar extends StatelessWidget {
-  const TCalendar({super.key, required this.month, required this.selected, required this.window, this.today, this.firstWeekday = 6, this.days = 31});
+/// A month calendar.
+///
+/// With a [fieldKey] and the app's own [TData] it is a real calendar: it
+/// opens on the current month, the member moves between months and taps a day,
+/// and the chosen day is the session value [fieldKey] as `yyyy-MM-dd`. Days
+/// run from tomorrow to [maxDaysAhead] days ahead; the days [recommendedFrom]
+/// to [recommendedTo] days ahead are marked as recommended. A date that the
+/// session already holds for the key, and that is still allowed, is chosen
+/// when it opens; the key is empty until a day is chosen.
+///
+/// With preview data ([TData.isPreview]), or without a [fieldKey], it draws
+/// the design: [month] with [selected], [window] and [today], and nothing is
+/// tappable. A keyed design calendar writes its chosen day ([year],
+/// [monthNumber], [selected]) to the session when built, as the other
+/// controls write their starting values.
+class TCalendar extends StatefulWidget {
+  const TCalendar({super.key, required this.month, required this.selected, required this.window, this.today, this.firstWeekday = 6, this.days = 31, this.fieldKey, this.year, this.monthNumber});
   final String month;
   final int selected;
   final List<int> window;
   final int? today;
   final int firstWeekday; // 0 = Sunday
   final int days;
+
+  /// Session key of the chosen date.
+  final String? fieldKey;
+
+  /// The design's year and month (1-12); only used to write the design's
+  /// chosen day to the session.
+  final int? year;
+  final int? monthNumber;
+
+  /// The latest day that can be chosen, in days from today.
+  static const int maxDaysAhead = 90;
+
+  /// The recommended window, in days from today (first and last).
+  static const int recommendedFrom = 7;
+  static const int recommendedTo = 14;
+
+  /// The current time. Tests replace it.
+  static DateTime Function() clock = DateTime.now;
+
+  /// `yyyy-MM-dd` of [date].
+  static String iso(DateTime date) => '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+
+  /// The date held by [raw], a `yyyy-MM-dd` string naming a real day, or null.
+  static DateTime? parseIso(Object? raw) {
+    if (raw is! String || !RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(raw)) return null;
+    final date = DateTime.tryParse(raw);
+    return date != null && iso(date) == raw ? DateUtils.dateOnly(date) : null;
+  }
+
+  /// [date] in full, for example "Friday, August 28, 2026", in the app language.
+  static String fullDate(TStrings s, DateTime date) =>
+      s.kitDateFull(weekday: s.kitWeekdayNames.split('|')[date.weekday % 7], month: s.kitMonthNames.split('|')[date.month - 1], day: date.day, year: date.year);
+
+  /// Today, without the time.
+  static DateTime get currentDay => DateUtils.dateOnly(clock());
+
+  /// The day [days] calendar days after [from] (a daylight-saving change in
+  /// between does not shift it).
+  static DateTime daysAfter(DateTime from, int days) => DateTime(from.year, from.month, from.day + days);
+
+  /// The whole calendar days from [from] to [to].
+  static int daysBetween(DateTime from, DateTime to) => DateTime.utc(to.year, to.month, to.day).difference(DateTime.utc(from.year, from.month, from.day)).inDays;
+
   @override
-  Widget build(BuildContext context) {
+  State<TCalendar> createState() => _TCalendarState();
+}
+
+class _TCalendarState extends State<TCalendar> {
+  late final bool _design = widget.fieldKey == null || TData.isPreview;
+  DateTime? _selected;
+  DateTime? _start;
+  late DateTime _shown;
+
+  DateTime get _min => TCalendar.daysAfter(TCalendar.currentDay, 1);
+  DateTime get _max => TCalendar.daysAfter(TCalendar.currentDay, TCalendar.maxDaysAhead);
+  bool _allowed(DateTime d) => !d.isBefore(_min) && !d.isAfter(_max);
+
+  @override
+  void initState() {
+    super.initState();
+    final key = widget.fieldKey;
+    TSession.markTouched(key, false);
+    if (_design) {
+      final year = widget.year, month = widget.monthNumber;
+      if (key != null && year != null && month != null) TSession.set(key, TCalendar.iso(DateTime(year, month, widget.selected)));
+      return;
+    }
+    final kept = TCalendar.parseIso(TSession.values[key]);
+    _selected = _start = kept != null && _allowed(kept) ? kept : null;
+    _shown = DateTime((_selected ?? _min).year, (_selected ?? _min).month);
+    _selected == null ? TSession.forget(key) : TSession.set(key, TCalendar.iso(_selected!));
+  }
+
+  void _choose(DateTime date) {
+    setState(() => _selected = date);
+    TSession.set(widget.fieldKey, TCalendar.iso(date));
+    TSession.markTouched(widget.fieldKey, date != _start);
+  }
+
+  void _move(int months) => setState(() => _shown = DateTime(_shown.year, _shown.month + months));
+
+  @override
+  Widget build(BuildContext context) => _design ? _buildDesign(context) : _buildLive(context);
+
+  Widget _buildDesign(BuildContext context) {
+    final TCalendar(:month, :selected, :window, :today, :firstWeekday, :days) = widget;
     final cells = <Widget>[
       for (final d in TStrings.of(context).kitWeekdayInitials.split(' ')) Center(child: Text(d, style: TText.eyebrow)),
       for (var i = 0; i < firstWeekday; i++) const SizedBox(),
@@ -2456,6 +2630,127 @@ class TCalendar extends StatelessWidget {
       Row(children: [Expanded(child: Text(month, style: TText.label)), const Icon(Icons.chevron_left_rounded, color: TColors.muted), const Icon(Icons.chevron_right_rounded, color: TColors.muted)]),
       GridView.count(crossAxisCount: 7, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), mainAxisSpacing: 4, crossAxisSpacing: 4, childAspectRatio: 1.2, children: cells),
     ]);
+  }
+
+  Widget _buildLive(BuildContext context) {
+    final s = TStrings.of(context);
+    final months = s.kitMonthNames.split('|');
+    final today = TCalendar.currentDay;
+    final first = DateTime(_shown.year, _shown.month);
+    final canGoBack = first.isAfter(DateTime(_min.year, _min.month));
+    final canGoOn = first.isBefore(DateTime(_max.year, _max.month));
+    final recommendedStart = TCalendar.daysAfter(today, TCalendar.recommendedFrom);
+    final recommendedEnd = TCalendar.daysAfter(today, TCalendar.recommendedTo);
+    final cells = <Widget>[
+      for (final d in s.kitWeekdayInitials.split(' ')) ExcludeSemantics(child: Center(child: Text(d, style: TText.eyebrow))),
+      for (var i = 0; i < first.weekday % 7; i++) const SizedBox(),
+      for (var d = 1; d <= DateUtils.getDaysInMonth(first.year, first.month); d++) _day(s, DateTime(first.year, first.month, d), today, recommendedStart, recommendedEnd),
+    ];
+    return TCard(children: [
+      Row(children: [
+        Expanded(child: Semantics(header: true, child: Text(s.kitCalendarTitle(month: months[first.month - 1], year: first.year), style: TText.label))),
+        IconButton(key: const ValueKey('calendar-prev'), tooltip: s.kitCalendarPrev, onPressed: canGoBack ? () => _move(-1) : null, icon: const Icon(Icons.chevron_left_rounded), color: TColors.teal, disabledColor: TColors.line),
+        IconButton(key: const ValueKey('calendar-next'), tooltip: s.kitCalendarNext, onPressed: canGoOn ? () => _move(1) : null, icon: const Icon(Icons.chevron_right_rounded), color: TColors.teal, disabledColor: TColors.line),
+      ]),
+      GridView.count(crossAxisCount: 7, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), childAspectRatio: 1, children: cells),
+    ]);
+  }
+
+  Widget _day(TStrings s, DateTime date, DateTime today, DateTime recommendedStart, DateTime recommendedEnd) {
+    final allowed = _allowed(date);
+    final chosen = date == _selected;
+    final recommended = !date.isBefore(recommendedStart) && !date.isAfter(recommendedEnd);
+    return Semantics(
+      button: true,
+      enabled: allowed,
+      selected: chosen,
+      excludeSemantics: true,
+      label: TCalendar.fullDate(s, date),
+      hint: allowed && recommended ? s.kitCalendarRecommended : null,
+      onTap: allowed ? () => _choose(date) : null,
+      child: InkWell(
+        key: ValueKey('calendar-day-${TCalendar.iso(date)}'),
+        borderRadius: BorderRadius.circular(10),
+        onTap: allowed ? () => _choose(date) : null,
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: chosen ? TColors.teal : (allowed && recommended ? TColors.mint : null),
+              borderRadius: BorderRadius.circular(10),
+              border: date == today ? Border.all(color: TColors.teal, width: 1.5) : null,
+            ),
+            child: Text(
+              '${date.day}',
+              style: TText.chip.copyWith(color: chosen ? Colors.white : (allowed ? TColors.teal : TColors.disabledFg.withValues(alpha: 0.55)), fontWeight: chosen ? FontWeight.w800 : FontWeight.w600),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Runs [builder] again whenever [TSession] changes. A change made while the
+/// tree is being built (an input writing its starting value) rebuilds after
+/// the frame instead of during it.
+class _OnSession extends StatefulWidget {
+  const _OnSession({required this.builder});
+  final WidgetBuilder builder;
+
+  @override
+  State<_OnSession> createState() => _OnSessionState();
+}
+
+class _OnSessionState extends State<_OnSession> {
+  @override
+  void initState() {
+    super.initState();
+    TSession.changes.addListener(_changed);
+  }
+
+  @override
+  void dispose() {
+    TSession.changes.removeListener(_changed);
+    super.dispose();
+  }
+
+  void _changed() {
+    if (!mounted) return;
+    if (SchedulerBinding.instance.schedulerPhase == SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() {});
+      });
+    } else {
+      setState(() {});
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.builder(context);
+}
+
+/// The card that sums up the date chosen in a [TCalendar] ([fieldKey] is the
+/// calendar's key): the date in full and the days left to prepare, under
+/// [eyebrow]. It draws nothing until a day is chosen. With preview data it is
+/// [design], the design's card.
+class TDateSummary extends StatelessWidget {
+  const TDateSummary({super.key, required this.fieldKey, this.eyebrow, required this.design});
+  final String fieldKey;
+  final String? eyebrow;
+  final Widget design;
+
+  @override
+  Widget build(BuildContext context) {
+    if (TData.isPreview) return design;
+    return _OnSession(builder: (context) {
+      final date = TCalendar.parseIso(TSession.values[fieldKey]);
+      if (date == null) return const SizedBox.shrink();
+      final s = TStrings.of(context);
+      final left = TCalendar.daysBetween(TCalendar.currentDay, date);
+      return TCard(variant: TCardVariant.dark, eyebrow: eyebrow, title: TCalendar.fullDate(s, date), text: left > 0 ? s.kitDaysToPrepare(n: left) : null);
+    });
   }
 }
 
@@ -2515,6 +2810,44 @@ class TButton extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A [TButton] that works only once an input of the screen holds a value:
+/// disabled while [TSession] has nothing for [fieldKey] (no value, blank
+/// text or an empty list). When the value is a list (the selected programs),
+/// [countLabel] gives the label for the number chosen and [emptyLabel] the
+/// label while none is; otherwise [label] is shown (and [emptyLabel], while
+/// the button is disabled, when given).
+class TGatedButton extends StatelessWidget {
+  const TGatedButton({super.key, required this.fieldKey, this.label, this.countLabel, this.emptyLabel, this.onPressed, this.variant = TButtonVariant.primary, this.small = false, this.arrow = false})
+      : assert(label != null || countLabel != null, 'a gated button needs a label');
+  final String fieldKey;
+  final String? label;
+  final String Function(int count)? countLabel;
+  final String? emptyLabel;
+  final VoidCallback? onPressed;
+  final TButtonVariant variant;
+  final bool small;
+  final bool arrow;
+
+  /// Whether [value] counts as chosen.
+  static bool hasValue(Object? value) => switch (value) {
+        null => false,
+        final String text => text.trim().isNotEmpty,
+        final Iterable<Object?> items => items.isNotEmpty,
+        _ => true,
+      };
+
+  @override
+  Widget build(BuildContext context) => _OnSession(builder: (context) {
+        final value = TSession.values[fieldKey];
+        final ready = hasValue(value);
+        final count = value is List<Object?> ? value.length : null;
+        final text = ready
+            ? (countLabel != null && count != null ? countLabel!(count) : (label ?? emptyLabel ?? ''))
+            : (emptyLabel ?? label ?? '');
+        return TButton(label: text, onPressed: ready ? onPressed : null, variant: variant, small: small, arrow: arrow);
+      });
 }
 
 class TButtonRow extends StatelessWidget {
