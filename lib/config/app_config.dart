@@ -2,45 +2,138 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-class AppConfig {
-  const AppConfig(
-      {required this.apiBaseUrl,
-      required this.supabaseUrl,
-      required this.supabaseAnonKey});
+import '../app/ui_selection.dart';
 
+/// Where the tether_ui screens send their data (`TETHER_BACKEND`).
+enum BackendMode {
+  /// An in-process server on the phone with synthetic data only. Nothing
+  /// leaves the device.
+  sandbox,
+
+  /// The real services: the API, Supabase Auth and the sync service.
+  http,
+}
+
+class AppConfig {
+  const AppConfig({
+    required this.apiBaseUrl,
+    required this.supabaseUrl,
+    required this.supabaseAnonKey,
+    this.backend = '',
+    this.syncBaseUrl = '',
+    this.googleWebClientId = '',
+    this.googleIosClientId = '',
+    this.epicSandboxClientId = '',
+  });
+
+  /// Reads the build's defines. This is the only place in lib/ that reads
+  /// service configuration.
   factory AppConfig.fromEnvironment() => const AppConfig(
         apiBaseUrl: String.fromEnvironment('API_BASE_URL'),
         supabaseUrl: String.fromEnvironment('SUPABASE_URL'),
         supabaseAnonKey: String.fromEnvironment('SUPABASE_ANON_KEY'),
+        backend: String.fromEnvironment('TETHER_BACKEND'),
+        syncBaseUrl: String.fromEnvironment('SYNC_BASE_URL'),
+        googleWebClientId: String.fromEnvironment('GOOGLE_WEB_CLIENT_ID'),
+        googleIosClientId: String.fromEnvironment('GOOGLE_IOS_CLIENT_ID'),
+        epicSandboxClientId: String.fromEnvironment('EPIC_SANDBOX_CLIENT_ID'),
       );
 
   final String apiBaseUrl;
   final String supabaseUrl;
   final String supabaseAnonKey;
 
+  /// `TETHER_BACKEND` as written: `sandbox`, `http`, or empty.
+  final String backend;
+
+  /// The sync service's base URL (`SYNC_BASE_URL`); http mode only.
+  final String syncBaseUrl;
+
+  /// Public OAuth client identifiers of the sign-in providers. Optional and
+  /// never secrets; in http mode a provider without its IDs fails closed.
+  final String googleWebClientId;
+  final String googleIosClientId;
+  final String epicSandboxClientId;
+
   bool get isConfigured =>
       apiBaseUrl.isNotEmpty &&
       supabaseUrl.isNotEmpty &&
       supabaseAnonKey.isNotEmpty;
+
+  /// Whether any service value is set. `TETHER_BACKEND=sandbox` alone is not
+  /// configuration: it asks for no service.
   bool get hasAnyConfiguration =>
       apiBaseUrl.isNotEmpty ||
       supabaseUrl.isNotEmpty ||
-      supabaseAnonKey.isNotEmpty;
+      supabaseAnonKey.isNotEmpty ||
+      syncBaseUrl.isNotEmpty ||
+      (backend.isNotEmpty && backend != _sandbox);
+
+  static const String _sandbox = 'sandbox';
+  static const String _http = 'http';
+
+  /// The four service values http mode needs, by define name.
+  Map<String, String> get _serviceValues => {
+        'API_BASE_URL': apiBaseUrl,
+        'SUPABASE_URL': supabaseUrl,
+        'SUPABASE_ANON_KEY': supabaseAnonKey,
+        'SYNC_BASE_URL': syncBaseUrl,
+      };
+
+  /// The backend mode of the tether_ui screens, or null when the defines do
+  /// not name exactly one mode (the build is then misconfigured):
+  /// - `sandbox` with none of the four service values set;
+  /// - `http` with all four set;
+  /// - nothing at all set, in a debug build only: sandbox.
+  /// Anything partial is null, so one member's data never splits between a
+  /// server and the phone. [debug] exists for tests.
+  BackendMode? backendMode({bool debug = kDebugMode}) =>
+      backendModeProblem(debug: debug) == null
+          ? (_isHttp ? BackendMode.http : BackendMode.sandbox)
+          : null;
+
+  bool get _isHttp => backend.trim() == _http;
+
+  /// Why [backendMode] is null, naming defines only (never values); null when
+  /// the mode is valid.
+  String? backendModeProblem({bool debug = kDebugMode}) {
+    final set = _serviceValues.values.where((v) => v.trim().isNotEmpty).length;
+    final names = _serviceValues.keys.join(', ');
+    switch (backend.trim()) {
+      case _sandbox:
+        return set == 0
+            ? null
+            : 'TETHER_BACKEND=sandbox requires $names to be absent.';
+      case _http:
+        return set == _serviceValues.length
+            ? null
+            : 'TETHER_BACKEND=http requires all of $names.';
+      case '':
+        if (debug && set == 0) return null;
+        return 'TETHER_BACKEND must be sandbox or http.';
+      default:
+        return 'TETHER_BACKEND must be sandbox or http.';
+    }
+  }
 
   /// Pure check of the two service endpoints for a release build. Returns the
   /// human-readable problems of each failing value (empty list means
   /// acceptable). Names the dart-define, never the value, so a misbuilt
   /// release is easy to diagnose. Neither URL may carry user info, a query or
   /// a fragment, and SUPABASE_URL may not have a path beyond "/", as in
-  /// tool/release_define_check.sh.
+  /// tool/release_define_check.sh. When [syncBaseUrl] is given (http mode of
+  /// the tether_ui screens), SYNC_BASE_URL is checked with the API_BASE_URL
+  /// rules.
   static List<String> releaseEndpointProblems({
     required String supabaseUrl,
     required String apiBaseUrl,
+    String? syncBaseUrl,
   }) {
     final problems = <String>[];
     for (final entry in {
       'SUPABASE_URL': supabaseUrl,
       'API_BASE_URL': apiBaseUrl,
+      if (syncBaseUrl != null) 'SYNC_BASE_URL': syncBaseUrl,
     }.entries) {
       final value = entry.value.trim();
       if (value.isEmpty) {
@@ -390,11 +483,27 @@ class AppConfig {
     return roles;
   }
 
-  void validate({bool production = kReleaseMode}) {
+  /// Throws a [FormatException] naming the failing defines when this build
+  /// cannot start.
+  ///
+  /// The legacy app's rules are unchanged. For the tether_ui screens
+  /// ([tetherUi], by default whether [selectAppUi] picks them), the backend
+  /// mode must be valid first ([backendModeProblem]): sandbox mode has no
+  /// service to check, and http mode also checks SYNC_BASE_URL.
+  void validate({bool production = kReleaseMode, bool? tetherUi}) {
+    final forTetherUi = tetherUi ?? selectAppUi() == AppUi.tetherUi;
+    if (forTetherUi) {
+      final problem = backendModeProblem(debug: !production && kDebugMode);
+      if (problem != null) {
+        throw FormatException('This build is misconfigured. $problem');
+      }
+      if (!_isHttp) return;
+    }
     if (production) {
       final problems = releaseEndpointProblems(
         supabaseUrl: supabaseUrl,
         apiBaseUrl: apiBaseUrl,
+        syncBaseUrl: forTetherUi ? syncBaseUrl : null,
       );
       if (problems.isNotEmpty) {
         throw FormatException(
@@ -407,7 +516,11 @@ class AppConfig {
       throw const FormatException(
           'API_BASE_URL, SUPABASE_URL and SUPABASE_ANON_KEY must be provided together.');
     }
-    for (final value in [apiBaseUrl, supabaseUrl]) {
+    for (final value in [
+      apiBaseUrl,
+      supabaseUrl,
+      if (forTetherUi) syncBaseUrl,
+    ]) {
       final uri = Uri.tryParse(value);
       if (uri == null || !uri.hasScheme || !uri.hasAuthority) {
         throw const FormatException('Service URLs must be absolute.');

@@ -206,4 +206,161 @@ void main() {
       expect(() => config.validate(production: true), throwsFormatException);
     });
   });
+
+  group('backend mode (TETHER_BACKEND)', () {
+    const key = 'sb_publishable_synthetic-placeholder';
+    AppConfig config({
+      String backend = '',
+      String api = '',
+      String supabase = '',
+      String anon = '',
+      String sync = '',
+    }) =>
+        AppConfig(
+          apiBaseUrl: api,
+          supabaseUrl: supabase,
+          supabaseAnonKey: anon,
+          backend: backend,
+          syncBaseUrl: sync,
+        );
+    AppConfig http(
+            {String backend = 'http',
+            String sync = 'https://sync.example.test'}) =>
+        config(
+          backend: backend,
+          api: 'https://api.example.test',
+          supabase: 'https://project.supabase.co',
+          anon: key,
+          sync: sync,
+        );
+
+    test('a debug build with nothing set is sandbox', () {
+      expect(config().backendMode(debug: true), BackendMode.sandbox);
+      expect(config().hasAnyConfiguration, isFalse);
+      expect(
+        () => config().validate(production: false, tetherUi: true),
+        returnsNormally,
+      );
+    });
+
+    test('a release or profile build with nothing set is misconfigured', () {
+      expect(config().backendMode(debug: false), isNull);
+      expect(config().backendModeProblem(debug: false),
+          'TETHER_BACKEND must be sandbox or http.');
+      expect(
+        () => config().validate(production: true, tetherUi: true),
+        throwsA(isA<FormatException>().having((e) => e.message, 'message',
+            contains('TETHER_BACKEND must be sandbox or http.'))),
+      );
+    });
+
+    test('sandbox with no service value is sandbox, also in release', () {
+      final sandbox = config(backend: 'sandbox');
+      expect(sandbox.backendMode(debug: false), BackendMode.sandbox);
+      expect(sandbox.hasAnyConfiguration, isFalse);
+      expect(() => sandbox.validate(production: true, tetherUi: true),
+          returnsNormally);
+    });
+
+    test('http with all four values over https is http', () {
+      expect(http().backendMode(debug: false), BackendMode.http);
+      expect(http().hasAnyConfiguration, isTrue);
+      expect(() => http().validate(production: true, tetherUi: true),
+          returnsNormally);
+    });
+
+    test('http in release rejects a sync URL that is not https', () {
+      final insecure = http(sync: 'http://sync.example.test');
+      expect(insecure.backendMode(debug: false), BackendMode.http);
+      expect(
+        () => insecure.validate(production: true, tetherUi: true),
+        throwsA(isA<FormatException>()
+            .having((e) => e.message, 'message', contains('SYNC_BASE_URL'))),
+      );
+      // Debug keeps accepting http endpoints, as for the other URLs.
+      expect(() => insecure.validate(production: false, tetherUi: true),
+          returnsNormally);
+    });
+
+    test('anything partial is misconfigured', () {
+      final partial = <String, AppConfig>{
+        'http without SYNC_BASE_URL': http(sync: ''),
+        'sandbox with a service value':
+            config(backend: 'sandbox', api: 'https://api.example.test'),
+        'sandbox with only SYNC_BASE_URL':
+            config(backend: 'sandbox', sync: 'https://sync.example.test'),
+        'all four without TETHER_BACKEND': http(backend: ''),
+        'one value without TETHER_BACKEND':
+            config(sync: 'https://sync.example.test'),
+        'an unknown mode': config(backend: 'staging'),
+        'http with nothing else': config(backend: 'http'),
+      };
+      for (final MapEntry(key: name, value: value) in partial.entries) {
+        for (final debug in [true, false]) {
+          expect(value.backendMode(debug: debug), isNull,
+              reason: '$name (debug: $debug)');
+        }
+        expect(value.hasAnyConfiguration, isTrue, reason: name);
+        expect(() => value.validate(production: true, tetherUi: true),
+            throwsFormatException,
+            reason: name);
+        expect(() => value.validate(production: false, tetherUi: true),
+            throwsFormatException,
+            reason: name);
+      }
+    });
+
+    test('problems name defines, never values', () {
+      final problem = config(
+        backend: 'sandbox',
+        api: 'https://secret-host.example.test',
+      ).backendModeProblem()!;
+      expect(problem, isNot(contains('secret-host')));
+      expect(problem, contains('API_BASE_URL'));
+    });
+
+    test('the legacy app keeps its rules whatever the mode defines say', () {
+      // A store build has only the three legacy defines.
+      const legacy = AppConfig(
+        apiBaseUrl: 'https://api.example.test',
+        supabaseUrl: 'https://project.supabase.co',
+        supabaseAnonKey: key,
+      );
+      expect(() => legacy.validate(production: true, tetherUi: false),
+          returnsNormally);
+      // Sandbox never satisfies the legacy app: it needs its services.
+      expect(
+        () => config(backend: 'sandbox')
+            .validate(production: true, tetherUi: false),
+        throwsFormatException,
+      );
+      // The default picks the UI the way main.dart does: legacy in tests.
+      expect(() => legacy.validate(production: true), returnsNormally);
+      expect(
+        () => config(backend: 'sandbox').validate(production: true),
+        throwsFormatException,
+      );
+    });
+
+    test('provider client IDs are optional and do not change the mode', () {
+      const withIds = AppConfig(
+        apiBaseUrl: '',
+        supabaseUrl: '',
+        supabaseAnonKey: '',
+        backend: 'sandbox',
+        googleWebClientId: 'web.apps.example.test',
+        googleIosClientId: 'ios.apps.example.test',
+        epicSandboxClientId: 'epic-client',
+      );
+      expect(withIds.backendMode(debug: false), BackendMode.sandbox);
+      expect(withIds.hasAnyConfiguration, isFalse);
+    });
+
+    test('this test run has no mode defines, so it is debug sandbox', () {
+      final env = AppConfig.fromEnvironment();
+      expect(env.backend, isEmpty);
+      expect(env.syncBaseUrl, isEmpty);
+      expect(env.backendMode(), BackendMode.sandbox);
+    });
+  });
 }
