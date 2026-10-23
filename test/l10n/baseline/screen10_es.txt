@@ -7,9 +7,9 @@ T TU PLAN PARA DEJARLO
 T Tu plan está listo.
 T Dale una última mirada. Puedes editar cualquier parte ahora o más adelante.
 T FECHA PARA DEJARLO
-T OCT
-T 29
-T JUE
+T <month>
+T <day>
+T <weekday>
 T <weekday>, <day> de <month>
 T 7 días para prepararte
 T VENTANA RECOMENDADA
@@ -38,7 +38,7 @@ ST Atrás
 SL TU PLAN PARA DEJARLO
 SL Tu plan está listo.
 SL Dale una última mirada. Puedes editar cualquier parte ahora o más adelante.
-SL FECHA PARA DEJARLO\nOCT\n29\nJUE\n<weekday>, <day> de <month>\n7 días para prepararte\nVENTANA RECOMENDADA\nHOY\nDÍA DE DEJARLO
+SL FECHA PARA DEJARLO\n<month>\n<day>\n<weekday>\n<weekday>, <day> de <month>\n7 días para prepararte\nVENTANA RECOMENDADA\nHOY\nDÍA DE DEJARLO
 ST Editar fecha
 SL DETALLES DEL PLAN
 SL Toca para editar

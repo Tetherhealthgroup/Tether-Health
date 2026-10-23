@@ -1,6 +1,6 @@
 # baseline TH-1015b · screen21 · en
 T BreatheFree
-T QUIT DAY · OCT 22
+T QUIT DAY · <month> <day>
 T <greeting>.
 T Keep today simple. One choice at a time.
 T SINCE YOUR PLANNED QUIT TIME
@@ -36,7 +36,7 @@ T Support
 SL BreatheFree
 ST Notifications
 SL Guest profile
-SL QUIT DAY · OCT 22
+SL QUIT DAY · <month> <day>
 SL <greeting>.
 SL Keep today simple. One choice at a time.
 SL SINCE YOUR PLANNED QUIT TIME

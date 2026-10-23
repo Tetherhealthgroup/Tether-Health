@@ -15,9 +15,9 @@ T V
 T S
 T <calendar days>
 T Ventana de preparación recomendada: <month> <day> – <month> <day>
-T OCT
-T 29
-T JUE
+T <month>
+T <day>
+T <weekday>
 T TU FECHA PARA DEJARLO
 T <weekday>, <day> de <month> de <year>
 T 7 días para prepararte
@@ -45,9 +45,9 @@ SL <date>
 SL <date>\n<day>
 SL <date>
 SL Ventana de preparación recomendada: <month> <day> – <month> <day>
-SL OCT
-SL 29
-SL JUE
+SL <month>
+SL <day>
+SL <weekday>
 SL TU FECHA PARA DEJARLO
 SL <weekday>, <day> de <month> de <year>
 SL 7 días para prepararte
