@@ -58,7 +58,8 @@
       "text": "4 min read · 3:12 audio · downloaded",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "bf.cravings-today"
       }
     },
     {
@@ -69,7 +70,8 @@
       "title": "Why “one more video” never feels like enough",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "sf.one-more-video"
       }
     },
     {
@@ -80,7 +82,8 @@
       "title": "How your lungs recover after you quit",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "ca.lungs-recover"
       }
     },
     {
@@ -110,7 +113,8 @@
       "path": "body[2]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "bf.cravings-today"
       },
       "summary": "push → learn_lesson"
     },
@@ -119,7 +123,8 @@
       "path": "body[3]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "sf.one-more-video"
       },
       "summary": "push → learn_lesson"
     },
@@ -128,7 +133,8 @@
       "path": "body[4]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "ca.lungs-recover"
       },
       "summary": "push → learn_lesson"
     },

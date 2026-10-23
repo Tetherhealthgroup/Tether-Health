@@ -185,6 +185,17 @@
       "change": "P-73, not routed: no screen opens it any more (new Apple and Google accounts go through the normal sign-up from its start, ob_programs); it is kept as the approved design and listed as a reference entry point. footer[0] \"Create my account\": submit \"POST supabase /auth/v1/token?grant_type=id_token\" then push ob_programs -> push ob_programs, so it creates no account; api [that endpoint] -> []; desc rewritten to say so. No visible element changes. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[3].rows[0][1] -> auth.social.name (TH-909)"
     },
     {
+      "screen": "be_home",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "04b7160e117a735bb948770d4dfd3f8979ed7d661e76fbe5648f962b6b86244f",
+      "change": "Item argument on a push, action only (no label, starting value or layout change): body[1].rows[1] -> learn_lesson arg 'be.skin-self-check' (TH-909)"
+    },
+    {
       "screen": "be_intro",
       "decisions": [
         "P-88"
@@ -266,6 +277,17 @@
       "change": "Craving card: \"One tap · works offline\" -> \"One tap · no typing\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].children[0].value -> bf.days_to_quit_day; body[0].children[0].caption -> bf.quit_date_caption; body[3].children[0].text -> bf.top_reason; body[4].rows[1].sub -> bf.meds.summary; body[4].rows[2].sub -> bf.saved_summary (TH-909)"
     },
     {
+      "screen": "bf_home_explore",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "64cd1ef107451eeea02cc1181b9154b5d1b3c1224f1ef8f61095b60230a7c1a1",
+      "change": "Item argument on a push, action only (no label, starting value or layout change): body[3] -> learn_lesson arg 'bf.cravings-what-to-expect'; body[4] -> learn_lesson arg 'bf.quit-medicines' (TH-909)"
+    },
+    {
       "screen": "bf_home_quitday",
       "decisions": [
         "P-22",
@@ -299,8 +321,8 @@
       "tickets": [
         "TH-909"
       ],
-      "sha256": "9c6312032c0cd12af2f9cd4ab3c1709922a447e83fb4613b82c73b1d1e4f7c8d",
-      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].title -> bf.meds.recorded_plan (TH-909)"
+      "sha256": "2d4ec172f118bd934107d04f5170aeb0f27b13715fe7e0fd4825519f661939cf",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].title -> bf.meds.recorded_plan (TH-909). Item argument on a push, action only (no label, starting value or layout change): body[2].rows[0] -> learn_lesson arg 'bf.nicotine-replacement'; body[2].rows[1] -> learn_lesson arg 'bf.prescription-options' (TH-909)"
     },
     {
       "screen": "bf_meds_edit",
@@ -393,6 +415,17 @@
       ],
       "sha256": "a077fbf02a7d2195b8d4c01acc4e574dafc662502b3903461163be5cc3314862",
       "change": "P-88: \"Add as Learn only\" submits POST /v1/enrolments (not queueable) before its toast and tab; api lists POST /v1/enrolments (TH-1031f)"
+    },
+    {
+      "screen": "ca_noplan",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "cd67e7739583fd8594fecb48526d5ead172cbe2bd486b462e35e63d12a4ca09b",
+      "change": "Item argument on a push, action only (no label, starting value or layout change): body[3].rows[1] -> learn_lesson arg 'ca.questions-for-next-visit' (TH-909)"
     },
     {
       "screen": "ca_plan",
@@ -570,6 +603,17 @@
       "change": "P-22: the note dropped \"Works offline.\" (TH-942). P-58: the designer note body[5] \"Shown whenever someone chooses … localize per region.\" is no longer rendered; its text moves to the screen's notes, which are not rendered (TH-1001). P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[4].title -> ea.plan.things_that_help_line; body[4].text -> ea.plan.reach_out_line (TH-909)"
     },
     {
+      "screen": "ea_checkback",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "7e48a09a0eed773617d87f12c66761361126969786f6330c4b1f1dcd3b526668",
+      "change": "Item argument on a push, action only (no label, starting value or layout change): body[3].cta[0] -> learn_lesson arg 'ea.what-to-say' (TH-909)"
+    },
+    {
       "screen": "ea_home",
       "decisions": [
         "P-89"
@@ -577,8 +621,8 @@
       "tickets": [
         "TH-909"
       ],
-      "sha256": "4f605894838c28369e1847e41cb2555a7d8980e6364a52171eca8267b09e5939",
-      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0].sub -> ea.plan_updated; body[1].rows[1].sub -> ea.check_back_due (TH-909)"
+      "sha256": "593c4d1de358c31b5e37cd3f91ca5a9a1e420eb6c3667c40c183ddcfa4683c4e",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0].sub -> ea.plan_updated; body[1].rows[1].sub -> ea.check_back_due (TH-909). Item argument on a push, action only (no label, starting value or layout change): body[2] -> learn_lesson arg 'ea.sleep-and-mood' (TH-909)"
     },
     {
       "screen": "ea_intro",
@@ -730,6 +774,28 @@
       "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].values -> hw.systolic_series; body[2].items[0].value -> hw.avg_30d; body[2].items[1].value -> hw.readings_30d; body[2].items[1].sub -> hw.days_missed_30d (TH-909)"
     },
     {
+      "screen": "learn",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "e85dffaee4fbaa562bb534195650534f1e102497674118777791060f0221b0ec",
+      "change": "Item argument on a push, action only (no label, starting value or layout change): body[2] -> learn_lesson arg 'bf.cravings-today'; body[3] -> learn_lesson arg 'sf.one-more-video'; body[4] -> learn_lesson arg 'ca.lungs-recover' (TH-909)"
+    },
+    {
+      "screen": "learn_error",
+      "decisions": [
+        "P-89"
+      ],
+      "tickets": [
+        "TH-909"
+      ],
+      "sha256": "fe90dffbab5575bc08a9e00bac039f6a9c04eb63191da79e7772f32d21b4ffc7",
+      "change": "Item argument on a push, action only (no label, starting value or layout change): body[4] -> learn_lesson arg 'bf.cravings-today' (TH-909)"
+    },
+    {
       "screen": "nu_habit",
       "decisions": [
         "P-71"
@@ -748,8 +814,8 @@
       "tickets": [
         "TH-909"
       ],
-      "sha256": "fc32bc8b0de1eb1fe0af436c3bba459958bed3df6cc6543af79017fca6e9ce29",
-      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> nu.habit_week; body[0].title -> nu.habit_name; body[0].text -> nu.habit_progress; body[3].rows[1].sub -> nu.milestone_due (TH-909)"
+      "sha256": "e9b1b03caf5c2365e30feeac19ee25ccb2d0ab4d0592f1fc19c378a993753a79",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> nu.habit_week; body[0].title -> nu.habit_name; body[0].text -> nu.habit_progress; body[3].rows[1].sub -> nu.milestone_due (TH-909). Item argument on a push, action only (no label, starting value or layout change): body[2] -> learn_lesson arg 'nu.bean-veggie-tacos' (TH-909)"
     },
     {
       "screen": "nu_intro",
@@ -1016,8 +1082,8 @@
       "tickets": [
         "TH-909"
       ],
-      "sha256": "3e83a2a838c67fe09ce973ee1bb62c0e3769817755d62dc5e48ccab25ced9787",
-      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0].label -> records.source_1.name; body[1].rows[0].sub -> records.source_1.status; body[1].rows[1].label -> records.source_2.name; body[1].rows[1].sub -> records.source_2.status; body[2].rows[0].sub -> records.imported.blood_pressure; body[2].rows[1].sub -> records.imported.labs; body[2].rows[2].sub -> records.imported.immunizations; body[2].rows[3].sub -> records.imported.smoking_status; body[3].title -> records.review_count (TH-909)"
+      "sha256": "611949820fa98cd3360fe82b0d0f41775e017dc3e0804a57ddb8dd03ea73015b",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0].label -> records.source_1.name; body[1].rows[0].sub -> records.source_1.status; body[1].rows[1].label -> records.source_2.name; body[1].rows[1].sub -> records.source_2.status; body[2].rows[0].sub -> records.imported.blood_pressure; body[2].rows[1].sub -> records.imported.labs; body[2].rows[2].sub -> records.imported.immunizations; body[2].rows[3].sub -> records.imported.smoking_status; body[3].title -> records.review_count (TH-909). Item argument on a push, action only (no label, starting value or layout change): body[1].rows[0] -> records_source arg 'source_1'; body[1].rows[1] -> records_source arg 'source_2' (TH-909)"
     },
     {
       "screen": "records_item",
@@ -1087,8 +1153,8 @@
         "TH-1008d",
         "TH-909"
       ],
-      "sha256": "b9544cd06099954a5e81395426227ac4dfd0706d4652ff7d22ba492651c2b832",
-      "change": "TH-1008d, as P-78: body[1] row \"What we read\" (push to records_consent) is removed, because that checklist now starts unticked and would under-report what the source reads; a new body[2] list titled \"What we read\" shows the six categories the source reads (Conditions, Vital signs, Lab results, Medications, Immunizations, Smoking status, with the same subtitles as the consent checklist) as read-only rows with no action, matching \"Read-only · 6 categories\"; no new wording; action summaries follow. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].rows[0][1] -> records.source.connection; body[0].rows[1][1] -> records.source.last_sync; body[0].rows[2][1] -> records.source.next_sync; body[0].rows[3][1] -> records.source.access; body[0].rows[4][1] -> records.source.connected_on (TH-909)"
+      "sha256": "aa1ef9b147f39873dfa87132f8f20e208e73f039c5f72e47c275b625e82e5bd1",
+      "change": "TH-1008d, as P-78: body[1] row \"What we read\" (push to records_consent) is removed, because that checklist now starts unticked and would under-report what the source reads; a new body[2] list titled \"What we read\" shows the six categories the source reads (Conditions, Vital signs, Lab results, Medications, Immunizations, Smoking status, with the same subtitles as the consent checklist) as read-only rows with no action, matching \"Read-only · 6 categories\"; no new wording; action summaries follow. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].rows[0][1] -> records.source.connection; body[0].rows[1][1] -> records.source.last_sync; body[0].rows[2][1] -> records.source.next_sync; body[0].rows[3][1] -> records.source.access; body[0].rows[4][1] -> records.source.connected_on (TH-909). Item argument on a push, action only (no label, starting value or layout change): footer[0] -> records_disconnect argInherit (TH-909)"
     },
     {
       "screen": "rescue_escalate",
@@ -1147,8 +1213,8 @@
       "tickets": [
         "TH-909"
       ],
-      "sha256": "ff0a0de04729c4528bc3bf83b0af4e8dfd690450e7a627e9358caa6c4ad6c47c",
-      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].rows[0].label -> sd.caregiver_call_action (TH-909)"
+      "sha256": "1ce71ce7c6db2049ab1ab6d1ecefad831884fae621a6e61e79192c94d4a8c6fa",
+      "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[2].rows[0].label -> sd.caregiver_call_action (TH-909). Item argument on a push, action only (no label, starting value or layout change): body[3] -> learn_lesson arg 'sd.get-up-safely' (TH-909)"
     },
     {
       "screen": "sd_home",
@@ -1430,8 +1496,8 @@
         "TH-942",
         "TH-909"
       ],
-      "sha256": "803e72dd410fb1a674cb458e9d3c3c06823a1e7297daa9a5019c6df871bd1307",
-      "change": "Craving card: drops \" · works offline\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> today.date; body[1].text -> today.greeting; body[4].eyebrow -> today.steps_heading; body[6].items[0].value -> bf.days_to_quit_day; body[6].items[0].sub -> bf.quit_date_short; body[6].items[1].value -> sf.minutes_yesterday; body[6].items[1].sub -> sf.goal_short (TH-909)"
+      "sha256": "f99a1c1af150c36b0249fe698130a278d82a9cba05d53071c257b251ea8c5e27",
+      "change": "Craving card: drops \" · works offline\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].text -> today.date; body[1].text -> today.greeting; body[4].eyebrow -> today.steps_heading; body[6].items[0].value -> bf.days_to_quit_day; body[6].items[0].sub -> bf.quit_date_short; body[6].items[1].value -> sf.minutes_yesterday; body[6].items[1].sub -> sf.goal_short (TH-909). Item argument on a push, action only (no label, starting value or layout change): body[8] -> learn_lesson arg 'ca.lungs-recover' (TH-909)"
     },
     {
       "screen": "today_empty",

@@ -173,7 +173,8 @@
       "text": "4 min read",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "ca.lungs-recover"
       }
     }
   ],
@@ -234,7 +235,8 @@
       "path": "body[8]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "ca.lungs-recover"
       },
       "summary": "push → learn_lesson"
     },

@@ -71,7 +71,8 @@
           "sub": "Patch, gum, lozenge",
           "action": {
             "type": "push",
-            "to": "learn_lesson"
+            "to": "learn_lesson",
+            "arg": "bf.nicotine-replacement"
           }
         },
         {
@@ -79,7 +80,8 @@
           "sub": "Varenicline · bupropion SR",
           "action": {
             "type": "push",
-            "to": "learn_lesson"
+            "to": "learn_lesson",
+            "arg": "bf.prescription-options"
           }
         }
       ]
@@ -148,7 +150,8 @@
       "path": "body[2].rows[0]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "bf.nicotine-replacement"
       },
       "summary": "push → learn_lesson"
     },
@@ -157,7 +160,8 @@
       "path": "body[2].rows[1]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "bf.prescription-options"
       },
       "summary": "push → learn_lesson"
     },

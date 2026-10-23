@@ -28,7 +28,7 @@ class CaNoplanScreen extends StatelessWidget {
         TIllustration(glyph: 'i', tone: TTone.warn),
         TTitle(s.caNoplanBodyN1Text, center: true),
         TBody(s.caNoplanBodyN2Text, tone: TTextTone.muted, center: true),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: s.caNoplanBodyN3RowsN0Label, sub: s.caNoplanBodyN3RowsN0Sub, onTap: () => TNav.push(context, Routes.caSymptoms)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: s.caNoplanBodyN3RowsN1Label, onTap: () => TNav.push(context, Routes.learnLesson)), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: s.caNoplanBodyN3RowsN2Label, onTap: () => TNav.push(context, Routes.supportMessageCare))]),
+        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: s.caNoplanBodyN3RowsN0Label, sub: s.caNoplanBodyN3RowsN0Sub, onTap: () => TNav.push(context, Routes.caSymptoms)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: s.caNoplanBodyN3RowsN1Label, onTap: () => TNav.push(context, Routes.learnLesson, argument: 'ca.questions-for-next-visit')), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: s.caNoplanBodyN3RowsN2Label, onTap: () => TNav.push(context, Routes.supportMessageCare))]),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.caNoplanFooterN0Label, onPressed: () => TNav.replace(context, (TFlow.onboarding ? Routes.obSetup : Routes.caHome)), arrow: true),

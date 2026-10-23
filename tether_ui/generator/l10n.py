@@ -99,7 +99,7 @@ PROPS = {
     'progtag': {'extra': TEXT},
     'illus': {'glyph': 'data'},
     'zone': {'selected': 'identifier', 'rule': 'identifier'},
-    'action:push': {'to': 'identifier'}, 'action:replace': {'to': 'identifier'}, 'action:tab': {'to': 'identifier'},
+    'action:push': {'to': 'identifier', 'arg': 'identifier'}, 'action:replace': {'to': 'identifier'}, 'action:tab': {'to': 'identifier'},
     'action:sheet': {'to': 'identifier'}, 'action:reset': {'to': 'identifier'}, 'action:popto': {'to': 'identifier'},
     'action:replace.context': {'onboarding': 'identifier'}, 'action:push.context': {'onboarding': 'identifier'},
     'action:toast': {'value': TEXT},

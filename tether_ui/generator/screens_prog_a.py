@@ -85,8 +85,8 @@ def programs_a():
     S('bf_home_explore', 'BreatheFree · explore', '/p/bf/home?state=explore', 'bf', program='bf', phase='daily', tabname='plans', variant_of='bf_home', state='explore', hdr=home_hdr('bf'), body=[
         eyebrow('Exploring · no date set'), title('Learn at your own pace.'),
         card(v='coral', title='Craving now?', text='Rescue works without a plan', cta=button('Rescue', sheet('rescue_pick'), v='rescue', small=True)),
-        card(tag='bf', title='Cravings: what to expect', text='4 min read', action=go('learn_lesson')),
-        card(tag='bf', title='What quit medicines can do', text='Education only · 5 min', action=go('learn_lesson')),
+        card(tag='bf', title='Cravings: what to expect', text='4 min read', action=go('learn_lesson', arg='bf.cravings-what-to-expect')),
+        card(tag='bf', title='What quit medicines can do', text='Education only · 5 min', action=go('learn_lesson', arg='bf.quit-medicines')),
         card(v='mint', title='Ready when you are', text='Setting a date takes 2 minutes.', cta=button('Choose a path', go('bf_path'), small=True)),
     ])
     S('bf_slip', 'Slip recovery', '/p/bf/slip', 'bf', program='bf', phase='milestone', hdr=H('Slip recovery', left='close', pill='Private'), body=[
@@ -101,7 +101,7 @@ def programs_a():
         banner('info', 'Education and tracking, not prescribing. The app never selects a medicine or changes a dose.'),
         card(eyebrow='Your recorded plan', title='Nicotine patch · morning', text='Entered by you · follow your clinician’s instructions',
              children=[buttons(button('Taken today', toast('Recorded: taken at 8:07 AM'), small=True), button('Not today', toast('Recorded: not taken'), v='secondary', small=True))]),
-        rows([row('Nicotine replacement', 'Patch, gum, lozenge', action=go('learn_lesson')), row('Prescription options', 'Varenicline · bupropion SR', action=go('learn_lesson'))], title='Learn'),
+        rows([row('Nicotine replacement', 'Patch, gum, lozenge', action=go('learn_lesson', arg='bf.nicotine-replacement')), row('Prescription options', 'Varenicline · bupropion SR', action=go('learn_lesson', arg='bf.prescription-options'))], title='Learn'),
         card(v='warn', title='Pregnant, breastfeeding or under 18?', text='Talk with a doctor before using quit medicines.'),
         card(v='urgent', title='Side effect or worrying symptom?', text='Contact your care team or pharmacist. Emergency: 911.', action=go('support_message_care')),
     ], footer=[button('Add or update recorded plan', go('bf_meds_edit'), v='secondary')])
@@ -202,7 +202,7 @@ def programs_a():
     S('ca_noplan', 'No action plan yet', '/p/ca/plan?state=none', 'ca', program='ca', phase='plan', variant_of='ca_plan', state='empty', hdr=H('No action plan', pill='Learn'), body=[
         illus('i', 'warn'), title('Let’s get you a plan first', align='center'),
         text('Zone checks need a plan from your clinician. Until then you can learn, log symptoms and prepare questions.', 'muted', align='center'),
-        rows([row('Symptom diary', 'Shareable with your clinician', action=go('ca_symptoms')), row('Questions for my next visit', None, action=go('learn_lesson')), row('Message my care team', None, action=go('support_message_care'))]),
+        rows([row('Symptom diary', 'Shareable with your clinician', action=go('ca_symptoms')), row('Questions for my next visit', None, action=go('learn_lesson', arg='ca.questions-for-next-visit')), row('Message my care team', None, action=go('support_message_care'))]),
     ], footer=[button('Continue to ClearAir', onboarding_or('ca_home'))])
     S('ca_home', 'ClearAir home', '/p/ca/home', 'ca', program='ca', phase='daily', tabname='plans', hdr=home_hdr('ca'), body=[
         card(v='dark', eyebrow='Today’s zone', title='Green · 410 L/min', text='Checked 7:40 AM · from your plan'),

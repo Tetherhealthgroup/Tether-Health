@@ -31,9 +31,9 @@ class LearnScreen extends StatelessWidget {
       children: [
         TField(fieldKey: 'learn.search', label: s.learnBodyN0Label, placeholder: s.learnBodyN0Placeholder, kind: TFieldKind.search),
         TChips(fieldKey: 'learn.value', options: ['For you', 'BreatheFree', 'ScrollFree', 'ClearAir'], labels: [s.learnBodyN1OptionsN0, 'BreatheFree', 'ScrollFree', 'ClearAir'], selected: ['For you'], multi: false, dots: {'BreatheFree': TColors.program('bf'), 'ScrollFree': TColors.program('sf'), 'ClearAir': TColors.program('ca')}),
-        TCard(key: const ValueKey('a:body[2]'), variant: TCardVariant.dark, tag: 'bf', tagExtra: s.learnBodyN2TagExtra, title: s.learnBodyN2Title, text: s.learnBodyN2Text, onTap: () => TNav.push(context, Routes.learnLesson)),
-        TCard(key: const ValueKey('a:body[3]'), tag: 'sf', tagExtra: s.learnBodyN3TagExtra, title: s.learnBodyN3Title, onTap: () => TNav.push(context, Routes.learnLesson)),
-        TCard(key: const ValueKey('a:body[4]'), tag: 'ca', tagExtra: s.learnBodyN4TagExtra, title: s.learnBodyN4Title, onTap: () => TNav.push(context, Routes.learnLesson)),
+        TCard(key: const ValueKey('a:body[2]'), variant: TCardVariant.dark, tag: 'bf', tagExtra: s.learnBodyN2TagExtra, title: s.learnBodyN2Title, text: s.learnBodyN2Text, onTap: () => TNav.push(context, Routes.learnLesson, argument: 'bf.cravings-today')),
+        TCard(key: const ValueKey('a:body[3]'), tag: 'sf', tagExtra: s.learnBodyN3TagExtra, title: s.learnBodyN3Title, onTap: () => TNav.push(context, Routes.learnLesson, argument: 'sf.one-more-video')),
+        TCard(key: const ValueKey('a:body[4]'), tag: 'ca', tagExtra: s.learnBodyN4TagExtra, title: s.learnBodyN4Title, onTap: () => TNav.push(context, Routes.learnLesson, argument: 'ca.lungs-recover')),
         TBody(s.learnBodyN5Text, tone: TTextTone.small),
       ],
     );

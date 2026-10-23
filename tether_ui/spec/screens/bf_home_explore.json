@@ -57,7 +57,8 @@
       "text": "4 min read",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "bf.cravings-what-to-expect"
       }
     },
     {
@@ -68,7 +69,8 @@
       "text": "Education only · 5 min",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "bf.quit-medicines"
       }
     },
     {
@@ -125,7 +127,8 @@
       "path": "body[3]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "bf.cravings-what-to-expect"
       },
       "summary": "push → learn_lesson"
     },
@@ -134,7 +137,8 @@
       "path": "body[4]",
       "action": {
         "type": "push",
-        "to": "learn_lesson"
+        "to": "learn_lesson",
+        "arg": "bf.quit-medicines"
       },
       "summary": "push → learn_lesson"
     },
