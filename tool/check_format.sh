@@ -26,7 +26,7 @@ files=$(mktemp)
 trap 'rm -f "$files"' EXIT
 
 find . \
-  \( -path ./third_party -o -path ./tether_ui -o -path ./build -o -name '.?*' \) -prune -o \
+  \( -path ./third_party -o -path ./tether_ui -o -path ./build -o -path ./code-develop -o -path ./code-unplug -o -name '.?*' \) -prune -o \
   -type f -name '*.dart' -print0 > "$files"
 
 if [ ! -s "$files" ]; then

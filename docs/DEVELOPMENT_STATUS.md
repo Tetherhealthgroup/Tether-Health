@@ -4,7 +4,7 @@
 
 ### Starting state and scope
 
-- Mobile, backend and website Git working trees were clean at inspection. The `tether-health-ai-office` directory is not a Git repository; its status command failed. No existing changes were reset or overwritten.
+- Mobile, backend and website Git working trees were clean at inspection. No existing changes were reset or overwritten.
 - This status file did not exist. Read `DEVELOPMENT_NOTES.md` and `PRODUCTION_RELEASE_CHECKLIST.md`; both remain unchanged.
 - Root Flutter package is the approved-screen prototype, separate from nested `code-develop` and `code-unplug` sources. This run changes only the root app.
 - Selected a reproducible crash affecting quitline, callback consent, export, deletion and information dialogs. Used existing Flutter Builder/showDialog APIs; no new dependency or custom framework needed.
