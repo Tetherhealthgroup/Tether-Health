@@ -120,6 +120,7 @@ Map<String, Future<Object?> Function(TetherApi)> clientCalls() => {
       'care.sendMessage': (a) => a.care.sendMessage({}, idempotencyKey: 'k'),
       'care.addSupporter': (a) => a.care.addSupporter({}),
       'care.supporters': (a) => a.care.supporters(),
+      'care.caregivers': (a) => a.care.caregivers(),
       'care.sendSummary': (a) => a.care.sendSummary({}, idempotencyKey: 'k'),
       'care.addCaregiver': (a) => a.care.addCaregiver({}),
       'care.requestReferral': (a) => a.care.requestReferral({}),
@@ -149,25 +150,11 @@ Future<Map<String, BackendRequest>> allRequests() async {
   return found;
 }
 
-/// Routes the app calls that the contract at this revision does not have
-/// yet (care routes and the records core are being built), and the spec
-/// shapes whose contract change is not merged here yet.
+/// Routes the app calls that the published contract does not have yet:
+/// referrals (their schema is pending) and source sync and disconnect
+/// (they arrive with SMART connect).
 const notInContractYet = {
-  'POST /v1/account/export',
-  'PATCH /v1/enrolments/consents',
-  'POST /v1/care/connections',
-  'GET /v1/care/connections',
-  'POST /v1/care/messages',
-  'POST /v1/care/supporters',
-  'GET /v1/care/supporters',
-  'POST /v1/care/summaries',
-  'POST /v1/care/caregivers',
   'POST /v1/care/referrals',
-  'POST /v1/records/manual',
-  'GET /v1/records/fhir/sources',
-  'GET /v1/records/fhir/items',
-  'POST /v1/records/fhir/accept',
-  'POST /v1/records/fhir/conflicts',
   'POST /v1/records/fhir/sources/:id/sync',
   'DELETE /v1/records/fhir/sources/:id',
 };

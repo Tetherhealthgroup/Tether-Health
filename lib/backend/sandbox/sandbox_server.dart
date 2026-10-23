@@ -4,6 +4,7 @@ import '../backend.dart';
 import 'day_window.dart';
 import 'sandbox_api.dart' as api;
 import 'sandbox_auth.dart';
+import 'sandbox_care.dart' as care;
 import 'sandbox_store.dart';
 import 'sandbox_sync.dart' as sync;
 import 'sandbox_validation.dart';
@@ -110,38 +111,36 @@ final List<SandboxRoute> sandboxRoutes = [
       _api, _patch, '/v1/notifications/preferences', api.patchPreferences,
       writes: true),
   // Care team: stored, never delivered.
-  const SandboxRoute(_api, _post, '/v1/care/connections', api.redeemConnection,
+  const SandboxRoute(_api, _post, '/v1/care/connections', care.redeemConnection,
       writes: true),
-  SandboxRoute(_api, _get, '/v1/care/connections', api.listCare('connections')),
-  SandboxRoute(
-      _api, _post, '/v1/care/messages', api.storeCare('messages', keyed: true),
+  const SandboxRoute(_api, _get, '/v1/care/connections', care.listConnections),
+  const SandboxRoute(_api, _post, '/v1/care/messages', care.createMessage,
       writes: true),
-  SandboxRoute(_api, _post, '/v1/care/supporters', api.storeCare('supporters'),
+  const SandboxRoute(_api, _post, '/v1/care/supporters', care.createSupporter,
       writes: true),
-  SandboxRoute(_api, _get, '/v1/care/supporters', api.listCare('supporters')),
-  SandboxRoute(_api, _post, '/v1/care/summaries',
-      api.storeCare('summaries', keyed: true),
+  const SandboxRoute(_api, _get, '/v1/care/supporters', care.listSupporters),
+  const SandboxRoute(_api, _post, '/v1/care/summaries', care.createSummary,
       writes: true),
-  SandboxRoute(_api, _post, '/v1/care/caregivers', api.storeCare('caregivers'),
+  const SandboxRoute(_api, _post, '/v1/care/caregivers', care.createCaregiver,
       writes: true),
-  SandboxRoute(_api, _post, '/v1/care/referrals', api.storeCare('referrals'),
+  const SandboxRoute(_api, _get, '/v1/care/caregivers', care.listCaregivers),
+  const SandboxRoute(_api, _post, '/v1/care/referrals', care.createReferral,
       writes: true),
   // Health records.
-  const SandboxRoute(_api, _post, '/v1/records/manual', api.addManualRecord,
+  const SandboxRoute(_api, _post, '/v1/records/manual', care.addManualRecord,
       writes: true),
-  const SandboxRoute(_api, _get, '/v1/records/fhir/sources', api.listSources),
-  const SandboxRoute(_api, _get, '/v1/records/fhir/items', api.listItems),
-  SandboxRoute(
-      _api, _post, '/v1/records/fhir/accept', api.storeRecords('accepted'),
-      writes: true),
-  SandboxRoute(
-      _api, _post, '/v1/records/fhir/conflicts', api.storeRecords('conflicts'),
+  const SandboxRoute(_api, _get, '/v1/records/fhir/sources', care.listSources),
+  const SandboxRoute(_api, _get, '/v1/records/fhir/items', care.listItems),
+  const SandboxRoute(_api, _post, '/v1/records/fhir/accept', care.acceptRecords,
       writes: true),
   const SandboxRoute(
-      _api, _post, '/v1/records/fhir/sources/:id/sync', api.syncSource,
+      _api, _post, '/v1/records/fhir/conflicts', care.resolveConflicts,
       writes: true),
   const SandboxRoute(
-      _api, _delete, '/v1/records/fhir/sources/:id', api.disconnectSource,
+      _api, _post, '/v1/records/fhir/sources/:id/sync', care.syncSource,
+      writes: true),
+  const SandboxRoute(
+      _api, _delete, '/v1/records/fhir/sources/:id', care.disconnectSource,
       writes: true),
   // Sync service.
   const SandboxRoute(_sync, _post, '/v1/sync/pull', sync.syncPull),

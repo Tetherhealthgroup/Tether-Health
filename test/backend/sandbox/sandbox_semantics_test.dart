@@ -403,20 +403,58 @@ void main() {
 
   group('care', () {
     test('the sandbox invite code redeems to Sandbox Clinic', () async {
-      final bad = await h.api.care.redeemConnection({'code': 'WRONG'});
+      final bad = await h.api.care.redeemConnection({'inviteCode': 'WRONG'});
       expect(_status(bad), 400);
-      final good =
-          (await h.api.care.redeemConnection({'code': 'tether-sandbox-clinic'}))
-              .valueOrNull!;
+      expect(bad.errorOrNull!.wire, 'care_invite_invalid');
+      final good = (await h.api.care
+              .redeemConnection({'inviteCode': 'tether-sandbox-clinic'}))
+          .valueOrNull!;
       expect(good['clinicName'], 'Sandbox Clinic');
+      final list = (await h.api.care.connections()).valueOrNull!;
+      expect(list['connections'], hasLength(1));
     });
 
-    test('messages are stored and never delivered', () async {
-      await h.api.care
-          .sendMessage({'text': 'synthetic'}, idempotencyKey: h.key());
-      final export = (await h.api.account.export()).valueOrNull!;
-      final care = (export['sandbox']! as Map)['care']! as Map;
-      expect((care['messages']! as List).single['delivery'], 'none (sandbox)');
+    test('messages need a connection, are stored and never delivered',
+        () async {
+      final none = await h.api.care.sendMessage(
+          {'topic': 'Question', 'message': 'synthetic'},
+          idempotencyKey: h.key());
+      expect(none.errorOrNull!.wire, 'connection_required');
+      await h.api.care.redeemConnection({'inviteCode': sandboxInviteCode});
+      final sent = (await h.api.care.sendMessage(
+              {'topic': 'Question', 'message': 'synthetic'},
+              idempotencyKey: h.key()))
+          .valueOrNull!;
+      expect(sent['delivery'], 'stored');
+    });
+
+    test('supporters need an enrolled programme; phones are stored E.164',
+        () async {
+      final body = {
+        'name': 'Synthetic Friend',
+        'phone': '(555) 010-4421',
+        'programmes': ['bf']
+      };
+      final refused = await h.api.care.addSupporter(body);
+      expect(refused.errorOrNull!.wire, 'programme_not_enrolled');
+      await h.enrol('bf');
+      final added = (await h.api.care.addSupporter(body)).valueOrNull!;
+      expect(added['phone'], '+15550104421');
+    });
+
+    test('manual records are entered by you and routed', () async {
+      await h.enrol('st');
+      final r = (await h.api.care.addManualRecord({
+        'type': 'lab_result',
+        'test': 'a1c',
+        'value': 6.8,
+        'date': '2026-10-01'
+      }, idempotencyKey: h.key()))
+          .valueOrNull!;
+      expect((r['items']! as List).single['enteredByYou'], isTrue);
+      expect(r['routedTo'], [
+        {'programmeCode': 'st', 'items': 1},
+      ]);
     });
   });
 

@@ -217,6 +217,7 @@ void main() {
     await api.care.connections();
     await api.care.addSupporter({'name': 'Synthetic Friend'});
     await api.care.supporters();
+    await api.care.caregivers();
     await api.care.sendMessage({'text': 'synthetic'}, idempotencyKey: h.key());
     await api.care
         .sendSummary({'snapshot': 'synthetic'}, idempotencyKey: h.key());

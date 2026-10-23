@@ -78,6 +78,10 @@ class CareRecordsApi {
           Map<String, Object?> body) =>
       _send(BackendMethod.post, '/v1/care/caregivers', body: body);
 
+  /// `GET /v1/care/caregivers`.
+  Future<ApiResult<Map<String, Object?>>> caregivers() =>
+      _send(BackendMethod.get, '/v1/care/caregivers');
+
   /// `POST /v1/care/referrals`.
   Future<ApiResult<Map<String, Object?>>> requestReferral(
           Map<String, Object?> body) =>
