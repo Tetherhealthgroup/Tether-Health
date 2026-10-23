@@ -2,15 +2,108 @@
 // test builds (TETHER_UI_INTERNAL, added only by the release scripts'
 // --internal-tether-ui flag). Every other profile and release build runs the
 // legacy app.
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:breathefree_patient/app/tether_ui_shell.dart';
 import 'package:breathefree_patient/app/ui_selection.dart';
+import 'package:breathefree_patient/auth/account_controller.dart';
+import 'package:breathefree_patient/backend/backend_factory.dart';
+import 'package:breathefree_patient/backend/sandbox/sandbox_backend.dart';
+import 'package:breathefree_patient/backend/sandbox/sandbox_store.dart';
+import 'package:breathefree_patient/config/app_config.dart';
+import 'package:breathefree_patient/config/misconfigured_build_app.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tether_ui/router/routes.dart';
+import 'package:tether_ui/ui/ui.dart';
 
+import 'fakes.dart';
 import 'source_scan.dart';
 
+/// The config of an internal sandbox build made from
+/// tool/defines/internal-sandbox.example.json (the release scripts pass the
+/// file with --dart-define-from-file; AppConfig.fromEnvironment reads it).
+AppConfig _internalSandboxConfig() {
+  final defines = jsonDecode(
+    File('tool/defines/internal-sandbox.example.json').readAsStringSync(),
+  ) as Map<String, Object?>;
+  expect(defines, {'TETHER_BACKEND': 'sandbox'});
+  return AppConfig(
+    apiBaseUrl: '',
+    supabaseUrl: '',
+    supabaseAnonKey: '',
+    backend: defines['TETHER_BACKEND']! as String,
+  );
+}
+
 void main() {
+  group('an internal sandbox release build', () {
+    tearDown(() {
+      TDefaults.forPreview();
+      TSession.values.clear();
+    });
+
+    test('picks tether_ui and passes the release start-up check', () {
+      final config = _internalSandboxConfig();
+      // Release: kDebugMode false, no TETHER_UI, TETHER_UI_INTERNAL=true.
+      expect(
+        selectAppUi(debug: false, requested: false, internal: true),
+        AppUi.tetherUi,
+      );
+      // main.dart's check, as a release build runs it: no exception, so no
+      // MisconfiguredBuildApp.
+      expect(
+        () => config.validate(production: true, tetherUi: true),
+        returnsNormally,
+      );
+      expect(config.backendMode(debug: false), BackendMode.sandbox);
+      expect(createBackend(config, debug: false), isA<SandboxBackend>());
+    });
+
+    test('without TETHER_BACKEND it would show the misconfigured screen', () {
+      // Why the release scripts take the sandbox define file: the internal
+      // define alone names no backend mode in a release build.
+      const none =
+          AppConfig(apiBaseUrl: '', supabaseUrl: '', supabaseAnonKey: '');
+      expect(
+        () => none.validate(production: true, tetherUi: true),
+        throwsA(isA<FormatException>().having((e) => e.message, 'message',
+            contains('TETHER_BACKEND must be sandbox or http'))),
+      );
+    });
+
+    testWidgets('starts the tether_ui shell on the sandbox backend',
+        (tester) async {
+      tester.view.physicalSize = const Size(390, 844) * 3;
+      tester.view.devicePixelRatio = 3;
+      addTearDown(tester.view.reset);
+      Widget? shown;
+      final runtime = await runTetherUi(
+        account: AccountController.disabled(),
+        guestStore: FakeGuestStore(hasPlan: false),
+        release: true,
+        config: _internalSandboxConfig(),
+        // The real sandbox backend, kept in memory: secure storage never
+        // answers in a widget test.
+        backend: SandboxBackend(persistence: MemorySandboxPersistence()),
+        run: (widget) => shown = widget,
+      );
+      addTearDown(runtime.lifecycle.dispose);
+      expect(shown, isA<TetherUiShell>());
+      expect(runtime.composition.backend.mode, BackendMode.sandbox);
+      await tester.pumpWidget(shown!);
+      await tester.pump();
+      expect(find.byType(MisconfiguredBuildApp), findsNothing);
+      expect(find.byType(TetherUiShell), findsOneWidget);
+      expect(
+        [for (final route in runtime.instances.stack) route.settings.name],
+        [Routes.welcome],
+      );
+    });
+  });
+
   group('selectAppUi', () {
     test('a profile or release build runs the legacy app even when asked', () {
       expect(selectAppUi(debug: false, requested: true), AppUi.legacy);
