@@ -103,13 +103,17 @@ final class BackendOk extends BackendResponse {
 }
 
 final class BackendProblem extends BackendResponse {
-  const BackendProblem(this.status, this.code);
+  const BackendProblem(this.status, this.code, {this.positions = const []});
 
   final int status;
 
-  /// A stable machine code (for example `focus_limit_reached`), never
+  /// A stable machine code (for example `focus_cap_reached`), never
   /// content.
   final String code;
+
+  /// Sync push refusals only: the positions (in the pushed `areas` list) of
+  /// the refused bundles. Never programme names.
+  final List<int> positions;
 
   @override
   bool operator ==(Object other) =>
