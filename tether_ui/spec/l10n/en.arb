@@ -280,6 +280,46 @@
       }
     }
   },
+  "kit.month_abbreviations": "Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec",
+  "@kit.month_abbreviations": {
+    "description": "Calendar: short names of the months, January first, separated by |",
+    "screen": "kit",
+    "path": "",
+    "prop": "month_abbreviations",
+    "sourceHash": "63dc685429ef8a5e00b0da3d5c154c3a6604173d3cae49517ee4049e951a7661"
+  },
+  "kit.date_short": "{month} {day}",
+  "@kit.date_short": {
+    "description": "A date without weekday and year: the short month name and the day, for example Aug 28",
+    "screen": "kit",
+    "path": "",
+    "prop": "date_short",
+    "sourceHash": "27f57af1f143c213913b1c3cf81cdab3a4b83a974cd9389bf8cca0285241060f",
+    "placeholders": {
+      "day": {
+        "type": "Object"
+      },
+      "month": {
+        "type": "Object"
+      }
+    }
+  },
+  "kit.calendar_window": "Recommended window: {start} – {end}",
+  "@kit.calendar_window": {
+    "description": "Caption under a calendar: the first and last day of the recommended window, each as a short date",
+    "screen": "kit",
+    "path": "",
+    "prop": "calendar_window",
+    "sourceHash": "752dbac63372d56125430fafabf97818a7c616c7545f6e84746fccc1222e744a",
+    "placeholders": {
+      "end": {
+        "type": "Object"
+      },
+      "start": {
+        "type": "Object"
+      }
+    }
+  },
   "kit.calendar_prev": "Previous month",
   "@kit.calendar_prev": {
     "description": "Accessibility label of the calendar button that shows the previous month",

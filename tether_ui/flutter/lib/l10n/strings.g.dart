@@ -61,6 +61,9 @@ extension TStringsKeys on TStrings {
   String get kitWeekdayNames => get('kit.weekday_names');
   String kitCalendarTitle({required Object month, required Object year}) => format('kit.calendar_title', {'month': month, 'year': year});
   String kitDateFull({required Object day, required Object month, required Object weekday, required Object year}) => format('kit.date_full', {'day': day, 'month': month, 'weekday': weekday, 'year': year});
+  String get kitMonthAbbreviations => get('kit.month_abbreviations');
+  String kitDateShort({required Object day, required Object month}) => format('kit.date_short', {'day': day, 'month': month});
+  String kitCalendarWindow({required Object end, required Object start}) => format('kit.calendar_window', {'end': end, 'start': start});
   String get kitCalendarPrev => get('kit.calendar_prev');
   String get kitCalendarNext => get('kit.calendar_next');
   String get kitCalendarRecommended => get('kit.calendar_recommended');
@@ -3087,6 +3090,9 @@ const Map<String, String> _en = <String, String>{
   'kit.weekday_names': 'Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday',
   'kit.calendar_title': '{month} {year}',
   'kit.date_full': '{weekday}, {month} {day}, {year}',
+  'kit.month_abbreviations': 'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec',
+  'kit.date_short': '{month} {day}',
+  'kit.calendar_window': 'Recommended window: {start} – {end}',
   'kit.calendar_prev': 'Previous month',
   'kit.calendar_next': 'Next month',
   'kit.calendar_recommended': 'Recommended',
@@ -6113,6 +6119,9 @@ const Map<String, String> _pseudo = <String, String>{
   'kit.weekday_names': '⟦Šûñðàý|Ṁöñðàý|Ţûéšðàý|Ŵéðñéšðàý|Ţĥûŕšðàý|Ƒŕîðàý|Šàţûŕðàý~~~~~~~~~~~~~~~~~~~~⟧',
   'kit.calendar_title': '⟦{month} {year}⟧',
   'kit.date_full': '⟦{weekday}, {month} {day}, {year}⟧',
+  'kit.month_abbreviations': '⟦Ĵàñ|Ƒéƀ|Ṁàŕ|Àþŕ|Ṁàý|Ĵûñ|Ĵûļ|Àûĝ|Šéþ|Öçţ|Ñöṽ|Ðéç~~~~~~~~~~~~~~~⟧',
+  'kit.date_short': '⟦{month} {day}⟧',
+  'kit.calendar_window': '⟦Ŕéçöɱɱéñðéð ŵîñðöŵ: ~~~~~~~{start} – {end}⟧',
   'kit.calendar_prev': '⟦Þŕéṽîöûš ɱöñţĥ~~~~~~⟧',
   'kit.calendar_next': '⟦Ñéẋţ ɱöñţĥ~~~~⟧',
   'kit.calendar_recommended': '⟦Ŕéçöɱɱéñðéð~~~~~⟧',

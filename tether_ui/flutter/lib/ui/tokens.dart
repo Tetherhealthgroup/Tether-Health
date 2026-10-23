@@ -90,7 +90,7 @@ abstract final class TText {
   static const tag = TextStyle(fontSize: 11.5, letterSpacing: 0.8, fontWeight: FontWeight.w800, fontFamilyFallback: _f);
   static const stat = TextStyle(fontSize: 26, height: 1.1, fontWeight: FontWeight.w800, letterSpacing: -0.6, color: TColors.teal, fontFamilyFallback: _f);
   static const big = TextStyle(fontSize: 44, height: 1, fontWeight: FontWeight.w800, letterSpacing: -1.4, color: TColors.teal, fontFamilyFallback: _f);
-  static const quote = TextStyle(fontFamily: 'Georgia', fontStyle: FontStyle.italic, fontSize: 20, height: 1.35, color: TColors.teal);
+  static const quote = TextStyle(fontFamily: 'Georgia', fontFamilyFallback: ['Georgia', 'Noto Serif', 'serif'], fontStyle: FontStyle.italic, fontSize: 20, height: 1.35, color: TColors.teal);
   static const tab = TextStyle(fontSize: 11, fontWeight: FontWeight.w600, fontFamilyFallback: _f);
 }
 
