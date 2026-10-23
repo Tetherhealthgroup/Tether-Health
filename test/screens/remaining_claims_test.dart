@@ -1,3 +1,4 @@
+import 'package:breathefree_patient/l10n/app_localizations.dart';
 import 'package:breathefree_patient/l10n/app_locale.dart';
 import 'package:breathefree_patient/main.dart';
 import 'package:breathefree_patient/quit_plan/guest_quit_plan_store.dart';
@@ -67,6 +68,7 @@ void main() {
     });
 
     Widget tool(RescueLastResult? lastResult) => MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
           home: RecommendedRescueToolScreen(
             isSpanish: false,
             intensity: 7,

@@ -1,4 +1,268 @@
 {
+  "activeCravingRescueBreathingInGuide": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueBreathingInLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueBreathingOutGuide": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueBreathingOutLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueBreathingPace": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueBreathingSecondsUnit": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueBreathingTimeLeft": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart",
+    "form": "composed"
+  },
+  "activeCravingRescueBreathingTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueChangeSceneGuide": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueChangeSceneHeadline": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueChangeSceneTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueCloseTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueControlOff": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/daily_check_in_screen.dart"
+  },
+  "activeCravingRescueControlOn": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/approved_screen_player.dart"
+  },
+  "activeCravingRescueEncouragementBody": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueEncouragementNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueEncouragementTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueEndButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueEndDialogBody": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueEndDialogCancel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueEndDialogConfirm": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueEndDialogTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueHapticsControl": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart",
+    "form": "composed"
+  },
+  "activeCravingRescueIntro": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueLeaveDialogBody": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueLeaveDialogLeave": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueLeaveDialogStay": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueLeaveDialogTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueMovementGuide": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueMovementHapticsOff": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueMovementHapticsOn": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueMovementHeadline": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueMovementTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueMovementVoiceOff": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueMovementVoiceOn": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueOfflineBadge": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueOtherSupportBody": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueOtherSupportTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescuePauseButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescuePersonSupportButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescuePrivacyNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueProgressLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueRecheckNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueReducedMotionNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueResumeButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSpokenBreatheIn": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSpokenBreatheOut": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSpokenKeepMoving": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSpokenMovementDone": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSpokenMovementStart": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSpokenOneMinuteLeft": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSpokenSceneDone": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSpokenSceneEncouragement": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSpokenSceneHalfway": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSpokenSceneKeepGoing": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSpokenTenSecondsLeft": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSpokenThirtySecondsLeft": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueStepCounter": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueSwitchToolButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueThisBreathIn": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueThisBreathLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueThisBreathOut": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueTimeLeft": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart",
+    "form": "composed"
+  },
+  "activeCravingRescueTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "activeCravingRescueVoiceControl": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart",
+    "form": "composed"
+  },
   "baselineAssessmentBackTooltip": {
     "status": "shipped-04813d0",
     "file": "lib/screens/baseline_assessment_screen.dart"
@@ -246,6 +510,393 @@
   "consentPrivacyTrustNoteNoSale": {
     "status": "shipped-04813d0",
     "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "cravingRescueStartBackTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartCallFailed": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartContextAfterMeal": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartContextAlcohol": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartContextAroundSmoking": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartContextBored": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartContextDriving": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartContextNotSure": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartContextNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartContextOptional": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/consent_privacy_screen.dart"
+  },
+  "cravingRescueStartContextQuestion": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartContextStress": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartContinueButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartEmergencyCallButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartEmergencyCloseButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "cravingRescueStartEmergencyLink": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartEmergencySheetBody": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartEmergencySheetNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartEmergencySheetTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartEyebrow": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartHeaderTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartIntensityHint": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartIntensityMaxLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_recheck_screen.dart"
+  },
+  "cravingRescueStartIntensityMild": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_recheck_screen.dart"
+  },
+  "cravingRescueStartIntensityModerate": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_recheck_screen.dart"
+  },
+  "cravingRescueStartIntensityNext": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartIntensityQuestion": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartIntensityStrong": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_recheck_screen.dart"
+  },
+  "cravingRescueStartIntensityTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartIntensityVeryStrong": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_recheck_screen.dart"
+  },
+  "cravingRescueStartIntro": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartOfflineBadge": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartPrivacyNoteBody": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartPrivacyNoteTracking": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartPrivateOffline": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartSupportBody": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartSupportButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartSupportNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartSupportTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartTopReasonLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "cravingRescueStartTopReasonNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "guidedStressResetBreathCount": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart",
+    "form": "composed"
+  },
+  "guidedStressResetBreatheEyebrow": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetBreatheInInstruction": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetBreatheOutInstruction": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetCircleBreatheIn": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetCircleBreatheOut": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetCircleDrinkWater": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetCircleSecondsUnit": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetCloseTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetEndButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetEndDialogBody": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetEndDialogCancel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetEndDialogConfirm": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetEndDialogTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetFinishButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetFollowHint": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetFullMotionOn": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetHeaderTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/exercise_complete_recheck_screen.dart"
+  },
+  "guidedStressResetLeaveDialogBody": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetLeaveDialogLeave": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetLeaveDialogStay": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetLeaveDialogTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetPauseButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetReducedMotionOn": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetRescueButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/daily_check_in_screen.dart"
+  },
+  "guidedStressResetRescueTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetResumeButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/active_craving_rescue_screen.dart"
+  },
+  "guidedStressResetSavedNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetSequenceBreathe": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetSequenceDone": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetSequenceNext": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetSequenceNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetSequenceNow": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_recheck_screen.dart"
+  },
+  "guidedStressResetSequenceSwitch": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetSequenceTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetSequenceWater": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/exercise_complete_recheck_screen.dart"
+  },
+  "guidedStressResetSkipButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetSpokenSwitch": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetStepCounter": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart",
+    "form": "composed"
+  },
+  "guidedStressResetStepNameBreathe": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetStepNameSwitch": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetStepNameWater": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetSwitchEyebrow": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetSwitchInstruction": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetSwitchTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetTimeLeft": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart",
+    "form": "composed"
+  },
+  "guidedStressResetVoiceGuidanceOff": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetVoiceGuidanceOn": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetVoiceToggleLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetVoiceToggleOff": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetVoiceToggleOn": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetWaterEyebrow": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetWaterInstruction": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
+  },
+  "guidedStressResetWaterTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/guided_stress_reset_screen.dart"
   },
   "myReasonsBackTooltip": {
     "status": "shipped-04813d0",
@@ -608,6 +1259,204 @@
   "readinessResultWhyThisFitsSheetTitle": {
     "status": "shipped-04813d0",
     "file": "lib/screens/readiness_result_screen.dart"
+  },
+  "recommendedRescueToolBackTooltip": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "recommendedRescueToolBreathingDescription": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolBreathingName": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/approved_screen_player.dart"
+  },
+  "recommendedRescueToolBreathingOffline": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolBreathingVoice": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolContextPersonal": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolContextStress": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolDataNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolEyebrow": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolIntro": {
+    "status": "derived-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart",
+    "source": "Una acción recomendada según este antojo y tus resultados.",
+    "change": "trimmed: “y tus resultados” removed"
+  },
+  "recommendedRescueToolIntroWithResult": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolLastResult": {
+    "status": "derived-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart",
+    "source": "El antojo cambió de 6 a 3 después del ejercicio.",
+    "change": "demo numbers replaced by the member’s own before and after values"
+  },
+  "recommendedRescueToolLastResultLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolMoveDescription": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolMoveFeatures": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolMoveName": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolOtherActionsLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolProgressLabel": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolReason": {
+    "status": "derived-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart",
+    "source": "Antojo $intensity/10 + tu resultado útil anterior.",
+    "change": "trimmed: the clause about the earlier helpful result removed"
+  },
+  "recommendedRescueToolReasonHelped": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolReasonStress": {
+    "status": "derived-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart",
+    "source": "Estrés + antojo $intensity/10 + tu resultado útil anterior.",
+    "change": "trimmed: the clause about the earlier helpful result removed"
+  },
+  "recommendedRescueToolReasonStressHelped": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolRecommendedBadge": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "recommendedRescueToolSceneDescription": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolSceneFeatures": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolSceneName": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolStartBreathingButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolStartMoveButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolStartRecommendedButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolStartSceneButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/approved_screen_player.dart"
+  },
+  "recommendedRescueToolStepCounter": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolSupportBody": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolSupportButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/craving_rescue_start_screen.dart"
+  },
+  "recommendedRescueToolSupportNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolSupportTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolSupportTitleStrong": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolSwitchNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/choose_quit_path_screen.dart"
+  },
+  "recommendedRescueToolTitleHelpedBefore": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolWhyMatchLink": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolWhySheetBody": {
+    "status": "derived-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart",
+    "source": "$triggerText + antojo $intensity/10 + un resultado previo útil con respiración hacen que la respiración lenta sea un buen primer paso.",
+    "change": "trimmed: the clause about an earlier helpful breathing result removed"
+  },
+  "recommendedRescueToolWhySheetBodyHelped": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolWhySheetDoneButton": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolWhySheetNote": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolWhySheetTitle": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolWhySheetTitleStress": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
+  },
+  "recommendedRescueToolYourChoiceBadge": {
+    "status": "shipped-04813d0",
+    "file": "lib/screens/recommended_rescue_tool_screen.dart"
   },
   "selectQuitDateBackTooltip": {
     "status": "shipped-04813d0",

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import '../l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../theme/app_colors.dart';
@@ -39,23 +41,35 @@ class CravingRescueStartScreen extends StatelessWidget {
   final VoidCallback onContinue;
   final VoidCallback onViewSupport;
 
-  String _contextLabel(RescueContext context) => switch (context) {
-        RescueContext.stress => isSpanish ? 'Estrés' : 'Stress',
+  String _contextLabel(BuildContext context, RescueContext rescueContext) =>
+      switch (rescueContext) {
+        RescueContext.stress =>
+          AppLocalizations.of(context).cravingRescueStartContextStress,
         RescueContext.afterMeal =>
-          isSpanish ? 'Después de comer' : 'After a meal',
+          AppLocalizations.of(context).cravingRescueStartContextAfterMeal,
         RescueContext.aroundSmoking =>
-          isSpanish ? 'Cerca de alguien que fuma' : 'Around someone smoking',
-        RescueContext.driving => isSpanish ? 'Al conducir' : 'Driving',
-        RescueContext.alcohol => isSpanish ? 'Alcohol' : 'Alcohol',
-        RescueContext.bored => isSpanish ? 'Aburrimiento' : 'Bored',
-        RescueContext.notSure => isSpanish ? 'No estoy seguro' : 'Not sure',
+          AppLocalizations.of(context).cravingRescueStartContextAroundSmoking,
+        RescueContext.driving =>
+          AppLocalizations.of(context).cravingRescueStartContextDriving,
+        RescueContext.alcohol =>
+          AppLocalizations.of(context).cravingRescueStartContextAlcohol,
+        RescueContext.bored =>
+          AppLocalizations.of(context).cravingRescueStartContextBored,
+        RescueContext.notSure =>
+          AppLocalizations.of(context).cravingRescueStartContextNotSure,
       };
 
-  String _intensityLabel(int value) {
-    if (value <= 3) return isSpanish ? 'Leve' : 'Mild';
-    if (value <= 6) return isSpanish ? 'Moderado' : 'Moderate';
-    if (value <= 8) return isSpanish ? 'Fuerte' : 'Strong';
-    return isSpanish ? 'Muy fuerte' : 'Very strong';
+  String _intensityLabel(BuildContext context, int value) {
+    if (value <= 3) {
+      return AppLocalizations.of(context).cravingRescueStartIntensityMild;
+    }
+    if (value <= 6) {
+      return AppLocalizations.of(context).cravingRescueStartIntensityModerate;
+    }
+    if (value <= 8) {
+      return AppLocalizations.of(context).cravingRescueStartIntensityStrong;
+    }
+    return AppLocalizations.of(context).cravingRescueStartIntensityVeryStrong;
   }
 
   void _toggleContext(RescueContext context) {
@@ -97,7 +111,8 @@ class CravingRescueStartScreen extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      isSpanish ? 'Emergencia médica' : 'Medical emergency',
+                      AppLocalizations.of(context)
+                          .cravingRescueStartEmergencySheetTitle,
                       style: const TextStyle(
                         color: AppColors.deepTeal,
                         fontSize: 23,
@@ -109,9 +124,8 @@ class CravingRescueStartScreen extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               Text(
-                isSpanish
-                    ? 'Si es una emergencia médica o estás en peligro inmediato, llama al 911 ahora.'
-                    : 'If this is a medical emergency or you are in immediate danger, call 911 now.',
+                AppLocalizations.of(context)
+                    .cravingRescueStartEmergencySheetBody,
                 style: const TextStyle(
                   color: AppColors.deepTeal,
                   fontSize: 17,
@@ -121,9 +135,8 @@ class CravingRescueStartScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                isSpanish
-                    ? 'BreatheFree no realizará ninguna llamada automáticamente.'
-                    : 'BreatheFree will only start a call when you tap “Call 911.”',
+                AppLocalizations.of(context)
+                    .cravingRescueStartEmergencySheetNote,
                 style: const TextStyle(
                   color: AppColors.tealSecondary,
                   height: 1.4,
@@ -142,16 +155,16 @@ class CravingRescueStartScreen extends StatelessWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            isSpanish
-                                ? 'No se pudo abrir la aplicación Teléfono.'
-                                : 'Could not open the Phone app.',
+                            AppLocalizations.of(context)
+                                .cravingRescueStartCallFailed,
                           ),
                         ),
                       );
                     }
                   },
                   icon: const Icon(Icons.phone_rounded),
-                  label: Text(isSpanish ? 'Llamar al 911' : 'Call 911'),
+                  label: Text(AppLocalizations.of(context)
+                      .cravingRescueStartEmergencyCallButton),
                 ),
               ),
               const SizedBox(height: 8),
@@ -160,7 +173,8 @@ class CravingRescueStartScreen extends StatelessWidget {
                 child: OutlinedButton(
                   key: const ValueKey('rescue-start-emergency-done'),
                   onPressed: () => Navigator.pop(context),
-                  child: Text(isSpanish ? 'Cerrar' : 'Close'),
+                  child: Text(AppLocalizations.of(context)
+                      .cravingRescueStartEmergencyCloseButton),
                 ),
               ),
             ],
@@ -172,6 +186,12 @@ class CravingRescueStartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      isSpanish == (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     final size = MediaQuery.sizeOf(context);
     final compact = size.height < 760;
     final horizontalPadding = size.width < 390 ? 16.0 : 20.0;
@@ -210,7 +230,8 @@ class CravingRescueStartScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          isSpanish ? 'AHORA MISMO' : 'RIGHT NOW',
+                          AppLocalizations.of(context)
+                              .cravingRescueStartEyebrow,
                           style: const TextStyle(
                             color: AppColors.mutedTeal,
                             fontSize: 12,
@@ -220,9 +241,7 @@ class CravingRescueStartScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          isSpanish
-                              ? 'Superemos este momento.'
-                              : 'Let’s get through this moment.',
+                          AppLocalizations.of(context).cravingRescueStartTitle,
                           style: TextStyle(
                             color: AppColors.deepTeal,
                             fontFamily: 'Georgia',
@@ -233,9 +252,7 @@ class CravingRescueStartScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          isSpanish
-                              ? 'Empieza con lo que sientes ahora. No necesitas escribir.'
-                              : 'Start with what you feel now. No typing is required.',
+                          AppLocalizations.of(context).cravingRescueStartIntro,
                           style: const TextStyle(
                             color: AppColors.tealSecondary,
                             fontSize: 15,
@@ -246,7 +263,7 @@ class CravingRescueStartScreen extends StatelessWidget {
                         _IntensityCard(
                           isSpanish: isSpanish,
                           intensity: intensity,
-                          intensityLabel: _intensityLabel(intensity),
+                          intensityLabel: _intensityLabel(context, intensity),
                           onChanged: onIntensityChanged,
                           compact: compact,
                         ),
@@ -260,9 +277,8 @@ class CravingRescueStartScreen extends StatelessWidget {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      isSpanish
-                                          ? '¿Qué puede estar detrás?'
-                                          : 'What might be behind it?',
+                                      AppLocalizations.of(context)
+                                          .cravingRescueStartContextQuestion,
                                       style: const TextStyle(
                                         color: AppColors.deepTeal,
                                         fontSize: 20,
@@ -272,9 +288,8 @@ class CravingRescueStartScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
-                                    isSpanish
-                                        ? 'Opcional'
-                                        : 'Optional · Skip anytime',
+                                    AppLocalizations.of(context)
+                                        .cravingRescueStartContextOptional,
                                     style: const TextStyle(
                                       color: AppColors.mutedTeal,
                                       fontSize: 11,
@@ -295,7 +310,7 @@ class CravingRescueStartScreen extends StatelessWidget {
                                       ),
                                       selected: selectedContexts.contains(item),
                                       onSelected: (_) => _toggleContext(item),
-                                      label: Text(_contextLabel(item)),
+                                      label: Text(_contextLabel(context, item)),
                                       showCheckmark: true,
                                       checkmarkColor: AppColors.lime,
                                       selectedColor: AppColors.mint,
@@ -369,9 +384,8 @@ class CravingRescueStartScreen extends StatelessWidget {
                         iconAlignment: IconAlignment.end,
                         icon: const Icon(Icons.arrow_forward_rounded),
                         label: Text(
-                          isSpanish
-                              ? 'Muéstrame qué hacer'
-                              : 'Show me what to do',
+                          AppLocalizations.of(context)
+                              .cravingRescueStartContinueButton,
                         ),
                       ),
                     ),
@@ -386,9 +400,8 @@ class CravingRescueStartScreen extends StatelessWidget {
                         const SizedBox(width: 5),
                         Expanded(
                           child: Text(
-                            isSpanish
-                                ? 'Privado · Funciona sin conexión'
-                                : 'Private · Works offline',
+                            AppLocalizations.of(context)
+                                .cravingRescueStartPrivateOffline,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
@@ -406,18 +419,16 @@ class CravingRescueStartScreen extends StatelessWidget {
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           child: Text(
-                            isSpanish
-                                ? '¿Emergencia médica?'
-                                : 'Medical emergency?',
+                            AppLocalizations.of(context)
+                                .cravingRescueStartEmergencyLink,
                             style: const TextStyle(fontSize: 11),
                           ),
                         ),
                       ],
                     ),
                     Text(
-                      isSpanish
-                          ? 'Los detalles son opcionales y nunca bloquean Rescate.'
-                          : 'Trigger details are optional and never block Rescue.',
+                      AppLocalizations.of(context)
+                          .cravingRescueStartContextNote,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: AppColors.mutedTeal,
@@ -450,7 +461,7 @@ class _RescueHeader extends StatelessWidget {
           IconButton.outlined(
             key: const ValueKey('rescue-start-close'),
             onPressed: onClose,
-            tooltip: isSpanish ? 'Volver' : 'Go back',
+            tooltip: AppLocalizations.of(context).cravingRescueStartBackTooltip,
             icon: const Icon(Icons.close_rounded),
             style: IconButton.styleFrom(
               backgroundColor: AppColors.paper,
@@ -461,7 +472,7 @@ class _RescueHeader extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              isSpanish ? 'Rescate del antojo' : 'Craving Rescue',
+              AppLocalizations.of(context).cravingRescueStartHeaderTitle,
               maxLines: 1,
               textAlign: TextAlign.center,
               style: const TextStyle(
@@ -488,7 +499,7 @@ class _RescueHeader extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  isSpanish ? 'SIN CONEXIÓN' : 'OFFLINE READY',
+                  AppLocalizations.of(context).cravingRescueStartOfflineBadge,
                   style: const TextStyle(
                     color: AppColors.tealSecondary,
                     fontSize: 9,
@@ -546,7 +557,8 @@ class _IntensityCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isSpanish ? 'INTENSIDAD DEL ANTOJO' : 'CRAVING INTENSITY',
+                      AppLocalizations.of(context)
+                          .cravingRescueStartIntensityTitle,
                       style: const TextStyle(
                         color: Color(0xFFBFD5CD),
                         fontSize: 11,
@@ -556,9 +568,8 @@ class _IntensityCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      isSpanish
-                          ? '¿Qué tan fuerte es ahora?'
-                          : 'How strong is it right now?',
+                      AppLocalizations.of(context)
+                          .cravingRescueStartIntensityQuestion,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 21,
@@ -632,14 +643,15 @@ class _IntensityCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  isSpanish ? 'Leve' : 'Mild',
+                  AppLocalizations.of(context).cravingRescueStartIntensityMild,
                   style: const TextStyle(
                     color: Color(0xFFBFD5CD),
                     fontSize: 11,
                   ),
                 ),
                 Text(
-                  isSpanish ? 'Más fuerte' : 'Strongest',
+                  AppLocalizations.of(context)
+                      .cravingRescueStartIntensityMaxLabel,
                   style: const TextStyle(
                     color: Color(0xFFBFD5CD),
                     fontSize: 11,
@@ -666,9 +678,8 @@ class _IntensityCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isSpanish
-                          ? 'Solo necesitas elegir un número.'
-                          : 'You only need to choose a number.',
+                      AppLocalizations.of(context)
+                          .cravingRescueStartIntensityHint,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -677,9 +688,8 @@ class _IntensityCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      isSpanish
-                          ? 'La siguiente pantalla ofrece una acción recomendada.'
-                          : 'The next screen gives one recommended action.',
+                      AppLocalizations.of(context)
+                          .cravingRescueStartIntensityNext,
                       style: const TextStyle(
                         color: Color(0xFFBFD5CD),
                         fontSize: 12,
@@ -745,18 +755,16 @@ class _PrivacyNote extends StatelessWidget {
             TextSpan(
               children: [
                 TextSpan(
-                  text: isSpanish
-                      ? 'Se usa para personalizar el apoyo, nunca para vigilarte.\n'
-                      : 'Used to personalize support — never to monitor you.\n',
+                  text: AppLocalizations.of(context)
+                      .cravingRescueStartPrivacyNoteBody,
                   style: const TextStyle(
                     color: AppColors.tealSecondary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 TextSpan(
-                  text: isSpanish
-                      ? 'Sin rastreo de ubicación ni conversaciones.'
-                      : 'No background location or conversation tracking.',
+                  text: AppLocalizations.of(context)
+                      .cravingRescueStartPrivacyNoteTracking,
                   style: const TextStyle(color: AppColors.mutedTeal),
                 ),
               ],
@@ -799,7 +807,7 @@ class _TopReasonCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isSpanish ? 'TU RAZÓN PRINCIPAL' : 'YOUR TOP REASON',
+                  AppLocalizations.of(context).cravingRescueStartTopReasonLabel,
                   style: const TextStyle(
                     color: AppColors.mutedTeal,
                     fontSize: 10,
@@ -820,9 +828,7 @@ class _TopReasonCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  isSpanish
-                      ? 'Este momento puede pasar sin cambiar tu meta.'
-                      : 'This moment can pass without changing your goal.',
+                  AppLocalizations.of(context).cravingRescueStartTopReasonNote,
                   style: const TextStyle(
                     color: AppColors.tealSecondary,
                     fontSize: 12,
@@ -869,9 +875,8 @@ class _SupportCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isSpanish
-                          ? '¿Prefieres hablar con alguien?'
-                          : 'Want a person instead?',
+                      AppLocalizations.of(context)
+                          .cravingRescueStartSupportTitle,
                       style: const TextStyle(
                         color: AppColors.deepTeal,
                         fontSize: 17,
@@ -880,9 +885,8 @@ class _SupportCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      isSpanish
-                          ? 'Contacta a $supportName o a un consejero capacitado.'
-                          : 'Contact $supportName or a trained quitline counselor.',
+                      AppLocalizations.of(context)
+                          .cravingRescueStartSupportBody(supportName),
                       style: const TextStyle(
                         color: AppColors.mutedTeal,
                         fontSize: 12,
@@ -902,15 +906,14 @@ class _SupportCard extends StatelessWidget {
                     vertical: 10,
                   ),
                 ),
-                child: Text(isSpanish ? 'Ver apoyo' : 'View support'),
+                child: Text(AppLocalizations.of(context)
+                    .cravingRescueStartSupportButton),
               ),
             ],
           ),
           const SizedBox(height: 9),
           Text(
-            isSpanish
-                ? 'Los mensajes y llamadas solo ocurren cuando tú los eliges.'
-                : 'Messages and calls only happen when you choose them.',
+            AppLocalizations.of(context).cravingRescueStartSupportNote,
             style: const TextStyle(
               color: AppColors.mutedTeal,
               fontSize: 11,

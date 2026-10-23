@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/app_localizations.dart';
+
 enum RescueTool {
   slowBreathing,
   move,
@@ -66,8 +68,6 @@ class RecommendedRescueToolScreen extends StatelessWidget {
 
   bool get _strongCraving => intensity >= 7;
 
-  String _t(String english, String spanish) => isSpanish ? spanish : english;
-
   /// The last result, when it was the slow breathing this card recommends.
   RescueLastResult? get _breathingResult =>
       lastResult?.tool == RescueTool.slowBreathing ? lastResult : null;
@@ -75,27 +75,33 @@ class RecommendedRescueToolScreen extends StatelessWidget {
   /// Slow breathing helped the member before.
   bool get _helpedBefore => _breathingResult?.helpful == true;
 
-  String? get _primaryContext {
-    if (stressSelected) return _t('Stress selected', 'Estrés seleccionado');
+  String? _primaryContext(BuildContext context) {
+    if (stressSelected) {
+      return AppLocalizations.of(context).recommendedRescueToolContextStress;
+    }
     if (_helpedBefore) {
-      return _t('Personalized match', 'Recomendación personalizada');
+      return AppLocalizations.of(context).recommendedRescueToolContextPersonal;
     }
     return null;
   }
 
-  String get _startLabel => switch (selectedTool) {
-        RescueTool.slowBreathing => _t(
-            'Start recommended tool',
-            'Iniciar herramienta recomendada',
-          ),
+  String _startLabel(BuildContext context) => switch (selectedTool) {
+        RescueTool.slowBreathing => AppLocalizations.of(context)
+            .recommendedRescueToolStartRecommendedButton,
         RescueTool.move =>
-          _t('Start 3-minute movement', 'Iniciar movimiento de 3 minutos'),
+          AppLocalizations.of(context).recommendedRescueToolStartMoveButton,
         RescueTool.changeScene =>
-          _t('Start scene change', 'Cambiar de entorno'),
+          AppLocalizations.of(context).recommendedRescueToolStartSceneButton,
       };
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      isSpanish == (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     return Scaffold(
       key: const ValueKey('functional-recommended-rescue-tool-screen'),
       backgroundColor: _cream,
@@ -120,7 +126,8 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                         _ProgressIntro(isSpanish: isSpanish),
                         const SizedBox(height: 26),
                         Text(
-                          _t('BEST MATCH', 'MEJOR OPCIÓN'),
+                          AppLocalizations.of(context)
+                              .recommendedRescueToolEyebrow,
                           style: const TextStyle(
                             color: _mutedTeal,
                             fontSize: 13,
@@ -131,14 +138,10 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         Text(
                           _helpedBefore
-                              ? _t(
-                                  'Start with what helped before.',
-                                  'Empieza con lo que te ayudó antes.',
-                                )
-                              : _t(
-                                  'What feels possible right now?',
-                                  '¿Qué te parece posible ahora mismo?',
-                                ),
+                              ? AppLocalizations.of(context)
+                                  .recommendedRescueToolTitleHelpedBefore
+                              : AppLocalizations.of(context)
+                                  .recommendedRescueToolTitle,
                           style: const TextStyle(
                             color: _deepTeal,
                             fontSize: 31,
@@ -150,14 +153,10 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                         const SizedBox(height: 12),
                         Text(
                           lastResult == null
-                              ? _t(
-                                  'One recommended action, based on this craving.',
-                                  'Una acción recomendada según este antojo.',
-                                )
-                              : _t(
-                                  'One recommended action, based on this craving and your results.',
-                                  'Una acción recomendada según este antojo y tus resultados.',
-                                ),
+                              ? AppLocalizations.of(context)
+                                  .recommendedRescueToolIntro
+                              : AppLocalizations.of(context)
+                                  .recommendedRescueToolIntroWithResult,
                           style: const TextStyle(
                             color: _teal,
                             fontSize: 16,
@@ -168,7 +167,7 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                         _RecommendedCard(
                           isSpanish: isSpanish,
                           selected: selectedTool == RescueTool.slowBreathing,
-                          contextLabel: _primaryContext,
+                          contextLabel: _primaryContext(context),
                           lastResult: _breathingResult,
                           onSelect: () =>
                               onToolChanged(RescueTool.slowBreathing),
@@ -190,10 +189,8 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                _t(
-                                  'Or choose another action',
-                                  'O elige otra acción',
-                                ),
+                                AppLocalizations.of(context)
+                                    .recommendedRescueToolOtherActionsLabel,
                                 style: const TextStyle(
                                   color: _deepTeal,
                                   fontSize: 20,
@@ -202,7 +199,8 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              _t('Your choice', 'Tu elección'),
+                              AppLocalizations.of(context)
+                                  .recommendedRescueToolYourChoiceBadge,
                               style: const TextStyle(
                                 color: _mutedTeal,
                                 fontSize: 12,
@@ -216,28 +214,24 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                             final stackCards = constraints.maxWidth < 430;
                             final move = _AlternateToolCard(
                               key: const ValueKey('rescue-tool-move'),
-                              title: _t('Move for 3 minutes',
-                                  'Muévete por 3 minutos'),
-                              subtitle:
-                                  _t('Walk or stretch', 'Camina o estírate'),
-                              footer: _t('Offline · No equipment',
-                                  'Sin conexión · Sin equipo'),
+                              title: AppLocalizations.of(context)
+                                  .recommendedRescueToolMoveName,
+                              subtitle: AppLocalizations.of(context)
+                                  .recommendedRescueToolMoveDescription,
+                              footer: AppLocalizations.of(context)
+                                  .recommendedRescueToolMoveFeatures,
                               icon: Icons.directions_walk_rounded,
                               selected: selectedTool == RescueTool.move,
                               onTap: () => onToolChanged(RescueTool.move),
                             );
                             final change = _AlternateToolCard(
                               key: const ValueKey('rescue-tool-change-scene'),
-                              title:
-                                  _t('Change the scene', 'Cambia de entorno'),
-                              subtitle: _t(
-                                'Go somewhere smoke-free',
-                                'Ve a un lugar sin humo',
-                              ),
-                              footer: _t(
-                                'Quick environment shift',
-                                'Cambio rápido de ambiente',
-                              ),
+                              title: AppLocalizations.of(context)
+                                  .recommendedRescueToolSceneName,
+                              subtitle: AppLocalizations.of(context)
+                                  .recommendedRescueToolSceneDescription,
+                              footer: AppLocalizations.of(context)
+                                  .recommendedRescueToolSceneFeatures,
                               icon: Icons.swap_horiz_rounded,
                               selected: selectedTool == RescueTool.changeScene,
                               onTap: () =>
@@ -290,10 +284,8 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
-                                  _t(
-                                    'Recommendation uses your data only for personalized support.',
-                                    'La recomendación usa tus datos solo para apoyo personalizado.',
-                                  ),
+                                  AppLocalizations.of(context)
+                                      .recommendedRescueToolDataNote,
                                   style: const TextStyle(
                                     color: _mutedTeal,
                                     fontSize: 12.5,
@@ -316,10 +308,8 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                         const SizedBox(height: 18),
                         Center(
                           child: Text(
-                            _t(
-                              'You can switch tools at any time',
-                              'Puedes cambiar de herramienta en cualquier momento',
-                            ),
+                            AppLocalizations.of(context)
+                                .recommendedRescueToolSwitchNote,
                             style: const TextStyle(
                               color: _mutedTeal,
                               fontSize: 12,
@@ -364,7 +354,7 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Text(
-                          _startLabel,
+                          _startLabel(context),
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -394,8 +384,9 @@ class RecommendedRescueToolScreen extends StatelessWidget {
       backgroundColor: _paper,
       builder: (context) {
         final triggerText = stressSelected
-            ? _t('Stress trigger', 'Desencadenante: estrés')
-            : _t('Your current context', 'Tu contexto actual');
+            ? AppLocalizations.of(context)
+                .recommendedRescueToolWhySheetTitleStress
+            : AppLocalizations.of(context).recommendedRescueToolWhySheetTitle;
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
@@ -404,7 +395,8 @@ class RecommendedRescueToolScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _t('Why this match?', '¿Por qué esta opción?'),
+                  AppLocalizations.of(context)
+                      .recommendedRescueToolWhyMatchLink,
                   style: const TextStyle(
                     color: _deepTeal,
                     fontSize: 22,
@@ -414,14 +406,12 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text(
                   _helpedBefore
-                      ? _t(
-                          '$triggerText + craving $intensity/10 + a previously helpful breathing result make slow breathing a practical first step.',
-                          '$triggerText + antojo $intensity/10 + un resultado previo útil con respiración hacen que la respiración lenta sea un buen primer paso.',
-                        )
-                      : _t(
-                          '$triggerText + craving $intensity/10 make slow breathing a practical first step.',
-                          '$triggerText + antojo $intensity/10 hacen que la respiración lenta sea un buen primer paso.',
-                        ),
+                      ? AppLocalizations.of(context)
+                          .recommendedRescueToolWhySheetBodyHelped(
+                              triggerText, intensity)
+                      : AppLocalizations.of(context)
+                          .recommendedRescueToolWhySheetBody(
+                              triggerText, intensity),
                   style: const TextStyle(
                     color: _teal,
                     fontSize: 15,
@@ -430,10 +420,8 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  _t(
-                    'You can choose another action now or change personalization later in Settings.',
-                    'Puedes elegir otra acción ahora o cambiar la personalización más tarde en Configuración.',
-                  ),
+                  AppLocalizations.of(context)
+                      .recommendedRescueToolWhySheetNote,
                   style: const TextStyle(
                     color: _mutedTeal,
                     fontSize: 13,
@@ -446,7 +434,8 @@ class RecommendedRescueToolScreen extends StatelessWidget {
                   child: FilledButton(
                     key: const ValueKey('rescue-tool-why-done'),
                     onPressed: () => Navigator.of(context).pop(),
-                    child: Text(_t('Got it', 'Entendido')),
+                    child: Text(AppLocalizations.of(context)
+                        .recommendedRescueToolWhySheetDoneButton),
                   ),
                 ),
               ],
@@ -472,7 +461,8 @@ class _Header extends StatelessWidget {
         children: [
           IconButton.outlined(
             key: const ValueKey('rescue-tool-back'),
-            tooltip: isSpanish ? 'Volver' : 'Go back',
+            tooltip:
+                AppLocalizations.of(context).recommendedRescueToolBackTooltip,
             onPressed: onBack,
             icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
             style: IconButton.styleFrom(
@@ -498,7 +488,7 @@ class _Header extends StatelessWidget {
               borderRadius: BorderRadius.circular(24),
             ),
             child: Text(
-              isSpanish ? '2 DE 5' : '2 OF 5',
+              AppLocalizations.of(context).recommendedRescueToolStepCounter,
               style: const TextStyle(
                 color: RecommendedRescueToolScreen._teal,
                 fontSize: 12,
@@ -524,7 +514,7 @@ class _ProgressIntro extends StatelessWidget {
         Row(
           children: [
             Text(
-              isSpanish ? 'ELIGE APOYO' : 'CHOOSE SUPPORT',
+              AppLocalizations.of(context).recommendedRescueToolProgressLabel,
               style: const TextStyle(
                 color: RecommendedRescueToolScreen._mutedTeal,
                 fontSize: 12,
@@ -619,7 +609,8 @@ class _RecommendedCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        isSpanish ? 'RECOMENDADO' : 'RECOMMENDED',
+                        AppLocalizations.of(context)
+                            .recommendedRescueToolRecommendedBadge,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 11,
@@ -639,7 +630,8 @@ class _RecommendedCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isSpanish ? 'Respiración lenta' : 'Slow breathing',
+                            AppLocalizations.of(context)
+                                .recommendedRescueToolBreathingName,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 27,
@@ -648,9 +640,8 @@ class _RecommendedCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            isSpanish
-                                ? 'Deja que el antojo suba y baje mientras sigues una guía de respiración tranquila.'
-                                : 'Let the urge rise and fall while you follow a calm breathing cue.',
+                            AppLocalizations.of(context)
+                                .recommendedRescueToolBreathingDescription,
                             style: const TextStyle(
                               color: Color(0xFFD5E6E1),
                               fontSize: 15,
@@ -709,9 +700,8 @@ class _RecommendedCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isSpanish
-                                    ? 'TU ÚLTIMO RESULTADO'
-                                    : 'YOUR LAST RESULT',
+                                AppLocalizations.of(context)
+                                    .recommendedRescueToolLastResultLabel,
                                 style: const TextStyle(
                                   color: Color(0xFFBFD4CD),
                                   fontSize: 10,
@@ -721,9 +711,9 @@ class _RecommendedCard extends StatelessWidget {
                               ),
                               const SizedBox(height: 3),
                               Text(
-                                isSpanish
-                                    ? 'El antojo cambió de ${result.before} a ${result.after} después del ejercicio.'
-                                    : 'Craving changed from ${result.before} to ${result.after} after the exercise.',
+                                AppLocalizations.of(context)
+                                    .recommendedRescueToolLastResult(
+                                        result.before, result.after),
                                 style: const TextStyle(
                                   color: Color(0xFFC7DAD4),
                                   fontSize: 12,
@@ -773,12 +763,13 @@ class _RecommendedCard extends StatelessWidget {
                     if (contextLabel case final label?)
                       _Pill(text: label, icon: Icons.circle, accent: true),
                     _Pill(
-                      text:
-                          isSpanish ? 'Funciona sin conexión' : 'Works offline',
+                      text: AppLocalizations.of(context)
+                          .recommendedRescueToolBreathingOffline,
                       icon: Icons.wifi_rounded,
                     ),
                     _Pill(
-                      text: isSpanish ? 'Voz opcional' : 'Voice optional',
+                      text: AppLocalizations.of(context)
+                          .recommendedRescueToolBreathingVoice,
                       icon: Icons.volume_up_outlined,
                     ),
                   ],
@@ -792,9 +783,8 @@ class _RecommendedCard extends StatelessWidget {
                     onPressed: onStart,
                     icon: const Icon(Icons.play_circle_fill_rounded),
                     label: Text(
-                      isSpanish
-                          ? 'Iniciar respiración de 2 minutos'
-                          : 'Start 2-minute breathing',
+                      AppLocalizations.of(context)
+                          .recommendedRescueToolStartBreathingButton,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -879,21 +869,18 @@ class _WhyMatchCard extends StatelessWidget {
   final bool helpedBefore;
   final VoidCallback onTap;
 
-  String get _reason {
+  String _reason(BuildContext context) {
     if (helpedBefore) {
       return stressSelected
-          ? (isSpanish
-              ? 'Estrés + antojo $intensity/10 + tu resultado útil anterior.'
-              : 'Stress trigger + craving $intensity/10 + your previous helpful result.')
-          : (isSpanish
-              ? 'Antojo $intensity/10 + tu resultado útil anterior.'
-              : 'Craving $intensity/10 + your previous helpful result.');
+          ? (AppLocalizations.of(context)
+              .recommendedRescueToolReasonStressHelped(intensity))
+          : (AppLocalizations.of(context)
+              .recommendedRescueToolReasonHelped(intensity));
     }
     return stressSelected
-        ? (isSpanish
-            ? 'Estrés + antojo $intensity/10.'
-            : 'Stress trigger + craving $intensity/10.')
-        : (isSpanish ? 'Antojo $intensity/10.' : 'Craving $intensity/10.');
+        ? (AppLocalizations.of(context)
+            .recommendedRescueToolReasonStress(intensity))
+        : (AppLocalizations.of(context).recommendedRescueToolReason(intensity));
   }
 
   @override
@@ -927,7 +914,8 @@ class _WhyMatchCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isSpanish ? '¿Por qué esta opción?' : 'Why this match?',
+                      AppLocalizations.of(context)
+                          .recommendedRescueToolWhyMatchLink,
                       style: const TextStyle(
                         color: RecommendedRescueToolScreen._deepTeal,
                         fontSize: 16,
@@ -936,7 +924,7 @@ class _WhyMatchCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      _reason,
+                      _reason(context),
                       style: const TextStyle(
                         color: RecommendedRescueToolScreen._teal,
                         fontSize: 13,
@@ -1122,12 +1110,10 @@ class _SupportCard extends StatelessWidget {
                   children: [
                     Text(
                       strongCraving
-                          ? (isSpanish
-                              ? 'Tu antojo es fuerte. ¿Quieres hablar con alguien?'
-                              : 'Your craving is strong. Want a person?')
-                          : (isSpanish
-                              ? '¿Prefieres apoyo de una persona?'
-                              : 'Want a person instead?'),
+                          ? (AppLocalizations.of(context)
+                              .recommendedRescueToolSupportTitleStrong)
+                          : (AppLocalizations.of(context)
+                              .recommendedRescueToolSupportTitle),
                       style: const TextStyle(
                         color: RecommendedRescueToolScreen._deepTeal,
                         fontSize: 16,
@@ -1136,9 +1122,8 @@ class _SupportCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      isSpanish
-                          ? 'Contacta a $supportName o a un consejero capacitado de la línea para dejar de fumar.'
-                          : 'Contact $supportName or a trained quitline counselor.',
+                      AppLocalizations.of(context)
+                          .recommendedRescueToolSupportBody(supportName),
                       style: const TextStyle(
                         color: RecommendedRescueToolScreen._teal,
                         fontSize: 12.5,
@@ -1160,14 +1145,13 @@ class _SupportCard extends StatelessWidget {
                 backgroundColor: RecommendedRescueToolScreen._coral,
                 foregroundColor: Colors.white,
               ),
-              child: Text(isSpanish ? 'Ver apoyo' : 'View support'),
+              child: Text(AppLocalizations.of(context)
+                  .recommendedRescueToolSupportButton),
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            isSpanish
-                ? 'No se envía ni comparte nada a menos que tú lo elijas.'
-                : 'Nothing is sent or shared unless you choose it.',
+            AppLocalizations.of(context).recommendedRescueToolSupportNote,
             style: const TextStyle(
               color: Color(0xFF8E756E),
               fontSize: 10.5,

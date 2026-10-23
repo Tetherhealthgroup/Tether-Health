@@ -3,12 +3,19 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+
+import '../l10n/app_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 import '../error/privacy_safe_error_reporter.dart';
 import '../theme/app_colors.dart';
 import 'recommended_rescue_tool_screen.dart';
+
+/// The speech voice for [locale]: US Spanish for Spanish, US English
+/// otherwise.
+String rescueSpeechLanguage(Locale locale) =>
+    locale.languageCode == 'es' ? 'es-US' : 'en-US';
 
 class ActiveCravingRescueScreen extends StatefulWidget {
   const ActiveCravingRescueScreen({
@@ -60,7 +67,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
   Timer? _timer;
   late final FlutterTts _tts;
 
-  bool get _isSpanish => widget.isSpanish;
+  bool _speechConfigured = false;
 
   bool get _isInhale => (widget.elapsedSeconds % 10) < 4;
 
@@ -96,7 +103,6 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
   void initState() {
     super.initState();
     _tts = FlutterTts();
-    unawaited(_configureTts());
     _syncTimer();
 
     if (widget.voiceEnabled && widget.tool == RescueTool.slowBreathing) {
@@ -154,7 +160,16 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
     super.dispose();
   }
 
-  Future<void> _configureTts() async {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_speechConfigured) return;
+    _speechConfigured = true;
+    unawaited(
+        _configureTts(rescueSpeechLanguage(Localizations.localeOf(context))));
+  }
+
+  Future<void> _configureTts(String language) async {
     try {
       if (defaultTargetPlatform == TargetPlatform.iOS) {
         await _tts.setSharedInstance(true);
@@ -171,7 +186,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
         );
       }
 
-      await _tts.setLanguage(_isSpanish ? 'es-US' : 'en-US');
+      await _tts.setLanguage(language);
       await _tts.setSpeechRate(0.42);
       await _tts.setPitch(1.0);
       await _tts.setVolume(1.0);
@@ -189,26 +204,29 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
 
     if (widget.tool == RescueTool.slowBreathing) {
       message = _isInhale
-          ? (_isSpanish ? 'Inhala lentamente' : 'Breathe in slowly')
-          : (_isSpanish ? 'Exhala lentamente' : 'Breathe out slowly');
+          ? (AppLocalizations.of(context).activeCravingRescueSpokenBreatheIn)
+          : (AppLocalizations.of(context).activeCravingRescueSpokenBreatheOut);
     } else if (widget.tool == RescueTool.move) {
       final elapsed = widget.elapsedSeconds;
 
       if (elapsed == 0) {
-        message = _isSpanish ? 'Empieza a moverte' : 'Start moving';
-      } else if (elapsed == 120) {
-        message = _isSpanish ? 'Te queda un minuto' : 'One minute left';
-      } else if (elapsed == 150) {
         message =
-            _isSpanish ? 'Te quedan treinta segundos' : 'Thirty seconds left';
+            AppLocalizations.of(context).activeCravingRescueSpokenMovementStart;
+      } else if (elapsed == 120) {
+        message =
+            AppLocalizations.of(context).activeCravingRescueSpokenOneMinuteLeft;
+      } else if (elapsed == 150) {
+        message = AppLocalizations.of(context)
+            .activeCravingRescueSpokenThirtySecondsLeft;
       } else if (elapsed == 170) {
-        message = _isSpanish ? 'Diez segundos más' : 'Ten seconds left';
+        message = AppLocalizations.of(context)
+            .activeCravingRescueSpokenTenSecondsLeft;
       } else if (elapsed >= 180) {
-        message = _isSpanish
-            ? 'Muy bien. Completaste tres minutos.'
-            : 'Great job. You completed three minutes.';
+        message =
+            AppLocalizations.of(context).activeCravingRescueSpokenMovementDone;
       } else if (elapsed % 30 == 0) {
-        message = _isSpanish ? 'Sigue moviéndote' : 'Keep moving';
+        message =
+            AppLocalizations.of(context).activeCravingRescueSpokenKeepMoving;
       } else {
         return;
       }
@@ -287,26 +305,28 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
       case 30:
       case 60:
       case 90:
-        message = _isSpanish ? 'Sigue moviéndote' : 'Keep moving';
+        message =
+            AppLocalizations.of(context).activeCravingRescueSpokenKeepMoving;
         break;
 
       case 120:
-        message = _isSpanish ? 'Te queda un minuto' : 'One minute left';
+        message =
+            AppLocalizations.of(context).activeCravingRescueSpokenOneMinuteLeft;
         break;
 
       case 150:
-        message =
-            _isSpanish ? 'Te quedan treinta segundos' : 'Thirty seconds left';
+        message = AppLocalizations.of(context)
+            .activeCravingRescueSpokenThirtySecondsLeft;
         break;
 
       case 170:
-        message = _isSpanish ? 'Diez segundos más' : 'Ten seconds left';
+        message = AppLocalizations.of(context)
+            .activeCravingRescueSpokenTenSecondsLeft;
         break;
 
       case 180:
-        message = _isSpanish
-            ? 'Muy bien. Completaste tres minutos.'
-            : 'Great job. You completed three minutes.';
+        message =
+            AppLocalizations.of(context).activeCravingRescueSpokenMovementDone;
         break;
 
       default:
@@ -330,24 +350,20 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
 
     switch (elapsed) {
       case 30:
-        message = _isSpanish
-            ? 'Sigue moviéndote a un lugar sin humo.'
-            : 'Keep moving to a smoke-free place.';
+        message = AppLocalizations.of(context)
+            .activeCravingRescueSpokenSceneKeepGoing;
         break;
       case 60:
-        message = _isSpanish
-            ? 'Ya estás a la mitad. Sigue adelante.'
-            : 'You are halfway there. Keep going.';
+        message =
+            AppLocalizations.of(context).activeCravingRescueSpokenSceneHalfway;
         break;
       case 90:
-        message = _isSpanish
-            ? 'Sigue adelante. Estás haciendo un cambio positivo.'
-            : 'Keep going. You are making a positive change.';
+        message = AppLocalizations.of(context)
+            .activeCravingRescueSpokenSceneEncouragement;
         break;
       case 120:
-        message = _isSpanish
-            ? 'Muy bien. Has cambiado de entorno.'
-            : 'Great job. You changed your surroundings.';
+        message =
+            AppLocalizations.of(context).activeCravingRescueSpokenSceneDone;
         break;
       default:
         return;
@@ -376,7 +392,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _isSpanish ? '¿Salir del ejercicio?' : 'Leave this exercise?',
+              AppLocalizations.of(context).activeCravingRescueLeaveDialogTitle,
               style: const TextStyle(
                 color: AppColors.deepTeal,
                 fontSize: 23,
@@ -385,9 +401,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              _isSpanish
-                  ? 'Tu progreso se mantendrá para que puedas volver.'
-                  : 'Your progress will be kept so you can return.',
+              AppLocalizations.of(context).activeCravingRescueLeaveDialogBody,
               style: const TextStyle(
                 color: AppColors.tealSecondary,
                 height: 1.4,
@@ -400,7 +414,8 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                 key: const ValueKey('active-rescue-close-stay'),
                 onPressed: () => Navigator.pop(context, false),
                 child: Text(
-                  _isSpanish ? 'Seguir respirando' : 'Keep breathing',
+                  AppLocalizations.of(context)
+                      .activeCravingRescueLeaveDialogStay,
                 ),
               ),
             ),
@@ -411,7 +426,8 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                 key: const ValueKey('active-rescue-close-leave'),
                 onPressed: () => Navigator.pop(context, true),
                 child: Text(
-                  _isSpanish ? 'Guardar y salir' : 'Save and leave',
+                  AppLocalizations.of(context)
+                      .activeCravingRescueLeaveDialogLeave,
                 ),
               ),
             ),
@@ -446,9 +462,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _isSpanish
-                  ? '¿Terminar el ejercicio ahora?'
-                  : 'End the exercise now?',
+              AppLocalizations.of(context).activeCravingRescueEndDialogTitle,
               style: const TextStyle(
                 color: AppColors.deepTeal,
                 fontSize: 23,
@@ -457,9 +471,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              _isSpanish
-                  ? 'A continuación podrás volver a calificar el antojo.'
-                  : 'You can rate the craving again next.',
+              AppLocalizations.of(context).activeCravingRescueEndDialogBody,
               style: const TextStyle(
                 color: AppColors.tealSecondary,
                 height: 1.4,
@@ -472,7 +484,8 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                 key: const ValueKey('active-rescue-end-confirm'),
                 onPressed: () => Navigator.pop(context, true),
                 child: Text(
-                  _isSpanish ? 'Terminar y revisar' : 'End and recheck',
+                  AppLocalizations.of(context)
+                      .activeCravingRescueEndDialogConfirm,
                 ),
               ),
             ),
@@ -483,7 +496,8 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                 key: const ValueKey('active-rescue-end-cancel'),
                 onPressed: () => Navigator.pop(context, false),
                 child: Text(
-                  _isSpanish ? 'Seguir practicando' : 'Keep practicing',
+                  AppLocalizations.of(context)
+                      .activeCravingRescueEndDialogCancel,
                 ),
               ),
             ),
@@ -505,6 +519,13 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // The text comes from the app locale; the language the screen was given
+    // must be the same one.
+    assert(
+      widget.isSpanish ==
+          (Localizations.localeOf(context).languageCode == 'es'),
+      'the screen language must match the app locale',
+    );
     final size = MediaQuery.sizeOf(context);
     final compact = size.height < 760;
     final horizontalPadding = size.width < 390 ? 16.0 : 20.0;
@@ -523,7 +544,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                 6,
               ),
               child: _Header(
-                isSpanish: _isSpanish,
+                isSpanish: widget.isSpanish,
                 onClose: _showCloseConfirmation,
               ),
             ),
@@ -531,7 +552,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
               padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
               child: _ProgressHeader(
                 progress: 0.6,
-                isSpanish: _isSpanish,
+                isSpanish: widget.isSpanish,
               ),
             ),
             const SizedBox(height: 10),
@@ -551,9 +572,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          _isSpanish
-                              ? 'Quédate con este momento.'
-                              : 'Stay with this moment.',
+                          AppLocalizations.of(context).activeCravingRescueTitle,
                           style: TextStyle(
                             color: AppColors.deepTeal,
                             fontSize: compact ? 25 : 29,
@@ -563,9 +582,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                         ),
                         const SizedBox(height: 7),
                         Text(
-                          _isSpanish
-                              ? 'Sigue el círculo o respira lentamente a tu manera.'
-                              : 'Follow the circle—or breathe slowly in your own way.',
+                          AppLocalizations.of(context).activeCravingRescueIntro,
                           style: const TextStyle(
                             color: AppColors.tealSecondary,
                             fontSize: 14,
@@ -575,7 +592,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                         const SizedBox(height: 16),
                         if (widget.tool == RescueTool.slowBreathing)
                           _BreathingCard(
-                            isSpanish: _isSpanish,
+                            isSpanish: widget.isSpanish,
                             remainingLabel: _remainingLabel,
                             isInhale: _isInhale,
                             phaseCountdown: _phaseCountdown,
@@ -590,7 +607,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                           )
                         else if (widget.tool == RescueTool.move)
                           _MovementCard(
-                            isSpanish: _isSpanish,
+                            isSpanish: widget.isSpanish,
                             remainingLabel: _remainingLabel,
                             overallProgress: _overallProgress,
                             paused: widget.isPaused,
@@ -602,7 +619,7 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                           )
                         else
                           _ChangeSceneCard(
-                            isSpanish: _isSpanish,
+                            isSpanish: widget.isSpanish,
                             remainingLabel: _remainingLabel,
                             overallProgress: _overallProgress,
                             paused: widget.isPaused,
@@ -613,10 +630,10 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                             onHapticsChanged: widget.onHapticsChanged,
                           ),
                         const SizedBox(height: 16),
-                        _EncouragementCard(isSpanish: _isSpanish),
+                        _EncouragementCard(isSpanish: widget.isSpanish),
                         const SizedBox(height: 16),
                         _AlternateSupportCard(
-                          isSpanish: _isSpanish,
+                          isSpanish: widget.isSpanish,
                           onSwitchTool: () {
                             widget.onPausedChanged(true);
                             widget.onSwitchTool();
@@ -639,7 +656,8 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                             ),
                           ),
                           child: Text(
-                            _isSpanish ? 'Terminar ejercicio' : 'End exercise',
+                            AppLocalizations.of(context)
+                                .activeCravingRescueEndButton,
                             style: const TextStyle(
                               fontWeight: FontWeight.w800,
                             ),
@@ -664,9 +682,8 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
-                                  _isSpanish
-                                      ? 'No se envían ni comparten datos durante este ejercicio.\nContenido v1.0'
-                                      : 'No data is being sent or shared during this exercise.\nContent v1.0',
+                                  AppLocalizations.of(context)
+                                      .activeCravingRescuePrivacyNote,
                                   style: const TextStyle(
                                     color: AppColors.tealSecondary,
                                     fontSize: 11.5,
@@ -679,9 +696,8 @@ class _ActiveCravingRescueScreenState extends State<ActiveCravingRescueScreen> {
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          _isSpanish
-                              ? 'Después de 2 minutos, volverás a calificar el antojo'
-                              : 'After 2 minutes, you’ll rate the craving again',
+                          AppLocalizations.of(context)
+                              .activeCravingRescueRecheckNote,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: AppColors.tealSecondary,
@@ -734,7 +750,8 @@ class _Header extends StatelessWidget {
               onPressed: onClose,
               icon: const Icon(Icons.close_rounded),
               color: AppColors.deepTeal,
-              tooltip: isSpanish ? 'Cerrar' : 'Close',
+              tooltip:
+                  AppLocalizations.of(context).activeCravingRescueCloseTooltip,
             ),
           ),
           const Text(
@@ -754,7 +771,7 @@ class _Header extends StatelessWidget {
                 borderRadius: BorderRadius.circular(99),
               ),
               child: Text(
-                isSpanish ? '3 DE 5' : '3 OF 5',
+                AppLocalizations.of(context).activeCravingRescueStepCounter,
                 style: const TextStyle(
                   color: AppColors.deepTeal,
                   fontSize: 10,
@@ -788,7 +805,7 @@ class _ProgressHeader extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                isSpanish ? 'HERRAMIENTA ACTIVA' : 'ACTIVE TOOL',
+                AppLocalizations.of(context).activeCravingRescueProgressLabel,
                 style: const TextStyle(
                   color: AppColors.tealSecondary,
                   fontSize: 10,
@@ -883,7 +900,8 @@ class _BreathingCard extends StatelessWidget {
                   border: Border.all(color: AppColors.mutedTeal),
                 ),
                 child: Text(
-                  isSpanish ? 'RESPIRACIÓN LENTA' : 'SLOW BREATHING',
+                  AppLocalizations.of(context)
+                      .activeCravingRescueBreathingTitle,
                   style: const TextStyle(
                     color: AppColors.mintStrong,
                     fontSize: 9,
@@ -901,7 +919,8 @@ class _BreathingCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(99),
                 ),
                 child: Text(
-                  '$remainingLabel ${isSpanish ? 'REST.' : 'LEFT'}',
+                  AppLocalizations.of(context)
+                      .activeCravingRescueBreathingTimeLeft(remainingLabel),
                   key: const ValueKey('active-rescue-time-left'),
                   style: const TextStyle(
                     color: Colors.white,
@@ -941,8 +960,10 @@ class _BreathingCard extends StatelessWidget {
                 children: [
                   Text(
                     isInhale
-                        ? (isSpanish ? 'INHALA' : 'BREATHE IN')
-                        : (isSpanish ? 'EXHALA' : 'BREATHE OUT'),
+                        ? (AppLocalizations.of(context)
+                            .activeCravingRescueBreathingInLabel)
+                        : (AppLocalizations.of(context)
+                            .activeCravingRescueBreathingOutLabel),
                     key: const ValueKey('active-rescue-phase'),
                     style: const TextStyle(
                       color: AppColors.deepTeal,
@@ -953,7 +974,8 @@ class _BreathingCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    isSpanish ? 'Lentamente' : 'Slowly',
+                    AppLocalizations.of(context)
+                        .activeCravingRescueBreathingPace,
                     style: const TextStyle(
                       color: AppColors.tealSecondary,
                       fontSize: 12,
@@ -973,7 +995,8 @@ class _BreathingCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    isSpanish ? 'SEGUNDOS' : 'SECONDS',
+                    AppLocalizations.of(context)
+                        .activeCravingRescueBreathingSecondsUnit,
                     style: const TextStyle(
                       color: AppColors.tealSecondary,
                       fontSize: 9,
@@ -988,12 +1011,10 @@ class _BreathingCard extends StatelessWidget {
           const SizedBox(height: 18),
           Text(
             isInhale
-                ? (isSpanish
-                    ? 'Deja que el aire entre suavemente.'
-                    : 'Let the breath come in gently.')
-                : (isSpanish
-                    ? 'Deja que los hombros se relajen al exhalar.'
-                    : 'Let your shoulders soften as you exhale.'),
+                ? (AppLocalizations.of(context)
+                    .activeCravingRescueBreathingInGuide)
+                : (AppLocalizations.of(context)
+                    .activeCravingRescueBreathingOutGuide),
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: Colors.white,
@@ -1006,7 +1027,7 @@ class _BreathingCard extends StatelessWidget {
           Row(
             children: [
               Text(
-                isSpanish ? 'ESTA RESPIRACIÓN' : 'THIS BREATH',
+                AppLocalizations.of(context).activeCravingRescueThisBreathLabel,
                 style: const TextStyle(
                   color: AppColors.mintStrong,
                   fontSize: 9,
@@ -1041,7 +1062,7 @@ class _BreathingCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  isSpanish ? 'Inhala suavemente' : 'Inhale gently',
+                  AppLocalizations.of(context).activeCravingRescueThisBreathIn,
                   style: const TextStyle(
                     color: AppColors.mintStrong,
                     fontSize: 10,
@@ -1049,7 +1070,7 @@ class _BreathingCard extends StatelessWidget {
                 ),
               ),
               Text(
-                isSpanish ? 'Exhala lentamente' : 'Exhale slowly',
+                AppLocalizations.of(context).activeCravingRescueThisBreathOut,
                 style: const TextStyle(
                   color: AppColors.mintStrong,
                   fontSize: 10,
@@ -1065,8 +1086,10 @@ class _BreathingCard extends StatelessWidget {
                   key: const ValueKey('active-rescue-pause'),
                   icon: paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
                   label: paused
-                      ? (isSpanish ? 'Reanudar' : 'Resume')
-                      : (isSpanish ? 'Pausar' : 'Pause'),
+                      ? (AppLocalizations.of(context)
+                          .activeCravingRescueResumeButton)
+                      : (AppLocalizations.of(context)
+                          .activeCravingRescuePauseButton),
                   active: true,
                   onTap: () => onPausedChanged(!paused),
                 ),
@@ -1078,8 +1101,12 @@ class _BreathingCard extends StatelessWidget {
                   icon: voiceEnabled
                       ? Icons.volume_up_outlined
                       : Icons.volume_off_outlined,
-                  label: '${isSpanish ? 'Voz' : 'Voice'}\n'
-                      '${voiceEnabled ? (isSpanish ? 'Sí' : 'On') : (isSpanish ? 'No' : 'Off')}',
+                  label: AppLocalizations.of(context)
+                      .activeCravingRescueVoiceControl(voiceEnabled
+                          ? AppLocalizations.of(context)
+                              .activeCravingRescueControlOn
+                          : AppLocalizations.of(context)
+                              .activeCravingRescueControlOff),
                   active: voiceEnabled,
                   onTap: () => onVoiceChanged(!voiceEnabled),
                 ),
@@ -1089,8 +1116,12 @@ class _BreathingCard extends StatelessWidget {
                 child: _ControlButton(
                   key: const ValueKey('active-rescue-haptics'),
                   icon: Icons.vibration_rounded,
-                  label: '${isSpanish ? 'Hápticos' : 'Haptics'}\n'
-                      '${hapticsEnabled ? (isSpanish ? 'Sí' : 'On') : (isSpanish ? 'No' : 'Off')}',
+                  label: AppLocalizations.of(context)
+                      .activeCravingRescueHapticsControl(hapticsEnabled
+                          ? AppLocalizations.of(context)
+                              .activeCravingRescueControlOn
+                          : AppLocalizations.of(context)
+                              .activeCravingRescueControlOff),
                   active: hapticsEnabled,
                   onTap: () => onHapticsChanged(!hapticsEnabled),
                 ),
@@ -1113,9 +1144,8 @@ class _BreathingCard extends StatelessWidget {
               const SizedBox(width: 7),
               Expanded(
                 child: Text(
-                  isSpanish
-                      ? 'Movimiento reducido sigue la configuración del teléfono'
-                      : 'Reduced motion follows your phone setting',
+                  AppLocalizations.of(context)
+                      .activeCravingRescueReducedMotionNote,
                   style: const TextStyle(
                     color: AppColors.mintStrong,
                     fontSize: 9.5,
@@ -1130,7 +1160,7 @@ class _BreathingCard extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                isSpanish ? 'Sin conexión' : 'Works offline',
+                AppLocalizations.of(context).activeCravingRescueOfflineBadge,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 9.5,
@@ -1203,7 +1233,7 @@ class _MovementCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(99),
                 ),
                 child: Text(
-                  isSpanish ? 'MOVIMIENTO' : 'MOVEMENT',
+                  AppLocalizations.of(context).activeCravingRescueMovementTitle,
                   style: const TextStyle(
                     color: AppColors.mintStrong,
                     fontSize: 9,
@@ -1214,7 +1244,8 @@ class _MovementCard extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                '$remainingLabel ${isSpanish ? 'RESTANTE' : 'LEFT'}',
+                AppLocalizations.of(context)
+                    .activeCravingRescueTimeLeft(remainingLabel),
                 key: const ValueKey('active-rescue-time-left'),
                 style: const TextStyle(
                   color: Colors.white,
@@ -1246,7 +1277,7 @@ class _MovementCard extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Text(
-            isSpanish ? 'MUÉVETE' : 'KEEP MOVING',
+            AppLocalizations.of(context).activeCravingRescueMovementHeadline,
             key: const ValueKey('active-rescue-phase'),
             style: const TextStyle(
               color: Colors.white,
@@ -1257,9 +1288,7 @@ class _MovementCard extends StatelessWidget {
           ),
           const SizedBox(height: 7),
           Text(
-            isSpanish
-                ? 'Camina, estírate o muévete suavemente.'
-                : 'Walk, stretch, or move gently.',
+            AppLocalizations.of(context).activeCravingRescueMovementGuide,
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: AppColors.mintStrong,
@@ -1284,8 +1313,10 @@ class _MovementCard extends StatelessWidget {
                   key: const ValueKey('active-rescue-pause'),
                   icon: paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
                   label: paused
-                      ? (isSpanish ? 'Reanudar' : 'Resume')
-                      : (isSpanish ? 'Pausar' : 'Pause'),
+                      ? (AppLocalizations.of(context)
+                          .activeCravingRescueResumeButton)
+                      : (AppLocalizations.of(context)
+                          .activeCravingRescuePauseButton),
                   active: paused,
                   onTap: () => onPausedChanged(!paused),
                 ),
@@ -1298,8 +1329,10 @@ class _MovementCard extends StatelessWidget {
                       ? Icons.volume_up_rounded
                       : Icons.volume_off_rounded,
                   label: voiceEnabled
-                      ? (isSpanish ? 'Voz ON' : 'Voice ON')
-                      : (isSpanish ? 'Voz OFF' : 'Voice OFF'),
+                      ? (AppLocalizations.of(context)
+                          .activeCravingRescueMovementVoiceOn)
+                      : (AppLocalizations.of(context)
+                          .activeCravingRescueMovementVoiceOff),
                   active: voiceEnabled,
                   onTap: () => onVoiceChanged(!voiceEnabled),
                 ),
@@ -1312,8 +1345,10 @@ class _MovementCard extends StatelessWidget {
                       ? Icons.vibration_rounded
                       : Icons.smartphone_rounded,
                   label: hapticsEnabled
-                      ? (isSpanish ? 'Hápticos ON' : 'Haptics ON')
-                      : (isSpanish ? 'Hápticos OFF' : 'Haptics OFF'),
+                      ? (AppLocalizations.of(context)
+                          .activeCravingRescueMovementHapticsOn)
+                      : (AppLocalizations.of(context)
+                          .activeCravingRescueMovementHapticsOff),
                   active: hapticsEnabled,
                   onTap: () => onHapticsChanged(!hapticsEnabled),
                 ),
@@ -1377,7 +1412,8 @@ class _ChangeSceneCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(99),
                 ),
                 child: Text(
-                  isSpanish ? 'CAMBIA DE ENTORNO' : 'CHANGE THE SCENE',
+                  AppLocalizations.of(context)
+                      .activeCravingRescueChangeSceneTitle,
                   style: const TextStyle(
                     color: AppColors.mintStrong,
                     fontSize: 9,
@@ -1388,7 +1424,8 @@ class _ChangeSceneCard extends StatelessWidget {
               ),
               const Spacer(),
               Text(
-                '$remainingLabel ${isSpanish ? 'RESTANTE' : 'LEFT'}',
+                AppLocalizations.of(context)
+                    .activeCravingRescueTimeLeft(remainingLabel),
                 key: const ValueKey('active-rescue-time-left'),
                 style: const TextStyle(
                   color: Colors.white,
@@ -1420,7 +1457,7 @@ class _ChangeSceneCard extends StatelessWidget {
           ),
           const SizedBox(height: 22),
           Text(
-            isSpanish ? 'CAMBIA EL ENTORNO' : 'CHANGE YOUR SURROUNDINGS',
+            AppLocalizations.of(context).activeCravingRescueChangeSceneHeadline,
             key: const ValueKey('active-rescue-phase'),
             textAlign: TextAlign.center,
             style: const TextStyle(
@@ -1432,9 +1469,7 @@ class _ChangeSceneCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            isSpanish
-                ? 'Ve a otro lugar sin humo y cambia lo que estás haciendo.'
-                : 'Go somewhere smoke-free and change what you are doing.',
+            AppLocalizations.of(context).activeCravingRescueChangeSceneGuide,
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: AppColors.mintStrong,
@@ -1459,8 +1494,10 @@ class _ChangeSceneCard extends StatelessWidget {
                   key: const ValueKey('active-rescue-pause'),
                   icon: paused ? Icons.play_arrow_rounded : Icons.pause_rounded,
                   label: paused
-                      ? (isSpanish ? 'Reanudar' : 'Resume')
-                      : (isSpanish ? 'Pausar' : 'Pause'),
+                      ? (AppLocalizations.of(context)
+                          .activeCravingRescueResumeButton)
+                      : (AppLocalizations.of(context)
+                          .activeCravingRescuePauseButton),
                   active: paused,
                   onTap: () => onPausedChanged(!paused),
                 ),
@@ -1473,8 +1510,10 @@ class _ChangeSceneCard extends StatelessWidget {
                       ? Icons.volume_up_rounded
                       : Icons.volume_off_rounded,
                   label: voiceEnabled
-                      ? (isSpanish ? 'Voz ON' : 'Voice ON')
-                      : (isSpanish ? 'Voz OFF' : 'Voice OFF'),
+                      ? (AppLocalizations.of(context)
+                          .activeCravingRescueMovementVoiceOn)
+                      : (AppLocalizations.of(context)
+                          .activeCravingRescueMovementVoiceOff),
                   active: voiceEnabled,
                   onTap: () => onVoiceChanged(!voiceEnabled),
                 ),
@@ -1487,8 +1526,10 @@ class _ChangeSceneCard extends StatelessWidget {
                       ? Icons.vibration_rounded
                       : Icons.smartphone_rounded,
                   label: hapticsEnabled
-                      ? (isSpanish ? 'Hápticos ON' : 'Haptics ON')
-                      : (isSpanish ? 'Hápticos OFF' : 'Haptics OFF'),
+                      ? (AppLocalizations.of(context)
+                          .activeCravingRescueMovementHapticsOn)
+                      : (AppLocalizations.of(context)
+                          .activeCravingRescueMovementHapticsOff),
                   active: hapticsEnabled,
                   onTap: () => onHapticsChanged(!hapticsEnabled),
                 ),
@@ -1575,7 +1616,7 @@ class _EncouragementCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            isSpanish ? 'El antojo es una ola.' : 'The urge is a wave.',
+            AppLocalizations.of(context).activeCravingRescueEncouragementTitle,
             style: const TextStyle(
               color: AppColors.deepTeal,
               fontSize: 18,
@@ -1584,9 +1625,7 @@ class _EncouragementCard extends StatelessWidget {
           ),
           const SizedBox(height: 7),
           Text(
-            isSpanish
-                ? 'Puedes dejar que suba y pase sin fumar.'
-                : 'You can let it rise and pass without smoking.',
+            AppLocalizations.of(context).activeCravingRescueEncouragementBody,
             style: const TextStyle(
               color: AppColors.deepTeal,
               fontSize: 13,
@@ -1596,9 +1635,7 @@ class _EncouragementCard extends StatelessWidget {
           ),
           const SizedBox(height: 5),
           Text(
-            isSpanish
-                ? 'Solo necesitas quedarte con esta respiración, no resolver todo el día.'
-                : 'You only need to stay with this breath—not solve the whole day.',
+            AppLocalizations.of(context).activeCravingRescueEncouragementNote,
             style: const TextStyle(
               color: AppColors.tealSecondary,
               fontSize: 12,
@@ -1635,9 +1672,7 @@ class _AlternateSupportCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            isSpanish
-                ? '¿Necesitas otro tipo de apoyo ahora?'
-                : 'Need different support right now?',
+            AppLocalizations.of(context).activeCravingRescueOtherSupportTitle,
             style: const TextStyle(
               color: AppColors.deepTeal,
               fontSize: 18,
@@ -1646,9 +1681,7 @@ class _AlternateSupportCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            isSpanish
-                ? 'Puedes cambiar de herramienta sin perder este registro.'
-                : 'You can change tools without losing this check-in.',
+            AppLocalizations.of(context).activeCravingRescueOtherSupportBody,
             style: const TextStyle(
               color: AppColors.tealSecondary,
               fontSize: 12.5,
@@ -1663,7 +1696,8 @@ class _AlternateSupportCard extends StatelessWidget {
               onPressed: onSwitchTool,
               icon: const Icon(Icons.swap_horiz_rounded),
               label: Text(
-                isSpanish ? 'Cambiar herramienta' : 'Switch coping tool',
+                AppLocalizations.of(context)
+                    .activeCravingRescueSwitchToolButton,
               ),
             ),
           ),
@@ -1679,9 +1713,8 @@ class _AlternateSupportCard extends StatelessWidget {
               ),
               icon: const Icon(Icons.people_outline_rounded),
               label: Text(
-                isSpanish
-                    ? 'Obtener apoyo de una persona'
-                    : 'Get support from a person',
+                AppLocalizations.of(context)
+                    .activeCravingRescuePersonSupportButton,
               ),
             ),
           ),

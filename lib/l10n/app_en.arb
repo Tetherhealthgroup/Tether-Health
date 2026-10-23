@@ -1,5 +1,285 @@
 {
   "@@locale": "en",
+  "activeCravingRescueBreathingInGuide": "Let the breath come in gently.",
+  "@activeCravingRescueBreathingInGuide": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Guidance line while breathing in"
+  },
+  "activeCravingRescueBreathingInLabel": "BREATHE IN",
+  "@activeCravingRescueBreathingInLabel": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Big label in the breathing circle while breathing in"
+  },
+  "activeCravingRescueBreathingOutGuide": "Let your shoulders soften as you exhale.",
+  "@activeCravingRescueBreathingOutGuide": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Guidance line while breathing out"
+  },
+  "activeCravingRescueBreathingOutLabel": "BREATHE OUT",
+  "@activeCravingRescueBreathingOutLabel": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Big label in the breathing circle while breathing out"
+  },
+  "activeCravingRescueBreathingPace": "Slowly",
+  "@activeCravingRescueBreathingPace": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Word under the circle label: breathe slowly"
+  },
+  "activeCravingRescueBreathingSecondsUnit": "SECONDS",
+  "@activeCravingRescueBreathingSecondsUnit": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Unit under the seconds countdown in the circle"
+  },
+  "activeCravingRescueBreathingTimeLeft": "{time} LEFT",
+  "@activeCravingRescueBreathingTimeLeft": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Time left on the breathing card ({time} is minutes:seconds); short form",
+    "placeholders": {
+      "time": {
+        "type": "Object"
+      }
+    }
+  },
+  "activeCravingRescueBreathingTitle": "SLOW BREATHING",
+  "@activeCravingRescueBreathingTitle": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Title of the breathing card"
+  },
+  "activeCravingRescueChangeSceneGuide": "Go somewhere smoke-free and change what you are doing.",
+  "@activeCravingRescueChangeSceneGuide": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Guidance on the change-the-scene card"
+  },
+  "activeCravingRescueChangeSceneHeadline": "CHANGE YOUR SURROUNDINGS",
+  "@activeCravingRescueChangeSceneHeadline": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Big instruction on the change-the-scene card"
+  },
+  "activeCravingRescueChangeSceneTitle": "CHANGE THE SCENE",
+  "@activeCravingRescueChangeSceneTitle": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Title of the change-the-scene card"
+  },
+  "activeCravingRescueCloseTooltip": "Close",
+  "@activeCravingRescueCloseTooltip": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Tooltip and accessibility label of the header close button"
+  },
+  "activeCravingRescueControlOff": "Off",
+  "@activeCravingRescueControlOff": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: State shown under the voice or haptics control when it is off"
+  },
+  "activeCravingRescueControlOn": "On",
+  "@activeCravingRescueControlOn": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: State shown under the voice or haptics control when it is on"
+  },
+  "activeCravingRescueEncouragementBody": "You can let it rise and pass without smoking.",
+  "@activeCravingRescueEncouragementBody": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Encouragement card text: let the urge pass without smoking"
+  },
+  "activeCravingRescueEncouragementNote": "You only need to stay with this breath—not solve the whole day.",
+  "@activeCravingRescueEncouragementNote": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Encouragement card note: stay with this breath"
+  },
+  "activeCravingRescueEncouragementTitle": "The urge is a wave.",
+  "@activeCravingRescueEncouragementTitle": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Encouragement card: the urge is a wave"
+  },
+  "activeCravingRescueEndButton": "End exercise",
+  "@activeCravingRescueEndButton": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Button that ends the exercise"
+  },
+  "activeCravingRescueEndDialogBody": "You can rate the craving again next.",
+  "@activeCravingRescueEndDialogBody": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Dialog text: the craving can be rated again next"
+  },
+  "activeCravingRescueEndDialogCancel": "Keep practicing",
+  "@activeCravingRescueEndDialogCancel": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Dialog button that keeps practicing"
+  },
+  "activeCravingRescueEndDialogConfirm": "End and recheck",
+  "@activeCravingRescueEndDialogConfirm": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Dialog button that ends the exercise and goes to the recheck"
+  },
+  "activeCravingRescueEndDialogTitle": "End the exercise now?",
+  "@activeCravingRescueEndDialogTitle": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Title of the dialog that asks whether to end the exercise"
+  },
+  "activeCravingRescueHapticsControl": "Haptics\n{state}",
+  "@activeCravingRescueHapticsControl": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Vibration control button: the word Haptics and, on a second line, its state ({state} is on or off)",
+    "placeholders": {
+      "state": {
+        "type": "Object"
+      }
+    }
+  },
+  "activeCravingRescueIntro": "Follow the circle—or breathe slowly in your own way.",
+  "@activeCravingRescueIntro": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Text under the title: follow the circle or breathe slowly"
+  },
+  "activeCravingRescueLeaveDialogBody": "Your progress will be kept so you can return.",
+  "@activeCravingRescueLeaveDialogBody": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Dialog text: progress is kept"
+  },
+  "activeCravingRescueLeaveDialogLeave": "Save and leave",
+  "@activeCravingRescueLeaveDialogLeave": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Dialog button that saves and leaves"
+  },
+  "activeCravingRescueLeaveDialogStay": "Keep breathing",
+  "@activeCravingRescueLeaveDialogStay": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Dialog button that stays and keeps breathing"
+  },
+  "activeCravingRescueLeaveDialogTitle": "Leave this exercise?",
+  "@activeCravingRescueLeaveDialogTitle": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Title of the dialog that asks whether to leave the exercise"
+  },
+  "activeCravingRescueMovementGuide": "Walk, stretch, or move gently.",
+  "@activeCravingRescueMovementGuide": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Guidance on the movement card"
+  },
+  "activeCravingRescueMovementHapticsOff": "Haptics OFF",
+  "@activeCravingRescueMovementHapticsOff": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Vibration control on the movement card when vibration is off"
+  },
+  "activeCravingRescueMovementHapticsOn": "Haptics ON",
+  "@activeCravingRescueMovementHapticsOn": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Vibration control on the movement card when vibration is on"
+  },
+  "activeCravingRescueMovementHeadline": "KEEP MOVING",
+  "@activeCravingRescueMovementHeadline": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Big instruction on the movement card"
+  },
+  "activeCravingRescueMovementTitle": "MOVEMENT",
+  "@activeCravingRescueMovementTitle": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Title of the movement card"
+  },
+  "activeCravingRescueMovementVoiceOff": "Voice OFF",
+  "@activeCravingRescueMovementVoiceOff": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Voice control on the movement card when voice is off"
+  },
+  "activeCravingRescueMovementVoiceOn": "Voice ON",
+  "@activeCravingRescueMovementVoiceOn": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Voice control on the movement card when voice is on"
+  },
+  "activeCravingRescueOfflineBadge": "Works offline",
+  "@activeCravingRescueOfflineBadge": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Badge: the breathing tool works offline"
+  },
+  "activeCravingRescueOtherSupportBody": "You can change tools without losing this check-in.",
+  "@activeCravingRescueOtherSupportBody": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Card text: tools can be changed without losing the check-in"
+  },
+  "activeCravingRescueOtherSupportTitle": "Need different support right now?",
+  "@activeCravingRescueOtherSupportTitle": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Title of the card offering different support"
+  },
+  "activeCravingRescuePauseButton": "Pause",
+  "@activeCravingRescuePauseButton": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Button that pauses the exercise"
+  },
+  "activeCravingRescuePersonSupportButton": "Get support from a person",
+  "@activeCravingRescuePersonSupportButton": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Button that opens support from a person"
+  },
+  "activeCravingRescuePrivacyNote": "No data is being sent or shared during this exercise.\nContent v1.0",
+  "@activeCravingRescuePrivacyNote": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Privacy note: no data is sent or shared during the exercise (two lines)"
+  },
+  "activeCravingRescueProgressLabel": "ACTIVE TOOL",
+  "@activeCravingRescueProgressLabel": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Label of the progress bar: the active tool"
+  },
+  "activeCravingRescueRecheckNote": "After 2 minutes, you’ll rate the craving again",
+  "@activeCravingRescueRecheckNote": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Note: after 2 minutes the member rates the craving again"
+  },
+  "activeCravingRescueReducedMotionNote": "Reduced motion follows your phone setting",
+  "@activeCravingRescueReducedMotionNote": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Note: reduced motion follows the phone setting"
+  },
+  "activeCravingRescueResumeButton": "Resume",
+  "@activeCravingRescueResumeButton": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Button that resumes the paused exercise"
+  },
+  "activeCravingRescueSpokenBreatheIn": "Breathe in slowly",
+  "@activeCravingRescueSpokenBreatheIn": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Spoken aloud: breathe in slowly"
+  },
+  "activeCravingRescueSpokenBreatheOut": "Breathe out slowly",
+  "@activeCravingRescueSpokenBreatheOut": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Spoken aloud: breathe out slowly"
+  },
+  "activeCravingRescueSpokenKeepMoving": "Keep moving",
+  "@activeCravingRescueSpokenKeepMoving": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Spoken aloud every 30 seconds during movement"
+  },
+  "activeCravingRescueSpokenMovementDone": "Great job. You completed three minutes.",
+  "@activeCravingRescueSpokenMovementDone": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Spoken aloud when the three-minute movement is complete"
+  },
+  "activeCravingRescueSpokenMovementStart": "Start moving",
+  "@activeCravingRescueSpokenMovementStart": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Spoken aloud at the start of the movement exercise"
+  },
+  "activeCravingRescueSpokenOneMinuteLeft": "One minute left",
+  "@activeCravingRescueSpokenOneMinuteLeft": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Spoken aloud: one minute left"
+  },
+  "activeCravingRescueSpokenSceneDone": "Great job. You changed your surroundings.",
+  "@activeCravingRescueSpokenSceneDone": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Spoken aloud when the change of scene is complete"
+  },
+  "activeCravingRescueSpokenSceneEncouragement": "Keep going. You are making a positive change.",
+  "@activeCravingRescueSpokenSceneEncouragement": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Spoken aloud near the end of changing the scene"
+  },
+  "activeCravingRescueSpokenSceneHalfway": "You are halfway there. Keep going.",
+  "@activeCravingRescueSpokenSceneHalfway": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Spoken aloud halfway through changing the scene"
+  },
+  "activeCravingRescueSpokenSceneKeepGoing": "Keep moving to a smoke-free place.",
+  "@activeCravingRescueSpokenSceneKeepGoing": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Spoken aloud while changing the scene"
+  },
+  "activeCravingRescueSpokenTenSecondsLeft": "Ten seconds left",
+  "@activeCravingRescueSpokenTenSecondsLeft": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Spoken aloud: ten seconds left"
+  },
+  "activeCravingRescueSpokenThirtySecondsLeft": "Thirty seconds left",
+  "@activeCravingRescueSpokenThirtySecondsLeft": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Spoken aloud: thirty seconds left"
+  },
+  "activeCravingRescueStepCounter": "3 OF 5",
+  "@activeCravingRescueStepCounter": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Step counter in the header: step 3 of 5 of the rescue"
+  },
+  "activeCravingRescueSwitchToolButton": "Switch coping tool",
+  "@activeCravingRescueSwitchToolButton": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Button that switches to another coping tool"
+  },
+  "activeCravingRescueThisBreathIn": "Inhale gently",
+  "@activeCravingRescueThisBreathIn": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Progress-bar caption while breathing in"
+  },
+  "activeCravingRescueThisBreathLabel": "THIS BREATH",
+  "@activeCravingRescueThisBreathLabel": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Label of the progress bar for the current breath"
+  },
+  "activeCravingRescueThisBreathOut": "Exhale slowly",
+  "@activeCravingRescueThisBreathOut": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Progress-bar caption while breathing out"
+  },
+  "activeCravingRescueTimeLeft": "{time} LEFT",
+  "@activeCravingRescueTimeLeft": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Time left on the movement and change-the-scene cards ({time} is minutes:seconds)",
+    "placeholders": {
+      "time": {
+        "type": "Object"
+      }
+    }
+  },
+  "activeCravingRescueTitle": "Stay with this moment.",
+  "@activeCravingRescueTitle": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Screen title: stay with this moment"
+  },
+  "activeCravingRescueVoiceControl": "Voice\n{state}",
+  "@activeCravingRescueVoiceControl": {
+    "description": "lib/screens/active_craving_rescue_screen.dart: Voice control button: the word Voice and, on a second line, its state ({state} is on or off)",
+    "placeholders": {
+      "state": {
+        "type": "Object"
+      }
+    }
+  },
   "baselineAssessmentBackTooltip": "Back",
   "@baselineAssessmentBackTooltip": {
     "description": "lib/screens/baseline_assessment_screen.dart: Tooltip and accessibility label of the header back button"
@@ -252,6 +532,413 @@
   "consentPrivacyTrustNoteNoSale": "We never sell patient health information.",
   "@consentPrivacyTrustNoteNoSale": {
     "description": "lib/screens/consent_privacy_screen.dart: Trust note: health information is never sold"
+  },
+  "cravingRescueStartBackTooltip": "Go back",
+  "@cravingRescueStartBackTooltip": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Tooltip and accessibility label of the header back button"
+  },
+  "cravingRescueStartCallFailed": "Could not open the Phone app.",
+  "@cravingRescueStartCallFailed": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Message when the phone app could not be opened"
+  },
+  "cravingRescueStartContextAfterMeal": "After a meal",
+  "@cravingRescueStartContextAfterMeal": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Context option: after a meal"
+  },
+  "cravingRescueStartContextAlcohol": "Alcohol",
+  "@cravingRescueStartContextAlcohol": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Context option: alcohol"
+  },
+  "cravingRescueStartContextAroundSmoking": "Around someone smoking",
+  "@cravingRescueStartContextAroundSmoking": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Context option: around someone smoking"
+  },
+  "cravingRescueStartContextBored": "Bored",
+  "@cravingRescueStartContextBored": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Context option: bored"
+  },
+  "cravingRescueStartContextDriving": "Driving",
+  "@cravingRescueStartContextDriving": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Context option: driving"
+  },
+  "cravingRescueStartContextNotSure": "Not sure",
+  "@cravingRescueStartContextNotSure": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Context option: not sure"
+  },
+  "cravingRescueStartContextNote": "Trigger details are optional and never block Rescue.",
+  "@cravingRescueStartContextNote": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Note: trigger details are optional"
+  },
+  "cravingRescueStartContextOptional": "Optional · Skip anytime",
+  "@cravingRescueStartContextOptional": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Note next to the question: optional"
+  },
+  "cravingRescueStartContextQuestion": "What might be behind it?",
+  "@cravingRescueStartContextQuestion": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Question: what might be behind the craving"
+  },
+  "cravingRescueStartContextStress": "Stress",
+  "@cravingRescueStartContextStress": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Context option: stress"
+  },
+  "cravingRescueStartContinueButton": "Show me what to do",
+  "@cravingRescueStartContinueButton": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Main button that shows what to do"
+  },
+  "cravingRescueStartEmergencyCallButton": "Call 911",
+  "@cravingRescueStartEmergencyCallButton": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Button that calls emergency services (911)"
+  },
+  "cravingRescueStartEmergencyCloseButton": "Close",
+  "@cravingRescueStartEmergencyCloseButton": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Button that closes the emergency sheet"
+  },
+  "cravingRescueStartEmergencyLink": "Medical emergency?",
+  "@cravingRescueStartEmergencyLink": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Link that opens emergency guidance"
+  },
+  "cravingRescueStartEmergencySheetBody": "If this is a medical emergency or you are in immediate danger, call 911 now.",
+  "@cravingRescueStartEmergencySheetBody": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Sheet text: what to do in an emergency"
+  },
+  "cravingRescueStartEmergencySheetNote": "BreatheFree will only start a call when you tap “Call 911.”",
+  "@cravingRescueStartEmergencySheetNote": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Sheet text: a call starts only when the member taps the call button"
+  },
+  "cravingRescueStartEmergencySheetTitle": "Medical emergency",
+  "@cravingRescueStartEmergencySheetTitle": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Title of the emergency guidance sheet"
+  },
+  "cravingRescueStartEyebrow": "RIGHT NOW",
+  "@cravingRescueStartEyebrow": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Small label above the title"
+  },
+  "cravingRescueStartHeaderTitle": "Craving Rescue",
+  "@cravingRescueStartHeaderTitle": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Header title: craving rescue"
+  },
+  "cravingRescueStartIntensityHint": "You only need to choose a number.",
+  "@cravingRescueStartIntensityHint": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Hint: only a number is needed"
+  },
+  "cravingRescueStartIntensityMaxLabel": "Strongest",
+  "@cravingRescueStartIntensityMaxLabel": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Label at the strongest end of the scale"
+  },
+  "cravingRescueStartIntensityMild": "Mild",
+  "@cravingRescueStartIntensityMild": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Intensity word for a rating of 0 to 3"
+  },
+  "cravingRescueStartIntensityModerate": "Moderate",
+  "@cravingRescueStartIntensityModerate": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Intensity word for a rating of 4 to 6"
+  },
+  "cravingRescueStartIntensityNext": "The next screen gives one recommended action.",
+  "@cravingRescueStartIntensityNext": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Note: the next screen gives one recommended action"
+  },
+  "cravingRescueStartIntensityQuestion": "How strong is it right now?",
+  "@cravingRescueStartIntensityQuestion": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Question on the intensity card"
+  },
+  "cravingRescueStartIntensityStrong": "Strong",
+  "@cravingRescueStartIntensityStrong": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Intensity word for a rating of 7 or 8"
+  },
+  "cravingRescueStartIntensityTitle": "CRAVING INTENSITY",
+  "@cravingRescueStartIntensityTitle": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Title of the craving-intensity card"
+  },
+  "cravingRescueStartIntensityVeryStrong": "Very strong",
+  "@cravingRescueStartIntensityVeryStrong": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Intensity word for a rating of 9 or 10"
+  },
+  "cravingRescueStartIntro": "Start with what you feel now. No typing is required.",
+  "@cravingRescueStartIntro": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Text under the title"
+  },
+  "cravingRescueStartOfflineBadge": "OFFLINE READY",
+  "@cravingRescueStartOfflineBadge": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Badge in the header: works offline"
+  },
+  "cravingRescueStartPrivacyNoteBody": "Used to personalize support — never to monitor you.\n",
+  "@cravingRescueStartPrivacyNoteBody": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Privacy note, first line: used to personalize support, never to monitor"
+  },
+  "cravingRescueStartPrivacyNoteTracking": "No background location or conversation tracking.",
+  "@cravingRescueStartPrivacyNoteTracking": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Privacy note, second line: no location or conversation tracking"
+  },
+  "cravingRescueStartPrivateOffline": "Private · Works offline",
+  "@cravingRescueStartPrivateOffline": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Note: private and works offline"
+  },
+  "cravingRescueStartSupportBody": "Contact {supportName} or a trained quitline counselor.",
+  "@cravingRescueStartSupportBody": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Card text: contact the support person ({supportName}) or a quitline counselor",
+    "placeholders": {
+      "supportName": {
+        "type": "Object"
+      }
+    }
+  },
+  "cravingRescueStartSupportButton": "View support",
+  "@cravingRescueStartSupportButton": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Button that opens support"
+  },
+  "cravingRescueStartSupportNote": "Messages and calls only happen when you choose them.",
+  "@cravingRescueStartSupportNote": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Note: messages and calls only happen when the member chooses"
+  },
+  "cravingRescueStartSupportTitle": "Want a person instead?",
+  "@cravingRescueStartSupportTitle": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Title of the card offering a person instead"
+  },
+  "cravingRescueStartTitle": "Let’s get through this moment.",
+  "@cravingRescueStartTitle": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Screen title"
+  },
+  "cravingRescueStartTopReasonLabel": "YOUR TOP REASON",
+  "@cravingRescueStartTopReasonLabel": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Label of the card showing the member’s top reason"
+  },
+  "cravingRescueStartTopReasonNote": "This moment can pass without changing your goal.",
+  "@cravingRescueStartTopReasonNote": {
+    "description": "lib/screens/craving_rescue_start_screen.dart: Card text: this moment can pass"
+  },
+  "guidedStressResetBreathCount": "Breath {number} of 10",
+  "@guidedStressResetBreathCount": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Breath counter: breath number ({number}) of 10",
+    "placeholders": {
+      "number": {
+        "type": "Object"
+      }
+    }
+  },
+  "guidedStressResetBreatheEyebrow": "SLOW BREATHING",
+  "@guidedStressResetBreatheEyebrow": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Small label above the instruction in the breathing step"
+  },
+  "guidedStressResetBreatheInInstruction": "Slowly breathe in through your nose.",
+  "@guidedStressResetBreatheInInstruction": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Instruction while breathing in; also spoken aloud"
+  },
+  "guidedStressResetBreatheOutInstruction": "Slowly breathe out through your mouth.",
+  "@guidedStressResetBreatheOutInstruction": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Instruction while breathing out; also spoken aloud"
+  },
+  "guidedStressResetCircleBreatheIn": "BREATHE IN",
+  "@guidedStressResetCircleBreatheIn": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Label in the exercise circle while breathing in"
+  },
+  "guidedStressResetCircleBreatheOut": "BREATHE OUT",
+  "@guidedStressResetCircleBreatheOut": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Label in the exercise circle while breathing out"
+  },
+  "guidedStressResetCircleDrinkWater": "DRINK WATER",
+  "@guidedStressResetCircleDrinkWater": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Label in the exercise circle during the water step"
+  },
+  "guidedStressResetCircleSecondsUnit": "SECONDS",
+  "@guidedStressResetCircleSecondsUnit": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Unit under the seconds countdown in the circle"
+  },
+  "guidedStressResetCloseTooltip": "Close",
+  "@guidedStressResetCloseTooltip": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Tooltip and accessibility label of the header close button"
+  },
+  "guidedStressResetEndButton": "End exercise",
+  "@guidedStressResetEndButton": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Button that ends the exercise"
+  },
+  "guidedStressResetEndDialogBody": "Your time and completed steps will still be saved.",
+  "@guidedStressResetEndDialogBody": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Dialog text: time and finished steps are saved"
+  },
+  "guidedStressResetEndDialogCancel": "Keep practicing",
+  "@guidedStressResetEndDialogCancel": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Dialog button that keeps practicing"
+  },
+  "guidedStressResetEndDialogConfirm": "End and review",
+  "@guidedStressResetEndDialogConfirm": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Dialog button that ends the exercise and goes to the review"
+  },
+  "guidedStressResetEndDialogTitle": "End the exercise now?",
+  "@guidedStressResetEndDialogTitle": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Title of the dialog that asks whether to end the exercise"
+  },
+  "guidedStressResetFinishButton": "Finish",
+  "@guidedStressResetFinishButton": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Button on the last step that finishes the exercise"
+  },
+  "guidedStressResetFollowHint": "Follow the circle, listen, or use the countdown.",
+  "@guidedStressResetFollowHint": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Hint: follow the circle, listen or use the countdown"
+  },
+  "guidedStressResetFullMotionOn": "Full motion on",
+  "@guidedStressResetFullMotionOn": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Motion control when full motion is on"
+  },
+  "guidedStressResetHeaderTitle": "Stress reset",
+  "@guidedStressResetHeaderTitle": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Header title: stress reset"
+  },
+  "guidedStressResetLeaveDialogBody": "Your partial progress will be saved so you can continue later.",
+  "@guidedStressResetLeaveDialogBody": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Dialog text: partial progress is saved"
+  },
+  "guidedStressResetLeaveDialogLeave": "Save and leave",
+  "@guidedStressResetLeaveDialogLeave": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Dialog button that saves and leaves"
+  },
+  "guidedStressResetLeaveDialogStay": "Continue exercise",
+  "@guidedStressResetLeaveDialogStay": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Dialog button that continues the exercise"
+  },
+  "guidedStressResetLeaveDialogTitle": "Leave the exercise?",
+  "@guidedStressResetLeaveDialogTitle": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Title of the dialog that asks whether to leave the exercise"
+  },
+  "guidedStressResetPauseButton": "Pause exercise",
+  "@guidedStressResetPauseButton": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Button that pauses the exercise"
+  },
+  "guidedStressResetReducedMotionOn": "Reduced motion on",
+  "@guidedStressResetReducedMotionOn": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Motion control when reduced motion is on"
+  },
+  "guidedStressResetRescueButton": "Open Rescue",
+  "@guidedStressResetRescueButton": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Button that opens craving rescue"
+  },
+  "guidedStressResetRescueTitle": "Craving getting stronger?",
+  "@guidedStressResetRescueTitle": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Card question: is the craving getting stronger"
+  },
+  "guidedStressResetResumeButton": "Resume exercise",
+  "@guidedStressResetResumeButton": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Button that resumes the paused exercise"
+  },
+  "guidedStressResetSavedNote": "Partial completion is saved · Works offline",
+  "@guidedStressResetSavedNote": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Note: partial completion is saved and the exercise works offline"
+  },
+  "guidedStressResetSequenceBreathe": "Breathe",
+  "@guidedStressResetSequenceBreathe": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Step in the exercise sequence: breathe"
+  },
+  "guidedStressResetSequenceDone": "DONE",
+  "@guidedStressResetSequenceDone": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Status of a finished step in the sequence"
+  },
+  "guidedStressResetSequenceNext": "NEXT",
+  "@guidedStressResetSequenceNext": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Status of a coming step in the sequence"
+  },
+  "guidedStressResetSequenceNote": "The timer pauses automatically if you leave this screen.",
+  "@guidedStressResetSequenceNote": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Note: the timer pauses when the member leaves the screen"
+  },
+  "guidedStressResetSequenceNow": "NOW",
+  "@guidedStressResetSequenceNow": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Status of the current step in the sequence"
+  },
+  "guidedStressResetSequenceSwitch": "Switch",
+  "@guidedStressResetSequenceSwitch": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Step in the exercise sequence: switch activities"
+  },
+  "guidedStressResetSequenceTitle": "Exercise sequence",
+  "@guidedStressResetSequenceTitle": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Title of the exercise sequence list"
+  },
+  "guidedStressResetSequenceWater": "Water",
+  "@guidedStressResetSequenceWater": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Step in the exercise sequence: water"
+  },
+  "guidedStressResetSkipButton": "Skip step",
+  "@guidedStressResetSkipButton": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Button that skips to the next step"
+  },
+  "guidedStressResetSpokenSwitch": "Switch what you are doing. Walk, play music, or start one quick task.",
+  "@guidedStressResetSpokenSwitch": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Spoken aloud in the switch-activities step"
+  },
+  "guidedStressResetStepCounter": "STEP {step} OF 3 · {name}",
+  "@guidedStressResetStepCounter": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Step counter: step number ({step}) of 3 and the step name ({name})",
+    "placeholders": {
+      "step": {
+        "type": "Object"
+      },
+      "name": {
+        "type": "Object"
+      }
+    }
+  },
+  "guidedStressResetStepNameBreathe": "BREATHE",
+  "@guidedStressResetStepNameBreathe": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Step name in the step counter (upper case): breathe"
+  },
+  "guidedStressResetStepNameSwitch": "SWITCH",
+  "@guidedStressResetStepNameSwitch": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Step name in the step counter (upper case): switch activities"
+  },
+  "guidedStressResetStepNameWater": "WATER",
+  "@guidedStressResetStepNameWater": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Step name in the step counter (upper case): water"
+  },
+  "guidedStressResetSwitchEyebrow": "SWITCH ACTIVITIES",
+  "@guidedStressResetSwitchEyebrow": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Small label above the instruction in the switch-activities step"
+  },
+  "guidedStressResetSwitchInstruction": "Walk, play music, or start one quick task.",
+  "@guidedStressResetSwitchInstruction": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Instruction in the switch-activities step"
+  },
+  "guidedStressResetSwitchTitle": "Switch what you are doing",
+  "@guidedStressResetSwitchTitle": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Title of the switch-activities step"
+  },
+  "guidedStressResetTimeLeft": "{time} LEFT",
+  "@guidedStressResetTimeLeft": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Time left in the step ({time} is minutes:seconds)",
+    "placeholders": {
+      "time": {
+        "type": "Object"
+      }
+    }
+  },
+  "guidedStressResetVoiceGuidanceOff": "Voice guidance off",
+  "@guidedStressResetVoiceGuidanceOff": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Voice guidance control when it is off"
+  },
+  "guidedStressResetVoiceGuidanceOn": "Voice guidance on",
+  "@guidedStressResetVoiceGuidanceOn": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Voice guidance control when it is on"
+  },
+  "guidedStressResetVoiceToggleLabel": "Voice guidance",
+  "@guidedStressResetVoiceToggleLabel": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Accessibility label of the voice guidance toggle in the header"
+  },
+  "guidedStressResetVoiceToggleOff": "VOICE OFF",
+  "@guidedStressResetVoiceToggleOff": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Voice toggle in the header when voice guidance is off"
+  },
+  "guidedStressResetVoiceToggleOn": "VOICE ON",
+  "@guidedStressResetVoiceToggleOn": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Voice toggle in the header when voice guidance is on"
+  },
+  "guidedStressResetWaterEyebrow": "WATER BREAK",
+  "@guidedStressResetWaterEyebrow": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Small label above the instruction in the water step"
+  },
+  "guidedStressResetWaterInstruction": "Sip slowly and notice the temperature.",
+  "@guidedStressResetWaterInstruction": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Instruction in the water step; also spoken aloud"
+  },
+  "guidedStressResetWaterTitle": "Drink a glass of water",
+  "@guidedStressResetWaterTitle": {
+    "description": "lib/screens/guided_stress_reset_screen.dart: Title of the water step"
   },
   "myReasonsBackTooltip": "Back",
   "@myReasonsBackTooltip": {
@@ -605,14 +1292,14 @@
   "@readinessResultTriggersLabel": {
     "description": "lib/screens/readiness_result_screen.dart: Label in the summary card: the triggers"
   },
-  "readinessResultTriggersMany": "{value}, {value2}, and {remaining} more",
+  "readinessResultTriggersMany": "{first}, {second}, and {remaining} more",
   "@readinessResultTriggersMany": {
-    "description": "lib/screens/readiness_result_screen.dart: Short list of many triggers: the first two ({value}, {value2}) and how many more ({remaining})",
+    "description": "lib/screens/readiness_result_screen.dart: Short list of many triggers: the first two ({first}, {second}) and how many more ({remaining})",
     "placeholders": {
-      "value": {
+      "first": {
         "type": "Object"
       },
-      "value2": {
+      "second": {
         "type": "Object"
       },
       "remaining": {
@@ -664,6 +1351,243 @@
   "readinessResultWhyThisFitsSheetTitle": "Why preparation may fit",
   "@readinessResultWhyThisFitsSheetTitle": {
     "description": "lib/screens/readiness_result_screen.dart: Title of the sheet that explains why preparation may fit"
+  },
+  "recommendedRescueToolBackTooltip": "Go back",
+  "@recommendedRescueToolBackTooltip": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Tooltip and accessibility label of the header back button"
+  },
+  "recommendedRescueToolBreathingDescription": "Let the urge rise and fall while you follow a calm breathing cue.",
+  "@recommendedRescueToolBreathingDescription": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Description of slow breathing"
+  },
+  "recommendedRescueToolBreathingName": "Slow breathing",
+  "@recommendedRescueToolBreathingName": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Name of the recommended tool: slow breathing"
+  },
+  "recommendedRescueToolBreathingOffline": "Works offline",
+  "@recommendedRescueToolBreathingOffline": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Feature of slow breathing: works offline"
+  },
+  "recommendedRescueToolBreathingVoice": "Voice optional",
+  "@recommendedRescueToolBreathingVoice": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Feature of slow breathing: voice is optional"
+  },
+  "recommendedRescueToolContextPersonal": "Personalized match",
+  "@recommendedRescueToolContextPersonal": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Chip naming why the tool is suggested: a personalized match"
+  },
+  "recommendedRescueToolContextStress": "Stress selected",
+  "@recommendedRescueToolContextStress": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Chip naming why the tool is suggested: stress was selected"
+  },
+  "recommendedRescueToolDataNote": "Recommendation uses your data only for personalized support.",
+  "@recommendedRescueToolDataNote": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Note: the recommendation uses data only for personalized support"
+  },
+  "recommendedRescueToolEyebrow": "BEST MATCH",
+  "@recommendedRescueToolEyebrow": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Small label above the title"
+  },
+  "recommendedRescueToolIntro": "One recommended action, based on this craving.",
+  "@recommendedRescueToolIntro": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Text under the title when there is no earlier result"
+  },
+  "recommendedRescueToolIntroWithResult": "One recommended action, based on this craving and your results.",
+  "@recommendedRescueToolIntroWithResult": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Text under the title when there is an earlier result"
+  },
+  "recommendedRescueToolLastResult": "Craving changed from {before} to {after} after the exercise.",
+  "@recommendedRescueToolLastResult": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: The last result: craving before ({before}) and after ({after}) the exercise",
+    "placeholders": {
+      "before": {
+        "type": "Object"
+      },
+      "after": {
+        "type": "Object"
+      }
+    }
+  },
+  "recommendedRescueToolLastResultLabel": "YOUR LAST RESULT",
+  "@recommendedRescueToolLastResultLabel": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Label of the member’s last result with this tool"
+  },
+  "recommendedRescueToolMoveDescription": "Walk or stretch",
+  "@recommendedRescueToolMoveDescription": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Description of the movement action"
+  },
+  "recommendedRescueToolMoveFeatures": "Offline · No equipment",
+  "@recommendedRescueToolMoveFeatures": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Features of the movement action"
+  },
+  "recommendedRescueToolMoveName": "Move for 3 minutes",
+  "@recommendedRescueToolMoveName": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Other action: move for 3 minutes"
+  },
+  "recommendedRescueToolOtherActionsLabel": "Or choose another action",
+  "@recommendedRescueToolOtherActionsLabel": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Label above the other actions"
+  },
+  "recommendedRescueToolProgressLabel": "CHOOSE SUPPORT",
+  "@recommendedRescueToolProgressLabel": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Label of the progress bar: choose support"
+  },
+  "recommendedRescueToolReason": "Craving {intensity}/10.",
+  "@recommendedRescueToolReason": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Reason line: craving rating ({intensity})",
+    "placeholders": {
+      "intensity": {
+        "type": "Object"
+      }
+    }
+  },
+  "recommendedRescueToolReasonHelped": "Craving {intensity}/10 + your previous helpful result.",
+  "@recommendedRescueToolReasonHelped": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Reason line: craving rating ({intensity}) and an earlier helpful result",
+    "placeholders": {
+      "intensity": {
+        "type": "Object"
+      }
+    }
+  },
+  "recommendedRescueToolReasonStress": "Stress trigger + craving {intensity}/10.",
+  "@recommendedRescueToolReasonStress": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Reason line: stress and craving rating ({intensity})",
+    "placeholders": {
+      "intensity": {
+        "type": "Object"
+      }
+    }
+  },
+  "recommendedRescueToolReasonStressHelped": "Stress trigger + craving {intensity}/10 + your previous helpful result.",
+  "@recommendedRescueToolReasonStressHelped": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Reason line: stress, craving rating ({intensity}) and an earlier helpful result",
+    "placeholders": {
+      "intensity": {
+        "type": "Object"
+      }
+    }
+  },
+  "recommendedRescueToolRecommendedBadge": "RECOMMENDED",
+  "@recommendedRescueToolRecommendedBadge": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Badge on the recommended tool card"
+  },
+  "recommendedRescueToolSceneDescription": "Go somewhere smoke-free",
+  "@recommendedRescueToolSceneDescription": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Description of the change-the-scene action"
+  },
+  "recommendedRescueToolSceneFeatures": "Quick environment shift",
+  "@recommendedRescueToolSceneFeatures": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Feature of the change-the-scene action"
+  },
+  "recommendedRescueToolSceneName": "Change the scene",
+  "@recommendedRescueToolSceneName": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Other action: change the scene"
+  },
+  "recommendedRescueToolStartBreathingButton": "Start 2-minute breathing",
+  "@recommendedRescueToolStartBreathingButton": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Button on the card that starts the 2-minute breathing"
+  },
+  "recommendedRescueToolStartMoveButton": "Start 3-minute movement",
+  "@recommendedRescueToolStartMoveButton": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Main button when movement is chosen"
+  },
+  "recommendedRescueToolStartRecommendedButton": "Start recommended tool",
+  "@recommendedRescueToolStartRecommendedButton": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Main button that starts the recommended tool"
+  },
+  "recommendedRescueToolStartSceneButton": "Start scene change",
+  "@recommendedRescueToolStartSceneButton": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Main button when change the scene is chosen"
+  },
+  "recommendedRescueToolStepCounter": "2 OF 5",
+  "@recommendedRescueToolStepCounter": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Step counter in the header: step 2 of 5 of the rescue"
+  },
+  "recommendedRescueToolSupportBody": "Contact {supportName} or a trained quitline counselor.",
+  "@recommendedRescueToolSupportBody": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Card text: contact the support person ({supportName}) or a quitline counselor",
+    "placeholders": {
+      "supportName": {
+        "type": "Object"
+      }
+    }
+  },
+  "recommendedRescueToolSupportButton": "View support",
+  "@recommendedRescueToolSupportButton": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Button that opens support"
+  },
+  "recommendedRescueToolSupportNote": "Nothing is sent or shared unless you choose it.",
+  "@recommendedRescueToolSupportNote": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Note: nothing is sent unless the member chooses"
+  },
+  "recommendedRescueToolSupportTitle": "Want a person instead?",
+  "@recommendedRescueToolSupportTitle": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Title of the support card otherwise"
+  },
+  "recommendedRescueToolSupportTitleStrong": "Your craving is strong. Want a person?",
+  "@recommendedRescueToolSupportTitleStrong": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Title of the support card when the craving is strong"
+  },
+  "recommendedRescueToolSwitchNote": "You can switch tools at any time",
+  "@recommendedRescueToolSwitchNote": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Note: tools can be switched anytime"
+  },
+  "recommendedRescueToolTitle": "What feels possible right now?",
+  "@recommendedRescueToolTitle": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Screen title when no tool has helped before yet"
+  },
+  "recommendedRescueToolTitleHelpedBefore": "Start with what helped before.",
+  "@recommendedRescueToolTitleHelpedBefore": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Screen title when a tool helped before"
+  },
+  "recommendedRescueToolWhyMatchLink": "Why this match?",
+  "@recommendedRescueToolWhyMatchLink": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Link that explains why this tool is suggested"
+  },
+  "recommendedRescueToolWhySheetBody": "{triggerText} + craving {intensity}/10 make slow breathing a practical first step.",
+  "@recommendedRescueToolWhySheetBody": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Sheet text otherwise: the trigger ({triggerText}) and craving rating ({intensity})",
+    "placeholders": {
+      "triggerText": {
+        "type": "Object"
+      },
+      "intensity": {
+        "type": "Object"
+      }
+    }
+  },
+  "recommendedRescueToolWhySheetBodyHelped": "{triggerText} + craving {intensity}/10 + a previously helpful breathing result make slow breathing a practical first step.",
+  "@recommendedRescueToolWhySheetBodyHelped": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Sheet text when a tool helped before: the trigger ({triggerText}) and craving rating ({intensity})",
+    "placeholders": {
+      "triggerText": {
+        "type": "Object"
+      },
+      "intensity": {
+        "type": "Object"
+      }
+    }
+  },
+  "recommendedRescueToolWhySheetDoneButton": "Got it",
+  "@recommendedRescueToolWhySheetDoneButton": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Button that closes the sheet"
+  },
+  "recommendedRescueToolWhySheetNote": "You can choose another action now or change personalization later in Settings.",
+  "@recommendedRescueToolWhySheetNote": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Sheet text: another action or personalization settings"
+  },
+  "recommendedRescueToolWhySheetTitle": "Your current context",
+  "@recommendedRescueToolWhySheetTitle": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Title of the why-this-match sheet otherwise"
+  },
+  "recommendedRescueToolWhySheetTitleStress": "Stress trigger",
+  "@recommendedRescueToolWhySheetTitleStress": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Title of the why-this-match sheet when stress was selected"
+  },
+  "recommendedRescueToolYourChoiceBadge": "Your choice",
+  "@recommendedRescueToolYourChoiceBadge": {
+    "description": "lib/screens/recommended_rescue_tool_screen.dart: Badge on the action the member chose"
   },
   "selectQuitDateBackTooltip": "Back",
   "@selectQuitDateBackTooltip": {

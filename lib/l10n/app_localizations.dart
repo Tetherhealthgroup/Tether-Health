@@ -98,6 +98,396 @@ abstract class AppLocalizations {
     Locale('es')
   ];
 
+  /// lib/screens/active_craving_rescue_screen.dart: Guidance line while breathing in
+  ///
+  /// In en, this message translates to:
+  /// **'Let the breath come in gently.'**
+  String get activeCravingRescueBreathingInGuide;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Big label in the breathing circle while breathing in
+  ///
+  /// In en, this message translates to:
+  /// **'BREATHE IN'**
+  String get activeCravingRescueBreathingInLabel;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Guidance line while breathing out
+  ///
+  /// In en, this message translates to:
+  /// **'Let your shoulders soften as you exhale.'**
+  String get activeCravingRescueBreathingOutGuide;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Big label in the breathing circle while breathing out
+  ///
+  /// In en, this message translates to:
+  /// **'BREATHE OUT'**
+  String get activeCravingRescueBreathingOutLabel;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Word under the circle label: breathe slowly
+  ///
+  /// In en, this message translates to:
+  /// **'Slowly'**
+  String get activeCravingRescueBreathingPace;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Unit under the seconds countdown in the circle
+  ///
+  /// In en, this message translates to:
+  /// **'SECONDS'**
+  String get activeCravingRescueBreathingSecondsUnit;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Time left on the breathing card ({time} is minutes:seconds); short form
+  ///
+  /// In en, this message translates to:
+  /// **'{time} LEFT'**
+  String activeCravingRescueBreathingTimeLeft(Object time);
+
+  /// lib/screens/active_craving_rescue_screen.dart: Title of the breathing card
+  ///
+  /// In en, this message translates to:
+  /// **'SLOW BREATHING'**
+  String get activeCravingRescueBreathingTitle;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Guidance on the change-the-scene card
+  ///
+  /// In en, this message translates to:
+  /// **'Go somewhere smoke-free and change what you are doing.'**
+  String get activeCravingRescueChangeSceneGuide;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Big instruction on the change-the-scene card
+  ///
+  /// In en, this message translates to:
+  /// **'CHANGE YOUR SURROUNDINGS'**
+  String get activeCravingRescueChangeSceneHeadline;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Title of the change-the-scene card
+  ///
+  /// In en, this message translates to:
+  /// **'CHANGE THE SCENE'**
+  String get activeCravingRescueChangeSceneTitle;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Tooltip and accessibility label of the header close button
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get activeCravingRescueCloseTooltip;
+
+  /// lib/screens/active_craving_rescue_screen.dart: State shown under the voice or haptics control when it is off
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get activeCravingRescueControlOff;
+
+  /// lib/screens/active_craving_rescue_screen.dart: State shown under the voice or haptics control when it is on
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get activeCravingRescueControlOn;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Encouragement card text: let the urge pass without smoking
+  ///
+  /// In en, this message translates to:
+  /// **'You can let it rise and pass without smoking.'**
+  String get activeCravingRescueEncouragementBody;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Encouragement card note: stay with this breath
+  ///
+  /// In en, this message translates to:
+  /// **'You only need to stay with this breath—not solve the whole day.'**
+  String get activeCravingRescueEncouragementNote;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Encouragement card: the urge is a wave
+  ///
+  /// In en, this message translates to:
+  /// **'The urge is a wave.'**
+  String get activeCravingRescueEncouragementTitle;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Button that ends the exercise
+  ///
+  /// In en, this message translates to:
+  /// **'End exercise'**
+  String get activeCravingRescueEndButton;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Dialog text: the craving can be rated again next
+  ///
+  /// In en, this message translates to:
+  /// **'You can rate the craving again next.'**
+  String get activeCravingRescueEndDialogBody;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Dialog button that keeps practicing
+  ///
+  /// In en, this message translates to:
+  /// **'Keep practicing'**
+  String get activeCravingRescueEndDialogCancel;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Dialog button that ends the exercise and goes to the recheck
+  ///
+  /// In en, this message translates to:
+  /// **'End and recheck'**
+  String get activeCravingRescueEndDialogConfirm;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Title of the dialog that asks whether to end the exercise
+  ///
+  /// In en, this message translates to:
+  /// **'End the exercise now?'**
+  String get activeCravingRescueEndDialogTitle;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Vibration control button: the word Haptics and, on a second line, its state ({state} is on or off)
+  ///
+  /// In en, this message translates to:
+  /// **'Haptics\n{state}'**
+  String activeCravingRescueHapticsControl(Object state);
+
+  /// lib/screens/active_craving_rescue_screen.dart: Text under the title: follow the circle or breathe slowly
+  ///
+  /// In en, this message translates to:
+  /// **'Follow the circle—or breathe slowly in your own way.'**
+  String get activeCravingRescueIntro;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Dialog text: progress is kept
+  ///
+  /// In en, this message translates to:
+  /// **'Your progress will be kept so you can return.'**
+  String get activeCravingRescueLeaveDialogBody;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Dialog button that saves and leaves
+  ///
+  /// In en, this message translates to:
+  /// **'Save and leave'**
+  String get activeCravingRescueLeaveDialogLeave;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Dialog button that stays and keeps breathing
+  ///
+  /// In en, this message translates to:
+  /// **'Keep breathing'**
+  String get activeCravingRescueLeaveDialogStay;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Title of the dialog that asks whether to leave the exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Leave this exercise?'**
+  String get activeCravingRescueLeaveDialogTitle;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Guidance on the movement card
+  ///
+  /// In en, this message translates to:
+  /// **'Walk, stretch, or move gently.'**
+  String get activeCravingRescueMovementGuide;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Vibration control on the movement card when vibration is off
+  ///
+  /// In en, this message translates to:
+  /// **'Haptics OFF'**
+  String get activeCravingRescueMovementHapticsOff;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Vibration control on the movement card when vibration is on
+  ///
+  /// In en, this message translates to:
+  /// **'Haptics ON'**
+  String get activeCravingRescueMovementHapticsOn;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Big instruction on the movement card
+  ///
+  /// In en, this message translates to:
+  /// **'KEEP MOVING'**
+  String get activeCravingRescueMovementHeadline;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Title of the movement card
+  ///
+  /// In en, this message translates to:
+  /// **'MOVEMENT'**
+  String get activeCravingRescueMovementTitle;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Voice control on the movement card when voice is off
+  ///
+  /// In en, this message translates to:
+  /// **'Voice OFF'**
+  String get activeCravingRescueMovementVoiceOff;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Voice control on the movement card when voice is on
+  ///
+  /// In en, this message translates to:
+  /// **'Voice ON'**
+  String get activeCravingRescueMovementVoiceOn;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Badge: the breathing tool works offline
+  ///
+  /// In en, this message translates to:
+  /// **'Works offline'**
+  String get activeCravingRescueOfflineBadge;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Card text: tools can be changed without losing the check-in
+  ///
+  /// In en, this message translates to:
+  /// **'You can change tools without losing this check-in.'**
+  String get activeCravingRescueOtherSupportBody;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Title of the card offering different support
+  ///
+  /// In en, this message translates to:
+  /// **'Need different support right now?'**
+  String get activeCravingRescueOtherSupportTitle;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Button that pauses the exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get activeCravingRescuePauseButton;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Button that opens support from a person
+  ///
+  /// In en, this message translates to:
+  /// **'Get support from a person'**
+  String get activeCravingRescuePersonSupportButton;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Privacy note: no data is sent or shared during the exercise (two lines)
+  ///
+  /// In en, this message translates to:
+  /// **'No data is being sent or shared during this exercise.\nContent v1.0'**
+  String get activeCravingRescuePrivacyNote;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Label of the progress bar: the active tool
+  ///
+  /// In en, this message translates to:
+  /// **'ACTIVE TOOL'**
+  String get activeCravingRescueProgressLabel;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Note: after 2 minutes the member rates the craving again
+  ///
+  /// In en, this message translates to:
+  /// **'After 2 minutes, you’ll rate the craving again'**
+  String get activeCravingRescueRecheckNote;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Note: reduced motion follows the phone setting
+  ///
+  /// In en, this message translates to:
+  /// **'Reduced motion follows your phone setting'**
+  String get activeCravingRescueReducedMotionNote;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Button that resumes the paused exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Resume'**
+  String get activeCravingRescueResumeButton;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Spoken aloud: breathe in slowly
+  ///
+  /// In en, this message translates to:
+  /// **'Breathe in slowly'**
+  String get activeCravingRescueSpokenBreatheIn;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Spoken aloud: breathe out slowly
+  ///
+  /// In en, this message translates to:
+  /// **'Breathe out slowly'**
+  String get activeCravingRescueSpokenBreatheOut;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Spoken aloud every 30 seconds during movement
+  ///
+  /// In en, this message translates to:
+  /// **'Keep moving'**
+  String get activeCravingRescueSpokenKeepMoving;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Spoken aloud when the three-minute movement is complete
+  ///
+  /// In en, this message translates to:
+  /// **'Great job. You completed three minutes.'**
+  String get activeCravingRescueSpokenMovementDone;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Spoken aloud at the start of the movement exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Start moving'**
+  String get activeCravingRescueSpokenMovementStart;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Spoken aloud: one minute left
+  ///
+  /// In en, this message translates to:
+  /// **'One minute left'**
+  String get activeCravingRescueSpokenOneMinuteLeft;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Spoken aloud when the change of scene is complete
+  ///
+  /// In en, this message translates to:
+  /// **'Great job. You changed your surroundings.'**
+  String get activeCravingRescueSpokenSceneDone;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Spoken aloud near the end of changing the scene
+  ///
+  /// In en, this message translates to:
+  /// **'Keep going. You are making a positive change.'**
+  String get activeCravingRescueSpokenSceneEncouragement;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Spoken aloud halfway through changing the scene
+  ///
+  /// In en, this message translates to:
+  /// **'You are halfway there. Keep going.'**
+  String get activeCravingRescueSpokenSceneHalfway;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Spoken aloud while changing the scene
+  ///
+  /// In en, this message translates to:
+  /// **'Keep moving to a smoke-free place.'**
+  String get activeCravingRescueSpokenSceneKeepGoing;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Spoken aloud: ten seconds left
+  ///
+  /// In en, this message translates to:
+  /// **'Ten seconds left'**
+  String get activeCravingRescueSpokenTenSecondsLeft;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Spoken aloud: thirty seconds left
+  ///
+  /// In en, this message translates to:
+  /// **'Thirty seconds left'**
+  String get activeCravingRescueSpokenThirtySecondsLeft;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Step counter in the header: step 3 of 5 of the rescue
+  ///
+  /// In en, this message translates to:
+  /// **'3 OF 5'**
+  String get activeCravingRescueStepCounter;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Button that switches to another coping tool
+  ///
+  /// In en, this message translates to:
+  /// **'Switch coping tool'**
+  String get activeCravingRescueSwitchToolButton;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Progress-bar caption while breathing in
+  ///
+  /// In en, this message translates to:
+  /// **'Inhale gently'**
+  String get activeCravingRescueThisBreathIn;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Label of the progress bar for the current breath
+  ///
+  /// In en, this message translates to:
+  /// **'THIS BREATH'**
+  String get activeCravingRescueThisBreathLabel;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Progress-bar caption while breathing out
+  ///
+  /// In en, this message translates to:
+  /// **'Exhale slowly'**
+  String get activeCravingRescueThisBreathOut;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Time left on the movement and change-the-scene cards ({time} is minutes:seconds)
+  ///
+  /// In en, this message translates to:
+  /// **'{time} LEFT'**
+  String activeCravingRescueTimeLeft(Object time);
+
+  /// lib/screens/active_craving_rescue_screen.dart: Screen title: stay with this moment
+  ///
+  /// In en, this message translates to:
+  /// **'Stay with this moment.'**
+  String get activeCravingRescueTitle;
+
+  /// lib/screens/active_craving_rescue_screen.dart: Voice control button: the word Voice and, on a second line, its state ({state} is on or off)
+  ///
+  /// In en, this message translates to:
+  /// **'Voice\n{state}'**
+  String activeCravingRescueVoiceControl(Object state);
+
   /// lib/screens/baseline_assessment_screen.dart: Tooltip and accessibility label of the header back button
   ///
   /// In en, this message translates to:
@@ -469,6 +859,582 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We never sell patient health information.'**
   String get consentPrivacyTrustNoteNoSale;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Tooltip and accessibility label of the header back button
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get cravingRescueStartBackTooltip;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Message when the phone app could not be opened
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the Phone app.'**
+  String get cravingRescueStartCallFailed;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Context option: after a meal
+  ///
+  /// In en, this message translates to:
+  /// **'After a meal'**
+  String get cravingRescueStartContextAfterMeal;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Context option: alcohol
+  ///
+  /// In en, this message translates to:
+  /// **'Alcohol'**
+  String get cravingRescueStartContextAlcohol;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Context option: around someone smoking
+  ///
+  /// In en, this message translates to:
+  /// **'Around someone smoking'**
+  String get cravingRescueStartContextAroundSmoking;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Context option: bored
+  ///
+  /// In en, this message translates to:
+  /// **'Bored'**
+  String get cravingRescueStartContextBored;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Context option: driving
+  ///
+  /// In en, this message translates to:
+  /// **'Driving'**
+  String get cravingRescueStartContextDriving;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Context option: not sure
+  ///
+  /// In en, this message translates to:
+  /// **'Not sure'**
+  String get cravingRescueStartContextNotSure;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Note: trigger details are optional
+  ///
+  /// In en, this message translates to:
+  /// **'Trigger details are optional and never block Rescue.'**
+  String get cravingRescueStartContextNote;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Note next to the question: optional
+  ///
+  /// In en, this message translates to:
+  /// **'Optional · Skip anytime'**
+  String get cravingRescueStartContextOptional;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Question: what might be behind the craving
+  ///
+  /// In en, this message translates to:
+  /// **'What might be behind it?'**
+  String get cravingRescueStartContextQuestion;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Context option: stress
+  ///
+  /// In en, this message translates to:
+  /// **'Stress'**
+  String get cravingRescueStartContextStress;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Main button that shows what to do
+  ///
+  /// In en, this message translates to:
+  /// **'Show me what to do'**
+  String get cravingRescueStartContinueButton;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Button that calls emergency services (911)
+  ///
+  /// In en, this message translates to:
+  /// **'Call 911'**
+  String get cravingRescueStartEmergencyCallButton;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Button that closes the emergency sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get cravingRescueStartEmergencyCloseButton;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Link that opens emergency guidance
+  ///
+  /// In en, this message translates to:
+  /// **'Medical emergency?'**
+  String get cravingRescueStartEmergencyLink;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Sheet text: what to do in an emergency
+  ///
+  /// In en, this message translates to:
+  /// **'If this is a medical emergency or you are in immediate danger, call 911 now.'**
+  String get cravingRescueStartEmergencySheetBody;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Sheet text: a call starts only when the member taps the call button
+  ///
+  /// In en, this message translates to:
+  /// **'BreatheFree will only start a call when you tap “Call 911.”'**
+  String get cravingRescueStartEmergencySheetNote;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Title of the emergency guidance sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Medical emergency'**
+  String get cravingRescueStartEmergencySheetTitle;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Small label above the title
+  ///
+  /// In en, this message translates to:
+  /// **'RIGHT NOW'**
+  String get cravingRescueStartEyebrow;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Header title: craving rescue
+  ///
+  /// In en, this message translates to:
+  /// **'Craving Rescue'**
+  String get cravingRescueStartHeaderTitle;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Hint: only a number is needed
+  ///
+  /// In en, this message translates to:
+  /// **'You only need to choose a number.'**
+  String get cravingRescueStartIntensityHint;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Label at the strongest end of the scale
+  ///
+  /// In en, this message translates to:
+  /// **'Strongest'**
+  String get cravingRescueStartIntensityMaxLabel;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Intensity word for a rating of 0 to 3
+  ///
+  /// In en, this message translates to:
+  /// **'Mild'**
+  String get cravingRescueStartIntensityMild;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Intensity word for a rating of 4 to 6
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get cravingRescueStartIntensityModerate;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Note: the next screen gives one recommended action
+  ///
+  /// In en, this message translates to:
+  /// **'The next screen gives one recommended action.'**
+  String get cravingRescueStartIntensityNext;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Question on the intensity card
+  ///
+  /// In en, this message translates to:
+  /// **'How strong is it right now?'**
+  String get cravingRescueStartIntensityQuestion;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Intensity word for a rating of 7 or 8
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get cravingRescueStartIntensityStrong;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Title of the craving-intensity card
+  ///
+  /// In en, this message translates to:
+  /// **'CRAVING INTENSITY'**
+  String get cravingRescueStartIntensityTitle;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Intensity word for a rating of 9 or 10
+  ///
+  /// In en, this message translates to:
+  /// **'Very strong'**
+  String get cravingRescueStartIntensityVeryStrong;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Text under the title
+  ///
+  /// In en, this message translates to:
+  /// **'Start with what you feel now. No typing is required.'**
+  String get cravingRescueStartIntro;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Badge in the header: works offline
+  ///
+  /// In en, this message translates to:
+  /// **'OFFLINE READY'**
+  String get cravingRescueStartOfflineBadge;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Privacy note, first line: used to personalize support, never to monitor
+  ///
+  /// In en, this message translates to:
+  /// **'Used to personalize support — never to monitor you.\n'**
+  String get cravingRescueStartPrivacyNoteBody;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Privacy note, second line: no location or conversation tracking
+  ///
+  /// In en, this message translates to:
+  /// **'No background location or conversation tracking.'**
+  String get cravingRescueStartPrivacyNoteTracking;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Note: private and works offline
+  ///
+  /// In en, this message translates to:
+  /// **'Private · Works offline'**
+  String get cravingRescueStartPrivateOffline;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Card text: contact the support person ({supportName}) or a quitline counselor
+  ///
+  /// In en, this message translates to:
+  /// **'Contact {supportName} or a trained quitline counselor.'**
+  String cravingRescueStartSupportBody(Object supportName);
+
+  /// lib/screens/craving_rescue_start_screen.dart: Button that opens support
+  ///
+  /// In en, this message translates to:
+  /// **'View support'**
+  String get cravingRescueStartSupportButton;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Note: messages and calls only happen when the member chooses
+  ///
+  /// In en, this message translates to:
+  /// **'Messages and calls only happen when you choose them.'**
+  String get cravingRescueStartSupportNote;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Title of the card offering a person instead
+  ///
+  /// In en, this message translates to:
+  /// **'Want a person instead?'**
+  String get cravingRescueStartSupportTitle;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Let’s get through this moment.'**
+  String get cravingRescueStartTitle;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Label of the card showing the member’s top reason
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR TOP REASON'**
+  String get cravingRescueStartTopReasonLabel;
+
+  /// lib/screens/craving_rescue_start_screen.dart: Card text: this moment can pass
+  ///
+  /// In en, this message translates to:
+  /// **'This moment can pass without changing your goal.'**
+  String get cravingRescueStartTopReasonNote;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Breath counter: breath number ({number}) of 10
+  ///
+  /// In en, this message translates to:
+  /// **'Breath {number} of 10'**
+  String guidedStressResetBreathCount(Object number);
+
+  /// lib/screens/guided_stress_reset_screen.dart: Small label above the instruction in the breathing step
+  ///
+  /// In en, this message translates to:
+  /// **'SLOW BREATHING'**
+  String get guidedStressResetBreatheEyebrow;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Instruction while breathing in; also spoken aloud
+  ///
+  /// In en, this message translates to:
+  /// **'Slowly breathe in through your nose.'**
+  String get guidedStressResetBreatheInInstruction;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Instruction while breathing out; also spoken aloud
+  ///
+  /// In en, this message translates to:
+  /// **'Slowly breathe out through your mouth.'**
+  String get guidedStressResetBreatheOutInstruction;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Label in the exercise circle while breathing in
+  ///
+  /// In en, this message translates to:
+  /// **'BREATHE IN'**
+  String get guidedStressResetCircleBreatheIn;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Label in the exercise circle while breathing out
+  ///
+  /// In en, this message translates to:
+  /// **'BREATHE OUT'**
+  String get guidedStressResetCircleBreatheOut;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Label in the exercise circle during the water step
+  ///
+  /// In en, this message translates to:
+  /// **'DRINK WATER'**
+  String get guidedStressResetCircleDrinkWater;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Unit under the seconds countdown in the circle
+  ///
+  /// In en, this message translates to:
+  /// **'SECONDS'**
+  String get guidedStressResetCircleSecondsUnit;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Tooltip and accessibility label of the header close button
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get guidedStressResetCloseTooltip;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Button that ends the exercise
+  ///
+  /// In en, this message translates to:
+  /// **'End exercise'**
+  String get guidedStressResetEndButton;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Dialog text: time and finished steps are saved
+  ///
+  /// In en, this message translates to:
+  /// **'Your time and completed steps will still be saved.'**
+  String get guidedStressResetEndDialogBody;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Dialog button that keeps practicing
+  ///
+  /// In en, this message translates to:
+  /// **'Keep practicing'**
+  String get guidedStressResetEndDialogCancel;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Dialog button that ends the exercise and goes to the review
+  ///
+  /// In en, this message translates to:
+  /// **'End and review'**
+  String get guidedStressResetEndDialogConfirm;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Title of the dialog that asks whether to end the exercise
+  ///
+  /// In en, this message translates to:
+  /// **'End the exercise now?'**
+  String get guidedStressResetEndDialogTitle;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Button on the last step that finishes the exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get guidedStressResetFinishButton;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Hint: follow the circle, listen or use the countdown
+  ///
+  /// In en, this message translates to:
+  /// **'Follow the circle, listen, or use the countdown.'**
+  String get guidedStressResetFollowHint;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Motion control when full motion is on
+  ///
+  /// In en, this message translates to:
+  /// **'Full motion on'**
+  String get guidedStressResetFullMotionOn;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Header title: stress reset
+  ///
+  /// In en, this message translates to:
+  /// **'Stress reset'**
+  String get guidedStressResetHeaderTitle;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Dialog text: partial progress is saved
+  ///
+  /// In en, this message translates to:
+  /// **'Your partial progress will be saved so you can continue later.'**
+  String get guidedStressResetLeaveDialogBody;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Dialog button that saves and leaves
+  ///
+  /// In en, this message translates to:
+  /// **'Save and leave'**
+  String get guidedStressResetLeaveDialogLeave;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Dialog button that continues the exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Continue exercise'**
+  String get guidedStressResetLeaveDialogStay;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Title of the dialog that asks whether to leave the exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Leave the exercise?'**
+  String get guidedStressResetLeaveDialogTitle;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Button that pauses the exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Pause exercise'**
+  String get guidedStressResetPauseButton;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Motion control when reduced motion is on
+  ///
+  /// In en, this message translates to:
+  /// **'Reduced motion on'**
+  String get guidedStressResetReducedMotionOn;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Button that opens craving rescue
+  ///
+  /// In en, this message translates to:
+  /// **'Open Rescue'**
+  String get guidedStressResetRescueButton;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Card question: is the craving getting stronger
+  ///
+  /// In en, this message translates to:
+  /// **'Craving getting stronger?'**
+  String get guidedStressResetRescueTitle;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Button that resumes the paused exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Resume exercise'**
+  String get guidedStressResetResumeButton;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Note: partial completion is saved and the exercise works offline
+  ///
+  /// In en, this message translates to:
+  /// **'Partial completion is saved · Works offline'**
+  String get guidedStressResetSavedNote;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Step in the exercise sequence: breathe
+  ///
+  /// In en, this message translates to:
+  /// **'Breathe'**
+  String get guidedStressResetSequenceBreathe;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Status of a finished step in the sequence
+  ///
+  /// In en, this message translates to:
+  /// **'DONE'**
+  String get guidedStressResetSequenceDone;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Status of a coming step in the sequence
+  ///
+  /// In en, this message translates to:
+  /// **'NEXT'**
+  String get guidedStressResetSequenceNext;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Note: the timer pauses when the member leaves the screen
+  ///
+  /// In en, this message translates to:
+  /// **'The timer pauses automatically if you leave this screen.'**
+  String get guidedStressResetSequenceNote;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Status of the current step in the sequence
+  ///
+  /// In en, this message translates to:
+  /// **'NOW'**
+  String get guidedStressResetSequenceNow;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Step in the exercise sequence: switch activities
+  ///
+  /// In en, this message translates to:
+  /// **'Switch'**
+  String get guidedStressResetSequenceSwitch;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Title of the exercise sequence list
+  ///
+  /// In en, this message translates to:
+  /// **'Exercise sequence'**
+  String get guidedStressResetSequenceTitle;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Step in the exercise sequence: water
+  ///
+  /// In en, this message translates to:
+  /// **'Water'**
+  String get guidedStressResetSequenceWater;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Button that skips to the next step
+  ///
+  /// In en, this message translates to:
+  /// **'Skip step'**
+  String get guidedStressResetSkipButton;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Spoken aloud in the switch-activities step
+  ///
+  /// In en, this message translates to:
+  /// **'Switch what you are doing. Walk, play music, or start one quick task.'**
+  String get guidedStressResetSpokenSwitch;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Step counter: step number ({step}) of 3 and the step name ({name})
+  ///
+  /// In en, this message translates to:
+  /// **'STEP {step} OF 3 · {name}'**
+  String guidedStressResetStepCounter(Object step, Object name);
+
+  /// lib/screens/guided_stress_reset_screen.dart: Step name in the step counter (upper case): breathe
+  ///
+  /// In en, this message translates to:
+  /// **'BREATHE'**
+  String get guidedStressResetStepNameBreathe;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Step name in the step counter (upper case): switch activities
+  ///
+  /// In en, this message translates to:
+  /// **'SWITCH'**
+  String get guidedStressResetStepNameSwitch;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Step name in the step counter (upper case): water
+  ///
+  /// In en, this message translates to:
+  /// **'WATER'**
+  String get guidedStressResetStepNameWater;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Small label above the instruction in the switch-activities step
+  ///
+  /// In en, this message translates to:
+  /// **'SWITCH ACTIVITIES'**
+  String get guidedStressResetSwitchEyebrow;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Instruction in the switch-activities step
+  ///
+  /// In en, this message translates to:
+  /// **'Walk, play music, or start one quick task.'**
+  String get guidedStressResetSwitchInstruction;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Title of the switch-activities step
+  ///
+  /// In en, this message translates to:
+  /// **'Switch what you are doing'**
+  String get guidedStressResetSwitchTitle;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Time left in the step ({time} is minutes:seconds)
+  ///
+  /// In en, this message translates to:
+  /// **'{time} LEFT'**
+  String guidedStressResetTimeLeft(Object time);
+
+  /// lib/screens/guided_stress_reset_screen.dart: Voice guidance control when it is off
+  ///
+  /// In en, this message translates to:
+  /// **'Voice guidance off'**
+  String get guidedStressResetVoiceGuidanceOff;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Voice guidance control when it is on
+  ///
+  /// In en, this message translates to:
+  /// **'Voice guidance on'**
+  String get guidedStressResetVoiceGuidanceOn;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Accessibility label of the voice guidance toggle in the header
+  ///
+  /// In en, this message translates to:
+  /// **'Voice guidance'**
+  String get guidedStressResetVoiceToggleLabel;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Voice toggle in the header when voice guidance is off
+  ///
+  /// In en, this message translates to:
+  /// **'VOICE OFF'**
+  String get guidedStressResetVoiceToggleOff;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Voice toggle in the header when voice guidance is on
+  ///
+  /// In en, this message translates to:
+  /// **'VOICE ON'**
+  String get guidedStressResetVoiceToggleOn;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Small label above the instruction in the water step
+  ///
+  /// In en, this message translates to:
+  /// **'WATER BREAK'**
+  String get guidedStressResetWaterEyebrow;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Instruction in the water step; also spoken aloud
+  ///
+  /// In en, this message translates to:
+  /// **'Sip slowly and notice the temperature.'**
+  String get guidedStressResetWaterInstruction;
+
+  /// lib/screens/guided_stress_reset_screen.dart: Title of the water step
+  ///
+  /// In en, this message translates to:
+  /// **'Drink a glass of water'**
+  String get guidedStressResetWaterTitle;
 
   /// lib/screens/my_reasons_screen.dart: Tooltip and accessibility label of the header back button
   ///
@@ -956,12 +1922,12 @@ abstract class AppLocalizations {
   /// **'TRIGGERS'**
   String get readinessResultTriggersLabel;
 
-  /// lib/screens/readiness_result_screen.dart: Short list of many triggers: the first two ({value}, {value2}) and how many more ({remaining})
+  /// lib/screens/readiness_result_screen.dart: Short list of many triggers: the first two ({first}, {second}) and how many more ({remaining})
   ///
   /// In en, this message translates to:
-  /// **'{value}, {value2}, and {remaining} more'**
+  /// **'{first}, {second}, and {remaining} more'**
   String readinessResultTriggersMany(
-      Object value, Object value2, Object remaining);
+      Object first, Object second, Object remaining);
 
   /// lib/screens/readiness_result_screen.dart: Triggers summary when none were chosen
   ///
@@ -1010,6 +1976,290 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Why preparation may fit'**
   String get readinessResultWhyThisFitsSheetTitle;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Tooltip and accessibility label of the header back button
+  ///
+  /// In en, this message translates to:
+  /// **'Go back'**
+  String get recommendedRescueToolBackTooltip;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Description of slow breathing
+  ///
+  /// In en, this message translates to:
+  /// **'Let the urge rise and fall while you follow a calm breathing cue.'**
+  String get recommendedRescueToolBreathingDescription;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Name of the recommended tool: slow breathing
+  ///
+  /// In en, this message translates to:
+  /// **'Slow breathing'**
+  String get recommendedRescueToolBreathingName;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Feature of slow breathing: works offline
+  ///
+  /// In en, this message translates to:
+  /// **'Works offline'**
+  String get recommendedRescueToolBreathingOffline;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Feature of slow breathing: voice is optional
+  ///
+  /// In en, this message translates to:
+  /// **'Voice optional'**
+  String get recommendedRescueToolBreathingVoice;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Chip naming why the tool is suggested: a personalized match
+  ///
+  /// In en, this message translates to:
+  /// **'Personalized match'**
+  String get recommendedRescueToolContextPersonal;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Chip naming why the tool is suggested: stress was selected
+  ///
+  /// In en, this message translates to:
+  /// **'Stress selected'**
+  String get recommendedRescueToolContextStress;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Note: the recommendation uses data only for personalized support
+  ///
+  /// In en, this message translates to:
+  /// **'Recommendation uses your data only for personalized support.'**
+  String get recommendedRescueToolDataNote;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Small label above the title
+  ///
+  /// In en, this message translates to:
+  /// **'BEST MATCH'**
+  String get recommendedRescueToolEyebrow;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Text under the title when there is no earlier result
+  ///
+  /// In en, this message translates to:
+  /// **'One recommended action, based on this craving.'**
+  String get recommendedRescueToolIntro;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Text under the title when there is an earlier result
+  ///
+  /// In en, this message translates to:
+  /// **'One recommended action, based on this craving and your results.'**
+  String get recommendedRescueToolIntroWithResult;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: The last result: craving before ({before}) and after ({after}) the exercise
+  ///
+  /// In en, this message translates to:
+  /// **'Craving changed from {before} to {after} after the exercise.'**
+  String recommendedRescueToolLastResult(Object before, Object after);
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Label of the member’s last result with this tool
+  ///
+  /// In en, this message translates to:
+  /// **'YOUR LAST RESULT'**
+  String get recommendedRescueToolLastResultLabel;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Description of the movement action
+  ///
+  /// In en, this message translates to:
+  /// **'Walk or stretch'**
+  String get recommendedRescueToolMoveDescription;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Features of the movement action
+  ///
+  /// In en, this message translates to:
+  /// **'Offline · No equipment'**
+  String get recommendedRescueToolMoveFeatures;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Other action: move for 3 minutes
+  ///
+  /// In en, this message translates to:
+  /// **'Move for 3 minutes'**
+  String get recommendedRescueToolMoveName;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Label above the other actions
+  ///
+  /// In en, this message translates to:
+  /// **'Or choose another action'**
+  String get recommendedRescueToolOtherActionsLabel;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Label of the progress bar: choose support
+  ///
+  /// In en, this message translates to:
+  /// **'CHOOSE SUPPORT'**
+  String get recommendedRescueToolProgressLabel;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Reason line: craving rating ({intensity})
+  ///
+  /// In en, this message translates to:
+  /// **'Craving {intensity}/10.'**
+  String recommendedRescueToolReason(Object intensity);
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Reason line: craving rating ({intensity}) and an earlier helpful result
+  ///
+  /// In en, this message translates to:
+  /// **'Craving {intensity}/10 + your previous helpful result.'**
+  String recommendedRescueToolReasonHelped(Object intensity);
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Reason line: stress and craving rating ({intensity})
+  ///
+  /// In en, this message translates to:
+  /// **'Stress trigger + craving {intensity}/10.'**
+  String recommendedRescueToolReasonStress(Object intensity);
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Reason line: stress, craving rating ({intensity}) and an earlier helpful result
+  ///
+  /// In en, this message translates to:
+  /// **'Stress trigger + craving {intensity}/10 + your previous helpful result.'**
+  String recommendedRescueToolReasonStressHelped(Object intensity);
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Badge on the recommended tool card
+  ///
+  /// In en, this message translates to:
+  /// **'RECOMMENDED'**
+  String get recommendedRescueToolRecommendedBadge;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Description of the change-the-scene action
+  ///
+  /// In en, this message translates to:
+  /// **'Go somewhere smoke-free'**
+  String get recommendedRescueToolSceneDescription;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Feature of the change-the-scene action
+  ///
+  /// In en, this message translates to:
+  /// **'Quick environment shift'**
+  String get recommendedRescueToolSceneFeatures;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Other action: change the scene
+  ///
+  /// In en, this message translates to:
+  /// **'Change the scene'**
+  String get recommendedRescueToolSceneName;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Button on the card that starts the 2-minute breathing
+  ///
+  /// In en, this message translates to:
+  /// **'Start 2-minute breathing'**
+  String get recommendedRescueToolStartBreathingButton;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Main button when movement is chosen
+  ///
+  /// In en, this message translates to:
+  /// **'Start 3-minute movement'**
+  String get recommendedRescueToolStartMoveButton;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Main button that starts the recommended tool
+  ///
+  /// In en, this message translates to:
+  /// **'Start recommended tool'**
+  String get recommendedRescueToolStartRecommendedButton;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Main button when change the scene is chosen
+  ///
+  /// In en, this message translates to:
+  /// **'Start scene change'**
+  String get recommendedRescueToolStartSceneButton;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Step counter in the header: step 2 of 5 of the rescue
+  ///
+  /// In en, this message translates to:
+  /// **'2 OF 5'**
+  String get recommendedRescueToolStepCounter;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Card text: contact the support person ({supportName}) or a quitline counselor
+  ///
+  /// In en, this message translates to:
+  /// **'Contact {supportName} or a trained quitline counselor.'**
+  String recommendedRescueToolSupportBody(Object supportName);
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Button that opens support
+  ///
+  /// In en, this message translates to:
+  /// **'View support'**
+  String get recommendedRescueToolSupportButton;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Note: nothing is sent unless the member chooses
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing is sent or shared unless you choose it.'**
+  String get recommendedRescueToolSupportNote;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Title of the support card otherwise
+  ///
+  /// In en, this message translates to:
+  /// **'Want a person instead?'**
+  String get recommendedRescueToolSupportTitle;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Title of the support card when the craving is strong
+  ///
+  /// In en, this message translates to:
+  /// **'Your craving is strong. Want a person?'**
+  String get recommendedRescueToolSupportTitleStrong;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Note: tools can be switched anytime
+  ///
+  /// In en, this message translates to:
+  /// **'You can switch tools at any time'**
+  String get recommendedRescueToolSwitchNote;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Screen title when no tool has helped before yet
+  ///
+  /// In en, this message translates to:
+  /// **'What feels possible right now?'**
+  String get recommendedRescueToolTitle;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Screen title when a tool helped before
+  ///
+  /// In en, this message translates to:
+  /// **'Start with what helped before.'**
+  String get recommendedRescueToolTitleHelpedBefore;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Link that explains why this tool is suggested
+  ///
+  /// In en, this message translates to:
+  /// **'Why this match?'**
+  String get recommendedRescueToolWhyMatchLink;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Sheet text otherwise: the trigger ({triggerText}) and craving rating ({intensity})
+  ///
+  /// In en, this message translates to:
+  /// **'{triggerText} + craving {intensity}/10 make slow breathing a practical first step.'**
+  String recommendedRescueToolWhySheetBody(
+      Object triggerText, Object intensity);
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Sheet text when a tool helped before: the trigger ({triggerText}) and craving rating ({intensity})
+  ///
+  /// In en, this message translates to:
+  /// **'{triggerText} + craving {intensity}/10 + a previously helpful breathing result make slow breathing a practical first step.'**
+  String recommendedRescueToolWhySheetBodyHelped(
+      Object triggerText, Object intensity);
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Button that closes the sheet
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get recommendedRescueToolWhySheetDoneButton;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Sheet text: another action or personalization settings
+  ///
+  /// In en, this message translates to:
+  /// **'You can choose another action now or change personalization later in Settings.'**
+  String get recommendedRescueToolWhySheetNote;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Title of the why-this-match sheet otherwise
+  ///
+  /// In en, this message translates to:
+  /// **'Your current context'**
+  String get recommendedRescueToolWhySheetTitle;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Title of the why-this-match sheet when stress was selected
+  ///
+  /// In en, this message translates to:
+  /// **'Stress trigger'**
+  String get recommendedRescueToolWhySheetTitleStress;
+
+  /// lib/screens/recommended_rescue_tool_screen.dart: Badge on the action the member chose
+  ///
+  /// In en, this message translates to:
+  /// **'Your choice'**
+  String get recommendedRescueToolYourChoiceBadge;
 
   /// lib/screens/select_quit_date_screen.dart: Tooltip and accessibility label of the header back button
   ///
