@@ -69,6 +69,18 @@ describe("parseSummaryQuery", () => {
       { programme: "bf", days: "90" },
       { programme: "bf", days: 90 },
     ],
+    [
+      { programme: "hw", range: "7d" },
+      { programme: "hw", days: 7 },
+    ],
+    [
+      { programme: "st", range: "30d" },
+      { programme: "st", days: 30 },
+    ],
+    [
+      { programme: "bf", range: "90d" },
+      { programme: "bf", days: 90 },
+    ],
   ])("%p → %p", (query, parsed) => {
     expect(parseSummaryQuery(query)).toEqual(parsed);
   });
@@ -81,6 +93,13 @@ describe("parseSummaryQuery", () => {
     { programme: "hw", days: ["7", "30"] },
     { programme: ["hw", "st"], days: "7" },
     { programme: "hw", days: "7", extra: "1" },
+    { programme: "hw", range: "7" },
+    { programme: "hw", range: "14d" },
+    { programme: "hw", range: "7D" },
+    { programme: "hw", range: ["7d", "30d"] },
+    { programme: "hw", range: "constructor" },
+    { programme: "hw", range: "7d", days: "7" },
+    { programme: "hw", range: "7d", days: "30" },
   ])("%p → 400", (query) => {
     expect(() => parseSummaryQuery(query)).toThrow(ProgrammeDataException);
   });

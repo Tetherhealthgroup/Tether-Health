@@ -105,6 +105,9 @@ import {
  *   (skipped for a rescue with no enrolment, MATCH SIMPLE). A reminder time
  *   that is not a time fails the cast (22007). profiles.time_zone is
  *   readable (UTC unless setProfileTimeZone);
+ * - quit_plans and program_data: select own rows only, for the account
+ *   export (addQuitPlan and addProgramData seed them; every write is refused
+ *   with 42501 here);
  * - sync_lapse: select own rows only (members never write it; addSyncLapse
  *   seeds rows as the sync writer would). Account deletion and "Delete now"
  *   remove and count them;
@@ -309,6 +312,11 @@ const MEMBER_TABLES = [
   "notification_preferences",
   "wellbeing_baseline",
 ];
+/**
+ * Read as the member for the account export (own rows); written here only
+ * by the superuser helpers addQuitPlan and addProgramData.
+ */
+const READ_ONLY_TABLES = ["quit_plans", "program_data"];
 /** observations and programme_entries (202610180013). */
 const RECORD_TABLES = ["observations", "programme_entries"];
 /** Rows that go with their enrolment ("Delete now", on delete cascade). */
@@ -815,11 +823,19 @@ export class FakePostgrest {
         ...RECORD_TABLES,
         ...MEMBER_TABLES,
         "sync_lapse",
+        ...READ_ONLY_TABLES,
       ].includes(path)
     ) {
       return fail(404, "PGRST205", "Table not found");
     }
     const table = path as keyof State;
+    if (
+      READ_ONLY_TABLES.includes(table) &&
+      method !== "GET" &&
+      method !== "HEAD"
+    ) {
+      return fail(403, "42501", `permission denied for table ${table}`);
+    }
     let rows: Row[];
     let status = 200;
     if (method === "GET" || method === "HEAD") {
@@ -1304,6 +1320,7 @@ export class FakePostgrest {
     if (
       RECORD_TABLES.includes(table) ||
       MEMBER_TABLES.includes(table) ||
+      READ_ONLY_TABLES.includes(table) ||
       table === "sync_lapse"
     ) {
       return this.state[table].filter((row) => row.user_id === uid);

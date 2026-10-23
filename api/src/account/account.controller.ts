@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, Post } from "@nestjs/common";
 import type { AuthUser } from "../auth/auth-user";
 import { RequestUser } from "../auth/request-user.decorator";
 import { AccountService } from "./account.service";
@@ -8,8 +8,16 @@ import { DeleteAccountDataDto } from "./account.dto";
 export class AccountController {
   constructor(private readonly accounts: AccountService) {}
 
+  /** Kept for app versions that read the export with GET. */
   @Get("export")
   export(@RequestUser() user: AuthUser) {
+    return this.accounts.export(user);
+  }
+
+  /** The app's form: the same export and response as GET. */
+  @Post("export")
+  @HttpCode(200)
+  exportPost(@RequestUser() user: AuthUser) {
     return this.accounts.export(user);
   }
 

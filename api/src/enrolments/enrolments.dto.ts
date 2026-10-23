@@ -126,6 +126,31 @@ export class RevokeConsentDto {
   revoked!: true;
 }
 
+/**
+ * `PATCH /v1/enrolments/consents`: revoke the live consent of one purpose on
+ * one of the caller's enrolments, as the app sends it (no consent id).
+ */
+export class RevokeConsentByPurposeDto {
+  @IsUUID()
+  enrolmentId!: string;
+
+  @IsIn(consentPurposes)
+  purpose!: ConsentPurpose;
+
+  /**
+   * Share purposes only: the connection or caregiver the consent names.
+   * Needed only when more than one consent of that purpose is live.
+   */
+  @ValidateIf(
+    (dto: RevokeConsentByPurposeDto) => dto.recipientRef !== undefined,
+  )
+  @IsUUID()
+  recipientRef?: string;
+
+  @Equals(true)
+  revoked!: true;
+}
+
 export interface ConsentResponse {
   id: string;
   enrolmentId: string;

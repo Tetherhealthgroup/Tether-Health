@@ -38,6 +38,7 @@ import {
   type FocusSwapResponse,
   type GrantConsentDto,
   type GrantConsentResponse,
+  type RevokeConsentByPurposeDto,
   type SwapFocusDto,
   type UpdateEnrolmentDto,
 } from "./enrolments.dto";
@@ -421,6 +422,45 @@ export class EnrolmentsService {
     }
     if (data) return toConsent(data);
     return explainNotLive(client, id);
+  }
+
+  /**
+   * Revokes the live consent of `purpose` on one of the caller's
+   * enrolments (the app's form, without a consent id). An enrolment that is
+   * not the caller's is not found; with no live consent of that purpose
+   * (and recipient, when given) the answer is `consent_not_found` and no row
+   * is written. A share purpose with more than one live recipient needs
+   * `recipientRef` (`consent_recipient_required`). The revocation itself is
+   * the one by id, with the same race handling.
+   */
+  async revokeConsentByPurpose(
+    user: AuthUser,
+    dto: RevokeConsentByPurposeDto,
+  ): Promise<ConsentResponse> {
+    if (
+      dto.recipientRef !== undefined &&
+      !sharePurposes.includes(dto.purpose)
+    ) {
+      throw new BadRequestException("recipientRef does not match purpose");
+    }
+    const client = this.clients.forUser(user);
+    const enrolment = await this.ownEnrolment(client, user, dto.enrolmentId);
+    let query = client
+      .from("programme_consents")
+      .select(CONSENT_COLUMNS)
+      .eq("enrolment_id", enrolment.id)
+      .eq("purpose", dto.purpose)
+      .is("revoked_at", null);
+    if (dto.recipientRef !== undefined) {
+      // Recipients are stored by their lowercase id (TH021).
+      query = query.eq("recipient_ref", dto.recipientRef.toLowerCase());
+    }
+    const { data, error } = await query.returns<ConsentRow[]>();
+    if (error) throw new BadGatewayException("Consents are unavailable");
+    const [only, ...others] = data;
+    if (only === undefined) throw notFound("consent_not_found");
+    if (others.length > 0) throw conflict("consent_recipient_required");
+    return this.revokeConsent(user, only.id);
   }
 
   /**

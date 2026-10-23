@@ -282,9 +282,16 @@ async function readOwn(
   return result.rows;
 }
 
+/** `range` values the app sends, as an alias of `days`. */
+export const SUMMARY_RANGES: Readonly<
+  Record<string, (typeof SUMMARY_DAYS)[number]>
+> = { "7d": 7, "30d": 30, "90d": 90 };
+
 /**
- * `programme` (a programme code) and `days` (7, 30 or 90), nothing else;
- * any other key, a repeated key or another value → 400 `invalid_request`.
+ * `programme` (a programme code) and the window: `days` (7, 30 or 90) or
+ * its alias `range` (7d, 30d or 90d), exactly one of the two, nothing else.
+ * Any other key, a repeated key, both window keys, neither, or another
+ * value → 400 `invalid_request`.
  */
 export function parseSummaryQuery(query: unknown): {
   programme: string;
@@ -293,15 +300,23 @@ export function parseSummaryQuery(query: unknown): {
   if (query === null || typeof query !== "object") throw invalidRequest();
   const values = query as Record<string, unknown>;
   if (
-    Reflect.ownKeys(values).some((key) => key !== "programme" && key !== "days")
+    Reflect.ownKeys(values).some(
+      (key) => key !== "programme" && key !== "days" && key !== "range",
+    )
   ) {
     throw invalidRequest();
   }
-  const { programme, days } = values;
+  const { programme, days, range } = values;
   if (typeof programme !== "string" || !PROGRAMME_CODE.test(programme)) {
     throw invalidRequest();
   }
-  const parsed = SUMMARY_DAYS.find((value) => String(value) === days);
+  if ((days === undefined) === (range === undefined)) throw invalidRequest();
+  const parsed =
+    range === undefined
+      ? SUMMARY_DAYS.find((value) => String(value) === days)
+      : typeof range === "string" && Object.hasOwn(SUMMARY_RANGES, range)
+        ? SUMMARY_RANGES[range]
+        : undefined;
   if (parsed === undefined) throw invalidRequest();
   return { programme, days: parsed };
 }

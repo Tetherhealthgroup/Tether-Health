@@ -1,11 +1,17 @@
 openapi: 3.1.0
 info:
   title: Tether Health API
-  version: 1.8.0
+  version: 1.9.0
   description: >-
     Development contract for authenticated profiles and bounded program data.
     Real patient, clinical, and support-person data remain prohibited until
     privacy, clinical, retention, deletion, and compliance review is complete.
+    Added in 1.9.0, each for app use: `POST /v1/account/export` (the same
+    export as `GET`, which stays for older app versions), `PATCH
+    /v1/enrolments/consents` (revoke the live consent of one purpose on one
+    of the caller's enrolments, without a consent id; new code
+    `consent_recipient_required`), and `range` (7d, 30d or 90d) on `GET
+    /v1/records/summary` as an alias of `days`.
     Added in 1.8.0, each for app use: `POST /v1/records/check-ins` (one
     row per focus programme with a live core consent, each with only its
     own answer), `POST /v1/records/rescues` (a BreatheFree rescue always
@@ -143,6 +149,23 @@ paths:
       description: >-
         Returns the bounded app-owned profile and optional quit-plan snapshot.
         Requires a timestamped Supabase JWT authentication method (amr) within the configured recent-auth window.
+      security: [{supabaseJwt: []}]
+      responses:
+        '200':
+          description: JSON account data export
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AccountDataExport'}
+        '401': {description: Missing, invalid, or insufficiently recent authentication}
+        '502': {description: Account data is temporarily unavailable}
+    post:
+      operationId: exportMyAppDataPost
+      description: >-
+        The app's form of the export: the same handler and response as `GET
+        /v1/account/export`, with no request body. Requires a timestamped
+        Supabase JWT authentication method (amr) within the configured
+        recent-auth window.
+      x-app-use: true
       security: [{supabaseJwt: []}]
       responses:
         '200':
@@ -547,6 +570,50 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/CodedRequestRejected'}
         '502': {description: 'Consent storage is temporarily unavailable, or the database refused the consent for a reason the caller cannot fix'}
+    patch:
+      operationId: revokeProgrammeConsentByPurpose
+      description: >-
+        Revokes the live consent of one purpose on one of the caller's
+        enrolments, as the app sends it (no consent id). Only `revoked: true`
+        is accepted; nothing is ever granted here. The revocation is the same
+        as `PATCH /v1/enrolments/consents/{consentId}`: the database sets the
+        time, and revoking core revokes every live consent of the
+        enrolment. An enrolment that is not the caller's (or does not exist)
+        is `enrolment_not_found`. With no live consent of that purpose (and
+        `recipientRef`, when given) the answer is `consent_not_found` and no
+        row is written. `recipientRef` is for the share purposes only, and is
+        needed when more than one consent of that purpose is live
+        (`consent_recipient_required`).
+      x-app-use: true
+      security: [{supabaseJwt: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/RevokeConsentByPurpose'}
+      responses:
+        '200':
+          description: Revoked consent
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProgrammeConsent'}
+        '400':
+          description: Invalid body, including `recipientRef` for a purpose that is not a share purpose
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/RequestRejected'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404':
+          description: '`enrolment_not_found` (also for enrolments of other users) or `consent_not_found` (no live consent of that purpose)'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '409':
+          description: '`consent_recipient_required`, `consent_already_revoked` (a concurrent revocation got there first), or `consent_superseded`'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CodedRequestRejected'}
+        '502': {description: Consent storage is temporarily unavailable}
   /v1/enrolments/consents/{consentId}:
     parameters:
       - name: consentId
@@ -1226,12 +1293,14 @@ paths:
         One programme per call: its observations, entries and lessons from
         the last `days` days, its lapses (bf, sf) and its rescues (bf
         only). A programme the member left is summarised too (its data is
-        kept until deleted).
+        kept until deleted). The window is `days` or its alias `range`
+        (`7d` = 7, `30d` = 30, `90d` = 90): exactly one of the two.
       x-app-use: true
       security: [{supabaseJwt: []}]
       parameters:
         - {name: programme, in: query, required: true, schema: {type: string, pattern: '^[a-z]{2}$'}}
-        - {name: days, in: query, required: true, schema: {type: integer, enum: [7, 30, 90]}}
+        - {name: days, in: query, required: false, description: 'Exactly one of days and range', schema: {type: integer, enum: [7, 30, 90]}}
+        - {name: range, in: query, required: false, description: 'Alias of days; exactly one of days and range', schema: {type: string, enum: [7d, 30d, 90d]}}
       responses:
         '200':
           description: The programme's records
@@ -1239,7 +1308,7 @@ paths:
             application/json:
               schema: {$ref: '#/components/schemas/RecordsSummary'}
         '400':
-          description: '`invalid_request`: a missing, repeated, unknown or invalid query parameter'
+          description: '`invalid_request`: a missing, repeated, unknown or invalid query parameter, or both or neither of `days` and `range`'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/RecordsRequestRejected'}
@@ -1666,6 +1735,7 @@ components:
             - consent_document_unavailable
             - consent_version_unchanged
             - consent_conflict_retry
+            - consent_recipient_required
             - focus_swap_invalid
             - sharing_not_available
             - confirmation_required
@@ -1737,6 +1807,20 @@ components:
         locale:
           $ref: '#/components/schemas/ConsentLocale'
           description: The locale of the consent document the app showed.
+    RevokeConsentByPurpose:
+      type: object
+      additionalProperties: false
+      required: [enrolmentId, purpose, revoked]
+      properties:
+        enrolmentId: {type: string, format: uuid}
+        purpose: {$ref: '#/components/schemas/ConsentPurpose'}
+        recipientRef:
+          type: string
+          format: uuid
+          description: >-
+            Share purposes only: the connection or caregiver the consent
+            names. Needed when more than one consent of that purpose is live.
+        revoked: {const: true}
     ProgrammeConsentFields:
       type: object
       required: [id, enrolmentId, purpose, recipientRef, consentVersion, locale, consentText, grantedAt, revokedAt]

@@ -1031,6 +1031,147 @@ describe("EnrolmentsService", () => {
     });
   });
 
+  describe("revoke by enrolment and purpose", () => {
+    const revokeDto = (overrides: Record<string, unknown> = {}) => ({
+      enrolmentId: ENROLMENT_ID,
+      purpose: "screen_time" as const,
+      revoked: true as const,
+      ...overrides,
+    });
+
+    it("finds the live row of that purpose on the caller's enrolment and revokes it by id", async () => {
+      const live = consentRow({ id: OTHER_ID, purpose: "screen_time" });
+      const { service, calls } = setup(
+        { data: enrolmentRow(), error: null },
+        { data: [live], error: null },
+        {
+          data: { ...live, revoked_at: "2026-10-18T02:00:00.000Z" },
+          error: null,
+        },
+      );
+      const result = await service.revokeConsentByPurpose(user, revokeDto());
+      expect(result).toMatchObject({ id: OTHER_ID, purpose: "screen_time" });
+      expect(calls).toContainEqual([
+        "eq",
+        '"user_id"',
+        JSON.stringify(user.id),
+      ]);
+      expect(calls).toContainEqual(["eq", '"purpose"', '"screen_time"']);
+      expect(calls).toContainEqual(["is", '"revoked_at"', "null"]);
+      expect(calls).toContainEqual(["eq", '"id"', JSON.stringify(OTHER_ID)]);
+      expect(calls.filter(([name]) => name === "insert")).toEqual([]);
+    });
+
+    it("another member's or an unknown enrolment is enrolment_not_found", async () => {
+      const { service, calls } = setup({ data: null, error: null });
+      expect(
+        await codeOf(service.revokeConsentByPurpose(user, revokeDto())),
+      ).toEqual({
+        status: HttpStatus.NOT_FOUND,
+        code: "enrolment_not_found",
+      });
+      expect(calls.filter(([name]) => name === "update")).toEqual([]);
+    });
+
+    it("none live is consent_not_found and nothing is written", async () => {
+      const { service, calls } = setup(
+        { data: enrolmentRow(), error: null },
+        { data: [], error: null },
+      );
+      expect(
+        await codeOf(service.revokeConsentByPurpose(user, revokeDto())),
+      ).toEqual({
+        status: HttpStatus.NOT_FOUND,
+        code: "consent_not_found",
+      });
+      expect(
+        calls.filter(([name]) => name === "update" || name === "insert"),
+      ).toEqual([]);
+    });
+
+    it("two live share consents without a recipient need recipientRef", async () => {
+      const { service, calls } = setup(
+        { data: enrolmentRow(), error: null },
+        {
+          data: [
+            consentRow({
+              id: OTHER_ID,
+              purpose: "share_care_team",
+              recipient_ref: CORE_ID,
+            }),
+            consentRow({
+              id: NEW_CORE_ID,
+              purpose: "share_care_team",
+              recipient_ref: ENROLMENT_ID,
+            }),
+          ],
+          error: null,
+        },
+      );
+      expect(
+        await codeOf(
+          service.revokeConsentByPurpose(
+            user,
+            revokeDto({ purpose: "share_care_team" }),
+          ),
+        ),
+      ).toEqual({
+        status: HttpStatus.CONFLICT,
+        code: "consent_recipient_required",
+      });
+      expect(calls.filter(([name]) => name === "update")).toEqual([]);
+    });
+
+    it("matches a recipient by its lowercase id", async () => {
+      const live = consentRow({
+        id: OTHER_ID,
+        purpose: "share_care_team",
+        recipient_ref: CORE_ID,
+      });
+      const { service, calls } = setup(
+        { data: enrolmentRow(), error: null },
+        { data: [live], error: null },
+        {
+          data: { ...live, revoked_at: "2026-10-18T02:00:00.000Z" },
+          error: null,
+        },
+      );
+      await service.revokeConsentByPurpose(
+        user,
+        revokeDto({
+          purpose: "share_care_team",
+          recipientRef: CORE_ID.toUpperCase(),
+        }),
+      );
+      expect(calls).toContainEqual([
+        "eq",
+        '"recipient_ref"',
+        JSON.stringify(CORE_ID),
+      ]);
+    });
+
+    it("refuses a recipient for a purpose that is not shared, before any read", async () => {
+      const { service, forUser } = setup();
+      await expect(
+        service.revokeConsentByPurpose(
+          user,
+          revokeDto({ recipientRef: CORE_ID }),
+        ),
+      ).rejects.toThrow("recipientRef does not match purpose");
+      expect(forUser).not.toHaveBeenCalled();
+    });
+
+    it("a failed read is a 502", async () => {
+      const { service } = setup(
+        { data: enrolmentRow(), error: null },
+        { data: null, error: { code: "XX000", message: "synthetic" } },
+      );
+      await expect(
+        service.revokeConsentByPurpose(user, revokeDto()),
+      ).rejects.toBeInstanceOf(BadGatewayException);
+    });
+  });
+
   describe("focus swap", () => {
     const swapped = {
       data: [
