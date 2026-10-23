@@ -66,7 +66,7 @@ Map<String, EndpointHandler> eventHandlers(HandlerKit kit) {
     }),
     'POST /v1/program-data/hw/lipids':
         queued('POST /v1/program-data/hw/lipids', (api, s, k) {
-      final date = s.date('lab_date') ?? DateTime.now();
+      final date = s.requiredDate('lab_date');
       final total = s.number('total'), ldl = s.number('ldl');
       final hdl = s.number('hdl'), tg = s.number('triglycerides');
       if (total == null && ldl == null && hdl == null && tg == null) {
@@ -97,9 +97,7 @@ Map<String, EndpointHandler> eventHandlers(HandlerKit kit) {
       final a1c = s.number('a1c');
       if (a1c == null) throw const InvalidInput();
       return api.events.stA1c(
-          idempotencyKey: k,
-          a1c: a1c,
-          labDate: s.date('lab_date') ?? DateTime.now());
+          idempotencyKey: k, a1c: a1c, labDate: s.requiredDate('lab_date'));
     }),
     'POST /v1/program-data/ca/zone-checks':
         queued('POST /v1/program-data/ca/zone-checks', (api, s, k) async {
@@ -118,7 +116,7 @@ Map<String, EndpointHandler> eventHandlers(HandlerKit kit) {
       if (zone.startsWith('Invalid')) throw const InvalidInput();
       return api.events.caZoneCheck(
         idempotencyKey: k,
-        zone: byLabel(AsthmaZone.values, zone) ?? AsthmaZone.green,
+        zone: byLabel(AsthmaZone.values, zone) ?? (throw const InvalidInput()),
         symptoms: allByLabel(ZoneSymptom.values, s.list('symptoms')),
         peakFlow: s.number('peak_flow'),
       );
@@ -164,7 +162,7 @@ Map<String, EndpointHandler> eventHandlers(HandlerKit kit) {
       }
       return api.events.reLabs(
           idempotencyKey: k,
-          labDate: s.date('lab_date') ?? DateTime.now(),
+          labDate: s.requiredDate('lab_date'),
           egfr: egfr,
           urineAcr: acr,
           alt: alt);
@@ -183,7 +181,7 @@ Map<String, EndpointHandler> eventHandlers(HandlerKit kit) {
       return api.events.ckDone(
           idempotencyKey: k,
           item: slug(item),
-          doneOn: s.date('date') ?? DateTime.now(),
+          doneOn: s.requiredDate('date'),
           place: s.text('where_optional'));
     }),
     'POST /v1/program-data/be/diary':

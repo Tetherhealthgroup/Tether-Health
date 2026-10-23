@@ -157,4 +157,14 @@ void main() {
   test('an entry never prints its body', () {
     expect(_entry('ea/moods').toString(), isNot(contains('synthetic')));
   });
+
+  test('an unreadable outbox is kept as it is, never overwritten', () async {
+    store.documents['account.acct-1'] = 'not json';
+    final result = await outbox().submit(_entry('ea/moods', safety: true));
+    expect((result as OutboxFailed).code, OutboxCodes.unreadable);
+    expect(store.documents['account.acct-1'], 'not json');
+    await outbox().flush();
+    expect(store.documents['account.acct-1'], 'not json');
+    expect(codes, contains(OutboxCodes.unreadable));
+  });
 }

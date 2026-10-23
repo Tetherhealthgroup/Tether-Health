@@ -18,7 +18,12 @@ const Set<String> todayKeys = {
 
 /// Bind keys filled from a programme's 30-day summary, by programme.
 const Map<String, Set<String>> summaryKeys = {
-  'hw': {'hw.avg_30d', 'hw.readings_30d', 'hw.systolic_series'},
+  'hw': {
+    'hw.avg_30d',
+    'hw.readings_30d',
+    'hw.systolic_series',
+    ...hwSummaryKeys
+  },
   'st': {'st.after_meal_series'},
   're': {'re.egfr_series', 're.acr_latest'},
   'ca': {
@@ -29,6 +34,59 @@ const Map<String, Set<String>> summaryKeys = {
   },
   'sd': {'sd.falls_30d'},
 };
+
+/// The Heartwise care-summary preview: what the member sees before sending
+/// and exactly what is sent.
+const Set<String> hwSummaryKeys = {
+  'hw.summary.dates',
+  'hw.summary.bp_average',
+  'hw.summary.highest',
+  'hw.summary.latest_panel',
+};
+
+const List<String> _months = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov',
+  'Dec', //
+];
+
+String _day(DateTime t) =>
+    '${_months[t.toLocal().month - 1]} ${t.toLocal().day}';
+
+/// The preview values from a 30-day Heartwise summary; empty when the
+/// member has no readings (then nothing can be shared).
+Map<String, String> hwSummaryPreview(RecordsSummary s, DateTime now) {
+  final sys = [
+    for (final o in s.observations)
+      if (o['metric'] == 'bp_systolic') o
+  ];
+  final dia = [
+    for (final o in s.observations)
+      if (o['metric'] == 'bp_diastolic') o
+  ];
+  if (sys.isEmpty) return const {};
+  num avg(List<Map<String, Object?>> v) =>
+      v.map((o) => o['value']! as num).reduce((a, b) => a + b) / v.length;
+  final average = dia.isEmpty
+      ? '${avg(sys).round()}'
+      : '${avg(sys).round()}/${avg(dia).round()}';
+  final top = sys
+      .reduce((a, b) => (a['value']! as num) >= (b['value']! as num) ? a : b);
+  final topDia = dia.where((o) => o['at'] == top['at']).firstOrNull;
+  final ldl = [
+    for (final o in s.observations)
+      if (o['metric'] == 'chol_ldl') o
+  ];
+  return {
+    'hw.summary.dates': '${_day(s.since)} – ${_day(now)}',
+    'hw.summary.bp_average': '$average (${sys.length} readings)',
+    'hw.summary.highest': '${showNumber(top['value']! as num)}'
+        '${topDia == null ? '' : '/${showNumber(topDia['value']! as num)}'}'
+        ' · ${_day(DateTime.parse(top['at']! as String))}',
+    if (ldl.isNotEmpty)
+      'hw.summary.latest_panel': 'LDL ${showNumber(ldl.last['value']! as num)}'
+          ' · ${_day(DateTime.parse(ldl.last['at']! as String))}',
+  };
+}
 
 /// A number as shown: whole numbers without decimals.
 String showNumber(num value) =>
@@ -124,6 +182,7 @@ class SummarySource implements DataSource {
           out['hw.readings_30d'] = '${sys.length}';
           out['hw.systolic_series'] = sys;
           num avg(List<num> v) => v.reduce((a, b) => a + b) / v.length;
+          out.addAll(hwSummaryPreview(s, DateTime.now()));
           out['hw.avg_30d'] = dia.isEmpty
               ? '${avg(sys).round()}'
               : '${avg(sys).round()}/${avg(dia).round()}';

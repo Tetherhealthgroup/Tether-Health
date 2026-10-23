@@ -15,8 +15,10 @@ class AppServices {
     this.backend, {
     SyncDocumentStore? syncStore,
     SyncDocumentStore? outboxStore,
+    SyncDocumentStore? localStore,
     void Function(String code)? onCode,
   })  : api = TetherApi(backend.transport),
+        local = localStore ?? const SecureSyncDocumentStore(),
         sync = SyncEngine(
           client: SyncClient(backend.transport),
           store: syncStore ?? const SecureSyncDocumentStore(),
@@ -42,6 +44,10 @@ class AppServices {
 
   final Backend backend;
   final TetherApi api;
+
+  /// Small encrypted records on the phone: pending onboarding, deletion
+  /// records, the Ease safety plan.
+  final SyncDocumentStore local;
   final SyncEngine sync;
   late final Outbox outbox;
 
@@ -63,9 +69,33 @@ class AppServices {
 
   bool _opened = false;
 
-  /// Deletes this phone's sync document and outbox of [accountId].
+  /// Deletes this phone's sync document, outbox and safety plan of
+  /// [accountId]. Throws when a part could not be deleted (the caller
+  /// retries).
   Future<void> wipeAccount(String accountId) async {
     await sync.wipe(accountId: accountId);
     await outbox.wipe(accountId: accountId);
+    await local.delete(safetyPlanScope(accountId));
+  }
+
+  /// The current document version of [purpose] in the member's language,
+  /// or null when it cannot be known now.
+  Future<(String, ConsentLocale)?> consentDocument(
+      ConsentPurpose purpose) async {
+    final source = backend;
+    if (source is! ConsentDocuments) return null;
+    final versions =
+        await (source as ConsentDocuments).currentConsentVersions();
+    if (versions == null) return null;
+    final profile = await api.account.profile();
+    final locale = profile.valueOrNull?.locale == 'es'
+        ? ConsentLocale.es
+        : ConsentLocale.en;
+    final version = versions['${purpose.wire}/${locale.wire}'];
+    return version == null ? null : (version, locale);
   }
 }
+
+/// Where the Ease safety plan is kept (per account, or the guest's).
+String safetyPlanScope(String? accountId) =>
+    'device.ea.safety-plan.${accountId ?? 'guest'}';

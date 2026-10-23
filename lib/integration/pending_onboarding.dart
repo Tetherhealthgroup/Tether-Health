@@ -129,12 +129,13 @@ class PendingOnboarding {
       if (id == null) throw StateError('enrolment failed');
       ids[p.code] = id;
     }
-    // 2. Consents, core first, on each enrolment.
+    // 2. Consents, core first, on each enrolment, each with its own current
+    // document in the member's language. A refused grant keeps the record
+    // so the commit is retried; what was granted stays granted.
     final list = (await api.enrolments.list()).valueOrNull;
     if (list == null) throw StateError('enrolments unavailable');
-    final version = list.currentCoreConsentVersions[ConsentLocale.en];
     final wanted = await consents();
-    if (version != null && wanted.contains(ConsentPurpose.core)) {
+    if (wanted.contains(ConsentPurpose.core)) {
       final order = [
         ConsentPurpose.core,
         for (final p in wanted)
@@ -145,18 +146,24 @@ class PendingOnboarding {
           if (purpose == ConsentPurpose.screenTime && e.programmeCode != 'sf') {
             continue;
           }
-          if (e.consents.any((c) => c.purpose == purpose)) continue;
+          if (e.consents
+              .any((c) => c.purpose == purpose && c.revokedAt == null)) {
+            continue;
+          }
+          final document = await services.consentDocument(purpose);
+          if (document == null) {
+            throw StateError('consent document unavailable');
+          }
+          final (version, locale) = document;
           final granted = await api.enrolments.grantConsent(
             enrolmentId: e.id,
             purpose: purpose,
             consentVersion: version,
-            locale: ConsentLocale.en,
+            locale: locale,
           );
           final code = granted.errorOrNull?.code;
           if (code != null && code != ApiProblemCode.consentAlreadyGranted) {
-            if (purpose == ConsentPurpose.core) {
-              throw StateError('consent failed');
-            }
+            throw StateError('consent refused');
           }
         }
       }
@@ -171,12 +178,16 @@ class PendingOnboarding {
     final basics = (record['basics'] as Map?)?.cast<String, Object?>();
     if (basics != null) {
       final name = basics['displayName'] as String?;
-      if (name != null) await api.account.updateProfile(displayName: name);
-      await api.account.putBaseline(Baseline(
+      if (name != null) {
+        final named = await api.account.updateProfile(displayName: name);
+        if (!named.isSuccess) throw StateError('profile refused');
+      }
+      final saved = await api.account.putBaseline(Baseline(
         ageRange: basics['ageRange'] as String?,
         sleepBand: basics['sleepBand'] as String?,
         stressBand: basics['stressBand'] as String?,
       ));
+      if (!saved.isSuccess) throw StateError('baseline refused');
     }
     await clear();
   }

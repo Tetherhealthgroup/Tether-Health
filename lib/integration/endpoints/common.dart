@@ -124,6 +124,11 @@ class Snapshot {
     return null;
   }
 
+  /// A date the member must give; never defaulted. Throws [InvalidInput]
+  /// when it is missing or not a date.
+  DateTime requiredDate(String key, {String? screen}) =>
+      date(key, screen: screen) ?? (throw const InvalidInput());
+
   /// A typed date (`YYYY-MM-DD`, or as the date field writes it), or null.
   /// Throws [InvalidInput] when it is not a date.
   DateTime? date(String key, {String? screen}) {

@@ -3,12 +3,13 @@
 // device.
 import '../backend.dart';
 import 'day_window.dart';
+import 'sandbox_api.dart' show sandboxConsentVersion;
 import 'sandbox_auth.dart';
 import 'sandbox_server.dart';
 import 'sandbox_store.dart';
 
 /// [Backend] for `TETHER_BACKEND=sandbox`.
-class SandboxBackend implements Backend {
+class SandboxBackend implements Backend, ConsentDocuments {
   /// [persistence] defaults to the encrypted store; tests pass memory.
   factory SandboxBackend({
     SandboxPersistence persistence = const SecureSandboxPersistence(),
@@ -45,6 +46,18 @@ class SandboxBackend implements Backend {
 
   @override
   Future<void> init() => restore();
+
+  /// The sandbox's draft documents: one version for every purpose and
+  /// locale.
+  @override
+  Future<Map<String, String>?> currentConsentVersions() async => {
+        for (final purpose in const [
+          'core', 'reminders', 'records_import', 'share_care_team', //
+          'share_caregiver', 'research', 'screen_time',
+        ])
+          for (final locale in const ['en', 'es'])
+            '$purpose/$locale': sandboxConsentVersion,
+      };
 
   /// Removes the signed-in account's sandbox data, account and session.
   /// Other synthetic accounts on the phone stay.

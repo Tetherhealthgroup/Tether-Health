@@ -6,10 +6,11 @@ import 'package:breathefree_patient/backend/backend.dart';
 import 'package:breathefree_patient/backend/post_auth_hooks.dart';
 import 'package:breathefree_patient/backend/sandbox/sandbox_backend.dart';
 import 'package:breathefree_patient/data/app_services.dart';
+import 'package:breathefree_patient/data/display_source.dart';
 import 'package:breathefree_patient/data/sync_codec.dart';
 import 'package:breathefree_patient/integration/data_adapter.dart';
+import 'package:breathefree_patient/integration/deletion_records.dart';
 import 'package:breathefree_patient/integration/endpoints/common.dart';
-import 'package:breathefree_patient/integration/endpoints/device_endpoints.dart';
 import 'package:breathefree_patient/integration/endpoints/handlers.dart';
 import 'package:breathefree_patient/integration/pending_onboarding.dart';
 import 'package:breathefree_patient/integration/registry.dart';
@@ -21,12 +22,19 @@ import 'package:tether_ui/ui/ui.dart';
 import '../backend/sandbox/support.dart';
 
 /// The sandbox backend with every request recorded.
-class _Recorded implements Backend {
+class _Recorded implements Backend, ConsentDocuments {
   _Recorded(this.inner);
 
   final SandboxBackend inner;
   final List<String> calls = [];
   bool offline = false;
+
+  /// Replaces the sandbox's document versions when set.
+  Map<String, String>? versions;
+
+  @override
+  Future<Map<String, String>?> currentConsentVersions() async =>
+      versions ?? await inner.currentConsentVersions();
 
   @override
   BackendMode get mode => inner.mode;
@@ -68,21 +76,19 @@ void main() {
   setUp(() async {
     h = SandboxHarness();
     backend = _Recorded(h.backend);
+    deviceStore = MemorySyncDocumentStore();
     services = AppServices(backend,
         syncStore: MemorySyncDocumentStore(),
-        outboxStore: MemorySyncDocumentStore());
+        outboxStore: MemorySyncDocumentStore(),
+        localStore: deviceStore);
     kit = HandlerKit(
       services: services,
       data: AppData(),
       cleaners: DeletionCleaners(),
       postAuthHooks: PostAuthHooks(),
-      pending: PendingOnboarding(MemorySyncDocumentStore()),
+      pending: PendingOnboarding(deviceStore),
     );
-    deviceStore = MemorySyncDocumentStore();
-    api = AppApi(handlers: {
-      ...handlersFor(kit),
-      ...deviceHandlers(kit, store: deviceStore),
-    });
+    api = AppApi(handlers: handlersFor(kit));
     HandlerKit.programOfScreen = null;
     HandlerKit.argumentOfScreen = null;
   });
@@ -295,10 +301,18 @@ void main() {
         const TResult.ok());
   });
 
-  test(
-      'the quit plan: a guest keeps it, an account stores it; explore writes none',
-      () async {
+  test('the quit plan is saved only with the date the member chose', () async {
     await h.signUp();
+    await h.enrol('bf', status: EnrolmentStatus.focus);
+    final noDate = await submit('PUT /v1/quit-plan', 'bf_review', {
+      'bf_q1.value': '10 or fewer',
+      'bf_path.path': 'Set a quit date',
+    });
+    expect(noDate, const TResult.ok());
+    expect(backend.calls, isNot(contains('PUT /v1/quit-plan')),
+        reason: 'no date is invented');
+    expect(services.sync.answersOf('bf', 'q1'), isNotNull,
+        reason: 'the answers are kept through sync');
     final explore = await submit(
         'PUT /v1/quit-plan', 'bf_review', {'bf_path.path': 'Explore first'});
     expect(explore, const TResult.ok());
@@ -308,15 +322,233 @@ void main() {
       'bf_q1.value': '10 or fewer',
       'bf_q3.value': ['Protect my family'],
       'bf_path.path': 'Set a quit date',
+      'bf_date.quit_date': '2026-11-02',
     });
     expect(r, const TResult.ok());
     final plan = (await h.api.account.quitPlan()).valueOrNull!;
     expect(plan.dailyCigaretteUse, 'tenOrFewer');
     expect(plan.topQuitReason, 'family');
+    expect(plan.quitDate, DateTime(2026, 11, 2));
   });
 
   test('the codec stores a plan the settings source can read back', () {
     final a = encodeScreen('hw_targets', {'top_below': '130'});
     expect(decodeScreen('hw_targets', a)['top_below'], '130');
+  });
+
+  group('account deletion', () {
+    Future<TResult> delete() =>
+        submit('DELETE /v1/account/data', 'account_delete', {
+          'account_delete.type_delete_to_confirm': 'DELETE',
+        });
+
+    test('removes the safety plan, sync document and outbox of the account',
+        () async {
+      await h.signUp();
+      final id = services.accountId!;
+      await submit('PUT device:encrypted/ea/safety-plan', 'ea_plan',
+          {'ea_plan.my_warning_signs': 'synthetic'});
+      expect(deviceStore.documents.keys, contains(safetyPlanScope(id)));
+      expect(await delete(), const TResult.ok());
+      expect(deviceStore.documents.keys.where((k) => k.startsWith('device.')),
+          isEmpty);
+      final records = await DeletionRecords(deviceStore).all();
+      expect(records[id]!['state'], 'complete');
+      expect((records[id]!['receipt']! as Map)['requestId'], isNotNull);
+      final shown = (await DeletionSource(services).load())!;
+      expect(shown['account.deletion.receipt'], isNotNull);
+    });
+
+    test('a server failure wipes nothing and keeps no record', () async {
+      await h.signUp();
+      final id = services.accountId!;
+      await submit('PUT device:encrypted/ea/safety-plan', 'ea_plan',
+          {'ea_plan.my_warning_signs': 'synthetic'});
+      backend.offline = true;
+      expect(await delete(), isA<TFailed>());
+      expect(deviceStore.documents.keys, contains(safetyPlanScope(id)));
+      expect(await DeletionRecords(deviceStore).all(), isEmpty);
+    });
+
+    test('an unfinished local cleanup is retried on the next start', () async {
+      await h.signUp();
+      final id = services.accountId!;
+      await DeletionRecords(deviceStore).put(id, {
+        'state': 'server_done',
+        'receipt': {
+          'requestId': 'r-1',
+          'completedAt': '2026-10-22T12:00:00.000Z',
+          'deleted': <String, int>{},
+        },
+      });
+      await deviceStore.write(safetyPlanScope(id), '{}');
+      await resumeUnfinished(kit);
+      expect(deviceStore.documents.containsKey(safetyPlanScope(id)), isFalse);
+      expect(
+          (await DeletionRecords(deviceStore).all())[id]!['state'], 'complete');
+    });
+  });
+
+  group('consents', () {
+    test('each purpose uses its own document in the member\'s language',
+        () async {
+      await h.signUp();
+      await h.api.account.updateProfile(locale: 'es');
+      backend.versions = {
+        'core/es': 'sandbox-draft-1',
+        'reminders/es': 'sandbox-draft-1',
+      };
+      await submit('POST /v1/enrolments/consents', 'ob_consent', {
+        'ob_programs.programs': ['Heartwise'],
+        'ob_consent.essential_app_data': true,
+        'ob_consent.private_reminders': true,
+      });
+      final e = (await h.api.enrolments.list()).valueOrNull!.enrolments.single;
+      expect({
+        for (final c in e.consents) c.purpose: c.locale
+      }, {
+        ConsentPurpose.core: 'es',
+        ConsentPurpose.reminders: 'es',
+      });
+    });
+
+    test('a refused optional grant keeps the onboarding record to retry',
+        () async {
+      backend.versions = {'core/en': 'sandbox-draft-1'};
+      await submit('POST /v1/enrolments/consents', 'ob_consent', {
+        'ob_programs.programs': ['Heartwise'],
+        'ob_consent.essential_app_data': true,
+        'ob_consent.de_identified_research': true,
+      });
+      await h.signUp();
+      await expectLater(kit.pending.commit(services), throwsStateError);
+      expect(await kit.pending.read(), isNotEmpty);
+      backend.versions = null;
+      await kit.pending.commit(services);
+      expect(await kit.pending.read(), isEmpty);
+      final e = (await h.api.enrolments.list()).valueOrNull!.enrolments.single;
+      expect(e.consents.map((c) => c.purpose),
+          containsAll([ConsentPurpose.core, ConsentPurpose.research]));
+    });
+  });
+
+  group('records', () {
+    Future<void> addItems(List<Map<String, Object?>> items) =>
+        h.backend.store.transact((state) {
+          final data = (state['data']! as Map)[services.accountId] as Map;
+          (data['records'] as Map)['items'] = items;
+        });
+
+    Map<String, Object?> item(String id, String code, String status,
+            {String? category}) =>
+        {
+          'id': id,
+          'code': code,
+          'category': category ?? 'lab_result',
+          'status': status
+        };
+
+    test('review accepts only the programmes the member ticked', () async {
+      await h.signUp();
+      const a1c = '5a4db0c0-0000-4000-8000-0000000000a1';
+      const ldl = '5a4db0c0-0000-4000-8000-0000000000a2';
+      await addItems([
+        item(a1c, 'a1c', 'pending_review'),
+        item(ldl, 'ldl', 'pending_review')
+      ]);
+      final r = await submit('POST /v1/records/fhir/accept', 'records_review', {
+        'records_review.keep_st': ['A1C 7.6%'],
+        'records_review.keep_hw': <String>[],
+      });
+      expect(r, const TResult.ok());
+      final items =
+          ((await h.api.care.recordItems()).valueOrNull!['items']! as List)
+              .cast<Map>();
+      expect({for (final i in items) i['code']: i['status']},
+          {'a1c': 'accepted', 'ldl': 'pending_review'});
+    });
+
+    test('conflict choices go to their own item', () async {
+      await h.signUp();
+      const bp = '5a4db0c0-0000-4000-8000-0000000000b1';
+      const a1c = '5a4db0c0-0000-4000-8000-0000000000b2';
+      await addItems([
+        item(bp, 'bp', 'conflict', category: 'blood_pressure'),
+        item(a1c, 'a1c', 'conflict'),
+      ]);
+      await submit('POST /v1/records/fhir/conflicts', 'records_conflict', {
+        'records_conflict.a1c': 'Keep both',
+        'records_conflict.bp': 'Discard',
+      });
+      final items =
+          ((await h.api.care.recordItems()).valueOrNull!['items']! as List)
+              .cast<Map>();
+      expect({for (final i in items) i['code']: i['status']},
+          {'bp': 'rejected', 'a1c': 'accepted'});
+    });
+  });
+
+  group('Heartwise care summary', () {
+    test('no readings: nothing is sent', () async {
+      await h.signUp();
+      await h.enrol('hw');
+      await h.api.care
+          .redeemConnection({'inviteCode': 'TETHER-SANDBOX-CLINIC'});
+      final r = await submit('POST /v1/care/summaries', 'hw_summary', {});
+      expect(r, const TResult.failed('nothing_to_share'));
+      expect(backend.calls, isNot(contains('POST /v1/care/summaries')));
+    });
+
+    test('sends exactly the preview shown', () async {
+      await h.signUp();
+      await h.enrol('hw');
+      await h.api.care
+          .redeemConnection({'inviteCode': 'TETHER-SANDBOX-CLINIC'});
+      await h.api.events
+          .hwReading(idempotencyKey: h.key(), systolic: 130, diastolic: 80);
+      final data = AppData(sources: [SummarySource(services, 'hw')]);
+      kit = HandlerKit(
+        services: services,
+        data: data,
+        cleaners: DeletionCleaners(),
+        postAuthHooks: PostAuthHooks(),
+        pending: PendingOnboarding(deviceStore),
+      );
+      api = AppApi(handlers: handlersFor(kit));
+      for (final key in hwSummaryKeys) {
+        data.watch(key);
+      }
+      await data.refresh();
+      final preview = data.watch('hw.summary.bp_average').value;
+      expect(preview, '130/80 (1 readings)');
+      expect(await submit('POST /v1/care/summaries', 'hw_summary', {}),
+          const TResult.ok());
+      final export = (await h.api.account.export()).valueOrNull!;
+      final stored =
+          (((export['sandbox']! as Map)['care']! as Map)['summaries']! as List)
+              .single as Map;
+      expect(
+          ((stored['snapshot']! as Map)['preview']!
+              as Map)['hw.summary.bp_average'],
+          preview);
+    });
+  });
+
+  test('a zone outside the plan\'s valid range is refused, never green',
+      () async {
+    await h.signUp();
+    await h.enrol('ca');
+    final r = await submit('POST /v1/program-data/ca/zone-checks', 'ca_zone',
+        {'ca_zone.peak_flow': '2000'});
+    expect(r, const TResult.failed(HandlerCodes.invalidInput));
+    expect(await services.outbox.pending(), isEmpty);
+  });
+
+  test('a missing lab date is refused, not set to today', () async {
+    await h.signUp();
+    await h.enrol('hw');
+    final r = await submit('POST /v1/program-data/hw/lipids', 'hw_lipids',
+        {'hw_lipids.ldl': '120'});
+    expect(r, const TResult.failed(HandlerCodes.invalidInput));
   });
 }

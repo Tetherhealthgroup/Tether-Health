@@ -2,9 +2,43 @@
 // The server stores what is sent; it delivers nothing itself.
 import 'package:tether_ui/ui/ui.dart';
 
-import '../../api/tether_api.dart';
+import '../../data/display_source.dart' show hwSummaryKeys;
 import '../registry.dart';
 import 'common.dart';
+
+/// The programme a record item belongs to, by its code, category or
+/// resource type; null when it fits none of the review groups.
+String? programmeOfItem(Map<String, Object?> item) {
+  final code = '${item['code']}'.toLowerCase();
+  final category = '${item['category']}'.toLowerCase();
+  final display = '${item['display']}'.toLowerCase();
+  if (code == 'a1c' || code == 'glucose' || category == 'glucose') return 'st';
+  if (code == 'egfr' || code == 'urine_acr') return 're';
+  if (code == 'ldl' ||
+      code == 'hdl' ||
+      code.startsWith('chol') ||
+      category == 'blood_pressure') {
+    return 'hw';
+  }
+  if (category == 'vaccine' || item['resourceType'] == 'Immunization') {
+    return 'ck';
+  }
+  if (display.contains('smok') || code == 'smoking_status') return 'bf';
+  return null;
+}
+
+/// Which conflict question (`a1c` or `bp`) an item answers, or null.
+String? conflictKindOf(Map<String, Object?> item) {
+  final code = '${item['code']}'.toLowerCase();
+  final category = '${item['category']}'.toLowerCase();
+  if (code == 'a1c') return 'a1c';
+  if (category == 'blood_pressure' ||
+      code == 'blood_pressure' ||
+      code.startsWith('bp')) {
+    return 'bp';
+  }
+  return null;
+}
 
 /// Handlers of the care and records endpoints.
 Map<String, EndpointHandler> careRecordsHandlers(HandlerKit kit) {
@@ -44,21 +78,21 @@ Map<String, EndpointHandler> careRecordsHandlers(HandlerKit kit) {
       ));
     }),
     'POST /v1/care/summaries': signedIn((s) async {
-      // The snapshot is the member's own 30-day Heartwise data, as stored.
-      final summary = await kit.api.records
-          .summary(programme: 'hw', range: SummaryRange.days30);
-      final data = summary.valueOrNull;
-      if (data == null) return resultOf(summary);
-      final readings = [
-        for (final o in data.observations)
-          if (o['metric'] == 'bp_systolic' || o['metric'] == 'bp_diastolic') o,
-      ];
-      if (readings.isEmpty) return const TResult.failed('nothing_to_share');
+      // Exactly the preview the member saw: the shown values, all real. If
+      // any is missing (no readings, or not loaded) nothing is sent.
+      final shown = <String, String>{};
+      for (final key in hwSummaryKeys) {
+        final value = kit.data.watch(key).value;
+        if (value is String) shown[key] = value;
+      }
+      if (!shown.containsKey('hw.summary.dates') ||
+          !shown.containsKey('hw.summary.bp_average')) {
+        return const TResult.failed('nothing_to_share');
+      }
       return resultOf(await kit.api.care.sendSummary({
         'programmeCode': 'hw',
         'snapshot': {
-          'since': data.since.toIso8601String(),
-          'observations': readings,
+          'preview': shown,
           'includeNotes': s.flag('include_notes') ?? false,
         },
       }, idempotencyKey: s.call.idempotencyKey));
@@ -112,7 +146,7 @@ Map<String, EndpointHandler> careRecordsHandlers(HandlerKit kit) {
           types[s.one('type', screen: 'records_manual')] ?? 'lab_result';
       final test = s.text('test');
       final value = s.number('value');
-      final date = s.date('date') ?? DateTime.now();
+      final date = s.requiredDate('date');
       final testCode = test == null ? null : slug(test);
       return resultOf(await kit.api.care.addManualRecord({
         'type': type,
@@ -125,41 +159,42 @@ Map<String, EndpointHandler> careRecordsHandlers(HandlerKit kit) {
       }, idempotencyKey: s.call.idempotencyKey));
     }),
     'POST /v1/records/fhir/accept': signedIn((s) async {
-      final ticked = [
-        for (final key in const [
-          'keep_hw',
-          'keep_st',
-          'keep_ck',
-          'keep_bf',
-          'keep_re'
-        ])
-          ...s.list(key),
-      ];
+      // Only the items of the programmes the member ticked.
+      final ticked = {
+        for (final code in const ['hw', 'st', 'ck', 'bf', 're'])
+          if (s.list('keep_$code').isNotEmpty) code,
+      };
       if (ticked.isEmpty) return const TResult.ok();
-      final pending = await items('pending_review');
-      if (pending.isEmpty) return const TResult.ok();
-      return resultOf(await kit.api.care.acceptRecords({
-        'itemIds': [for (final i in pending) i['id']],
-      }));
+      final chosen = [
+        for (final i in await items('pending_review'))
+          if (ticked.contains(programmeOfItem(i))) i['id'],
+      ];
+      if (chosen.isEmpty) return const TResult.ok();
+      return resultOf(await kit.api.care.acceptRecords({'itemIds': chosen}));
     }),
     'POST /v1/records/fhir/conflicts': signedIn((s) async {
-      final conflicts = await items('conflict');
-      if (conflicts.isEmpty) return const TResult.ok();
-      String choiceOf(String? label) {
-        if (label == null) return 'keep_both';
+      String? choiceOf(String? label) {
+        if (label == null) return null;
         if (label.startsWith('From ')) return 'use_imported';
         if (label.startsWith('Entered by you')) return 'keep_mine';
         if (label == 'Discard') return 'discard';
-        return 'keep_both';
+        if (label == 'Keep both' || label.startsWith('Ask')) return 'keep_both';
+        return null;
       }
 
-      final choices = [choiceOf(s.one('a1c')), choiceOf(s.one('bp'))];
-      return resultOf(await kit.api.care.resolveRecordConflicts({
-        'resolutions': [
-          for (var i = 0; i < conflicts.length; i++)
-            {'itemId': conflicts[i]['id'], 'choice': choices[i < 2 ? i : 1]},
-        ],
-      }));
+      // Each choice goes to the conflict it was asked about, by item.
+      final byKind = {
+        'a1c': choiceOf(s.one('a1c')),
+        'bp': choiceOf(s.one('bp'))
+      };
+      final resolutions = [
+        for (final item in await items('conflict'))
+          if (byKind[conflictKindOf(item)] case final choice?)
+            {'itemId': item['id'], 'choice': choice},
+      ];
+      if (resolutions.isEmpty) return const TResult.ok();
+      return resultOf(await kit.api.care
+          .resolveRecordConflicts({'resolutions': resolutions}));
     }),
     'POST /v1/records/fhir/sources/:id/sync': signedIn((s) async {
       final source = HandlerKit.argumentOfScreen?.call(s.screen);

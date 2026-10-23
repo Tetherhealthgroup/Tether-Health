@@ -1,4 +1,4 @@
-// Settings screens (P-71): the app's class lists match the kit's, the
+// Settings screens: the app's class lists match the kit's, the
 // registry sends only touched keys on consent screens and refuses plan
 // screens that are not loaded, and the stored values come from the backend.
 import 'dart:io';

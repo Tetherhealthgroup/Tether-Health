@@ -31,6 +31,12 @@ class DeletionReceipt {
 
   /// Deleted row counts by kind (the receipt's key set).
   final Map<String, int> deleted;
+
+  Map<String, Object?> toJson() => {
+        'requestId': requestId,
+        'completedAt': completedAt.toUtc().toIso8601String(),
+        'deleted': deleted,
+      };
 }
 
 /// A programme of the catalogue.

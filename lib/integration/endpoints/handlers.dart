@@ -3,14 +3,16 @@
 //
 // Every registered endpoint has a handler here except the Supabase Auth
 // submits, which the sign-in work provides.
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 
 import '../../app/composition.dart' show HandlerContext;
 import '../../backend/backend.dart';
 import '../../data/app_services.dart';
 import '../../data/display_source.dart';
-import '../../sync/sync_store.dart';
 import '../data_adapter.dart';
+import '../deletion_records.dart';
 import '../pending_onboarding.dart';
 import '../registry.dart';
 import '../settings_data.dart';
@@ -31,12 +33,27 @@ Map<String, EndpointHandler> buildHandlers(HandlerContext context) {
     data: context.data,
     cleaners: context.cleaners,
     postAuthHooks: context.postAuthHooks,
-    pending: PendingOnboarding(const SecureSyncDocumentStore()),
+    pending: PendingOnboarding(services.local),
   );
   context.cleaners.register(services.wipeAccount);
   context.postAuthHooks.register(kit.pending.commitHook(services));
   ForegroundSync.install(services, context.data);
+  unawaited(resumeUnfinished(kit));
   return handlersFor(kit);
+}
+
+/// Work left unfinished by an earlier run: a deletion whose local cleanup
+/// did not complete, and an onboarding commit that was refused part way.
+/// Nothing is dropped: a failure here is retried on the next start.
+Future<void> resumeUnfinished(HandlerKit kit) async {
+  try {
+    await retryDeletions(kit.services, kit.cleaners, kit.pending);
+    if (kit.services.signedIn && (await kit.pending.read()).isNotEmpty) {
+      await kit.pending.commit(kit.services);
+    }
+  } catch (_) {
+    // Kept; retried on the next start.
+  }
 }
 
 /// Every handler, for [kit] (tests build their own kit).
@@ -55,6 +72,7 @@ AppData buildAppData(Backend backend) {
     accountId: () => services.accountId,
     sources: [
       SettingsSource(services),
+      DeletionSource(services),
       TodaySource(services),
       for (final programme in summaryKeys.keys)
         SummarySource(services, programme),

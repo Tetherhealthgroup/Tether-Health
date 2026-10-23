@@ -218,6 +218,13 @@ abstract interface class AuthBackend
   Future<String?> accessToken();
 }
 
+/// The current consent document versions, which a backend may offer.
+abstract interface class ConsentDocuments {
+  /// The current version by `<purpose>/<locale>` (for example
+  /// `research/es`), or null when they cannot be read now.
+  Future<Map<String, String>?> currentConsentVersions();
+}
+
 /// Everything the app needs from a backend.
 abstract interface class Backend {
   /// Which backend this is. Sandbox mode shows the environment badge.

@@ -1,4 +1,4 @@
-// Settings screens (P-71): the stored values their bound controls start
+// Settings screens: the stored values their bound controls start
 // from, and the class of each screen.
 //
 // Consent class: a control starts from the member's stored value only; a

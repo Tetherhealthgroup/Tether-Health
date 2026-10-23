@@ -7,8 +7,12 @@ import 'package:tether_ui/ui/ui.dart';
 import '../../api/tether_api.dart';
 import '../../quit_plan/guest_quit_plan_store.dart';
 import '../../quit_plan/quit_plan.dart';
+import '../deletion_records.dart';
 import '../pending_onboarding.dart';
+import '../../data/sync_codec.dart';
 import '../registry.dart';
+import 'device_endpoints.dart';
+import 'sync_endpoints.dart';
 import 'common.dart';
 
 /// ob_consent toggles and the consent each one grants.
@@ -50,9 +54,9 @@ List<PendingProgramme> onboardingProgrammes(Snapshot s) {
   ];
 }
 
-/// The quit plan built from the BreatheFree onboarding answers, or null for
-/// "Explore first" (which writes no plan).
-QuitPlan? quitPlanOf(Snapshot s, String userId, DateTime today) {
+/// The quit plan built from the BreatheFree answers and the quit date the
+/// member chose, or null for "Explore first" (which writes no plan).
+QuitPlan? quitPlanOf(Snapshot s, String userId, DateTime quitDate) {
   const daily = {
     'I don’t smoke every day': 'notEveryDay',
     '10 or fewer': 'tenOrFewer',
@@ -73,13 +77,14 @@ QuitPlan? quitPlanOf(Snapshot s, String userId, DateTime today) {
     'My health': 'improveHealth', 'Be there for my future': 'future',
   };
   const paths = {
-    'Set a quit date': ('setQuitDate', 7),
-    'Quit today': ('quitToday', 0),
-    'Reduce gradually': ('reduceGradually', 28),
+    'Set a quit date': 'setQuitDate',
+    'Quit today': 'quitToday',
+    'Reduce gradually': 'reduceGradually',
   };
   final path = s.one('path', screen: 'bf_path');
   if (path == 'Explore first') return null;
-  final (pathCode, days) = paths[path] ?? ('setQuitDate', 7);
+  final pathCode = paths[path];
+  if (pathCode == null) return null;
   final chosenReasons = [
     for (final r in s.list('value', screen: 'bf_q3'))
       if (reasons[r] case final code?) code,
@@ -95,7 +100,7 @@ QuitPlan? quitPlanOf(Snapshot s, String userId, DateTime today) {
     customSmokingTrigger: custom,
     readinessPath: 'prepare',
     quitPlanPath: pathCode,
-    quitDate: DateTime(today.year, today.month, today.day + days),
+    quitDate: DateTime(quitDate.year, quitDate.month, quitDate.day),
     quitDayCheckIn:
         s.flag('quit_day_check_in_at_7_00_am', screen: 'bf_date') ?? false,
     quitReasons: chosenReasons,
@@ -108,6 +113,27 @@ QuitPlan? quitPlanOf(Snapshot s, String userId, DateTime today) {
         s.flag('remind_me_to_discuss_quit_medici', screen: 'bf_support') ??
             false,
   );
+}
+
+/// The BreatheFree setup screens whose answers are kept through sync.
+const List<String> breatheFreeAnswerScreens = [
+  'bf_q1', 'bf_q2', 'bf_q3', 'bf_path', 'bf_date', 'bf_support', //
+];
+
+/// Saves the BreatheFree setup answers to the sync document (area bf,
+/// screens q1, q2, q3, path, date, support), creating the enrolment when
+/// it is missing.
+Future<TResult> saveBreatheFreeAnswers(HandlerKit kit, Snapshot s) async {
+  final refused = await ensureEnrolment(kit, 'bf');
+  if (refused != null) return TResult.failed(refused);
+  await kit.services.openSync();
+  for (final screen in breatheFreeAnswerScreens) {
+    final values = screenValues(screen, s.call.payload);
+    if (values.isEmpty) continue;
+    await kit.services.sync
+        .saveAnswers('bf', screen.substring(3), encodeScreen(screen, values));
+  }
+  return afterSyncSave(kit);
 }
 
 /// The programme a programme-scoped screen acts on.
@@ -133,10 +159,6 @@ Map<String, EndpointHandler> accountHandlers(
     return null;
   }
 
-  Future<String?> coreVersion() async => (await kit.api.enrolments.list())
-      .valueOrNull
-      ?.currentCoreConsentVersions[ConsentLocale.en];
-
   Future<TResult> setConsent(Enrolment e, ConsentPurpose purpose, bool on,
       {String? recipient}) async {
     final live =
@@ -146,15 +168,16 @@ Map<String, EndpointHandler> accountHandlers(
       return resultOf(await kit.api.enrolments
           .revokeConsent(enrolmentId: e.id, purpose: purpose));
     }
-    final version = await coreVersion();
-    if (version == null) {
+    final document = await kit.services.consentDocument(purpose);
+    if (document == null) {
       return const TResult.failed('consent_document_unavailable');
     }
+    final (version, locale) = document;
     return resultOf(await kit.api.enrolments.grantConsent(
       enrolmentId: e.id,
       purpose: purpose,
       consentVersion: version,
-      locale: ConsentLocale.en,
+      locale: locale,
       recipientRef: recipient,
     ));
   }
@@ -312,10 +335,15 @@ Map<String, EndpointHandler> accountHandlers(
         }),
     'PUT /v1/quit-plan': (call) => guarded(() async {
           final s = Snapshot(call);
-          final plan =
-              quitPlanOf(s, kit.services.accountId ?? 'guest', DateTime.now());
+          // The quit date only as the member chose it; never invented.
+          final date = s.date('quit_date', screen: 'bf_date');
+          final plan = date == null
+              ? null
+              : quitPlanOf(s, kit.services.accountId ?? 'guest', date);
           if (plan == null) {
-            return const TResult.ok(); // Explore first: no plan.
+            // "Explore first", or no date chosen: no quit plan row. The
+            // answers are kept through the sync document instead.
+            return saveBreatheFreeAnswers(kit, s);
           }
           if (!kit.services.signedIn) {
             await guest.save(GuestQuitPlanSnapshot(
@@ -338,6 +366,7 @@ Map<String, EndpointHandler> accountHandlers(
           await kit.services.openSync();
           await kit.services.sync.adoptGuest();
           await kit.services.outbox.adoptGuest();
+          await adoptGuestSafetyPlan(kit.services, kit.services.accountId!);
           if (choice.startsWith('Use this phone')) {
             final plan = (await guest.load())?.plan;
             if (plan != null) {
@@ -378,16 +407,32 @@ Map<String, EndpointHandler> accountHandlers(
               return const TResult.failed('invalid_credentials');
             }
           }
+          final records = DeletionRecords(kit.services.local);
+          // Recorded before the server is asked, so an interrupted deletion
+          // is found again on the next start.
+          await records.put(id, {'state': 'requested'});
           final r = await kit.api.account.deleteData();
-          if (!r.isSuccess) return resultOf(r);
-          await kit.cleaners.runAll(id);
-          await kit.pending.clear();
-          await kit.services.backend.wipeLocal();
+          final receipt = r.valueOrNull;
+          if (receipt == null) {
+            // The server deleted nothing: neither does the phone.
+            await records.remove(id);
+            return resultOf(r);
+          }
+          await records
+              .put(id, {'state': 'server_done', 'receipt': receipt.toJson()});
+          final cleaned =
+              await cleanUpAccount(kit.services, kit.cleaners, kit.pending, id);
+          if (cleaned) {
+            await records
+                .put(id, {'state': 'complete', 'receipt': receipt.toJson()});
+          }
           try {
+            await kit.services.backend.wipeLocal();
             await kit.services.backend.auth.signOut();
           } catch (_) {
-            // The account is gone; the local session ends with it.
+            // The account is gone on the server; the session ends with it.
           }
+          await kit.data.refresh();
           return const TResult.ok();
         }),
   };

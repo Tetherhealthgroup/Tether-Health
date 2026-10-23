@@ -141,6 +141,12 @@ class SecureOutboxStore implements SyncDocumentStore {
 abstract final class OutboxCodes {
   static const String full = 'outbox_full';
   static const String rejected = 'outbox_rejected';
+  static const String unreadable = 'outbox_unreadable';
+}
+
+/// The stored outbox could not be read; it is left as it is.
+class OutboxUnreadable implements Exception {
+  const OutboxUnreadable();
 }
 
 /// The outbox of the signed-in account (or the guest's).
@@ -197,7 +203,9 @@ class Outbox {
           OutboxEntry.fromJson((e! as Map).cast<String, Object?>()),
       ];
     } catch (_) {
-      return <OutboxEntry>[];
+      // Never treated as empty: that would overwrite entries (safety ones
+      // included) that may still be recoverable.
+      throw const OutboxUnreadable();
     }
   }
 
@@ -215,6 +223,7 @@ class Outbox {
   }
 
   /// Entries queued in the current scope (tests and the badge).
+  /// Throws [OutboxUnreadable] when the stored outbox cannot be read.
   Future<List<OutboxEntry>> pending() => _serial(() => _load(_scope));
 
   static bool _retryable(BackendResponse response) => switch (response) {
@@ -230,7 +239,13 @@ class Outbox {
   /// it (failed). Queued entries are sent first, in order.
   Future<OutboxResult> submit(OutboxEntry entry) => _serial(() async {
         final scope = _scope;
-        final queue = await _load(scope);
+        final List<OutboxEntry> queue;
+        try {
+          queue = await _load(scope);
+        } on OutboxUnreadable {
+          _onCode?.call(OutboxCodes.unreadable);
+          return const OutboxFailed(OutboxCodes.unreadable);
+        }
         if (scope != guestSyncScope) {
           await _flushQueue(scope, queue);
           if (queue.isEmpty) {
@@ -258,7 +273,13 @@ class Outbox {
   Future<void> flush() => _serial(() async {
         final scope = _scope;
         if (scope == guestSyncScope) return;
-        final queue = await _load(scope);
+        final List<OutboxEntry> queue;
+        try {
+          queue = await _load(scope);
+        } on OutboxUnreadable {
+          _onCode?.call(OutboxCodes.unreadable);
+          return;
+        }
         if (queue.isEmpty) return;
         await _flushQueue(scope, queue);
       });

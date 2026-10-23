@@ -15,7 +15,7 @@
 //   result;
 // - nothing is logged, and a handler that throws gives a code, never the
 //   exception;
-// - settings screens (P-71): a consent-class screen submits only the keys
+// - settings screens: a consent-class screen submits only the keys
 //   the member changed, and nothing at all when there are none; a
 //   plan-class screen is not submitted while a bound control is not loaded.
 import 'dart:math';
@@ -190,6 +190,7 @@ const List<EndpointEntry> endpointRegistry = [
     'bf_q2.add_your_own',
     'bf_q3.value',
     'bf_path.path',
+    'bf_date.quit_date',
     'bf_date.quit_day_check_in_at_7_00_am',
     'bf_support.remind_me_to_discuss_quit_medici',
   }),
