@@ -555,7 +555,7 @@ class _Header extends StatelessWidget {
     Widget middle = const Spacer();
     switch (spec.left) {
       case THeaderLeft.logo:
-        left = Row(children: [const TLogoMark(), const SizedBox(width: 10), Text(spec.title, style: TText.headerTitle.copyWith(fontSize: 20, fontWeight: FontWeight.w800, color: fg))]);
+        left = Row(children: [const TLogoMark(), const SizedBox(width: 10), Text(spec.title.isEmpty ? 'Tether Health' : spec.title, style: TText.headerTitle.copyWith(fontSize: 20, fontWeight: FontWeight.w800, color: fg))]);
       case THeaderLeft.none:
         left = Padding(padding: const EdgeInsetsDirectional.only(start: 4), child: Text(spec.title, style: TText.largeTitle.copyWith(color: fg)));
       case THeaderLeft.back:

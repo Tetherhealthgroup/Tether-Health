@@ -7,6 +7,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tether_ui/router/app_router.dart';
+import 'package:tether_ui/router/routes.dart';
 import 'package:tether_ui/ui/ui.dart';
 
 const _frame = ValueKey('logo-frame');
@@ -64,5 +66,21 @@ void main() {
     expect(find.byIcon(Icons.eco_rounded), findsNothing);
     expect(tester.getSemantics(find.byType(TLogoMark)).label, isEmpty);
     handle.dispose();
+  });
+
+  testWidgets('the welcome header shows the mark and the wordmark "Tether Health"', (tester) async {
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(MaterialApp(theme: tetherTheme(), home: Builder(builder: AppRouter.screens[Routes.welcome]!)));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.byType(TLogoMark), findsOneWidget);
+    expect(find.text('Tether Health'), findsOneWidget, reason: 'the approved welcome PNG shows the wordmark next to the leaf');
+  });
+
+  testWidgets('a logo header with a title shows that title, not the fallback', (tester) async {
+    await tester.pumpWidget(MaterialApp(theme: tetherTheme(), home: const TScreen(header: THeader(title: 'Today', left: THeaderLeft.logo))));
+    expect(find.text('Today'), findsOneWidget);
+    expect(find.text('Tether Health'), findsNothing);
   });
 }
