@@ -11,11 +11,15 @@ import 'package:flutter/material.dart';
 import 'package:tether_ui/ui/ui.dart';
 
 import '../auth/account_controller.dart';
-import '../integration/registry.dart';
+import '../backend/backend.dart';
+import '../backend/backend_factory.dart';
+import '../config/app_config.dart';
+import '../config/misconfigured_build_app.dart';
 import '../integration/session_lifecycle.dart';
 import '../l10n/app_locale.dart';
 import '../l10n/app_localizations.dart';
 import '../quit_plan/guest_quit_plan_store.dart';
+import 'composition.dart';
 import 'entry.dart';
 import 'native_slots.dart';
 import 'production_hooks.dart';
@@ -168,22 +172,26 @@ class _TetherUiShellState extends State<TetherUiShell> {
 /// What [runTetherUi] set up.
 class TetherUiRuntime {
   const TetherUiRuntime({
+    required this.composition,
     required this.hooks,
     required this.entry,
     required this.lifecycle,
     required this.instances,
   });
 
+  /// The backend and the services built on it.
+  final Composition composition;
   final ProductionHooks hooks;
   final EntryNavigator entry;
   final SessionLifecycle lifecycle;
   final ScreenInstances instances;
 }
 
-/// Starts the tether_ui app: reads the local entry inputs, installs the hooks,
-/// starts the session lifecycle, then calls [run] (runApp) with the shell.
-/// Nothing here reaches the network before the first frame; the profile
-/// loads after it.
+/// Starts the tether_ui app: reads the local entry inputs, builds the backend
+/// and its services from [config] (the build's defines by default; [backend]
+/// replaces the configured one in tests), installs the hooks, starts the
+/// session lifecycle, then calls [run] (runApp) with the shell. Nothing here
+/// reaches the network before the first frame; the profile loads after it.
 Future<TetherUiRuntime> runTetherUi({
   required AccountController account,
   required GuestQuitPlanStore guestStore,
@@ -191,6 +199,8 @@ Future<TetherUiRuntime> runTetherUi({
   void Function(Widget app) run = runApp,
   TargetPlatform? platform,
   AppLocale? appLocale,
+  AppConfig? config,
+  Backend? backend,
 }) async {
   // Local inputs only: the restored session is already in [account].
   await account.restorePendingAccountDeletion();
@@ -202,9 +212,23 @@ Future<TetherUiRuntime> runTetherUi({
   }
 
   final instances = ScreenInstances();
+  final Composition composition;
+  try {
+    composition = await compose(
+      config: config ?? AppConfig.fromEnvironment(),
+      backend: backend,
+      screenInstance: instances.instanceOf,
+    );
+  } on MisconfiguredBuildException catch (error) {
+    // Show the problem on screen rather than a blank app.
+    run(MisconfiguredBuildApp(message: error.message));
+    rethrow;
+  }
   final hooks = installProductionHooks(
     release: release,
-    api: AppApi(screenInstance: instances.instanceOf),
+    api: composition.api,
+    data: composition.data,
+    auth: composition.auth,
   );
   registerNativeSlots();
 
@@ -222,6 +246,7 @@ Future<TetherUiRuntime> runTetherUi({
   final lifecycle = SessionLifecycle(
     account: account,
     data: hooks.data,
+    cleaners: composition.cleaners,
     resetToEntry: () {
       // After a session ends, a guest plan read at launch may have been
       // merged into the account that ended; do not open on it.
@@ -240,6 +265,7 @@ Future<TetherUiRuntime> runTetherUi({
     },
   ));
   return TetherUiRuntime(
+    composition: composition,
     hooks: hooks,
     entry: entry,
     lifecycle: lifecycle,

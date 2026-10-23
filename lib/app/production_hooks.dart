@@ -69,13 +69,16 @@ class ProductionHooks {
 ///
 /// [release] is whether this is a release build. The hooks are the same for
 /// both values: the app never installs a preview hook. The parameter exists so
-/// the release configuration can be tested in a debug test run.
+/// the release configuration can be tested in a debug test run. [auth] is
+/// the native sign-in hook from the composition root; without one, provider
+/// branches fail closed.
 ProductionHooks installProductionHooks({
   required bool release,
   AppApi? api,
   AppData? data,
   AppDevice? device,
   AppCodeReporter? reporter,
+  TAuth? auth,
 }) {
   final codes = reporter ?? AppCodeReporter();
   final hooks = ProductionHooks(
@@ -94,8 +97,7 @@ ProductionHooks installProductionHooks({
   TNav.branchResolver = hooks.resolver.resolve;
   TNav.redactQuestion = true;
   TNav.reporter = codes.report;
-  // Native sign-in is not wired yet, so provider branches fail closed.
-  TAuth.instance = null;
+  TAuth.instance = auth;
   TSim.reset();
   TFlow.onboarding = false;
   return hooks;

@@ -9,6 +9,8 @@ import 'package:breathefree_patient/integration/device_outcomes.dart';
 import 'package:breathefree_patient/integration/platform_adapter.dart';
 import 'package:breathefree_patient/integration/registry.dart';
 import 'package:breathefree_patient/quit_plan/guest_quit_plan_store.dart';
+import 'package:breathefree_patient/backend/stub_backend.dart';
+import 'package:breathefree_patient/config/app_config.dart' show BackendMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tether_ui/router/routes.dart';
@@ -159,6 +161,9 @@ void main() {
     Map<String, Object?>? atRunApp;
     late Widget app;
     final runtime = await runTetherUi(
+      // A stub backend: the sandbox reads secure storage, which never
+      // answers in a widget test.
+      backend: StubBackend(BackendMode.sandbox),
       account: AccountController.disabled(),
       guestStore: _NoGuestPlan(),
       release: true,

@@ -14,11 +14,16 @@
 // - declared secrets (passwords, the invite code) leave the session after the
 //   result;
 // - nothing is logged, and a handler that throws gives a code, never the
-//   exception.
+//   exception;
+// - settings screens: a consent-class screen submits only the keys
+//   the member changed, and nothing at all when there are none; a
+//   plan-class screen is not submitted while a bound control is not loaded.
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:tether_ui/ui/ui.dart';
+
+import 'settings_data.dart';
 
 /// The service that serves an endpoint. One per endpoint.
 enum OwnerService {
@@ -134,6 +139,10 @@ abstract final class RegistryCodes {
   /// The session changed (sign-out, account switch, deletion) while the save
   /// was in flight.
   static const String sessionChanged = 'session_changed';
+
+  /// A plan-class settings screen whose stored values are not loaded yet:
+  /// saving would overwrite them with defaults.
+  static const String notLoaded = 'not_loaded';
 }
 
 /// Every endpoint in tether_ui/spec/endpoints.json, with its service.
@@ -153,7 +162,8 @@ const List<EndpointEntry> endpointRegistry = [
   EndpointEntry('PATCH /v1/enrolments/:id', OwnerService.api),
   EndpointEntry('PATCH /v1/enrolments/consents', OwnerService.api),
   EndpointEntry('POST /v1/enrolments', OwnerService.api, queueable: false),
-  EndpointEntry('POST /v1/enrolments/consents', OwnerService.api),
+  EndpointEntry('POST /v1/enrolments/consents', OwnerService.api,
+      extraKeys: {'ob_programs.programs', 'ob_third.value'}),
   EndpointEntry('PATCH /v1/notifications/preferences', OwnerService.api),
   // Health records.
   EndpointEntry('DELETE /v1/records/fhir/sources/:id', OwnerService.api),
@@ -163,7 +173,8 @@ const List<EndpointEntry> endpointRegistry = [
   EndpointEntry('POST /v1/records/manual', OwnerService.api),
   EndpointEntry('POST /v1/records/check-ins', OwnerService.api),
   EndpointEntry('POST /v1/records/lessons', OwnerService.api),
-  EndpointEntry('POST /v1/records/rescues', OwnerService.api),
+  EndpointEntry('POST /v1/records/rescues', OwnerService.api,
+      extraKeys: {'rescue_tools.value'}),
   // Care team.
   EndpointEntry('POST /v1/care/caregivers', OwnerService.api),
   EndpointEntry('POST /v1/care/connections', OwnerService.api,
@@ -173,7 +184,16 @@ const List<EndpointEntry> endpointRegistry = [
   EndpointEntry('POST /v1/care/summaries', OwnerService.api),
   EndpointEntry('POST /v1/care/supporters', OwnerService.api),
   // Quit plan.
-  EndpointEntry('PUT /v1/quit-plan', OwnerService.api),
+  EndpointEntry('PUT /v1/quit-plan', OwnerService.api, extraKeys: {
+    'bf_q1.value',
+    'bf_q2.value',
+    'bf_q2.add_your_own',
+    'bf_q3.value',
+    'bf_path.path',
+    'bf_date.quit_date',
+    'bf_date.quit_day_check_in_at_7_00_am',
+    'bf_support.remind_me_to_discuss_quit_medici',
+  }),
   EndpointEntry('POST /v1/quit-plan/guest-import', OwnerService.api),
   // Programme events.
   EndpointEntry('POST /v1/program-data/be/diary', OwnerService.api),
@@ -267,6 +287,9 @@ class AppApi implements TApi {
   /// The entry for [endpoint], or null when it is not registered.
   EndpointEntry? entryFor(String endpoint) => _entries[endpoint];
 
+  /// Whether [endpoint] has a handler.
+  bool hasHandler(String endpoint) => _handlers.containsKey(endpoint);
+
   @override
   Future<TResult> submit(String endpoint, {required String screenId}) async {
     // Everything up to the handler call runs synchronously, at the tap.
@@ -274,6 +297,15 @@ class AppApi implements TApi {
     final entry = _entries[endpoint];
     if (entry == null) {
       return const TResult.failed(RegistryCodes.unregisteredEndpoint);
+    }
+    if (consentSettingsScreens.contains(screenId) &&
+        TSession.touched(screenId).isEmpty) {
+      // Nothing changed: nothing to send, and no consent from a default.
+      return const TResult.ok();
+    }
+    if (planSettingsScreens.contains(screenId) &&
+        boundKeysOf(screenId).any((k) => !TSession.values.containsKey(k))) {
+      return const TResult.failed(RegistryCodes.notLoaded);
     }
     TResult result;
     try {
@@ -305,9 +337,12 @@ class AppApi implements TApi {
 
   Map<String, Object?> _snapshot(String screenId, EndpointEntry entry) {
     final prefix = '$screenId.';
+    final consent = consentSettingsScreens.contains(screenId);
+    final touched = consent ? TSession.touched(screenId) : const <String>{};
     return Map<String, Object?>.unmodifiable(<String, Object?>{
       for (final MapEntry(:key, :value) in TSession.values.entries)
-        if (key.startsWith(prefix) || entry.extraKeys.contains(key))
+        if ((key.startsWith(prefix) && (!consent || touched.contains(key))) ||
+            entry.extraKeys.contains(key))
           key: _frozen(value),
     });
   }

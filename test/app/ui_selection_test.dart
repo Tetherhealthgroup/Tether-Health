@@ -44,7 +44,7 @@ void main() {
     });
   });
 
-  test('lib/ reads only the three config defines and TETHER_UI', () {
+  test('lib/ reads only the config defines and TETHER_UI', () {
     final found = <String>[];
     final call = RegExp(
       r'\b(?:String|bool|int)\s*\.\s*(?:fromEnvironment|hasEnvironment)\s*\(',
@@ -63,8 +63,13 @@ void main() {
     expect(found..sort(), [
       'lib/app/ui_selection.dart:TETHER_UI',
       'lib/config/app_config.dart:API_BASE_URL',
+      'lib/config/app_config.dart:EPIC_SANDBOX_CLIENT_ID',
+      'lib/config/app_config.dart:GOOGLE_IOS_CLIENT_ID',
+      'lib/config/app_config.dart:GOOGLE_WEB_CLIENT_ID',
       'lib/config/app_config.dart:SUPABASE_ANON_KEY',
       'lib/config/app_config.dart:SUPABASE_URL',
+      'lib/config/app_config.dart:SYNC_BASE_URL',
+      'lib/config/app_config.dart:TETHER_BACKEND',
     ]);
   });
 

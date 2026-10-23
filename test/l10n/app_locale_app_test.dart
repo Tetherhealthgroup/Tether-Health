@@ -7,6 +7,8 @@ import 'package:breathefree_patient/auth/account_controller.dart';
 import 'package:breathefree_patient/l10n/app_locale.dart';
 import 'package:breathefree_patient/main.dart';
 import 'package:breathefree_patient/quit_plan/quit_plan_controller.dart';
+import 'package:breathefree_patient/backend/stub_backend.dart';
+import 'package:breathefree_patient/config/app_config.dart' show BackendMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -340,6 +342,9 @@ void main() {
     );
     late Widget app;
     final runtime = await runTetherUi(
+      // A stub backend: the sandbox reads secure storage, which never
+      // answers in a widget test.
+      backend: StubBackend(BackendMode.sandbox),
       account: fakeAccount(),
       guestStore: FakeGuestStore(hasPlan: false),
       platform: TargetPlatform.iOS,
