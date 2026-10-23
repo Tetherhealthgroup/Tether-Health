@@ -33,7 +33,8 @@ void main() {
     expect(composition.config, same(_none));
     expect(composition.auth, isNull);
     expect(composition.postAuthHooks.length, 0);
-    expect(composition.cleaners.length, 0);
+    // The local sync document and outbox are wiped after a deletion.
+    expect(composition.cleaners.length, 1);
   });
 
   test('every registered endpoint is routed, none handled yet', () async {

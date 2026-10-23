@@ -14,11 +14,16 @@
 // - declared secrets (passwords, the invite code) leave the session after the
 //   result;
 // - nothing is logged, and a handler that throws gives a code, never the
-//   exception.
+//   exception;
+// - settings screens (P-71): a consent-class screen submits only the keys
+//   the member changed, and nothing at all when there are none; a
+//   plan-class screen is not submitted while a bound control is not loaded.
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:tether_ui/ui/ui.dart';
+
+import 'settings_data.dart';
 
 /// The service that serves an endpoint. One per endpoint.
 enum OwnerService {
@@ -134,6 +139,10 @@ abstract final class RegistryCodes {
   /// The session changed (sign-out, account switch, deletion) while the save
   /// was in flight.
   static const String sessionChanged = 'session_changed';
+
+  /// A plan-class settings screen whose stored values are not loaded yet:
+  /// saving would overwrite them with defaults.
+  static const String notLoaded = 'not_loaded';
 }
 
 /// Every endpoint in tether_ui/spec/endpoints.json, with its service.
@@ -275,6 +284,15 @@ class AppApi implements TApi {
     if (entry == null) {
       return const TResult.failed(RegistryCodes.unregisteredEndpoint);
     }
+    if (consentSettingsScreens.contains(screenId) &&
+        TSession.touched(screenId).isEmpty) {
+      // Nothing changed: nothing to send, and no consent from a default.
+      return const TResult.ok();
+    }
+    if (planSettingsScreens.contains(screenId) &&
+        boundKeysOf(screenId).any((k) => !TSession.values.containsKey(k))) {
+      return const TResult.failed(RegistryCodes.notLoaded);
+    }
     TResult result;
     try {
       final payload = _snapshot(screenId, entry);
@@ -305,9 +323,12 @@ class AppApi implements TApi {
 
   Map<String, Object?> _snapshot(String screenId, EndpointEntry entry) {
     final prefix = '$screenId.';
+    final consent = consentSettingsScreens.contains(screenId);
+    final touched = consent ? TSession.touched(screenId) : const <String>{};
     return Map<String, Object?>.unmodifiable(<String, Object?>{
       for (final MapEntry(:key, :value) in TSession.values.entries)
-        if (key.startsWith(prefix) || entry.extraKeys.contains(key))
+        if ((key.startsWith(prefix) && (!consent || touched.contains(key))) ||
+            entry.extraKeys.contains(key))
           key: _frozen(value),
     });
   }
