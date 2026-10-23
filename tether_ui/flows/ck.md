@@ -65,7 +65,7 @@ flowchart LR
 |---|---|---|
 | Checkup intro | Back | `back` |
 | Checkup intro | Set up Checkup | `push → ck_q1` |
-| Checkup intro | Add as Learn only | `toast “Checkup added as Learn only” then tab → plans` |
+| Checkup intro | Add as Learn only | `POST /v1/enrolments then toast “Checkup added as Learn only” then tab → plans` |
 | About you | Back | `back` |
 | About you | Import vaccination history | `push → records_add` |
 | About you | Build my list | `PUT /v1/program-data/ck/profile then replace → ck_list (onboarding: ob_setup)` |

@@ -12,8 +12,8 @@ import '../../ui/ui.dart';
 /// Actions (generated from spec/screens/hw_intro.json):
 ///   • Back → back
 ///   • Set up Heartwise → sheet → focus_full
-///   • Add as Learn only → toast “Heartwise added as Learn only” then tab → plans
-/// API: —
+///   • Add as Learn only → POST /v1/enrolments then toast “Heartwise added as Learn only” then tab → plans
+/// API: POST /v1/enrolments
 class HwIntroScreen extends StatelessWidget {
   const HwIntroScreen({super.key});
 
@@ -30,7 +30,7 @@ class HwIntroScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.hwIntroFooterN0Label, onPressed: () => TNav.sheet(context, Routes.focusFull), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: s.hwIntroFooterN1Label, onPressed: () => TNav.toast(context, s.hwIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.hwIntroFooterN1Label, onPressed: () => TNav.submit(context, 'POST /v1/enrolments', screenId: 'hw_intro', queueable: false, then: () => TNav.toast(context, s.hwIntroFooterN1ActionThenValue, then: () => TNav.tab(context, Routes.plans))), variant: TButtonVariant.secondary),
       ],
     );
   }

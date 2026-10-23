@@ -9654,11 +9654,15 @@
         "t": "button",
         "label": "Add as Learn only",
         "action": {
-          "type": "toast",
-          "value": "BreatheFree added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "BreatheFree added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
         "variant": "secondary",
@@ -9667,7 +9671,9 @@
     ],
     "notes": [],
     "over": null,
-    "api": [],
+    "api": [
+      "POST /v1/enrolments"
+    ],
     "actions": [
       {
         "element": "Back",
@@ -9690,14 +9696,18 @@
         "element": "Add as Learn only",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "BreatheFree added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "BreatheFree added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
-        "summary": "toast “BreatheFree added as Learn only” then tab → plans"
+        "summary": "POST /v1/enrolments then toast “BreatheFree added as Learn only” then tab → plans"
       }
     ]
   },
@@ -12173,11 +12183,15 @@
         "t": "button",
         "label": "Add as Learn only",
         "action": {
-          "type": "toast",
-          "value": "ScrollFree added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "ScrollFree added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
         "variant": "secondary",
@@ -12188,7 +12202,9 @@
       "Never called “addiction”."
     ],
     "over": null,
-    "api": [],
+    "api": [
+      "POST /v1/enrolments"
+    ],
     "actions": [
       {
         "element": "Back",
@@ -12211,14 +12227,18 @@
         "element": "Add as Learn only",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "ScrollFree added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "ScrollFree added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
-        "summary": "toast “ScrollFree added as Learn only” then tab → plans"
+        "summary": "POST /v1/enrolments then toast “ScrollFree added as Learn only” then tab → plans"
       }
     ]
   },
@@ -13724,11 +13744,15 @@
         "t": "button",
         "label": "Add as Learn only",
         "action": {
-          "type": "toast",
-          "value": "ClearAir added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "ClearAir added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
         "variant": "secondary",
@@ -13737,7 +13761,9 @@
     ],
     "notes": [],
     "over": null,
-    "api": [],
+    "api": [
+      "POST /v1/enrolments"
+    ],
     "actions": [
       {
         "element": "Back",
@@ -13760,14 +13786,18 @@
         "element": "Add as Learn only",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "ClearAir added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "ClearAir added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
-        "summary": "toast “ClearAir added as Learn only” then tab → plans"
+        "summary": "POST /v1/enrolments then toast “ClearAir added as Learn only” then tab → plans"
       }
     ]
   },
@@ -15161,11 +15191,15 @@
         "t": "button",
         "label": "Add as Learn only",
         "action": {
-          "type": "toast",
-          "value": "Heartwise added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Heartwise added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
         "variant": "secondary",
@@ -15174,7 +15208,9 @@
     ],
     "notes": [],
     "over": null,
-    "api": [],
+    "api": [
+      "POST /v1/enrolments"
+    ],
     "actions": [
       {
         "element": "Back",
@@ -15197,14 +15233,18 @@
         "element": "Add as Learn only",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "Heartwise added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Heartwise added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
-        "summary": "toast “Heartwise added as Learn only” then tab → plans"
+        "summary": "POST /v1/enrolments then toast “Heartwise added as Learn only” then tab → plans"
       }
     ]
   },
@@ -16888,11 +16928,15 @@
         "t": "button",
         "label": "Add as Learn only",
         "action": {
-          "type": "toast",
-          "value": "Steady added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Steady added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
         "variant": "secondary",
@@ -16901,7 +16945,9 @@
     ],
     "notes": [],
     "over": null,
-    "api": [],
+    "api": [
+      "POST /v1/enrolments"
+    ],
     "actions": [
       {
         "element": "Back",
@@ -16924,14 +16970,18 @@
         "element": "Add as Learn only",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "Steady added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Steady added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
-        "summary": "toast “Steady added as Learn only” then tab → plans"
+        "summary": "POST /v1/enrolments then toast “Steady added as Learn only” then tab → plans"
       }
     ]
   },
@@ -18098,11 +18148,15 @@
         "t": "button",
         "label": "Add as Learn only",
         "action": {
-          "type": "toast",
-          "value": "Renew added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Renew added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
         "variant": "secondary",
@@ -18111,7 +18165,9 @@
     ],
     "notes": [],
     "over": null,
-    "api": [],
+    "api": [
+      "POST /v1/enrolments"
+    ],
     "actions": [
       {
         "element": "Back",
@@ -18134,14 +18190,18 @@
         "element": "Add as Learn only",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "Renew added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Renew added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
-        "summary": "toast “Renew added as Learn only” then tab → plans"
+        "summary": "POST /v1/enrolments then toast “Renew added as Learn only” then tab → plans"
       }
     ]
   },
@@ -18964,11 +19024,15 @@
         "t": "button",
         "label": "Add as Learn only",
         "action": {
-          "type": "toast",
-          "value": "Nourish added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Nourish added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
         "variant": "secondary",
@@ -18977,7 +19041,9 @@
     ],
     "notes": [],
     "over": null,
-    "api": [],
+    "api": [
+      "POST /v1/enrolments"
+    ],
     "actions": [
       {
         "element": "Back",
@@ -19000,14 +19066,18 @@
         "element": "Add as Learn only",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "Nourish added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Nourish added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
-        "summary": "toast “Nourish added as Learn only” then tab → plans"
+        "summary": "POST /v1/enrolments then toast “Nourish added as Learn only” then tab → plans"
       }
     ]
   },
@@ -19954,11 +20024,15 @@
         "t": "button",
         "label": "Add as Learn only",
         "action": {
-          "type": "toast",
-          "value": "Stride added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Stride added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
         "variant": "secondary",
@@ -19967,7 +20041,9 @@
     ],
     "notes": [],
     "over": null,
-    "api": [],
+    "api": [
+      "POST /v1/enrolments"
+    ],
     "actions": [
       {
         "element": "Back",
@@ -19990,14 +20066,18 @@
         "element": "Add as Learn only",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "Stride added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Stride added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
-        "summary": "toast “Stride added as Learn only” then tab → plans"
+        "summary": "POST /v1/enrolments then toast “Stride added as Learn only” then tab → plans"
       }
     ]
   },
@@ -21022,11 +21102,15 @@
         "t": "button",
         "label": "Add as Learn only",
         "action": {
-          "type": "toast",
-          "value": "Ease added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Ease added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
         "variant": "secondary",
@@ -21035,7 +21119,9 @@
     ],
     "notes": [],
     "over": null,
-    "api": [],
+    "api": [
+      "POST /v1/enrolments"
+    ],
     "actions": [
       {
         "element": "Back",
@@ -21058,14 +21144,18 @@
         "element": "Add as Learn only",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "Ease added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Ease added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
-        "summary": "toast “Ease added as Learn only” then tab → plans"
+        "summary": "POST /v1/enrolments then toast “Ease added as Learn only” then tab → plans"
       }
     ]
   },
@@ -22061,11 +22151,15 @@
         "t": "button",
         "label": "Add as Learn only",
         "action": {
-          "type": "toast",
-          "value": "Checkup added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Checkup added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
         "variant": "secondary",
@@ -22074,7 +22168,9 @@
     ],
     "notes": [],
     "over": null,
-    "api": [],
+    "api": [
+      "POST /v1/enrolments"
+    ],
     "actions": [
       {
         "element": "Back",
@@ -22097,14 +22193,18 @@
         "element": "Add as Learn only",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "Checkup added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Checkup added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
-        "summary": "toast “Checkup added as Learn only” then tab → plans"
+        "summary": "POST /v1/enrolments then toast “Checkup added as Learn only” then tab → plans"
       }
     ]
   },
@@ -23008,11 +23108,15 @@
         "t": "button",
         "label": "Add as Learn only",
         "action": {
-          "type": "toast",
-          "value": "Beacon added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Beacon added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
         "variant": "secondary",
@@ -23021,7 +23125,9 @@
     ],
     "notes": [],
     "over": null,
-    "api": [],
+    "api": [
+      "POST /v1/enrolments"
+    ],
     "actions": [
       {
         "element": "Back",
@@ -23044,14 +23150,18 @@
         "element": "Add as Learn only",
         "path": "footer[1]",
         "action": {
-          "type": "toast",
-          "value": "Beacon added as Learn only",
+          "type": "submit",
+          "api": "POST /v1/enrolments",
           "then": {
-            "type": "tab",
-            "to": "plans"
+            "type": "toast",
+            "value": "Beacon added as Learn only",
+            "then": {
+              "type": "tab",
+              "to": "plans"
+            }
           }
         },
-        "summary": "toast “Beacon added as Learn only” then tab → plans"
+        "summary": "POST /v1/enrolments then toast “Beacon added as Learn only” then tab → plans"
       }
     ]
   },

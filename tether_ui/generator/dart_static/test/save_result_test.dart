@@ -152,4 +152,25 @@ void main() {
     expect(_keptClaims(tester, before), isEmpty);
     await tester.pump(const Duration(seconds: 3));
   });
+
+  testWidgets('a failed Learn-only add stays on the intro with the generic error; a successful one shows the toast and opens Plans', (tester) async {
+    await _open(tester, Routes.bfIntro);
+    TApi.instance = _Api(() async => const TResult.failed('synthetic_code'));
+    final add = find.text('Add as Learn only');
+    await tester.ensureVisible(add);
+    await tester.tap(add, warnIfMissed: false);
+    await _settle(tester);
+    expect(find.text(TNav.saveFailed), findsOneWidget);
+    expect(find.text('BreatheFree added as Learn only'), findsNothing);
+    expect(ModalRoute.of(tester.element(add))!.settings.name, Routes.bfIntro);
+    await tester.pump(const Duration(seconds: 3));
+    final calls = PreviewApi.calls.length;
+    TApi.instance = PreviewApi();
+    await tester.tap(add, warnIfMissed: false);
+    await _settle(tester);
+    expect(PreviewApi.calls.length, calls + 1);
+    expect(PreviewApi.calls.last, 'POST /v1/enrolments');
+    expect(find.text('BreatheFree added as Learn only'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 3));
+  });
 }

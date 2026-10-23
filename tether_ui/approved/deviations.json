@@ -185,6 +185,17 @@
       "change": "P-73, not routed: no screen opens it any more (new Apple and Google accounts go through the normal sign-up from its start, ob_programs); it is kept as the approved design and listed as a reference entry point. footer[0] \"Create my account\": submit \"POST supabase /auth/v1/token?grant_type=id_token\" then push ob_programs -> push ob_programs, so it creates no account; api [that endpoint] -> []; desc rewritten to say so. No visible element changes. P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[3].rows[0][1] -> auth.social.name (TH-909)"
     },
     {
+      "screen": "be_intro",
+      "decisions": [
+        "P-88"
+      ],
+      "tickets": [
+        "TH-1031f"
+      ],
+      "sha256": "2404f876543fa2bc2c4aa33cfb01a72b757dd06ce5d3f2d7de25c80d5fd52c92",
+      "change": "P-88: \"Add as Learn only\" submits POST /v1/enrolments (not queueable) before its toast and tab; api lists POST /v1/enrolments (TH-1031f)"
+    },
+    {
       "screen": "be_q2",
       "decisions": [
         "P-31",
@@ -259,13 +270,15 @@
     {
       "screen": "bf_intro",
       "decisions": [
-        "P-22"
+        "P-22",
+        "P-88"
       ],
       "tickets": [
-        "TH-942"
+        "TH-942",
+        "TH-1031f"
       ],
-      "sha256": "fee51a4e3b73a6c2be91d3be96ad55fd183c3608befdae5a01fa1cd794add6b7",
-      "change": "Row value: \"one tap, offline\" -> \"one tap, no typing\""
+      "sha256": "b89b13a4145c8116a33787070a32c2d5ce4d6a115f7434761e007a6e3f41b0bd",
+      "change": "Row value: \"one tap, offline\" -> \"one tap, no typing\". P-88: \"Add as Learn only\" submits POST /v1/enrolments (not queueable) before its toast and tab; api lists POST /v1/enrolments (TH-1031f)"
     },
     {
       "screen": "bf_meds",
@@ -358,6 +371,17 @@
       ],
       "sha256": "da53fbdb48e907cc2874f954491ce72e35fa14dfd67d22fd5b5de7c3a344e849",
       "change": "Red-zone plan card: \"Open it fast, even offline\" -> \"Open it fast\". P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].title -> ca.zone_today; body[0].text -> ca.zone_checked; body[3].rows[1].sub -> ca.zone_counts; body[3].rows[2].sub -> ca.plan_entered (TH-909)"
+    },
+    {
+      "screen": "ca_intro",
+      "decisions": [
+        "P-88"
+      ],
+      "tickets": [
+        "TH-1031f"
+      ],
+      "sha256": "a077fbf02a7d2195b8d4c01acc4e574dafc662502b3903461163be5cc3314862",
+      "change": "P-88: \"Add as Learn only\" submits POST /v1/enrolments (not queueable) before its toast and tab; api lists POST /v1/enrolments (TH-1031f)"
     },
     {
       "screen": "ca_plan",
@@ -474,6 +498,17 @@
       "change": "P-31 placeholders, fields start empty: body[0] \"What\" example \"Flu vaccine\" -> placeholder; body[1] \"Date\" example \"Oct 12, 2026\" -> placeholder; body[2] \"Where (optional)\" example \"Main St Pharmacy\" -> placeholder"
     },
     {
+      "screen": "ck_intro",
+      "decisions": [
+        "P-88"
+      ],
+      "tickets": [
+        "TH-1031f"
+      ],
+      "sha256": "719d1cefec5aacb14bf2e775d31652133422acfb1911b50bb2ced5cd29252dce",
+      "change": "P-88: \"Add as Learn only\" submits POST /v1/enrolments (not queueable) before its toast and tab; api lists POST /v1/enrolments (TH-1031f)"
+    },
+    {
       "screen": "ck_list",
       "decisions": [
         "P-89"
@@ -535,6 +570,17 @@
       "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[1].rows[0].sub -> ea.plan_updated; body[1].rows[1].sub -> ea.check_back_due (TH-909)"
     },
     {
+      "screen": "ea_intro",
+      "decisions": [
+        "P-88"
+      ],
+      "tickets": [
+        "TH-1031f"
+      ],
+      "sha256": "c7fb42dca187d147e42420be026dc95061b03159ddf467972e35fc2df82daef8",
+      "change": "P-88: \"Add as Learn only\" submits POST /v1/enrolments (not queueable) before its toast and tab; api lists POST /v1/enrolments (TH-1031f)"
+    },
+    {
       "screen": "ea_plan",
       "decisions": [
         "P-22",
@@ -568,6 +614,17 @@
       ],
       "sha256": "aa33fa036f389b7598c004a539cb5f1b48becfe60d174b8341bacdbc93c3cc5b",
       "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> hw.last_reading_time; body[0].children[0].value -> hw.last_bp; body[0].children[0].caption -> hw.last_bp_caption; body[2].rows[0].sub -> hw.avg_30d_summary; body[2].rows[1].sub -> hw.lipids_summary; body[2].rows[3].sub -> hw.records_summary; body[2].rows[4].sub -> hw.targets_summary (TH-909)"
+    },
+    {
+      "screen": "hw_intro",
+      "decisions": [
+        "P-88"
+      ],
+      "tickets": [
+        "TH-1031f"
+      ],
+      "sha256": "191bd420e86bb6d435e8997a3bd9d96c74edc5785dc40b0374963472a262df65",
+      "change": "P-88: \"Add as Learn only\" submits POST /v1/enrolments (not queueable) before its toast and tab; api lists POST /v1/enrolments (TH-1031f)"
     },
     {
       "screen": "hw_lipids",
@@ -682,6 +739,17 @@
       ],
       "sha256": "fc32bc8b0de1eb1fe0af436c3bba459958bed3df6cc6543af79017fca6e9ce29",
       "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> nu.habit_week; body[0].title -> nu.habit_name; body[0].text -> nu.habit_progress; body[3].rows[1].sub -> nu.milestone_due (TH-909)"
+    },
+    {
+      "screen": "nu_intro",
+      "decisions": [
+        "P-88"
+      ],
+      "tickets": [
+        "TH-1031f"
+      ],
+      "sha256": "0c431341b5ace4bce5ef920332ea585ee700c1d20449df943802c04218277768",
+      "change": "P-88: \"Add as Learn only\" submits POST /v1/enrolments (not queueable) before its toast and tab; api lists POST /v1/enrolments (TH-1031f)"
     },
     {
       "screen": "nu_week4",
@@ -818,6 +886,17 @@
       ],
       "sha256": "fcd27290d58e0d9157a8c1421168a0bde2a0649a0e264ef2dc37ec7f24d3ddea",
       "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> re.egfr_latest_date; body[0].children[0].value -> re.egfr_latest; body[0].children[0].caption -> re.next_check_caption; body[2].rows[1].sub -> re.history_span (TH-909)"
+    },
+    {
+      "screen": "re_intro",
+      "decisions": [
+        "P-88"
+      ],
+      "tickets": [
+        "TH-1031f"
+      ],
+      "sha256": "09c9b0eac6af5fd52ae432f66718df8a94663fa61ccf4cc6d098dfcd9468b9b3",
+      "change": "P-88: \"Add as Learn only\" submits POST /v1/enrolments (not queueable) before its toast and tab; api lists POST /v1/enrolments (TH-1031f)"
     },
     {
       "screen": "re_labs",
@@ -1068,6 +1147,17 @@
       "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> sd.today_heading; body[0].title -> sd.today_session; body[2].rows[0].sub -> sd.safety_progress; body[2].rows[1].sub -> sd.caregiver_summary; body[2].rows[2].sub -> sd.plan_summary; body[3].items[0].value -> sd.sessions_this_week; body[3].items[1].value -> sd.falls_30d (TH-909)"
     },
     {
+      "screen": "sd_intro",
+      "decisions": [
+        "P-88"
+      ],
+      "tickets": [
+        "TH-1031f"
+      ],
+      "sha256": "1679deea308941943a3a3028e1f8545760304476bf26c379b3fc55a1bc211888",
+      "change": "P-88: \"Add as Learn only\" submits POST /v1/enrolments (not queueable) before its toast and tab; api lists POST /v1/enrolments (TH-1031f)"
+    },
+    {
       "screen": "sd_plan",
       "decisions": [
         "P-89"
@@ -1132,13 +1222,15 @@
     {
       "screen": "sf_intro",
       "decisions": [
-        "P-62"
+        "P-62",
+        "P-88"
       ],
       "tickets": [
-        "TH-1001"
+        "TH-1001",
+        "TH-1031f"
       ],
-      "sha256": "bc28725525750608cc2734be8d15667acec7bc46d8aaf9f5c3836a17fa19b0d6",
-      "change": "P-62: body[3].text drops the sentence \"Never called “addiction”.\"; that sentence moves to the screen's notes, which are not rendered. The rest of the text is unchanged"
+      "sha256": "810531d0b5983f8746343aadab66484aeafa1efe99d8c55b3e3db5a3720e08e6",
+      "change": "P-62: body[3].text drops the sentence \"Never called “addiction”.\"; that sentence moves to the screen's notes, which are not rendered. The rest of the text is unchanged. P-88: \"Add as Learn only\" submits POST /v1/enrolments (not queueable) before its toast and tab; api lists POST /v1/enrolments (TH-1031f)"
     },
     {
       "screen": "sf_screentime",
@@ -1187,6 +1279,17 @@
       ],
       "sha256": "c45afa467e7bf8af3cdf25e5af35edb2d96231b134473c9bc88765af1325d8d3",
       "change": "P-89: member-data bind keys, data only (no label, starting value, layout or action changes): body[0].eyebrow -> st.last_reading_context; body[0].children[0].value -> st.last_glucose; body[0].children[0].caption -> st.last_glucose_caption; body[2].rows[1].sub -> st.in_range_summary; body[2].rows[2].sub -> st.a1c_latest (TH-909)"
+    },
+    {
+      "screen": "st_intro",
+      "decisions": [
+        "P-88"
+      ],
+      "tickets": [
+        "TH-1031f"
+      ],
+      "sha256": "0da936b0b9371135b360c697e0aae04a6c0d3770575721932bb580ca629f219a",
+      "change": "P-88: \"Add as Learn only\" submits POST /v1/enrolments (not queueable) before its toast and tab; api lists POST /v1/enrolments (TH-1031f)"
     },
     {
       "screen": "st_log",

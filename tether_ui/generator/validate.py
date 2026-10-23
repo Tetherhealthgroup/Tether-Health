@@ -548,6 +548,7 @@ NOT_CONSENT_CREATING = {
     'PUT device:encrypted/ea/safety-plan': _DEVICE,
     'DELETE /v1/account/data': 'deletes the member\'s data; ends every share',
     'DELETE /v1/enrolments/:id': 'leaves a programme; ends its shares',
+    'POST /v1/enrolments': 'adds a programme as Learn only (R-162); shares nothing and records no consent',
     'DELETE /v1/records/fhir/sources/:id': 'disconnects a records source; ends the import',
     'PATCH /v1/notifications/preferences': 'notification switches on this account; shares nothing',
     'POST /v1/account/export': 'sends the member a copy of their own data',

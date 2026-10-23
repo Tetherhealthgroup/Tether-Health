@@ -9,8 +9,10 @@ def intro(p, bullets, time, setup=None, notes=None):
         kv(bullets),
     ] + ([text(setup[1], 'muted')] if setup and len(setup) > 1 else []), footer=[
         button(f'Set up {name}', setup[0] if setup else go(f'{p}_q1')),
-        button('Add as Learn only', toast(f'{name} added as Learn only', tab('plans')), v='secondary'),
-    ], desc='Entry from Choose programs, Catalog or a Learn-only row.', notes=notes)
+        # P-88 (R-162): adding the programme as Learn only creates its
+        # enrolment; the toast and the tab follow a successful save only.
+        button('Add as Learn only', submit('POST /v1/enrolments', toast(f'{name} added as Learn only', tab('plans'))), v='secondary'),
+    ], desc='Entry from Choose programs, Catalog or a Learn-only row.', notes=notes, api=['POST /v1/enrolments'])
 
 def home_hdr(p): return H(PROGRAMS[p][0], avatar='A')
 

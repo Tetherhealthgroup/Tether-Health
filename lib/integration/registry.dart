@@ -152,6 +152,7 @@ const List<EndpointEntry> endpointRegistry = [
   EndpointEntry('DELETE /v1/enrolments/:id', OwnerService.api),
   EndpointEntry('PATCH /v1/enrolments/:id', OwnerService.api),
   EndpointEntry('PATCH /v1/enrolments/consents', OwnerService.api),
+  EndpointEntry('POST /v1/enrolments', OwnerService.api, queueable: false),
   EndpointEntry('POST /v1/enrolments/consents', OwnerService.api),
   EndpointEntry('PATCH /v1/notifications/preferences', OwnerService.api),
   // Health records.

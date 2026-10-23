@@ -2968,11 +2968,11 @@
     "screen_name": "BreatheFree intro",
     "element": "Add as Learn only",
     "path": "footer[1]",
-    "type": "toast",
+    "type": "submit",
     "targets": [
       "plans"
     ],
-    "summary": "toast “BreatheFree added as Learn only” then tab → plans"
+    "summary": "POST /v1/enrolments then toast “BreatheFree added as Learn only” then tab → plans"
   },
   {
     "screen": "bf_q1",
@@ -3766,11 +3766,11 @@
     "screen_name": "ScrollFree intro",
     "element": "Add as Learn only",
     "path": "footer[1]",
-    "type": "toast",
+    "type": "submit",
     "targets": [
       "plans"
     ],
-    "summary": "toast “ScrollFree added as Learn only” then tab → plans"
+    "summary": "POST /v1/enrolments then toast “ScrollFree added as Learn only” then tab → plans"
   },
   {
     "screen": "sf_q1",
@@ -4174,11 +4174,11 @@
     "screen_name": "ClearAir intro",
     "element": "Add as Learn only",
     "path": "footer[1]",
-    "type": "toast",
+    "type": "submit",
     "targets": [
       "plans"
     ],
-    "summary": "toast “ClearAir added as Learn only” then tab → plans"
+    "summary": "POST /v1/enrolments then toast “ClearAir added as Learn only” then tab → plans"
   },
   {
     "screen": "ca_q1",
@@ -4571,11 +4571,11 @@
     "screen_name": "Heartwise intro",
     "element": "Add as Learn only",
     "path": "footer[1]",
-    "type": "toast",
+    "type": "submit",
     "targets": [
       "plans"
     ],
-    "summary": "toast “Heartwise added as Learn only” then tab → plans"
+    "summary": "POST /v1/enrolments then toast “Heartwise added as Learn only” then tab → plans"
   },
   {
     "screen": "hw_q1",
@@ -5040,11 +5040,11 @@
     "screen_name": "Steady intro",
     "element": "Add as Learn only",
     "path": "footer[1]",
-    "type": "toast",
+    "type": "submit",
     "targets": [
       "plans"
     ],
-    "summary": "toast “Steady added as Learn only” then tab → plans"
+    "summary": "POST /v1/enrolments then toast “Steady added as Learn only” then tab → plans"
   },
   {
     "screen": "st_q1",
@@ -5348,11 +5348,11 @@
     "screen_name": "Renew intro",
     "element": "Add as Learn only",
     "path": "footer[1]",
-    "type": "toast",
+    "type": "submit",
     "targets": [
       "plans"
     ],
-    "summary": "toast “Renew added as Learn only” then tab → plans"
+    "summary": "POST /v1/enrolments then toast “Renew added as Learn only” then tab → plans"
   },
   {
     "screen": "re_q1",
@@ -5619,11 +5619,11 @@
     "screen_name": "Nourish intro",
     "element": "Add as Learn only",
     "path": "footer[1]",
-    "type": "toast",
+    "type": "submit",
     "targets": [
       "plans"
     ],
-    "summary": "toast “Nourish added as Learn only” then tab → plans"
+    "summary": "POST /v1/enrolments then toast “Nourish added as Learn only” then tab → plans"
   },
   {
     "screen": "nu_q1",
@@ -5914,11 +5914,11 @@
     "screen_name": "Stride intro",
     "element": "Add as Learn only",
     "path": "footer[1]",
-    "type": "toast",
+    "type": "submit",
     "targets": [
       "plans"
     ],
-    "summary": "toast “Stride added as Learn only” then tab → plans"
+    "summary": "POST /v1/enrolments then toast “Stride added as Learn only” then tab → plans"
   },
   {
     "screen": "sd_q1",
@@ -6230,11 +6230,11 @@
     "screen_name": "Ease intro",
     "element": "Add as Learn only",
     "path": "footer[1]",
-    "type": "toast",
+    "type": "submit",
     "targets": [
       "plans"
     ],
-    "summary": "toast “Ease added as Learn only” then tab → plans"
+    "summary": "POST /v1/enrolments then toast “Ease added as Learn only” then tab → plans"
   },
   {
     "screen": "ea_q1",
@@ -6583,11 +6583,11 @@
     "screen_name": "Checkup intro",
     "element": "Add as Learn only",
     "path": "footer[1]",
-    "type": "toast",
+    "type": "submit",
     "targets": [
       "plans"
     ],
-    "summary": "toast “Checkup added as Learn only” then tab → plans"
+    "summary": "POST /v1/enrolments then toast “Checkup added as Learn only” then tab → plans"
   },
   {
     "screen": "ck_q1",
@@ -6940,11 +6940,11 @@
     "screen_name": "Beacon intro",
     "element": "Add as Learn only",
     "path": "footer[1]",
-    "type": "toast",
+    "type": "submit",
     "targets": [
       "plans"
     ],
-    "summary": "toast “Beacon added as Learn only” then tab → plans"
+    "summary": "POST /v1/enrolments then toast “Beacon added as Learn only” then tab → plans"
   },
   {
     "screen": "be_q1",

@@ -6457,11 +6457,11 @@
     "prop": "label",
     "sourceHash": "617cb82362344f5acb1e2f0c4fabae79f0eb439f3e35f45d5ecb1ccb367fdca7"
   },
-  "bf_intro.footer[1].action.value": "BreatheFree added as Learn only",
-  "@bf_intro.footer[1].action.value": {
+  "bf_intro.footer[1].action.then.value": "BreatheFree added as Learn only",
+  "@bf_intro.footer[1].action.then.value": {
     "description": "BreatheFree intro: toast value",
     "screen": "bf_intro",
-    "path": "footer[1].action",
+    "path": "footer[1].action.then",
     "prop": "value",
     "sourceHash": "edafac7adf6f27fe3803b4d4029be3c4f337f57ebd292617d96804d663a53799"
   },
@@ -8593,11 +8593,11 @@
     "prop": "label",
     "sourceHash": "a573974b8a3d6e099013e3a5c752594aab474e15e508f4a1ea4451437b49016d"
   },
-  "sf_intro.footer[1].action.value": "ScrollFree added as Learn only",
-  "@sf_intro.footer[1].action.value": {
+  "sf_intro.footer[1].action.then.value": "ScrollFree added as Learn only",
+  "@sf_intro.footer[1].action.then.value": {
     "description": "ScrollFree intro: toast value",
     "screen": "sf_intro",
-    "path": "footer[1].action",
+    "path": "footer[1].action.then",
     "prop": "value",
     "sourceHash": "040e37f9e0929d127f331c87ca2bb1efe8feb0c3dde5b69434080c38cfa66aa1"
   },
@@ -9937,11 +9937,11 @@
     "prop": "label",
     "sourceHash": "2d46f4087fddf0d9537572b3babb24ea2530108cd9f020eac909e64cd1dc323a"
   },
-  "ca_intro.footer[1].action.value": "ClearAir added as Learn only",
-  "@ca_intro.footer[1].action.value": {
+  "ca_intro.footer[1].action.then.value": "ClearAir added as Learn only",
+  "@ca_intro.footer[1].action.then.value": {
     "description": "ClearAir intro: toast value",
     "screen": "ca_intro",
-    "path": "footer[1].action",
+    "path": "footer[1].action.then",
     "prop": "value",
     "sourceHash": "776e0eebd1af331b3bf6c0bb8e4a58d5ab505b83e955d6c2513b09fe22d43d07"
   },
@@ -11025,11 +11025,11 @@
     "prop": "label",
     "sourceHash": "0c991a0a64f232c18719b383f522f74908c5a93492321d0c07af88acca7d2709"
   },
-  "hw_intro.footer[1].action.value": "Heartwise added as Learn only",
-  "@hw_intro.footer[1].action.value": {
+  "hw_intro.footer[1].action.then.value": "Heartwise added as Learn only",
+  "@hw_intro.footer[1].action.then.value": {
     "description": "Heartwise intro: toast value",
     "screen": "hw_intro",
-    "path": "footer[1].action",
+    "path": "footer[1].action.then",
     "prop": "value",
     "sourceHash": "58a3a0ec32ae31fc454933b09c71980058a68d22b5d1f95740ffe31fd08060f0"
   },
@@ -12233,11 +12233,11 @@
     "prop": "label",
     "sourceHash": "b36244ef1b0d7ee273649de94ebdf425e870927bff3e2157e3bef7f97a1f4348"
   },
-  "st_intro.footer[1].action.value": "Steady added as Learn only",
-  "@st_intro.footer[1].action.value": {
+  "st_intro.footer[1].action.then.value": "Steady added as Learn only",
+  "@st_intro.footer[1].action.then.value": {
     "description": "Steady intro: toast value",
     "screen": "st_intro",
-    "path": "footer[1].action",
+    "path": "footer[1].action.then",
     "prop": "value",
     "sourceHash": "97a081cefa1e378a17d304684cb1fa9a574c62ac2eb1af42b0a739bb3a51eeb0"
   },
@@ -13209,11 +13209,11 @@
     "prop": "label",
     "sourceHash": "1ebb2315f58463e7f532997bcba605bb8aac53a517d87c68894ca50d7ba8b3af"
   },
-  "re_intro.footer[1].action.value": "Renew added as Learn only",
-  "@re_intro.footer[1].action.value": {
+  "re_intro.footer[1].action.then.value": "Renew added as Learn only",
+  "@re_intro.footer[1].action.then.value": {
     "description": "Renew intro: toast value",
     "screen": "re_intro",
-    "path": "footer[1].action",
+    "path": "footer[1].action.then",
     "prop": "value",
     "sourceHash": "e8b343c6bff645363e67790342f300611650e815de335e82e73cee83d88d0efa"
   },
@@ -13897,11 +13897,11 @@
     "prop": "label",
     "sourceHash": "d5ef07a9da87ef57ecf3fe024151e321bdf4fc493eda2b3cd0e7be763e8ca6bf"
   },
-  "nu_intro.footer[1].action.value": "Nourish added as Learn only",
-  "@nu_intro.footer[1].action.value": {
+  "nu_intro.footer[1].action.then.value": "Nourish added as Learn only",
+  "@nu_intro.footer[1].action.then.value": {
     "description": "Nourish intro: toast value",
     "screen": "nu_intro",
-    "path": "footer[1].action",
+    "path": "footer[1].action.then",
     "prop": "value",
     "sourceHash": "3bcecbe20cb12cf27f28fcef87d7df435aa4eb5d3628f46ac87099dcc3efe973"
   },
@@ -14649,11 +14649,11 @@
     "prop": "label",
     "sourceHash": "b92b57fff7c13b06133677958227e8e23007c2a11db30263dac5b2042fa0a1bc"
   },
-  "sd_intro.footer[1].action.value": "Stride added as Learn only",
-  "@sd_intro.footer[1].action.value": {
+  "sd_intro.footer[1].action.then.value": "Stride added as Learn only",
+  "@sd_intro.footer[1].action.then.value": {
     "description": "Stride intro: toast value",
     "screen": "sd_intro",
-    "path": "footer[1].action",
+    "path": "footer[1].action.then",
     "prop": "value",
     "sourceHash": "38040bae26cca63cfb79982d6aee4e74f42fe90233f1d70da09fc4b0b0be975d"
   },
@@ -15473,11 +15473,11 @@
     "prop": "label",
     "sourceHash": "d653c97df0593f1d2865ca36acb9af01602ae9273fb394e17f865925145175cf"
   },
-  "ea_intro.footer[1].action.value": "Ease added as Learn only",
-  "@ea_intro.footer[1].action.value": {
+  "ea_intro.footer[1].action.then.value": "Ease added as Learn only",
+  "@ea_intro.footer[1].action.then.value": {
     "description": "Ease intro: toast value",
     "screen": "ea_intro",
-    "path": "footer[1].action",
+    "path": "footer[1].action.then",
     "prop": "value",
     "sourceHash": "588ed727813c12123beb48847f4bb76904b3dd594e213e93c36370f7327645af"
   },
@@ -16273,11 +16273,11 @@
     "prop": "label",
     "sourceHash": "58da646f5a1b3f42fbe424008197ecfe8817832a04d44c2be4db06231da363a7"
   },
-  "ck_intro.footer[1].action.value": "Checkup added as Learn only",
-  "@ck_intro.footer[1].action.value": {
+  "ck_intro.footer[1].action.then.value": "Checkup added as Learn only",
+  "@ck_intro.footer[1].action.then.value": {
     "description": "Checkup intro: toast value",
     "screen": "ck_intro",
-    "path": "footer[1].action",
+    "path": "footer[1].action.then",
     "prop": "value",
     "sourceHash": "4989199fa637b9f7408763dac904359b5406418eb695ad6d23c3252295de2483"
   },
@@ -16961,11 +16961,11 @@
     "prop": "label",
     "sourceHash": "fb49299e96aa4584a5e9bf920a963e1c9478547e21b50de06a9ed308cffe693e"
   },
-  "be_intro.footer[1].action.value": "Beacon added as Learn only",
-  "@be_intro.footer[1].action.value": {
+  "be_intro.footer[1].action.then.value": "Beacon added as Learn only",
+  "@be_intro.footer[1].action.then.value": {
     "description": "Beacon intro: toast value",
     "screen": "be_intro",
-    "path": "footer[1].action",
+    "path": "footer[1].action.then",
     "prop": "value",
     "sourceHash": "899c396c2a2c0b8121546124d7b2f13a5ed1688df5d26092d46525f8e3ea0a2e"
   },

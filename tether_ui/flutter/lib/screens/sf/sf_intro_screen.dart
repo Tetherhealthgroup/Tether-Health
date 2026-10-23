@@ -12,8 +12,8 @@ import '../../ui/ui.dart';
 /// Actions (generated from spec/screens/sf_intro.json):
 ///   • Back → back
 ///   • Set up ScrollFree → push → sf_q1
-///   • Add as Learn only → toast “ScrollFree added as Learn only” then tab → plans
-/// API: —
+///   • Add as Learn only → POST /v1/enrolments then toast “ScrollFree added as Learn only” then tab → plans
+/// API: POST /v1/enrolments
 class SfIntroScreen extends StatelessWidget {
   const SfIntroScreen({super.key});
 
@@ -30,7 +30,7 @@ class SfIntroScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.sfIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.sfQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: s.sfIntroFooterN1Label, onPressed: () => TNav.toast(context, s.sfIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sfIntroFooterN1Label, onPressed: () => TNav.submit(context, 'POST /v1/enrolments', screenId: 'sf_intro', queueable: false, then: () => TNav.toast(context, s.sfIntroFooterN1ActionThenValue, then: () => TNav.tab(context, Routes.plans))), variant: TButtonVariant.secondary),
       ],
     );
   }

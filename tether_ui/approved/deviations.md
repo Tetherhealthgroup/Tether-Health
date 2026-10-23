@@ -559,6 +559,17 @@ Not bound, for the app lane: header titles (`support_message_care`,
 input controls and their labels, the structure of member-specific lists,
 running timers and breathing rings, and the `bf_date` picker card.
 
+## P-88: "Add as Learn only" creates the enrolment (TH-1031f)
+
+On the 11 programme intros (`bf_intro`, `sf_intro`, `ca_intro`, `hw_intro`,
+`st_intro`, `re_intro`, `nu_intro`, `sd_intro`, `ea_intro`, `ck_intro`,
+`be_intro`), `footer[1]` "Add as Learn only" was a toast and a tab that
+saved nothing. It now submits `POST /v1/enrolments`, which is never queued,
+and the same toast and tab follow a successful save only. A failed save
+shows the generic error and stays on the intro. Each intro's `api` lists the
+endpoint. Label, layout and the other actions are unchanged. The
+`focus_full` "Learn only" option and `ob_third` still save nothing.
+
 ## P-31 / P-78: the programmes start unselected (TH-1031h)
 
 | Screen | Node | Change |

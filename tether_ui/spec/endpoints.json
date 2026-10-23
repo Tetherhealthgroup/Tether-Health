@@ -123,6 +123,23 @@
     ]
   },
   {
+    "endpoint": "POST /v1/enrolments",
+    "queueable": false,
+    "screens": [
+      "bf_intro",
+      "sf_intro",
+      "ca_intro",
+      "hw_intro",
+      "st_intro",
+      "re_intro",
+      "nu_intro",
+      "sd_intro",
+      "ea_intro",
+      "ck_intro",
+      "be_intro"
+    ]
+  },
+  {
     "endpoint": "POST /v1/enrolments/consents",
     "queueable": true,
     "screens": [

@@ -66,7 +66,7 @@ flowchart LR
 |---|---|---|
 | Nourish intro | Back | `back` |
 | Nourish intro | Set up Nourish | `push → nu_q1` |
-| Nourish intro | Add as Learn only | `toast “Nourish added as Learn only” then tab → plans` |
+| Nourish intro | Add as Learn only | `POST /v1/enrolments then toast “Nourish added as Learn only” then tab → plans` |
 | Goals & screen | Back | `back` |
 | Goals & screen | Next | `decide choice:nu_q1.eating: Eating-history answer → No: push → nu_habit | Yes / Prefer not to say: push → nu_protect` |
 | Weekly habit | Back | `back` |

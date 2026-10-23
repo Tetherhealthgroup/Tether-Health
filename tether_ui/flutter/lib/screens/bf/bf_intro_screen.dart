@@ -12,8 +12,8 @@ import '../../ui/ui.dart';
 /// Actions (generated from spec/screens/bf_intro.json):
 ///   • Back → back
 ///   • Set up BreatheFree → push → bf_q1
-///   • Add as Learn only → toast “BreatheFree added as Learn only” then tab → plans
-/// API: —
+///   • Add as Learn only → POST /v1/enrolments then toast “BreatheFree added as Learn only” then tab → plans
+/// API: POST /v1/enrolments
 class BfIntroScreen extends StatelessWidget {
   const BfIntroScreen({super.key});
 
@@ -30,7 +30,7 @@ class BfIntroScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.bfIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.bfQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: s.bfIntroFooterN1Label, onPressed: () => TNav.toast(context, s.bfIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.bfIntroFooterN1Label, onPressed: () => TNav.submit(context, 'POST /v1/enrolments', screenId: 'bf_intro', queueable: false, then: () => TNav.toast(context, s.bfIntroFooterN1ActionThenValue, then: () => TNav.tab(context, Routes.plans))), variant: TButtonVariant.secondary),
       ],
     );
   }

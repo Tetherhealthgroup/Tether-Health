@@ -81,7 +81,7 @@ flowchart LR
 |---|---|---|
 | Beacon intro | Back | `back` |
 | Beacon intro | Set up Beacon | `push → be_q1` |
-| Beacon intro | Add as Learn only | `toast “Beacon added as Learn only” then tab → plans` |
+| Beacon intro | Add as Learn only | `POST /v1/enrolments then toast “Beacon added as Learn only” then tab → plans` |
 | Journey stage | Back | `back` |
 | Journey stage | Next | `decide choice:be_q1.stage: Journey stage → Lowering my risk: push → be_q2 | Going through treatment: replace → be_tx (onboarding: ob_setup) | After treatment: replace → be_survivor (onboarding: ob_setup) | Supporting someone: tab → learn` |
 | Family history | Back | `back` |

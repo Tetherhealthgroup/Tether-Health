@@ -834,7 +834,7 @@ extension TStringsKeys on TStrings {
   String get bfIntroBodyN2RowsN2N1 => get('bf_intro.body[2].rows[2][1]');
   String get bfIntroBodyN3Text => get('bf_intro.body[3].text');
   String get bfIntroFooterN0Label => get('bf_intro.footer[0].label');
-  String get bfIntroFooterN1ActionValue => get('bf_intro.footer[1].action.value');
+  String get bfIntroFooterN1ActionThenValue => get('bf_intro.footer[1].action.then.value');
   String get bfIntroFooterN1Label => get('bf_intro.footer[1].label');
   String get bfIntroHeaderPill => get('bf_intro.header.pill');
   String get bfQ1BodyN1Text => get('bf_q1.body[1].text');
@@ -1101,7 +1101,7 @@ extension TStringsKeys on TStrings {
   String get sfIntroBodyN2RowsN2N1 => get('sf_intro.body[2].rows[2][1]');
   String get sfIntroBodyN3Text => get('sf_intro.body[3].text');
   String get sfIntroFooterN0Label => get('sf_intro.footer[0].label');
-  String get sfIntroFooterN1ActionValue => get('sf_intro.footer[1].action.value');
+  String get sfIntroFooterN1ActionThenValue => get('sf_intro.footer[1].action.then.value');
   String get sfIntroFooterN1Label => get('sf_intro.footer[1].label');
   String get sfIntroHeaderPill => get('sf_intro.header.pill');
   String get sfQ1BodyN1Text => get('sf_q1.body[1].text');
@@ -1269,7 +1269,7 @@ extension TStringsKeys on TStrings {
   String get caIntroBodyN2RowsN2N1 => get('ca_intro.body[2].rows[2][1]');
   String get caIntroBodyN3Text => get('ca_intro.body[3].text');
   String get caIntroFooterN0Label => get('ca_intro.footer[0].label');
-  String get caIntroFooterN1ActionValue => get('ca_intro.footer[1].action.value');
+  String get caIntroFooterN1ActionThenValue => get('ca_intro.footer[1].action.then.value');
   String get caIntroFooterN1Label => get('ca_intro.footer[1].label');
   String get caIntroHeaderPill => get('ca_intro.header.pill');
   String get caQ1BodyN1Text => get('ca_q1.body[1].text');
@@ -1405,7 +1405,7 @@ extension TStringsKeys on TStrings {
   String get hwIntroBodyN2RowsN2N1 => get('hw_intro.body[2].rows[2][1]');
   String get hwIntroBodyN3Text => get('hw_intro.body[3].text');
   String get hwIntroFooterN0Label => get('hw_intro.footer[0].label');
-  String get hwIntroFooterN1ActionValue => get('hw_intro.footer[1].action.value');
+  String get hwIntroFooterN1ActionThenValue => get('hw_intro.footer[1].action.then.value');
   String get hwIntroFooterN1Label => get('hw_intro.footer[1].label');
   String get hwIntroHeaderPill => get('hw_intro.header.pill');
   String get hwQ1BodyN1Text => get('hw_q1.body[1].text');
@@ -1556,7 +1556,7 @@ extension TStringsKeys on TStrings {
   String get stIntroBodyN2RowsN2N1 => get('st_intro.body[2].rows[2][1]');
   String get stIntroBodyN3Text => get('st_intro.body[3].text');
   String get stIntroFooterN0Label => get('st_intro.footer[0].label');
-  String get stIntroFooterN1ActionValue => get('st_intro.footer[1].action.value');
+  String get stIntroFooterN1ActionThenValue => get('st_intro.footer[1].action.then.value');
   String get stIntroFooterN1Label => get('st_intro.footer[1].label');
   String get stIntroHeaderPill => get('st_intro.header.pill');
   String get stQ1BodyN1Text => get('st_q1.body[1].text');
@@ -1678,7 +1678,7 @@ extension TStringsKeys on TStrings {
   String get reIntroBodyN2RowsN2N0 => get('re_intro.body[2].rows[2][0]');
   String get reIntroBodyN2RowsN2N1 => get('re_intro.body[2].rows[2][1]');
   String get reIntroFooterN0Label => get('re_intro.footer[0].label');
-  String get reIntroFooterN1ActionValue => get('re_intro.footer[1].action.value');
+  String get reIntroFooterN1ActionThenValue => get('re_intro.footer[1].action.then.value');
   String get reIntroFooterN1Label => get('re_intro.footer[1].label');
   String get reIntroHeaderPill => get('re_intro.header.pill');
   String get reQ1BodyN1Text => get('re_q1.body[1].text');
@@ -1764,7 +1764,7 @@ extension TStringsKeys on TStrings {
   String get nuIntroBodyN2RowsN2N0 => get('nu_intro.body[2].rows[2][0]');
   String get nuIntroBodyN2RowsN2N1 => get('nu_intro.body[2].rows[2][1]');
   String get nuIntroFooterN0Label => get('nu_intro.footer[0].label');
-  String get nuIntroFooterN1ActionValue => get('nu_intro.footer[1].action.value');
+  String get nuIntroFooterN1ActionThenValue => get('nu_intro.footer[1].action.then.value');
   String get nuIntroFooterN1Label => get('nu_intro.footer[1].label');
   String get nuIntroHeaderPill => get('nu_intro.header.pill');
   String get nuQ1BodyN1Text => get('nu_q1.body[1].text');
@@ -1858,7 +1858,7 @@ extension TStringsKeys on TStrings {
   String get sdIntroBodyN2RowsN2N0 => get('sd_intro.body[2].rows[2][0]');
   String get sdIntroBodyN2RowsN2N1 => get('sd_intro.body[2].rows[2][1]');
   String get sdIntroFooterN0Label => get('sd_intro.footer[0].label');
-  String get sdIntroFooterN1ActionValue => get('sd_intro.footer[1].action.value');
+  String get sdIntroFooterN1ActionThenValue => get('sd_intro.footer[1].action.then.value');
   String get sdIntroFooterN1Label => get('sd_intro.footer[1].label');
   String get sdIntroHeaderPill => get('sd_intro.header.pill');
   String get sdQ1BodyN1OptionsN0 => get('sd_q1.body[1].options[0]');
@@ -1961,7 +1961,7 @@ extension TStringsKeys on TStrings {
   String get eaIntroBodyN2RowsN2N0 => get('ea_intro.body[2].rows[2][0]');
   String get eaIntroBodyN2RowsN2N1 => get('ea_intro.body[2].rows[2][1]');
   String get eaIntroFooterN0Label => get('ea_intro.footer[0].label');
-  String get eaIntroFooterN1ActionValue => get('ea_intro.footer[1].action.value');
+  String get eaIntroFooterN1ActionThenValue => get('ea_intro.footer[1].action.then.value');
   String get eaIntroFooterN1Label => get('ea_intro.footer[1].label');
   String get eaIntroHeaderPill => get('ea_intro.header.pill');
   String get eaQ1BodyN1Text => get('ea_q1.body[1].text');
@@ -2061,7 +2061,7 @@ extension TStringsKeys on TStrings {
   String get ckIntroBodyN2RowsN2N0 => get('ck_intro.body[2].rows[2][0]');
   String get ckIntroBodyN2RowsN2N1 => get('ck_intro.body[2].rows[2][1]');
   String get ckIntroFooterN0Label => get('ck_intro.footer[0].label');
-  String get ckIntroFooterN1ActionValue => get('ck_intro.footer[1].action.value');
+  String get ckIntroFooterN1ActionThenValue => get('ck_intro.footer[1].action.then.value');
   String get ckIntroFooterN1Label => get('ck_intro.footer[1].label');
   String get ckIntroHeaderPill => get('ck_intro.header.pill');
   String get ckQ1BodyN1Text => get('ck_q1.body[1].text');
@@ -2147,7 +2147,7 @@ extension TStringsKeys on TStrings {
   String get beIntroBodyN2RowsN2N0 => get('be_intro.body[2].rows[2][0]');
   String get beIntroBodyN2RowsN2N1 => get('be_intro.body[2].rows[2][1]');
   String get beIntroFooterN0Label => get('be_intro.footer[0].label');
-  String get beIntroFooterN1ActionValue => get('be_intro.footer[1].action.value');
+  String get beIntroFooterN1ActionThenValue => get('be_intro.footer[1].action.then.value');
   String get beIntroFooterN1Label => get('be_intro.footer[1].label');
   String get beIntroHeaderPill => get('be_intro.header.pill');
   String get beQ1BodyN1Text => get('be_q1.body[1].text');
@@ -3850,7 +3850,7 @@ const Map<String, String> _en = <String, String>{
   'bf_intro.body[2].rows[2][1]': 'education only',
   'bf_intro.body[3].text': 'Plan, practice and get through cravings, with no judgment. A slip never erases your wins.',
   'bf_intro.footer[0].label': 'Set up BreatheFree',
-  'bf_intro.footer[1].action.value': 'BreatheFree added as Learn only',
+  'bf_intro.footer[1].action.then.value': 'BreatheFree added as Learn only',
   'bf_intro.footer[1].label': 'Add as Learn only',
   'bf_intro.header.pill': '~3 min/day',
   'bf_q1.body[1].text': 'Question 1 of 3',
@@ -4117,7 +4117,7 @@ const Map<String, String> _en = <String, String>{
   'sf_intro.body[2].rows[2][1]': 'reads messages or feeds',
   'sf_intro.body[3].text': 'Notice what pulls you in, set a goal that feels doable, and pause for 60 seconds when the urge hits.',
   'sf_intro.footer[0].label': 'Set up ScrollFree',
-  'sf_intro.footer[1].action.value': 'ScrollFree added as Learn only',
+  'sf_intro.footer[1].action.then.value': 'ScrollFree added as Learn only',
   'sf_intro.footer[1].label': 'Add as Learn only',
   'sf_intro.header.pill': '~1 min/day',
   'sf_q1.body[1].text': 'On a typical day, how long on social apps?',
@@ -4285,7 +4285,7 @@ const Map<String, String> _en = <String, String>{
   'ca_intro.body[2].rows[2][1]': 'from your clinician only',
   'ca_intro.body[3].text': 'Check your zone, log symptoms and know exactly what to do, using the plan your clinician gave you.',
   'ca_intro.footer[0].label': 'Set up ClearAir',
-  'ca_intro.footer[1].action.value': 'ClearAir added as Learn only',
+  'ca_intro.footer[1].action.then.value': 'ClearAir added as Learn only',
   'ca_intro.footer[1].label': 'Add as Learn only',
   'ca_intro.header.pill': '~1 min/day',
   'ca_q1.body[1].text': 'Which applies to you?',
@@ -4421,7 +4421,7 @@ const Map<String, String> _en = <String, String>{
   'hw_intro.body[2].rows[2][1]': 'information, not a grade',
   'hw_intro.body[3].text': 'Log blood pressure and cholesterol, see trends and prepare for visits. Both focus slots are in use, so you’ll choose how to add it.',
   'hw_intro.footer[0].label': 'Set up Heartwise',
-  'hw_intro.footer[1].action.value': 'Heartwise added as Learn only',
+  'hw_intro.footer[1].action.then.value': 'Heartwise added as Learn only',
   'hw_intro.footer[1].label': 'Add as Learn only',
   'hw_intro.header.pill': '~2 min/day',
   'hw_q1.body[1].text': 'Has a clinician talked with you about…',
@@ -4572,7 +4572,7 @@ const Map<String, String> _en = <String, String>{
   'st_intro.body[2].rows[2][1]': 'information, not failure',
   'st_intro.body[3].text': 'Log readings, see patterns around meals and sleep, and follow the low plan your clinician gave you. Steady never counts calories.',
   'st_intro.footer[0].label': 'Set up Steady',
-  'st_intro.footer[1].action.value': 'Steady added as Learn only',
+  'st_intro.footer[1].action.then.value': 'Steady added as Learn only',
   'st_intro.footer[1].label': 'Add as Learn only',
   'st_intro.header.pill': '~2 min/day',
   'st_q1.body[1].text': 'Which describes you?',
@@ -4694,7 +4694,7 @@ const Map<String, String> _en = <String, String>{
   're_intro.body[2].rows[2][0]': 'Reminders',
   're_intro.body[2].rows[2][1]': 'checks from your clinician',
   're_intro.footer[0].label': 'Set up Renew',
-  're_intro.footer[1].action.value': 'Renew added as Learn only',
+  're_intro.footer[1].action.then.value': 'Renew added as Learn only',
   're_intro.footer[1].label': 'Add as Learn only',
   're_intro.header.pill': '~1 min/day',
   're_q1.body[1].text': 'Do any of these apply?',
@@ -4780,7 +4780,7 @@ const Map<String, String> _en = <String, String>{
   'nu_intro.body[2].rows[2][0]': 'Approach',
   'nu_intro.body[2].rows[2][1]': 'add, don’t restrict',
   'nu_intro.footer[0].label': 'Set up Nourish',
-  'nu_intro.footer[1].action.value': 'Nourish added as Learn only',
+  'nu_intro.footer[1].action.then.value': 'Nourish added as Learn only',
   'nu_intro.footer[1].label': 'Add as Learn only',
   'nu_intro.header.pill': '~1 min/day',
   'nu_q1.body[1].text': 'What would you like more of?',
@@ -4874,7 +4874,7 @@ const Map<String, String> _en = <String, String>{
   'sd_intro.body[2].rows[2][0]': 'Caregiver',
   'sd_intro.body[2].rows[2][1]': 'optional, Stride only',
   'sd_intro.footer[0].label': 'Set up Stride',
-  'sd_intro.footer[1].action.value': 'Stride added as Learn only',
+  'sd_intro.footer[1].action.then.value': 'Stride added as Learn only',
   'sd_intro.footer[1].label': 'Add as Learn only',
   'sd_intro.header.pill': '~10 min/day',
   'sd_q1.body[1].options[0]': 'No',
@@ -4977,7 +4977,7 @@ const Map<String, String> _en = <String, String>{
   'ea_intro.body[2].rows[2][0]': 'Help now',
   'ea_intro.body[2].rows[2][1]': '988 always one tap away',
   'ea_intro.footer[0].label': 'Set up Ease',
-  'ea_intro.footer[1].action.value': 'Ease added as Learn only',
+  'ea_intro.footer[1].action.then.value': 'Ease added as Learn only',
   'ea_intro.footer[1].label': 'Add as Learn only',
   'ea_intro.header.pill': '~2 min/day',
   'ea_q1.body[1].text': 'Over the last 2 weeks, how often have you been bothered by…',
@@ -5077,7 +5077,7 @@ const Map<String, String> _en = <String, String>{
   'ck_intro.body[2].rows[2][0]': 'Records',
   'ck_intro.body[2].rows[2][1]': 'mark done, add dates',
   'ck_intro.footer[0].label': 'Set up Checkup',
-  'ck_intro.footer[1].action.value': 'Checkup added as Learn only',
+  'ck_intro.footer[1].action.then.value': 'Checkup added as Learn only',
   'ck_intro.footer[1].label': 'Add as Learn only',
   'ck_intro.header.pill': '~1 min/week',
   'ck_q1.body[1].text': 'A few details to personalize',
@@ -5163,7 +5163,7 @@ const Map<String, String> _en = <String, String>{
   'be_intro.body[2].rows[2][0]': 'Treatment support',
   'be_intro.body[2].rows[2][1]': 'questions, side-effect diary',
   'be_intro.footer[0].label': 'Set up Beacon',
-  'be_intro.footer[1].action.value': 'Beacon added as Learn only',
+  'be_intro.footer[1].action.then.value': 'Beacon added as Learn only',
   'be_intro.footer[1].label': 'Add as Learn only',
   'be_intro.header.pill': '~1 min/week',
   'be_q1.body[1].text': 'Which fits you best?',
@@ -6866,7 +6866,7 @@ const Map<String, String> _pseudo = <String, String>{
   'bf_intro.body[2].rows[2][1]': '⟦éðûçàţîöñ öñļý~~~~~~⟧',
   'bf_intro.body[3].text': '⟦Þļàñ, þŕàçţîçé àñð ĝéţ ţĥŕöûĝĥ çŕàṽîñĝš, ŵîţĥ ñö ĵûðĝɱéñţ. À šļîþ ñéṽéŕ éŕàšéš ýöûŕ ŵîñš.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~⟧',
   'bf_intro.footer[0].label': '⟦Šéţ ûþ ƁŕéàţĥéƑŕéé~~~~~~~⟧',
-  'bf_intro.footer[1].action.value': '⟦ƁŕéàţĥéƑŕéé àððéð àš Ļéàŕñ öñļý~~~~~~~~~~~⟧',
+  'bf_intro.footer[1].action.then.value': '⟦ƁŕéàţĥéƑŕéé àððéð àš Ļéàŕñ öñļý~~~~~~~~~~~⟧',
   'bf_intro.footer[1].label': '⟦Àðð àš Ļéàŕñ öñļý~~~~~~⟧',
   'bf_intro.header.pill': '⟦~3 ɱîñ/ðàý~~~⟧',
   'bf_q1.body[1].text': '⟦Ǫûéšţîöñ 1 öƒ 3~~~~⟧',
@@ -7133,7 +7133,7 @@ const Map<String, String> _pseudo = <String, String>{
   'sf_intro.body[2].rows[2][1]': '⟦ŕéàðš ɱéššàĝéš öŕ ƒééðš~~~~~~~~⟧',
   'sf_intro.body[3].text': '⟦Ñöţîçé ŵĥàţ þûļļš ýöû îñ, šéţ à ĝöàļ ţĥàţ ƒééļš ðöàƀļé, àñð þàûšé ƒöŕ 60 šéçöñðš ŵĥéñ ţĥé ûŕĝé ĥîţš.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~⟧',
   'sf_intro.footer[0].label': '⟦Šéţ ûþ ŠçŕöļļƑŕéé~~~~~~⟧',
-  'sf_intro.footer[1].action.value': '⟦ŠçŕöļļƑŕéé àððéð àš Ļéàŕñ öñļý~~~~~~~~~~~⟧',
+  'sf_intro.footer[1].action.then.value': '⟦ŠçŕöļļƑŕéé àððéð àš Ļéàŕñ öñļý~~~~~~~~~~~⟧',
   'sf_intro.footer[1].label': '⟦Àðð àš Ļéàŕñ öñļý~~~~~~⟧',
   'sf_intro.header.pill': '⟦~1 ɱîñ/ðàý~~~⟧',
   'sf_q1.body[1].text': '⟦Öñ à ţýþîçàļ ðàý, ĥöŵ ļöñĝ öñ šöçîàļ àþþš?~~~~~~~~~~~~~⟧',
@@ -7301,7 +7301,7 @@ const Map<String, String> _pseudo = <String, String>{
   'ca_intro.body[2].rows[2][1]': '⟦ƒŕöɱ ýöûŕ çļîñîçîàñ öñļý~~~~~~~~~⟧',
   'ca_intro.body[3].text': '⟦Çĥéçķ ýöûŕ žöñé, ļöĝ šýɱþţöɱš àñð ķñöŵ éẋàçţļý ŵĥàţ ţö ðö, ûšîñĝ ţĥé þļàñ ýöûŕ çļîñîçîàñ ĝàṽé ýöû.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~⟧',
   'ca_intro.footer[0].label': '⟦Šéţ ûþ ÇļéàŕÀîŕ~~~~~~⟧',
-  'ca_intro.footer[1].action.value': '⟦ÇļéàŕÀîŕ àððéð àš Ļéàŕñ öñļý~~~~~~~~~~⟧',
+  'ca_intro.footer[1].action.then.value': '⟦ÇļéàŕÀîŕ àððéð àš Ļéàŕñ öñļý~~~~~~~~~~⟧',
   'ca_intro.footer[1].label': '⟦Àðð àš Ļéàŕñ öñļý~~~~~~⟧',
   'ca_intro.header.pill': '⟦~1 ɱîñ/ðàý~~~⟧',
   'ca_q1.body[1].text': '⟦Ŵĥîçĥ àþþļîéš ţö ýöû?~~~~~~~⟧',
@@ -7437,7 +7437,7 @@ const Map<String, String> _pseudo = <String, String>{
   'hw_intro.body[2].rows[2][1]': '⟦îñƒöŕɱàţîöñ, ñöţ à ĝŕàðé~~~~~~~~⟧',
   'hw_intro.body[3].text': '⟦Ļöĝ ƀļööð þŕéššûŕé àñð çĥöļéšţéŕöļ, šéé ţŕéñðš àñð þŕéþàŕé ƒöŕ ṽîšîţš. Ɓöţĥ ƒöçûš šļöţš àŕé îñ ûšé, šö ýöû’ļļ çĥööšé ĥöŵ ţö àðð îţ.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~⟧',
   'hw_intro.footer[0].label': '⟦Šéţ ûþ Ĥéàŕţŵîšé~~~~~~⟧',
-  'hw_intro.footer[1].action.value': '⟦Ĥéàŕţŵîšé àððéð àš Ļéàŕñ öñļý~~~~~~~~~~⟧',
+  'hw_intro.footer[1].action.then.value': '⟦Ĥéàŕţŵîšé àððéð àš Ļéàŕñ öñļý~~~~~~~~~~⟧',
   'hw_intro.footer[1].label': '⟦Àðð àš Ļéàŕñ öñļý~~~~~~⟧',
   'hw_intro.header.pill': '⟦~2 ɱîñ/ðàý~~~⟧',
   'hw_q1.body[1].text': '⟦Ĥàš à çļîñîçîàñ ţàļķéð ŵîţĥ ýöû àƀöûţ…~~~~~~~~~~~~~⟧',
@@ -7588,7 +7588,7 @@ const Map<String, String> _pseudo = <String, String>{
   'st_intro.body[2].rows[2][1]': '⟦îñƒöŕɱàţîöñ, ñöţ ƒàîļûŕé~~~~~~~~~⟧',
   'st_intro.body[3].text': '⟦Ļöĝ ŕéàðîñĝš, šéé þàţţéŕñš àŕöûñð ɱéàļš àñð šļééþ, àñð ƒöļļöŵ ţĥé ļöŵ þļàñ ýöûŕ çļîñîçîàñ ĝàṽé ýöû. Šţéàðý ñéṽéŕ çöûñţš çàļöŕîéš.~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~⟧',
   'st_intro.footer[0].label': '⟦Šéţ ûþ Šţéàðý~~~~~⟧',
-  'st_intro.footer[1].action.value': '⟦Šţéàðý àððéð àš Ļéàŕñ öñļý~~~~~~~~~⟧',
+  'st_intro.footer[1].action.then.value': '⟦Šţéàðý àððéð àš Ļéàŕñ öñļý~~~~~~~~~⟧',
   'st_intro.footer[1].label': '⟦Àðð àš Ļéàŕñ öñļý~~~~~~⟧',
   'st_intro.header.pill': '⟦~2 ɱîñ/ðàý~~~⟧',
   'st_q1.body[1].text': '⟦Ŵĥîçĥ ðéšçŕîƀéš ýöû?~~~~~~~⟧',
@@ -7710,7 +7710,7 @@ const Map<String, String> _pseudo = <String, String>{
   're_intro.body[2].rows[2][0]': '⟦Ŕéɱîñðéŕš~~~~⟧',
   're_intro.body[2].rows[2][1]': '⟦çĥéçķš ƒŕöɱ ýöûŕ çļîñîçîàñ~~~~~~~~~~⟧',
   're_intro.footer[0].label': '⟦Šéţ ûþ Ŕéñéŵ~~~~⟧',
-  're_intro.footer[1].action.value': '⟦Ŕéñéŵ àððéð àš Ļéàŕñ öñļý~~~~~~~~~⟧',
+  're_intro.footer[1].action.then.value': '⟦Ŕéñéŵ àððéð àš Ļéàŕñ öñļý~~~~~~~~~⟧',
   're_intro.footer[1].label': '⟦Àðð àš Ļéàŕñ öñļý~~~~~~⟧',
   're_intro.header.pill': '⟦~1 ɱîñ/ðàý~~~⟧',
   're_q1.body[1].text': '⟦Ðö àñý öƒ ţĥéšé àþþļý?~~~~~~~⟧',
@@ -7796,7 +7796,7 @@ const Map<String, String> _pseudo = <String, String>{
   'nu_intro.body[2].rows[2][0]': '⟦Àþþŕöàçĥ~~~~⟧',
   'nu_intro.body[2].rows[2][1]': '⟦àðð, ðöñ’ţ ŕéšţŕîçţ~~~~~~⟧',
   'nu_intro.footer[0].label': '⟦Šéţ ûþ Ñöûŕîšĥ~~~~~⟧',
-  'nu_intro.footer[1].action.value': '⟦Ñöûŕîšĥ àððéð àš Ļéàŕñ öñļý~~~~~~~~~~⟧',
+  'nu_intro.footer[1].action.then.value': '⟦Ñöûŕîšĥ àððéð àš Ļéàŕñ öñļý~~~~~~~~~~⟧',
   'nu_intro.footer[1].label': '⟦Àðð àš Ļéàŕñ öñļý~~~~~~⟧',
   'nu_intro.header.pill': '⟦~1 ɱîñ/ðàý~~~⟧',
   'nu_q1.body[1].text': '⟦Ŵĥàţ ŵöûļð ýöû ļîķé ɱöŕé öƒ?~~~~~~~~~⟧',
@@ -7890,7 +7890,7 @@ const Map<String, String> _pseudo = <String, String>{
   'sd_intro.body[2].rows[2][0]': '⟦Çàŕéĝîṽéŕ~~~~⟧',
   'sd_intro.body[2].rows[2][1]': '⟦öþţîöñàļ, Šţŕîðé öñļý~~~~~~~~⟧',
   'sd_intro.footer[0].label': '⟦Šéţ ûþ Šţŕîðé~~~~~⟧',
-  'sd_intro.footer[1].action.value': '⟦Šţŕîðé àððéð àš Ļéàŕñ öñļý~~~~~~~~~⟧',
+  'sd_intro.footer[1].action.then.value': '⟦Šţŕîðé àððéð àš Ļéàŕñ öñļý~~~~~~~~~⟧',
   'sd_intro.footer[1].label': '⟦Àðð àš Ļéàŕñ öñļý~~~~~~⟧',
   'sd_intro.header.pill': '⟦~10 ɱîñ/ðàý~~~⟧',
   'sd_q1.body[1].options[0]': '⟦Ñö~⟧',
@@ -7993,7 +7993,7 @@ const Map<String, String> _pseudo = <String, String>{
   'ea_intro.body[2].rows[2][0]': '⟦Ĥéļþ ñöŵ~~~⟧',
   'ea_intro.body[2].rows[2][1]': '⟦988 àļŵàýš öñé ţàþ àŵàý~~~~~~~⟧',
   'ea_intro.footer[0].label': '⟦Šéţ ûþ Éàšé~~~~⟧',
-  'ea_intro.footer[1].action.value': '⟦Éàšé àððéð àš Ļéàŕñ öñļý~~~~~~~~⟧',
+  'ea_intro.footer[1].action.then.value': '⟦Éàšé àððéð àš Ļéàŕñ öñļý~~~~~~~~⟧',
   'ea_intro.footer[1].label': '⟦Àðð àš Ļéàŕñ öñļý~~~~~~⟧',
   'ea_intro.header.pill': '⟦~2 ɱîñ/ðàý~~~⟧',
   'ea_q1.body[1].text': '⟦Öṽéŕ ţĥé ļàšţ 2 ŵééķš, ĥöŵ öƒţéñ ĥàṽé ýöû ƀééñ ƀöţĥéŕéð ƀý…~~~~~~~~~~~~~~~~~~⟧',
@@ -8093,7 +8093,7 @@ const Map<String, String> _pseudo = <String, String>{
   'ck_intro.body[2].rows[2][0]': '⟦Ŕéçöŕðš~~~⟧',
   'ck_intro.body[2].rows[2][1]': '⟦ɱàŕķ ðöñé, àðð ðàţéš~~~~~~~⟧',
   'ck_intro.footer[0].label': '⟦Šéţ ûþ Çĥéçķûþ~~~~~⟧',
-  'ck_intro.footer[1].action.value': '⟦Çĥéçķûþ àððéð àš Ļéàŕñ öñļý~~~~~~~~~~⟧',
+  'ck_intro.footer[1].action.then.value': '⟦Çĥéçķûþ àððéð àš Ļéàŕñ öñļý~~~~~~~~~~⟧',
   'ck_intro.footer[1].label': '⟦Àðð àš Ļéàŕñ öñļý~~~~~~⟧',
   'ck_intro.header.pill': '⟦~1 ɱîñ/ŵééķ~~~⟧',
   'ck_q1.body[1].text': '⟦À ƒéŵ ðéţàîļš ţö þéŕšöñàļîžé~~~~~~~~~~⟧',
@@ -8179,7 +8179,7 @@ const Map<String, String> _pseudo = <String, String>{
   'be_intro.body[2].rows[2][0]': '⟦Ţŕéàţɱéñţ šûþþöŕţ~~~~~~~⟧',
   'be_intro.body[2].rows[2][1]': '⟦ǫûéšţîöñš, šîðé-éƒƒéçţ ðîàŕý~~~~~~~~~~⟧',
   'be_intro.footer[0].label': '⟦Šéţ ûþ Ɓéàçöñ~~~~~⟧',
-  'be_intro.footer[1].action.value': '⟦Ɓéàçöñ àððéð àš Ļéàŕñ öñļý~~~~~~~~~⟧',
+  'be_intro.footer[1].action.then.value': '⟦Ɓéàçöñ àððéð àš Ļéàŕñ öñļý~~~~~~~~~⟧',
   'be_intro.footer[1].label': '⟦Àðð àš Ļéàŕñ öñļý~~~~~~⟧',
   'be_intro.header.pill': '⟦~1 ɱîñ/ŵééķ~~~⟧',
   'be_q1.body[1].text': '⟦Ŵĥîçĥ ƒîţš ýöû ƀéšţ?~~~~~~~⟧',

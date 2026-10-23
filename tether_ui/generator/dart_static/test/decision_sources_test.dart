@@ -418,27 +418,34 @@ void main() {
       expect([...bySource['device']!, ...bySource['reference']!].length, 18);
     });
 
-    test('spec/endpoints.json: sign-in and account endpoints are never queued, every other endpoint may be', () {
+    // Enrolment creation is never queued either (R-162): Learn-only adds.
+    const enrolment = 'POST /v1/enrolments';
+    bool neverQueued(String endpoint) => endpoint.contains(' supabase /auth/') || endpoint == enrolment;
+
+    test('spec/endpoints.json: sign-in, account and enrolment-creating endpoints are never queued, every other endpoint may be', () {
       final eps = _endpoints();
       final auth = [for (final e in eps) if ((e['endpoint'] as String).contains(' supabase /auth/')) e['endpoint']];
       expect(auth, hasLength(5));
+      expect([for (final e in eps) e['endpoint']], contains(enrolment));
       for (final e in eps) {
-        expect(e['queueable'], !(e['endpoint'] as String).contains(' supabase /auth/'), reason: e['endpoint'] as String);
+        expect(e['queueable'], !neverQueued(e['endpoint'] as String), reason: e['endpoint'] as String);
       }
     });
 
-    test('generated screens pass queueable: false on every sign-in and account submit, and nowhere else', () {
+    test('generated screens pass queueable: false on every sign-in, account and enrolment-creating submit, and nowhere else', () {
       final submit = RegExp(r"TNav\.submit\(context, '([^']*)', screenId: '[^']*'(, queueable: false)?");
       final generated = Directory('lib/screens').listSync(recursive: true).whereType<File>().where((f) => f.path.endsWith('.dart'));
-      var auth = 0;
+      var auth = 0, enrolments = 0;
       for (final f in generated) {
         for (final m in submit.allMatches(f.readAsStringSync())) {
           final isAuth = m.group(1)!.contains(' supabase /auth/');
           if (isAuth) auth++;
-          expect(m.group(2) != null, isAuth, reason: '${f.path}: ${m.group(1)}');
+          if (m.group(1) == enrolment) enrolments++;
+          expect(m.group(2) != null, neverQueued(m.group(1)!), reason: '${f.path}: ${m.group(1)}');
         }
       }
       expect(auth, 7, reason: 'five endpoints on seven screens: the token endpoint on auth_session, auth_signin and auth_signin_error');
+      expect(enrolments, 11, reason: '"Add as Learn only" on the 11 programme intros');
     });
   });
 

@@ -82,7 +82,7 @@ flowchart LR
 |---|---|---|
 | ClearAir intro | Back | `back` |
 | ClearAir intro | Set up ClearAir | `push → ca_q1` |
-| ClearAir intro | Add as Learn only | `toast “ClearAir added as Learn only” then tab → plans` |
+| ClearAir intro | Add as Learn only | `POST /v1/enrolments then toast “ClearAir added as Learn only” then tab → plans` |
 | Diagnosis & plan | Back | `back` |
 | Diagnosis & plan | Next | `decide choice:ca_q1.has_plan: Has a written action plan? → Yes: push → ca_plan | No / Not sure: push → ca_noplan` |
 | Enter action plan | Back | `back` |

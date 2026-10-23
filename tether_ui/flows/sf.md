@@ -102,7 +102,7 @@ flowchart LR
 |---|---|---|
 | ScrollFree intro | Back | `back` |
 | ScrollFree intro | Set up ScrollFree | `push → sf_q1` |
-| ScrollFree intro | Add as Learn only | `toast “ScrollFree added as Learn only” then tab → plans` |
+| ScrollFree intro | Add as Learn only | `POST /v1/enrolments then toast “ScrollFree added as Learn only” then tab → plans` |
 | Baseline: use | Back | `back` |
 | Baseline: use | Next | `push → sf_q2` |
 | Baseline: triggers | Back | `back` |

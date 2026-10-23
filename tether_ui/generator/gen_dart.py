@@ -953,7 +953,9 @@ def _device_self_test():
     _expect("screenId: 'selftest', queueable: false, then:" in auth, auth)
     save = act({'type': 'submit', 'api': 'POST /v1/records/check-ins', 'then': {'type': 'back'}})
     _expect('queueable' not in save, save)
-    _expect(all(not queueable(e) and is_auth_endpoint(e) for e in NOT_QUEUEABLE), 'NOT_QUEUEABLE holds a non-auth endpoint')
+    _expect(all(not queueable(e) and (is_auth_endpoint(e) or e == 'POST /v1/enrolments') for e in NOT_QUEUEABLE), 'NOT_QUEUEABLE holds an unexpected endpoint')
+    learn = act({'type': 'submit', 'api': 'POST /v1/enrolments', 'then': {'type': 'back'}})
+    _expect("screenId: 'selftest', queueable: false, then:" in learn, learn)
 
 
 if __name__ == '__main__':

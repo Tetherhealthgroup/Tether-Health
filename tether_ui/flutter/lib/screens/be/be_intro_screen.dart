@@ -12,8 +12,8 @@ import '../../ui/ui.dart';
 /// Actions (generated from spec/screens/be_intro.json):
 ///   • Back → back
 ///   • Set up Beacon → push → be_q1
-///   • Add as Learn only → toast “Beacon added as Learn only” then tab → plans
-/// API: —
+///   • Add as Learn only → POST /v1/enrolments then toast “Beacon added as Learn only” then tab → plans
+/// API: POST /v1/enrolments
 class BeIntroScreen extends StatelessWidget {
   const BeIntroScreen({super.key});
 
@@ -29,7 +29,7 @@ class BeIntroScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.beIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.beQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: s.beIntroFooterN1Label, onPressed: () => TNav.toast(context, s.beIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.beIntroFooterN1Label, onPressed: () => TNav.submit(context, 'POST /v1/enrolments', screenId: 'be_intro', queueable: false, then: () => TNav.toast(context, s.beIntroFooterN1ActionThenValue, then: () => TNav.tab(context, Routes.plans))), variant: TButtonVariant.secondary),
       ],
     );
   }

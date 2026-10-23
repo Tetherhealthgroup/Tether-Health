@@ -87,7 +87,7 @@ void main() {
   group('entries', () {
     test('match the spec endpoints exactly, one entry each', () {
       final spec = _specEndpoints();
-      expect(spec, hasLength(60));
+      expect(spec, hasLength(61));
       final registered = [for (final e in endpointRegistry) e.endpoint];
       expect(registered.toSet(), hasLength(registered.length),
           reason: 'an endpoint is registered twice');
@@ -152,12 +152,12 @@ void main() {
       for (final entry in endpointRegistry) {
         expect(entry.queueable, spec[entry.endpoint], reason: entry.endpoint);
         expect(entry.acceptsQueued, entry.queueable,
-            reason: '${entry.endpoint}: only auth endpoints are non-queueable');
+            reason: '${entry.endpoint}: auth and enrolment endpoints only');
       }
       final auth = endpointRegistry.where((e) => isAuthEndpoint(e.endpoint));
       expect(auth, hasLength(5));
       expect(auth.every((e) => !e.acceptsQueued), isTrue);
-      expect(spec.values.where((q) => q == false), hasLength(5));
+      expect(spec.values.where((q) => q == false), hasLength(6));
     });
 
     test('the four safety endpoints are flagged, and only they', () {
@@ -275,7 +275,7 @@ void main() {
         for (final e in endpointRegistry.where((e) => !e.acceptsQueued))
           e.endpoint: (EndpointCall _) async => const TResult.queued(),
       };
-      expect(handlers, hasLength(5));
+      expect(handlers, hasLength(6));
       final api = AppApi(handlers: handlers);
       for (final endpoint in handlers.keys) {
         expect(

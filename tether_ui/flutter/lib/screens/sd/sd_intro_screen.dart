@@ -12,8 +12,8 @@ import '../../ui/ui.dart';
 /// Actions (generated from spec/screens/sd_intro.json):
 ///   • Back → back
 ///   • Set up Stride → push → sd_q1
-///   • Add as Learn only → toast “Stride added as Learn only” then tab → plans
-/// API: —
+///   • Add as Learn only → POST /v1/enrolments then toast “Stride added as Learn only” then tab → plans
+/// API: POST /v1/enrolments
 class SdIntroScreen extends StatelessWidget {
   const SdIntroScreen({super.key});
 
@@ -29,7 +29,7 @@ class SdIntroScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.sdIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.sdQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: s.sdIntroFooterN1Label, onPressed: () => TNav.toast(context, s.sdIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.sdIntroFooterN1Label, onPressed: () => TNav.submit(context, 'POST /v1/enrolments', screenId: 'sd_intro', queueable: false, then: () => TNav.toast(context, s.sdIntroFooterN1ActionThenValue, then: () => TNav.tab(context, Routes.plans))), variant: TButtonVariant.secondary),
       ],
     );
   }
