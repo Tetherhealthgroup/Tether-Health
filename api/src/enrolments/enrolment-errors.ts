@@ -31,7 +31,10 @@ export const enrolmentErrorCodes = [
   "consent_document_unavailable",
   "consent_version_unchanged",
   "consent_conflict_retry",
+  "consent_recipient_required",
+  "consent_recipient_invalid",
   "focus_swap_invalid",
+  /** No longer raised: share consents are accepted with a recipient. */
   "sharing_not_available",
   "confirmation_required",
   "recent_authentication_required",

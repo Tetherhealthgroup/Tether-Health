@@ -80,9 +80,10 @@ export class GrantConsentDto {
   purpose!: ConsentPurpose;
 
   /**
-   * A care connection or caregiver id (UUID) for share purposes only. Share
-   * purposes are refused until care connections exist, so today any value is
-   * refused; a value that is not a UUID is invalid input.
+   * Required for the share purposes and refused for the others: the care
+   * connection (share_care_team) or caregiver of the same enrolment
+   * (share_caregiver) the consent names. The database checks it is the
+   * member's and live (consent_recipient_invalid).
    */
   @ValidateIf((dto: GrantConsentDto) => dto.recipientRef !== undefined)
   @IsUUID()
@@ -122,6 +123,31 @@ export class DeleteEnrolmentDto {
 }
 
 export class RevokeConsentDto {
+  @Equals(true)
+  revoked!: true;
+}
+
+/**
+ * `PATCH /v1/enrolments/consents`: revoke the live consent of one purpose on
+ * one of the caller's enrolments, as the app sends it (no consent id).
+ */
+export class RevokeConsentByPurposeDto {
+  @IsUUID()
+  enrolmentId!: string;
+
+  @IsIn(consentPurposes)
+  purpose!: ConsentPurpose;
+
+  /**
+   * Share purposes only: the connection or caregiver the consent names.
+   * Needed only when more than one consent of that purpose is live.
+   */
+  @ValidateIf(
+    (dto: RevokeConsentByPurposeDto) => dto.recipientRef !== undefined,
+  )
+  @IsUUID()
+  recipientRef?: string;
+
   @Equals(true)
   revoked!: true;
 }

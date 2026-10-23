@@ -185,7 +185,11 @@ returns jsonb language sql stable set search_path = '' as $f$
     'lesson_progress', (select count(*) from public.lesson_progress where user_id = p_user),
     'programme_reminders', (select count(*) from public.programme_reminders where user_id = p_user),
     'notification_preferences', (select count(*) from public.notification_preferences where user_id = p_user),
-    'wellbeing_baseline', (select count(*) from public.wellbeing_baseline where user_id = p_user))
+    'wellbeing_baseline', (select count(*) from public.wellbeing_baseline where user_id = p_user),
+    'record_routes', (select count(*) from public.record_routes where user_id = p_user),
+    'record_items', (select count(*) from public.record_items where user_id = p_user),
+    'record_imports', (select count(*) from public.record_imports where user_id = p_user),
+    'record_sources', (select count(*) from public.record_sources where user_id = p_user))
 $f$;
 
 -- The consent release gate, exactly as documented in docs/contracts/database.md
@@ -594,7 +598,8 @@ select th988_test.ok(
     "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
     "caregivers": 0, "care_connections": 0, "supporters": 0,
     "observations": 0, "programme_entries": 0, "rescue_events": 0, "lesson_progress": 0,
-    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0}'::jsonb
+    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0,
+    "record_routes": 0, "record_items": 0, "record_imports": 0, "record_sources": 0}'::jsonb
   and th988_test.counts('00000000-0000-4000-8000-0000009880b1') =
       th988_test.counts('00000000-0000-4000-8000-0000009880a1'),
   'setup: synthetic A and B each hold a row in every member table except the care tables, which verify_care_migration.sh covers');

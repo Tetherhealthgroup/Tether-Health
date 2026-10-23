@@ -1,5 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { databaseError, type DatabaseErrorHint } from "./database-errors";
+import { CARE_TABLES, FakeCare, type CareTable } from "./fake-care";
+import {
+  FakeHealthRecords,
+  HEALTH_RECORD_TABLES,
+  RECORD_CATEGORIES,
+  type HealthRecordTable,
+} from "./fake-health-records";
 import {
   attributesTriggerFails,
   entryCheckFails,
@@ -105,12 +112,24 @@ import {
  *   (skipped for a rescue with no enrolment, MATCH SIMPLE). A reminder time
  *   that is not a time fails the cast (22007). profiles.time_zone is
  *   readable (UTC unless setProfileTimeZone);
+ * - quit_plans and program_data: select own rows only, for the account
+ *   export (addQuitPlan and addProgramData seed them; every write is refused
+ *   with 42501 here);
  * - sync_lapse: select own rows only (members never write it; addSyncLapse
  *   seeds rows as the sync writer would). Account deletion and "Delete now"
  *   remove and count them;
  * - filters gte and lt (timestamps compare as instants), offset, and HEAD
  *   with an exact count (the count ignores limit and offset, as PostgREST's
  *   does);
+ * - the care tables of 202610180011 (see fake-care.ts): their select,
+ *   insert, update and delete paths as the member sees them,
+ *   redeem_care_invite() (seed invites with care.addInvite), the consent
+ *   recipient check (TH021) and the revocation cascades. "Delete now" and
+ *   account deletion remove the care rows they cascade to (counts not
+ *   returned);
+ * - the health record tables of 202610180015 (see fake-health-records.ts):
+ *   record_categories, record_sources, record_items and record_routes as
+ *   the member sees them (seed rows with records.seedSource/seedItem);
  * - error bodies: standard SQLSTATEs for constraints and RLS, and the
  *   database's own `TH` codes with the registry's exact message and hint
  *   (test/support/database-errors.ts), answered as HTTP 400 the way
@@ -143,6 +162,19 @@ interface State {
   wellbeing_baseline: Row[];
   /** Written by the sync writer only (addSyncLapse); members read. */
   sync_lapse: Row[];
+  /** Care tables (202610180011); see fake-care.ts. */
+  care_orgs: Row[];
+  care_invites: Row[];
+  care_connections: Row[];
+  care_shares: Row[];
+  care_messages: Row[];
+  caregivers: Row[];
+  supporters: Row[];
+  /** Health record tables (202610180015); see fake-health-records.ts. */
+  record_categories: Row[];
+  record_sources: Row[];
+  record_items: Row[];
+  record_routes: Row[];
   /** Stand-in for auth.users (id only). */
   auth_users: Row[];
   /** Stand-in for storage.objects (bucket_id, name). */
@@ -309,6 +341,11 @@ const MEMBER_TABLES = [
   "notification_preferences",
   "wellbeing_baseline",
 ];
+/**
+ * Read as the member for the account export (own rows); written here only
+ * by the superuser helpers addQuitPlan and addProgramData.
+ */
+const READ_ONLY_TABLES = ["quit_plans", "program_data"];
 /** observations and programme_entries (202610180013). */
 const RECORD_TABLES = ["observations", "programme_entries"];
 /** Rows that go with their enrolment ("Delete now", on delete cascade). */
@@ -493,9 +530,40 @@ export class FakePostgrest {
     notification_preferences: [],
     wellbeing_baseline: [],
     sync_lapse: [],
+    care_orgs: [],
+    care_invites: [],
+    care_connections: [],
+    care_shares: [],
+    care_messages: [],
+    caregivers: [],
+    supporters: [],
+    record_categories: RECORD_CATEGORIES.map((category) => ({ category })),
+    record_sources: [],
+    record_items: [],
+    record_routes: [],
     auth_users: [],
     storage_objects: [],
   };
+  /** The health record tables; tests seed with records.seedSource/seedItem. */
+  readonly records = new FakeHealthRecords({
+    state: () => this.state,
+    barrierOpen: (uid) => this.barrierOpen(uid),
+    hasConsent: (uid, enrolmentId, purpose) =>
+      this.hasConsent(uid, enrolmentId, purpose),
+    now: () => this.now(),
+    fail,
+  });
+  /** The care tables; tests seed clinics and invites with care.addInvite. */
+  readonly care = new FakeCare({
+    state: () => this.state,
+    barrierOpen: (uid) => this.barrierOpen(uid),
+    hasConsent: (uid, enrolmentId, purpose, recipient) =>
+      this.hasConsent(uid, enrolmentId, purpose, recipient),
+    now: () => this.now(),
+    clockMs: () => this.clock,
+    fail,
+    raise,
+  });
   /**
    * Seconds since the sign-in recorded in each token's amr claim (0 unless
    * set); null means the token has no usable amr entry.
@@ -815,14 +883,74 @@ export class FakePostgrest {
         ...RECORD_TABLES,
         ...MEMBER_TABLES,
         "sync_lapse",
+        ...READ_ONLY_TABLES,
+        ...CARE_TABLES,
+        ...HEALTH_RECORD_TABLES,
       ].includes(path)
     ) {
       return fail(404, "PGRST205", "Table not found");
     }
     const table = path as keyof State;
+    if (
+      READ_ONLY_TABLES.includes(table) &&
+      method !== "GET" &&
+      method !== "HEAD"
+    ) {
+      return fail(403, "42501", `permission denied for table ${table}`);
+    }
     let rows: Row[];
     let status = 200;
-    if (method === "GET" || method === "HEAD") {
+    const careTable = (CARE_TABLES as readonly string[]).includes(table)
+      ? (table as CareTable)
+      : null;
+    const recordTable = (HEALTH_RECORD_TABLES as readonly string[]).includes(
+      table,
+    )
+      ? (table as HealthRecordTable)
+      : null;
+    if (recordTable !== null) {
+      const values = Array.isArray(body) ? (body as Row[]) : [body as Row];
+      if (method === "GET" || method === "HEAD") {
+        rows = this.filter(this.records.visible(uid, recordTable), url);
+      } else if (method === "POST") {
+        rows = this.records.insert(uid, recordTable, values);
+        status = 201;
+      } else if (method === "PATCH") {
+        rows = this.records.update(
+          uid,
+          recordTable,
+          this.filter(this.records.visible(uid, recordTable), url),
+          body as Row,
+        );
+      } else if (method === "DELETE") {
+        rows = this.records.remove(recordTable);
+      } else {
+        return fail(405, "PGRST117", "Unsupported method");
+      }
+    } else if (careTable !== null) {
+      const values = Array.isArray(body) ? (body as Row[]) : [body as Row];
+      if (method === "GET" || method === "HEAD") {
+        rows = this.filter(this.care.visible(uid, careTable), url);
+      } else if (method === "POST") {
+        rows = values.map((value) => this.care.insert(uid, careTable, value));
+        status = 201;
+      } else if (method === "PATCH") {
+        rows = this.care.update(
+          uid,
+          careTable,
+          this.filter(this.care.visible(uid, careTable), url),
+          body as Row,
+        );
+      } else if (method === "DELETE") {
+        rows = this.care.remove(
+          uid,
+          careTable,
+          this.filter(this.care.visible(uid, careTable), url),
+        );
+      } else {
+        return fail(405, "PGRST117", "Unsupported method");
+      }
+    } else if (method === "GET" || method === "HEAD") {
       rows = this.filter(this.visible(uid, table), url);
     } else if (method === "POST") {
       const values = Array.isArray(body) ? (body as Row[]) : [body as Row];
@@ -927,6 +1055,10 @@ export class FakePostgrest {
     if (name === "delete_my_account" && method === "POST") {
       return { status: 200, body: this.deleteAccount(uid, token, args) };
     }
+    if (name === "redeem_care_invite" && method === "POST") {
+      const row = this.care.redeem(uid, args);
+      return { status: 200, body: this.project(row, url) };
+    }
     if (name === "delete_enrolment_now" && method === "POST") {
       return { status: 200, body: this.deleteEnrolmentNow(uid, token, args) };
     }
@@ -1001,6 +1133,8 @@ export class FakePostgrest {
     for (const table of MEMBER_ROW_TABLES) {
       removeWhere(table as keyof State, (row) => row.user_id === uid);
     }
+    this.care.dropMember(uid);
+    this.records.dropMember(uid);
     removeWhere("auth_users", (row) => row.id === uid);
     return counts;
   }
@@ -1063,6 +1197,8 @@ export class FakePostgrest {
         (row) => row.enrolment_id === enrolment.id,
       );
     }
+    this.care.dropEnrolment(enrolment.id as string);
+    this.records.dropEnrolment(enrolment.id as string);
     const syncLapses = removeWhere(
       "sync_lapse",
       (row) => row.user_id === uid && row.programme_code === code,
@@ -1304,6 +1440,7 @@ export class FakePostgrest {
     if (
       RECORD_TABLES.includes(table) ||
       MEMBER_TABLES.includes(table) ||
+      READ_ONLY_TABLES.includes(table) ||
       table === "sync_lapse"
     ) {
       return this.state[table].filter((row) => row.user_id === uid);
@@ -1377,6 +1514,27 @@ export class FakePostgrest {
       }
       this.state.enrolments.push(row);
       return row;
+    }
+    // programme_consents_check_recipient (before insert, fires before
+    // programme_consents_fill_text): a share consent's recipient must be a
+    // live connection or caregiver of the enrolment's member. The trigger
+    // runs as the caller, so another member's enrolment has no member.
+    if (
+      SHARE.includes(value.purpose as string) &&
+      value.recipient_ref !== undefined &&
+      value.recipient_ref !== null
+    ) {
+      const own = this.state.enrolments.find(
+        (other) => other.id === value.enrolment_id && other.user_id === uid,
+      );
+      if (!own) raise("consent_recipient_invalid");
+      else {
+        this.care.checkConsentRecipient(
+          own,
+          value.purpose as string,
+          value.recipient_ref as string,
+        );
+      }
     }
     // consent_fill_text (before insert): the text comes from the document.
     const doc = this.grantable(
@@ -1887,6 +2045,7 @@ export class FakePostgrest {
    * the user whose rows the request wrote (the trigger counts that user's).
    */
   private deferredChecks(uid: string): void {
+    this.care.cascade();
     const focus = this.state.enrolments.filter(
       (row) => row.user_id === uid && row.status === "focus",
     );
@@ -1904,6 +2063,7 @@ export class FakePostgrest {
     uid: string,
     enrolmentId: string,
     purpose: string,
+    recipient: string | null = null,
   ): boolean {
     const enrolment = this.state.enrolments.find(
       (row) => row.id === enrolmentId,
@@ -1917,9 +2077,10 @@ export class FakePostgrest {
         (row) =>
           row.enrolment_id === enrolmentId &&
           row.purpose === purpose &&
-          row.recipient_ref === null &&
+          row.recipient_ref === recipient &&
           row.revoked_at === null,
-      )
+      ) &&
+      (purpose === "core" || this.hasConsent(uid, enrolmentId, "core"))
     );
   }
 

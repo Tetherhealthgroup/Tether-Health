@@ -33,6 +33,10 @@ import { NotificationsService } from "./notifications/notifications.service";
 import { BaselineController } from "./baseline/baseline.controller";
 import { BaselineService } from "./baseline/baseline.service";
 import { AppConfigController } from "./app-config/app-config.controller";
+import { CareController } from "./care/care.controller";
+import { CareService } from "./care/care.service";
+import { RecordsFhirController } from "./records-fhir/records-fhir.controller";
+import { RecordsFhirService } from "./records-fhir/records-fhir.service";
 
 @Module({
   imports: [
@@ -57,6 +61,8 @@ import { AppConfigController } from "./app-config/app-config.controller";
     NotificationsController,
     BaselineController,
     AppConfigController,
+    CareController,
+    RecordsFhirController,
   ],
   providers: [
     TokenVerifier,
@@ -72,6 +78,8 @@ import { AppConfigController } from "./app-config/app-config.controller";
     TodayService,
     NotificationsService,
     BaselineService,
+    CareService,
+    RecordsFhirService,
     { provide: APP_GUARD, useClass: AuthGuard },
   ],
 })

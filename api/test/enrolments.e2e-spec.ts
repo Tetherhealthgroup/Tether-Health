@@ -991,26 +991,40 @@ describe("Enrolments and consents API (e2e)", () => {
       ).toBe(false);
     });
 
-    it.each([
-      ["share_care_team", { recipientRef: randomUUID() }],
-      ["share_caregiver", { recipientRef: randomUUID() }],
-      ["share_care_team", {}],
-      ["share_caregiver", {}],
-    ])(
-      "refuses %s with sharing_not_available until care connections exist",
-      async (purpose, extra) => {
+    it.each(["share_care_team", "share_caregiver"])(
+      "refuses %s without a recipient (400, nothing sent)",
+      async (purpose) => {
         const a = newCaller();
         const id = await enrol(a, "hw");
+        await grant(a, id, "core");
+        const since = fake.requests.length;
+        expectUncoded(
+          await call(a, "POST", "/v1/enrolments/consents", {
+            enrolmentId: id,
+            purpose,
+            ...SHOWN,
+          }),
+          400,
+        );
+        expect(fake.requests.length).toBe(since);
+      },
+    );
+
+    it.each(["share_care_team", "share_caregiver"])(
+      "refuses %s naming no live connection or caregiver of the member (consent_recipient_invalid)",
+      async (purpose) => {
+        const a = newCaller();
+        const id = await enrol(a, "sd");
         await grant(a, id, "core");
         expectCoded(
           await call(a, "POST", "/v1/enrolments/consents", {
             enrolmentId: id,
             purpose,
+            recipientRef: randomUUID(),
             ...SHOWN,
-            ...extra,
           }),
           409,
-          "sharing_not_available",
+          "consent_recipient_invalid",
         );
         expect(
           fake
@@ -2025,7 +2039,8 @@ describe("Enrolments and consents API (e2e)", () => {
             "POST",
             "/v1/enrolments/consents",
             { enrolmentId: id, purpose: "research", ...SHOWN },
-            FUNCTION_CODES,
+            // The consent insert also maps the share recipient check.
+            [...FUNCTION_CODES, "TH021"],
           ],
           [
             "POST",

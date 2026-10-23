@@ -747,6 +747,69 @@ Rules:
   `authenticated` or `thsync`. The reminder time and the two settings tables
   can be updated and have no truncate guard.
 
+## Health records
+
+Migration source of truth: `supabase/migrations/202610180015_records.sql`.
+`supabase/tests/verify_records_migration.sh` checks this section.
+
+- `record_categories` lists the record categories a programme may receive. It
+  is seeded with exactly the distinct values of
+  `programmes.receives_resources` (`a1c`, `blood_pressure`, `egfr`,
+  `glucose`, `immunizations`, `lipids`, `smoking_status`).
+  `record_category_codes` maps a LOINC or CVX code to a category and starts
+  empty: its rows need clinical and informatics sign-off before a later
+  reviewed seed. Both are reference data: `authenticated` may select them and
+  nobody writes them through the API.
+- `record_sources` is one member's records source: `epic`, `oracle`,
+  `bluebutton` or `smart` (each with an `https://` `fhir_base_url`),
+  `apple_health`, `health_connect` or `manual` (no URL; at most one of each
+  per member). `status` is `connected`, `needs_reauth` or `disconnected`.
+  Members insert and update their own sources (display name, status, last
+  sync) and never delete them. `fhir_base_url` is member-written and
+  untrusted: the API checks it before every outbound call.
+- `record_imports` is one sync run of a source, with numeric counts only.
+- `record_items` holds each imported or manually entered value
+  (`Observation`, `Condition`, `MedicationRequest` or `Immunization`) with
+  its code, display text, value, UCUM unit and effective time.
+  `status` is `pending_review`, `accepted`, `rejected` or `conflict`; members
+  may update only the status, and readers use only `accepted` items.
+  `dedupe_key` (code, date and value) is unique per member.
+- `record_routes` gives an accepted item to one programme. Its insert check
+  requires the enrolment's live `records_import` consent (`has_consent`), an
+  accepted item of the same member, and an item category in that programme's
+  `receives_resources`, so a programme with an empty list (Ease, ScrollFree
+  and others) never receives records.
+- Every member table has `user_id` cascading from `auth.users`; imports and
+  items cascade from their source and routes from their item through
+  composite keys that include `user_id`; routes also cascade from their
+  enrolment through `(enrolment_id, user_id, programme_code)`. No table here
+  references the consent, sync or care tables, and no foreign key sets null
+  or a default.
+- Row-level security is enabled and forced on all six tables. Every insert
+  and update policy ends with a top-level `and not
+  public.sync_writer_session()`; every insert policy calls
+  `public.deletion_barrier_open()`. Members cannot delete any of these rows
+  directly.
+- `record_rows_truncate_guard` refuses `TRUNCATE` of `record_sources`,
+  `record_imports`, `record_items` and `record_routes` for every role
+  (`TH028`); `TRUNCATE` is not granted on them to `PUBLIC`, `anon`,
+  `authenticated` or `thsync`.
+- `delete_record_source_items(p_source_id, p_confirmation)` deletes the
+  routes, items and imports of one of the caller's sources and returns
+  `record_routes`, `record_items` and `record_imports` counts. It refuses, in
+  this order: no caller (`42501`); a sync service session (`TH010`); a
+  confirmation other than `DELETE` (`23514`); a function owner that neither
+  is a superuser nor bypasses row-level security (`TH020`); a source that is
+  not the caller's (`TH029`). The source row stays. Only `authenticated` may
+  execute it.
+- `delete_my_app_data` also deletes and counts the four member tables;
+  `delete_enrolment_now` also deletes and counts the enrolment's routes
+  (before the enrolment, whose delete would otherwise cascade them first).
+  Imported items stay with the account when one programme is deleted.
+- Export and deletion coverage: the four member tables are in the deletion
+  receipt (`record_routes`, `record_items`, `record_imports`,
+  `record_sources`). API export of them: pending.
+
 ## Account-data deletion
 
 Migration sources of truth:
@@ -758,14 +821,16 @@ Migration sources of truth:
 `supabase/migrations/202610180008_delete_my_account.sql`,
 `supabase/migrations/202610180009_begin_deletion_recent_sign_in.sql`,
 `supabase/migrations/202610180010_app_data_deletion_owner_only.sql`,
-`supabase/migrations/202610180011_care.sql` and
-`supabase/migrations/202610180013_programme_records.sql`.
+`supabase/migrations/202610180011_care.sql`,
+`supabase/migrations/202610180013_programme_records.sql` and
+`supabase/migrations/202610180015_records.sql`.
 
 `delete_my_app_data` deletes the caller's sync lapses, answers, areas and sync
 account, care share access rows, care messages, care shares, caregiver events,
 caregivers, care connections, supporters, observations, programme entries,
 rescue events, lesson progress, programme reminders, notification
-preferences, wellbeing baseline, programme consents, enrolments (and
+preferences, wellbeing baseline, health-record routes, items, imports and
+sources, programme consents, enrolments (and
 everything that cascades from them), account consents, program data, quit plan
 and profile. It returns counts only, one for each table it deletes from:
 `profiles`, `quit_plans`, `program_data`, `enrolments`, `programme_consents`,
@@ -773,7 +838,8 @@ and profile. It returns counts only, one for each table it deletes from:
 `sync_accounts`, `care_share_access`, `care_messages`, `care_shares`,
 `caregiver_events`, `caregivers`, `care_connections`, `supporters`,
 `observations`, `programme_entries`, `rescue_events`, `lesson_progress`,
-`programme_reminders`, `notification_preferences` and `wellbeing_baseline`.
+`programme_reminders`, `notification_preferences`, `wellbeing_baseline`,
+`record_routes`, `record_items`, `record_imports` and `record_sources`.
 Clinics and invite codes are not member data and are not deleted.
 Consent history is deleted with the account; nothing records what was deleted.
 It and `begin_account_deletion` refuse to run in a sync service (`thsync`)
@@ -867,7 +933,7 @@ function": every later function that writes and refuses a sync session raises
 | `TH007` | `sync_area_mismatch` | `sync_area_match_enrolment` (trigger on `sync_area`) | Sync area must match its enrolment |
 | `TH008` | `lapses_append_only` | `sync_lapse_append_only` (update trigger on `sync_lapse`) | Lapses are append-only |
 | `TH009` | `deletion_via_api_only` | `begin_account_deletion` and `delete_my_app_data` in a sync service session | Account deletion goes through the API |
-| `TH010` | `sync_session_refused` | `save_program_data`, `swap_focus`, `supersede_core_consent`, `redeem_care_invite` and `delete_enrolment_now` in a sync service session; the shared code for every later writing function that refuses a sync session | The sync service writes only sync tables |
+| `TH010` | `sync_session_refused` | `save_program_data`, `swap_focus`, `supersede_core_consent`, `redeem_care_invite`, `delete_enrolment_now` and `delete_record_source_items` in a sync service session; the shared code for every later writing function that refuses a sync session | The sync service writes only sync tables |
 | `TH011` | `consent_document_unavailable` | `consent_fill_text` (insert trigger on `programme_consents` and `account_consents`) and `supersede_core_consent`: no effective, unretired document for that purpose, version and locale | No consent document is available for this purpose, version and locale |
 | `TH012` | `enrolment_not_found` | `swap_focus`, `supersede_core_consent` and `delete_enrolment_now`: no such enrolment for the caller | Enrolment not found |
 | `TH013` | `focus_swap_invalid` | `swap_focus`: the programme to demote is not in focus, the one to promote is already in focus, or both are the same | A swap needs one programme in focus and another not in focus |
@@ -885,6 +951,8 @@ function": every later function that writes and refuses a sync session raises
 | `TH025` | `care_invite_invalid` | `redeem_care_invite`: the code is malformed or unknown, its clinic is not verified or is disabled, or it is expired or used up (for a member not already connected to that clinic) | Invite code is not valid |
 | `TH026` | `programme_records_append_only` | `programme_records_append_only` (update trigger on `observations`, `programme_entries`, `rescue_events` and `lesson_progress`) | Programme records are append-only |
 | `TH027` | `programme_rows_delete_only` | `programme_records_truncate_guard` (truncate trigger on `observations`, `programme_entries`, `rescue_events` and `lesson_progress`: a truncate, whatever the role, including a cascade into them when no other table's guard fires first) | Programme records are removed only with their programme or account |
+| `TH028` | `record_rows_delete_only` | `record_rows_truncate_guard` (truncate trigger on `record_sources`, `record_imports`, `record_items` and `record_routes`: a truncate, whatever the role) | Health records are removed only with their source or account |
+| `TH029` | `record_source_not_found` | `delete_record_source_items`: no such source for the caller | Record source not found |
 
 Standard SQLSTATEs are kept where PostgreSQL defines the condition:
 `42501` for row-level security and privilege refusals and for

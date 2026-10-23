@@ -179,6 +179,18 @@ export const DATABASE_ERRORS = [
       "Programme records are removed only with their programme or account",
     ] as readonly string[],
   },
+  {
+    code: "TH028",
+    hint: "record_rows_delete_only",
+    messages: [
+      "Health records are removed only with their source or account",
+    ] as readonly string[],
+  },
+  {
+    code: "TH029",
+    hint: "record_source_not_found",
+    messages: ["Record source not found"] as readonly string[],
+  },
 ] as const satisfies readonly DatabaseErrorEntry[];
 
 export type DatabaseErrorHint = (typeof DATABASE_ERRORS)[number]["hint"];

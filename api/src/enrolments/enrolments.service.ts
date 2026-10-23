@@ -38,6 +38,7 @@ import {
   type FocusSwapResponse,
   type GrantConsentDto,
   type GrantConsentResponse,
+  type RevokeConsentByPurposeDto,
   type SwapFocusDto,
   type UpdateEnrolmentDto,
 } from "./enrolments.dto";
@@ -92,6 +93,7 @@ const {
   consentAlreadyRevoked: CONSENT_ALREADY_REVOKED,
   consentImmutable: CONSENT_IMMUTABLE,
   enrolmentNotFound: ENROLMENT_NOT_FOUND,
+  consentRecipientInvalid: CONSENT_RECIPIENT_INVALID,
 } = DatabaseErrorCode;
 
 /**
@@ -336,14 +338,16 @@ export class EnrolmentsService {
     user: AuthUser,
     dto: GrantConsentDto,
   ): Promise<GrantConsentResponse> {
-    // Sharing needs a validated care connection or caregiver as recipient;
-    // until those exist, share purposes are not accepted.
-    if (sharePurposes.includes(dto.purpose)) {
-      throw conflict("sharing_not_available");
-    }
-    if (dto.recipientRef !== undefined) {
+    // A share consent names its recipient: a care connection
+    // (share_care_team) or a caregiver of the same enrolment
+    // (share_caregiver). The database checks that it is the member's and
+    // live (TH021). Other purposes never name one.
+    const share = sharePurposes.includes(dto.purpose);
+    if (share !== (dto.recipientRef !== undefined)) {
       throw new BadRequestException("recipientRef does not match purpose");
     }
+    // Recipients are stored by their lowercase id (TH021 compares so).
+    const recipientRef = dto.recipientRef?.toLowerCase() ?? null;
     const client = this.clients.forUser(user);
     const enrolment = await this.ownEnrolment(client, user, dto.enrolmentId);
     if (enrolment.status === "left") throw conflict("enrolment_left");
@@ -365,7 +369,7 @@ export class EnrolmentsService {
       .insert({
         enrolment_id: enrolment.id,
         purpose: dto.purpose,
-        recipient_ref: null,
+        recipient_ref: recipientRef,
         consent_version: dto.consentVersion,
         locale: dto.locale,
       })
@@ -390,6 +394,11 @@ export class EnrolmentsService {
       }
       if (error.code === CHECK_VIOLATION) {
         throw new BadRequestException("Consent rejected");
+      }
+      // care_check_consent_recipient: the share recipient is not a live
+      // connection or caregiver of the member (only a consent insert).
+      if (error.code === CONSENT_RECIPIENT_INVALID) {
+        throw conflict("consent_recipient_invalid");
       }
       throw (
         registryErrorFor(error.code) ??
@@ -421,6 +430,45 @@ export class EnrolmentsService {
     }
     if (data) return toConsent(data);
     return explainNotLive(client, id);
+  }
+
+  /**
+   * Revokes the live consent of `purpose` on one of the caller's
+   * enrolments (the app's form, without a consent id). An enrolment that is
+   * not the caller's is not found; with no live consent of that purpose
+   * (and recipient, when given) the answer is `consent_not_found` and no row
+   * is written. A share purpose with more than one live recipient needs
+   * `recipientRef` (`consent_recipient_required`). The revocation itself is
+   * the one by id, with the same race handling.
+   */
+  async revokeConsentByPurpose(
+    user: AuthUser,
+    dto: RevokeConsentByPurposeDto,
+  ): Promise<ConsentResponse> {
+    if (
+      dto.recipientRef !== undefined &&
+      !sharePurposes.includes(dto.purpose)
+    ) {
+      throw new BadRequestException("recipientRef does not match purpose");
+    }
+    const client = this.clients.forUser(user);
+    const enrolment = await this.ownEnrolment(client, user, dto.enrolmentId);
+    let query = client
+      .from("programme_consents")
+      .select(CONSENT_COLUMNS)
+      .eq("enrolment_id", enrolment.id)
+      .eq("purpose", dto.purpose)
+      .is("revoked_at", null);
+    if (dto.recipientRef !== undefined) {
+      // Recipients are stored by their lowercase id (TH021).
+      query = query.eq("recipient_ref", dto.recipientRef.toLowerCase());
+    }
+    const { data, error } = await query.returns<ConsentRow[]>();
+    if (error) throw new BadGatewayException("Consents are unavailable");
+    const [only, ...others] = data;
+    if (only === undefined) throw notFound("consent_not_found");
+    if (others.length > 0) throw conflict("consent_recipient_required");
+    return this.revokeConsent(user, only.id);
   }
 
   /**

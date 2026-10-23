@@ -198,7 +198,11 @@ returns jsonb language sql stable set search_path = '' as $f$
     'lesson_progress', (select count(*) from public.lesson_progress where user_id = p_user),
     'programme_reminders', (select count(*) from public.programme_reminders where user_id = p_user),
     'notification_preferences', (select count(*) from public.notification_preferences where user_id = p_user),
-    'wellbeing_baseline', (select count(*) from public.wellbeing_baseline where user_id = p_user))
+    'wellbeing_baseline', (select count(*) from public.wellbeing_baseline where user_id = p_user),
+    'record_routes', (select count(*) from public.record_routes where user_id = p_user),
+    'record_items', (select count(*) from public.record_items where user_id = p_user),
+    'record_imports', (select count(*) from public.record_imports where user_id = p_user),
+    'record_sources', (select count(*) from public.record_sources where user_id = p_user))
 $f$;
 
 -- Member rows plus the identity.
@@ -238,7 +242,8 @@ returns jsonb language sql stable set search_path = '' as $f$
     'programme_entries', (select count(*) from public.programme_entries where enrolment_id = p_enrolment),
     'rescue_events', (select count(*) from public.rescue_events where enrolment_id = p_enrolment),
     'lesson_progress', (select count(*) from public.lesson_progress where enrolment_id = p_enrolment),
-    'programme_reminders', (select count(*) from public.programme_reminders where enrolment_id = p_enrolment))
+    'programme_reminders', (select count(*) from public.programme_reminders where enrolment_id = p_enrolment),
+    'record_routes', (select count(*) from public.record_routes where enrolment_id = p_enrolment))
 $f$;
 
 -- A synthetic member p_user (key p_key) enrolled, each with a core consent,
@@ -1154,8 +1159,8 @@ select th914b_test.act_as(current_setting('th914b.superuser'), null);
 select th914b_test.ok(
   th914b_test.v('receipt')::jsonb = th914b_test.v('expected')::jsonb
   and (th914b_test.v('receipt')::jsonb ->> 'rescue_events')::int = 1
-  and (select count(*) from pg_catalog.jsonb_object_keys(th914b_test.v('receipt')::jsonb)) = 17,
-  'B BreatheFree: delete-now returns 17 counts equal to the rows held, its rescue included');
+  and (select count(*) from pg_catalog.jsonb_object_keys(th914b_test.v('receipt')::jsonb)) = 18,
+  'B BreatheFree: delete-now returns 18 counts equal to the rows held, its rescue included');
 select th914b_test.ok(
   (select count(*) from public.rescue_events where user_id = '00000000-0000-4000-8000-00000914b0b1') = 1
   and (select count(*) from public.rescue_events where user_id = '00000000-0000-4000-8000-00000914b0b1'
@@ -1188,8 +1193,8 @@ select set_config('th914b.receipt', public.delete_enrolment_now(th914b_test.v('a
 select th914b_test.act_as(current_setting('th914b.superuser'), null);
 select th914b_test.ok(
   th914b_test.v('receipt')::jsonb = th914b_test.v('expected')::jsonb
-  and (select count(*) from pg_catalog.jsonb_object_keys(th914b_test.v('receipt')::jsonb)) = 17,
-  'A Heartwise: delete-now returns 17 counts equal to the rows held for Heartwise');
+  and (select count(*) from pg_catalog.jsonb_object_keys(th914b_test.v('receipt')::jsonb)) = 18,
+  'A Heartwise: delete-now returns 18 counts equal to the rows held for Heartwise');
 select th914b_test.ok(
   not exists (select 1 from pg_catalog.jsonb_each(th914b_test.rows_for('00000000-0000-4000-8000-00000914b0a1',
                 th914b_test.v('a_hw')::uuid, 'hw')) as e where e.value <> '0'::jsonb)
@@ -1216,9 +1221,10 @@ select th914b_test.ok(
 select set_config('th914b.a_before', th914b_test.counts('00000000-0000-4000-8000-00000914b0a1')::text, true);
 select set_config('th914b.b_before', th914b_test.state('00000000-0000-4000-8000-00000914b0b1')::text, true);
 select th914b_test.ok(
-  (select count(*) = 24 and bool_and((value #>> '{}')::int >= 1)
+  (select count(*) = 28 and bool_and((value #>> '{}')::int >= 1
+                                      or key in ('record_routes', 'record_items', 'record_imports', 'record_sources'))
    from pg_catalog.jsonb_each(th914b_test.v('a_before')::jsonb)),
-  'deletion setup: A holds rows in all 24 member tables');
+  'deletion setup: A holds rows in all 24 member tables older than the health records (verify_records_migration.sh covers those)');
 select th914b_test.act_as('authenticator', th914b_test.claims('00000000-0000-4000-8000-00000914b0a1'));
 select th914b_test.ok(public.begin_account_deletion('DELETE'), 'A API: begin_account_deletion sets the barrier');
 select th914b_test.refused(th914b_test.obs_sql('a_st', 'a1c', '%', '6.1'),
@@ -1242,8 +1248,8 @@ select set_config('th914b.a_receipt', public.delete_my_account('DELETE')::text, 
 select th914b_test.act_as(current_setting('th914b.superuser'), null);
 select th914b_test.ok(
   th914b_test.v('a_receipt')::jsonb = th914b_test.v('a_before')::jsonb
-  and (select count(*) from pg_catalog.jsonb_object_keys(th914b_test.v('a_receipt')::jsonb)) = 24,
-  'deletion: delete_my_account returns the 24 counts of the rows A held');
+  and (select count(*) from pg_catalog.jsonb_object_keys(th914b_test.v('a_receipt')::jsonb)) = 28,
+  'deletion: delete_my_account returns the 28 counts of the rows A held');
 select th914b_test.ok(
   (select bool_and(value = '0'::jsonb)
    from pg_catalog.jsonb_each(th914b_test.state('00000000-0000-4000-8000-00000914b0a1'))),
@@ -1255,9 +1261,9 @@ select th914b_test.act_as('authenticator', th914b_test.claims('00000000-0000-400
 select set_config('th914b.a_repeat', public.delete_my_account('DELETE')::text, true);
 select th914b_test.act_as(current_setting('th914b.superuser'), null);
 select th914b_test.ok(
-  (select count(*) = 24 and bool_and(value = '0'::jsonb)
+  (select count(*) = 28 and bool_and(value = '0'::jsonb)
    from pg_catalog.jsonb_each(th914b_test.v('a_repeat')::jsonb)),
-  'deletion: a repeat returns 24 zero counts');
+  'deletion: a repeat returns 28 zero counts');
 
 -- B: delete_my_app_data on its own (owner context, as delete_my_account runs
 -- it) deletes and counts every row before any identity delete could cascade.
@@ -1270,7 +1276,8 @@ select th914b_test.act_as(current_setting('th914b.superuser'), null);
 select th914b_test.ok(
   th914b_test.v('b_receipt')::jsonb = th914b_test.v('b_before')::jsonb
   and th914b_test.v('b_before')::jsonb @> '{"observations": 1, "programme_entries": 1, "rescue_events": 1,
-    "lesson_progress": 1, "programme_reminders": 1, "notification_preferences": 1, "wellbeing_baseline": 1}'::jsonb
+    "lesson_progress": 1, "programme_reminders": 1, "notification_preferences": 1, "wellbeing_baseline": 1,
+    "record_routes": 0, "record_items": 0, "record_imports": 0, "record_sources": 0}'::jsonb
   and (select bool_and(value = '0'::jsonb)
        from pg_catalog.jsonb_each(th914b_test.counts('00000000-0000-4000-8000-00000914b0b1')))
   and (select count(*) from auth.users where id = '00000000-0000-4000-8000-00000914b0b1') = 1,

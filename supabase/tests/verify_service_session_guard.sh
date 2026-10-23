@@ -228,6 +228,12 @@ select th972_test.ok(
   'public.programme_reminders:programme_reminders_insert_own,'
   'public.programme_reminders:programme_reminders_update_own,'
   'public.quit_plans:quit_plans_insert_own,public.quit_plans:quit_plans_update_own,'
+  'public.record_imports:record_imports_insert_own,'
+  'public.record_imports:record_imports_update_own,'
+  'public.record_items:record_items_insert_own,public.record_items:record_items_update_own,'
+  'public.record_routes:record_routes_insert_own,'
+  'public.record_sources:record_sources_insert_own,'
+  'public.record_sources:record_sources_update_own,'
   'public.rescue_events:rescue_events_insert_own,'
   'public.supporters:supporters_delete_own,public.supporters:supporters_insert_own,'
   'public.supporters:supporters_update_own,'
@@ -235,7 +241,7 @@ select th972_test.ok(
   'public.wellbeing_baseline:wellbeing_baseline_update_own,'
   'storage.objects:avatars_delete_own,storage.objects:avatars_insert_own,'
   'storage.objects:avatars_update_own',
-  'the guarded write policies are exactly the 35 expected ones');
+  'the guarded write policies are exactly the 42 expected ones');
 select th972_test.ok(
   not exists (
     select 1 from pg_catalog.pg_policies
@@ -259,8 +265,8 @@ select th972_test.ok(
           or has_table_privilege('authenticated', c.oid, 'DELETE'))) =
   'account_consents,care_connections,care_messages,care_shares,caregiver_events,caregivers,'
   'enrolments,lesson_progress,notification_preferences,observations,profiles,program_data,'
-  'programme_consents,programme_entries,programme_reminders,quit_plans,rescue_events,supporters,'
-  'wellbeing_baseline',
+  'programme_consents,programme_entries,programme_reminders,quit_plans,record_imports,record_items,'
+  'record_routes,record_sources,rescue_events,supporters,wellbeing_baseline',
   'tables authenticated can write outside sync_* are exactly the reviewed set');
 select th972_test.ok(
   not exists (
@@ -281,7 +287,7 @@ select th972_test.ok(
 -- one has to be reviewed for the sync-session refusal before this passes.
 -- Writers that refuse a sync session: begin_account_deletion (TH009);
 -- save_program_data, swap_focus, supersede_core_consent, delete_my_account,
--- redeem_care_invite and delete_enrolment_now (TH010). current_consent_documents only reads. delete_my_app_data is not
+-- redeem_care_invite, delete_enrolment_now and delete_record_source_items (TH010). current_consent_documents only reads. delete_my_app_data is not
 -- listed: only its owner may execute it; its TH009 guard stays and is
 -- checked statically below.
 select th972_test.ok(
@@ -290,7 +296,7 @@ select th972_test.ok(
    where p.pronamespace = 'public'::regnamespace
      and has_function_privilege('authenticated', p.oid, 'EXECUTE')) =
   'avatar_write_allowed(text),begin_account_deletion(text),current_consent_documents(),'
-  'delete_enrolment_now(uuid,text),delete_my_account(text),'
+  'delete_enrolment_now(uuid,text),delete_my_account(text),delete_record_source_items(uuid,text),'
   'deletion_barrier_open(),has_consent(uuid,text,text),is_unique_text_array(text[]),'
   'is_valid_support_people(jsonb),redeem_care_invite(text),save_program_data(text,jsonb,integer),'
   'supersede_core_consent(uuid,text,text),swap_focus(uuid,uuid),sync_writer_session()',
@@ -710,7 +716,15 @@ select set_config('th972.b_counts', jsonb_build_object(
   'notification_preferences', (select count(*) from public.notification_preferences
                                where user_id = '00000000-0000-4000-8000-000000972002'),
   'wellbeing_baseline', (select count(*) from public.wellbeing_baseline
-                         where user_id = '00000000-0000-4000-8000-000000972002')
+                         where user_id = '00000000-0000-4000-8000-000000972002'),
+  'record_routes', (select count(*) from public.record_routes
+                    where user_id = '00000000-0000-4000-8000-000000972002'),
+  'record_items', (select count(*) from public.record_items
+                   where user_id = '00000000-0000-4000-8000-000000972002'),
+  'record_imports', (select count(*) from public.record_imports
+                     where user_id = '00000000-0000-4000-8000-000000972002'),
+  'record_sources', (select count(*) from public.record_sources
+                     where user_id = '00000000-0000-4000-8000-000000972002')
 )::text, true);
 select th972_test.ok(
   current_setting('th972.b_counts')::jsonb = '{"profiles": 1, "quit_plans": 1,
@@ -719,7 +733,8 @@ select th972_test.ok(
     "care_share_access": 0, "care_messages": 0, "care_shares": 0, "caregiver_events": 0,
     "caregivers": 0, "care_connections": 0, "supporters": 0,
     "observations": 0, "programme_entries": 0, "rescue_events": 0, "lesson_progress": 0,
-    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0}'::jsonb,
+    "programme_reminders": 0, "notification_preferences": 0, "wellbeing_baseline": 0,
+    "record_routes": 0, "record_items": 0, "record_imports": 0, "record_sources": 0}'::jsonb,
   'B has the expected rows before deletion');
 select th972_test.become('authenticator', '00000000-0000-4000-8000-000000972002');
 -- A recent sign-in, which begin_account_deletion requires.
@@ -931,6 +946,10 @@ for expected in public.profiles:profiles_update_own \
   public.programme_consents:programme_consents_update_own \
   public.account_consents:account_consents_insert_own \
   public.account_consents:account_consents_update_own \
+  public.record_sources:record_sources_insert_own public.record_sources:record_sources_update_own \
+  public.record_imports:record_imports_insert_own public.record_imports:record_imports_update_own \
+  public.record_items:record_items_insert_own public.record_items:record_items_update_own \
+  public.record_routes:record_routes_insert_own \
   storage.objects:avatars_insert_own storage.objects:avatars_update_own \
   storage.objects:avatars_delete_own; do
   printf '%s\n' "${guarded[@]}" | grep -Fxq "$expected" || fail "missing guarded write policy $expected"
@@ -960,6 +979,7 @@ sync_refusal supersede_core_consent TH010
 sync_refusal delete_my_account TH010
 sync_refusal redeem_care_invite TH010
 sync_refusal delete_enrolment_now TH010
+sync_refusal delete_record_source_items TH010
 
 for pair in enrolments_focus_cap:TH001 consent_revoke_only:TH002 consent_revoke_only:TH003 \
   sync_area_match_enrolment:TH007 sync_lapse_append_only:TH008; do
