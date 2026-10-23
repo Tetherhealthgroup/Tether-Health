@@ -12,8 +12,8 @@ import '../../ui/ui.dart';
 /// Actions (generated from spec/screens/nu_intro.json):
 ///   • Back → back
 ///   • Set up Nourish → push → nu_q1
-///   • Add as Learn only → toast “Nourish added as Learn only” then tab → plans
-/// API: —
+///   • Add as Learn only → POST /v1/enrolments then toast “Nourish added as Learn only” then tab → plans
+/// API: POST /v1/enrolments
 class NuIntroScreen extends StatelessWidget {
   const NuIntroScreen({super.key});
 
@@ -29,7 +29,7 @@ class NuIntroScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.nuIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.nuQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: s.nuIntroFooterN1Label, onPressed: () => TNav.toast(context, s.nuIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.nuIntroFooterN1Label, onPressed: () => TNav.submit(context, 'POST /v1/enrolments', screenId: 'nu_intro', queueable: false, then: () => TNav.toast(context, s.nuIntroFooterN1ActionThenValue, then: () => TNav.tab(context, Routes.plans))), variant: TButtonVariant.secondary),
       ],
     );
   }

@@ -55,7 +55,10 @@
     {
       "t": "text",
       "text": "2 of 5 done",
-      "tone": "small"
+      "tone": "small",
+      "data": {
+        "text": "sd.safety_progress"
+      }
     }
   ],
   "footer": [

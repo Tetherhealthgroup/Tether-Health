@@ -30,7 +30,7 @@ class CkUptodateScreen extends StatelessWidget {
       children: [
         TIllustration(glyph: '✓'),
         TTitle(s.ckUptodateBodyN1Text, size: TTitleSize.l, center: true),
-        TBody(s.ckUptodateBodyN2Text, tone: TTextTone.muted, center: true),
+        TBoundValues(keys: const ['ck.next_due_line'], place: TExamplePlace.inline, builder: (context, v) => TBody(v.text('ck.next_due_line', s.ckUptodateBodyN2Text), tone: TTextTone.muted, center: true)),
         TButton(key: const ValueKey('a:body[3]'), label: s.ckUptodateBodyN3Label, onPressed: () => TNav.replace(context, Routes.ckList), variant: TButtonVariant.secondary),
       ],
     );

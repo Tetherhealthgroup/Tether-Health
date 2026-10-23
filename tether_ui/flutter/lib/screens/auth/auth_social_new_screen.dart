@@ -26,7 +26,7 @@ class AuthSocialNewScreen extends StatelessWidget {
         TIllustration(glyph: 'A'),
         TTitle(s.authSocialNewBodyN1Text, size: TTitleSize.l, center: true),
         TBody(s.authSocialNewBodyN2Text, tone: TTextTone.muted, center: true),
-        TKeyValue(rows: [(s.authSocialNewBodyN3RowsN0N0, s.authSocialNewBodyN3RowsN0N1), (s.authSocialNewBodyN3RowsN1N0, s.authSocialNewBodyN3RowsN1N1), (s.authSocialNewBodyN3RowsN2N0, s.authSocialNewBodyN3RowsN2N1)]),
+        TBoundValues(keys: const ['auth.social.name'], builder: (context, v) => TKeyValue(rows: [(s.authSocialNewBodyN3RowsN0N0, v.text('auth.social.name', s.authSocialNewBodyN3RowsN0N1)), (s.authSocialNewBodyN3RowsN1N0, s.authSocialNewBodyN3RowsN1N1), (s.authSocialNewBodyN3RowsN2N0, s.authSocialNewBodyN3RowsN2N1)])),
         TBody(s.authSocialNewBodyN4Text, tone: TTextTone.small),
       ],
       footer: [

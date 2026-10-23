@@ -29,7 +29,7 @@ class TodayEmptyScreen extends StatelessWidget {
       header: THeader(title: s.todayEmptyHeaderTitle, left: THeaderLeft.logo, avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'today',
       children: [
-        TTitle(s.todayEmptyBodyN0Text),
+        TBoundValues(keys: const ['today.greeting'], place: TExamplePlace.inline, builder: (context, v) => TTitle(v.text('today.greeting', s.todayEmptyBodyN0Text))),
         TIllustration(glyph: '+'),
         TTitle(s.todayEmptyBodyN2Text, center: true),
         TBody(s.todayEmptyBodyN3Text, tone: TTextTone.muted, center: true),

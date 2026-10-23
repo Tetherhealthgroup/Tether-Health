@@ -616,15 +616,53 @@ class _CircleButton extends StatelessWidget {
       );
 }
 
+/// The Tether Health mark: the outlined lime leaf on the teal disc, drawn
+/// with the geometry of tool/brand/tether_mark.svg (the app icon's master
+/// artwork, from the design's header logo).
 class TLogoMark extends StatelessWidget {
-  const TLogoMark({super.key});
+  const TLogoMark({super.key, this.size = 32});
+  final double size;
+
+  /// The leaf outline in the mark's 32-unit space (tool/brand/tether_mark.svg `#leaf`).
+  static Path leaf() => _LogoMarkPainter.leaf();
+
   @override
-  Widget build(BuildContext context) => Container(
-        width: 32,
-        height: 32,
-        decoration: const BoxDecoration(color: TColors.teal, shape: BoxShape.circle),
-        child: const Icon(Icons.eco_rounded, size: 18, color: TColors.lime),
-      );
+  Widget build(BuildContext context) => ExcludeSemantics(child: CustomPaint(size: Size.square(size), painter: const _LogoMarkPainter()));
+}
+
+class _LogoMarkPainter extends CustomPainter {
+  const _LogoMarkPainter();
+
+  /// The leaf of tool/brand/tether_mark.svg (`#leaf`) in its 32-unit space:
+  /// the outer and inner edges of the rotated outline, filled even-odd.
+  static Path leaf() {
+    const r14 = Radius.circular(14), r9 = Radius.circular(9);
+    return Path()
+      ..fillType = PathFillType.evenOdd
+      ..moveTo(11.136, 26.776)
+      ..arcToPoint(const Offset(16.261, 7.651), radius: r14)
+      ..lineTo(20.764, 5.051)
+      ..lineTo(20.864, 5.224)
+      ..arcToPoint(const Offset(15.739, 24.349), radius: r14)
+      ..lineTo(11.236, 26.949)
+      ..close()
+      ..moveTo(12.188, 23.397)
+      ..arcToPoint(const Offset(15.482, 11.103), radius: r9)
+      ..lineTo(19.812, 8.603)
+      ..arcToPoint(const Offset(16.518, 20.897), radius: r9)
+      ..close();
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final scale = size.shortestSide / 32;
+    canvas.scale(scale);
+    canvas.drawCircle(const Offset(16, 16), 16, Paint()..color = TColors.teal);
+    canvas.drawPath(leaf(), Paint()..color = TColors.lime);
+  }
+
+  @override
+  bool shouldRepaint(_LogoMarkPainter oldDelegate) => false;
 }
 
 class TTabBar extends StatelessWidget {

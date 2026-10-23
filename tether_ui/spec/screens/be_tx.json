@@ -38,6 +38,9 @@
         "variant": "lime",
         "arrow": false,
         "small": true
+      },
+      "data": {
+        "title": "be.next_appointment"
       }
     },
     {

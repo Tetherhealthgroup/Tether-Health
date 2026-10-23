@@ -64,6 +64,10 @@
       "action": {
         "type": "push",
         "to": "ea_plan"
+      },
+      "data": {
+        "title": "ea.plan.things_that_help_line",
+        "text": "ea.plan.reach_out_line"
       }
     }
   ],

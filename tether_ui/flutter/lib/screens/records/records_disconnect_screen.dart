@@ -21,7 +21,7 @@ class RecordsDisconnectScreen extends StatelessWidget {
     final s = TStrings.of(context);
     return TSheet(
       children: [
-        TTitle(s.recordsDisconnectBodyN0Text),
+        TBoundValues(keys: const ['records.disconnect_title'], place: TExamplePlace.inline, builder: (context, v) => TTitle(v.text('records.disconnect_title', s.recordsDisconnectBodyN0Text))),
         TBody(s.recordsDisconnectBodyN1Text, tone: TTextTone.muted),
         TRadioList(fieldKey: 'records_disconnect.keep', items: [TRadioItem(s.recordsDisconnectBodyN2ItemsN0Label, value: 'Keep imported data', sub: s.recordsDisconnectBodyN2ItemsN0Sub), TRadioItem(s.recordsDisconnectBodyN2ItemsN1Label, value: 'Delete data imported from this source', sub: s.recordsDisconnectBodyN2ItemsN1Sub)], selected: 0),
       ],

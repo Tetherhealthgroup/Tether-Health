@@ -29,7 +29,7 @@ class CrisisScreen extends StatelessWidget {
         TButton(key: const ValueKey('a:body[1]'), label: s.crisisBodyN1Label, onPressed: () => TNav.call(context, '988', label: '988'), variant: TButtonVariant.danger),
         TButton(key: const ValueKey('a:body[2]'), label: s.crisisBodyN2Label, onPressed: () => TNav.sms(context, '988'), variant: TButtonVariant.secondary),
         TButton(key: const ValueKey('a:body[3]'), label: s.crisisBodyN3Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.secondary),
-        TCard(key: const ValueKey('a:body[4]'), eyebrow: s.crisisBodyN4Eyebrow, title: s.crisisBodyN4Title, text: s.crisisBodyN4Text, onTap: () => TNav.push(context, Routes.eaPlan)),
+        TBoundValues(keys: const ['ea.plan.things_that_help_line', 'ea.plan.reach_out_line'], builder: (context, v) => TCard(key: const ValueKey('a:body[4]'), eyebrow: s.crisisBodyN4Eyebrow, title: v.text('ea.plan.things_that_help_line', s.crisisBodyN4Title), text: v.text('ea.plan.reach_out_line', s.crisisBodyN4Text), onTap: () => TNav.push(context, Routes.eaPlan))),
       ],
     );
   }

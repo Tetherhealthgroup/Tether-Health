@@ -27,7 +27,7 @@ class CaZoneScreen extends StatelessWidget {
         TChips(fieldKey: 'ca_zone.symptoms', options: ['Coughing', 'Wheezing', 'Short of breath', 'Chest tightness', 'Woke at night', 'Can’t speak in full sentences'], labels: [s.caZoneBodyN2OptionsN0, s.caZoneBodyN2OptionsN1, s.caZoneBodyN2OptionsN2, s.caZoneBodyN2OptionsN3, s.caZoneBodyN2OptionsN4, s.caZoneBodyN2OptionsN5], selected: ['Wheezing'], label: s.caZoneBodyN2Label),
         TEyebrow(s.caZoneBodyN3Text),
         TZoneSelector(selected: 'yellow', rule: 'ca.zone'),
-        TBody(s.caZoneBodyN5Text, tone: TTextTone.small),
+        TBoundValues(keys: const ['ca.zone_thresholds_line'], place: TExamplePlace.inline, builder: (context, v) => TBody(v.text('ca.zone_thresholds_line', s.caZoneBodyN5Text), tone: TTextTone.small)),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.caZoneFooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/ca/zone-checks', screenId: 'ca_zone', then: () => TNav.branch(context, 'Computed zone', <String, VoidCallback>{'Green': () => TNav.toast(context, s.caZoneFooterN0ActionThenCasesN0ActionValue, then: () => TNav.replace(context, Routes.caHome)), 'Yellow': () => TNav.replace(context, Routes.caYellow), 'Red': () => TNav.replace(context, Routes.caRed), 'Invalid peak flow': () => TNav.toast(context, s.caZoneFooterN0ActionThenCasesN3ActionValue)}, decide: 'ca.zone'), safety: TSafetyRoutes('ca.zone', <String, VoidCallback>{'Red': () => TNav.replace(context, Routes.caRed)})), arrow: true),

@@ -67,11 +67,15 @@
       "t": "button",
       "label": "Add as Learn only",
       "action": {
-        "type": "toast",
-        "value": "ScrollFree added as Learn only",
+        "type": "submit",
+        "api": "POST /v1/enrolments",
         "then": {
-          "type": "tab",
-          "to": "plans"
+          "type": "toast",
+          "value": "ScrollFree added as Learn only",
+          "then": {
+            "type": "tab",
+            "to": "plans"
+          }
         }
       },
       "variant": "secondary",
@@ -82,7 +86,9 @@
     "Never called “addiction”."
   ],
   "over": null,
-  "api": [],
+  "api": [
+    "POST /v1/enrolments"
+  ],
   "actions": [
     {
       "element": "Back",
@@ -105,14 +111,18 @@
       "element": "Add as Learn only",
       "path": "footer[1]",
       "action": {
-        "type": "toast",
-        "value": "ScrollFree added as Learn only",
+        "type": "submit",
+        "api": "POST /v1/enrolments",
         "then": {
-          "type": "tab",
-          "to": "plans"
+          "type": "toast",
+          "value": "ScrollFree added as Learn only",
+          "then": {
+            "type": "tab",
+            "to": "plans"
+          }
         }
       },
-      "summary": "toast “ScrollFree added as Learn only” then tab → plans"
+      "summary": "POST /v1/enrolments then toast “ScrollFree added as Learn only” then tab → plans"
     }
   ]
 }

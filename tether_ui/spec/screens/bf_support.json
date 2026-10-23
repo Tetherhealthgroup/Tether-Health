@@ -49,7 +49,11 @@
             "icon": "+"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].label": "bf.supporter_name",
+        "rows[0].sub": "bf.supporter_detail"
+      }
     },
     {
       "t": "card",

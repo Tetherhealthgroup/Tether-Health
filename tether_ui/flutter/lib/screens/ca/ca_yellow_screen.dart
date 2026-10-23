@@ -24,7 +24,7 @@ class CaYellowScreen extends StatelessWidget {
     return TScreen(
       header: THeader(title: s.caYellowHeaderTitle, pill: s.caYellowHeaderPill),
       children: [
-        TCard(variant: TCardVariant.warn, title: s.caYellowBodyN0Title, text: s.caYellowBodyN0Text),
+        TBoundValues(keys: const ['ca.plan_entered_line'], builder: (context, v) => TCard(variant: TCardVariant.warn, title: s.caYellowBodyN0Title, text: v.text('ca.plan_entered_line', s.caYellowBodyN0Text))),
         TCard(children: [TChecklist(items: [TCheckItem(s.caYellowBodyN1ChildrenN0ItemsN0Label, value: 'Reliever inhaler · 2–4 puffs', sub: s.caYellowBodyN1ChildrenN0ItemsN0Sub, done: true), TCheckItem(s.caYellowBodyN1ChildrenN0ItemsN1Label, value: 'Re-check in 20 minutes', sub: s.caYellowBodyN1ChildrenN0ItemsN1Sub), TCheckItem(s.caYellowBodyN1ChildrenN0ItemsN2Label, value: 'Tell your care team if no better', sub: s.caYellowBodyN1ChildrenN0ItemsN2Sub)])]),
         TCard(key: const ValueKey('a:body[2]'), variant: TCardVariant.urgent, title: s.caYellowBodyN2Title, text: s.caYellowBodyN2Text, onTap: () => TNav.replace(context, Routes.caRed)),
       ],

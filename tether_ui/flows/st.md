@@ -64,7 +64,7 @@ flowchart LR
 |---|---|---|
 | Steady intro | Back | `back` |
 | Steady intro | Set up Steady | `push → st_q1` |
-| Steady intro | Add as Learn only | `toast “Steady added as Learn only” then tab → plans` |
+| Steady intro | Add as Learn only | `POST /v1/enrolments then toast “Steady added as Learn only” then tab → plans` |
 | Type & device | Back | `back` |
 | Type & device | Next | `push → st_range` |
 | Range & low plan | Back | `back` |

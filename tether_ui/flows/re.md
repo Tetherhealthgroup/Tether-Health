@@ -65,7 +65,7 @@ flowchart LR
 |---|---|---|
 | Renew intro | Back | `back` |
 | Renew intro | Set up Renew | `push → re_q1` |
-| Renew intro | Add as Learn only | `toast “Renew added as Learn only” then tab → plans` |
+| Renew intro | Add as Learn only | `POST /v1/enrolments then toast “Renew added as Learn only” then tab → plans` |
 | Risk check | Back | `back` |
 | Risk check | See what this means | `push → re_result` |
 | Risk result | Back | `back` |

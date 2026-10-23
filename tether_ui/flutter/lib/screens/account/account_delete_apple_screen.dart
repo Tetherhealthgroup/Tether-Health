@@ -24,7 +24,7 @@ class AccountDeleteAppleScreen extends StatelessWidget {
       header: THeader(title: s.accountDeleteAppleHeaderTitle),
       children: [
         TTitle(s.accountDeleteAppleBodyN0Text),
-        TKeyValue(rows: [(s.accountDeleteAppleBodyN1RowsN0N0, '4'), (s.accountDeleteAppleBodyN1RowsN1N0, '63'), (s.accountDeleteAppleBodyN1RowsN2N0, '118'), (s.accountDeleteAppleBodyN1RowsN3N0, s.accountDeleteAppleBodyN1RowsN3N1)]),
+        TBoundValues(keys: const ['account.data.programs', 'account.data.check_ins', 'account.data.readings', 'account.data.shared_summaries'], builder: (context, v) => TKeyValue(rows: [(s.accountDeleteAppleBodyN1RowsN0N0, v.text('account.data.programs', '4')), (s.accountDeleteAppleBodyN1RowsN1N0, v.text('account.data.check_ins', '63')), (s.accountDeleteAppleBodyN1RowsN2N0, v.text('account.data.readings', '118')), (s.accountDeleteAppleBodyN1RowsN3N0, v.text('account.data.shared_summaries', s.accountDeleteAppleBodyN1RowsN3N1))])),
         TBody(s.accountDeleteAppleBodyN2Text, tone: TTextTone.small),
         TButton(key: const ValueKey('a:body[3]'), label: s.accountDeleteAppleBodyN3Label, onPressed: () => TNav.push(context, Routes.accountData), variant: TButtonVariant.secondary),
         TField(fieldKey: 'account_delete_apple.type_delete_to_confirm', label: s.accountDeleteAppleBodyN4Label, placeholder: s.accountDeleteAppleBodyN4Placeholder),

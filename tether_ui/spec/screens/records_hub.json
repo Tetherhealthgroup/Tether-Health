@@ -49,7 +49,13 @@
             "icon": "M"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].label": "records.source_1.name",
+        "rows[0].sub": "records.source_1.status",
+        "rows[1].label": "records.source_2.name",
+        "rows[1].sub": "records.source_2.status"
+      }
     },
     {
       "t": "list",
@@ -95,7 +101,13 @@
             "to": "records_item"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "records.imported.blood_pressure",
+        "rows[1].sub": "records.imported.labs",
+        "rows[2].sub": "records.imported.immunizations",
+        "rows[3].sub": "records.imported.smoking_status"
+      }
     },
     {
       "t": "card",
@@ -105,6 +117,9 @@
       "action": {
         "type": "push",
         "to": "records_conflict"
+      },
+      "data": {
+        "title": "records.review_count"
       }
     }
   ],

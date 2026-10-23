@@ -22,7 +22,10 @@
     {
       "t": "title",
       "text": "Share with Dr. Patel’s clinic?",
-      "size": "m"
+      "size": "m",
+      "data": {
+        "text": "hw.summary.title"
+      }
     },
     {
       "t": "kv",
@@ -43,7 +46,13 @@
           "Latest panel",
           "LDL 138 · Sep 30"
         ]
-      ]
+      ],
+      "data": {
+        "rows[0][1]": "hw.summary.dates",
+        "rows[1][1]": "hw.summary.bp_average",
+        "rows[2][1]": "hw.summary.highest",
+        "rows[3][1]": "hw.summary.latest_panel"
+      }
     },
     {
       "t": "text",

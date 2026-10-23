@@ -23,7 +23,7 @@ class RecordsConsentScreen extends StatelessWidget {
     return TScreen(
       header: THeader(title: s.recordsConsentHeaderTitle, pill: s.recordsConsentHeaderPill),
       children: [
-        TTitle(s.recordsConsentBodyN0Text),
+        TBoundValues(keys: const ['records.connect_title'], place: TExamplePlace.inline, builder: (context, v) => TTitle(v.text('records.connect_title', s.recordsConsentBodyN0Text))),
         TKeyValue(rows: [(s.recordsConsentBodyN1RowsN0N0, s.recordsConsentBodyN1RowsN0N1), (s.recordsConsentBodyN1RowsN1N0, s.recordsConsentBodyN1RowsN1N1), (s.recordsConsentBodyN1RowsN2N0, s.recordsConsentBodyN1RowsN2N1), (s.recordsConsentBodyN1RowsN3N0, s.recordsConsentBodyN1RowsN3N1)]),
         TChecklist(fieldKey: 'records_consent.resources', items: [TCheckItem(s.recordsConsentBodyN2ItemsN0Label, value: 'Conditions', sub: s.recordsConsentBodyN2ItemsN0Sub), TCheckItem(s.recordsConsentBodyN2ItemsN1Label, value: 'Vital signs', sub: s.recordsConsentBodyN2ItemsN1Sub), TCheckItem(s.recordsConsentBodyN2ItemsN2Label, value: 'Lab results', sub: s.recordsConsentBodyN2ItemsN2Sub), TCheckItem(s.recordsConsentBodyN2ItemsN3Label, value: 'Medications', sub: s.recordsConsentBodyN2ItemsN3Sub), TCheckItem(s.recordsConsentBodyN2ItemsN4Label, value: 'Immunizations', sub: s.recordsConsentBodyN2ItemsN4Sub), TCheckItem(s.recordsConsentBodyN2ItemsN5Label, value: 'Smoking status', sub: s.recordsConsentBodyN2ItemsN5Sub)], label: s.recordsConsentBodyN2Label),
         TListGroup(flat: true, rows: [TListRow(label: s.recordsConsentBodyN3RowsN0Label, sub: s.recordsConsentBodyN3RowsN0Sub)]),

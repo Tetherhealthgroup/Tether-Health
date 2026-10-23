@@ -12,8 +12,8 @@ import '../../ui/ui.dart';
 /// Actions (generated from spec/screens/re_intro.json):
 ///   • Back → back
 ///   • Set up Renew → push → re_q1
-///   • Add as Learn only → toast “Renew added as Learn only” then tab → plans
-/// API: —
+///   • Add as Learn only → POST /v1/enrolments then toast “Renew added as Learn only” then tab → plans
+/// API: POST /v1/enrolments
 class ReIntroScreen extends StatelessWidget {
   const ReIntroScreen({super.key});
 
@@ -29,7 +29,7 @@ class ReIntroScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.reIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.reQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: s.reIntroFooterN1Label, onPressed: () => TNav.toast(context, s.reIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.reIntroFooterN1Label, onPressed: () => TNav.submit(context, 'POST /v1/enrolments', screenId: 're_intro', queueable: false, then: () => TNav.toast(context, s.reIntroFooterN1ActionThenValue, then: () => TNav.tab(context, Routes.plans))), variant: TButtonVariant.secondary),
       ],
     );
   }

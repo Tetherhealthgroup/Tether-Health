@@ -61,7 +61,7 @@ flowchart LR
 |---|---|---|
 | Stride intro | Back | `back` |
 | Stride intro | Set up Stride | `push → sd_q1` |
-| Stride intro | Add as Learn only | `toast “Stride added as Learn only” then tab → plans` |
+| Stride intro | Add as Learn only | `POST /v1/enrolments then toast “Stride added as Learn only” then tab → plans` |
 | Falls check | Back | `back` |
 | Falls check | Next | `push → sd_plan` |
 | Movement plan | Back | `back` |

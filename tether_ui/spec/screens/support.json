@@ -85,7 +85,10 @@
             "icon": "+"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].label": "support.supporter_name"
+      }
     },
     {
       "t": "list",
@@ -102,7 +105,11 @@
             "icon": "+"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].label": "support.care_team_name",
+        "rows[0].sub": "support.care_team_programs"
+      }
     },
     {
       "t": "emergency",

@@ -38,7 +38,10 @@
       "t": "text",
       "text": "Next: flu vaccine in Sep 2027. We’ll remind you a month before.",
       "tone": "muted",
-      "align": "center"
+      "align": "center",
+      "data": {
+        "text": "ck.next_due_line"
+      }
     },
     {
       "t": "button",

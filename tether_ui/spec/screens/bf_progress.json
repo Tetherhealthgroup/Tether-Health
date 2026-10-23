@@ -55,7 +55,10 @@
         "S",
         "S"
       ],
-      "caption": "Thursday: no check-in · not counted as zero"
+      "caption": "Thursday: no check-in · not counted as zero",
+      "data": {
+        "values": "bf.cigarettes_week"
+      }
     },
     {
       "t": "stats",
@@ -81,7 +84,15 @@
           "sub": "3 of 4 times"
         }
       ],
-      "cols": 2
+      "cols": 2,
+      "data": {
+        "items[0].value": "bf.avoided",
+        "items[1].value": "bf.saved",
+        "items[1].sub": "bf.price_per_pack",
+        "items[2].value": "bf.cravings_eased",
+        "items[3].value": "bf.most_helpful_tool",
+        "items[3].sub": "bf.most_helpful_count"
+      }
     },
     {
       "t": "list",
@@ -94,7 +105,10 @@
             "to": "bf_estimates"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "bf.estimates_summary"
+      }
     }
   ],
   "footer": [],

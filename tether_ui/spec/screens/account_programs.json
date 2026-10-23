@@ -21,7 +21,10 @@
     {
       "t": "text",
       "text": "2 of 2 focus slots used",
-      "tone": "small"
+      "tone": "small",
+      "data": {
+        "text": "account.focus_slots"
+      }
     },
     {
       "t": "list",
@@ -70,7 +73,13 @@
             "program": "hw"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "enrolment.bf.summary",
+        "rows[1].sub": "enrolment.sf.summary",
+        "rows[2].sub": "enrolment.ca.summary",
+        "rows[3].sub": "enrolment.hw.summary"
+      }
     }
   ],
   "footer": [

@@ -2,9 +2,10 @@ import json, os, re
 from dsl import *
 
 def load():
-    import screens_shared, screens_prog_a, screens_prog_b, screens_records, screens_additions
+    import screens_shared, screens_prog_a, screens_prog_b, screens_records, screens_additions, bindings
     if not SCREENS:
         screens_shared.shared(); screens_prog_a.programs_a(); screens_prog_b.programs_b(); screens_records.records(); screens_additions.additions()
+        bindings.apply()  # member-data bind keys (P-89), after every screen exists
     return SCREENS
 
 # Consent checklists and their session keys (TH-907). Each screen has exactly
@@ -547,6 +548,7 @@ NOT_CONSENT_CREATING = {
     'PUT device:encrypted/ea/safety-plan': _DEVICE,
     'DELETE /v1/account/data': 'deletes the member\'s data; ends every share',
     'DELETE /v1/enrolments/:id': 'leaves a programme; ends its shares',
+    'POST /v1/enrolments': 'adds a programme as Learn only (R-162); shares nothing and records no consent',
     'DELETE /v1/records/fhir/sources/:id': 'disconnects a records source; ends the import',
     'PATCH /v1/notifications/preferences': 'notification switches on this account; shares nothing',
     'POST /v1/account/export': 'sends the member a copy of their own data',

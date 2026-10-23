@@ -57,7 +57,10 @@
             }
           ]
         }
-      ]
+      ],
+      "data": {
+        "title": "bf.meds.recorded_plan"
+      }
     },
     {
       "t": "list",

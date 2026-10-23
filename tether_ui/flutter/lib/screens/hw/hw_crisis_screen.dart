@@ -23,7 +23,7 @@ class HwCrisisScreen extends StatelessWidget {
     return TScreen(
       header: THeader(title: s.hwCrisisHeaderTitle, left: THeaderLeft.close),
       children: [
-        TBanner(kind: TBannerKind.urgent, text: s.hwCrisisBodyN0Text),
+        TBoundValues(keys: const ['hw.crisis_banner'], builder: (context, v) => TBanner(kind: TBannerKind.urgent, text: v.text('hw.crisis_banner', s.hwCrisisBodyN0Text))),
         TCard(variant: TCardVariant.urgent, title: s.hwCrisisBodyN1Title, text: s.hwCrisisBodyN1Text),
         TButton(key: const ValueKey('a:body[2]'), label: s.hwCrisisBodyN2Label, onPressed: () => TNav.call(context, '911', label: '911'), variant: TButtonVariant.danger),
         TButton(key: const ValueKey('a:body[3]'), label: s.hwCrisisBodyN3Label, onPressed: () => TNav.replace(context, Routes.hwRecheck), variant: TButtonVariant.secondary),

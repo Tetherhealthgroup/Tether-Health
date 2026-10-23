@@ -62,11 +62,15 @@
       "t": "button",
       "label": "Add as Learn only",
       "action": {
-        "type": "toast",
-        "value": "Stride added as Learn only",
+        "type": "submit",
+        "api": "POST /v1/enrolments",
         "then": {
-          "type": "tab",
-          "to": "plans"
+          "type": "toast",
+          "value": "Stride added as Learn only",
+          "then": {
+            "type": "tab",
+            "to": "plans"
+          }
         }
       },
       "variant": "secondary",
@@ -75,7 +79,9 @@
   ],
   "notes": [],
   "over": null,
-  "api": [],
+  "api": [
+    "POST /v1/enrolments"
+  ],
   "actions": [
     {
       "element": "Back",
@@ -98,14 +104,18 @@
       "element": "Add as Learn only",
       "path": "footer[1]",
       "action": {
-        "type": "toast",
-        "value": "Stride added as Learn only",
+        "type": "submit",
+        "api": "POST /v1/enrolments",
         "then": {
-          "type": "tab",
-          "to": "plans"
+          "type": "toast",
+          "value": "Stride added as Learn only",
+          "then": {
+            "type": "tab",
+            "to": "plans"
+          }
         }
       },
-      "summary": "toast “Stride added as Learn only” then tab → plans"
+      "summary": "POST /v1/enrolments then toast “Stride added as Learn only” then tab → plans"
     }
   ]
 }

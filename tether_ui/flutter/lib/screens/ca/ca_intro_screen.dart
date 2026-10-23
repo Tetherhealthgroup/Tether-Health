@@ -12,8 +12,8 @@ import '../../ui/ui.dart';
 /// Actions (generated from spec/screens/ca_intro.json):
 ///   • Back → back
 ///   • Set up ClearAir → push → ca_q1
-///   • Add as Learn only → toast “ClearAir added as Learn only” then tab → plans
-/// API: —
+///   • Add as Learn only → POST /v1/enrolments then toast “ClearAir added as Learn only” then tab → plans
+/// API: POST /v1/enrolments
 class CaIntroScreen extends StatelessWidget {
   const CaIntroScreen({super.key});
 
@@ -30,7 +30,7 @@ class CaIntroScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.caIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.caQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: s.caIntroFooterN1Label, onPressed: () => TNav.toast(context, s.caIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.caIntroFooterN1Label, onPressed: () => TNav.submit(context, 'POST /v1/enrolments', screenId: 'ca_intro', queueable: false, then: () => TNav.toast(context, s.caIntroFooterN1ActionThenValue, then: () => TNav.tab(context, Routes.plans))), variant: TButtonVariant.secondary),
       ],
     );
   }

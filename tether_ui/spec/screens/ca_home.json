@@ -28,7 +28,11 @@
       "variant": "dark",
       "eyebrow": "Today’s zone",
       "title": "Green · 410 L/min",
-      "text": "Checked 7:40 AM · from your plan"
+      "text": "Checked 7:40 AM · from your plan",
+      "data": {
+        "title": "ca.zone_today",
+        "text": "ca.zone_checked"
+      }
     },
     {
       "t": "button",
@@ -84,7 +88,11 @@
             "to": "program_settings"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[1].sub": "ca.zone_counts",
+        "rows[2].sub": "ca.plan_entered"
+      }
     }
   ],
   "footer": [],

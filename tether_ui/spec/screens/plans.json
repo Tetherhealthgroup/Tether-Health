@@ -51,7 +51,12 @@
           },
           "pill": "Focus"
         }
-      ]
+      ],
+      "data": {
+        "title": "plans.focus_heading",
+        "rows[0].sub": "bf.plan_summary",
+        "rows[1].sub": "sf.plan_summary"
+      }
     },
     {
       "t": "list",
@@ -91,7 +96,10 @@
             "to": "account_programs"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "plans.medication_summary"
+      }
     }
   ],
   "footer": [

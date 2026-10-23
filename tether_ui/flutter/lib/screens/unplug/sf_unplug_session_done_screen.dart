@@ -22,7 +22,7 @@ class SfUnplugSessionDoneScreen extends StatelessWidget {
       header: THeader(title: s.sfUnplugSessionDoneHeaderTitle, left: THeaderLeft.none),
       children: [
         TIllustration(glyph: '✓'),
-        TBigNumber(value: '45', unit: 'min', caption: s.sfUnplugSessionDoneBodyN1Caption, center: true),
+        TBoundValues(keys: const ['sf.unplug.session_minutes'], place: TExamplePlace.inline, builder: (context, v) => TBigNumber(value: v.text('sf.unplug.session_minutes', '45'), unit: 'min', caption: s.sfUnplugSessionDoneBodyN1Caption, center: true)),
         TBody(s.sfUnplugSessionDoneBodyN2Text, tone: TTextTone.muted, center: true),
       ],
       footer: [

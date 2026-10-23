@@ -72,7 +72,14 @@
             "to": "bf_support"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "bf.review.approach",
+        "rows[1].sub": "bf.review.quit_date",
+        "rows[2].sub": "bf.review.top_reason",
+        "rows[3].sub": "bf.review.support",
+        "rows[4].sub": "bf.review.space"
+      }
     },
     {
       "t": "text",

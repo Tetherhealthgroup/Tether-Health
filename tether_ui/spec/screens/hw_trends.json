@@ -53,7 +53,10 @@
         110,
         130
       ],
-      "caption": "Shaded: your clinician’s target"
+      "caption": "Shaded: your clinician’s target",
+      "data": {
+        "values": "hw.systolic_series"
+      }
     },
     {
       "t": "stats",
@@ -68,7 +71,12 @@
           "sub": "4 days missed"
         }
       ],
-      "cols": 2
+      "cols": 2,
+      "data": {
+        "items[0].value": "hw.avg_30d",
+        "items[1].value": "hw.readings_30d",
+        "items[1].sub": "hw.days_missed_30d"
+      }
     }
   ],
   "footer": [

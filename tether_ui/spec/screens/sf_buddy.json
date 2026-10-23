@@ -62,7 +62,10 @@
       "children": [
         {
           "t": "quote",
-          "text": "Phone-free nights this week: 5. Thanks for cheering me on!"
+          "text": "Phone-free nights this week: 5. Thanks for cheering me on!",
+          "data": {
+            "text": "sf.buddy.preview_message"
+          }
         }
       ]
     }

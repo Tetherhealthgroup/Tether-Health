@@ -21,7 +21,10 @@
     {
       "t": "banner",
       "kind": "urgent",
-      "text": "186/122 is in a range that needs attention now."
+      "text": "186/122 is in a range that needs attention now.",
+      "data": {
+        "text": "hw.crisis_banner"
+      }
     },
     {
       "t": "card",

@@ -24,8 +24,8 @@ class HwResultScreen extends StatelessWidget {
       header: THeader(title: s.hwResultHeaderTitle, left: THeaderLeft.close),
       children: [
         TIllustration(glyph: '✓'),
-        TTitle(s.hwResultBodyN1Text, size: TTitleSize.l, center: true),
-        TBody(s.hwResultBodyN2Text, tone: TTextTone.muted, center: true),
+        TBoundValues(keys: const ['hw.result_title'], place: TExamplePlace.inline, builder: (context, v) => TTitle(v.text('hw.result_title', s.hwResultBodyN1Text), size: TTitleSize.l, center: true)),
+        TBoundValues(keys: const ['hw.result_text'], place: TExamplePlace.inline, builder: (context, v) => TBody(v.text('hw.result_text', s.hwResultBodyN2Text), tone: TTextTone.muted, center: true)),
         TCard(variant: TCardVariant.mint, text: s.hwResultBodyN3Text),
       ],
       footer: [

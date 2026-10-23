@@ -26,7 +26,7 @@ class ObProgramsScreen extends StatelessWidget {
         TSteps(n: 1, total: 5),
         TTitle(s.obProgramsBodyN1Text),
         TBody(s.obProgramsBodyN2Text, tone: TTextTone.muted),
-        TTileGrid(fieldKey: 'ob_programs.programs', tiles: [TTile(label: 'BreatheFree', sub: s.obProgramsBodyN3ItemsN0Sub, program: 'bf', selected: true), TTile(label: 'ScrollFree', sub: s.obProgramsBodyN3ItemsN1Sub, program: 'sf', selected: true), TTile(label: 'ClearAir', sub: s.obProgramsBodyN3ItemsN2Sub, program: 'ca'), TTile(label: 'Heartwise', sub: s.obProgramsBodyN3ItemsN3Sub, program: 'hw'), TTile(label: 'Steady', sub: s.obProgramsBodyN3ItemsN4Sub, program: 'st'), TTile(label: 'Ease', sub: s.obProgramsBodyN3ItemsN5Sub, program: 'ea'), TTile(label: 'Nourish', sub: s.obProgramsBodyN3ItemsN6Sub, program: 'nu'), TTile(label: 'Stride', sub: s.obProgramsBodyN3ItemsN7Sub, program: 'sd')]),
+        TTileGrid(fieldKey: 'ob_programs.programs', tiles: [TTile(label: 'BreatheFree', sub: s.obProgramsBodyN3ItemsN0Sub, program: 'bf'), TTile(label: 'ScrollFree', sub: s.obProgramsBodyN3ItemsN1Sub, program: 'sf'), TTile(label: 'ClearAir', sub: s.obProgramsBodyN3ItemsN2Sub, program: 'ca'), TTile(label: 'Heartwise', sub: s.obProgramsBodyN3ItemsN3Sub, program: 'hw'), TTile(label: 'Steady', sub: s.obProgramsBodyN3ItemsN4Sub, program: 'st'), TTile(label: 'Ease', sub: s.obProgramsBodyN3ItemsN5Sub, program: 'ea'), TTile(label: 'Nourish', sub: s.obProgramsBodyN3ItemsN6Sub, program: 'nu'), TTile(label: 'Stride', sub: s.obProgramsBodyN3ItemsN7Sub, program: 'sd')]),
         TLink(key: const ValueKey('a:body[4]'), label: s.obProgramsBodyN4Label, onTap: () => TNav.push(context, Routes.catalog)),
       ],
       footer: [

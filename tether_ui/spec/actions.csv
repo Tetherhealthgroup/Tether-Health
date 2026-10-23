@@ -282,7 +282,7 @@ sys_update,Update required,Update now,external,,external https://apps.apple.com/
 sys_update,Update required,Open Rescue,sheet,rescue_pick,sheet → rescue_pick
 bf_intro,BreatheFree intro,Back,back,,back
 bf_intro,BreatheFree intro,Set up BreatheFree,push,bf_q1,push → bf_q1
-bf_intro,BreatheFree intro,Add as Learn only,toast,plans,toast “BreatheFree added as Learn only” then tab → plans
+bf_intro,BreatheFree intro,Add as Learn only,submit,plans,POST /v1/enrolments then toast “BreatheFree added as Learn only” then tab → plans
 bf_q1,Baseline: amount,Back,back,,back
 bf_q1,Baseline: amount,Next,push,bf_q2,push → bf_q2
 bf_q2,Baseline: triggers,Back,back,,back
@@ -358,7 +358,7 @@ bf_estimates,How estimates work,Edit numbers,toast,,toast “Opened baseline set
 bf_estimates,How estimates work,Done,close,,close
 sf_intro,ScrollFree intro,Back,back,,back
 sf_intro,ScrollFree intro,Set up ScrollFree,push,sf_q1,push → sf_q1
-sf_intro,ScrollFree intro,Add as Learn only,toast,plans,toast “ScrollFree added as Learn only” then tab → plans
+sf_intro,ScrollFree intro,Add as Learn only,submit,plans,POST /v1/enrolments then toast “ScrollFree added as Learn only” then tab → plans
 sf_q1,Baseline: use,Back,back,,back
 sf_q1,Baseline: use,Next,push,sf_q2,push → sf_q2
 sf_q2,Baseline: triggers,Back,back,,back
@@ -398,7 +398,7 @@ sf_week,Weekly reflection,Yes,toast,,toast “Goal set to 75 min” then back
 sf_week,Weekly reflection,Stay at 90,back,,back
 ca_intro,ClearAir intro,Back,back,,back
 ca_intro,ClearAir intro,Set up ClearAir,push,ca_q1,push → ca_q1
-ca_intro,ClearAir intro,Add as Learn only,toast,plans,toast “ClearAir added as Learn only” then tab → plans
+ca_intro,ClearAir intro,Add as Learn only,submit,plans,POST /v1/enrolments then toast “ClearAir added as Learn only” then tab → plans
 ca_q1,Diagnosis & plan,Back,back,,back
 ca_q1,Diagnosis & plan,Next,branch,ca_plan ca_noplan,decide choice:ca_q1.has_plan: Has a written action plan? → Yes: push → ca_plan | No / Not sure: push → ca_noplan
 ca_plan,Enter action plan,Back,back,,back
@@ -436,7 +436,7 @@ ca_progress,ClearAir progress,Back,back,,back
 ca_progress,ClearAir progress,Create visit summary,push,hw_summary,push → hw_summary
 hw_intro,Heartwise intro,Back,back,,back
 hw_intro,Heartwise intro,Set up Heartwise,sheet,focus_full,sheet → focus_full
-hw_intro,Heartwise intro,Add as Learn only,toast,plans,toast “Heartwise added as Learn only” then tab → plans
+hw_intro,Heartwise intro,Add as Learn only,submit,plans,POST /v1/enrolments then toast “Heartwise added as Learn only” then tab → plans
 hw_q1,Baseline,Back,back,,back
 hw_q1,Baseline,Next,push,hw_targets,push → hw_targets
 hw_targets,Clinician targets,Back,back,,back
@@ -482,7 +482,7 @@ hw_summary,Visit summary,Send summary,submit,,POST /v1/care/summaries then toast
 hw_summary,Visit summary,Save as PDF,toast,,toast “PDF saved to Files”
 st_intro,Steady intro,Back,back,,back
 st_intro,Steady intro,Set up Steady,push,st_q1,push → st_q1
-st_intro,Steady intro,Add as Learn only,toast,plans,toast “Steady added as Learn only” then tab → plans
+st_intro,Steady intro,Add as Learn only,submit,plans,POST /v1/enrolments then toast “Steady added as Learn only” then tab → plans
 st_q1,Type & device,Back,back,,back
 st_q1,Type & device,Next,push,st_range,push → st_range
 st_range,Range & low plan,Back,back,,back
@@ -512,7 +512,7 @@ st_a1c,A1C,Back,back,,back
 st_a1c,A1C,Save,submit,,POST /v1/program-data/st/a1c then toast “Saved” then back
 re_intro,Renew intro,Back,back,,back
 re_intro,Renew intro,Set up Renew,push,re_q1,push → re_q1
-re_intro,Renew intro,Add as Learn only,toast,plans,toast “Renew added as Learn only” then tab → plans
+re_intro,Renew intro,Add as Learn only,submit,plans,POST /v1/enrolments then toast “Renew added as Learn only” then tab → plans
 re_q1,Risk check,Back,back,,back
 re_q1,Risk check,See what this means,push,re_result,push → re_result
 re_result,Risk result,Back,back,,back
@@ -538,7 +538,7 @@ re_symptoms,Symptom check,Contact my care team,push,support_message_care,push �
 re_symptoms,Symptom check,Vomiting blood or confused? Call 911,call,,call 911
 nu_intro,Nourish intro,Back,back,,back
 nu_intro,Nourish intro,Set up Nourish,push,nu_q1,push → nu_q1
-nu_intro,Nourish intro,Add as Learn only,toast,plans,toast “Nourish added as Learn only” then tab → plans
+nu_intro,Nourish intro,Add as Learn only,submit,plans,POST /v1/enrolments then toast “Nourish added as Learn only” then tab → plans
 nu_q1,Goals & screen,Back,back,,back
 nu_q1,Goals & screen,Next,branch,nu_habit nu_protect,decide choice:nu_q1.eating: Eating-history answer → No: push → nu_habit | Yes / Prefer not to say: push → nu_protect
 nu_habit,Weekly habit,Back,back,,back
@@ -566,7 +566,7 @@ nu_protect,Protective mode,Call 911,call,,call 911
 nu_protect,Protective mode,Continue with gentle habits,replace,nu_habit nu_habit,replace → nu_habit (onboarding: nu_habit)
 sd_intro,Stride intro,Back,back,,back
 sd_intro,Stride intro,Set up Stride,push,sd_q1,push → sd_q1
-sd_intro,Stride intro,Add as Learn only,toast,plans,toast “Stride added as Learn only” then tab → plans
+sd_intro,Stride intro,Add as Learn only,submit,plans,POST /v1/enrolments then toast “Stride added as Learn only” then tab → plans
 sd_q1,Falls check,Back,back,,back
 sd_q1,Falls check,Next,push,sd_plan,push → sd_plan
 sd_plan,Movement plan,Back,back,,back
@@ -597,7 +597,7 @@ sd_caregiver,Caregiver access,Back,back,,back
 sd_caregiver,Caregiver access,Send invite,submit,,POST /v1/care/caregivers then toast “Invite sent to Rosa” then back
 ea_intro,Ease intro,Back,back,,back
 ea_intro,Ease intro,Set up Ease,push,ea_q1,push → ea_q1
-ea_intro,Ease intro,Add as Learn only,toast,plans,toast “Ease added as Learn only” then tab → plans
+ea_intro,Ease intro,Add as Learn only,submit,plans,POST /v1/enrolments then toast “Ease added as Learn only” then tab → plans
 ea_q1,Optional screener,Back,back,,back
 ea_q1,Optional screener,Next,push,ea_result,push → ea_result
 ea_q1,Optional screener,Skip the check,push,ea_plan,push → ea_plan
@@ -631,7 +631,7 @@ ea_checkback,Check-back day,Show me,push,learn_lesson,push → learn_lesson
 ea_checkback,Check-back day,Save,submit,,POST /v1/program-data/ea/check-backs then toast “Saved” then back
 ck_intro,Checkup intro,Back,back,,back
 ck_intro,Checkup intro,Set up Checkup,push,ck_q1,push → ck_q1
-ck_intro,Checkup intro,Add as Learn only,toast,plans,toast “Checkup added as Learn only” then tab → plans
+ck_intro,Checkup intro,Add as Learn only,submit,plans,POST /v1/enrolments then toast “Checkup added as Learn only” then tab → plans
 ck_q1,About you,Back,back,,back
 ck_q1,About you,Import vaccination history,push,records_add,push → records_add
 ck_q1,About you,Build my list,submit,ck_list ob_setup,PUT /v1/program-data/ck/profile then replace → ck_list (onboarding: ob_setup)
@@ -665,7 +665,7 @@ ck_day,Screening day,Add to calendar,toast,,toast “Added to your calendar”
 ck_day,Screening day,Mark as done,push,ck_done,push → ck_done
 be_intro,Beacon intro,Back,back,,back
 be_intro,Beacon intro,Set up Beacon,push,be_q1,push → be_q1
-be_intro,Beacon intro,Add as Learn only,toast,plans,toast “Beacon added as Learn only” then tab → plans
+be_intro,Beacon intro,Add as Learn only,submit,plans,POST /v1/enrolments then toast “Beacon added as Learn only” then tab → plans
 be_q1,Journey stage,Back,back,,back
 be_q1,Journey stage,Next,branch,be_q2 be_tx ob_setup be_survivor ob_setup learn,decide choice:be_q1.stage: Journey stage → Lowering my risk: push → be_q2 | Going through treatment: replace → be_tx (onboarding: ob_setup) | After treatment: replace → be_survivor (onboarding: ob_setup) | Supporting someone: tab → learn
 be_q2,Family history,Back,back,,back

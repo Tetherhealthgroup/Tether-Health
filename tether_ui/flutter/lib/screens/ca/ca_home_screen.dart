@@ -33,10 +33,10 @@ class CaHomeScreen extends StatelessWidget {
       header: THeader(title: 'ClearAir', avatar: 'A', onAvatar: () => TNav.push(context, Routes.account)),
       tab: 'plans',
       children: [
-        TCard(variant: TCardVariant.dark, eyebrow: s.caHomeBodyN0Eyebrow, title: s.caHomeBodyN0Title, text: s.caHomeBodyN0Text),
+        TBoundValues(keys: const ['ca.zone_today', 'ca.zone_checked'], builder: (context, v) => TCard(variant: TCardVariant.dark, eyebrow: s.caHomeBodyN0Eyebrow, title: v.text('ca.zone_today', s.caHomeBodyN0Title), text: v.text('ca.zone_checked', s.caHomeBodyN0Text))),
         TButton(key: const ValueKey('a:body[1]'), label: s.caHomeBodyN1Label, onPressed: () => TNav.push(context, Routes.caZone), arrow: true),
         TCard(key: const ValueKey('a:body[2]'), variant: TCardVariant.urgent, title: s.caHomeBodyN2Title, text: s.caHomeBodyN2Text, onTap: () => TNav.push(context, Routes.caRed)),
-        TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: s.caHomeBodyN3RowsN0Label, onTap: () => TNav.push(context, Routes.caSymptoms)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: s.caHomeBodyN3RowsN1Label, sub: s.caHomeBodyN3RowsN1Sub, onTap: () => TNav.push(context, Routes.caProgress)), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: s.caHomeBodyN3RowsN2Label, sub: s.caHomeBodyN3RowsN2Sub, onTap: () => TNav.push(context, Routes.caPlan)), TListRow(key: const ValueKey('a:body[3].rows[3]'), label: s.caHomeBodyN3RowsN3Label, sub: s.caHomeBodyN3RowsN3Sub, onTap: () => TNav.push(context, Routes.programSettings, program: 'ca'))]),
+        TBoundValues(keys: const ['ca.zone_counts', 'ca.plan_entered'], builder: (context, v) => TListGroup(rows: [TListRow(key: const ValueKey('a:body[3].rows[0]'), label: s.caHomeBodyN3RowsN0Label, onTap: () => TNav.push(context, Routes.caSymptoms)), TListRow(key: const ValueKey('a:body[3].rows[1]'), label: s.caHomeBodyN3RowsN1Label, sub: v.text('ca.zone_counts', s.caHomeBodyN3RowsN1Sub), onTap: () => TNav.push(context, Routes.caProgress)), TListRow(key: const ValueKey('a:body[3].rows[2]'), label: s.caHomeBodyN3RowsN2Label, sub: v.text('ca.plan_entered', s.caHomeBodyN3RowsN2Sub), onTap: () => TNav.push(context, Routes.caPlan)), TListRow(key: const ValueKey('a:body[3].rows[3]'), label: s.caHomeBodyN3RowsN3Label, sub: s.caHomeBodyN3RowsN3Sub, onTap: () => TNav.push(context, Routes.programSettings, program: 'ca'))])),
       ],
     );
   }

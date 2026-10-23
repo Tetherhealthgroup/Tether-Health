@@ -27,7 +27,10 @@
     {
       "t": "text",
       "text": "From about 3 hours a day.",
-      "tone": "muted"
+      "tone": "muted",
+      "data": {
+        "text": "sf.baseline_line"
+      }
     },
     {
       "t": "card",

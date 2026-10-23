@@ -42,7 +42,13 @@
           "Shared with care team",
           "3 summaries (their copies stay with them)"
         ]
-      ]
+      ],
+      "data": {
+        "rows[0][1]": "account.data.programs",
+        "rows[1][1]": "account.data.check_ins",
+        "rows[2][1]": "account.data.readings",
+        "rows[3][1]": "account.data.shared_summaries"
+      }
     },
     {
       "t": "text",

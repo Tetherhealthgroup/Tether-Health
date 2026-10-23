@@ -31,7 +31,11 @@
         {
           "t": "big",
           "value": "2h 10m",
-          "caption": "Goal 90 min · down from 3h"
+          "caption": "Goal 90 min · down from 3h",
+          "data": {
+            "value": "sf.minutes_yesterday",
+            "caption": "sf.goal_caption"
+          }
         }
       ]
     },
@@ -49,7 +53,11 @@
           "sub": "On this phone only · pause screen after 20"
         }
       ],
-      "cols": 2
+      "cols": 2,
+      "data": {
+        "items[0].value": "sf.minutes_today",
+        "items[1].value": "sf.opens_today"
+      }
     },
     {
       "t": "text",
@@ -81,6 +89,9 @@
       "action": {
         "type": "push",
         "to": "sf_unplug_home"
+      },
+      "data": {
+        "text": "sf.unplug.status_line"
       }
     },
     {
@@ -142,7 +153,12 @@
             "to": "program_settings"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "sf.phone_free_nights_summary",
+        "rows[2].sub": "sf.goal_summary",
+        "rows[3].sub": "sf.buddy.summary"
+      }
     }
   ],
   "footer": [],

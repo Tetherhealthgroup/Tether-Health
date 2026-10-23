@@ -45,7 +45,12 @@
           "Favorite",
           "Water before meals"
         ]
-      ]
+      ],
+      "data": {
+        "rows[0][1]": "nu.habits_tried",
+        "rows[1][1]": "nu.days_done",
+        "rows[2][1]": "nu.favorite_habit"
+      }
     },
     {
       "t": "segmented",

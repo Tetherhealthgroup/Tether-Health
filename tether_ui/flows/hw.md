@@ -87,7 +87,7 @@ flowchart LR
 |---|---|---|
 | Heartwise intro | Back | `back` |
 | Heartwise intro | Set up Heartwise | `sheet → focus_full` |
-| Heartwise intro | Add as Learn only | `toast “Heartwise added as Learn only” then tab → plans` |
+| Heartwise intro | Add as Learn only | `POST /v1/enrolments then toast “Heartwise added as Learn only” then tab → plans` |
 | Baseline | Back | `back` |
 | Baseline | Next | `push → hw_targets` |
 | Clinician targets | Back | `back` |

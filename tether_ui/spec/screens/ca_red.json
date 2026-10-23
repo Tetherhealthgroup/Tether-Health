@@ -69,7 +69,10 @@
             "avatar": "M"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].label": "ca.emergency_contact_action"
+      }
     },
     {
       "t": "text",

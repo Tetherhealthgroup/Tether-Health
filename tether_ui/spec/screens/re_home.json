@@ -32,9 +32,16 @@
           "t": "big",
           "value": "58",
           "unit": "mL/min",
-          "caption": "Next check Apr 2027 · from your clinician"
+          "caption": "Next check Apr 2027 · from your clinician",
+          "data": {
+            "value": "re.egfr_latest",
+            "caption": "re.next_check_caption"
+          }
         }
-      ]
+      ],
+      "data": {
+        "eyebrow": "re.egfr_latest_date"
+      }
     },
     {
       "t": "card",
@@ -90,7 +97,10 @@
             "to": "program_settings"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[1].sub": "re.history_span"
+      }
     },
     {
       "t": "card",

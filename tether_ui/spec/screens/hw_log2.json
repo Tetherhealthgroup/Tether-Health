@@ -69,7 +69,11 @@
           "Average so far",
           "135/85"
         ]
-      ]
+      ],
+      "data": {
+        "rows[0][1]": "hw.log.reading_1",
+        "rows[1][1]": "hw.log.average"
+      }
     }
   ],
   "footer": [

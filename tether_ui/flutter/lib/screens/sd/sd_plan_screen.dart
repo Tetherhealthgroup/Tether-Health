@@ -23,7 +23,7 @@ class SdPlanScreen extends StatelessWidget {
       header: THeader(title: s.sdPlanHeaderTitle, pill: s.sdPlanHeaderPill),
       children: [
         TTitle(s.sdPlanBodyN0Text),
-        TKeyValue(rows: [(s.sdPlanBodyN1RowsN0N0, s.sdPlanBodyN1RowsN0N1), (s.sdPlanBodyN1RowsN1N0, s.sdPlanBodyN1RowsN1N1), (s.sdPlanBodyN1RowsN2N0, s.sdPlanBodyN1RowsN2N1)]),
+        TBoundValues(keys: const ['sd.plan.day_1', 'sd.plan.session_1', 'sd.plan.day_2', 'sd.plan.session_2', 'sd.plan.day_3', 'sd.plan.session_3'], builder: (context, v) => TKeyValue(rows: [(v.text('sd.plan.day_1', s.sdPlanBodyN1RowsN0N0), v.text('sd.plan.session_1', s.sdPlanBodyN1RowsN0N1)), (v.text('sd.plan.day_2', s.sdPlanBodyN1RowsN1N0), v.text('sd.plan.session_2', s.sdPlanBodyN1RowsN1N1)), (v.text('sd.plan.day_3', s.sdPlanBodyN1RowsN2N0), v.text('sd.plan.session_3', s.sdPlanBodyN1RowsN2N1))])),
         TCard(children: [TChecklist(items: [TCheckItem(s.sdPlanBodyN2ChildrenN0ItemsN0Label, value: 'Do sessions near a sturdy chair', done: true), TCheckItem(s.sdPlanBodyN2ChildrenN0ItemsN1Label, value: 'Tell my caregiver when I finish')])]),
         TBody(s.sdPlanBodyN3Text, tone: TTextTone.small),
       ],

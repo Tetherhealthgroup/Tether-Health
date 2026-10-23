@@ -22,8 +22,8 @@ class HwSummaryScreen extends StatelessWidget {
     return TScreen(
       header: THeader(title: s.hwSummaryHeaderTitle, pill: s.hwSummaryHeaderPill),
       children: [
-        TTitle(s.hwSummaryBodyN0Text),
-        TKeyValue(rows: [(s.hwSummaryBodyN1RowsN0N0, s.hwSummaryBodyN1RowsN0N1), (s.hwSummaryBodyN1RowsN1N0, s.hwSummaryBodyN1RowsN1N1), (s.hwSummaryBodyN1RowsN2N0, s.hwSummaryBodyN1RowsN2N1), (s.hwSummaryBodyN1RowsN3N0, s.hwSummaryBodyN1RowsN3N1)]),
+        TBoundValues(keys: const ['hw.summary.title'], place: TExamplePlace.inline, builder: (context, v) => TTitle(v.text('hw.summary.title', s.hwSummaryBodyN0Text))),
+        TBoundValues(keys: const ['hw.summary.dates', 'hw.summary.bp_average', 'hw.summary.highest', 'hw.summary.latest_panel'], builder: (context, v) => TKeyValue(rows: [(s.hwSummaryBodyN1RowsN0N0, v.text('hw.summary.dates', s.hwSummaryBodyN1RowsN0N1)), (s.hwSummaryBodyN1RowsN1N0, v.text('hw.summary.bp_average', s.hwSummaryBodyN1RowsN1N1)), (s.hwSummaryBodyN1RowsN2N0, v.text('hw.summary.highest', s.hwSummaryBodyN1RowsN2N1)), (s.hwSummaryBodyN1RowsN3N0, v.text('hw.summary.latest_panel', s.hwSummaryBodyN1RowsN3N1))])),
         TBody(s.hwSummaryBodyN2Text, tone: TTextTone.small),
         TToggleRow(fieldKey: 'hw_summary.include_notes', label: s.hwSummaryBodyN3Label),
       ],

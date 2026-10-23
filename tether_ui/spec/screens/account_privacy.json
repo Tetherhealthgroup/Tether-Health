@@ -75,7 +75,10 @@
             "value": "https://www.tetherhealthgroup.com/privacy/"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[1].sub": "consents.history_summary"
+      }
     },
     {
       "t": "text",

@@ -89,11 +89,12 @@ ASKS = {
 # layout changes).
 BRANCH_ID = re.compile(r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*){2}$')
 
-# Submit endpoints that are never queued (R-31): the sign-in and account
-# endpoints. A queued result counts as failed('not_queueable') and a failure
-# shows the generic message, not the save message. validate.py checks that
-# every submit endpoint on "supabase /auth/" is listed and every entry is used.
+# Submit endpoints that are never queued (R-31, R-162): the sign-in and
+# account endpoints, and enrolment creation. A queued result counts as
+# failed('not_queueable'). validate.py checks that every submit endpoint on
+# "supabase /auth/" is listed and every entry is used.
 NOT_QUEUEABLE = (
+    'POST /v1/enrolments',
     'POST supabase /auth/v1/recover',
     'POST supabase /auth/v1/signup',
     'POST supabase /auth/v1/token',

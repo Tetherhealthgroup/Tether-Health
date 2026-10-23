@@ -120,7 +120,7 @@ flowchart LR
 |---|---|---|
 | BreatheFree intro | Back | `back` |
 | BreatheFree intro | Set up BreatheFree | `push → bf_q1` |
-| BreatheFree intro | Add as Learn only | `toast “BreatheFree added as Learn only” then tab → plans` |
+| BreatheFree intro | Add as Learn only | `POST /v1/enrolments then toast “BreatheFree added as Learn only” then tab → plans` |
 | Baseline: amount | Back | `back` |
 | Baseline: amount | Next | `push → bf_q2` |
 | Baseline: triggers | Back | `back` |

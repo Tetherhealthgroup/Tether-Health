@@ -27,7 +27,10 @@
     {
       "t": "text",
       "text": "From your baseline of 15 a day. Adjust any week.",
-      "tone": "muted"
+      "tone": "muted",
+      "data": {
+        "text": "bf.stepdown.baseline_line"
+      }
     },
     {
       "t": "kv",
@@ -52,7 +55,14 @@
           "Quit day · Sep 18",
           "0"
         ]
-      ]
+      ],
+      "data": {
+        "rows[0][1]": "bf.stepdown.week_1",
+        "rows[1][1]": "bf.stepdown.week_2",
+        "rows[2][1]": "bf.stepdown.week_3",
+        "rows[3][1]": "bf.stepdown.week_4",
+        "rows[4][0]": "bf.stepdown.quit_day_label"
+      }
     },
     {
       "t": "card",

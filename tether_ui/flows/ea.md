@@ -70,7 +70,7 @@ flowchart LR
 |---|---|---|
 | Ease intro | Back | `back` |
 | Ease intro | Set up Ease | `push → ea_q1` |
-| Ease intro | Add as Learn only | `toast “Ease added as Learn only” then tab → plans` |
+| Ease intro | Add as Learn only | `POST /v1/enrolments then toast “Ease added as Learn only” then tab → plans` |
 | Optional screener | Back | `back` |
 | Optional screener | Next | `push → ea_result` |
 | Optional screener | Skip the check | `push → ea_plan` |

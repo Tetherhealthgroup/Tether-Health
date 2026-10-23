@@ -21,7 +21,10 @@
     {
       "t": "banner",
       "kind": "urgent",
-      "text": "62 mg/dL is below your low of 70."
+      "text": "62 mg/dL is below your low of 70.",
+      "data": {
+        "text": "st.low_banner"
+      }
     },
     {
       "t": "card",

@@ -12,8 +12,8 @@ import '../../ui/ui.dart';
 /// Actions (generated from spec/screens/ck_intro.json):
 ///   • Back → back
 ///   • Set up Checkup → push → ck_q1
-///   • Add as Learn only → toast “Checkup added as Learn only” then tab → plans
-/// API: —
+///   • Add as Learn only → POST /v1/enrolments then toast “Checkup added as Learn only” then tab → plans
+/// API: POST /v1/enrolments
 class CkIntroScreen extends StatelessWidget {
   const CkIntroScreen({super.key});
 
@@ -29,7 +29,7 @@ class CkIntroScreen extends StatelessWidget {
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.ckIntroFooterN0Label, onPressed: () => TNav.push(context, Routes.ckQ1), arrow: true),
-        TButton(key: const ValueKey('a:footer[1]'), label: s.ckIntroFooterN1Label, onPressed: () => TNav.toast(context, s.ckIntroFooterN1ActionValue, then: () => TNav.tab(context, Routes.plans)), variant: TButtonVariant.secondary),
+        TButton(key: const ValueKey('a:footer[1]'), label: s.ckIntroFooterN1Label, onPressed: () => TNav.submit(context, 'POST /v1/enrolments', screenId: 'ck_intro', queueable: false, then: () => TNav.toast(context, s.ckIntroFooterN1ActionThenValue, then: () => TNav.tab(context, Routes.plans))), variant: TButtonVariant.secondary),
       ],
     );
   }

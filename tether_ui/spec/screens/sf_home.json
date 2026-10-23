@@ -31,7 +31,11 @@
         {
           "t": "big",
           "value": "2h 10m",
-          "caption": "Goal 90 min · down from 3h"
+          "caption": "Goal 90 min · down from 3h",
+          "data": {
+            "value": "sf.minutes_yesterday",
+            "caption": "sf.goal_caption"
+          }
         }
       ]
     },
@@ -128,7 +132,12 @@
             "to": "program_settings"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "sf.phone_free_nights_summary",
+        "rows[2].sub": "sf.goal_summary",
+        "rows[3].sub": "sf.buddy.summary"
+      }
     }
   ],
   "footer": [],

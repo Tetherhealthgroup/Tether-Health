@@ -25,12 +25,18 @@
   "body": [
     {
       "t": "eyebrow",
-      "text": "Friday, August 21"
+      "text": "Friday, August 21",
+      "data": {
+        "text": "today.date"
+      }
     },
     {
       "t": "title",
       "text": "Good morning, Alex.",
-      "size": "m"
+      "size": "m",
+      "data": {
+        "text": "today.greeting"
+      }
     },
     {
       "t": "chips",
@@ -85,7 +91,10 @@
             }
           ]
         }
-      ]
+      ],
+      "data": {
+        "eyebrow": "today.steps_heading"
+      }
     },
     {
       "t": "card",
@@ -120,7 +129,13 @@
           "program": "sf"
         }
       ],
-      "cols": 2
+      "cols": 2,
+      "data": {
+        "items[0].value": "bf.days_to_quit_day",
+        "items[0].sub": "bf.quit_date_short",
+        "items[1].value": "sf.minutes_yesterday",
+        "items[1].sub": "sf.goal_short"
+      }
     },
     {
       "t": "list",

@@ -25,7 +25,7 @@ class CheckinDoneScreen extends StatelessWidget {
       header: THeader(title: s.checkinDoneHeaderTitle, left: THeaderLeft.close),
       children: [
         TIllustration(glyph: '✓'),
-        TTitle(s.checkinDoneBodyN1Text, size: TTitleSize.l, center: true),
+        TBoundValues(keys: const ['checkin.thanks'], place: TExamplePlace.inline, builder: (context, v) => TTitle(v.text('checkin.thanks', s.checkinDoneBodyN1Text), size: TTitleSize.l, center: true)),
         TBody(s.checkinDoneBodyN2Text, center: true),
         TCard(tag: 'bf', title: s.checkinDoneBodyN3Title, text: s.checkinDoneBodyN3Text, cta: TButton(key: const ValueKey('a:body[3].cta[0]'), label: s.checkinDoneBodyN3CtaN0Label, onPressed: () => TNav.push(context, Routes.rescueActive), small: true)),
         TCard(tag: 'sf', title: s.checkinDoneBodyN4Title, text: s.checkinDoneBodyN4Text, cta: TButton(key: const ValueKey('a:body[4].cta[0]'), label: s.checkinDoneBodyN4CtaN0Label, onPressed: () => TNav.push(context, Routes.sfGoal), variant: TButtonVariant.secondary, small: true)),

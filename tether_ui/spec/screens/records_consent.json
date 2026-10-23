@@ -22,7 +22,10 @@
     {
       "t": "title",
       "text": "Connect Patel Family Medicine?",
-      "size": "m"
+      "size": "m",
+      "data": {
+        "text": "records.connect_title"
+      }
     },
     {
       "t": "kv",

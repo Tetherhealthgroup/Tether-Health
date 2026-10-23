@@ -31,7 +31,12 @@ import 'package:tether_ui/ui/ui.dart';
 /// Synthetic payload that must never reach the UI or a recorded code.
 const _canary = 'canary-synthetic-user-01';
 
-const _saveError = 'Couldn’t save. Your entry is kept on this phone.';
+/// No failure message may say the entry was kept (no outbox keeps it).
+void _noKeptClaim(WidgetTester tester) {
+  for (final t in _texts(tester)) {
+    expect(t.toLowerCase().contains('kept'), isFalse, reason: t);
+  }
+}
 
 const _host = '/__host';
 
@@ -413,27 +418,34 @@ void main() {
       expect([...bySource['device']!, ...bySource['reference']!].length, 18);
     });
 
-    test('spec/endpoints.json: sign-in and account endpoints are never queued, every other endpoint may be', () {
+    // Enrolment creation is never queued either (R-162): Learn-only adds.
+    const enrolment = 'POST /v1/enrolments';
+    bool neverQueued(String endpoint) => endpoint.contains(' supabase /auth/') || endpoint == enrolment;
+
+    test('spec/endpoints.json: sign-in, account and enrolment-creating endpoints are never queued, every other endpoint may be', () {
       final eps = _endpoints();
       final auth = [for (final e in eps) if ((e['endpoint'] as String).contains(' supabase /auth/')) e['endpoint']];
       expect(auth, hasLength(5));
+      expect([for (final e in eps) e['endpoint']], contains(enrolment));
       for (final e in eps) {
-        expect(e['queueable'], !(e['endpoint'] as String).contains(' supabase /auth/'), reason: e['endpoint'] as String);
+        expect(e['queueable'], !neverQueued(e['endpoint'] as String), reason: e['endpoint'] as String);
       }
     });
 
-    test('generated screens pass queueable: false on every sign-in and account submit, and nowhere else', () {
+    test('generated screens pass queueable: false on every sign-in, account and enrolment-creating submit, and nowhere else', () {
       final submit = RegExp(r"TNav\.submit\(context, '([^']*)', screenId: '[^']*'(, queueable: false)?");
       final generated = Directory('lib/screens').listSync(recursive: true).whereType<File>().where((f) => f.path.endsWith('.dart'));
-      var auth = 0;
+      var auth = 0, enrolments = 0;
       for (final f in generated) {
         for (final m in submit.allMatches(f.readAsStringSync())) {
           final isAuth = m.group(1)!.contains(' supabase /auth/');
           if (isAuth) auth++;
-          expect(m.group(2) != null, isAuth, reason: '${f.path}: ${m.group(1)}');
+          if (m.group(1) == enrolment) enrolments++;
+          expect(m.group(2) != null, neverQueued(m.group(1)!), reason: '${f.path}: ${m.group(1)}');
         }
       }
       expect(auth, 7, reason: 'five endpoints on seven screens: the token endpoint on auth_session, auth_signin and auth_signin_error');
+      expect(enrolments, 11, reason: '"Add as Learn only" on the 11 programme intros');
     });
   });
 
@@ -830,7 +842,7 @@ void main() {
     });
 
     for (final screen in [Routes.authSignin, Routes.authSigninError]) {
-      testWidgets('$screen: a queued result is a failure: nothing navigates, the generic error shows, never the save error', (tester) async {
+      testWidgets('$screen: a queued result is a failure: nothing navigates, the generic error shows', (tester) async {
         final arrivals = _Arrivals();
         TApi.instance = _ScriptedApi(const TResult.queued());
         await _open(tester, screen, observers: [arrivals]);
@@ -838,17 +850,17 @@ void main() {
         await _tapKey(tester, 'footer[0]');
         expect(arrivals.names, isEmpty);
         expect(find.text(TFailClosedResolver.message), findsOneWidget);
-        expect(find.text(_saveError), findsNothing);
+        _noKeptClaim(tester);
         expect(find.byType(screen == Routes.authSignin ? AuthSigninScreen : AuthSigninErrorScreen), findsOneWidget);
         await tester.pump(const Duration(seconds: 3));
       });
 
-      testWidgets('$screen: a failed sign-in shows the generic error, never the save error or the code', (tester) async {
+      testWidgets('$screen: a failed sign-in shows the generic error, never the code', (tester) async {
         TApi.instance = _ScriptedApi(const TResult.failed(_canary));
         await _open(tester, screen);
         await _tapKey(tester, 'footer[0]');
         expect(find.text(TFailClosedResolver.message), findsOneWidget);
-        expect(find.text(_saveError), findsNothing);
+        _noKeptClaim(tester);
         for (final t in _texts(tester)) {
           expect(t.contains('canary'), isFalse, reason: t);
         }
@@ -862,7 +874,7 @@ void main() {
       await _tapKey(tester, 'footer[0]');
       expect(find.byType(AuthSigninScreen), findsOneWidget);
       expect(find.text(TFailClosedResolver.message), findsOneWidget);
-      expect(find.text(_saveError), findsNothing);
+      _noKeptClaim(tester);
       await tester.pump(const Duration(seconds: 3));
     });
 
@@ -889,13 +901,14 @@ void main() {
       await tester.pump(const Duration(seconds: 3));
     });
 
-    testWidgets('a failed save that may be queued still shows the save error', (tester) async {
+    testWidgets('a failed save that may be queued shows the generic error, which never says the entry was kept', (tester) async {
       await _hostPage(tester);
       TApi.instance = _ScriptedApi(const TResult.failed('synthetic_code'));
       await TNav.submit(_hostContext, 'POST /v1/records/check-ins', screenId: 's');
       await tester.pump();
-      expect(find.text(_saveError), findsOneWidget);
-      expect(find.text(TFailClosedResolver.message), findsNothing);
+      expect(find.text(TNav.saveFailed), findsOneWidget);
+      expect(TNav.saveFailed, TFailClosedResolver.message);
+      _noKeptClaim(tester);
       await tester.pump(const Duration(seconds: 3));
     });
   });

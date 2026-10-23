@@ -1,26 +1,32 @@
 // Tether Health UI kit — live values for display.
 //
-// A bound slot shows a value from [TData.instance] in place of a spec
-// literal. [PreviewData] (the debug and test default) answers [TData.example] for every
-// key, so the slot shows its fallback, which is the spec's example value:
-// the preview, scenarios and screenshots stay as they are. The app installs
-// its own [TData] at startup, from app code. A real [TData] never returns
-// [TData.example]; when it has no value it returns null and the slot shows
-// its empty state, never the fallback. Release builds start with
-// [TEmptyData] (see TDefaults in nav.dart).
+// A bound element shows values from [TData.instance] in place of the spec's
+// example values (P-89, R-163):
+// - the member's value: shown exactly as the static component would show
+//   it, with no tag;
+// - no value (null = not loaded, [TData.unset] = the member has none, or a
+//   value of the wrong type): the spec's example value plus the "Example"
+//   tag ([TExampleTag]), so an example is never presented as the member's
+//   own data;
+// - [TData.example], which only [PreviewData] (debug and tests) returns: the
+//   example with no tag, so the preview, prototype, scenarios and render
+//   tests look exactly like the design.
+// Release builds start with [TEmptyData] (see TDefaults in nav.dart): every
+// bound element shows its example with the tag until the app installs its
+// own [TData]. Bound display values are never written to [TSession], so an
+// example never reaches a payload or a decision rule.
 //
 // TSession.clear() does not reset TData. An app-owned TData that caches
 // values must drop them itself on sign-out, account switch and account
 // deletion.
-//
-// Binding changes data, never layout or visuals: a slot builds exactly the
-// widget the static component would build with the same value, and adds no
-// widget that paints or lays out.
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
+import '../l10n/strings.g.dart';
 import 'components.dart';
 import 'nav.dart';
+import 'strings.dart';
+import 'tokens.dart';
 
 /// Live values for display, keyed by bind key (for example `hw.last_bp`).
 ///
@@ -30,8 +36,8 @@ import 'nav.dart';
 abstract class TData {
   static TData instance = TDefaults.data();
 
-  /// Marker value meaning "show the spec's example value" (the slot's
-  /// fallback). Only [PreviewData] returns it.
+  /// Marker value meaning "preview: show the spec's example value", with no
+  /// Example tag. Only [PreviewData] returns it; a real TData never does.
   static const Object example = _Example();
 
   /// Marker value meaning "loaded, and the member has no stored value".
@@ -99,8 +105,9 @@ class PreviewData implements TData {
   }
 }
 
-/// Release default for [TData]: null (no value) for every key, so slots show
-/// their empty state and never a fallback.
+/// Release default for [TData]: null (no value) for every key, so bound
+/// elements show their example values with the Example tag, and bound input
+/// controls their empty state.
 class TEmptyData implements TData {
   const TEmptyData();
 
@@ -123,26 +130,30 @@ class _Constant implements ValueListenable<Object?> {
 /// Builds the static component for a bound value.
 typedef TBoundBuilder<T> = Widget Function(BuildContext context, T value);
 
-/// Bound slots. Each one watches a bind key in [TData.instance] and builds
-/// the static component with the value it gets:
+/// Bound slots: one bind key each. Each watches the key in [TData.instance]
+/// and builds the static component with the member's value, or with the
+/// fallback (the spec's example value), tagged as in [TBoundValues]:
 ///
 ///     TBound.text('hw.last_bp', fallback: '128/82', builder: (c, v) => TBigNumber(value: v, unit: 'mmHg'))
 ///     TBound.series('hw.week', fallback: const [128, 131, 126], builder: (c, v) => TBarChart(values: v, color: TColors.teal))
 ///     TBound.list<TListRow>('records.recent', fallback: rows, builder: (c, v) => TListGroup(rows: v))
+///
+/// Generated screens use [TBoundValues], which binds several properties of
+/// one element (spec/bindings.json).
 abstract final class TBound {
   /// A text value. Strings show as they are and numbers in their default
   /// form; anything else counts as no value. Default builder: [TBody].
-  static TBoundSlot<String> text(String bindKey, {Key? key, required String fallback, TBoundBuilder<String>? builder, WidgetBuilder? empty}) =>
-      TBoundSlot<String>(key: key, bindKey: bindKey, fallback: fallback, convert: textOf, builder: builder ?? _body, empty: empty);
+  static TBoundSlot<String> text(String bindKey, {Key? key, required String fallback, TBoundBuilder<String>? builder}) =>
+      TBoundSlot<String>(key: key, bindKey: bindKey, fallback: fallback, convert: textOf, builder: builder ?? _body);
 
   /// A chart series. Only a non-empty list of numbers counts as a value.
-  static TBoundSlot<List<double>> series(String bindKey, {Key? key, required List<double> fallback, required TBoundBuilder<List<double>> builder, WidgetBuilder? empty}) =>
-      TBoundSlot<List<double>>(key: key, bindKey: bindKey, fallback: fallback, convert: seriesOf, builder: builder, empty: empty);
+  static TBoundSlot<List<double>> series(String bindKey, {Key? key, required List<double> fallback, required TBoundBuilder<List<double>> builder}) =>
+      TBoundSlot<List<double>>(key: key, bindKey: bindKey, fallback: fallback, convert: seriesOf, builder: builder);
 
   /// List rows (rows, stats, tiles...). Only a non-empty list whose items
   /// are all [T] counts as a value.
-  static TBoundSlot<List<T>> list<T>(String bindKey, {Key? key, required List<T> fallback, required TBoundBuilder<List<T>> builder, WidgetBuilder? empty}) =>
-      TBoundSlot<List<T>>(key: key, bindKey: bindKey, fallback: fallback, convert: listOf<T>, builder: builder, empty: empty);
+  static TBoundSlot<List<T>> list<T>(String bindKey, {Key? key, required List<T> fallback, required TBoundBuilder<List<T>> builder}) =>
+      TBoundSlot<List<T>>(key: key, bindKey: bindKey, fallback: fallback, convert: listOf<T>, builder: builder);
 
   static Widget _body(BuildContext context, String value) => TBody(value);
 
@@ -166,14 +177,17 @@ abstract final class TBound {
   }
 }
 
-/// One bound slot. Shows [fallback] for [TData.example], [builder] with the
-/// converted value for a usable value, and [empty] (or nothing) otherwise.
+/// One bound slot. Shows [builder] with the converted value when TData has a
+/// usable value for [bindKey]; otherwise [builder] with [fallback], and the
+/// Example tag unless the answer is [TData.example] (preview).
 class TBoundSlot<T> extends StatelessWidget {
-  const TBoundSlot({super.key, required this.bindKey, required this.fallback, required this.convert, required this.builder, this.empty});
+  const TBoundSlot({super.key, required this.bindKey, required this.fallback, required this.convert, required this.builder});
 
+  /// The TData key; a `:program` segment is resolved for the screen's
+  /// programme ([TData.resolve]).
   final String bindKey;
 
-  /// The spec's example value, shown only for [TData.example].
+  /// The spec's example value, shown when there is no usable value.
   final T fallback;
 
   /// Converts the raw value; null means no usable value.
@@ -181,17 +195,145 @@ class TBoundSlot<T> extends StatelessWidget {
 
   final TBoundBuilder<T> builder;
 
-  /// Shown when there is no usable value. Default: nothing.
-  final WidgetBuilder? empty;
+  @override
+  Widget build(BuildContext context) => TBoundValues(
+        keys: [bindKey],
+        builder: (context, values) => builder(context, values.value<T>(bindKey, fallback, convert)),
+      );
+}
+
+/// The member's values for the bind keys of one element, read by the
+/// element's builder ([TBoundValues]). Each read returns the member's value
+/// or the example; [needsTag] records whether an example was shown because
+/// the member has no value.
+final class TValues {
+  TValues._(this._raw);
+
+  final Map<String, Object?> _raw;
+
+  /// Whether a read returned an example because the member has no value
+  /// (not loaded, [TData.unset], or a value of the wrong type). A preview
+  /// answer ([TData.example]) does not count.
+  bool get needsTag => _needsTag;
+  bool _needsTag = false;
+
+  /// The member's text for [bindKey], or [example].
+  String text(String bindKey, String example) => value<String>(bindKey, example, TBound.textOf);
+
+  /// The member's series for [bindKey], or [example].
+  List<double> series(String bindKey, List<double> example) => value<List<double>>(bindKey, example, TBound.seriesOf);
+
+  /// The member's value for [bindKey] converted by [convert], or [example].
+  T value<T>(String bindKey, T example, T? Function(Object? raw) convert) {
+    final raw = _raw[bindKey];
+    if (identical(raw, TData.example)) return example;
+    final v = convert(raw);
+    if (v != null) return v;
+    _needsTag = true;
+    return example;
+  }
+}
+
+/// Where the Example tag goes (R-163).
+enum TExamplePlace {
+  /// After a text or number element, on the same row.
+  inline,
+
+  /// At the top trailing corner of a card, chart, list, stat grid or banner,
+  /// just above it.
+  corner,
+}
+
+/// Builds one generated element from the member's values for [keys]
+/// (spec/bindings.json; a card and everything in it is one element, so it
+/// carries at most one tag). The element shows the member's values; a value
+/// the member does not have shows the spec's example, and the element then
+/// carries the Example tag at [place]. With all of the member's values, or
+/// with preview answers, it builds exactly what [builder] returns, and
+/// nothing else.
+///
+/// A `:program` segment in a key is resolved for the programme the screen
+/// was opened for ([TNav.programOf], [TData.resolve]); with no programme the
+/// key has no value. Inside an element that already shows the tag, no
+/// second tag is added.
+class TBoundValues extends StatelessWidget {
+  const TBoundValues({super.key, required this.keys, this.place = TExamplePlace.corner, required this.builder});
+
+  final List<String> keys;
+  final TExamplePlace place;
+  final Widget Function(BuildContext context, TValues values) builder;
 
   @override
-  Widget build(BuildContext context) => ValueListenableBuilder<Object?>(
-        valueListenable: TData.instance.watch(bindKey),
-        builder: (context, raw, _) {
-          if (identical(raw, TData.example)) return builder(context, fallback);
-          final value = convert(raw);
-          if (value != null) return builder(context, value);
-          return empty?.call(context) ?? const SizedBox.shrink();
-        },
+  Widget build(BuildContext context) {
+    final program = TNav.programOf(context);
+    final data = TData.instance;
+    final watched = <String, ValueListenable<Object?>>{
+      for (final k in keys)
+        if (TData.resolve(k, program) case final resolved?) k: data.watch(resolved),
+    };
+    return ListenableBuilder(
+      listenable: Listenable.merge(watched.values.toList()),
+      builder: (context, _) {
+        final values = TValues._({for (final MapEntry(:key, :value) in watched.entries) key: value.value});
+        final child = builder(context, values);
+        if (!values.needsTag || TExampleTag.shownAround(context)) return child;
+        return TExampleTag.mark(child, place);
+      },
+    );
+  }
+}
+
+/// The "Example" tag (`kit.example`): marks a design example value shown
+/// because the member has no value yet (P-89). Screen readers hear
+/// "Example" first, then the value.
+class TExampleTag extends StatelessWidget {
+  const TExampleTag({super.key});
+
+  /// [child] marked with the tag at [place].
+  static Widget mark(Widget child, TExamplePlace place) => switch (place) {
+        TExamplePlace.inline => _ExampleShown(
+            child: MergeSemantics(
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                // Read first, so the merged label is "Example", then the value.
+                const _ExampleLabel(),
+                Expanded(child: child),
+                const SizedBox(width: 8),
+                const Padding(padding: EdgeInsets.only(top: 2), child: ExcludeSemantics(child: TExampleTag())),
+              ]),
+            ),
+          ),
+        TExamplePlace.corner => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Align(alignment: AlignmentDirectional.centerEnd, child: _ExampleLabel(child: ExcludeSemantics(child: TExampleTag()))),
+              const SizedBox(height: 4),
+              _ExampleShown(child: child),
+            ],
+          ),
+      };
+
+  /// Whether an element around [context] already shows the tag.
+  static bool shownAround(BuildContext context) => context.dependOnInheritedWidgetOfExactType<_ExampleShown>() != null;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+        decoration: BoxDecoration(color: TColors.warnFill, borderRadius: BorderRadius.circular(10), border: Border.all(color: TColors.warnBorder)),
+        child: Text(TStrings.of(context).kitExample.toUpperCase(), style: TText.pill.copyWith(color: TColors.warnText)),
       );
+}
+
+/// The tag's screen-reader label, "Example".
+class _ExampleLabel extends StatelessWidget {
+  const _ExampleLabel({this.child = const SizedBox.shrink()});
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => Semantics(label: TStrings.of(context).kitExample, child: child);
+}
+
+class _ExampleShown extends InheritedWidget {
+  const _ExampleShown({required super.child});
+  @override
+  bool updateShouldNotify(_ExampleShown oldWidget) => false;
 }

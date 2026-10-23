@@ -451,6 +451,146 @@ member-visible string by screen, element path and property, and writes the
 keys only to `spec/l10n/en.arb` and the generated Dart. So adding or
 changing a translation never changes a screen file or its sha256.
 
+## P-89: member values are bound; examples carry an "Example" tag (TH-909)
+
+The design's example values (a blood pressure of 128/82, "Good morning,
+Alex.", a quit date of Aug 28) are member data. Each one now names the TData
+key of the member's value: the element gains `data`, a map from the bound
+property to its key. This changes data only: no label, starting value,
+layout or action in `spec/screens` changes, and in the preview, the
+prototype and the screenshots every screen looks exactly as before.
+
+In the app (from the shared kit, not from `spec/screens`, so the sha256
+guard cannot see it): a bound element shows the member's value when there
+is one. Without one (not loaded, or loaded with no value) it shows the
+design's example with a small "Example" tag: after a text or a number, or
+above the top trailing corner of a card, chart, list, stat grid or banner,
+one tag per card. Screen readers read "Example" before the value. The
+preview answer shows no tag. Bound values are never written to the session,
+so an example never reaches a payload or a decision rule.
+
+What is bound, and what stays static copy, is set out in
+`generator/bindings.py`, which also pins each example value. Every bound
+value is listed, with its key, type, kind and example, in
+`spec/bindings.json` for the app to fill. Examples that could read as
+clinical advice are listed for the clinical lead in
+`spec/review_TH-909.md`. "Example" is the owner's word; its Spanish needs
+translation (kit string `kit.example`).
+
+| Screen | Bound property and key |
+|---|---|
+| `account` | `body[0].rows[0].label` `profile.name`; `body[0].rows[0].sub` `profile.email`; `body[1].rows[0].sub` `records.sources_summary`; `body[1].rows[1].sub` `account.signin_methods_summary`; `body[2].rows[0].sub` `account.programs_summary`; `body[2].rows[1].sub` `notifications.summary`; `body[2].rows[2].sub` `consents.reviewed_summary` |
+| `account_delete` | `body[1].rows[0][1]` `account.data.programs`; `body[1].rows[1][1]` `account.data.check_ins`; `body[1].rows[2][1]` `account.data.readings`; `body[1].rows[3][1]` `account.data.shared_summaries` |
+| `account_deleted` | `body[2].rows[0][1]` `account.deletion.receipt`; `body[2].rows[1][1]` `account.deletion.completed_at` |
+| `account_notifications` | `body[1].rows[0].sub` `notifications.bf.summary`; `body[1].rows[1].sub` `notifications.sf.summary` |
+| `account_privacy` | `body[1].rows[1].sub` `consents.history_summary` |
+| `account_programs` | `body[0].text` `account.focus_slots`; `body[1].rows[0].sub` `enrolment.bf.summary`; `body[1].rows[1].sub` `enrolment.sf.summary`; `body[1].rows[2].sub` `enrolment.ca.summary`; `body[1].rows[3].sub` `enrolment.hw.summary` |
+| `auth_merge` | `body[2].rows[0].sub` `auth.merge.guest_plan`; `body[3].text` `auth.merge.account_plan` |
+| `auth_social_new` | `body[3].rows[0][1]` `auth.social.name` |
+| `be_survivor` | `body[3].rows[0][1]` `be.next_follow_up` |
+| `be_tx` | `body[0].title` `be.next_appointment` |
+| `bf_estimates` | `body[1].rows[0][1]` `bf.estimates.baseline`; `body[1].rows[1][1]` `bf.estimates.price`; `body[1].rows[2][1]` `bf.estimates.time_per_cigarette` |
+| `bf_home` | `body[0].children[0].value` `bf.days_to_quit_day`; `body[0].children[0].caption` `bf.quit_date_caption`; `body[3].children[0].text` `bf.top_reason`; `body[4].rows[1].sub` `bf.meds.summary`; `body[4].rows[2].sub` `bf.saved_summary` |
+| `bf_home_quitday` | `body[0].text` `bf.quit_day_heading`; `body[2].children[0].value` `bf.time_since_quit`; `body[2].children[0].caption` `bf.quit_time_caption`; `body[6].rows[1].sub` `bf.meds.today_summary` |
+| `bf_meds` | `body[1].title` `bf.meds.recorded_plan` |
+| `bf_progress` | `body[1].values` `bf.cigarettes_week`; `body[2].items[0].value` `bf.avoided`; `body[2].items[1].value` `bf.saved`; `body[2].items[1].sub` `bf.price_per_pack`; `body[2].items[2].value` `bf.cravings_eased`; `body[2].items[3].value` `bf.most_helpful_tool`; `body[2].items[3].sub` `bf.most_helpful_count`; `body[3].rows[0].sub` `bf.estimates_summary` |
+| `bf_review` | `body[2].rows[0].sub` `bf.review.approach`; `body[2].rows[1].sub` `bf.review.quit_date`; `body[2].rows[2].sub` `bf.review.top_reason`; `body[2].rows[3].sub` `bf.review.support`; `body[2].rows[4].sub` `bf.review.space` |
+| `bf_slip` | `body[2].rows[0][1]` `bf.smoke_free_days` |
+| `bf_stepdown` | `body[1].text` `bf.stepdown.baseline_line`; `body[2].rows[0][1]` `bf.stepdown.week_1`; `body[2].rows[1][1]` `bf.stepdown.week_2`; `body[2].rows[2][1]` `bf.stepdown.week_3`; `body[2].rows[3][1]` `bf.stepdown.week_4`; `body[2].rows[4][0]` `bf.stepdown.quit_day_label` |
+| `bf_support` | `body[1].rows[0].label` `bf.supporter_name`; `body[1].rows[0].sub` `bf.supporter_detail` |
+| `ca_home` | `body[0].title` `ca.zone_today`; `body[0].text` `ca.zone_checked`; `body[3].rows[1].sub` `ca.zone_counts`; `body[3].rows[2].sub` `ca.plan_entered` |
+| `ca_progress` | `body[0].values` `ca.peak_flow_series`; `body[1].items[0].value` `ca.days_green`; `body[1].items[1].value` `ca.days_yellow`; `body[1].items[2].value` `ca.days_red`; `body[2].title` `ca.top_symptom` |
+| `ca_red` | `body[3].rows[0].label` `ca.emergency_contact_action` |
+| `ca_yellow` | `body[0].text` `ca.plan_entered_line` |
+| `ca_zone` | `body[5].text` `ca.zone_thresholds_line` |
+| `checkin_done` | `body[1].text` `checkin.thanks` |
+| `ck_day` | `body[0].text` `ck.appointment_title` |
+| `ck_list` | `body[0].text` `ck.due_summary` |
+| `ck_uptodate` | `body[2].text` `ck.next_due_line` |
+| `crisis` | `body[4].title` `ea.plan.things_that_help_line`; `body[4].text` `ea.plan.reach_out_line` |
+| `ea_home` | `body[1].rows[0].sub` `ea.plan_updated`; `body[1].rows[1].sub` `ea.check_back_due` |
+| `hw_crisis` | `body[0].text` `hw.crisis_banner` |
+| `hw_home` | `body[0].eyebrow` `hw.last_reading_time`; `body[0].children[0].value` `hw.last_bp`; `body[0].children[0].caption` `hw.last_bp_caption`; `body[2].rows[0].sub` `hw.avg_30d_summary`; `body[2].rows[1].sub` `hw.lipids_summary`; `body[2].rows[3].sub` `hw.records_summary`; `body[2].rows[4].sub` `hw.targets_summary` |
+| `hw_log2` | `body[4].rows[0][1]` `hw.log.reading_1`; `body[4].rows[1][1]` `hw.log.average` |
+| `hw_result` | `body[1].text` `hw.result_title`; `body[2].text` `hw.result_text` |
+| `hw_summary` | `body[0].text` `hw.summary.title`; `body[1].rows[0][1]` `hw.summary.dates`; `body[1].rows[1][1]` `hw.summary.bp_average`; `body[1].rows[2][1]` `hw.summary.highest`; `body[1].rows[3][1]` `hw.summary.latest_panel` |
+| `hw_trends` | `body[1].values` `hw.systolic_series`; `body[2].items[0].value` `hw.avg_30d`; `body[2].items[1].value` `hw.readings_30d`; `body[2].items[1].sub` `hw.days_missed_30d` |
+| `nu_home` | `body[0].eyebrow` `nu.habit_week`; `body[0].title` `nu.habit_name`; `body[0].text` `nu.habit_progress`; `body[3].rows[1].sub` `nu.milestone_due` |
+| `nu_week4` | `body[2].rows[0][1]` `nu.habits_tried`; `body[2].rows[1][1]` `nu.days_done`; `body[2].rows[2][1]` `nu.favorite_habit` |
+| `plans` | `body[0].title` `plans.focus_heading`; `body[0].rows[0].sub` `bf.plan_summary`; `body[0].rows[1].sub` `sf.plan_summary`; `body[2].rows[0].sub` `plans.medication_summary` |
+| `program_settings` | `body[0].rows[0].sub` `enrolment.:program.since` |
+| `progress` | `body[2].values` `bf.cigarettes_week`; `body[2].caption` `bf.progress_caption`; `body[3].values` `sf.minutes_week`; `body[3].caption` `sf.progress_caption`; `body[4].title` `insights.cross_program` |
+| `re_history` | `body[0].values` `re.egfr_series`; `body[1].rows[0][1]` `re.egfr_latest_summary`; `body[1].rows[1][1]` `re.acr_latest`; `body[1].rows[2][1]` `re.next_check` |
+| `re_home` | `body[0].eyebrow` `re.egfr_latest_date`; `body[0].children[0].value` `re.egfr_latest`; `body[0].children[0].caption` `re.next_check_caption`; `body[2].rows[1].sub` `re.history_span` |
+| `records_conflict` | `body[0].eyebrow` `records.conflict_1.heading`; `body[1].eyebrow` `records.conflict_2.heading`; `body[1].title` `records.conflict_2.title` |
+| `records_consent` | `body[0].text` `records.connect_title` |
+| `records_disconnect` | `body[0].text` `records.disconnect_title` |
+| `records_hub` | `body[1].rows[0].label` `records.source_1.name`; `body[1].rows[0].sub` `records.source_1.status`; `body[1].rows[1].label` `records.source_2.name`; `body[1].rows[1].sub` `records.source_2.status`; `body[2].rows[0].sub` `records.imported.blood_pressure`; `body[2].rows[1].sub` `records.imported.labs`; `body[2].rows[2].sub` `records.imported.immunizations`; `body[2].rows[3].sub` `records.imported.smoking_status`; `body[3].title` `records.review_count` |
+| `records_item` | `body[0].values` `records.item.series`; `body[1].rows[0].label` `records.item.latest_1`; `body[1].rows[0].sub` `records.item.latest_1_source`; `body[1].rows[1].label` `records.item.latest_2`; `body[1].rows[1].sub` `records.item.latest_2_source`; `body[1].rows[2].label` `records.item.latest_3`; `body[1].rows[2].sub` `records.item.latest_3_source` |
+| `records_review` | `body[2].text` `records.review_banner`; `body[9].rows[0][1]` `records.review.units_converted`; `body[9].rows[1][1]` `records.review.duplicates_skipped`; `body[9].rows[2][1]` `records.review.held_as_typo`; `body[9].rows[3][1]` `records.review.future_dates_rejected` |
+| `records_source` | `body[0].rows[0][1]` `records.source.connection`; `body[0].rows[1][1]` `records.source.last_sync`; `body[0].rows[2][1]` `records.source.next_sync`; `body[0].rows[3][1]` `records.source.access`; `body[0].rows[4][1]` `records.source.connected_on` |
+| `rescue_escalate` | `body[3].rows[0].label` `support.contact_text_action`; `body[3].rows[0].sub` `support.help_phrase_short` |
+| `rescue_pick` | `body[4].eyebrow` `rescue.last_helpful_result`; `body[4].title` `rescue.last_helpful_tool` |
+| `rescue_result` | `body[2].items[0].value` `rescue.rating_before`; `body[2].items[1].value` `rescue.rating_now` |
+| `sd_fell` | `body[2].rows[0].label` `sd.caregiver_call_action` |
+| `sd_home` | `body[0].eyebrow` `sd.today_heading`; `body[0].title` `sd.today_session`; `body[2].rows[0].sub` `sd.safety_progress`; `body[2].rows[1].sub` `sd.caregiver_summary`; `body[2].rows[2].sub` `sd.plan_summary`; `body[3].items[0].value` `sd.sessions_this_week`; `body[3].items[1].value` `sd.falls_30d` |
+| `sd_plan` | `body[1].rows[0][0]` `sd.plan.day_1`; `body[1].rows[0][1]` `sd.plan.session_1`; `body[1].rows[1][0]` `sd.plan.day_2`; `body[1].rows[1][1]` `sd.plan.session_2`; `body[1].rows[2][0]` `sd.plan.day_3`; `body[1].rows[2][1]` `sd.plan.session_3` |
+| `sd_safety` | `body[2].text` `sd.safety_progress` |
+| `sf_buddy` | `body[4].children[0].text` `sf.buddy.preview_message` |
+| `sf_goal` | `body[1].text` `sf.baseline_line` |
+| `sf_home` | `body[0].children[0].value` `sf.minutes_yesterday`; `body[0].children[0].caption` `sf.goal_caption`; `body[4].rows[0].sub` `sf.phone_free_nights_summary`; `body[4].rows[2].sub` `sf.goal_summary`; `body[4].rows[3].sub` `sf.buddy.summary` |
+| `sf_week` | `body[1].values` `sf.minutes_week`; `body[2].items[0].value` `sf.phone_free_nights`; `body[2].items[1].value` `sf.urges_paused`; `body[2].items[1].sub` `sf.urges_put_down`; `body[3].text` `sf.insight`; `body[3].children[0].text` `sf.you_said`; `body[4].title` `sf.next_week_suggestion` |
+| `st_a1c` | `body[3].rows[0][1]` `st.a1c_previous`; `body[3].rows[1][1]` `st.a1c_change` |
+| `st_home` | `body[0].eyebrow` `st.last_reading_context`; `body[0].children[0].value` `st.last_glucose`; `body[0].children[0].caption` `st.last_glucose_caption`; `body[2].rows[1].sub` `st.in_range_summary`; `body[2].rows[2].sub` `st.a1c_latest` |
+| `st_low` | `body[0].text` `st.low_banner` |
+| `st_patterns` | `body[1].values` `st.after_meal_series`; `body[2].items[0].value` `st.in_range`; `body[2].items[0].sub` `st.in_range_count`; `body[2].items[1].value` `st.lows`; `body[2].items[1].sub` `st.last_low`; `body[3].title` `st.pattern_insight` |
+| `support` | `body[1].rows[0].label` `support.supporter_name`; `body[2].rows[0].label` `support.care_team_name`; `body[2].rows[0].sub` `support.care_team_programs` |
+| `support_message` | `body[0].text` `support.message_title`; `body[1].title` `support.help_phrase_quoted` |
+| `today` | `body[0].text` `today.date`; `body[1].text` `today.greeting`; `body[4].eyebrow` `today.steps_heading`; `body[6].items[0].value` `bf.days_to_quit_day`; `body[6].items[0].sub` `bf.quit_date_short`; `body[6].items[1].value` `sf.minutes_yesterday`; `body[6].items[1].sub` `sf.goal_short` |
+| `today_empty` | `body[0].text` `today.greeting` |
+| `today_offline` | `body[0].text` `today.offline_banner`; `body[1].text` `today.greeting` |
+| `today_safety` | `body[1].text` `hw.crisis_reading_source` |
+
+The same keys are added to these additions (`additions.json` lists P-89 and
+TH-909 on each; they are not hash-pinned): `account_delete_apple`, `account_delete_google`, `program_settings_sf`, `sf_home_unplug`, `sf_home_unplug_android`, `sf_unplug_apps_chosen`, `sf_unplug_home`, `sf_unplug_session_done`, `sf_unplug_session_done_early`, `sf_week_unplug`.
+
+Not bound, for the app lane: header titles (`support_message_care`,
+`records_source`, `sf_week`, `sf_week_unplug`), header and row avatars,
+input controls and their labels, the structure of member-specific lists,
+running timers and breathing rings, and the `bf_date` picker card.
+
+## P-88: "Add as Learn only" creates the enrolment (TH-1031f)
+
+On the 11 programme intros (`bf_intro`, `sf_intro`, `ca_intro`, `hw_intro`,
+`st_intro`, `re_intro`, `nu_intro`, `sd_intro`, `ea_intro`, `ck_intro`,
+`be_intro`), `footer[1]` "Add as Learn only" was a toast and a tab that
+saved nothing. It now submits `POST /v1/enrolments`, which is never queued,
+and the same toast and tab follow a successful save only. A failed save
+shows the generic error and stays on the intro. Each intro's `api` lists the
+endpoint. Label, layout and the other actions are unchanged. The
+`focus_full` "Learn only" option and `ob_third` still save nothing.
+
+## P-31 / P-78: the programmes start unselected (TH-1031h)
+
+| Screen | Node | Change |
+|---|---|---|
+| `ob_programs` | `body[3]` tiles (key `programs`) | BreatheFree and ScrollFree no longer start selected; nothing does. Also TH-902 (TH-907). |
+
+The member's choice becomes enrolments and consents, so nothing is chosen
+for them. The footer label "Continue with 2 programs" is unchanged and no
+longer matches a starting selection; binding it to the number chosen, and
+whether Continue needs a selection, are still open.
+
+## Kit messages with no spec change (TH-1030, TH-909)
+
+- **Failed saves (P-85, P-88).** "Couldn’t save. Your entry is kept on this
+  phone." is removed: nothing kept the entry. Every failed save now shows
+  the kit's existing generic error, "Something went wrong. Please try
+  again." A save the app's outbox keeps (queued) continues the flow with no
+  message. Safety screens still open before the save is awaited.
+- **"Example" tag (P-89).** New kit string `kit.example`, "Example", as
+  described above.
+
 ## Rendering changes with no spec change (TH-907)
 
 These come from the shared field component, not from `spec/screens`, so the

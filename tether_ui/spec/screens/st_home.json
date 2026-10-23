@@ -32,9 +32,16 @@
           "t": "big",
           "value": "142",
           "unit": "mg/dL",
-          "caption": "Within your after-meal range (below 180)"
+          "caption": "Within your after-meal range (below 180)",
+          "data": {
+            "value": "st.last_glucose",
+            "caption": "st.last_glucose_caption"
+          }
         }
-      ]
+      ],
+      "data": {
+        "eyebrow": "st.last_reading_context"
+      }
     },
     {
       "t": "button",
@@ -88,7 +95,11 @@
             "to": "program_settings"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[1].sub": "st.in_range_summary",
+        "rows[2].sub": "st.a1c_latest"
+      }
     },
     {
       "t": "card",

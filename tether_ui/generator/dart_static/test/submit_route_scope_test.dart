@@ -18,7 +18,7 @@ import 'package:tether_ui/screens/tabs/support_message_care_screen.dart';
 import 'package:tether_ui/ui/ui.dart';
 
 const _host = '/__host';
-const _saveError = 'Couldn’t save. Your entry is kept on this phone.';
+const _saveError = TNav.saveFailed;
 
 /// A save per call, each completing only when the test says so.
 class _EachCallApi implements TApi {

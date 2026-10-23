@@ -74,7 +74,11 @@
             "program": "sf"
           }
         }
-      ]
+      ],
+      "data": {
+        "rows[0].sub": "notifications.bf.summary",
+        "rows[1].sub": "notifications.sf.summary"
+      }
     },
     {
       "t": "card",

@@ -37,7 +37,10 @@
         "type": "push",
         "to": "records_conflict"
       },
-      "actionLabel": "Review"
+      "actionLabel": "Review",
+      "data": {
+        "text": "records.review_banner"
+      }
     },
     {
       "t": "card",
@@ -155,7 +158,13 @@
           "Future dates rejected",
           "0"
         ]
-      ]
+      ],
+      "data": {
+        "rows[0][1]": "records.review.units_converted",
+        "rows[1][1]": "records.review.duplicates_skipped",
+        "rows[2][1]": "records.review.held_as_typo",
+        "rows[3][1]": "records.review.future_dates_rejected"
+      }
     }
   ],
   "footer": [

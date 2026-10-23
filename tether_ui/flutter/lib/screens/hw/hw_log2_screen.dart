@@ -26,7 +26,7 @@ class HwLog2Screen extends StatelessWidget {
         TBody(s.hwLog2BodyN1Text, tone: TTextTone.muted),
         TFieldRow(children: [TField(fieldKey: 'hw_log2.systolic', label: s.hwLog2BodyN2FieldsN0Label, unit: 'mmHg', placeholder: '132', kind: TFieldKind.number), TField(fieldKey: 'hw_log2.diastolic', label: s.hwLog2BodyN2FieldsN1Label, unit: 'mmHg', placeholder: '84', kind: TFieldKind.number)]),
         TField(fieldKey: 'hw_log2.pulse_optional', label: s.hwLog2BodyN3Label, unit: 'bpm', placeholder: '70', kind: TFieldKind.number),
-        TKeyValue(rows: [(s.hwLog2BodyN4RowsN0N0, '138/86'), (s.hwLog2BodyN4RowsN1N0, '135/85')]),
+        TBoundValues(keys: const ['hw.log.reading_1', 'hw.log.average'], builder: (context, v) => TKeyValue(rows: [(s.hwLog2BodyN4RowsN0N0, v.text('hw.log.reading_1', '138/86')), (s.hwLog2BodyN4RowsN1N0, v.text('hw.log.average', '135/85'))])),
       ],
       footer: [
         TButton(key: const ValueKey('a:footer[0]'), label: s.hwLog2FooterN0Label, onPressed: () => TNav.submit(context, 'POST /v1/program-data/hw/readings', screenId: 'hw_log2', then: () => TNav.branch(context, 'Validated average', <String, VoidCallback>{'Valid · below crisis range': () => TNav.replace(context, Routes.hwResult), 'Invalid value': () => TNav.replace(context, Routes.hwLogError), '≥180 top or ≥120 bottom': () => TNav.replace(context, Routes.hwCrisis)}, decide: 'hw.bp'), safety: TSafetyRoutes('hw.bp', <String, VoidCallback>{'≥180 top or ≥120 bottom': () => TNav.replace(context, Routes.hwCrisis)})), arrow: true),
