@@ -43,16 +43,27 @@
 #                   TETHER_UI_INTERNAL is refused). iOS version numbers must
 #                   stay numeric, so the version is unchanged; instead the
 #                   script prints a banner and, after a successful build,
-#                   writes the marker file build/ios/INTERNAL_TETHER_UI (removed
-#                   before the build). With --check-only it runs the internal
-#                   checks. Not accepted with --inspect-ipa. Without this flag
-#                   the script behaves exactly as before; nothing else (no
-#                   environment variable, no define file key) can turn it on.
+#                   writes the marker file build/ios/INTERNAL_TETHER_UI (every
+#                   build removes it first). After the build, whether it
+#                   succeeded or not, the script regenerates
+#                   ios/Flutter/Generated.xcconfig with no define
+#                   (flutter build ios --config-only --release) and checks that
+#                   its DART_DEFINES no longer carry TETHER_UI_INTERNAL, so a
+#                   later Xcode archive cannot pick the internal define up; it
+#                   fails if that check fails. With --check-only it runs the
+#                   internal checks. Not accepted with --inspect-ipa. Without
+#                   this flag the script builds exactly as before; nothing else
+#                   (no environment variable, no define file key) can turn it
+#                   on.
 #
-# Checklist (owner): never submit an IPA built with --internal-tether-ui (the
-# banner was printed and build/ios/INTERNAL_TETHER_UI exists) for App Store
-# review or external testing. It runs the tether_ui screens, which stay off the
-# public store until full acceptance.
+# Checklist (owner):
+# - Never submit an IPA built with --internal-tether-ui (the banner was printed
+#   and build/ios/INTERNAL_TETHER_UI exists) for App Store review or external
+#   testing. It runs the tether_ui screens, which stay off the public store
+#   until full acceptance.
+# - Always build a store IPA with this script (without the flag). Never use
+#   Xcode Product > Archive after an internal build: Xcode archives with the
+#   defines of the last flutter build.
 #
 # The project uses Swift Package Manager: the script refuses to run if
 # ios/Podfile exists or ios/Runner.xcodeproj/project.pbxproj or
@@ -257,6 +268,44 @@ check_no_cocoapods() {
   done
 }
 
+# Internal builds only. Regenerates ios/Flutter/Generated.xcconfig with no
+# define, then fails (exit 1) unless its DART_DEFINES (base64 entries) hold no
+# TETHER_UI_INTERNAL, so a later Xcode archive cannot build the tether_ui
+# screens by accident.
+clear_internal_ios_config() {
+  echo "== flutter build ios --config-only --release (removes the internal define from ios/Flutter/Generated.xcconfig)"
+  if ! flutter build ios --config-only --release; then
+    fail "could not regenerate ios/Flutter/Generated.xcconfig; it may still carry TETHER_UI_INTERNAL. Run the store build (this script without --internal-tether-ui) before any Xcode archive."
+  fi
+  python3 -I - ios/Flutter/Generated.xcconfig <<'PY' || fail "ios/Flutter/Generated.xcconfig still carries TETHER_UI_INTERNAL. Run the store build (this script without --internal-tether-ui) before any Xcode archive."
+import base64, binascii, sys
+
+try:
+    with open(sys.argv[1], encoding="utf-8") as fh:
+        text = fh.read()
+except FileNotFoundError:
+    sys.exit(0)
+except (OSError, ValueError):
+    sys.exit(1)
+if "TETHER_UI_INTERNAL" in text:
+    sys.exit(1)
+for line in text.splitlines():
+    name, _, value = line.partition("=")
+    if name.strip() != "DART_DEFINES":
+        continue
+    for item in value.strip().split(","):
+        if not item:
+            continue
+        try:
+            decoded = base64.b64decode(item, validate=True).decode("utf-8")
+        except (binascii.Error, ValueError):
+            sys.exit(1)
+        if decoded.split("=", 1)[0].strip() == "TETHER_UI_INTERNAL":
+            sys.exit(1)
+PY
+  echo "ios/Flutter/Generated.xcconfig carries no TETHER_UI_INTERNAL."
+}
+
 # Internal builds only: the warning printed before and after the build.
 internal_banner() {
   echo
@@ -297,16 +346,19 @@ echo "== flutter test"
 flutter test
 ipa_dir="build/ios/ipa"
 rm -f "$ipa_dir"/*.ipa # never report a stale IPA from an earlier build
+rm -f "$internal_marker" # never leave an earlier internal build's marker
 if [ "$internal_ui" -eq 1 ]; then
-  rm -f "$internal_marker"
   internal_banner
+  build_status=0
   if [ -n "$build_number" ]; then
     echo "== flutter build ipa --release --build-number $build_number --dart-define=TETHER_UI_INTERNAL=true"
-    flutter build ipa --release "--dart-define-from-file=$env_file" --build-number "$build_number" --dart-define=TETHER_UI_INTERNAL=true
+    flutter build ipa --release "--dart-define-from-file=$env_file" --build-number "$build_number" --dart-define=TETHER_UI_INTERNAL=true || build_status=$?
   else
     echo "== flutter build ipa --release --dart-define=TETHER_UI_INTERNAL=true"
-    flutter build ipa --release "--dart-define-from-file=$env_file" --dart-define=TETHER_UI_INTERNAL=true
+    flutter build ipa --release "--dart-define-from-file=$env_file" --dart-define=TETHER_UI_INTERNAL=true || build_status=$?
   fi
+  clear_internal_ios_config
+  [ "$build_status" -eq 0 ] || fail "flutter build ipa failed" "$build_status"
 elif [ -n "$build_number" ]; then
   echo "== flutter build ipa --release --build-number $build_number"
   flutter build ipa --release "--dart-define-from-file=$env_file" --build-number "$build_number"

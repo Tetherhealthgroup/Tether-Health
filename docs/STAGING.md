@@ -9,6 +9,12 @@ projects, hold credentials or run these commands against a live service.
 Nothing here changes production (`render.yaml`, the production Supabase
 project, the store builds).
 
+**What has been tested.** No command in this runbook has been run against a
+live Supabase project, a Render service or a staging host. Each step says what
+was checked locally (on an in-memory PostgreSQL 17.5, with fake command-line
+tools, or by the repository's tests) and labels the rest **UNTESTED**. Expect
+to stop and report if an UNTESTED step does not behave as written.
+
 Secrets (database passwords, keys) are typed only into the Supabase or Render
 dashboard, or into a hidden prompt in your own terminal. Never paste them into
 this repository, a chat, an issue or a commit. This document holds variable
@@ -48,6 +54,10 @@ select current_setting('app.environment', true) as environment;
 It must show `staging`. The staging seed (step 7) refuses to run anywhere this
 is not set, so never run step 2 on production.
 
+Tested locally: both statements on an in-memory PostgreSQL 17.5 (superuser).
+**UNTESTED** on hosted Supabase, including whether its `postgres` role may set
+this value and whether a new SQL editor tab picks it up.
+
 ## 3. Apply the migrations
 
 The migrations are every file in `supabase/migrations`, applied in filename
@@ -76,7 +86,14 @@ sh tool/staging_db.sh list
 `migrate --dry-run` lists the migrations it would apply; check the list is the
 files in `supabase/migrations`, in order, before running `migrate`.
 
-## 4. Give the sync role a login (staging equivalent of H28)
+Tested locally: `read -rs` in bash 3.2 and zsh; every `tool/staging_db.sh`
+command refuses while `STAGING_HOSTS` is empty, and, with fake hosts and a
+fake Supabase CLI, calls the CLI once with the expected arguments; the
+Supabase CLI 2.108 accepts these flags; all migrations apply in filename order
+on an in-memory PostgreSQL 17.5. **UNTESTED** against a live Supabase project:
+`check`, `migrate --dry-run`, `migrate` and `list`.
+
+## 4. Give the sync role a login
 
 The migrations create the role `thsync` without a login. In the SQL editor,
 give it a login with a new, strong password used nowhere else, and bound how
@@ -100,6 +117,9 @@ from pg_roles where rolname = 'thsync';
 
 Expected: `rolcanlogin` true; `rolsuper`, `rolbypassrls`, `rolcreaterole` and
 `rolreplication` false; `rolconfig` lists the three timeouts.
+
+Tested locally: these statements and the check on an in-memory PostgreSQL 17.5
+(superuser), with a made-up password. **UNTESTED** on hosted Supabase.
 
 ## 5. Create the two Render services
 
@@ -129,6 +149,11 @@ set) or `THSYNC_JWT_SECRET` (thsync refuses it in production mode). Then
 deploy both services manually and note their hosts (for example
 `tether-api-staging.onrender.com`).
 
+Tested locally: `render.staging.yaml` parses with two YAML parsers and the
+repository's tests check its services and variables. **UNTESTED** on Render:
+creating the Blueprint from a non-default path, the build and start commands,
+`PYTHON_VERSION`, the health checks, and thsync through the pooler.
+
 ## 6. Set STAGING_HOSTS
 
 Internal builds in http mode, and `tool/staging_db.sh`, accept only hosts in
@@ -151,6 +176,8 @@ then run the tool tests:
 flutter test --no-pub test/tool
 ```
 
+Tested locally: the repository's tests swap in a host list in this exact form.
+
 ## 7. Seed the staging consent documents
 
 The seed adds DRAFT consent documents marked `[DRAFT · staging]` (synthetic,
@@ -161,6 +188,13 @@ not approved). It refuses unless step 2 was done on this database, and
 sh tool/staging_db.sh seed --dry-run
 sh tool/staging_db.sh seed
 ```
+
+Tested locally: on an in-memory PostgreSQL 17.5 the seed refuses (and writes
+nothing) without `app.environment` and with `production`, adds 20 draft
+documents with `staging`, and adds nothing when run again; `seed --dry-run`
+and the host refusal are covered by the repository's tests. **UNTESTED**
+against a live Supabase project, including `supabase db query` running the
+file.
 
 When the database steps are done, close the terminal (or run
 `unset STAGING_DATABASE_URL`).
@@ -180,6 +214,8 @@ curl -fsS https://tether-thsync-staging.onrender.com/v1/health
 - In the dashboard (Project Settings > Data API), the exposed schemas are only
   the defaults (`public`, `graphql_public`); no other schema is exposed.
 
+**UNTESTED**: every check in this step (no staging service exists yet).
+
 ## 9. Build an internal test app against staging
 
 Copy `tool/defines/internal-staging.example.json` to a file outside the
@@ -194,6 +230,12 @@ bash tool/build_play_release.sh --dart-define-from-file=<your file> --internal-t
 A sandbox build (no backend) uses `tool/defines/internal-sandbox.example.json`
 as it is.
 
+Tested locally: the iOS `--check-only` command with the sandbox template
+passes, and with the unedited staging template is refused; the Play command
+with the sandbox template stops at the missing signing configuration on an
+agent machine. **UNTESTED**: a signed build, and both commands with a filled-in
+staging file.
+
 ## Always
 
 - Keep every staging account synthetic: made-up names, `example.com`-style
@@ -203,3 +245,8 @@ as it is.
   promote or roll it out beyond the internal testing track. An iOS one printed
   the internal banner and left `build/ios/INTERNAL_TETHER_UI`; never submit it
   for App Store review or external testing.
+- Always make a store iOS build with `tool/build_ios_release.sh` (without the
+  flag). Never use Xcode Product > Archive after an internal build: Xcode
+  archives with the defines of the last Flutter build. (The script removes the
+  internal define from `ios/Flutter/Generated.xcconfig` after every internal
+  build, but the script is the only supported path.)

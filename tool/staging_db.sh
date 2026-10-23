@@ -18,8 +18,10 @@
 #
 # The target is the connection string in the environment variable
 # STAGING_DATABASE_URL (postgresql://postgres:<password>@<host>:5432/postgres,
-# percent-encoded). It is never taken from an argument and never printed. Its
-# host must belong to a host in STAGING_HOSTS (tool/release_define_check.sh):
+# percent-encoded). It is never taken from an argument and never printed. It
+# must have no query string, fragment or whitespace, and its host part one
+# plain host (no ",", "%" or brackets). Its host must belong to a host in
+# STAGING_HOSTS (tool/release_define_check.sh):
 #   db.<ref>.supabase.co                   -> <ref>.supabase.co must be listed
 #   <region>.pooler.supabase.com, user
 #   postgres.<ref>                         -> <ref>.supabase.co must be listed
@@ -67,11 +69,21 @@ project_host="$(python3 -I - <<'PY'
 import os, sys
 from urllib.parse import unquote, urlsplit
 
+raw = os.environ["STAGING_DATABASE_URL"]
+# The Supabase CLI receives the raw value. A query (host=, hostaddr=,
+# service=, ...), a fragment, or a host list ("a,b"), percent-encoding or a
+# bracketed address in the host part could make it connect somewhere other
+# than the host checked here, so all of them are refused, as is whitespace.
+if "?" in raw or "#" in raw or raw != raw.strip() or any(c.isspace() for c in raw):
+    sys.exit(1)
 try:
-    url = urlsplit(os.environ["STAGING_DATABASE_URL"].strip())
+    url = urlsplit(raw)
+    host_part = url.netloc.rpartition("@")[2]
     host = (url.hostname or "").lower().rstrip(".")
     user = unquote(url.username or "")
 except Exception:
+    sys.exit(1)
+if any(c in host_part for c in ",%[]/\\"):
     sys.exit(1)
 if url.scheme not in ("postgresql", "postgres") or not host:
     sys.exit(1)
@@ -83,7 +95,7 @@ elif host.endswith(".pooler.supabase.com"):
     host = user[len("postgres."):].lower() + ".supabase.co"
 print(host)
 PY
-)" || fail "STAGING_DATABASE_URL is not a postgresql:// URL with a host (value not shown)"
+)" || fail "STAGING_DATABASE_URL is not a postgresql:// URL with one plain host and no query string (value not shown)"
 
 # shellcheck source=tool/release_define_check.sh
 . tool/release_define_check.sh

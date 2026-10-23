@@ -334,6 +334,41 @@ void main() {
         expect(calls(), isEmpty);
       });
 
+      test('a query, fragment, host list or encoded host is refused', () {
+        const base = 'postgresql://postgres:$password@db.stagingref.supabase.co'
+            ':5432/postgres';
+        for (final url in [
+          '$base?host=db.prodref.supabase.co',
+          '$base?hostaddr=192.0.2.1',
+          '$base?service=prod',
+          '$base?sslmode=require',
+          '$base?',
+          '$base#x',
+          'postgresql://postgres:$password@db.stagingref.supabase.co,'
+              'db.prodref.supabase.co:5432/postgres',
+          'postgresql://postgres:$password@db.stagingref.supabase.co:5432,'
+              'db.prodref.supabase.co:5432/postgres',
+          'postgresql://postgres:$password@%2Ftmp/postgres',
+          'postgresql://postgres:$password@db.stagingref.supabase.co%2C'
+              'db.prodref.supabase.co/postgres',
+          'postgresql://postgres:$password@[::1]:5432/postgres',
+          ' $base',
+          '$base\n',
+          'postgresql://postgres:$password@db.stagingref.supabase.co'
+              ':5432/postgres x',
+        ]) {
+          final r = run(['seed'], url: url);
+          expect(r.exitCode, 1, reason: url);
+          expect(
+              r.stderr,
+              'staging_db: STAGING_DATABASE_URL is not a postgresql:// URL '
+              'with one plain host and no query string (value not shown)\n',
+              reason: url);
+          expectNoLeak(r);
+        }
+        expect(calls(), isEmpty);
+      });
+
       test('the staging database, direct or through the pooler, passes', () {
         for (final url in [direct, pooler]) {
           final r = run(['check'], url: url);

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -109,13 +110,34 @@ void main() {
       );
     // Records each call as [arg][arg]...; `build appbundle` writes an AAB and
     // records the --build-name it got (the fake aapt2 reports it as the
-    // versionName) unless FAKE_IGNORE_BUILD_NAME is set; `build ipa` writes an
-    // IPA. FAKE_FAIL_BUILD makes a build fail.
+    // versionName) unless FAKE_IGNORE_BUILD_NAME is set; `build ipa` first
+    // writes ios/Flutter/Generated.xcconfig with its --dart-define values
+    // base64-encoded in DART_DEFINES (as flutter does), then an IPA.
+    // FAKE_FAIL_BUILD makes the appbundle or ipa build fail after that.
+    // `build ios --config-only` rewrites Generated.xcconfig with no define,
+    // unless FAKE_KEEP_DEFINES is set (it then leaves the file) or
+    // FAKE_FAIL_CONFIG is set (it fails).
     writeExecutable(
         'bin/flutter',
         r'''#!/bin/sh
 for a in "$@"; do printf '[%s]' "$a" >> "LOG"; done
 echo >> "LOG"
+if [ "$1" = build ] && [ "$2" = ios ]; then
+  [ -z "${FAKE_FAIL_CONFIG:-}" ] || exit 1
+  if [ -z "${FAKE_KEEP_DEFINES:-}" ]; then
+    printf 'FLUTTER_ROOT=/fake\nDART_DEFINES=%s\n' "$(printf 'FLUTTER_BUILD_NAME=1.0.0' | base64)" > ios/Flutter/Generated.xcconfig
+  fi
+  exit 0
+fi
+if [ "$1" = build ] && [ "$2" = ipa ]; then
+  defs=""
+  for a in "$@"; do
+    case "$a" in
+      --dart-define=*) e="$(printf '%s' "${a#--dart-define=}" | base64)"; defs="${defs:+$defs,}$e" ;;
+    esac
+  done
+  printf 'FLUTTER_ROOT=/fake\nDART_DEFINES=%s\n' "$defs" > ios/Flutter/Generated.xcconfig
+fi
 if [ "$1" = build ]; then
   [ -z "${FAKE_FAIL_BUILD:-}" ] || exit 1
   if [ "$2" = appbundle ]; then
@@ -176,6 +198,17 @@ echo "    A: package=\\"$appId\\" (Raw: \\"$appId\\")"
 
   List<String> calls() =>
       flutterLog.existsSync() ? flutterLog.readAsLinesSync() : const [];
+
+  // The decoded DART_DEFINES of the copy's ios/Flutter/Generated.xcconfig.
+  List<String> generatedDefines() {
+    final line = inRoot('ios/Flutter/Generated.xcconfig')
+        .readAsLinesSync()
+        .singleWhere((l) => l.startsWith('DART_DEFINES='));
+    return [
+      for (final item in line.substring('DART_DEFINES='.length).split(','))
+        if (item.isNotEmpty) utf8.decode(base64.decode(item.trim())),
+    ];
+  }
 
   // The internal define check, sourced as the scripts source it.
   ProcessResult internalCheck(String contents) => Process.runSync(
@@ -437,7 +470,13 @@ echo "    A: package=\\"$appId\\" (Raw: \\"$appId\\")"
         '[test]',
         '[build][ipa][--release][--dart-define-from-file=$file]'
             '[--dart-define=TETHER_UI_INTERNAL=true]',
+        '[build][ios][--config-only][--release]',
       ]);
+      expect(generatedDefines(), ['FLUTTER_BUILD_NAME=1.0.0']);
+      expect(
+          r.stdout,
+          contains(
+              'ios/Flutter/Generated.xcconfig carries no TETHER_UI_INTERNAL.'));
       expect(r.stdout, contains('Never submit it for App Store review.'));
       expect(r.stdout, contains('\nCFBundleShortVersionString: 1.0.0\n'));
       final marker = inRoot('build/ios/INTERNAL_TETHER_UI');
@@ -457,11 +496,11 @@ echo "    A: package=\\"$appId\\" (Raw: \\"$appId\\")"
         '2',
       ]);
       expect(r.exitCode, 0, reason: output(r));
-      expect(
-        calls().last,
+      expect(calls().sublist(calls().length - 2), [
         '[build][ipa][--release][--dart-define-from-file=$file]'
-        '[--build-number][2][--dart-define=TETHER_UI_INTERNAL=true]',
-      );
+            '[--build-number][2][--dart-define=TETHER_UI_INTERNAL=true]',
+        '[build][ios][--config-only][--release]',
+      ]);
     });
 
     test('a failed internal build leaves no marker from an earlier build', () {
@@ -477,6 +516,40 @@ echo "    A: package=\\"$appId\\" (Raw: \\"$appId\\")"
       );
       expect(r.exitCode, isNonZero, reason: output(r));
       expect(marker.existsSync(), isFalse);
+      // The failed build had already written the internal define; it is gone.
+      expect(calls().last, '[build][ios][--config-only][--release]');
+      expect(generatedDefines(), ['FLUTTER_BUILD_NAME=1.0.0']);
+      expect(r.stderr, contains('build_ios_release: flutter build ipa failed'));
+    });
+
+    test('fails when Generated.xcconfig still carries the internal define', () {
+      for (final env in [
+        {'FAKE_KEEP_DEFINES': '1'},
+        {'FAKE_FAIL_CONFIG': '1'},
+      ]) {
+        final r = ios(
+          [
+            '--dart-define-from-file=${define(sandboxDefine)}',
+            '--internal-tether-ui',
+          ],
+          env: env,
+        );
+        expect(r.exitCode, 1, reason: '$env ${output(r)}');
+        expect(r.stderr, contains('Generated.xcconfig'), reason: '$env');
+        expect(r.stderr, contains('before any Xcode archive'), reason: '$env');
+        expect(r.stdout, isNot(contains('Marker:')), reason: '$env');
+      }
+      expect(generatedDefines(), contains('TETHER_UI_INTERNAL=true'));
+    });
+
+    test('a store build removes an earlier internal marker', () {
+      final marker = inRoot('build/ios/INTERNAL_TETHER_UI')
+        ..parent.createSync(recursive: true)
+        ..writeAsStringSync('stale');
+      final r = ios(['--dart-define-from-file=${define(storeDefine)}']);
+      expect(r.exitCode, 0, reason: output(r));
+      expect(marker.existsSync(), isFalse);
+      expect(calls().where((c) => c.contains('--config-only')), isEmpty);
     });
 
     test('--check-only with the flag runs the internal checks only', () {

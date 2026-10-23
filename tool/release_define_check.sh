@@ -93,7 +93,7 @@
 # is_staging_host <prefix> <host>
 #   Succeeds if <host> (case-insensitive, one trailing dot ignored) is in
 #   STAGING_HOSTS; otherwise prints "<prefix>: ..." to stderr, without the
-#   host, and returns 1. Used by tool/staging_seed.sh.
+#   host, and returns 1. Used by tool/staging_db.sh.
 check_release_define_file() {
   _release_define_python "$1" "$2" release
 }
@@ -168,9 +168,9 @@ PROVIDER_ID = re.compile(r"[A-Za-z0-9._-]{1,200}")
 # The script adds this define itself; a define file must never hold it.
 INTERNAL_FLAG_KEY = "TETHER_UI_INTERNAL"
 
-# Hosts of the staging backend (P-87): the staging Supabase project host
-# (<ref>.supabase.co), the staging API host and the staging sync host, lower
-# case, without scheme, port or path. EMPTY until the owner has created the
+# Hosts of the staging backend (synthetic accounts only): the staging
+# Supabase project host (<ref>.supabase.co), the staging API host and the
+# staging sync host, lower case, without scheme, port or path. EMPTY until the owner has created the
 # staging projects; while it is empty every http internal build is refused.
 # Only the owner adds hosts here (docs/STAGING.md). Never add a production
 # host: this list is what keeps an internal build away from production data.
