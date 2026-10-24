@@ -477,21 +477,23 @@ void main() {
 
   group('the assets have not drifted from the source bundle', () {
     // Only two of the six design files have a second copy in the repo to
-    // compare against; the rest came out of files/tether-design.zip, which
+    // compare against; the rest came out of specs-and-design/archive/files/tether-design.zip, which
     // cannot be opened without adding an archive package. So this checks what
     // it can and the report says so, rather than implying full coverage.
     for (final name in ['areas.json', 'shell.json']) {
       test(name, () {
         final shipped = File('assets/design/$name');
-        final source = File('files/$name');
+        final source = File('specs-and-design/archive/files/$name');
         if (!source.existsSync()) {
-          markTestSkipped('files/$name is not in this checkout');
+          markTestSkipped(
+              'specs-and-design/archive/files/$name is not in this checkout');
           return;
         }
         expect(
           jsonDecode(shipped.readAsStringSync()),
           jsonDecode(source.readAsStringSync()),
-          reason: 'assets/design/$name no longer matches files/$name',
+          reason:
+              'assets/design/$name no longer matches specs-and-design/archive/files/$name',
         );
       });
     }

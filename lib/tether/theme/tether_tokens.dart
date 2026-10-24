@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// The Tether shell design tokens, transcribed from the `:root` block and
-/// component rules of `files/tether-prototype.html`.
+/// component rules of `specs-and-design/archive/files/tether-prototype.html`.
 ///
 /// The shell is built once and is identical in every area (`shell.json`), so
 /// these tokens belong to the shell rather than to LookUp, even though the

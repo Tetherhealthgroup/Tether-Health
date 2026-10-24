@@ -13,8 +13,7 @@ analyzer:
     # generator/dart_static is not a package.
     - specs-and-design/tether_ui/generator/**
     # Design archive copies kept for reference; not part of the app.
-    - code-develop/**
-    - code-unplug/**
+    - specs-and-design/archive/**
     - specs-and-design/tether_ui/flutter/**
 include: package:flutter_lints/flutter.yaml
 

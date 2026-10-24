@@ -1,6 +1,6 @@
 /// The design bundle, parsed.
 ///
-/// `files/tether-design.zip` ships the product as data in three deliberately
+/// `specs-and-design/archive/files/tether-design.zip` ships the product as data in three deliberately
 /// separate layers — the area catalogue, the shared archetype machinery, and
 /// thin per-product files — plus safeguards that are constraints rather than
 /// features. Its README is blunt about which artefact is the asset: *the
@@ -32,7 +32,7 @@ import 'package:flutter/foundation.dart';
 /// Anything [ContentProvenance.supplement] renders with a visible notice. See
 /// `lib/tether/screens/content_screen.dart`.
 enum ContentProvenance {
-  /// From `files/tether-design.zip`, copied verbatim into `assets/design/`.
+  /// From `specs-and-design/archive/files/tether-design.zip`, copied verbatim into `assets/design/`.
   bundle,
 
   /// Authored in this repository to fill a gap. Not clinically reviewed.

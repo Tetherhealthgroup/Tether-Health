@@ -8,7 +8,7 @@ at [tetherhealthgroup.com/programs](https://www.tetherhealthgroup.com/programs).
 
 The app renders the design bundle in `assets/design/` at runtime rather than
 transcribing it into Dart. That bundle is the same one in
-`files/tether-design.zip`, and its README is blunt about which artefact is the
+`specs-and-design/archive/files/tether-design.zip`, and its README is blunt about which artefact is the
 asset: *the prototype is disposable; the JSON is the asset.*
 
 Three layers, kept separate:

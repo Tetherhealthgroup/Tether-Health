@@ -6,7 +6,7 @@ import 'design_bundle.dart';
 
 /// Reads the design bundle out of `assets/design/`.
 ///
-/// The files are copies of `files/tether-design.zip`, kept byte-identical so
+/// The files are copies of `specs-and-design/archive/files/tether-design.zip`, kept byte-identical so
 /// that `tools/validate.py` in the bundle still validates what the app
 /// actually ships. `test/tether_bundle_test.dart` asserts they have not
 /// drifted apart; a copy nobody checks is a copy that is already stale.

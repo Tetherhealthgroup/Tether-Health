@@ -6,7 +6,7 @@ import '../theme/tether_tokens.dart';
 /// The chrome every screen in every program sits inside.
 ///
 /// Transcribed from the `.phone` / `.bar` / `.scroll` / `.acts` structure in
-/// `files/tether-prototype.html`. The prototype draws a 330 × 660 phone on a
+/// `specs-and-design/archive/files/tether-prototype.html`. The prototype draws a 330 × 660 phone on a
 /// desktop page; here the phone *is* the device, so the bezel and the fixed
 /// size are dropped and everything inside it is kept.
 ///

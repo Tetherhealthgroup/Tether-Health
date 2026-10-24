@@ -73,6 +73,6 @@ Until 3 exists, condition-specific remedies stay out of the app, and the
 ## Provenance
 
 Authored in this repository. **Not clinically reviewed.** Not from
-`files/tether-design.zip`. The six practices are widely published
+`specs-and-design/archive/files/tether-design.zip`. The six practices are widely published
 self-management techniques rather than novel advice, which makes them plausible
 and does not make them reviewed.
