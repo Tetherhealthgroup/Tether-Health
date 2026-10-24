@@ -416,6 +416,24 @@ not yet been applied for. Until it is, `requestAuthorization` fails on a real iP
 screen I reports exactly that. The drafted submissions for Apple and for Google Play are
 in `design/unplug-platform-submissions.md`.
 
+## Repository layout
+
+```
+lib/, test/, assets/      Flutter app, its tests and bundled assets
+android/, ios/, web/, windows/
+                          platform hosts (manifests: docs/PLATFORM_MANIFESTS.md)
+design/                   approved artwork, specs and review notes
+pigeons/, third_party/    channel contract source, vendored packages
+config/, tool/            build defines, release and setup scripts
+backend/api/              NestJS API (Render rootDir backend/api)
+backend/sync/             thsync session sync service (Render rootDir backend/sync)
+supabase/                 migrations, config and static checks
+specs-and-design/
+  tether_ui/              UI spec, generator and generated package (path dependency)
+  archive/                reference material, not built: code snapshots, files/, images
+docs/                     architecture, contracts, release, testing and store docs
+```
+
 ## Project structure
 
 - `lib/main.dart` — the entry point; picks the shell or the bitmap prototype
