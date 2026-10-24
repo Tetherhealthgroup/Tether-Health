@@ -493,7 +493,7 @@ The production foundation uses Flutter on iPhone/Android, a NestJS API
 Store clinical production release, complete security/privacy testing, obtain
 clinical/legal review, finish professional Spanish localization and replace the
 prototype application identifier/signing configuration. See
-`docs/ARCHITECTURE.md`, `docs/contracts/` and `PRODUCTION_RELEASE_CHECKLIST.md`.
+`docs/ARCHITECTURE.md`, `docs/contracts/` and `docs/PRODUCTION_RELEASE_CHECKLIST.md`.
 
 For a configured development build, copy `config/dart_defines.example.json` to
 an ignored local file, replace placeholders through an approved secret/config

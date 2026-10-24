@@ -48,7 +48,7 @@ abstract final class ContactInfo {
   /// Emergency services number presented to the patient.
   ///
   /// United States only. Jurisdiction-specific emergency routing is an
-  /// outstanding item on `PRODUCTION_RELEASE_CHECKLIST.md`.
+  /// outstanding item on `docs/PRODUCTION_RELEASE_CHECKLIST.md`.
   static const String emergencyNumber = '911';
 
   /// The national English-language quitline.

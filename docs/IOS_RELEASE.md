@@ -267,7 +267,7 @@ Each is a proposed ticket for the maintainers to file. None was changed here.
   those merge, add a smoke test on a synthetic account against whichever
   backend production actually uses, confirming the Auth user is gone (owner
   runs it).
-- **G-9 Release checklist.** `PRODUCTION_RELEASE_CHECKLIST.md:75-79` has two
+- **G-9 Release checklist.** `docs/PRODUCTION_RELEASE_CHECKLIST.md:75-79` has two
   iOS-related bullets under the distribution heading (`:77`, `:78-79`); link
   them to this runbook once TH-099 merges. The `:77` bullet (choose final
   identifiers) is already decided by D3 (maintainers' records).
