@@ -23,7 +23,7 @@ const ROW = /^\| `(TH\d{3})` \| `([a-z_]+)` \| .* \| (.+) \|$/;
 /** The registry table's rows, raw: header, separator, then the body. */
 function readTable(): string[] {
   const doc = readFileSync(
-    join(__dirname, "..", "..", "docs", "contracts", "database.md"),
+    join(__dirname, "..", "..", "..", "docs", "contracts", "database.md"),
     "utf8",
   );
   const section = doc.split(/^## Error codes$/m)[1]?.split(/^## /m)[0] ?? "";

@@ -8,7 +8,7 @@ import 'package:breathefree_patient/tether/sync/sync_client.dart';
 import 'package:breathefree_patient/tether/sync/sync_mapper.dart';
 import 'package:breathefree_patient/tether/sync/sync_models.dart';
 
-/// The Dart client against a running instance of the service in `sync/`.
+/// The Dart client against a running instance of the service in `backend/sync/`.
 ///
 /// Everything else about sync is tested against a fake. This is the only test
 /// that proves the two halves agree — that the JSON this client builds is the

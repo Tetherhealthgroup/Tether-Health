@@ -447,7 +447,7 @@ not be able to execute it.
 
 Migration sources of truth: `supabase/migrations/202610180001_sync_tables.sql`
 and `supabase/migrations/202610180007_sync_truncate_guards.sql`.
-The `sync/` service stores plan and questionnaire answers and lapses here, per
+The `backend/sync/` service stores plan and questionnaire answers and lapses here, per
 programme. Enrolment and consent are not stored here: they stay in
 `enrolments` and `programme_consents`, so sync is never a second consent store.
 Every table below has row-level security enabled and forced; `anon` has no

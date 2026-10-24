@@ -4,7 +4,7 @@ import { join, relative, sep } from "node:path";
 /**
  * The API holds no Supabase service key and makes no Auth admin call:
  * account deletion runs with the member's own token. Scans every file under
- * api/src. The searched names are assembled from fragments so that this file
+ * backend/api/src. The searched names are assembled from fragments so that this file
  * does not contain them literally.
  */
 const SRC = join(__dirname, "..");

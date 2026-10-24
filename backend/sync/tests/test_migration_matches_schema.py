@@ -33,7 +33,7 @@ from sqlalchemy.schema import CreateTable
 from thsync.schema import SYNC_TABLES, metadata
 
 #: Repo-root `supabase/migrations`, where Supabase applies migrations from.
-MIGRATIONS = Path(__file__).resolve().parents[2] / "supabase" / "migrations"
+MIGRATIONS = Path(__file__).resolve().parents[3] / "supabase" / "migrations"
 
 #: The migration that creates the sync tables.
 SYNC_MIGRATION = MIGRATIONS / "202610180001_sync_tables.sql"

@@ -46,7 +46,7 @@ pytestmark = pytest.mark.postgres
 _URL = os.environ.get("THSYNC_TEST_DATABASE_URL", "")
 _SYNC_ROOT = Path(__file__).resolve().parents[1]
 _STAND_IN = _SYNC_ROOT / "tests" / "postgres" / "supabase_stand_in.sql"
-_MIGRATIONS = _SYNC_ROOT.parent / "supabase" / "migrations"
+_MIGRATIONS = _SYNC_ROOT.parent.parent / "supabase" / "migrations"
 _CONSENT_VERSION = "sync-test-1"
 
 

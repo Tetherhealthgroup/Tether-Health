@@ -1,4 +1,4 @@
-// The sandbox's copy of the sync service (`sync/thsync`): pull and push with
+// The sandbox's copy of the sync service (`backend/sync/thsync`): pull and push with
 // the same revision, area, consent and lapse rules and problem codes.
 import 'sandbox_api.dart';
 import 'sandbox_store.dart';

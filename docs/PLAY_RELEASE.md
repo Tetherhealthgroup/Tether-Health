@@ -80,9 +80,9 @@ build refuses to start (shows a configuration message) if either URL is
 missing, not https or a `.invalid` host. Debug runs also reject placeholder
 anon keys: use the anon key from a local `supabase start` or an
 `sb_publishable_` key. Which production API host to use depends on decision
-D2 (the app currently calls the NestJS `api/`); confirm before building.
+D2 (the app currently calls the NestJS `backend/api/`); confirm before building.
 D2 was decided 2026-10-12 (production is `Tether-Health-Backend`), but the app
-still calls `api/`, so the app has not yet been moved onto the decided backend.
+still calls `backend/api/`, so the app has not yet been moved onto the decided backend.
 
 ## 4. Build
 
@@ -189,7 +189,7 @@ request deletion of the account and data.
 - In-app: Observed. Settings has "Delete account and data"
   (`lib/screens/settings_privacy_screen.dart`, wired to
   `_deleteAccountData` in `lib/screens/approved_screen_player.dart`), backed by
-  `DELETE /v1/account/data` in `api/src/account/account.controller.ts`.
+  `DELETE /v1/account/data` in `backend/api/src/account/account.controller.ts`.
 - Web URL: **Not found.** No dedicated deletion page exists in the website
   repo (`project/src/pages/` on `master`: privacy, support, terms, ...);
   `privacy.astro` only says deletion can be requested.

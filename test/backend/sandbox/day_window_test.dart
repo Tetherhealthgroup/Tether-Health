@@ -1,4 +1,4 @@
-// The day window, with the API's unit cases (api/src/today/
+// The day window, with the API's unit cases (backend/api/src/today/
 // today.service.spec.ts). Dart has no zone database, so the two zones of
 // those cases are given as rules here.
 import 'package:breathefree_patient/backend/sandbox/day_window.dart';

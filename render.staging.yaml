@@ -14,7 +14,7 @@ services:
     runtime: node
     plan: free
     region: oregon
-    rootDir: api
+    rootDir: backend/api
     buildCommand: npm ci --include=dev && npm run build && npm prune --omit=dev
     startCommand: node dist/main.js
     healthCheckPath: /health
@@ -34,7 +34,7 @@ services:
     runtime: python
     plan: free
     region: oregon
-    rootDir: sync
+    rootDir: backend/sync
     buildCommand: pip install --require-hashes -r requirements-lock.txt
     startCommand: uvicorn --factory thsync.app:create_app --host 0.0.0.0 --port $PORT
     healthCheckPath: /v1/health

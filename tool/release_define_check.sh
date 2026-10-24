@@ -130,7 +130,7 @@ JWT_SEGMENT = re.compile(r"[A-Za-z0-9_-]+={0,2}")
 #   SUPABASE_SERVICE_ROLE_KEY    not read by the release scripts or app_config.
 #                                The Supabase service key name; the API refuses
 #                                to start while it is set
-#                                (api/src/config/environment.ts). Listed
+#                                (backend/api/src/config/environment.ts). Listed
 #                                so that the mistake this check exists to catch
 #                                (an sb_secret_ value pasted under that name)
 #                                is reported by its name (R1). The name is a

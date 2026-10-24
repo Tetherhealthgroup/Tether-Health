@@ -27,10 +27,10 @@ import 'settings_data.dart';
 
 /// The service that serves an endpoint. One per endpoint.
 enum OwnerService {
-  /// The app's NestJS API (`api/`).
+  /// The app's NestJS API (`backend/api/`).
   api,
 
-  /// The sync service (`sync/`), through push and pull.
+  /// The sync service (`backend/sync/`), through push and pull.
   sync,
 
   /// Supabase Auth.

@@ -1,4 +1,4 @@
-// The wire types of the sync service (`sync/thsync/wire.py`).
+// The wire types of the sync service (`backend/sync/thsync/wire.py`).
 //
 // A bundle is one programme's sync data: its answers, keyed by the full
 // `programme/screenId`, and its append-only lapses. Enrolment and consent are

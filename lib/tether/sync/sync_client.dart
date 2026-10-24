@@ -1,4 +1,4 @@
-/// The client for the sync service in `sync/`.
+/// The client for the sync service in `backend/sync/`.
 ///
 /// Four calls, matching the four the service exposes: pull, push, revoke one
 /// programme, erase everything. There is deliberately no `sync()` that does

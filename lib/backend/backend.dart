@@ -17,10 +17,10 @@ export '../config/app_config.dart' show BackendMode;
 
 /// The service a request goes to.
 enum BackendService {
-  /// The app's API (`api/`), under `API_BASE_URL`.
+  /// The app's API (`backend/api/`), under `API_BASE_URL`.
   api,
 
-  /// The sync service (`sync/thsync`), under `SYNC_BASE_URL`.
+  /// The sync service (`backend/sync/thsync`), under `SYNC_BASE_URL`.
   sync,
 }
 

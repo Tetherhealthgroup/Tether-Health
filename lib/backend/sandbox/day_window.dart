@@ -1,4 +1,4 @@
-// The member's calendar day, ported from the API (`api/src/today/
+// The member's calendar day, ported from the API (`backend/api/src/today/
 // day-window.ts`): today's local date, its bounds, and the last 7 days.
 //
 // Dart has no time-zone database, so the zone's offset is a function

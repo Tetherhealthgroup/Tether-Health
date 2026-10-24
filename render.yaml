@@ -5,7 +5,7 @@ services:
     plan: free
     region: oregon
     branch: develop
-    rootDir: api
+    rootDir: backend/api
     buildCommand: npm ci --include=dev && npm run build && npm prune --omit=dev
     startCommand: node dist/main.js
     healthCheckPath: /health

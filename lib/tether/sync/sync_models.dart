@@ -1,6 +1,6 @@
 /// The wire types the sync service speaks.
 ///
-/// These mirror `sync/thsync/wire.py` and deliberately keep its two naming
+/// These mirror `backend/sync/thsync/wire.py` and deliberately keep its two naming
 /// conventions rather than harmonising them: fields that came out of the
 /// session document stay camelCase (`joinedOn`, `totalsAndAdherence`) because
 /// they are copied to and from [TetherSession.toJson] verbatim, and fields the

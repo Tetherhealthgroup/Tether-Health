@@ -21,7 +21,7 @@ keys for new projects; the legacy symmetric `JWT_SECRET` belongs to older ones.
 That matters because the sync service originally only did HS256, so **no token
 from this project would ever have verified**. It now supports both families and
 chooses between them from configuration — never from the token's own header,
-which is the algorithm confusion bug. `sync/tests/test_auth_jwks.py` forges
+which is the algorithm confusion bug. `backend/sync/tests/test_auth_jwks.py` forges
 exactly that attack, by hand, and asserts it is refused.
 
 Verifying against the JWKS is also strictly better than a shared secret: the
@@ -53,7 +53,7 @@ in the morning.
 
 ## Migrations live in `supabase/migrations/`
 
-Not in `sync/`. Branching applies whatever is in that directory when it builds
+Not in `backend/sync/`. Branching applies whatever is in that directory when it builds
 a preview branch and when it deploys production; DDL kept anywhere else would
 mean every branch came up with an empty database while the tests stayed green.
 
@@ -119,5 +119,5 @@ Not verified:
 - Nothing has been created, changed or deleted in the Supabase project. No
   branch exists yet; the dashboard steps above are untouched.
 - The migration has still never run on a Postgres server locally — see
-  `sync/README.md` for why (the sandbox denies `shmget`, so `initdb` cannot
+  `backend/sync/README.md` for why (the sandbox denies `shmget`, so `initdb` cannot
   bootstrap a cluster). The CI job above is where that first happens.

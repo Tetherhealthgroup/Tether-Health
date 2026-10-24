@@ -25,10 +25,10 @@ ship, these answers must be redone.
 |---|---|---|---|
 | Email address, password | Creating an account or signing in (optional; guests skip it) | Supabase Auth | `lib/auth/auth_gateway.dart:129-132` (sign in), `:150-154` (sign up), `:180-184` (password reset email) |
 | User ID (account UUID), session tokens | Signed in | Held on the device in the Keychain/Keystore-backed secure store; sent to the API as a bearer token | `lib/auth/auth_gateway.dart:6-16`, `lib/auth/secure_session_storage.dart:9,22-23`, `lib/auth/auth_deep_link.dart:49-56` |
-| Display name | Member edits their profile | API `PATCH /v1/profile` | `lib/profile/profile_api_client.dart:41`, `lib/auth/account_controller.dart:110`; limit 80 characters `api/src/profile/profile.dto.ts:12-20` |
+| Display name | Member edits their profile | API `PATCH /v1/profile` | `lib/profile/profile_api_client.dart:41`, `lib/auth/account_controller.dart:110`; limit 80 characters `backend/api/src/profile/profile.dto.ts:12-20` |
 | Profile photo | Member picks one (optional) | Private Supabase Storage bucket `avatars`, path `<userId>/avatar` | Gallery only: `lib/widgets/profile_editor_dialog.dart:54-59`; upload: `lib/profile/avatar_storage.dart:26-34`; bucket is private: `supabase/migrations/202609110001_profiles.sql:87-88` |
 | Quit plan (BreatheFree): daily cigarette use, triggers, reasons, quit date, readiness, preparation tasks, support-option choices, free-text custom reason and trigger | Signed-in member saves the plan | API `GET`/`PUT /v1/quit-plan`, `POST /v1/quit-plan/guest-import` | `lib/quit_plan/quit_plan.dart:107-123`, `lib/quit_plan/quit_plan_api_client.dart:35-55` |
-| Names of support people, their relationship and preferred channel (text or call; no phone numbers) | Signed-in member adds them to the quit plan | API, inside the quit plan | `api/src/quit-plan/quit-plan.dto.ts:78-93` |
+| Names of support people, their relationship and preferred channel (text or call; no phone numbers) | Signed-in member adds them to the quit plan | API, inside the quit plan | `backend/api/src/quit-plan/quit-plan.dto.ts:78-93` |
 | Heartwise: blood pressure (systolic, diastolic, time, note), cholesterol panels | Signed-in member logs them | API `PUT /v1/program-data/heartwise` | `lib/programs/heartwise/models/bp_reading.dart:29-34`, `lib/programs/heartwise/models/cholesterol_panel.dart:41-48`, `lib/programs/program_data_api_client.dart:42,69` |
 | Steady: glucose readings (mg/dL, context, time, note), target range | Signed-in member logs them | API `PUT /v1/program-data/steady` | `lib/programs/steady/models/glucose_reading.dart:44-49`, `lib/programs/steady/models/target_range.dart:29-33` |
 | ClearAir: action-plan zone, symptom logs, peak flow | Signed-in member logs them | API `PUT /v1/program-data/clearair` | `lib/programs/clearair/models/action_plan.dart:40-44`, `lib/programs/clearair/models/symptom_log.dart:34-39` |
@@ -54,7 +54,7 @@ the device (`lib/programs/secure_program_store.dart:40,154-156`,
   release app does not call them.
 - **Health records, Apple Health, Health Connect.** No HealthKit entitlement
   (`ios/Runner/Release.entitlements`), no Health Connect permission, no health
-  plugin, no FHIR route in `api/src`.
+  plugin, no FHIR route in `backend/api/src`.
 - **Push or local notifications.** No notification plugin, no `aps-environment`
   entitlement, no `POST_NOTIFICATIONS` permission.
 
@@ -76,9 +76,9 @@ the device (`lib/programs/secure_program_store.dart:40,154-156`,
 - **On the device:** sessions, the guest quit plan and program data are kept in
   `flutter_secure_storage` (iOS Keychain; Android encrypted storage).
 - **Server side:** the API requires an https Supabase URL in production
-  (`api/src/config/environment.ts:209-217`), verifies tokens against Supabase
-  (`api/src/auth/token-verifier.ts:40-48`) and logs no request bodies or IP
-  addresses (`api/src/common/privacy-exception.filter.ts:42-54`).
+  (`backend/api/src/config/environment.ts:209-217`), verifies tokens against Supabase
+  (`backend/api/src/auth/token-verifier.ts:40-48`) and logs no request bodies or IP
+  addresses (`backend/api/src/common/privacy-exception.filter.ts:42-54`).
 
 ## Deletion and export
 
@@ -90,14 +90,14 @@ the device (`lib/programs/secure_program_store.dart:40,154-156`,
   `DELETE /v1/account/data` (`lib/account/account_data_api_client.dart:106-125`).
 - **On the server:** a recent sign-in is required, avatar files are removed,
   then all app data rows and the sign-in identity are deleted in one
-  transaction (`api/src/account/account.service.ts:114-181`,
+  transaction (`backend/api/src/account/account.service.ts:114-181`,
   `supabase/migrations/202610180008_delete_my_account.sql:96-103`).
 - **On the device:** local program data, guest plan and language choice are
   wiped (`lib/main.dart:429-448`).
 - **Export:** `GET /v1/account/export` after re-entering the password returns
   profile, quit plan and program data, shown as JSON that can be copied
   (`lib/account/account_data_api_client.dart:100-103`,
-  `api/src/account/account.service.ts:69-106`).
+  `backend/api/src/account/account.service.ts:69-106`).
 - **Web deletion URL (Play requires one): not published.** A draft page exists
   in the website repository but is excluded from the build until counsel signs
   off. **Blocker.**

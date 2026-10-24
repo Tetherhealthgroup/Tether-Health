@@ -28,7 +28,16 @@ interface OpenApiDocument {
 
 const document = yaml.load(
   readFileSync(
-    join(__dirname, "..", "..", "..", "docs", "contracts", "openapi.yaml"),
+    join(
+      __dirname,
+      "..",
+      "..",
+      "..",
+      "..",
+      "docs",
+      "contracts",
+      "openapi.yaml",
+    ),
     "utf8",
   ),
 ) as OpenApiDocument;

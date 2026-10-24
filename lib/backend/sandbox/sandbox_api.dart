@@ -1,5 +1,5 @@
 // The sandbox's copy of the API routes the app calls: the same paths,
-// validation, statuses and problem codes as `api/`, over the synthetic data
+// validation, statuses and problem codes as `backend/api/`, over the synthetic data
 // of the signed-in sandbox account.
 import 'day_window.dart';
 import 'sandbox_store.dart';

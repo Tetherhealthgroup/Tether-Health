@@ -16,7 +16,7 @@ import { ANSWERS, FEEL, HELPED, STRESS } from "./records-events.dto";
  * wellbeing_baseline_age_range_check and the stored notification defaults.
  * A change on either side fails here until the API follows it.
  */
-const ROOT = join(__dirname, "..", "..", "..");
+const ROOT = join(__dirname, "..", "..", "..", "..");
 const SPEC = join(ROOT, "specs-and-design", "tether_ui", "spec");
 const MIGRATIONS = join(ROOT, "supabase", "migrations");
 const read = <T>(name: string): T =>

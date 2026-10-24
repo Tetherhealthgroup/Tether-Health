@@ -350,14 +350,14 @@ void main() {
         'docs/a.md',
         'build/out.txt',
         '.dart_tool/x.json',
-        'api/node_modules/p/index.js',
+        'backend/api/node_modules/p/index.js',
         'pubspec.lock',
-        'api/package-lock.json',
+        'backend/api/package-lock.json',
         'ios/Flutter/Generated.xcconfig',
         'ios/Flutter/ephemeral/flutter_native_integration.env',
         '.flutter-plugins-dependencies',
         '.env',
-        'api/.env.local',
+        'backend/api/.env.local',
         'android/app/.cxx/Debug/x.txt',
       ]) {
         File('${tmp.path}/$p')

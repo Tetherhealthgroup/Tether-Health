@@ -172,17 +172,17 @@ is recorded as gap G-10 in section 2.
   (`lib/screens/approved_screen_player.dart:709-732`, `lib/main.dart:393-404`),
   which calls `DELETE /v1/account/data` with `{"confirmation": "DELETE"}`
   (`lib/account/account_data_api_client.dart:106-113`).
-- Server: `api/src/account/account.controller.ts` →
-  `AccountService.deleteData` (`api/src/account/account.service.ts`), all with
+- Server: `backend/api/src/account/account.controller.ts` →
+  `AccountService.deleteData` (`backend/api/src/account/account.service.ts`), all with
   the member's own token: the `begin_account_deletion` barrier RPC, avatar
-  removal through Storage (`api/src/account/avatar-objects.ts`), then the
+  removal through Storage (`backend/api/src/account/avatar-objects.ts`), then the
   `delete_my_account` RPC, which deletes the app data and hard-deletes the
   Supabase Auth user in one transaction
   (`supabase/migrations/202610180008_delete_my_account.sql`).
 - Rule (Assumed, confirm against App Review Guideline **5.1.1(v)** Account
   Sign-In): an app that supports account creation must let users start
   account deletion inside the app. The code path exists in this repo.
-- **This server path is the NestJS `api/` at `f06b7c7`, not production.**
+- **This server path is the NestJS `backend/api/` at `f06b7c7`, not production.**
   Under owner decision D2 (maintainers' records), production is
   Tether-Health-Backend and the app must be moved onto it. There, Auth-user
   deletion is BE-047 and the client move is TH-103; both are Blocked. Whether
@@ -262,7 +262,7 @@ Each is a proposed ticket for the maintainers to file. None was changed here.
   must be built with a minimum Xcode and iOS SDK. Pin and record the Xcode
   version used for the store build.
 - **G-8 Deletion against production.** The deletion path in this repo targets
-  the NestJS `api/`; production is Tether-Health-Backend (D2), where deletion
+  the NestJS `backend/api/`; production is Tether-Health-Backend (D2), where deletion
   lands with BE-047 and the client move with TH-103 (both Blocked). After
   those merge, add a smoke test on a synthetic account against whichever
   backend production actually uses, confirming the Auth user is gone (owner

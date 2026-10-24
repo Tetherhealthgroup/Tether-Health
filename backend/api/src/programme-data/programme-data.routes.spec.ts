@@ -15,6 +15,7 @@ const MIGRATION = readFileSync(
     "..",
     "..",
     "..",
+    "..",
     "supabase",
     "migrations",
     "202610180013_programme_records.sql",

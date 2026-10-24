@@ -60,7 +60,7 @@ void main() {
     test('the API service', () {
       final api = service('tether-api-staging');
       expect(api['runtime'], 'node');
-      expect(api['rootDir'], 'api');
+      expect(api['rootDir'], 'backend/api');
       expect(api['healthCheckPath'], '/health');
       expect(api['startCommand'], 'node dist/main.js');
       expect(
@@ -80,7 +80,7 @@ void main() {
     test('the thsync service', () {
       final sync = service('tether-thsync-staging');
       expect(sync['runtime'], 'python');
-      expect(sync['rootDir'], 'sync');
+      expect(sync['rootDir'], 'backend/sync');
       expect(sync['healthCheckPath'], '/v1/health');
       expect(sync['buildCommand'],
           'pip install --require-hashes -r requirements-lock.txt');

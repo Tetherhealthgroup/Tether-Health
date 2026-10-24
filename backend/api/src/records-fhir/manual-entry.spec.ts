@@ -12,7 +12,16 @@ import {
 import { parseItemsQuery } from "./records-fhir.service";
 
 const NOW = Date.parse("2026-10-22T10:00:00.000Z");
-const SPEC = join(__dirname, "..", "..", "..", "specs-and-design", "tether_ui", "spec");
+const SPEC = join(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  "..",
+  "specs-and-design",
+  "tether_ui",
+  "spec",
+);
 const rules = JSON.parse(
   readFileSync(join(SPEC, "rules.json"), "utf8"),
 ) as Record<string, { inputs: string[]; params: Record<string, unknown> }>;
