@@ -168,7 +168,7 @@ const allowedRuntimePackages = <String, String>{
   'supabase_flutter':
       'Our Supabase project (vendor/processor; BAA/DPA status to confirm).',
   'tether_ui':
-      'First-party UI package in this repo (tether_ui/flutter); no third-party '
+      'First-party UI package in this repo (specs-and-design/tether_ui/flutter); no third-party '
           'code, Flutter SDK only (owner decision P-01).',
   'url_launcher':
       'Opens the dialer for 988, 911 and the quitlines, and support URLs; it '
@@ -440,7 +440,7 @@ String? sourceViolation(LockedPackage package) {
 
 /// The one path dependency outside `third_party/`: the first-party UI
 /// package. Matched by string equality only.
-const uiPackagePath = 'tether_ui/flutter';
+const uiPackagePath = 'specs-and-design/tether_ui/flutter';
 
 /// Why the UI package's pubspec ([uiPackagePath]`/pubspec.yaml`) may ship
 /// something other than the Flutter SDK, or an empty list. Its `dependencies:`
@@ -2369,22 +2369,27 @@ gms = { id = "com.google.gms.google-services", version = "4.4.2" }
           ..descriptionFields['path'] = path
           ..descriptionFields['relative'] = '$relative';
 
-    test('only the relative path tether_ui/flutter is accepted', () {
-      expect(sourceViolation(pathPackage('tether_ui/flutter')), isNull);
+    test(
+        'only the relative path specs-and-design/tether_ui/flutter is accepted',
+        () {
+      expect(sourceViolation(pathPackage('specs-and-design/tether_ui/flutter')),
+          isNull);
       for (final path in [
-        'tether_ui/other',
-        '../tether_ui/flutter',
-        'tether_ui/flutter/',
-        './tether_ui/flutter',
-        'tether_ui/flutter/..',
-        'tether_ui',
-        'Tether_ui/flutter',
-        r'tether_ui\flutter',
+        'specs-and-design/tether_ui/other',
+        '../specs-and-design/tether_ui/flutter',
+        'specs-and-design/tether_ui/flutter/',
+        './specs-and-design/tether_ui/flutter',
+        'specs-and-design/tether_ui/flutter/..',
+        'specs-and-design/tether_ui',
+        'specs-and-design/Tether_ui/flutter',
+        r'specs-and-design\tether_ui\flutter',
+        'tether_ui/flutter',
       ]) {
         expect(sourceViolation(pathPackage(path)), isNotNull, reason: path);
       }
       expect(
-        sourceViolation(pathPackage('tether_ui/flutter', relative: false)),
+        sourceViolation(
+            pathPackage('specs-and-design/tether_ui/flutter', relative: false)),
         isNotNull,
       );
     });

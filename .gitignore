@@ -52,16 +52,16 @@ macos/Flutter/ephemeral/
 # Generated local runner files can be recreated with tool/setup_*.
 
 # tether_ui (TH-906): PNG renders are not committed (P-18); regenerate them
-# with tether_ui/generator/build_all.py --images. Python caches and the
+# with specs-and-design/tether_ui/generator/build_all.py --images. Python caches and the
 # package lock file stay untracked: the generator deletes and recreates
-# tether_ui/flutter/ on every run, and the package has no third-party deps.
-tether_ui/screens/png/
-tether_ui/screens/sheets/
-tether_ui/flows/png/
-tether_ui/screens/**/*.png
-tether_ui/flows/**/*.png
-tether_ui/**/__pycache__/
-tether_ui/flutter/pubspec.lock
+# specs-and-design/tether_ui/flutter/ on every run, and the package has no third-party deps.
+specs-and-design/tether_ui/screens/png/
+specs-and-design/tether_ui/screens/sheets/
+specs-and-design/tether_ui/flows/png/
+specs-and-design/tether_ui/screens/**/*.png
+specs-and-design/tether_ui/flows/**/*.png
+specs-and-design/tether_ui/**/__pycache__/
+specs-and-design/tether_ui/flutter/pubspec.lock
 
 # Fastlane store credentials. Every one of these is a key that can publish as
 # us, so none of them belongs in the repository. See docs/releasing.md.

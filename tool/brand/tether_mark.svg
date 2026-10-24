@@ -5,12 +5,12 @@
   regenerates all outputs from them; edit this file, then rerun the script.
 
   Source: the logo in the tether_ui design (header "logo" on the Welcome and
-  Today screens, tether_ui/generator/render_html.py):
+  Today screens, specs-and-design/tether_ui/generator/render_html.py):
     .logo i         32x32 circle, background var(teal) #123C37
     .logo i::after  width 14px, height 9px, border 2.6px solid var(lime)
                     #D5EF75, border-radius 14px 0 14px 0, rotate(-30deg),
                     centred in the circle
-  Colours are tokens teal and lime in tether_ui/design/tokens.json.
+  Colours are tokens teal and lime in specs-and-design/tether_ui/design/tokens.json.
   The ::after box is content-box (the kit's border-box reset matches elements,
   not pseudo-elements), so the leaf's outer edge is 19.2 x 14.2 with 14px
   top-left and bottom-right radii, and its inner edge is 14 x 9 with 9px

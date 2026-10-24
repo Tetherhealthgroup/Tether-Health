@@ -14,18 +14,19 @@ import 'package:tether_ui/ui/ui.dart';
 const _canary = 'canary-synthetic-user-01-bp-187-121';
 
 List<Map<String, dynamic>> _specEndpoints() =>
-    (jsonDecode(File('tether_ui/spec/endpoints.json').readAsStringSync())
-            as List<dynamic>)
+    (jsonDecode(File('specs-and-design/tether_ui/spec/endpoints.json')
+            .readAsStringSync()) as List<dynamic>)
         .cast<Map<String, dynamic>>();
 
 /// Every endpoint the generated screens submit.
 Set<String> _generatedSubmits() {
   final submit = RegExp(r"TNav\.submit\(context, '([^']+)'");
   return {
-    for (final file in Directory('tether_ui/flutter/lib/screens')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((f) => f.path.endsWith('.dart')))
+    for (final file
+        in Directory('specs-and-design/tether_ui/flutter/lib/screens')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('.dart')))
       ...submit
           .allMatches(file.readAsStringSync())
           .map((match) => match.group(1)!),
@@ -104,7 +105,7 @@ void main() {
 
     test('match the submits in spec/actions.json', () {
       final actions = (jsonDecode(
-        File('tether_ui/spec/actions.json').readAsStringSync(),
+        File('specs-and-design/tether_ui/spec/actions.json').readAsStringSync(),
       ) as List<dynamic>)
           .cast<Map<String, dynamic>>();
       final summaries = actions.map((a) => a['summary'] as String).join('\n');
@@ -178,7 +179,7 @@ void main() {
     test('every endpoint submitted from a password screen scrubs passwords',
         () {
       final screens = jsonDecode(
-        File('tether_ui/spec/screens.json').readAsStringSync(),
+        File('specs-and-design/tether_ui/spec/screens.json').readAsStringSync(),
       ) as Map<String, dynamic>;
       Set<String> keysOf(Object? node) => switch (node) {
             {'key': final String key} && final Map<String, dynamic> map => {
@@ -211,7 +212,7 @@ void main() {
 
     test("declared extra keys never belong to another programme's screen", () {
       final screens = jsonDecode(
-        File('tether_ui/spec/screens.json').readAsStringSync(),
+        File('specs-and-design/tether_ui/spec/screens.json').readAsStringSync(),
       ) as Map<String, dynamic>;
       String? programOf(String screenId) =>
           (screens[screenId] as Map<String, dynamic>?)?['program'] as String?;

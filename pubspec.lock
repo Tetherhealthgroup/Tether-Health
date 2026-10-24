@@ -860,7 +860,7 @@ packages:
   tether_ui:
     dependency: "direct main"
     description:
-      path: "tether_ui/flutter"
+      path: "specs-and-design/tether_ui/flutter"
       relative: true
     source: path
     version: "1.0.0+1"

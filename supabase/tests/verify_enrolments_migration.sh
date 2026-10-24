@@ -12,7 +12,7 @@
 set -euo pipefail
 
 migration="supabase/migrations/202610170002_enrolments.sql"
-programs_spec="tether_ui/spec/programs.json"
+programs_spec="specs-and-design/tether_ui/spec/programs.json"
 
 print_sql() {
   cat <<'SQL'

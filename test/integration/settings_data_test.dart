@@ -16,7 +16,8 @@ import 'package:tether_ui/ui/ui.dart';
 import '../backend/sandbox/support.dart';
 
 Set<String> _kitSet(String name) {
-  final text = File('tether_ui/flutter/lib/router/settings_screens.dart')
+  final text = File(
+          'specs-and-design/tether_ui/flutter/lib/router/settings_screens.dart')
       .readAsStringSync();
   final block =
       RegExp('$name = <String>\\{([^}]*)\\}').firstMatch(text)!.group(1)!;

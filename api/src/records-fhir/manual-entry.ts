@@ -7,7 +7,7 @@ import { rangesFor } from "../programme-data/ranges";
  *
  * The code list is a curated subset (LOINC for the measured values). It is
  * an assumption until clinical and informatics sign-off; the plausibility
- * ranges are tether_ui/spec/rules.json `rec.manual` (lab values) and `hw.bp`
+ * ranges are specs-and-design/tether_ui/spec/rules.json `rec.manual` (lab values) and `hw.bp`
  * (blood pressure), checked by records-fhir-spec-parity.spec.ts. They are
  * plausibility ranges, not clinical targets.
  */

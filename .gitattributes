@@ -1,14 +1,14 @@
-# TH-980: tether_ui/ is checked byte-for-byte. The approved-screen guard
+# TH-980: specs-and-design/tether_ui/ is checked byte-for-byte. The approved-screen guard
 # (test/tether_ui/approved_design_parity_test.dart) hashes the raw bytes of
-# tether_ui/spec/screens/*.json, and CI diffs a regeneration against the tree
+# specs-and-design/tether_ui/spec/screens/*.json, and CI diffs a regeneration against the tree
 # with `diff -r`. Pin LF so a checkout with core.autocrlf=true (Git for
 # Windows default) does not rewrite those bytes.
-tether_ui/** text eol=lf
+specs-and-design/tether_ui/** text eol=lf
 
 # The generator writes CSV with Python's csv module, whose default line ending
 # is CRLF, and that is what is committed. Never convert it.
-tether_ui/**/*.csv -text
+specs-and-design/tether_ui/**/*.csv -text
 
 # PNG renders are gitignored (TH-906) but generated in place; if one is ever
 # force-added it must not be treated as text.
-tether_ui/**/*.png binary
+specs-and-design/tether_ui/**/*.png binary

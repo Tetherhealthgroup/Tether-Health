@@ -10,7 +10,7 @@ import build_proto as B, gen_dart as G, sim, mapping
 from render_html import CSS, render_screen
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.dirname(HERE) if os.path.basename(HERE) == 'generator' else os.path.abspath('tether_ui')
+OUT = os.path.dirname(HERE) if os.path.basename(HERE) == 'generator' else os.path.abspath(os.path.join('specs-and-design', 'tether_ui'))
 
 def w(path, content):
     p = os.path.join(OUT, path); os.makedirs(os.path.dirname(p), exist_ok=True)

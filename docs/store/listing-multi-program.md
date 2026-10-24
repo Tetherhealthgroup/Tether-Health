@@ -8,8 +8,8 @@ does not have. The live drafts are `metadata/android/en-US/` and
 `ios/fastlane/metadata/en-US/`.
 
 Program names, areas and purposes come from the design
-(`tether_ui/spec/programs.json` and each program's intro screen in
-`tether_ui/spec/l10n/en.arb`). Wording that could read as a health outcome
+(`specs-and-design/tether_ui/spec/programs.json` and each program's intro screen in
+`specs-and-design/tether_ui/spec/l10n/en.arb`). Wording that could read as a health outcome
 claim was left out (for example Beacon's design tagline "Lower your risk").
 Needs clinical and legal review before use.
 

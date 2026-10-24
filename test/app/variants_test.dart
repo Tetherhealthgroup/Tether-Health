@@ -33,7 +33,7 @@ void main() {
 
   test('each pair is an Android variant of its screen in the spec', () {
     final screens = jsonDecode(
-      File('tether_ui/spec/screens.json').readAsStringSync(),
+      File('specs-and-design/tether_ui/spec/screens.json').readAsStringSync(),
     ) as Map<String, dynamic>;
     for (final MapEntry(:key, :value) in androidRouteVariants.entries) {
       final base = screens[idOf[key]] as Map<String, dynamic>;

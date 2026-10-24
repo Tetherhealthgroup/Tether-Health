@@ -14,7 +14,7 @@ import { PROGRAMME_CODE } from "./records-access";
 
 // Request bodies of the records event routes. Unknown keys are refused (400
 // invalid_request). Option values are slug(label) of the spec's labels; the
-// parity test derives each list from tether_ui/spec/screens.json.
+// parity test derives each list from specs-and-design/tether_ui/spec/screens.json.
 
 /** `checkin` "How do you feel today?" */
 export const FEEL = ["low", "not_great", "okay", "good", "great"] as const;

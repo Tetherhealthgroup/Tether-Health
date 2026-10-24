@@ -10,14 +10,14 @@ import { slug } from "../programme-data/option-codes";
 import { ANSWERS, FEEL, HELPED, STRESS } from "./records-events.dto";
 
 /**
- * Parity with the app spec (tether_ui/spec) and the migrations
+ * Parity with the app spec (specs-and-design/tether_ui/spec) and the migrations
  * (supabase/migrations): every option list of the check-in, rescue result
  * and basics screens, the endpoints, the age bands of the latest
  * wellbeing_baseline_age_range_check and the stored notification defaults.
  * A change on either side fails here until the API follows it.
  */
 const ROOT = join(__dirname, "..", "..", "..");
-const SPEC = join(ROOT, "tether_ui", "spec");
+const SPEC = join(ROOT, "specs-and-design", "tether_ui", "spec");
 const MIGRATIONS = join(ROOT, "supabase", "migrations");
 const read = <T>(name: string): T =>
   JSON.parse(readFileSync(join(SPEC, name), "utf8")) as T;

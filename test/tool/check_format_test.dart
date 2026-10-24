@@ -60,7 +60,7 @@ void main() {
     expect(output(r), contains('drift.dart'));
   });
 
-  for (final excluded in ['third_party', 'tether_ui']) {
+  for (final excluded in ['third_party', 'specs-and-design/tether_ui']) {
     test('ignores an unformatted file under top-level $excluded/', () {
       write('$excluded/pkg/lib/unformatted.dart', _unformatted);
       final r = run();

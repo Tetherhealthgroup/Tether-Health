@@ -1,6 +1,6 @@
 /**
  * Option codes of the programme event screens. A code is `slug(label)` of
- * the option label in tether_ui/spec/screens.json; the parity test derives
+ * the option label in specs-and-design/tether_ui/spec/screens.json; the parity test derives
  * every list from the spec, so a label change there fails the test until
  * the list here follows it.
  */

@@ -1,13 +1,13 @@
-// Checks the screens in tether_ui/spec/screens against the owner-approved
-// registry in tether_ui/approved/ (manifest, deviations, additions). Kept free
+// Checks the screens in specs-and-design/tether_ui/spec/screens against the owner-approved
+// registry in specs-and-design/tether_ui/approved/ (manifest, deviations, additions). Kept free
 // of file access so approved_design_parity_test.dart can run it on the real
-// tree and on small synthetic fixtures. Procedure: tether_ui/approved/README.md.
+// tree and on small synthetic fixtures. Procedure: specs-and-design/tether_ui/approved/README.md.
 
 import 'dart:convert';
 import 'dart:typed_data';
 
-const approvedDir = 'tether_ui/approved';
-const screensDir = 'tether_ui/spec/screens';
+const approvedDir = 'specs-and-design/tether_ui/approved';
+const screensDir = 'specs-and-design/tether_ui/spec/screens';
 
 const _procedure =
     'Do not change approved screens without an owner decision: get an owner '

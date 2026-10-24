@@ -6,12 +6,12 @@ import { PROGRAMME_ROUTES, routeName } from "./programme-data.routes";
 import { SPEC_RULES } from "./ranges";
 
 /**
- * Parity with the app spec (tether_ui/spec): the routes and their screens
+ * Parity with the app spec (specs-and-design/tether_ui/spec): the routes and their screens
  * (endpoints.json), every option list and every screen input
  * (screens.json), and every range (rules.json). A spec change fails here
  * until the API follows it.
  */
-const SPEC = join(__dirname, "..", "..", "..", "tether_ui", "spec");
+const SPEC = join(__dirname, "..", "..", "..", "specs-and-design", "tether_ui", "spec");
 const read = <T>(name: string): T =>
   JSON.parse(readFileSync(join(SPEC, name), "utf8")) as T;
 

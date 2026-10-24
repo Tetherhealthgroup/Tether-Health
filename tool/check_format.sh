@@ -1,11 +1,12 @@
 #!/bin/sh
 # Canonical Dart format check. Never rewrites files.
 # Checks every .dart file under the repo root, found by walking the filesystem
-# (tracked and untracked alike), except those under top-level third_party/,
-# tether_ui/ and build/ (anchored to the repo root, so first-party dirs of the
-# same name deeper in the tree are still checked) and hidden directories at any
-# depth, such as .dart_tool/. tether_ui/ is generated code, not dart-formatted;
-# the CI regeneration diff check keeps it identical to the generator output.
+# (tracked and untracked alike), except those under third_party/,
+# specs-and-design/tether_ui/ and build/ (anchored to the repo root, so
+# first-party dirs of the same name deeper in the tree are still checked) and
+# hidden directories at any depth, such as .dart_tool/.
+# specs-and-design/tether_ui/ is generated code, not dart-formatted; the CI
+# regeneration diff check keeps it identical to the generator output.
 # Requires `flutter pub get` to have run: without .dart_tool/package_config.json
 # dart format cannot resolve the language version and reports false changes, so
 # the script exits 2 in that case.
@@ -26,7 +27,7 @@ files=$(mktemp)
 trap 'rm -f "$files"' EXIT
 
 find . \
-  \( -path ./third_party -o -path ./tether_ui -o -path ./build -o -path ./code-develop -o -path ./code-unplug -o -name '.?*' \) -prune -o \
+  \( -path ./third_party -o -path ./specs-and-design/tether_ui -o -path ./build -o -path ./code-develop -o -path ./code-unplug -o -name '.?*' \) -prune -o \
   -type f -name '*.dart' -print0 > "$files"
 
 if [ ! -s "$files" ]; then

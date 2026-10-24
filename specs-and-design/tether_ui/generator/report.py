@@ -9,7 +9,7 @@ from rules import SCENARIOS, RULES
 import sim
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.dirname(HERE) if os.path.basename(HERE) == 'generator' else os.path.abspath('tether_ui')
+OUT = os.path.dirname(HERE) if os.path.basename(HERE) == 'generator' else os.path.abspath(os.path.join('specs-and-design', 'tether_ui'))
 
 def flutter_results(path):
     tests, res, files = {}, {}, {}

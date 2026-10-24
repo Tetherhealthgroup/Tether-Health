@@ -22,10 +22,10 @@ void main() {
       );
 
   test('every question in branches.json, and every TAsk, has an owner', () {
-    final branches =
-        (jsonDecode(File('tether_ui/spec/branches.json').readAsStringSync())
-                as List<dynamic>)
-            .cast<Map<String, dynamic>>();
+    final branches = (jsonDecode(
+            File('specs-and-design/tether_ui/spec/branches.json')
+                .readAsStringSync()) as List<dynamic>)
+        .cast<Map<String, dynamic>>();
     final asked = {
       for (final b in branches)
         if (b['ask'] != null) b['ask'] as String,

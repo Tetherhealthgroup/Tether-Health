@@ -25,9 +25,11 @@ List<Map<String, Object?>> _inputs(Object? node) {
 }
 
 void main() {
-  test('the screen field table matches tether_ui/spec/screens', () {
+  test('the screen field table matches specs-and-design/tether_ui/spec/screens',
+      () {
     final fromSpec = <String, List<String>>{};
-    for (final file in Directory('tether_ui/spec/screens').listSync()) {
+    for (final file
+        in Directory('specs-and-design/tether_ui/spec/screens').listSync()) {
       if (!file.path.endsWith('.json')) continue;
       final d = jsonDecode(File(file.path).readAsStringSync()) as Map;
       final inputs = _inputs([d['body'], d['footer'], d['over']]);

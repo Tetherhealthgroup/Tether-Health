@@ -1,7 +1,7 @@
 // The app's endpoint registry: the production TApi for the tether_ui screens.
 //
 // Every endpoint string the generated screens submit
-// (tether_ui/spec/endpoints.json) has exactly one entry here, naming the one
+// (specs-and-design/tether_ui/spec/endpoints.json) has exactly one entry here, naming the one
 // service that owns it. Handlers are added by the tickets that wire each
 // service; until then a registered endpoint fails with `not_implemented`.
 //
@@ -62,7 +62,7 @@ class EndpointEntry {
   /// The one service that serves it.
   final OwnerService owner;
 
-  /// The spec's `queueable` flag (tether_ui/spec/endpoints.json).
+  /// The spec's `queueable` flag (specs-and-design/tether_ui/spec/endpoints.json).
   final bool queueable;
 
   /// A safety endpoint: its saves must be kept on the phone and retried, not
@@ -145,7 +145,7 @@ abstract final class RegistryCodes {
   static const String notLoaded = 'not_loaded';
 }
 
-/// Every endpoint in tether_ui/spec/endpoints.json, with its service.
+/// Every endpoint in specs-and-design/tether_ui/spec/endpoints.json, with its service.
 const List<EndpointEntry> endpointRegistry = [
   // Native Unplug calls.
   EndpointEntry('CALL device:unplug/endSession', OwnerService.device),

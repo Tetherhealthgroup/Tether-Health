@@ -9,10 +9,11 @@ void main() {
   test('the table holds every native slot id in the generated screens', () {
     final ids = <String>{};
     final slot = RegExp(r"TNativeSlot\(\s*id:\s*'([^']+)'");
-    for (final file in Directory('tether_ui/flutter/lib/screens')
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((f) => f.path.endsWith('.dart'))) {
+    for (final file
+        in Directory('specs-and-design/tether_ui/flutter/lib/screens')
+            .listSync(recursive: true)
+            .whereType<File>()
+            .where((f) => f.path.endsWith('.dart'))) {
       ids.addAll(slot
           .allMatches(file.readAsStringSync())
           .map((match) => match.group(1)!));

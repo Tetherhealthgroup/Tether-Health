@@ -14,7 +14,7 @@ import { DB_CANARY, FakePostgrest } from "./support/fake-postgrest";
 import { openApiDocument, openApiErrors } from "./support/openapi";
 
 /**
- * The three request shapes the app spec sends (tether_ui/spec/endpoints.json)
+ * The three request shapes the app spec sends (specs-and-design/tether_ui/spec/endpoints.json)
  * where the API had another: `POST /v1/account/export`, `PATCH
  * /v1/enrolments/consents` without a consent id, and `range` on the
  * records summary. End to end through the real app, guard, filters and

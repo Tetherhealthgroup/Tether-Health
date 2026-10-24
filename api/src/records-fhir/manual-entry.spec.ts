@@ -12,12 +12,12 @@ import {
 import { parseItemsQuery } from "./records-fhir.service";
 
 const NOW = Date.parse("2026-10-22T10:00:00.000Z");
-const SPEC = join(__dirname, "..", "..", "..", "tether_ui", "spec");
+const SPEC = join(__dirname, "..", "..", "..", "specs-and-design", "tether_ui", "spec");
 const rules = JSON.parse(
   readFileSync(join(SPEC, "rules.json"), "utf8"),
 ) as Record<string, { inputs: string[]; params: Record<string, unknown> }>;
 
-describe("parity with tether_ui/spec/rules.json", () => {
+describe("parity with specs-and-design/tether_ui/spec/rules.json", () => {
   it("the manual ranges are rec.manual's", () => {
     expect(rules["rec.manual"]?.params.ranges).toEqual(MANUAL_RANGES);
     expect(rules["rec.manual"]?.inputs).toEqual([

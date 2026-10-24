@@ -159,8 +159,8 @@ jobs:
       - run: pytest
       - run: mypy
 
-  # TH-906: the vendored UI package (tether_ui/, P-01). Generated files are
-  # never hand-edited (P-02): regenerating from tether_ui/generator must
+  # TH-906: the vendored UI package (specs-and-design/tether_ui/, P-01). Generated files are
+  # never hand-edited (P-02): regenerating from specs-and-design/tether_ui/generator must
   # reproduce the committed tree exactly.
   tether_ui:
     runs-on: ubuntu-latest
@@ -168,10 +168,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Spec validator (no loose ends)
-        working-directory: tether_ui/generator
+        working-directory: specs-and-design/tether_ui/generator
         run: python3 validate.py
       - name: Generator self-test (safety cases)
-        run: python3 tether_ui/generator/gen_dart.py
+        run: python3 specs-and-design/tether_ui/generator/gen_dart.py
       - name: Regeneration is diff-clean (in place, on a scratch copy)
         # Regenerates a scratch copy in place (generator inside the output
         # tree, as in the repo) and compares it with the checkout. Runs
@@ -179,17 +179,17 @@ jobs:
         run: |
           scratch="$RUNNER_TEMP/regen"
           mkdir -p "$scratch"
-          cp -R tether_ui "$scratch/"
+          cp -R specs-and-design/tether_ui "$scratch/"
           python3 "$scratch/tether_ui/generator/build_all.py"
           test -f "$scratch/tether_ui/generator/build_all.py"
-          diff -r -x __pycache__ tether_ui "$scratch/tether_ui"
+          diff -r -x __pycache__ specs-and-design/tether_ui "$scratch/tether_ui"
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.47.1
           channel: stable
           cache: true
       - name: Package pub get, analyze and test
-        working-directory: tether_ui/flutter
+        working-directory: specs-and-design/tether_ui/flutter
         run: |
           flutter pub get
           flutter analyze

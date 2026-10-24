@@ -29,13 +29,13 @@ icon, adaptive layers, listing lengths and wording).
 The mark is the logo in the design's screen header (Welcome and Today): a
 brand-teal circle (`#123C37`) with a lime (`#D5EF75`) leaf outline, next to
 the wordmark "Tether Health" in bold. The geometry is taken from the design's
-CSS (`tether_ui/generator/render_html.py`, `.logo i` and `.logo i::after`); see
+CSS (`specs-and-design/tether_ui/generator/render_html.py`, `.logo i` and `.logo i::after`); see
 the comment in `tether_mark.svg` for the derivation. Rendered at the design's
 size and compared with the mark in the design's Welcome screenshot, the leaf's
 angle differs by about 1 degree and its spread by under half a pixel.
 
 Note: the Flutter kit's header widget (`TLogoMark` in
-`tether_ui/flutter/lib/ui/components.dart`) draws Material's `eco_rounded`
+`specs-and-design/tether_ui/flutter/lib/ui/components.dart`) draws Material's `eco_rounded`
 icon instead of this leaf, so the in-app header and the design screenshots
 differ. The icons follow the design screenshots.
 
@@ -74,7 +74,7 @@ build ships them.
 
 Sources: the design's Welcome screen ("Care that meets you where you are." /
 "Small steps, practical support and no judgment, for the parts of your health
-you choose."), `tether_ui/spec/programs.json`, and the program screens in
+you choose."), `specs-and-design/tether_ui/spec/programs.json`, and the program screens in
 `lib/programs/`. No "treats", "cures", "diagnoses" or "clinically proven"; the
 test enforces a list of such words.
 

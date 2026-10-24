@@ -7,20 +7,20 @@ import 'approved_parity.dart';
 
 // Owner instruction: the UI must match Tether-Health/tether_ui. This test
 // fails the build when any of the owner-approved screens in
-// tether_ui/spec/screens changes without a recorded owner decision, goes
+// specs-and-design/tether_ui/spec/screens changes without a recorded owner decision, goes
 // missing, or when a screen appears that no owner decision added.
-// Procedure: tether_ui/approved/README.md.
+// Procedure: specs-and-design/tether_ui/approved/README.md.
 
 /// Number of screens in the owner's snapshot (tether_ui.zip, 2026-10-17).
 const approvedScreenCount = 183;
 
-/// sha256 of [manifestCanonicalText] for tether_ui/approved/manifest.json.
+/// sha256 of [manifestCanonicalText] for specs-and-design/tether_ui/approved/manifest.json.
 /// Changes only with a new owner snapshot.
 const ownerManifestDigest =
     '540be2a16c7fa2342c6dc401b9f4165b2359a038912369629ff20326ac39776a';
 
 const _regen = 'Regenerate from the repo root with '
-    '`python3 tether_ui/generator/build_all.py`, or restore it from git';
+    '`python3 specs-and-design/tether_ui/generator/build_all.py`, or restore it from git';
 
 /// Loads the registry and the screens under [root] and runs the check. Missing
 /// or unreadable inputs are reported as failures (never skipped), with the
@@ -60,7 +60,7 @@ List<String> checkTree(
   final dir = Directory('$root/$screensDir');
   if (!dir.existsSync()) {
     failures.add('$screensDir is missing (a generator run that failed part '
-        'way leaves spec/ removed). $_regen (git checkout -- tether_ui/spec).');
+        'way leaves spec/ removed). $_regen (git checkout -- specs-and-design/tether_ui/spec).');
   } else {
     try {
       for (final f in dir.listSync().whereType<File>()) {
@@ -329,7 +329,8 @@ void main() {
       final failures = runTree();
       expect(failures, hasLength(1));
       expect(failures.single, contains('$screensDir is missing'));
-      expect(failures.single, contains('tether_ui/generator/build_all.py'));
+      expect(failures.single,
+          contains('specs-and-design/tether_ui/generator/build_all.py'));
     });
 
     for (final name in ['manifest.json', 'deviations.json', 'additions.json']) {

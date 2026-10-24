@@ -1,4 +1,4 @@
-// GENERATED from tether_ui/spec/screens/*.json — the input fields of every
+// GENERATED from specs-and-design/tether_ui/spec/screens/*.json — the input fields of every
 // screen that has any: key, control type, option values (stable, English),
 // and the settings bind key. test/integration/screen_fields_test.dart checks
 // this table against the spec, so a spec change fails until it follows.

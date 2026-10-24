@@ -297,9 +297,9 @@ void main() {
 
     test('master artwork uses the design tokens', () {
       final svg = File('tool/brand/tether_mark.svg').readAsStringSync();
-      final tokens =
-          jsonDecode(File('tether_ui/design/tokens.json').readAsStringSync())
-              as Map;
+      final tokens = jsonDecode(
+          File('specs-and-design/tether_ui/design/tokens.json')
+              .readAsStringSync()) as Map;
       final colors = (tokens['colors'] ?? tokens['color']) as Map;
       expect(svg, contains('id="disc"'));
       expect(svg, contains('fill="${colors['teal']}"'));

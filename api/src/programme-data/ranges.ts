@@ -1,5 +1,5 @@
 /**
- * Ranges from tether_ui/spec/rules.json. A rule's range applies to an API
+ * Ranges from specs-and-design/tether_ui/spec/rules.json. A rule's range applies to an API
  * field only where the rule's `inputs` name the screen input that field
  * carries; every other numeric field has only the database's bound. The API
  * invents no clinical range. The parity test reads rules.json and fails if a

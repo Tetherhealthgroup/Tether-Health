@@ -3,7 +3,7 @@ from dsl import *
 from render_html import render_screen, CSS, e
 from validate import validate
 
-OUT = os.path.abspath('tether_ui')
+OUT = os.path.abspath(os.path.join('specs-and-design', 'tether_ui'))
 
 def describe(a):
     if not a: return 'disabled'
